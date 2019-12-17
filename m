@@ -2,91 +2,66 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B30C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 09:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B398C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63474207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 09:52:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cAIc/AxK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63474207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3273420733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:00:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3273420733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih9WN-0007KL-FV
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 04:52:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58581)
+	id 1ih9eQ-0000TO-AI
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 05:00:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ih9Ve-0006nN-IW
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 04:51:19 -0500
+ (envelope-from <yan.y.zhao@intel.com>) id 1ih9de-0008SH-81
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 04:59:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ih9Vd-0005mC-1Q
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 04:51:18 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46757)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ih9Vc-0005lB-PS
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 04:51:16 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z7so10503256wrl.13
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 01:51:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=NaKJgMspXK96PXPoxqU5GH9h7fCR/dnwBXYabK2mpw0=;
- b=cAIc/AxKJtt2hHo7ofHUIhkREZgqGhaYIhJdMu08F3fPmStTWD3NPY5NI05Rd46Qxi
- zbXBmsW1dxBOsnZBqohXZuHxNqQ5r2ZNl9Po5hYD0cvJ9LCKvX6aSVwlA7i+KNfggC32
- VzugRsX2/UATIKcYp+/CMY/Hd0wAevcLlKFnqxNwC9pW52qOHTorLraFAG7wu7fbSdci
- jJh0JHLlKq/CQjwg1TiWR4YYVwQlNvy+ASg2vFw+XBX0/Kla3rVFHSpcuxFBAIWypvLm
- rBegYoHaRKmON6jbS7A6JxLLOZXZxLarPGe0LwwM5hduy5Nl/0C0O5/NKIjIGReF0O/A
- 8gpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=NaKJgMspXK96PXPoxqU5GH9h7fCR/dnwBXYabK2mpw0=;
- b=nFxYAcL8zeSocLHUXxELyBiKdFCXlMrpqDW5lBAi56XUZQo3650e5wTtkNVK7hnytN
- iQaOhXfE24n4QxClAZDQqcA1lUpPl1xPh9d7PFYAxrIwhJVF7FS0ulYce9BZ0DXThEGx
- p43SL7J++XLr+BcQl7hGYYI9NxO0UXpXWWnCFIwkbtPOTUhB7gKA9jdUhRsNOfbAkf9T
- ug+5RU3ic3MG9qQ47VBaazCUnaELzDy1lxJoc9iZ8rv/CGQmxhm3KNshf6QeGKAFQ6Os
- WRfwygELhtwy2x7PrY2KDBmjGSXGab7WhSOp+9sI0vwCtkQPCgKwmwUwpGRlMHNXi9rq
- 8ibA==
-X-Gm-Message-State: APjAAAVtrbMOZpHyTGazbQkxWYs36LFOa+Nd9jaG4bx2eU6ll4crzBbY
- MUTt9UwWV7cptGp3wpgCvuZXjQ==
-X-Google-Smtp-Source: APXvYqxsdWLa7CWRH1VHH+fWhTsR8W03M/+76VkWVTBrHbb/FIArc9XIx2y/QA0c/A+hZFUoHZCwLQ==
-X-Received: by 2002:a05:6000:1052:: with SMTP id
- c18mr35828773wrx.268.1576576275364; 
- Tue, 17 Dec 2019 01:51:15 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id w22sm2250615wmk.34.2019.12.17.01.51.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Dec 2019 01:51:14 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4A9FD1FF87;
- Tue, 17 Dec 2019 09:51:13 +0000 (GMT)
-References: <87h83w4dod.fsf@keithp.com>
- <20191104204230.12249-1-keithp@keithp.com> <87h81zwdmw.fsf@linaro.org>
- <5a3b1155-4242-831c-8ae4-e9fb07f1cdb2@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v6)
-In-reply-to: <5a3b1155-4242-831c-8ae4-e9fb07f1cdb2@redhat.com>
-Date: Tue, 17 Dec 2019 09:51:13 +0000
-Message-ID: <87eex3wa9a.fsf@linaro.org>
+ (envelope-from <yan.y.zhao@intel.com>) id 1ih9db-0004WY-Eq
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 04:59:33 -0500
+Received: from mga11.intel.com ([192.55.52.93]:11182)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1ih9db-0004Bh-2j
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 04:59:31 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 17 Dec 2019 01:59:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,325,1571727600"; d="scan'208";a="212509611"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by fmsmga008.fm.intel.com with ESMTP; 17 Dec 2019 01:59:23 -0800
+Date: Tue, 17 Dec 2019 04:51:10 -0500
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20191217095110.GH21868@joy-OptiPlex-7040>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ <20191217051513.GE21868@joy-OptiPlex-7040>
+ <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,109 +73,419 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Keith Packard <keithp@keithp.com>,
- Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, qemu-arm@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Dec 17, 2019 at 05:24:14PM +0800, Kirti Wankhede wrote:
+> 
+> 
+> On 12/17/2019 10:45 AM, Yan Zhao wrote:
+> > On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:
+> >> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
+> >> - Start unpinned pages dirty pages tracking while migration is active and
+> >>    device is running, i.e. during pre-copy phase.
+> >> - Stop unpinned pages dirty pages tracking. This is required to stop
+> >>    unpinned dirty pages tracking if migration failed or cancelled during
+> >>    pre-copy phase. Unpinned pages tracking is clear.
+> >> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
+> >>    unpinned pages information on bitmap read. This ioctl returns bitmap of
+> >>    dirty pages, its user space application responsibility to copy content
+> >>    of dirty pages from source to destination during migration.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>   drivers/vfio/vfio_iommu_type1.c | 210 ++++++++++++++++++++++++++++++++++++++--
+> >>   1 file changed, 203 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> >> index 3f6b04f2334f..264449654d3f 100644
+> >> --- a/drivers/vfio/vfio_iommu_type1.c
+> >> +++ b/drivers/vfio/vfio_iommu_type1.c
+> >> @@ -70,6 +70,7 @@ struct vfio_iommu {
+> >>   	unsigned int		dma_avail;
+> >>   	bool			v2;
+> >>   	bool			nesting;
+> >> +	bool			dirty_page_tracking;
+> >>   };
+> >>   
+> >>   struct vfio_domain {
+> >> @@ -112,6 +113,7 @@ struct vfio_pfn {
+> >>   	dma_addr_t		iova;		/* Device address */
+> >>   	unsigned long		pfn;		/* Host pfn */
+> >>   	atomic_t		ref_count;
+> >> +	bool			unpinned;
+> >>   };
+> >>   
+> >>   struct vfio_regions {
+> >> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
+> >>   	kfree(vpfn);
+> >>   }
+> >>   
+> >> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
+> >> +{
+> >> +	struct rb_node *n = rb_first(&dma->pfn_list);
+> >> +
+> >> +	for (; n; n = rb_next(n)) {
+> >> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
+> >> +
+> >> +		if (warn)
+> >> +			WARN_ON_ONCE(vpfn->unpinned);
+> >> +
+> >> +		if (vpfn->unpinned)
+> >> +			vfio_remove_from_pfn_list(dma, vpfn);
+> >> +	}
+> >> +}
+> >> +
+> >> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
+> >> +{
+> >> +	struct rb_node *n = rb_first(&iommu->dma_list);
+> >> +
+> >> +	for (; n; n = rb_next(n)) {
+> >> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
+> >> +
+> >> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> >> +	}
+> >> +}
+> >> +
+> >>   static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+> >>   					       unsigned long iova)
+> >>   {
+> >> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
+> >>   	return vpfn;
+> >>   }
+> >>   
+> >> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+> >> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
+> >> +				  bool dirty_tracking)
+> >>   {
+> >>   	int ret = 0;
+> >>   
+> >>   	if (atomic_dec_and_test(&vpfn->ref_count)) {
+> >>   		ret = put_pfn(vpfn->pfn, dma->prot);
+> > if physical page here is put, it may cause problem when pin this iova
+> > next time:
+> > vfio_iommu_type1_pin_pages {
+> >      ...
+> >      vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+> >      if (vpfn) {
+> >          phys_pfn[i] = vpfn->pfn;
+> >          continue;
+> >      }
+> >      ...
+> > }
+> > 
+> 
+> Good point. Fixing it as:
+> 
+>                  vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+>                  if (vpfn) {
+> -                       phys_pfn[i] = vpfn->pfn;
+> -                       continue;
+> +                       if (vpfn->unpinned)
+> +                               vfio_remove_from_pfn_list(dma, vpfn);
+what about updating vpfn instead?
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 17/12/19 09:38, Alex Benn=C3=A9e wrote:
->>   Thread 3 (Thread 0x7f8b1959e700 (LWP 14017)):
->>   #0  0x00007f8b2ada900c in futex_wait_cancelable (private=3D0, expected=
-=3D0, futex_word=3D0x56213f5482e8 <console+136>) at ../sysdeps/unix/sysv/li=
-nux/futex-internal.h:88
->>   #1  0x00007f8b2ada900c in __pthread_cond_wait_common (abstime=3D0x0, m=
-utex=3D0x56213f548298 <console+56>, cond=3D0x56213f5482c0 <console+96>) at =
-pthread_cond_wait.c:502
->>   #2  0x00007f8b2ada900c in __pthread_cond_wait (cond=3Dcond@entry=3D0x5=
-6213f5482c0 <console+96>, mutex=3Dmutex@entry=3D0x56213f548298 <console+56>=
-) at pthread_cond_wait.c:655
->>   #3  0x000056213ea31a40 in qemu_semihosting_console_inc (env=3Denv@entr=
-y=3D0x56214138a680) at /home/alex/lsrc/qemu.git/hw/semihosting/console.c:151
->>   #4  0x000056213eab96e8 in do_arm_semihosting (env=3Denv@entry=3D0x5621=
-4138a680) at /home/alex/lsrc/qemu.git/target/arm/arm-semi.c:805
->>   #5  0x000056213eacd521 in handle_semihosting (cs=3D<optimized out>) at=
- /home/alex/lsrc/qemu.git/target/arm/helper.c:8476
->>   #6  0x000056213eacd521 in arm_cpu_do_interrupt (cs=3D<optimized out>) =
-at /home/alex/lsrc/qemu.git/target/arm/helper.c:8522
->>   #7  0x000056213e9e53d0 in cpu_handle_exception (ret=3D<synthetic point=
-er>, cpu=3D0x5621411fe2f0) at /home/alex/lsrc/qemu.git/accel/tcg/cpu-exec.c=
-:503
->>   #8  0x000056213e9e53d0 in cpu_exec (cpu=3Dcpu@entry=3D0x562141381550) =
-at /home/alex/lsrc/qemu.git/accel/tcg/cpu-exec.c:711
->>   #9  0x000056213e9b4f1f in tcg_cpu_exec (cpu=3D0x562141381550) at /home=
-/alex/lsrc/qemu.git/cpus.c:1473
->>   #10 0x000056213e9b715b in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x=
-562141381550) at /home/alex/lsrc/qemu.git/cpus.c:1781
->>   #11 0x000056213ef026fa in qemu_thread_start (args=3D<optimized out>) a=
-t /home/alex/lsrc/qemu.git/util/qemu-thread-posix.c:519
->>   #12 0x00007f8b2ada2fa3 in start_thread (arg=3D<optimized out>) at pthr=
-ead_create.c:486
->>   #13 0x00007f8b2acd14cf in clone () at ../sysdeps/unix/sysv/linux/x86_6=
-4/clone.S:95
->>
->>   Thread 1 (Thread 0x7f8b1c151680 (LWP 14010)):
->>   #0  0x00007f8b2ada900c in futex_wait_cancelable (private=3D0, expected=
-=3D0, futex_word=3D0x56213f52c7c8 <qemu_pause_cond+40>) at ../sysdeps/unix/=
-sysv/linux/futex-internal.h:88
->>   #1  0x00007f8b2ada900c in __pthread_cond_wait_common (abstime=3D0x0, m=
-utex=3D0x56213f52c8c0 <qemu_global_mutex>, cond=3D0x56213f52c7a0 <qemu_paus=
-e_cond>) at pthread_cond_wait.c:502
->>   #2  0x00007f8b2ada900c in __pthread_cond_wait (cond=3Dcond@entry=3D0x5=
-6213f52c7a0 <qemu_pause_cond>, mutex=3Dmutex@entry=3D0x56213f52c8c0 <qemu_g=
-lobal_mutex>) at pthread_cond_wait.c:655
->>   #3  0x000056213ef02e2b in qemu_cond_wait_impl (cond=3D0x56213f52c7a0 <=
-qemu_pause_cond>, mutex=3D0x56213f52c8c0 <qemu_global_mutex>, file=3D0x5621=
-3ef43700 "/home/alex/lsrc/qemu.git/cpus.c", line=3D1943) at /home/alex/lsrc=
-/qemu.git/util/qemu-thread-posix.c:173
->>   #4  0x000056213e9b74a4 in pause_all_vcpus () at /home/alex/lsrc/qemu.g=
-it/cpus.c:1943
->>   #5  0x000056213e9b74a4 in pause_all_vcpus () at /home/alex/lsrc/qemu.g=
-it/cpus.c:1923
->>   #6  0x000056213e9b7532 in do_vm_stop (state=3DRUN_STATE_SHUTDOWN, send=
-_stop=3D<optimized out>) at /home/alex/lsrc/qemu.git/cpus.c:1102
->>   #7  0x000056213e96b8fc in main (argc=3D<optimized out>, argv=3D<optimi=
-zed out>, envp=3D<optimized out>) at /home/alex/lsrc/qemu.git/vl.c:4473
->>
->> I guess my first question is why do we need a separate mutex/cond
->> variable for this operation? This seems like the sort of thing that the
->> BQL could protect.
+> +                       else {
+> +                               phys_pfn[i] = vpfn->pfn;
+> +                               continue;
+> +                       }
+>                  }
+> 
+> 
+> 
+> >> -		vfio_remove_from_pfn_list(dma, vpfn);
+> >> +		if (dirty_tracking)
+> >> +			vpfn->unpinned = true;
+> >> +		else
+> >> +			vfio_remove_from_pfn_list(dma, vpfn);
+> > so the unpinned pages before dirty page tracking is not treated as
+> > dirty?
+> > 
+> 
+> Yes. That's we agreed on previous version:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg663157.html
+> 
+> >>   	}
+> >>   	return ret;
+> >>   }
+> >> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
+> >>   }
+> >>   
+> >>   static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> >> -				    bool do_accounting)
+> >> +				    bool do_accounting, bool dirty_tracking)
+> >>   {
+> >>   	int unlocked;
+> >>   	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
+> >> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
+> >>   	if (!vpfn)
+> >>   		return 0;
+> >>   
+> >> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
+> >> +	if (vpfn->unpinned)
+> >> +		return 0;
+> >> +
+> >> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+> >>   
+> >>   	if (do_accounting)
+> >>   		vfio_lock_acct(dma, -unlocked, true);
+> >> @@ -583,7 +618,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>   
+> >>   		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> >>   		if (ret) {
+> >> -			vfio_unpin_page_external(dma, iova, do_accounting);
+> >> +			vfio_unpin_page_external(dma, iova, do_accounting,
+> >> +						 false);
+> >>   			goto pin_unwind;
+> >>   		}
+> >>   	}
+> >> @@ -598,7 +634,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>   
+> >>   		iova = user_pfn[j] << PAGE_SHIFT;
+> >>   		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> >> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> >> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
+> >>   		phys_pfn[j] = 0;
+> >>   	}
+> >>   pin_done:
+> >> @@ -632,7 +668,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+> >>   		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+> >>   		if (!dma)
+> >>   			goto unpin_exit;
+> >> -		vfio_unpin_page_external(dma, iova, do_accounting);
+> >> +		vfio_unpin_page_external(dma, iova, do_accounting,
+> >> +					 iommu->dirty_page_tracking);
+> >>   	}
+> >>   
+> >>   unpin_exit:
+> >> @@ -850,6 +887,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+> >>   	return bitmap;
+> >>   }
+> >>   
+> >> +/*
+> >> + * start_iova is the reference from where bitmaping started. This is called
+> >> + * from DMA_UNMAP where start_iova can be different than iova
+> >> + */
+> >> +
+> >> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
+> >> +				  size_t size, uint64_t pgsize,
+> >> +				  dma_addr_t start_iova, unsigned long *bitmap)
+> >> +{
+> >> +	struct vfio_dma *dma;
+> >> +	dma_addr_t i = iova;
+> >> +	unsigned long pgshift = __ffs(pgsize);
+> >> +
+> >> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
+> >> +		/* mark all pages dirty if all pages are pinned and mapped. */
+> >> +		if (dma->iommu_mapped) {
+> > This prevents pass-through devices from calling vfio_pin_pages to do
+> > fine grained log dirty.
+> 
+> Yes, I mentioned that in yet TODO item in cover letter:
+> 
+> "If IOMMU capable device is present in the container, then all pages are
+> marked dirty. Need to think smart way to know if IOMMU capable device's
+> driver is smart to report pages to be marked dirty by pinning those 
+> pages externally."
 >
-> No, please do not introduce more uses of the BQL from the CPU thread.
-> The problem seems to lie with the condition variable, not the mutex.
+why not just check first if any vpfn present for IOMMU capable devices?
 
-Well in this case we are holding the BQL anyway as we are being called
-from the interrupt context. The BQL protects all shared HW state outside
-of MMIO which is explicitly marked as doing it's own locking. That said
-I don't know if the semihosting console will always be called from a
-BQL held context.
+> 
+> >> +			dma_addr_t iova_limit;
+> >> +
+> >> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
+> >> +				     (dma->iova + dma->size) : (iova + size);
+> >> +
+> >> +			for (; i < iova_limit; i += pgsize) {
+> >> +				unsigned int start;
+> >> +
+> >> +				start = (i - start_iova) >> pgshift;
+> >> +
+> >> +				__bitmap_set(bitmap, start, 1);
+> >> +			}
+> >> +			if (i >= iova + size)
+> >> +				return;
+> >> +		} else {
+> >> +			struct rb_node *n = rb_first(&dma->pfn_list);
+> >> +			bool found = false;
+> >> +
+> >> +			for (; n; n = rb_next(n)) {
+> >> +				struct vfio_pfn *vpfn = rb_entry(n,
+> >> +							struct vfio_pfn, node);
+> >> +				if (vpfn->iova >= i) {
+> >> +					found = true;
+> >> +					break;
+> >> +				}
+> >> +			}
+> >> +
+> >> +			if (!found) {
+> >> +				i += dma->size;
+> >> +				continue;
+> >> +			}
+> >> +
+> >> +			for (; n; n = rb_next(n)) {
+> >> +				unsigned int start;
+> >> +				struct vfio_pfn *vpfn = rb_entry(n,
+> >> +							struct vfio_pfn, node);
+> >> +
+> >> +				if (vpfn->iova >= iova + size)
+> >> +					return;
+> >> +
+> >> +				start = (vpfn->iova - start_iova) >> pgshift;
+> >> +
+> >> +				__bitmap_set(bitmap, start, 1);
+> >> +
+> >> +				i = vpfn->iova + pgsize;
+> >> +			}
+> >> +		}
+> >> +		vfio_remove_unpinned_from_pfn_list(dma, false);
+> >> +	}
+> >> +}
+> >> +
+> >> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
+> >> +{
+> >> +	long bsize;
+> >> +
+> >> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
+> >> +		return -EINVAL;
+> >> +
+> >> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
+> >> +
+> >> +	if (bitmap_size < bsize)
+> >> +		return -EINVAL;
+> >> +
+> >> +	return bsize;
+> >> +}
+> >> +
+> >>   static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+> >>   			     struct vfio_iommu_type1_dma_unmap *unmap)
+> >>   {
+> >> @@ -2298,6 +2417,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+> >>   
+> >>   		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> >>   			-EFAULT : 0;
+> >> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> >> +		struct vfio_iommu_type1_dirty_bitmap range;
+> >> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> >> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> >> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> >> +		int ret;
+> >> +
+> >> +		if (!iommu->v2)
+> >> +			return -EACCES;
+> >> +
+> >> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> >> +				    bitmap);
+> >> +
+> >> +		if (copy_from_user(&range, (void __user *)arg, minsz))
+> >> +			return -EFAULT;
+> >> +
+> >> +		if (range.argsz < minsz || range.flags & ~mask)
+> >> +			return -EINVAL;
+> >> +
+> >> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> >> +			iommu->dirty_page_tracking = true;
+> >> +			return 0;
+> >> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> >> +			iommu->dirty_page_tracking = false;
+> >> +
+> >> +			mutex_lock(&iommu->lock);
+> >> +			vfio_remove_unpinned_from_dma_list(iommu);
+> >> +			mutex_unlock(&iommu->lock);
+> >> +			return 0;
+> >> +
+> >> +		} else if (range.flags &
+> >> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> >> +			uint64_t iommu_pgmask;
+> >> +			unsigned long pgshift = __ffs(range.pgsize);
+> >> +			unsigned long *bitmap;
+> >> +			long bsize;
+> >> +
+> >> +			iommu_pgmask =
+> >> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> >> +
+> >> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> >> +			    (range.pgsize - 1))
+> >> +				return -EINVAL;
+> >> +
+> >> +			if (range.iova & iommu_pgmask)
+> >> +				return -EINVAL;
+> >> +			if (!range.size || range.size > SIZE_MAX)
+> >> +				return -EINVAL;
+> >> +			if (range.iova + range.size < range.iova)
+> >> +				return -EINVAL;
+> >> +
+> >> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> >> +						   range.bitmap_size);
+> >> +			if (bsize)
+> >> +				return ret;
+> >> +
+> >> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> >> +			if (!bitmap)
+> >> +				return -ENOMEM;
+> >> +
+> >> +			ret = copy_from_user(bitmap,
+> >> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> >> +			if (ret)
+> >> +				goto bitmap_exit;
+> >> +
+> >> +			iommu->dirty_page_tracking = false;
+> > why iommu->dirty_page_tracking is false here?
+> > suppose this ioctl can be called several times.
+> > 
+> 
+> This ioctl can be called several times, but once this ioctl is called 
+> that means vCPUs are stopped and VFIO devices are stopped (i.e. in 
+> stop-and-copy phase) and dirty pages bitmap are being queried by user.
+> 
+can't agree that VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP can only be
+called in stop-and-copy phase.
+As stated in last version, this will cause QEMU to get a wrong expectation
+of VM downtime and this is also the reason for previously pinned pages
+before log_sync cannot be treated as dirty. If this get bitmap ioctl can
+be called early in save_setup phase, then it's no problem even all ram
+is dirty.
 
->
->> Secondly if the vCPU is paused (via console or gdbstub) we need to
->> unwind from our blocking position and be in a position to restart
->> cleanly.
->
-> Perhaps if fifo8_is_empty(&c->fifo) the CPU could update the PC back to
-> the SVC instruction and enter a halted state?  Perhaps with a new
-> CPU_INTERRUPT_* flag that would be checked in arm_cpu_has_work.
-
-I don't think the PC has been updated at this point - but we don't want
-that logic in the common semihosting code. If we cpu_loop_exit the
-exception is still in effect and will re-run when we start again.
-
-What we really want to do is fall back to the same halting semantics
-that leave us in qemu_wait_io_event until there is something to process.
-Is there any particular reason a blocking semihosting event isn't like
-any other IO event?
-
->
-> Paolo
-
-
---
-Alex Benn=C3=A9e
+Thanks
+Yan
+> 
+> 
+> > Thanks
+> > Yan
+> >> +			mutex_lock(&iommu->lock);
+> >> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
+> >> +					     range.pgsize, range.iova, bitmap);
+> >> +			mutex_unlock(&iommu->lock);
+> >> +
+> >> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
+> >> +					   range.bitmap_size) ? -EFAULT : 0;
+> >> +bitmap_exit:
+> >> +			kfree(bitmap);
+> >> +			return ret;
+> >> +		}
+> >>   	}
+> >>   
+> >>   	return -ENOTTY;
+> >> -- 
+> >> 2.7.0
+> >>
 
