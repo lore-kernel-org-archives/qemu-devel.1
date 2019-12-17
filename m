@@ -2,79 +2,84 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E98C2D0CD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C460C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:29:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11A6624680
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B34D2072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:29:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o6UZsbY0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A6624680
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L7j3VoaF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B34D2072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihElm-0005Z8-9y
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 10:28:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49473)
+	id 1ihEnN-00072S-9e
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 10:29:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49918)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ihElA-00053z-DT
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:27:41 -0500
+ (envelope-from <thuth@redhat.com>) id 1ihEmO-00068Q-Qi
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:28:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ihEl8-0006uk-TX
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:27:40 -0500
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:36004)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ihEl8-0006qG-Oq
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:27:38 -0500
-Received: by mail-oi1-x234.google.com with SMTP id c16so4888907oic.3
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 07:27:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xdCCfNsCVOXJc6B6aX2Y1faIl82TrW+R4iZY0KIqM5A=;
- b=o6UZsbY0LRwRPJeXgp8TdnUmTfG7AJ7DT44rLFWTPwGKmdhlJGZyydjVeJK8WR8b9i
- IyHY9Q4tl/L/G5Vz7dzs2Kp0bzSLIIvLOhwLF35aOEj96YinyaJ1Jc2fOZePUGZRKxr1
- 6hg/2CwTpArPXNy0krB1ycfYs0u/gIhYo7AStZ/HkuifhEvV1ctyXlY0FX5x+cUyjoLR
- l+KKXHGrsG5Wan+cD1saoPnyjXlJCkU7lzJwyE3+rzmQ9C9vzoK13HlYNG+Yk+l8HPfb
- IvgITPfefBaO/qjWhhOp8EgH2QcM7RV0FoeTtjtrae3KpS5vyJxaEyJzFrakW41CbrtT
- Cy0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xdCCfNsCVOXJc6B6aX2Y1faIl82TrW+R4iZY0KIqM5A=;
- b=AtooIesm5F3ACcybTZY1cK2z+3UyccayfMQJ1m08Pag45s5jzcbcEjengoX+sdi47p
- mbqJaX3PLmO3TSD+7tyD0Rc6flbeCk+Ihpvp9CS/JBF89e3iDMqLV9woxWfBiWN+4srY
- /PGjUzh4eVns7Pje5hTnLSW2G24K9gGEZJmi0xufXMep4NlLuILF63AwEILj43KFjhGG
- FnHIdnu0SCttXrbK7Iah2jDFaemJ8UHJrcDB8/uS73gc1fhFp1LY2ZjmWJYUI4LoehGS
- 2X7TB0biN7jM58efO9y45fbxzqmodbThb6WZED/nPutte1yb9JGJ5n/KZ61+UQ9HptLB
- MuXg==
-X-Gm-Message-State: APjAAAXiiBf9K9/yQo3a2nkukkRq8jtzj9qMYC/xmzKzbVtgxCWgWW07
- steLjT1XeuxLMCBcrdEQNdUHy8TuB+kvCBTkifm7yA==
-X-Google-Smtp-Source: APXvYqwvgJSsXWore8DUE3Dc858cKxsU8jZjE36Gj0Zl140607EVYvp0cIqs3xzC+On4cVQbNbu4dPaFHsTKOIMZvkA=
-X-Received: by 2002:aca:f5cc:: with SMTP id t195mr1781871oih.163.1576596457542; 
- Tue, 17 Dec 2019 07:27:37 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1ihEmL-0001E8-GL
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:28:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53991
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihEmL-0001Dx-1Q
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:28:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576596532;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=CXeMealuP7hjG2ThTWAelozFjETM1TZVh0hXRm7nnmM=;
+ b=L7j3VoaFb2r8M4zvCS+SAo+JSaswwsldM0itXpn+wWe3CUN8toxYfP9GGirNYOGUElDAf6
+ dcr7ret/kPpUTFZbl42LoMyoBxkrX/ClTxTCgQdeQzLaO+fol/VYzVSPj2rVCjeKQ7JR9E
+ vt1qArPFhO90S5rQkXiIPS8j/K5EH1c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-2TTKQu0FMuyZk0YtbHfyOA-1; Tue, 17 Dec 2019 10:28:48 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E6C0107ACC9;
+ Tue, 17 Dec 2019 15:28:47 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B86168872;
+ Tue, 17 Dec 2019 15:28:46 +0000 (UTC)
+Subject: Re: Vote against removing the bluetooth subsystem from Quemu.
+To: Andreas Scheucher <andreas.scheucher@otaya.cc>
+References: <mail.3cd9c49a-989a-40c1-b627-b2197ff912ce@storage.wm.amazon.com>
+ <0102016f14331e64-fc1b813a-187a-4ece-9c9e-8f78ea832fe9-000000@eu-west-1.amazonses.com>
+ <CAFEAcA8hXW7YhfsF60-wdzOHHf5e5yO9-bNSTWti9Z5kvJn4+g@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8eca441b-5939-24ec-03b0-ee64a8fc84c0@redhat.com>
+Date: Tue, 17 Dec 2019 16:28:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20191217051521.1239-1-crosa@redhat.com>
-In-Reply-To: <20191217051521.1239-1-crosa@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Dec 2019 15:27:26 +0000
-Message-ID: <CAFEAcA-2t7TiLjk-xY-Shp03TYizybYPns_kkL9vCXP4LufiSw@mail.gmail.com>
-Subject: Re: [PULL 00/15] Python queue 2019-12-17
-To: Cleber Rosa <crosa@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::234
+In-Reply-To: <CAFEAcA8hXW7YhfsF60-wdzOHHf5e5yO9-bNSTWti9Z5kvJn4+g@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 2TTKQu0FMuyZk0YtbHfyOA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +91,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Dec 2019 at 05:15, Cleber Rosa <crosa@redhat.com> wrote:
->
-> The following changes since commit 856ffa6465ad38a31603223eb057a253114ceaea:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20191216-1' into staging (2019-12-16 13:04:34 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/clebergnu/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to e42cb9678cee7ff7c28afe7917c1002d6d8fdc0d:
->
->   python/qemu: Remove unneeded imports in __init__ (2019-12-16 18:39:51 -0500)
->
-> ----------------------------------------------------------------
->
+On 17/12/2019 15.17, Peter Maydell wrote:
+> On Tue, 17 Dec 2019 at 14:13, Andreas Scheucher
+> <andreas.scheucher@otaya.cc> wrote:
+>> I found following note in the Qemu documentation: This option and the wh=
+ole bluetooth subsystem is considered as deprecated. If you still use it, p=
+lease send a mail to qemu-devel@nongnu.org where you describe your usecase.
+>=20
+>> As GPU passthrough is becoming more and more common (to run Linux / Wind=
+ows / Mac OS X simultaneously on the same host to prevent multiboot) on des=
+ktop systems, support for the use of the host Bluetooth device in Quemu VMs=
+ for sure will be a common use case: https://www.reddit.com/r/VFIO/
+>=20
+>> For me personally I just want to set up a setup supporting Windows & Lin=
+ux to use the first strong nVidia GPU for occasional gaming on Windows and =
+video editing with DaVinci Resolve under CentOs.
+>=20
+> Hi; thanks for your response. It's not clear from your email:
+> do you mean that you *currently, today* have a setup which uses
+> QEMU's bluetooth support; or do you just mean that you have
+> an idea for how you would like to use it in future ? The request
+> for users was really aimed mostly at finding if we had
+> any current users, because as far as we could tell the
+> code we have at the moment is just broken and doesn't
+> work at all.
 
+Right, if you have the QEMU bluetooth code in use somehow, please
+provide more details how you're using it (i.e. the QEMU command line
+etc.). Otherwise, be assured that the current bluetooth code won't be of
+any help for your topic, since it is likely completely broken. You then
+better pass-through a dedicated USB bluetooth adapter from your host to
+your instead, or simply use emulated USB mouse and keyboard with your
+macOS guest.
 
-Applied, thanks.
+ Thomas
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
