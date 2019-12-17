@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8912C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D34C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:05:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83C7820733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:05:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 384BD20733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:05:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hJ9N7d1E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83C7820733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KhdT80b8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384BD20733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih52s-0002zv-4c
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:05:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34585)
+	id 1ih52u-00034q-UM
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:05:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34013)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4jB-0001Nk-KN
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:58 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4ia-0000LX-Fu
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4jA-0006o4-Eo
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:57 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:38365 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4iZ-0005vz-8B
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:20 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36987 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4jA-0006G0-4I; Mon, 16 Dec 2019 23:44:56 -0500
+ id 1ih4iY-0005Zd-Tf; Mon, 16 Dec 2019 23:44:19 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWZ0qFjz9sT3; Tue, 17 Dec 2019 15:43:35 +1100 (AEDT)
+ id 47cQWV3DSZz9sSl; Tue, 17 Dec 2019 15:43:32 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557818;
- bh=hd3b5kZWmqs5s5i8WFPHWqDD8/H2XVn5MIFF9ib4lpM=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557814;
+ bh=SF6fWedF+5KWjn9BhcYbOsSQqaIC10oX6/pQpr5822g=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hJ9N7d1E8F4ddkP5mCdjTNaUgunRwvueDPtvCmQDq8xm7yMWzOCUFqdzfjU21y+fr
- +19YVLB7G72Ip3kB9b7dO5lFu5rOUNIa7hoFsoqdTMoJFNJaHN9QYXmIKiU065R/iZ
- Qh9IcZKZfGpuYMn81vV/zARI7lL2BuB/L725etvA=
+ b=KhdT80b8J/NZIKjKnnWmeVf2v3Q4fjbt1LyhWBUUopSdAXiEMMXX5VxJOa//wkvtX
+ 81g7wFGb9rrfN0868oz3lMe9dCzoVzmvyeRTffWEQ7sX1biomPfKh58njQBg/9xwyM
+ 7JyhB0aRjcYzisV4lFbP+H6hIU3pEDAJ+zIDuP0Q=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 42/88] spapr/xive: Configure number of servers in KVM
-Date: Tue, 17 Dec 2019 15:42:36 +1100
-Message-Id: <20191217044322.351838-43-david@gibson.dropbear.id.au>
+Subject: [PULL 30/88] ppc/pnv: Loop on the threads of the chip to find a
+ matching NVT
+Date: Tue, 17 Dec 2019 15:42:24 +1100
+Message-Id: <20191217044322.351838-31-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
@@ -75,84 +76,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The XIVE KVM devices now has an attribute to configure the number of
-interrupt servers. This allows to greatly optimize the usage of the VP
-space in the XIVE HW, and thus to start a lot more VMs.
+CPU_FOREACH() loops on all the CPUs of the machine which is incorrect.
+Each XIVE Presenter should scan only the HW threads of the chip it
+belongs to.
 
-Only set this attribute if available in order to support older POWER9
-KVM.
-
-The XIVE KVM device now reports the exhaustion of VPs upon the
-connection of the first VCPU. Check that in order to have a chance
-to provide a hint to the user.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <157478679392.67101.7843580591407950866.stgit@bahia.tlslab.ib=
-m.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20191125065820.927-5-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ hw/intc/pnv_xive.c | 61 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 35 insertions(+), 26 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 46c7609bd8..32b2809210 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -152,7 +152,8 @@ void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx=
-, Error **errp)
-=20
- void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 8055de89cf..9798bd9e72 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -377,34 +377,43 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, =
+uint8_t format,
+                               bool cam_ignore, uint8_t priority,
+                               uint32_t logic_serv, XiveTCTXMatch *match)
  {
--    SpaprXive *xive =3D SPAPR_MACHINE(qdev_get_machine())->xive;
-+    MachineState *ms =3D MACHINE(qdev_get_machine());
-+    SpaprXive *xive =3D SPAPR_MACHINE(ms)->xive;
-     unsigned long vcpu_id;
-     int ret;
-=20
-@@ -171,8 +172,16 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error *=
-*errp)
-     ret =3D kvm_vcpu_enable_cap(tctx->cs, KVM_CAP_PPC_IRQ_XIVE, 0, xive-=
->fd,
-                               vcpu_id, 0);
-     if (ret < 0) {
--        error_setg(errp, "XIVE: unable to connect CPU%ld to KVM device: =
-%s",
-+        Error *local_err =3D NULL;
+-    CPUState *cs;
++    PnvXive *xive =3D PNV_XIVE(xptr);
++    PnvChip *chip =3D xive->chip;
+     int count =3D 0;
+-
+-    CPU_FOREACH(cs) {
+-        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-        XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+-        int ring;
+-
+-        /*
+-         * Check the thread context CAM lines and record matches.
+-         */
+-        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_blk, =
+nvt_idx,
+-                                         cam_ignore, logic_serv);
+-        /*
+-         * Save the context and follow on to catch duplicates, that we
+-         * don't support yet.
+-         */
+-        if (ring !=3D -1) {
+-            if (match->tctx) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a "
+-                              "thread context NVT %x/%x\n",
+-                              nvt_blk, nvt_idx);
+-                return -1;
++    int i, j;
 +
-+        error_setg(&local_err,
-+                   "XIVE: unable to connect CPU%ld to KVM device: %s",
-                    vcpu_id, strerror(errno));
-+        if (errno =3D=3D ENOSPC) {
-+            error_append_hint(&local_err, "Try -smp maxcpus=3DN with N <=
- %u\n",
-+                              ms->smp.max_cpus);
-+        }
-+        error_propagate(errp, local_err);
-         return;
++    for (i =3D 0; i < chip->nr_cores; i++) {
++        PnvCore *pc =3D chip->cores[i];
++        CPUCore *cc =3D CPU_CORE(pc);
++
++        for (j =3D 0; j < cc->nr_threads; j++) {
++            PowerPCCPU *cpu =3D pc->threads[j];
++            XiveTCTX *tctx;
++            int ring;
++
++            tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
++
++            /*
++             * Check the thread context CAM lines and record matches.
++             */
++            ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_b=
+lk,
++                                             nvt_idx, cam_ignore, logic_=
+serv);
++            /*
++             * Save the context and follow on to catch duplicates, that =
+we
++             * don't support yet.
++             */
++            if (ring !=3D -1) {
++                if (match->tctx) {
++                    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found =
+a "
++                                  "thread context NVT %x/%x\n",
++                                  nvt_blk, nvt_idx);
++                    return -1;
++                }
++
++                match->ring =3D ring;
++                match->tctx =3D tctx;
++                count++;
+             }
+-
+-            match->ring =3D ring;
+-            match->tctx =3D tctx;
+-            count++;
+         }
      }
 =20
-@@ -758,6 +767,16 @@ int kvmppc_xive_connect(SpaprInterruptController *in=
-tc, uint32_t nr_servers,
-         return -1;
-     }
-=20
-+    /* Tell KVM about the # of VCPUs we may have */
-+    if (kvm_device_check_attr(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
-+                              KVM_DEV_XIVE_NR_SERVERS)) {
-+        if (kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
-+                              KVM_DEV_XIVE_NR_SERVERS, &nr_servers, true=
-,
-+                              &local_err)) {
-+            goto fail;
-+        }
-+    }
-+
-     /*
-      * 1. Source ESB pages - KVM mapping
-      */
 --=20
 2.23.0
 
