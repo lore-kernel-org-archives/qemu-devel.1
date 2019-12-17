@@ -2,108 +2,111 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255CCC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1CEC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:44:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E357220733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:42:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAC8420733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:44:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YsgEO1Mg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E357220733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="lXDg7t/S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAC8420733
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihHnI-0003BL-2x
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 13:42:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50186)
+	id 1ihHpT-0004TE-QS
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 13:44:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihHma-0002c5-KE
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:41:22 -0500
+ (envelope-from <amarkovic@wavecomp.com>) id 1ihHoj-00042B-Cv
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:43:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihHmY-0005Du-2s
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:41:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20751
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihHmX-0005Dg-U1
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:41:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576608076;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=f3sATrBClMlY9DL8gW1dd+a7IVwIb+RF5yx+AhagqTs=;
- b=YsgEO1MgAXonfVCEUUru68ldI2EbLEVwNuXKqqV1F5n3FUicXjSmi8L0hnp+OuaE4BFoFV
- lWPINtzjvxhd6TyQv+6gZIVt3uhNdfeNTDbWA3nS9v45K2n9SzvBJSSrSBbxAYmlB3GqpN
- 5ns2GIAY9guLOkAqoddaPXtrtpMIEJA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-430-GoRygTFgM5OTI9bt3GAYYg-1; Tue, 17 Dec 2019 13:41:12 -0500
-Received: by mail-wr1-f72.google.com with SMTP id t3so5675455wrm.23
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 10:41:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=f3sATrBClMlY9DL8gW1dd+a7IVwIb+RF5yx+AhagqTs=;
- b=TwJRK++Iv3Y2hyFkqSiJ4+HyZtwF4eKVzhqLeCyiNPM2qUM/osVzBTeUeBaPawz+Fj
- h4PsF8H66OSU178Bk7IjIsTVcauGvAMJG9q8F18FZTJD9SAcmURxvZxWpjSdE8wdBW3Y
- vokXq9M6Oa33sTzYHGas+oPes0it8WqmsUng7bp/MFAy1rICXcEOhuJLQ/llvDxM3XsH
- p3Zt+rXE7O2D+uKwPE+DIfJsNgkyo+GyFb3SHZ4BZquuqwYh9GxG11lXK85Lb4wXA2Eh
- +ITiNK8tuB+021jZuDy3At58+H3jf/BdO5SWc2Yge4D8wv4gjTwIRAHQQBaZf7M03tvW
- 6VMg==
-X-Gm-Message-State: APjAAAUasrDxDhtRtFiJ2niDIF37JAQVqi9FjBwsTaiw3jPfnia4CEdy
- wkbs3myZUJfZRmdMjnmezCdhuvEtyF2cod5rryLFSWPLCx4sheRelvG7ABaBXIh7EesVn4RF1Hj
- 9Wyob3+jYkkY7UY4=
-X-Received: by 2002:adf:8bde:: with SMTP id w30mr37713387wra.124.1576608071012; 
- Tue, 17 Dec 2019 10:41:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxWQlkCrF0qLhfAE6wosHqnc7/G8Ve6lFUTxQfmPbzGJrhntByBLyTs6IRUbYvQBIHFO92LVQ==
-X-Received: by 2002:adf:8bde:: with SMTP id w30mr37713365wra.124.1576608070714; 
- Tue, 17 Dec 2019 10:41:10 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id u14sm26933372wrm.51.2019.12.17.10.41.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Dec 2019 10:41:10 -0800 (PST)
-Subject: Re: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
-To: Peter Maydell <peter.maydell@linaro.org>,
- Taylor Simpson <tsimpson@quicinc.com>
-References: <BYAPR02MB48863165DEE32E5C563E93F4DE650@BYAPR02MB4886.namprd02.prod.outlook.com>
- <CAL1e-=jvmJNiZR4iLDL-97qm=v+2s0cwn5YTzJQ=JZ_gwOe4tQ@mail.gmail.com>
- <BYAPR02MB4886C8D82898F1E406C124F8DE7E0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <BYAPR02MB48865884056A88B660B620FCDE770@BYAPR02MB4886.namprd02.prod.outlook.com>
- <87d0dw83uz.fsf@linaro.org>
- <BYAPR02MB48866E2D82D9C76ABBECA842DE760@BYAPR02MB4886.namprd02.prod.outlook.com>
- <ffe58977-f251-df34-4bd0-62e32f78cc1a@linaro.org>
- <SN6PR02MB48953397AA553FA7456E7CFCDE700@SN6PR02MB4895.namprd02.prod.outlook.com>
- <BYAPR02MB488640DD7CC887E5FCC0F167DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
- <CAFEAcA-TpZfqbWjGX-tD0Osapt_K4yuTBg6+B=ZxU4MuVr7omg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ffdee96f-c9dc-0281-d4bc-da53e518e020@redhat.com>
-Date: Tue, 17 Dec 2019 19:41:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-TpZfqbWjGX-tD0Osapt_K4yuTBg6+B=ZxU4MuVr7omg@mail.gmail.com>
+ (envelope-from <amarkovic@wavecomp.com>) id 1ihHoh-0007iz-Mj
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:43:32 -0500
+Received: from mail-co1nam11on2098.outbound.protection.outlook.com
+ ([40.107.220.98]:57248 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1ihHoh-0007i7-8E
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:43:31 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OwT/A47a5jFb0ACtYEbxfk7yo/h2J+wkfER1gv8ZZqMSnULHMdfsOyRGHKyRxrxbT5kMUkI/bfl1ZSFGxek/iM6lChqFeU6ofJkYGTl4b8wizw1zO72KcBzfFi0IE+hXH1B9nxM+qsPqBbnzYxOHVv9PqwG99WVE26H6LaPQO3zv+IXYs2Ch4f/BWmwYNTnhSaWk8xvxIeIlp1anhlvfZ42Zyk+1U73UwqT8c33vpEWKS7O/3kSAsrg56RozJLB5+qBAeUtzvoSDdPH35e3uPh6C80c7KAXoEuLCPOZwQV9SdqgyegsvoNz1hjUBVXIaiHROfegI+1h6fmSfC2ntvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z0sr2XzWo+k2zZ23WMeUwBZxTSFaCZ/oKRIBuEMYdpU=;
+ b=dBZgJjIGA3WFejM6EywiIdl2OPkYcrRmnQJjHWUjw9lvl0lXt0zn/GPfTfHax20d1xdJpS9ZaHBY9EC3/tcIc/+c+EOM64cR/bRaveUSa24ewXq+rjLjbMSSUIOwy06h6ZrJzQRK2skOvOe8227XDvFgjUVQchpTglnw8HlAmHnNe5U+vXQNvxkfCJ9jppD9Ey34L8Lm+aNcmGGtB+AfKLhkgcWmTzIW/59Ov80RvCxUFjiZP5cZZaK2VIiZDdjfooXhoOCzE2Oo6fiKWlzcjIlgvDgybg8wTungFSD+iR4RUzDk8GOdZxI641sJJJOrpqJmv1IR6/SdpQcxfWfJGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z0sr2XzWo+k2zZ23WMeUwBZxTSFaCZ/oKRIBuEMYdpU=;
+ b=lXDg7t/S9LRrHmn4rEI8OA2ivpaxD6VEGGmu5g2t1RtyVYW/Eaf1PS90qVetQCDtvzUr/wacOuocPzEa79Sl36QdUl5y6YXFEr4bScGf40O48R8ujGkMJSqDLIHtasyzW3gsZGtZvEdr+uoad7AHipkpkkTTedNHxJm1yahT048=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+ BN6PR2201MB1202.namprd22.prod.outlook.com (10.174.80.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2538.15; Tue, 17 Dec 2019 18:43:27 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::8d7a:f373:d18d:db1c]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::8d7a:f373:d18d:db1c%10]) with mapi id 15.20.2538.019; Tue, 17 Dec
+ 2019 18:43:27 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: Thomas Huth <thuth@redhat.com>, =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?=
+ <philmd@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [EXTERNAL]Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
+Thread-Topic: [EXTERNAL]Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
+Thread-Index: AQHVtQVdxqpnuV46RUSu9/QyBLijlKe+qQT5
+Date: Tue, 17 Dec 2019 18:43:27 +0000
+Message-ID: <BN6PR2201MB1251317E014311162EDA9507C6500@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20191125104103.28962-1-philmd@redhat.com>,
+ <691a359f-f923-5e2d-6beb-2f9c0a0aca8c@redhat.com>
+In-Reply-To: <691a359f-f923-5e2d-6beb-2f9c0a0aca8c@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-MC-Unique: GoRygTFgM5OTI9bt3GAYYg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5b14dcc4-4775-487a-dfc4-08d78321015a
+x-ms-traffictypediagnostic: BN6PR2201MB1202:
+x-microsoft-antispam-prvs: <BN6PR2201MB12022E56A7F45BC7634E84E9C6500@BN6PR2201MB1202.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 02543CD7CD
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(346002)(39850400004)(366004)(376002)(136003)(189003)(199004)(5660300002)(508600001)(9686003)(86362001)(55016002)(2906002)(66446008)(66946007)(66556008)(64756008)(66476007)(71200400001)(110136005)(33656002)(81156014)(8676002)(91956017)(76116006)(54906003)(81166006)(8936002)(26005)(6506007)(53546011)(316002)(55236004)(4326008)(7696005)(186003)(52536014)(42413003)(586874002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1202;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: eHrOWRpeUwE1SE77Xk16HT9nB/4bAtpcFtTYh3dOB1q+f0W5HY+yeWwvFjZvZyNjgjtOgGP4ziBYGRE0wyrYqdCwC+WU23oFPkuVgMGxnrsdiUVINfOm3ycdgMRcf29W+CsW98WESeN2PJy1lr5UsGXo7Yta5usH0OhHkKZWi0oJ0YlDk8MdLmlGjIymxvctmHwZJEEGX+cgHaN/T8ME8H7IJmgkXF54KJvgL0WftwqutHlLhGoDMClFaF4fBzZm77QeKQsk6RJQpM3Gp067g8KNmtqaViw2E9RV/IZ3Oypcnw9VZmPLk91zWtkJiN181i+uudAywkCtUJSOZ0bDQdVAypRxcoc87XILZWox1KH47fuMpR+cooQN91QCIIdzWc96/niEVngeKZJq+rKcGTjTkIASAHNtQPnzneocQ2J83FT9LuTEiYCNTqf2eL2p2MydVxa2LwjGnfkVYWER7p6G7i26vP7EwVzE/bK4rnuqx7wMwysC9Vsd2lcvtz+hx6UMPb6F/6tok6lFEoUJYw==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b14dcc4-4775-487a-dfc4-08d78321015a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2019 18:43:27.1378 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: M0bxqCAp1zBXj63K+IhMhRIDH3jtqmszxR7wjPvE5PtuBh8g/Eb9MOtMSSoENIRYtjyKFZiwX7tZT6aKhoPe1w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1202
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.220.98
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,148 +118,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alessandro Di Federico <ale@rev.ng>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Niccol=c3=b2_Izzo?= <izzoniccolo@gmail.com>,
- "nizzo@rev.ng" <nizzo@rev.ng>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?iso-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/17/19 7:21 PM, Peter Maydell wrote:
-> On Tue, 17 Dec 2019 at 18:16, Taylor Simpson <tsimpson@quicinc.com> wrote:
->> Question 1:
->> I see this error from checkpatch.pl
->> ERROR: Macros with complex values should be enclosed in parenthesis
->> However, there are times when the code will not compile with parenthesis.  For example, we have a file that defined all the instruction attributes.  Each line has
->> DEF_ATTRIB(LOAD, "Loads from memory", "", "")
->> So, we create an enum of all the possible attributes as follows
->> enum {
->> #define DEF_ATTRIB(NAME, ...) A_##NAME,
->> #include "attribs_def.h"
->> #undef DEF_ATTRIB
->> };
-> 
-> checkpatch is often right, but also often wrong,
-> especially for C macros which are in the general case
-> impossible to parse. If the error makes no sense, you can
-> ignore it.
-> 
->> Question 2:
->> What is the best source of guidance on breaking down support for a new target into a patch series?
-> 
-> Look at how previous ports did it.
-
-Recent ports were system (softmmu), this is a linux-user port. The last 
-architecture merged is RISCV, they did that with commit, so I'm not sure 
-this is our best example on breaking down:
-
-$ git show --stat ea10325917c8
-commit ea10325917c8a8f92611025c85950c00f826cb73
-Author: Michael Clark <mjc@sifive.com>
-Date:   Sat Mar 3 01:31:10 2018 +1300
-
-     RISC-V Disassembler
-
-     The RISC-V disassembler has no dependencies outside of the 'disas'
-     directory so it can be applied independently. The majority of the
-     disassembler is machine-generated from instruction set metadata:
-
-     - https://github.com/michaeljclark/riscv-meta
-
-     Expected checkpatch errors for consistency and brevity reasons:
-
-     ERROR: line over 90 characters
-     ERROR: trailing statements should be on next line
-     ERROR: space prohibited between function name and open parenthesis '('
-
-     Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-     Signed-off-by: Michael Clark <mjc@sifive.com>
-
-  include/disas/bfd.h |    2 +
-  disas.c             |    2 +
-  disas/riscv.c       | 3048 
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  disas/Makefile.objs |    1 +
-  4 files changed, 3053 insertions(+)
-
-$ git show --stat 55c2a12cbcd3d
-commit 55c2a12cbcd3d417de39ee82dfe1d26b22a07116
-Author: Michael Clark <mjc@sifive.com>
-Date:   Sat Mar 3 01:31:11 2018 +1300
-
-     RISC-V TCG Code Generation
-
-     TCG code generation for the RV32IMAFDC and RV64IMAFDC. The QEMU
-     RISC-V code generator has complete coverage for the Base ISA v2.2,
-     Privileged ISA v1.9.1 and Privileged ISA v1.10:
-
-     - RISC-V Instruction Set Manual Volume I: User-Level ISA Version 2.2
-     - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.9.1
-     - RISC-V Instruction Set Manual Volume II: Privileged ISA Version 1.10
-
-     Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-     Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-     Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
-     Signed-off-by: Michael Clark <mjc@sifive.com>
-
-  target/riscv/instmap.h   |  364 ++++++++++++++++++++++++++++++++++++++
-  target/riscv/translate.c | 1978 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  2 files changed, 2342 insertions(+)
-
-$ git show --stat 47ae93cdfed
-commit 47ae93cdfedc683c56e19113d516d7ce4971c8e6
-Author: Michael Clark <mjc@sifive.com>
-Date:   Sat Mar 3 01:31:11 2018 +1300
-
-     RISC-V Linux User Emulation
-
-     Implementation of linux user emulation for RISC-V.
-
-     Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-     Signed-off-by: Sagar Karandikar <sagark@eecs.berkeley.edu>
-     Signed-off-by: Michael Clark <mjc@sifive.com>
-
-  linux-user/riscv/syscall_nr.h     | 287 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  linux-user/riscv/target_cpu.h     |  18 +++++++++++++
-  linux-user/riscv/target_elf.h     |  14 ++++++++++
-  linux-user/riscv/target_signal.h  |  23 ++++++++++++++++
-  linux-user/riscv/target_structs.h |  46 ++++++++++++++++++++++++++++++++
-  linux-user/riscv/target_syscall.h |  56 
-++++++++++++++++++++++++++++++++++++++
-  linux-user/riscv/termbits.h       | 222 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  linux-user/syscall_defs.h         |  13 +++++----
-  target/riscv/cpu_user.h           |  13 +++++++++
-  linux-user/elfload.c              |  22 +++++++++++++++
-  linux-user/main.c                 |  99 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  linux-user/signal.c               | 203 
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-  linux-user/syscall.c              |   2 ++
-  13 files changed, 1012 insertions(+), 6 deletions(-)
-
-
-> Also I thought we'd
-> had a subthread on how best to split things up, but maybe I'm
-> misremembering.
-
-I remember something too, I hope you are right :P
-
->>   I see avr being reviewed currently.  I have mostly new files: 12 in linux-user/hexagon, and ~50 in target/hexagon.  I also need to add test cases and a container for the toolchain.  Is it OK to break things down mostly at file boundaries?
-> 
-> No, file boundaries are generally a bad choice of breakdown.
-> You want to split at conceptual boundaries, ie one chunk
-> of functionality that can be comprehended in one go without
-> having to refer forward to other patches.
-> 
-> thanks
-> -- PMM
-> 
-
+=0A=
+=0A=
+________________________________________=0A=
+From: Thomas Huth <thuth@redhat.com>=0A=
+Sent: Tuesday, December 17, 2019 7:10 PM=0A=
+To: Philippe Mathieu-Daud=E9; qemu-devel@nongnu.org=0A=
+Cc: libvir-list@redhat.com; Herv=E9 Poussineau; Aleksandar Markovic; Aleksa=
+ndar Rikalo; Aurelien Jarno=0A=
+Subject: [EXTERNAL]Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine=
+=0A=
+=0A=
+ Hi,=0A=
+=0A=
+On 25/11/2019 11.41, Philippe Mathieu-Daud=E9 wrote:=0A=
+> > diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi=0A=
+> > index 4b4b7425ac..05265b43c8 100644=0A=
+> > --- a/qemu-deprecated.texi=0A=
+> > +++ b/qemu-deprecated.texi=0A=
+> > @@ -266,6 +266,11 @@ The 'scsi-disk' device is deprecated. Users should=
+ use 'scsi-hd' or=0A=
+> >=0A=
+> >  @section System emulator machines=0A=
+> >=0A=
+> > +@subsection mips r4k platform (since 4.2)=0A=
+> =0A=
+> Since the patch has now been merged after the release of 4.2, the mips=0A=
+> 4k platform will be deprecated in 5.0 instead. Could you send a patch to=
+=0A=
+> fix it up?=0A=
+=0A=
+OK, I'll send a patch that'll certainly be applied to the next MIPS queue.=
+=0A=
+=0A=
+Thanks for spotting this, Thomas.=0A=
+=0A=
+Aleksandar=0A=
+=0A=
+>  Thanks,=0A=
+>   Thomas=0A=
+=0A=
 
