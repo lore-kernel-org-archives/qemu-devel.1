@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC1BC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAB2C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:01:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6873F20733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:00:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 852B520733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:01:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PipfyywD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6873F20733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="X/TXAZPi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 852B520733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih4y7-0005cN-FU
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:00:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34045)
+	id 1ih4yu-00066H-Aa
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:01:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4ib-0000NZ-Es
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:22 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4i2-0008CH-G7
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:43:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4ia-0005xE-CK
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:21 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:47239 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4i1-0005SR-7V
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:43:46 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51863 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4ia-0005aQ-1G; Mon, 16 Dec 2019 23:44:20 -0500
+ id 1ih4i0-0005Ko-T4; Mon, 16 Dec 2019 23:43:45 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWV6T2Mz9sSv; Tue, 17 Dec 2019 15:43:33 +1100 (AEDT)
+ id 47cQWR547Yz9sSX; Tue, 17 Dec 2019 15:43:29 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557814;
- bh=ey4PkgIVy1Dh/wZ3ywzkhTE9eyeU/5i9x3xN5XfNKH4=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557811;
+ bh=z9QUoRpZ10vAUbFSnp5wy0y9JozdiioGdb647sP2Mqw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=PipfyywDpH4HMBUg0w+fH764+JCgVoE5K1H6A3nCe8kPLTqLq7gj++jG7Z0mtnOMY
- yMy3gdryG169YyxW4TK3v2kPqgdFwrOoKSCmGPeR98amu9W0RY61BGmSHWAwRaLOL3
- TaQaygHnnNfr1aIV2e2kOVxSuZ8v6ha74PTQvIqk=
+ b=X/TXAZPik/kVDT/nyVLQgoYMExWlJ0CAAah+Yy667Bfd+p3H8OJMlXXQEgsctdsrA
+ fhcxSvac5hQt3HYBdZgTLL4I6NI2xSyekxlYWy07GygdS6KmYCBYF00djaUKvokIFE
+ aes7SdjxqYiL6PyGxEYOOuqKSuTru6Pht0n0d1Dc=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 35/88] ppc/pnv: Implement the XiveFabric interface
-Date: Tue, 17 Dec 2019 15:42:29 +1100
-Message-Id: <20191217044322.351838-36-david@gibson.dropbear.id.au>
+Subject: [PULL 17/88] ppc/xive: Record the IPB in the associated NVT
+Date: Tue, 17 Dec 2019 15:42:11 +1100
+Message-Id: <20191217044322.351838-18-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
@@ -77,84 +77,69 @@ Sender: "Qemu-devel"
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The CAM line matching on the PowerNV machine now scans all chips of
-the system and all CPUs of a chip to find a dispatched NVT in the
-thread contexts.
+When an interrupt can not be presented to a vCPU, because it is not
+running on any of the HW treads, the XIVE presenter updates the
+Interrupt Pending Buffer register of the associated XIVE NVT
+structure. This is only done if backlog is activated in the END but
+this is generally the case.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+The current code assumes that the fields of the NVT structure is
+architected with the same layout of the thread interrupt context
+registers. Fix this assumption and define an offset for the IPB
+register backup value in the NVT.
+
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20191125065820.927-10-clg@kaod.org>
+Message-Id: <20191115162436.30548-2-clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ hw/intc/xive.c             | 11 +++++++++--
+ include/hw/ppc/xive_regs.h |  1 +
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 8f688f4efc..5b8b07f6ae 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -1443,6 +1443,35 @@ static void pnv_pic_print_info(InterruptStatsProvi=
-der *obj,
-     }
- }
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 3d472e29c8..177663d2b4 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1607,14 +1607,21 @@ static void xive_router_end_notify(XiveRouter *xr=
+tr, uint8_t end_blk,
+      * - logical server : forward request to IVPE (not supported)
+      */
+     if (xive_end_is_backlog(&end)) {
++        uint8_t ipb;
++
+         if (format =3D=3D 1) {
+             qemu_log_mask(LOG_GUEST_ERROR,
+                           "XIVE: END %x/%x invalid config: F1 & backlog\=
+n",
+                           end_blk, end_idx);
+             return;
+         }
+-        /* Record the IPB in the associated NVT structure */
+-        ipb_update((uint8_t *) &nvt.w4, priority);
++        /*
++         * Record the IPB in the associated NVT structure for later
++         * use. The presenter will resend the interrupt when the vCPU
++         * is dispatched again on a HW thread.
++         */
++        ipb =3D xive_get_field32(NVT_W4_IPB, nvt.w4) | priority_to_ipb(p=
+riority);
++        nvt.w4 =3D xive_set_field32(NVT_W4_IPB, nvt.w4, ipb);
+         xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
 =20
-+static int pnv_match_nvt(XiveFabric *xfb, uint8_t format,
-+                         uint8_t nvt_blk, uint32_t nvt_idx,
-+                         bool cam_ignore, uint8_t priority,
-+                         uint32_t logic_serv,
-+                         XiveTCTXMatch *match)
-+{
-+    PnvMachineState *pnv =3D PNV_MACHINE(xfb);
-+    int total_count =3D 0;
-+    int i;
-+
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        Pnv9Chip *chip9 =3D PNV9_CHIP(pnv->chips[i]);
-+        XivePresenter *xptr =3D XIVE_PRESENTER(&chip9->xive);
-+        XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
-+        int count;
-+
-+        count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_ign=
-ore,
-+                               priority, logic_serv, match);
-+
-+        if (count < 0) {
-+            return count;
-+        }
-+
-+        total_count +=3D count;
-+    }
-+
-+    return total_count;
-+}
-+
- static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
-                               void *opaque, Error **errp)
- {
-@@ -1506,9 +1535,11 @@ static void pnv_machine_power8_class_init(ObjectCl=
-ass *oc, void *data)
- static void pnv_machine_power9_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-+    XiveFabricClass *xfc =3D XIVE_FABRIC_CLASS(oc);
-=20
-     mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER9";
-     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
-+    xfc->match_nvt =3D pnv_match_nvt;
-=20
-     mc->alias =3D "powernv";
- }
-@@ -1555,6 +1586,10 @@ static const TypeInfo types[] =3D {
-         .name          =3D MACHINE_TYPE_NAME("powernv9"),
-         .parent        =3D TYPE_PNV_MACHINE,
-         .class_init    =3D pnv_machine_power9_class_init,
-+        .interfaces =3D (InterfaceInfo[]) {
-+            { TYPE_XIVE_FABRIC },
-+            { },
-+        },
-     },
-     {
-         .name          =3D MACHINE_TYPE_NAME("powernv8"),
+         /*
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index 55307cd153..530f232b04 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -255,6 +255,7 @@ typedef struct XiveNVT {
+         uint32_t        w2;
+         uint32_t        w3;
+         uint32_t        w4;
++#define NVT_W4_IPB               PPC_BITMASK32(16, 23)
+         uint32_t        w5;
+         uint32_t        w6;
+         uint32_t        w7;
 --=20
 2.23.0
 
