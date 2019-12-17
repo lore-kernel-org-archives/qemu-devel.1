@@ -2,64 +2,98 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA15C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5D6C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2F0D206B7
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:02:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F0D206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 620772082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:11:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620772082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5wA-0005Q0-VR
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 01:02:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55608)
+	id 1ih650-0007Jn-Km
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 01:11:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1ih5Kc-0005uj-Ac
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:23:40 -0500
+ (envelope-from <sbhat@linux.ibm.com>) id 1ih64N-0006nr-8Z
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:10:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1ih5KZ-0007XT-N7
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:23:37 -0500
-Received: from mga17.intel.com ([192.55.52.151]:56569)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1ih5KZ-0006xQ-An
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:23:35 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Dec 2019 21:23:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,324,1571727600"; d="scan'208";a="365258184"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga004.jf.intel.com with ESMTP; 16 Dec 2019 21:23:26 -0800
-Date: Tue, 17 Dec 2019 00:15:13 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20191217051513.GE21868@joy-OptiPlex-7040>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
- <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ (envelope-from <sbhat@linux.ibm.com>) id 1ih64M-00081a-CE
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:10:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35692)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1ih64M-0007yv-57
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:10:54 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBH67TjA139294
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 01:10:52 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wwdvn6j40-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 01:10:52 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
+ Tue, 17 Dec 2019 06:10:50 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 17 Dec 2019 06:10:48 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBH6Ala544892256
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 17 Dec 2019 06:10:47 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 781AE11C05B;
+ Tue, 17 Dec 2019 06:10:47 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4677911C04A;
+ Tue, 17 Dec 2019 06:10:46 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.124.35.229])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 17 Dec 2019 06:10:46 +0000 (GMT)
+Subject: Re: [PATCH v3 3/3] spapr: Add Hcalls to support PAPR NVDIMM device
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <157107820388.27733.3565652855304038259.stgit@lep8c.aus.stglabs.ibm.com>
+ <157107827730.27733.6442960086351627702.stgit@lep8c.aus.stglabs.ibm.com>
+ <20191122051121.GE5582@umbus.fritz.box>
+From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Date: Tue, 17 Dec 2019 11:40:45 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.5.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
+In-Reply-To: <20191122051121.GE5582@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19121706-0020-0000-0000-00000398FBC2
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121706-0021-0000-0000-000021F015FC
+Message-Id: <60ac495d-a6ef-f182-1c08-4061e362919e@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-17_01:2019-12-16,2019-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ mlxlogscore=958 lowpriorityscore=0 malwarescore=0 spamscore=0 bulkscore=0
+ suspectscore=0 clxscore=1015 phishscore=0 impostorscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912170055
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,364 +105,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, sbhat@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start unpinned pages dirty pages tracking while migration is active and
->   device is running, i.e. during pre-copy phase.
-> - Stop unpinned pages dirty pages tracking. This is required to stop
->   unpinned dirty pages tracking if migration failed or cancelled during
->   pre-copy phase. Unpinned pages tracking is clear.
-> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
->   unpinned pages information on bitmap read. This ioctl returns bitmap of
->   dirty pages, its user space application responsibility to copy content
->   of dirty pages from source to destination during migration.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 210 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 203 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 3f6b04f2334f..264449654d3f 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -70,6 +70,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -112,6 +113,7 @@ struct vfio_pfn {
->  	dma_addr_t		iova;		/* Device address */
->  	unsigned long		pfn;		/* Host pfn */
->  	atomic_t		ref_count;
-> +	bool			unpinned;
->  };
->  
->  struct vfio_regions {
-> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
->  	kfree(vpfn);
->  }
->  
-> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
-> +{
-> +	struct rb_node *n = rb_first(&dma->pfn_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
-> +
-> +		if (warn)
-> +			WARN_ON_ONCE(vpfn->unpinned);
-> +
-> +		if (vpfn->unpinned)
-> +			vfio_remove_from_pfn_list(dma, vpfn);
-> +	}
-> +}
-> +
-> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_remove_unpinned_from_pfn_list(dma, false);
-> +	}
-> +}
-> +
->  static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  					       unsigned long iova)
->  {
-> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  	return vpfn;
->  }
->  
-> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
-> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
-> +				  bool dirty_tracking)
->  {
->  	int ret = 0;
->  
->  	if (atomic_dec_and_test(&vpfn->ref_count)) {
->  		ret = put_pfn(vpfn->pfn, dma->prot);
-if physical page here is put, it may cause problem when pin this iova
-next time:
-vfio_iommu_type1_pin_pages {
-    ...
-    vpfn = vfio_iova_get_vfio_pfn(dma, iova);
-    if (vpfn) {
-        phys_pfn[i] = vpfn->pfn;
-        continue;
-    }
-    ...
-}
+Hi David,
 
-> -		vfio_remove_from_pfn_list(dma, vpfn);
-> +		if (dirty_tracking)
-> +			vpfn->unpinned = true;
-> +		else
-> +			vfio_remove_from_pfn_list(dma, vpfn);
-so the unpinned pages before dirty page tracking is not treated as
-dirty?
 
->  	}
->  	return ret;
->  }
-> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
->  }
->  
->  static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
-> -				    bool do_accounting)
-> +				    bool do_accounting, bool dirty_tracking)
->  {
->  	int unlocked;
->  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
-> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->  	if (!vpfn)
->  		return 0;
->  
-> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
-> +	if (vpfn->unpinned)
-> +		return 0;
-> +
-> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
->  
->  	if (do_accounting)
->  		vfio_lock_acct(dma, -unlocked, true);
-> @@ -583,7 +618,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
->  		if (ret) {
-> -			vfio_unpin_page_external(dma, iova, do_accounting);
-> +			vfio_unpin_page_external(dma, iova, do_accounting,
-> +						 false);
->  			goto pin_unwind;
->  		}
->  	}
-> @@ -598,7 +634,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		iova = user_pfn[j] << PAGE_SHIFT;
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
->  		phys_pfn[j] = 0;
->  	}
->  pin_done:
-> @@ -632,7 +668,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->  		if (!dma)
->  			goto unpin_exit;
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(dma, iova, do_accounting,
-> +					 iommu->dirty_page_tracking);
->  	}
->  
->  unpin_exit:
-> @@ -850,6 +887,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +/*
-> + * start_iova is the reference from where bitmaping started. This is called
-> + * from DMA_UNMAP where start_iova can be different than iova
-> + */
-> +
-> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, uint64_t pgsize,
-> +				  dma_addr_t start_iova, unsigned long *bitmap)
-> +{
-> +	struct vfio_dma *dma;
-> +	dma_addr_t i = iova;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +
-> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> +		/* mark all pages dirty if all pages are pinned and mapped. */
-> +		if (dma->iommu_mapped) {
-This prevents pass-through devices from calling vfio_pin_pages to do
-fine grained log dirty.
-> +			dma_addr_t iova_limit;
-> +
-> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
-> +				     (dma->iova + dma->size) : (iova + size);
-> +
-> +			for (; i < iova_limit; i += pgsize) {
-> +				unsigned int start;
-> +
-> +				start = (i - start_iova) >> pgshift;
-> +
-> +				__bitmap_set(bitmap, start, 1);
-> +			}
-> +			if (i >= iova + size)
-> +				return;
-> +		} else {
-> +			struct rb_node *n = rb_first(&dma->pfn_list);
-> +			bool found = false;
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +							struct vfio_pfn, node);
-> +				if (vpfn->iova >= i) {
-> +					found = true;
-> +					break;
-> +				}
-> +			}
-> +
-> +			if (!found) {
-> +				i += dma->size;
-> +				continue;
-> +			}
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				unsigned int start;
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +							struct vfio_pfn, node);
-> +
-> +				if (vpfn->iova >= iova + size)
-> +					return;
-> +
-> +				start = (vpfn->iova - start_iova) >> pgshift;
-> +
-> +				__bitmap_set(bitmap, start, 1);
-> +
-> +				i = vpfn->iova + pgsize;
-> +			}
-> +		}
-> +		vfio_remove_unpinned_from_pfn_list(dma, false);
-> +	}
-> +}
-> +
-> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
-> +{
-> +	long bsize;
-> +
-> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
-> +		return -EINVAL;
-> +
-> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return bsize;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -2298,6 +2417,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap range;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    bitmap);
-> +
-> +		if (copy_from_user(&range, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (range.argsz < minsz || range.flags & ~mask)
-> +			return -EINVAL;
-> +
-> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			iommu->dirty_page_tracking = true;
-> +			return 0;
-> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			iommu->dirty_page_tracking = false;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			vfio_remove_unpinned_from_dma_list(iommu);
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +
-> +		} else if (range.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			uint64_t iommu_pgmask;
-> +			unsigned long pgshift = __ffs(range.pgsize);
-> +			unsigned long *bitmap;
-> +			long bsize;
-> +
-> +			iommu_pgmask =
-> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> +
-> +			if (((range.pgsize - 1) & iommu_pgmask) !=
-> +			    (range.pgsize - 1))
-> +				return -EINVAL;
-> +
-> +			if (range.iova & iommu_pgmask)
-> +				return -EINVAL;
-> +			if (!range.size || range.size > SIZE_MAX)
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +
-> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> +						   range.bitmap_size);
-> +			if (bsize)
-> +				return ret;
-> +
-> +			bitmap = kmalloc(bsize, GFP_KERNEL);
-> +			if (!bitmap)
-> +				return -ENOMEM;
-> +
-> +			ret = copy_from_user(bitmap,
-> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
-> +			if (ret)
-> +				goto bitmap_exit;
-> +
-> +			iommu->dirty_page_tracking = false;
-why iommu->dirty_page_tracking is false here?
-suppose this ioctl can be called several times.
+On 11/22/2019 10:41 AM, David Gibson wrote:
+> On Mon, Oct 14, 2019 at 01:38:16PM -0500, Shivaprasad G Bhat wrote:
+>> device_add/del phase itself instead.
+>>
+>> The guest kernel makes bind/unbind requests for the virtual NVDIMM device
+>> at the region level granularity. Without interleaving, each virtual NVDIMM
+> It's not clear to me what a "region" means in this context.
 
-Thanks
-Yan
-> +			mutex_lock(&iommu->lock);
-> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
-> +					     range.pgsize, range.iova, bitmap);
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
-> +					   range.bitmap_size) ? -EFAULT : 0;
-> +bitmap_exit:
-> +			kfree(bitmap);
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
-> -- 
-> 2.7.0
-> 
+That is PMEM terminology. "region" in this context is guest physical
+address range.
+
+Fixing all the rest of the things you pointed out.
+
+Thanks,
+Shivaprasad
+
+>
+
 
