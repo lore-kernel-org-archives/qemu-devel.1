@@ -2,85 +2,79 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D0F4C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C767C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:36:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 359EB20716
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49BD320717
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:36:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fzBOj6eQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 359EB20716
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YwEtO0uv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49BD320717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihA3i-0007tt-CD
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 05:26:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47464)
+	id 1ihACv-0001EI-F0
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 05:36:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ihA34-0007Tf-5Y
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:25:51 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ihACI-0000hx-EK
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:35:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ihA30-0006hr-SW
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:25:48 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22088
+ (envelope-from <stefanha@redhat.com>) id 1ihACG-0007Zr-7Q
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:35:22 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52916
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihA30-0006f9-4m
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:25:46 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihACF-0007YT-Mt
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:35:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576578345;
+ s=mimecast20190719; t=1576578918;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YpEEspXTfhvuqd/JM76Z3jQ5wplc4fS/KP6yqEZkFOw=;
- b=fzBOj6eQDrwi+Piti4L9bbpZDAK9K25yD0KjSD1S4s400kkG3ubb6ywSf3Ydc0pEqO/qyV
- HpMokVPcDRGuWCxXfh2blCnjaivFLzg3eSwZorC7ndggrwSPYQIQ/Bk6Og9a9mFsa4Udu4
- 4j7Y9KveNb6KBP2DRl3P4OmdlswINGE=
+ bh=+mchDPGKuVz25Sj1QUyFdMAi9DRB/iI2JTClmINdtGA=;
+ b=YwEtO0uvw0tgN6TUpyUkwZe+g4w/GIoy0tz1TGcRwg5M4GH6lFRo+ZTuaqSbHXZ9auPPoD
+ ZUcXHvfinILUnlTNqKE3WVXOKrfUo0bn1ABW9T3uK4YgNqYdzYC6z3WYIzT77dJu4FHRSK
+ fP6e5hIyZ6CwoLSzzoKk4udEr4DGowo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-bbq2dfDJPh684Cm5cUiD6A-1; Tue, 17 Dec 2019 05:25:42 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-430-pT5spJt-MquSCSjOI5N38Q-1; Tue, 17 Dec 2019 05:35:14 -0500
+X-MC-Unique: pT5spJt-MquSCSjOI5N38Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A9DF593A1;
- Tue, 17 Dec 2019 10:25:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
- [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 990B860C63;
- Tue, 17 Dec 2019 10:25:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 2548311386A7; Tue, 17 Dec 2019 11:25:39 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH] util/cutils: Expand do_strtosz parsing precision to 64
- bits
-References: <20191205021459.29920-1-tao3.xu@intel.com>
- <87a786sse9.fsf@dusky.pond.sub.org>
- <b7c442e3-cc7e-155e-5370-db9a371928a6@intel.com>
-Date: Tue, 17 Dec 2019 11:25:39 +0100
-In-Reply-To: <b7c442e3-cc7e-155e-5370-db9a371928a6@intel.com> (Tao Xu's
- message of "Mon, 9 Dec 2019 13:38:39 +0800")
-Message-ID: <87y2vbgsf0.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F90F102CE15;
+ Tue, 17 Dec 2019 10:35:13 +0000 (UTC)
+Received: from localhost (ovpn-117-244.ams2.redhat.com [10.36.117.244])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C174151;
+ Tue, 17 Dec 2019 10:35:12 +0000 (UTC)
+Date: Tue, 17 Dec 2019 10:35:11 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: qemu-project git server not utf-8 clean?
+Message-ID: <20191217103511.GC1267701@stefanha-x1.localdomain>
+References: <87k16ww7wl.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: bbq2dfDJPh684Cm5cUiD6A-1
+In-Reply-To: <87k16ww7wl.fsf@linaro.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ABTtc+pdwF7KHXCz"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,187 +86,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>
+Cc: jeff@codyprime.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tao Xu <tao3.xu@intel.com> writes:
+--ABTtc+pdwF7KHXCz
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On 12/5/19 11:29 PM, Markus Armbruster wrote:
->> Tao Xu <tao3.xu@intel.com> writes:
->>
->>> Parse input string both as a double and as a uint64_t, then use the
->>> method which consumes more characters. Update the related test cases.
->>>
->>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->>> ---
->> [...]
->>> diff --git a/util/cutils.c b/util/cutils.c
->>> index 77acadc70a..b08058c57c 100644
->>> --- a/util/cutils.c
->>> +++ b/util/cutils.c
->>> @@ -212,24 +212,43 @@ static int do_strtosz(const char *nptr, const cha=
-r **end,
->>>                         const char default_suffix, int64_t unit,
->>>                         uint64_t *result)
->>>   {
->>> -    int retval;
->>> -    const char *endptr;
->>> +    int retval, retd, retu;
->>> +    const char *suffix, *suffixd, *suffixu;
->>>       unsigned char c;
->>>       int mul_required =3D 0;
->>> -    double val, mul, integral, fraction;
->>> +    bool use_strtod;
->>> +    uint64_t valu;
->>> +    double vald, mul, integral, fraction;
->>
->> Note for later: @mul is double.
->>
->>> +
->>> +    retd =3D qemu_strtod_finite(nptr, &suffixd, &vald);
->>> +    retu =3D qemu_strtou64(nptr, &suffixu, 0, &valu);
+On Mon, Dec 16, 2019 at 04:29:46PM +0000, Alex Benn=E9e wrote:
+>=20
+> Hi,
+>=20
+> I was doing some housekeeping of the wiki links into the docs page and I
+> discovered my name getting corrupted for:
+>=20
+>   https://git.qemu.org/?p=3Dqemu.git;a=3Dblob_plain;f=3Ddocs/devel/tcg-pl=
+ugins.rst;hb=3DHEAD
+>=20
+> Looking at the headers:
+>=20
+>   HTTP/1.1 200 OK
+>   Date: Mon, 16 Dec 2019 16:24:50 GMT
+>   Server: Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips PHP/5.4.16
+>   Content-disposition: inline; filename=3D"docs/devel/tcg-plugins.rst"
+>   Keep-Alive: timeout=3D5, max=3D100
+>   Connection: Keep-Alive
+>   Transfer-Encoding: chunked
+>   Content-Type: text/plain; charset=3DISO-8859-1
+>=20
+> Shouldn't we (Apache/gitweb?) be passing UTF-8 contents?
 
-Note for later: passing 0 to base accepts octal and hexadecimal
-integers.
+Strange, apache is configured to use UTF-8 by default and the gitweb
+documentation indicates the web server default charset is used.
 
->>> +    use_strtod =3D strlen(suffixd) < strlen(suffixu);
->>> +
->>> +    /*
->>> +     * Parse @nptr both as a double and as a uint64_t, then use the me=
-thod
->>> +     * which consumes more characters.
->>> +     */
->>
->> The comment is in a funny place.  I'd put it right before the
->> qemu_strtod_finite() line.
->>
->>> +    if (use_strtod) {
->>> +        suffix =3D suffixd;
->>> +        retval =3D retd;
->>> +    } else {
->>> +        suffix =3D suffixu;
->>> +        retval =3D retu;
->>> +    }
->>>   -    retval =3D qemu_strtod_finite(nptr, &endptr, &val);
->>>       if (retval) {
->>>           goto out;
->>>       }
->>
->> This is even more subtle than it looks.
->>
->> A close reading of the function contracts leads to three cases for each
->> conversion:
->>
->> * parse error (including infinity and NaN)
->>
->>    @retu / @retd is -EINVAL
->>    @valu / @vald is uninitialized
->>    @suffixu / @suffixd is @nptr
->>
->> * range error
->>
->>    @retu / @retd is -ERANGE
->>    @valu / @vald is our best approximation of the conversion result
->>    @suffixu / @suffixd points to the first character not consumed by the
->>    conversion.
->>
->>    Sub-cases:
->>
->>    - uint64_t overflow
->>
->>      We know the conversion result exceeds UINT64_MAX.
->>
->>    - double overflow
->>
->>      we know the conversion result's magnitude exceeds the largest
->>      representable finite double DBL_MAX.
->>
->>    - double underflow
->>
->>      we know the conversion result is close to zero (closer than DBL_MIN=
-,
->>      the smallest normalized positive double).
->>
->> * success
->>
->>    @retu / @retd is 0
->>    @valu / @vald is the conversion result
->>    @suffixu / @suffixd points to the first character not consumed by the
->>    conversion.
->>
->> This leads to a matrix (parse error, uint64_t overflow, success) x
->> (parse error, double overflow, double underflow, success).  We need to
->> check the code does what we want for each element of this matrix, and
->> document any behavior that's not perfectly obvious.
->>
->> (success, success): we pick uint64_t if qemu_strtou64() consumed more
->> characters than qemu_strtod_finite(), else double.  "More" is important
->> here; when they consume the same characters, we *need* to use the
->> uint64_t result.  Example: for "18446744073709551615", we need to use
->> uint64_t 18446744073709551615, not double 18446744073709551616.0.  But
->> for "18446744073709551616.", we need to use the double.  Good.
+Anyway, it is fixed now.  I forced gitweb's charset by changing
+/etc/gitweb.conf.
 
-Also fun: for "0123", we use uint64_t 83, not double 123.0.  But for
-"0123.", we use 123.0, not 83.
+Stefan
 
-Do we really want to accept octal and hexadecimal integers?
+--ABTtc+pdwF7KHXCz
+Content-Type: application/pgp-signature; name="signature.asc"
 
->> (success, parse error) and (parse error, success): we pick the one that
->> succeeds, because success consumes characters, and failure to parse does
->> not.  Good.
->>
->> (parse error, parse error): neither consumes characters, so we pick
->> uint64_t.  Good.
->>
->> (parse error, double overflow), (parse error, double underflow) and
->> (uint64_t overflow, parse error): we pick the range error, because it
->> consumes characters.  Good.
->>
->> These are the simple combinations.  The remainder are hairier: (success,
->> double overflow), (success, double underflow), (uint64_t overflow,
->> success).  I lack the time to analyze them today.  Must be done before
->> we take this patch.  Any takers?
->
-> (success, double overflow), (success, double underflow), pick double
-> overflow error, return -ERANGE. Because it consumes
-> characters. Example: for "1.79769e+309", qemu_strtou64 consumes "1",
-> and prases as uint64_t; but qemu_strtod_finite return -ERANGE and
-> consumes all characters. It is OK.
+-----BEGIN PGP SIGNATURE-----
 
-The only way to have double overflow when uint64_t succeeds is an
-exponent.  Double consumes the characters making up the exponent,
-uint64_t does not.  We use double.
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl34r18ACgkQnKSrs4Gr
+c8jgkAf5AV9PM8l8om7vyIDy6FYQjuYHnxjEhperPToVs7BiElSgdMX3Y4B8NNX5
+fuySc8Hrj6ttRdHykiBJmk1fTyO9W/5j20FHaJz3ehRa6gfTTQO0J8TMCz/t8jM3
+zdjJNZvghVko8ZNJeJRwZJOtrpa3et9jKiKg4V+z1b1mZFEslHw1EjwGRczF+txv
+nlJebCRTHnFkwWNjQP+bWBzn3X9qwKmzGoXWyOKt0sKtucFxcjeRLLMjaLVVRSsh
+msgfyTOvA7h72mhHFVon/AguWNN9EYd3Zog2Slnt+N6svRBQHkoyeFXaCwks+1FZ
+z4ZmzKfgwPuX18j1Lk+fAQGyPF9Xdg==
+=/A10
+-----END PGP SIGNATURE-----
 
-The only way to have double underflow is with an exponent or a decimal
-point.  Double consumes their characters, uint64_t does not.  We use
-double.
-
-Okay.
-
-> (uint64_t overflow, success), consume the same characters, use the
-> uint64_t return -ERANGE. Note that even if qemu_strtod_finite can
-> parse these cases such as "18446744073709551617", but the result is
-> uint64_t so we also need to return -ERANGE. It is OK.
-
-That's just one of two cases, I think.  The other one is when the
-overflowing integer is followed by an exponent or decimal point.  We use
-double then.  Converting the double to uint64_t overflows, except when a
-negative exponent brings the number into range.
-
-Examples: "18446744073709551617" picks uint64_t overflow,
-"18446744073709551617.0" picks double success (but converting it to
-uint64_t below overflows), and "18446744073709551617e-10" picks double
-success (converted to 1844674407 below).
-
-Okay.
-
-> Thank you for your analysis and suggestion. I will add more test cases
-> to cover some of these analysis.
-
-Good move.
+--ABTtc+pdwF7KHXCz--
 
 
