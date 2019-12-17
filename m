@@ -2,82 +2,82 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF61C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F774C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A53BF2067C
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:11:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C7372067C
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:14:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elez5hmr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53BF2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="veGF3xKa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C7372067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihHK8-0007ss-LF
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 13:11:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39151)
+	id 1ihHMb-0000vt-DU
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 13:14:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40454)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ihHJT-0007Ph-0B
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:11:16 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ihHLw-0000Sy-TM
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:13:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ihHJP-00060u-JZ
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:11:12 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59150
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihHJP-0005se-3T
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:11:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576606270;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=wkIcpolS57vVS9fzxwArH0a1QlqpQA80PbbohhHK3QA=;
- b=elez5hmrypax/s5mbRefY4gnwgV45HUaJudPt9OcvSC7EmsyZQCmQ2dBLWTOlbcsAUuIvs
- VQ5FZB7CIjKOseWCsuLmDTDJAumrKSaO8RZcbaiKdy2ZbeAG4T+ZLUOw2jizr50wm/9/rb
- fqpC7aFokSI7F+UrlPPG/e5B22xhMcs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-xkpdJ5YmODGctiMPoews1w-1; Tue, 17 Dec 2019 13:11:05 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 216A918A6ED3;
- Tue, 17 Dec 2019 18:11:04 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 30A7B19427;
- Tue, 17 Dec 2019 18:10:56 +0000 (UTC)
-Subject: Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191125104103.28962-1-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <691a359f-f923-5e2d-6beb-2f9c0a0aca8c@redhat.com>
-Date: Tue, 17 Dec 2019 19:10:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1ihHLv-0006fi-Gb
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:13:48 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:46205)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ihHLv-0006eu-9e
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:13:47 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id c22so3470023otj.13
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 10:13:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=tC3wW3n5O1INqhutE2gaG6tKCVqJW9cCEUGwo50wAOw=;
+ b=veGF3xKajsmAUseXgIinO3Mxx29G6jdVS3JMxEjdWATrRPnlL0KJk4cna/vWiDpWBv
+ 8GHDDXeBwDio7RQ+zDfs+BA4kUt1o1a5LT/5m2bF4AfFM9Z1JElbjn4jFpJJIOlYlpau
+ o8ppp4+NA7n6ogoa3NjZlYbtlF/14HshkzXBxgOKa/WmCnR7HNI50qBH2v4n7OOjnte1
+ 5H4QZ0QXG2svhFA6XOE5FxHY5hd5T3oXMAWTUJnbNRWoi+PGRmn8vftQNOWg/J+TRXVf
+ 5tMeI8TabXgFYLG0Wxb41lhk5r6yepMhzxIZNwNdp1/AQLIHj/Q36GL9yIAjoyDt4Zkq
+ +nig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tC3wW3n5O1INqhutE2gaG6tKCVqJW9cCEUGwo50wAOw=;
+ b=oC2EZ7CFM0j2MV21qbHvWhy0Fm1x4GfGjjKsWzetbeSVkHSZAL0PpZFkELc7sZmnTP
+ COi9cj2mX9/eHh61xjRWU2WQ5vCuL97Xv5pdbgLaeqtknX9o2GxYRCB1sy4zKlDiom9I
+ crdwyiDGm//uyeQ94CoAMSvg1izuHRp8haOiNyQ+XYZIXBYdgNNq6zAeWY6y/8M1T2hd
+ yiSh9WEgV9vUhlJLgk4Z4xy3sb8Yy2NpkCXuk1EKwKun0qTi1OTo3WKMYxyY5YRKK1cr
+ m6QR3szW6JOeZ+WVGW3fSAmOYja57cCtGbk1LJEyHg/QTowUF5T0UQ0wMAXQBqmQGxwK
+ RE2A==
+X-Gm-Message-State: APjAAAWi2vJuv7JRSMNXed/V5GPQv27+BtE4USLd4D5Yl8wVLKcPyD8w
+ viLINnr68pIhG9xjfT3bIizhdA+NvKJyxPLu/oTRMQ==
+X-Google-Smtp-Source: APXvYqxTAkn4W1agc55+zJuJc+HcSYG/2pFKA5TQK/kdl+on28PjouKhXHtvkzbpIBE2qBYEexhwCZ2Mg6bbm32kdC8=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr39457173otq.135.1576606426402; 
+ Tue, 17 Dec 2019 10:13:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191125104103.28962-1-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: xkpdJ5YmODGctiMPoews1w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+References: <1576605445-28158-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1576605445-28158-1-git-send-email-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Dec 2019 18:13:35 +0000
+Message-ID: <CAFEAcA96uWaOD0wN5g6Q7+eMH-RbkiCYo-aE-d_KvkSFVmUP3Q@mail.gmail.com>
+Subject: Re: [PULL v2 00/62] Misc patches for 2019-12-16
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +89,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi,
+On Tue, 17 Dec 2019 at 17:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> The following changes since commit 084a398bf8aa7634738e6c6c0103236ee1b3b7=
+2f:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2019-12-13 18:14:07 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 74c14076700436f9d340652042c81f46eaf0cf9f:
+>
+>   colo: fix return without releasing RCU (2019-12-17 14:03:44 +0100)
+>
+> ----------------------------------------------------------------
+> * More uses of RCU_READ_LOCK_GUARD (Dave, myself)
+> * QOM doc improvments (Greg)
+> * Cleanups from the Meson conversion (Marc-Andr=C3=A9)
+> * Support for multiple -accel options (myself)
+> * Many x86 machine cleanup (Philippe, myself)
+> * tests/migration-test cleanup (Juan)
+>
+> ----------------------------------------------------------------
 
-On 25/11/2019 11.41, Philippe Mathieu-Daud=C3=A9 wrote:
-[...]
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 4b4b7425ac..05265b43c8 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -266,6 +266,11 @@ The 'scsi-disk' device is deprecated. Users should u=
-se 'scsi-hd' or
-> =20
->  @section System emulator machines
-> =20
-> +@subsection mips r4k platform (since 4.2)
+Conflict:
 
-Since the patch has now been merged after the release of 4.2, the mips
-4k platform will be deprecated in 5.0 instead. Could you send a patch to
-fix it up?
+diff --cc hw/ppc/spapr_irq.c
+index 07e08d6544,15c3dd4812..0000000000
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@@ -70,17 -70,15 +70,22 @@@ void spapr_irq_msi_free(SpaprMachineSta
+      bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
+  }
 
- Thanks,
-  Thomas
+ -int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
+ +int spapr_irq_init_kvm(SpaprInterruptControllerInitKvm fn,
+                         SpaprInterruptController *intc,
+ +                       uint32_t nr_servers,
+                         Error **errp)
+  {
+-     MachineState *machine =3D MACHINE(qdev_get_machine());
+      Error *local_err =3D NULL;
 
+++<<<<<<< HEAD
+ +    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
+ +        if (fn(intc, nr_servers, &local_err) < 0) {
+ +            if (machine_kernel_irqchip_required(machine)) {
+++=3D=3D=3D=3D=3D=3D=3D
++     if (kvm_enabled() && kvm_kernel_irqchip_allowed()) {
++         if (fn(intc, &local_err) < 0) {
++             if (kvm_kernel_irqchip_required()) {
+++>>>>>>> remotes/bonzini/tags/for-upstream
+                  error_prepend(&local_err,
+                                "kernel_irqchip requested but unavailable: =
+");
+                  error_propagate(errp, local_err);
+
+
+I could probably figure out the resolution but I'm about 5 minutes
+from having to leave the office; sorry.
+
+-- PMM
 
