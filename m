@@ -2,79 +2,99 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034AEC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 11:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1AEC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 11:59:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2CEB2082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 11:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE18F207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 11:59:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IiCsx6Wc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CEB2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cn3EKbzk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE18F207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihBOq-0007c3-Uf
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 06:52:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60594)
+	id 1ihBVE-00019A-1Z
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 06:59:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ihBOE-0007Dc-AO
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 06:51:47 -0500
+ (envelope-from <dinechin@redhat.com>) id 1ihBUb-0000i3-5r
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 06:58:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ihBOC-00048n-VY
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 06:51:46 -0500
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:42654)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ihBOC-00045d-HM
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 06:51:44 -0500
-Received: by mail-oi1-x22e.google.com with SMTP id j22so5153378oij.9
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 03:51:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nyvy3MQAEiB7N3HDPy09KD1ny7mv1/A3Bg5IZhu27oY=;
- b=IiCsx6WcUe2uram9iWdePtrEF3jvVS8FOYE0GcIwmViSMEh4I6ZL6Mkep6m6YKlqPV
- fjw9pElWECA2RhzwCrINT38M/3ekNVwa8I9ndEH4vylGg0666fk1Fxc69Woe63R9hJ4k
- 4OFunMpPx1Z1BU7Low4L2cfapYYxDM3cGj2nuCERME1nH8AYYB4T04DljOzvvbtVNrBZ
- PZzJbDN4QlbMEekQlIA8IxLmWYcM0Pt6/8NyRB8xrTNIjv1niHcqnNYwyTfQFZGkZ97w
- S+Ezqz9TlgcF84AxleoqxRLVlXjqzzjIbfvuB9IpjfYmawtaN3vYNntnZFPdwQY6F2+K
- VGSQ==
+ (envelope-from <dinechin@redhat.com>) id 1ihBUZ-00007A-2T
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 06:58:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40673
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1ihBUY-0008TQ-QZ
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 06:58:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576583897;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=c7gRXh5dn38UHamU5mA/LadIM5P95eTj0S8O1nnVnTE=;
+ b=cn3EKbzkmwiWEmOUHYOf3QMjnCOZzdlcbMpP2X+PwhFwherV1a3GNQ/WjG1MlZ4NGRvQQU
+ O6cgDNNJ7AEjwFznyZCRfVDSLgKiSW3G6c4+z5N3DvEW5uC1c7J+m83L/PtFSRDBAVbZ6/
+ DzWJjOixK8pSYnLGXDdPRwa7rlKlduM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-pakaXeAwMsCgCHv3xfXi0w-1; Tue, 17 Dec 2019 06:58:14 -0500
+Received: by mail-wr1-f69.google.com with SMTP id d8so4597310wrq.12
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 03:58:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nyvy3MQAEiB7N3HDPy09KD1ny7mv1/A3Bg5IZhu27oY=;
- b=PWIxholNAIuKQZJ82joCU0DOBbZyinIfejdpz6Z5PCmkXEDXHALysy6WRwJFMOJ6d0
- 5FhY3/QInrZLR067SGJtzI1YGms4eH121o90NrpkajyCuOUtBSEvGQ9rkOAltxlGc7EN
- Xeodr2+cCBMHQrpFys1pmhicCcUdwvQmpVcdq3cVq3wQ0EhiqIGxCm5tQ6+IpgQHkNUV
- Spmy14zDDKLLbbdfypmgnVbTS3o4ED9/vZkqa9NPQ11zn7zYTNFoVgpjmur1f2EE7XNv
- UEWig91hOWC+4iz9emNQBgSsbT1pXceWfTehVzj54DruyuVtHCFKydoLN6eNXy0YXA6s
- qJcA==
-X-Gm-Message-State: APjAAAURsduSh0IuY/QPFoZ0fFjAlTPFOknczPhIbQtt6pHAwXv68q9d
- bBrzpPjcqWDEL0shq8N2RHnReltJ5DNCXPy8QZC42Q==
-X-Google-Smtp-Source: APXvYqzp5F2Ttvw9TCMnbE5bcyogCFU3QSIDM9GNGsrT+6qlbWdTW1IYIonnBk5ixtqXUA1U6DwmbFMPZOxsfgwxfdM=
-X-Received: by 2002:aca:edd5:: with SMTP id l204mr1374372oih.98.1576583503217; 
- Tue, 17 Dec 2019 03:51:43 -0800 (PST)
-MIME-Version: 1.0
-References: <20191216193825.1794153-1-ehabkost@redhat.com>
-In-Reply-To: <20191216193825.1794153-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Dec 2019 11:51:32 +0000
-Message-ID: <CAFEAcA8_=GR+FeOuYQ+18_inZb26NMwurTN58wnS68dsvNziVQ@mail.gmail.com>
-Subject: Re: [PULL 0/4] x86 queue, 2019-12-16
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=xrXP+8vsjjqtAgpZXoAzY5Ei+hVt9KEj4FbqxCQB3kY=;
+ b=N3p1L8z2sCpYaS297FT8DftVO14A2fz2qsjri3SKyq4qUp2Ntmuse7DWpauuzo44HM
+ s/NrNOu62DdxbLS22AF3+q/RdmGRbbfPLkhLN4mUVGCd7CSpfn65qrMT5+O2GRbH6wID
+ 7alfLmUS9Jhzyd15Imsuw5ZBgsmbxdXpCwGp74PveVwaCcX13KHUEEz+JJ7mogGHBtI/
+ AbCuzsKE9GsmnuY59UjfKD01K4/OOSkGa5NAXGniv7DFMVTbhp/SctzWSsAgvMWnLy/4
+ wyzsLpkv1LB+NGN4qJgGF2IIouQXMcF4ctS0jEyX58374B+7UnrAokSwdEevoL4yB34o
+ QO1g==
+X-Gm-Message-State: APjAAAUsSZOH2k3myjXFbdzc8P50dRJPbRAuXmE+1PyNAKGxiTe9IMX5
+ c5A4yTIEi6V9yTCykAFvj4GyGRFahzCgxPvRVTCj4L5C1RhkG+clHtQMEdCD1tsXhSTlKpF+Pyb
+ ZNjHxNbo19ZC2pzs=
+X-Received: by 2002:a5d:690e:: with SMTP id t14mr36043384wru.65.1576583893073; 
+ Tue, 17 Dec 2019 03:58:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzT6qjkim6HB1Mt2HQJa48HwVI0wsbN9dC3HsAS9/DnAFSsM1dMRvXnQ/PS81y0RcFfZHHrBw==
+X-Received: by 2002:a5d:690e:: with SMTP id t14mr36043354wru.65.1576583892779; 
+ Tue, 17 Dec 2019 03:58:12 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:466:71c0:1c42:ed63:2256:4add?
+ ([2a01:e0a:466:71c0:1c42:ed63:2256:4add])
+ by smtp.gmail.com with ESMTPSA id q15sm25194281wrr.11.2019.12.17.03.58.11
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 17 Dec 2019 03:58:12 -0800 (PST)
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: [PATCH] memory: Do not allow subregion out of the parent region
+ range
+From: Christophe de Dinechin <dinechin@redhat.com>
+In-Reply-To: <4a07cc6f-8762-145e-2b54-c61b0e287f19@redhat.com>
+Date: Tue, 17 Dec 2019 12:58:11 +0100
+Message-Id: <127AF076-D309-4952-B572-52587A93F46A@redhat.com>
+References: <20191214160223.20012-1-philmd@redhat.com>
+ <da81a3e7-62a8-f46e-c12f-4dead2a9091f@redhat.com>
+ <92bb8e12-3ece-9811-438b-8fa64d2bde66@redhat.com>
+ <4a07cc6f-8762-145e-2b54-c61b0e287f19@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
+X-MC-Unique: pakaXeAwMsCgCHv3xfXi0w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,42 +106,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 16 Dec 2019 at 19:38, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 4148d142a8cbbce10bb77e560997ae6b482e5edf:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-virtiofs-20191213a' into staging (2019-12-13 15:58:54 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
->
-> for you to fetch changes up to 88703ce2e6bbc8cc00c90c1bb8af1f3cd964ac9c:
->
->   i386: Use g_autofree in a few places (2019-12-13 16:32:19 -0300)
->
-> ----------------------------------------------------------------
-> x86 queue, 2019-12-16
->
-> Feature:
-> * Cooperlake CPU model
->
-> Cleanups:
-> * Use g_autofree in a few places
->
-> ----------------------------------------------------------------
 
 
-Applied, thanks.
+> On 17 Dec 2019, at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>=20
+> On 16/12/19 18:46, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>=20
+>>>=20
+>>> I think in some cases this could be intentional, for example if you hav=
+e
+>>> different models with different BAR sizes and you organize this with th=
+e
+>>> same tree of MemoryRegion and different sizes for the parent.
+>>=20
+>> But if a child is outside of the parent range, it can't be reached,
+>> right? I'm confused, maybe AddressSpace can do that, but MemoryRegion
+>> shouldn't?
+>=20
+> Yes, the idea is that you could have for one version of the device
+>=20
+>   parent 0x000-0x7ff
+>     stuff 0x000-0x3ff
+>     morestuff 0x400-0x7ff
+>=20
+> and for another
+>=20
+>   parent 0x000-0x3ff
+>     stuff 0x000-0x3ff
+>     morestuff 0x400-0x7ff
+>=20
+> where parent is the BAR, and you can share the code to generate the tree
+> underneath parent.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+I can see why you would have code reuse reasons to do that,
+but frankly it looks buggy and confusing. In the rare cases
+where this is indented, maybe add a flag making it explicit?
 
--- PMM
+>=20
+>> In the PCI case, you will simply alias a subregion with
+>> memory_region_init_alias(..., size), and size has to be <=3D parent size=
+.
+>> But you won't add the PCI region, you'll add the alias, so the assert
+>> won't fire.
+>=20
+> Yes, this is a workaround though.  You shouldn't need the alias.
+>=20
+> I can see a case for your patch but I can also see one for the current
+> behavior...
+>=20
+> Paolo
+>=20
+>=20
+
 
