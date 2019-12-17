@@ -1,91 +1,86 @@
-Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEE2C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E7EC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:59:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A05C205F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:37:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6CA2206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:59:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pk08aSpV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A05C205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hx504QzL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6CA2206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icVmt-0004NZ-Kr
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 09:37:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44590)
+	id 1ihH7n-0002Ej-1n
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:59:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1icVlS-00031U-SW
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:36:27 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihH6H-0000zT-7c
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:57:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1icVlR-0004NE-OF
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:36:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53579
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1icVlR-0004Mx-J5
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:36:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575470185;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wXo36HgzlbTfTaQKoAHPr3/cD5/dZ7/sHcvhO/TIFo4=;
- b=Pk08aSpVVnt322+iGAUnZCSmD9G8/kgmp119xLXF1a7gtSg3Aun5vj4GlGD4j4LaeVOJ5X
- fgqZHdTwvMDRQohVnCX9IRYsO7/1OaRD5bkJEBgOgoUOFsJZnjfmtjNdi1T1TTJWuKUTge
- a/+uVMmkMCVcs4WuuIvIhKN1EZJa26c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-wHK5jtmaOnu0l_1a7dMO_A-1; Wed, 04 Dec 2019 09:36:22 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 834F4911FA;
- Wed,  4 Dec 2019 14:36:21 +0000 (UTC)
-Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98B8C5D6B7;
- Wed,  4 Dec 2019 14:36:12 +0000 (UTC)
-Subject: Re: virtiofsd: Where should it live?
-To: Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-References: <20191126102600.GG556568@redhat.com>
- <20191126121416.GE2928@work-vm>
- <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
- <87k17ekhs9.fsf@dusky.pond.sub.org>
- <fef0eaaf-149a-f8a8-02c5-821d2d42becd@redhat.com>
- <20191203105341.GB3078@work-vm>
- <CAFEAcA8bjGAs7JSTNYYYwCH1yF06i0v0r9wjKXqZGZg_Sqy0VA@mail.gmail.com>
- <20191203111949.GB267814@redhat.com> <87o8wofsda.fsf@dusky.pond.sub.org>
- <20191204081726.md3qakjtszftnuag@sirius.home.kraxel.org>
- <20191204132810.GB20250@dhcp-200-226.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <02eec949-f768-dd42-fb46-284489c1a964@redhat.com>
-Date: Wed, 4 Dec 2019 08:36:12 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihH6D-0006zb-CH
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:57:35 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:43930)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ihH6D-0006ua-3z
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:57:33 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id d16so12314734wre.10
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 09:57:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Yky/nTR0SQlrT6THuvlR/Qqa2GZaOthOIWsdsv/boS4=;
+ b=hx504QzLSsd6/5PlrzrVOD7dX+nP/9auWMsV+IEZAa6Z6Cv5+2m5lC1nY2s+uTQ8Wd
+ +mlhHIZl4rKce8ypISijzrbwnacjcuL1dsjmfF5x82oCtFbcCQgKHEOpNLZZGkFq5H2+
+ nxio3FUWQoALqHkbaQgL8sdRk41yDrq5fr6fWNKCaXPiB+rMCcwPUkjUUgMJnoMfR5PA
+ uFSuVT4vcW1KSVQPCIpZDrtELCv4fonPyfCK5g9sBYztC6xnlMiI25YHfkHOnyExjCuz
+ xmFCD2ab21N1prm3yIEJbmx4akHydAArLpd1qCohfMhTovG+yAWBZHxawULgQJXloDzd
+ C2Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Yky/nTR0SQlrT6THuvlR/Qqa2GZaOthOIWsdsv/boS4=;
+ b=YsuGMuK+krcc64IcHf5zWkCG9DukeVvBwnCBsfOFE5WuAcRClwfKO3X5B9xEZiiPC+
+ 6YiLp7DuWysH4xNmA08h4ueq33W2ro88e3Gw5G0RYVWAYHbRY3EQQfNPMxOWDAZAjRxf
+ wL6vUu9JEbjklPondLWmDLwrtDby6MjwBzTpihFCLs6+6qLdGYA7Ma63Sgp5jf5B4Ekg
+ u+kDocFC9CzesC0/Y2PkPwDN1y9yK43QIQkXJi1H3U/A/0Ro/pAisRAE0BZ0oaWP12DE
+ al5SKLAwg9kMH0Q1ZSc1IQ4nH300ytveiLBvkux0DVkAKoBF07Br1vuicN8NxlCrS85D
+ lTxA==
+X-Gm-Message-State: APjAAAVvTZ5MgwoPHEeiiuRwdAD7EeOGdI0J7eHB/l4TXPCkMsj2fH3q
+ o6t6S5MTDAmfRXVV586HG+CuPjNa
+X-Google-Smtp-Source: APXvYqwh4bk9gEbf1SPOKzw8XdECrFyKobdYmY59CKnjCfJfpXze17ccV41/wwZ05cAVfUKADUMwiw==
+X-Received: by 2002:adf:eb09:: with SMTP id s9mr39916298wrn.61.1576605447836; 
+ Tue, 17 Dec 2019 09:57:27 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q8sm3649573wmq.3.2019.12.17.09.57.26
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 17 Dec 2019 09:57:26 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 00/62] Misc patches for 2019-12-16
+Date: Tue, 17 Dec 2019 18:57:23 +0100
+Message-Id: <1576605445-28158-1-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <20191204132810.GB20250@dhcp-200-226.str.redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: wHK5jtmaOnu0l_1a7dMO_A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,48 +92,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, mszeredi@redhat.com, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- vgoyal@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/4/19 7:28 AM, Kevin Wolf wrote:
-> Am 04.12.2019 um 09:17 hat Gerd Hoffmann geschrieben:
->>    Hi,
->>
->>>>      |   ...
->>>>      +- qemu-edid
->>>
->>> Has its own MAINTAINERS section, together with hw/display/edit* and
->>> include/hw/display/edid.h.  I'm not sure moving it hw/display/ is a good
->>> idea.  Gerd?
->>
->> Sort-of makes sense.  My personal preference would be a tools/ directory
->> for all those small utilities though.
-> 
-> I think I would like that better than throwing tools into block/ where
-> currently mostly just block drivers live.
+The following changes since commit 084a398bf8aa7634738e6c6c0103236ee1b3b72f:
 
-Ooh, I should have read this sub-thread before writing my reply at the 
-top level.  Yes, I like the idea of tools/ for qemu-img, qemu-io, and 
-qemu-nbd better than block/.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-12-13 18:14:07 +0000)
 
-> 
-> Or, if we want to move the tools there, we'd need another directory
-> level inside block/ to keep things reasonably organised.
+are available in the git repository at:
 
-Separating drivers from executables sounds worthwhile either way, 
-whether that division is by a new tools/ or by a subdirectory in block/.
 
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 74c14076700436f9d340652042c81f46eaf0cf9f:
+
+  colo: fix return without releasing RCU (2019-12-17 14:03:44 +0100)
+
+----------------------------------------------------------------
+* More uses of RCU_READ_LOCK_GUARD (Dave, myself)
+* QOM doc improvments (Greg)
+* Cleanups from the Meson conversion (Marc-André)
+* Support for multiple -accel options (myself)
+* Many x86 machine cleanup (Philippe, myself)
+* tests/migration-test cleanup (Juan)
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (3):
+      kvm: Reallocate dirty_bmap when we change a slot
+      hyperv: Use auto rcu_read macros
+      qsp: Use WITH_RCU_READ_LOCK_GUARD
+
+Greg Kurz (1):
+      object: Improve documentation of interfaces
+
+Juan Quintela (10):
+      migration-test: Create cmd_soure and cmd_target
+      migration-test: Move hide_stderr to common commandline
+      migration-test: Move -machine to common commandline
+      migration-test: Move memory size to common commandline
+      migration-test: Move shmem handling to common commandline
+      migration-test: Move -name handling to common commandline
+      migration-test: Move -serial handling to common commandline
+      migration-test: Move -incomming handling to common commandline
+      migration-test: Rename cmd_src/dst to arch_source/arch_target
+      migration-test: Use a struct for test_migrate_start parameters
+
+Marc-André Lureau (7):
+      build-sys: build vhost-user-gpu only if CONFIG_TOOLS
+      migration: fix maybe-uninitialized warning
+      monitor: fix maybe-uninitialized
+      vhost-user-scsi: fix printf format warning
+      os-posix: simplify os_find_datadir
+      tests: skip block layer tests if !CONFIG_TOOLS
+      configure: simplify vhost condition with Kconfig
+
+Paolo Bonzini (35):
+      memory: do not look at current_machine->accel
+      vl: move icount configuration earlier
+      tcg: move qemu_tcg_configure to accel/tcg/tcg-all.c
+      vl: extract accelerator option processing to a separate function
+      vl: merge -accel processing into configure_accelerators
+      accel: compile accel/accel.c just once
+      vl: introduce object_parse_property_opt
+      vl: configure accelerators from -accel options
+      vl: warn for unavailable accelerators, clarify messages
+      qom: introduce object_register_sugar_prop
+      qom: add object_new_with_class
+      accel: pass object to accel_init_machine
+      tcg: convert "-accel threads" to a QOM property
+      tcg: add "-accel tcg,tb-size" and deprecate "-tb-size"
+      xen: convert "-machine igd-passthru" to an accelerator property
+      kvm: convert "-machine kvm_shadow_mem" to an accelerator property
+      kvm: introduce kvm_kernel_irqchip_* functions
+      kvm: convert "-machine kernel_irqchip" to an accelerator property
+      Makefile: remove unused variables
+      build-sys: do not include Windows SLIRP dependencies in $LIBS
+      libvixl: remove per-target compiler flags
+      crypto: move common bits for all emulators to libqemuutil
+      stubs: replace stubs with lnot if applicable
+      configure: set $PYTHON to a full path
+      i386: conditionally compile more files
+      fw_cfg: allow building without other devices
+      hw: replace hw/i386/pc.h with a header just for the i8259
+      pci-stub: add more MSI functions
+      x86: move SMM property to X86MachineState
+      x86: move more x86-generic functions out of PC files
+      acpi: move PC stubs out of stubs/
+      pc: stubify x86 iommu
+      hw/isa/isa-bus: cleanup irq functions
+      memory: use RCU_READ_LOCK_GUARD
+      colo: fix return without releasing RCU
+
+Philippe Mathieu-Daudé (6):
+      hw/i386/pc: Convert DPRINTF() to trace events
+      hw/i386: De-duplicate gsi_handler() to remove kvm_pc_gsi_handler()
+      hw/i386: Simplify ioapic_init_gsi()
+      hw/i386/pc: Use TYPE_PORT92 instead of hardcoded string
+      hw/i386/pc: Inline port92_init()
+      hw/i386/pc: Extract the port92 device
+
+ Kconfig.host                                       |   5 +
+ Makefile                                           |  14 +-
+ Makefile.objs                                      |   6 +-
+ Makefile.target                                    |   2 -
+ accel/Makefile.objs                                |   2 +-
+ accel/accel.c                                      |  73 +-----
+ accel/kvm/kvm-all.c                                | 161 ++++++++++--
+ accel/tcg/tcg-all.c                                | 149 ++++++++++-
+ configure                                          |  10 +-
+ contrib/vhost-user-scsi/vhost-user-scsi.c          |   2 +-
+ cpus.c                                             |  72 -----
+ crypto/Makefile.objs                               |  13 +-
+ disas/libvixl/Makefile.objs                        |  11 +-
+ hw/acpi/Makefile.objs                              |   3 +-
+ .../pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c |   0
+ hw/alpha/alpha_sys.h                               |   3 +-
+ hw/alpha/dp264.c                                   |   1 +
+ hw/core/machine.c                                  | 141 ----------
+ hw/hppa/hppa_sys.h                                 |   3 +-
+ hw/hppa/machine.c                                  |   1 +
+ hw/hyperv/hyperv.c                                 |  22 +-
+ hw/i386/Kconfig                                    |   6 +
+ hw/i386/Makefile.objs                              |  10 +-
+ hw/i386/acpi-build.c                               |   1 +
+ hw/i386/fw_cfg.c                                   |   8 +-
+ hw/i386/fw_cfg.h                                   |   2 +
+ hw/i386/kvm/Makefile.objs                          |   6 +-
+ hw/i386/kvm/i8259.c                                |   1 +
+ hw/i386/kvm/ioapic.c                               |  14 +-
+ hw/i386/microvm.c                                  |   4 +-
+ hw/i386/pc.c                                       | 291 +--------------------
+ hw/i386/pc_piix.c                                  |   6 +-
+ hw/i386/pc_q35.c                                   |   2 +-
+ hw/i386/port92.c                                   | 126 +++++++++
+ hw/i386/trace-events                               |   8 +
+ hw/i386/x86-iommu-stub.c                           |  34 +++
+ hw/i386/x86.c                                      | 154 ++++++++++-
+ hw/input/pckbd.c                                   |   1 -
+ hw/intc/Kconfig                                    |   2 +
+ hw/intc/apic.c                                     |   2 +-
+ hw/intc/i8259.c                                    |   2 +-
+ hw/intc/i8259_common.c                             |   2 +-
+ hw/intc/ioapic.c                                   |   3 +-
+ hw/isa/i82378.c                                    |   2 +-
+ hw/isa/isa-bus.c                                   |  11 +-
+ hw/isa/lpc_ich9.c                                  |   1 -
+ hw/isa/piix4.c                                     |   2 +-
+ hw/mips/gt64xxx_pci.c                              |   2 +-
+ hw/mips/mips_fulong2e.c                            |   2 +-
+ hw/mips/mips_jazz.c                                |   2 +-
+ hw/mips/mips_r4k.c                                 |   2 +-
+ hw/pci-host/bonito.c                               |   1 -
+ hw/pci-host/prep.c                                 |   2 +-
+ hw/pci/pci-stub.c                                  |  27 ++
+ hw/ppc/e500.c                                      |   5 +-
+ hw/ppc/spapr_irq.c                                 |  16 +-
+ hw/virtio/Kconfig                                  |   3 +
+ hw/virtio/Makefile.objs                            |   4 +-
+ hw/xen/xen-common.c                                |  18 ++
+ hw/xen/xen_pt.c                                    |   2 +
+ include/exec/memory.h                              |   3 +-
+ include/hw/boards.h                                |   7 -
+ include/hw/i386/pc.h                               |  32 +--
+ include/hw/i386/x86.h                              |  23 ++
+ include/hw/intc/i8259.h                            |  12 +
+ include/hw/isa/i8259_internal.h                    |   2 +-
+ include/hw/isa/isa.h                               |   8 +-
+ include/qom/object.h                               |  23 +-
+ include/sysemu/accel.h                             |   4 +-
+ include/sysemu/cpus.h                              |   2 -
+ include/sysemu/kvm.h                               |   8 +-
+ memory.c                                           |   5 +-
+ migration/ram.c                                    |  53 ++--
+ monitor/misc.c                                     |   3 +-
+ os-posix.c                                         |  41 +--
+ qemu-deprecated.texi                               |   6 +
+ qemu-options.hx                                    |  30 ++-
+ qom/object.c                                       |  28 +-
+ stubs/Makefile.objs                                |   1 -
+ target/arm/kvm.c                                   |   8 +-
+ target/i386/cpu.c                                  |   8 +-
+ target/i386/kvm.c                                  |  11 +-
+ target/i386/machine.c                              |   2 +-
+ target/i386/monitor.c                              |   1 -
+ target/mips/kvm.c                                  |   2 +-
+ target/ppc/kvm.c                                   |   2 +-
+ target/s390x/cpu_models.c                          |   4 +-
+ target/s390x/kvm.c                                 |   2 +-
+ tests/Makefile.include                             |   4 +-
+ tests/arm-cpu-features.c                           |   4 +-
+ tests/bios-tables-test.c                           |  16 +-
+ tests/boot-serial-test.c                           |   4 +-
+ tests/cdrom-test.c                                 |   2 +-
+ tests/libqtest.c                                   |   4 +-
+ tests/migration-test.c                             | 264 ++++++++++---------
+ tests/pflash-cfi02-test.c                          |   4 +-
+ tests/pnv-xscom-test.c                             |   4 +-
+ tests/prom-env-test.c                              |   2 +-
+ tests/pxe-test.c                                   |   2 +-
+ tests/vmgenid-test.c                               |   2 +-
+ util/Makefile.objs                                 |   3 +-
+ util/qsp.c                                         |  22 +-
+ vl.c                                               | 225 +++++++++++-----
+ 103 files changed, 1298 insertions(+), 1076 deletions(-)
+ rename stubs/pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c (100%)
+ create mode 100644 hw/i386/port92.c
+ create mode 100644 hw/i386/x86-iommu-stub.c
+ create mode 100644 include/hw/intc/i8259.h
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+1.8.3.1
 
 
