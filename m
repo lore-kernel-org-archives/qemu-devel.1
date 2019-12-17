@@ -2,61 +2,86 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=FROM_WSP_TRAIL,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8005DC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A951C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 13:00:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 490EE20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:58:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490EE20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DEF31206B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 13:00:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YMCJELu6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF31206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihCRB-00068Y-Gn
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:58:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54022)
+	id 1ihCSj-0007TB-2h
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 08:00:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1ihCMV-0000Ok-QF
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:05 -0500
+ (envelope-from <stevensd@chromium.org>) id 1ihCRy-0006zh-Me
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1ihCMT-0001DG-TB
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:03 -0500
-Received: from mga18.intel.com ([134.134.136.126]:49326)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1ihCMT-00016O-Kd
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:01 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Dec 2019 04:53:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,325,1571727600"; d="scan'208";a="209689617"
-Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by orsmga008.jf.intel.com with ESMTP; 17 Dec 2019 04:53:53 -0800
-From: Zhang Chen <chen.zhang@intel.com >
-To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH V4 1/5] net/awd.c: Introduce Advanced Watch Dog module
- framework
-Date: Tue, 17 Dec 2019 20:45:50 +0800
-Message-Id: <20191217124554.30818-2-chen.zhang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191217124554.30818-1-chen.zhang@intel.com>
-References: <20191217124554.30818-1-chen.zhang@intel.com>
+ (envelope-from <stevensd@chromium.org>) id 1ihCRx-0008ST-NQ
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:59:42 -0500
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:47008)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stevensd@chromium.org>)
+ id 1ihCRx-0008RO-Hw
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:59:41 -0500
+Received: by mail-qk1-x742.google.com with SMTP id r14so7700408qke.13
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 04:59:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4bZpGkKAkvfd+jX4DG0vMQ2qfrG6ll9qDalxUKn1b3E=;
+ b=YMCJELu631QRNTqwkjAcCOyFtrMLDTS5TMyx6OvxxAkDtKxhgfrna//TtU2raSRNzY
+ gwQWOfT1HpZvRZBEsApA0YfgTjyjxYUXxUx9xKZoFDLhlO3noHCZIPQyYpJgt+zfy9qr
+ aPs71Gjd0r2qzgILwvNDn4unYX33ibUDXggyU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4bZpGkKAkvfd+jX4DG0vMQ2qfrG6ll9qDalxUKn1b3E=;
+ b=moieLioJxpoBFXQsdvwMUEB3nxzCqDGoJV77P2DhHFw8SUxt7+oJW72zNS1el4FY/B
+ dX1Qe+2wdXX61DPLLL4+qL47cCF6KaIEYXSJujWD4tBc7XiGH839Usm6jtTLPKwGunkg
+ 1H9+PFvgFgv4KEtO6eU1jpp1LdRvLNNIOPaHeqSf4JFziEKwnlrAMV0XNLN+0iHr+qDm
+ yMMZlY544qw+XOHec7UYlLGvdAn6H49xon/uFBRMUqetmfSL1V0AYQfGUaZK1XdGjFPg
+ JZG8Gl/qk5/rpEFQWrbz7hUjBphPgJvrT3ZcwnrCdbHUAM2towHvkQ8Ku5Lxjmoo/RcB
+ Hmag==
+X-Gm-Message-State: APjAAAXh8yLqzBuxXaOA0gytr0ZETDGlv+HOr+qyEqQnMLeFlJ9lJtst
+ BCGKZsC0+RwVvtwsl7vrJb8UabosKWvieFQwm85ltg==
+X-Google-Smtp-Source: APXvYqyb1xxZ9FokZNGah/UIpAaFRfxJfgV4qwKVLTBXmZOACLUgrXPPiNzDxSLuRgoM0J8lMuMLN3unMTrUaERb+JU=
+X-Received: by 2002:a05:620a:910:: with SMTP id
+ v16mr4862526qkv.194.1576587580491; 
+ Tue, 17 Dec 2019 04:59:40 -0800 (PST)
+MIME-Version: 1.0
+References: <d65bec5074eda5f389668e28922c1609@hostfission.com>
+ <CAAFQd5AWqYaNWfYQ2hepjg7OD8y8ehHn0guusAR8JYefc+BNaw@mail.gmail.com>
+ <CAEUnVG77y2DrV5kLTHDy1xio+yzMGv9j=M0c4388vH_LUaiXLg@mail.gmail.com>
+ <CAD=HUj40Jb2cy8EP=24coO-CPUvq6ib+01bvXHn1G9GD8KuenA@mail.gmail.com>
+ <20191211092625.jzqx2ukphhggwavo@sirius.home.kraxel.org>
+ <CAD=HUj7d3SWqCH=57ymy-BVd6xdJWc=WSqHAFyQXt-3MjchEAA@mail.gmail.com>
+ <20191212094121.by7w7fywlzdfoktn@sirius.home.kraxel.org>
+ <CAD=HUj6YYupjdxxz2mgMmE2DcKhXP-qdhRORvUNTmzcORRrLzg@mail.gmail.com>
+ <20191212133048.4nbmuwhbq5z2ai6o@sirius.home.kraxel.org>
+ <CAD=HUj623MyeZ7VmrYTfig9oiyNhipidpvhuuurs3VgGBgjZpQ@mail.gmail.com>
+ <20191216134728.czulyb6yvrkokrqv@sirius.home.kraxel.org>
+In-Reply-To: <20191216134728.czulyb6yvrkokrqv@sirius.home.kraxel.org>
+From: David Stevens <stevensd@chromium.org>
+Date: Tue, 17 Dec 2019 21:59:29 +0900
+Message-ID: <CAD=HUj4us6_cEv40EVRLd5K5cGW7GsN10EFWifmog-pq9_RC8Q@mail.gmail.com>
+Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.126
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,382 +93,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
+Cc: Geoffrey McRae <geoff@hostfission.com>, Hans Verkuil <hverkuil@xs4all.nl>,
+ Zach Reizner <zachr@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
+ virtio-dev@lists.oasis-open.org, qemu-devel <qemu-devel@nongnu.org>,
+ Alex Lau <alexlau@chromium.org>, Tomasz Figa <tfiga@chromium.org>,
+ Keiichi Watanabe <keiichiw@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zhang Chen <chen.zhang@intel.com>
+> > > Of course only virtio drivers would try step (2), other drivers (when
+> > > sharing buffers between intel gvt device and virtio-gpu for example)
+> > > would go straight to (3).
+> >
+> > For virtio-gpu as it is today, it's not clear to me that they're
+> > equivalent. As I read it, the virtio-gpu spec makes a distinction
+> > between the guest memory and the host resource. If virtio-gpu is
+> > communicating with non-virtio devices, then obviously you'd just be
+> > working with guest memory. But if it's communicating with another
+> > virtio device, then there are potentially distinct guest and host
+> > buffers that could be used. The spec shouldn't leave any room for
+> > ambiguity as to how this distinction is handled.
+>
+> Yep.  It should be the host side buffer.
 
-This patch introduce a new module named Advanced Watch Dog,
-and defined the input and output parameter. AWD use standard chardev
-as the way of communicationg with the outside world.
-If you want to use it, please add "--enable-awd" when configure qemu.
+I agree that it should be the host side buffer. I just want to make
+sure that the meaning of 'import' is clear, and to establish the fact
+that importing a buffer by uuid is not necessarily the same thing as
+creating a new buffer in a different device from the same sglist (for
+example, sharing a guest sglist might require more flushes).
 
-Demo command:
--object advanced-watchdog,id=awd1,server=on,awd_node=d_node,notification_node=remote_server,opt_script=opt_script_path,iothread=awd_iothread,pulse_interval=1000,timeout=5000
-
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- configure         |   9 ++
- net/Makefile.objs |   1 +
- net/awd.c         | 261 ++++++++++++++++++++++++++++++++++++++++++++++
- qemu-options.hx   |  20 ++++
- 4 files changed, 291 insertions(+)
- create mode 100644 net/awd.c
-
-diff --git a/configure b/configure
-index 6099be1d84..49d1830de4 100755
---- a/configure
-+++ b/configure
-@@ -383,6 +383,7 @@ vhost_scsi=""
- vhost_vsock=""
- vhost_user=""
- vhost_user_fs=""
-+awd="no"
- kvm="no"
- hax="no"
- hvf="no"
-@@ -1304,6 +1305,10 @@ for opt do
-   ;;
-   --enable-vhost-user-fs) vhost_user_fs="yes"
-   ;;
-+  --disable-awd) awd="no"
-+  ;;
-+  --enable-awd) awd="yes"
-+  ;;
-   --disable-opengl) opengl="no"
-   ;;
-   --enable-opengl) opengl="yes"
-@@ -1780,6 +1785,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   vhost-crypto    vhost-user-crypto backend support
-   vhost-kernel    vhost kernel backend support
-   vhost-user      vhost-user backend support
-+  awd             Advanced Watch Dog support
-   spice           spice
-   rbd             rados block device (rbd)
-   libiscsi        iscsi support
-@@ -7043,6 +7049,9 @@ fi
- if test "$vhost_user" = "yes" ; then
-   echo "CONFIG_VHOST_USER=y" >> $config_host_mak
- fi
-+if test "$awd" = "yes" ; then
-+  echo "CONFIG_AWD=y" >> $config_host_mak
-+fi
- if test "$vhost_user_fs" = "yes" ; then
-   echo "CONFIG_VHOST_USER_FS=y" >> $config_host_mak
- fi
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index c5d076d19c..187e655443 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -19,6 +19,7 @@ common-obj-y += colo-compare.o
- common-obj-y += colo.o
- common-obj-y += filter-rewriter.o
- common-obj-y += filter-replay.o
-+common-obj-$(CONFIG_AWD) += awd.o
- 
- tap-obj-$(CONFIG_LINUX) = tap-linux.o
- tap-obj-$(CONFIG_BSD) = tap-bsd.o
-diff --git a/net/awd.c b/net/awd.c
-new file mode 100644
-index 0000000000..d42b4a7372
---- /dev/null
-+++ b/net/awd.c
-@@ -0,0 +1,261 @@
-+/*
-+ * Advanced Watch Dog
-+ *
-+ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
-+ * (a.k.a. Fault Tolerance or Continuous Replication)
-+ *
-+ * Copyright (c) 2019 Intel Corporation
-+ *
-+ * Author: Zhang Chen <chen.zhang@intel.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "trace.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "net/net.h"
-+#include "qom/object_interfaces.h"
-+#include "qom/object.h"
-+#include "chardev/char-fe.h"
-+#include "qemu/sockets.h"
-+#include "sysemu/iothread.h"
-+
-+#define TYPE_AWD  "advanced-watchdog"
-+#define AWD(obj)  OBJECT_CHECK(AwdState, (obj), TYPE_AWD)
-+
-+#define AWD_READ_LEN_MAX NET_BUFSIZE
-+/* Default advanced watchdog pulse interval */
-+#define AWD_PULSE_INTERVAL_DEFAULT 5000
-+/* Default advanced watchdog timeout */
-+#define AWD_TIMEOUT_DEFAULT 2000
-+
-+typedef struct AwdState {
-+    Object parent;
-+
-+    bool server;
-+    char *awd_node;
-+    char *notification_node;
-+    char *opt_script;
-+    uint32_t pulse_interval;
-+    uint32_t timeout;
-+    IOThread *iothread;
-+} AwdState;
-+
-+typedef struct AwdClass {
-+    ObjectClass parent_class;
-+} AwdClass;
-+
-+static char *awd_get_node(Object *obj, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    return g_strdup(s->awd_node);
-+}
-+
-+static void awd_set_node(Object *obj, const char *value, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    g_free(s->awd_node);
-+    s->awd_node = g_strdup(value);
-+}
-+
-+static char *noti_get_node(Object *obj, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    return g_strdup(s->notification_node);
-+}
-+
-+static void noti_set_node(Object *obj, const char *value, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    g_free(s->notification_node);
-+    s->notification_node = g_strdup(value);
-+}
-+
-+static char *opt_script_get_node(Object *obj, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    return g_strdup(s->opt_script);
-+}
-+
-+static void opt_script_set_node(Object *obj, const char *value, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    g_free(s->opt_script);
-+    s->opt_script = g_strdup(value);
-+}
-+
-+static bool awd_get_server(Object *obj, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    return s->server;
-+}
-+
-+static void awd_set_server(Object *obj, bool value, Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    s->server = value;
-+}
-+
-+static void awd_get_interval(Object *obj, Visitor *v,
-+                                   const char *name, void *opaque,
-+                                   Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+    uint32_t value = s->pulse_interval;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void awd_set_interval(Object *obj, Visitor *v,
-+                                   const char *name, void *opaque,
-+                                   Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+    Error *local_err = NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+    if (!value) {
-+        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+                   object_get_typename(obj), name);
-+        goto out;
-+    }
-+    s->pulse_interval = value;
-+
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
-+static void awd_get_timeout(Object *obj, Visitor *v,
-+                            const char *name, void *opaque,
-+                            Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+    uint32_t value = s->timeout;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void awd_set_timeout(Object *obj, Visitor *v,
-+                            const char *name, void *opaque,
-+                            Error **errp)
-+{
-+    AwdState *s = AWD(obj);
-+    Error *local_err = NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &local_err);
-+    if (local_err) {
-+        goto out;
-+    }
-+
-+    if (!value) {
-+        error_setg(&local_err, "Property '%s.%s' requires a positive value",
-+                   object_get_typename(obj), name);
-+        goto out;
-+    }
-+    s->timeout = value;
-+
-+out:
-+    error_propagate(errp, local_err);
-+}
-+
-+static void awd_complete(UserCreatable *uc, Error **errp)
-+{
-+    AwdState *s = AWD(uc);
-+
-+    if (!s->awd_node || !s->iothread ||
-+        !s->notification_node || !s->opt_script) {
-+        error_setg(errp, "advanced-watchdog needs 'awd_node', "
-+                   "'notification_node', 'opt_script' "
-+                   "and 'server' property set");
-+        return;
-+    }
-+
-+    return;
-+}
-+
-+static void awd_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+
-+    ucc->complete = awd_complete;
-+}
-+
-+static void awd_init(Object *obj)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    object_property_add_str(obj, "awd_node",
-+                            awd_get_node, awd_set_node,
-+                            NULL);
-+
-+    object_property_add_str(obj, "notification_node",
-+                            noti_get_node, noti_set_node,
-+                            NULL);
-+
-+    object_property_add_str(obj, "opt_script",
-+                            opt_script_get_node, opt_script_set_node,
-+                            NULL);
-+
-+    object_property_add_bool(obj, "server",
-+                             awd_get_server,
-+                             awd_set_server, NULL);
-+
-+    object_property_add(obj, "pulse_interval", "uint32",
-+                        awd_get_interval,
-+                        awd_set_interval, NULL, NULL, NULL);
-+
-+    object_property_add(obj, "timeout", "uint32",
-+                        awd_get_timeout,
-+                        awd_set_timeout, NULL, NULL, NULL);
-+
-+    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
-+                            (Object **)&s->iothread,
-+                            object_property_allow_set_link,
-+                            OBJ_PROP_LINK_STRONG, NULL);
-+}
-+
-+static void awd_finalize(Object *obj)
-+{
-+    AwdState *s = AWD(obj);
-+
-+    g_free(s->awd_node);
-+    g_free(s->notification_node);
-+}
-+
-+static const TypeInfo awd_info = {
-+    .name = TYPE_AWD,
-+    .parent = TYPE_OBJECT,
-+    .instance_size = sizeof(AwdState),
-+    .instance_init = awd_init,
-+    .instance_finalize = awd_finalize,
-+    .class_size = sizeof(AwdClass),
-+    .class_init = awd_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+static void register_types(void)
-+{
-+    type_register_static(&awd_info);
-+}
-+
-+type_init(register_types);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 65c9473b73..40417afab5 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4589,6 +4589,26 @@ Dump the network traffic on netdev @var{dev} to the file specified by
- The file format is libpcap, so it can be analyzed with tools such as tcpdump
- or Wireshark.
- 
-+@item -object advanced-watchdog,id=@var{id},awd_node=@var{chardevid},notification_node=@var{chardevid},server=@var{server},iothread=@var{id},opt_script=@var{path}[,pulse_interval=@var{time_ms},timeout=@var{time_ms}]
-+
-+Advanced Watch Dog is an universal monitoring module on VMM side, it can be used
-+to detect network down(VMM to guest, VMM to VMM, VMM to another remote server)
-+and do previously set operation. AWD(Advanced WatchDog) use awd_node
-+@var{chardevid} parameter to connect with a -chardev node for heartbeat
-+service, and the service use the server @var{server} parameter to divided into
-+server side and client side. The iothread @var{id} parameter make AWD attach to
-+iothread and run independently of the main loop. The pulse_interval @var{time_ms}
-+and timeout @var{time_ms} are heartbeat service property, default property are
-+pulse_interval=5000, timeout=2000. AWD use the notification_node @var{chardevid}
-+attach another -chardev socket node to do previously set operation, user can
-+setup the operation(user command) in opt_script file, AWD will open this script
-+and send it to notification_node. It make user have basic VM/Host network
-+monitoring tools and basic false tolerance and recovery solution.
-+
-+Usage cases:
-+Send message to admin, notify another VMM, send qmp command to qemu do some
-+operation like restart the VM, build VMM heartbeat system, etc.
-+
- @item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support][,notify_dev=@var{id}]
- 
- Colo-compare gets packet from primary_in@var{chardevid} and secondary_in@var{chardevid}, than compare primary packet with
--- 
-2.17.1
-
+-David
 
