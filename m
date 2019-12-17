@@ -2,95 +2,79 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A039C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A785C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E54E321835
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:58:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4091221582
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:20:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UvmpMEBe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E54E321835
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l3BczMjD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4091221582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44019 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihGBW-0004mo-Us
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:58:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58749)
+	id 1ihGWV-00069i-ET
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:20:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39833)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihGAb-000484-5t
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:58:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ihGVk-0005hE-DB
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:19:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihGAZ-0000a4-R0
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:58:00 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37505)
+ (envelope-from <peter.maydell@linaro.org>) id 1ihGVj-0001Xz-1D
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:19:52 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:34863)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihGAZ-0000Ze-JC
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:57:59 -0500
-Received: by mail-pg1-x544.google.com with SMTP id q127so5993003pga.4
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 08:57:59 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ihGVi-0001Xr-Rp
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:19:50 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id f71so5001781otf.2
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 09:19:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=35wX1HYRxAyJpHe8LnX7Y8fHENDYiRGdXDfL0VomOJk=;
- b=UvmpMEBeJL+ECJ45w+tDMOp5Z20XmhytSXycmInXunj53NsW2u3OqhdJQOKvxxy8tD
- a4dOnPftC4f8DbKjUWErjeK+7sRp7WNtOl6Hu1mUSYvEYGO9HhjxynKc9FNCHAGFOZ+i
- /Y/CvKeUHmM7cv5bYYV95KpSfKOz+5rXEoiJ1TtY1+uHF3TgLorXJsjSnanX/99qAoXr
- jl9wbLKKY+5SnBxlSaeLa9lEEHaBwHzDaH/1ws42G3cl5gyG785ydEiAi0DHLQd5DTW3
- UL2vbNMEAcCp/mkZ2eA488V+OFd+SLCsOZ7AOVnQdH4j32M91oAFovAZWIqBp5M1dety
- N+nQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rcECzhTd1HBYWF7LAUn/lPdWQwFk6rMb++qmPhd3QMk=;
+ b=l3BczMjDeeajcbn9ErmpwyWGQxmKHB4FfQg/pAtBsXhs82khCfdh+X/N4XafTOuUOX
+ sPxLPQoV5iwNJqJKq4yHTppeb+89OBCSaTZOe62OgkvDfJSVmn3zMrzjiKhAa10fhIUy
+ WGgo+kkfwHdVnagBJgUiLWxi7fknltezC6SnbOEd/edC9vEeLpp+zRoGycNV6aOb8qcs
+ oIMVHeyT4ITWQwJwdrbv9bJc/UAxHdbs08c3jBRmoXnR4at0vPamIPD1weypYcH12s9G
+ vUzqhrcryZ20NxXAT564OZs4qfAeYJDKbYccKKp/gxCjJKexj/q0RySNsB/ayDhmm2uv
+ ADJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=35wX1HYRxAyJpHe8LnX7Y8fHENDYiRGdXDfL0VomOJk=;
- b=SMTrpoTPMoIdtkyEC1dWOGt0F+DXYG86FtYk7n/LycoSSSsrRo8ZJNUzxUrpbhLX5K
- FcMrNewYDS9FQYS+qNNnS6jMl8plWoc5TRgX2MhvaImKun+gHzFHlK46EgYnLobQt56d
- NzyH0hq2oXNgHnGQmACngXt2kGXzV8X7G7NCYxNrgRXI1fLmzc+5ht3uhG8Xu9b8ILnY
- Ng/4VV2D7mBgZwOLBEfpfTTxixIRU8Wov8bu/OWj/cnJS5+hG7PUXRa9jl3IY/sYhaby
- TEWKM3mg5RtFQjbdtkvvUsynxMRXPbpy0mXL+DAvJr4g61MGLKwAfBeIe12V5SpNOc6V
- X82A==
-X-Gm-Message-State: APjAAAU0nFpJOGry7GkZ2tGcfT2308JrtOzU0k7ApIn9Ctl6V1SMyjY5
- JT8kRJQ8Xs8MQwgkxr/plBPxwQ==
-X-Google-Smtp-Source: APXvYqzjIHAl4TyhYYjoygIu3rxBy0b9BmBu3q1ol9CDjY/iPCaMQ0zQkYrXp9MC0tSuX2AUyGRXLg==
-X-Received: by 2002:a63:cc02:: with SMTP id x2mr26541622pgf.114.1576601878297; 
- Tue, 17 Dec 2019 08:57:58 -0800 (PST)
-Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
- ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id a15sm28528346pfh.169.2019.12.17.08.57.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Dec 2019 08:57:57 -0800 (PST)
-Subject: Re: [PATCH] memory: Do not allow subregion out of the parent region
- range
-To: Christophe de Dinechin <dinechin@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20191214160223.20012-1-philmd@redhat.com>
- <da81a3e7-62a8-f46e-c12f-4dead2a9091f@redhat.com>
- <92bb8e12-3ece-9811-438b-8fa64d2bde66@redhat.com>
- <4a07cc6f-8762-145e-2b54-c61b0e287f19@redhat.com>
- <127AF076-D309-4952-B572-52587A93F46A@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c5c27111-efc5-0a05-bdbd-415533e5bc30@linaro.org>
-Date: Tue, 17 Dec 2019 06:57:53 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rcECzhTd1HBYWF7LAUn/lPdWQwFk6rMb++qmPhd3QMk=;
+ b=S+0/VF3wl97AsT/QxyykGjW7lLa0VfWDrZcM4lYutzx67QZDMwHTlje3zhAlK0xex9
+ ld3XIg1ve1xv6XtsEAbkOQ6UtCp9zMQ70507/Mc/ZI74qhGybO62s8+smH47ricW23cd
+ QvU6wbAs7nCrsWDFvJjdbhz909Yr61N6swClJRe5Y0pKyaibqXeEOJA8tjzdck1hxgYD
+ ikKzWXwLXzqQVu+1Vak6FPPJai2lbWVPgWT46cEEgHtQW04WrB41dRJ5wCEqgT3VDGep
+ bYkwhjWxp9QvAb2lUO9+vJYbPXHGDEHh2ZlRdPnDjtC/JcinzigFPIwdXUFXmOHhTbNw
+ t7Mw==
+X-Gm-Message-State: APjAAAUBZDXf/U0d5v3T519KTgfs71p2XeCUEYszvF8uucAgaZJKwjU+
+ /3ZN+i58TIvfGYJ74AnkLt/S+e1dQ6b/0viS9cOwIg==
+X-Google-Smtp-Source: APXvYqxsF0tSitO3YZEBzZdMg2M9ppqXULqVW7NMxeqY+/OYyPs0W6EBfS7+WagA6xNtWqAxOPXiR+k1jttaWO2P4mM=
+X-Received: by 2002:a9d:6745:: with SMTP id w5mr36859834otm.221.1576603189995; 
+ Tue, 17 Dec 2019 09:19:49 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <127AF076-D309-4952-B572-52587A93F46A@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20191217084223.10231-1-thuth@redhat.com>
+In-Reply-To: <20191217084223.10231-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 17 Dec 2019 17:19:39 +0000
+Message-ID: <CAFEAcA_xwsaCym6yg7En0YScZDiA1nTnRcxCShur7LTQ5omrLQ@mail.gmail.com>
+Subject: Re: [PULL v2 00/10] Bluetooth removal, and qtest & misc patches
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,53 +86,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/17/19 1:58 AM, Christophe de Dinechin wrote:
-> 
-> 
->> On 17 Dec 2019, at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 16/12/19 18:46, Philippe Mathieu-Daudé wrote:
->>>>>
->>>>
->>>> I think in some cases this could be intentional, for example if you have
->>>> different models with different BAR sizes and you organize this with the
->>>> same tree of MemoryRegion and different sizes for the parent.
->>>
->>> But if a child is outside of the parent range, it can't be reached,
->>> right? I'm confused, maybe AddressSpace can do that, but MemoryRegion
->>> shouldn't?
->>
->> Yes, the idea is that you could have for one version of the device
->>
->>   parent 0x000-0x7ff
->>     stuff 0x000-0x3ff
->>     morestuff 0x400-0x7ff
->>
->> and for another
->>
->>   parent 0x000-0x3ff
->>     stuff 0x000-0x3ff
->>     morestuff 0x400-0x7ff
->>
->> where parent is the BAR, and you can share the code to generate the tree
->> underneath parent.
-> 
-> I can see why you would have code reuse reasons to do that,
-> but frankly it looks buggy and confusing. In the rare cases
-> where this is indented, maybe add a flag making it explicit?
+On Tue, 17 Dec 2019 at 08:42, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi!
+>
+> The following changes since commit cb88904a54903ef6ba21a68a61d9cd51e2166304:
+>
+>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-dec-16-2019' into staging (2019-12-16 14:07:56 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-12-17
+>
+> for you to fetch changes up to 0f555602c7430ae55b5a4bacf39ce9e483e11193:
+>
+>   tests: use g_test_rand_int (2019-12-17 09:05:23 +0100)
+>
+> ----------------------------------------------------------------
+> * Removal of the deprecated bluetooth code
+> * Some qtest and misc patches
+> ----------------------------------------------------------------
+>
+> v2: Unfortunately, I was not able to reproduce the build problem that
+>     Peter reported for the v1 pull request. So I'm trying to work-around
+>     the issue now by leaving an empty hw/bt/Kconfig file around this time.
+>     I'll remove it by another patch later in a couple of weeks instead.
+>
 
-The guest OS is programming the BAR, producing a configuration that, while it
-doesn't make sense, is also legal per PCI.  QEMU cannot abort for this
-configuration.
+This passed without issues on all my build hosts, so your guess
+about it being down to the deletion of the Kconfig file must
+be right.
 
 
-r~
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
