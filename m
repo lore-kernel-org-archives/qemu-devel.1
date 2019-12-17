@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A359C2D0C5
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A62C2D0C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE02E21739
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:38:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 155C021739
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:41:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXtB7wEX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE02E21739
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqAZXUxg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 155C021739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih6V9-00085y-HY
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 01:38:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48992)
+	id 1ih6YP-0003AQ-Hu
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 01:41:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49085)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ih6Jz-0000lD-Dw
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:05 -0500
+ (envelope-from <armbru@redhat.com>) id 1ih6K0-0000n7-NU
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ih6Jw-0000xa-2R
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:03 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26359
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1ih6Jy-0001Bo-9G
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45939
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ih6Jv-0000ti-Tm
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:26:59 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ih6Jy-00018a-3p
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576564019;
+ s=mimecast20190719; t=1576564021;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WJkfHcaxEpYm5hhWlCXM/SGv2lErq8lQvcIGyEnWk0o=;
- b=KXtB7wEX20npvTVtnT2y5Gxn26GuYI1jzvSOe3KXJ8ioosP7Z+0o2torfJ1UMAbyTuzCvd
- ghbABXLyIN7yR0ySUR9W5GW/Avo25QWLVexneW+DszJ0SHx9ShbGwMrKYcDK+9S0DSVkou
- yJOv885IeLLncf9si7IQYzhHedv7Dm8=
+ bh=n/OmQfNuIfCdF7J9e+osTcpQv9FggwcAnVFk1+xrsXc=;
+ b=OqAZXUxgJfr3rY7f+tFSj1iWdMr63tPXDHy2UVXczatKPG0WpWV9Nmnpkrt8XtuTFZbFAW
+ tTfp+dt/w10lD2TguVgyj+p0PT0bjS1EGnC5Q1SltmMlHnjZSa2PsCwfykb1cZfKcU+0fU
+ hOCo/OU4vpdO+Tc+RNmBkWjxqhPwyg8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-MOKIn_EJOluOqmUsthPagA-1; Tue, 17 Dec 2019 01:26:55 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-245-psJ2dp7nO1Cs0jEjETkbmg-1; Tue, 17 Dec 2019 01:26:58 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8DF4800D4C;
- Tue, 17 Dec 2019 06:26:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75BFC911A4
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 06:26:57 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
  [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9ED2381;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78D007C836;
  Tue, 17 Dec 2019 06:26:54 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 61F8D11384AA; Tue, 17 Dec 2019 07:26:51 +0100 (CET)
+ id 6BAEC11384DA; Tue, 17 Dec 2019 07:26:51 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/34] hw/ipmi: Fix realize() error API violations
-Date: Tue, 17 Dec 2019 07:26:26 +0100
-Message-Id: <20191217062651.9687-10-armbru@redhat.com>
+Subject: [PULL 12/34] error: Clean up unusual names of Error * variables
+Date: Tue, 17 Dec 2019 07:26:29 +0100
+Message-Id: <20191217062651.9687-13-armbru@redhat.com>
 In-Reply-To: <20191217062651.9687-1-armbru@redhat.com>
 References: <20191217062651.9687-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: MOKIn_EJOluOqmUsthPagA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: psJ2dp7nO1Cs0jEjETkbmg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,137 +88,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-isa_ipmi_bt_realize(), ipmi_isa_realize(), pci_ipmi_bt_realize(), and
-pci_ipmi_kcs_realize() dereference @errp when IPMIInterfaceClass
-method init() fails.  That's wrong; see the big comment in error.h.
-Introduced in commit 0719029c47 "ipmi: Add an ISA KCS low-level
-interface", then imitated in commit a9b74079cb "ipmi: Add a BT
-low-level interface" and commit 12f983c6aa "ipmi: Add PCI IPMI
-interfaces".
+Local Error * variables are conventionally named @err or @local_err,
+and Error ** parameters @errp.  Naming local variables like parameters
+is confusing.  Clean that up.
 
-No caller actually passes null.
+Naming parameters like local variables is also confusing.  Left for
+another day.
 
-Fix anyway: splice in a local Error *err, and error_propagate().
-
-Cc: Corey Minyard <cminyard@mvista.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20191204093625.14836-9-armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20191204093625.14836-17-armbru@redhat.com>
 ---
- hw/ipmi/isa_ipmi_bt.c  | 7 +++++--
- hw/ipmi/isa_ipmi_kcs.c | 7 +++++--
- hw/ipmi/pci_ipmi_bt.c  | 6 ++++--
- hw/ipmi/pci_ipmi_kcs.c | 6 ++++--
- 4 files changed, 18 insertions(+), 8 deletions(-)
+ hw/intc/s390_flic_kvm.c    | 10 +++++-----
+ hw/ppc/spapr_pci.c         | 16 ++++++++--------
+ hw/ppc/spapr_pci_nvlink2.c | 10 +++++-----
+ tests/test-blockjob.c      | 16 ++++++++--------
+ 4 files changed, 26 insertions(+), 26 deletions(-)
 
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index 9a87ffd3f0..9fba5ed383 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -70,6 +70,7 @@ static void isa_ipmi_bt_lower_irq(IPMIBT *ib)
-=20
- static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
- {
+diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
+index c9ee80eaae..30d50c2369 100644
+--- a/hw/intc/s390_flic_kvm.c
++++ b/hw/intc/s390_flic_kvm.c
+@@ -582,10 +582,10 @@ static void kvm_s390_flic_realize(DeviceState *dev, E=
+rror **errp)
+     struct kvm_create_device cd =3D {0};
+     struct kvm_device_attr test_attr =3D {0};
+     int ret;
+-    Error *errp_local =3D NULL;
 +    Error *err =3D NULL;
-     ISADevice *isadev =3D ISA_DEVICE(dev);
-     ISAIPMIBTDevice *iib =3D ISA_IPMI_BT(dev);
-     IPMIInterface *ii =3D IPMI_INTERFACE(dev);
-@@ -85,9 +86,11 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error =
-**errp)
-     iib->bt.bmc->intf =3D ii;
-     iib->bt.opaque =3D iib;
 =20
--    iic->init(ii, 0, errp);
--    if (*errp)
-+    iic->init(ii, 0, &err);
+-    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &errp_local);
+-    if (errp_local) {
++    KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &err);
 +    if (err) {
-+        error_propagate(errp, err);
-         return;
-+    }
-=20
-     if (iib->isairq > 0) {
-         isa_init_irq(isadev, &iib->irq, iib->isairq);
-diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
-index ca3ea36a3f..cc6bd817f2 100644
---- a/hw/ipmi/isa_ipmi_kcs.c
-+++ b/hw/ipmi/isa_ipmi_kcs.c
-@@ -69,6 +69,7 @@ static void isa_ipmi_kcs_lower_irq(IPMIKCS *ik)
-=20
- static void ipmi_isa_realize(DeviceState *dev, Error **errp)
- {
-+    Error *err =3D NULL;
-     ISADevice *isadev =3D ISA_DEVICE(dev);
-     ISAIPMIKCSDevice *iik =3D ISA_IPMI_KCS(dev);
-     IPMIInterface *ii =3D IPMI_INTERFACE(dev);
-@@ -84,9 +85,11 @@ static void ipmi_isa_realize(DeviceState *dev, Error **e=
-rrp)
-     iik->kcs.bmc->intf =3D ii;
-     iik->kcs.opaque =3D iik;
-=20
--    iic->init(ii, 0, errp);
--    if (*errp)
-+    iic->init(ii, 0, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-         return;
-+    }
-=20
-     if (iik->isairq > 0) {
-         isa_init_irq(isadev, &iik->irq, iik->isairq);
-diff --git a/hw/ipmi/pci_ipmi_bt.c b/hw/ipmi/pci_ipmi_bt.c
-index 6ed925a665..ba9cf016b5 100644
---- a/hw/ipmi/pci_ipmi_bt.c
-+++ b/hw/ipmi/pci_ipmi_bt.c
-@@ -54,6 +54,7 @@ static void pci_ipmi_lower_irq(IPMIBT *ik)
-=20
- static void pci_ipmi_bt_realize(PCIDevice *pd, Error **errp)
- {
-+    Error *err =3D NULL;
-     PCIIPMIBTDevice *pik =3D PCI_IPMI_BT(pd);
-     IPMIInterface *ii =3D IPMI_INTERFACE(pd);
-     IPMIInterfaceClass *iic =3D IPMI_INTERFACE_GET_CLASS(ii);
-@@ -74,8 +75,9 @@ static void pci_ipmi_bt_realize(PCIDevice *pd, Error **er=
-rp)
-     pik->bt.raise_irq =3D pci_ipmi_raise_irq;
-     pik->bt.lower_irq =3D pci_ipmi_lower_irq;
-=20
--    iic->init(ii, 8, errp);
--    if (*errp) {
-+    iic->init(ii, 8, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-         return;
+         goto fail;
      }
-     pci_register_bar(pd, 0, PCI_BASE_ADDRESS_SPACE_IO, &pik->bt.io);
-diff --git a/hw/ipmi/pci_ipmi_kcs.c b/hw/ipmi/pci_ipmi_kcs.c
-index eeba63baa4..99f46152f4 100644
---- a/hw/ipmi/pci_ipmi_kcs.c
-+++ b/hw/ipmi/pci_ipmi_kcs.c
-@@ -54,6 +54,7 @@ static void pci_ipmi_lower_irq(IPMIKCS *ik)
-=20
- static void pci_ipmi_kcs_realize(PCIDevice *pd, Error **errp)
- {
-+    Error *err =3D NULL;
-     PCIIPMIKCSDevice *pik =3D PCI_IPMI_KCS(pd);
-     IPMIInterface *ii =3D IPMI_INTERFACE(pd);
-     IPMIInterfaceClass *iic =3D IPMI_INTERFACE_GET_CLASS(ii);
-@@ -74,8 +75,9 @@ static void pci_ipmi_kcs_realize(PCIDevice *pd, Error **e=
-rrp)
-     pik->kcs.raise_irq =3D pci_ipmi_raise_irq;
-     pik->kcs.lower_irq =3D pci_ipmi_lower_irq;
-=20
--    iic->init(ii, 8, errp);
--    if (*errp) {
-+    iic->init(ii, 8, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-         return;
+     flic_state->fd =3D -1;
+@@ -593,7 +593,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Err=
+or **errp)
+     cd.type =3D KVM_DEV_TYPE_FLIC;
+     ret =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
+     if (ret < 0) {
+-        error_setg_errno(&errp_local, errno, "Creating the KVM device fail=
+ed");
++        error_setg_errno(&err, errno, "Creating the KVM device failed");
+         trace_flic_create_device(errno);
+         goto fail;
      }
-     pci_register_bar(pd, 0, PCI_BASE_ADDRESS_SPACE_IO, &pik->kcs.io);
+@@ -605,7 +605,7 @@ static void kvm_s390_flic_realize(DeviceState *dev, Err=
+or **errp)
+                                             KVM_HAS_DEVICE_ATTR, test_attr=
+);
+     return;
+ fail:
+-    error_propagate(errp, errp_local);
++    error_propagate(errp, err);
+ }
+=20
+ static void kvm_s390_flic_reset(DeviceState *dev)
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index f6fbcf99ed..723373de73 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2042,13 +2042,13 @@ void spapr_phb_dma_reset(SpaprPhbState *sphb)
+ static void spapr_phb_reset(DeviceState *qdev)
+ {
+     SpaprPhbState *sphb =3D SPAPR_PCI_HOST_BRIDGE(qdev);
+-    Error *errp =3D NULL;
++    Error *err =3D NULL;
+=20
+     spapr_phb_dma_reset(sphb);
+     spapr_phb_nvgpu_free(sphb);
+-    spapr_phb_nvgpu_setup(sphb, &errp);
+-    if (errp) {
+-        error_report_err(errp);
++    spapr_phb_nvgpu_setup(sphb, &err);
++    if (err) {
++        error_report_err(err);
+     }
+=20
+     /* Reset the IOMMU state */
+@@ -2326,7 +2326,7 @@ int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbSt=
+ate *phb,
+                                 cpu_to_be32(phb->numa_node)};
+     SpaprTceTable *tcet;
+     SpaprDrc *drc;
+-    Error *errp =3D NULL;
++    Error *err =3D NULL;
+=20
+     /* Start populating the FDT */
+     _FDT(bus_off =3D fdt_add_subnode(fdt, 0, phb->dtbusname));
+@@ -2408,9 +2408,9 @@ int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbSt=
+ate *phb,
+         return ret;
+     }
+=20
+-    spapr_phb_nvgpu_populate_dt(phb, fdt, bus_off, &errp);
+-    if (errp) {
+-        error_report_err(errp);
++    spapr_phb_nvgpu_populate_dt(phb, fdt, bus_off, &err);
++    if (err) {
++        error_report_err(err);
+     }
+     spapr_phb_nvgpu_ram_populate_dt(phb, fdt);
+=20
+diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
+index 4aa89ede23..8332d5694e 100644
+--- a/hw/ppc/spapr_pci_nvlink2.c
++++ b/hw/ppc/spapr_pci_nvlink2.c
+@@ -57,7 +57,7 @@ struct SpaprPhbPciNvGpuConfig {
+     uint64_t nv2_atsd_current;
+     int num; /* number of non empty (i.e. tgt!=3D0) entries in slots[] */
+     SpaprPhbPciNvGpuSlot slots[NVGPU_MAX_NUM];
+-    Error *errp;
++    Error *err;
+ };
+=20
+ static SpaprPhbPciNvGpuSlot *
+@@ -153,7 +153,7 @@ static void spapr_phb_pci_collect_nvgpu(PCIBus *bus, PC=
+IDevice *pdev,
+             spapr_pci_collect_nvnpu(nvgpus, pdev, tgt, MEMORY_REGION(mr_np=
+u),
+                                     &local_err);
+         }
+-        error_propagate(&nvgpus->errp, local_err);
++        error_propagate(&nvgpus->err, local_err);
+     }
+     if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=3D
+          PCI_HEADER_TYPE_BRIDGE)) {
+@@ -187,9 +187,9 @@ void spapr_phb_nvgpu_setup(SpaprPhbState *sphb, Error *=
+*errp)
+     pci_for_each_device(bus, pci_bus_num(bus),
+                         spapr_phb_pci_collect_nvgpu, sphb->nvgpus);
+=20
+-    if (sphb->nvgpus->errp) {
+-        error_propagate(errp, sphb->nvgpus->errp);
+-        sphb->nvgpus->errp =3D NULL;
++    if (sphb->nvgpus->err) {
++        error_propagate(errp, sphb->nvgpus->err);
++        sphb->nvgpus->err =3D NULL;
+         goto cleanup_exit;
+     }
+=20
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 7844c9ffcb..e670a20617 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -34,13 +34,13 @@ static BlockJob *mk_job(BlockBackend *blk, const char *=
+id,
+                         int flags)
+ {
+     BlockJob *job;
+-    Error *errp =3D NULL;
++    Error *err =3D NULL;
+=20
+     job =3D block_job_create(id, drv, NULL, blk_bs(blk),
+                            0, BLK_PERM_ALL, 0, flags, block_job_cb,
+-                           NULL, &errp);
++                           NULL, &err);
+     if (should_succeed) {
+-        g_assert_null(errp);
++        g_assert_null(err);
+         g_assert_nonnull(job);
+         if (id) {
+             g_assert_cmpstr(job->job.id, =3D=3D, id);
+@@ -48,9 +48,9 @@ static BlockJob *mk_job(BlockBackend *blk, const char *id=
+,
+             g_assert_cmpstr(job->job.id, =3D=3D, blk_name(blk));
+         }
+     } else {
+-        g_assert_nonnull(errp);
++        g_assert_nonnull(err);
+         g_assert_null(job);
+-        error_free(errp);
++        error_free(err);
+     }
+=20
+     return job;
+@@ -80,9 +80,9 @@ static BlockBackend *create_blk(const char *name)
+     bdrv_unref(bs);
+=20
+     if (name) {
+-        Error *errp =3D NULL;
+-        monitor_add_blk(blk, name, &errp);
+-        g_assert_null(errp);
++        Error *err =3D NULL;
++        monitor_add_blk(blk, name, &err);
++        g_assert_null(err);
+     }
+=20
+     return blk;
 --=20
 2.21.0
 
