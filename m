@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 119E4C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF641C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:54:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3A9A21835
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E5A821835
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:54:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A3ynwGsw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3A9A21835
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRqc/4FS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5A821835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihG70-0000St-Jz
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:54:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54017)
+	id 1ihG7A-0000kj-Eu
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:54:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihFxr-0005AH-Gh
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:44:52 -0500
+ (envelope-from <philmd@redhat.com>) id 1ihFxR-0004hW-IQ
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:44:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihFxq-0007co-AJ
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:44:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27750
+ (envelope-from <philmd@redhat.com>) id 1ihFxQ-0007GE-B6
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:44:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52617
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihFxq-0007cH-6Q
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:44:50 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihFxQ-0007Fb-5l
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:44:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576601089;
+ s=mimecast20190719; t=1576601063;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cgmzu31Rt2ux67Lpas/rsmhkVxbL3amuZtxQ77YbDhM=;
- b=A3ynwGswjViAkFb7MBzdTpRJHjBvjoEn/64MlPl7XdH3ckSyUSUEE8644+j0+Qn3Q+E4IU
- 6WuH6aQLtvYjKxo0P82lfGIj8Epx4PFT43YvdbtsbLp4XRCZK8QKV50Zuc0//EZKL4OvFm
- 67SAAwUE/29Z+0Fm4uOexvKOZhmvQGk=
+ bh=MYVIpFLxZh/foCyP2XwIVnvo4LnIBsgaGRLRhMaYw14=;
+ b=PRqc/4FSK0EezMtFucpWfaxMAvKfPmdv8O7abU8yVdZQ3Cch10WgYk1xIdXKN4cXn8Wqnz
+ Wu9eWtTpKD9OXwBjKfhMz8woVhSUZJnb6vjvsG69P0UN0lt8b8DYStKP1ai2zwEW0AWryU
+ WmEli4lyDxsVgxivK5++v+O4qIvxueE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189-K55-sau0PYefSDfGkLWuzg-1; Tue, 17 Dec 2019 11:44:46 -0500
+ us-mta-279-wgik6hrlOhGkOgAq2xvtuQ-1; Tue, 17 Dec 2019 11:44:19 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F0631183E1A;
- Tue, 17 Dec 2019 16:44:41 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB86F68894;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 770751023150;
  Tue, 17 Dec 2019 16:44:15 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7598D68877;
+ Tue, 17 Dec 2019 16:43:50 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
-Subject: [RFC PATCH 13/14] hw/char/terminal3270: Explicit ignored QEMUChrEvent
+Subject: [RFC PATCH 12/14] vhost-user-blk: Explicit we ignore few QEMUChrEvent
  in IOEventHandler
-Date: Tue, 17 Dec 2019 17:38:07 +0100
-Message-Id: <20191217163808.20068-14-philmd@redhat.com>
+Date: Tue, 17 Dec 2019 17:38:06 +0100
+Message-Id: <20191217163808.20068-13-philmd@redhat.com>
 In-Reply-To: <20191217163808.20068-1-philmd@redhat.com>
 References: <20191217163808.20068-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: K55-sau0PYefSDfGkLWuzg-1
+X-MC-Unique: wgik6hrlOhGkOgAq2xvtuQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -125,37 +125,37 @@ able to use this enum in the IOEventHandler typedef, we need to
 explicit when frontends ignore some events, to silent GCC the
 following warnings:
 
-    CC      s390x-softmmu/hw/char/terminal3270.o
-  hw/char/terminal3270.c: In function =E2=80=98chr_event=E2=80=99:
-  hw/char/terminal3270.c:156:5: error: enumeration value =E2=80=98CHR_EVENT=
-_BREAK=E2=80=99 not handled in switch [-Werror=3Dswitch]
-    156 |     switch (event) {
+    CC      s390x-softmmu/hw/block/vhost-user-blk.o
+  hw/block/vhost-user-blk.c: In function =E2=80=98vhost_user_blk_event=E2=
+=80=99:
+  hw/block/vhost-user-blk.c:370:5: error: enumeration value =E2=80=98CHR_EV=
+ENT_BREAK=E2=80=99 not handled in switch [-Werror=3Dswitch]
+    370 |     switch (event) {
         |     ^~~~~~
-  hw/char/terminal3270.c:156:5: error: enumeration value =E2=80=98CHR_EVENT=
-_MUX_IN=E2=80=99 not handled in switch [-Werror=3Dswitch]
-  hw/char/terminal3270.c:156:5: error: enumeration value =E2=80=98CHR_EVENT=
-_MUX_OUT=E2=80=99 not handled in switch [-Werror=3Dswitch]
+  hw/block/vhost-user-blk.c:370:5: error: enumeration value =E2=80=98CHR_EV=
+ENT_MUX_IN=E2=80=99 not handled in switch [-Werror=3Dswitch]
+  hw/block/vhost-user-blk.c:370:5: error: enumeration value =E2=80=98CHR_EV=
+ENT_MUX_OUT=E2=80=99 not handled in switch [-Werror=3Dswitch]
   cc1: all warnings being treated as errors
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org
 ---
- hw/char/terminal3270.c | 3 +++
+ hw/block/vhost-user-blk.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
-index 6859c1bcb2..9e59a2d92b 100644
---- a/hw/char/terminal3270.c
-+++ b/hw/char/terminal3270.c
-@@ -166,6 +166,9 @@ static void chr_event(void *opaque, int event)
-         sch->curr_status.scsw.dstat =3D SCSW_DSTAT_DEVICE_END;
-         css_conditional_io_interrupt(sch);
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 63da9bb619..4e2b2efdd3 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -383,6 +383,9 @@ static void vhost_user_blk_event(void *opaque, int even=
+t)
+             s->watch =3D 0;
+         }
          break;
 +    default:
 +        /* Ignore */
