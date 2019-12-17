@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=FROM_WSP_TRAIL,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D703C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8005DC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:58:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 641452146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:57:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 641452146E
+	by mail.kernel.org (Postfix) with ESMTPS id 490EE20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:58:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 490EE20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihCQC-0005FG-K7
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:57:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54011)
+	id 1ihCRB-00068Y-Gn
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:58:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1ihCMV-0000OZ-9V
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:04 -0500
+ (envelope-from <chen.zhang@intel.com>) id 1ihCMV-0000Ok-QF
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1ihCMU-0001Di-1E
+ (envelope-from <chen.zhang@intel.com>) id 1ihCMT-0001DG-TB
  for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:03 -0500
-Received: from mga18.intel.com ([134.134.136.126]:49328)
+Received: from mga18.intel.com ([134.134.136.126]:49326)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1ihCMT-00018a-Mv
+ id 1ihCMT-00016O-Kd
  for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:01 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Dec 2019 04:54:01 -0800
+ 17 Dec 2019 04:53:55 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,325,1571727600"; d="scan'208";a="209689654"
+X-IronPort-AV: E=Sophos;i="5.69,325,1571727600"; d="scan'208";a="209689617"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by orsmga008.jf.intel.com with ESMTP; 17 Dec 2019 04:54:00 -0800
+ by orsmga008.jf.intel.com with ESMTP; 17 Dec 2019 04:53:53 -0800
 From: Zhang Chen <chen.zhang@intel.com >
 To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH V4 5/5] docs/awd.txt: Add doc to introduce Advanced
- WatchDog(AWD) module
-Date: Tue, 17 Dec 2019 20:45:54 +0800
-Message-Id: <20191217124554.30818-6-chen.zhang@intel.com>
+Subject: [PATCH V4 1/5] net/awd.c: Introduce Advanced Watch Dog module
+ framework
+Date: Tue, 17 Dec 2019 20:45:50 +0800
+Message-Id: <20191217124554.30818-2-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191217124554.30818-1-chen.zhang@intel.com>
 References: <20191217124554.30818-1-chen.zhang@intel.com>
@@ -75,108 +75,374 @@ Sender: "Qemu-devel"
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-Add docs to introduce Advanced WatchDog detail and usage.
+This patch introduce a new module named Advanced Watch Dog,
+and defined the input and output parameter. AWD use standard chardev
+as the way of communicationg with the outside world.
+If you want to use it, please add "--enable-awd" when configure qemu.
+
+Demo command:
+-object advanced-watchdog,id=awd1,server=on,awd_node=d_node,notification_node=remote_server,opt_script=opt_script_path,iothread=awd_iothread,pulse_interval=1000,timeout=5000
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- docs/awd.txt | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
- create mode 100644 docs/awd.txt
+ configure         |   9 ++
+ net/Makefile.objs |   1 +
+ net/awd.c         | 261 ++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx   |  20 ++++
+ 4 files changed, 291 insertions(+)
+ create mode 100644 net/awd.c
 
-diff --git a/docs/awd.txt b/docs/awd.txt
+diff --git a/configure b/configure
+index 6099be1d84..49d1830de4 100755
+--- a/configure
++++ b/configure
+@@ -383,6 +383,7 @@ vhost_scsi=""
+ vhost_vsock=""
+ vhost_user=""
+ vhost_user_fs=""
++awd="no"
+ kvm="no"
+ hax="no"
+ hvf="no"
+@@ -1304,6 +1305,10 @@ for opt do
+   ;;
+   --enable-vhost-user-fs) vhost_user_fs="yes"
+   ;;
++  --disable-awd) awd="no"
++  ;;
++  --enable-awd) awd="yes"
++  ;;
+   --disable-opengl) opengl="no"
+   ;;
+   --enable-opengl) opengl="yes"
+@@ -1780,6 +1785,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vhost-crypto    vhost-user-crypto backend support
+   vhost-kernel    vhost kernel backend support
+   vhost-user      vhost-user backend support
++  awd             Advanced Watch Dog support
+   spice           spice
+   rbd             rados block device (rbd)
+   libiscsi        iscsi support
+@@ -7043,6 +7049,9 @@ fi
+ if test "$vhost_user" = "yes" ; then
+   echo "CONFIG_VHOST_USER=y" >> $config_host_mak
+ fi
++if test "$awd" = "yes" ; then
++  echo "CONFIG_AWD=y" >> $config_host_mak
++fi
+ if test "$vhost_user_fs" = "yes" ; then
+   echo "CONFIG_VHOST_USER_FS=y" >> $config_host_mak
+ fi
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index c5d076d19c..187e655443 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -19,6 +19,7 @@ common-obj-y += colo-compare.o
+ common-obj-y += colo.o
+ common-obj-y += filter-rewriter.o
+ common-obj-y += filter-replay.o
++common-obj-$(CONFIG_AWD) += awd.o
+ 
+ tap-obj-$(CONFIG_LINUX) = tap-linux.o
+ tap-obj-$(CONFIG_BSD) = tap-bsd.o
+diff --git a/net/awd.c b/net/awd.c
 new file mode 100644
-index 0000000000..0ce513be5a
+index 0000000000..d42b4a7372
 --- /dev/null
-+++ b/docs/awd.txt
-@@ -0,0 +1,88 @@
-+Advanced Watch Dog (AWD)
-+========================
-+Copyright (c) 2019 Intel Corporation.
-+Author: Zhang Chen <chen.zhang@intel.com>
++++ b/net/awd.c
+@@ -0,0 +1,261 @@
++/*
++ * Advanced Watch Dog
++ *
++ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
++ * (a.k.a. Fault Tolerance or Continuous Replication)
++ *
++ * Copyright (c) 2019 Intel Corporation
++ *
++ * Author: Zhang Chen <chen.zhang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
 +
-+This work is licensed under the terms of the GNU GPL, version 2 or later.
-+See the COPYING file in the top-level directory.
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "trace.h"
++#include "qemu-common.h"
++#include "qapi/error.h"
++#include "net/net.h"
++#include "qom/object_interfaces.h"
++#include "qom/object.h"
++#include "chardev/char-fe.h"
++#include "qemu/sockets.h"
++#include "sysemu/iothread.h"
 +
-+Introduction
-+------------
++#define TYPE_AWD  "advanced-watchdog"
++#define AWD(obj)  OBJECT_CHECK(AwdState, (obj), TYPE_AWD)
++
++#define AWD_READ_LEN_MAX NET_BUFSIZE
++/* Default advanced watchdog pulse interval */
++#define AWD_PULSE_INTERVAL_DEFAULT 5000
++/* Default advanced watchdog timeout */
++#define AWD_TIMEOUT_DEFAULT 2000
++
++typedef struct AwdState {
++    Object parent;
++
++    bool server;
++    char *awd_node;
++    char *notification_node;
++    char *opt_script;
++    uint32_t pulse_interval;
++    uint32_t timeout;
++    IOThread *iothread;
++} AwdState;
++
++typedef struct AwdClass {
++    ObjectClass parent_class;
++} AwdClass;
++
++static char *awd_get_node(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return g_strdup(s->awd_node);
++}
++
++static void awd_set_node(Object *obj, const char *value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->awd_node);
++    s->awd_node = g_strdup(value);
++}
++
++static char *noti_get_node(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return g_strdup(s->notification_node);
++}
++
++static void noti_set_node(Object *obj, const char *value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->notification_node);
++    s->notification_node = g_strdup(value);
++}
++
++static char *opt_script_get_node(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return g_strdup(s->opt_script);
++}
++
++static void opt_script_set_node(Object *obj, const char *value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->opt_script);
++    s->opt_script = g_strdup(value);
++}
++
++static bool awd_get_server(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return s->server;
++}
++
++static void awd_set_server(Object *obj, bool value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    s->server = value;
++}
++
++static void awd_get_interval(Object *obj, Visitor *v,
++                                   const char *name, void *opaque,
++                                   Error **errp)
++{
++    AwdState *s = AWD(obj);
++    uint32_t value = s->pulse_interval;
++
++    visit_type_uint32(v, name, &value, errp);
++}
++
++static void awd_set_interval(Object *obj, Visitor *v,
++                                   const char *name, void *opaque,
++                                   Error **errp)
++{
++    AwdState *s = AWD(obj);
++    Error *local_err = NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    if (!value) {
++        error_setg(&local_err, "Property '%s.%s' requires a positive value",
++                   object_get_typename(obj), name);
++        goto out;
++    }
++    s->pulse_interval = value;
++
++out:
++    error_propagate(errp, local_err);
++}
++
++static void awd_get_timeout(Object *obj, Visitor *v,
++                            const char *name, void *opaque,
++                            Error **errp)
++{
++    AwdState *s = AWD(obj);
++    uint32_t value = s->timeout;
++
++    visit_type_uint32(v, name, &value, errp);
++}
++
++static void awd_set_timeout(Object *obj, Visitor *v,
++                            const char *name, void *opaque,
++                            Error **errp)
++{
++    AwdState *s = AWD(obj);
++    Error *local_err = NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++
++    if (!value) {
++        error_setg(&local_err, "Property '%s.%s' requires a positive value",
++                   object_get_typename(obj), name);
++        goto out;
++    }
++    s->timeout = value;
++
++out:
++    error_propagate(errp, local_err);
++}
++
++static void awd_complete(UserCreatable *uc, Error **errp)
++{
++    AwdState *s = AWD(uc);
++
++    if (!s->awd_node || !s->iothread ||
++        !s->notification_node || !s->opt_script) {
++        error_setg(errp, "advanced-watchdog needs 'awd_node', "
++                   "'notification_node', 'opt_script' "
++                   "and 'server' property set");
++        return;
++    }
++
++    return;
++}
++
++static void awd_class_init(ObjectClass *oc, void *data)
++{
++    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++
++    ucc->complete = awd_complete;
++}
++
++static void awd_init(Object *obj)
++{
++    AwdState *s = AWD(obj);
++
++    object_property_add_str(obj, "awd_node",
++                            awd_get_node, awd_set_node,
++                            NULL);
++
++    object_property_add_str(obj, "notification_node",
++                            noti_get_node, noti_set_node,
++                            NULL);
++
++    object_property_add_str(obj, "opt_script",
++                            opt_script_get_node, opt_script_set_node,
++                            NULL);
++
++    object_property_add_bool(obj, "server",
++                             awd_get_server,
++                             awd_set_server, NULL);
++
++    object_property_add(obj, "pulse_interval", "uint32",
++                        awd_get_interval,
++                        awd_set_interval, NULL, NULL, NULL);
++
++    object_property_add(obj, "timeout", "uint32",
++                        awd_get_timeout,
++                        awd_set_timeout, NULL, NULL, NULL);
++
++    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
++                            (Object **)&s->iothread,
++                            object_property_allow_set_link,
++                            OBJ_PROP_LINK_STRONG, NULL);
++}
++
++static void awd_finalize(Object *obj)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->awd_node);
++    g_free(s->notification_node);
++}
++
++static const TypeInfo awd_info = {
++    .name = TYPE_AWD,
++    .parent = TYPE_OBJECT,
++    .instance_size = sizeof(AwdState),
++    .instance_init = awd_init,
++    .instance_finalize = awd_finalize,
++    .class_size = sizeof(AwdClass),
++    .class_init = awd_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void register_types(void)
++{
++    type_register_static(&awd_info);
++}
++
++type_init(register_types);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 65c9473b73..40417afab5 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4589,6 +4589,26 @@ Dump the network traffic on netdev @var{dev} to the file specified by
+ The file format is libpcap, so it can be analyzed with tools such as tcpdump
+ or Wireshark.
+ 
++@item -object advanced-watchdog,id=@var{id},awd_node=@var{chardevid},notification_node=@var{chardevid},server=@var{server},iothread=@var{id},opt_script=@var{path}[,pulse_interval=@var{time_ms},timeout=@var{time_ms}]
 +
 +Advanced Watch Dog is an universal monitoring module on VMM side, it can be used
-+to detect network issues(VMM to guest, VMM to VMM, VMM to another remote server)
-+and do previously set operation. Current AWD accept any input as the signal
-+to refresh the watchdog timer, and we can also make a certain interactive
-+protocol here. Users can pre-write some command or some messages in the
-+AWD opt-script as the notification output. We noticed that there is no way
-+for VMM communicate directly, so we engaged with real customer found that they
-+need a lightweight and efficient mechanism to solve some practical problems,
-+for example Edge Computing cases(they think high level software is too heavy
-+to use in Edge or it is hard to manage and combine with VM instance).
-+It make user have basic VM/Host network monitoring tools and basic false
-+tolerance and recovery solution.
++to detect network down(VMM to guest, VMM to VMM, VMM to another remote server)
++and do previously set operation. AWD(Advanced WatchDog) use awd_node
++@var{chardevid} parameter to connect with a -chardev node for heartbeat
++service, and the service use the server @var{server} parameter to divided into
++server side and client side. The iothread @var{id} parameter make AWD attach to
++iothread and run independently of the main loop. The pulse_interval @var{time_ms}
++and timeout @var{time_ms} are heartbeat service property, default property are
++pulse_interval=5000, timeout=2000. AWD use the notification_node @var{chardevid}
++attach another -chardev socket node to do previously set operation, user can
++setup the operation(user command) in opt_script file, AWD will open this script
++and send it to notification_node. It make user have basic VM/Host network
++monitoring tools and basic false tolerance and recovery solution.
 +
-+Use case
-+--------
++Usage cases:
++Send message to admin, notify another VMM, send qmp command to qemu do some
++operation like restart the VM, build VMM heartbeat system, etc.
 +
-+1. Monitor local guest status.
-+Running a simple application in guest for send signal to the local AWD module,
-+if timeout occur, AWD will notify high level admin or do some previously set
-+operation. For example send exit command to local QMP interface or qemu monitor.
-+
-+2. Monitor other VMM.
-+AWD module can be connected to each other to build heartbeat service.
-+
-+3. Monitor other remote service.
-+In some cases, remote service have certain relationship with current VM. If
-+network connection have some issue, AWD can do some urgent operation like reboot
-+local VM. etc...
-+
-+AWD usage
-+---------
-+
-+User must "--enable-awd" in Qemu configuration.
-+
-+1. Monitor local guest status.
-+
-+-chardev socket,id=detection,host=0.0.0.0,port=9009,server,nowait
-+-chardev socket,id=notification,host=127.0.0.1,port=4445
-+-object iothread,id=iothread1
-+-object advanced-watchdog,id=awd1,server=on,awd_node=detection,notification_node=notification,opt_script=colo_opt_script,iothread=iothread1,pulse_interval=1000,timeout=5000
-+-monitor tcp::4445,server,nowait
-+
-+qemu_opt_script:
-+quit
-+
-+Guest service need connect to detection node, admin can check notification node
-+to get message when timeout occur.
-+
-+2. Monitor other VMM.
-+
-+Demo usage(for COLO heartbeat service):
-+
-+In primary node:
-+
-+-chardev socket,id=h1,host=3.3.3.3,port=9009,server,nowait
-+-chardev socket,id=heartbeat0,host=3.3.3.3,port=4445
-+-object iothread,id=iothread1
-+-object advanced-watchdog,id=heart1,server=on,awd_node=h1,notification_node=heartbeat0,opt_script=colo_primary_opt_script,iothread=iothread1,pulse_interval=1000,timeout=5000
-+
-+colo_primary_opt_script:
-+x_colo_lost_heartbeat
-+
-+In secondary node:
-+
-+-monitor tcp::4445,server,nowait
-+-chardev socket,id=h1,host=3.3.3.3,port=9009,reconnect=1
-+-chardev socket,id=heart1,host=3.3.3.8,port=4445
-+-object iothread,id=iothread1
-+-object advanced-watchdog,id=heart1,server=off,awd_node=h1,notification_node=heart1,opt_script=colo_secondary_opt_script,iothread=iothread1,timeout=10000
-+
-+colo_secondary_opt_script:
-+nbd_server_stop
-+x_colo_lost_heartbeat
-+
-+3. Monitor other remote service.
-+
-+Same like monitor local guest except detection node and notification node.
+ @item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support][,notify_dev=@var{id}]
+ 
+ Colo-compare gets packet from primary_in@var{chardevid} and secondary_in@var{chardevid}, than compare primary packet with
 -- 
 2.17.1
 
