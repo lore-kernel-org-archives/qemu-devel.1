@@ -2,79 +2,63 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80901C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3690EC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:48:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4960220733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:47:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02F0A20733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:48:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZnsJfw10"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4960220733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gBsv/bXi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F0A20733
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5hY-00058l-3z
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:47:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52137)
+	id 1ih5iR-0006fE-0f
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:48:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1ih5D8-000324-95
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:15:55 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kX-0002u4-8A
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1ih5D7-0003MW-2k
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:15:54 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54727
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kW-0000EJ-14
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:21 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:38431 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ih5D6-0003LD-Vm
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:15:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576559752;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BXjHJ/nHmfAHIatMjaNdnTAvIONIZN05s8S26P3Z/mo=;
- b=ZnsJfw10RQn44VAjOmihnWacJ3w1p8P+phYGXVD+28QlwwOXSfvgY2CjlSad6APfpdW1Fx
- t1sfB7ivwd5VIUfDh66CeW8PsAQhkqyVeJFPJh7GFT1RmnyTwgLv2U2cj8fs38DHzWpyXv
- 2iNzklFdlMkXIcFH01GRO9leHACb70A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-n2n22fOBN5eOqTM-Hs74IA-1; Tue, 17 Dec 2019 00:15:49 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4554A189CD01;
- Tue, 17 Dec 2019 05:15:48 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-6.gru2.redhat.com
- [10.97.116.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4194819C4F;
- Tue, 17 Dec 2019 05:15:42 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 03/15] analyze-migration.py: fix find() type error
-Date: Tue, 17 Dec 2019 00:15:09 -0500
-Message-Id: <20191217051521.1239-4-crosa@redhat.com>
-In-Reply-To: <20191217051521.1239-1-crosa@redhat.com>
-References: <20191217051521.1239-1-crosa@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ih4kV-00084z-NI; Mon, 16 Dec 2019 23:46:19 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47cQWk3ZZXz9sRm; Tue, 17 Dec 2019 15:43:44 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1576557826;
+ bh=TnBNdG+3SdShSrmyjXjRpG/CG/lHE/VGGq3tKwTGdB4=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=gBsv/bXivXwIWmCNu8NVW82d7l7Nqu3ees1WwMIGa6u3sEMEHzlBtyjstjXDWn+aD
+ zKSeWt3GDLtwAnBIRyYfCBkrt8mfmJEnLm0r589Y/FEjOEfCEoMokHiqiVaBRK2bMn
+ UrTc87sZrGnc3dU54HnItORHMnTRipb8Km9iVr00=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 80/88] ppc/pnv: Drop pnv_is_power9() and pnv_is_power10()
+ helpers
+Date: Tue, 17 Dec 2019 15:43:14 +1100
+Message-Id: <20191217044322.351838-81-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
+References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: n2n22fOBN5eOqTM-Hs74IA-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,60 +70,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-Traceback (most recent call last):
-  File "../scripts/analyze-migration.py", line 611, in <module>
-    dump.read(desc_only =3D True)
-  File "../scripts/analyze-migration.py", line 513, in read
-    self.load_vmsd_json(file)
-  File "../scripts/analyze-migration.py", line 556, in load_vmsd_json
-    vmsd_json =3D file.read_migration_debug_json()
-  File "../scripts/analyze-migration.py", line 89, in read_migration_debug_=
-json
-    nulpos =3D data.rfind("\0")
-TypeError: argument should be integer or bytes-like object, not 'str'
+They aren't used anymore.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20191127101038.327080-2-marcandre.lureau@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <157623840200.360005.1300941274565357363.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- scripts/analyze-migration.py | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/hw/ppc/pnv.h | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration.py
-index e527eb168e..2b835d9b70 100755
---- a/scripts/analyze-migration.py
-+++ b/scripts/analyze-migration.py
-@@ -86,8 +86,8 @@ class MigrationFile(object):
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 8a42c199b6..c213bdd5ec 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -227,11 +227,6 @@ static inline bool pnv_chip_is_power9(const PnvChip =
+*chip)
+     return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER9;
+ }
 =20
-         # Find the last NULL byte, then the first brace after that. This s=
-hould
-         # be the beginning of our JSON data.
--        nulpos =3D data.rfind("\0")
--        jsonpos =3D data.find("{", nulpos)
-+        nulpos =3D data.rfind(b'\0')
-+        jsonpos =3D data.find(b'{', nulpos)
+-static inline bool pnv_is_power9(PnvMachineState *pnv)
+-{
+-    return pnv_chip_is_power9(pnv->chips[0]);
+-}
+-
+ PnvChip *pnv_get_chip(uint32_t chip_id);
 =20
-         # Check backwards from there and see whether we guessed right
-         self.file.seek(datapos + jsonpos - 5, 0)
+ #define PNV_FDT_ADDR          0x01000000
+@@ -242,11 +237,6 @@ static inline bool pnv_chip_is_power10(const PnvChip=
+ *chip)
+     return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER10;
+ }
+=20
+-static inline bool pnv_is_power10(PnvMachineState *pnv)
+-{
+-    return pnv_chip_is_power10(pnv->chips[0]);
+-}
+-
+ /*
+  * BMC helpers
+  */
 --=20
-2.21.0
+2.23.0
 
 
