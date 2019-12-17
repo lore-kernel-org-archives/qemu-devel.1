@@ -2,86 +2,63 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=FROM_WSP_TRAIL,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37456C2D0CD
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB5DC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:55:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10A34218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:48:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A34218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E777620663
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:55:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E777620663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihCGr-00074z-4L
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:48:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52526)
+	id 1ihCNe-0001fD-MN
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:55:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ihCEl-0004gA-96
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:46:04 -0500
+ (envelope-from <chen.zhang@intel.com>) id 1ihCMT-0000OP-Vs
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ihCEj-0008WM-Vu
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:46:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35806)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ihCEj-0008VY-OY
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:46:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ihCEg-00040G-Au
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 12:45:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 80D192E80DD
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 12:45:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Dec 2019 12:38:11 -0000
-From: Vasili <1851552@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=cloud-init; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=networking-calico; status=New; importance=Undecided; 
- assignee=None; 
-X-Launchpad-Bug: product=nova; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: product=openstack-community; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: product=qemu-kvm; status=New; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=cloud-init; component=main;
- status=Confirmed; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: daniel-thewatkins janitor legovini raharper smoser
- vasili.namatov
-X-Launchpad-Bug-Reporter: Vasili (vasili.namatov)
-X-Launchpad-Bug-Modifier: Vasili (vasili.namatov)
-References: <157306761727.2702.10828795840242046904.malonedeb@gac.canonical.com>
-Message-Id: <157658629127.14566.7589239350219795426.launchpad@wampee.canonical.com>
-Subject: [Bug 1851552] Re: since ubuntu 18 bionic release and latest,
- the ubuntu18 cloud image is unable to boot up on openstack instance 
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4469229a7788de35bef6a18d88ff66266283013b
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+ (envelope-from <chen.zhang@intel.com>) id 1ihCMS-0001Bb-6a
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:01 -0500
+Received: from mga18.intel.com ([134.134.136.126]:49328)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1ihCMR-00018a-Ty
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:54:00 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 17 Dec 2019 04:53:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,325,1571727600"; d="scan'208";a="209689629"
+Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
+ by orsmga008.jf.intel.com with ESMTP; 17 Dec 2019 04:53:55 -0800
+From: Zhang Chen <chen.zhang@intel.com >
+To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-dev <qemu-devel@nongnu.org>
+Subject: [PATCH V4 2/5] net/awd.c: Initailize input/output chardev
+Date: Tue, 17 Dec 2019 20:45:51 +0800
+Message-Id: <20191217124554.30818-3-chen.zhang@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191217124554.30818-1-chen.zhang@intel.com>
+References: <20191217124554.30818-1-chen.zhang@intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,57 +67,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1851552 <1851552@bugs.launchpad.net>
+Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Also affects: nova
-   Importance: Undecided
-       Status: New
+From: Zhang Chen <chen.zhang@intel.com>
 
--- =
+Find and check the chardev awd_node and notification_node,
+The awd_node used for keep connect with outside(like VM client/other
+host/Remote server), and the notification_node used for do some
+operation when disconnect event occur.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1851552
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+---
+ net/awd.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-Title:
-  since ubuntu 18 bionic release and latest, the ubuntu18 cloud image is
-  unable to boot up on openstack instance
+diff --git a/net/awd.c b/net/awd.c
+index d42b4a7372..ad3d39c982 100644
+--- a/net/awd.c
++++ b/net/awd.c
+@@ -42,6 +42,8 @@ typedef struct AwdState {
+     char *opt_script;
+     uint32_t pulse_interval;
+     uint32_t timeout;
++    CharBackend chr_awd_node;
++    CharBackend chr_notification_node;
+     IOThread *iothread;
+ } AwdState;
+ 
+@@ -175,9 +177,30 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
++static int find_and_check_chardev(Chardev **chr,
++                                  char *chr_name,
++                                  Error **errp)
++{
++    *chr = qemu_chr_find(chr_name);
++    if (*chr == NULL) {
++        error_setg(errp, "Device '%s' not found",
++                   chr_name);
++        return 1;
++    }
++
++    if (!qemu_chr_has_feature(*chr, QEMU_CHAR_FEATURE_RECONNECTABLE)) {
++        error_setg(errp, "chardev \"%s\" is not reconnectable",
++                   chr_name);
++        return 1;
++    }
++
++    return 0;
++}
++
+ static void awd_complete(UserCreatable *uc, Error **errp)
+ {
+     AwdState *s = AWD(uc);
++    Chardev *chr;
+ 
+     if (!s->awd_node || !s->iothread ||
+         !s->notification_node || !s->opt_script) {
+@@ -187,6 +210,20 @@ static void awd_complete(UserCreatable *uc, Error **errp)
+         return;
+     }
+ 
++    if (find_and_check_chardev(&chr, s->awd_node, errp) ||
++        !qemu_chr_fe_init(&s->chr_awd_node, chr, errp)) {
++        error_setg(errp, "advanced-watchdog can't find chardev awd_node: %s",
++                   s->awd_node);
++        return;
++    }
++
++    if (find_and_check_chardev(&chr, s->notification_node, errp) ||
++        !qemu_chr_fe_init(&s->chr_notification_node, chr, errp)) {
++        error_setg(errp, "advanced-watchdog can't find "
++                   "chardev notification_node: %s", s->notification_node);
++        return;
++    }
++
+     return;
+ }
+ 
+-- 
+2.17.1
 
-Status in cloud-init:
-  New
-Status in networking-calico:
-  New
-Status in OpenStack Compute (nova):
-  New
-Status in OpenStack Community Project:
-  New
-Status in QEMU:
-  New
-Status in qemu-kvm:
-  New
-Status in cloud-init package in Ubuntu:
-  Confirmed
-
-Bug description:
-  Openstack Queens release which is running on ubuntu 18 LTS Controller and=
- Compute.
-  Tried to boot up the instance via horizon dashboard without success.
-  Nova flow works perfect.
-  When access to console I discovered that the boot process stuck in the mi=
-ddle.
-  [[0;1;31m TIME [0m] Timed out waiting for device dev-vdb.device.
-  [[0;1;33mDEPEND[0m] Dependency failed for /mnt.
-  [[0;1;33mDEPEND[0m] Dependency failed for File System Check on /dev/vdb.
-  It receives IP but looks like not get configured at time.
-  since ubuntu 18 there is netplan feature managing the network interfaces
-  please advise.
-
-  more details as follow:
-  https://bugs.launchpad.net/networking-calico/+bug/1851548
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-init/+bug/1851552/+subscriptions
 
