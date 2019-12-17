@@ -2,78 +2,74 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12261C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D60ECC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D16EE24655
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:36:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A64362465E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:36:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OreWebw9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16EE24655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOhYqfox"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A64362465E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihGlm-0003XK-B4
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:36:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46076)
+	id 1ihGlp-0003dY-Ap
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:36:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihGkK-0001WZ-4y
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:34:57 -0500
+ (envelope-from <philmd@redhat.com>) id 1ihGkF-0001Sf-Kf
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihGkI-0008Ak-7c
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:34:56 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44920
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ihGkE-000827-Kc
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:34:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44522
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihGkI-0008A4-3q
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:34:54 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihGkE-000812-Gw
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:34:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576604093;
+ s=mimecast20190719; t=1576604089;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i/ycAlXiPXADaLAOWo3IoxfdaOKQ4Pec1+OI0orkZ5c=;
- b=OreWebw9FkyVlzJmb01uipl/8WCSkZ6mmGvWsLzxBl5g4oJL22btiH/vMY30ER06MnGujs
- ZPs5KJXWgsnMgSy0B9aSxipSB4VUkjd1VsJjo8omXmdHF520vOn7kx3PPhHij/ZQpYTxmH
- wzQj2JsDRmK1QT8M/z0xswNliJiniYo=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=nO8L9Ff0gTs0Ghul9qOGY/vgywrMy48c7WRyGNxm0bk=;
+ b=EOhYqfoxAYGrhWZIvpRW5Shdf8tIoiM5hT15Uz+IkVkBhGH168zm9s6XuxGoUCg4gerSiR
+ ckYyJGOGs+ykh2rKOTEzOOqZxygV3vpKShNzlDE0tNQoRZjvo2Qp/y7YP0h1u9lB3lAoag
+ C5LfyaczIMV+OTT0sNRj3lrIQUmH0q8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-Fz3Ue5MAMvqsmOjIRlB__g-1; Tue, 17 Dec 2019 12:34:50 -0500
+ us-mta-56-DndLY13tOwGjhVK3iHR_uQ-1; Tue, 17 Dec 2019 12:34:48 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6373C8024E6;
- Tue, 17 Dec 2019 17:34:49 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB5EA19C4F;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54908100551A;
  Tue, 17 Dec 2019 17:34:46 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B89226DC6;
+ Tue, 17 Dec 2019 17:34:31 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/6] audio/audio: Add missing fall through comment
-Date: Tue, 17 Dec 2019 18:34:20 +0100
-Message-Id: <20191217173425.5082-2-philmd@redhat.com>
-In-Reply-To: <20191217173425.5082-1-philmd@redhat.com>
-References: <20191217173425.5082-1-philmd@redhat.com>
+Subject: [PATCH 0/6] Fix more GCC9 -O3 warnings
+Date: Tue, 17 Dec 2019 18:34:19 +0100
+Message-Id: <20191217173425.5082-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Fz3Ue5MAMvqsmOjIRlB__g-1
+X-MC-Unique: DndLY13tOwGjhVK3iHR_uQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,51 +81,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Hannes Reinecke <hare@suse.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Max Reitz <mreitz@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?= <dirty.ice.hu@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?= <dirty.ice.hu@gmail.com>
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-GCC9 is confused by this comment when building with
-CFLAG -Wimplicit-fallthrough=3D2:
+Fix some trivial warnings when building with -O3.
 
-  audio/audio.c: In function =E2=80=98audio_pcm_init_info=E2=80=99:
-  audio/audio.c:306:14: error: this statement may fall through [-Werror=3Di=
-mplicit-fallthrough=3D]
-    306 |         sign =3D 1;
-        |         ~~~~~^~~
-  audio/audio.c:307:5: note: here
-    307 |     case AUDIO_FORMAT_U8:
-        |     ^~~~
-  cc1: all warnings being treated as errors
+Philippe Mathieu-Daud=C3=A9 (6):
+  audio/audio: Add missing fall through comment
+  hw/display/tcx: Add missing fall through comments
+  hw/net/imx_fec: Rewrite fall through comments
+  hw/timer/aspeed_timer: Add a fall through comment
+  hw/scsi/megasas: Silent GCC9 duplicated-cond warning
+  qemu-io-cmds: Silent GCC9 format-overflow warning
 
-Add the missing fall through comment, similarly to e46349414.
+ audio/audio.c           | 1 +
+ hw/display/tcx.c        | 2 ++
+ hw/net/imx_fec.c        | 8 +++++---
+ hw/scsi/megasas.c       | 3 ++-
+ hw/timer/aspeed_timer.c | 2 +-
+ qemu-io-cmds.c          | 1 +
+ 6 files changed, 12 insertions(+), 5 deletions(-)
 
-Fixes: 2b9cce8c8c
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n" <dirty.ice.hu@gmail.com>
----
- audio/audio.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/audio/audio.c b/audio/audio.c
-index 56fae55047..57daf3f620 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -304,6 +304,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info, =
-struct audsettings *as)
-     switch (as->fmt) {
-     case AUDIO_FORMAT_S8:
-         sign =3D 1;
-+        /* fall through */
-     case AUDIO_FORMAT_U8:
-         mul =3D 1;
-         break;
 --=20
 2.21.0
 
