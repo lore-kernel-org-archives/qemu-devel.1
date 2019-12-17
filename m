@@ -2,80 +2,82 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2AC5C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E67CEC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF03F2465E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1B7821835
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:53:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2Mgumvd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF03F2465E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CxZ2tU7N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B7821835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihG4m-0005D9-GO
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:52:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52557)
+	id 1ihG6f-0008QQ-Jy
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:53:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihFvN-0001mz-2y
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:42:18 -0500
+ (envelope-from <thuth@redhat.com>) id 1ihG0Z-00008C-Ni
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:47:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihFvM-00045W-0D
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:42:16 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36222
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1ihG0V-0003Aj-Hm
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:47:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40173
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihFvL-00042v-Rs
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:42:15 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihG0U-0003AA-AU
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:47:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576600935;
+ s=mimecast20190719; t=1576601253;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZWk3zkMpgfU3ZN3J4EBBgjkfYGLkbV6WwKoyJTF7Ddg=;
- b=Q2MgumvdGvUajQdfGBqiQYwIMW9Qic7W5nkAzNlx1wgpI1UmMjlgTKLvdfGUWSIe4A6aNQ
- OAM8EFB++J8vl8pWjSaXFxynHNplww8c19ywjTaqhPZEzEZtdpF8k9FFN1GxqBWdBdnCOj
- DsmSG7plpGce4+fkFbbce+smJLFojyw=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=TyMfOmVwxZHG0er0HbkabROkpDlIzP2fMhLhONe7t/Y=;
+ b=CxZ2tU7NrFzYk7KokanKllkvijk46ziMV8qsOOKIGtX3lrh7ov2DPNCrAJv6stSK1ryAZ6
+ uZcfEukKaxquM0aqfwQp1BzD1X0/zBmtBkb0nreHFxbOHByPzxyN8DxoU2yYbpUdXWM4kb
+ 3BREI8VaxILdIBEFL5VA9O2NpHPq4nE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-tPNfmaoHPaSfPXAbkkq9zQ-1; Tue, 17 Dec 2019 11:42:11 -0500
+ us-mta-363-2QsDyCCmPvyAsvzDOc3MYg-1; Tue, 17 Dec 2019 11:47:32 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77E7080256C;
- Tue, 17 Dec 2019 16:42:07 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CA6C675B0;
- Tue, 17 Dec 2019 16:41:44 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Subject: [RFC PATCH 07/14] ccid-card-passthru: Explicit we ignore QEMUChrEvent
- in IOEventHandler
-Date: Tue, 17 Dec 2019 17:38:01 +0100
-Message-Id: <20191217163808.20068-8-philmd@redhat.com>
-In-Reply-To: <20191217163808.20068-1-philmd@redhat.com>
-References: <20191217163808.20068-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B07C5107ACCA;
+ Tue, 17 Dec 2019 16:47:31 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A37B6B566;
+ Tue, 17 Dec 2019 16:47:27 +0000 (UTC)
+Subject: Re: [PATCH v2] docs: build an index page for the HTML docs
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191111102157.440664-1-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <22747677-3ea5-b0f3-aaa8-20d501364d7d@redhat.com>
+Date: Tue, 17 Dec 2019 17:47:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20191111102157.440664-1-stefanha@redhat.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: tPNfmaoHPaSfPXAbkkq9zQ-1
+X-MC-Unique: 2QsDyCCmPvyAsvzDOc3MYg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,78 +90,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, Paul Burton <pburton@wavecomp.com>,
- Jason Wang <jasowang@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Alberto Garcia <berto@igalia.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Joel Stanley <joel@jms.id.au>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Antony Pavlov <antonynpavlov@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>,
- Alistair Francis <alistair@alistair23.me>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Kevin Wolf <kwolf@redhat.com>, qemu-riscv@nongnu.org,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Zhang Chen <chen.zhang@intel.com>, Michael Walle <michael@walle.cc>,
- Palmer Dabbelt <palmer@dabbelt.com>, Thomas Huth <huth@tuxfamily.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Daniel Berrange <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Chardev events are listed in the QEMUChrEvent enum. To be
-able to use this enum in the IOEventHandler typedef, we need to
-explicit when frontends ignore some events, to silent GCC the
-following warnings:
+On 11/11/2019 11.21, Stefan Hajnoczi wrote:
+> There is no index.html start page for the QEMU HTML documentation.  An
+> index page is needed so that documentation can be browsed easily on the
+> web.
+> 
+> This patch adds an index.html.in template file where the QEMU version
+> number is expanded.  It is written in HTML instead of using the existing
+> sphinx (rST) and texi documentation generators because they are
+> heavyweight and would make this harder.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  Makefile           |  6 ++++++
+>  docs/index.html.in | 17 +++++++++++++++++
+>  2 files changed, 23 insertions(+)
+>  create mode 100644 docs/index.html.in
+> 
+> diff --git a/Makefile b/Makefile
+> index aa9d1a42aa..581bc68918 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -347,6 +347,7 @@ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/
+>  DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+>  DOCS+=docs/qemu-block-drivers.7
+>  DOCS+=docs/qemu-cpu-models.7
+> +DOCS+=$(MANUAL_BUILDDIR)/index.html
+>  ifdef CONFIG_VIRTFS
+>  DOCS+=fsdev/virtfs-proxy-helper.1
+>  endif
+> @@ -818,6 +819,7 @@ install-sphinxdocs: sphinxdocs
+>  
+>  install-doc: $(DOCS) install-sphinxdocs
+>  	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+> +	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/index.html "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)"
+> @@ -1024,6 +1026,10 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+>  $(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
+>  	$(call build-manual,interop,man)
+>  
+> +$(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+> +	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
+> +             "GEN","$@")
+> +
+>  qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
+>  
+> diff --git a/docs/index.html.in b/docs/index.html.in
+> new file mode 100644
+> index 0000000000..c2df85a185
+> --- /dev/null
+> +++ b/docs/index.html.in
+> @@ -0,0 +1,17 @@
+> +<!DOCTYPE html>
+> +<html>
 
-  hw/usb/ccid-card-passthru.c: In function =E2=80=98ccid_card_vscard_event=
-=E2=80=99:
-  hw/usb/ccid-card-passthru.c:314:5: error: enumeration value =E2=80=98CHR_=
-EVENT_MUX_IN=E2=80=99 not handled in switch [-Werror=3Dswitch]
-    314 |     switch (event) {
-        |     ^~~~~~
-  hw/usb/ccid-card-passthru.c:314:5: error: enumeration value =E2=80=98CHR_=
-EVENT_MUX_OUT=E2=80=99 not handled in switch [-Werror=3Dswitch]
-  hw/usb/ccid-card-passthru.c:314:5: error: enumeration value =E2=80=98CHR_=
-EVENT_CLOSED=E2=80=99 not handled in switch [-Werror=3Dswitch]
-  cc1: all warnings being treated as errors
+https://validator.w3.org/ says:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Cc: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/ccid-card-passthru.c | 3 +++
- 1 file changed, 3 insertions(+)
+"Warning: Consider adding a lang attribute to the html start tag to
+declare the language of this document."
 
-diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-index 267ed9a8a0..190f268da2 100644
---- a/hw/usb/ccid-card-passthru.c
-+++ b/hw/usb/ccid-card-passthru.c
-@@ -318,6 +318,9 @@ static void ccid_card_vscard_event(void *opaque, int ev=
-ent)
-     case CHR_EVENT_OPENED:
-         DPRINTF(card, D_INFO, "%s: CHR_EVENT_OPENED\n", __func__);
-         break;
-+    default:
-+        /* Ignore */
-+        break;
-     }
- }
-=20
---=20
-2.21.0
+... it's just a warning though, but in case you respin, you might want
+to add it.
+
+> +    <head>
+> +        <meta charset="UTF-8">
+> +        <title>QEMU @@VERSION@@ Documentation</title>
+> +    </head>
+> +    <body>
+> +        <h1>QEMU @@VERSION@@ Documentation</h1>
+> +        <ul>
+> +            <li><a href="qemu-doc.html">User Documentation</a></li>
+> +            <li><a href="qemu-qmp-ref.html">QMP Reference Manual</a></li>
+> +            <li><a href="qemu-ga-ref.html">Guest Agent Protocol Reference</a></li>
+> +            <li><a href="interop/index.html">System Emulation Management and Interoperability Guide</a></li>
+> +            <li><a href="specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+> +        </ul>
+> +    </body>
+> +</html>
+> 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
