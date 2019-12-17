@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F09F2C2D0C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCC8C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:41:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0E9A20733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:39:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 161D820733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:41:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jpWxkqBq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E9A20733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aWIoqsuI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161D820733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5aI-00043f-JU
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:39:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35427)
+	id 1ih5bR-0005TP-S8
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:41:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4k9-0002MF-G1
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:58 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kt-0003VL-PJ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4k6-00082T-1H
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:55 -0500
-Received: from ozlabs.org ([203.11.71.1]:43161)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4ks-0001KQ-Jh
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:43 -0500
+Received: from ozlabs.org ([203.11.71.1]:44487)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4k3-0007WJ-Vn; Mon, 16 Dec 2019 23:45:53 -0500
+ id 1ih4ks-0000Eu-8M; Mon, 16 Dec 2019 23:46:42 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWg6KvRz9sTR; Tue, 17 Dec 2019 15:43:39 +1100 (AEDT)
+ id 47cQWm083dz9sTp; Tue, 17 Dec 2019 15:43:45 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557823;
- bh=9x8gEiCBBz8Y4SRiMXedwXwlBbOLRMLDFUsvTWQEkMk=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557828;
+ bh=WPGhRLVgvuo1dfcfSmYeMRPiaxlknfIpHytSLFhG/OA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=jpWxkqBq15DNtCnkWfwg2+7fI1OJXQmdZQNdEeGAmP9HFY0LL0CM/EcgAcozcWIs9
- dTvAgKvdcb0zlc7IuO33jLotBritGZS9LKzlZmrGi5G86uSBFC4E56ZYIWn0X3BOR5
- gwPLtzjMNXsCJatA9KGQDU9torOcqH8G+mbukknE=
+ b=aWIoqsuIfjjubhESYx8NAuAV0YlJAbe4andXIa91KzeDo/v6kzdbOpbQ5BXEyoTat
+ 0CAqaKui3/i9QD1hcr+gROqKRHotPhqErpu+h/A8FnVCUq+zrzthPltsfk/SVYWNx3
+ h+2yVExEi9dkDyHMEhiGaGbdp2/pflED9pHOkq6c=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 63/88] ppc/psi: cleanup definitions
-Date: Tue, 17 Dec 2019 15:42:57 +1100
-Message-Id: <20191217044322.351838-64-david@gibson.dropbear.id.au>
+Subject: [PULL 85/88] ppc/pnv: Drop pnv_chip_is_power9() and
+ pnv_chip_is_power10() helpers
+Date: Tue, 17 Dec 2019 15:43:19 +1100
+Message-Id: <20191217044322.351838-86-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
@@ -75,34 +76,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20191205184454.10722-4-clg@kaod.org>
+They aren't used anymore.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <157623842986.360005.1787401623906380181.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv_psi.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ include/hw/ppc/pnv.h | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 7e725aaf2b..e6c266ac4a 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -608,9 +608,12 @@ static const TypeInfo pnv_psi_power8_info =3D {
- #define   PSIHB9_IRQ_METHOD             PPC_BIT(0)
- #define   PSIHB9_IRQ_RESET              PPC_BIT(1)
- #define PSIHB9_ESB_CI_BASE              0x60
--#define   PSIHB9_ESB_CI_VALID           1
-+#define   PSIHB9_ESB_CI_64K             PPC_BIT(1)
-+#define   PSIHB9_ESB_CI_ADDR_MASK       PPC_BITMASK(8, 47)
-+#define   PSIHB9_ESB_CI_VALID           PPC_BIT(63)
- #define PSIHB9_ESB_NOTIF_ADDR           0x68
--#define   PSIHB9_ESB_NOTIF_VALID        1
-+#define   PSIHB9_ESB_NOTIF_ADDR_MASK    PPC_BITMASK(8, 60)
-+#define   PSIHB9_ESB_NOTIF_VALID        PPC_BIT(63)
- #define PSIHB9_IVT_OFFSET               0x70
- #define   PSIHB9_IVT_OFF_SHIFT          32
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 17ca9a14ac..7a134a15d3 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -224,21 +224,11 @@ struct PnvMachineState {
+     PnvPnor      *pnor;
+ };
 =20
+-static inline bool pnv_chip_is_power9(const PnvChip *chip)
+-{
+-    return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER9;
+-}
+-
+ PnvChip *pnv_get_chip(uint32_t chip_id);
+=20
+ #define PNV_FDT_ADDR          0x01000000
+ #define PNV_TIMEBASE_FREQ     512000000ULL
+=20
+-static inline bool pnv_chip_is_power10(const PnvChip *chip)
+-{
+-    return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER10;
+-}
+-
+ /*
+  * BMC helpers
+  */
 --=20
 2.23.0
 
