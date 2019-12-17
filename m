@@ -2,93 +2,108 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F8AC2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 19:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FCDBC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 19:45:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E4AC20733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 19:33:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E4AC20733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id EBB5E2146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 19:45:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBB5E2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihIar-0001Ke-CB
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 14:33:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43444)
+	id 1ihImR-0003Ww-4m
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 14:45:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48495)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ihIZY-0000nY-TJ
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 14:31:58 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1ihIld-00034e-Qo
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 14:44:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ihIZX-0003Tf-Ab
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 14:31:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38358)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ihIZW-0003ON-Tx
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 14:31:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ihIZN-0006LC-TU
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:31:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9723F2E80FF
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:31:44 +0000 (UTC)
+ (envelope-from <stefanb@linux.ibm.com>) id 1ihIlc-0003SQ-Er
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 14:44:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49856)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+ id 1ihIlc-0003S0-6v; Tue, 17 Dec 2019 14:44:24 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBHJd69S027508; Tue, 17 Dec 2019 14:44:13 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wy41qthcm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 17 Dec 2019 14:44:12 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBHJd8Ra027751;
+ Tue, 17 Dec 2019 14:44:12 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wy41qthcd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 17 Dec 2019 14:44:12 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBHJePWh009484;
+ Tue, 17 Dec 2019 19:44:11 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma04dal.us.ibm.com with ESMTP id 2wvqc6px22-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 17 Dec 2019 19:44:11 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBHJiAPG22151476
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 17 Dec 2019 19:44:10 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 34EB378063;
+ Tue, 17 Dec 2019 19:44:10 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AB13B78066;
+ Tue, 17 Dec 2019 19:44:09 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 17 Dec 2019 19:44:09 +0000 (GMT)
+Subject: Re: [PATCH v5 1/5] tpm_spapr: Support TPM for ppc64 using CRQ based
+ interface
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
+ <20191212202430.1079725-2-stefanb@linux.vnet.ibm.com>
+ <20191213053453.GD207300@umbus.fritz.box>
+ <75fd3e95-d72f-069b-22ce-f354e1c34660@linux.ibm.com>
+ <20191217002954.GH6242@umbus.fritz.box>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <1efef315-cb85-79ea-9c46-ff318e05a543@linux.ibm.com>
+Date: Tue, 17 Dec 2019 14:44:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191217002954.GH6242@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-17_03:2019-12-17,2019-12-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0
+ adultscore=0 spamscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
+ suspectscore=0 mlxscore=0 mlxlogscore=999 clxscore=1015 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1912170156
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Dec 2019 19:17:19 -0000
-From: dann frazier <dann.frazier@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Confirmed; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=Confirmed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=Confirmed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=In Progress; importance=Medium;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Confirmed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dannf jan-glauber-i jnsnow kongzizaixian lizhengui
- rafaeldtinoco
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: dann frazier (dannf)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <157661023975.3236.2997142622538228535.malone@soybean.canonical.com>
-Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
- Aarch64 when converting images
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 18e77f82acbede77bf2d8b2d5bf9fdf69db92854
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id xBHJd69S027508
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,161 +112,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I tested the patch in Comment #34, and it was able to pass 500
-iterations.
+On 12/16/19 7:29 PM, David Gibson wrote:
+> On Fri, Dec 13, 2019 at 08:03:36AM -0500, Stefan Berger wrote:
+>> On 12/13/19 12:34 AM, David Gibson wrote:
+>>
+>> The existing one looks like this:
+>>
+>> typedef struct SpaprVioCrq {
+>>  =A0=A0=A0 uint64_t qladdr;
+>>  =A0=A0=A0 uint32_t qsize;
+>>  =A0=A0=A0 uint32_t qnext;
+>>  =A0=A0=A0 int(*SendFunc)(struct SpaprVioDevice *vdev, uint8_t *crq);
+>> } SpaprVioCrq;
+>>
+>> I don't seem to find the fields there that we need for vTPM support.
+> Yeah, I can see the difference in the structures.  What I'm after is
+> what is the difference in purpose which means they have different
+> content.
+>
+> Having read through the whole series now, I *think* the answer is that
+> the tpm specific structure is one entry in the request queue for the
+> vtpm, whereas the VioCrq structure is a handle on an entire queue.
+>
+> I think the tpm one needs a rename to reflect that a) it's vtpm
+> specific and b) it's not actually a queue, just part of it.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
+v6 has it as TpmCrq. It's local to the file, so from that perspective=20
+it's specific to (v)TPM.
 
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
 
-Status in kunpeng920:
-  Confirmed
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  Confirmed
-Status in qemu source package in Bionic:
-  Confirmed
-Status in qemu source package in Disco:
-  Confirmed
-Status in qemu source package in Eoan:
-  In Progress
-Status in qemu source package in Focal:
-  Confirmed
+>> This is a 1:1 copy from the existing TIS driver.
+> Hm, right.  Probably not a bad idea to move that out as a helper
+> function then.
 
-Bug description:
-  Command:
 
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+In V7 then.
 
-  Hangs indefinitely approximately 30% of the runs.
 
-  ----
+>>>> +static void tpm_spapr_update_deviceclass(SpaprVioDevice *dev)
+>>>> +{
+>>>> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
+>>>> +    SpaprVioDeviceClass *k =3D VIO_SPAPR_DEVICE_GET_CLASS(dev);
+>>>> +
+>>>> +    switch (s->be_tpm_version) {
+>>>> +    case TPM_VERSION_UNSPEC:
+>>>> +        assert(false);
+>>>> +        break;
+>>>> +    case TPM_VERSION_1_2:
+>>>> +        k->dt_name =3D "vtpm";
+>>>> +        k->dt_type =3D "IBM,vtpm";
+>>>> +        k->dt_compatible =3D "IBM,vtpm";
+>>>> +        break;
+>>>> +    case TPM_VERSION_2_0:
+>>>> +        k->dt_name =3D "vtpm";
+>>>> +        k->dt_type =3D "IBM,vtpm";
+>>>> +        k->dt_compatible =3D "IBM,vtpm20";
+>>>> +        break;
+>>> Erk.  Updating DeviceClass structures on the fly is hideously ugly.
+>>> We might need to take a different approach for this.
+>> Make a suggestion... Obviously, we can hard-initialize dt_name and dt_=
+type
+>> but dt_compatible can only be set after we have determined the version=
+ of
+>> TPM.
+> As you say name and type can just be put into the class statically.
 
-  Workaround:
 
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+I did this in v6.
 
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
 
-  ----
+> Since you need to change compatible based on an internal variable,
+> we'd need to replace the static dt_compatible in the class with a
+> callback.
 
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
 
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
+Why can we not initialize it once we know the version of TPM? From the=20
+perspective of SLOF at least this seems to be building the device tree=20
+fine since it sees the proper value...
 
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
 
-  ----
+ =A0=A0 Stefan
 
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  [ Original Description ]
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
