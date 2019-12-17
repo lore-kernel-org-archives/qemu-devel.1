@@ -2,80 +2,127 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4B5C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 22:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4B5C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 22:21:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC4E924672
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 22:13:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 219D321582
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 22:21:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GF7zTetB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4E924672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="W8BtBdh0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219D321582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihL5Q-0007M3-2q
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 17:13:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34483)
+	id 1ihLE2-0001op-AC
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 17:21:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36357)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1ihL4k-0006us-G7
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 17:12:20 -0500
+ (envelope-from <felipe@nutanix.com>) id 1ihLDK-0001NP-R9
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 17:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1ihL4f-0000vX-VG
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 17:12:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44745
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1ihL4f-0000v6-Bf
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 17:12:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576620732;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9pK3JnBLjEsVY3heyjJEMY5G75Wrg6csWmLdwh+0TTw=;
- b=GF7zTetB9qa80PKYK//3JJRhLWrwkw5SwJ/rc2NveQLdsy/zsW0uC4++4r2Kjs22gY1GQZ
- ETWpeEb1k6BflLNCYWPWGHDSO/N5awYifHl0kNXaI9JwbNE329MvUs+FfxGYmDxtP0b+4S
- HC9aR0hV6I1uNP4KttNf94vR6wbrvHw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-y8n9TuvbM4-LmZMv1DR8Pg-1; Tue, 17 Dec 2019 17:12:08 -0500
-X-MC-Unique: y8n9TuvbM4-LmZMv1DR8Pg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 218D2190D353;
- Tue, 17 Dec 2019 22:12:06 +0000 (UTC)
-Received: from x1.home (ovpn-116-53.phx2.redhat.com [10.3.116.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0DE8766847;
- Tue, 17 Dec 2019 22:12:03 +0000 (UTC)
-Date: Tue, 17 Dec 2019 15:12:03 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20191217151203.342b686a@x1.home>
-In-Reply-To: <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
-References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
- <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
-Organization: Red Hat
+ (envelope-from <felipe@nutanix.com>) id 1ihLDH-0007RX-20
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 17:21:09 -0500
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:53430)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1ihLDG-0007Nd-NW
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 17:21:07 -0500
+Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBHMKFn8017098; Tue, 17 Dec 2019 14:20:51 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=PB8lnr4SJqoLKxDLX/LF3u4hQXJupIffzZ2C+V87kHk=;
+ b=W8BtBdh05tMy8Yavjy+Gab5JaIptQbt3u3szpdInWvTGD78bUPK1W6s8JUdGTOXJ5CD6
+ dVZHbdIvnU/UV/cp6XxhJkpRO/uKkaOu6IYXvn7IT/p7qaYh5SdTrjQEMhLzGVi2QakT
+ Ua3OlEs4BeHmSZ5SRKk3aMccGepZPow3qula1cc4I63VOmLwaZl//ax4HodPncOjd80w
+ mfIhu1QN/1Q6J1Y+uEyvchGLMDYVF/MQz3yMVOhS0rCSpX/ytvv7sIeirRjuvwHwNHUA
+ I3V5mK2bMAhhnOmQjrXAszAwQQtJstbLznCJLy5XwFvNhx36P8D8LhdUzGtrdIIhYVCZ 8w== 
+Received: from nam12-mw2-obe.outbound.protection.outlook.com
+ (mail-mw2nam12lp2047.outbound.protection.outlook.com [104.47.66.47])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 2wvyppps7v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 17 Dec 2019 14:20:51 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BbR4hfb2xPrBOFCPgdyZCUgaiV4lY3wQc/I3iu/o6MkS/w6A4lISgPipMY2NxzruIJMlhA6+KPEua4CuR2kb2Ws/MfqWAy+dxO/f4oniePBTncNdLi3zWWO7J3WGBDecoN8HghUT7N/J7TBLSAxObzpniXRf4piv3+WJ2mO5BxK+me6VVY/OPbduUk58SswbctdB4miDx7scZapo5/DfvGTyb6ZukkBZL2++FMM4Fi9KDD0Tg4WEjucpcZ8rgW+nvEvmWgNIImg4XR7vyXx00O8XbeGbNoLUi26EUpwg0PsOnZ/MNCREhsCW/KLJ3FbhQXUBwqJxDijR/Y3Vp3rdkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PB8lnr4SJqoLKxDLX/LF3u4hQXJupIffzZ2C+V87kHk=;
+ b=UzFBRLDGukUa2dZ+SewYjNLPrITNq/5H98Wmiggo1hNl953dayEYXp+mDqEp+hCVPMs5VnZhxti3sAPRReGEU0hgVNYilEyEF0IpFU9ur3uQEfK1bHjTXGRJ0DQwOJR9M5aPo3CrOmkMeC/zQSIcVDczqr8Sq65GlRXDaYVtEY+o7pxu3cYN5YM1AalPjFq0cmKX7R95qfxpVA8QpZ0fEw0JxtowcoHeflW5edGepDCY6UOD7fuC0swpB4f8I7TJLUNeZnnmuOzFfNcieXk098k1XBJX0A7teUuYisIrcCzWnMzOiiH9L3rsf5urH+ib3fsIbQOps9oUobJXbp+rrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB2622.namprd02.prod.outlook.com (10.168.207.14) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2538.18; Tue, 17 Dec 2019 22:19:10 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2559.012; Tue, 17 Dec
+ 2019 22:19:09 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH v3 4/4] qom/object: Use common get/set uint helpers
+Thread-Topic: [PATCH v3 4/4] qom/object: Use common get/set uint helpers
+Thread-Index: AQHVptz985oxjq8vNkWSjwigP/vuiqemZqeAgAzvioCAC6wRgA==
+Date: Tue, 17 Dec 2019 22:19:09 +0000
+Message-ID: <5C28BA81-9EF0-4AA1-A04E-8F7B58E856FB@nutanix.com>
+References: <20191129174630.6922-1-felipe@nutanix.com>
+ <20191129174630.6922-5-felipe@nutanix.com>
+ <ef90cc03-7e72-2238-72c5-b531032208e2@ozlabs.ru>
+ <894244E2-85E3-4779-A6A2-EC5192D504B7@nutanix.com>
+In-Reply-To: <894244E2-85E3-4779-A6A2-EC5192D504B7@nutanix.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [46.189.28.43]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1b739e37-9333-410d-4cd4-08d7833f2392
+x-ms-traffictypediagnostic: MWHPR02MB2622:
+x-microsoft-antispam-prvs: <MWHPR02MB262208DB30EFEEBFBB2502FED7500@MWHPR02MB2622.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 02543CD7CD
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(396003)(376002)(39860400002)(346002)(136003)(189003)(199004)(71200400001)(2906002)(6506007)(36756003)(186003)(53546011)(6916009)(30864003)(26005)(4326008)(5660300002)(478600001)(6512007)(66476007)(66556008)(64756008)(66446008)(91956017)(66946007)(76116006)(81166006)(81156014)(86362001)(33656002)(8676002)(8936002)(316002)(6486002)(2616005)(966005)(54906003)(64030200001)(579004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2622;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:3; A:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: b+xVWC30RuV2BGaT6ccLx49JclYEBMZKc4SckZomaY4vmWM0AyEPB4MCR8mUtXSI8QF3URwS4b9qZzOtcPKM9q1ayLljM/t8DbyZRhlklfbgLbngb8P6q+ERsFQPQrWlw4i9P2vD0mQj43JX72ayhRyMhxSdsXrvGABmoUp/YZx70vgPHWTfJdy7iqCX7KPtc8bEQA35jcGldlpdCB53EbqznEHzA9xrP6c0PBk9XxzNiJQJvPDxQ2qvf7xcA1FLtMUUEs9YDNph4RkUhtahJarNIm+aQNlNDyjJgJOt0TQ+XcileVRRzTA1y2HcnU/b7D4UwlyaH8y1dX5KwC3oJovv6yRDgU4NmffxRiS9ssq6M1Io+AzDNygmtsdEH1bBFyioYrPS2TFGmsbBWt+yK3kXtOydlXZ7GLjSTuaWefl8ePYtaskf5dVV+7rumy3AaPMOdn4S87n8Kb8y2UJUlPAzKSD3eS8WsC7kJqyEZDrfoIW5Lj8lkeAlDglIe6/zmbBOLpFqb5bxJUdieeyD6YZsjCvHkzpWoVj05jLiGHE=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <7C8E2808F1C556488A97B03254939650@namprd02.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b739e37-9333-410d-4cd4-08d7833f2392
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2019 22:19:09.7973 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: f7QbM4VGrFk0LOPgsqRyqT2vXN7+wgAk2ZGPqz4IRvX0t1iO9GXsrO/R0TyxdjxCkz57kVdj2W1gTKbBCw3VxjdiQ4/g2AsgwaYbMBkoZi8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2622
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-17_04:2019-12-17,2019-12-17 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.151.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,416 +134,658 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Marc-Andre Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe Mathieu-Daude <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Dec 2019 22:40:48 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Hi Alexey,
 
-> VFIO_IOMMU_DIRTY_PAGES ioctl performs three operations:
-> - Start unpinned pages dirty pages tracking while migration is active and
->   device is running, i.e. during pre-copy phase.
-> - Stop unpinned pages dirty pages tracking. This is required to stop
->   unpinned dirty pages tracking if migration failed or cancelled during
->   pre-copy phase. Unpinned pages tracking is clear.
-> - Get dirty pages bitmap. Stop unpinned dirty pages tracking and clear
->   unpinned pages information on bitmap read. This ioctl returns bitmap of
->   dirty pages, its user space application responsibility to copy content
->   of dirty pages from source to destination during migration.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 218 ++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 209 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 2ada8e6cdb88..215aecb25453 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -70,6 +70,7 @@ struct vfio_iommu {
->  	unsigned int		dma_avail;
->  	bool			v2;
->  	bool			nesting;
-> +	bool			dirty_page_tracking;
->  };
->  
->  struct vfio_domain {
-> @@ -112,6 +113,7 @@ struct vfio_pfn {
->  	dma_addr_t		iova;		/* Device address */
->  	unsigned long		pfn;		/* Host pfn */
->  	atomic_t		ref_count;
-> +	bool			unpinned;
+I don't know how, but somehow I didn't receive your reply:
+https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg02127.html
 
-Doesn't this duplicate ref_count == 0?
+(I was about to follow up, then I decided to look at the archives to
+make sure your response didn't get lost in my client somehow...)
 
->  };
->  
->  struct vfio_regions {
-> @@ -244,6 +246,32 @@ static void vfio_remove_from_pfn_list(struct vfio_dma *dma,
->  	kfree(vpfn);
->  }
->  
-> +static void vfio_remove_unpinned_from_pfn_list(struct vfio_dma *dma, bool warn)
-> +{
-> +	struct rb_node *n = rb_first(&dma->pfn_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_pfn *vpfn = rb_entry(n, struct vfio_pfn, node);
-> +
-> +		if (warn)
-> +			WARN_ON_ONCE(vpfn->unpinned);
+Still not sure of what happened, lol, let's move on. :)
 
-This option isn't used within this patch, perhaps better to add with
-its use case, but it seems this presents both a denial of service via
-kernel tainting and an undocumented feature/bug.  As I interpret its
-use within the next patch, this generates a warning if the user
-unmapped the IOVA with dirty pages present, without using the dirty
-bitmap extension of the unmap call.  Our job is not to babysit the
-user, if they don't care to look at the dirty bitmap, that's their
-prerogative.  Drop this warning and the function arg.
+I'm top-posting as I couldn't pull your response in for a proper reply.
 
-> +
-> +		if (vpfn->unpinned)
+You said:
+> The franciozzy/autosetters branch with this on top -
+> https://github.com/aik/qemu/commit/94c33bb7debf
+> - works fine. Thanks,
 
-if (!atomic_read(&vpfn->ref_count))
+Your patch basically reverts a part of my commit and then makes the
+change Marc-Andre recommended (by dropping the (void *) cast).
 
-> +			vfio_remove_from_pfn_list(dma, vpfn);
-> +	}
-> +}
-> +
-> +static void vfio_remove_unpinned_from_dma_list(struct vfio_iommu *iommu)
-> +{
-> +	struct rb_node *n = rb_first(&iommu->dma_list);
-> +
-> +	for (; n; n = rb_next(n)) {
-> +		struct vfio_dma *dma = rb_entry(n, struct vfio_dma, node);
-> +
-> +		vfio_remove_unpinned_from_pfn_list(dma, false);
-> +	}
-> +}
-> +
->  static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  					       unsigned long iova)
->  {
-> @@ -254,13 +282,17 @@ static struct vfio_pfn *vfio_iova_get_vfio_pfn(struct vfio_dma *dma,
->  	return vpfn;
->  }
->  
-> -static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
-> +static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn,
-> +				  bool dirty_tracking)
->  {
->  	int ret = 0;
->  
->  	if (atomic_dec_and_test(&vpfn->ref_count)) {
->  		ret = put_pfn(vpfn->pfn, dma->prot);
-> -		vfio_remove_from_pfn_list(dma, vpfn);
-> +		if (dirty_tracking)
-> +			vpfn->unpinned = true;
-> +		else
-> +			vfio_remove_from_pfn_list(dma, vpfn);
+Is it ok for me to just drop that part of my patch and send the v4?
 
-This can also simply use ref_count.  BTW, checking the locking, I think
-->ref_count is only manipulated under iommu->lock, therefore the atomic
-ops are probably overkill.
-
->  	}
->  	return ret;
->  }
-> @@ -504,7 +536,7 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
->  }
->  
->  static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
-> -				    bool do_accounting)
-> +				    bool do_accounting, bool dirty_tracking)
->  {
->  	int unlocked;
->  	struct vfio_pfn *vpfn = vfio_find_vpfn(dma, iova);
-> @@ -512,7 +544,10 @@ static int vfio_unpin_page_external(struct vfio_dma *dma, dma_addr_t iova,
->  	if (!vpfn)
->  		return 0;
->  
-> -	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn);
-> +	if (vpfn->unpinned)
-> +		return 0;
-
-Combine with above, if (!vpfn || !vpfn->ref_count)
-
-> +
-> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
->  
->  	if (do_accounting)
->  		vfio_lock_acct(dma, -unlocked, true);
-> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
->  		if (vpfn) {
-> -			phys_pfn[i] = vpfn->pfn;
-> -			continue;
-> +			if (vpfn->unpinned)
-> +				vfio_remove_from_pfn_list(dma, vpfn);
-
-This seems inefficient, we have an allocated vpfn at the right places
-in the list, wouldn't it be better to repin the page?
-
-> +			else {
-> +				phys_pfn[i] = vpfn->pfn;
-> +				continue;
-> +			}
->  		}
->  
->  		remote_vaddr = dma->vaddr + iova - dma->iova;
-> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
->  		if (ret) {
-> -			vfio_unpin_page_external(dma, iova, do_accounting);
-> +			vfio_unpin_page_external(dma, iova, do_accounting,
-> +						 false);
->  			goto pin_unwind;
->  		}
->  	}
-> @@ -598,7 +638,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  
->  		iova = user_pfn[j] << PAGE_SHIFT;
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(dma, iova, do_accounting, false);
->  		phys_pfn[j] = 0;
->  	}
->  pin_done:
-> @@ -632,7 +672,8 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
->  		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
->  		if (!dma)
->  			goto unpin_exit;
-> -		vfio_unpin_page_external(dma, iova, do_accounting);
-> +		vfio_unpin_page_external(dma, iova, do_accounting,
-> +					 iommu->dirty_page_tracking);
->  	}
->  
->  unpin_exit:
-> @@ -850,6 +891,88 @@ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
->  	return bitmap;
->  }
->  
-> +/*
-> + * start_iova is the reference from where bitmaping started. This is called
-> + * from DMA_UNMAP where start_iova can be different than iova
-> + */
-> +
-> +static void vfio_iova_dirty_bitmap(struct vfio_iommu *iommu, dma_addr_t iova,
-> +				  size_t size, uint64_t pgsize,
-> +				  dma_addr_t start_iova, unsigned long *bitmap)
-> +{
-> +	struct vfio_dma *dma;
-> +	dma_addr_t i = iova;
-> +	unsigned long pgshift = __ffs(pgsize);
-> +
-> +	while ((dma = vfio_find_dma(iommu, i, pgsize))) {
-> +		/* mark all pages dirty if all pages are pinned and mapped. */
-> +		if (dma->iommu_mapped) {
-> +			dma_addr_t iova_limit;
-> +
-> +			iova_limit = (dma->iova + dma->size) < (iova + size) ?
-> +				     (dma->iova + dma->size) : (iova + size);
-
-min(dma->iova + dma->size, iova + size);
-
-> +
-> +			for (; i < iova_limit; i += pgsize) {
-> +				unsigned int start;
-> +
-> +				start = (i - start_iova) >> pgshift;
-> +
-> +				__bitmap_set(bitmap, start, 1);
-
-Why __bitmap_set() rather than bitmap_set()?  Also why not try to take
-advantage of the number of bits arg?
-
-> +			}
-> +			if (i >= iova + size)
-> +				return;
-
-This skips the removed unpinned callback at the end of the loop,
-leaving unnecessarily tracked, unpinned vpfns.
-
-> +		} else {
-> +			struct rb_node *n = rb_first(&dma->pfn_list);
-> +			bool found = false;
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +							struct vfio_pfn, node);
-> +				if (vpfn->iova >= i) {
-
-This doesn't look right, how does a vpfn with .iova > i necessarily
-contain i?
-
-> +					found = true;
-> +					break;
-> +				}
-> +			}
-> +
-> +			if (!found) {
-> +				i += dma->size;
-> +				continue;
-> +			}
-> +
-> +			for (; n; n = rb_next(n)) {
-> +				unsigned int start;
-> +				struct vfio_pfn *vpfn = rb_entry(n,
-> +							struct vfio_pfn, node);
-> +
-> +				if (vpfn->iova >= iova + size)
-> +					return;
-> +
-> +				start = (vpfn->iova - start_iova) >> pgshift;
-> +
-> +				__bitmap_set(bitmap, start, 1);
-
-Don't we need to iterate over the vfpn relative to pgsize?  Oh, I
-see below that pgsize is the minimum user advertised size, which is at
-least PAGE_SIZE, to maybe not.  Same bitmap_set() question as above
-though.
-
-> +
-> +				i = vpfn->iova + pgsize;
-> +			}
-> +		}
-> +		vfio_remove_unpinned_from_pfn_list(dma, false);
-> +	}
-> +}
-> +
-> +static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
-> +{
-> +	long bsize;
-> +
-> +	if (!bitmap_size || bitmap_size > SIZE_MAX)
-> +		return -EINVAL;
-> +
-> +	bsize = ALIGN(npages, BITS_PER_LONG) / sizeof(unsigned long);
-> +
-> +	if (bitmap_size < bsize)
-> +		return -EINVAL;
-> +
-> +	return bsize;
-> +}
-> +
->  static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  			     struct vfio_iommu_type1_dma_unmap *unmap)
->  {
-> @@ -2297,6 +2420,83 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
->  			-EFAULT : 0;
-> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> +		struct vfio_iommu_type1_dirty_bitmap range;
-> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> +		int ret;
-> +
-> +		if (!iommu->v2)
-> +			return -EACCES;
-> +
-> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> +				    bitmap);
-> +
-> +		if (copy_from_user(&range, (void __user *)arg, minsz))
-> +			return -EFAULT;
-> +
-> +		if (range.argsz < minsz || range.flags & ~mask)
-> +			return -EINVAL;
-> +
-
-flags should be sanitized further, invalid combinations should be
-rejected.  For example, if a user provides STOP|GET_BITMAP it should
-either populate the bitmap AND turn off tracking, or error.  It's not
-acceptable to turn off tracking and silently ignore GET_BITMAP.
-
-> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> +			iommu->dirty_page_tracking = true;
-> +			return 0;
-> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> +			iommu->dirty_page_tracking = false;
-> +
-> +			mutex_lock(&iommu->lock);
-> +			vfio_remove_unpinned_from_dma_list(iommu);
-> +			mutex_unlock(&iommu->lock);
-> +			return 0;
-> +
-> +		} else if (range.flags &
-> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> +			uint64_t iommu_pgmask;
-> +			unsigned long pgshift = __ffs(range.pgsize);
-> +			unsigned long *bitmap;
-> +			long bsize;
-> +
-> +			iommu_pgmask =
-> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> +
-> +			if (((range.pgsize - 1) & iommu_pgmask) !=
-> +			    (range.pgsize - 1))
-> +				return -EINVAL;
-> +
-> +			if (range.iova & iommu_pgmask)
-> +				return -EINVAL;
-> +			if (!range.size || range.size > SIZE_MAX)
-> +				return -EINVAL;
-> +			if (range.iova + range.size < range.iova)
-> +				return -EINVAL;
-> +
-> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> +						   range.bitmap_size);
-> +			if (bsize < 0)
-> +				return ret;
-> +
-> +			bitmap = kmalloc(bsize, GFP_KERNEL);
-
-I think I remember mentioning previously that we cannot allocate an
-arbitrary buffer on behalf of the user, it's far too easy for them to
-kill the kernel that way.  kmalloc is also limited in what it can
-alloc.  Can't we use the user buffer directly or only work on a part of
-it at a time?
-
-> +			if (!bitmap)
-> +				return -ENOMEM;
-> +
-> +			ret = copy_from_user(bitmap,
-> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
-> +			if (ret)
-> +				goto bitmap_exit;
-> +
-> +			iommu->dirty_page_tracking = false;
-
-a) This is done outside of the mutex and susceptible to races, b) why
-is this done?
+You can follow-up on the cast change afterwards.
 
 Thanks,
-Alex
+F.
 
-> +			mutex_lock(&iommu->lock);
-> +			vfio_iova_dirty_bitmap(iommu, range.iova, range.size,
-> +					     range.pgsize, range.iova, bitmap);
-> +			mutex_unlock(&iommu->lock);
-> +
-> +			ret = copy_to_user((void __user *)range.bitmap, bitmap,
-> +					   range.bitmap_size) ? -EFAULT : 0;
-> +bitmap_exit:
-> +			kfree(bitmap);
-> +			return ret;
-> +		}
->  	}
->  
->  	return -ENOTTY;
+
+> On Dec 10, 2019, at 1:04 PM, Felipe Franciosi <felipe@nutanix.com> wrote:
+>=20
+> Hi
+>=20
+>> On Dec 2, 2019, at 6:31 AM, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>>=20
+>>=20
+>>=20
+>> On 30/11/2019 04:46, Felipe Franciosi wrote:
+>>> Several objects implemented their own uint property getters and setters=
+,
+>>> despite them being straightforward (without any checks/validations on
+>>> the values themselves) and identical across objects. This makes use of
+>>> an enhanced API for object_property_add_uintXX_ptr() which offers
+>>> default setters.
+>>>=20
+>>> Some of these setters used to update the value even if the type visit
+>>> failed (eg. because the value being set overflowed over the given type)=
+.
+>>> The new setter introduces a check for these errors, not updating the
+>>> value if an error occurred. The error is propagated.
+>>>=20
+>>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+>>> ---
+>>> hw/acpi/ich9.c       |  95 ++++----------------------------------
+>>> hw/isa/lpc_ich9.c    |  12 +----
+>>> hw/misc/edu.c        |  13 ++----
+>>> hw/pci-host/q35.c    |  14 ++----
+>>> hw/ppc/spapr.c       |  18 ++------
+>>> hw/vfio/pci-quirks.c |  20 +++-----
+>>> memory.c             |  15 +-----
+>>> target/arm/cpu.c     |  22 ++-------
+>>> target/i386/sev.c    | 106 ++++---------------------------------------
+>>> 9 files changed, 40 insertions(+), 275 deletions(-)
+>>>=20
+>>> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+>>> index 742fb78226..d9305be891 100644
+>>> --- a/hw/acpi/ich9.c
+>>> +++ b/hw/acpi/ich9.c
+>>> @@ -357,81 +357,6 @@ static void ich9_pm_set_cpu_hotplug_legacy(Object =
+*obj, bool value,
+>>>    s->pm.cpu_hotplug_legacy =3D value;
+>>> }
+>>>=20
+>>> -static void ich9_pm_get_disable_s3(Object *obj, Visitor *v, const char=
+ *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCPMRegs *pm =3D opaque;
+>>> -    uint8_t value =3D pm->disable_s3;
+>>> -
+>>> -    visit_type_uint8(v, name, &value, errp);
+>>> -}
+>>> -
+>>> -static void ich9_pm_set_disable_s3(Object *obj, Visitor *v, const char=
+ *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCPMRegs *pm =3D opaque;
+>>> -    Error *local_err =3D NULL;
+>>> -    uint8_t value;
+>>> -
+>>> -    visit_type_uint8(v, name, &value, &local_err);
+>>> -    if (local_err) {
+>>> -        goto out;
+>>> -    }
+>>> -    pm->disable_s3 =3D value;
+>>> -out:
+>>> -    error_propagate(errp, local_err);
+>>> -}
+>>> -
+>>> -static void ich9_pm_get_disable_s4(Object *obj, Visitor *v, const char=
+ *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCPMRegs *pm =3D opaque;
+>>> -    uint8_t value =3D pm->disable_s4;
+>>> -
+>>> -    visit_type_uint8(v, name, &value, errp);
+>>> -}
+>>> -
+>>> -static void ich9_pm_set_disable_s4(Object *obj, Visitor *v, const char=
+ *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCPMRegs *pm =3D opaque;
+>>> -    Error *local_err =3D NULL;
+>>> -    uint8_t value;
+>>> -
+>>> -    visit_type_uint8(v, name, &value, &local_err);
+>>> -    if (local_err) {
+>>> -        goto out;
+>>> -    }
+>>> -    pm->disable_s4 =3D value;
+>>> -out:
+>>> -    error_propagate(errp, local_err);
+>>> -}
+>>> -
+>>> -static void ich9_pm_get_s4_val(Object *obj, Visitor *v, const char *na=
+me,
+>>> -                               void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCPMRegs *pm =3D opaque;
+>>> -    uint8_t value =3D pm->s4_val;
+>>> -
+>>> -    visit_type_uint8(v, name, &value, errp);
+>>> -}
+>>> -
+>>> -static void ich9_pm_set_s4_val(Object *obj, Visitor *v, const char *na=
+me,
+>>> -                               void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCPMRegs *pm =3D opaque;
+>>> -    Error *local_err =3D NULL;
+>>> -    uint8_t value;
+>>> -
+>>> -    visit_type_uint8(v, name, &value, &local_err);
+>>> -    if (local_err) {
+>>> -        goto out;
+>>> -    }
+>>> -    pm->s4_val =3D value;
+>>> -out:
+>>> -    error_propagate(errp, local_err);
+>>> -}
+>>> -
+>>> static bool ich9_pm_get_enable_tco(Object *obj, Error **errp)
+>>> {
+>>>    ICH9LPCState *s =3D ICH9_LPC_DEVICE(obj);
+>>> @@ -468,18 +393,14 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCP=
+MRegs *pm, Error **errp)
+>>>                             ich9_pm_get_cpu_hotplug_legacy,
+>>>                             ich9_pm_set_cpu_hotplug_legacy,
+>>>                             NULL);
+>>> -    object_property_add(obj, ACPI_PM_PROP_S3_DISABLED, "uint8",
+>>> -                        ich9_pm_get_disable_s3,
+>>> -                        ich9_pm_set_disable_s3,
+>>> -                        NULL, pm, NULL);
+>>> -    object_property_add(obj, ACPI_PM_PROP_S4_DISABLED, "uint8",
+>>> -                        ich9_pm_get_disable_s4,
+>>> -                        ich9_pm_set_disable_s4,
+>>> -                        NULL, pm, NULL);
+>>> -    object_property_add(obj, ACPI_PM_PROP_S4_VAL, "uint8",
+>>> -                        ich9_pm_get_s4_val,
+>>> -                        ich9_pm_set_s4_val,
+>>> -                        NULL, pm, NULL);
+>>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S3_DISABLED,
+>>> +                                  &pm->disable_s3, OBJ_PROP_FLAG_READW=
+RITE,
+>>> +                                  NULL);
+>>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S4_DISABLED,
+>>> +                                  &pm->disable_s4, OBJ_PROP_FLAG_READW=
+RITE,
+>>> +                                  NULL);
+>>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S4_VAL,
+>>> +                                  &pm->s4_val, OBJ_PROP_FLAG_READWRITE=
+, NULL);
+>>>    object_property_add_bool(obj, ACPI_PM_PROP_TCO_ENABLED,
+>>>                             ich9_pm_get_enable_tco,
+>>>                             ich9_pm_set_enable_tco,
+>>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>>> index c40bb3c420..b99a613954 100644
+>>> --- a/hw/isa/lpc_ich9.c
+>>> +++ b/hw/isa/lpc_ich9.c
+>>> @@ -627,13 +627,6 @@ static const MemoryRegionOps ich9_rst_cnt_ops =3D =
+{
+>>>    .endianness =3D DEVICE_LITTLE_ENDIAN
+>>> };
+>>>=20
+>>> -static void ich9_lpc_get_sci_int(Object *obj, Visitor *v, const char *=
+name,
+>>> -                                 void *opaque, Error **errp)
+>>> -{
+>>> -    ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
+>>> -    visit_type_uint8(v, name, &lpc->sci_gsi, errp);
+>>> -}
+>>> -
+>>> static void ich9_lpc_initfn(Object *obj)
+>>> {
+>>>    ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
+>>> @@ -641,9 +634,8 @@ static void ich9_lpc_initfn(Object *obj)
+>>>    static const uint8_t acpi_enable_cmd =3D ICH9_APM_ACPI_ENABLE;
+>>>    static const uint8_t acpi_disable_cmd =3D ICH9_APM_ACPI_DISABLE;
+>>>=20
+>>> -    object_property_add(obj, ACPI_PM_PROP_SCI_INT, "uint8",
+>>> -                        ich9_lpc_get_sci_int,
+>>> -                        NULL, NULL, NULL, NULL);
+>>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_SCI_INT,
+>>> +                                  &lpc->sci_gsi, OBJ_PROP_FLAG_READ, N=
+ULL);
+>>>    object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_ENABLE_=
+CMD,
+>>>                                  &acpi_enable_cmd, OBJ_PROP_FLAG_READ, =
+NULL);
+>>>    object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_DISABLE=
+_CMD,
+>>> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+>>> index d5e2bdbb57..ff10f5b794 100644
+>>> --- a/hw/misc/edu.c
+>>> +++ b/hw/misc/edu.c
+>>> @@ -396,21 +396,14 @@ static void pci_edu_uninit(PCIDevice *pdev)
+>>>    msi_uninit(pdev);
+>>> }
+>>>=20
+>>> -static void edu_obj_uint64(Object *obj, Visitor *v, const char *name,
+>>> -                           void *opaque, Error **errp)
+>>> -{
+>>> -    uint64_t *val =3D opaque;
+>>> -
+>>> -    visit_type_uint64(v, name, val, errp);
+>>> -}
+>>> -
+>>> static void edu_instance_init(Object *obj)
+>>> {
+>>>    EduState *edu =3D EDU(obj);
+>>>=20
+>>>    edu->dma_mask =3D (1UL << 28) - 1;
+>>> -    object_property_add(obj, "dma_mask", "uint64", edu_obj_uint64,
+>>> -                    edu_obj_uint64, NULL, &edu->dma_mask, NULL);
+>>> +    object_property_add_uint64_ptr(obj, "dma_mask",
+>>> +                                   &edu->dma_mask, OBJ_PROP_FLAG_READW=
+RITE,
+>>> +                                   NULL);
+>>> }
+>>>=20
+>>> static void edu_class_init(ObjectClass *class, void *data)
+>>> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+>>> index 158d270b9f..f384ab95c6 100644
+>>> --- a/hw/pci-host/q35.c
+>>> +++ b/hw/pci-host/q35.c
+>>> @@ -165,14 +165,6 @@ static void q35_host_get_pci_hole64_end(Object *ob=
+j, Visitor *v,
+>>>    visit_type_uint64(v, name, &value, errp);
+>>> }
+>>>=20
+>>> -static void q35_host_get_mmcfg_size(Object *obj, Visitor *v, const cha=
+r *name,
+>>> -                                    void *opaque, Error **errp)
+>>> -{
+>>> -    PCIExpressHost *e =3D PCIE_HOST_BRIDGE(obj);
+>>> -
+>>> -    visit_type_uint64(v, name, &e->size, errp);
+>>> -}
+>>> -
+>>> /*
+>>> * NOTE: setting defaults for the mch.* fields in this table
+>>> * doesn't work, because mch is a separate QOM object that is
+>>> @@ -213,6 +205,7 @@ static void q35_host_initfn(Object *obj)
+>>> {
+>>>    Q35PCIHost *s =3D Q35_HOST_DEVICE(obj);
+>>>    PCIHostState *phb =3D PCI_HOST_BRIDGE(obj);
+>>> +    PCIExpressHost *pehb =3D PCIE_HOST_BRIDGE(obj);
+>>>=20
+>>>    memory_region_init_io(&phb->conf_mem, obj, &pci_host_conf_le_ops, ph=
+b,
+>>>                          "pci-conf-idx", 4);
+>>> @@ -242,9 +235,8 @@ static void q35_host_initfn(Object *obj)
+>>>                        q35_host_get_pci_hole64_end,
+>>>                        NULL, NULL, NULL, NULL);
+>>>=20
+>>> -    object_property_add(obj, PCIE_HOST_MCFG_SIZE, "uint64",
+>>> -                        q35_host_get_mmcfg_size,
+>>> -                        NULL, NULL, NULL, NULL);
+>>> +    object_property_add_uint64_ptr(obj, PCIE_HOST_MCFG_SIZE,
+>>> +                                   &pehb->size, OBJ_PROP_FLAG_READ, NU=
+LL);
+>>>=20
+>>>    object_property_add_link(obj, MCH_HOST_PROP_RAM_MEM, TYPE_MEMORY_REG=
+ION,
+>>>                             (Object **) &s->mch.ram_memory,
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index e076f6023c..668f045023 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -3227,18 +3227,6 @@ static void spapr_set_resize_hpt(Object *obj, co=
+nst char *value, Error **errp)
+>>>    }
+>>> }
+>>>=20
+>>> -static void spapr_get_vsmt(Object *obj, Visitor *v, const char *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>>> -}
+>>> -
+>>> -static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>>> -}
+>>> -
+>>> static char *spapr_get_ic_mode(Object *obj, Error **errp)
+>>> {
+>>>    SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
+>>> @@ -3336,8 +3324,10 @@ static void spapr_instance_init(Object *obj)
+>>>    object_property_set_description(obj, "resize-hpt",
+>>>                                    "Resizing of the Hash Page Table (en=
+abled, disabled, required)",
+>>>                                    NULL);
+>>> -    object_property_add(obj, "vsmt", "uint32", spapr_get_vsmt,
+>>> -                        spapr_set_vsmt, NULL, &spapr->vsmt, &error_abo=
+rt);
+>>> +    object_property_add_uint32_ptr(obj, "vsmt",
+>>> +                                   &spapr->vsmt, OBJ_PROP_FLAG_READWRI=
+TE,
+>>> +                                   &error_abort);
+>>=20
+>>=20
+>> Ths looks alright but...
+>=20
+> Ok.
+>=20
+>>=20
+>>=20
+>>> +
+>>>    object_property_set_description(obj, "vsmt",
+>>>                                    "Virtual SMT: KVM behaves as if this=
+ were"
+>>>                                    " the host's SMT mode", &error_abort=
+);
+>>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+>>> index 136f3a9ad6..d769c99bde 100644
+>>> --- a/hw/vfio/pci-quirks.c
+>>> +++ b/hw/vfio/pci-quirks.c
+>>> @@ -2187,14 +2187,6 @@ int vfio_add_virt_caps(VFIOPCIDevice *vdev, Erro=
+r **errp)
+>>>    return 0;
+>>> }
+>>>=20
+>>> -static void vfio_pci_nvlink2_get_tgt(Object *obj, Visitor *v,
+>>> -                                     const char *name,
+>>> -                                     void *opaque, Error **errp)
+>>> -{
+>>> -    uint64_t tgt =3D (uintptr_t) opaque;
+>>> -    visit_type_uint64(v, name, &tgt, errp);
+>>> -}
+>>> -
+>>> static void vfio_pci_nvlink2_get_link_speed(Object *obj, Visitor *v,
+>>>                                                 const char *name,
+>>>                                                 void *opaque, Error **e=
+rrp)
+>>> @@ -2240,9 +2232,9 @@ int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *=
+vdev, Error **errp)
+>>>                               nv2reg->size, p);
+>>>    QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
+>>>=20
+>>> -    object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
+>>> -                        vfio_pci_nvlink2_get_tgt, NULL, NULL,
+>>> -                        (void *) (uintptr_t) cap->tgt, NULL);
+>>> +    object_property_add_uint64_ptr(OBJECT(vdev), "nvlink2-tgt",
+>>> +                                   (void *)(uintptr_t)cap->tgt,
+>>=20
+>>=20
+>> ... this does not seem equalent. The getter will assume cap->tgt is an
+>> userspace address which it is not. &cap->tgt would be QOM-correct but
+>> won't work because of the lifetime of @cap but this is another story.
+>=20
+> Maybe I just don't understand where this value comes from. It sounds
+> like you know what you are talking about :) so I'll send a v4 and
+> leave this method untouched, unless you have a chance to test this and
+> tell me that it still works.
+>=20
+>>=20
+>> btw what is this patchset based on? I tried applying it on top of 3 week
+>> old and today upstream and it failed. Thanks,
+>=20
+> I'm not sure why there were problems. I just rebased my branch on top
+> of latest master (without issues). I pushed it to Github so you can
+> have a look. Let me know if you want to try it out or if I should just
+> send a v4 straight away dropping the changes immediately above.
+>=20
+> https://github.com/franciozzy/qemu
+>=20
+> Thanks!
+> F.
+>=20
+>>=20
+>>=20
+>>=20
+>>=20
+>>=20
+>>> +                                   OBJ_PROP_FLAG_READ, NULL);
+>>>    trace_vfio_pci_nvidia_gpu_setup_quirk(vdev->vbasedev.name, cap->tgt,
+>>>                                          nv2reg->size);
+>>> free_exit:
+>>> @@ -2301,9 +2293,9 @@ int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Er=
+ror **errp)
+>>>        QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
+>>>    }
+>>>=20
+>>> -    object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
+>>> -                        vfio_pci_nvlink2_get_tgt, NULL, NULL,
+>>> -                        (void *) (uintptr_t) captgt->tgt, NULL);
+>>> +    object_property_add_uint64_ptr(OBJECT(vdev), "nvlink2-tgt",
+>>> +                                   (void *)(uintptr_t)captgt->tgt,
+>>> +                                   OBJ_PROP_FLAG_READ, NULL);
+>>>    trace_vfio_pci_nvlink2_setup_quirk_ssatgt(vdev->vbasedev.name, captg=
+t->tgt,
+>>>                                              atsdreg->size);
+>>>=20
+>>> diff --git a/memory.c b/memory.c
+>>> index 06484c2bff..7dac2aa059 100644
+>>> --- a/memory.c
+>>> +++ b/memory.c
+>>> @@ -1158,15 +1158,6 @@ void memory_region_init(MemoryRegion *mr,
+>>>    memory_region_do_init(mr, owner, name, size);
+>>> }
+>>>=20
+>>> -static void memory_region_get_addr(Object *obj, Visitor *v, const char=
+ *name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    MemoryRegion *mr =3D MEMORY_REGION(obj);
+>>> -    uint64_t value =3D mr->addr;
+>>> -
+>>> -    visit_type_uint64(v, name, &value, errp);
+>>> -}
+>>> -
+>>> static void memory_region_get_container(Object *obj, Visitor *v,
+>>>                                        const char *name, void *opaque,
+>>>                                        Error **errp)
+>>> @@ -1230,10 +1221,8 @@ static void memory_region_initfn(Object *obj)
+>>>                             NULL, NULL, &error_abort);
+>>>    op->resolve =3D memory_region_resolve_container;
+>>>=20
+>>> -    object_property_add(OBJECT(mr), "addr", "uint64",
+>>> -                        memory_region_get_addr,
+>>> -                        NULL, /* memory_region_set_addr */
+>>> -                        NULL, NULL, &error_abort);
+>>> +    object_property_add_uint64_ptr(OBJECT(mr), "addr",
+>>> +                                   &mr->addr, OBJ_PROP_FLAG_READ, &err=
+or_abort);
+>>>    object_property_add(OBJECT(mr), "priority", "uint32",
+>>>                        memory_region_get_priority,
+>>>                        NULL, /* memory_region_set_priority */
+>>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>>> index 7a4ac9339b..bbe25a73c4 100644
+>>> --- a/target/arm/cpu.c
+>>> +++ b/target/arm/cpu.c
+>>> @@ -1039,22 +1039,6 @@ static void arm_set_pmu(Object *obj, bool value,=
+ Error **errp)
+>>>    cpu->has_pmu =3D value;
+>>> }
+>>>=20
+>>> -static void arm_get_init_svtor(Object *obj, Visitor *v, const char *na=
+me,
+>>> -                               void *opaque, Error **errp)
+>>> -{
+>>> -    ARMCPU *cpu =3D ARM_CPU(obj);
+>>> -
+>>> -    visit_type_uint32(v, name, &cpu->init_svtor, errp);
+>>> -}
+>>> -
+>>> -static void arm_set_init_svtor(Object *obj, Visitor *v, const char *na=
+me,
+>>> -                               void *opaque, Error **errp)
+>>> -{
+>>> -    ARMCPU *cpu =3D ARM_CPU(obj);
+>>> -
+>>> -    visit_type_uint32(v, name, &cpu->init_svtor, errp);
+>>> -}
+>>> -
+>>> void arm_cpu_post_init(Object *obj)
+>>> {
+>>>    ARMCPU *cpu =3D ARM_CPU(obj);
+>>> @@ -1165,9 +1149,9 @@ void arm_cpu_post_init(Object *obj)
+>>>         * a simple DEFINE_PROP_UINT32 for this because we want to permi=
+t
+>>>         * the property to be set after realize.
+>>>         */
+>>> -        object_property_add(obj, "init-svtor", "uint32",
+>>> -                            arm_get_init_svtor, arm_set_init_svtor,
+>>> -                            NULL, NULL, &error_abort);
+>>> +        object_property_add_uint32_ptr(obj, "init-svtor",
+>>> +                                       &cpu->init_svtor,
+>>> +                                       OBJ_PROP_FLAG_READWRITE, &error=
+_abort);
+>>>    }
+>>>=20
+>>>    qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
+>>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>>> index 024bb24e51..846018a12d 100644
+>>> --- a/target/i386/sev.c
+>>> +++ b/target/i386/sev.c
+>>> @@ -266,94 +266,6 @@ qsev_guest_class_init(ObjectClass *oc, void *data)
+>>>            "guest owners session parameters (encoded with base64)", NUL=
+L);
+>>> }
+>>>=20
+>>> -static void
+>>> -qsev_guest_set_handle(Object *obj, Visitor *v, const char *name,
+>>> -                      void *opaque, Error **errp)
+>>> -{
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -    uint32_t value;
+>>> -
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -    sev->handle =3D value;
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_set_policy(Object *obj, Visitor *v, const char *name,
+>>> -                      void *opaque, Error **errp)
+>>> -{
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -    uint32_t value;
+>>> -
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -    sev->policy =3D value;
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_set_cbitpos(Object *obj, Visitor *v, const char *name,
+>>> -                       void *opaque, Error **errp)
+>>> -{
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -    uint32_t value;
+>>> -
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -    sev->cbitpos =3D value;
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_set_reduced_phys_bits(Object *obj, Visitor *v, const char *=
+name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -    uint32_t value;
+>>> -
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -    sev->reduced_phys_bits =3D value;
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_get_policy(Object *obj, Visitor *v, const char *name,
+>>> -                      void *opaque, Error **errp)
+>>> -{
+>>> -    uint32_t value;
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -
+>>> -    value =3D sev->policy;
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_get_handle(Object *obj, Visitor *v, const char *name,
+>>> -                      void *opaque, Error **errp)
+>>> -{
+>>> -    uint32_t value;
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -
+>>> -    value =3D sev->handle;
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_get_cbitpos(Object *obj, Visitor *v, const char *name,
+>>> -                       void *opaque, Error **errp)
+>>> -{
+>>> -    uint32_t value;
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -
+>>> -    value =3D sev->cbitpos;
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -}
+>>> -
+>>> -static void
+>>> -qsev_guest_get_reduced_phys_bits(Object *obj, Visitor *v, const char *=
+name,
+>>> -                                   void *opaque, Error **errp)
+>>> -{
+>>> -    uint32_t value;
+>>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>>> -
+>>> -    value =3D sev->reduced_phys_bits;
+>>> -    visit_type_uint32(v, name, &value, errp);
+>>> -}
+>>> -
+>>> static void
+>>> qsev_guest_init(Object *obj)
+>>> {
+>>> @@ -361,15 +273,15 @@ qsev_guest_init(Object *obj)
+>>>=20
+>>>    sev->sev_device =3D g_strdup(DEFAULT_SEV_DEVICE);
+>>>    sev->policy =3D DEFAULT_GUEST_POLICY;
+>>> -    object_property_add(obj, "policy", "uint32", qsev_guest_get_policy=
+,
+>>> -                        qsev_guest_set_policy, NULL, NULL, NULL);
+>>> -    object_property_add(obj, "handle", "uint32", qsev_guest_get_handle=
+,
+>>> -                        qsev_guest_set_handle, NULL, NULL, NULL);
+>>> -    object_property_add(obj, "cbitpos", "uint32", qsev_guest_get_cbitp=
+os,
+>>> -                        qsev_guest_set_cbitpos, NULL, NULL, NULL);
+>>> -    object_property_add(obj, "reduced-phys-bits", "uint32",
+>>> -                        qsev_guest_get_reduced_phys_bits,
+>>> -                        qsev_guest_set_reduced_phys_bits, NULL, NULL, =
+NULL);
+>>> +    object_property_add_uint32_ptr(obj, "policy", &sev->policy,
+>>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>>> +    object_property_add_uint32_ptr(obj, "handle", &sev->handle,
+>>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>>> +    object_property_add_uint32_ptr(obj, "cbitpos", &sev->cbitpos,
+>>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>>> +    object_property_add_uint32_ptr(obj, "reduced-phys-bits",
+>>> +                                   &sev->reduced_phys_bits,
+>>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>>> }
+>>>=20
+>>> /* sev guest info */
+>>>=20
+>>=20
+>> --=20
+>> Alexey
+>=20
 
 
