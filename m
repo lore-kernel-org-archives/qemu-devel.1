@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8E3C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B853C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:04:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4529E20733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:02:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34D5620733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:04:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="duOEa1Wp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4529E20733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Gi+HCqPI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34D5620733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih50Y-0008IK-Jk
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:02:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33908)
+	id 1ih52L-0002C6-Q9
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:04:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33499)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4iV-0000Dl-9X
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:16 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4i0-00088b-H1
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:43:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4iR-0005nb-T5
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:44:15 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55305 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4hy-0005P7-Oq
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:43:44 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:59651 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4iR-0005UW-IQ; Mon, 16 Dec 2019 23:44:11 -0500
+ id 1ih4hy-0005Jt-DG; Mon, 16 Dec 2019 23:43:42 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWV17mhz9sSp; Tue, 17 Dec 2019 15:43:30 +1100 (AEDT)
+ id 47cQWR297tz9sSY; Tue, 17 Dec 2019 15:43:29 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557814;
- bh=0iPUaHnfHvwmQN/HVOaXeUDSVR/0Qc7oi4z2XkI4XvI=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557811;
+ bh=QKA6fjaDYEUorHcTXfljK4SzeitthhfaucE1VVMPv2k=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=duOEa1WpjVZZTvCXheJ6aFjf0DKjmsOq8UXjkePPCvPa0LkWTt2kulgSQlxCYbfhd
- NctQ1SNieFNecqm29TIzZc4dYBEp/F7T+NBhKtIVzZeUxpIWjrnS7UqSUnAGaRyNBZ
- Gnxx9A6m6eAsxFc38OND8XhFVcGlPApYO5PfHjcE=
+ b=Gi+HCqPIEXTEkG8guGaN47BL36Z3Z5EOVFuItHYu9vC8HAQz7qvXKAaY/mqhL4fus
+ bLK/x596QSjlNVenRL1HAhjXavRrLnWi0q6O41VmlPLTFgWNycQt6Gb4qRWWMthWY6
+ U543iVzznNhHVeLduHE7akGnl3kMLnxKk0Y5OAkI=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 24/88] ipmi: Add support to customize OEM functions
-Date: Tue, 17 Dec 2019 15:42:18 +1100
-Message-Id: <20191217044322.351838-25-david@gibson.dropbear.id.au>
+Subject: [PULL 19/88] ppc/pnv: Remove pnv_xive_vst_size() routine
+Date: Tue, 17 Dec 2019 15:42:13 +1100
+Message-Id: <20191217044322.351838-20-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
@@ -69,184 +69,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Corey Minyard <cminyard@mvista.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The routine ipmi_register_oem_netfn() lets external modules register
-command handlers for OEM functions. Required for the PowerNV machine.
+pnv_xive_vst_size() tries to compute the size of a VSD table from the
+information given by FW. The number of entries of the table are
+deduced from the result and the MMIO regions of the ESBs and the END
+ESBs are then resized accordingly with the computed value. This
+reduces the number of elements that can be addressed by the ESB pages.
 
-Cc: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
+The maximum number of elements of a direct table can contain is simply:
+
+   Table size / sizeof(XIVE structure)
+
+An indirect table is a one page array of VSDs pointing to subpages
+containing XIVE virtual structures and the maximum number of elements
+an indirect table can contain :
+
+   (PAGE_SIZE / sizeof(vsd)) * (PAGE_SIZE / sizeof(XIVE structure))
+
+which gives us 16M for XiveENDs, 8M for XiveNVTs. That's more than the
+associated VC and PC BARS can address.
+
+The result returned by pnv_xive_vst_size() for indirect tables is
+incorrect and can not be used to reduce the size of the MMIO region of
+a XIVE resource using an indirect table, such as ENDs in skiboot.
+
+Remove pnv_xive_vst_size() and use a simpler form for direct tables
+only. Keep the resizing of the MMIO region for direct tables only as
+this is still useful for the ESB MMIO window.
+
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20191028070027.22752-2-clg@kaod.org>
-Acked-by: Corey Minyard <cminyard@mvista.com>
+Message-Id: <20191115162436.30548-4-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ipmi/ipmi_bmc_sim.c | 50 +++++-------------------------------------
- include/hw/ipmi/ipmi.h | 42 +++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 44 deletions(-)
+ hw/intc/pnv_xive.c | 112 +++++++++++++++++----------------------------
+ 1 file changed, 43 insertions(+), 69 deletions(-)
 
-diff --git a/hw/ipmi/ipmi_bmc_sim.c b/hw/ipmi/ipmi_bmc_sim.c
-index 71e56f3b13..6670cf039d 100644
---- a/hw/ipmi/ipmi_bmc_sim.c
-+++ b/hw/ipmi/ipmi_bmc_sim.c
-@@ -167,32 +167,14 @@ typedef struct IPMISensor {
- #define MAX_SENSORS 20
- #define IPMI_WATCHDOG_SENSOR 0
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 4e56c2e468..a4d80fd5e7 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -123,36 +123,22 @@ static uint64_t pnv_xive_vst_page_size_allowed(uint=
+32_t page_shift)
+          page_shift =3D=3D 21 || page_shift =3D=3D 24;
+ }
 =20
--typedef struct IPMIBmcSim IPMIBmcSim;
--typedef struct RspBuffer RspBuffer;
--
- #define MAX_NETFNS 64
-=20
--typedef struct IPMICmdHandler {
--    void (*cmd_handler)(IPMIBmcSim *s,
--                        uint8_t *cmd, unsigned int cmd_len,
--                        RspBuffer *rsp);
--    unsigned int cmd_len_min;
--} IPMICmdHandler;
--
--typedef struct IPMINetfn {
--    unsigned int cmd_nums;
--    const IPMICmdHandler *cmd_handlers;
--} IPMINetfn;
--
- typedef struct IPMIRcvBufEntry {
-     QTAILQ_ENTRY(IPMIRcvBufEntry) entry;
-     uint8_t len;
-     uint8_t buf[MAX_IPMI_MSG_SIZE];
- } IPMIRcvBufEntry;
-=20
--#define TYPE_IPMI_BMC_SIMULATOR "ipmi-bmc-sim"
--#define IPMI_BMC_SIMULATOR(obj) OBJECT_CHECK(IPMIBmcSim, (obj), \
--                                        TYPE_IPMI_BMC_SIMULATOR)
- struct IPMIBmcSim {
-     IPMIBmc parent;
-=20
-@@ -279,28 +261,8 @@ struct IPMIBmcSim {
- #define IPMI_BMC_WATCHDOG_ACTION_POWER_DOWN      2
- #define IPMI_BMC_WATCHDOG_ACTION_POWER_CYCLE     3
-=20
--struct RspBuffer {
--    uint8_t buffer[MAX_IPMI_MSG_SIZE];
--    unsigned int len;
--};
--
- #define RSP_BUFFER_INITIALIZER { }
-=20
--static inline void rsp_buffer_set_error(RspBuffer *rsp, uint8_t byte)
+-static uint64_t pnv_xive_vst_size(uint64_t vsd)
 -{
--    rsp->buffer[2] =3D byte;
--}
+-    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
 -
--/* Add a byte to the response. */
--static inline void rsp_buffer_push(RspBuffer *rsp, uint8_t byte)
--{
--    if (rsp->len >=3D sizeof(rsp->buffer)) {
--        rsp_buffer_set_error(rsp, IPMI_CC_REQUEST_DATA_TRUNCATED);
--        return;
+-    /*
+-     * Read the first descriptor to get the page size of the indirect
+-     * table.
+-     */
+-    if (VSD_INDIRECT & vsd) {
+-        uint32_t nr_pages =3D vst_tsize / XIVE_VSD_SIZE;
+-        uint32_t page_shift;
+-
+-        vsd =3D ldq_be_dma(&address_space_memory, vsd & VSD_ADDRESS_MASK=
+);
+-        page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
+-
+-        if (!pnv_xive_vst_page_size_allowed(page_shift)) {
+-            return 0;
+-        }
+-
+-        return nr_pages * (1ull << page_shift);
 -    }
--    rsp->buffer[rsp->len++] =3D byte;
+-
+-    return vst_tsize;
 -}
 -
- static inline void rsp_buffer_pushmore(RspBuffer *rsp, uint8_t *bytes,
-                                        unsigned int n)
+ static uint64_t pnv_xive_vst_addr_direct(PnvXive *xive, uint32_t type,
+                                          uint64_t vsd, uint32_t idx)
  {
-@@ -630,8 +592,8 @@ static void ipmi_init_sensors_from_sdrs(IPMIBmcSim *s=
-)
+     const XiveVstInfo *info =3D &vst_infos[type];
+     uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
++    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
++    uint32_t idx_max;
++
++    idx_max =3D vst_tsize / info->size - 1;
++    if (idx > idx_max) {
++#ifdef XIVE_DEBUG
++        xive_error(xive, "VST: %s entry %x out of range [ 0 .. %x ] !?",
++                   info->name, idx, idx_max);
++#endif
++        return 0;
++    }
+=20
+     return vst_addr + idx * info->size;
+ }
+@@ -215,7 +201,6 @@ static uint64_t pnv_xive_vst_addr(PnvXive *xive, uint=
+32_t type, uint8_t blk,
+ {
+     const XiveVstInfo *info =3D &vst_infos[type];
+     uint64_t vsd;
+-    uint32_t idx_max;
+=20
+     if (blk >=3D info->max_blocks) {
+         xive_error(xive, "VST: invalid block id %d for VST %s %d !?",
+@@ -232,15 +217,6 @@ static uint64_t pnv_xive_vst_addr(PnvXive *xive, uin=
+t32_t type, uint8_t blk,
+         return xive ? pnv_xive_vst_addr(xive, type, blk, idx) : 0;
+     }
+=20
+-    idx_max =3D pnv_xive_vst_size(vsd) / info->size - 1;
+-    if (idx > idx_max) {
+-#ifdef XIVE_DEBUG
+-        xive_error(xive, "VST: %s entry %x/%x out of range [ 0 .. %x ] !=
+?",
+-                   info->name, blk, idx, idx_max);
+-#endif
+-        return 0;
+-    }
+-
+     if (VSD_INDIRECT & vsd) {
+         return pnv_xive_vst_addr_indirect(xive, type, vsd, idx);
+     }
+@@ -453,19 +429,12 @@ static uint64_t pnv_xive_pc_size(PnvXive *xive)
+     return (~xive->regs[CQ_PC_BARM >> 3] + 1) & CQ_PC_BARM_MASK;
+ }
+=20
+-static uint32_t pnv_xive_nr_ipis(PnvXive *xive)
++static uint32_t pnv_xive_nr_ipis(PnvXive *xive, uint8_t blk)
+ {
+-    uint8_t blk =3D xive->chip->chip_id;
+-
+-    return pnv_xive_vst_size(xive->vsds[VST_TSEL_SBE][blk]) * SBE_PER_BY=
+TE;
+-}
+-
+-static uint32_t pnv_xive_nr_ends(PnvXive *xive)
+-{
+-    uint8_t blk =3D xive->chip->chip_id;
++    uint64_t vsd =3D xive->vsds[VST_TSEL_SBE][blk];
++    uint64_t vst_tsize =3D 1ull << (GETFIELD(VSD_TSIZE, vsd) + 12);
+=20
+-    return pnv_xive_vst_size(xive->vsds[VST_TSEL_EQDT][blk])
+-        / vst_infos[VST_TSEL_EQDT].size;
++    return VSD_INDIRECT & vsd ? 0 : vst_tsize * SBE_PER_BYTE;
+ }
+=20
+ /*
+@@ -598,6 +567,7 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xive,=
+ uint8_t type,
+     XiveSource *xsrc =3D &xive->ipi_source;
+     const XiveVstInfo *info =3D &vst_infos[type];
+     uint32_t page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
++    uint64_t vst_tsize =3D 1ull << page_shift;
+     uint64_t vst_addr =3D vsd & VSD_ADDRESS_MASK;
+=20
+     /* Basic checks */
+@@ -633,11 +603,16 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xiv=
+e, uint8_t type,
+=20
+     case VST_TSEL_EQDT:
+         /*
+-         * Backing store pages for the END. Compute the number of ENDs
+-         * provisioned by FW and resize the END ESB window accordingly.
++         * Backing store pages for the END.
++         *
++         * If the table is direct, we can compute the number of PQ
++         * entries provisioned by FW (such as skiboot) and resize the
++         * END ESB window accordingly.
+          */
+-        memory_region_set_size(&end_xsrc->esb_mmio, pnv_xive_nr_ends(xiv=
+e) *
+-                               (1ull << (end_xsrc->esb_shift + 1)));
++        if (!(VSD_INDIRECT & vsd)) {
++            memory_region_set_size(&end_xsrc->esb_mmio, (vst_tsize / inf=
+o->size)
++                                   * (1ull << xsrc->esb_shift));
++        }
+         memory_region_add_subregion(&xive->end_edt_mmio, 0,
+                                     &end_xsrc->esb_mmio);
+         break;
+@@ -646,11 +621,16 @@ static void pnv_xive_vst_set_exclusive(PnvXive *xiv=
+e, uint8_t type,
+         /*
+          * Backing store pages for the source PQ bits. The model does
+          * not use these PQ bits backed in RAM because the XiveSource
+-         * model has its own. Compute the number of IRQs provisioned
+-         * by FW and resize the IPI ESB window accordingly.
++         * model has its own.
++         *
++         * If the table is direct, we can compute the number of PQ
++         * entries provisioned by FW (such as skiboot) and resize the
++         * ESB window accordingly.
+          */
+-        memory_region_set_size(&xsrc->esb_mmio, pnv_xive_nr_ipis(xive) *
+-                               (1ull << xsrc->esb_shift));
++        if (!(VSD_INDIRECT & vsd)) {
++            memory_region_set_size(&xsrc->esb_mmio, vst_tsize * SBE_PER_=
+BYTE
++                                   * (1ull << xsrc->esb_shift));
++        }
+         memory_region_add_subregion(&xive->ipi_edt_mmio, 0, &xsrc->esb_m=
+mio);
+         break;
+=20
+@@ -1579,8 +1559,7 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
+ *mon)
+     XiveRouter *xrtr =3D XIVE_ROUTER(xive);
+     uint8_t blk =3D xive->chip->chip_id;
+     uint32_t srcno0 =3D XIVE_EAS(blk, 0);
+-    uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive);
+-    uint32_t nr_ends =3D pnv_xive_nr_ends(xive);
++    uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive, blk);
+     XiveEAS eas;
+     XiveEND end;
+     int i;
+@@ -1600,21 +1579,16 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monit=
+or *mon)
+         }
+     }
+=20
+-    monitor_printf(mon, "XIVE[%x] ENDT %08x .. %08x\n", blk, 0, nr_ends =
+- 1);
+-    for (i =3D 0; i < nr_ends; i++) {
+-        if (xive_router_get_end(xrtr, blk, i, &end)) {
+-            break;
+-        }
+-        xive_end_pic_print_info(&end, i, mon);
++    monitor_printf(mon, "XIVE[%x] ENDT\n", blk);
++    i =3D 0;
++    while (!xive_router_get_end(xrtr, blk, i, &end)) {
++        xive_end_pic_print_info(&end, i++, mon);
+     }
+=20
+-    monitor_printf(mon, "XIVE[%x] END Escalation %08x .. %08x\n", blk, 0=
+,
+-                   nr_ends - 1);
+-    for (i =3D 0; i < nr_ends; i++) {
+-        if (xive_router_get_end(xrtr, blk, i, &end)) {
+-            break;
+-        }
+-        xive_end_eas_pic_print_info(&end, i, mon);
++    monitor_printf(mon, "XIVE[%x] END Escalation EAT\n", blk);
++    i =3D 0;
++    while (!xive_router_get_end(xrtr, blk, i, &end)) {
++        xive_end_eas_pic_print_info(&end, i++, mon);
      }
  }
 =20
--static int ipmi_register_netfn(IPMIBmcSim *s, unsigned int netfn,
--                               const IPMINetfn *netfnd)
-+int ipmi_sim_register_netfn(IPMIBmcSim *s, unsigned int netfn,
-+                        const IPMINetfn *netfnd)
- {
-     if ((netfn & 1) || (netfn >=3D MAX_NETFNS) || (s->netfns[netfn / 2])=
-) {
-         return -1;
-@@ -1860,10 +1822,10 @@ static const IPMINetfn storage_netfn =3D {
-=20
- static void register_cmds(IPMIBmcSim *s)
- {
--    ipmi_register_netfn(s, IPMI_NETFN_CHASSIS, &chassis_netfn);
--    ipmi_register_netfn(s, IPMI_NETFN_SENSOR_EVENT, &sensor_event_netfn)=
-;
--    ipmi_register_netfn(s, IPMI_NETFN_APP, &app_netfn);
--    ipmi_register_netfn(s, IPMI_NETFN_STORAGE, &storage_netfn);
-+    ipmi_sim_register_netfn(s, IPMI_NETFN_CHASSIS, &chassis_netfn);
-+    ipmi_sim_register_netfn(s, IPMI_NETFN_SENSOR_EVENT, &sensor_event_ne=
-tfn);
-+    ipmi_sim_register_netfn(s, IPMI_NETFN_APP, &app_netfn);
-+    ipmi_sim_register_netfn(s, IPMI_NETFN_STORAGE, &storage_netfn);
- }
-=20
- static uint8_t init_sdrs[] =3D {
-diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
-index 6f2413b39b..8a99d958bb 100644
---- a/include/hw/ipmi/ipmi.h
-+++ b/include/hw/ipmi/ipmi.h
-@@ -55,6 +55,7 @@ enum ipmi_op {
- #define IPMI_CC_COMMAND_NOT_SUPPORTED                    0xd5
-=20
- #define IPMI_NETFN_APP                0x06
-+#define IPMI_NETFN_OEM                0x3a
-=20
- #define IPMI_DEBUG 1
-=20
-@@ -265,4 +266,45 @@ int ipmi_bmc_sdr_find(IPMIBmc *b, uint16_t recid,
-                       const struct ipmi_sdr_compact **sdr, uint16_t *nex=
-trec);
- void ipmi_bmc_gen_event(IPMIBmc *b, uint8_t *evt, bool log);
-=20
-+#define TYPE_IPMI_BMC_SIMULATOR "ipmi-bmc-sim"
-+#define IPMI_BMC_SIMULATOR(obj) OBJECT_CHECK(IPMIBmcSim, (obj), \
-+                                        TYPE_IPMI_BMC_SIMULATOR)
-+
-+typedef struct IPMIBmcSim IPMIBmcSim;
-+
-+typedef struct RspBuffer {
-+    uint8_t buffer[MAX_IPMI_MSG_SIZE];
-+    unsigned int len;
-+} RspBuffer;
-+
-+static inline void rsp_buffer_set_error(RspBuffer *rsp, uint8_t byte)
-+{
-+    rsp->buffer[2] =3D byte;
-+}
-+
-+/* Add a byte to the response. */
-+static inline void rsp_buffer_push(RspBuffer *rsp, uint8_t byte)
-+{
-+    if (rsp->len >=3D sizeof(rsp->buffer)) {
-+        rsp_buffer_set_error(rsp, IPMI_CC_REQUEST_DATA_TRUNCATED);
-+        return;
-+    }
-+    rsp->buffer[rsp->len++] =3D byte;
-+}
-+
-+typedef struct IPMICmdHandler {
-+    void (*cmd_handler)(IPMIBmcSim *s,
-+                        uint8_t *cmd, unsigned int cmd_len,
-+                        RspBuffer *rsp);
-+    unsigned int cmd_len_min;
-+} IPMICmdHandler;
-+
-+typedef struct IPMINetfn {
-+    unsigned int cmd_nums;
-+    const IPMICmdHandler *cmd_handlers;
-+} IPMINetfn;
-+
-+int ipmi_sim_register_netfn(IPMIBmcSim *s, unsigned int netfn,
-+                            const IPMINetfn *netfnd);
-+
- #endif
 --=20
 2.23.0
 
