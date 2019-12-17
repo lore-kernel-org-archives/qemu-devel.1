@@ -2,91 +2,77 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBB67C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CBCC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:43:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86E45207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:39:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 826EF207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:43:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OQVbh9RW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E45207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUmIAHG+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826EF207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih8Nt-0001mk-Me
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 03:39:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59100)
+	id 1ih8Rm-0002vZ-LS
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 03:43:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ih8N5-0001F7-0P
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:38:25 -0500
+ (envelope-from <thuth@redhat.com>) id 1ih8RB-0002U8-QD
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ih8N2-0006P1-J2
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:38:22 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34259)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ih8N2-0006Ky-8R
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:38:20 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t2so10330377wrr.1
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 00:38:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=UanTn2sevHxPdwCP77RUSC5TLxUqtwG+0yaCDTyANqo=;
- b=OQVbh9RWafeCgrAo55GNlgPsrl0kD1sXGq8kSAh6uzYb7kGnpLkxn7qpf4AtBP/UmA
- 7pYhSZg/aIM8Ex60iumuOq5miT8/T5rg610m2jLiihdmV/4IB2JYVwqESxworEO6jQU6
- jIUkbKdacmXuOfECJtVqdXcZH4pBNd2NA6ZC79E4uWD7FYYrdAzggPn9wWsyolXUjMRq
- 80KtknN5aex7XxNOCZKVdWpFEFUbl75GNFUwGHlfO/KjHh9Ns/zFrCEvf+5K2G8AEmQA
- d2P15UMSahjnXWBIGqkLOk5yPE0uEl5gZfYJEkY99YC6A97FYrNcwSDnnrTj4aNtEz+K
- 6T1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=UanTn2sevHxPdwCP77RUSC5TLxUqtwG+0yaCDTyANqo=;
- b=kV4fZrbyon5Ck1kYX1u3ySJF+7oZ5Xa/Pbl2yQeHtloULyE93qX57IEHzbPP2Qb888
- CEL4Izr+6/nwx/OMh8nh9uVNramaDoGugsxp56OFznchSfnk1VXvU0IDqFvxGdcjjh2D
- lySS/V45hZc88Pr7wp2ov7U1XtD01NiNo4XgivQ0AuxgCTSn/tN9TKvfYYUHZUwieYQo
- mWxY57k/KRJVcOKMXF/Lp2jv7MQd3SWod78c2iXGlcZLv+TLFLYWEg3+QyGEsq2RUyT/
- VSj/b3L6ubHyH/ygAW7P9Dhy0qxkl6NF5tD4CgVgB2+MeTVf4KjTiS7Uj+DHKEdruIkC
- FtZw==
-X-Gm-Message-State: APjAAAVEQdRqAJAtAihXQjtajGQ51wJevh44SfUcnhQbS9W4Hzc/PE2R
- AxMKA0R5lbKfMWEQ/4cJhId5fQ==
-X-Google-Smtp-Source: APXvYqzWMPMrHhwZ1iYw5eeY8oVBLeGGDcS1cv5YYfSdqD6QyF58yCQS/vLwoYYmm9PKnrqWW35IhQ==
-X-Received: by 2002:a05:6000:11c3:: with SMTP id
- i3mr35047398wrx.244.1576571897937; 
- Tue, 17 Dec 2019 00:38:17 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x11sm2110650wmg.46.2019.12.17.00.38.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Dec 2019 00:38:16 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A15FC1FF87;
- Tue, 17 Dec 2019 08:38:15 +0000 (GMT)
-References: <87h83w4dod.fsf@keithp.com>
- <20191104204230.12249-1-keithp@keithp.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Keith Packard <keithp@keithp.com>
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v6)
-In-reply-to: <20191104204230.12249-1-keithp@keithp.com>
-Date: Tue, 17 Dec 2019 08:38:15 +0000
-Message-ID: <87h81zwdmw.fsf@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1ih8R8-0007oJ-8M
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50447
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ih8R8-0007mv-3W
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576572153;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Dm9HhKVzTOuAXnV6JPJx2A8N3dmAelMfkSAoeZikMCY=;
+ b=ZUmIAHG+nqHCK2D51vFlrb+ckfrgvK07WzPFDtghGr7OW0RdHDI3f/j5YLlw3qAQkrYGAN
+ tzwIWzkUoAGH7O57v+s1TQH/Ra7zqTsjK9iExRcrtnQGiBqptnDl2oO35OPZ62bg8uTNul
+ tJi/mY18UaTnPPW1GS+sn1cSUvxhbZU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-xMPm4jebO46R3Fx9Kd7xhw-1; Tue, 17 Dec 2019 03:42:31 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B329E800D41;
+ Tue, 17 Dec 2019 08:42:30 +0000 (UTC)
+Received: from thuth.com (ovpn-116-149.ams2.redhat.com [10.36.116.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1589560BE2;
+ Tue, 17 Dec 2019 08:42:26 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PULL v2 00/10] Bluetooth removal, and qtest & misc patches
+Date: Tue, 17 Dec 2019 09:42:22 +0100
+Message-Id: <20191217084223.10231-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: xMPm4jebO46R3Fx9Kd7xhw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,381 +84,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+ Hi!
 
-Keith Packard <keithp@keithp.com> writes:
+The following changes since commit cb88904a54903ef6ba21a68a61d9cd51e2166304=
+:
 
-> Provides a blocking call to read a character from the console using
-> semihosting.chardev, if specified. This takes some careful command
-> line options to use stdio successfully as the serial ports, monitor
-> and semihost all want to use stdio. Here's a sample set of command
-> line options which share stdio betwen semihost, monitor and serial
-> ports:
->
-> 	qemu \
-> 	-chardev stdio,mux=3Don,id=3Dstdio0 \
-> 	-serial chardev:stdio0 \
-> 	-semihosting-config enable=3Don,chardev=3Dstdio0 \
-> 	-mon chardev=3Dstdio0,mode=3Dreadline
->
-> This creates a chardev hooked to stdio and then connects all of the
-> subsystems to it. A shorter mechanism would be good to hear about.
->
-> Signed-off-by: Keith Packard <keithp@keithp.com>
->
-> ---
->
-> v2:
-> 	Add implementation in linux-user/arm/semihost.c
->
-> v3:  (thanks to Paolo Bonzini <pbonzini@redhat.com>)
-> 	Replace hand-rolled fifo with fifo8
-> 	Avoid mixing code and declarations
-> 	Remove spurious (void) cast of function parameters
-> 	Define qemu_semihosting_console_init when CONFIG_USER_ONLY
->
-> v4:
-> 	Add qemu_semihosting_console_init to stubs/semihost.c for
-> 	hosts that don't support semihosting
->
-> v5:
-> 	Move #include statements to the top of the file.
-> 	Actually include the stubs/semihost.c patch that was
-> 	supposed to be in v4
-> v6:
-> 	Move call to qemu_semihosting_console_init earlier in
-> 	main so that the mux starts connected to the serial device
-> ---
->  hw/semihosting/console.c          | 72 +++++++++++++++++++++++++++++++
->  include/hw/semihosting/console.h  | 12 ++++++
->  include/hw/semihosting/semihost.h |  4 ++
->  linux-user/arm/semihost.c         | 23 ++++++++++
->  stubs/semihost.c                  |  4 ++
->  target/arm/arm-semi.c             |  3 +-
->  vl.c                              |  3 ++
->  7 files changed, 119 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-> index b4b17c8afb..4db68d6227 100644
-> --- a/hw/semihosting/console.c
-> +++ b/hw/semihosting/console.c
-> @@ -22,6 +22,12 @@
->  #include "exec/gdbstub.h"
->  #include "qemu/log.h"
->  #include "chardev/char.h"
-> +#include <pthread.h>
-> +#include "chardev/char-fe.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/main-loop.h"
-> +#include "qapi/error.h"
-> +#include "qemu/fifo8.h"
->=20=20
->  int qemu_semihosting_log_out(const char *s, int len)
->  {
-> @@ -98,3 +104,69 @@ void qemu_semihosting_console_outc(CPUArchState *env,=
- target_ulong addr)
->                        __func__, addr);
->      }
->  }
-> +
-> +#define FIFO_SIZE   1024
-> +
-> +typedef struct SemihostingConsole {
-> +    CharBackend         backend;
-> +    pthread_mutex_t     mutex;
-> +    pthread_cond_t      cond;
-> +    bool                got;
-> +    Fifo8               fifo;
-> +} SemihostingConsole;
-> +
-> +static SemihostingConsole console =3D {
-> +    .mutex =3D PTHREAD_MUTEX_INITIALIZER,
-> +    .cond =3D PTHREAD_COND_INITIALIZER
-> +};
-> +
-> +static int console_can_read(void *opaque)
-> +{
-> +    SemihostingConsole *c =3D opaque;
-> +    int ret;
-> +    pthread_mutex_lock(&c->mutex);
-> +    ret =3D (int) fifo8_num_free(&c->fifo);
-> +    pthread_mutex_unlock(&c->mutex);
-> +    return ret;
-> +}
-> +
-> +static void console_read(void *opaque, const uint8_t *buf, int size)
-> +{
-> +    SemihostingConsole *c =3D opaque;
-> +    pthread_mutex_lock(&c->mutex);
-> +    while (size-- && !fifo8_is_full(&c->fifo)) {
-> +        fifo8_push(&c->fifo, *buf++);
-> +    }
-> +    pthread_cond_broadcast(&c->cond);
-> +    pthread_mutex_unlock(&c->mutex);
-> +}
-> +
-> +target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-> +{
-> +    uint8_t ch;
-> +    SemihostingConsole *c =3D &console;
-> +    qemu_mutex_unlock_iothread();
-> +    pthread_mutex_lock(&c->mutex);
-> +    while (fifo8_is_empty(&c->fifo)) {
-> +        pthread_cond_wait(&c->cond, &c->mutex);
-> +    }
-> +    ch =3D fifo8_pop(&c->fifo);
-> +    pthread_mutex_unlock(&c->mutex);
-> +    qemu_mutex_lock_iothread();
-> +    return (target_ulong) ch;
-> +}
+  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-dec-16-20=
+19' into staging (2019-12-16 14:07:56 +0000)
 
-I've been trying to exercise this code with a new test case:
+are available in the Git repository at:
 
-  https://github.com/stsquad/semihosting-tests/tree/readc-test
+  https://gitlab.com/huth/qemu.git tags/pull-request-2019-12-17
 
-But I end up deadlocked. Even worse when I issue quit via the mmio we
-end up hanging on something that will never complete:
+for you to fetch changes up to 0f555602c7430ae55b5a4bacf39ce9e483e11193:
 
-  (gdb) thread apply all bt
+  tests: use g_test_rand_int (2019-12-17 09:05:23 +0100)
 
-  Thread 3 (Thread 0x7f8b1959e700 (LWP 14017)):
-  #0  0x00007f8b2ada900c in futex_wait_cancelable (private=3D0, expected=3D=
-0, futex_word=3D0x56213f5482e8 <console+136>) at ../sysdeps/unix/sysv/linux=
-/futex-internal.h:88
-  #1  0x00007f8b2ada900c in __pthread_cond_wait_common (abstime=3D0x0, mute=
-x=3D0x56213f548298 <console+56>, cond=3D0x56213f5482c0 <console+96>) at pth=
-read_cond_wait.c:502
-  #2  0x00007f8b2ada900c in __pthread_cond_wait (cond=3Dcond@entry=3D0x5621=
-3f5482c0 <console+96>, mutex=3Dmutex@entry=3D0x56213f548298 <console+56>) a=
-t pthread_cond_wait.c:655
-  #3  0x000056213ea31a40 in qemu_semihosting_console_inc (env=3Denv@entry=
-=3D0x56214138a680) at /home/alex/lsrc/qemu.git/hw/semihosting/console.c:151
-  #4  0x000056213eab96e8 in do_arm_semihosting (env=3Denv@entry=3D0x5621413=
-8a680) at /home/alex/lsrc/qemu.git/target/arm/arm-semi.c:805
-  #5  0x000056213eacd521 in handle_semihosting (cs=3D<optimized out>) at /h=
-ome/alex/lsrc/qemu.git/target/arm/helper.c:8476
-  #6  0x000056213eacd521 in arm_cpu_do_interrupt (cs=3D<optimized out>) at =
-/home/alex/lsrc/qemu.git/target/arm/helper.c:8522
-  #7  0x000056213e9e53d0 in cpu_handle_exception (ret=3D<synthetic pointer>=
-, cpu=3D0x5621411fe2f0) at /home/alex/lsrc/qemu.git/accel/tcg/cpu-exec.c:503
-  #8  0x000056213e9e53d0 in cpu_exec (cpu=3Dcpu@entry=3D0x562141381550) at =
-/home/alex/lsrc/qemu.git/accel/tcg/cpu-exec.c:711
-  #9  0x000056213e9b4f1f in tcg_cpu_exec (cpu=3D0x562141381550) at /home/al=
-ex/lsrc/qemu.git/cpus.c:1473
-  #10 0x000056213e9b715b in qemu_tcg_cpu_thread_fn (arg=3Darg@entry=3D0x562=
-141381550) at /home/alex/lsrc/qemu.git/cpus.c:1781
-  #11 0x000056213ef026fa in qemu_thread_start (args=3D<optimized out>) at /=
-home/alex/lsrc/qemu.git/util/qemu-thread-posix.c:519
-  #12 0x00007f8b2ada2fa3 in start_thread (arg=3D<optimized out>) at pthread=
-_create.c:486
-  #13 0x00007f8b2acd14cf in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:95
+----------------------------------------------------------------
+* Removal of the deprecated bluetooth code
+* Some qtest and misc patches
+----------------------------------------------------------------
 
-  Thread 2 (Thread 0x7f8b1c012700 (LWP 14016)):
-  #0  0x00007f8b2accbf59 in syscall () at ../sysdeps/unix/sysv/linux/x86_64=
-/syscall.S:38
-  #1  0x000056213ef034ab in qemu_futex_wait (val=3D<optimized out>, f=3D<op=
-timized out>) at /home/alex/lsrc/qemu.git/util/qemu-thread-posix.c:455
-  #2  0x000056213ef034ab in qemu_event_wait (ev=3Dev@entry=3D0x56213f55ffe0=
- <rcu_gp_event>) at /home/alex/lsrc/qemu.git/util/qemu-thread-posix.c:459
-  #3  0x000056213ef14dc7 in wait_for_readers () at /home/alex/lsrc/qemu.git=
-/util/rcu.c:134
-  #4  0x000056213ef14dc7 in synchronize_rcu () at /home/alex/lsrc/qemu.git/=
-util/rcu.c:170
-  #5  0x000056213ef1508d in call_rcu_thread (opaque=3Dopaque@entry=3D0x0) a=
-t /home/alex/lsrc/qemu.git/util/rcu.c:267
-  #6  0x000056213ef026fa in qemu_thread_start (args=3D<optimized out>) at /=
-home/alex/lsrc/qemu.git/util/qemu-thread-posix.c:519
-  #7  0x00007f8b2ada2fa3 in start_thread (arg=3D<optimized out>) at pthread=
-_create.c:486
-  #8  0x00007f8b2acd14cf in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:95
+v2: Unfortunately, I was not able to reproduce the build problem that
+    Peter reported for the v1 pull request. So I'm trying to work-around
+    the issue now by leaving an empty hw/bt/Kconfig file around this time.
+    I'll remove it by another patch later in a couple of weeks instead.
 
-  Thread 1 (Thread 0x7f8b1c151680 (LWP 14010)):
-  #0  0x00007f8b2ada900c in futex_wait_cancelable (private=3D0, expected=3D=
-0, futex_word=3D0x56213f52c7c8 <qemu_pause_cond+40>) at ../sysdeps/unix/sys=
-v/linux/futex-internal.h:88
-  #1  0x00007f8b2ada900c in __pthread_cond_wait_common (abstime=3D0x0, mute=
-x=3D0x56213f52c8c0 <qemu_global_mutex>, cond=3D0x56213f52c7a0 <qemu_pause_c=
-ond>) at pthread_cond_wait.c:502
-  #2  0x00007f8b2ada900c in __pthread_cond_wait (cond=3Dcond@entry=3D0x5621=
-3f52c7a0 <qemu_pause_cond>, mutex=3Dmutex@entry=3D0x56213f52c8c0 <qemu_glob=
-al_mutex>) at pthread_cond_wait.c:655
-  #3  0x000056213ef02e2b in qemu_cond_wait_impl (cond=3D0x56213f52c7a0 <qem=
-u_pause_cond>, mutex=3D0x56213f52c8c0 <qemu_global_mutex>, file=3D0x56213ef=
-43700 "/home/alex/lsrc/qemu.git/cpus.c", line=3D1943) at /home/alex/lsrc/qe=
-mu.git/util/qemu-thread-posix.c:173
-  #4  0x000056213e9b74a4 in pause_all_vcpus () at /home/alex/lsrc/qemu.git/=
-cpus.c:1943
-  #5  0x000056213e9b74a4 in pause_all_vcpus () at /home/alex/lsrc/qemu.git/=
-cpus.c:1923
-  #6  0x000056213e9b7532 in do_vm_stop (state=3DRUN_STATE_SHUTDOWN, send_st=
-op=3D<optimized out>) at /home/alex/lsrc/qemu.git/cpus.c:1102
-  #7  0x000056213e96b8fc in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at /home/alex/lsrc/qemu.git/vl.c:4473
+Cole Robinson (1):
+      tests: fix modules-test 'duplicate test case' error
 
-I guess my first question is why do we need a separate mutex/cond
-variable for this operation? This seems like the sort of thing that the
-BQL could protect.
+Laurent Vivier (1):
+      pseries: disable migration-test if /dev/kvm cannot be used
 
-Secondly if the vCPU is paused (via console or gdbstub) we need to
-unwind from our blocking position and be in a position to restart
-cleanly.
+Marc-Andr=C3=A9 Lureau (1):
+      glib: use portable g_setenv()
 
-> +
-> +void qemu_semihosting_console_init(void)
-> +{
-> +    Chardev *chr =3D semihosting_get_chardev();
-> +
-> +    if  (chr) {
-> +        fifo8_create(&console.fifo, FIFO_SIZE);
-> +        qemu_chr_fe_init(&console.backend, chr, &error_abort);
-> +        qemu_chr_fe_set_handlers(&console.backend,
-> +                                 console_can_read,
-> +                                 console_read,
-> +                                 NULL, NULL, &console,
-> +                                 NULL, true);
-> +    }
-> +}
-> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/co=
-nsole.h
-> index 9be9754bcd..f7d5905b41 100644
-> --- a/include/hw/semihosting/console.h
-> +++ b/include/hw/semihosting/console.h
-> @@ -37,6 +37,18 @@ int qemu_semihosting_console_outs(CPUArchState *env, t=
-arget_ulong s);
->   */
->  void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
->=20=20
-> +/**
-> + * qemu_semihosting_console_inc:
-> + * @env: CPUArchState
-> + *
-> + * Receive single character from debug console. This
-> + * may be the remote gdb session if a softmmu guest is currently being
-> + * debugged.
-> + *
-> + * Returns: character read or -1 on error
-> + */
-> +target_ulong qemu_semihosting_console_inc(CPUArchState *env);
-> +
->  /**
->   * qemu_semihosting_log_out:
->   * @s: pointer to string
-> diff --git a/include/hw/semihosting/semihost.h b/include/hw/semihosting/s=
-emihost.h
-> index 60fc42d851..b8ce5117ae 100644
-> --- a/include/hw/semihosting/semihost.h
-> +++ b/include/hw/semihosting/semihost.h
-> @@ -56,6 +56,9 @@ static inline Chardev *semihosting_get_chardev(void)
->  {
->      return NULL;
->  }
-> +static inline void qemu_semihosting_console_init(void)
-> +{
-> +}
->  #else /* !CONFIG_USER_ONLY */
->  bool semihosting_enabled(void);
->  SemihostingTarget semihosting_get_target(void);
-> @@ -68,6 +71,7 @@ Chardev *semihosting_get_chardev(void);
->  void qemu_semihosting_enable(void);
->  int qemu_semihosting_config_options(const char *opt);
->  void qemu_semihosting_connect_chardevs(void);
-> +void qemu_semihosting_console_init(void);
->  #endif /* CONFIG_USER_ONLY */
->=20=20
->  #endif /* SEMIHOST_H */
-> diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
-> index a16b525eec..4f998d6220 100644
-> --- a/linux-user/arm/semihost.c
-> +++ b/linux-user/arm/semihost.c
-> @@ -14,6 +14,7 @@
->  #include "cpu.h"
->  #include "hw/semihosting/console.h"
->  #include "qemu.h"
-> +#include <poll.h>
->=20=20
->  int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
->  {
-> @@ -47,3 +48,25 @@ void qemu_semihosting_console_outc(CPUArchState *env, =
-target_ulong addr)
->          }
->      }
->  }
-> +
-> +target_ulong qemu_semihosting_console_inc(CPUArchState *env)
-> +{
-> +    uint8_t c;
-> +    struct pollfd pollfd =3D {
-> +        .fd =3D STDIN_FILENO,
-> +        .events =3D POLLIN
-> +    };
-> +
-> +    if (poll(&pollfd, 1, -1) !=3D 1) {
-> +        qemu_log_mask(LOG_UNIMP, "%s: unexpected read from stdin failure=
-",
-> +                      __func__);
-> +        return (target_ulong) -1;
-> +    }
-> +
-> +    if (read(STDIN_FILENO, &c, 1) !=3D 1) {
-> +        qemu_log_mask(LOG_UNIMP, "%s: unexpected read from stdin failure=
-",
-> +                      __func__);
-> +        return (target_ulong) -1;
-> +    }
-> +    return (target_ulong) c;
-> +}
-> diff --git a/stubs/semihost.c b/stubs/semihost.c
-> index f90589259c..1d8b37f7b2 100644
-> --- a/stubs/semihost.c
-> +++ b/stubs/semihost.c
-> @@ -69,3 +69,7 @@ void semihosting_arg_fallback(const char *file, const c=
-har *cmd)
->  void qemu_semihosting_connect_chardevs(void)
->  {
->  }
-> +
-> +void qemu_semihosting_console_init(void)
-> +{
-> +}
-> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-> index 6f7b6d801b..47d61f6fe1 100644
-> --- a/target/arm/arm-semi.c
-> +++ b/target/arm/arm-semi.c
-> @@ -802,8 +802,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
->=20=20
->          return guestfd_fns[gf->type].readfn(cpu, gf, arg1, len);
->      case TARGET_SYS_READC:
-> -        qemu_log_mask(LOG_UNIMP, "%s: SYS_READC not implemented", __func=
-__);
-> -        return 0;
-> +        return qemu_semihosting_console_inc(env);
->      case TARGET_SYS_ISTTY:
->          GET_ARG(0);
->=20=20
-> diff --git a/vl.c b/vl.c
-> index 4489cfb2bb..7ea8a907fd 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4284,6 +4284,9 @@ int main(int argc, char **argv, char **envp)
->      qemu_opts_foreach(qemu_find_opts("mon"),
->                        mon_init_func, NULL, &error_fatal);
->=20=20
-> +    /* connect semihosting console input if requested */
-> +    qemu_semihosting_console_init();
-> +
->      if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
->          exit(1);
->      if (foreach_device_config(DEV_PARALLEL, parallel_parse) < 0)
+Markus Armbruster (1):
+      hw/misc/ivshmem: Bury dead legacy INTx code
 
+Paolo Bonzini (1):
+      tests: use g_test_rand_int
 
---=20
-Alex Benn=C3=A9e
+Thomas Huth (4):
+      hw/arm/nseries: Replace the bluetooth chardev with a "null" chardev
+      hw/usb: Remove the USB bluetooth dongle device
+      Remove the core bluetooth code
+      Remove libbluetooth / bluez from the CI tests
+
+Wainer dos Santos Moschetta (1):
+      tests/Makefile: Fix check-report.* targets shown in check-help
+
+ .gitlab-ci.yml                             |    2 +-
+ Makefile.objs                              |    2 -
+ bt-host.c                                  |  198 ---
+ bt-vhci.c                                  |  167 --
+ configure                                  |   31 -
+ hw/Kconfig                                 |    1 -
+ hw/Makefile.objs                           |    1 -
+ hw/arm/nseries.c                           |   16 +-
+ hw/bt/Kconfig                              |    2 -
+ hw/bt/Makefile.objs                        |    3 -
+ hw/bt/core.c                               |  143 --
+ hw/bt/hci-csr.c                            |  512 -------
+ hw/bt/hci.c                                | 2263 ------------------------=
+----
+ hw/bt/hid.c                                |  553 -------
+ hw/bt/l2cap.c                              | 1367 -----------------
+ hw/bt/sdp.c                                |  989 ------------
+ hw/misc/ivshmem.c                          |   35 -
+ hw/usb/Kconfig                             |    5 -
+ hw/usb/Makefile.objs                       |    1 -
+ hw/usb/dev-bluetooth.c                     |  581 -------
+ include/hw/bt.h                            | 2177 ------------------------=
+--
+ include/sysemu/bt.h                        |   20 -
+ include/sysemu/os-win32.h                  |    2 -
+ os-win32.c                                 |   22 -
+ qemu-deprecated.texi                       |    7 -
+ qemu-doc.texi                              |   17 -
+ qemu-options.hx                            |   79 -
+ tests/Makefile.include                     |    4 +-
+ tests/docker/dockerfiles/fedora.docker     |    1 -
+ tests/docker/dockerfiles/ubuntu.docker     |    1 -
+ tests/docker/dockerfiles/ubuntu1804.docker |    1 -
+ tests/ivshmem-test.c                       |    2 +-
+ tests/libqtest.c                           |    2 +-
+ tests/migration-test.c                     |    3 +-
+ tests/modules-test.c                       |    3 +-
+ tests/test-bitmap.c                        |    8 +-
+ tests/test-crypto-tlscredsx509.c           |    2 +-
+ tests/test-crypto-tlssession.c             |    2 +-
+ tests/test-io-channel-tls.c                |    2 +-
+ tests/test-qga.c                           |    4 +-
+ tests/test-vmstate.c                       |    2 +-
+ ui/sdl2.c                                  |    2 +-
+ vl.c                                       |  136 --
+ 43 files changed, 26 insertions(+), 9345 deletions(-)
+ delete mode 100644 bt-host.c
+ delete mode 100644 bt-vhci.c
+ delete mode 100644 hw/bt/Makefile.objs
+ delete mode 100644 hw/bt/core.c
+ delete mode 100644 hw/bt/hci-csr.c
+ delete mode 100644 hw/bt/hci.c
+ delete mode 100644 hw/bt/hid.c
+ delete mode 100644 hw/bt/l2cap.c
+ delete mode 100644 hw/bt/sdp.c
+ delete mode 100644 hw/usb/dev-bluetooth.c
+ delete mode 100644 include/hw/bt.h
+ delete mode 100644 include/sysemu/bt.h
+
 
