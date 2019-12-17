@@ -2,80 +2,66 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E7AFC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 07:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDB5C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 07:22:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E7C720733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 07:11:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E7C720733
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
+	by mail.kernel.org (Postfix) with ESMTPS id B13652067C
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 07:22:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B13652067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih71D-0006xx-97
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 02:11:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59909)
+	id 1ih7Bc-0000It-UX
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 02:22:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <emacsray@gmail.com>) id 1ih70d-0006XK-JI
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 02:11:09 -0500
+ (envelope-from <yan.y.zhao@intel.com>) id 1ih7Ay-0008Kd-RO
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 02:21:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <emacsray@gmail.com>) id 1ih70c-0008Fm-2K
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 02:11:07 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:41316)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1ih70b-0008Ex-SP
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 02:11:06 -0500
-Received: by mail-pf1-f193.google.com with SMTP id w62so27905pfw.8
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 23:11:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=ddWHYPJB10Bw6IdstRP8DK21hSg6Maleq/jUgFOYr28=;
- b=oHTqrAmCzRwk9SRwq/8i6zoaXvKyKowbqNUqjFHi2vHijZLfpqT4WQbMiraejcCdKj
- iumDX2oo42sd1IiFPI3Iu71npTobgvq6tKj4KkKbyzZwPiqHAEyC1YJcL4I8MxVhY+34
- qbK2UGbRbedgIknmCpWY3AGO95VbVC6S4yOvEtmYqXltVd7FMcmvCNbGa6g4EVtVR88i
- WG2KoxI9vp7N0h9jJmEfnLWidc5EP2peyoC1z8Sd6ZB5hqjl+ntGEXMVQ3sitPipSRRK
- /0TlBwAiCO0au4klRJ5Ca6MQrkcmfN6RTpT/X74+3xzUCLZGHlmO4QXQ+mV/xV7ZjF5K
- a4ug==
-X-Gm-Message-State: APjAAAXSt0enOdBk5RUPlmU6bMxHRHSBR1/HfA8Chp9w/2eLWcAt7NJJ
- UZ5HmgAhstV5loquwojIKBY=
-X-Google-Smtp-Source: APXvYqwRDIT+NTtb9AfybNcUoNL40F4fbcpV2jtxdacTPqND4pTYRSOGdwmBc2zRb/gSNIgIl+Mtzg==
-X-Received: by 2002:a63:5219:: with SMTP id g25mr22984638pgb.321.1576566664712; 
- Mon, 16 Dec 2019 23:11:04 -0800 (PST)
-Received: from localhost (c-71-204-169-238.hsd1.ca.comcast.net.
- [71.204.169.238])
- by smtp.gmail.com with ESMTPSA id e25sm24205696pge.64.2019.12.16.23.11.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 23:11:03 -0800 (PST)
-Date: Mon, 16 Dec 2019 23:11:02 -0800
-From: Fangrui Song <i@maskray.me>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] configure: Use lld --image-base for --disable-pie user
- mode binaries
-Message-ID: <20191217071102.vlhy4hnr3yqfe3ma@gmail.com>
-References: <20191116052815.nop3xkmd4umqsdsb@google.com>
- <20191120210200.hvwlfuzo2vy5d5n4@gmail.com>
- <20191127183631.n3kfz7k5szri27b3@gmail.com>
- <e5bf2584-bae2-8dda-a2b2-8930ee17ea86@linaro.org>
- <20191202040103.p5ywvxixglmt6oqx@google.com>
- <20191210071030.c5igsbxf3v7pzrwn@gmail.com>
+ (envelope-from <yan.y.zhao@intel.com>) id 1ih7Aw-0004dY-Kh
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 02:21:48 -0500
+Received: from mga14.intel.com ([192.55.52.115]:62206)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1ih7Aw-0004LE-AO
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 02:21:46 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Dec 2019 23:21:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,324,1571727600"; d="scan'208";a="266493368"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by FMSMGA003.fm.intel.com with ESMTP; 16 Dec 2019 23:21:02 -0800
+Date: Tue, 17 Dec 2019 02:12:48 -0500
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20191217071248.GG21868@joy-OptiPlex-7040>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+ <20191216154406.023f912b@x1.home>
+ <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191210071030.c5igsbxf3v7pzrwn@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.193
+In-Reply-To: <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,111 +73,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-12-09, Fangrui Song wrote:
->On 2019-12-01, Fangrui Song wrote:
->>
->>Thanks for reviewing this patch!
->>
->>On 2019-12-01, Richard Henderson wrote:
->>>On 11/27/19 6:36 PM, Fangrui Song wrote:
->>>>On 2019-11-20, Fangrui Song wrote:
->>>>>On 2019-11-15, Fangrui Song wrote:
->>>>>>For lld, --image-base is the preferred way to set the base address.
->>>>>>lld does not actually implement -Ttext-segment, but treats it as an alias for
->>>>>>-Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
->>>>>>create a 1.6GB executable.
->>>>>>
->>>>>>Fix the problem by using --image-base for lld. GNU ld and gold will
->>>>>>still get -Ttext-segment. Also delete the ld --verbose fallback introduced
->>>>>>in 2013, which is no longer relevant or correct (the default linker
->>>>>>script has changed).
->>>>>>
->>>>>>Signed-off-by: Fangrui Song <i@maskray.me>
->>>>>>---
->>>>>>configure | 33 ++++++++++++---------------------
->>>>>>1 file changed, 12 insertions(+), 21 deletions(-)
->>>>>>
->>>>>>diff --git a/configure b/configure
->>>>>>index 6099be1d84..2d45af0d09 100755
->>>>>>--- a/configure
->>>>>>+++ b/configure
->>>>>>@@ -6336,43 +6336,34 @@ fi
->>>>>>
->>>>>># Probe for the need for relocating the user-only binary.
->>>>>>if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ];
->>>>>>then
->>>>>>-  textseg_addr=
->>>>>>+  image_base=
->>>>>>  case "$cpu" in
->>>>>>    arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
->>>>>>-      # ??? Rationale for choosing this address
->>>>>>-      textseg_addr=0x60000000
->>>>>>+      # An arbitrary address that makes it unlikely to collide with user
->>>>>>+      # programs.
->>>
->>>Please don't replace this ??? with an arbitrary rationale, which clearly
->>>doesn't apply to all of these hosts.
->>
->>In
->>https://lists.nongnu.org/archive/html/qemu-devel/2019-11/msg04646.html
->>it was suggested to move the comment around a bit.
->>I am not puzzled where and what I should say in the comment.
->>Can you (or other maintainers) kindly edit the comment for me?
->>I do not know enough about qemu to provide a good rationale here.
->>
->>>>>>+      image_base=0x60000000
->>>>>>      ;;
->>>>>>    mips)
->>>>>>      # A 256M aligned address, high in the address space, with enough
->>>>>>      # room for the code_gen_buffer above it before the stack.
->>>
->>>This is the only one with a proper rationale.
->>>
->>>That said, I'm not sure that the proper way to handle this issue with lld is to
->>>drop this code entirely.
->>
->>The patch changes a feature that lld does not support: -Ttext-segment,
->>to use --image-base instead.
->>
->>Due to the prevalence of -z separate-code in GNU ld, -Ttext-segment is
->>no longer appropriate. I suggested that GNU linkers implement the
->>feature https://sourceware.org/bugzilla/show_bug.cgi?id=25207 .
->>
->>What gets deleted is the sed script. As I explained in the commit
->>message, it is no longer relevant. It probably applies to an old GNU ld
->>that FreeBSD used. FreeBSD has switched to lld now.
->>
->>>The best way to handle the underlying issue -- address conflict between
->>>interpreter and guest binary -- is PIE, for which this code is skipped.
->>>
->>>After that, we go to some pain to choose a guest_base address that allows the
->>>guest binary to load around the interpreter's reserved addresses.
->>>
->>>So what's left that this messing about with link addresses buys us?
->>
->>I agree that --enable-pie will be a better solution, but dropping the
->>support now will break at least FreeBSD. Its kernel supports running an
->>ET_DYN executable but it does not perform address randomization.
->>--disable-pie also appears to be used by ChromeOS developers who
->>reported https://bugs.llvm.org/show_bug.cgi?id=43997 . I can communicate
->>to them that migrating to --enable-pie is the way going forward.
->
->Ping? There is another very good reason that we need to keep
->--disable-pie for a while. Many users build statically linked qemu user
->mode binaries. -static-pie requires newer toolchain:
->
->* GCC 8 or clang 9
->* binutils>=2.29
->* glibc>=2.27 or musl
->
->Dropping support for GCC<8 does not sound a good idea in the year of 2019. (It may be in a few years.)
+On Tue, Dec 17, 2019 at 02:28:44PM +0800, Kirti Wankhede wrote:
+> 
+> 
+> On 12/17/2019 4:14 AM, Alex Williamson wrote:
+> > On Tue, 17 Dec 2019 01:51:36 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > 
+> >> - Defined MIGRATION region type and sub-type.
+> >>
+> >> - Defined vfio_device_migration_info structure which will be placed at 0th
+> >>    offset of migration region to get/set VFIO device related information.
+> >>    Defined members of structure and usage on read/write access.
+> >>
+> >> - Defined device states and added state transition details in the comment.
+> >>
+> >> - Added sequence to be followed while saving and resuming VFIO device state
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> ---
+> >>   include/uapi/linux/vfio.h | 180 ++++++++++++++++++++++++++++++++++++++++++++++
+> >>   1 file changed, 180 insertions(+)
+> >>
+> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >> index 9e843a147ead..a0817ba267c1 100644
+> >> --- a/include/uapi/linux/vfio.h
+> >> +++ b/include/uapi/linux/vfio.h
+> >> @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+> >>   #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> >>   #define VFIO_REGION_TYPE_GFX                    (1)
+> >>   #define VFIO_REGION_TYPE_CCW			(2)
+> >> +#define VFIO_REGION_TYPE_MIGRATION              (3)
+> >>   
+> >>   /* sub-types for VFIO_REGION_TYPE_PCI_* */
+> >>   
+> >> @@ -379,6 +380,185 @@ struct vfio_region_gfx_edid {
+> >>   /* sub-types for VFIO_REGION_TYPE_CCW */
+> >>   #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+> >>   
+> >> +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
+> >> +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+> >> +
+> >> +/*
+> >> + * Structure vfio_device_migration_info is placed at 0th offset of
+> >> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
+> >> + * information. Field accesses from this structure are only supported at their
+> >> + * native width and alignment, otherwise the result is undefined and vendor
+> >> + * drivers should return an error.
+> >> + *
+> >> + * device_state: (read/write)
+> >> + *      To indicate vendor driver the state VFIO device should be transitioned
+> >> + *      to. If device state transition fails, write on this field return error.
+> >> + *      It consists of 3 bits:
+> >> + *      - If bit 0 set, indicates _RUNNING state. When its clear, that indicates
+> > 
+> > s/its/it's/
+> > 
+> >> + *        _STOP state. When device is changed to _STOP, driver should stop
+> >> + *        device before write() returns.
+> >> + *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
+> >> + *        should start gathering device state information which will be provided
+> >> + *        to VFIO user space application to save device's state.
+> >> + *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
+> >> + *        prepare to resume device, data provided through migration region
+> >> + *        should be used to resume device.
+> >> + *      Bits 3 - 31 are reserved for future use. User should perform
+> >> + *      read-modify-write operation on this field.
+> >> + *
+> >> + *  +------- _RESUMING
+> >> + *  |+------ _SAVING
+> >> + *  ||+----- _RUNNING
+> >> + *  |||
+> >> + *  000b => Device Stopped, not saving or resuming
+> >> + *  001b => Device running state, default state
+> >> + *  010b => Stop Device & save device state, stop-and-copy state
+> >> + *  011b => Device running and save device state, pre-copy state
+> >> + *  100b => Device stopped and device state is resuming
+> >> + *  101b => Invalid state
+> > 
+> > Eventually this would be intended for post-copy, if supported by the
+> > device, right?
+> > 
+> 
+> No, as per Yan mentioned in earlier version, _RESUMING + _RUNNING can't 
+> be used for post-copy. New flag will be required for post-copy.
+> 
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg658768.html
 
-Ping...
+sorry, I didn't mean _RESUMING + _RUNNING can't be used for post-copy.
+I just mean another POSCOPY state needs to be introduced. But I'm not
+sure what _RESUMING state is for.
+actually, we do nothing in response to _RESUMING state, no matter precopy
+or poscopy.
+If in your side_RESUMING state means it is allowed to restore device data,
+then I think _RESUMING + _RUNNING is a valid state for postcopy.
+
+Thanks
+Yan
 
