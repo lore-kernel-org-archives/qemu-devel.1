@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 945FDC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C477C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:42:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EFCB20733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC76D20733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:42:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pp3QAFPf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EFCB20733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VmE1pc3E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC76D20733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5cN-0006li-CQ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:41:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35424)
+	id 1ih5cY-0006wR-KG
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:42:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4k9-0002MD-G8
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:58 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4l4-0003kl-Hs
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4k6-00082c-1m
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:55 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52743 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4l3-0001YG-EV
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:54 -0500
+Received: from ozlabs.org ([203.11.71.1]:48091)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4k2-0007V9-3s; Mon, 16 Dec 2019 23:45:53 -0500
+ id 1ih4l3-0000g2-3O; Mon, 16 Dec 2019 23:46:53 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWg2mZKz9sTS; Tue, 17 Dec 2019 15:43:41 +1100 (AEDT)
+ id 47cQWm43QMz9sTv; Tue, 17 Dec 2019 15:43:45 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557823;
- bh=5/a5TMrvK4EzeFh6JE4d9uQG/td8uvROAlRqOMDCQng=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557828;
+ bh=hAkVJ+pdy5kFzF3todD0E6oMTylecfVF64CKJc42ZPI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=pp3QAFPf4XCm3gCh3bHQR27GX9dZJPZt/k2mZ5ohGxI6JSZYnkOxB7SyrTZQSddI8
- aJm4p2oXplpdp4uNxYXWvxSBOe27bCJkqdtdxqqyKa5pfTkLdWSrdhn8/c8mZYPX8y
- GXri7XvK9GU4oQtxelFbqcn8KCcY+2Tc0hPgd6fk=
+ b=VmE1pc3EZuaek8lTVma21UoA4Ov6/cFuXSqluCm1nM1cn+m44OYXhU6EeLdp/YXQg
+ q26HWjjgHGL5hORxT7joOudFgwuAkCgFM7zUiBCFXL0aNa57EOWLYk4BZt+PGwuDf6
+ E20XOYuVLq9etM0b4OMnQryPJt+lkCWDx5g4p4To=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 68/88] target/ppc: Add SPR ASDR
-Date: Tue, 17 Dec 2019 15:43:02 +1100
-Message-Id: <20191217044322.351838-69-david@gibson.dropbear.id.au>
+Subject: [PULL 87/88] ppc/pnv: Drop PnvChipClass::type
+Date: Tue, 17 Dec 2019 15:43:21 +1100
+Message-Id: <20191217044322.351838-88-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,62 +70,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, clg@kaod.org,
- Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+From: Greg Kurz <groug@kaod.org>
 
-The Access Segment Descriptor Register (ASDR) provides information about
-the storage element when taking a hypervisor storage interrupt. When
-performing nested radix address translation, this is normally the guest
-real address. This register is present on POWER9 processors and later.
+It isn't used anymore.
 
-Implement the ADSR, note read and write access is limited to the
-hypervisor.
-
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20191128134700.16091-4-clg@kaod.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <157623844102.360005.12070225703151669294.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h                | 1 +
- target/ppc/translate_init.inc.c | 6 ++++++
- 2 files changed, 7 insertions(+)
+ hw/ppc/pnv.c         | 5 -----
+ include/hw/ppc/pnv.h | 9 ---------
+ 2 files changed, 14 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index da44cc8809..e99850c3ae 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1778,6 +1778,7 @@ typedef PowerPCCPU ArchCPU;
- #define SPR_MPC_MD_DBRAM1     (0x32A)
- #define SPR_RCPU_L2U_RA3      (0x32B)
- #define SPR_TAR               (0x32F)
-+#define SPR_ASDR              (0x330)
- #define SPR_IC                (0x350)
- #define SPR_VTB               (0x351)
- #define SPR_MMCRC             (0x353)
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index c5e4d45569..c850a9d065 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -8295,6 +8295,12 @@ static void gen_spr_power9_mmu(CPUPPCState *env)
-                         SPR_NOACCESS, SPR_NOACCESS,
-                         &spr_read_generic, &spr_write_ptcr,
-                         KVM_REG_PPC_PTCR, 0x00000000);
-+    /* Address Segment Descriptor Register */
-+    spr_register_hv(env, SPR_ASDR, "ASDR",
-+                    SPR_NOACCESS, SPR_NOACCESS,
-+                    SPR_NOACCESS, SPR_NOACCESS,
-+                    &spr_read_generic, &spr_write_generic,
-+                    0x0000000000000000);
- #endif
- }
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 41e5d762df..f77e7ca84e 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1131,7 +1131,6 @@ static void pnv_chip_power8e_class_init(ObjectClass=
+ *klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
+=20
+-    k->chip_type =3D PNV_CHIP_POWER8E;
+     k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+     k->cores_mask =3D POWER8E_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+@@ -1155,7 +1154,6 @@ static void pnv_chip_power8_class_init(ObjectClass =
+*klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
+=20
+-    k->chip_type =3D PNV_CHIP_POWER8;
+     k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+@@ -1179,7 +1177,6 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
+ss *klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
+=20
+-    k->chip_type =3D PNV_CHIP_POWER8NVL;
+     k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+@@ -1359,7 +1356,6 @@ static void pnv_chip_power9_class_init(ObjectClass =
+*klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
+=20
+-    k->chip_type =3D PNV_CHIP_POWER9;
+     k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
+@@ -1448,7 +1444,6 @@ static void pnv_chip_power10_class_init(ObjectClass=
+ *klass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     PnvChipClass *k =3D PNV_CHIP_CLASS(klass);
+=20
+-    k->chip_type =3D PNV_CHIP_POWER10;
+     k->chip_cfam_id =3D 0x120da04900008000ull; /* P10 DD1.0 (with NX) */
+     k->cores_mask =3D POWER10_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p10;
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 4972e93c26..f78fd0dd96 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -38,14 +38,6 @@
+ #define PNV_CHIP_GET_CLASS(obj) \
+      OBJECT_GET_CLASS(PnvChipClass, (obj), TYPE_PNV_CHIP)
+=20
+-typedef enum PnvChipType {
+-    PNV_CHIP_POWER8E,     /* AKA Murano (default) */
+-    PNV_CHIP_POWER8,      /* AKA Venice */
+-    PNV_CHIP_POWER8NVL,   /* AKA Naples */
+-    PNV_CHIP_POWER9,      /* AKA Nimbus */
+-    PNV_CHIP_POWER10,     /* AKA TBD */
+-} PnvChipType;
+-
+ typedef struct PnvChip {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -123,7 +115,6 @@ typedef struct PnvChipClass {
+     SysBusDeviceClass parent_class;
+=20
+     /*< public >*/
+-    PnvChipType  chip_type;
+     uint64_t     chip_cfam_id;
+     uint64_t     cores_mask;
 =20
 --=20
 2.23.0
