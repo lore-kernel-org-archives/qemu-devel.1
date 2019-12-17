@@ -2,92 +2,100 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32936C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 13:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69681C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 13:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0F0E206B7
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 13:43:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3319120733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 13:49:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rn8jqi5M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F0E206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LUsdD0c4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3319120733
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihD8V-0002VH-3m
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 08:43:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40749)
+	id 1ihDES-00045l-E7
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 08:49:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ihD7o-00026d-Gj
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 08:42:57 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ihDDY-0003dt-VG
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 08:48:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ihD7m-00045O-W6
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 08:42:56 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40630)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ihD7m-00042v-Mu
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 08:42:54 -0500
-Received: by mail-wm1-x343.google.com with SMTP id t14so3208044wmi.5
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 05:42:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=aI8FRt6gMNkzQ3NSwFBE3OcYXv1YpvqQnALfuHKrT4k=;
- b=rn8jqi5MN7I3O3dRsLttryixDgj2U6YQdNdTtH9dCFWeVzJslgpwr2hifmvctDsowt
- qDwbTagXv/NE5UGo3EX9F7I//K5U8PwPGEvgQACoqHd9W2nfDhRAr727pH2Qef8HO/zK
- 7HkV/MCEomGNj8h3ZX/b2y5RxYaKQwTWyWpbC5u1prf6Ji3mugFIIJJxLx8PwcJThryE
- OSjbShL7/Qx/q8kzDWjQr2AqXuT1S3n7qh9z8exXbkfUjc5GIDsGervpfnEbEBK9I6v4
- Br/VZvdnoVq+5p97WewCr/hbZ3x51Xuzhwfleq7O2hmeSt7SvqG//X7JTP1kHES8S2Wh
- H+Gg==
+ (envelope-from <pbonzini@redhat.com>) id 1ihDDW-0003aL-Kl
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 08:48:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32574
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihDDW-0003Ts-DG
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 08:48:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576590529;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Hk+7HmkDULmMy1KOGnl54fo1+VKeLwGRqnCJ2Jww1l4=;
+ b=LUsdD0c4ePqZBwzyEhnuF5kQR6knIToBUjoVlEF9dbQibf0u0uy9qgxKwQopOyp9OTkPDB
+ YZjjpx4FEJeuRtwhj7TEUD3ka7mHQkMDb8IWJEhgBL0jYuKdE18eywGAtbHhop3sPsLxHl
+ Wp85oKKXdUK8PDpbQUJTn4qNb/8ztU4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-anLM4B8iP1O69O2xyA74QA-1; Tue, 17 Dec 2019 08:48:45 -0500
+Received: by mail-wr1-f71.google.com with SMTP id b13so3967434wrx.22
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 05:48:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=aI8FRt6gMNkzQ3NSwFBE3OcYXv1YpvqQnALfuHKrT4k=;
- b=SaTDhST7yELis0WlRZ2+ADmzLjZyR/rr9EPooGkvAL2MfvyIM6b5FXct/mxYTUeWgr
- MoMaLCebTwgcKTTzSBUZBPzmepB6H8v/u3EhqDLpLK0i6K2gjbaA+flBb5TKOv2TwN0g
- iP+8kX8UNg7MsbsWR0FJVp6ajTY/POpVGIXsqs6wCnUKdN3DcamlM8RiAky7kyKihgp0
- yOeQgc6mtAYczulyxoHoxlTldj1PX29kC/hkk5HYM/OR0rBYIj33QWqLe7RlUBRCiz35
- wy+JoO+aXlrsTE7O+be4si8WIRAeJzj+GQrbsfAOexodJ1Wt1r14A6T+qEVXL4FZStj4
- hvkg==
-X-Gm-Message-State: APjAAAWE0z2nEnbIXgB6y2RHDomUhjANw7mGh47OKxHAv/o4f1YpmMR9
- mQu1sb5Nqn4nf2SSrlvxmKsqag==
-X-Google-Smtp-Source: APXvYqyxgxV2oH/Br4Y95CeMb2YylncC+EtioyrTNmFhYKLHsnhvFwENP0rkNIFF7ujlDiiaVD32qQ==
-X-Received: by 2002:a05:600c:2218:: with SMTP id
- z24mr5666898wml.50.1576590169866; 
- Tue, 17 Dec 2019 05:42:49 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a14sm26701755wrx.81.2019.12.17.05.42.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Dec 2019 05:42:48 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id F089A1FF87;
- Tue, 17 Dec 2019 13:42:47 +0000 (GMT)
-References: <77dd4863-6301-b17d-529c-451d491d4794@redhat.com>
- <20191217121443.14757-1-alex.bennee@linaro.org>
- <1ca001f0-43a5-d8fc-fee0-3a318cc698e5@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=rHuHjNyj7YHGt3juuZOtLnoTZRz3IScSwGiMs6zt8ck=;
+ b=nB09QdRWXV/kt7lP2CDNxMsoK3sbyy4oJwCCnBSAFOdWHpLzJFnDKXf1b8ViPFawHO
+ zM8yGZZfoiqXZoUTjr63EhGWcW+pTgc9NVDCUhjMhwB91vTZlxqvifIGkVqElm33lII1
+ G89lfJ41CnaQEmlS3z2v+3zyn5mpzUhI+3/G7TZ5ZuMsxJ6A0D1EbqMvAvwHeDB1veKY
+ +EOg7ZsGuo5HCJQRrY14vO7G0+TrioE8T8h+Pnu1uQKAex09qrTrnKeyb8ihCkpAGRdV
+ eRUEgZZBnBvu8ZbpgkcvE0gRPCIpum4xicnutM3qJ8oFyHUprtWg8eqBLci00sJ5oJCN
+ eIZg==
+X-Gm-Message-State: APjAAAVHMjYAPeMdhbbdCWrSBg8u0F+EBboEcglwwZyTuBVc0sVQWjZu
+ Oe6AItugNJPfjGBRaPBQo4WWgKS5J+0ew4Bp0DHw73EXW5+aEDe8tu9ZWwwtfFXGU7ODvcyAXg0
+ QuTEBUUJt3JevwgQ=
+X-Received: by 2002:a7b:cb86:: with SMTP id m6mr5594305wmi.51.1576590524915;
+ Tue, 17 Dec 2019 05:48:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwvIRSSn7wNW+SZlBEgWv65sN31XULJnO6YUaMbJf0XTukRazEFP8k9yABUEudLmR3+A7soZg==
+X-Received: by 2002:a7b:cb86:: with SMTP id m6mr5594283wmi.51.1576590524695;
+ Tue, 17 Dec 2019 05:48:44 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:503f:4ffc:fc4a:f29a?
+ ([2001:b07:6468:f312:503f:4ffc:fc4a:f29a])
+ by smtp.gmail.com with ESMTPSA id 2sm25796684wrq.31.2019.12.17.05.48.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Dec 2019 05:48:44 -0800 (PST)
 Subject: Re: [RFC PATCH] semihosting: suspend recieving CPU when blocked
  (HACK, WIP)
-In-reply-to: <1ca001f0-43a5-d8fc-fee0-3a318cc698e5@redhat.com>
-Date: Tue, 17 Dec 2019 13:42:47 +0000
-Message-ID: <87bls7vzjc.fsf@linaro.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <77dd4863-6301-b17d-529c-451d491d4794@redhat.com>
+ <20191217121443.14757-1-alex.bennee@linaro.org>
+ <1ca001f0-43a5-d8fc-fee0-3a318cc698e5@redhat.com> <87bls7vzjc.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <976227bb-916a-2c50-1f8d-e146a199de15@redhat.com>
+Date: Tue, 17 Dec 2019 14:48:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <87bls7vzjc.fsf@linaro.org>
+Content-Language: en-US
+X-MC-Unique: anLM4B8iP1O69O2xyA74QA-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,136 +113,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 17/12/19 14:42, Alex Benn=C3=A9e wrote:
+>> Why do you need to set exception_index to something other than -1 (using
+>> cpu_loop_exit_noexc for example)?
+> If there is no exception to process we won't exit the main loop which we
+> need to do if we want to wait until there is data to read.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Okay.
 
-> On 17/12/19 13:14, Alex Benn=C3=A9e wrote:
->> [AJB:
->>=20
->> So this at least solves the hang of not being able to quit system
->> emulation while blocked. However there are two things we still need to
->> ensure:
->>=20
->>  - the PC has not advanced until completion so we can redo the instructi=
-on
->>  - we actually wake up the CPU in console_read
->>=20
->> In my testcase console_read never seems to get called. I've tried with
->> both an external pipe loopback and using the ringbuf:
->>=20
->> qemu-system-aarch64 -M virt --display none -cpu cortex-a57 -kernel syste=
-st-a64-with-console.axf -semihosting-config
->>  enable=3Don,chardev=3Dsh0 -serial mon:stdio -chardev ringbuf,logfile=3D=
-foo,id=3Dsh0
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  include/exec/cpu-all.h   |  1 +
->>  hw/semihosting/console.c | 34 +++++++++++++++++-----------------
->>  2 files changed, 18 insertions(+), 17 deletions(-)
->>=20
->> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
->> index e96781a4559..093d7a76edd 100644
->> --- a/include/exec/cpu-all.h
->> +++ b/include/exec/cpu-all.h
->> @@ -31,6 +31,7 @@
->>  #define EXCP_HALTED     0x10003 /* cpu is halted (waiting for external =
-event) */
->>  #define EXCP_YIELD      0x10004 /* cpu wants to yield timeslice to anot=
-her */
->>  #define EXCP_ATOMIC     0x10005 /* stop-the-world and emulate atomic */
->> +#define EXCP_BLOCKED    0x10006 /* cpu is blocked (semihosting) */
->>=20=20
->>  /* some important defines:
->>   *
->> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
->> index 4db68d62270..bda457a0608 100644
->> --- a/hw/semihosting/console.c
->> +++ b/hw/semihosting/console.c
->> @@ -20,6 +20,7 @@
->>  #include "hw/semihosting/semihost.h"
->>  #include "hw/semihosting/console.h"
->>  #include "exec/gdbstub.h"
->> +#include "exec/exec-all.h"
->>  #include "qemu/log.h"
->>  #include "chardev/char.h"
->>  #include <pthread.h>
->> @@ -109,50 +110,49 @@ void qemu_semihosting_console_outc(CPUArchState *e=
-nv, target_ulong addr)
->>=20=20
->>  typedef struct SemihostingConsole {
->>      CharBackend         backend;
->> -    pthread_mutex_t     mutex;
->> -    pthread_cond_t      cond;
->> +    CPUState            *sleeping_cpu;
->>      bool                got;
->>      Fifo8               fifo;
->>  } SemihostingConsole;
->>=20=20
->> -static SemihostingConsole console =3D {
->> -    .mutex =3D PTHREAD_MUTEX_INITIALIZER,
->> -    .cond =3D PTHREAD_COND_INITIALIZER
->> -};
->> +static SemihostingConsole console;
->>=20=20
->>  static int console_can_read(void *opaque)
->>  {
->>      SemihostingConsole *c =3D opaque;
->>      int ret;
->> -    pthread_mutex_lock(&c->mutex);
->> +    g_assert(qemu_mutex_iothread_locked());
->>      ret =3D (int) fifo8_num_free(&c->fifo);
->> -    pthread_mutex_unlock(&c->mutex);
->>      return ret;
->>  }
->>=20=20
->>  static void console_read(void *opaque, const uint8_t *buf, int size)
->>  {
->>      SemihostingConsole *c =3D opaque;
->> -    pthread_mutex_lock(&c->mutex);
->> +    g_assert(qemu_mutex_iothread_locked());
->>      while (size-- && !fifo8_is_full(&c->fifo)) {
->>          fifo8_push(&c->fifo, *buf++);
->>      }
->> -    pthread_cond_broadcast(&c->cond);
->> -    pthread_mutex_unlock(&c->mutex);
->> +    if (c->sleeping_cpu) {
->> +        cpu_resume(c->sleeping_cpu);
->> +    }
->>  }
->>=20=20
->>  target_ulong qemu_semihosting_console_inc(CPUArchState *env)
->>  {
->>      uint8_t ch;
->>      SemihostingConsole *c =3D &console;
->> -    qemu_mutex_unlock_iothread();
->> -    pthread_mutex_lock(&c->mutex);
->> -    while (fifo8_is_empty(&c->fifo)) {
->> -        pthread_cond_wait(&c->cond, &c->mutex);
->> +    g_assert(qemu_mutex_iothread_locked());
->> +    g_assert(current_cpu);
->> +    if (fifo8_is_empty(&c->fifo)) {
->> +        c->sleeping_cpu =3D current_cpu;
->> +        c->sleeping_cpu->stop =3D true;
->> +        c->sleeping_cpu->exception_index =3D EXCP_BLOCKED;
->
-> Why do you need to set exception_index to something other than -1 (using
-> cpu_loop_exit_noexc for example)?
+>> Using ->stop here is a bit weird, since ->stop is usually related to
+>> pause_all_vcpus.
+>=20
+> Arguably we could come up with a better API to cpu.c but this allows us
+> to use cpu_resume(c->sleeping_cpu) when waking up rather than hand
+> rolling our own wake-up mechanism.
 
-If there is no exception to process we won't exit the main loop which we
-need to do if we want to wait until there is data to read.
+But we already have the right wake-up mechanism, which is
+cpu->halted/cpu_has_work.  That also makes it possible to just use
+EXCP_HALTED instead of adding a new EXCP_BLOCKED.
 
-> Using ->stop here is a bit weird, since ->stop is usually related to
-> pause_all_vcpus.
+Paolo
 
-Arguably we could come up with a better API to cpu.c but this allows us
-to use cpu_resume(c->sleeping_cpu) when waking up rather than hand
-rolling our own wake-up mechanism.
-
->
-> Paolo
-
-
---=20
-Alex Benn=C3=A9e
 
