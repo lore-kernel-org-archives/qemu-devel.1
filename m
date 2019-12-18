@@ -2,81 +2,65 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BE2C2D0CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65400C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:46:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C063521582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:45:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q658exgy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C063521582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38F5521582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:46:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F5521582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihUxW-00031c-SM
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:45:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47681)
+	id 1ihUyR-0004Bf-Ay
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:46:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49876)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ihUbo-0005Bv-TU
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:23:05 -0500
+ (envelope-from <clg@kaod.org>) id 1ihUjw-0000Fa-4G
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:31:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ihUbn-0003su-2m
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:23:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53754
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ihUju-0001uh-Jy
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:31:27 -0500
+Received: from 8.mo68.mail-out.ovh.net ([46.105.74.219]:35563)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihUbm-0003qp-VU
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:23:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576657382;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HktqrVv0Tt2FKK/0WSo+4o3EvZ+0VSPvuEV+CM3+v8Q=;
- b=Q658exgyFu4ewYpvJh7InZgtRwDG1LAjXfNTiJOoI40lRhkNALx/j7CJUAjPnsq7QKX2ka
- 5J8YefA9Owzs6rv9f1iaj5+my98J9IfuleBUEaMzed7s+/TuVVcMAPLQFQN42dl/qHHzNm
- ohgdaKwUpcnq9/GKKEPFxBRJ9ou+TTE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-GOH8EWd-MkqOup3JYwhUAA-1; Wed, 18 Dec 2019 03:17:29 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC455107ACCD;
- Wed, 18 Dec 2019 08:17:28 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
- [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 47D945DA70;
- Wed, 18 Dec 2019 08:17:28 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id DC2421136432; Wed, 18 Dec 2019 09:17:21 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 34/35] hw/vfio/ap: drop local_err from vfio_ap_realize
-Date: Wed, 18 Dec 2019 09:17:20 +0100
-Message-Id: <20191218081721.23520-35-armbru@redhat.com>
-In-Reply-To: <20191218081721.23520-1-armbru@redhat.com>
-References: <20191218081721.23520-1-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ihUju-0001sR-Cn
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:31:26 -0500
+Received: from player761.ha.ovh.net (unknown [10.108.16.88])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id EDED9153B5A
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 09:31:23 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player761.ha.ovh.net (Postfix) with ESMTPSA id AACAFD6ECCCE;
+ Wed, 18 Dec 2019 08:31:15 +0000 (UTC)
+Subject: Re: [PATCH v3 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
+ pseries guest
+To: Bharata B Rao <bharata@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191218043208.28613-1-bharata@linux.ibm.com>
+ <20191218043208.28613-3-bharata@linux.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <8bd76cda-ec66-4f96-3d3f-9e5b2802aa33@kaod.org>
+Date: Wed, 18 Dec 2019 09:31:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: GOH8EWd-MkqOup3JYwhUAA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20191218043208.28613-3-bharata@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 16418716868425518054
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtkedguddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeiuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.74.219
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,69 +72,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Cornelia Huck <cohuck@redhat.com>
+Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, linuxram@us.ibm.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 18/12/2019 05:32, Bharata B Rao wrote:
+> A pseries guest can be run as a secure guest on Ultravisor-enabled
+> POWER platforms. When such a secure guest is reset, we need to
+> release/reset a few resources both on ultravisor and hypervisor side.
+> This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF from the
+> machine reset path.
+>=20
+> As part of this ioctl, the secure guest is essentially transitioned
+> back to normal mode so that it can reboot like a regular guest and
+> become secure again.
+>=20
+> This ioctl has no effect when invoked for a normal guest. If this ioctl
+> fails for a secure guest, the guest is terminated.
+>=20
+> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
 
-No reason for local_err here, use errp directly instead.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20191205174635.18758-21-vsementsov@virtuozzo.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/vfio/ap.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index da6a20669d..8fbaa724c2 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -89,14 +89,13 @@ static void vfio_ap_realize(DeviceState *dev, Error **e=
-rrp)
- {
-     int ret;
-     char *mdevid;
--    Error *local_err =3D NULL;
-     VFIOGroup *vfio_group;
-     APDevice *apdev =3D AP_DEVICE(dev);
-     VFIOAPDevice *vapdev =3D VFIO_AP_DEVICE(apdev);
-=20
--    vfio_group =3D vfio_ap_get_group(vapdev, &local_err);
-+    vfio_group =3D vfio_ap_get_group(vapdev, errp);
-     if (!vfio_group) {
--        goto out_err;
-+        return;
-     }
-=20
-     vapdev->vdev.ops =3D &vfio_ap_ops;
-@@ -113,7 +112,7 @@ static void vfio_ap_realize(DeviceState *dev, Error **e=
-rrp)
-      */
-     vapdev->vdev.balloon_allowed =3D true;
-=20
--    ret =3D vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err)=
-;
-+    ret =3D vfio_get_device(vfio_group, mdevid, &vapdev->vdev, errp);
-     if (ret) {
-         goto out_get_dev_err;
-     }
-@@ -123,8 +122,6 @@ static void vfio_ap_realize(DeviceState *dev, Error **e=
-rrp)
- out_get_dev_err:
-     vfio_ap_put_device(vapdev);
-     vfio_put_group(vfio_group);
--out_err:
--    error_propagate(errp, local_err);
- }
-=20
- static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
---=20
-2.21.0
+> ---
+>  hw/ppc/spapr.c       |  1 +
+>  target/ppc/kvm.c     | 15 +++++++++++++++
+>  target/ppc/kvm_ppc.h |  6 ++++++
+>  3 files changed, 22 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f11422fc41..e62c89b3dd 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1597,6 +1597,7 @@ static void spapr_machine_reset(MachineState *mac=
+hine)
+>      void *fdt;
+>      int rc;
+> =20
+> +    kvmppc_svm_off(&error_fatal);
+>      spapr_caps_apply(spapr);
+> =20
+>      first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7406d18945..ae920ec310 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2900,3 +2900,18 @@ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, i=
+nt64_t tb_offset)
+>          kvm_set_one_reg(cs, KVM_REG_PPC_TB_OFFSET, &tb_offset);
+>      }
+>  }
+> +
+> +/*
+> + * Don't set error if KVM_PPC_SVM_OFF ioctl is invoked on kernels
+> + * that don't support this ioctl.
+> + */
+> +void kvmppc_svm_off(Error **errp)
+> +{
+> +    int rc;
+> +    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +
+> +    rc =3D kvm_vm_ioctl(s, KVM_PPC_SVM_OFF);
+> +    if (rc && rc !=3D -ENOTTY) {
+> +        error_setg(errp, "KVM_PPC_SVM_OFF ioctl failed");
+> +    }
+> +}
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 47b08a4030..9a9bca1b72 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -37,6 +37,7 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+>  target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+>                                       bool radix, bool gtse,
+>                                       uint64_t proc_tbl);
+> +void kvmppc_svm_off(Error **errp);
+>  #ifndef CONFIG_USER_ONLY
+>  bool kvmppc_spapr_use_multitce(void);
+>  int kvmppc_spapr_enable_inkernel_multitce(void);
+> @@ -201,6 +202,11 @@ static inline target_ulong kvmppc_configure_v3_mmu=
+(PowerPCCPU *cpu,
+>      return 0;
+>  }
+> =20
+> +static inline void kvmppc_svm_off(Error **errp)
+> +{
+> +    return;
+> +}
+> +
+>  static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
+>                                               unsigned int online)
+>  {
+>=20
 
 
