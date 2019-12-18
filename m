@@ -2,80 +2,92 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F04C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 102B1C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:59:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5F492176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CED5D2176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:59:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ggJf0GiN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F492176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O8ysGq1B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED5D2176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihcd0-0007a9-1B
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:56:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52406)
+	id 1ihcfs-00013D-Q7
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:59:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ihcbT-0006eI-Qg
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:55:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihcf0-000097-L3
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:58:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ihcbS-0006Re-OS
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:55:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60860
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ihcbS-0006Oq-Gz
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:55:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576688114;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XtaIjN69JN5lg5ft4xTpzgokQQ6pRyYcJxly1JoJQK0=;
- b=ggJf0GiNztU4JrVbNHV9Z3jQf3alARgJWXkAj/IHR4Io2QZL+AKFcnMLsHyHE9q78YMsWs
- 3DvXBrFjh04rMS+2KXZAFlPLPbZ3JrsAdclvOVUs7CfnPSNIkW5vrnxPJcsvYtg/Nwsiuc
- G5NnyHz5FXDvObCsVrxcBTn52VMmFjk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-Ab-TjQwAMGq3DxltT2PATA-1; Wed, 18 Dec 2019 11:55:13 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4A80593B1;
- Wed, 18 Dec 2019 16:55:11 +0000 (UTC)
-Received: from gondolin (ovpn-117-253.ams2.redhat.com [10.36.117.253])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6F43368886;
- Wed, 18 Dec 2019 16:55:07 +0000 (UTC)
-Date: Wed, 18 Dec 2019 17:55:05 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH 1/3] s390x: Properly fetch and test the short psw on
- diag308 subc 0/1
-Message-ID: <20191218175505.1f2149cf.cohuck@redhat.com>
-In-Reply-To: <20191129142025.21453-2-frankja@linux.ibm.com>
-References: <20191129142025.21453-1-frankja@linux.ibm.com>
- <20191129142025.21453-2-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <richard.henderson@linaro.org>) id 1ihcez-0007jm-5E
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:58:54 -0500
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:56259)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ihcey-0007Zx-L7
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:58:52 -0500
+Received: by mail-pj1-x1041.google.com with SMTP id d5so1141073pjz.5
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 08:58:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=2xYdTJGHOg4PV7izCo96sUKrslij+lJbCuxqKsphOSs=;
+ b=O8ysGq1BAP1kPcuwLam/SF6MEVtZQ5SAkOj/Fu4ogfA+ozG+k9mvNcY0rRL3P37E8E
+ MkZxASBIVG6rK6LJKG84moXAdCnsROr5tbPcdz4JYTElEXB5zdD1pvJQaXiaVUd36Qxv
+ 8XKTsfP3XLi9anzbxIlOMpYhS8qVCMgeme9uYnE+4k9VUHaYwRHwQHACeozxR/4OP1a2
+ RrOTcGpClsDEOspacnban1O6WG41ff1YR6B9FWxKJrlToAOTqt+/2tXIbrM3aM25tZ0I
+ yovBuLdTb+c+I49e80MsZfzzmsvlg1Mc0v7QnvGFb/kNnSMcx7yHoGLJ4U6/djM0YqB9
+ hMNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2xYdTJGHOg4PV7izCo96sUKrslij+lJbCuxqKsphOSs=;
+ b=bWJ3cuqSYOPU/ZU6YBREIZ6+ktLJyAXPtFSljiX0t16Sw5ysBebIrALrDWeRI9/ku7
+ WQn+8XLStjn332pYULrSt149vrcGhNqUyYpn3FH48uORVHogBKVBb8uLWoCLt6RHj9Us
+ 6Hdcb2clOI3ZKY28tdAyZdnJcKlKDxVVxd/fSk/Epf1oStSeyK84i4nL2A1aTRGxjeST
+ rJEDcZx8fsjRhl9dGP3vDihxzzYHVAkK7C/5gTBd0j9DKWiDv7oYhqOtoO7wAZ154+Qj
+ /+j2nGKzF2+h7iyyPQ9OtMA2NuoRvLl4zUDUkwWlzV0baHU2dy3g2jCxuyR0PUEfb9w1
+ YgYg==
+X-Gm-Message-State: APjAAAVQWsWztqH9rs9Kq1rlwxWERlgEaApq0DL1R1fT2dd7GgzH+t5D
+ i8aTMEsAl3QB7cMfhJytyr1Fzg==
+X-Google-Smtp-Source: APXvYqyKXOUi2oeaQCfaL6pSsz/8fTRBWsP6H5c4KFvdsX1jaZDbk4cHUBExd8NdSDhOdGbmr8OwTA==
+X-Received: by 2002:a17:902:7c0d:: with SMTP id
+ x13mr3867480pll.85.1576688329617; 
+ Wed, 18 Dec 2019 08:58:49 -0800 (PST)
+Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
+ ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
+ by smtp.gmail.com with ESMTPSA id e1sm4152751pfl.98.2019.12.18.08.58.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Dec 2019 08:58:48 -0800 (PST)
+Subject: Re: [PATCH 5/7] configure: Unnest detection of -z,relro and -z,now
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20191218031920.6414-1-richard.henderson@linaro.org>
+ <20191218031920.6414-6-richard.henderson@linaro.org>
+ <881dff30-a729-6d7b-f823-5f136125ac0b@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6a556fb0-619f-ffab-e9b3-5afb17447bee@linaro.org>
+Date: Wed, 18 Dec 2019 06:58:45 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Ab-TjQwAMGq3DxltT2PATA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <881dff30-a729-6d7b-f823-5f136125ac0b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,26 +99,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 09:20:23 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> We need to actually fetch the cpu mask and set it. As we invert the
-> short psw indication in the mask, SIE will report a specification
-> exception, if it wasn't present in the reset psw.
+On 12/17/19 10:11 PM, Thomas Huth wrote:
+>> +# Detect support for DT_BIND_NOW.
+>> +if compile_prog "" "-Wl,-z,now" ; then
+>> +  LDFLAGS="-Wl,-z,now $LDFLAGS"
+>> +fi
+>> +
+>> +# Detect support for PT_GNU_RELRO.
+>> +if compile_prog "" "-Wl,-z,relro" ; then
+>> +  LDFLAGS="-Wl,-z,relro $LDFLAGS"
+>> +fi
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.c | 12 ++++++++++--
->  target/s390x/cpu.h |  1 +
->  2 files changed, 11 insertions(+), 2 deletions(-)
+> Looking at
+> https://mudongliang.github.io/2016/07/11/relro-a-not-so-well-known-memory-corruption-mitigation-technique.html
+> the idea of specifying these two options together was likely to get
+> "Full RELRO" instead of only "Partial RELRO".
 
-Thanks, requeued.
+Sure.
 
+> Thus, does it make sense to have "-Wl,-z,now" without "-Wl,-z,relro" in
+> QEMU? Or should this rather check whether both are possible, then use
+> both, otherwise just try to use "relro" alone?
+
+Honestly, I expect them both to be supported in any binutils.
+
+I split the two tests just because they didn't seem to be logically connected.
+ But I had forgotten about, or perhaps never heard, the terms "full" and
+"partial" relro.
+
+I can put them back together with an appropriate comment it you like.  One less
+thing to run during configure...
+
+
+r~
 
