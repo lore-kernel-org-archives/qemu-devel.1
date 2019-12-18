@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FB5C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DAEC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:28:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C862421582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EBE421582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:28:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGs1XBEE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C862421582
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r1OTnd6T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBE421582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYPI-0004Li-Cd
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:26:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47775)
+	id 1ihYR2-0006ek-F6
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:28:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY38-0006JA-Hi
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:32 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3a-0006vE-BN
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY36-0000VB-5C
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:30 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:38425)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3Z-0002DF-4s
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:58 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:35439)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY35-0000Sr-QR
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:28 -0500
-Received: by mail-wm1-x331.google.com with SMTP id u2so1607137wmc.3
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:25 -0800 (PST)
+ id 1ihY3Y-00029i-TP
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:57 -0500
+Received: by mail-wr1-x430.google.com with SMTP id g17so2024596wro.2
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=o7A6ug5Mdlq4+wSzMttY8PZCN40HV0ufczSQm1VvlTk=;
- b=AGs1XBEEyVi3yx6bJaj5+O4HeznyXuZyDJmPAXyJuBdkGK5OTgxn3TXJ0xsNbOFnki
- 7lIqO67WmXG2CfzxkeEkExd7SnVyQUAtEjIJTkw/Yb7mI9tchWvWcLV0BsD2zgoxwBIs
- w7QZ9Ij5dCQnTLhESPuUqPNyBrCLOKThnlYgzwCqh8AMFlFNW0lKQ5/QLCBYNW7go8lb
- Z0+GJezPu9a/4DBX0m0oYNSiRcKaW9Oj2uUz0k8tax0n0ScGeGSVKHRaJDzUUKtCToiG
- +lNjup0jpa69SlgSAMLKU4wvsanXSlrAo43reL3PCgad3LpRpgL2pCenlg6tikZ7i9ao
- W2Jw==
+ bh=bCglA2xU8XIovJ5evRIXUQsgqKR2GztUSfl273PP6MA=;
+ b=r1OTnd6TgT0Odu3JhHL/KfCZ9Luq7IFhzSJeMIL6T4OJTeLtfn8W5jrdpLGmUTvU5+
+ aFJ42fVxm1mZUbIvzbBON+WDHv6CuayWsJHeF2vSJp70gPEjJFHs//DgksAPToX2iWz5
+ iCsq02SBRkJsUWH7mtbsFtKuiV+H6oWdlT8DY18avA/ZMZ372QEEEK/qaxfdMuByAPXc
+ OGJc4DrMPi7UvW/6GZpnRmckrYekr/IvmTD0jYkK6Tf9ZrbqhVYQB7E/KNjZsB+Kk7iK
+ bwYG8HuMLeDVtQGSmJBulWCd4VAYtZILvLAi2ylxd1s4X4E7Exl6hOvPbbwiLNzzk3vU
+ s3Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=o7A6ug5Mdlq4+wSzMttY8PZCN40HV0ufczSQm1VvlTk=;
- b=pDjy1GcoC6ecdAMwYTW2d/5Xf3fc6JNHTQNMSE15JZyqae9tnPMPfZwJ89nmPCae/P
- gb+QctNpRNd4c394orObE3ZqiZAYpG7cIulvzEC1zaGcG5vSKRZ9FWEyucWZfgb5ejNm
- 6tPtqErwhc80UARuJUyyWktMA65v0XyT2hsO9pKoghNanmv3jEal1yrmkM4N01nq4D8t
- 3BJXMCfibQows1eA0UsqJXc1VjmaG1bylr+qBYTvlbO0ySEVPUpJFNIfozaa7l05k5Ts
- VXoULEVTE+109AMD9pqs/mlyJAFVem0OEYnVgprb7V0CQUQgZy1J5B/Fcz+cD48fasFn
- 3gGg==
-X-Gm-Message-State: APjAAAXkHTTwwBQiGRmVrBC7x0bU8Dru3IavN1LDbi0myIOttfwoBlgV
- MUmrky+pO9zNyGvPGlr+IZKUSGwk
-X-Google-Smtp-Source: APXvYqzj9Ho2YhSN4K8hAor+QAXgJp089Ao2hBJzSuYz2HbJNiXlgNG+AlM/nzvnaGp6HVb+8olGVg==
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr2957203wmk.15.1576670604242; 
- Wed, 18 Dec 2019 04:03:24 -0800 (PST)
+ bh=bCglA2xU8XIovJ5evRIXUQsgqKR2GztUSfl273PP6MA=;
+ b=fjczZMsjJhxaO/wwdn2Mo6T2VlUxDeXSN9cRha8CGKa9Q4qtDWMqeEXC/YdBN85uqy
+ RzdMARDRQ7xlWhHIMNoa3wGvy41uFVDJSEibgfCWQ6RLeIhrzmG5htSYRnIfeLXFMnCX
+ swnLv8/HvOR8ETcMJLYRskjiAGeecajLH4BSulT1M1eMiLwb7VgAtSGizEiTv2ljjPMa
+ AgHPUoOHyplT1U5Te19M/NPk2Hr53zG+4auOGzREMTA2kbjuojLXicPeH/ewOF0C3jOG
+ mOlkRVVGELwHyAKu/cuYqxQerszudfl1iTy5FpEZNojQV3eNJ/wJ1VIMB22NahlH5LR+
+ bsWw==
+X-Gm-Message-State: APjAAAWakiCuwJ66Iujq0r4z9t95tYjUU3aUYWaWyqhxPJTtOJWqwQ95
+ HSevlQMAiTi0sCxbojG1xHQgqHY5
+X-Google-Smtp-Source: APXvYqzHvZ/AvLx1bHzYeyMa8Hur/16+RSPt+GGl9/GYI5FoGbiCQfD+732ird3QAgqgCH4fsiMfGg==
+X-Received: by 2002:adf:c147:: with SMTP id w7mr2500529wre.389.1576670635635; 
+ Wed, 18 Dec 2019 04:03:55 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.23
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.48
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:23 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:49 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/87] kvm: convert "-machine kernel_irqchip" to an accelerator
- property
-Date: Wed, 18 Dec 2019 13:01:55 +0100
-Message-Id: <1576670573-48048-30-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 51/87] acpi: move PC stubs out of stubs/
+Date: Wed, 18 Dec 2019 13:02:17 +0100
+Message-Id: <1576670573-48048-52-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,292 +94,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is a small cleanup that lets microvm build entirely without
+include/hw/i386/pc.h.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++-----
- hw/core/machine.c   | 61 -----------------------------------------------------
- include/hw/boards.h |  3 ---
- qemu-options.hx     |  9 +++++---
- vl.c                |  3 ++-
- 5 files changed, 62 insertions(+), 73 deletions(-)
+ hw/acpi/Makefile.objs                                | 3 ++-
+ stubs/pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c | 0
+ stubs/Makefile.objs                                  | 1 -
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ rename stubs/pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c (100%)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 34e8f26..b2f1a5b 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -42,6 +42,8 @@
- #include "sysemu/sev.h"
- #include "sysemu/balloon.h"
- #include "qapi/visitor.h"
-+#include "qapi/qapi-types-common.h"
-+#include "qapi/qapi-visit-common.h"
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 655a9c1..9925305 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+ common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
++common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
  
- #include "hw/boards.h"
- 
-@@ -94,6 +96,9 @@ struct KVMState
-     int many_ioeventfds;
-     int intx_set_mask;
-     int kvm_shadow_mem;
-+    bool kernel_irqchip_allowed;
-+    bool kernel_irqchip_required;
-+    bool kernel_irqchip_split;
-     bool sync_mmu;
-     bool manual_dirty_log_protect;
-     /* The man page (and posix) say ioctl numbers are signed int, but
-@@ -1794,7 +1799,7 @@ static void kvm_irqchip_create(KVMState *s)
-      * in-kernel irqchip for us */
-     ret = kvm_arch_irqchip_create(s);
-     if (ret == 0) {
--        if (kvm_kernel_irqchip_split()) {
-+        if (s->kernel_irqchip_split) {
-             perror("Split IRQ chip mode not supported.");
-             exit(1);
-         } else {
-@@ -2065,7 +2070,7 @@ static int kvm_init(MachineState *ms)
-         goto err;
-     }
- 
--    if (machine_kernel_irqchip_allowed(ms)) {
-+    if (s->kernel_irqchip_allowed) {
-         kvm_irqchip_create(s);
-     }
- 
-@@ -2983,19 +2988,57 @@ static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v,
-     s->kvm_shadow_mem = value;
- }
- 
-+static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
-+                                   const char *name, void *opaque,
-+                                   Error **errp)
-+{
-+    Error *err = NULL;
-+    KVMState *s = KVM_STATE(obj);
-+    OnOffSplit mode;
-+
-+    visit_type_OnOffSplit(v, name, &mode, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    } else {
-+        switch (mode) {
-+        case ON_OFF_SPLIT_ON:
-+            s->kernel_irqchip_allowed = true;
-+            s->kernel_irqchip_required = true;
-+            s->kernel_irqchip_split = false;
-+            break;
-+        case ON_OFF_SPLIT_OFF:
-+            s->kernel_irqchip_allowed = false;
-+            s->kernel_irqchip_required = false;
-+            s->kernel_irqchip_split = false;
-+            break;
-+        case ON_OFF_SPLIT_SPLIT:
-+            s->kernel_irqchip_allowed = true;
-+            s->kernel_irqchip_required = true;
-+            s->kernel_irqchip_split = true;
-+            break;
-+        default:
-+            /* The value was checked in visit_type_OnOffSplit() above. If
-+             * we get here, then something is wrong in QEMU.
-+             */
-+            abort();
-+        }
-+    }
-+}
-+
- bool kvm_kernel_irqchip_allowed(void)
- {
--    return machine_kernel_irqchip_allowed(current_machine);
-+    return kvm_state->kernel_irqchip_allowed;
- }
- 
- bool kvm_kernel_irqchip_required(void)
- {
--    return machine_kernel_irqchip_required(current_machine);
-+    return kvm_state->kernel_irqchip_required;
- }
- 
- bool kvm_kernel_irqchip_split(void)
- {
--    return machine_kernel_irqchip_split(current_machine);
-+    return kvm_state->kernel_irqchip_split;
- }
- 
- static void kvm_accel_instance_init(Object *obj)
-@@ -3013,6 +3056,12 @@ static void kvm_accel_class_init(ObjectClass *oc, void *data)
-     ac->has_memory = kvm_accel_has_memory;
-     ac->allowed = &kvm_allowed;
- 
-+    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
-+        NULL, kvm_set_kernel_irqchip,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, "kernel-irqchip",
-+        "Configure KVM in-kernel irqchip", &error_abort);
-+
-     object_class_property_add(oc, "kvm-shadow-mem", "int",
-         kvm_get_kvm_shadow_mem, kvm_set_kvm_shadow_mem,
-         NULL, NULL, &error_abort);
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 9c93353..56137e9 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -178,44 +178,6 @@ GlobalProperty hw_compat_2_1[] = {
- };
- const size_t hw_compat_2_1_len = G_N_ELEMENTS(hw_compat_2_1);
- 
--static void machine_set_kernel_irqchip(Object *obj, Visitor *v,
--                                       const char *name, void *opaque,
--                                       Error **errp)
--{
--    Error *err = NULL;
--    MachineState *ms = MACHINE(obj);
--    OnOffSplit mode;
--
--    visit_type_OnOffSplit(v, name, &mode, &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    } else {
--        switch (mode) {
--        case ON_OFF_SPLIT_ON:
--            ms->kernel_irqchip_allowed = true;
--            ms->kernel_irqchip_required = true;
--            ms->kernel_irqchip_split = false;
--            break;
--        case ON_OFF_SPLIT_OFF:
--            ms->kernel_irqchip_allowed = false;
--            ms->kernel_irqchip_required = false;
--            ms->kernel_irqchip_split = false;
--            break;
--        case ON_OFF_SPLIT_SPLIT:
--            ms->kernel_irqchip_allowed = true;
--            ms->kernel_irqchip_required = true;
--            ms->kernel_irqchip_split = true;
--            break;
--        default:
--            /* The value was checked in visit_type_OnOffSplit() above. If
--             * we get here, then something is wrong in QEMU.
--             */
--            abort();
--        }
--    }
--}
--
- static char *machine_get_kernel(Object *obj, Error **errp)
- {
-     MachineState *ms = MACHINE(obj);
-@@ -757,12 +719,6 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     mc->numa_mem_align_shift = 23;
-     mc->numa_auto_assign_ram = numa_default_auto_assign_ram;
- 
--    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
--        NULL, machine_set_kernel_irqchip,
--        NULL, NULL, &error_abort);
--    object_class_property_set_description(oc, "kernel-irqchip",
--        "Configure KVM in-kernel irqchip", &error_abort);
--
-     object_class_property_add_str(oc, "kernel",
-         machine_get_kernel, machine_set_kernel, &error_abort);
-     object_class_property_set_description(oc, "kernel",
-@@ -862,8 +818,6 @@ static void machine_initfn(Object *obj)
-     MachineState *ms = MACHINE(obj);
-     MachineClass *mc = MACHINE_GET_CLASS(obj);
- 
--    ms->kernel_irqchip_allowed = true;
--    ms->kernel_irqchip_split = mc->default_kernel_irqchip_split;
-     ms->dump_guest_core = true;
-     ms->mem_merge = true;
-     ms->enable_graphics = true;
-@@ -919,21 +873,6 @@ bool machine_usb(MachineState *machine)
-     return machine->usb;
- }
- 
--bool machine_kernel_irqchip_allowed(MachineState *machine)
--{
--    return machine->kernel_irqchip_allowed;
--}
--
--bool machine_kernel_irqchip_required(MachineState *machine)
--{
--    return machine->kernel_irqchip_required;
--}
--
--bool machine_kernel_irqchip_split(MachineState *machine)
--{
--    return machine->kernel_irqchip_split;
--}
--
- int machine_phandle_start(MachineState *machine)
- {
-     return machine->phandle_start;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 6084e61..61f8bb8 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -63,9 +63,6 @@ extern MachineState *current_machine;
- 
- void machine_run_board_init(MachineState *machine);
- bool machine_usb(MachineState *machine);
--bool machine_kernel_irqchip_allowed(MachineState *machine);
--bool machine_kernel_irqchip_required(MachineState *machine);
--bool machine_kernel_irqchip_split(MachineState *machine);
- int machine_phandle_start(MachineState *machine);
- bool machine_dump_guest_core(MachineState *machine);
- bool machine_mem_merge(MachineState *machine);
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 004370c..71ec733 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -32,7 +32,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                selects emulated machine ('-machine help' for list)\n"
-     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
-     "                supported accelerators are kvm, xen, hax, hvf, whpx or tcg (default: tcg)\n"
--    "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
-     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
-     "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
-     "                mem-merge=on|off controls memory merge support (default: on)\n"
-@@ -67,8 +66,6 @@ This is used to enable an accelerator. Depending on the target architecture,
- kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is used. If there is
- more than one accelerator specified, the next one is used if the previous one
- fails to initialize.
--@item kernel_irqchip=on|off
--Controls in-kernel irqchip support for the chosen accelerator when available.
- @item vmport=on|off|auto
- Enables emulation of VMWare IO port, for vmmouse etc. auto says to select the
- value based on accel. For accel=xen the default is off otherwise the default
-@@ -115,6 +112,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "-accel [accel=]accelerator[,prop[=value][,...]]\n"
-     "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
-     "                igd-passthru=on|off (enable Xen integrated Intel graphics passthrough, default=off)\n"
-+    "                kernel-irqchip=on|off|split controls accelerated irqchip support (default=on)\n"
-     "                kvm-shadow-mem=size of KVM shadow MMU in bytes\n"
-     "                tb-size=n (TCG translation block cache size)\n"
-     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
-@@ -129,6 +127,11 @@ fails to initialize.
- @item igd-passthru=on|off
- When Xen is in use, this option controls whether Intel integrated graphics
- devices can be passed through to the guest (default=off)
-+@item kernel-irqchip=on|off|split
-+Controls KVM in-kernel irqchip support.  The default is full acceleration of the
-+interrupt controllers.  On x86, split irqchip reduces the kernel attack
-+surface, at a performance cost for non-MSI interrupts.  Disabling the in-kernel
-+irqchip completely is not recommended except for debugging purposes.
- @item kvm-shadow-mem=size
- Defines the size of the KVM shadow MMU.
- @item tb-size=@var{n}
-diff --git a/vl.c b/vl.c
-index 8c6fcda..4034c23 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2514,7 +2514,8 @@ static int machine_set_property(void *opaque,
-         object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value);
-         return 0;
-     }
--    if (g_str_equal(qom_name, "kvm-shadow-mem")) {
-+    if (g_str_equal(qom_name, "kvm-shadow-mem") ||
-+        g_str_equal(qom_name, "kernel-irqchip")) {
-         object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value);
-         return 0;
-     }
+ common-obj-y += acpi_interface.o
+ common-obj-y += bios-linker-loader.o
+@@ -20,4 +21,4 @@ common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+ else
+ common-obj-y += acpi-stub.o
+ endif
+-common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
++common-obj-$(CONFIG_ALL) += acpi-stub.o acpi-x86-stub.o ipmi-stub.o
+diff --git a/stubs/pc_madt_cpu_entry.c b/hw/acpi/acpi-x86-stub.c
+similarity index 100%
+rename from stubs/pc_madt_cpu_entry.c
+rename to hw/acpi/acpi-x86-stub.c
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 4a50e95..8b0ff25 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -33,7 +33,6 @@ stub-obj-y += fd-register.o
+ stub-obj-y += qmp_memory_device.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+-stub-obj-y += pc_madt_cpu_entry.o
+ stub-obj-y += vmgenid.o
+ stub-obj-y += xen-common.o
+ stub-obj-y += xen-hvm.o
 -- 
 1.8.3.1
 
