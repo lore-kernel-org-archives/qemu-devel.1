@@ -2,84 +2,94 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B60EC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F4166C3F68F
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:42:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0854A21582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:32:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C45AA227BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:42:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="doUPLif3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0854A21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tKt2e9RO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C45AA227BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihe7N-0003Ku-2w
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 13:32:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55513)
+	id 1iheHO-0006no-Uz
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 13:42:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ihe6Y-0002tS-DZ
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:31:27 -0500
+ (envelope-from <tcminyard@gmail.com>) id 1iheGN-0006IR-72
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:41:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ihe6V-0005g1-8c
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:31:25 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45560
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihe6V-0005a6-03
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:31:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576693881;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=6lveHfzvYEhUQZQoLOEVVZLGBtKYwoKcLo/V2ABQGuc=;
- b=doUPLif3IeHBhY+NWJuRVJMp4+Fem6VZ87NGwA9fbv8kxhUk6Wcf1dUDsJNzLe83Edm9Ju
- sGweUdnu1pqFMrgSJ+UuonkGVrApLUEPHPGPuQIEYVvN5AiX8bmKyoxg8jiM0VWBhxAERF
- lQRbQ6jla5pbCeTvTDferYPddDhEJoQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354--9EZz_owN7Gr_p0xr1P6JA-1; Wed, 18 Dec 2019 13:31:20 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BE3B800D41;
- Wed, 18 Dec 2019 18:31:19 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA7045C1D4;
- Wed, 18 Dec 2019 18:31:14 +0000 (UTC)
-Subject: Re: [PATCH 5/7] configure: Unnest detection of -z,relro and -z,now
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191218031920.6414-1-richard.henderson@linaro.org>
- <20191218031920.6414-6-richard.henderson@linaro.org>
- <881dff30-a729-6d7b-f823-5f136125ac0b@redhat.com>
- <6a556fb0-619f-ffab-e9b3-5afb17447bee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <81681a5d-6175-7fc8-6f39-0549a4db191e@redhat.com>
-Date: Wed, 18 Dec 2019 19:31:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <tcminyard@gmail.com>) id 1iheGH-0000Ux-FB
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:41:34 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35334)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1iheGG-0000PM-Kh
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:41:28 -0500
+Received: by mail-ot1-x341.google.com with SMTP id f71so3666517otf.2
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 10:41:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:date:from:to:cc:subject:message-id:reply-to:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=rPfkkIjCYBAYZKzPDtZc/D9binCza9SS6cgg4jnftXA=;
+ b=tKt2e9ROODs3/7ZmykDUgr458DDSist2Q29ttg0zD6lG6ICIU55DxhmtxvkG13X6zc
+ UEBT316EVjSLLq7GBCve5a3yW5pDY2NSca4u8mTa2gaTzUfNV3NVqlx7fJ0kKpbxjKul
+ aaZUP8fDHLd99/Gr0FPXfjQj2Eiu/I8edrWz+7CTbDTYKsTikj8RCxH4GxgIPINkwv6s
+ f75XbVl0eVdyBHvu31Cs+YjDgLnL2zjIGa0CYsrNSRB3iiMeo9TVL4UmRA9Rt9xxVdxT
+ O1duE/HZ2V0CiNYTHwRRb79nE/C3fsKOgUubsapg1sjPpMUYhIjzeVV+Oh/SwNmQ7kmC
+ JBKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+ :reply-to:references:mime-version:content-disposition
+ :content-transfer-encoding:in-reply-to:user-agent;
+ bh=rPfkkIjCYBAYZKzPDtZc/D9binCza9SS6cgg4jnftXA=;
+ b=RUiBBaOe6PklcMi4qRrQJt9fFFQhAgBj+SK5SaEsb7uervdJLed6Qf7CGGchObYJcF
+ RGloDS4RXiyFENgyTl8rlpBt+iSKVO1HVsMAE3NHLJHGNCPt/PRtEMG4IJeMJQn/J4RE
+ BO0NPFTwqSXz5bdPeCASimB+NNCXMulKoS5adSJG/2DkHDyapaUxX5EvCk5/kUnU5/tC
+ XRu7vdvx1jjBSrfFvMSIIhVjpYn+gX1zTNkV3G7/QUMFvH4aRIZ72BCKGiJ8qDL01i28
+ H3JN0bAbyA9aiqbYEW4s/sbfBymbyy7bnY6RF8G0pdpmrpHJC8nmEuuRZZMjUkni/sxU
+ ai5w==
+X-Gm-Message-State: APjAAAX9oTQ8Ahbg8IrukECh46eBXn7iT1g6QP/+RzDYvM+iH6VcdZoe
+ T18NEIWJlSJemTBCgkE9Kh9VGw8=
+X-Google-Smtp-Source: APXvYqw7IUSwrB/YVBJ6e22A4k+l+BHZ9emWE9huBNZJBfZUUuEcZxRei7Ls0seBTKM7rwEPKXSsIg==
+X-Received: by 2002:a9d:5c86:: with SMTP id a6mr4221268oti.68.1576694485791;
+ Wed, 18 Dec 2019 10:41:25 -0800 (PST)
+Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
+ by smtp.gmail.com with ESMTPSA id n25sm1078940oic.6.2019.12.18.10.41.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 18 Dec 2019 10:41:25 -0800 (PST)
+Received: from minyard.net (unknown
+ [IPv6:2001:470:b8f6:1b:69de:55d9:4498:6ca0])
+ by serve.minyard.net (Postfix) with ESMTPSA id A6C9E180058;
+ Wed, 18 Dec 2019 18:41:24 +0000 (UTC)
+Date: Wed, 18 Dec 2019 12:41:23 -0600
+From: Corey Minyard <minyard@acm.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [RFC PATCH v2 02/14] hw/ipmi: Explicit we ignore some
+ QEMUChrEvent in IOEventHandler
+Message-ID: <20191218184123.GE7025@minyard.net>
+References: <20191218172009.8868-1-philmd@redhat.com>
+ <20191218172009.8868-3-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6a556fb0-619f-ffab-e9b3-5afb17447bee@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: -9EZz_owN7Gr_p0xr1P6JA-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191218172009.8868-3-philmd@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,46 +101,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
+Reply-To: minyard@acm.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/12/2019 17.58, Richard Henderson wrote:
-> On 12/17/19 10:11 PM, Thomas Huth wrote:
->>> +# Detect support for DT_BIND_NOW.
->>> +if compile_prog "" "-Wl,-z,now" ; then
->>> +  LDFLAGS="-Wl,-z,now $LDFLAGS"
->>> +fi
->>> +
->>> +# Detect support for PT_GNU_RELRO.
->>> +if compile_prog "" "-Wl,-z,relro" ; then
->>> +  LDFLAGS="-Wl,-z,relro $LDFLAGS"
->>> +fi
->>
->> Looking at
->> https://mudongliang.github.io/2016/07/11/relro-a-not-so-well-known-memory-corruption-mitigation-technique.html
->> the idea of specifying these two options together was likely to get
->> "Full RELRO" instead of only "Partial RELRO".
+On Wed, Dec 18, 2019 at 06:19:57PM +0100, Philippe Mathieu-Daudé wrote:
+> The Chardev events are listed in the QEMUChrEvent enum. To be
+> able to use this enum in the IOEventHandler typedef, we need to
+> explicit all the events ignored by this frontend, to silent the
+> following GCC warning:
 > 
-> Sure.
-> 
->> Thus, does it make sense to have "-Wl,-z,now" without "-Wl,-z,relro" in
->> QEMU? Or should this rather check whether both are possible, then use
->> both, otherwise just try to use "relro" alone?
-> 
-> Honestly, I expect them both to be supported in any binutils.
-> 
-> I split the two tests just because they didn't seem to be logically connected.
->  But I had forgotten about, or perhaps never heard, the terms "full" and
-> "partial" relro.
-> 
-> I can put them back together with an appropriate comment it you like.  One less
-> thing to run during configure...
+>   hw/ipmi/ipmi_bmc_extern.c: In function ‘chr_event’:
+>   hw/ipmi/ipmi_bmc_extern.c:389:5: error: enumeration value ‘CHR_EVENT_BREAK’ not handled in switch [-Werror=switch]
+>     389 |     switch (event) {
+>         |     ^~~~~~
+>   hw/ipmi/ipmi_bmc_extern.c:389:5: error: enumeration value ‘CHR_EVENT_MUX_IN’ not handled in switch [-Werror=switch]
+>   hw/ipmi/ipmi_bmc_extern.c:389:5: error: enumeration value ‘CHR_EVENT_MUX_OUT’ not handled in switch [-Werror=switch]
+>   cc1: all warnings being treated as errors
 
-Yes, please.
+Obviously a no-op, but better style.  This is fine.
 
- Thanks,
-  Thomas
+Acked-by: Corey Minyard <cminyard@mvista.com>
 
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> v2: Add all missing enums
+> 
+> Cc: Corey Minyard <minyard@acm.org>
+> ---
+>  hw/ipmi/ipmi_bmc_extern.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
+> index 450926e5fb..adf2afe728 100644
+> --- a/hw/ipmi/ipmi_bmc_extern.c
+> +++ b/hw/ipmi/ipmi_bmc_extern.c
+> @@ -435,6 +435,12 @@ static void chr_event(void *opaque, int event)
+>              k->handle_rsp(s, ibe->outbuf[0], ibe->inbuf + 1, 3);
+>          }
+>          break;
+> +
+> +    case CHR_EVENT_BREAK:
+> +    case CHR_EVENT_MUX_IN:
+> +    case CHR_EVENT_MUX_OUT:
+> +        /* Ignore */
+> +        break;
+>      }
+>  }
+>  
+> -- 
+> 2.21.0
+> 
 
