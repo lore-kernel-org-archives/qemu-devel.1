@@ -2,82 +2,82 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DFEC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F46AC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:55:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCDEC206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF8C9206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:55:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rc1uwZpR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCDEC206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAFtmbG1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF8C9206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYrk-0002gr-IG
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:55:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55785)
+	id 1ihYrn-0002kM-SD
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:55:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3p-0007Fu-2E
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:14 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3x-0007QR-3S
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3n-0003C6-Jo
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:12 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:53453)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3v-0003ij-FT
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:20 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40972)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3n-00038q-Aq
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:11 -0500
-Received: by mail-wm1-x336.google.com with SMTP id m24so1554742wmc.3
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:04:11 -0800 (PST)
+ id 1ihY3v-0003ao-5M
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:19 -0500
+Received: by mail-wr1-x442.google.com with SMTP id c9so2002162wrw.8
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:04:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=hQn5BCLt9ly+0ISKdp5mviL+DCI+GuaIKgSx0WHQgTU=;
- b=rc1uwZpRhdqIDpd+HUK9tFWpL2f4o2J0ob2s0kE8re2YXkm3T2Lm3dJYzq4g7ySjwu
- yNRKpjSOlX9LyojW/9sPASj9rcaYvGG7A0D8qgRWOYgAw8fg1XbLggtvm85IJLjuwis8
- h+4Y4lodne7cp8CT7jChkezTKyVMoFmZE/enBy0+ffsmCVTqY5PAHesPHBHa6YuUBuxJ
- 3c9Gayf6bI7HT5cTs/cPno/3YW33sV1Fjo3R1T4VsZS6SwxnNN939wZKeJjI9WtQz6UX
- vIHHd8uNUa4iI0d9Ifp9FEVEKQIrjhv2WZwMmP5qQA3Bp07mu2GgLJr3eevqEAiMxnzC
- BxUQ==
+ bh=oWlQxy3gHFTwYR2OAKyR7heGQKIg7ID0fB2XfRVmZV0=;
+ b=VAFtmbG1WmEbcoy3vxWyuytJK8xTNRjZ3LPZmlxs4bNP17hyqUAYSK04S46ixZenOQ
+ l4WAw1NHT9rafXGePdqZCUW2OFy2M+jBOW3OZc9NIIlNO48HZMxSP0cCCSPhnzZWv08U
+ ZJAt3jvxTHrfKq37P7IbKhWpEf80PPoTZkZoN5+GgycqhBqV3Qx+5SrXW4g8acbOjrvv
+ XXbKLbilJnhZu/pRVXWz8q8PawgL6Q9apxthW1bhWFAU8WF/jSooShqm4T2Lw0/LsdAw
+ GFlK5F3tuA/n2siBvkx68whLf9ygks193af8qQn8Ew/W/XPbu5g/QxblV+8utjRmutHO
+ 6UeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=hQn5BCLt9ly+0ISKdp5mviL+DCI+GuaIKgSx0WHQgTU=;
- b=t6gm+b9FPrh4TLXDOhsVpN3UtT/bcS/LAoxQTPQmkOXsJSdzV9AB75zUUSS4tC9Mee
- 6kymccL95gQYogdKUyzLj98vhvEi6CasjyVLwSfcSgHw0zX4oDm+Mm0mJQ8vZ4NhE4s5
- QjmFtIwNugdnlJpJ7NQw2qZYO9Bd+RdWSztIEOJbbeQTEoeBZGil/HrO808kkqYYtMOH
- XuiENI5ox4cwx9yj2ayzj/qrjHWcdHVNLhi8wvR+Ye79OpxB3h/6l97+Kku24hLAMGv8
- 4/vdQ5mxbzkBSn5kFdLOf76DQlf27vqLBTF4c3OIPjvKRX+4xBQge3HuZ5oWarESxw4u
- q45A==
-X-Gm-Message-State: APjAAAVNBmPbHMRsQ8Hr+0FofxYK0dPp9W5lQ79ZGnJTP9YYpl1rhzW7
- GuM0vBS9zdUid9ZSGNZrder+2py3
-X-Google-Smtp-Source: APXvYqzrDX6Q4Pky8qKO2JuqpH0k26VkKKncfhkIk6YhwyjSCqr3KzdNV7+JyYsyjAvdPC2SPQLqew==
-X-Received: by 2002:a7b:c93a:: with SMTP id h26mr2798903wml.83.1576670650020; 
- Wed, 18 Dec 2019 04:04:10 -0800 (PST)
+ bh=oWlQxy3gHFTwYR2OAKyR7heGQKIg7ID0fB2XfRVmZV0=;
+ b=twvufvffqheUJiqOz5t072rlAM6aWHLDKOgeKlp28ZWk87bRA09oIfCMErbcv9cYHl
+ cAZESep8rhBmSawyPeNzKF8HtMgQPUh64t2zed1XqyXIvE/KyQEYi/Da0litrNoPUEuS
+ AsGgjgWu6wzUAsNJcEALasym723KmzdIWti5Jgzh8SqrkyS0ah13GfDMWcR5ShZmg/CR
+ iBQRm+2tgpDDSolHCpc3Y+OZbWCd6SyCdXl1mC5XoQj8fgymzP0scjuKpDqz/Wrlmb4o
+ Vg8oNih83nEfs/3fSFe0B28LlBPd0hoFeYqXJjywnxu3flGmH/U3o+7s5Mq2UkvkCsBb
+ ZGqg==
+X-Gm-Message-State: APjAAAX+APdd4oQ4S04tzBXdKyFe+po0DcwKXU6bxyf/GM6kDVAIW4jM
+ oaOhRK5h4sEGoP4rH9yzGiPoWT9j
+X-Google-Smtp-Source: APXvYqyP29bwoVRnmYf5nsse0VFydatCcPFA+YCLCC3tbR3L9s+fhUFv3rntzcKIHhkkwSmrCx3SgQ==
+X-Received: by 2002:a5d:5403:: with SMTP id g3mr2494282wrv.302.1576670656716; 
+ Wed, 18 Dec 2019 04:04:16 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.04.09
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.04.15
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:04:09 -0800 (PST)
+ Wed, 18 Dec 2019 04:04:16 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 67/87] Makefile: disable Sphinx nitpicking
-Date: Wed, 18 Dec 2019 13:02:33 +0100
-Message-Id: <1576670573-48048-68-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 74/87] WHPX: refactor load library
+Date: Wed, 18 Dec 2019 13:02:40 +0100
+Message-Id: <1576670573-48048-75-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,36 +89,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Sunil Muthuswamy <sunilmut@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
 
-Turn off Sphinx nitpicking as a temporary (?) measure so
-sphinx builds complete even with warnings about missing
-references.
+This refactors the load library of WHV libraries to make it more
+modular. It makes a helper routine that can be called on demand.
+This allows future expansion of load library/functions to support
+functionality that is dependent on some feature being available.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20190521122519.12573-11-peter.maydell@linaro.org>
+Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+Message-Id: <MW2PR2101MB1116578040BE1F0C1B662318C0760@MW2PR2101MB1116.namprd21.prod.outlook.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/whp-dispatch.h |  4 +++
+ target/i386/whpx-all.c     | 85 +++++++++++++++++++++++++++++++---------------
+ 2 files changed, 62 insertions(+), 27 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 531e955..6b5ad11 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1001,7 +1001,7 @@ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/interop/index
- # Note the use of different doctree for each (manual, builder) tuple;
- # this works around Sphinx not handling parallel invocation on
- # a single doctree: https://github.com/sphinx-doc/sphinx/issues/2946
--build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" sphinx-build $(if $(V),,-q) -W -n -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
-+build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" sphinx-build $(if $(V),,-q) -W -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
- # We assume all RST files in the manual's directory are used in it
- manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
+diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
+index 23791fb..87d049c 100644
+--- a/target/i386/whp-dispatch.h
++++ b/target/i386/whp-dispatch.h
+@@ -50,5 +50,9 @@ extern struct WHPDispatch whp_dispatch;
+ 
+ bool init_whp_dispatch(void);
+ 
++typedef enum WHPFunctionList {
++    WINHV_PLATFORM_FNS_DEFAULT,
++    WINHV_EMULATION_FNS_DEFAULT,
++} WHPFunctionList;
+ 
+ #endif /* WHP_DISPATCH_H */
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index def0c28..3ed2aa1 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -1356,6 +1356,58 @@ static void whpx_handle_interrupt(CPUState *cpu, int mask)
+ }
+ 
+ /*
++ * Load the functions from the given library, using the given handle. If a
++ * handle is provided, it is used, otherwise the library is opened. The
++ * handle will be updated on return with the opened one.
++ */
++static bool load_whp_dispatch_fns(HMODULE *handle,
++    WHPFunctionList function_list)
++{
++    HMODULE hLib = *handle;
++
++    #define WINHV_PLATFORM_DLL "WinHvPlatform.dll"
++    #define WINHV_EMULATION_DLL "WinHvEmulation.dll"
++    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
++        whp_dispatch.function_name = \
++            (function_name ## _t)GetProcAddress(hLib, #function_name); \
++        if (!whp_dispatch.function_name) { \
++            error_report("Could not load function %s", #function_name); \
++            goto error; \
++        } \
++
++    #define WHP_LOAD_LIB(lib_name, handle_lib) \
++    if (!handle_lib) { \
++        handle_lib = LoadLibrary(lib_name); \
++        if (!handle_lib) { \
++            error_report("Could not load library %s.", lib_name); \
++            goto error; \
++        } \
++    } \
++
++    switch (function_list) {
++    case WINHV_PLATFORM_FNS_DEFAULT:
++        WHP_LOAD_LIB(WINHV_PLATFORM_DLL, hLib)
++        LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
++        break;
++
++    case WINHV_EMULATION_FNS_DEFAULT:
++        WHP_LOAD_LIB(WINHV_EMULATION_DLL, hLib)
++        LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
++        break;
++    }
++
++    *handle = hLib;
++    return true;
++
++error:
++    if (hLib) {
++        FreeLibrary(hLib);
++    }
++
++    return false;
++}
++
++/*
+  * Partition support
+  */
+ 
+@@ -1490,51 +1542,30 @@ static void whpx_type_init(void)
+ 
+ bool init_whp_dispatch(void)
+ {
+-    const char *lib_name;
+-    HMODULE hLib;
+-
+     if (whp_dispatch_initialized) {
+         return true;
+     }
+ 
+-    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
+-        whp_dispatch.function_name = \
+-            (function_name ## _t)GetProcAddress(hLib, #function_name); \
+-        if (!whp_dispatch.function_name) { \
+-            error_report("Could not load function %s from library %s.", \
+-                         #function_name, lib_name); \
+-            goto error; \
+-        } \
+-
+-    lib_name = "WinHvPlatform.dll";
+-    hWinHvPlatform = LoadLibrary(lib_name);
+-    if (!hWinHvPlatform) {
+-        error_report("Could not load library %s.", lib_name);
++    if (!load_whp_dispatch_fns(&hWinHvPlatform, WINHV_PLATFORM_FNS_DEFAULT)) {
+         goto error;
+     }
+-    hLib = hWinHvPlatform;
+-    LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
+ 
+-    lib_name = "WinHvEmulation.dll";
+-    hWinHvEmulation = LoadLibrary(lib_name);
+-    if (!hWinHvEmulation) {
+-        error_report("Could not load library %s.", lib_name);
++    if (!load_whp_dispatch_fns(&hWinHvEmulation, WINHV_EMULATION_FNS_DEFAULT)) {
+         goto error;
+     }
+-    hLib = hWinHvEmulation;
+-    LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
+ 
+     whp_dispatch_initialized = true;
+-    return true;
+-
+-    error:
+ 
++    return true;
++error:
+     if (hWinHvPlatform) {
+         FreeLibrary(hWinHvPlatform);
+     }
++
+     if (hWinHvEmulation) {
+         FreeLibrary(hWinHvEmulation);
+     }
++
+     return false;
+ }
  
 -- 
 1.8.3.1
