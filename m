@@ -6,41 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD36FC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679E8C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:37:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F59B21D7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:35:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F59B21D7D
+	by mail.kernel.org (Postfix) with ESMTPS id 3C09724650
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:37:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C09724650
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihXcS-0007pP-RW
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:35:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34951)
+	id 1ihXeG-0000pk-Do
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:37:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51359)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ihXbk-00079S-7B
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:35:13 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihXdY-00006M-Ma
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:37:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ihXbi-0000Xu-UK
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:35:12 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:60631)
+ (envelope-from <laurent@vivier.eu>) id 1ihXdV-0007AU-4c
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:37:03 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:49587)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ihXbi-0000M4-Jr; Wed, 18 Dec 2019 06:35:10 -0500
+ id 1ihXdH-0006zI-D3; Wed, 18 Dec 2019 06:36:47 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MnJdE-1i0oL00i3w-00jKi9; Wed, 18 Dec 2019 12:34:50 +0100
-Subject: Re: [PATCH] target/sparc: Remove old TODO file
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>
-References: <20190930171044.25312-1-thuth@redhat.com>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MTOZQ-1iG8KF0r2S-00TjXi; Wed, 18 Dec 2019 12:36:43 +0100
+Subject: Re: [PATCH v2] Revert "qemu-options.hx: Update for reboot-timeout
+ parameter"
+To: Han Han <hhan@redhat.com>, qemu-devel@nongnu.org
+References: <20191205024821.245435-1-hhan@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -84,36 +82,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2d4b45cb-686d-ba70-a6dd-acb7fecc1bcb@vivier.eu>
-Date: Wed, 18 Dec 2019 12:34:48 +0100
+Message-ID: <5fe686d9-4672-23df-7d65-da7fa8d58018@vivier.eu>
+Date: Wed, 18 Dec 2019 12:36:42 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20190930171044.25312-1-thuth@redhat.com>
+In-Reply-To: <20191205024821.245435-1-hhan@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:F0R5tE+18Ez+qH7y6pY8GB8Ii3p3t4RmJWxPiCUXQQ5AX/9DqyK
- d4oWu3EfzfvWPqIYIOdY30CUifFh8hTE0D+48VkpTfiE5fl76UAwg66HDiv6PSoh+W2fwcV
- xqeKIEoDVgSL1UYDJlsSZrmQ2PyPxxF4jzkG/Rs5aqsxIy+Wp/C4SyclQuzoPW1jRcPuiqb
- ahUdL9YoaYvMJd5I/SxlA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5Xj3l5nRLQw=:xDmydpkJDUBLhif5xJh0b9
- senNEj4SOXZijGgNZF3TTf9uhBvGL06xzUp8Rlz+DpR6E9sq1alJUxJOIIT2mZTzQdCqiS5kc
- uEVt4jg53zGeUT/1xgVVt2gCLmftr5yATjx0VQ/te001xHzQoBvDsdt//B8oqCs5lf2PCrJE2
- I7o3E6MJP02YIRoyJ9pUSqK4IWSBCOFH/E6EKHVZ752vfpq83Q9wRnoU3lvPf2BoibXQkr7gj
- DwUkZJhaU+Mg/m5ruz2z+4oWIvXdHop6gE83jGxe+R/5ltNogz+dKV5BBXU9DnqJUPv6t4xx1
- zS6Wf2YZN6noTRdLciebeY9nEhE+G76Nzm5FyINw4WAaAlgeOEz3UrvYFQvSBnhfM88wIy3NX
- lMvJCzSL5JXN/SDDOypCmjEgmR3whqoKIS4nBdf9N0Caslq9ufqPg8kMq/4VxNYXLDXjS3I1Y
- kflwQlhdrLIq4Syw/Ffyc9xDv8Y/CFuqWHF7iYFLLyYA699CoaPLfsZ+qPUhmr8dwfrvc1kcL
- 4tjkTFpKDq6Ny5rhBZCVCuhv5+bYiWQ8hSFAtArq7QJUgcTLwNJo8MSs9yM4CVnvAOhV0E9w9
- A746Tgk9Y+ba1MWSYLyYgLSrGJrlSPNRxkcVgFiCn6rhHjfW3kkyEfNUmRZmNCUj60wFhRFo+
- SYBwi4IHHGV1sRpBsfG/Zf0gqEizfkJleAVPIFDDn5QtktiNx+xJ2aJ1oYOrBURXLb7GyTXu3
- FMOOtO5fFbEwn/qeQo2rll1aGkl1QVCCP5swtZsXlJIRYXayHVdDyiQ8ONvB01f3A3GT9NUtK
- dj6GUi5YZdCGU6mWaSrdk37gYz8pmd2AvoOml0vN4KZql7J6nP7DYEN6CME929Hvp01vvsVSM
- TmADdmlWiStWzBBB7aHnABfF4aehuTuRIhceywFbs=
+X-Provags-ID: V03:K1:ypF1HpnYwbeYMpAbY74TCahuHWXb8g+DNFsWXnOig0w6Au8N62P
+ hsv/ur+OCp0vGBHWbNy9Q4o843d+8oab4MaX438EGPEpKQqKTIkilx0uHpqcEpLPCpHmg3f
+ iHbVEMZQuG8dRBBaxoe+DGf28YiCNL38sbfkzglMiI3LTAUImk1nMC9FgQFIhPpCsJh7uBm
+ eIQ8R0ZHf7NnlkFuhXzVg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1NQES/3+xCc=:ECNBe0ruIE2WbZYcaL4T/M
+ E1vpM/EPSX01ceYko+KuLbPBD7e42/2XqF3vaKNxcyHd+6qQKYco4dsWNUjv/OAjvU3mmgmft
+ t0OdUjz+lpqr+98xvZluYl0AtlBB28Q6yc91FzBtUBTTcO3HE4GNjO1XvUa7087Z1xcrN7LUT
+ TMrjFuHojHziexQfWAqp8rbZpOV9GsaX06Zx+0UZ0M5nYKDAfhU0TdxdI80a/cz6DnmB3uv6a
+ YXunSJ2u4F2hD2jfDFusN3WUwiZAaS++Sz3JxF5mnI7WPfqyVwg7g0fG2pYtoYB6om5By4ORm
+ GptDSM7IjonwICxvAwMfxiWa3tnXcmCfXnpxt3JYo43Qyq3ChDBATbMdLv8jRtahfKPy5I+yR
+ QBfudP5XTOVUxEfuVTSRuTLLosaRxSv2lASdQ/9NPPL91N8n63RiKYOaQdSvNyC1SppieGIA8
+ OEHAVVC7UvEbcDKknaX09pcWEiPkNa6B1t+pVEkMGhVhBIijAWFuoqtpL6tn3yrXC0rfioYpc
+ Xg2ySvaFAOVF5tEaUvo7va2hYqiKDUJR+oI4O7ztAgpGtb5RTAHBKOJe3hP2wrAYENib9DjHS
+ +slxehem3HIhK5nZMTrwogABtdlQBfW6I/uCI4CulpbF+WAA911tT0MN+8AKzPaWHoPHyCMUf
+ VLesR2ZuHCEcDHj8qIALln12+b9VCiv3n9MeGY2PuAiJdBUZnDwwXAGe5R9Zw6lQI6NLsSIw6
+ 9xbQwtFex8SFihOorQd3HYC99V+7Ft4sCpz4iHGWKZp+lUn3KSkfAAVNxVYGlc8TdWteDRJi6
+ EsJrORz4rZUDabakvuvsDCGY5CAWupQK/+LmlCDbseVclzkHx32ueNx8Zfm/qKXPKar0fM9hK
+ 6UlI1gnY9PV8DV2zxcHA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,116 +123,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/09/2019 à 19:10, Thomas Huth a écrit :
-> This file hasn't seen a real (non-trivial) update since 2008 anymore,
-> so we can assume that it is pretty much out of date and nobody cares
-> for it anymore. Let's simply remove it.
+Le 05/12/2019 à 03:48, Han Han a écrit :
+> This reverts commit bbd9e6985ff342cbe15b9cb7eb30e842796fbbe8.
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> In 20a1922032 we allowed reboot-timeout=-1 again, so update the doc
+> accordingly.
+> 
+> Signed-off-by: Han Han <hhan@redhat.com>
 > ---
->  target/sparc/TODO | 88 -----------------------------------------------
->  1 file changed, 88 deletions(-)
->  delete mode 100644 target/sparc/TODO
+>  qemu-options.hx | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/target/sparc/TODO b/target/sparc/TODO
-> deleted file mode 100644
-> index b8c727e858..0000000000
-> --- a/target/sparc/TODO
-> +++ /dev/null
-> @@ -1,88 +0,0 @@
-> -TODO-list:
-> -
-> -CPU common:
-> -- Unimplemented features/bugs:
-> - - Delay slot handling may fail sometimes (branch end of page, delay
-> - slot next page)
-> - - Atomical instructions
-> - - CPU features should match real CPUs (also ASI selection)
-> -- Optimizations/improvements:
-> - - Condition code/branch handling like x86, also for FPU?
-> - - Remove remaining explicit alignment checks
-> - - Global register for regwptr, so that windowed registers can be
-> - accessed directly
-> - - Improve Sparc32plus addressing
-> - - NPC/PC static optimisations (use JUMP_TB when possible)? (Is this
-> - obsolete?)
-> - - Synthetic instructions
-> - - MMU model dependent on CPU model
-> - - Select ASI helper at translation time (on V9 only if known)
-> - - KQemu/KVM support for VM only
-> - - Hardware breakpoint/watchpoint support
-> - - Cache emulation mode
-> - - Reverse-endian pages
-> - - Faster FPU emulation
-> - - Busy loop detection
-> -
-> -Sparc32 CPUs:
-> -- Unimplemented features/bugs:
-> - - Sun4/Sun4c MMUs
-> - - Some V8 ASIs
-> -
-> -Sparc64 CPUs:
-> -- Unimplemented features/bugs:
-> - - Interrupt handling
-> - - Secondary address space, other MMU functions
-> - - Many V9/UA2005/UA2007 ASIs
-> - - Rest of V9 instructions, missing VIS instructions
-> - - IG/MG/AG vs. UA2007 globals
-> - - Full hypervisor support
-> - - SMP/CMT
-> - - Sun4v CPUs
-> -
-> -Sun4:
-> -- To be added
-> -
-> -Sun4c:
-> -- A lot of unimplemented features
-> -- Maybe split from Sun4m
-> -
-> -Sun4m:
-> -- Unimplemented features/bugs:
-> - - Hardware devices do not match real boards
-> - - Floppy does not work
-> - - CS4231: merge with cs4231a, add DMA
-> - - Add cg6, bwtwo
-> - - Arbitrary resolution support
-> - - PCI for MicroSparc-IIe
-> - - JavaStation machines
-> - - SBus slot probing, FCode ROM support
-> - - SMP probing support
-> - - Interrupt routing does not match real HW
-> - - SuSE 7.3 keyboard sometimes unresponsive
-> - - Gentoo 2004.1 SMP does not work
-> - - SS600MP ledma -> lebuffer
-> - - Type 5 keyboard
-> - - Less fixed hardware choices
-> - - DBRI audio (Am7930)
-> - - BPP parallel
-> - - Diagnostic switch
-> - - ESP PIO mode
-> -
-> -Sun4d:
-> -- A lot of unimplemented features:
-> - - SBI
-> - - IO-unit
-> -- Maybe split from Sun4m
-> -
-> -Sun4u:
-> -- Unimplemented features/bugs:
-> - - Interrupt controller
-> - - PCI/IOMMU support (Simba, JIO, Tomatillo, Psycho, Schizo, Safari...)
-> - - SMP
-> - - Happy Meal Ethernet, flash, I2C, GPIO
-> - - A lot of real machine types
-> -
-> -Sun4v:
-> -- A lot of unimplemented features
-> - - A lot of real machine types
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 65c9473b..e14d88e9 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -327,8 +327,8 @@ format(true color). The resolution should be supported by the SVGA mode, so
+>  the recommended is 320x240, 640x480, 800x640.
+>  
+>  A timeout could be passed to bios, guest will pause for @var{rb_timeout} ms
+> -when boot failed, then reboot. If @option{reboot-timeout} is not set,
+> -guest will not reboot by default. Currently Seabios for X86
+> +when boot failed, then reboot. If @var{rb_timeout} is '-1', guest will not
+> +reboot, qemu passes '-1' to bios by default. Currently Seabios for X86
+>  system support it.
+>  
+>  Do strict boot via @option{strict=on} as far as firmware/BIOS
 > 
 
 Applied to my trivial-patches branch.
