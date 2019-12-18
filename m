@@ -2,54 +2,51 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8EBC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D86B1C2D0CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:38:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57ED7218AC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57ED7218AC
+	by mail.kernel.org (Postfix) with ESMTPS id B20D4227BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:38:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B20D4227BF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihVlR-00079F-Uj
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 04:37:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44398)
+	id 1ihVnA-0001dB-K4
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 04:38:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44325)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ihVjw-0005QL-7i
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ihVjw-0005QK-7e
  for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ihVju-0001AR-8l
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ihVju-0001Aq-AF
  for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:35:31 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34199 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:34118 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1ihVjt-0005fG-T2
+ id 1ihVjt-0005f3-UK
  for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:35:30 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 307431A223E;
+ by mail.rt-rk.com (Postfix) with ESMTP id 20F861A2248;
  Wed, 18 Dec 2019 10:34:20 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id E0CC81A1D0B;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id D551B1A153B;
  Wed, 18 Dec 2019 10:34:19 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/6] linux-user: Add support for getting/setting RTC time
- and alarm using ioctls
-Date: Wed, 18 Dec 2019 10:34:08 +0100
-Message-Id: <1576661652-2870-3-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH v4 0/6] linux-user: Add support for real time clock ioctls
+Date: Wed, 18 Dec 2019 10:34:06 +0100
+Message-Id: <1576661652-2870-1-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1576661652-2870-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1576661652-2870-1-git-send-email-Filip.Bozuta@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -68,111 +65,138 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionalities of following ioctls:
+Add ioctls for all RTC features that are currently supported in linux kernel.
 
-RTC_RD_TIME - Getting RTC time
+This series covers following 22 iocts:
 
-    Returns this RTC's time in the following structure:
+    * RTC_AIE_ON          * RTC_ALM_SET         * RTC_WKALM_SET
+    * RTC_AIE_OFF         * RTC_ALM_READ        * RTC_WKALM_RD
+    * RTC_UIE_ON          * RTC_RD_TIME         * RTC_PLL_GET
+    * RTC_UIE_OFF         * RTC_SET_TIME        * RTC_PLL_SET
+    * RTC_PIE_ON          * RTC_IRQP_READ       * RTC_VL_READ
+    * RTC_PIE_OFF         * RTC_IRQP_SET        * RTC_VL_CLR
+    * RTC_WIE_ON          * RTC_EPOCH_READ
+    * RTC_WIE_OFF         * RTC_EPOCH_SET
 
-        struct rtc_time {
-            int tm_sec;
-            int tm_min;
-            int tm_hour;
-            int tm_mday;
-            int tm_mon;
-            int tm_year;
-            int tm_wday;     /* unused */
-            int tm_yday;     /* unused */
-            int tm_isdst;    /* unused */
-        };
 
-    The fields in this structure have the same meaning and ranges
-    as the tm structure described in gmtime man page. A pointer
-    to this structure should be passed as the third ioctl's argument.
+The functionalities of individual ioctls were described in this series
+patch commit messages.
 
-RTC_SET_TIME - Setting RTC time
+Testing method:
 
-    Sets this RTC's time to the time specified by the rtc_time
-    structure pointed to by the third ioctl's argument. To set
-    the RTC's time the process must be privileged (i.e., have the
-    CAP_SYS_TIME capability).
+    Mini test programs were written for each ioctl. Those programs were
+    compiled (sometimes using cross-compilers) for the following
+    architectures:
 
-RTC_ALM_READ, RTC_ALM_SET - Getting/Setting alarm time
+        * Intel 64-bit (little endian)
+        * Power pc 32-bit (big endian)
+        * Power pc 64-bit (big endian)
 
-    Read and set the alarm time, for RTCs that support alarms.
-    The alarm interrupt must be separately enabled or disabled
-    using the RTC_AIE_ON, RTC_AIE_OFF requests. The third
-    ioctl's argument is a pointer to an rtc_time structure. Only
-    the tm_sec, tm_min, and tm_hour fields of this structure are
-    used.
+    The corresponding native programs were executed without using
+    QEMU on following hosts:
 
-Implementation notes:
+        * Intel Core i7-4790K (x86_64 host)
+        * Power 7447A (ppc32 host)
 
-    All ioctls in this patch have pointer to a structure rtc_time
-    as their third argument. That is the reason why corresponding
-    definition is added in linux-user/syscall_types.h. Since all
-    elements of this structure are of type 'int', the rest of the
-    implementation is straightforward.
+    All applicable compiled programs were in turn executed through QEMU
+    and the results obtained were the same ones gotten for native
+    execution.
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
----
- linux-user/ioctls.h        |  4 ++++
- linux-user/syscall_defs.h  |  4 ++++
- linux-user/syscall_types.h | 11 +++++++++++
- 3 files changed, 19 insertions(+)
+Example of a test program:
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 97741c7..f472794 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -77,6 +77,10 @@
-      IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
-      IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
-      IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
-+     IOCTL(RTC_ALM_READ, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-+     IOCTL(RTC_ALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-+     IOCTL(RTC_RD_TIME, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
-+     IOCTL(RTC_SET_TIME, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
- 
-      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index f91579a..f0bf09d 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -772,6 +772,10 @@ struct target_pollfd {
- #define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
- #define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
- #define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
-+#define TARGET_RTC_ALM_READ         TARGET_IOR('p', 0x08, struct rtc_time)
-+#define TARGET_RTC_ALM_SET          TARGET_IOW('p', 0x07, struct rtc_time)
-+#define TARGET_RTC_RD_TIME          TARGET_IOR('p', 0x09, struct rtc_time)
-+#define TARGET_RTC_SET_TIME         TARGET_IOW('p', 0x0a, struct rtc_time)
- 
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 4e36983..a35072a 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -255,6 +255,17 @@ STRUCT(blkpg_partition,
-        MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
-        MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
- 
-+STRUCT(rtc_time,
-+       TYPE_INT, /* tm_sec */
-+       TYPE_INT, /* tm_min */
-+       TYPE_INT, /* tm_hour */
-+       TYPE_INT, /* tm_mday */
-+       TYPE_INT, /* tm_mon */
-+       TYPE_INT, /* tm_year */
-+       TYPE_INT, /* tm_wday */
-+       TYPE_INT, /* tm_yday */
-+       TYPE_INT) /* tm_isdst */
-+
- STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* op */
-        TYPE_INT, /* flags */
+    For ioctl RTC_RD_TIME the following test program was used:
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <linux/rtc.h>
+    #include <fcntl.h>
+    #include <linux/input.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+
+    #define ERROR -1
+
+    int main()
+    {
+
+        int fd = open("/dev/rtc", O_RDWR | O_NONBLOCK);
+
+        if(fd == ERROR)
+        {
+            perror("open");
+            return -1;
+        }
+
+        struct rtc_time cur_time;
+
+        if(ioctl(fd, RTC_RD_TIME, &cur_time) < 0)
+        {
+            perror("ioctl");
+            return -1;
+        }
+
+        printf("Second: %d, Minute: %d, Hour: %d, Day: %d, Month: %d, Year: %d,",
+            cur_time.tm_sec, cur_time.tm_min, cur_time.tm_hour, 
+            cur_time.tm_mday, cur_time.tm_mon, cur_time.tm_year);
+
+        return 0;
+    }
+
+Limitations of testing:
+    
+    The test host pc that was used for testing (intel pc) has RTC
+    that doesn't support all RTC features that are accessible
+    through ioctls. This means that testing can't discover
+    functionality errors related to the third argument of ioctls
+    that are used for features which are not supported. For example,
+    running the test program for ioctl RTC_EPOCH_READ gives
+    the error output: inappropriate ioctl for device. As expected,
+    the same output was obtained through QEMU which means that this
+    ioctl is recognized in QEMU but doesn't really do anything
+    because it is not supported in the host computer's RTC.
+
+    Conclusion: Some RTC ioctls need to be tested on computers
+    that support their functionalities so that it can be inferred
+    that they are really supported in QEMU. In absence of such
+    test hosts, the specifications of those ioctls need to be
+    carefully checked manually and the implementations should be
+    updated accordingly.
+
+v4:
+
+    * changed patch descriptions so that they are better
+      formatted and more cemprehensible
+
+v3:
+
+    * changed two instances of MK_PTR(TYPE_ULONG) to TYPE_ULONG
+
+v2:
+
+    * added description of each ioctl in patches
+    * wrote a more detailed cover letter with description of testing
+    * changed one instance of TYPE_INT to MK_PTR(TYPE_INT)
+
+Filip Bozuta (6):
+  linux-user: Add support for enabling/disabling RTC features using
+    ioctls
+  linux-user: Add support for getting/setting RTC time and alarm using
+    ioctls
+  linux-user: Add support for getting/setting RTC periodic interrupt and
+    epoch using ioctls
+  linux-user: Add support for getting/setting RTC wakeup alarm using
+    ioctls
+  linux-user: Add support for getting/setting RTC PLL correction using
+    ioctls
+  linux-user: Add support for read/clear RTC voltage low detector using
+    ioctls
+
+ linux-user/ioctls.h        | 23 +++++++++++++++++++++++
+ linux-user/syscall.c       |  1 +
+ linux-user/syscall_defs.h  | 36 ++++++++++++++++++++++++++++++++++++
+ linux-user/syscall_types.h | 25 +++++++++++++++++++++++++
+ 4 files changed, 85 insertions(+)
+
 -- 
 2.7.4
 
