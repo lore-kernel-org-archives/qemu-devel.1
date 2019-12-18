@@ -2,85 +2,81 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB98C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B60EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:32:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FC1220716
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:28:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0854A21582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:32:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfMeHsS5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC1220716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="doUPLif3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0854A21582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihe3H-0001rs-N8
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 13:28:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49193)
+	id 1ihe7N-0003Ku-2w
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 13:32:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55513)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ihe2I-0001NI-9l
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:27:03 -0500
+ (envelope-from <thuth@redhat.com>) id 1ihe6Y-0002tS-DZ
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:31:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ihe2D-0005nK-Aa
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:26:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49831
+ (envelope-from <thuth@redhat.com>) id 1ihe6V-0005g1-8c
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:31:25 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45560
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihe2B-0005iM-UV
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:26:56 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihe6V-0005a6-03
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:31:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576693610;
+ s=mimecast20190719; t=1576693881;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KlgzqueGNMAR/MZHjCHRvYMDnbvpW4UvSMoQ9ly0dIw=;
- b=PfMeHsS52Q+3mXokdphzYOZAV4fwv1RXesnsCMdN+9O+AxV3hzbaXk/VNOC9wXTYRPB7Lp
- YklbDJHLk2g8wMa958cOj0u5VDjZ8ddu5dsQGP4itBymn2zUlyUacWUfpseJdOemOAgEbA
- HRVvGHn3C/tDB0Dv6PRWZMo3MlUAPMI=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=6lveHfzvYEhUQZQoLOEVVZLGBtKYwoKcLo/V2ABQGuc=;
+ b=doUPLif3IeHBhY+NWJuRVJMp4+Fem6VZ87NGwA9fbv8kxhUk6Wcf1dUDsJNzLe83Edm9Ju
+ sGweUdnu1pqFMrgSJ+UuonkGVrApLUEPHPGPuQIEYVvN5AiX8bmKyoxg8jiM0VWBhxAERF
+ lQRbQ6jla5pbCeTvTDferYPddDhEJoQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-134-UTCAWv0-MuSXf0JhD3lQJw-1; Wed, 18 Dec 2019 13:26:47 -0500
+ us-mta-354--9EZz_owN7Gr_p0xr1P6JA-1; Wed, 18 Dec 2019 13:31:20 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42C6C80257F;
- Wed, 18 Dec 2019 18:26:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
- [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F147B5C1D4;
- Wed, 18 Dec 2019 18:26:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7BAD511386A7; Wed, 18 Dec 2019 19:26:44 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH] util/cutils: Expand do_strtosz parsing precision to 64
- bits
-References: <20191205021459.29920-1-tao3.xu@intel.com>
- <87a786sse9.fsf@dusky.pond.sub.org>
- <b7c442e3-cc7e-155e-5370-db9a371928a6@intel.com>
- <87y2vbgsf0.fsf@dusky.pond.sub.org>
- <e731445a-4461-3212-c08d-05dc7ad2b742@intel.com>
- <52a11f3a-f2c8-26e9-b823-0093cfe91fdc@intel.com>
-Date: Wed, 18 Dec 2019 19:26:44 +0100
-In-Reply-To: <52a11f3a-f2c8-26e9-b823-0093cfe91fdc@intel.com> (Tao Xu's
- message of "Wed, 18 Dec 2019 13:26:32 +0800")
-Message-ID: <87y2v9zdzv.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BE3B800D41;
+ Wed, 18 Dec 2019 18:31:19 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-120.ams2.redhat.com [10.36.116.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DA7045C1D4;
+ Wed, 18 Dec 2019 18:31:14 +0000 (UTC)
+Subject: Re: [PATCH 5/7] configure: Unnest detection of -z,relro and -z,now
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20191218031920.6414-1-richard.henderson@linaro.org>
+ <20191218031920.6414-6-richard.henderson@linaro.org>
+ <881dff30-a729-6d7b-f823-5f136125ac0b@redhat.com>
+ <6a556fb0-619f-ffab-e9b3-5afb17447bee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <81681a5d-6175-7fc8-6f39-0549a4db191e@redhat.com>
+Date: Wed, 18 Dec 2019 19:31:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <6a556fb0-619f-ffab-e9b3-5afb17447bee@linaro.org>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: UTCAWv0-MuSXf0JhD3lQJw-1
+X-MC-Unique: -9EZz_owN7Gr_p0xr1P6JA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -95,49 +91,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tao Xu <tao3.xu@intel.com> writes:
-
-> On 12/18/2019 9:33 AM, Tao Xu wrote:
->> On 12/17/2019 6:25 PM, Markus Armbruster wrote:
-[...]
->>> Also fun: for "0123", we use uint64_t 83, not double 123.0.=C2=A0 But f=
-or
->>> "0123.", we use 123.0, not 83.
->>>
->>> Do we really want to accept octal and hexadecimal integers?
->>>
+On 18/12/2019 17.58, Richard Henderson wrote:
+> On 12/17/19 10:11 PM, Thomas Huth wrote:
+>>> +# Detect support for DT_BIND_NOW.
+>>> +if compile_prog "" "-Wl,-z,now" ; then
+>>> +  LDFLAGS="-Wl,-z,now $LDFLAGS"
+>>> +fi
+>>> +
+>>> +# Detect support for PT_GNU_RELRO.
+>>> +if compile_prog "" "-Wl,-z,relro" ; then
+>>> +  LDFLAGS="-Wl,-z,relro $LDFLAGS"
+>>> +fi
 >>
->> Thank you for reminding me. Octal and hexadecimal may bring more
->> confusion. I will use qemu_strtou64(nptr, &suffixu, 10, &valu) and
->> add test for input like "0123".
->>
->
-> Hi Markus,
->
-> After I use qemu_strtou64(nptr, &suffixu, 10, &valu), it cause another
-> question. Because qemu_strtod_finite support hexadecimal input, so in
-> this situation, it will parsed as double. It will also let large
-> hexadecimal integers be rounded. So there may be two solution:
->
-> 1: use qemu_strtou64(nptr, &suffixu, 0, &valu) and parse octal as
-> decimal. This will keep hexadecimal valid as now.
->
-> "0123" --> 123; "0x123" --> 291
+>> Looking at
+>> https://mudongliang.github.io/2016/07/11/relro-a-not-so-well-known-memory-corruption-mitigation-technique.html
+>> the idea of specifying these two options together was likely to get
+>> "Full RELRO" instead of only "Partial RELRO".
+> 
+> Sure.
+> 
+>> Thus, does it make sense to have "-Wl,-z,now" without "-Wl,-z,relro" in
+>> QEMU? Or should this rather check whether both are possible, then use
+>> both, otherwise just try to use "relro" alone?
+> 
+> Honestly, I expect them both to be supported in any binutils.
+> 
+> I split the two tests just because they didn't seem to be logically connected.
+>  But I had forgotten about, or perhaps never heard, the terms "full" and
+> "partial" relro.
+> 
+> I can put them back together with an appropriate comment it you like.  One less
+> thing to run during configure...
 
-How would you make qemu_strtou64() parse octal as decimal?
+Yes, please.
 
-> 2: use qemu_strtou64(nptr, &suffixu, 10, &valu) and reject octal and
-> decimal.
->
-> "0123" --> Error; "0x123" --> Error
-
-How would you reject the 0x prefix?
+ Thanks,
+  Thomas
 
 
