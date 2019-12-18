@@ -7,78 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DE7C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7282EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E034C21582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41B2521582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:25:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WF2pFPF6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E034C21582
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rCSv5bNz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B2521582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYOc-00032T-D8
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:25:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49404)
+	id 1ihYOi-0003F8-12
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:25:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47689)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3J-0006Vx-5r
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:42 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY38-0006Ic-0m
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3F-00016n-8b
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:40 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44234)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY36-0000WM-EX
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:29 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38306)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3E-000138-Up
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:37 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id q10so1984378wrm.11
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:36 -0800 (PST)
+ id 1ihY35-0000T7-P1
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:27 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y17so2010285wrh.5
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=eX9q8umIrXfd/sk2F6QDWc9JJlH4gBHHbDDQi+DXr74=;
- b=WF2pFPF6046r/94+RXAsFrjvf99tn68ygwUA/3wE+AXgvZgD5C3NbfjkQPJQd+9pS5
- hbhGOS3s3D/BEG+zyaLlyjDFxZsKSpoLcxG26BaW47xGLoYm3WVW8dgKAgVff4D7ow3D
- jPqkBM73c0oMKfTE17GEtXRa6/q7ZOAlvfBjQ3nwDJ37Gjri3qJ2jwJYwGFwceeyMAqC
- 4UvKdM4Xbv5Ng3G41HmGhzexqDGe+3fAGEod9tFsSe4ah4gCSITV/IJZtsLc5OcnY/69
- 9G6jivNK6TGBgDJVnGfA5wMvG1OMMP44aZJsrQjjoRXB80+jmI/Tw2dRuMMRI5gA3sCc
- b6OQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=0e9iZbZwVOF2w7GIO2zU28bMFshOQAQOAmPOJxZU0us=;
+ b=rCSv5bNzkE6a+ZVDTCqrxIsa2bGL3+gU5ilt1Am50Q5Eb+IWwWppIypqbzIpBzxCHE
+ /kTrmSd+dvqim7HDCtGvCK6+N1sONdc7uN6R0T7Je/jmwscCb+N4MA/NeNBvrOryOjXE
+ Unwl5M4jAeiMn1IsTcHAOhWYYB1XA3EgAA205mzd9fe57zoZebayOfnCjXAMb/m1Bf4o
+ URTaBGJfp9t+G+y3u0EYgbUHQaA+IGxQ6QWn6m1jP0l49ZzugUB79ZGhjvIZhz3ITz8r
+ i+QHN3y+HzQSuAt63qVhQLqtCy7UrSwVXH7s9L1S/siyw9rOXpWfosvoZrPORk467naJ
+ ZGyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=eX9q8umIrXfd/sk2F6QDWc9JJlH4gBHHbDDQi+DXr74=;
- b=H7USb3bs4OqnKHfXh7t3lCqudMB1DOW3Z7pc01b5pdzOc65bRb1JjB3GO1FnQH5QT6
- GcjbOVwFzco3fuQd5bBmqfGLkYP/OZN0HaM/DsxLXW9U6sh+VbN90tqruADMsgr5JwYF
- FxnQCa/QijK6XZpt2E6OKHiG8J23qwIl6fWIwzLLWk2cy/1fVqdNlMNDLtcHv2gU0+Kw
- QoZylaeyXpOT+XEws/4txjOFB2nLjbptAN02MtBsKy6Y14U1MLJz+iGO2AZRUYoDATs2
- sXo4YN14TUOAl1ZrUz9hdmdOtR5ANetI+l967BNhPlE7Y6M8L8THiVug6upfkYeWE9Rw
- 39QA==
-X-Gm-Message-State: APjAAAXzKKMVDCcK000Vk/oJ2Br4cqX/e/vG1P0AkeBrbBLUEK6d+kwq
- dViddAgOwAGMMltqeNHRh/uAsO0U
-X-Google-Smtp-Source: APXvYqwWIGQadIUjviFhD2SIc7xN7alqSD5fNrkcwVRIGIhWuEFN76RXxmcM/mjDBRZZZsOQITYUJQ==
-X-Received: by 2002:adf:d184:: with SMTP id v4mr2489334wrc.76.1576670615832;
- Wed, 18 Dec 2019 04:03:35 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=0e9iZbZwVOF2w7GIO2zU28bMFshOQAQOAmPOJxZU0us=;
+ b=JAg0JeJfgoXvMy/m2i1AZ9sdmc5OolBKWL8p50WUzloryF3R+jZcL6vMAOBb4ROuAM
+ sJpCkkp+1KDzT3cKmiJB/OXcUZDaE0HhTtoVFRXrppduJBsBPH1znxabrOHOc3U88KB9
+ ZlryT+EkcsWxKOpRThQgRx/B7HZhCWom/LyH8Zbz12wIsGtqDK2y0rllX1gKlxin+4dz
+ fkkWVM+MwLu0QFV+q7iFfheQQycu8H9ueDOSl3et4MPsiU4WoVz5ZPQGFm0cwx23NFD/
+ DRMw6S8vTWYFiDyOTU87FVc5f425MuncR28qhLYnrvGEx6XPP3eDQ6NYnC+tyNvoZAJV
+ pQDg==
+X-Gm-Message-State: APjAAAUdsCrE2dvxOVTY6zbRb1JWB8lfkdgJ9y404Ih1KHMpePHdbyWU
+ SmhuHniFeTssko5GaQrqAG35Q/xo
+X-Google-Smtp-Source: APXvYqyfDgicVsOuPxkMeKjpzWR4ecSzCY7LsGkprmQxaJp4aNKPZ0CK2/LpMbP2cqIeZmUruYGvFw==
+X-Received: by 2002:adf:e984:: with SMTP id h4mr2380406wrm.275.1576670606354; 
+ Wed, 18 Dec 2019 04:03:26 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.35
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.25
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:35 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:25 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 41/87] stubs: replace stubs with lnot if applicable
-Date: Wed, 18 Dec 2019 13:02:07 +0100
-Message-Id: <1576670573-48048-42-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 31/87] object: Improve documentation of interfaces
+Date: Wed, 18 Dec 2019 13:01:57 +0100
+Message-Id: <1576670573-48048-32-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,68 +93,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The stubs mechanism relies on static libraries and compilation order,
-which is a bit brittle and should be avoided unless necessary.
-Replace it with Boolean operations on CONFIG_* symbols.
+From: Greg Kurz <groug@kaod.org>
 
+QOM interfaces allow a limited form of multiple inheritance, at the
+condition of being stateless. That is, they cannot be instantiated
+and a pointer to an interface shouldn't be dereferenceable in any way.
+This is achieved by making the QOM instance type an incomplete type,
+which is, as mentioned by Markus Armbruster, the closest you can get
+to abstract class in C.
+
+Incomplete types are widely used to hide implementation details, but
+people usually expect to find at least one place where the type is
+fully defined. The fact that it doesn't happen with QOM interfaces is
+quite disturbing, especially since it isn't documented anywhere as
+recently discussed in this thread:
+
+https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg01579.html
+
+Amend the documentation in the object.h header file to provide more
+details about why and how to implement QOM interfaces using incomplete
+types.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs        | 2 +-
- crypto/Makefile.objs | 3 +--
- util/Makefile.objs   | 3 +--
- 3 files changed, 3 insertions(+), 5 deletions(-)
+ include/qom/object.h | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 6807c8b..02bf5ce 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -1,6 +1,6 @@
- #######################################################################
- # Common libraries for tools and emulators
--stub-obj-y = stubs/ util/ crypto/
-+stub-obj-y = stubs/
- util-obj-y = crypto/ util/ qobject/ qapi/
- 
- chardev-obj-y = chardev/
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 58014d1..c2a371b 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -22,6 +22,7 @@ crypto-obj-y += secret.o
- crypto-obj-y += pbkdf.o
- crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
- crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += pbkdf-gcrypt.o
-+crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += pbkdf-stub.o
- crypto-obj-y += ivgen.o
- crypto-obj-y += ivgen-essiv.o
- crypto-obj-y += ivgen-plain.o
-@@ -32,8 +33,6 @@ crypto-obj-y += block.o
- crypto-obj-y += block-qcow.o
- crypto-obj-y += block-luks.o
- 
--stub-obj-y += pbkdf-stub.o
--
- util-obj-$(CONFIG_GCRYPT) += random-gcrypt.o
- util-obj-$(if $(CONFIG_GCRYPT),n,$(CONFIG_GNUTLS)) += random-gnutls.o
- util-obj-$(if $(CONFIG_GCRYPT),n,$(if $(CONFIG_GNUTLS),n,y)) += random-platform.o
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index df124af..63599d6 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -52,8 +52,7 @@ util-obj-y += stats64.o
- util-obj-y += systemd.o
- util-obj-y += iova-tree.o
- util-obj-$(CONFIG_INOTIFY1) += filemonitor-inotify.o
-+util-obj-$(call lnot,$(CONFIG_INOTIFY1)) += filemonitor-stub.o
- util-obj-$(CONFIG_LINUX) += vfio-helpers.o
- util-obj-$(CONFIG_POSIX) += drm.o
- util-obj-y += guest-random.o
--
--stub-obj-y += filemonitor-stub.o
+diff --git a/include/qom/object.h b/include/qom/object.h
+index f9ad692..bd68d19 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -200,8 +200,14 @@ typedef struct InterfaceInfo InterfaceInfo;
+  *
+  * Interfaces allow a limited form of multiple inheritance.  Instances are
+  * similar to normal types except for the fact that are only defined by
+- * their classes and never carry any state.  You can dynamically cast an object
+- * to one of its #Interface types and vice versa.
++ * their classes and never carry any state.  As a consequence, a pointer to
++ * an interface instance should always be of incomplete type in order to be
++ * sure it cannot be dereferenced.  That is, you should define the
++ * 'typedef struct SomethingIf SomethingIf' so that you can pass around
++ * 'SomethingIf *si' arguments, but not define a 'struct SomethingIf { ... }'.
++ * The only things you can validly do with a 'SomethingIf *' are to pass it as
++ * an argument to a method on its corresponding SomethingIfClass, or to
++ * dynamically cast it to an object that implements the interface.
+  *
+  * # Methods #
+  *
 -- 
 1.8.3.1
 
