@@ -2,80 +2,64 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D625C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1810EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:14:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB6FB2146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D875421582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:14:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GgayuRYb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB6FB2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="P6rDkqBb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D875421582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihb1I-0001KN-3A
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 10:13:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56740)
+	id 1ihb1X-0001am-Sk
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 10:14:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1ihazW-0007fp-0e
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:11:59 -0500
+ (envelope-from <11a52f72d4a301518ad3fa3ec08080cf1d02e3d1@lizzy.crudebyte.com>)
+ id 1ihb0F-0000HS-Hi
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:12:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1ihazU-0005zE-0w
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:11:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59931
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ihazT-0005l5-Cm
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:11:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576681910;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4y3dxCgrBzf0atq0UaYCsV8MnPAsfK4jHvXp2ilPVWc=;
- b=GgayuRYbTP1dnGaBvYN7z6fwknsNS5Cysvpe9TrwXOkHkLIwIb5v1+BG+c2lcbg2Yx2zts
- t/kuQoAzlTTShYoz68UNuThyidUE6Q4A3nsFAsJYkC7oHY+kZw+anWNZ95rXOJ5xALkEaN
- FZoAmU+USKamCvYtk8zQ25rOXKbwI+c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-HmktsWCQOm-sgoWfNocuUA-1; Wed, 18 Dec 2019 10:11:47 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 524D9802B9A;
- Wed, 18 Dec 2019 15:11:46 +0000 (UTC)
-Received: from localhost (ovpn-116-90.gru2.redhat.com [10.97.116.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CF1FC6046B;
- Wed, 18 Dec 2019 15:11:45 +0000 (UTC)
-Date: Wed, 18 Dec 2019 12:11:44 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] i386: pass CLZERO to guests with EPYC CPU model on AMD
- ZEN platform
-Message-ID: <20191218151144.GN498046@habkost.net>
-References: <1576659933-37123-1-git-send-email-ani.sinha@nutanix.com>
- <2883fd0e-191a-c5a4-be1c-04442c8de1c9@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <2883fd0e-191a-c5a4-be1c-04442c8de1c9@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: HmktsWCQOm-sgoWfNocuUA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+ (envelope-from <11a52f72d4a301518ad3fa3ec08080cf1d02e3d1@lizzy.crudebyte.com>)
+ id 1ihb0D-0001Dp-M1
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:12:42 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:42473)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71)
+ (envelope-from <11a52f72d4a301518ad3fa3ec08080cf1d02e3d1@lizzy.crudebyte.com>)
+ id 1ihb0C-0004hl-TR
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:12:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Subject:Date:Cc:To:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=f75LCKXuW/82lh/Zq9Mk5ElCuMF9Qpgl+UzPHjR/EyQ=; b=P6rDk
+ qBb8yW5GUiapZCxfjcgiI1kJIN880N8SYp4GX9LSjmYhgZQZEPGxSEwTLeMUxGk1qBTYSDR9oGmeO
+ mt5v0WqBxSHY6zdQp0e2T7559x4l06flD0pKaJieA8NdjZ8pVFGqNLPNkR4M4iEj1OIznD55gaExh
+ v75ZMEbRGLUGej7qtihQXQ8kABAe+xCGwycnefHeJMhjQ4bA4oiTS40QF/HyhKeLXDko46Sk3VNUR
+ 09H02VAlZYC3oGr776tPUvPISEldZ9P6fuygYEgdttipRz8pd8bWTkvAsUs3VxUSKh7AjJGAEA343
+ 7o7dRmIBwI4lWhPxruYmwBF2I5egA==;
+Message-Id: <11a52f72d4a301518ad3fa3ec08080cf1d02e3d1.1576678644.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1576678644.git.qemu_oss@crudebyte.com>
+References: <cover.1576678644.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Date: Wed, 18 Dec 2019 14:06:30 +0100
+Subject: [PATCH v2 1/9] tests/virtio-9p: add terminating null in
+ v9fs_string_read()
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.194.90.13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,59 +71,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani.sinha@nutanix.com>, qemu-devel@nongnu.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 18, 2019 at 12:53:45PM +0100, Paolo Bonzini wrote:
-> On 18/12/19 10:05, Ani Sinha wrote:
-> > CLZERO CPUID should be passed on to the guests that use EPYC or EPYC-IB=
-PB CPU
-> > model when the AMD ZEN based host supports it. This change makes it rec=
-ognize
-> > this CPUID for guests which use EPYC or EPYC-IBPB CPU model.
+The 9p protocol sends strings in general without null termination
+over the wire. However for future use of this functions it is
+beneficial for the delivered string to be null terminated though
+for being able to use the string with standard C functions which
+often rely on strings being null terminated.
 
-Can you clarify what's the intended use case here?  Why the
-"if host supports it" conditional?
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+---
+ tests/virtio-9p-test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-If you need host-dependent CPU configuration, "-cpu host" (or the
-libvirt "host-model" mode) is the most appropriate solution.
-
-> >=20
-> > Signed-off-by: Ani Sinha <ani.sinha@nutanix.com>
-> > ---
-> >  target/i386/cpu.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >=20
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 69f518a..55f0691 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -3813,6 +3813,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM=
- |
-> >              CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-> >              CPUID_EXT3_TOPOEXT,
-> > +        .features[FEAT_8000_0008_EBX] =3D
-> > +            CPUID_8000_0008_EBX_CLZERO,
-> >          .features[FEAT_7_0_EBX] =3D
-> >              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EB=
-X_AVX2 |
-> >              CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RD=
-SEED |
-> >=20
->=20
-> This needs to be done only for newer machine type (or is it CPU model
-> versions now? need Eduardo to respond).
-
-If we want to add it, it has to be done as a new CPU model version.
-
-But I don't know yet if we want to add it.  Do all EPYC CPUs have
-CLZERO available?  If not, it's probably not advisable to add it
-to EPYC (even if it's just on EPYC-v3).
-
---=20
-Eduardo
+diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+index e7b58e3a0c..06263edb53 100644
+--- a/tests/virtio-9p-test.c
++++ b/tests/virtio-9p-test.c
+@@ -130,8 +130,9 @@ static void v9fs_string_read(P9Req *req, uint16_t *len, char **string)
+         *len = local_len;
+     }
+     if (string) {
+-        *string = g_malloc(local_len);
++        *string = g_malloc(local_len + 1);
+         v9fs_memread(req, *string, local_len);
++        (*string)[local_len] = 0;
+     } else {
+         v9fs_memskip(req, local_len);
+     }
+-- 
+2.20.1
 
 
