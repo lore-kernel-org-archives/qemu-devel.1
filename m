@@ -7,78 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08C7C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E01E0C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:15:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B10B2072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE4AB2072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:15:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YswgD7vS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B10B2072B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eCRZDY7v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE4AB2072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYEM-0005ez-U0
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:15:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46217)
+	id 1ihYEh-00065S-1g
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:15:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2q-00067C-In
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:14 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2z-0006F3-Tg
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2o-0008QO-V5
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:12 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:33689)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2x-0000Ot-WB
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:21 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50297)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY2o-0008NP-Gk
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:10 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id d139so4490111wmd.0
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:10 -0800 (PST)
+ id 1ihY2x-0000LV-Lu
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:19 -0500
+Received: by mail-wm1-x334.google.com with SMTP id a5so1561974wmb.0
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=u7/VzsObPJenJKrRI20Is7W11ftIW2OHO+f1XruWVNs=;
- b=YswgD7vSTwH9TOZkhS7aoliHMjEXmHuoodyIrKzCo2Q/zbbVM/Pk+OKVsSfuvEaHs7
- mAaI1Hvsm4M7UwDMQDDVCeAVfzXm/nw/iH6ybr6AJ1aVPihUBnZDROeX3wWvK8umOwip
- 8tvjJLQTYcarKrn73tgBpgL6mQZTwRyujvsxcVYkP7Co61Cyj4DYDKKTFLsJsKaJN0/b
- f1XaZzOAsDUCfajW7Wubdcl91CT/mISB2+iVQ7s8LasauqOrL1xrTCr/0rCqhlb3xy5l
- WqAr3wyekWTtWxsmCCT5aWq69MpmK6ZQAkJPFTHxFZRoZxvSjsGZl5UZmLkQ3n8DFj7+
- NL9g==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=68N7S2GMWXB6Wxfq+Q7vQW0ttC/7iAxjGXgUq3dx0c4=;
+ b=eCRZDY7v49kCODUceKl1GPUf1+RP/6J6WZUaJEEklcJn2DbVAbNCaZXxptQVY/7Irb
+ +jvtGwbV3MJmCWJ4oOV/krEmr+zcuCH9fhn/XulNT9TiMGnTDrZ+Xa8dEV58AHsUfR/T
+ ErQ867xmBJf0h2yNWXoqVJ+tpTSgW0SRGnld+u13qZoWFlCTLEd1HtWBcqZbG26yAlYp
+ bXDOGPNQ0VCLlwYNi2XM+3utmaCX/ubOfH4L2pcpAOryHVwxvJamMY6fH1oJQMgJJrdo
+ fVlWc7iwV61GKTSZVG40IrWAG9hpO5LVszVsDBO+I9k/iQQtNgEz75+4E3WYYMnwaUIz
+ 576A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=u7/VzsObPJenJKrRI20Is7W11ftIW2OHO+f1XruWVNs=;
- b=DaHr8/HjLxv0S78VxPcRiImAf5IUAEAYbWlXi3skLV6D6vLcpq2g/ltOylTIfU84u0
- xoySsMFBDD4uR5FqXDjYs6+5aXlRwSgJ+drLh9JausNn6/YJTVY46nEKyqz22WyHdOMK
- tEr/MwkYwL2vsJcRrsMY0HjmnZsgT4SOipxl2w9s3TgStfDWcLCICy3M0kHkkI1Hseq2
- E64kUcb0euqnmZeDL4uY2OZ7cJBToCWm9N25ja5Qj9sz99ub8fG6vK1NNELQeOJHbii3
- xQ7bMxgRnfizKC9xnD8V6m754uu6KB79SlKlga0mQdkKuEbP1tR9j6tunC1nBrcv6Cxy
- L6+Q==
-X-Gm-Message-State: APjAAAW4oKgASiLmjqnwoZP0gwxWMMIPZbg9gZMuC7g69oFtihjRikQl
- 0/rbpUuli7arLSwQ88am4ZC+SEMI
-X-Google-Smtp-Source: APXvYqxSntZ0XUDATuCAtKRph+gouhEvzPC/LquMsFpEgEMX9/EIozE51ooLpZVPecwVHqa3VZFxBw==
-X-Received: by 2002:a7b:c936:: with SMTP id h22mr2722213wml.115.1576670589310; 
- Wed, 18 Dec 2019 04:03:09 -0800 (PST)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=68N7S2GMWXB6Wxfq+Q7vQW0ttC/7iAxjGXgUq3dx0c4=;
+ b=tsdv7BzmBUOsXiyQ9Aa/vC05h/DtD4SxXquELx6QQR2cDdLlbrAS+CYV1bddzcd25f
+ Q1yiSqbYO7145XMJQkh6qc/sDa+wAkx1K+ve/AFH3GK/fFcuKv22nU5DiwWpapJXHWJv
+ cLQlM3aGWVheBGJn4pCsGH0Qk+EW8emBnnN48e3NJ09LkMjU9Cwn6OwXJUXceA/VjBXO
+ jqDjqIDBNUNUsZURVYjegLjm2kIjarrp2BVStvqAZnvVmKMM+cgppRwJlVC6SPTBQdws
+ L8T4665vj7hn8+mAvXE+ZoHB+0n2q3p8xiDRIUqGOf8EcuVzPXE5NAGVztveuQ6s0IQ0
+ nVfQ==
+X-Gm-Message-State: APjAAAWk7sURdp/pL6XhVNkRQtzEsYDrsGGQMDTdMERYaphR4W1S4JOi
+ 7Fj31/JvIz4sbrl30rmvLEXOwhgw
+X-Google-Smtp-Source: APXvYqyDnMvO7HM8FOEYLEr8FM/K6w2OOgaCFbU4gpF+fu6RoIf3cFEZl+oq4bIL7bn/JF8qn6eOwg==
+X-Received: by 2002:a7b:c936:: with SMTP id h22mr2723031wml.115.1576670598269; 
+ Wed, 18 Dec 2019 04:03:18 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.08
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.17
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:08 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:17 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/87] tcg: move qemu_tcg_configure to accel/tcg/tcg-all.c
-Date: Wed, 18 Dec 2019 13:01:40 +0100
-Message-Id: <1576670573-48048-15-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 23/87] accel: pass object to accel_init_machine
+Date: Wed, 18 Dec 2019 13:01:49 +0100
+Message-Id: <1576670573-48048-24-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,217 +98,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move everything related to mttcg_enabled in accel/tcg/tcg-all.c,
-which will make even more sense when "thread" becomes a QOM property.
+We will have to set QOM properties before accel_init_machine, based on the
+options provided to -accel.  Construct the object outside it so that it
+will be possible to iterate on properties between object_new_with_class
+and accel_init_machine.
 
-For now, initializing mttcg_enabled in the instance_init function
-prepares for the next patch, which will only invoke qemu_tcg_configure
-when the command line includes a -accel option.
-
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/tcg/tcg-all.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- cpus.c              | 72 ----------------------------------------------
- 2 files changed, 83 insertions(+), 72 deletions(-)
+ accel/accel.c          | 4 ++--
+ include/sysemu/accel.h | 2 +-
+ vl.c                   | 4 +++-
+ 3 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index c59d5b0..6b000f0 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -30,6 +30,11 @@
- #include "cpu.h"
- #include "sysemu/cpus.h"
- #include "qemu/main-loop.h"
-+#include "tcg/tcg.h"
-+#include "include/qapi/error.h"
-+#include "include/qemu/error-report.h"
-+#include "include/hw/boards.h"
-+#include "qemu/option.h"
+diff --git a/accel/accel.c b/accel/accel.c
+index dd38a46..1c5c3a6 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -46,9 +46,9 @@ AccelClass *accel_find(const char *opt_name)
+     return ac;
+ }
  
- unsigned long tcg_tb_size;
+-int accel_init_machine(AccelClass *acc, MachineState *ms)
++int accel_init_machine(AccelState *accel, MachineState *ms)
+ {
+-    AccelState *accel = ACCEL(object_new_with_class(OBJECT_CLASS(acc)));
++    AccelClass *acc = ACCEL_GET_CLASS(accel);
+     int ret;
+     ms->accelerator = accel;
+     *(acc->allowed) = true;
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 90b6213..22cac0f 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -67,7 +67,7 @@ typedef struct AccelClass {
+ extern unsigned long tcg_tb_size;
  
-@@ -58,6 +63,53 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+ AccelClass *accel_find(const char *opt_name);
+-int accel_init_machine(AccelClass *acc, MachineState *ms);
++int accel_init_machine(AccelState *accel, MachineState *ms);
+ 
+ /* Called just before os_setup_post (ie just before drop OS privs) */
+ void accel_setup_post(MachineState *ms);
+diff --git a/vl.c b/vl.c
+index 65e6b75..b2f00cc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2716,6 +2716,7 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+     bool *p_init_failed = opaque;
+     const char *acc = qemu_opt_get(opts, "accel");
+     AccelClass *ac = accel_find(acc);
++    AccelState *accel;
+     int ret;
+ 
+     if (!ac) {
+@@ -2723,7 +2724,8 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+         error_report("invalid accelerator %s", acc);
+         return 0;
      }
- }
- 
-+/*
-+ * We default to false if we know other options have been enabled
-+ * which are currently incompatible with MTTCG. Otherwise when each
-+ * guest (target) has been updated to support:
-+ *   - atomic instructions
-+ *   - memory ordering primitives (barriers)
-+ * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-+ *
-+ * Once a guest architecture has been converted to the new primitives
-+ * there are two remaining limitations to check.
-+ *
-+ * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-+ * - The host must have a stronger memory order than the guest
-+ *
-+ * It may be possible in future to support strong guests on weak hosts
-+ * but that will require tagging all load/stores in a guest with their
-+ * implicit memory order requirements which would likely slow things
-+ * down a lot.
-+ */
-+
-+static bool check_tcg_memory_orders_compatible(void)
-+{
-+#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
-+    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
-+#else
-+    return false;
-+#endif
-+}
-+
-+static bool default_mttcg_enabled(void)
-+{
-+    if (use_icount || TCG_OVERSIZED_GUEST) {
-+        return false;
-+    } else {
-+#ifdef TARGET_SUPPORTS_MTTCG
-+        return check_tcg_memory_orders_compatible();
-+#else
-+        return false;
-+#endif
-+    }
-+}
-+
-+static void tcg_accel_instance_init(Object *obj)
-+{
-+    mttcg_enabled = default_mttcg_enabled();
-+}
-+
- static int tcg_init(MachineState *ms)
- {
-     tcg_exec_init(tcg_tb_size * 1024 * 1024);
-@@ -65,6 +117,36 @@ static int tcg_init(MachineState *ms)
-     return 0;
- }
- 
-+void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-+{
-+    const char *t = qemu_opt_get(opts, "thread");
-+    if (!t) {
-+        return;
-+    }
-+    if (strcmp(t, "multi") == 0) {
-+        if (TCG_OVERSIZED_GUEST) {
-+            error_setg(errp, "No MTTCG when guest word size > hosts");
-+        } else if (use_icount) {
-+            error_setg(errp, "No MTTCG when icount is enabled");
-+        } else {
-+#ifndef TARGET_SUPPORTS_MTTCG
-+            warn_report("Guest not yet converted to MTTCG - "
-+                        "you may get unexpected results");
-+#endif
-+            if (!check_tcg_memory_orders_compatible()) {
-+                warn_report("Guest expects a stronger memory ordering "
-+                            "than the host provides");
-+                error_printf("This may cause strange/hard to debug errors\n");
-+            }
-+            mttcg_enabled = true;
-+        }
-+    } else if (strcmp(t, "single") == 0) {
-+        mttcg_enabled = false;
-+    } else {
-+        error_setg(errp, "Invalid 'thread' setting %s", t);
-+    }
-+}
-+
- static void tcg_accel_class_init(ObjectClass *oc, void *data)
- {
-     AccelClass *ac = ACCEL_CLASS(oc);
-@@ -78,6 +160,7 @@ static void tcg_accel_class_init(ObjectClass *oc, void *data)
- static const TypeInfo tcg_accel_type = {
-     .name = TYPE_TCG_ACCEL,
-     .parent = TYPE_ACCEL,
-+    .instance_init = tcg_accel_instance_init,
-     .class_init = tcg_accel_class_init,
- };
- 
-diff --git a/cpus.c b/cpus.c
-index 63bda15..b472378 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -166,78 +166,6 @@ typedef struct TimersState {
- static TimersState timers_state;
- bool mttcg_enabled;
- 
--/*
-- * We default to false if we know other options have been enabled
-- * which are currently incompatible with MTTCG. Otherwise when each
-- * guest (target) has been updated to support:
-- *   - atomic instructions
-- *   - memory ordering primitives (barriers)
-- * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-- *
-- * Once a guest architecture has been converted to the new primitives
-- * there are two remaining limitations to check.
-- *
-- * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-- * - The host must have a stronger memory order than the guest
-- *
-- * It may be possible in future to support strong guests on weak hosts
-- * but that will require tagging all load/stores in a guest with their
-- * implicit memory order requirements which would likely slow things
-- * down a lot.
-- */
--
--static bool check_tcg_memory_orders_compatible(void)
--{
--#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
--    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
--#else
--    return false;
--#endif
--}
--
--static bool default_mttcg_enabled(void)
--{
--    if (use_icount || TCG_OVERSIZED_GUEST) {
--        return false;
--    } else {
--#ifdef TARGET_SUPPORTS_MTTCG
--        return check_tcg_memory_orders_compatible();
--#else
--        return false;
--#endif
--    }
--}
--
--void qemu_tcg_configure(QemuOpts *opts, Error **errp)
--{
--    const char *t = qemu_opt_get(opts, "thread");
--    if (t) {
--        if (strcmp(t, "multi") == 0) {
--            if (TCG_OVERSIZED_GUEST) {
--                error_setg(errp, "No MTTCG when guest word size > hosts");
--            } else if (use_icount) {
--                error_setg(errp, "No MTTCG when icount is enabled");
--            } else {
--#ifndef TARGET_SUPPORTS_MTTCG
--                warn_report("Guest not yet converted to MTTCG - "
--                            "you may get unexpected results");
--#endif
--                if (!check_tcg_memory_orders_compatible()) {
--                    warn_report("Guest expects a stronger memory ordering "
--                                "than the host provides");
--                    error_printf("This may cause strange/hard to debug errors\n");
--                }
--                mttcg_enabled = true;
--            }
--        } else if (strcmp(t, "single") == 0) {
--            mttcg_enabled = false;
--        } else {
--            error_setg(errp, "Invalid 'thread' setting %s", t);
--        }
--    } else {
--        mttcg_enabled = default_mttcg_enabled();
--    }
--}
- 
- /* The current number of executed instructions is based on what we
-  * originally budgeted minus the current state of the decrementing
+-    ret = accel_init_machine(ac, current_machine);
++    accel = ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
++    ret = accel_init_machine(accel, current_machine);
+     if (ret < 0) {
+         *p_init_failed = true;
+         error_report("failed to initialize %s: %s",
 -- 
 1.8.3.1
 
