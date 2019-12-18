@@ -2,85 +2,74 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB575C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 01:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F22FCC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 01:56:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DAA1206EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 01:47:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DAA1206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE7252176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 01:56:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQDsXjts"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7252176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihORA-0002jA-LS
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 20:47:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41029)
+	id 1ihOa9-0005Uo-SW
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 20:56:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farosas@linux.ibm.com>) id 1ihOQ9-0002F1-BV
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:46:38 -0500
+ (envelope-from <quintela@redhat.com>) id 1ihOYk-0004Gg-Pg
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:55:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1ihOQ8-0006kR-BC
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:46:37 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3204)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1ihOQ6-0006i6-0o; Tue, 17 Dec 2019 20:46:34 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBI1gQpA126838; Tue, 17 Dec 2019 20:46:24 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wy3355bh9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 17 Dec 2019 20:46:23 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBI1hhQY016191;
- Wed, 18 Dec 2019 01:46:23 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma04dal.us.ibm.com with ESMTP id 2wvqc6sst1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 18 Dec 2019 01:46:23 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBI1kMhK51708376
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 18 Dec 2019 01:46:22 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3F58F112062;
- Wed, 18 Dec 2019 01:46:22 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CE06E112061;
- Wed, 18 Dec 2019 01:46:20 +0000 (GMT)
-Received: from farosas.linux.ibm.com.ibmuc.com (unknown [9.85.130.202])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed, 18 Dec 2019 01:46:20 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
+ (envelope-from <quintela@redhat.com>) id 1ihOYh-0004HQ-EF
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:55:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39706
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ihOYg-0004Ea-SV
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:55:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576634125;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=KOTR2InTacFoLiulMlepJs86JjtHjVFCFg2+mF4MnZ4=;
+ b=DQDsXjtsSPoU3k9lKTrSFiTlNeliAV3plz6G5XxjvXr1GBHNhIP1/d52B4bKLFZULTAUYR
+ GkVjGCHWPEqWWF7DcmiLm6h3pW6Sjf993qri/izPX+zLU/zH69YWJ4DLBsBBN8RcsCgFf9
+ K9sSI2T+E2BGmaPjYzlEY6Y1a2eULT0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-281-rhrJBEqnMJOg38ynpsbbbw-1; Tue, 17 Dec 2019 20:55:24 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F5B8800D48
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 01:55:23 +0000 (UTC)
+Received: from secure.mitica (ovpn-116-32.ams2.redhat.com [10.36.116.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E7FCA51;
+ Wed, 18 Dec 2019 01:55:21 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] target/ppc: Remove unused PPC_INPUT_INT defines
-Date: Tue, 17 Dec 2019 22:46:16 -0300
-Message-Id: <20191218014616.686124-1-farosas@linux.ibm.com>
-X-Mailer: git-send-email 2.23.0
+Subject: [PATCH v2 00/10] Migration Arguments cleanup
+Date: Wed, 18 Dec 2019 02:55:10 +0100
+Message-Id: <20191218015520.2881-1-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-17_05:2019-12-17,2019-12-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- suspectscore=1 clxscore=1015 impostorscore=0 phishscore=0 mlxscore=0
- priorityscore=1501 mlxlogscore=834 bulkscore=0 adultscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912180012
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: rhrJBEqnMJOg38ynpsbbbw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,38 +81,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-They were added in "16415335be Use correct input constant" with a
-single use in kvm_arch_pre_run but that function's implementation was
-removed by "1e8f51e856 ppc: remove idle_timer logic".
+[v2]
+- fix use-after-free (thanks peter)
 
-Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
----
- target/ppc/kvm.c | 6 ------
- 1 file changed, 6 deletions(-)
+[v1]
+This series simplify test_migrate_start() in two ways:
+- simplify the command line creation, so everything that is common between
+  architectures don't have to be repeated (DRY).
+  Note that this bit remove lines of code.
+- test_migrate_start() has two bools and two strings as arguments, it is ve=
+ry
+  difficult to remmeber which is which and meaning.  And it is even worse t=
+o
+  add new parameters.  Just pass them through one struct.
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 7406d18945..b19555e97e 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1325,12 +1325,6 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
-     return 0;
- }
- 
--#if defined(TARGET_PPC64)
--#define PPC_INPUT_INT PPC970_INPUT_INT
--#else
--#define PPC_INPUT_INT PPC6xx_INPUT_INT
--#endif
--
- void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- {
-     return;
--- 
+Please, review.
+
+Juan Quintela (10):
+  migration-test: Create cmd_soure and cmd_target
+  migration-test: Move hide_stderr to common commandline
+  migration-test: Move -machine to common commandline
+  migration-test: Move memory size to common commandline
+  migration-test: Move shmem handling to common commandline
+  migration-test: Move -name handling to common commandline
+  migration-test: Move -serial handling to common commandline
+  migration-test: Move -incomming handling to common commandline
+  migration-test: Rename cmd_src/dst to arch_source/arch_target
+  migration-test: Use a struct for test_migrate_start parameters
+
+ tests/migration-test.c | 269 +++++++++++++++++++++++------------------
+ 1 file changed, 149 insertions(+), 120 deletions(-)
+
+--=20
 2.23.0
 
 
