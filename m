@@ -2,75 +2,85 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E57FC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95FDC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:40:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D64021582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:36:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D64021582
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AD09F2176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:40:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e/PHyS+W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD09F2176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihgzp-0007px-1w
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 16:36:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49273)
+	id 1ihh37-0001xq-On
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 16:40:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ihgyj-0006u6-5R
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:35:34 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1ihh2J-00013c-8X
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ihgyh-0002F6-Ru
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:35:33 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56420)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ihgyh-0002DC-J3
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:35:31 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ihgyg-00048w-7C
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 21:35:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2A46D2E8079
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 21:35:30 +0000 (UTC)
+ (envelope-from <alex.williamson@redhat.com>) id 1ihh2F-0006jw-Tk
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:39:12 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46325
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1ihh2F-0006iG-Is
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:39:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576705150;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=u9TtCci2FuLajUtFOw5B/HodtCZRSzWxgnpe0HYK4bg=;
+ b=e/PHyS+WzhcioDHG9fRTHI83wk3APbJCx+9CCS8qu8du02DJwvLP3D9rCEsvsBFrmXZ3ie
+ 5FQ0lMlfvJiayczd6EVY1XceHcKAxru0qqGHeeS4HxDiZaFdRshbIobdZ1G91NThJKBjJz
+ 9g616ZkG29WSP1yAiZZ40+Ze2nJnNoA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-326-TtPgruxiOy2jW2yv518w1w-1; Wed, 18 Dec 2019 16:39:07 -0500
+X-MC-Unique: TtPgruxiOy2jW2yv518w1w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08FF7801E6D;
+ Wed, 18 Dec 2019 21:39:05 +0000 (UTC)
+Received: from x1.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36C0426DEC;
+ Wed, 18 Dec 2019 21:39:03 +0000 (UTC)
+Date: Wed, 18 Dec 2019 14:39:02 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20191218143902.3c9b06df@x1.home>
+In-Reply-To: <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ <20191217051513.GE21868@joy-OptiPlex-7040>
+ <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Dec 2019 21:28:44 -0000
-From: ecsdn <1856834@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ecsdn
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <157670452478.5510.9482875911654695038.launchpad@gac.canonical.com>
-Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 902e75f3169609f51fd1b8891643bea8303fb503
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,70 +89,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: ppc
+On Tue, 17 Dec 2019 14:54:14 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
--- =
+> On 12/17/2019 10:45 AM, Yan Zhao wrote:
+> > On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:  
+> >> +		} else if (range.flags &
+> >> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> >> +			uint64_t iommu_pgmask;
+> >> +			unsigned long pgshift = __ffs(range.pgsize);
+> >> +			unsigned long *bitmap;
+> >> +			long bsize;
+> >> +
+> >> +			iommu_pgmask =
+> >> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> >> +
+> >> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> >> +			    (range.pgsize - 1))
+> >> +				return -EINVAL;
+> >> +
+> >> +			if (range.iova & iommu_pgmask)
+> >> +				return -EINVAL;
+> >> +			if (!range.size || range.size > SIZE_MAX)
+> >> +				return -EINVAL;
+> >> +			if (range.iova + range.size < range.iova)
+> >> +				return -EINVAL;
+> >> +
+> >> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> >> +						   range.bitmap_size);
+> >> +			if (bsize)
+> >> +				return ret;
+> >> +
+> >> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> >> +			if (!bitmap)
+> >> +				return -ENOMEM;
+> >> +
+> >> +			ret = copy_from_user(bitmap,
+> >> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> >> +			if (ret)
+> >> +				goto bitmap_exit;
+> >> +
+> >> +			iommu->dirty_page_tracking = false;  
+> > why iommu->dirty_page_tracking is false here?
+> > suppose this ioctl can be called several times.
+> >   
+> 
+> This ioctl can be called several times, but once this ioctl is called 
+> that means vCPUs are stopped and VFIO devices are stopped (i.e. in 
+> stop-and-copy phase) and dirty pages bitmap are being queried by user.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
+Do not assume how userspace works or its intent.  If dirty tracking is
+on, it should remain on until the user turns it off.  We cannot assume
+userspace uses a one-shot approach.  Thanks,
 
-Title:
-  Virtio broken in qemu ppc in 4.2.0 and other versions
+Alex
 
-Status in QEMU:
-  New
-
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
-
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
-
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
-
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
