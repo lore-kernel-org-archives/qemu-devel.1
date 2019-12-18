@@ -2,80 +2,93 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB35FC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3317C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A34862176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 795CE2176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 21:27:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB+vxT/N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A34862176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BW/S8bUt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795CE2176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihgom-0008Dw-RI
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 16:25:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53796)
+	id 1ihgqy-0001fJ-JX
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 16:27:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ihgnJ-0007D9-Fo
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:23:46 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ihgnV-0007NV-JI
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:23:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ihgnI-000465-2s
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:23:45 -0500
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:36233)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ihgnH-00043R-Sm; Wed, 18 Dec 2019 16:23:44 -0500
-Received: by mail-io1-xd43.google.com with SMTP id r13so3542887ioa.3;
- Wed, 18 Dec 2019 13:23:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WtKoWcYA4eLIkTD5hhsie5xpQCIYiUwxTm3208IaOxQ=;
- b=VB+vxT/N6AhQaOfbqc9J8H2pfyaQ1f2YM0CnHaQOsHkvoQf423NiJKfcQ4LlY8QivG
- dTOxiOVp6h6uF7vKsetAHW1zdH2kUY19wofGZOkZvS4DbLi5TfJPMSsAhuJcLBg68MMr
- b6d1s4d3cgaajIu4pHKDh7w+sn7/X3tn/1+W7aPwUN0wJqdD0vuu0Xt6lpH43RFgZI+6
- +JCBiyjCniMu5AlMV8W3eSuOSm7JPKq4lNGUTQJX7xkFNobUB+hDBl6plMB3bsZShVes
- Ntg3G2YETn2Ep7n0XP2QOMAWljtgAh1gixenT8PfYDWbWyJTiC5yl8VWt6fqe2KJDRdt
- qI9g==
+ (envelope-from <pbonzini@redhat.com>) id 1ihgnR-0004Ml-N5
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:23:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43820)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihgnR-0004K3-8V
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:23:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576704232;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=LVZFMcIEjQKaW0eDLoog1RTkQaYm2YhANjpvmc6A8+A=;
+ b=BW/S8bUtS2IeG9oYpTCOrxwtVmKAmO/XawUkI1KwhZU0VAa7jCRrQhsUEXTHQaVEV24+VV
+ PTVh4z0PQ0pfi7/gSxSXdSWT2oG0WnpH/ay0klhY12tszttlk0pTNNUd/UHAjPFuouMncJ
+ PBFtKEjnYw90eGHs8bEArdImoxr77E0=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-rCNYesjcNC6s6Z06Y7vnWg-1; Wed, 18 Dec 2019 16:23:48 -0500
+Received: by mail-ed1-f71.google.com with SMTP id cy24so2132567edb.12
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 13:23:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=WtKoWcYA4eLIkTD5hhsie5xpQCIYiUwxTm3208IaOxQ=;
- b=BEDoeq/+Q/nhjJIrm/FNCVsmEzIE8mV5n5W40I/5eNZ/4Y/Jo/F/0gqAgGfTP65EfZ
- 3n1kSdJ2Z5eJ0oV5VDlC4uXXYXeZm2V4VVd+6ZcDZezJqPxF3bN0w8YONyO0rBGXJHL+
- yj+BH+p1rCBlj7hx3rNgeeXXtc1JfhF9eK+oin0X0JaaZkJCm76x1ZxMLHHtqu17AvW2
- yu5UkbRy8FkXLjS7tlKcAl0gAhvQdTpLoALuRtPc6Ke+w30IRuQtyPsCwKV2QTgnoVK8
- QMXjy4/xezH/C/ITde9MDHBFXEYidWGZWT4ViJaawA05l2nyuUKApUIAbSvpH4GbJB1w
- pPwg==
-X-Gm-Message-State: APjAAAUydaQHHbh0FZ5UUOj0pL3gz0bSAGztZ8EUbohaUUMfEg73yEon
- a66H/stgkVaVgMuPkAd0IukYiOHCqHpXG5zdsD0=
-X-Google-Smtp-Source: APXvYqwnw6dhg98pv1fDSDdgEea4/1/0StD071ln9a2/MIcBmJCoxMIqn40ZP8h/TBgc+4ljrPrz4fd7bxeYNDpp9T8=
-X-Received: by 2002:a02:7fd0:: with SMTP id r199mr4373763jac.126.1576704223115; 
- Wed, 18 Dec 2019 13:23:43 -0800 (PST)
+ bh=LVZFMcIEjQKaW0eDLoog1RTkQaYm2YhANjpvmc6A8+A=;
+ b=aQ9TtfA1ICSWd9GZEcE7QtegvhvCmJeUevUj2JOPPe+OIeO/v2SFAy647EMC8TI1Lx
+ cPP8d6LTmyQn4dIcmIvpnx6F9QN4q4RGgHU0kMmTrRIQ5csGCoMcZbbEUmyYSwcEkn84
+ UQ76G82sPBoC5Zf+r1nR1NI50nzSUUSG20eS80pJ2DQGG/IIBcisoUMig4NWB0hEbuv3
+ 8O57VcGNJmgcEs5hoiIi52CUKoI4DK9warY5Bi0dDqsK2aElJQJPfCzL2EQtqFA7h1MR
+ NzPKe0bmoJ/nlk1Pp60qfGlipFlfzk/EVOf7ds0n8S227bTQ0mXYaU4VNvM6UOlsPlG6
+ YuOQ==
+X-Gm-Message-State: APjAAAVcXlrFJQdv3i+TRnEEP8a1t1Q7UwvLdCpVsMLipuWbEzbOEU6E
+ TJJYdlDiqOlPLXZK5AUy/6vhO5ZYfyeMXLBUl2HbSSpnh3i3F4WxB08D1T+dYQiWOq7qCEwrIPF
+ GCTk8xoVF76yFZQI8IiU1mqRHZP6n/e4=
+X-Received: by 2002:a17:906:7fd0:: with SMTP id
+ r16mr5049042ejs.319.1576704227181; 
+ Wed, 18 Dec 2019 13:23:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzrpAUekW53Fe3LOd+MfvP3xxphyDzaoy2yWMGzjbIa5G9Yt1M77gkZOd2UtKL7DVOtlt4CV80HDR+Hak3oO8A=
+X-Received: by 2002:a17:906:7fd0:: with SMTP id
+ r16mr5049023ejs.319.1576704226919; 
+ Wed, 18 Dec 2019 13:23:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20191217182730.943-1-f4bug@amsat.org>
- <20191217182730.943-5-f4bug@amsat.org>
-In-Reply-To: <20191217182730.943-5-f4bug@amsat.org>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Wed, 18 Dec 2019 22:23:32 +0100
-Message-ID: <CAPan3WoW60CgKWhXD8RD0xAjH+g+vRa8aKY7dx4fxC=XPxZ7WQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/5] !fixup "hw: arm: add Xunlong Orange Pi PC machine"
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="0000000000002281e1059a010fc4"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
+References: <77dd4863-6301-b17d-529c-451d491d4794@redhat.com>
+ <20191217121443.14757-1-alex.bennee@linaro.org>
+ <1ca001f0-43a5-d8fc-fee0-3a318cc698e5@redhat.com>
+ <87bls7vzjc.fsf@linaro.org> <976227bb-916a-2c50-1f8d-e146a199de15@redhat.com>
+ <875zifvxw0.fsf@linaro.org> <5c6068cb-f8bf-fe4b-391b-7ced97f14221@redhat.com>
+ <877e2tfsd1.fsf@linaro.org>
+In-Reply-To: <877e2tfsd1.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 18 Dec 2019 22:23:34 +0100
+Message-ID: <CABgObfbUE8TjnA+Jz6nqPim3uQmepSrFiM-U3ZJ4iKJeByfxTg@mail.gmail.com>
+Subject: Re: [RFC PATCH] semihosting: suspend recieving CPU when blocked
+ (HACK, WIP)
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+X-MC-Unique: rCNYesjcNC6s6Z06Y7vnWg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/alternative; boundary="0000000000005cb131059a010f32"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,152 +100,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Guenter Roeck <linux@roeck-us.net>,
- Cleber Rosa <crosa@redhat.com>
+Cc: "Packard, Keith" <keithp@keithp.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002281e1059a010fc4
+--0000000000005cb131059a010f32
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Philippe,
+Il mer 18 dic 2019, 18:36 Alex Benn=C3=A9e <alex.bennee@linaro.org> ha scri=
+tto:
 
-Noted. I'll make sure mc->default_ram_size =3D 1 * GiB is added for the nex=
-t
-reworked patch set v3.
-
-Regards,
-Niek
-
-On Tue, Dec 17, 2019 at 7:27 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
-
-> Without this, the machine starts with default 128MB, and Ubuntu Bionic
-> fails:
 >
-> [ ***  ] (2 of 4) A start job is running for=E2=80=A6Persistent Storage (=
-37s /
-> 2min 1s)
-> [  *** ] (2 of 4) A start job is running for=E2=80=A6Persistent Storage (=
-38s /
-> 2min 1s)
-> [  OK  ] Started Flush Journal to Persistent Storage.
-> Starting Create Volatile Files and Directories...
-> Starting Armbian ZRAM config...
-> [    **] (3 of 6) A start job is running for=E2=80=A6s and Directories (5=
-5s / no
-> limit)
-> [     *] (3 of 6) A start job is running for=E2=80=A6s and Directories (5=
-5s / no
-> limit)
-> [    **] (3 of 6) A start job is running for=E2=80=A6s and Directories (5=
-6s / no
-> limit)
-> [  OK  ] Started Create Volatile Files and Directories.
-> [***   ] (5 of 6) A start job is running for=E2=80=A6 ZRAM config (1min 1=
-0s / 1min
-> 19s)
-> [**    ] (5 of 6) A start job is running for=E2=80=A6 ZRAM config (1min 1=
-2s / 1min
-> 19s)
-> [*     ] (5 of 6) A start job is running for=E2=80=A6 ZRAM config (1min 1=
-3s / 1min
-> 19s)
-> [FAILED] Failed to start Armbian ZRAM config.
-> See 'systemctl status armbian-zram-config.service' for details.
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/arm/orangepi.c | 1 +
->  1 file changed, 1 insertion(+)
+> > On 17/12/19 15:18, Alex Benn=C3=A9e wrote:
+> >> cpu_has_work is a guest function though and semihosting_console is a
+> >> common hw module. It can't peek into the guests internal state.
+> >
+> > semihosting_console only needs to something like
+> > cpu_interrupt(cpu->stopped_cpu, CPU_INTERRUPT_SEMIHOST).
 >
-> diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c
-> index 119f370924..da758d7eba 100644
-> --- a/hw/arm/orangepi.c
-> +++ b/hw/arm/orangepi.c
-> @@ -122,6 +122,7 @@ static void orangepi_machine_init(MachineClass *mc)
->      mc->max_cpus =3D AW_H3_NUM_CPUS;
->      mc->default_cpus =3D AW_H3_NUM_CPUS;
->      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a7");
-> +    mc->default_ram_size =3D 1 * GiB;
->  }
->
->  DEFINE_MACHINE("orangepi-pc", orangepi_machine_init)
-> --
-> 2.21.0
->
+> As an exception is being delivered we just end up re-executing the
+> EXCP_SEMIHOST. I still don't see why using cpu_interrupt is an
+> improvement seeing as it is secondary to exception processing.
 >
 
---=20
-Niek Linnenbank
+FWIW I skimmed your patch and yes an interrupt is not needed since you are
+delaying the update of the program counter; that's nicer.
 
---0000000000002281e1059a010fc4
+Paolo
+
+--0000000000005cb131059a010f32
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div>Hi Philippe,</div><div><br></div><div>Noted. I&#39;ll=
- make sure mc-&gt;default_ram_size =3D 1 * GiB is added for the next rework=
-ed patch set v3.</div><div><br></div><div>Regards,</div><div>Niek<br></div>=
-</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=
-On Tue, Dec 17, 2019 at 7:27 PM Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"=
-mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt; wrote:<br></div><blockquote=
- class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px so=
-lid rgb(204,204,204);padding-left:1ex">Without this, the machine starts wit=
-h default 128MB, and Ubuntu Bionic<br>
-fails:<br>
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il mer 18 dic 2019, 18:36 Alex Benn=C3=A9e &lt;<a href=
+=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; ha scritt=
+o:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
+rder-left:1px #ccc solid;padding-left:1ex"><br>
+Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=3D"_blank" =
+rel=3D"noreferrer">pbonzini@redhat.com</a>&gt; writes:<br>
 <br>
-[ ***=C2=A0 ] (2 of 4) A start job is running for=E2=80=A6Persistent Storag=
-e (37s / 2min 1s)<br>
-[=C2=A0 *** ] (2 of 4) A start job is running for=E2=80=A6Persistent Storag=
-e (38s / 2min 1s)<br>
-[=C2=A0 OK=C2=A0 ] Started Flush Journal to Persistent Storage.<br>
-Starting Create Volatile Files and Directories...<br>
-Starting Armbian ZRAM config...<br>
-[=C2=A0 =C2=A0 **] (3 of 6) A start job is running for=E2=80=A6s and Direct=
-ories (55s / no limit)<br>
-[=C2=A0 =C2=A0 =C2=A0*] (3 of 6) A start job is running for=E2=80=A6s and D=
-irectories (55s / no limit)<br>
-[=C2=A0 =C2=A0 **] (3 of 6) A start job is running for=E2=80=A6s and Direct=
-ories (56s / no limit)<br>
-[=C2=A0 OK=C2=A0 ] Started Create Volatile Files and Directories.<br>
-[***=C2=A0 =C2=A0] (5 of 6) A start job is running for=E2=80=A6 ZRAM config=
- (1min 10s / 1min 19s)<br>
-[**=C2=A0 =C2=A0 ] (5 of 6) A start job is running for=E2=80=A6 ZRAM config=
- (1min 12s / 1min 19s)<br>
-[*=C2=A0 =C2=A0 =C2=A0] (5 of 6) A start job is running for=E2=80=A6 ZRAM c=
-onfig (1min 13s / 1min 19s)<br>
-[FAILED] Failed to start Armbian ZRAM config.<br>
-See &#39;systemctl status armbian-zram-config.service&#39; for details.<br>
+&gt; On 17/12/19 15:18, Alex Benn=C3=A9e wrote:<br>&gt;&gt; cpu_has_work is=
+ a guest function though and semihosting_console is a<br>
+&gt;&gt; common hw module. It can&#39;t peek into the guests internal state=
+.<br>
+&gt;<br>
+&gt; semihosting_console only needs to something like<br>
+&gt; cpu_interrupt(cpu-&gt;stopped_cpu, CPU_INTERRUPT_SEMIHOST).<br>
 <br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
-t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
----<br>
-=C2=A0hw/arm/orangepi.c | 1 +<br>
-=C2=A01 file changed, 1 insertion(+)<br>
-<br>
-diff --git a/hw/arm/orangepi.c b/hw/arm/orangepi.c<br>
-index 119f370924..da758d7eba 100644<br>
---- a/hw/arm/orangepi.c<br>
-+++ b/hw/arm/orangepi.c<br>
-@@ -122,6 +122,7 @@ static void orangepi_machine_init(MachineClass *mc)<br>
-=C2=A0 =C2=A0 =C2=A0mc-&gt;max_cpus =3D AW_H3_NUM_CPUS;<br>
-=C2=A0 =C2=A0 =C2=A0mc-&gt;default_cpus =3D AW_H3_NUM_CPUS;<br>
-=C2=A0 =C2=A0 =C2=A0mc-&gt;default_cpu_type =3D ARM_CPU_TYPE_NAME(&quot;cor=
-tex-a7&quot;);<br>
-+=C2=A0 =C2=A0 mc-&gt;default_ram_size =3D 1 * GiB;<br>
-=C2=A0}<br>
-<br>
-=C2=A0DEFINE_MACHINE(&quot;orangepi-pc&quot;, orangepi_machine_init)<br>
--- <br>
-2.21.0<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div>
+As an exception is being delivered we just end up re-executing the<br>
+EXCP_SEMIHOST. I still don&#39;t see why using cpu_interrupt is an<br>
+improvement seeing as it is secondary to exception processing.<br></blockqu=
+ote></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">FWIW I skimme=
+d your patch and yes an interrupt is not needed since you are delaying the =
+update of the program counter; that&#39;s nicer.</div><div dir=3D"auto"><br=
+></div><div dir=3D"auto">Paolo</div></div>
 
---0000000000002281e1059a010fc4--
+--0000000000005cb131059a010f32--
+
 
