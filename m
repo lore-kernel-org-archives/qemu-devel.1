@@ -2,93 +2,91 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EAD8C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8268DC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:47:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D7902072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:46:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C5182072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:47:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X4GIK6Ix"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7902072B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="blXkoP5I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C5182072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihQIV-0001vY-3K
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 22:46:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45294)
+	id 1ihQJ5-0002V9-CJ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 22:47:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihQGw-00013E-4X
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:45:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihQHX-0001SH-8z
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:45:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihQGu-00036B-Nq
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:45:13 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:40059)
+ (envelope-from <richard.henderson@linaro.org>) id 1ihQHW-0003jn-7A
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:45:51 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41666)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihQGu-00033J-Gs
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:45:12 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id n67so216341pjb.5
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:45:12 -0800 (PST)
+ id 1ihQHW-0003ht-0V
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:45:50 -0500
+Received: by mail-pg1-x543.google.com with SMTP id x8so475842pgk.8
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:45:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4BY76WHYZYu3SM+DW6jPxH+7o+ToqfkQOtBe0hdVU54=;
- b=X4GIK6Ix6/YqvozJQM1qury/NT4LgeZZZrQoyQ7HdEj3FH2oCw45TZemnPqBBjA5o6
- 8tkO1gAtzx8POal3ZgQo9UI+2MaiZW2ildCnCuvoQKrWrjE0e8hceE04qKI4wkn177Ij
- rfHX9SaAWzkc4EdOOeu0UAEme/EuPVKlZuD2G0aSQBgcsvKxhf8DSogA/nDykRtlCU4p
- f9LR5u6ygc0jAnqad4CdOgIc8APfM5UTUW591iLBHYJ5JiMSg+Sy1jiCroZDIB+c1Umh
- I8sUsMX91ZD88jInLWr0mJUrzeYr923m+BNRpvwS7okeg2I+lqC1J/GCyWYKK63hVCoe
- BhhA==
+ bh=bGfARsdCLz5Bkj4bxAAz0ZLKVs1p1DoNYlG/3BcpDrQ=;
+ b=blXkoP5I8XVTLn9OHLlMkkqo+8h9Wd+G48X2meg7HYdfqneVVvsLgXlto7tKLCWxam
+ QBoKsS+S12w7avHTOwV5PWm66kx1KK/ka02jJM26+kZvrDoa8WJLvEmZkYlesH/TJvJW
+ UsaIG2MRihbh7tt7b0khHpbBPO40Zv/sHhm+rT3JgjH65Z8n71PWy5XGY8woGsvG+is0
+ khzX/866sULBnSrrbiUwic36PI0c+L1Q54RSZqDu5kZ151HBjGaM8a85IGwJg0ZcBgCn
+ QIAleerw/dy8GM4soIzjikNYOPrd3gQaouQkmGFWHnIdFBa5m+UIJt4OJ7v8JOg0vJg9
+ oAnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=4BY76WHYZYu3SM+DW6jPxH+7o+ToqfkQOtBe0hdVU54=;
- b=lw0N9nMb8wTZThrSmA1YSJGg1GElbzwB8Koi5MZZfL7BLdBjlwzhhjXcamDlIdO0BX
- yiJH9rU/FbsgAFsQ6Jn9y2e32ADFpUqC/S3jdTsxsJSHvr4c1mItqHUZ4GSb1ZI2DDDF
- y6QH3mVqgEpMprkHPSGklwv6/S7XAJFScCD4qJKGZrXvg7DiZQReOhDgYw4aqy64tpb0
- 83Viq0TS0enUwJ5/LwLkXKRZaUeXgcf3ugyQHBXIXv0LcBzbpdW1xomXxX3Uqv3xplY8
- GE0AS6Qpv3jUdVwNWdWeUcd20Oo8BWp8tbDSh526XFqeP5E9Xpic/nqRBFkZn6eF47Sg
- sN7w==
-X-Gm-Message-State: APjAAAVJD+w5/YnHmenU85fjgatGiMRBYYqPJ8l3sxFjYXgKGyE67trc
- IiKOATnUUv5gbxAh8Z1/amnJFw==
-X-Google-Smtp-Source: APXvYqwXTH0BuwOkiBVFuU95mpMLmFML2h5VkQ+J5XWk0mi0oD+fAqbrj9d9N+6Fu50RTgcYn5JKFg==
-X-Received: by 2002:a17:90a:e98a:: with SMTP id
- v10mr112682pjy.67.1576640711224; 
- Tue, 17 Dec 2019 19:45:11 -0800 (PST)
+ bh=bGfARsdCLz5Bkj4bxAAz0ZLKVs1p1DoNYlG/3BcpDrQ=;
+ b=my+kYgMucz0yRe94LhT/jtCSm244VoBbLvpd5xK+EBhe+T0IhVkG+B27ustMCiAJP9
+ Hj6ss2NEth+/qHVuylKTe/jgFu1C7pC94kTV3iRZhHAIVrroelp/gWHRN9UWRsvwLXyw
+ vwvlRxF0VwIj+3aDZ+iqfrkTZnSzzeMzT+3MCFtiUIe97HKZGVKi+n5vcrgl9bZzAKVL
+ C6EhocMObrJBHwhiYVbV39Ng0qGRx48jufm4yhXSsYmAPeG+o89UL5oDqWMJnwdWyJKj
+ yXN1t9th49Td/LyPJ2p+/24r1deXUwWJMvNT+de/qbNZtV4X4jiLEjiMg1IJTmAFJXpD
+ Hg5w==
+X-Gm-Message-State: APjAAAWwjOvgE7rMO3i/OV1gi1n5HZ41Iq5vxnAVgajNUtCx3f8yPjRZ
+ 1wQAxksjGpULlQYw6/O6Dcmyjw==
+X-Google-Smtp-Source: APXvYqyRnnFSqx+UTMvs81vZfubBhd+o+BdbF2S46aqTYgPqURfT3vZeFqmEmLNRXHA8yEoPeEW5Bg==
+X-Received: by 2002:a63:e80d:: with SMTP id s13mr475383pgh.134.1576640748924; 
+ Tue, 17 Dec 2019 19:45:48 -0800 (PST)
 Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
  ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id h3sm648871pfr.15.2019.12.17.19.45.09
+ by smtp.gmail.com with ESMTPSA id a6sm567390pgg.25.2019.12.17.19.45.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Dec 2019 19:45:10 -0800 (PST)
-Subject: Re: [PATCH 1/6] audio/audio: Add missing fall through comment
+ Tue, 17 Dec 2019 19:45:48 -0800 (PST)
+Subject: Re: [PATCH 3/6] hw/net/imx_fec: Rewrite fall through comments
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20191217173425.5082-1-philmd@redhat.com>
- <20191217173425.5082-2-philmd@redhat.com>
+ <20191217173425.5082-4-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <cf500e60-91be-c0a6-c7ee-56229128fd4c@linaro.org>
-Date: Tue, 17 Dec 2019 17:45:07 -1000
+Message-ID: <d5f87b5f-b1be-9d7e-b57e-a8d9f4ac0127@linaro.org>
+Date: Tue, 17 Dec 2019 17:45:45 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191217173425.5082-2-philmd@redhat.com>
+In-Reply-To: <20191217173425.5082-4-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,42 +98,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/17/19 7:34 AM, Philippe Mathieu-Daudé wrote:
-> GCC9 is confused by this comment when building with
-> CFLAG -Wimplicit-fallthrough=2:
+> GCC9 is confused by this comment when building with CFLAG
+> -Wimplicit-fallthrough=2:
 > 
->   audio/audio.c: In function ‘audio_pcm_init_info’:
->   audio/audio.c:306:14: error: this statement may fall through [-Werror=implicit-fallthrough=]
->     306 |         sign = 1;
->         |         ~~~~~^~~
->   audio/audio.c:307:5: note: here
->     307 |     case AUDIO_FORMAT_U8:
+>   hw/net/imx_fec.c: In function ‘imx_eth_write’:
+>   hw/net/imx_fec.c:906:12: error: this statement may fall through [-Werror=implicit-fallthrough=]
+>     906 |         if (unlikely(single_tx_ring)) {
+>         |            ^
+>   hw/net/imx_fec.c:912:5: note: here
+>     912 |     case ENET_TDAR:     /* FALLTHROUGH */
 >         |     ^~~~
 >   cc1: all warnings being treated as errors
 > 
-> Add the missing fall through comment, similarly to e46349414.
-...
-> diff --git a/audio/audio.c b/audio/audio.c
-> index 56fae55047..57daf3f620 100644
-> --- a/audio/audio.c
-> +++ b/audio/audio.c
-> @@ -304,6 +304,7 @@ void audio_pcm_init_info (struct audio_pcm_info *info, struct audsettings *as)
->      switch (as->fmt) {
->      case AUDIO_FORMAT_S8:
->          sign = 1;
-> +        /* fall through */
->      case AUDIO_FORMAT_U8:
->          mul = 1;
->          break;
+> Rewrite the comments in the correct place,  using 'fall through'
+> which is recognized by GCC and static analyzers.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Cc: Peter Chubb <peter.chubb@nicta.com.au>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: qemu-arm@nongnu.org
+> ---
+>  hw/net/imx_fec.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 r~
-
 
