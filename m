@@ -2,86 +2,62 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B528FC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7069EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FA0621582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:47:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c026CSMK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FA0621582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43CD821582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:48:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43CD821582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihUzi-0005Bv-O8
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:47:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47914)
+	id 1ihV0h-0006H8-CN
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:48:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ihUyw-0004gL-LC
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:47:00 -0500
+ (envelope-from <groug@kaod.org>) id 1ihUzj-0005PN-Ft
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:47:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ihUyu-0006eH-F0
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:46:57 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58249
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ihUzi-0008Ob-DX
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:47:47 -0500
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:44940)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihUyu-0006bj-5Q
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:46:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576658815;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ee5gUjBENRaG/tHQKTptNVk3k88PEC2471tSsxGrdCI=;
- b=c026CSMKGuvl0SStxfa8nEJBnFCtOkolITYeU6bP0D2b4BC1THwRqmTSi774dhRGcXrhdU
- SxTUx2/AuVv8QePDztoGJArx0F0dLPiGyxilX950U43KOyYeMZHpgz84t8mx2fkU5+SndK
- xkpQwHluc3LexS/l+NNp9uPio608MW0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-TUlf4UHGPj-yHRhBW_YuDg-1; Wed, 18 Dec 2019 03:46:53 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80D9C10054E3;
- Wed, 18 Dec 2019 08:46:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
- [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D4B11001902;
- Wed, 18 Dec 2019 08:46:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D3D6211386A7; Wed, 18 Dec 2019 09:46:50 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PULL 34/34] nbd: assert that Error** is not NULL in
- nbd_iter_channel_error
-References: <20191217062651.9687-1-armbru@redhat.com>
- <20191217062651.9687-35-armbru@redhat.com>
- <4135813b-af52-b743-858c-a86dbd3ebce3@redhat.com>
- <87imme84ya.fsf@dusky.pond.sub.org>
-Date: Wed, 18 Dec 2019 09:46:50 +0100
-In-Reply-To: <87imme84ya.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Wed, 18 Dec 2019 08:31:57 +0100")
-Message-ID: <87sgli3ts5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ihUzi-0008JS-6Z
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:47:46 -0500
+Received: from player787.ha.ovh.net (unknown [10.108.57.95])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id F163F15283D
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 09:47:43 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 9199FD8630B1;
+ Wed, 18 Dec 2019 08:47:41 +0000 (UTC)
+Date: Wed, 18 Dec 2019 09:47:36 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH 1/9] tests/virtio-9p: v9fs_string_read() didn't
+ terminate string
+Message-ID: <20191218094736.6d89f513@bahia.lan>
+In-Reply-To: <E1ihMue-00076W-9u@lizzy.crudebyte.com>
+References: <E1ihMue-00076W-9u@lizzy.crudebyte.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: TUlf4UHGPj-yHRhBW_YuDg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 16694562344593496384
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtkedguddviecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.36.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,37 +69,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> writes:
+An affirmative form would provide a better one-line summary of what this
+patch does, eg:
 
-> Eric Blake <eblake@redhat.com> writes:
->
->> On 12/17/19 12:26 AM, Markus Armbruster wrote:
->>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>
->>> All callers of nbd_iter_channel_error() pass the address of a
->>> local_err variable, and only call this function if an error has
->>> already occurred, using this function to propagate that error.
->>> This is already implied by its name (local_err instead of the classic
->>> errp), but it is worth additionally stressing this by adding an
->>> assertion to make it part of the function contract.
->>>
->>> The local_err parameter is not here to return information about
->>> nbd_iter_channel_error failure. Instead it's assumed to be filled when
->>> passed to the function. This is already stressed by its name
->>> (local_err, instead of classic errp). Stress it additionally by
->>> assertion.
->>
->> Redundant paragraph, but probably too late to worry about it now that
->> we have a pull request.
->
-> I'll have to respin anyway.  I'll drop the second paragraph.
+Add terminating nul in v9fs_string_read().
 
-Rats, I forgot.
+And maybe explain that, despite it is well known that strings don't have
+a terminating nul in 9P, this will allow future users of v9fs_string_read()
+to use regular C library string functions with the returned string.
+
+On Mon, 16 Dec 2019 00:17:48 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
+>  tests/virtio-9p-test.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+> index e7b58e3a0c..880b4ff567 100644
+> --- a/tests/virtio-9p-test.c
+> +++ b/tests/virtio-9p-test.c
+> @@ -130,8 +130,9 @@ static void v9fs_string_read(P9Req *req, uint16_t *len, char **string)
+>          *len = local_len;
+>      }
+>      if (string) {
+> -        *string = g_malloc(local_len);
+> +        *string = g_malloc(local_len+1);
+
+ERROR: spaces required around that '+' (ctx:VxV)
+#97: FILE: tests/virtio-9p-test.c:133:
++        *string = g_malloc(local_len+1);
+
+>          v9fs_memread(req, *string, local_len);
+> +        (*string)[local_len] = 0;
+>      } else {
+>          v9fs_memskip(req, local_len);
+>      }
 
 
