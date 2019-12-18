@@ -2,82 +2,92 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F8FC2D0D1
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0396FC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:32:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0C8C206CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:25:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C11CE206CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:32:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vt9a9EhA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0C8C206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YYUAcKmu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C11CE206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihbCA-0000xd-Pc
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 10:25:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56016)
+	id 1ihbJm-00038w-Pc
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 10:32:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ihbBU-0000Us-Aa
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:24:21 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ihbIm-0002jw-VI
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ihbBR-00037b-6r
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:24:18 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47629
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ihbBQ-0002xz-MV
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:24:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576682655;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nNwvsf50BmRyA0mYeKMlntKxek8JfLhV7NrOk9YCdpw=;
- b=Vt9a9EhAtChgdoORWmnJI2E+zuRZTkpuqSI3//Yfjjb60NTf278+Oan5Kt95axelRvvl4X
- IUF52steaOVR47DmVTgfwpAuidqy0sc2cvyM/SnzHZdXQ7bdf/nt/YLDz+2N8vPySJAlwk
- gf7qIekLIJ06MXHbtD4FhOXiGKJza8A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-iRWy5EsqNruWN4UkbiY59w-1; Wed, 18 Dec 2019 10:24:11 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A67318C43E5
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 15:24:10 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 59D4463B82;
- Wed, 18 Dec 2019 15:24:09 +0000 (UTC)
-Date: Wed, 18 Dec 2019 15:24:06 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH 1/4] qemu-file: Don't do IO after shutdown
-Message-ID: <20191218152406.GH3707@work-vm>
-References: <20191218050439.5989-1-quintela@redhat.com>
- <20191218050439.5989-2-quintela@redhat.com>
- <20191218122702.GF3707@work-vm> <87d0cl66sa.fsf@trasno.org>
+ (envelope-from <danielhb413@gmail.com>) id 1ihbIl-0002mH-Ms
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:31:52 -0500
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:37374)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1ihbIl-0002fa-E6
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:31:51 -0500
+Received: by mail-pj1-x1041.google.com with SMTP id m13so1040172pjb.2
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 07:31:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UvLm4Dra+KEKrEzBNLUg7ufAkJQKyX1fO/Wi/nDlMWc=;
+ b=YYUAcKmuZ+EYW404LXi99YCPmlKE/3e0dUrAAHzCoTD/B/v0eIHH9QuwAB9J1o4wj6
+ /shQllYfldnOdwh7CmDdivRDoe7OCrN/aoyMZ1jFJPvxLcukHWq0/3KAIZ6uPMaLqPVR
+ Z5zb91segW8K6W+24nwqRPyVCprBHjtByW9DxNAbW5L+oMd5Ah+LaaJIPdCaCaPEApKg
+ ufwvS/5cp/VY127jsAGJzaccSi80OBdnKqzWB23WTfCn9I2b0Du5HQnTR9BltBl0TyWx
+ 1nmCIkVi6VNHlrz66+V9M9vlnbk8s8Xoe7mAO47ww/49IJdo71zLx70RmggK6kbFT8UF
+ TOOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UvLm4Dra+KEKrEzBNLUg7ufAkJQKyX1fO/Wi/nDlMWc=;
+ b=ppWom1Z61LaNy/Uxo0J2BSnd3wxADMJ1kE2w54NAOAnIvdZCBprxB/k7Bf/A8/1rzF
+ XsKeWSAMvQavfj0CmMus9vsk5PdoO/OEgj7vP9o4i2DWXZmqb2jG8/mLBDHRGoJsHMg+
+ JjHdaF41aMwLncuPGIsWxQPFvd4llNeZxT2nI7XKtx86qeGPRZD80dBCi4Bx46yqCjLl
+ 41xbI1Xqlgv7cHmvKuDwXjTZ/koiyo5Ubc74twNulfelKY6qbpGIgIc+e7+lYN9ELCtC
+ /pxHEa25OkJaL4SoXUiH++4sRe05YlWWkCJ6qYq1lJzHYBB378lSkTKqHbu9TorMAPj5
+ uYxA==
+X-Gm-Message-State: APjAAAU73Q+HWAAfpkxf4dM/NNIJX3NlJZ07ot5cD/It1w29l6qKhJrL
+ HNPpglrfUJdP5oCnmO6OxxY=
+X-Google-Smtp-Source: APXvYqzP05ZPDJnWO3vLXhObwNhz3CNpcaX8gw1OSwnlo8yCfU1naZw6t5BNjvqixlZv9Yu5IRzyfg==
+X-Received: by 2002:a17:902:b785:: with SMTP id
+ e5mr3354987pls.327.1576683109872; 
+ Wed, 18 Dec 2019 07:31:49 -0800 (PST)
+Received: from ?IPv6:2804:431:c7c7:2336:5ba2:6450:4367:bbc2?
+ ([2804:431:c7c7:2336:5ba2:6450:4367:bbc2])
+ by smtp.gmail.com with ESMTPSA id f43sm2371994pje.23.2019.12.18.07.31.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Dec 2019 07:31:49 -0800 (PST)
+Subject: Re: [PATCH v8 0/4] delete created files when
+ block_crypto_co_create_opts_luks fails
+To: qemu-devel@nongnu.org
+References: <20191111170131.13742-1-danielhb413@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <1a56e26d-ec25-98a5-89e0-1f537c325a99@gmail.com>
+Date: Wed, 18 Dec 2019 12:31:38 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <87d0cl66sa.fsf@trasno.org>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: iRWy5EsqNruWN4UkbiY59w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20191111170131.13742-1-danielhb413@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,92 +99,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> Be sure that we are not doing neither read/write after shutdown of the
-> >> QEMUFile.
-> >>=20
-> >> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> >> ---
-> >>  migration/qemu-file.c | 13 +++++++++++++
-> >>  1 file changed, 13 insertions(+)
-> >>=20
-> >> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> >> index 26fb25ddc1..1e5543a279 100644
-> >> --- a/migration/qemu-file.c
-> >> +++ b/migration/qemu-file.c
-> >> @@ -53,6 +53,8 @@ struct QEMUFile {
-> >> =20
-> >>      int last_error;
-> >>      Error *last_error_obj;
-> >> +    /* has the file has been shutdown */
-> >> +    bool shutdown;
-> >>  };
-> >> =20
-> >>  /*
-> >> @@ -61,6 +63,7 @@ struct QEMUFile {
-> >>   */
-> >>  int qemu_file_shutdown(QEMUFile *f)
-> >>  {
-> >> +    f->shutdown =3D true;
-> >>      if (!f->ops->shut_down) {
-> >>          return -ENOSYS;
-> >>      }
-> >> @@ -214,6 +217,9 @@ void qemu_fflush(QEMUFile *f)
-> >>          return;
-> >>      }
-> >> =20
-> >> +    if (f->shutdown) {
-> >> +        return;
-> >> +    }
-> >
-> > OK, I did wonder if you need to free the iovec.
->=20
-> I will think about this one.
->=20
-> >>      if (f->iovcnt > 0) {
-> >>          expect =3D iov_size(f->iov, f->iovcnt);
-> >>          ret =3D f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f=
-->pos,
-> >> @@ -328,6 +334,10 @@ static ssize_t qemu_fill_buffer(QEMUFile *f)
-> >>      f->buf_index =3D 0;
-> >>      f->buf_size =3D pending;
-> >> =20
-> >> +    if (f->shutdown) {
-> >> +        return 0;
-> >> +    }
-> >
-> > I also wondered if perhaps an error would be reasonable here; but I'm
-> > not sure what a read(2) does after a shutdown(2).
->=20
-> A fast google shows that it is .... implementation dependant.  And
-> worse, only really works for sockets.
+Ping
 
-Yeh, so our main reason for using it is for hung sockets; in particular,
-if a machine just disappears, then you get a many-minute hang waiting
-for TCP to timeout.  Using 'shutdown(2)' means you can migrate_cancel
-even in that situation.  The same thing happens when you're using
-sockets in both directions, if you get an error on one direction you can
-shutdown(2) the other direction so you know any thread doesn't get stuck
-on it.
-
-Dave
-
->=20
-> > Still,
-> >
-> >
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
-> Thanks.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+On 11/11/19 2:01 PM, Daniel Henrique Barboza wrote:
+> changes from previous version 7 [1], all suggested by Kevin Wolf:
+> 
+> - patch 1:
+>      * removed function comment of raw_co_delete_file;
+>      * removed 'done' label from raw_co_delete_file;
+>      * removed 'local' remark from bdrv_co_delete_file comment. The comment
+>        is now single-lined;
+>      * added missing space in the commit msg;
+> - patch 2:
+>      * ditched bdrv_delete_co_entry and bdrv_delete_file, now it's a single
+>        coroutine_fn bdrv_co_delete_file;
+>      * BlockDriverState != NULL dropped - the caller will need to ensure it
+>        is not null;
+>      * changed the error message of '!bs->drv' condition;
+>      * s/delete/deletion in the error message of !bs->drv->bdrv_co_delete_file;
+>      * 'out' label removed - function will return immediately on error;
+> - patch 3:
+>      * check for (ret && bs);
+>      * drop the ENOENT verification;
+>      * do not prepend the filename in the error message;
+>      * removed an extra blank line.
+> 
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg00282.html
+> 
+> Daniel Henrique Barboza (4):
+>    block: introducing 'bdrv_co_delete_file' interface
+>    block.c: adding bdrv_co_delete_file
+>    crypto.c: cleanup created file when block_crypto_co_create_opts_luks
+>      fails
+>    qemu-iotests: adding LUKS cleanup for non-UTF8 secret error
+> 
+>   block.c                    | 26 +++++++++++++++
+>   block/crypto.c             | 18 ++++++++++
+>   block/file-posix.c         | 23 +++++++++++++
+>   include/block/block.h      |  1 +
+>   include/block/block_int.h  |  4 +++
+>   tests/qemu-iotests/273     | 67 ++++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/273.out | 11 +++++++
+>   tests/qemu-iotests/group   |  1 +
+>   8 files changed, 151 insertions(+)
+>   create mode 100755 tests/qemu-iotests/273
+>   create mode 100644 tests/qemu-iotests/273.out
+> 
 
