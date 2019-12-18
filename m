@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1FFC2D0CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B194FC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:41:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A3D22146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:39:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B4652146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:41:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNPZIVg0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A3D22146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uBFEGF9c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4652146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYbd-00063X-AW
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:39:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51266)
+	id 1ihYdl-0000nh-3S
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:41:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3S-0006iR-5S
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:51 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3w-0007Ol-1h
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3Q-0001cy-79
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:49 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:51664)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3s-0003XM-IG
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:19 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42346)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3P-0001ZW-TB
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:48 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id d73so1563189wmd.1
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:47 -0800 (PST)
+ id 1ihY3s-0003Sd-91
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:16 -0500
+Received: by mail-wr1-x433.google.com with SMTP id q6so1982349wro.9
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:04:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=ToK2OtnJ76oO0K5jmaY8PLTL4AZ+PoZe2UIvk4xI5zw=;
- b=MNPZIVg0oGlWOD0hmb+ikmSFSYW4gGOR3FHSr4+CshFYOw6nw/lDu9IZ3D172zOCe0
- rp9I+lmZcBh1nBigPg+bA/Ige+q3xPVhoHakcCq3B4+s2s2P/glKkU7ZL6qaHjdiSMcP
- vteokl8k6zniom70oQanHVkxlYfD1hBGPpC8WlG+qpSZb4UTF9eYW+lo8y9jvcylc+dX
- 6/PCpbvpLzQohVPwMT/AJ3g90Z1KQFOStQZPIbITPxeH1mRL/kRWyzxojON8T8YZEceS
- +rs27Eq4jx5mX7D/GA0yvVcRnHE5SlJaRL0ptcFkq1h2Zw+raDY8/5I3Dq0rpHKsKBO9
- 6I2w==
+ bh=wKT5fGLcBjweK2g0j9x3iDEnS480C/vWZj9Pg704MW0=;
+ b=uBFEGF9cpKGqQQW24pCETvFvKQe01KIQ50Ckw6KE2SiW5QFuItoyeNHQwLgz6riuLL
+ MwKZZaw2f/UHk1JQC+L/iFzB0P11KDEkxRsP3VM9z+X/kY1QP6dImo3d0cmXr3p2dKWN
+ eN9DhiHEF/GUWvyWGMuJCzbVjvVd8pZvQj6/jnFIbrRS7itTO0MwEk5Ycg43QCfFKgsb
+ Od4CPz8HhB0QsfeRjzbt4798usSPNJ1QpYET2fu+TTRa5M1QrCvGuX8pzOW1tr6AyoHD
+ ZjGpKf5A8lbj598Xm/ac1WIANB5D2BuZem6JBaumyUeEstZQ/PKrtnnFd+8ltLIgsZFi
+ MGBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=ToK2OtnJ76oO0K5jmaY8PLTL4AZ+PoZe2UIvk4xI5zw=;
- b=kf0PNPEIzARCi/+2ldaxQ5l9cCK/wJM1Gw/ibR5y78JXCKGCyFujLOWgIBHTp2sStf
- fsSndD6d31BmxAl+aA3sJFFObdMOeOnVSvWfqFh1znS8iENRYvEcbnk9cHvM5z4gq1Qw
- x1XxAp8Xe1R3MVLB/jj08rWscDgELhfofAePHD0S2NAD2Rq/qMSMuuR2zFMbJaaOFwB6
- oIzt8tC2saB3hs3lqzCuazmaM9sstlLyfKRWzHURhB23gD68hHWY72hF07zzRS74hPlm
- AEyat+FLvJf2KmsAtsID8YIF7DAOLkBpGtYcYaYDUHZbMJ4di1q1aBjdnhhwQQXXl1/v
- Qn3Q==
-X-Gm-Message-State: APjAAAWUZUb89QVtMt709d8z3dpTkOuZ8iO6eIjxPdjjzIi68cr0TMD2
- QEzgRhZ0yT4C6auEhll+5nUB9/PB
-X-Google-Smtp-Source: APXvYqxB8FIepv2qpRk/TyhDtGNEk222N3LHB9WQr0bzYGBHZ6gCAVhI2iSxo+vzeBXtu3YBvG4IEg==
-X-Received: by 2002:a1c:8116:: with SMTP id c22mr2790240wmd.27.1576670626486; 
- Wed, 18 Dec 2019 04:03:46 -0800 (PST)
+ bh=wKT5fGLcBjweK2g0j9x3iDEnS480C/vWZj9Pg704MW0=;
+ b=gLmKPxB5foap3hlQQfYDbmonmmuhODxph5UAkX+KszIjmqtHVHzkMKGluRoXJl1W+U
+ +xeNUx3JIvb99rrXQtfG/s6hX1toh+jv2WDPcGoOi7xHBXVBOqvnentiyjfesbhU8JvW
+ 9oaPItMYbpPQ5BDxud+eV27L8H20ivOtALDtVrUSdOsrTQsIrmRekNm9scazMDpQPieQ
+ 8ImTwNJy0pkLWLJgmwmnTqUnrg4FFB4WpPQIA26y4IG3uoE5WNUfQF40JdQ4FH+zQ+EF
+ LwqaKS0YpV4VBXASjQSahRxB1yNsiHOEpTJU5xYV4TnPbQzLXpNRP+PLfrSg8T3IQw4e
+ lMHg==
+X-Gm-Message-State: APjAAAUmGmahhjFNRdr9T4klME8NZcVfjffFDh7O3vSjSbmFXssEhU5G
+ ITCfuGtriWrmJR860Vm3P8W90dCq
+X-Google-Smtp-Source: APXvYqyPnT4GBD2x23hiCCRvwgJzih3+z8nN6BygoY6e2h9shmBuQ8Fkrb9CL7f5ApMV8VA2VgCOgQ==
+X-Received: by 2002:a5d:6901:: with SMTP id t1mr2334165wru.94.1576670654720;
+ Wed, 18 Dec 2019 04:04:14 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.45
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.04.13
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:45 -0800 (PST)
+ Wed, 18 Dec 2019 04:04:14 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 48/87] x86: move SMM property to X86MachineState
-Date: Wed, 18 Dec 2019 13:02:14 +0100
-Message-Id: <1576670573-48048-49-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 72/87] memory: include MemoryListener documentation and some
+ missing function parameters
+Date: Wed, 18 Dec 2019 13:02:38 +0100
+Message-Id: <1576670573-48048-73-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,277 +95,310 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add it to microvm as well, it is a generic property of the x86
-architecture.
+These cover the remaining warnings from kernel-doc.
 
-Suggested-by: Sergio Lopez <slp@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20191029162248.13383-7-pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c          | 49 -------------------------------------------------
- hw/i386/pc_piix.c     |  6 +++---
- hw/i386/pc_q35.c      |  2 +-
- hw/i386/x86.c         | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/i386/pc.h  |  3 ---
- include/hw/i386/x86.h |  5 +++++
- target/i386/kvm.c     |  3 +--
- 7 files changed, 59 insertions(+), 59 deletions(-)
+ include/exec/memory.h | 218 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 214 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b4384e2..e330a91 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2031,48 +2031,6 @@ static void pc_machine_set_vmport(Object *obj, Visitor *v, const char *name,
-     visit_type_OnOffAuto(v, name, &pcms->vmport, errp);
- }
- 
--bool pc_machine_is_smm_enabled(PCMachineState *pcms)
--{
--    bool smm_available = false;
--
--    if (pcms->smm == ON_OFF_AUTO_OFF) {
--        return false;
--    }
--
--    if (tcg_enabled() || qtest_enabled()) {
--        smm_available = true;
--    } else if (kvm_enabled()) {
--        smm_available = kvm_has_smm();
--    }
--
--    if (smm_available) {
--        return true;
--    }
--
--    if (pcms->smm == ON_OFF_AUTO_ON) {
--        error_report("System Management Mode not supported by this hypervisor.");
--        exit(1);
--    }
--    return false;
--}
--
--static void pc_machine_get_smm(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
--{
--    PCMachineState *pcms = PC_MACHINE(obj);
--    OnOffAuto smm = pcms->smm;
--
--    visit_type_OnOffAuto(v, name, &smm, errp);
--}
--
--static void pc_machine_set_smm(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
--{
--    PCMachineState *pcms = PC_MACHINE(obj);
--
--    visit_type_OnOffAuto(v, name, &pcms->smm, errp);
--}
--
- static bool pc_machine_get_smbus(Object *obj, Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
-@@ -2119,7 +2077,6 @@ static void pc_machine_initfn(Object *obj)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
- 
--    pcms->smm = ON_OFF_AUTO_AUTO;
- #ifdef CONFIG_VMPORT
-     pcms->vmport = ON_OFF_AUTO_AUTO;
- #else
-@@ -2226,12 +2183,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-         pc_machine_get_device_memory_region_size, NULL,
-         NULL, NULL, &error_abort);
- 
--    object_class_property_add(oc, PC_MACHINE_SMM, "OnOffAuto",
--        pc_machine_get_smm, pc_machine_set_smm,
--        NULL, NULL, &error_abort);
--    object_class_property_set_description(oc, PC_MACHINE_SMM,
--        "Enable SMM (pc & q35)", &error_abort);
--
-     object_class_property_add(oc, PC_MACHINE_VMPORT, "OnOffAuto",
-         pc_machine_get_vmport, pc_machine_set_vmport,
-         NULL, NULL, &error_abort);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index ffb30c3..b3f0304 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -281,7 +281,7 @@ else {
-         /* TODO: Populate SPD eeprom data.  */
-         pcms->smbus = piix4_pm_init(pci_bus, piix3_devfn + 3, 0xb100,
-                                     x86ms->gsi[9], smi_irq,
--                                    pc_machine_is_smm_enabled(pcms),
-+                                    x86_machine_is_smm_enabled(x86ms),
-                                     &piix4_pm);
-         smbus_eeprom_init(pcms->smbus, 8, NULL, 0);
- 
-@@ -309,9 +309,9 @@ else {
- 
- static void pc_compat_2_3_fn(MachineState *machine)
- {
--    PCMachineState *pcms = PC_MACHINE(machine);
-+    X86MachineState *x86ms = X86_MACHINE(machine);
-     if (kvm_enabled()) {
--        pcms->smm = ON_OFF_AUTO_OFF;
-+        x86ms->smm = ON_OFF_AUTO_OFF;
-     }
- }
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 7398d7b..52f4573 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -276,7 +276,7 @@ static void pc_q35_init(MachineState *machine)
-                          0xff0104);
- 
-     /* connect pm stuff to lpc */
--    ich9_lpc_pm_init(lpc, pc_machine_is_smm_enabled(pcms));
-+    ich9_lpc_pm_init(lpc, x86_machine_is_smm_enabled(x86ms));
- 
-     if (pcms->sata_enabled) {
-         /* ahci and SATA device, for q35 1 ahci controller is built-in */
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 3e4aee5..6fb01e4 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -746,10 +746,53 @@ static void x86_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-     x86ms->max_ram_below_4g = value;
- }
- 
-+bool x86_machine_is_smm_enabled(X86MachineState *x86ms)
-+{
-+    bool smm_available = false;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 4754749..e85b7de 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -423,30 +423,232 @@ struct IOMMUMemoryRegion {
+  * Use with memory_listener_register() and memory_listener_unregister().
+  */
+ struct MemoryListener {
++    /**
++     * @begin:
++     *
++     * Called at the beginning of an address space update transaction.
++     * Followed by calls to #MemoryListener.region_add(),
++     * #MemoryListener.region_del(), #MemoryListener.region_nop(),
++     * #MemoryListener.log_start() and #MemoryListener.log_stop() in
++     * increasing address order.
++     *
++     * @listener: The #MemoryListener.
++     */
+     void (*begin)(MemoryListener *listener);
 +
-+    if (x86ms->smm == ON_OFF_AUTO_OFF) {
-+        return false;
-+    }
++    /**
++     * @commit:
++     *
++     * Called at the end of an address space update transaction,
++     * after the last call to #MemoryListener.region_add(),
++     * #MemoryListener.region_del() or #MemoryListener.region_nop(),
++     * #MemoryListener.log_start() and #MemoryListener.log_stop().
++     *
++     * @listener: The #MemoryListener.
++     */
+     void (*commit)(MemoryListener *listener);
 +
-+    if (tcg_enabled() || qtest_enabled()) {
-+        smm_available = true;
-+    } else if (kvm_enabled()) {
-+        smm_available = kvm_has_smm();
-+    }
++    /**
++     * @region_add:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that is new in this address space
++     * space since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The new #MemoryRegionSection.
++     */
+     void (*region_add)(MemoryListener *listener, MemoryRegionSection *section);
 +
-+    if (smm_available) {
-+        return true;
-+    }
++    /**
++     * @region_del:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that has disappeared in the address
++     * space since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The old #MemoryRegionSection.
++     */
+     void (*region_del)(MemoryListener *listener, MemoryRegionSection *section);
 +
-+    if (x86ms->smm == ON_OFF_AUTO_ON) {
-+        error_report("System Management Mode not supported by this hypervisor.");
-+        exit(1);
-+    }
-+    return false;
-+}
++    /**
++     * @region_nop:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that is in the same place in the address
++     * space as in the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The #MemoryRegionSection.
++     */
+     void (*region_nop)(MemoryListener *listener, MemoryRegionSection *section);
 +
-+static void x86_machine_get_smm(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+    OnOffAuto smm = x86ms->smm;
++    /**
++     * @log_start:
++     *
++     * Called during an address space update transaction, after
++     * one of #MemoryListener.region_add(),#MemoryListener.region_del() or
++     * #MemoryListener.region_nop(), if dirty memory logging clients have
++     * become active since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The #MemoryRegionSection.
++     * @old: A bitmap of dirty memory logging clients that were active in
++     * the previous transaction.
++     * @new: A bitmap of dirty memory logging clients that are active in
++     * the current transaction.
++     */
+     void (*log_start)(MemoryListener *listener, MemoryRegionSection *section,
+                       int old, int new);
 +
-+    visit_type_OnOffAuto(v, name, &smm, errp);
-+}
++    /**
++     * @log_stop:
++     *
++     * Called during an address space update transaction, after
++     * one of #MemoryListener.region_add(), #MemoryListener.region_del() or
++     * #MemoryListener.region_nop() and possibly after
++     * #MemoryListener.log_start(), if dirty memory logging clients have
++     * become inactive since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The #MemoryRegionSection.
++     * @old: A bitmap of dirty memory logging clients that were active in
++     * the previous transaction.
++     * @new: A bitmap of dirty memory logging clients that are active in
++     * the current transaction.
++     */
+     void (*log_stop)(MemoryListener *listener, MemoryRegionSection *section,
+                      int old, int new);
 +
-+static void x86_machine_set_smm(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
++    /**
++     * @log_sync:
++     *
++     * Called by memory_region_snapshot_and_clear_dirty() and
++     * memory_global_dirty_log_sync(), before accessing QEMU's "official"
++     * copy of the dirty memory bitmap for a #MemoryRegionSection.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The #MemoryRegionSection.
++     */
+     void (*log_sync)(MemoryListener *listener, MemoryRegionSection *section);
 +
-+    visit_type_OnOffAuto(v, name, &x86ms->smm, errp);
-+}
++    /**
++     * @log_clear:
++     *
++     * Called before reading the dirty memory bitmap for a
++     * #MemoryRegionSection.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The #MemoryRegionSection.
++     */
+     void (*log_clear)(MemoryListener *listener, MemoryRegionSection *section);
 +
- static void x86_machine_initfn(Object *obj)
- {
-     X86MachineState *x86ms = X86_MACHINE(obj);
- 
-+    x86ms->smm = ON_OFF_AUTO_AUTO;
-     x86ms->max_ram_below_4g = 0; /* use default */
-     x86ms->smp_dies = 1;
- }
-@@ -770,9 +813,14 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
-         x86_machine_get_max_ram_below_4g, x86_machine_set_max_ram_below_4g,
-         NULL, NULL, &error_abort);
--
-     object_class_property_set_description(oc, X86_MACHINE_MAX_RAM_BELOW_4G,
-         "Maximum ram below the 4G boundary (32bit boundary)", &error_abort);
++    /**
++     * @log_global_start:
++     *
++     * Called by memory_global_dirty_log_start(), which
++     * enables the %DIRTY_LOG_MIGRATION client on all memory regions in
++     * the address space.  #MemoryListener.log_global_start() is also
++     * called when a #MemoryListener is added, if global dirty logging is
++     * active at that time.
++     *
++     * @listener: The #MemoryListener.
++     */
+     void (*log_global_start)(MemoryListener *listener);
 +
-+    object_class_property_add(oc, X86_MACHINE_SMM, "OnOffAuto",
-+        x86_machine_get_smm, x86_machine_set_smm,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, X86_MACHINE_SMM,
-+        "Enable SMM", &error_abort);
- }
- 
- static const TypeInfo x86_machine_info = {
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index e2cd453..ade5a85 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -43,7 +43,6 @@ struct PCMachineState {
- 
-     /* Configuration options: */
-     OnOffAuto vmport;
--    OnOffAuto smm;
- 
-     bool acpi_build_enabled;
-     bool smbus_enabled;
-@@ -61,7 +60,6 @@ struct PCMachineState {
- #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
- #define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
- #define PC_MACHINE_VMPORT           "vmport"
--#define PC_MACHINE_SMM              "smm"
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
-@@ -165,7 +163,6 @@ void vmmouse_set_data(const uint32_t *data);
- /* pc.c */
- extern int fd_bootchk;
- 
--bool pc_machine_is_smm_enabled(PCMachineState *pcms);
- void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- 
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 4b84917..97d1575 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -60,6 +60,8 @@ typedef struct {
-     uint16_t boot_cpus;
-     unsigned smp_dies;
- 
-+    OnOffAuto smm;
++    /**
++     * @log_global_stop:
++     *
++     * Called by memory_global_dirty_log_stop(), which
++     * disables the %DIRTY_LOG_MIGRATION client on all memory regions in
++     * the address space.
++     *
++     * @listener: The #MemoryListener.
++     */
+     void (*log_global_stop)(MemoryListener *listener);
 +
-     /*
-      * Address space used by IOAPIC device. All IOAPIC interrupts
-      * will be translated to MSI messages in the address space.
-@@ -68,6 +70,7 @@ typedef struct {
- } X86MachineState;
- 
- #define X86_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
-+#define X86_MACHINE_SMM              "smm"
- 
- #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
- #define X86_MACHINE(obj) \
-@@ -95,4 +98,6 @@ void x86_load_linux(X86MachineState *x86ms,
-                     bool pvh_enabled,
-                     bool linuxboot_dma_enabled);
- 
-+bool x86_machine_is_smm_enabled(X86MachineState *x86ms);
++    /**
++     * @log_global_after_sync:
++     *
++     * Called after reading the dirty memory bitmap
++     * for any #MemoryRegionSection.
++     *
++     * @listener: The #MemoryListener.
++     */
+     void (*log_global_after_sync)(MemoryListener *listener);
 +
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ef63f3a..c7ff67a 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2173,8 +2173,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     }
++    /**
++     * @eventfd_add:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that has had a new ioeventfd
++     * registration since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The new #MemoryRegionSection.
++     * @match_data: The @match_data parameter for the new ioeventfd.
++     * @data: The @data parameter for the new ioeventfd.
++     * @e: The #EventNotifier parameter for the new ioeventfd.
++     */
+     void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *section,
+                         bool match_data, uint64_t data, EventNotifier *e);
++
++    /**
++     * @eventfd_del:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that has dropped an ioeventfd
++     * registration since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The new #MemoryRegionSection.
++     * @match_data: The @match_data parameter for the dropped ioeventfd.
++     * @data: The @data parameter for the dropped ioeventfd.
++     * @e: The #EventNotifier parameter for the dropped ioeventfd.
++     */
+     void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection *section,
+                         bool match_data, uint64_t data, EventNotifier *e);
++
++    /**
++     * @coalesced_io_add:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that has had a new coalesced
++     * MMIO range registration since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The new #MemoryRegionSection.
++     * @addr: The starting address for the coalesced MMIO range.
++     * @len: The length of the coalesced MMIO range.
++     */
+     void (*coalesced_io_add)(MemoryListener *listener, MemoryRegionSection *section,
+                                hwaddr addr, hwaddr len);
++
++    /**
++     * @coalesced_io_del:
++     *
++     * Called during an address space update transaction,
++     * for a section of the address space that has dropped a coalesced
++     * MMIO range since the last transaction.
++     *
++     * @listener: The #MemoryListener.
++     * @section: The new #MemoryRegionSection.
++     * @addr: The starting address for the coalesced MMIO range.
++     * @len: The length of the coalesced MMIO range.
++     */
+     void (*coalesced_io_del)(MemoryListener *listener, MemoryRegionSection *section,
+                                hwaddr addr, hwaddr len);
+-    /* Lower = earlier (during add), later (during del) */
++    /**
++     * @priority:
++     *
++     * Govern the order in which memory listeners are invoked. Lower priorities
++     * are invoked earlier for "add" or "start" callbacks, and later for "delete"
++     * or "stop" callbacks.
++     */
+     unsigned priority;
++
++    /* private: */
+     AddressSpace *address_space;
+     QTAILQ_ENTRY(MemoryListener) link;
+     QTAILQ_ENTRY(MemoryListener) link_as;
+@@ -940,6 +1142,7 @@ void memory_region_init_rom(MemoryRegion *mr,
+  * @mr: the #MemoryRegion to be initialized.
+  * @owner: the object that tracks the region's reference count
+  * @ops: callbacks for write access handling (must not be NULL).
++ * @opaque: passed to the read and write callbacks of the @ops structure.
+  * @name: Region name, becomes part of RAMBlock name used in migration stream
+  *        must be unique within any device
+  * @size: size of the region.
+@@ -1028,7 +1231,7 @@ static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
+  * Returns pointer to IOMMUMemoryRegionClass if a memory region is an iommu,
+  * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
+  *
+- * @mr: the memory region being queried
++ * @iommu_mr: the memory region being queried
+  */
+ static inline IOMMUMemoryRegionClass *memory_region_get_iommu_class_nocheck(
+         IOMMUMemoryRegion *iommu_mr)
+@@ -1098,6 +1301,7 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+  * @n: the IOMMUNotifier to be added; the notify callback receives a
+  *     pointer to an #IOMMUTLBEntry as the opaque value; the pointer
+  *     ceases to be valid on exit from the notifier.
++ * @errp: pointer to Error*, to store an error if it happens.
+  */
+ int memory_region_register_iommu_notifier(MemoryRegion *mr,
+                                           IOMMUNotifier *n, Error **errp);
+@@ -1270,9 +1474,12 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
+ void memory_region_ram_resize(MemoryRegion *mr, ram_addr_t newsize,
+                               Error **errp);
+ /**
+- * memory_region_do_writeback: Trigger writeback for selected address range
+- * [addr, addr + size]
++ * memory_region_do_writeback: Trigger cache writeback or msync for
++ * selected address range
+  *
++ * @mr: the memory region to be updated
++ * @addr: the initial address of the range to be written back
++ * @size: the size of the range to be written back
+  */
+ void memory_region_do_writeback(MemoryRegion *mr, hwaddr addr, hwaddr size);
  
-     if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
--        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE) &&
--        pc_machine_is_smm_enabled(PC_MACHINE(ms))) {
-+        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
-         smram_machine_done.notify = register_smram_listener;
-         qemu_add_machine_init_done_notifier(&smram_machine_done);
-     }
+@@ -1591,6 +1798,8 @@ void memory_region_add_subregion_overlap(MemoryRegion *mr,
+ /**
+  * memory_region_get_ram_addr: Get the ram address associated with a memory
+  *                             region
++ *
++ * @mr: the region to be queried
+  */
+ ram_addr_t memory_region_get_ram_addr(MemoryRegion *mr);
+ 
+@@ -2161,6 +2370,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+  * @addr: address within that address space
+  * @attrs: memory transaction attributes
+  * @buf: buffer with the data transferred
++ * @len: length of the data transferred
+  */
+ static inline __attribute__((__always_inline__))
+ MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
 -- 
 1.8.3.1
 
