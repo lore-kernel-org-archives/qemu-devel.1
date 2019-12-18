@@ -2,85 +2,73 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CFDC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 10:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C97C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:01:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D0E82176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 10:59:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E1n1WVS+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D0E82176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C1642176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:01:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1642176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihX3L-00030l-Ek
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 05:59:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42842)
+	id 1ihX5N-00042b-Hg
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:01:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ihX2h-0002bc-UK
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 05:59:00 -0500
+ (envelope-from <bounces@canonical.com>) id 1ihX4d-0003dZ-Kt
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:01:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ihX2c-0000UB-Nn
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 05:58:58 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51429
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ihX2c-0000MX-I9
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 05:58:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576666733;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AHt/UUwaYaRT3otXQdV9pPDDr0xMOR1B/Xz0G8NLCxg=;
- b=E1n1WVS+eczG8SEDRX2xeSvqcXWH5GfyjVWXE1O4O25oh5W9DDl9lcZInetG79lVn9bU5y
- U9lcgaARjiHLQY0EHbaLcrxNXW/+CohwDnPYyAoTbofjuZE5gwDb9Rxr4tq0HvQzq+lQsK
- l4NL/TutRmMYOnjjwaBs/3kOuO3EUp4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-mX8FA7XuPbWCgX-d2Lg_mQ-1; Wed, 18 Dec 2019 05:58:50 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75AB21183E0F
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 10:58:49 +0000 (UTC)
-Received: from redhat.com (ovpn-117-244.ams2.redhat.com [10.36.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB1A15C28D;
- Wed, 18 Dec 2019 10:58:48 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 01/10] migration-test: Create cmd_soure and cmd_target
-In-Reply-To: <bd9939c4-9eff-9028-03bd-93e14f3defcd@redhat.com> (Thomas Huth's
- message of "Wed, 18 Dec 2019 11:40:24 +0100")
-References: <20191218015520.2881-1-quintela@redhat.com>
- <20191218015520.2881-2-quintela@redhat.com>
- <bd9939c4-9eff-9028-03bd-93e14f3defcd@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Wed, 18 Dec 2019 11:58:47 +0100
-Message-ID: <87pngl6gt4.fsf@trasno.org>
+ (envelope-from <bounces@canonical.com>) id 1ihX4b-0001K4-Mx
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:00:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43414)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ihX4a-0001IM-VG
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:00:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ihX4Z-0002sG-Ca
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 11:00:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5D38C2E8076
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 11:00:55 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: mX8FA7XuPbWCgX-d2Lg_mQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 18 Dec 2019 10:45:42 -0000
+From: Fabian Godehardt <1856837@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: gcc9.2 segfault
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fgodeh
+X-Launchpad-Bug-Reporter: Fabian Godehardt (fgodeh)
+X-Launchpad-Bug-Modifier: Fabian Godehardt (fgodeh)
+Message-Id: <157666594314.15384.3778802807711797985.malonedeb@wampee.canonical.com>
+Subject: [Bug 1856837] [NEW] qemu 4.2.0 arm  segmentation fault with gcc 9.2
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a48e4175b62b83f8a7e3ad618a9e86612085bd93
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,67 +77,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1856837 <1856837@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> wrote:
-> On 18/12/2019 02.55, Juan Quintela wrote:
->> We are repeating almost everything for each machine while creating the
->> command line for migration.  And once for source and another for
->> destination.  We start putting there opts_src and opts_dst.
->>=20
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  tests/migration-test.c | 44 ++++++++++++++++++++++++------------------
->>  1 file changed, 25 insertions(+), 19 deletions(-)
->>=20
->> diff --git a/tests/migration-test.c b/tests/migration-test.c
->> index a5343fdc66..fbddcf2317 100644
->> --- a/tests/migration-test.c
->> +++ b/tests/migration-test.c
->> @@ -557,6 +557,7 @@ static int test_migrate_start(QTestState **from, QTe=
-stState **to,
->>                                 const char *opts_dst)
->>  {
->>      gchar *cmd_src, *cmd_dst;
->> +    gchar *cmd_source, *cmd_target;
->
-> The naming looks quite unfortunate to me ... "cmd_src" can easily be
-> mixed up with "cmd_source" ... but maybe you could do it without these
-> additional variables (see below) ...
+Public bug reported:
 
-[...]
+As discussed with f4bug yesterday on IRC here comes the bug description.
 
-> May I suggest to qtest_initf() here instead:
->
->   *from =3D qtest_initf("%s %s", cmd_src, opts_src);
->
->   *to =3D qtest_initf("%s %s", cmd_dst, opts_dst);
->
->
-> And maybe you could even move the extra_opts here, too? e.g.:
->
->   *from =3D qtest_initf("%s %s %s", cmd_src, extra_opts ?: "", opts_src);
->
->   *to =3D qtest_initf("%s %s %s", cmd_dst,  extra_opts ?: "", opts_dst);
->
->  Thomas
+I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
+6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
+linux-user" and debug enabled. I use the arm-linux-user variant, "qemu-
+arm".
 
-I do that on later patches.  But the _final_ better name that I could
-get with was "cmd_source".  cmd_src ends being arch_source.
+Then i'm trying to cross-compile (arm gcc) an old version of googles v8
+(as i need this version of the lib for binary compatibility) which uses
+qemu during build.
 
-About using qtest_initf():
+It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
+7.4.0 and 8.3.0 but those are also causing the same segmentation fault.
 
-- I didn't knew it's existence (O:-)
-- I was considering about merning the command parts of cmd_source/target
-  But arrived to the conclusion that it was more complicated to have it
-  share it, that to repeat it.  But you need to look at the last patch
-  to arrive to one conclusion.
+The executed command wich breaks qemu is:
 
-Thanks, Juan.
+ qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
+positions --logfile
+/tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
+--random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
 
+The printed error message is:
+
+ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=3D1=
+ MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+Calling qemu with gdb gives the following information:
+
+ Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
+ 0x0000555555d63d11 in static_code_gen_buffer ()
+
+and
+
+ (gdb) bt
+ #0  0x0000555555d63d11 in static_code_gen_buffer ()
+ #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x5555=
+57c33930) at =
+
+ /tmp/build/qemu/accel/tcg/cpu-exec.c:172
+ #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic =
+pointer>, tb=3D<optimized out>, =
+
+ cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
+ #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel/t=
+cg/cpu-exec.c:731
+ #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/qe=
+mu/linux-user/arm/cpu_loop.c:219
+#5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized o=
+ut>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
+
+Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the log
+in the attached file.
+
+Thanks for any hints!
+Fabian
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: gcc9.2 segfault
+
+** Attachment added: "Debug with in_asm,int,op_opt"
+   https://bugs.launchpad.net/bugs/1856837/+attachment/5313610/+files/log-i=
+n_asm-int-op_opt
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856837
+
+Title:
+  qemu 4.2.0 arm  segmentation fault with gcc 9.2
+
+Status in QEMU:
+  New
+
+Bug description:
+  As discussed with f4bug yesterday on IRC here comes the bug
+  description.
+
+  I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
+  6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
+  linux-user" and debug enabled. I use the arm-linux-user variant,
+  "qemu-arm".
+
+  Then i'm trying to cross-compile (arm gcc) an old version of googles
+  v8 (as i need this version of the lib for binary compatibility) which
+  uses qemu during build.
+
+  It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
+  7.4.0 and 8.3.0 but those are also causing the same segmentation
+  fault.
+
+  The executed command wich breaks qemu is:
+
+   qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
+  positions --logfile
+  /tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
+  --random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
+
+  The printed error message is:
+
+  ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=
+=3D1 MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
+  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+
+  Calling qemu with gdb gives the following information:
+
+   Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
+   0x0000555555d63d11 in static_code_gen_buffer ()
+
+  and
+
+   (gdb) bt
+   #0  0x0000555555d63d11 in static_code_gen_buffer ()
+   #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55=
+5557c33930) at =
+
+   /tmp/build/qemu/accel/tcg/cpu-exec.c:172
+   #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<syntheti=
+c pointer>, tb=3D<optimized out>, =
+
+   cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
+   #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel=
+/tcg/cpu-exec.c:731
+   #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/=
+qemu/linux-user/arm/cpu_loop.c:219
+  #5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
+
+  Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the
+  log in the attached file.
+
+  Thanks for any hints!
+  Fabian
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856837/+subscriptions
 
