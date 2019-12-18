@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E01E0C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81517C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:17:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE4AB2072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:15:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C7812146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:17:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eCRZDY7v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE4AB2072B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k74tXKop"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C7812146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYEh-00065S-1g
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:15:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47200)
+	id 1ihYGg-0000Nc-Sd
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:17:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2z-0006F3-Tg
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:27 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3B-0006NX-H5
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2x-0000Ot-WB
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:21 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50297)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3A-0000kh-9p
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:33 -0500
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:46592)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY2x-0000LV-Lu
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:19 -0500
-Received: by mail-wm1-x334.google.com with SMTP id a5so1561974wmb.0
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:19 -0800 (PST)
+ id 1ihY3A-0000hB-1i
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:32 -0500
+Received: by mail-wr1-x434.google.com with SMTP id z7so1963174wrl.13
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=68N7S2GMWXB6Wxfq+Q7vQW0ttC/7iAxjGXgUq3dx0c4=;
- b=eCRZDY7v49kCODUceKl1GPUf1+RP/6J6WZUaJEEklcJn2DbVAbNCaZXxptQVY/7Irb
- +jvtGwbV3MJmCWJ4oOV/krEmr+zcuCH9fhn/XulNT9TiMGnTDrZ+Xa8dEV58AHsUfR/T
- ErQ867xmBJf0h2yNWXoqVJ+tpTSgW0SRGnld+u13qZoWFlCTLEd1HtWBcqZbG26yAlYp
- bXDOGPNQ0VCLlwYNi2XM+3utmaCX/ubOfH4L2pcpAOryHVwxvJamMY6fH1oJQMgJJrdo
- fVlWc7iwV61GKTSZVG40IrWAG9hpO5LVszVsDBO+I9k/iQQtNgEz75+4E3WYYMnwaUIz
- 576A==
+ bh=SnbM4HZb29FsG4J6fiW5WwWfE0ShjwYvCK5bmD3CYRU=;
+ b=k74tXKopfKzRPy/wQkZEPWyGWwStkA7fEXXEmn2NxdV+grs0EapWmEJ2Afonm/eJjG
+ GkX8+L6pr4Qc4wm3C06iM8VDGpyTTNIiF9J+qDZRcAkcpbJZbBs/OK/ta/szGZprBnLH
+ nqksaUXuMKIxwElnc41+AiJ2zodKk3LfArk2WRzZ019vMN+nC/3WOavUwqdRGP6BUoat
+ 2OYZQ1ErBOtXnpakoXJkddVW82XjuobCy/E4DSxayZDR14Qxc2LS/MAKFKG/wczXLaSF
+ 6cyDX+EmSmR4tP2f+gkkbNgwQLVHp6s9Q2HSWBpdJT9ZVfFoBle/iFH4hku1VtEEGYaw
+ l0Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=68N7S2GMWXB6Wxfq+Q7vQW0ttC/7iAxjGXgUq3dx0c4=;
- b=tsdv7BzmBUOsXiyQ9Aa/vC05h/DtD4SxXquELx6QQR2cDdLlbrAS+CYV1bddzcd25f
- Q1yiSqbYO7145XMJQkh6qc/sDa+wAkx1K+ve/AFH3GK/fFcuKv22nU5DiwWpapJXHWJv
- cLQlM3aGWVheBGJn4pCsGH0Qk+EW8emBnnN48e3NJ09LkMjU9Cwn6OwXJUXceA/VjBXO
- jqDjqIDBNUNUsZURVYjegLjm2kIjarrp2BVStvqAZnvVmKMM+cgppRwJlVC6SPTBQdws
- L8T4665vj7hn8+mAvXE+ZoHB+0n2q3p8xiDRIUqGOf8EcuVzPXE5NAGVztveuQ6s0IQ0
- nVfQ==
-X-Gm-Message-State: APjAAAWk7sURdp/pL6XhVNkRQtzEsYDrsGGQMDTdMERYaphR4W1S4JOi
- 7Fj31/JvIz4sbrl30rmvLEXOwhgw
-X-Google-Smtp-Source: APXvYqyDnMvO7HM8FOEYLEr8FM/K6w2OOgaCFbU4gpF+fu6RoIf3cFEZl+oq4bIL7bn/JF8qn6eOwg==
-X-Received: by 2002:a7b:c936:: with SMTP id h22mr2723031wml.115.1576670598269; 
- Wed, 18 Dec 2019 04:03:18 -0800 (PST)
+ bh=SnbM4HZb29FsG4J6fiW5WwWfE0ShjwYvCK5bmD3CYRU=;
+ b=iNzep+bK90HrmKgTDTbnrX0+E+tGSAFJK84lMBvL42rZAx19g8aQzYBhjutIfraTD+
+ 0CFtX39tg+I3YHPYrBqiLvyAwu4+DEcC2UFGOCeug4x/qiXYGdsigj5q9agayp+16h1D
+ xxwMA3G05t6Ii9kU+vkmXUjyO0ph0WQ076zFBDeKQ4pxY803E/Q5NmJckHJ7DgU1Ajg/
+ C6xaJt4BpOuKYc5z44UdhGvo3hnERMmCrC/n4yr07BFw0ROXA467seiwHhBw0o+TDyT7
+ GLA6oriwq2bUFDec05wMU5Tdx5UTkav7U0o+u2xTvoF84sDHe3X6+hAxkH02IkjBLJt8
+ iBhw==
+X-Gm-Message-State: APjAAAVd+lSMSEDTu7UC3URWQ1yHF+ustkCbKTLzWz3e9aqsB1G45NCo
+ 1UXgp4MiGMZgPjvUGFrfTBg4ehT7
+X-Google-Smtp-Source: APXvYqwE3r6OKAQOed6N+x8WWR8x6cTahbcHKP9KJJXfsw2dJMOzZ5XKEkY0k4YyE6MjKJSoGZ6F9A==
+X-Received: by 2002:a5d:6a8e:: with SMTP id s14mr2543802wru.150.1576670610728; 
+ Wed, 18 Dec 2019 04:03:30 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.17
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.29
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:17 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:30 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/87] accel: pass object to accel_init_machine
-Date: Wed, 18 Dec 2019 13:01:49 +0100
-Message-Id: <1576670573-48048-24-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 35/87] monitor: fix maybe-uninitialized
+Date: Wed, 18 Dec 2019 13:02:01 +0100
+Message-Id: <1576670573-48048-36-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::434
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,74 +93,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will have to set QOM properties before accel_init_machine, based on the
-options provided to -accel.  Construct the object outside it so that it
-will be possible to iterate on properties between object_new_with_class
-and accel_init_machine.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+../monitor/misc.c: In function ‘mon_get_cpu_sync’:
+/home/elmarco/src/qq/include/sysemu/hw_accel.h:22:9: error: ‘cpu’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+   22 |         kvm_cpu_synchronize_state(cpu);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../monitor/misc.c:397:15: note: ‘cpu’ was declared here
+  397 |     CPUState *cpu;
+      |               ^~~
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/accel.c          | 4 ++--
- include/sysemu/accel.h | 2 +-
- vl.c                   | 4 +++-
- 3 files changed, 6 insertions(+), 4 deletions(-)
+ monitor/misc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/accel/accel.c b/accel/accel.c
-index dd38a46..1c5c3a6 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -46,9 +46,9 @@ AccelClass *accel_find(const char *opt_name)
-     return ac;
- }
- 
--int accel_init_machine(AccelClass *acc, MachineState *ms)
-+int accel_init_machine(AccelState *accel, MachineState *ms)
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 3baa15f..a74cff3 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -394,7 +394,7 @@ int monitor_set_cpu(int cpu_index)
+ /* Callers must hold BQL. */
+ static CPUState *mon_get_cpu_sync(bool synchronize)
  {
--    AccelState *accel = ACCEL(object_new_with_class(OBJECT_CLASS(acc)));
-+    AccelClass *acc = ACCEL_GET_CLASS(accel);
-     int ret;
-     ms->accelerator = accel;
-     *(acc->allowed) = true;
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 90b6213..22cac0f 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -67,7 +67,7 @@ typedef struct AccelClass {
- extern unsigned long tcg_tb_size;
+-    CPUState *cpu;
++    CPUState *cpu = NULL;
  
- AccelClass *accel_find(const char *opt_name);
--int accel_init_machine(AccelClass *acc, MachineState *ms);
-+int accel_init_machine(AccelState *accel, MachineState *ms);
- 
- /* Called just before os_setup_post (ie just before drop OS privs) */
- void accel_setup_post(MachineState *ms);
-diff --git a/vl.c b/vl.c
-index 65e6b75..b2f00cc 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2716,6 +2716,7 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
-     bool *p_init_failed = opaque;
-     const char *acc = qemu_opt_get(opts, "accel");
-     AccelClass *ac = accel_find(acc);
-+    AccelState *accel;
-     int ret;
- 
-     if (!ac) {
-@@ -2723,7 +2724,8 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
-         error_report("invalid accelerator %s", acc);
-         return 0;
+     if (cur_mon->mon_cpu_path) {
+         cpu = (CPUState *) object_resolve_path_type(cur_mon->mon_cpu_path,
+@@ -411,6 +411,7 @@ static CPUState *mon_get_cpu_sync(bool synchronize)
+         monitor_set_cpu(first_cpu->cpu_index);
+         cpu = first_cpu;
      }
--    ret = accel_init_machine(ac, current_machine);
-+    accel = ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
-+    ret = accel_init_machine(accel, current_machine);
-     if (ret < 0) {
-         *p_init_failed = true;
-         error_report("failed to initialize %s: %s",
++    assert(cpu != NULL);
+     if (synchronize) {
+         cpu_synchronize_state(cpu);
+     }
 -- 
 1.8.3.1
 
