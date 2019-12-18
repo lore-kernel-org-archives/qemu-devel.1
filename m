@@ -2,63 +2,81 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C83C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1696CC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:10:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADF7C218AC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:09:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D93DF2146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 15:10:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="LxsxYt1C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF7C218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UCozZ/bI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D93DF2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihaws-0003vB-RF
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 10:09:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60021)
+	id 1ihaxy-00059h-Vu
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 10:10:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <a8d6dab2625554d425bd44a4d54d84459f083b18@lizzy.crudebyte.com>)
- id 1ihawF-0003Tf-Nw
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:08:37 -0500
+ (envelope-from <slp@redhat.com>) id 1ihawP-0003bX-4m
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:08:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <a8d6dab2625554d425bd44a4d54d84459f083b18@lizzy.crudebyte.com>)
- id 1ihawE-0003SZ-4y
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:08:35 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:52141)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <a8d6dab2625554d425bd44a4d54d84459f083b18@lizzy.crudebyte.com>)
- id 1ihawD-0006FQ-KN
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:08:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Subject:Date:Cc:To:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=qIKNwOBYoiZIKrTToOWeUyN8KcypATIyiBDvg/u2X54=; b=LxsxY
- t1CG7a8ljFxs3XKf9WXE0AHpMn3T9oQsPUpzVppgMFPLI5ZJb/JHhjbvUEKl+YBx85fD5BodTKWdE
- 8OxlK2XjynbpY/be5f7Q71xTqv8Sjg8/21f1/XZvx0MbttADP04QhOsvmNuDX7+uxuXCDaY4FNLvY
- GUjURJRQs7J5sLxt1CNVv5hcnuS4Hs5n9jVJd2BQjxVeb6ux6ZELgq/NQp09m++chFWclzkciZSJW
- XdNL1Nk6/JFr6VPh0deYdW4H/ipEUonIcfKWEX7ulFRM3zPBqUu2kHuTJWg6eWhRNAHxCqPIjWjas
- 6enTWuGGpJs9vlHrizkjBlb9XTkiw==;
-Message-Id: <a8d6dab2625554d425bd44a4d54d84459f083b18.1576678644.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1576678644.git.qemu_oss@crudebyte.com>
-References: <cover.1576678644.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Date: Wed, 18 Dec 2019 14:30:43 +0100
-Subject: [PATCH v2 4/9] tests/virtio-9p: added readdir test
+ (envelope-from <slp@redhat.com>) id 1ihawL-0004G9-QG
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:08:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31413
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1ihawL-0004C3-LD
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 10:08:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576681721;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=+zU9605pqX7Wzajiu1iFSoByg/A8JpvEG85wsowDPnM=;
+ b=UCozZ/bIP0p0qxLWuRRlyj+vOtThm42SbkSJzpq7WCyF1myec56vNCAOMpcDlo/266Djnx
+ 3vaHKeGZgz911CId9ltFFxSgpc2xl/AYtoJTk4D9JWiAQEoHADxKkIva9NvjzT5MAAJi0C
+ N8rmMD4j8NkirdpR8wjhfp5nZj/PQ5w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-fa92d3CPMU2EOoqtyedibQ-1; Wed, 18 Dec 2019 10:08:37 -0500
+X-MC-Unique: fa92d3CPMU2EOoqtyedibQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1D7F10752AB;
+ Wed, 18 Dec 2019 15:08:36 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B1EE21001281;
+ Wed, 18 Dec 2019 15:08:34 +0000 (UTC)
+References: <20191128104129.250206-1-slp@redhat.com>
+ <20191128104129.250206-5-slp@redhat.com>
+ <20191209160601.GB6715@linux.fritz.box>
+ <7ea304ab-0a4b-8c0a-ae9f-2f6501198840@redhat.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v5 4/4] blockdev: honor bdrv_try_set_aio_context() context
+ requirements
+In-reply-to: <7ea304ab-0a4b-8c0a-ae9f-2f6501198840@redhat.com>
+Date: Wed, 18 Dec 2019 16:08:29 +0100
+Message-ID: <87bls5zn6a.fsf@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.194.90.13
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,190 +88,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This first readdir test simply checks the amount of directory
-entries returned by 9pfs server, according to the created amount
-of virtual files on 9pfs synth driver side.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- tests/virtio-9p-test.c | 124 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 124 insertions(+)
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 06263edb53..48c0eca292 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
-     req->r_off += len;
- }
- 
-+static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-+{
-+    v9fs_memread(req, val, 1);
-+}
+Eric Blake <eblake@redhat.com> writes:
+
+> On 12/9/19 10:06 AM, Kevin Wolf wrote:
+>> Am 28.11.2019 um 11:41 hat Sergio Lopez geschrieben:
+>>> bdrv_try_set_aio_context() requires that the old context is held, and
+>>> the new context is not held. Fix all the occurrences where it's not
+>>> done this way.
+>>>
+>>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>>> ---
+>
+>> Or in fact, I think you need to hold the AioContext of a bs to
+>> bdrv_unref() it, so maybe 'goto out' is right, but you need to unref
+>> target_bs while you still hold old_context.
+>
+> I suspect https://bugzilla.redhat.com/show_bug.cgi?id=3D1779036 is also
+> a symptom of this.  The v5 patch did not fix this simple test case:
+>
+>
+> $ qemu-img create -f qcow2 f1 100m
+> $ qemu-img create -f qcow2 f2 100m
+> $ ./qemu-kvm -nodefaults -nographic -qmp stdio -object iothread,id=3Dio0 =
+\
+>  -drive driver=3Dqcow2,id=3Ddrive1,file=3Df1,if=3Dnone -device
+> virtio-scsi-pci,id=3Dscsi0,iothread=3Dio0 -device
+> scsi-hd,id=3Dimage1,drive=3Ddrive1 \
+>  -drive driver=3Dqcow2,id=3Ddrive2,file=3Df2,if=3Dnone -device
+> virtio-blk-pci,id=3Dimage2,drive=3Ddrive2,iothread=3Dio0
+>
+> {'execute':'qmp_capabilities'}
+>
+> {'execute':'transaction','arguments':{'actions':[
+> {'type':'blockdev-snapshot-sync','data':{'device':'drive1',
+> 'snapshot-file':'sn1','mode':'absolute-paths','format':'qcow2'}},
+> {'type':'blockdev-snapshot-sync','data':{'device':'drive2',
+> 'snapshot-file':'/aa/sn1','mode':'absolute-paths','format':'qcow2'}}]}}
+>
+> which is an aio context bug somewhere on the error path of
+> blockdev-snapshot-sync (the first one has to be rolled back because
+> the second part of the transaction fails early on a nonexistent
+> directory)
+
+This is slightly different. The problem resides in
+external_snapshot_abort():
+
+   1717 static void external_snapshot_abort(BlkActionState *common)
+   1718 {
+   1719     ExternalSnapshotState *state =3D
+   1720                              DO_UPCAST(ExternalSnapshotState, commo=
+n, common);
+   1721     if (state->new_bs) {
+   1722         if (state->overlay_appended) {
+   1723             AioContext *aio_context;
+   1724=20
+   1725             aio_context =3D bdrv_get_aio_context(state->old_bs);
+   1726             aio_context_acquire(aio_context);
+   1727=20
+   1728             bdrv_ref(state->old_bs);   /* we can't let bdrv_set_bac=
+kind_hd()
+   1729                                           close state->old_bs; we n=
+eed it */
+   1730             bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
+   1731             bdrv_replace_node(state->new_bs, state->old_bs, &error_=
+abort);
+   1732             bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'e=
+d old_bs */
+   1733=20
+   1734             aio_context_release(aio_context);
+   1735         }
+   1736     }
+   1737 }
+
+bdrv_set_backing_hd() returns state->old_bs to the main AioContext,
+while bdrv_replace_node() expects state->new_bs and state->old_bs to be
+using the same AioContext.
+
+I'm thinking sending this as a separate patch:
+
+diff --git a/blockdev.c b/blockdev.c
+index e33abd7fd2..6c73ac4e32 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1731,6 +1731,8 @@ static void external_snapshot_abort(BlkActionState *c=
+ommon)
+     if (state->new_bs) {
+         if (state->overlay_appended) {
+             AioContext *aio_context;
++            AioContext *tmp_context;
++            int ret;
+=20
+             aio_context =3D bdrv_get_aio_context(state->old_bs);
+             aio_context_acquire(aio_context);
+@@ -1738,6 +1740,25 @@ static void external_snapshot_abort(BlkActionState *=
+common)
+             bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backind_hd=
+()
+                                           close state->old_bs; we need it =
+*/
+             bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
 +
- static void v9fs_uint16_write(P9Req *req, uint16_t val)
- {
-     uint16_t le_val = cpu_to_le16(val);
-@@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
-     le32_to_cpus(val);
- }
- 
-+static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-+{
-+    v9fs_memread(req, val, 8);
-+    le64_to_cpus(val);
-+}
++            /*
++             * The call to bdrv_set_backing_hd() above returns state->old_=
+bs to
++             * the main AioContext. As we're still going to be using it, r=
+eturn
++             * it to the AioContext it was before.
++             */
++            tmp_context =3D bdrv_get_aio_context(state->old_bs);
++            if (aio_context !=3D tmp_context) {
++                aio_context_release(aio_context);
++                aio_context_acquire(tmp_context);
 +
- /* len[2] string[len] */
- static uint16_t v9fs_string_size(const char *string)
- {
-@@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RLOPEN ? "RLOPEN" :
-         id == P9_RWRITE ? "RWRITE" :
-         id == P9_RFLUSH ? "RFLUSH" :
-+        id == P9_RREADDIR ? "READDIR" :
-         "<unknown>";
- }
- 
-@@ -348,6 +360,79 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
-     v9fs_req_free(req);
- }
- 
-+/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-+static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-+                            uint32_t count, uint16_t tag)
-+{
-+    P9Req *req;
++                ret =3D bdrv_try_set_aio_context(state->old_bs,
++                                               aio_context, NULL);
++                assert(ret =3D=3D 0);
 +
-+    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-+    v9fs_uint32_write(req, fid);
-+    v9fs_uint64_write(req, offset);
-+    v9fs_uint32_write(req, count);
-+    v9fs_req_send(req);
-+    return req;
-+}
++                aio_context_release(tmp_context);
++                aio_context_acquire(aio_context);
++            }
 +
-+struct v9fs_dirent {
-+    v9fs_qid qid;
-+    uint64_t offset;
-+    uint8_t type;
-+    char *name;
-+    struct v9fs_dirent *next;
-+};
-+
-+/* size[4] Rreaddir tag[2] count[4] data[count] */
-+static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
-+                          struct v9fs_dirent **entries)
-+{
-+    uint32_t sz;
-+    struct v9fs_dirent *e = NULL;
-+    uint16_t slen;
-+    uint32_t n = 0;
-+
-+    v9fs_req_recv(req, P9_RREADDIR);
-+    v9fs_uint32_read(req, &sz);
-+
-+    if (count) {
-+        *count = sz;
-+    }
-+
-+    for (int32_t togo = (int32_t)sz;
-+         togo >= 13 + 8 + 1 + 2;
-+         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-+    {
-+        if (!e) {
-+            e = g_malloc(sizeof(struct v9fs_dirent));
-+            if (entries)
-+                *entries = e;
-+        } else {
-+            e = e->next = g_malloc(sizeof(struct v9fs_dirent));
-+        }
-+        e->next = NULL;
-+        /* qid[13] offset[8] type[1] name[s] */
-+        v9fs_memread(req, &e->qid, 13);
-+        v9fs_uint64_read(req, &e->offset);
-+        v9fs_uint8_read(req, &e->type);
-+        v9fs_string_read(req, &slen, &e->name);
-+    }
-+
-+    if (nentries) {
-+        *nentries = n;
-+    }
-+}
-+
-+static void v9fs_free_dirents(struct v9fs_dirent *e)
-+{
-+    struct v9fs_dirent *next = NULL;
-+
-+    for (; e; e = next) {
-+        next = e->next;
-+        g_free(e->name);
-+        g_free(e);
-+    }
-+}
-+
- /* size[4] Tlopen tag[2] fid[4] flags[4] */
- static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
-                           uint16_t tag)
-@@ -480,6 +565,44 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(wqid);
- }
- 
-+static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-+{
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-+    uint16_t nqid;
-+    v9fs_qid qid;
-+    uint32_t count, nentries;
-+    struct v9fs_dirent *entries = NULL;
-+    P9Req *req;
-+
-+    fs_attach(v9p, NULL, t_alloc);
-+    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rwalk(req, &nqid, NULL);
-+    g_assert_cmpint(nqid, ==, 1);
-+
-+    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rlopen(req, &qid, NULL);
-+
-+    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - P9_IOHDRSZ, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rreaddir(req, &count, &nentries, &entries);
-+
-+    /*
-+     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
-+     * dir entries with only one readdir request.
-+     */
-+    g_assert_cmpint(
-+        nentries, ==,
-+        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-+    );
-+
-+    v9fs_free_dirents(entries);
-+    g_free(wnames[0]);
-+}
-+
- static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtio9P *v9p = obj;
-@@ -658,6 +781,7 @@ static void register_virtio_9p_test(void)
-                  NULL);
-     qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
-                  NULL);
-+    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
- }
- 
- libqos_init(register_virtio_9p_test);
--- 
-2.20.1
+             bdrv_replace_node(state->new_bs, state->old_bs, &error_abort);
+             bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed old_b=
+s */
+
+What do you think?
+
+Sergio.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl36QO4ACgkQ9GknjS8M
+AjXPdQ//cROvK+82M1K2QyOHzMyEwIdGVwf9fHhfRB1ZElcEqvPXbMx1lVHRYz7S
+MF+EQNkwbJUs/1rdFPNWZHHrLlPmffZVDMx6vXSATgL/j+sUqxou1AJLGz5OYbJF
+tNJ8SxUAG2EFwNcWQcdJRThzbqy/alXw9PTZP3DPGib8+5paW2fr6IMsfolJGi7R
+qXrmeap369n6tVSv4unBA/zBIgZtpb2Ul414eat+j+rct5gbiJjAZhjhzXLW3KCe
+bs1UP2f+qIWzCaTDP8KZ7Atm0fkF4FQcxktcfguUllJ4xbteL9nc254c26iajdaa
+S5qDoyVazBQhzh87ei93fSqdWG+Zzu8orFQwzuSISzj6K7CdBk8bvBEpy2OQZbRs
+jCZiQE3YfXTRtRpyrouSWoSe6/lL4vZx5kDX1IW6ZY4BrrZ0w5hJgMucqsGzT0E8
+DQ2UmZ+fejDwpAl3kDGyX5LPm1oy8CKA1PaPs/ThoZNzzSqV1QHqA7jSb4ALSU8D
+bOL5htCl0aWtZdbpVQk5lvWRZYlqIpSWLJxVlP/ZH5NLUgaQJfER2YA43jUmM5dy
+5nSptaHeUx/8AI2MIe8bdDHrNwK6xYoop6xONbb9sltm3XtHDP9AJKbi504pbZ8F
+j1PWxcA27OOJ77Z8zOhjXwRE6vXVFSYpgF2q1ianHWBPuI/kTzw=
+=x3vk
+-----END PGP SIGNATURE-----
+--=-=-=--
 
 
