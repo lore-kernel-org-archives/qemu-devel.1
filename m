@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9126BC2D0CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CCDC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:42:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FFDB20717
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:41:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3113C20717
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:42:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxTfCfXG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FFDB20717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aVOdlXyE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3113C20717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihcOD-0005Va-1w
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:41:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45931)
+	id 1ihcP3-0006oO-0K
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:42:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ihcGU-0003YC-5F
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:35 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ihcGm-0003yc-Qy
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ihcGS-000305-Pt
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53380
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1ihcGl-00056H-5q
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:52 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47436
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihcGS-0002xK-MS
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:32 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihcGk-00052s-Uq
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576686812;
+ s=mimecast20190719; t=1576686830;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OnYGvJ06+l1FlWqGHZzLSS+/XEATbA9XcD6XhN6Ufxg=;
- b=dxTfCfXGUvU4wuHiXZa5M4x82A1MXwgcnkHd9ntzM4fE12FdtqumuQzLnOfr/eHKhzGPIn
- 7RsrDJ21yzlY7WQc2ahWI6hCggp+Ycl8s3bJdCB7XtfQGUzyq4pEem+m07Ty21PM2apVfv
- Z7BnmrWg038pj3fsvbWyu3IZOMQ+2dM=
+ bh=4fbCW/SiWWRFQMIcwfv+90yg5fa3lRtuz6Ug71HvyYs=;
+ b=aVOdlXyEozmxp7XfYd5NZshf5sCaFDyJGbUDl0lw5oNCPE+PMFnF252GkWnhwVf890a1Re
+ BdMHVluXB2ADyAe/QDIqPMgWothpuJsn0+L5O8c5FDZsWy/Ffbn0U8QtsZO9bfgYOfcX3s
+ Fy+5Lm5jGjm0BIszQgxt6ubFx0g+AXk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-q67cn_E4Ms2hr7_c0KvIGw-1; Wed, 18 Dec 2019 11:33:30 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-398-cip4xcv_PC2MN4tFy79DIA-1; Wed, 18 Dec 2019 11:33:48 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D2A31005502;
- Wed, 18 Dec 2019 16:33:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2FD8DB20;
+ Wed, 18 Dec 2019 16:33:47 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EB6491CB;
- Wed, 18 Dec 2019 16:33:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD8668885;
+ Wed, 18 Dec 2019 16:33:39 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v3 07/15] blockdev: adds bdrv_parse_aio to use io_uring
-Date: Wed, 18 Dec 2019 16:32:20 +0000
-Message-Id: <20191218163228.1613099-8-stefanha@redhat.com>
+Subject: [PATCH v3 09/15] block: add trace events for io_uring
+Date: Wed, 18 Dec 2019 16:32:22 +0000
+Message-Id: <20191218163228.1613099-10-stefanha@redhat.com>
 In-Reply-To: <20191218163228.1613099-1-stefanha@redhat.com>
 References: <20191218163228.1613099-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: q67cn_E4Ms2hr7_c0KvIGw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: cip4xcv_PC2MN4tFy79DIA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,91 +98,159 @@ From: Aarushi Mehta <mehta.aaru20@gmail.com>
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block.c               | 22 ++++++++++++++++++++++
- blockdev.c            | 12 ++++--------
- include/block/block.h |  1 +
- 3 files changed, 27 insertions(+), 8 deletions(-)
+ block/io_uring.c   | 23 ++++++++++++++++++++---
+ block/trace-events | 12 ++++++++++++
+ 2 files changed, 32 insertions(+), 3 deletions(-)
 
-diff --git a/block.c b/block.c
-index 473eb6eeaa..a06b47c638 100644
---- a/block.c
-+++ b/block.c
-@@ -845,6 +845,28 @@ static BlockdevDetectZeroesOptions bdrv_parse_detect_z=
-eroes(QemuOpts *opts,
-     return detect_zeroes;
+diff --git a/block/io_uring.c b/block/io_uring.c
+index bb433a685b..a5c0d16220 100644
+--- a/block/io_uring.c
++++ b/block/io_uring.c
+@@ -17,6 +17,7 @@
+ #include "block/raw-aio.h"
+ #include "qemu/coroutine.h"
+ #include "qapi/error.h"
++#include "trace.h"
+=20
+ /* io_uring ring size */
+ #define MAX_ENTRIES 128
+@@ -85,6 +86,8 @@ static void luring_resubmit_short_read(LuringState *s, Lu=
+ringAIOCB *luringcb,
+     QEMUIOVector *resubmit_qiov;
+     size_t remaining;
+=20
++    trace_luring_resubmit_short_read(s, luringcb, nread);
++
+     /* Update read position */
+     luringcb->total_read =3D nread;
+     remaining =3D luringcb->qiov->size - luringcb->total_read;
+@@ -156,6 +159,7 @@ static void luring_process_completions(LuringState *s)
+=20
+         /* Change counters one-by-one because we can be nested. */
+         s->io_q.in_flight--;
++        trace_luring_process_completion(s, luringcb, ret);
+=20
+         /* total_read is non-zero only for resubmitted read requests */
+         total_bytes =3D ret + luringcb->total_read;
+@@ -224,6 +228,7 @@ static int ioq_submit(LuringState *s)
+             QSIMPLEQ_REMOVE_HEAD(&s->io_q.submit_queue, next);
+         }
+         ret =3D io_uring_submit(&s->ring);
++        trace_luring_io_uring_submit(s, ret);
+         /* Prevent infinite loop if submission is refused */
+         if (ret <=3D 0) {
+             if (ret =3D=3D -EAGAIN) {
+@@ -280,12 +285,15 @@ static void ioq_init(LuringQueue *io_q)
+=20
+ void luring_io_plug(BlockDriverState *bs, LuringState *s)
+ {
++    trace_luring_io_plug(s);
+     s->io_q.plugged++;
  }
 =20
-+/**
-+ * Set open flags for aio engine
-+ *
-+ * Return 0 on success, -1 if the engine specified is invalid
-+ */
-+int bdrv_parse_aio(const char *mode, int *flags)
-+{
-+    if (!strcmp(mode, "threads")) {
-+        /* do nothing, default */
-+    } else if (!strcmp(mode, "native")) {
-+        *flags |=3D BDRV_O_NATIVE_AIO;
-+#ifdef CONFIG_LINUX_IO_URING
-+    } else if (!strcmp(mode, "io_uring")) {
-+        *flags |=3D BDRV_O_IO_URING;
-+#endif
-+    } else {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
- /**
-  * Set open flags for a given discard mode
-  *
-diff --git a/blockdev.c b/blockdev.c
-index 8e029e9c01..6523f9551d 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -385,13 +385,9 @@ static void extract_common_blockdev_options(QemuOpts *=
-opts, int *bdrv_flags,
-         }
+ void luring_io_unplug(BlockDriverState *bs, LuringState *s)
+ {
+     assert(s->io_q.plugged);
++    trace_luring_io_unplug(s, s->io_q.blocked, s->io_q.plugged,
++                           s->io_q.in_queue, s->io_q.in_flight);
+     if (--s->io_q.plugged =3D=3D 0 &&
+         !s->io_q.blocked && s->io_q.in_queue > 0) {
+         ioq_submit(s);
+@@ -306,6 +314,7 @@ void luring_io_unplug(BlockDriverState *bs, LuringState=
+ *s)
+ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
+                             uint64_t offset, int type)
+ {
++    int ret;
+     struct io_uring_sqe *sqes =3D &luringcb->sqeq;
 =20
-         if ((aio =3D qemu_opt_get(opts, "aio")) !=3D NULL) {
--            if (!strcmp(aio, "native")) {
--                *bdrv_flags |=3D BDRV_O_NATIVE_AIO;
--            } else if (!strcmp(aio, "threads")) {
--                /* this is the default */
--            } else {
--               error_setg(errp, "invalid aio option");
--               return;
-+            if (bdrv_parse_aio(aio, bdrv_flags) < 0) {
-+                error_setg(errp, "invalid aio option");
-+                return;
-             }
-         }
+     switch (type) {
+@@ -329,11 +338,14 @@ static int luring_do_submit(int fd, LuringAIOCB *luri=
+ngcb, LuringState *s,
+=20
+     QSIMPLEQ_INSERT_TAIL(&s->io_q.submit_queue, luringcb, next);
+     s->io_q.in_queue++;
+-
++    trace_luring_do_submit(s, s->io_q.blocked, s->io_q.plugged,
++                           s->io_q.in_queue, s->io_q.in_flight);
+     if (!s->io_q.blocked &&
+         (!s->io_q.plugged ||
+          s->io_q.in_flight + s->io_q.in_queue >=3D MAX_ENTRIES)) {
+-        return ioq_submit(s);
++        ret =3D ioq_submit(s);
++        trace_luring_do_submit_done(s, ret);
++        return ret;
      }
-@@ -4641,7 +4637,7 @@ QemuOptsList qemu_common_drive_opts =3D {
-         },{
-             .name =3D "aio",
-             .type =3D QEMU_OPT_STRING,
--            .help =3D "host AIO implementation (threads, native)",
-+            .help =3D "host AIO implementation (threads, native, io_uring)=
-",
-         },{
-             .name =3D BDRV_OPT_CACHE_WB,
-             .type =3D QEMU_OPT_BOOL,
-diff --git a/include/block/block.h b/include/block/block.h
-index 7071dc041e..2abe008399 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -300,6 +300,7 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverS=
-tate *bs_top,
- void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
-                        Error **errp);
+     return 0;
+ }
+@@ -348,8 +360,10 @@ int coroutine_fn luring_co_submit(BlockDriverState *bs=
+, LuringState *s, int fd,
+         .qiov       =3D qiov,
+         .is_read    =3D (type =3D=3D QEMU_AIO_READ),
+     };
+-
++    trace_luring_co_submit(bs, s, &luringcb, fd, offset, qiov ? qiov->size=
+ : 0,
++                           type);
+     ret =3D luring_do_submit(fd, &luringcb, s, offset, type);
++
+     if (ret < 0) {
+         return ret;
+     }
+@@ -382,6 +396,8 @@ LuringState *luring_init(Error **errp)
+     LuringState *s =3D g_new0(LuringState, 1);
+     struct io_uring *ring =3D &s->ring;
 =20
-+int bdrv_parse_aio(const char *mode, int *flags);
- int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough=
++    trace_luring_init_state(s, sizeof(*s));
++
+     rc =3D io_uring_queue_init(MAX_ENTRIES, ring, 0);
+     if (rc < 0) {
+         error_setg_errno(errp, errno, "failed to init linux io_uring ring"=
 );
- int bdrv_parse_discard_flags(const char *mode, int *flags);
- BdrvChild *bdrv_open_child(const char *filename,
+@@ -398,4 +414,5 @@ void luring_cleanup(LuringState *s)
+ {
+     io_uring_queue_exit(&s->ring);
+     g_free(s);
++    trace_luring_cleanup_state(s);
+ }
+diff --git a/block/trace-events b/block/trace-events
+index 6ba86decca..1a7329b736 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -63,6 +63,18 @@ qmp_block_stream(void *bs) "bs %p"
+ file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int t=
+ype) "acb %p opaque %p offset %"PRId64" count %d type %d"
+ file_copy_file_range(void *bs, int src, int64_t src_off, int dst, int64_t =
+dst_off, int64_t bytes, int flags, int64_t ret) "bs %p src_fd %d offset %"P=
+RIu64" dst_fd %d offset %"PRIu64" bytes %"PRIu64" flags %d ret %"PRId64
+=20
++#io_uring.c
++luring_init_state(void *s, size_t size) "s %p size %zu"
++luring_cleanup_state(void *s) "%p freed"
++luring_io_plug(void *s) "LuringState %p plug"
++luring_io_unplug(void *s, int blocked, int plugged, int queued, int inflig=
+ht) "LuringState %p blocked %d plugged %d queued %d inflight %d"
++luring_do_submit(void *s, int blocked, int plugged, int queued, int inflig=
+ht) "LuringState %p blocked %d plugged %d queued %d inflight %d"
++luring_do_submit_done(void *s, int ret) "LuringState %p submitted to kerne=
+l %d"
++luring_co_submit(void *bs, void *s, void *luringcb, int fd, uint64_t offse=
+t, size_t nbytes, int type) "bs %p s %p luringcb %p fd %d offset %" PRId64 =
+" nbytes %zd type %d"
++luring_process_completion(void *s, void *aiocb, int ret) "LuringState %p l=
+uringcb %p ret %d"
++luring_io_uring_submit(void *s, int ret) "LuringState %p ret %d"
++luring_resubmit_short_read(void *s, void *luringcb, int nread) "LuringStat=
+e %p luringcb %p nread %d"
++
+ # qcow2.c
+ qcow2_add_task(void *co, void *bs, void *pool, const char *action, int clu=
+ster_type, uint64_t file_cluster_offset, uint64_t offset, uint64_t bytes, v=
+oid *qiov, size_t qiov_offset) "co %p bs %p pool %p: %s: cluster_type %d fi=
+le_cluster_offset %" PRIu64 " offset %" PRIu64 " bytes %" PRIu64 " qiov %p =
+qiov_offset %zu"
+ qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset =
+0x%" PRIx64 " bytes %d"
 --=20
 2.23.0
 
