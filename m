@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 556E2C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FBC1C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C8D2206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0A3A21582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:21:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecscruxt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8D2206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lG+0VwIS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A3A21582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYKK-00057K-J6
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:21:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47127)
+	id 1ihYKd-0005Xg-Hw
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:21:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47550)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2x-0006Da-Mw
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:22 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY37-0006Hd-Bh
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2u-0000JY-0Q
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:18 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:51666)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY35-0000TB-3r
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:29 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:36635)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY2t-0000FM-Jg
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:15 -0500
-Received: by mail-wm1-x334.google.com with SMTP id d73so1561380wmd.1
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:15 -0800 (PST)
+ id 1ihY2z-0000QB-UR
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:22 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id z3so2023018wru.3
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=meJ3c7hsdmH9Bt9d5yNFDIbdJ46wwRMldpHUVRjZwpk=;
- b=ecscruxtZ32moibs9ZvfE9EprSAOcmiB0KxuR4iCE64alJrx/vVN4zNhTpQS3kbRnA
- QfcYEkB83/UGGLX43jZFv3ohIKy/0ZvzdqFcEktT9RAVkg5ctH/L5T94h0ggsZav3CBP
- TGUN+jl2Cj4s3b9wWjLia8L6+QXnasvA6X23TLcz+7IJ2e1N1/BcWQhGYNx4TTbtePs7
- a5NrXLSvUO3H4iJEq7cPK3LDHCeCfCJvTE0GGt7K42CECNnE2fIJbecAGKkiAk7yM31A
- hd7xy8GclETklfv6P0qLFbQ8ItjvTV5Iw0AOAqsK2rbDJPheQf0OuIndB7ytbreQ7Xjf
- LIXA==
+ bh=4RMbJ1vgiB2ahPcjjY43T5z1jQHk/pVa3Mh71/KfOko=;
+ b=lG+0VwIScgbnXTvwj3g0j5NFtiBRuFf0EXntw6vJu9oh1f+iASjDj53KUQOBIbI3lg
+ OUGJSvktegxjnq3CfRrd9fhc65l9zJE/aWu6BhK0Ei+Zv4KvGp3rZSMXgVH6FOCxsjRs
+ R5NLWLu0PYCsNQSF1VOUgBpNtmr/4WZq5PRZI+DCV1TqSJLG8DE4SsM9gP49XEA5+p5G
+ PEampx1j65U+zb+RvTxVv5/SzWRtOttg9FG1iagoQkDZ1/tbWnhyB8r4/hZE6OGK4hzx
+ p6pVTfbXD63VKuVCkIODqAAxq9WZaUZJCELUzDvulkijOphfwsYG1A8dPyTUlsHrG05Y
+ lajA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=meJ3c7hsdmH9Bt9d5yNFDIbdJ46wwRMldpHUVRjZwpk=;
- b=o3QGXG8dcWE72WX1r3g2UleW7bKMrdsgpb5zPo5LG4j68YCGO+glolYoQ6eOMKXdQM
- tziWy936L83G8k/zrtUFLT9qq2ma8DGez5H1qhIYJ3Z6uzcRlJvBfckEtku4U+OYJthN
- y1X8uDykRGrK95Hazd36TXfnOqQZ1vAl2QljQ1U/Fx249HG5ldWwRyZS40soVJZ9AglV
- BoKrsH2OXXiK1E2G/RhK1v04UaoWFmpJrLjNnvP+QbkBiVex7yxeQxFBOoXsDRAuGOF/
- lcwmCV8gqzuSZ4uEnER1dzUd9IJ4iWhBoJft0TK/A2JPCHFVCictzwtwBjCrOp7Dstp/
- OEcg==
-X-Gm-Message-State: APjAAAXTMJWqMbeqeqiNv7jgtM6flctT5FZe4LvWBlrSxEkd5MMs9SoP
- fAxi1aEudGbUI8t+EwYsSI+RKUVj
-X-Google-Smtp-Source: APXvYqx/RS1R6uHMGOlt2qc7zBrm2gB7IlswiE3UgmIg/LpAbwYe+Hq+AJdqDxAfpIbmwfdheo6pKw==
-X-Received: by 2002:a1c:9602:: with SMTP id y2mr2825571wmd.23.1576670593978;
- Wed, 18 Dec 2019 04:03:13 -0800 (PST)
+ bh=4RMbJ1vgiB2ahPcjjY43T5z1jQHk/pVa3Mh71/KfOko=;
+ b=njzcQ/ClX4AWK4chbZnWR7n2jdxIB2QlVcHGdJV20Oe6wVGx9RrXHaZ4dh9BSv5czu
+ q0PE7q5fyNqbUgwTGYU9vGDtMKyERDprKMUj2G5XuHhXjD2yC2FttRFXy0PU/OYCZqKm
+ b1SNzliCCn2ZsVfaUG2U/wBTJXwXfv0Gv9KiGiOxUPEcY+2zoUQmQRGrBrWT7iPWJ3sE
+ jdLMLAGaa67vypJhNJfYOuI3elgEsQ0zaEn0EMITFxhvQaG731Z84mM7p0bsOP8apQ1W
+ E5lmxgHaMk+X/tPsoorJI7uyRRgbtImFq35GsSJCwlbAJeKzrEVvdLNjhJoTtBSqcx7s
+ HLNw==
+X-Gm-Message-State: APjAAAWKqFuu6JtY8QAKAmtbFMVhbOxlf9D9NdmCTyvYg8dX6AwtrN9e
+ URyZnD/AmO15Vup61Q7Zhdt9qgnj
+X-Google-Smtp-Source: APXvYqx13J5jyZLllEhTNuvQMjlZTRJUNwyReVcUJ4aW3NINinwW60S5IEOUUpauU9vvK2T5rcNJLg==
+X-Received: by 2002:a5d:51c6:: with SMTP id n6mr2378181wrv.250.1576670600392; 
+ Wed, 18 Dec 2019 04:03:20 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.13
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.19
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:13 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:19 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/87] vl: configure accelerators from -accel options
-Date: Wed, 18 Dec 2019 13:01:45 +0100
-Message-Id: <1576670573-48048-20-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 25/87] tcg: add "-accel tcg,tb-size" and deprecate "-tb-size"
+Date: Wed, 18 Dec 2019 13:01:51 +0100
+Message-Id: <1576670573-48048-26-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,549 +94,199 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Drop the "accel" property from MachineState, and instead desugar
-"-machine accel=" to a list of "-accel" options.
-
-This has a semantic change due to removing merge_lists from -accel.
-For example:
-
-- "-accel kvm -accel tcg" all but ignored "-accel kvm".  This is a bugfix.
-
-- "-accel kvm -accel thread=single" ignored "thread=single", since it
-  applied the option to KVM.  Now it fails due to not specifying the
-  accelerator on "-accel thread=single".
-
-- "-accel tcg -accel thread=single" chose single-threaded TCG, while now
-  it will fail due to not specifying the accelerator on "-accel
-  thread=single".
-
-Also, "-machine accel" and "-accel" become incompatible.
+-tb-size fits nicely in the new framework for accelerator-specific options.  It
+is a very niche option, so insta-deprecate it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/machine.c         | 21 -----------
- include/hw/boards.h       |  1 -
- tests/arm-cpu-features.c  |  4 +-
- tests/bios-tables-test.c  | 16 ++++----
- tests/boot-serial-test.c  |  4 +-
- tests/cdrom-test.c        |  2 +-
- tests/libqtest.c          |  4 +-
- tests/migration-test.c    | 23 +++++-------
- tests/pflash-cfi02-test.c |  4 +-
- tests/pnv-xscom-test.c    |  4 +-
- tests/prom-env-test.c     |  2 +-
- tests/pxe-test.c          |  2 +-
- tests/vmgenid-test.c      |  2 +-
- vl.c                      | 93 +++++++++++++++++++++++++++--------------------
- 14 files changed, 85 insertions(+), 97 deletions(-)
+ accel/tcg/tcg-all.c    | 40 +++++++++++++++++++++++++++++++++++++---
+ include/sysemu/accel.h |  2 --
+ qemu-deprecated.texi   |  6 ++++++
+ qemu-options.hx        |  8 ++++++--
+ vl.c                   |  8 ++++----
+ 5 files changed, 53 insertions(+), 11 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 023548b..e661fa6 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -178,21 +178,6 @@ GlobalProperty hw_compat_2_1[] = {
- };
- const size_t hw_compat_2_1_len = G_N_ELEMENTS(hw_compat_2_1);
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 7829f02..1dc384c 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -34,11 +34,13 @@
+ #include "include/qapi/error.h"
+ #include "include/qemu/error-report.h"
+ #include "include/hw/boards.h"
++#include "qapi/qapi-builtin-visit.h"
  
--static char *machine_get_accel(Object *obj, Error **errp)
--{
--    MachineState *ms = MACHINE(obj);
+ typedef struct TCGState {
+     AccelState parent_obj;
+ 
+     bool mttcg_enabled;
++    unsigned long tb_size;
+ } TCGState;
+ 
+ #define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
+@@ -46,8 +48,6 @@ typedef struct TCGState {
+ #define TCG_STATE(obj) \
+         OBJECT_CHECK(TCGState, (obj), TYPE_TCG_ACCEL)
+ 
+-unsigned long tcg_tb_size;
 -
--    return g_strdup(ms->accel);
--}
+ /* mask must never be zero, except for A20 change call */
+ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+ {
+@@ -126,7 +126,7 @@ static int tcg_init(MachineState *ms)
+ {
+     TCGState *s = TCG_STATE(current_machine->accelerator);
+ 
+-    tcg_exec_init(tcg_tb_size * 1024 * 1024);
++    tcg_exec_init(s->tb_size * 1024 * 1024);
+     cpu_interrupt_handler = tcg_handle_interrupt;
+     mttcg_enabled = s->mttcg_enabled;
+     return 0;
+@@ -167,6 +167,33 @@ static void tcg_set_thread(Object *obj, const char *value, Error **errp)
+     }
+ }
+ 
++static void tcg_get_tb_size(Object *obj, Visitor *v,
++                            const char *name, void *opaque,
++                            Error **errp)
++{
++    TCGState *s = TCG_STATE(obj);
++    uint32_t value = s->tb_size;
++
++    visit_type_uint32(v, name, &value, errp);
++}
++
++static void tcg_set_tb_size(Object *obj, Visitor *v,
++                            const char *name, void *opaque,
++                            Error **errp)
++{
++    TCGState *s = TCG_STATE(obj);
++    Error *error = NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++
++    s->tb_size = value;
++}
++
+ static void tcg_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelClass *ac = ACCEL_CLASS(oc);
+@@ -178,6 +205,13 @@ static void tcg_accel_class_init(ObjectClass *oc, void *data)
+                                   tcg_get_thread,
+                                   tcg_set_thread,
+                                   NULL);
++
++    object_class_property_add(oc, "tb-size", "int",
++        tcg_get_tb_size, tcg_set_tb_size,
++        NULL, NULL, &error_abort);
++    object_class_property_set_description(oc, "tb-size",
++        "TCG translation block cache size", &error_abort);
++
+ }
+ 
+ static const TypeInfo tcg_accel_type = {
+diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+index 22cac0f..d4c1429 100644
+--- a/include/sysemu/accel.h
++++ b/include/sysemu/accel.h
+@@ -64,8 +64,6 @@ typedef struct AccelClass {
+ #define ACCEL_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(AccelClass, (obj), TYPE_ACCEL)
+ 
+-extern unsigned long tcg_tb_size;
 -
--static void machine_set_accel(Object *obj, const char *value, Error **errp)
--{
--    MachineState *ms = MACHINE(obj);
--
--    g_free(ms->accel);
--    ms->accel = g_strdup(value);
--}
--
- static void machine_set_kernel_irqchip(Object *obj, Visitor *v,
-                                        const char *name, void *opaque,
-                                        Error **errp)
-@@ -813,11 +798,6 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     mc->numa_mem_align_shift = 23;
-     mc->numa_auto_assign_ram = numa_default_auto_assign_ram;
+ AccelClass *accel_find(const char *opt_name);
+ int accel_init_machine(AccelState *accel, MachineState *ms);
  
--    object_class_property_add_str(oc, "accel",
--        machine_get_accel, machine_set_accel, &error_abort);
--    object_class_property_set_description(oc, "accel",
--        "Accelerator list", &error_abort);
--
-     object_class_property_add(oc, "kernel-irqchip", "on|off|split",
-         NULL, machine_set_kernel_irqchip,
-         NULL, NULL, &error_abort);
-@@ -976,7 +956,6 @@ static void machine_finalize(Object *obj)
- {
-     MachineState *ms = MACHINE(obj);
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 62680f7..e88f6d1 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -142,6 +142,12 @@ QEMU 4.1 has three options, please migrate to one of these three:
+       to do is specify the kernel they want to boot with the -kernel option
+  3. ``-bios <file>`` - Tells QEMU to load the specified file as the firmwrae.
  
--    g_free(ms->accel);
-     g_free(ms->kernel_filename);
-     g_free(ms->initrd_filename);
-     g_free(ms->kernel_cmdline);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 24cbeec..96f2084 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -275,7 +275,6 @@ struct MachineState {
++@subsection -tb-size option (since 5.0)
++
++QEMU 5.0 introduced an alternative syntax to specify the size of the translation
++block cache, @option{-accel tcg,tb-size=}.  The new syntax deprecates the
++previously available @option{-tb-size} option.
++
+ @section QEMU Machine Protocol (QMP) commands
  
-     /*< public >*/
+ @subsection change (since 2.5.0)
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c63e794..ee1f676 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -118,8 +118,9 @@ Select CPU model (@code{-cpu help} for list and additional feature selection)
+ ETEXI
  
--    char *accel;
-     bool kernel_irqchip_allowed;
-     bool kernel_irqchip_required;
-     bool kernel_irqchip_split;
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index 6e99aa9..bef3ed2 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -20,8 +20,8 @@
-  */
- #define SVE_MAX_VQ 16
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+-    "-accel [accel=]accelerator[,thread=single|multi]\n"
++    "-accel [accel=]accelerator[,prop[=value][,...]]\n"
+     "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
++    "                tb-size=n (TCG translation block cache size)\n"
+     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+@@ -129,6 +130,8 @@ kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is used. If th
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @table @option
++@item tb-size=@var{n}
++Controls the size (in MiB) of the TCG translation block cache.
+ @item thread=single|multi
+ Controls number of TCG threads. When the TCG is multi-threaded there will be one
+ thread per vCPU therefor taking advantage of additional host cores. The default
+@@ -3923,7 +3926,8 @@ DEF("tb-size", HAS_ARG, QEMU_OPTION_tb_size, \
+ STEXI
+ @item -tb-size @var{n}
+ @findex -tb-size
+-Set TB size.
++Set TCG translation block cache size.  Deprecated, use @samp{-accel tcg,tb-size=@var{n}}
++instead.
+ ETEXI
  
--#define MACHINE     "-machine virt,gic-version=max,accel=tcg "
--#define MACHINE_KVM "-machine virt,gic-version=max,accel=kvm:tcg "
-+#define MACHINE     "-machine virt,gic-version=max -accel tcg "
-+#define MACHINE_KVM "-machine virt,gic-version=max -accel kvm -accel tcg "
- #define QUERY_HEAD  "{ 'execute': 'query-cpu-model-expansion', " \
-                     "  'arguments': { 'type': 'full', "
- #define QUERY_TAIL  "}}"
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 79f5da0..bc0ad59 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -51,7 +51,7 @@
- #define ACPI_REBUILD_EXPECTED_AML "TEST_ACPI_REBUILD_AML"
- 
- typedef struct {
--    const char *accel;
-+    bool tcg_only;
-     const char *machine;
-     const char *variant;
-     const char *uefi_fl1;
-@@ -607,19 +607,19 @@ static void test_acpi_one(const char *params, test_data *data)
-          * TODO: convert '-drive if=pflash' to new syntax (see e33763be7cd3)
-          * when arm/virt boad starts to support it.
-          */
--        args = g_strdup_printf("-machine %s,accel=%s -nodefaults -nographic "
-+        args = g_strdup_printf("-machine %s %s -accel tcg -nodefaults -nographic "
-             "-drive if=pflash,format=raw,file=%s,readonly "
-             "-drive if=pflash,format=raw,file=%s,snapshot=on -cdrom %s %s",
--            data->machine, data->accel ? data->accel : "kvm:tcg",
-+            data->machine, data->tcg_only ? "" : "-accel kvm",
-             data->uefi_fl1, data->uefi_fl2, data->cd, params ? params : "");
- 
-     } else {
-         /* Disable kernel irqchip to be able to override apic irq0. */
--        args = g_strdup_printf("-machine %s,accel=%s,kernel-irqchip=off "
-+        args = g_strdup_printf("-machine %s,kernel-irqchip=off %s -accel tcg "
-             "-net none -display none %s "
-             "-drive id=hd0,if=none,file=%s,format=raw "
-             "-device ide-hd,drive=hd0 ",
--             data->machine, data->accel ? data->accel : "kvm:tcg",
-+             data->machine, data->tcg_only ? "" : "-accel kvm",
-              params ? params : "", disk);
-     }
- 
-@@ -904,7 +904,7 @@ static void test_acpi_virt_tcg_memhp(void)
- {
-     test_data data = {
-         .machine = "virt",
--        .accel = "tcg",
-+        .tcg_only = true,
-         .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
-         .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
-         .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
-@@ -929,7 +929,7 @@ static void test_acpi_virt_tcg_numamem(void)
- {
-     test_data data = {
-         .machine = "virt",
--        .accel = "tcg",
-+        .tcg_only = true,
-         .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
-         .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
-         .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
-@@ -951,7 +951,7 @@ static void test_acpi_virt_tcg(void)
- {
-     test_data data = {
-         .machine = "virt",
--        .accel = "tcg",
-+        .tcg_only = true,
-         .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
-         .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
-         .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index d3a54a0..05c7f44 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -215,9 +215,9 @@ static void test_machine(const void *data)
-      * Make sure that this test uses tcg if available: It is used as a
-      * fast-enough smoketest for that.
-      */
--    qts = qtest_initf("%s %s -M %s,accel=tcg:kvm -no-shutdown "
-+    qts = qtest_initf("%s %s -M %s -no-shutdown "
-                       "-chardev file,id=serial0,path=%s "
--                      "-serial chardev:serial0 %s",
-+                      "-serial chardev:serial0 -accel tcg -accel kvm %s",
-                       codeparam, code ? codetmp : "", test->machine,
-                       serialtmp, test->extra);
-     if (code) {
-diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-index 34e9974..67635e3 100644
---- a/tests/cdrom-test.c
-+++ b/tests/cdrom-test.c
-@@ -120,7 +120,7 @@ static void test_cdboot(gconstpointer data)
- {
-     QTestState *qts;
- 
--    qts = qtest_initf("-M accel=kvm:tcg -no-shutdown %s%s", (const char *)data,
-+    qts = qtest_initf("-accel kvm -accel tcg -no-shutdown %s%s", (const char *)data,
-                       isoimage);
-     boot_sector_test(qts);
-     qtest_quit(qts);
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index f36e30a..76c9f8e 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -241,9 +241,9 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
-                               "-qtest-log %s "
-                               "-chardev socket,path=%s,id=char0 "
-                               "-mon chardev=char0,mode=control "
--                              "-accel qtest "
-                               "-display none "
--                              "%s", qemu_binary, socket_path,
-+                              "%s"
-+                              " -accel qtest", qemu_binary, socket_path,
-                               getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
-                               qmp_socket_path,
-                               extra_args ?: "");
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index dbe25b8..e56e6dc 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -577,8 +577,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-     char *shmem_opts;
-     char *shmem_path;
-     const char *arch = qtest_get_arch();
--    const char *machine_type;
--    const char *machine_args;
-+    const char *machine_opts = NULL;
-     const char *memory_size;
- 
-     if (args->use_shmem) {
-@@ -594,8 +593,6 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         /* the assembled x86 boot sector should be exactly one sector large */
-         assert(sizeof(x86_bootsect) == 512);
-         init_bootfile(bootpath, x86_bootsect, sizeof(x86_bootsect));
--        machine_type = "";
--        machine_args = "";
-         memory_size = "150M";
-         arch_source = g_strdup_printf("-drive file=%s,format=raw", bootpath);
-         arch_target = g_strdup(arch_source);
-@@ -603,16 +600,13 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         end_address = X86_TEST_MEM_END;
-     } else if (g_str_equal(arch, "s390x")) {
-         init_bootfile(bootpath, s390x_elf, sizeof(s390x_elf));
--        machine_type = "";
--        machine_args = "";
-         memory_size = "128M";
-         arch_source = g_strdup_printf("-bios %s", bootpath);
-         arch_target = g_strdup(arch_source);
-         start_address = S390_TEST_MEM_START;
-         end_address = S390_TEST_MEM_END;
-     } else if (strcmp(arch, "ppc64") == 0) {
--        machine_type = "";
--        machine_args = ",vsmt=8";
-+        machine_opts = "vsmt=8";
-         memory_size = "256M";
-         arch_source = g_strdup_printf("-nodefaults "
-                                       "-prom-env 'use-nvramrc?=true' -prom-env "
-@@ -624,8 +618,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         end_address = PPC_TEST_MEM_END;
-     } else if (strcmp(arch, "aarch64") == 0) {
-         init_bootfile(bootpath, aarch64_kernel, sizeof(aarch64_kernel));
--        machine_type = "virt,";
--        machine_args = "gic-version=max";
-+        machine_opts = "virt,gic-version=max";
-         memory_size = "150M";
-         arch_source = g_strdup_printf("-cpu max "
-                                       "-kernel %s",
-@@ -658,12 +651,13 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         shmem_opts = g_strdup("");
-     }
- 
--    cmd_source = g_strdup_printf("-machine %saccel=kvm:tcg%s "
-+    cmd_source = g_strdup_printf("-accel kvm -accel tcg%s%s "
-                                  "-name source,debug-threads=on "
-                                  "-m %s "
-                                  "-serial file:%s/src_serial "
-                                  "%s %s %s %s",
--                                 machine_type, machine_args,
-+                                 machine_opts ? " -machine " : "",
-+                                 machine_opts ? machine_opts : "",
-                                  memory_size, tmpfs,
-                                  arch_source, shmem_opts, args->opts_source,
-                                  ignore_stderr);
-@@ -671,13 +665,14 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-     *from = qtest_init(cmd_source);
-     g_free(cmd_source);
- 
--    cmd_target = g_strdup_printf("-machine %saccel=kvm:tcg%s "
-+    cmd_target = g_strdup_printf("-accel kvm -accel tcg%s%s "
-                                  "-name target,debug-threads=on "
-                                  "-m %s "
-                                  "-serial file:%s/dest_serial "
-                                  "-incoming %s "
-                                  "%s %s %s %s",
--                                 machine_type, machine_args,
-+                                 machine_opts ? " -machine " : "",
-+                                 machine_opts ? machine_opts : "",
-                                  memory_size, tmpfs, uri,
-                                  arch_target, shmem_opts,
-                                  args->opts_target, ignore_stderr);
-diff --git a/tests/pflash-cfi02-test.c b/tests/pflash-cfi02-test.c
-index d3b23f4..17aa669 100644
---- a/tests/pflash-cfi02-test.c
-+++ b/tests/pflash-cfi02-test.c
-@@ -260,7 +260,7 @@ static void test_geometry(const void *opaque)
- {
-     const FlashConfig *config = opaque;
-     QTestState *qtest;
--    qtest = qtest_initf("-M musicpal,accel=qtest"
-+    qtest = qtest_initf("-M musicpal"
-                         " -drive if=pflash,file=%s,format=raw,copy-on-read"
-                         /* Device geometry properties. */
-                         " -global driver=cfi.pflash02,"
-@@ -580,7 +580,7 @@ static void test_cfi_in_autoselect(const void *opaque)
- {
-     const FlashConfig *config = opaque;
-     QTestState *qtest;
--    qtest = qtest_initf("-M musicpal,accel=qtest"
-+    qtest = qtest_initf("-M musicpal"
-                         " -drive if=pflash,file=%s,format=raw,copy-on-read",
-                         image_path);
-     FlashConfig explicit_config = expand_config_defaults(config);
-diff --git a/tests/pnv-xscom-test.c b/tests/pnv-xscom-test.c
-index 9fddc7d..2c46d5c 100644
---- a/tests/pnv-xscom-test.c
-+++ b/tests/pnv-xscom-test.c
-@@ -84,7 +84,7 @@ static void test_cfam_id(const void *data)
-         machine = "powernv9";
-     }
- 
--    qts = qtest_initf("-M %s,accel=tcg -cpu %s",
-+    qts = qtest_initf("-M %s -accel tcg -cpu %s",
-                       machine, chip->cpu_model);
-     test_xscom_cfam_id(qts, chip);
-     qtest_quit(qts);
-@@ -125,7 +125,7 @@ static void test_core(const void *data)
-         machine = "powernv9";
-     }
- 
--    qts = qtest_initf("-M %s,accel=tcg -cpu %s",
-+    qts = qtest_initf("-M %s -accel tcg -cpu %s",
-                       machine, chip->cpu_model);
-     test_xscom_core(qts, chip);
-     qtest_quit(qts);
-diff --git a/tests/prom-env-test.c b/tests/prom-env-test.c
-index 61bc1d1..9be52c7 100644
---- a/tests/prom-env-test.c
-+++ b/tests/prom-env-test.c
-@@ -57,7 +57,7 @@ static void test_machine(const void *machine)
-             " -machine cap-cfpc=broken,cap-sbbc=broken,cap-ibs=broken";
-     }
- 
--    qts = qtest_initf("-M %s,accel=tcg %s -prom-env 'use-nvramrc?=true' "
-+    qts = qtest_initf("-M %s -accel tcg %s -prom-env 'use-nvramrc?=true' "
-                       "-prom-env 'nvramrc=%x %x l!' ", (const char *)machine,
-                       extra_args, MAGIC, ADDRESS);
-     check_guest_memory(qts);
-diff --git a/tests/pxe-test.c b/tests/pxe-test.c
-index aaae54f..f68d0aa 100644
---- a/tests/pxe-test.c
-+++ b/tests/pxe-test.c
-@@ -74,7 +74,7 @@ static void test_pxe_one(const testdef_t *test, bool ipv6)
-     }
- 
-     args = g_strdup_printf(
--        "-machine %s,accel=kvm:tcg -nodefaults -boot order=n "
-+        "-accel kvm -accel tcg -machine %s -nodefaults -boot order=n "
-         "-netdev user,id=" NETNAME ",tftp=./,bootfile=%s,ipv4=%s,ipv6=%s "
-         "-device %s,bootindex=1,netdev=" NETNAME " %s",
-         test->machine, disk, ipv6 ? "off" : "on", ipv6 ? "on" : "off",
-diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
-index 85d8e64..efba76e 100644
---- a/tests/vmgenid-test.c
-+++ b/tests/vmgenid-test.c
-@@ -109,7 +109,7 @@ static void read_guid_from_monitor(QTestState *qts, QemuUUID *guid)
- static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
- 
- #define GUID_CMD(guid)                          \
--    "-machine accel=kvm:tcg "                   \
-+    "-accel kvm -accel tcg "                    \
-     "-device vmgenid,id=testvgid,guid=%s "      \
-     "-drive id=hd0,if=none,file=%s,format=raw " \
-     "-device ide-hd,drive=hd0 ", guid, disk
+ DEF("incoming", HAS_ARG, QEMU_OPTION_incoming, \
 diff --git a/vl.c b/vl.c
-index efd3b11..0f620be 100644
+index 7f2f3fb..900f97a 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -292,7 +292,6 @@ static QemuOptsList qemu_accel_opts = {
-     .name = "accel",
-     .implied_opt_name = "accel",
-     .head = QTAILQ_HEAD_INITIALIZER(qemu_accel_opts.head),
--    .merge_lists = true,
-     .desc = {
-         {
-             .name = "accel",
-@@ -2523,6 +2522,11 @@ static int machine_set_property(void *opaque,
-         }
+@@ -2727,6 +2727,7 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+         return 0;
      }
- 
-+    /* Legacy options do not correspond to MachineState properties.  */
-+    if (g_str_equal(qom_name, "accel")) {
-+        return 0;
-+    }
+     accel = ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
++    object_apply_compat_props(OBJECT(accel));
+     qemu_opt_foreach(opts, accelerator_set_property,
+                      accel,
+                      &error_fatal);
+@@ -2738,6 +2739,7 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+                      acc, strerror(-ret));
+         return 0;
+     }
 +
-     return object_parse_property_opt(opaque, name, value, "type", errp);
+     return 1;
  }
  
-@@ -2713,74 +2717,88 @@ static int do_configure_icount(void *opaque, QemuOpts *opts, Error **errp)
- 
- static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
- {
-+    bool *p_init_failed = opaque;
-+    const char *acc = qemu_opt_get(opts, "accel");
-+    AccelClass *ac = accel_find(acc);
-+    int ret;
-+
-+    if (!ac) {
-+        return 0;
-+    }
-+    ret = accel_init_machine(ac, current_machine);
-+    if (ret < 0) {
-+        *p_init_failed = true;
-+        error_report("failed to initialize %s: %s",
-+                     acc, strerror(-ret));
-+        return 0;
-+    }
-+
-     if (tcg_enabled()) {
-         qemu_tcg_configure(opts, &error_fatal);
-     }
--    return 0;
-+    return 1;
- }
- 
- static void configure_accelerators(const char *progname)
- {
-     const char *accel;
-     char **accel_list, **tmp;
--    int ret;
-     bool accel_initialised = false;
-     bool init_failed = false;
--    AccelClass *acc = NULL;
- 
-     qemu_opts_foreach(qemu_find_opts("icount"),
-                       do_configure_icount, NULL, &error_fatal);
- 
-     accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
--    if (accel == NULL) {
--        /* Select the default accelerator */
--        if (!accel_find("tcg") && !accel_find("kvm")) {
--            error_report("No accelerator selected and"
--                         " no default accelerator available");
--            exit(1);
--        } else {
--            int pnlen = strlen(progname);
--            if (pnlen >= 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
--                /* If the program name ends with "kvm", we prefer KVM */
--                accel = "kvm:tcg";
-+    if (QTAILQ_EMPTY(&qemu_accel_opts.head)) {
-+        if (accel == NULL) {
-+            /* Select the default accelerator */
-+            if (!accel_find("tcg") && !accel_find("kvm")) {
-+                error_report("No accelerator selected and"
-+                             " no default accelerator available");
-+                exit(1);
-             } else {
--                accel = "tcg:kvm";
-+                int pnlen = strlen(progname);
-+                if (pnlen >= 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
-+                    /* If the program name ends with "kvm", we prefer KVM */
-+                    accel = "kvm:tcg";
-+                } else {
-+                    accel = "tcg:kvm";
-+                }
-             }
-         }
--    }
- 
--    accel_list = g_strsplit(accel, ":", 0);
-+        accel_list = g_strsplit(accel, ":", 0);
- 
--    for (tmp = accel_list; !accel_initialised && tmp && *tmp; tmp++) {
--        acc = accel_find(*tmp);
--        if (!acc) {
--            continue;
-+        for (tmp = accel_list; !accel_initialised && tmp && *tmp; tmp++) {
-+            /*
-+             * Filter invalid accelerators here, to prevent obscenities
-+             * such as "-machine accel=tcg,,thread=single".
-+             */
-+            if (accel_find(*tmp)) {
-+                qemu_opts_parse_noisily(qemu_find_opts("accel"), *tmp, true);
-+            }
-         }
--        ret = accel_init_machine(acc, current_machine);
--        if (ret < 0) {
--            init_failed = true;
--            error_report("failed to initialize %s: %s",
--                         acc->name, strerror(-ret));
--        } else {
--            accel_initialised = true;
-+    } else {
-+        if (accel != NULL) {
-+            error_report("The -accel and \"-machine accel=\" options are incompatible");
-+            exit(1);
-         }
-     }
--    g_strfreev(accel_list);
- 
--    if (!accel_initialised) {
-+    if (!qemu_opts_foreach(qemu_find_opts("accel"),
-+                           do_configure_accelerator, &init_failed, &error_fatal)) {
-         if (!init_failed) {
--            error_report("-machine accel=%s: No accelerator found", accel);
-+            error_report("no accelerator found");
-         }
-         exit(1);
-     }
- 
-     if (init_failed) {
--        error_report("Back to %s accelerator", acc->name);
-+        AccelClass *ac = ACCEL_GET_CLASS(current_machine->accelerator);
-+        error_report("Back to %s accelerator", ac->name);
-     }
- 
--    qemu_opts_foreach(qemu_find_opts("accel"),
--                      do_configure_accelerator, NULL, &error_fatal);
--
-     if (use_icount && !(tcg_enabled() || qtest_enabled())) {
-         error_report("-icount is not allowed with hardware virtualization");
-         exit(1);
-@@ -3461,9 +3479,6 @@ int main(int argc, char **argv, char **envp)
-                                  "use -M accel=... for now instead");
-                     exit(1);
-                 }
--                opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
--                                        false, &error_abort);
--                qemu_opt_set(opts, "accel", optarg, &error_abort);
+@@ -3590,10 +3592,8 @@ int main(int argc, char **argv, char **envp)
+                 error_report("TCG is disabled");
+                 exit(1);
+ #endif
+-                if (qemu_strtoul(optarg, NULL, 0, &tcg_tb_size) < 0) {
+-                    error_report("Invalid argument to -tb-size");
+-                    exit(1);
+-                }
++                warn_report("The -tb-size option is deprecated, use -accel tcg,tb-size instead");
++                object_register_sugar_prop(ACCEL_CLASS_NAME("tcg"), "tb-size", optarg);
                  break;
-             case QEMU_OPTION_usb:
-                 olist = qemu_find_opts("machine");
+             case QEMU_OPTION_icount:
+                 icount_opts = qemu_opts_parse_noisily(qemu_find_opts("icount"),
 -- 
 1.8.3.1
 
