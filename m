@@ -2,92 +2,88 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF57C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB98C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:28:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BC5121582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:17:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FC1220716
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 18:28:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IJcHAYc7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC5121582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfMeHsS5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC1220716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihdtV-0006Am-OL
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 13:17:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36143)
+	id 1ihe3H-0001rs-N8
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 13:28:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihdsj-0005j0-AD
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:17:10 -0500
+ (envelope-from <armbru@redhat.com>) id 1ihe2I-0001NI-9l
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihdsh-0004X1-O8
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:17:08 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45654)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihdsh-0004SQ-Dr
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:17:07 -0500
-Received: by mail-pg1-x543.google.com with SMTP id b9so1671332pgk.12
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 10:17:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=u6leAVKk6Ni7i3OvVcb4O07P4mjwqpmWf9LdTxLjvEU=;
- b=IJcHAYc7sBEUzaQtfcP37iDL2bQtyy7ofvbaCOtNzpF5yqsRuSy+2yoKoy6ZfiANSo
- jQvmnCu+VOmTzkEacFRZRisqqDlpmHy3OxbQaYCqFvtp68jYD4AC49/XC+yTjaug3kMr
- dBKV4l9diG+s91LVWDLv07Yay3IvE4H9zfKKxELLSuhbrVoRuqFywFP68oGO1CqvUvg4
- 9SLZN/3CzzftMtqH5Yzpdm9NyOYGbB3VxCFAMGFOdxtzUvMSusxHPI+4waAdGoj9Be4z
- kX8tGf2TCi6e2aQCqWw27FNKFukKbFv69YbZv3EZFTAmgbjVVlYGSbJrt79Y8Hba7m3u
- g4eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=u6leAVKk6Ni7i3OvVcb4O07P4mjwqpmWf9LdTxLjvEU=;
- b=MXn5hAWhYH4aIRuTnjW4+voN0Qmd/JT6UhXAwuCxxRpOfDpTePD41vAsa3kSFr59kk
- z6DMAVxfKeeAL/5MHvSU2paOKd6ABuzSOoQVlfjNF1OvmdKG2h935drQe/2hGpFVa/ox
- dRLH1r3X4b3G7MlitEuLje6ayh8Sg8pTAavpUUCkvQy6X9Vfq+E/tDwK2zNkT8PWZZ6s
- 3ztenUMjPajAliIpMvsqIhacHMdBcQC4/C5ycyqzufl73FELMk5kHAtuTL71XGpDN6sF
- YUtDZZZls1V2OwPMwda/IFZe2ZZ010HcZRyPvJIjJwiPVMw6jojYkk752E1YUdyfBE8l
- sm9g==
-X-Gm-Message-State: APjAAAWx8b5s42pW+uEvb8T0A76bhvyoZo1DIjKa+7YSxZWpUm+03Zdy
- +GvShUQ+yLpYnBt2AaF3TRjRQg==
-X-Google-Smtp-Source: APXvYqzVw6QbLTCCEv/0oUUB6KaeolXFNxTzQ8B6tQr6EMXXkyXkVkC2gYYBJ4IdYzZveKyNQ+eNcQ==
-X-Received: by 2002:a63:150d:: with SMTP id v13mr4430055pgl.342.1576693026396; 
- Wed, 18 Dec 2019 10:17:06 -0800 (PST)
-Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
- ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id b22sm1479430pft.110.2019.12.18.10.17.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Dec 2019 10:17:05 -0800 (PST)
-Subject: Re: [PATCH v1 01/16] configure: allow disable of cross compilation
- containers
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191216110732.24027-1-alex.bennee@linaro.org>
- <20191216110732.24027-2-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8c4d3bea-80ce-24e8-23a1-57fef7a4eeb1@linaro.org>
-Date: Wed, 18 Dec 2019 08:17:02 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <armbru@redhat.com>) id 1ihe2D-0005nK-Aa
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:26:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49831
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihe2B-0005iM-UV
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 13:26:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576693610;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KlgzqueGNMAR/MZHjCHRvYMDnbvpW4UvSMoQ9ly0dIw=;
+ b=PfMeHsS52Q+3mXokdphzYOZAV4fwv1RXesnsCMdN+9O+AxV3hzbaXk/VNOC9wXTYRPB7Lp
+ YklbDJHLk2g8wMa958cOj0u5VDjZ8ddu5dsQGP4itBymn2zUlyUacWUfpseJdOemOAgEbA
+ HRVvGHn3C/tDB0Dv6PRWZMo3MlUAPMI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-UTCAWv0-MuSXf0JhD3lQJw-1; Wed, 18 Dec 2019 13:26:47 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42C6C80257F;
+ Wed, 18 Dec 2019 18:26:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
+ [10.36.116.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F147B5C1D4;
+ Wed, 18 Dec 2019 18:26:45 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7BAD511386A7; Wed, 18 Dec 2019 19:26:44 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Subject: Re: [PATCH] util/cutils: Expand do_strtosz parsing precision to 64
+ bits
+References: <20191205021459.29920-1-tao3.xu@intel.com>
+ <87a786sse9.fsf@dusky.pond.sub.org>
+ <b7c442e3-cc7e-155e-5370-db9a371928a6@intel.com>
+ <87y2vbgsf0.fsf@dusky.pond.sub.org>
+ <e731445a-4461-3212-c08d-05dc7ad2b742@intel.com>
+ <52a11f3a-f2c8-26e9-b823-0093cfe91fdc@intel.com>
+Date: Wed, 18 Dec 2019 19:26:44 +0100
+In-Reply-To: <52a11f3a-f2c8-26e9-b823-0093cfe91fdc@intel.com> (Tao Xu's
+ message of "Wed, 18 Dec 2019 13:26:32 +0800")
+Message-ID: <87y2v9zdzv.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191216110732.24027-2-alex.bennee@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: UTCAWv0-MuSXf0JhD3lQJw-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,29 +95,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- Stefan Weil <sw@weilnetz.de>, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/16/19 1:07 AM, Alex Bennée wrote:
-> Our docker infrastructure isn't quite as multiarch as we would wish so
-> lets allow the user to disable it if they want. This will allow us to
-> use still run check-tcg on non-x86 CI setups.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  configure              | 8 +++++++-
->  tests/tcg/configure.sh | 6 ++++--
->  2 files changed, 11 insertions(+), 3 deletions(-)
+Tao Xu <tao3.xu@intel.com> writes:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Richard Henderson <richard.henderson@linaro.org>
+> On 12/18/2019 9:33 AM, Tao Xu wrote:
+>> On 12/17/2019 6:25 PM, Markus Armbruster wrote:
+[...]
+>>> Also fun: for "0123", we use uint64_t 83, not double 123.0.=C2=A0 But f=
+or
+>>> "0123.", we use 123.0, not 83.
+>>>
+>>> Do we really want to accept octal and hexadecimal integers?
+>>>
+>>
+>> Thank you for reminding me. Octal and hexadecimal may bring more
+>> confusion. I will use qemu_strtou64(nptr, &suffixu, 10, &valu) and
+>> add test for input like "0123".
+>>
+>
+> Hi Markus,
+>
+> After I use qemu_strtou64(nptr, &suffixu, 10, &valu), it cause another
+> question. Because qemu_strtod_finite support hexadecimal input, so in
+> this situation, it will parsed as double. It will also let large
+> hexadecimal integers be rounded. So there may be two solution:
+>
+> 1: use qemu_strtou64(nptr, &suffixu, 0, &valu) and parse octal as
+> decimal. This will keep hexadecimal valid as now.
+>
+> "0123" --> 123; "0x123" --> 291
 
+How would you make qemu_strtou64() parse octal as decimal?
 
-r~
+> 2: use qemu_strtou64(nptr, &suffixu, 10, &valu) and reject octal and
+> decimal.
+>
+> "0123" --> Error; "0x123" --> Error
+
+How would you reject the 0x prefix?
+
 
