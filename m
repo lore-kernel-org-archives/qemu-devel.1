@@ -2,80 +2,56 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8325DC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFBBC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DE2D21582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:33:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZPo+m0n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE2D21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 84163218AC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:37:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84163218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihViF-0004VE-Hk
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 04:33:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44337)
+	id 1ihVlN-00073O-I9
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 04:37:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ihVhW-0003wJ-9S
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:33:03 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ihVjx-0005QP-1C
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:35:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ihVhS-0001EM-O8
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:32:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47892
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ihVjv-0001He-OH
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:35:32 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:47221 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihVhS-00018i-7K
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:32:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576661577;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pfoRo5KRxYSKs9LinVK0+21c+9/p5zdHPvKdelxjoX8=;
- b=AZPo+m0nxDO+8gePy5fjjswanhtyauTG3P9JHtI0ak6WBzTnhk4CgaQ8k+7E6oeJJk1NIh
- iS+n+7fT0+wXSgNYvjmkTCfea9PJsDD+v/vLImkUhakZMWHtrzJwEoXbxebCmENzoxW8pY
- 4qwsw5ukUGikjfm5lOnbQ9uK/Igo9U8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-srk2Q29lPk6vGKK87eSMTQ-1; Wed, 18 Dec 2019 04:32:55 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1945940D8;
- Wed, 18 Dec 2019 09:32:54 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-210.ams2.redhat.com [10.36.116.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B55C68889;
- Wed, 18 Dec 2019 09:32:53 +0000 (UTC)
-Date: Wed, 18 Dec 2019 10:32:52 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Tuguoyi <tu.guoyi@h3c.com>
-Subject: Re: [PATCH] qcow2: Move error check of local_err near its assignment
-Message-ID: <20191218093252.GB4632@linux.fritz.box>
-References: <c9d3fc7246ec4c1f9a6cde9ed3c3ae57@h3c.com>
-MIME-Version: 1.0
-In-Reply-To: <c9d3fc7246ec4c1f9a6cde9ed3c3ae57@h3c.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: srk2Q29lPk6vGKK87eSMTQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1ihVjv-0001Bm-B3
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:35:31 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 6C49E1A1526;
+ Wed, 18 Dec 2019 10:34:20 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 02CE51A20FB;
+ Wed, 18 Dec 2019 10:34:20 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 5/6] linux-user: Add support for getting/setting RTC PLL
+ correction using ioctls
+Date: Wed, 18 Dec 2019 10:34:11 +0100
+Message-Id: <1576661652-2870-6-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1576661652-2870-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1576661652-2870-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,67 +63,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.12.2019 um 03:26 hat Tuguoyi geschrieben:
->=20
-> Signed-off-by: Guoyi Tu <tu.guoyi@h3c.com>
+This patch implements functionalities of following ioctls:
 
-Empty commit messages are rarely acceptable. You should explain here
-why you are making the change and why it's correct (for example by
-comparing with when it was introduced).
+RTC_PLL_GET - Getting PLL correction
 
-In this case, the local_err check outside of the if block was necessary
-when it was introduced in commit d1258dd0c87 because it needed to be
-executed even if qcow2_load_autoloading_dirty_bitmaps() returned false.
+    Read the PLL correction for RTCs that support PLL. The PLL correction
+    is returned in the following structure:
 
-After some modifications that all required the error check to remain
-where it is, commit 9c98f145dfb finally moved the
-qcow2_load_dirty_bitmaps() call into the if block, so now the error
-check should be there, too.
+        struct rtc_pll_info {
+            int pll_ctrl;        /* placeholder for fancier control */
+            int pll_value;       /* get/set correction value */
+            int pll_max;         /* max +ve (faster) adjustment value */
+            int pll_min;         /* max -ve (slower) adjustment value */
+            int pll_posmult;     /* factor for +ve correction */
+            int pll_negmult;     /* factor for -ve correction */
+            long pll_clock;      /* base PLL frequency */
+        };
 
-This is information that should be in the commit message rather than
-requiring each reader to do the research.
+    A pointer to this structure should be passed as the third
+    ioctl's argument.
 
-Please also make sure to CC the author of the code that you're
-modifying, in this case Vladimir.
+RTC_PLL_SET - Setting PLL correction
 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 7c18721..ce3db29 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1705,14 +1705,14 @@ static int coroutine_fn qcow2_do_open(BlockDriver=
-State *bs, QDict *options,
->      if (!(bdrv_get_flags(bs) & BDRV_O_INACTIVE)) {
->          /* It's case 1, 2 or 3.2. Or 3.1 which is BUG in management laye=
-r. */
->          bool header_updated =3D qcow2_load_dirty_bitmaps(bs, &local_err)=
-;
-> +        if (local_err !=3D NULL) {
-> +            error_propagate(errp, local_err);
-> +            ret =3D -EINVAL;
-> +            goto fail;
-> +        }
-> =20
->          update_header =3D update_header && !header_updated;
->      }
-> -    if (local_err !=3D NULL) {
-> -        error_propagate(errp, local_err);
-> -        ret =3D -EINVAL;
-> -        goto fail;
-> -    }
-> =20
->      if (update_header) {
->          ret =3D qcow2_update_header(bs);
+    Sets the PLL correction for RTCs that support PLL. The PLL correction
+    that is set is specified by the rtc_pll_info structure pointed to by
+    the third ioctl's' argument.
 
-The change itself looks good to me, but I'll let Vladimir have a look as
-well. If there are no more comments, I'm looking forward to a v2 patch
-with a non-empty commit message.
+Implementation notes:
 
-Kevin
+    All ioctls in this patch have a pointer to a structure rtc_pll_info
+    as their third argument. All elements of this structure are of
+    type 'int', except the last one that is of type 'long'. That is
+    the reason why a separate target structure (target_rtc_pll_info)
+    is defined in linux-user/syscall_defs. The rest of the
+    implementation is straightforward.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ linux-user/ioctls.h        |  2 ++
+ linux-user/syscall_defs.h  | 14 ++++++++++++++
+ linux-user/syscall_types.h |  9 +++++++++
+ 3 files changed, 25 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index b09396e..0a4e3f1 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -87,6 +87,8 @@
+      IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
+      IOCTL(RTC_WKALM_RD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
+      IOCTL(RTC_WKALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
++     IOCTL(RTC_PLL_GET, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_pll_info)))
++     IOCTL(RTC_PLL_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_pll_info)))
+ 
+      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 37504a2..8370f41 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -763,6 +763,16 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
+ 
++struct target_rtc_pll_info {
++    int pll_ctrl;
++    int pll_value;
++    int pll_max;
++    int pll_min;
++    int pll_posmult;
++    int pll_negmult;
++    abi_long pll_clock;
++};
++
+ /* real time clock ioctls */
+ #define TARGET_RTC_AIE_ON           TARGET_IO('p', 0x01)
+ #define TARGET_RTC_AIE_OFF          TARGET_IO('p', 0x02)
+@@ -782,6 +792,10 @@ struct target_pollfd {
+ #define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
+ #define TARGET_RTC_WKALM_RD         TARGET_IOR('p', 0x10, struct rtc_wkalrm)
+ #define TARGET_RTC_WKALM_SET        TARGET_IOW('p', 0x0f, struct rtc_wkalrm)
++#define TARGET_RTC_PLL_GET          TARGET_IOR('p', 0x11,                      \
++                                               struct target_rtc_pll_info)
++#define TARGET_RTC_PLL_SET          TARGET_IOW('p', 0x12,                      \
++                                               struct target_rtc_pll_info)
+ 
+ #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
+        defined(TARGET_XTENSA)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 820bc8e..4027272 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -271,6 +271,15 @@ STRUCT(rtc_wkalrm,
+        TYPE_CHAR, /* pending */
+        MK_STRUCT(STRUCT_rtc_time)) /* time */
+ 
++STRUCT(rtc_pll_info,
++       TYPE_INT, /* pll_ctrl */
++       TYPE_INT, /* pll_value */
++       TYPE_INT, /* pll_max */
++       TYPE_INT, /* pll_min */
++       TYPE_INT, /* pll_posmult */
++       TYPE_INT, /* pll_negmult */
++       TYPE_LONG) /* pll_clock */
++
+ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* op */
+        TYPE_INT, /* flags */
+-- 
+2.7.4
 
 
