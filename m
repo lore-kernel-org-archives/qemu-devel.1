@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80887C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F2BC2D0CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:59:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 538722072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:59:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 538722072B
+	by mail.kernel.org (Postfix) with ESMTPS id BBF6B2072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:59:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF6B2072B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihXzD-000339-4r
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:59:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46784)
+	id 1ihXzS-0003Lo-Iy
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:59:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49556)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ihXy1-0001kc-Ua
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:58:15 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihXyD-0001yz-RU
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:58:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ihXy0-0005We-Kn
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:58:13 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:34271)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <laurent@vivier.eu>) id 1ihXyC-0006Pe-J9
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:58:25 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:46721)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ihXxy-0005UT-Io; Wed, 18 Dec 2019 06:58:12 -0500
+ id 1ihXy9-00068X-RS; Wed, 18 Dec 2019 06:58:22 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MJVU0-1iNpDq0RSK-00Jo1O; Wed, 18 Dec 2019 12:57:58 +0100
-Subject: Re: [PATCH-for-5.0 v3 1/6] hw/pci-host/i440fx: Correct the header
- description
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mati7-1i61YI3hf9-00cQ3R; Wed, 18 Dec 2019 12:58:02 +0100
+Subject: Re: [PATCH-for-5.0 v3 3/6] hw/pci-host/i440fx: Use size_t to iterate
+ over ARRAY_SIZE()
 To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
  <philmd@redhat.com>, qemu-devel@nongnu.org
 References: <20191209095002.32194-1-philmd@redhat.com>
- <20191209095002.32194-2-philmd@redhat.com>
- <12e7069c-46f0-ae9f-4e1f-70f0b8318180@redhat.com>
+ <20191209095002.32194-4-philmd@redhat.com>
+ <a4745134-47dc-ab8a-6009-69fcc9dfbb02@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -85,36 +85,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <0d11898c-d3b6-97a7-26d5-f71d5dc9e915@vivier.eu>
-Date: Wed, 18 Dec 2019 12:57:56 +0100
+Message-ID: <46339299-e45b-79a3-5b45-f62fb5c7b26f@vivier.eu>
+Date: Wed, 18 Dec 2019 12:57:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <12e7069c-46f0-ae9f-4e1f-70f0b8318180@redhat.com>
+In-Reply-To: <a4745134-47dc-ab8a-6009-69fcc9dfbb02@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:JNYvr0dF2iVjZPMM774y5p0XG32vbIXHKAwm9OVCJU4ZBvtFysh
- QNUXzjCkaQRKzA05is2I1+WD7k8MNmRa4y1Ckj5jvvx7Qf/2BlQQibq5S7vbEQeahhQH9xV
- AAHHV1J+4JGgV+GlB1CJ16XgWV8R0LSwE7OfXK0FCd4udYulqWvv1Kcn/FuyOQcE5sBLS8H
- 13/eNnPFPGCJf3m48EYqw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QCyaQd4Nwmo=:atB3YLjPnnoe58+SpaAwht
- DjodQlVdGgk//mH2QEQKLDCbSNPq8fdZw292BjhYyMbwkQ/8U2EWQxR9X+Tmyv9RUflbSqmNA
- Co9r93f29PwyHLFMCw8XvNlsLLRkKVpSQqak4doi+oFgvrQ8b3347FCyLic+OcDA61QNI91/h
- e3aXENGrOPgXgCHrh02EmDZDAf0rVhSWLSV5LW7YZIaKu1HTTJN9ieiGKNz9hfLQz8iX17LO3
- h+FQvHj0tB3cHOOKbon3wrwIrbD2pilDk2ZGA1yRLJlN8rIpISPC1mWETzvasO4lzvz01/+nQ
- GzvQha08p65NeoaUF7SPey9WaCikg40AoroZ/0PgNkZotDo/Mz0MjiXFM3HCzUDNmVehQfeDS
- 0iILfuRV60CNIhMBnjAFgYB4ITAU8tRm/w3HwPmvZgBLyr+hKjoVmUSNprVTfcWMR3xpzO52d
- ovCr+QYCsIzRUi/gb6NnfmOqwFaduLJJQkjMe5Bif3w32r0X5RI3etoMBEysJBNtHgVkjfW2h
- uXyO78zyXdqSSwJCzFlvWSOUnG4R3VKTxkDfE6KKymKs0upoYP/020P1ChrBwbdVsV2eRBl8s
- Si1aHGOjLxDLSH430Q9zdFhtmRPZiRPX2Mnzz66cxCUwaargFOfcUSRCYom3Dm0i7j9STjuzm
- +Pp5Spvx3h65ldXPVNRC1WF/nFVXtEljYJO9blaml59vox1J5fy326274QD+5ly21ErzVOKyj
- c6cDfeyqBz4er7VZGEPmmTHtK6kwoSWBfPr5De7CiGd9pHswmOY17gFyllW+MTVgRR8Q8DeQw
- rSaVZHGXHNB+0RFA2LHPGGTA/EfJes9GlpsKiM/cCywbrSvEaJXjeoRZJrLOnEbmMnIQkH+FH
- inJWy+gO5bO1wSL+AQ5A==
+X-Provags-ID: V03:K1:AR6rLL9OUaLXBSge+Ysq2JK5B3pRs3+5iqxqYL3rgqs4SMPQKEC
+ 5Wtg/deGODcWz12bGNdUSKtFdYrtpBikaQFwowetjIKj/0mEc/74p2pDNqVVlE+S0gF2o4t
+ o/Re3Pq4v31Rr8lDkXoB4KvnJzCwm8YaNSCRuNCbX0XyDJ5axLG+4GhOGeFM/TDV93POT+9
+ Se99TpCxYgyxsbFMDwc/w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PrIx85r8kCU=:JOjNJQv7MZR4KSDeQnsdNP
+ IKZYZNnV01s8cJ3LcfPJXbVyDQNAiEIMDAmgFzltNH3FLFgAqB9AJrkseajKo2qRSVWyKKPcK
+ IdMmuXjU2ie3H2/VeWdjiDM23jMJexiplzjOT6ZgyzMTeenYEgLr92eoNkc3ZEYEeLuOYurEO
+ mHmcenHLykBu3LFP0EeoVKUbnSiBOgE/knidEtgIpmxGGoYOA5RSEKAg8U94rXsrdzmkEo7yZ
+ AtDjGty9rOrT35UxOD6E3/xnAmF1cdKOnUH8ru6qDpNOr3sygBBPSwwZfn0Qx5wBp19VOST2x
+ tOkzb/HDqLmb1LJimWvLo9tqB6IvJfaues1RxUW2KSw4jh4XbyR3+wCj2p2SMtsggQ6h1EBI3
+ CGOGMrMFc33Zp++AeY0X3uirIxmyS6dxHxbIdpP22/Mk7Uvqyx4dzDO7fGfHgiwMzeGgmN/Ks
+ UXQyTI4yY5kXiax4lKuQEMHylT9dDj5kD+Ku+E8+dhPq1yBkmy0mqgT09p7ILYaLhBcerc+tP
+ 2aVzUmeHww2ECE8aiCtQF7r/K20qCMZB84aRSBw/7m92hhQImJlauckWvsrLrTeSBzlwTukKj
+ Rk/08ziwGHpZcn1EDm2CN+BS9VJ7tcBZxQ6xmHsJuLkpWMJyfr0Tu+AVJZE+Lp07ZlZ6iEVSH
+ BAsvbIgncO8zka2dWEbMIMtK72LbQ/gmt+k8UfgLJgeW4pkWTx8EbaWyPSIFlQ362oX2P1TTH
+ Bp0+FDOCyTEBt9cWZlIJfTXJ6FssPTrZUHBsNXkYeU2juEOB4Dlj9dkbnS/7lkq8Fj2LZL5ee
+ G03JwhBsCHB/7rJ5rrp64z9HbottFHy6lTz6G7y3AUNDci+NKLTaFNJIyL3RuApVMQ5MBDUXI
+ quP+dJagzZT1lvyJJ40qYn/bwg1lHfiLgp8FCTdFI=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.130
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,27 +136,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/12/2019 à 11:02, Thomas Huth a écrit :
+Le 09/12/2019 à 11:05, Thomas Huth a écrit :
 > On 09/12/2019 10.49, Philippe Mathieu-Daudé wrote:
->> Missed during the refactor in commits 14a026dd58 and 0f25d865a,
->> this file is now only about the i440FX chipset.
+>> We don't enforce the -Wsign-conversion CPPFLAG, but it doesn't hurt
+>> to avoid this warning:
+>>
+>>   warning: implicit conversion changes signedness: 'int' to 'size_t' (aka 'unsigned long') [-Wsign-conversion]
 >>
 >> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 >> ---
->>  hw/pci-host/i440fx.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>  hw/pci-host/i440fx.c | 5 ++---
+>>  1 file changed, 2 insertions(+), 3 deletions(-)
 >>
 >> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
->> index f27131102d..3fc94426ea 100644
+>> index fbdc563599..0cc80b276d 100644
 >> --- a/hw/pci-host/i440fx.c
 >> +++ b/hw/pci-host/i440fx.c
->> @@ -1,5 +1,5 @@
->>  /*
->> - * QEMU i440FX/PIIX3 PCI Bridge Emulation
->> + * QEMU i440FX PCI Bridge Emulation
->>   *
->>   * Copyright (c) 2006 Fabrice Bellard
->>   *
+>> @@ -419,12 +419,11 @@ out:
+>>  static void igd_pt_i440fx_realize(PCIDevice *pci_dev, Error **errp)
+>>  {
+>>      uint32_t val = 0;
+>> -    int i, num;
+>> +    size_t i;
+>>      int pos, len;
+>>      Error *local_err = NULL;
+>>  
+>> -    num = ARRAY_SIZE(igd_host_bridge_infos);
+>> -    for (i = 0; i < num; i++) {
+>> +    for (i = 0; i < ARRAY_SIZE(igd_host_bridge_infos); i++) {
+>>          pos = igd_host_bridge_infos[i].offset;
+>>          len = igd_host_bridge_infos[i].len;
+>>          host_pci_config_read(pos, len, &val, &local_err);
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
@@ -167,4 +177,5 @@ Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
 
