@@ -2,93 +2,93 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5645C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C5EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:05:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7912120715
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C206820715
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:05:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OxB7crqD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7912120715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YkkX46yT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C206820715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihQTj-0005rt-Hr
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 22:58:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44407)
+	id 1ihQa8-0008ST-Od
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 23:05:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihQT1-0005I1-LY
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:57:45 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihQZ5-0007X0-Pl
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:04:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihQT0-0004lv-Gu
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:57:43 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:35215)
+ (envelope-from <richard.henderson@linaro.org>) id 1ihQZ4-0006pW-Eu
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:03:59 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:33025)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihQT0-0004kZ-AV
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:57:42 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id s7so238801pjc.0
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:57:42 -0800 (PST)
+ id 1ihQZ4-0006nr-8B
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:03:58 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id u63so718406pjb.0
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 20:03:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=a9L2IvHq3lvHENt4BJuUXxmzubNR9R5kCR+Q0ZyNE0E=;
- b=OxB7crqDw7G7jgcja/rWjajqtEfYWMDYoCB/nRXWwLOk1i1ch3fpfEHgbhoZepXFWY
- hLIR85QCq4OKW2hu/pGXB/7K43lwA9bJ1SdK4tLZ1MM8/ek/htsltUgkHouRwPMCRGDF
- EMiJlRFVUXkfsX+jd9IKipqarMjWRUbFgCHmcq70ORz9sbQjOeosQNQsUHZCAiieXMQ5
- XKbhdxcEqIbdyrrD6NuHh5TGblE5d9ab5MzYBwr3wWC70Kmlu2f/mpFYl6vDX8DosHjz
- COEKaBJp93Rybv40XaZnX5ZPZtgLn+PMYdZG5zTtpn6Kf4h/1Ciq03dNGsWWO9FnZpnl
- J3tg==
+ bh=OJ8QuLvs50xb7QgUuuJ4JMKlcPCnwdM0tzFnyDlzGtE=;
+ b=YkkX46yTtwelnAvSrtVq4PHU4JjhrCnXLwfY6sTMYSIJhevuoY4msW9HOuh+UzmeWf
+ AOnUOkOvfjmJfZ9ggKJkSpWZYQTDM+muLjN7DNYKgkNMnqAbp0PWoCh14RBniIk7C1Pm
+ TPF/IhQyzPyAjfHVzUbeZs6tciyr2P/Q/dLyqbfexcXJ3IE+hQEKEFSvPWEi1Rz1uFdr
+ honrVN/LZHGilMYicUWqzQPIocPehFWozrc4FuaO1aONgf7prkb1jAsfO03uGpeV8IFc
+ 5ZKZXbis2K3DTolLDPGNWK0i7qbN5NkgcLgajVKyjPf6yi1PPgrcnKCN8w3TPMtBsj4m
+ ptIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=a9L2IvHq3lvHENt4BJuUXxmzubNR9R5kCR+Q0ZyNE0E=;
- b=J2XJ/93kqEleWn1/vS3eynGaiHGALwkfJ+nJVTdbgS2Xe6Rm3/WpFTthr3rexL/EAv
- YEl4oxlQvHSJy3xcUPGjge2iAlxmNUR91S5vC3PYPeJrtXeMC+BMivbGYXMqE16RaKFm
- qGu3ohMqaZigGTqNr40ktk7fq8TVfkp+QboZk8tQfN0at8TIyc01Wx9gM4A5eC0trjNk
- QyE81d3xA++hyBkvjaoFaV7zEIFk/y2KaYYvfzruGH81C0yuOsl7ftG5gN/nc59TwA02
- vwY++4EFjeC+7ojaEcye8WykTX2mdKJ5tMRBDe7vmva/BR8f8k2/XQxDUjgqDHXzjnx0
- AhoA==
-X-Gm-Message-State: APjAAAVJ3GnpYO/9x91QxvKMLOsCr/wZSAAss2rfWEJZpbgowaKGyPP1
- FFCeY5b8Fbu9Qi9tnk4m/haEoA==
-X-Google-Smtp-Source: APXvYqxY5FnOrHByhsz6NB3Byi1IJ4oVWVYb2yVR2aEYE2LfQmvwi/TEnr4LjIBdvwbqc/2xBWIXvQ==
-X-Received: by 2002:a17:902:7484:: with SMTP id
- h4mr299494pll.206.1576641461001; 
- Tue, 17 Dec 2019 19:57:41 -0800 (PST)
+ bh=OJ8QuLvs50xb7QgUuuJ4JMKlcPCnwdM0tzFnyDlzGtE=;
+ b=qqB/YwNGZv6YFvzItInVBYMVqk5GrAC5+P0Ir3FHitUCVp54akVdTv714wNa0uIZ/1
+ AiVkfmeCZEkOnbClKnMWU4DDNNimAG+ngsc2zsSM5LR833tvM6NpZcYmS7ewb1u73CBq
+ JrswWyAiXyAc31F1Up8FpTHqRNzZ8ZMiusjNXCJWs6VU9DocSFEPPBNgLFhm091TyQSm
+ wC5RmjG5EOfsJtByqw3j7sgwTWwNVQDBjwTUAsyu3MNXGcS474WKKZgAsjxhDyq2gvh+
+ oODA8JZVCpPs+LLRGkdSgP1Ii0qadmi7WzkZnz9sMglsT/0JuY095N/oX+qOKowhkjpW
+ jMdA==
+X-Gm-Message-State: APjAAAU3nu0srOHyhDY7RbQHhbbu7PKwdFzPuaUBaNA0PZkyLmXwlzqQ
+ J81gqTy4zzYSjlLNmqzERvZkiA==
+X-Google-Smtp-Source: APXvYqwDC1aBsDv77pimjQ44fUO/B2pO+POoQ+E72MmFV745VdZtDthWHS+H30uK4dy8VJhTZo/ZFA==
+X-Received: by 2002:a17:902:9682:: with SMTP id
+ n2mr317283plp.336.1576641837137; 
+ Tue, 17 Dec 2019 20:03:57 -0800 (PST)
 Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
  ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id l8sm484706pjy.24.2019.12.17.19.57.39
+ by smtp.gmail.com with ESMTPSA id u127sm706957pfc.95.2019.12.17.20.03.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Dec 2019 19:57:40 -0800 (PST)
-Subject: Re: [PATCH 2/6] hw/display/tcx: Add missing fall through comments
+ Tue, 17 Dec 2019 20:03:56 -0800 (PST)
+Subject: Re: [PATCH 5/6] hw/scsi/megasas: Silent GCC9 duplicated-cond warning
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20191217173425.5082-1-philmd@redhat.com>
- <20191217173425.5082-3-philmd@redhat.com>
+ <20191217173425.5082-6-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <be844995-0bdd-9273-75e9-47f20b25c6ec@linaro.org>
-Date: Tue, 17 Dec 2019 17:57:36 -1000
+Message-ID: <b29f856a-5199-6f62-4aee-5a2cfc9f05a3@linaro.org>
+Date: Tue, 17 Dec 2019 18:03:53 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191217173425.5082-3-philmd@redhat.com>
+In-Reply-To: <20191217173425.5082-6-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,44 +100,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Olivier Danet <odanet@caramail.com>
+Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org,
+ Hannes Reinecke <hare@suse.com>, qemu-block@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/17/19 7:34 AM, Philippe Mathieu-Daudé wrote:
-> GCC9 is confused by this comment when building with
-> CFLAG -Wimplicit-fallthrough=2:
+> GCC9 is confused when building with CFLAG -O3:
 > 
->   hw/display/tcx.c: In function ‘tcx_dac_writel’:
->   hw/display/tcx.c:453:26: error: this statement may fall through [-Werror=implicit-fallthrough=]
->     453 |             s->dac_index = (s->dac_index + 1) & 0xff; /* Index autoincrement */
->         |             ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
->   hw/display/tcx.c:454:9: note: here
->     454 |         default:
->         |         ^~~~~~~
->   hw/display/tcx.c: In function ‘tcx_dac_readl’:
->   hw/display/tcx.c:412:22: error: this statement may fall through [-Werror=implicit-fallthrough=]
->     412 |         s->dac_index = (s->dac_index + 1) & 0xff; /* Index autoincrement */
->         |         ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
->   hw/display/tcx.c:413:5: note: here
->     413 |     default:
->         |     ^~~~~~~
+>   hw/scsi/megasas.c: In function ‘megasas_scsi_realize’:
+>   hw/scsi/megasas.c:2387:26: error: duplicated ‘if’ condition [-Werror=duplicated-cond]
+>    2387 |     } else if (s->fw_sge >= 128 - MFI_PASS_FRAME_SIZE) {
+>   hw/scsi/megasas.c:2385:19: note: previously used here
+>    2385 |     if (s->fw_sge >= MEGASAS_MAX_SGE - MFI_PASS_FRAME_SIZE) {
 >   cc1: all warnings being treated as errors
 > 
-> Add the missing fall through comments.
+> When this device was introduced in commit e8f943c3bcc, the author
+> cared about modularity, using a definition for the firmware limit.
+> If we modify the limit, the code is valid. Add a check if the
+> definition got modified to a bigger limit.
 > 
-> Fixes: 55d7bfe22
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-> Cc: Olivier Danet <odanet@caramail.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Fam Zheng <fam@euphon.net>
+> Cc: qemu-block@nongnu.org
 > ---
->  hw/display/tcx.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/scsi/megasas.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+> index de9bd20887..ece1601b66 100644
+> --- a/hw/scsi/megasas.c
+> +++ b/hw/scsi/megasas.c
+> @@ -2382,7 +2382,8 @@ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+>      if (!s->hba_serial) {
+>          s->hba_serial = g_strdup(MEGASAS_HBA_SERIAL);
+>      }
+> -    if (s->fw_sge >= MEGASAS_MAX_SGE - MFI_PASS_FRAME_SIZE) {
+> +    if (MEGASAS_MAX_SGE > 128
+> +        && s->fw_sge >= MEGASAS_MAX_SGE - MFI_PASS_FRAME_SIZE) {
+>          s->fw_sge = MEGASAS_MAX_SGE - MFI_PASS_FRAME_SIZE;
+>      } else if (s->fw_sge >= 128 - MFI_PASS_FRAME_SIZE) {
+>          s->fw_sge = 128 - MFI_PASS_FRAME_SIZE;
+> 
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I'm not keen on this.  It looks to me like the raw 128 case should be removed
+-- surely that's the point of the symbolic constant.  But I'll defer if a
+maintainer disagrees.
+
 
 r~
 
