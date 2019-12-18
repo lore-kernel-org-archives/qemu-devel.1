@@ -7,81 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6345DC2D0C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 673D6C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:44:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31487218AC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32703206D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:44:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QzapCugb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31487218AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lltcuq+0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32703206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYgT-000554-P5
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:44:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53818)
+	id 1ihYh7-0005ut-1r
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:44:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3f-00072h-2S
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:08 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3b-0006wf-DB
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3e-0002WA-2M
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:02 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42121)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3Z-0002Gv-TW
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:59 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40713)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3d-0002ST-5G
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:01 -0500
-Received: by mail-wr1-x442.google.com with SMTP id q6so1981486wro.9
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:04:01 -0800 (PST)
+ id 1ihY3Z-0002Ch-IE
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:57 -0500
+Received: by mail-wm1-x341.google.com with SMTP id t14so1601790wmi.5
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=RhBoR/tLrwpSdP9TuRs6Sxp42lksgrEoIqiHxg6Q7mo=;
- b=QzapCugbnZ8RmTONGSO8ow5T/IxVty+EpyHLZj1QfrWXEZ7o2Uqz8e0yOGdJEQYhKl
- 5FJGd8q6xbaH1gQNyWVbL2EwOEoqtvGeLIH9oVqbnT9EAjXUZAW34mJsKi8ebzRxxYdt
- 3CYRu4LKeO1QotnWlM3w91fYZ11SMwBbdfcYXZzRtvpryznd9EXVtPFUTqv8uxy93rCE
- 2/T7I6bRJRZBf+ZIPocyamRk6PI5Y+r+GVA8KEJlHYSjEbaPgkB6nr6058sVcSlklcir
- eeKNCQQk2WDE1IOfrB7rxifA0jLtvCf0CL2KX9/fTCG0jkcj+tGYXlAwRPwxdjN6wrN2
- f86A==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=9NSUuNQ9Jf+FzPsRmj7s9FDau0CX5jauhzpAS1A8igc=;
+ b=Lltcuq+0ldRHjf0er3qRVaIC81aT3bi5KEE3iNcfJosmGuQK0YNnp/Sw4nfP/rb/Ia
+ aBQ3Aio6wEF873h0T74Qe1iUVoPDrPIYO+z7tstBBL1SRWnQjYLD24bUVVKU4+Yw3LXt
+ 5ex6M2OjOTEq7BacruMTg2l4BhOmP6UePS2AgKKhad4CGpyg7SqmpojdE0oXHtU+5xA9
+ I2UdwQSDNwL5dxMu0Lb1/GjiCv35ZfX2wqxqjU6AIJvgk7WDNIPgbu1fk+t+SC6r+KWZ
+ 7Fs/Dvi9bAmEPv6/MRTmg4gbileFUa07ow7emxftjURhvCzBATPejoYe8nbqJYEIB4+9
+ V9yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=RhBoR/tLrwpSdP9TuRs6Sxp42lksgrEoIqiHxg6Q7mo=;
- b=RVq9/Uuk5Z1TVOxLq4bR66ueXgl7603bACGnpzYUg7n1OFZTPteMtFK+tLmFCoQLsm
- LWSNQGrI85P+nZQsyqoGHLiAbh/vGto+mbwxlJmDZnOAC23u3+AvqM3WyEiFPRFOoNFo
- jGWcW92tKHG3nWB0orMmk5owEGikNHOia2LKFpFwUNpbNkPzXASoaOX+qHrElTarrw0A
- hzGpN0igXcLUW7aoAtcneKeJazDrPNWI3baxVJHX9n8bZPd458kjBIUkNbhEd3LnWtut
- hhLwLprXcR/faKqL39WDM9fHYhrIAnvvcpCVuVbl0S3jQjKFMM3AXIjxJlyKB0E1uVXm
- 5hgA==
-X-Gm-Message-State: APjAAAU7vCqBSiE13+Jv6/69q8a0v0lY+jcNO+3jiq8bnRu0tl+q7XVS
- t/FaPbJ/O3y8yrZGcwrHlywQwYpU
-X-Google-Smtp-Source: APXvYqxZmMlcnGWQHdUKFl8p/uoimCk0WeRdjCKxmPWqCd4pU326UY22JXJxU2Pq+kJJG+27cIxqQA==
-X-Received: by 2002:adf:f605:: with SMTP id t5mr2408374wrp.282.1576670639901; 
- Wed, 18 Dec 2019 04:03:59 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references;
+ bh=9NSUuNQ9Jf+FzPsRmj7s9FDau0CX5jauhzpAS1A8igc=;
+ b=iN3kGX0I/r5n2hF/rUa0PhKKLY8kjCyRCG0wxlORNFXmIRosv1dAT79Nrd0ZS03dlU
+ ExjVlvC8vMWPCoKotc8eDe2/wifNK0ZJfNKI13TaPCXoKMu/SdfJxJD0eVFAU69yF5fi
+ Mg4WreAfnGKZNhDKrgggItxklyx1/InNZNbbdxM1pvZvJfc5Jd4NHFW9vbx5i0noFfcP
+ 1/usB5WDB7SXCri1uWuaEW1dBGd/Laslhh3o9BWlP2SrN/wlwMGEFIYmBjm6UVPTv8Fr
+ l0qSVUPeFqPO38tGGPj/+xuRYC9CDmFWU9JcArSnVH9AtlCQbsX0oooJXN4u9U2Lypj2
+ +nQg==
+X-Gm-Message-State: APjAAAXEZHrWBbxEcE3MyqEfO+6cH28znCYLPDlAaVZAGQ1B3BrM0b1h
+ YRJSxsiAvGfXtnMYXs1GnyYTZUK/
+X-Google-Smtp-Source: APXvYqybIevhvTsxNbcpHBy1vU1D6eLHZhSvbguAZPjCAxgB1qrCxISjQ6694Ysze0BnOgaRj16u0g==
+X-Received: by 2002:a05:600c:246:: with SMTP id
+ 6mr2645075wmj.122.1576670636351; 
+ Wed, 18 Dec 2019 04:03:56 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.59
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.55
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:59 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:55 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 56/87] hw/i386/pc: Use TYPE_PORT92 instead of hardcoded string
-Date: Wed, 18 Dec 2019 13:02:22 +0100
-Message-Id: <1576670573-48048-57-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 52/87] pc: stubify x86 iommu
+Date: Wed, 18 Dec 2019 13:02:18 +0100
+Message-Id: <1576670573-48048-53-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,36 +91,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Allow building microvm without x86-iommu.c.
 
-By using the TYPE_* definitions for devices, we can:
-- quickly find where devices are used with 'git-grep'
-- easily rename a device (one-line change).
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/pc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/i386/Kconfig          |  6 ++++++
+ hw/i386/Makefile.objs    |  3 ++-
+ hw/i386/x86-iommu-stub.c | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 42 insertions(+), 1 deletion(-)
+ create mode 100644 hw/i386/x86-iommu-stub.c
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ea7320b..67fddcc 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1278,7 +1278,7 @@ static void pc_superio_init(ISABus *isa_bus, bool create_fdctrl, bool no_vmport)
-         qdev_prop_set_ptr(dev, "ps2_mouse", i8042);
-         qdev_init_nofail(dev);
-     }
--    port92 = isa_create_simple(isa_bus, "port92");
-+    port92 = isa_create_simple(isa_bus, TYPE_PORT92);
+diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+index 5a49434..91cf584 100644
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -103,11 +103,17 @@ config MICROVM
+     select MC146818RTC
+     select VIRTIO_MMIO
  
-     a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
-     i8042_setup_a20_line(i8042, a20_line[0]);
++config X86_IOMMU
++    bool
++    depends on PC
++
+ config VTD
+     bool
++    select X86_IOMMU
+ 
+ config AMD_IOMMU
+     bool
++    select X86_IOMMU
+ 
+ config VMPORT
+     bool
+diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+index 01ae202..1236c3b 100644
+--- a/hw/i386/Makefile.objs
++++ b/hw/i386/Makefile.objs
+@@ -6,7 +6,8 @@ obj-$(CONFIG_I440FX) += pc_piix.o
+ obj-$(CONFIG_Q35) += pc_q35.o
+ obj-$(CONFIG_MICROVM) += microvm.o
+ obj-y += fw_cfg.o
+-obj-y += x86-iommu.o
++obj-$(CONFIG_X86_IOMMU) += x86-iommu.o
++obj-$(call lnot,$(CONFIG_X86_IOMMU)) += x86-iommu-stub.o
+ obj-$(CONFIG_VTD) += intel_iommu.o
+ obj-$(CONFIG_AMD_IOMMU) += amd_iommu.o
+ obj-$(CONFIG_XEN) += ../xenpv/ xen/
+diff --git a/hw/i386/x86-iommu-stub.c b/hw/i386/x86-iommu-stub.c
+new file mode 100644
+index 0000000..03576cd
+--- /dev/null
++++ b/hw/i386/x86-iommu-stub.c
+@@ -0,0 +1,34 @@
++/*
++ * Stubs for X86 IOMMU emulation
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * Author: Paolo Bonzini <pbonzini@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/i386/x86-iommu.h"
++
++void x86_iommu_iec_register_notifier(X86IOMMUState *iommu,
++                                     iec_notify_fn fn, void *data)
++{
++}
++
++X86IOMMUState *x86_iommu_get_default(void)
++{
++    return NULL;
++}
++
 -- 
 1.8.3.1
 
