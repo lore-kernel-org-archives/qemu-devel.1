@@ -2,73 +2,121 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C97C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26435C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:19:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C1642176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:01:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C1642176D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0009324679
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:19:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0009324679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihX5N-00042b-Hg
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:01:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42306)
+	id 1ihXMG-0000hj-5S
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:19:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ihX4d-0003dZ-Kt
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:01:01 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihXLT-0008Sh-M9
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:18:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ihX4b-0001K4-Mx
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:00:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43414)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ihX4a-0001IM-VG
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:00:57 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ihX4Z-0002sG-Ca
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 11:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5D38C2E8076
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 11:00:55 +0000 (UTC)
+ (envelope-from <laurent@vivier.eu>) id 1ihXLS-0000cj-M8
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:18:23 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:39265)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1ihXLS-0000Hz-BI; Wed, 18 Dec 2019 06:18:22 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mo6WJ-1hsqNC2nOt-00pgeU; Wed, 18 Dec 2019 12:18:13 +0100
+Subject: Re: [PATCH 1/3] MAINTAINERS: Add hw/sd/ssi-sd.c in the SD section
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191012065426.10772-1-philmd@redhat.com>
+ <20191012065426.10772-2-philmd@redhat.com>
+ <46d94900-e916-54e2-06e6-1963fbed3bb8@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <ae01cfcb-bcca-87d6-4aaf-1c32cb3ac769@vivier.eu>
+Date: Wed, 18 Dec 2019 12:18:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Dec 2019 10:45:42 -0000
-From: Fabian Godehardt <1856837@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: gcc9.2 segfault
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fgodeh
-X-Launchpad-Bug-Reporter: Fabian Godehardt (fgodeh)
-X-Launchpad-Bug-Modifier: Fabian Godehardt (fgodeh)
-Message-Id: <157666594314.15384.3778802807711797985.malonedeb@wampee.canonical.com>
-Subject: [Bug 1856837] [NEW] qemu 4.2.0 arm  segmentation fault with gcc 9.2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a48e4175b62b83f8a7e3ad618a9e86612085bd93
+In-Reply-To: <46d94900-e916-54e2-06e6-1963fbed3bb8@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:l/xGEgRKYjXPvP7jQ97OLkGJxmRbN7XfBZtzwebu296FMZF9PB5
+ OzSVuNvXeM/f72xtPyi6hvZnDS5KqmIqgaRKo3yYUe0r6pLjD68qCMcrclPbXGb6VcONMgZ
+ NpYMH+u+JmGxEIJ/l7yRxbUhM+1qLFLaKVLt+/uqsYRcsOiue4jcfAZjkyHZ+lnOITTMCSA
+ iDmiwau4tkXg+xlNI+GHQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3FGB5m0FLwE=:QntDuNVqTdITqF2FI9YdUB
+ MK6yiGM2ElHAmh67cfaqHdYMQumCgKTQEffOQcqc5TBwIq6qpS/nZ3T9XVjV+MS35qVQblebE
+ eNX98Wls2uAz8syJsxBbVx4PkSaeVLFsTpQU58v5GT59trzaxC9R9Ke5TuZrZL4vKL6bPwxkm
+ OTojT4GCJGBs1qW77mOk+0GIfBC83PcCCvQtQ/omCr/gwKdpBFBt9xk9EreqRGSVwCUe16gg1
+ lWzTvvAEqFXTn/jcng2B0MlTsM3fu5mfBwZg6WuoO74WK5BplWFrYb5gZ+fUdrOzZvya88Pr/
+ sLwT/H8PgaTtwQjX4V6P1JK3Wv5OSBr556Xe7ZwR2FC0jljrO25e6cG53yrS4g4hlq5FXADV4
+ XeHSmgmYC7Zkqz7Nc0XoVSHt2o8DS6cWYJXISAqQS+2ZCIiiL5QdY2wQvS0LcEja60UwGH6BV
+ 678lZE4bhDqKDZ6ombdJd0cQNXBfqXGuzKrAmzj3XQyPgy4Wh6xty+GYPk87h6qu0/3mI05SD
+ oNvputVHo/HoR9+VFUo8moJYXVlo59JUQxLcNfdo/heuyC+NC3TTS7CeAx92VqhTXoDR6S1Ba
+ tPCvtM3UZ4t3scmS4rZlMYstNrbBmmvetEnUAhFMCjuriUc/+x3Dsg9p9h40AYMAwtVn6FABQ
+ 21sM+vJZwJhfsVFQ1CDHO1JUbBru81rpMfoer2keHuQEHgoAdvjhTmMT4ASSlKm16IPqwUbu6
+ AAbobpTBS3v2Sxl4CfltPBeFUWig72hgWiYrXeWCEg25FSHh8pvtT44bAO29RJ/NzunRmhoPa
+ jfyjURlhG8LFx9ZKkmePbUDEB+SIFG0J80lwrzrCKNhEKday7kURbo8YPjZ/bDBmOhSX4u0LC
+ DvTV0ffrQMh+iGzOxWegAe4gxTv+NuzbQE8umZqUE=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,153 +125,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856837 <1856837@bugs.launchpad.net>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Esteban Bosse <estebanbosse@gmail.com>, qemu-arm@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Le 18/11/2019 à 13:26, Philippe Mathieu-Daudé a écrit :
+> Cc'ing qemu-trivial@
+> 
+> On 10/12/19 8:54 AM, Philippe Mathieu-Daudé wrote:
+>> The hw/sd/ssi-sd.c file is orphean, add it to the SD section.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>   MAINTAINERS | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 3ca814850e..47eae9fc46 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -1445,6 +1445,7 @@ S: Odd Fixes
+>>   F: include/hw/sd/sd*
+>>   F: hw/sd/core.c
+>>   F: hw/sd/sd*
+>> +F: hw/sd/ssi-sd.c
+>>   F: tests/sd*
+>>     USB
+>>
+> 
+> 
 
-As discussed with f4bug yesterday on IRC here comes the bug description.
+Applied to my trivial-patches branch.
 
-I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
-6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
-linux-user" and debug enabled. I use the arm-linux-user variant, "qemu-
-arm".
-
-Then i'm trying to cross-compile (arm gcc) an old version of googles v8
-(as i need this version of the lib for binary compatibility) which uses
-qemu during build.
-
-It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
-7.4.0 and 8.3.0 but those are also causing the same segmentation fault.
-
-The executed command wich breaks qemu is:
-
- qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
-positions --logfile
-/tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
---random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
-
-The printed error message is:
-
-ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=3D1=
- MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-Calling qemu with gdb gives the following information:
-
- Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
- 0x0000555555d63d11 in static_code_gen_buffer ()
-
-and
-
- (gdb) bt
- #0  0x0000555555d63d11 in static_code_gen_buffer ()
- #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x5555=
-57c33930) at =
-
- /tmp/build/qemu/accel/tcg/cpu-exec.c:172
- #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<synthetic =
-pointer>, tb=3D<optimized out>, =
-
- cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
- #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel/t=
-cg/cpu-exec.c:731
- #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/qe=
-mu/linux-user/arm/cpu_loop.c:219
-#5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized o=
-ut>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
-
-Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the log
-in the attached file.
-
-Thanks for any hints!
-Fabian
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: gcc9.2 segfault
-
-** Attachment added: "Debug with in_asm,int,op_opt"
-   https://bugs.launchpad.net/bugs/1856837/+attachment/5313610/+files/log-i=
-n_asm-int-op_opt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856837
-
-Title:
-  qemu 4.2.0 arm  segmentation fault with gcc 9.2
-
-Status in QEMU:
-  New
-
-Bug description:
-  As discussed with f4bug yesterday on IRC here comes the bug
-  description.
-
-  I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
-  6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
-  linux-user" and debug enabled. I use the arm-linux-user variant,
-  "qemu-arm".
-
-  Then i'm trying to cross-compile (arm gcc) an old version of googles
-  v8 (as i need this version of the lib for binary compatibility) which
-  uses qemu during build.
-
-  It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
-  7.4.0 and 8.3.0 but those are also causing the same segmentation
-  fault.
-
-  The executed command wich breaks qemu is:
-
-   qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
-  positions --logfile
-  /tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
-  --random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
-
-  The printed error message is:
-
-  ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=
-=3D1 MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  Calling qemu with gdb gives the following information:
-
-   Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
-   0x0000555555d63d11 in static_code_gen_buffer ()
-
-  and
-
-   (gdb) bt
-   #0  0x0000555555d63d11 in static_code_gen_buffer ()
-   #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55=
-5557c33930) at =
-
-   /tmp/build/qemu/accel/tcg/cpu-exec.c:172
-   #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<syntheti=
-c pointer>, tb=3D<optimized out>, =
-
-   cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
-   #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel=
-/tcg/cpu-exec.c:731
-   #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/=
-qemu/linux-user/arm/cpu_loop.c:219
-  #5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
-
-  Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the
-  log in the attached file.
-
-  Thanks for any hints!
-  Fabian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856837/+subscriptions
+Thanks,
+Laurent
 
