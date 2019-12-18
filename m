@@ -2,79 +2,71 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A82E3C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A7DC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 736B22176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:12:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gh9ekUR+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 736B22176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C6982176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:12:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C6982176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihZ7W-0008IR-CR
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 08:12:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46070)
+	id 1ihZ7g-0008VR-D9
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 08:12:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ihYRZ-0007tR-AE
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:28:46 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihYx8-00020s-E8
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:01:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ihYRY-0001Qv-7T
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:28:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60323
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ihYRX-0001M2-Vx
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:28:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576672123;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=abpb771Ls4PQvTTxdpAOrOXGfp0x2Azjpf5Xis36iwM=;
- b=Gh9ekUR+nbDFz6vdQ+Nn7pfkfXIHbAXsmw92ML+S069Pby1ytQYgx9O0znU20E3S5+IjSI
- xaqJqHvUL9VZ3BTtPdJ+8uw9MYOBpa+T8+yMWEtzaT7YrK8LvHjRXYu+6s/y/+IyOaz2OM
- uBAdSROj1mtQa0WfsvNOlC21nBOBubE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-QXB6fBuKMemAhMl-P6ZOSQ-1; Wed, 18 Dec 2019 07:28:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E864107B007;
- Wed, 18 Dec 2019 12:28:40 +0000 (UTC)
-Received: from gondolin (ovpn-117-253.ams2.redhat.com [10.36.117.253])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F044E5C1B0;
- Wed, 18 Dec 2019 12:28:38 +0000 (UTC)
-Date: Wed, 18 Dec 2019 13:28:36 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v3 4/4] pc-bios/s390x: Fix reset psw mask
-Message-ID: <20191218132836.6e0c334c.cohuck@redhat.com>
-In-Reply-To: <20191203132813.2734-5-frankja@linux.ibm.com>
-References: <20191203132813.2734-1-frankja@linux.ibm.com>
- <20191203132813.2734-5-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <laurent@vivier.eu>) id 1ihYx7-0008CS-8s
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:01:22 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:34643)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1ihYx3-0007q8-GG; Wed, 18 Dec 2019 08:01:17 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1N8XkP-1he1yD1VAH-014TUZ; Wed, 18 Dec 2019 14:01:12 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 7/7] qemu-doc: Remove the unused "Guest Agent" node
+Date: Wed, 18 Dec 2019 14:01:05 +0100
+Message-Id: <20191218130105.125981-8-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20191218130105.125981-1-laurent@vivier.eu>
+References: <20191218130105.125981-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: QXB6fBuKMemAhMl-P6ZOSQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:OoM52WcD+7hA490CeupEbe9AmoiALHAO381+nS6jDBKFFoONge9
+ /+O3m2dnz2Wu5rNh8VFk8DA0bGrT1kHMOBZYAeShApYc2IZb93M93EYLbmwStUfV6LUOmAF
+ nRAr2MJAJvNdnFXQhDxkm1gaDyA2H0QyarUsRDcN3+uSSjE8xk5jWohK1zHNsrOVt/qo7aY
+ hyo/MWORXiCSbitVfSduw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RwNdeAo+slw=:X9sff6sd/GVtZmjfFHA4Gv
+ O3lvZhI+1dqamncpLlJDCqRH3LjVIw5iKn4WAYtHOWLf3z+t+Asw9hallyunccZEBMEMYNED/
+ yXWnFwrQ9rRlnAxIlEapS+ZeXK1moeg/nemQhvZ0Ou8mfPBMjaOdp6lYr6pSsX9IAGvuLPNf9
+ ybux64lubRNjjzhUcfrUHk+ufhuqWKTdHAfsJ9wi2Lxjw+2GXDJTW+++i1olgmtlIKT2AyhYp
+ PLiU1MTk8VjgwRadhwUiyx+1hRxGxQgieCumb07r0olpdBJVHwPUsw9gsKuKlrn7DGLaOyBVE
+ bUZOTahdjclf7IPxVrYEFllknDLGPTYWnkzc/C+hYXuhOlcQ3BiVvD0kGW2y0VwS/gs9UOjap
+ +osgE2Y6fV6MA5ALzHaBWX6Lu9FfFZ2ie50E9xX5L1HgkRyXsYziN1rUScjuKvGSwkMwbR8su
+ WNGr+wCYAkcohtVPbrIj8SMaNFS1ZyOXkwooAqJHxLa/+Ei2SK7xBSSbp7VBFIjGXYMZhoMUF
+ DEY41xvd5RVXXAdfletNDFU2L7yJ6BQb6KI7Jf6UZkQVARB56lJJ3wVtfVnZyzBRAt+TLSKVM
+ J4M9/9grPmtZFSylnHTc9zRmwTLKwKo830LL4tJCdm7aUMlxoCh/vvBqTWpLS9DpEguFKYdaD
+ UeImpaUtw16KEI43evUwHTGzV6ufBBsCN9Pc3lFQjM2xLvE/mXXT0pUoWOGGTpALYhHY0MSsL
+ +3ZFY1TiTKf/E/08BcgBsvHHjH84D0XAeDeK7vxIb04IHmlC3ekeGKdq1mE9GZwcyRErRYT1L
+ 7LfSl0UbRQ7psL1mzXVZ+YfkWV8/Y3gWlwyF6OIulGDri1Jzpe95QvW+x8WO4hYcRhrLLvkWK
+ lFBeSoT3NIAIGISDY8UQ==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,26 +78,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com,
- qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  3 Dec 2019 08:28:13 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
+From: Thomas Huth <thuth@redhat.com>
 
-> We need to set the short psw indication bit in the reset psw, as it is
-> a short psw.
-> 
-> fixes: 9629823290 ("pc-bios/s390-ccw: do a subsystem reset before running the guest")
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/jump2ipl.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+The node has been removed from the texi file some months ago, so we
+should remove it from the menu section, too.
 
-FWIW, I'll re-queue this patch (and the bios rebuild) in front of the
-short psw fix that exposed the problem, in order to preserve
-bisectability.
+Fixes: 27a296fce982 ("qemu-ga: Convert invocation documentation to rST")
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20191216132941.25729-1-thuth@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ qemu-doc.texi | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index eea91a2d1efd..39f950471f28 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -38,7 +38,6 @@
+ * Introduction::
+ * QEMU PC System emulator::
+ * QEMU System emulator for non PC targets::
+-* QEMU Guest Agent::
+ * QEMU User space emulator::
+ * System requirements::
+ * Security::
+-- 
+2.24.1
 
 
