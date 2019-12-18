@@ -2,92 +2,91 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF1CC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E53FC2D0C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:33:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E74532146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:17:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mbo78YQV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74532146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6806121582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:33:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6806121582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihQlj-0004dL-2N
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 23:17:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41286)
+	id 1ihR1d-0000Al-Gn
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 23:33:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56588)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihQkE-0003il-ES
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:15:31 -0500
+ (envelope-from <bharata@linux.ibm.com>) id 1ihR0l-0007Yp-1n
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:32:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihQkA-0008Gd-Jc
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:15:29 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:32822)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihQkA-0008FP-BY
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:15:26 -0500
-Received: by mail-pg1-x542.google.com with SMTP id 6so534464pgk.0
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 20:15:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9C/NllXt+IiMcTKuUu1KalZGcyy4YxFtVK0hNJJKSu8=;
- b=Mbo78YQV18F6yKgC0YqWhsSg64m6s3WkylVPQTiaXvbMV68K/GAxghjgo7pUZC1Io1
- SJPzkZ6eyKFZU64CMJkk0+p112O6+S//qA9H8Hwg0zsRfIller0eB4FkUFwHUvR8533Y
- mOULpqmWvTerrU6pAerBKovqrrblyZuo3D5xJ/3dlY40u/bbLKmUO5bUHyGEXP/SBMfv
- SX3OGN6CsNBgZVm+rfJfTwO2wbwxXwy9Qy5FRWyRDQvI+XantGdABp2HlqGQIqVOCemR
- nvEPyEACr7cPQYmWxBeZ/NYUEG5rmZ5pt1+kdMlUDXrh/2jltIUKoWPX3vGhNAMFaimr
- l9VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9C/NllXt+IiMcTKuUu1KalZGcyy4YxFtVK0hNJJKSu8=;
- b=X0cslgdZ8Q/4J/cXkHo45UJJhhtpA3bG2nTGMQlk3HcOpVURBb0IYrkJtovqATc2Ca
- pCgo+gVJiFsOla1LLvs0fCz3xnS+HYffrjX01PUmroW/ijcayt9uw5RAJGdBZUmtNwh0
- uLJPoFl+dcMqsQ9D7Iu5E/xpXkHSrU2y3WyYWY8scVqBD0b/y8KzZk3cazNdMzTYQbcY
- 21eq3C+1H6vEyt3tjjZAsKuGkAmzgybuWPiX5jTKcFaLAgQEOVqUetvYIrA4WhJxecsY
- vFY5oCtOGsOPaWl25hpqeHFDzDhUP67s5VQmX3J1BPU8YTWQnhimyri5b2ylXr11RGz4
- IBaQ==
-X-Gm-Message-State: APjAAAUdiC9Y5jsNJQhdZz4kpguCRsSRxvBH12dpxNw/V8zkJmksVZQC
- RaNrTNVxv9sNmAavNPux8uFWqA==
-X-Google-Smtp-Source: APXvYqwYAD4pd6h6l6Qs56nhZ9VCMA43ro3PTrHjKnumX0gkC05+9kc1EaR1YJZbquNLgs+0tAxGxw==
-X-Received: by 2002:a63:134e:: with SMTP id 14mr566737pgt.115.1576642525108;
- Tue, 17 Dec 2019 20:15:25 -0800 (PST)
-Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
- ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id a6sm657309pgg.25.2019.12.17.20.15.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Dec 2019 20:15:24 -0800 (PST)
-Subject: Re: [PATCH 6/6] qemu-io-cmds: Silent GCC9 format-overflow warning
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191217173425.5082-1-philmd@redhat.com>
- <20191217173425.5082-7-philmd@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0bd64884-03fd-68e1-a790-c9ceb7710fd9@linaro.org>
-Date: Tue, 17 Dec 2019 18:15:21 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <bharata@linux.ibm.com>) id 1ihR0i-0007mC-1i
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:32:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14194
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
+ id 1ihR0g-0007fT-68
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:32:30 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBI4WQBH067573
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 23:32:26 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wybsyt7tk-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 23:32:26 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
+ Wed, 18 Dec 2019 04:32:23 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 18 Dec 2019 04:32:19 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xBI4VZWp26411500
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 18 Dec 2019 04:31:35 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DA7D452051;
+ Wed, 18 Dec 2019 04:32:18 +0000 (GMT)
+Received: from bharata.ibmuc.com (unknown [9.85.89.92])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A401F52052;
+ Wed, 18 Dec 2019 04:32:17 +0000 (GMT)
+From: Bharata B Rao <bharata@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 ppc-for-5.0 0/2] ppc/spapr: Support reboot of secure
+ pseries guest
+Date: Wed, 18 Dec 2019 10:02:06 +0530
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20191217173425.5082-7-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-TM-AS-GCONF: 00
+x-cbid: 19121804-0016-0000-0000-000002D60370
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121804-0017-0000-0000-000033383F71
+Message-Id: <20191218043208.28613-1-bharata@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-17_05:2019-12-17,2019-12-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0
+ suspectscore=0 priorityscore=1501 mlxscore=0 malwarescore=0 clxscore=1015
+ bulkscore=0 spamscore=0 mlxlogscore=869 phishscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912180034
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,56 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: paulus@ozlabs.org, linuxram@us.ibm.com,
+ Bharata B Rao <bharata@linux.ibm.com>, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/17/19 7:34 AM, Philippe Mathieu-Daudé wrote:
-> GCC9 is confused when building with CFLAG -O3:
-> 
->   In function ‘help_oneline’,
->       inlined from ‘help_all’ at qemu-io-cmds.c:2414:9,
->       inlined from ‘help_f’ at qemu-io-cmds.c:2424:9:
->   qemu-io-cmds.c:2389:9: error: ‘%s’ directive argument is null [-Werror=format-overflow=]
->    2389 |         printf("%s ", ct->name);
->         |         ^~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Audit shows this can't happen. Give a hint to GCC adding an
-> assert() call.
+This patchset adds KVM_PPC_SVM_OFF ioctl which is required to support
+reset of secure guest. This includes linux-headers update so that we get
+the newly introduced ioctl.
 
-This deserves more investigation.  From my glance it appears you are right --
-and moreover impossible for gcc to have come to this conclusion.  Which begs
-the question of how that is.
+v2: https://lists.gnu.org/archive/html/qemu-ppc/2019-12/msg00162.html
 
-Did you file a gcc bug report?
+Changes in v3:
+-------------
+- Use of error_fatal as David Gibson suggested.
+- Updated linux-headers to 5.5.0-rc2
 
+Bharata B Rao (2):
+  linux-headers: Update
+  ppc/spapr: Support reboot of secure pseries guest
 
-r~
+ hw/ppc/spapr.c                                |  1 +
+ include/standard-headers/asm-x86/bootparam.h  |  7 +-
+ .../infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h | 15 +++-
+ include/standard-headers/drm/drm_fourcc.h     | 28 ++++++-
+ .../linux/input-event-codes.h                 | 77 +++++++++++++++++++
+ include/standard-headers/linux/pci_regs.h     |  3 +
+ .../standard-headers/rdma/vmw_pvrdma-abi.h    |  5 ++
+ linux-headers/linux/kvm.h                     |  1 +
+ target/ppc/kvm.c                              | 15 ++++
+ target/ppc/kvm_ppc.h                          |  6 ++
+ 10 files changed, 154 insertions(+), 4 deletions(-)
 
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
-> ---
->  qemu-io-cmds.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index 1b7e700020..9e956a5dd4 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -2411,6 +2411,7 @@ static void help_all(void)
->      const cmdinfo_t *ct;
->  
->      for (ct = cmdtab; ct < &cmdtab[ncmds]; ct++) {
-> +        assert(ct->name);
->          help_oneline(ct->name, ct);
->      }
->      printf("\nUse 'help commandname' for extended help.\n");
-> 
+-- 
+2.21.0
 
 
