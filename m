@@ -2,82 +2,83 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F5EC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 742E7C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:54:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D320C2176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:52:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D4612176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:54:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chnm9Yoj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D320C2176D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHCFhsI/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D4612176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihcYk-0002YD-55
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:52:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60762)
+	id 1ihcaJ-0004RD-3p
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:54:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ihcXn-0001Yh-Ka
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:51:28 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ihcZD-0003QW-6d
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:52:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ihcXl-000331-Br
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:51:26 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48262
+ (envelope-from <dgilbert@redhat.com>) id 1ihcZA-00021U-3C
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:52:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25787
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihcXl-0002xb-6W
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:51:25 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ihcZ8-0001yV-Ig
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:52:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576687883;
+ s=mimecast20190719; t=1576687968;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4KhdTY5TR+ZGrvSLypB3faUQRTdZLrWtF4m90aJGacw=;
- b=chnm9YojZFJ9jV9nq2JRGwXR8+nwSjQ9SBe+YB7NbaeX1J8oEoIuidzA0OjW/htg1yUwPn
- TgMTV6vlyMEinHljsld9+B9PobAfTSQf5Hltfx5qNPGgfcsPw2/9Ystb03vGPuYFwm+fJ3
- cyeXV78Y/1tjgN5Ee/XLssscTjGYlN4=
+ bh=+9vpbT6YvgH1acpwTohzA5ljDFqLy76z/AM4YF9pzGM=;
+ b=IHCFhsI/+s8Bz+Wk2BXAkMmTwA0PztBFlNCPiBuQHya0qagyEqiVNh7I7bYSwNAMvQyBNT
+ K/C8CHg/niVNscqToQZDCqlL1e2MHySICNIHpe6VP579/91MYi9jilNkvWY6CetzRkt8lD
+ j/URFKcCjVOaEhtVeTrKrrQeODTwxIo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-0NaomYnLPbGd-BT5r7rQmw-1; Wed, 18 Dec 2019 11:51:19 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-384--TgdsB7WO3Ohnp86_oBGTQ-1; Wed, 18 Dec 2019 11:52:47 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 158571404BC;
- Wed, 18 Dec 2019 16:51:18 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-210.ams2.redhat.com [10.36.116.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 102F71000322;
- Wed, 18 Dec 2019 16:51:16 +0000 (UTC)
-Date: Wed, 18 Dec 2019 17:51:15 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/3] block: eliminate BDRV_REQ_NO_SERIALISING
-Message-ID: <20191218165115.GE4632@linux.fritz.box>
-References: <1576675026-25046-1-git-send-email-pbonzini@redhat.com>
- <1576675026-25046-2-git-send-email-pbonzini@redhat.com>
- <20191218163636.GC4632@linux.fritz.box>
- <ebdddf75-60a7-48b2-c075-232149979776@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49D3A18C35C4
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 16:52:46 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A71260BC7;
+ Wed, 18 Dec 2019 16:52:45 +0000 (UTC)
+Date: Wed, 18 Dec 2019 16:52:42 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>, quintela@redhat.com
+Subject: Re: [PATCH] runstate: ignore finishmigrate -> prelaunch transition
+Message-ID: <20191218165242.GL3707@work-vm>
+References: <20191129115132.285988-1-lvivier@redhat.com>
+ <20191206195230.GJ2878@work-vm>
+ <b782071a-c522-0e50-ed49-152964fe6bd4@redhat.com>
+ <e0557fa4-e5b3-3f83-e002-b22d81e7561f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ebdddf75-60a7-48b2-c075-232149979776@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 0NaomYnLPbGd-BT5r7rQmw-1
+In-Reply-To: <e0557fa4-e5b3-3f83-e002-b22d81e7561f@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: -TgdsB7WO3Ohnp86_oBGTQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,41 +90,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Lieven <pl@kamp.de>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.12.2019 um 17:43 hat Paolo Bonzini geschrieben:
-> On 18/12/19 17:37, Kevin Wolf wrote:
-> >>       * passthrough flags.  */
-> >> -    assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_REA=
-D |
-> >> -                       BDRV_REQ_PREFETCH)));
-> >> +    assert(!(flags & ~(BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH)));
-> >> =20
-> >>      /* Handle Copy on Read and associated serialisation */
-> >>      if (flags & BDRV_REQ_COPY_ON_READ) {
-> >> @@ -1458,12 +1457,7 @@ static int coroutine_fn bdrv_aligned_preadv(Bdr=
-vChild *child,
-> >>          bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs))=
-;
-> >>      }
-> >> =20
-> >> -    /* BDRV_REQ_SERIALISING is only for write operation */
-> >> -    assert(!(flags & BDRV_REQ_SERIALISING));
-> > I think we shoud still keep this assertion as long as read requests
-> > don't mark themselves as serialising when BDRV_REQ_SERIALISING is given=
-.
-> > Otherwise, someone might add the flag to a read request and will later
-> > be surprised that it didn't work.
->=20
-> I'm removing it because it's anyway tested by the earlier
->=20
->     assert(!(flags & ~(BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH)));
+* Laurent Vivier (lvivier@redhat.com) wrote:
+> Ping?
 
-Ah, right. Never mind then.
+Juan says he's doing a migration pull soon - this seems like a good one
+for it.
 
-Kevin
+Dave
+
+> Thanks,
+> Laurent
+>=20
+> On 12/12/2019 20:40, Laurent Vivier wrote:
+> > On 06/12/2019 20:52, Dr. David Alan Gilbert wrote:
+> >> * Laurent Vivier (lvivier@redhat.com) wrote:
+> >>> Commit 1bd71dce4bf2 tries to prevent a finishmigrate -> prelaunch
+> >>> transition by exiting at the beginning of the main_loop_should_exit()
+> >>> function if the state is already finishmigrate.
+> >>>
+> >>> As the finishmigrate state is set in the migration thread it can
+> >>> happen concurrently to the function. The migration thread and the
+> >>> function are normally protected by the iothread mutex and thus the
+> >>> state should no evolve between the start of the function and its end.
+> >>>
+> >>> Unfortunately during the function life the lock is released by
+> >>> pause_all_vcpus() just before the point we need to be sure we are
+> >>> not in finishmigrate state and if the migration thread is waiting
+> >>> for the lock it will take the opportunity to change the state
+> >>> to finishmigrate.
+> >>
+> >> Ewww.
+> >> I hate those short wakeups for pause_all_vcpus; I'm sure there are loa=
+ds
+> >> more corners that break.
+> >>
+> >> Still, I _think_ this is an improvement, so:
+> >>
+> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >>
+> >=20
+> > Who volunteers to take this in his queue?
+> >=20
+> > Thanks,
+> > Laurent
+> >=20
+> >=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
