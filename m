@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BF6C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D87C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:23:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FD1B206EE
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A5B6206EE
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 03:23:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ffmarJqS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD1B206EE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SSDo/qpY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5B6206EE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihPvp-0000BC-Gm
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 22:23:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43923)
+	id 1ihPw3-0000VD-Un
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 22:23:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihPrz-00042w-QA
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:19:29 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihPs6-00049R-SO
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:19:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihPry-0002dn-Ld
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:19:27 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43048)
+ (envelope-from <richard.henderson@linaro.org>) id 1ihPs4-0002kL-Oz
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:19:34 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42840)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihPry-0002cz-Fv
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:19:26 -0500
-Received: by mail-pg1-x542.google.com with SMTP id k197so435061pga.10
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:19:26 -0800 (PST)
+ id 1ihPs4-0002jj-JW
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 22:19:32 -0500
+Received: by mail-pf1-x441.google.com with SMTP id 4so385241pfz.9
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 19:19:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+Toe6+kf85085QGBznhMe/ZC3IHb6MH8qdiKw5XlMFI=;
- b=ffmarJqSOoWRRJ5Qixi6fN4Y6Fx0Lh9cOfGrdDRa0B2w/drHIBmGHpPU018P36NEx+
- LJDfFwiMk+GWmrjheD59oPdZ7/Erer1TPxuWR4SUtHwiiJX/ATSccpifVIOucGMQSeTz
- 1m+BH7kq5AT33MXSEah3M+lnQu7ib6TFHb0SiAB5pahjKVTmKdLBkldDqX5dRNsBeJFl
- GBo2qZMSXttsKjpGixXbKYvkGvhkPtS2d9oLhIxeblfP+Xs/i8bOIBvzsgXGr1Od/Y7A
- jBS5cKBvJT10/ObOuCPMfF1XKAb4YalkR5BoFejcrq1JYLejccn1gQxGry3Gq65GnOpu
- D9fw==
+ bh=IVABMN0hJYlQXO1glbSSBN/F4pdMjp3DIhyEvyino7c=;
+ b=SSDo/qpYhLTxx5ztb+3nRQGRrHrPeNn6y4BeS90fRI+xFdHV3IXpC8lVNzQ095sSwE
+ 0R82gSpua4KmLmJN1WnTc8PYHeRlLHnv7fT/1GB/R4XqMre5+FhUE/qAjHAMqe83TOin
+ VXWkPEb3X5MZdVg3tfrBL/G7JH4QGDdEgXBc8t1SYWPRhej5bXSaAxfIYB+MP/J0BAVr
+ kC3J/oJwtw+uF9VbKdGZeHMOU4fOfYtMLZOp/czIcl1HxugSBJVnXox/Fl6+85ozjopm
+ Huo/504ckZIvREvtng90CwtPJ4uhbwOfszfudb6EwXs7rxMEKXTPuHL8QJ967OdbNuJ9
+ ph8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+Toe6+kf85085QGBznhMe/ZC3IHb6MH8qdiKw5XlMFI=;
- b=adJ4oZE66NZ8XdKgNporQim6QVnvzuG6VjHnpdZmynOY0NyCbdTjUEimRFzQW5RJRi
- r21qAs/mRK9AiDfu2sJ7u8s1NW5x/Hrb3LLjFRPW2tSdgZCtVugjxh824yDt2v5UK8pi
- tbj/lH0BdjozTcA3eTO+dOoR7hwSt543NFEc8wsJGXyxKFwDI2B37L8RJp1uHPqIoTny
- RjIlJ/M2sIfQPjK6ZrhOd84+H0SVZYMJ6sf9qHdMXIXTNWSK5BPD30BVIashXNZtJtjr
- U70RR1x56daqGay2vYBzkM3WSIfD1aYtL86+PmD23bS89yMRWJYWlJWXuMp+d2fegMvl
- Z2WA==
-X-Gm-Message-State: APjAAAW7UmhhQx7mgBMdgfrvF0NoNKkKPRI0WBA/De45n2T1js6xaIq4
- Cfisc4mZl+/76/Pp1fM7wuk8Fvpt8hg=
-X-Google-Smtp-Source: APXvYqzyoVU80nkVM6viZDd7ZtB0p0SrBMZyumo1mlLO5ihNbChTPwBahQXi90mgQe5g8ujkMk/d1Q==
-X-Received: by 2002:a63:4d5e:: with SMTP id n30mr288667pgl.275.1576639165011; 
- Tue, 17 Dec 2019 19:19:25 -0800 (PST)
+ bh=IVABMN0hJYlQXO1glbSSBN/F4pdMjp3DIhyEvyino7c=;
+ b=DMC1uDRgxHdyIG/rCRdPNko8dpt4KblRlqdCYUCkJsB7CLsmFtf9g5bbcM4xyoEDZw
+ Nws93BUnzUv//+3qpngNXberPOouX4epVZrS6pPjtuEIdXWo6QwSpM5cMKHsVfWoLEfA
+ 2TMPMLVKRj/aoauITNNcq2O0dwaRtF4qXgm7VPQaCRCNVeKh8usvAmqxgfKp4oLAp8cd
+ 4Kr1/97Q+7xHPYqoM6p+/4O9+PWxkrNzlmlLIBbybMsLIEvMyGwnqF59YHQs6jhGN0lK
+ Gh15jgIEEuRHh+EGxfKGVz4YG3E9GtTzzaGiqRNsIkQ85rnLNDnkaK1pFNSt+nDssrmd
+ TH3g==
+X-Gm-Message-State: APjAAAUXnnJ0BOPlaZTjvhEKTN/ukrfTQ51g4eb0rzWqYQTsThEQUCf6
+ Bl7zzxOPA/+TnI+DETD68/kTCIOztHw=
+X-Google-Smtp-Source: APXvYqw9lrS94GUPXHsMFF5nhNCcSXjGjJ2r6QqfUTbHKsk0WYkWLYHBMlP3/esnNBQB/dPv1PJGSA==
+X-Received: by 2002:a63:4b48:: with SMTP id k8mr326832pgl.362.1576639171240;
+ Tue, 17 Dec 2019 19:19:31 -0800 (PST)
 Received: from localhost.localdomain
  ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id k27sm404870pfp.66.2019.12.17.19.19.23
+ by smtp.gmail.com with ESMTPSA id k27sm404870pfp.66.2019.12.17.19.19.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 Dec 2019 19:19:24 -0800 (PST)
+ Tue, 17 Dec 2019 19:19:30 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/7] configure: Drop adjustment of textseg
-Date: Tue, 17 Dec 2019 17:19:14 -1000
-Message-Id: <20191218031920.6414-2-richard.henderson@linaro.org>
+Subject: [PATCH 5/7] configure: Unnest detection of -z,relro and -z,now
+Date: Tue, 17 Dec 2019 17:19:18 -1000
+Message-Id: <20191218031920.6414-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191218031920.6414-1-richard.henderson@linaro.org>
 References: <20191218031920.6414-1-richard.henderson@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,84 +98,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adjustment was random and unnecessary.  The user mode
-startup code in probe_guest_base() will choose a value for
-guest_base that allows the host qemu binary to not conflict
-with the guest binary.
-
-With modern distributions, this isn't even used, as the default
-is PIE, which does the same job in a more portable way.
+There is nothing about these options that is related to PIE.
+Nor is there anything that specifically ties them to each other.
+Use them unconditionally.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- configure | 47 -----------------------------------------------
- 1 file changed, 47 deletions(-)
+ configure | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/configure b/configure
-index 84b413dbfc..255ac432af 100755
+index 972ce7396f..f8981eec15 100755
 --- a/configure
 +++ b/configure
-@@ -6292,49 +6292,6 @@ if test "$cpu" = "s390x" ; then
-   fi
- fi
- 
--# Probe for the need for relocating the user-only binary.
--if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ]; then
--  textseg_addr=
--  case "$cpu" in
--    arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
--      # ??? Rationale for choosing this address
--      textseg_addr=0x60000000
--      ;;
--    mips)
--      # A 256M aligned address, high in the address space, with enough
--      # room for the code_gen_buffer above it before the stack.
--      textseg_addr=0x60000000
--      ;;
--  esac
--  if [ -n "$textseg_addr" ]; then
--    cat > $TMPC <<EOF
--    int main(void) { return 0; }
--EOF
--    textseg_ldflags="-Wl,-Ttext-segment=$textseg_addr"
--    if ! compile_prog "" "$textseg_ldflags"; then
--      # In case ld does not support -Ttext-segment, edit the default linker
--      # script via sed to set the .text start addr.  This is needed on FreeBSD
--      # at least.
--      if ! $ld --verbose >/dev/null 2>&1; then
--        error_exit \
--            "We need to link the QEMU user mode binaries at a" \
--            "specific text address. Unfortunately your linker" \
--            "doesn't support either the -Ttext-segment option or" \
--            "printing the default linker script with --verbose." \
--            "If you don't want the user mode binaries, pass the" \
--            "--disable-user option to configure."
--      fi
--
--      $ld --verbose | sed \
--        -e '1,/==================================================/d' \
--        -e '/==================================================/,$d' \
--        -e "s/[.] = [0-9a-fx]* [+] SIZEOF_HEADERS/. = $textseg_addr + SIZEOF_HEADERS/" \
--        -e "s/__executable_start = [0-9a-fx]*/__executable_start = $textseg_addr/" > config-host.ld
--      textseg_ldflags="-Wl,-T../config-host.ld"
+@@ -2034,9 +2034,6 @@ if test "$pie" != "no" ; then
+     QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
+     LDFLAGS="-pie $LDFLAGS"
+     pie="yes"
+-    if compile_prog "" "-Wl,-z,relro -Wl,-z,now" ; then
+-      LDFLAGS="-Wl,-z,relro -Wl,-z,now $LDFLAGS"
 -    fi
--  fi
--fi
--
- # Check that the C++ compiler exists and works with the C compiler.
- # All the QEMU_CXXFLAGS are based on QEMU_CFLAGS. Keep this at the end to don't miss any other that could be added.
- if has $cxx; then
-@@ -7897,10 +7854,6 @@ if test "$gprof" = "yes" ; then
+   else
+     if test "$pie" = "yes"; then
+       error_exit "PIE not available due to missing toolchain support"
+@@ -2047,6 +2044,16 @@ if test "$pie" != "no" ; then
    fi
  fi
  
--if test "$target_linux_user" = "yes" || test "$target_bsd_user" = "yes" ; then
--  ldflags="$ldflags $textseg_ldflags"
--fi
--
- # Newer kernels on s390 check for an S390_PGSTE program header and
- # enable the pgste page table extensions in that case. This makes
- # the vm.allocate_pgste sysctl unnecessary. We enable this program
++# Detect support for DT_BIND_NOW.
++if compile_prog "" "-Wl,-z,now" ; then
++  LDFLAGS="-Wl,-z,now $LDFLAGS"
++fi
++
++# Detect support for PT_GNU_RELRO.
++if compile_prog "" "-Wl,-z,relro" ; then
++  LDFLAGS="-Wl,-z,relro $LDFLAGS"
++fi
++
+ ##########################################
+ # __sync_fetch_and_and requires at least -march=i486. Many toolchains
+ # use i686 as default anyway, but for those that don't, an explicit
 -- 
 2.20.1
 
