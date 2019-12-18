@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B81C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:10:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A25C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:12:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D449A2072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E37F2072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:12:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eTvrffLx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D449A2072B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="enTGWBfI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E37F2072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYAC-00085X-Eo
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:10:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46215)
+	id 1ihYBl-00021H-Md
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:12:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2q-00067B-JD
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:14 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2o-00063w-Bd
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2o-0008Pa-MO
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:12 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54493)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2l-0008M2-2Z
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:10 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:39523)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY2o-0008Mi-Bb
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:10 -0500
-Received: by mail-wm1-x341.google.com with SMTP id b19so1551536wmj.4
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:07 -0800 (PST)
+ id 1ihY2k-0008Hy-Qb
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:06 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id 20so1481093wmj.4
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ef/FO6qoNGMLr8f5Vz4w7Or3wCDjsjS3iUWUZAId/HY=;
- b=eTvrffLxlaX3tv1AZe1Ck3pvc62zwHDQnSELzOfP+G57cxQu7G2QmBbG27O+OVjOf7
- nP5vbE3RFNxcPL4CBPdBy++Ow6b4JWrINC40a6SnrWA9XMBdF5BTFtxfv9uELpqMKoLm
- NeYwjZjg9JO2ekv5/zxkimre/Td3sSwONW2qcQ6N09La4TZkD9CXqst2GixJxCvnInsB
- yfFAabYfT7HXSSmWlksIH5r/uLlgnx7oTt85TYZzscFPRyGpwBMpgpYIKoT4F5/xH3Gr
- OExuAE/cgmutJ5pVx2GSN06ID8RTSn0ZS5dTcGMS5zwFUExvfKIPqKXxKqD6ZU7rCUAP
- jV5g==
+ bh=hDnMTI6Tisyyc4MUAZDZjzS6Nao0qdWk6sKjID5q248=;
+ b=enTGWBfIQQZ4aaMxTNMEmogZ7YcH7CGbrEXTQfK0tNVWdGUQjJyrmJ/xjsntZ5qq8N
+ eMATICr9B8EfvrEPh60NZ1Tq6lx0Xp/8dHW80KH8vjhQPvqvwdG2adm3D7AXCDR1/AET
+ xose8T/DCjPZX9TqzH14Zs52xEm5kjLH9IQzu0skJL/xIXcgQKck1DYSlnF3z8bfthGY
+ aNt2X6C9wzZQLLwkXv4MhDq4NVx7xKIJ08g0pUC0YPFagx0IvTfTDxgT29TbrmyYqKLo
+ YbpzIeY6Owc4lWlnvO7XtbbI+MHZsYDqRKRUAXAfC/srS3k7+KjLL6/ZKmvhnWevwws6
+ vb7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=ef/FO6qoNGMLr8f5Vz4w7Or3wCDjsjS3iUWUZAId/HY=;
- b=oZ6bBSM/iJYQ9GXsuZAGCoZ3h34AJmWbPwXzutDtuygPx2t/SKjpoPduqBC1P9vc6p
- UktYuut7CCZ7+6DqRm0N8eA6xhWDZN15m4Aif961DjQgNnof7j4VaQ8+3ZfF+AW8J5mw
- K/+hy7mpsnCfa06ALuDmiEiH6s033Qr8DQBKRxUO058qtcpaxQbmidtcAzM1vq3gghmB
- UN9ciK2F4EqRREzuIjkCFIk/O8gv1miNQw3A8zwcKVia+sY4p22CCISMAl9wpj9yIC9b
- EdXPh2JGzJ4rbVzjS3XZaMtl66XYtZXcs5uHxiwsV6w+M5RCd3hLDUmQSfOhUojKQxjF
- UNuw==
-X-Gm-Message-State: APjAAAUrdHofrs9IKOtZpgdvN9fWsfwEetkGfXlCXdKvi+UmPoFOA+B0
- kxJiVoThHdAdehkoQrxuiI5RtlMI
-X-Google-Smtp-Source: APXvYqx+Fhbcnj3Sz5sajxBJy1sVHmrQH1uhQ1/x45m06ugL+mDFYGkMhC1dw4jUyzjN9ZtQ8068aw==
-X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr2794428wme.177.1576670586403; 
- Wed, 18 Dec 2019 04:03:06 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ bh=hDnMTI6Tisyyc4MUAZDZjzS6Nao0qdWk6sKjID5q248=;
+ b=FN8KjrzIO1bXy/onnE26nLIvJSQQxJnaZEHgXei11hWwKJsBj5VmUasv3JvoSWHXgQ
+ 9RBz4mNKuWRMCaMgZNqRF3YluROpistC4+4D5/V+CF2TwIDM2oeb/YH5DC81PIiiqAQO
+ 0g9hq2o/6/UFjVKDLAsM7sDSSZoG2MEFM8Fm0ZHk8i+rGCh6fxERvfUm7vV5CWYDq2Rt
+ cWhysnvDsmOFqXJVUdZngh0vr98N3xWaF1ZiFouZET5IdIiTNo3UXZ1Yr1xR61sw7Dbu
+ oNecZGIemxeJHu5e9ujGj/Par0Fg5b+FH73QwMWM1Znn3G61eiCKdazQSbr6ydUhrzp5
+ D7ZQ==
+X-Gm-Message-State: APjAAAV8x8yL0bqvwzEB+BPK7cF0kAeYO0RrXbmSsc1j5GKPEeqfua2I
+ HnNaTMtU43MU2kANUz7VanWR/gkX
+X-Google-Smtp-Source: APXvYqw1qtJaloA/iZRFhYRg0/IBUYePXPN5rlud5t1eyL2s7twKSS0dXtT5mmRiblKZH8/Wc43mYQ==
+X-Received: by 2002:a7b:c00c:: with SMTP id c12mr2841557wmb.174.1576670585533; 
  Wed, 18 Dec 2019 04:03:05 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.04
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 18 Dec 2019 04:03:04 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/87] migration-test: Use a struct for test_migrate_start
- parameters
-Date: Wed, 18 Dec 2019 13:01:37 +0100
-Message-Id: <1576670573-48048-12-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 10/87] migration-test: Rename cmd_src/dst to
+ arch_source/arch_target
+Date: Wed, 18 Dec 2019 13:01:36 +0100
+Message-Id: <1576670573-48048-11-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,312 +97,107 @@ Sender: "Qemu-devel"
 
 From: Juan Quintela <quintela@redhat.com>
 
-It has two bools and two strings, it is very difficult to remember
-which does what.  And it makes very difficult to add new parameters as
-we need to modify all the callers.
+This explains better what they do and avoid confussino with
+command_src/target.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Tested-by: Cornelia Huck <cohuck@redhat.com> #s390x
 Tested-by: Laurent Vivier <lvivier@redhat.com>
 ---
- tests/migration-test.c | 118 ++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 78 insertions(+), 40 deletions(-)
+ tests/migration-test.c | 40 +++++++++++++++++++++-------------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 37e9663..dbe25b8 100644
+index 14f2ce3..37e9663 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -544,10 +544,31 @@ static void migrate_postcopy_start(QTestState *from, QTestState *to)
-     qtest_qmp_eventwait(to, "RESUME");
- }
- 
-+typedef struct {
-+    bool hide_stderr;
-+    bool use_shmem;
-+    char *opts_source;
-+    char *opts_target;
-+} MigrateStart;
-+
-+static MigrateStart *migrate_start_new(void)
-+{
-+    MigrateStart *args = g_new0(MigrateStart, 1);
-+
-+    args->opts_source = g_strdup("");
-+    args->opts_target = g_strdup("");
-+    return args;
-+}
-+
-+static void migrate_start_destroy(MigrateStart *args)
-+{
-+    g_free(args->opts_source);
-+    g_free(args->opts_target);
-+    g_free(args);
-+}
-+
- static int test_migrate_start(QTestState **from, QTestState **to,
--                               const char *uri, bool hide_stderr,
--                               bool use_shmem, const char *opts_src,
--                               const char *opts_dst)
-+                              const char *uri, MigrateStart *args)
+@@ -549,7 +549,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                bool use_shmem, const char *opts_src,
+                                const char *opts_dst)
  {
-     gchar *arch_source, *arch_target;
+-    gchar *cmd_src, *cmd_dst;
++    gchar *arch_source, *arch_target;
      gchar *cmd_source, *cmd_target;
-@@ -560,10 +581,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-     const char *machine_args;
-     const char *memory_size;
+     const gchar *ignore_stderr;
+     char *bootpath = NULL;
+@@ -579,8 +579,8 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_type = "";
+         machine_args = "";
+         memory_size = "150M";
+-        cmd_src = g_strdup_printf("-drive file=%s,format=raw", bootpath);
+-        cmd_dst = g_strdup(cmd_src);
++        arch_source = g_strdup_printf("-drive file=%s,format=raw", bootpath);
++        arch_target = g_strdup(arch_source);
+         start_address = X86_TEST_MEM_START;
+         end_address = X86_TEST_MEM_END;
+     } else if (g_str_equal(arch, "s390x")) {
+@@ -588,20 +588,20 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_type = "";
+         machine_args = "";
+         memory_size = "128M";
+-        cmd_src = g_strdup_printf("-bios %s", bootpath);
+-        cmd_dst = g_strdup(cmd_src);
++        arch_source = g_strdup_printf("-bios %s", bootpath);
++        arch_target = g_strdup(arch_source);
+         start_address = S390_TEST_MEM_START;
+         end_address = S390_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") == 0) {
+         machine_type = "";
+         machine_args = ",vsmt=8";
+         memory_size = "256M";
+-        cmd_src = g_strdup_printf("-nodefaults "
+-                                  "-prom-env 'use-nvramrc?=true' -prom-env "
+-                                  "'nvramrc=hex .\" _\" begin %x %x "
+-                                  "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
+-                                  "until'", end_address, start_address);
+-        cmd_dst = g_strdup("");
++        arch_source = g_strdup_printf("-nodefaults "
++                                      "-prom-env 'use-nvramrc?=true' -prom-env "
++                                      "'nvramrc=hex .\" _\" begin %x %x "
++                                      "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
++                                      "until'", end_address, start_address);
++        arch_target = g_strdup("");
+         start_address = PPC_TEST_MEM_START;
+         end_address = PPC_TEST_MEM_END;
+     } else if (strcmp(arch, "aarch64") == 0) {
+@@ -609,10 +609,10 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_type = "virt,";
+         machine_args = "gic-version=max";
+         memory_size = "150M";
+-        cmd_src = g_strdup_printf("-cpu max "
+-                                  "-kernel %s",
+-                                  bootpath);
+-        cmd_dst = g_strdup(cmd_src);
++        arch_source = g_strdup_printf("-cpu max "
++                                      "-kernel %s",
++                                      bootpath);
++        arch_target = g_strdup(arch_source);
+         start_address = ARM_TEST_MEM_START;
+         end_address = ARM_TEST_MEM_END;
  
--    opts_src = opts_src ? opts_src : "";
--    opts_dst = opts_dst ? opts_dst : "";
--
--    if (use_shmem) {
-+    if (args->use_shmem) {
-         if (!g_file_test("/dev/shm", G_FILE_TEST_IS_DIR)) {
-             g_test_skip("/dev/shm is not supported");
-             return -1;
-@@ -623,13 +641,13 @@ static int test_migrate_start(QTestState **from, QTestState **to,
- 
-     g_free(bootpath);
- 
--    if (hide_stderr) {
-+    if (args->hide_stderr) {
-         ignore_stderr = "2>/dev/null";
-     } else {
-         ignore_stderr = "";
-     }
- 
--    if (use_shmem) {
-+    if (args->use_shmem) {
-         shmem_path = g_strdup_printf("/dev/shm/qemu-%d", getpid());
-         shmem_opts = g_strdup_printf(
-             "-object memory-backend-file,id=mem0,size=%s"
-@@ -647,7 +665,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+@@ -647,8 +647,9 @@ static int test_migrate_start(QTestState **from, QTestState **to,
                                   "%s %s %s %s",
                                   machine_type, machine_args,
                                   memory_size, tmpfs,
--                                 arch_source, shmem_opts, opts_src,
-+                                 arch_source, shmem_opts, args->opts_source,
-                                  ignore_stderr);
-     g_free(arch_source);
+-                                 cmd_src, shmem_opts, opts_src, ignore_stderr);
+-    g_free(cmd_src);
++                                 arch_source, shmem_opts, opts_src,
++                                 ignore_stderr);
++    g_free(arch_source);
      *from = qtest_init(cmd_source);
-@@ -661,8 +679,8 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+     g_free(cmd_source);
+ 
+@@ -660,8 +661,9 @@ static int test_migrate_start(QTestState **from, QTestState **to,
                                   "%s %s %s %s",
                                   machine_type, machine_args,
                                   memory_size, tmpfs, uri,
--                                 arch_target, shmem_opts, opts_dst,
--                                 ignore_stderr);
-+                                 arch_target, shmem_opts,
-+                                 args->opts_target, ignore_stderr);
-     g_free(arch_target);
+-                                 cmd_dst, shmem_opts, opts_dst, ignore_stderr);
+-    g_free(cmd_dst);
++                                 arch_target, shmem_opts, opts_dst,
++                                 ignore_stderr);
++    g_free(arch_target);
      *to = qtest_init(cmd_target);
      g_free(cmd_target);
-@@ -672,11 +690,12 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-      * Remove shmem file immediately to avoid memory leak in test failed case.
-      * It's valid becase QEMU has already opened this file
-      */
--    if (use_shmem) {
-+    if (args->use_shmem) {
-         unlink(shmem_path);
-         g_free(shmem_path);
-     }
- 
-+    migrate_start_destroy(args);
-     return 0;
- }
- 
-@@ -762,13 +781,13 @@ static void test_deprecated(void)
- }
- 
- static int migrate_postcopy_prepare(QTestState **from_ptr,
--                                     QTestState **to_ptr,
--                                     bool hide_error)
-+                                    QTestState **to_ptr,
-+                                    MigrateStart *args)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
- 
--    if (test_migrate_start(&from, &to, uri, hide_error, false, NULL, NULL)) {
-+    if (test_migrate_start(&from, &to, uri, args)) {
-         return -1;
-     }
- 
-@@ -813,9 +832,10 @@ static void migrate_postcopy_complete(QTestState *from, QTestState *to)
- 
- static void test_postcopy(void)
- {
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
- 
--    if (migrate_postcopy_prepare(&from, &to, false)) {
-+    if (migrate_postcopy_prepare(&from, &to, args)) {
-         return;
-     }
-     migrate_postcopy_start(from, to);
-@@ -824,10 +844,13 @@ static void test_postcopy(void)
- 
- static void test_postcopy_recovery(void)
- {
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
-     char *uri;
- 
--    if (migrate_postcopy_prepare(&from, &to, true)) {
-+    args->hide_stderr = true;
-+
-+    if (migrate_postcopy_prepare(&from, &to, args)) {
-         return;
-     }
- 
-@@ -910,9 +933,12 @@ static void wait_for_migration_fail(QTestState *from, bool allow_active)
- 
- static void test_baddest(void)
- {
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
- 
--    if (test_migrate_start(&from, &to, "tcp:0:0", true, false, NULL, NULL)) {
-+    args->hide_stderr = true;
-+
-+    if (test_migrate_start(&from, &to, "tcp:0:0", args)) {
-         return;
-     }
-     migrate(from, "tcp:0:0", "{}");
-@@ -923,9 +949,10 @@ static void test_baddest(void)
- static void test_precopy_unix(void)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
- 
--    if (test_migrate_start(&from, &to, uri, false, false, NULL, NULL)) {
-+    if (test_migrate_start(&from, &to, uri, args)) {
-         return;
-     }
- 
-@@ -1001,9 +1028,10 @@ static void test_ignore_shared(void)
- 
- static void test_xbzrle(const char *uri)
- {
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
- 
--    if (test_migrate_start(&from, &to, uri, false, false, NULL, NULL)) {
-+    if (test_migrate_start(&from, &to, uri, args)) {
-         return;
-     }
- 
-@@ -1052,11 +1080,11 @@ static void test_xbzrle_unix(void)
- 
- static void test_precopy_tcp(void)
- {
-+    MigrateStart *args = migrate_start_new();
-     char *uri;
-     QTestState *from, *to;
- 
--    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", false, false,
--                           NULL, NULL)) {
-+    if (test_migrate_start(&from, &to, "tcp:127.0.0.1:0", args)) {
-         return;
-     }
- 
-@@ -1096,13 +1124,14 @@ static void test_precopy_tcp(void)
- 
- static void test_migrate_fd_proto(void)
- {
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
-     int ret;
-     int pair[2];
-     QDict *rsp;
-     const char *error_desc;
- 
--    if (test_migrate_start(&from, &to, "defer", false, false, NULL, NULL)) {
-+    if (test_migrate_start(&from, &to, "defer", args)) {
-         return;
-     }
- 
-@@ -1178,15 +1207,12 @@ static void test_migrate_fd_proto(void)
-     test_migrate_end(from, to, true);
- }
- 
--static void do_test_validate_uuid(const char *uuid_arg_src,
--                                  const char *uuid_arg_dst,
--                                  bool should_fail, bool hide_stderr)
-+static void do_test_validate_uuid(MigrateStart *args, bool should_fail)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-     QTestState *from, *to;
- 
--    if (test_migrate_start(&from, &to, uri, hide_stderr, false,
--                           uuid_arg_src, uuid_arg_dst)) {
-+    if (test_migrate_start(&from, &to, uri, args)) {
-         return;
-     }
- 
-@@ -1216,33 +1242,45 @@ static void do_test_validate_uuid(const char *uuid_arg_src,
- 
- static void test_validate_uuid(void)
- {
--    do_test_validate_uuid("-uuid 11111111-1111-1111-1111-111111111111",
--                          "-uuid 11111111-1111-1111-1111-111111111111",
--                          false, false);
-+    MigrateStart *args = migrate_start_new();
-+
-+    args->opts_source = g_strdup("-uuid 11111111-1111-1111-1111-111111111111");
-+    args->opts_target = g_strdup("-uuid 11111111-1111-1111-1111-111111111111");
-+    do_test_validate_uuid(args, false);
- }
- 
- static void test_validate_uuid_error(void)
- {
--    do_test_validate_uuid("-uuid 11111111-1111-1111-1111-111111111111",
--                          "-uuid 22222222-2222-2222-2222-222222222222",
--                          true, true);
-+    MigrateStart *args = migrate_start_new();
-+
-+    args->opts_source = g_strdup("-uuid 11111111-1111-1111-1111-111111111111");
-+    args->opts_target = g_strdup("-uuid 22222222-2222-2222-2222-222222222222");
-+    args->hide_stderr = true;
-+    do_test_validate_uuid(args, true);
- }
- 
- static void test_validate_uuid_src_not_set(void)
- {
--    do_test_validate_uuid(NULL, "-uuid 11111111-1111-1111-1111-111111111111",
--                          false, true);
-+    MigrateStart *args = migrate_start_new();
-+
-+    args->opts_target = g_strdup("-uuid 22222222-2222-2222-2222-222222222222");
-+    args->hide_stderr = true;
-+    do_test_validate_uuid(args, false);
- }
- 
- static void test_validate_uuid_dst_not_set(void)
- {
--    do_test_validate_uuid("-uuid 11111111-1111-1111-1111-111111111111", NULL,
--                          false, true);
-+    MigrateStart *args = migrate_start_new();
-+
-+    args->opts_source = g_strdup("-uuid 11111111-1111-1111-1111-111111111111");
-+    args->hide_stderr = true;
-+    do_test_validate_uuid(args, false);
- }
- 
- static void test_migrate_auto_converge(void)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
-+    MigrateStart *args = migrate_start_new();
-     QTestState *from, *to;
-     int64_t remaining, percentage;
- 
-@@ -1261,7 +1299,7 @@ static void test_migrate_auto_converge(void)
-      */
-     const int64_t expected_threshold = max_bandwidth * downtime_limit / 1000;
- 
--    if (test_migrate_start(&from, &to, uri, false, false, NULL, NULL)) {
-+    if (test_migrate_start(&from, &to, uri, args)) {
-         return;
-     }
  
 -- 
 1.8.3.1
