@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2479C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B458CC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:44:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB8CD20717
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7269520717
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:44:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gu6DlJvO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB8CD20717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ONaa83Vn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7269520717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihcPN-0007EM-Ns
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:42:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44964)
+	id 1ihcQx-0001Nq-AX
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:44:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ihcGL-0003Lj-4G
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:26 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ihcGu-00048O-Nn
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:34:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ihcGJ-0001x0-PS
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21546
+ (envelope-from <stefanha@redhat.com>) id 1ihcGt-0005yU-Jp
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:34:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29166
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihcGJ-0001sq-Jf
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:23 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihcGt-0005vT-Bg
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:33:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576686803;
+ s=mimecast20190719; t=1576686838;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CH5VXwZlwL83zczRIPWaQ6ySqX8xzOLWMH4GZYtfmQo=;
- b=Gu6DlJvOekIvbvrJORpwPTKVjCJmXkKPzaM6pChpChdX1Vt9Ufx4vfVLkE59DciKyO/8pv
- 6WItvHgOcokiWp0BVPgI4kIGzsz8CjUpG81zLfmreA9EKkpdjHI8u0uC7EyQWmjSWnHepW
- v7IuoNTNY/w8xg9wa5iKW83n/ViuS9Y=
+ bh=1RRkwabOIZaXYsp8FjguEH3I6RJD+LrqlQ3elr532bc=;
+ b=ONaa83VnV5Vx4rA3PmG99G/or95QIQAMJSfMazHoZcN14WGo0AZtUKC79x9LFd+1HRaW1O
+ TDVBe8h1rIqjkF4ibGljqIpboF8OaSKtAELBlSTY81wtksfVE7u5cn7bi4C10fuohe+WAC
+ Ns+jZFjjatMlw7wDIM47FAHzzOD5W3U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-aDBM15ZbOS6RWTkFcajAwg-1; Wed, 18 Dec 2019 11:33:21 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-76-zKlCdTpQPTySjyDfIRziSw-1; Wed, 18 Dec 2019 11:33:57 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88606800D4E;
- Wed, 18 Dec 2019 16:33:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A56FDB21;
+ Wed, 18 Dec 2019 16:33:56 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E731F5C1D4;
- Wed, 18 Dec 2019 16:33:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 30C781000322;
+ Wed, 18 Dec 2019 16:33:48 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v3 06/15] util/async: add aio interfaces for io_uring
-Date: Wed, 18 Dec 2019 16:32:19 +0000
-Message-Id: <20191218163228.1613099-7-stefanha@redhat.com>
+Subject: [PATCH v3 10/15] block/io_uring: adds userspace completion polling
+Date: Wed, 18 Dec 2019 16:32:23 +0000
+Message-Id: <20191218163228.1613099-11-stefanha@redhat.com>
 In-Reply-To: <20191218163228.1613099-1-stefanha@redhat.com>
 References: <20191218163228.1613099-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: aDBM15ZbOS6RWTkFcajAwg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: zKlCdTpQPTySjyDfIRziSw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -98,70 +98,47 @@ From: Aarushi Mehta <mehta.aaru20@gmail.com>
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- util/async.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ block/io_uring.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/util/async.c b/util/async.c
-index b1fa5319e5..c192a24a61 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -276,6 +276,14 @@ aio_ctx_finalize(GSource     *source)
-     }
- #endif
-=20
-+#ifdef CONFIG_LINUX_IO_URING
-+    if (ctx->linux_io_uring) {
-+        luring_detach_aio_context(ctx->linux_io_uring, ctx);
-+        luring_cleanup(ctx->linux_io_uring);
-+        ctx->linux_io_uring =3D NULL;
-+    }
-+#endif
-+
-     assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
-     qemu_bh_delete(ctx->co_schedule_bh);
-=20
-@@ -340,6 +348,29 @@ LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+diff --git a/block/io_uring.c b/block/io_uring.c
+index a5c0d16220..56892fd1ab 100644
+--- a/block/io_uring.c
++++ b/block/io_uring.c
+@@ -274,6 +274,21 @@ static void qemu_luring_completion_cb(void *opaque)
+     luring_process_completions_and_submit(s);
  }
- #endif
 =20
-+#ifdef CONFIG_LINUX_IO_URING
-+LuringState *aio_setup_linux_io_uring(AioContext *ctx, Error **errp)
++static bool qemu_luring_poll_cb(void *opaque)
 +{
-+    if (ctx->linux_io_uring) {
-+        return ctx->linux_io_uring;
++    LuringState *s =3D opaque;
++    struct io_uring_cqe *cqes;
++
++    if (io_uring_peek_cqe(&s->ring, &cqes) =3D=3D 0) {
++        if (cqes) {
++            luring_process_completions_and_submit(s);
++            return true;
++        }
 +    }
 +
-+    ctx->linux_io_uring =3D luring_init(errp);
-+    if (!ctx->linux_io_uring) {
-+        return NULL;
-+    }
-+
-+    luring_attach_aio_context(ctx->linux_io_uring, ctx);
-+    return ctx->linux_io_uring;
++    return false;
 +}
 +
-+LuringState *aio_get_linux_io_uring(AioContext *ctx)
-+{
-+    assert(ctx->linux_io_uring);
-+    return ctx->linux_io_uring;
-+}
-+#endif
-+
- void aio_notify(AioContext *ctx)
+ static void ioq_init(LuringQueue *io_q)
  {
-     /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
-@@ -434,6 +465,11 @@ AioContext *aio_context_new(Error **errp)
- #ifdef CONFIG_LINUX_AIO
-     ctx->linux_aio =3D NULL;
- #endif
-+
-+#ifdef CONFIG_LINUX_IO_URING
-+    ctx->linux_io_uring =3D NULL;
-+#endif
-+
-     ctx->thread_pool =3D NULL;
-     qemu_rec_mutex_init(&ctx->lock);
-     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
+     QSIMPLEQ_INIT(&io_q->submit_queue);
+@@ -387,7 +402,7 @@ void luring_attach_aio_context(LuringState *s, AioConte=
+xt *new_context)
+     s->aio_context =3D new_context;
+     s->completion_bh =3D aio_bh_new(new_context, qemu_luring_completion_bh=
+, s);
+     aio_set_fd_handler(s->aio_context, s->ring.ring_fd, false,
+-                       qemu_luring_completion_cb, NULL, NULL, s);
++                       qemu_luring_completion_cb, NULL, qemu_luring_poll_c=
+b, s);
+ }
+=20
+ LuringState *luring_init(Error **errp)
 --=20
 2.23.0
 
