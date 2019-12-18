@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC87DC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 035E0C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:30:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C227021582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:21:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C227021582
+	by mail.kernel.org (Postfix) with ESMTPS id D058621582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 11:30:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D058621582
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihXOh-0001x8-UP
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:21:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58814)
+	id 1ihXWv-0004l2-Vd
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 06:30:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ihXNs-0001Px-7a
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:20:53 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihXVw-0003x3-Of
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:29:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ihXNr-0000Tq-9m
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:20:52 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:40233)
+ (envelope-from <laurent@vivier.eu>) id 1ihXVv-0004oA-K2
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 06:29:12 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:56837)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ihXNo-0000Fx-Up; Wed, 18 Dec 2019 06:20:49 -0500
+ id 1ihXVv-0004hb-8w; Wed, 18 Dec 2019 06:29:11 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MqK2d-1hv3E726dv-00nMO8; Wed, 18 Dec 2019 12:20:44 +0100
-Subject: Re: [PATCH] monitor: Remove unused define
-To: Yury Kotov <yury-kotov@yandex-team.ru>, qemu-devel@nongnu.org
-References: <20191119110709.13827-1-yury-kotov@yandex-team.ru>
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MFsIZ-1iT0Ot3qZD-00HRfP; Wed, 18 Dec 2019 12:29:05 +0100
+Subject: Re: [PATCH 2/2] test-keyval: Tighten test of trailing crap after size
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20191125133846.27790-1-armbru@redhat.com>
+ <20191125133846.27790-3-armbru@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +82,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <88717464-d03d-87b0-43cd-886ccce20af5@vivier.eu>
-Date: Wed, 18 Dec 2019 12:20:42 +0100
+Message-ID: <7a80fed1-ae16-2fda-19d4-8f0dfa13ebb2@vivier.eu>
+Date: Wed, 18 Dec 2019 12:29:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191119110709.13827-1-yury-kotov@yandex-team.ru>
+In-Reply-To: <20191125133846.27790-3-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:pSXrmDYEdL41ZxF2cbbF70w8wLBWEEFOGWXnhWpRuOUR0WgkmWT
- AzdJ8KYKpvH6HkmJTsq614+OYkJishhionIbgB9lw3CLM2uQU1WmAeayJlAEFC9QHxq1MuW
- 9PvwQsvpJep/HSeV2Hl6z/6TtReftVuw4cr75twHq1OG6c4raHIzPmJuDOPFKx6ppEh5isX
- Q4J2pO4ThrdU3r0A8OhiA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0KSjFiC5mMg=:EztLKT6TYFL/kDvfLohsuH
- xt6lLChfSVYGEVXo4HdWUopvns/j0ZViNAsGmvkYuUaaJHGrZEDJkllI9hleXBRdLcRLtLzWS
- klIDkbuUjsIrSV2z5/Va6bM90ylupAlnDyCGfi1uQQ1p/z6gGXcg5nXIN1Oa2OhCOZOsKpj5W
- 1pwK1wcHkjt1buGcsImmRmRunm1DoEN+rcEv0eGXe2IzZP+opF5VMIIXE5kX/O8O5ifSRHl3l
- 1J37lNjC9u0Kl7X0zfutetMv8nK8NqiUZuVqdrRscHJhPqUgErClNZQA/eNrhXY+KM3O9DnU+
- Rq0fGYlkGjirljs8RDSNQhrUJ/6JlpjIJY+JcmqkB41hO7kk/v2aexHOk3zsWSXSe0qPApYt6
- sod4B/xi9yk/9pxDO/3i1RxqRyIPfG+uif2IFKqASsJnw0vaxgki88+wj/YYp3kg9TvDDHBpe
- wp2DvqIZ+1jFjnFh9/GvsxfRd45mYAsoArVNnRk2B5LavJOZePhO+I2bpvcc3r9iY91UcDdiH
- pe2m15FW13XRjP9Lmxxt7y0bPivD5GgiTNheOHaqlZnMp7usccXgblxytQSho4MWfhynbChVc
- r8WvkkFNiOpcnOFY9RLWClxJ7qrghOxmKIqabU4rSRZj92GViIFNVmGWged0WEe01OBbOP7Hr
- WdFJ7A+YR6PvP60bI4aeHWUMOSXZwr+WVHbkz4uDKBTvXI9ITz7Ln1+oHPFXjrmaUmijRnv/v
- mBBxHBu/IBBIOivP7nzQRW/nvl0cGjkyLjuvg5SVRHdkw/lDttj9YovPpeL6/Xv0nyJAeloAI
- g+IYso6RwdV0b/3Q23LWU/aT/babREUTbnU1buLtEkcgScgxqnYpoFNDDFqiIKu1j4X1ztc30
- SUd3VaEjR8sA8ynMd+GA==
+X-Provags-ID: V03:K1:RA9BnBGjgeXTH5jGi1LL4j2s7QioSgV5DAr0CsaDErEDhKF+aO3
+ Xd8C+oGIRs4H4Yi94G5nYlvviZgeyhscht42mqv2dobK5efL+nY9ZOlLHvGOHuRq8yhTRWG
+ sTpF2Ffy7Kaj6Pw+u8T2IEAGkv6x3ymURFLj5eH/kAyE46DibxCO/fENvN3tK+TswaJagK1
+ 490T2uU9uOMKvFGWiysVQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+DusY0GoJGA=:M32nRKoAqA2/H20TAgi+OZ
+ C5J3wu1xBoHSYDQpsWpwW7ouLpsSE9o7fQaWHlwXjBuCYYSaupofVY1o35eWsIAfdorsGEbkQ
+ Hhug7y5UvvlJSmSTDCLBTzaskOWfa6juSOZCFdcP9FhC2HKlARZqfmjgu3oD1KMKE1JDAt1tz
+ x3/urhiVeEQFSLoWS1cIpPITau3y1DPNwhp0Dwe47kD3I4s6qycQCwNvVHg1y8Tw9CV2z+w0a
+ CrDsExpje3KfZpN2TyOgnlzJPWL8ozTKiSMDh7aWlqiqqiR3hR7jWUSNct3DZU9RXO258ZypF
+ 1xB/wL5Q1cb0hOTUwkE7elESLPxIYmMoTEDjxrqTbBogWp9uz355iEC/vccKDWT4P5ajpGhQu
+ eKR89GqVL/4jYWnVZFVh+Vf1P2fzRvZ3XkSs2/gfuVte7RCwamrTNFozr8clK5mu1geWNWjM5
+ rE8tnSKRnc/JoyX2yTssLS7Pfd6IvjMSsXGPUPOIfMPUgkOiq1FsCogKGiNgHAFf5pnzfKQ2N
+ 0QD79OJfVGlwwg3EdjIrDkaYaniTSoZRMBQ2fvrpnQTDnTn9eElTaVTd/B1qwxYeCs5dH1CU/
+ RE3IDsYJeaCx7I+8hjE28KGSScFlkFDjSoHSYcTi/abZd7zFA7VZGQHbldNxtIxDBqvxtOPQJ
+ x79C1qtucL1RGzq2tdabPeyLzcOYSpihF5TbdbO07Sd6auz7OdD/6Fd2deJy4Wg4CMppuvWdz
+ x0jJg/dYMfKO4slZ6ygsLPJhYBmu9U7ASHl2/K6qOeWu73G/BdlFPTOWPpupInwExwckMi9ZK
+ +tEKAHuPYqLI94xZ2tXr3SkF1JewXFc6HUmC8X8lGgVttyAEcR4KxUaoaMQ5fU7i7bM4RuM1K
+ XFcr7znG0/AzLCZGFFtHQzan/J80+wcwCAQO7FKmQ=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,35 +123,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-trivial@nongnu.org, tao3.xu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/11/2019 à 12:07, Yury Kotov a écrit :
-> Remove the definition of QMP_ACCEPT_UNKNOWNS as it is unused since
-> refactoring 5c678ee8d940
+Le 25/11/2019 à 14:38, Markus Armbruster a écrit :
+> test_keyval_visit_size() should test for trailing crap after size with
+> and without suffix.  It does test the latter: "sz2=16Gi" has size
+> "16G" followed by crap "i".  It fails to test the former "sz1=16E" is
+> a syntactically valid size that overflows uint64_t.  Replace by
+> "sz1=0Z".
 > 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  monitor/misc.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  tests/test-keyval.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/monitor/misc.c b/monitor/misc.c
-> index 3baa15f3bf..6680734ea1 100644
-> --- a/monitor/misc.c
-> +++ b/monitor/misc.c
-> @@ -106,9 +106,6 @@ struct MonFdset {
->      QLIST_ENTRY(MonFdset) next;
->  };
+> diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+> index 09b0ae3c68..e331a84149 100644
+> --- a/tests/test-keyval.c
+> +++ b/tests/test-keyval.c
+> @@ -478,7 +478,7 @@ static void test_keyval_visit_size(void)
+>      visit_free(v);
 >  
-> -/* QMP checker flags */
-> -#define QMP_ACCEPT_UNKNOWNS 1
-> -
->  /* Protects mon_fdsets */
->  static QemuMutex mon_fdsets_lock;
->  static QLIST_HEAD(, MonFdset) mon_fdsets;
+>      /* Trailing crap */
+> -    qdict = keyval_parse("sz1=16E,sz2=16Gi", NULL, &error_abort);
+> +    qdict = keyval_parse("sz1=0Z,sz2=16Gi", NULL, &error_abort);
+>      v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
+>      qobject_unref(qdict);
+>      visit_start_struct(v, NULL, NULL, 0, &error_abort);
 > 
 
 Applied to my trivial-patches branch.
