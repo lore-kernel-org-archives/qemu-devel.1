@@ -2,95 +2,102 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35202C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 17:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 739D5C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 17:46:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0670C2082E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 17:40:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43E1D206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 17:46:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DdUi3tbB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0670C2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HeeRXG7o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43E1D206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihdJ1-0003AS-73
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 12:40:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37827)
+	id 1ihdPN-0005Fn-QF
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 12:46:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ihdFh-0000GO-4U
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 12:36:50 -0500
+ (envelope-from <philmd@redhat.com>) id 1ihdOX-0004RG-Sn
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 12:45:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ihdFf-0001wt-GI
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 12:36:48 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ihdFf-0001YK-1P
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 12:36:47 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z3so3228303wru.3
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 09:36:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=J4yMwC3JVUKyiDcFi9usF6f2hJRKwXZuCNuGmW3X7S0=;
- b=DdUi3tbB3guEhQgncu3BH6VZ5qXpcliB0Iik4N8B02UOfcF1xjoWmNEkumT7orc0mv
- pEcJgSGbd1WiNebDxE4w2wG0tD85JjqNzL97NEkcPmw/BOxZ72GdHTPTnclnaSqgtawA
- ANsvDK+1QU+PC9MuaSAv7W+qy6kPtjmNK/oMQIvaDoN6CoUqdikLL6WclH6LL/U4G7qx
- vvgmVYTnn5ZAx/AiEVjCRDl9YV4sMBEubC9XT+nfDYFuM9nbpA6Gmw8B8yoN4tZxvgh5
- J5dpYaTQH9OLEtXF+dk9VEdP2A5PY2ggUASgnp4T3Se60DwtwAyLDP//QIS7bFYWuahi
- WSFA==
+ (envelope-from <philmd@redhat.com>) id 1ihdOU-0005f8-PB
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 12:45:55 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29946
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihdOU-0005Sw-Ix
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 12:45:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576691143;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kYdCtARh1DlaJb5QhxAom7DShKuTQCeWthsEi/g0iqI=;
+ b=HeeRXG7o339Cd1RstBdgzWnH6dKN+LmeApubOElP8q66u000cQ8QUpjP+irAkF2ctgLcyi
+ rKuAS/j8IdP9A6e4FiEW0+kPRMWOJU575EjPNRKyheYT7Yi7c/l8EisWt8hmrtFP7c7mWZ
+ rwFflpu30Tkyx/Xe6+d6pN6FqYAm+hI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-CML05TKHMeGGPojmi8wkbw-1; Wed, 18 Dec 2019 12:45:38 -0500
+Received: by mail-wm1-f70.google.com with SMTP id b9so696659wmj.6
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 09:45:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=J4yMwC3JVUKyiDcFi9usF6f2hJRKwXZuCNuGmW3X7S0=;
- b=s5DQZ5VHDftdznfDi6dqqgsKVVNy5l2J4GgP1mSnWYsgYolm9iouw73fmAKx33Iy81
- tv+M/k+hP3wvhMqQsPl3YxrcC45wgwpT1jqWYkfs8CwCJTjskAzHTs7ZxCWPfmCZoGQz
- yHml1S1Kgy6nYbkfJ54yblkcG9A2NnWwJYg/wul2ADpqSyrD2MT3LksQa2O5FeMHtoZL
- lcQsxf8tnmkkhMdjDbDV0fNBzDqSmDaw7rksvLv+7HCXGVc2HQxhNPbD+IGXtgSg6D8c
- Rt9vplmWdYs6Oi8hC3hzeLVeeIQBWcOQv7g7HzILFiSSi+4wTDYD63jYJfz6RVfJVcbZ
- E5oA==
-X-Gm-Message-State: APjAAAVJpXQ6fLk3wzZbtI7HUx8KhDa/C83J2GQQfUK923OF0oDm2Cne
- eKJtxlG2eO0bLw1Sd0jxjP40NQ==
-X-Google-Smtp-Source: APXvYqwn9WdNVUhjxzaRsnFbsWC52niGkpygCMI3sDxV6dHpv7uyQlDzSPZrUMdEd161APhhEexFYg==
-X-Received: by 2002:a5d:4e0a:: with SMTP id p10mr4079371wrt.229.1576690604840; 
- Wed, 18 Dec 2019 09:36:44 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g17sm3069922wmc.37.2019.12.18.09.36.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 Dec 2019 09:36:43 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9FD201FF87;
- Wed, 18 Dec 2019 17:36:42 +0000 (GMT)
-References: <77dd4863-6301-b17d-529c-451d491d4794@redhat.com>
- <20191217121443.14757-1-alex.bennee@linaro.org>
- <1ca001f0-43a5-d8fc-fee0-3a318cc698e5@redhat.com>
- <87bls7vzjc.fsf@linaro.org>
- <976227bb-916a-2c50-1f8d-e146a199de15@redhat.com>
- <875zifvxw0.fsf@linaro.org>
- <5c6068cb-f8bf-fe4b-391b-7ced97f14221@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH] semihosting: suspend recieving CPU when blocked
- (HACK, WIP)
-In-reply-to: <5c6068cb-f8bf-fe4b-391b-7ced97f14221@redhat.com>
-Date: Wed, 18 Dec 2019 17:36:42 +0000
-Message-ID: <877e2tfsd1.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SXc/wu8KlY6VL5Z2QJesRd/ee9QosLEou+3J83m0oio=;
+ b=iHtjWGkioJtDGIDNXtwLFc63yw+mwlpZsCQ3ifymv6ivHXUv+OVxMkVrBzG64la7ku
+ EhxMfTGhjLCVBwtA3rxzjT5n/cX9Pc+54gr6wbN+d7BvqTZJpZGAOr8wqk+mADnToyVH
+ FrE1Il0YKaivQ8kcUZGmYzjlhSMkKLld1TR9sLr3QMC17Qn/zLvvK0WbFYn7UQ2QfWc1
+ QQYJ8HQ++i7TXur4mYasXnSez9jW/ITR6Jb2RJC37dPBt4ACS2VCzkJKx9LzbqTYig7b
+ WKB8wgZMWw8rQ3L1nyseEqQHV78XVKc2Vr7uPgtGuEew+uPwmJdGHIiy2Akr3O2K99P1
+ k5Tw==
+X-Gm-Message-State: APjAAAW79C6UHU/qnGmwKNx60WRidBZZfDYQ1Qkzkq6LSb0F6GEQyALN
+ n6JCNfiXYXl0n0ZGKqtS1PQF6jqNQRPbn2mQnHW0oVZ10nMGW76dGI01Xjrtgj0/xgnjvA46ivu
+ Tp+g3yIzTkGsD/QQ=
+X-Received: by 2002:a05:600c:108a:: with SMTP id
+ e10mr4478085wmd.38.1576691136999; 
+ Wed, 18 Dec 2019 09:45:36 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzxZFf933ygNrX6goWNEZCNEh4Z1T7XrmfQKj+0lmiiO4CTTeMAuX7QMLTamuo6X91ot5C7LA==
+X-Received: by 2002:a05:600c:108a:: with SMTP id
+ e10mr4478054wmd.38.1576691136690; 
+ Wed, 18 Dec 2019 09:45:36 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id z6sm3373743wrw.36.2019.12.18.09.45.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Dec 2019 09:45:36 -0800 (PST)
+Subject: Re: [PATCH 6/6] qemu-io-cmds: Silent GCC9 format-overflow warning
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20191217173425.5082-1-philmd@redhat.com>
+ <20191217173425.5082-7-philmd@redhat.com>
+ <0bd64884-03fd-68e1-a790-c9ceb7710fd9@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ac01ca89-ad58-a6f4-e33f-c1dcc4e0ad90@redhat.com>
+Date: Wed, 18 Dec 2019 18:45:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <0bd64884-03fd-68e1-a790-c9ceb7710fd9@linaro.org>
+Content-Language: en-US
+X-MC-Unique: CML05TKHMeGGPojmi8wkbw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,77 +109,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: keithp@keithp.com, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 12/18/19 5:15 AM, Richard Henderson wrote:
+> On 12/17/19 7:34 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> GCC9 is confused when building with CFLAG -O3:
+>>
+>>    In function =E2=80=98help_oneline=E2=80=99,
+>>        inlined from =E2=80=98help_all=E2=80=99 at qemu-io-cmds.c:2414:9,
+>>        inlined from =E2=80=98help_f=E2=80=99 at qemu-io-cmds.c:2424:9:
+>>    qemu-io-cmds.c:2389:9: error: =E2=80=98%s=E2=80=99 directive argument=
+ is null [-Werror=3Dformat-overflow=3D]
+>>     2389 |         printf("%s ", ct->name);
+>>          |         ^~~~~~~~~~~~~~~~~~~~~~~
+>>
+>> Audit shows this can't happen. Give a hint to GCC adding an
+>> assert() call.
+>=20
+> This deserves more investigation.  From my glance it appears you are righ=
+t --
+> and moreover impossible for gcc to have come to this conclusion.  Which b=
+egs
+> the question of how that is.
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+New entries are added to cmdtab[] in qemuio_add_command() which is=20
+public (also called in qemu-io.c). So you can insert a cmdinfo_t with a=20
+name being NULL. This is why I thought GCC was correct first, and I tried:
 
-> On 17/12/19 15:18, Alex Benn=C3=A9e wrote:
->>=20
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>=20
->>> On 17/12/19 14:42, Alex Benn=C3=A9e wrote:
->>>>> Why do you need to set exception_index to something other than -1 (us=
-ing
->>>>> cpu_loop_exit_noexc for example)?
->>>> If there is no exception to process we won't exit the main loop which =
-we
->>>> need to do if we want to wait until there is data to read.
->>>
->>> Okay.
->>>
->>>>> Using ->stop here is a bit weird, since ->stop is usually related to
->>>>> pause_all_vcpus.
->>>>
->>>> Arguably we could come up with a better API to cpu.c but this allows us
->>>> to use cpu_resume(c->sleeping_cpu) when waking up rather than hand
->>>> rolling our own wake-up mechanism.
->>>
->>> But we already have the right wake-up mechanism, which is
->>> cpu->halted/cpu_has_work.
->>=20
->> cpu_has_work is a guest function though and semihosting_console is a
->> common hw module. It can't peek into the guests internal state.
->
-> semihosting_console only needs to something like
-> cpu_interrupt(cpu->stopped_cpu, CPU_INTERRUPT_SEMIHOST).
+-- >8 --
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -42,6 +42,7 @@ void qemuio_add_command(const cmdinfo_t *ci)
+       * Catch it now rather than letting it manifest as a crash if a
+       * particular set of command line options are used.
+       */
++    assert(ci->name);
+      assert(ci->perm =3D=3D 0 ||
+             (ci->flags & (CMD_FLAG_GLOBAL | CMD_NOFILE_OK)) =3D=3D 0);
+      cmdtab =3D g_renew(cmdinfo_t, cmdtab, ++ncmds);
+---
 
-As an exception is being delivered we just end up re-executing the
-EXCP_SEMIHOST. I still don't see why using cpu_interrupt is an
-improvement seeing as it is secondary to exception processing.
+But this didn't fix the warning... So I moved the assert() in the other=20
+location.
 
-> (By the way,
-> the stopped_cpu should probably be a list to mimic the condition
-> variable---for example a GSList).
+>=20
+> Did you file a gcc bug report?
 
-ok
+No because I'm not sure this is a bug, but if you confirm I'll file one :)
 
->
->> This all
->> comes back to cpu_thread_is_idle anyway in making our decision about if
->> we do or do not sleep on the halt_cond.
->>=20
->>> That also makes it possible to just use
->>> EXCP_HALTED instead of adding a new EXCP_BLOCKED.
->>=20
->> We can certainly use EXCP_HALTED but maybe come up with a common way of
->> entering the state? There seems to be a combination of messing around
->> with special interrupts and direct poking of cs->halted =3D 1 while
->> setting the exception. Maybe this could finally clear up the #if
->> defined(TARGET_I386) hacking in cpus.c?
->
-> If you're talking accel/tcg/cpu-exec.c, that's different; the issue
-> there is that x86 has a kind of warm reset pin that is not equivalent to
-> cpu_reset.  Removing that would only entail adding a new member function
-> to CPUClass.
->
-> Paolo
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>> Cc: Kevin Wolf <kwolf@redhat.com>
+>> Cc: Max Reitz <mreitz@redhat.com>
+>> Cc: qemu-block@nongnu.org
+>> ---
+>>   qemu-io-cmds.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+>> index 1b7e700020..9e956a5dd4 100644
+>> --- a/qemu-io-cmds.c
+>> +++ b/qemu-io-cmds.c
+>> @@ -2411,6 +2411,7 @@ static void help_all(void)
+>>       const cmdinfo_t *ct;
+>>  =20
+>>       for (ct =3D cmdtab; ct < &cmdtab[ncmds]; ct++) {
+>> +        assert(ct->name);
+>>           help_oneline(ct->name, ct);
+>>       }
+>>       printf("\nUse 'help commandname' for extended help.\n");
+>>
+>=20
 
-
---=20
-Alex Benn=C3=A9e
 
