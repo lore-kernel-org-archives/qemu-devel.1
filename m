@@ -2,84 +2,83 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFC2C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70086C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BF2F218AC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:35:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A5A62072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="InxC95A6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BF2F218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZFGyUKke"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A5A62072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihTs5-0000pm-PQ
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 02:35:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37722)
+	id 1ihUAm-0003ow-Bt
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 02:55:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52181)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ihTrQ-0000Ih-26
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:35:09 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ihUA6-00034H-0q
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:54:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ihTrO-0003vW-SX
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:35:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20339
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihTrO-0003uf-Or
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:35:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576654506;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SadRx0ucG/io5p8saq/HZ6TYwOcTiPIAXFyaOu9BEDI=;
- b=InxC95A6OStZQgQbU6ZyRWYqe7agH2WIVwpMnXqFJmzJopaR4xv8E5fmhWjggnuT5z29WH
- y3Ym7W7Ld26pdEn8J5vYfeN4Ko47Vivj8C0EP6zyX3vcDG6a6W72+jBtCIk36BwwBjCvmR
- /ppwA9Niz5TYJZzimftUiinV2ZArXU0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-Gcss4_nbPbq88U8vUfl6TQ-1; Wed, 18 Dec 2019 02:35:02 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBC7B10054E3;
- Wed, 18 Dec 2019 07:35:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
- [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B52C620D3;
- Wed, 18 Dec 2019 07:35:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 289F211386A7; Wed, 18 Dec 2019 08:35:00 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 00/34] Error reporting patches for 2019-12-16
-References: <20191217062651.9687-1-armbru@redhat.com>
- <CAFEAcA8a=E9GLnAz+vFtSQ8w=5RJK5aZJvQhEzxsRrThvMT5FQ@mail.gmail.com>
-Date: Wed, 18 Dec 2019 08:35:00 +0100
-In-Reply-To: <CAFEAcA8a=E9GLnAz+vFtSQ8w=5RJK5aZJvQhEzxsRrThvMT5FQ@mail.gmail.com>
- (Peter Maydell's message of "Tue, 17 Dec 2019 15:49:27 +0000")
-Message-ID: <87eex284t7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ihUA4-0003zt-Ka
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:54:25 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33736)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ihUA4-0003yW-EX; Wed, 18 Dec 2019 02:54:24 -0500
+Received: by mail-ot1-x344.google.com with SMTP id b18so1388397otp.0;
+ Tue, 17 Dec 2019 23:54:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=c9Ott8n8VeSD/aim4reyK20MiBP+jR7McIfV4rDYYn0=;
+ b=ZFGyUKkeW6dKdapbz52w8fOFnMCGnovDcEDSohXpO0MBHJy57CpJuwfx960np7anbv
+ F0FBXprM2hABKw77oGIln8nFkkmUoOb7WfOzyHPw1W7HVIovHW6mz1N2bWmB99aRnpPY
+ pWGPG14/byN7BZt71xy80rzbAWin833vP/W4akvGQvuhcUQvpfAooFTmhnK0s9f/BACk
+ GROV/QH40CJWuc4UYbbb7yfnxJy3K02kYcZ1KWAywfRhvmLvYHNFKNKZ73NghViH/Xxc
+ Vsc7/VIKI0HjE63i4OoGMl4ehwNJRNWfilAoiswkdeOuy6eUG7dz0I8R49B/j83VeM8E
+ hHTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=c9Ott8n8VeSD/aim4reyK20MiBP+jR7McIfV4rDYYn0=;
+ b=uFqak62xfo4ShDR7p7YWVOZS4VISQ6WhGemxET95f5FTcAVNQnzSIouZ9vRoxelH/d
+ 4zql7y+OPfqVUZQgejHKv6JYgBe+nKD5z57Egdr5L2WpQtN/q4pcn95MPkzpEdbvf21g
+ lbnLJwcJ9PBWXjt+E9V4y89bemACjWR2UUJFMz5BrRaSJbqn+3PEbgGL+HK7ms26AojA
+ qHRbni8g/+2Kk9G3YQoF1KVXarWRECQcBZkIanC7CLFAtdx0xkChGbr13y4VH29kkeJF
+ cK6KkvvNhd36z0KCiohjgXlVgQgc7et7+BM1hC61ysZfmksGQJsaPCD+UCjG6np46xfA
+ Ae7g==
+X-Gm-Message-State: APjAAAWx6c/+r8defPMhJBxmgeFZS5aIAH1sLZjLS4MGTdLN4x+bMMGl
+ CZkVVqAzt1+Ts0zKHaCgDi/iMn57H+odi5T65g4=
+X-Google-Smtp-Source: APXvYqzOOgAiyiKw/9QmgW0UGh3/T2k4zdWBwRUtwSMRyVWzXi4As4Y78Zhp0nnhjss9xkXvfO/F8bfzBNYyJ59ixG4=
+X-Received: by 2002:a05:6830:3054:: with SMTP id
+ p20mr1189344otr.121.1576655663603; 
+ Tue, 17 Dec 2019 23:54:23 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Gcss4_nbPbq88U8vUfl6TQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Tue, 17 Dec 2019 23:54:23 -0800 (PST)
+In-Reply-To: <20191217173425.5082-3-philmd@redhat.com>
+References: <20191217173425.5082-1-philmd@redhat.com>
+ <20191217173425.5082-3-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 18 Dec 2019 08:54:23 +0100
+Message-ID: <CAL1e-=gPi2C41Lc7cOQnTP+gL3aW=yWpQvamzTSfdDCJOK5BEA@mail.gmail.com>
+Subject: Re: [PATCH 2/6] hw/display/tcx: Add missing fall through comments
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000c324830599f5c009"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,96 +90,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Olivier Danet <odanet@caramail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--000000000000c324830599f5c009
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, 17 Dec 2019 at 06:33, Markus Armbruster <armbru@redhat.com> wrote=
-:
->>
->> The following changes since commit cb88904a54903ef6ba21a68a61d9cd51e2166=
-304:
->>
->>   Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-dec-16=
--2019' into staging (2019-12-16 14:07:56 +0000)
->>
->> are available in the Git repository at:
->>
->>   git://repo.or.cz/qemu/armbru.git tags/pull-error-2019-12-16
->>
->> for you to fetch changes up to 0e7f83bab6559775cd71e418b12a49145e59faa7:
->>
->>   nbd: assert that Error** is not NULL in nbd_iter_channel_error (2019-1=
-2-16 20:50:16 +0100)
->>
->> ----------------------------------------------------------------
->> Error reporting patches for 2019-12-16
->>
->> ----------------------------------------------------------------
->
-> This gets conflicts:
-> diff --cc target/ppc/kvm.c
-> index 7406d18945,27ea3ce535..0000000000
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@@ -2076,7 -2076,7 +2076,11 @@@ int kvmppc_set_smt_threads(int smt
->       return ret;
->   }
->
-> ++<<<<<<< HEAD
->  +void kvmppc_error_append_smt_possible_hint(Error **errp_in)
-> ++=3D=3D=3D=3D=3D=3D=3D
-> + void kvmppc_error_append_smt_possible_hint(Error *const *errp)
-> ++>>>>>>> remotes/armbru/tags/pull-error-2019-12-16
->   {
->       int i;
->       GString *g;
-> diff --cc target/ppc/kvm_ppc.h
-> index 47b08a4030,f22daabf51..0000000000
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@@ -28,7 -28,7 +28,11 @@@ void kvmppc_set_papr(PowerPCCPU *cpu)
->   int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
->   void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
->   int kvmppc_smt_threads(void);
-> ++<<<<<<< HEAD
->  +void kvmppc_error_append_smt_possible_hint(Error **errp_in);
-> ++=3D=3D=3D=3D=3D=3D=3D
-> + void kvmppc_error_append_smt_possible_hint(Error *const *errp);
-> ++>>>>>>> remotes/armbru/tags/pull-error-2019-12-16
->   int kvmppc_set_smt_threads(int smt);
->   int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
->   int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
-> @@@ -164,7 -164,7 +168,11 @@@ static inline int kvmppc_smt_threads(vo
->       return 1;
->   }
->
-> ++<<<<<<< HEAD
->  +static inline void kvmppc_error_append_smt_possible_hint(Error **errp_i=
-n)
-> ++=3D=3D=3D=3D=3D=3D=3D
-> + static inline void kvmppc_error_append_smt_possible_hint(Error *const *=
-errp)
-> ++>>>>>>> remotes/armbru/tags/pull-error-2019-12-16
->   {
->       return;
->   }
->
-> Furthermore, it turns out that the conflicts are due to
-> different patches from the same author to the same function
-> ("ppc: well form kvmppc_hint_smt_possible error hint helper"
-> and "ppc: make Error **errp const where it is appropriate")
-> which both seem to be addressing broadly the same thing
-> but conflict with each other and arrived via different
-> pull requests.
->
-> So I'm just bouncing this one back for you to fix and
-> figure out which version you want...
+On Tuesday, December 17, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om>
+wrote:
 
-You got an outdated version of the patch via David's pull request.
-Happens.  I'll fix things up and repost.
+> GCC9 is confused by this comment when building with
+> CFLAG -Wimplicit-fallthrough=3D2:
+>
+>   hw/display/tcx.c: In function =E2=80=98tcx_dac_writel=E2=80=99:
+>   hw/display/tcx.c:453:26: error: this statement may fall through
+> [-Werror=3Dimplicit-fallthrough=3D]
+>     453 |             s->dac_index =3D (s->dac_index + 1) & 0xff; /* Inde=
+x
+> autoincrement */
+>         |             ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/display/tcx.c:454:9: note: here
+>     454 |         default:
+>         |         ^~~~~~~
+>   hw/display/tcx.c: In function =E2=80=98tcx_dac_readl=E2=80=99:
+>   hw/display/tcx.c:412:22: error: this statement may fall through
+> [-Werror=3Dimplicit-fallthrough=3D]
+>     412 |         s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index
+> autoincrement */
+>         |         ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   hw/display/tcx.c:413:5: note: here
+>     413 |     default:
+>         |     ^~~~~~~
+>   cc1: all warnings being treated as errors
+>
+> Add the missing fall through comments.
+>
+> Fixes: 55d7bfe22
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Cc: Olivier Danet <odanet@caramail.com>
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/display/tcx.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+>
+The content of the patch is fine, but the commit message is, I think,
+inacurate: gcc is not confused at all, it does what it was told to.
 
+The title is fine.
+
+
+> diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+> index 14e829d3fa..abbeb30284 100644
+> --- a/hw/display/tcx.c
+> +++ b/hw/display/tcx.c
+> @@ -410,6 +410,7 @@ static uint64_t tcx_dac_readl(void *opaque, hwaddr
+> addr,
+>      case 2:
+>          val =3D s->b[s->dac_index] << 24;
+>          s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index autoincreme=
+nt
+> */
+> +        /* fall through */
+>      default:
+>          s->dac_state =3D 0;
+>          break;
+> @@ -451,6 +452,7 @@ static void tcx_dac_writel(void *opaque, hwaddr addr,
+> uint64_t val,
+>              s->b[index] =3D val >> 24;
+>              update_palette_entries(s, index, index + 1);
+>              s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index
+> autoincrement */
+> +            /* fall through */
+>          default:
+>              s->dac_state =3D 0;
+>              break;
+> --
+> 2.21.0
+>
+>
+>
+
+--000000000000c324830599f5c009
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, December 17, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a h=
+ref=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">GCC9 is confused by this comment when building wit=
+h<br>
+CFLAG -Wimplicit-fallthrough=3D2:<br>
+<br>
+=C2=A0 hw/display/tcx.c: In function =E2=80=98tcx_dac_writel=E2=80=99:<br>
+=C2=A0 hw/display/tcx.c:453:26: error: this statement may fall through [-We=
+rror=3Dimplicit-fallthrough=3D<wbr>]<br>
+=C2=A0 =C2=A0 453 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;da=
+c_index =3D (s-&gt;dac_index + 1) &amp; 0xff; /* Index autoincrement */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~<wbr>~~~~~~~~~~<br>
+=C2=A0 hw/display/tcx.c:454:9: note: here<br>
+=C2=A0 =C2=A0 454 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0default:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^~~~~~~<br>
+=C2=A0 hw/display/tcx.c: In function =E2=80=98tcx_dac_readl=E2=80=99:<br>
+=C2=A0 hw/display/tcx.c:412:22: error: this statement may fall through [-We=
+rror=3Dimplicit-fallthrough=3D<wbr>]<br>
+=C2=A0 =C2=A0 412 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;dac_index =3D (s=
+-&gt;dac_index + 1) &amp; 0xff; /* Index autoincrement */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0~~~~~~~~~~~~=
+~^~~~~~~~~~~~~~~~~<wbr>~~~~~~~~~~<br>
+=C2=A0 hw/display/tcx.c:413:5: note: here<br>
+=C2=A0 =C2=A0 413 |=C2=A0 =C2=A0 =C2=A0default:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0^~~~~~~<br>
+=C2=A0 cc1: all warnings being treated as errors<br>
+<br>
+Add the missing fall through comments.<br>
+<br>
+Fixes: 55d7bfe22<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com">philmd@redhat.com</a>&gt;<br>
+---<br>
+Cc: Olivier Danet &lt;<a href=3D"mailto:odanet@caramail.com">odanet@caramai=
+l.com</a>&gt;<br>
+Cc: Mark Cave-Ayland &lt;<a href=3D"mailto:mark.cave-ayland@ilande.co.uk">m=
+ark.cave-ayland@ilande.co.uk</a>&gt;<br>
+---<br>
+=C2=A0hw/display/tcx.c | 2 ++<br>
+=C2=A01 file changed, 2 insertions(+)<br>
+<br></blockquote><div><br></div><div>The content of the patch is fine, but =
+the commit message is, I think, inacurate: gcc is not confused at all, it d=
+oes what it was told to.</div><div><br></div><div>The title is fine.</div><=
+div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
+x;border-left:1px #ccc solid;padding-left:1ex">
+diff --git a/hw/display/tcx.c b/hw/display/tcx.c<br>
+index 14e829d3fa..abbeb30284 100644<br>
+--- a/hw/display/tcx.c<br>
++++ b/hw/display/tcx.c<br>
+@@ -410,6 +410,7 @@ static uint64_t tcx_dac_readl(void *opaque, hwaddr addr=
+,<br>
+=C2=A0 =C2=A0 =C2=A0case 2:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0val =3D s-&gt;b[s-&gt;dac_index] &lt;&lt;=
+ 24;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;dac_index =3D (s-&gt;dac_index + 1)=
+ &amp; 0xff; /* Index autoincrement */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fall through */<br>
+=C2=A0 =C2=A0 =C2=A0default:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;dac_state =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+@@ -451,6 +452,7 @@ static void tcx_dac_writel(void *opaque, hwaddr addr, u=
+int64_t val,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;b[index] =3D val &gt;=
+&gt; 24;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0update_palette_entries(s, i=
+ndex, index + 1);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;dac_index =3D (s-&gt;=
+dac_index + 1) &amp; 0xff; /* Index autoincrement */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fall through */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0default:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;dac_state =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000c324830599f5c009--
 
