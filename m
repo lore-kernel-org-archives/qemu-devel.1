@@ -2,71 +2,68 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1075C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19578C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:34:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AC652053B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:34:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D85A52053B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:34:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wk8YP31N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AC652053B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iiLRw6V3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D85A52053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihcHS-0004Eo-0O
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:34:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41687)
+	id 1ihcHd-0004Rd-2v
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:34:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41151)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ihcFp-0002j2-Tl
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:32:55 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ihcFl-0002fP-Se
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:32:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ihcFo-0006l1-Gi
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:32:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35359
+ (envelope-from <stefanha@redhat.com>) id 1ihcFi-00067I-K7
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:32:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50995
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihcFo-0006h9-9S
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:32:52 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihcFi-0005uB-40
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:32:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576686771;
+ s=mimecast20190719; t=1576686764;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=COhHhumUMNCq81Rg1JY+HjQFERSd+slEA9mkqQ7PHKs=;
- b=Wk8YP31Nj1+LhXCr0E7u1ei4DQ0m5NXmtDq7jEc6HnxbSuRmQvJX++pKk/zRECTWCbnyLP
- GjUM3xYhPhgQ2z7Fg5f6arVWjDvlMSzCuHAsQKlp5sOjCaQnuqX17q9iA25HNPWxl9k7c8
- Stzk15kmejiiYRHqW+JZPrK7czFK9I8=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=v9nIrgMI/MuiSB6jH0NYvBGx9JtSbDnb/WTbG6E0I4s=;
+ b=iiLRw6V3l7tegIE1JJVgk/1brErn5MW4suTQ1mkIUXgTnVjleZA15GZSnQXBSw8clfRDYM
+ bN5M6pwyIAL1PXr0VpMLBYUekK20aY/tuWMtBSaZvc59kgcvj+L3D39y/28/42gvly/1vy
+ DrSyylu0GDhSDxBfrZQLos3UgloeJ/A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-q-hChBxeOw-r5HnwX6RxIg-1; Wed, 18 Dec 2019 11:32:50 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-147-wf-kpg4yMNmg3ZgRzfxMCg-1; Wed, 18 Dec 2019 11:32:41 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38772100551C;
- Wed, 18 Dec 2019 16:32:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 047AA800053;
+ Wed, 18 Dec 2019 16:32:40 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 643081891F;
- Wed, 18 Dec 2019 16:32:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E58935C1D4;
+ Wed, 18 Dec 2019 16:32:29 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v3 01/15] configure: permit use of io_uring
-Date: Wed, 18 Dec 2019 16:32:14 +0000
-Message-Id: <20191218163228.1613099-2-stefanha@redhat.com>
-In-Reply-To: <20191218163228.1613099-1-stefanha@redhat.com>
-References: <20191218163228.1613099-1-stefanha@redhat.com>
+Subject: [PATCH v3 00/15] io_uring: add Linux io_uring AIO engine
+Date: Wed, 18 Dec 2019 16:32:13 +0000
+Message-Id: <20191218163228.1613099-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: q-hChBxeOw-r5HnwX6RxIg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: wf-kpg4yMNmg3ZgRzfxMCg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -85,99 +82,133 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Maxim Levitsky <maximlevitsky@gmail.com>, qemu-block@nongnu.org,
- oleksandr@redhat.com, Julia Suvorova <jusual@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+ qemu-block@nongnu.org, oleksandr@redhat.com,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
+v12:
+ * Reword BlockdevAioOptions QAPI schema commit description [Markus]
+ * Increase QAPI "Since: 4.2" to "Since: 5.0"
+ * Explain rationale for io_uring stubs in commit description [Kevin]
+ * Tried to use file.aio=3Dio_uring instead of BDRV_O_IO_URING but it's rea=
+lly
+   hard to make qemu-iotests work.  Tests build blkdebug: and other graphs =
+so
+   the syntax for io_uring is dependent on the test case.  I scrapped this
+   approach and went back to a global flag.
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-Reviewed-by: Maxim Levitsky <maximlevitsky@gmail.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- configure | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+v11:
+ * Drop fd registration because it breaks QEMU's file locking and will need=
+ to
+   be resolved in a separate patch series
+ * Drop line-wrapping changes that accidentally broke several qemu-iotests
 
-diff --git a/configure b/configure
-index 84b413dbfc..acab024021 100755
---- a/configure
-+++ b/configure
-@@ -370,6 +370,7 @@ xen=3D""
- xen_ctrl_version=3D""
- xen_pci_passthrough=3D""
- linux_aio=3D""
-+linux_io_uring=3D""
- cap_ng=3D""
- attr=3D""
- libattr=3D""
-@@ -1251,6 +1252,10 @@ for opt do
-   ;;
-   --enable-linux-aio) linux_aio=3D"yes"
-   ;;
-+  --disable-linux-io-uring) linux_io_uring=3D"no"
-+  ;;
-+  --enable-linux-io-uring) linux_io_uring=3D"yes"
-+  ;;
-   --disable-attr) attr=3D"no"
-   ;;
-   --enable-attr) attr=3D"yes"
-@@ -1766,6 +1771,7 @@ disabled with --disable-FEATURE, default is enabled i=
-f available:
-   vde             support for vde network
-   netmap          support for netmap network
-   linux-aio       Linux AIO support
-+  linux-io-uring  Linux io_uring support
-   cap-ng          libcap-ng support
-   attr            attr and xattr support
-   vhost-net       vhost-net kernel acceleration support
-@@ -3988,6 +3994,21 @@ EOF
-     linux_aio=3Dno
-   fi
- fi
-+##########################################
-+# linux-io-uring probe
-+
-+if test "$linux_io_uring" !=3D "no" ; then
-+  if $pkg_config liburing; then
-+    linux_io_uring_cflags=3D$($pkg_config --cflags liburing)
-+    linux_io_uring_libs=3D$($pkg_config --libs liburing)
-+    linux_io_uring=3Dyes
-+  else
-+    if test "$linux_io_uring" =3D "yes" ; then
-+      feature_not_found "linux io_uring" "Install liburing devel"
-+    fi
-+    linux_io_uring=3Dno
-+  fi
-+fi
-=20
- ##########################################
- # TPM emulation is only on POSIX
-@@ -6472,6 +6493,7 @@ echo "PIE               $pie"
- echo "vde support       $vde"
- echo "netmap support    $netmap"
- echo "Linux AIO support $linux_aio"
-+echo "Linux io_uring support $linux_io_uring"
- echo "ATTR/XATTR support $attr"
- echo "Install blobs     $blobs"
- echo "KVM support       $kvm"
-@@ -6960,6 +6982,11 @@ fi
- if test "$linux_aio" =3D "yes" ; then
-   echo "CONFIG_LINUX_AIO=3Dy" >> $config_host_mak
- fi
-+if test "$linux_io_uring" =3D "yes" ; then
-+  echo "CONFIG_LINUX_IO_URING=3Dy" >> $config_host_mak
-+  echo "LINUX_IO_URING_CFLAGS=3D$linux_io_uring_cflags" >> $config_host_ma=
-k
-+  echo "LINUX_IO_URING_LIBS=3D$linux_io_uring_libs" >> $config_host_mak
-+fi
- if test "$attr" =3D "yes" ; then
-   echo "CONFIG_ATTR=3Dy" >> $config_host_mak
- fi
+v10:
+ * Dropped kernel submission queue polling, it requires root and has additi=
+onal
+   limitations.  It should be benchmarked and considered for inclusion late=
+r,
+   maybe even together with kernel side changes.
+ * Add io_uring_register_files() return value to trace_luring_fd_register()
+ * Fix indentation in luring_fd_unregister()
+ * Set s->fd_reg.fd_array to NULL after g_free() to avoid dangling pointers
+ * Simplify fd registration code
+ * Add luring_fd_unregister() and call it from file-posix.c to prevent
+   fd leaks
+ * Add trace_luring_fd_unregister() trace event
+ * Add missing space to qemu-img command-line documentation
+ * Update MAINTAINERS file [Julia]
+ * Rename MAX_EVENTS to MAX_ENTRIES [Julia]
+ * Define ioq_submit() before callers so the prototype isn't necessary [Jul=
+ia]
+ * Declare variables at the beginning of the block in luring_init() [Julia]
+
+This patch series is based on Aarushi Mehta's v9 patch series written for
+Google Summer of Code 2019:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg00179.html
+
+It adds a new AIO engine that uses the new Linux io_uring API.  This is the
+successor to Linux AIO with a number of improvements:
+1. Both O_DIRECT and buffered I/O work
+2. fdatasync(2) is supported (no need for a separate thread pool!)
+3. True async behavior so the syscall doesn't block (Linux AIO got there to=
+ some degree...)
+4. Advanced performance optimizations are available (file registration, mem=
+ory
+   buffer registration, completion polling, submission polling).
+
+Since Aarushi has been busy, I have taken up this patch series.  Booting a
+guest works with -drive aio=3Dio_uring and -drive aio=3Dio_uring,cache=3Dno=
+ne with a
+raw file on XFS.
+
+I currently recommend using -drive aio=3Dio_uring only with host block devi=
+ces
+(like NVMe devices).  As of Linux v5.4-rc1 I still hit kernel bugs when usi=
+ng
+image files on ext4 or XFS.
+
+Aarushi Mehta (15):
+  configure: permit use of io_uring
+  qapi/block-core: add option for io_uring
+  block/block: add BDRV flag for io_uring
+  block/io_uring: implements interfaces for io_uring
+  stubs: add stubs for io_uring interface
+  util/async: add aio interfaces for io_uring
+  blockdev: adds bdrv_parse_aio to use io_uring
+  block/file-posix.c: extend to use io_uring
+  block: add trace events for io_uring
+  block/io_uring: adds userspace completion polling
+  qemu-io: adds option to use aio engine
+  qemu-img: adds option to use aio engine for benchmarking
+  qemu-nbd: adds option for aio engines
+  tests/qemu-iotests: enable testing with aio options
+  tests/qemu-iotests: use AIOMODE with various tests
+
+ MAINTAINERS                   |   9 +
+ block.c                       |  22 ++
+ block/Makefile.objs           |   3 +
+ block/file-posix.c            |  95 ++++++--
+ block/io_uring.c              | 433 ++++++++++++++++++++++++++++++++++
+ block/trace-events            |  12 +
+ blockdev.c                    |  12 +-
+ configure                     |  27 +++
+ include/block/aio.h           |  16 +-
+ include/block/block.h         |   2 +
+ include/block/raw-aio.h       |  12 +
+ qapi/block-core.json          |   4 +-
+ qemu-img-cmds.hx              |   4 +-
+ qemu-img.c                    |  11 +-
+ qemu-img.texi                 |   5 +-
+ qemu-io.c                     |  25 +-
+ qemu-nbd.c                    |  12 +-
+ qemu-nbd.texi                 |   4 +-
+ stubs/Makefile.objs           |   1 +
+ stubs/io_uring.c              |  32 +++
+ tests/qemu-iotests/028        |   2 +-
+ tests/qemu-iotests/058        |   2 +-
+ tests/qemu-iotests/089        |   4 +-
+ tests/qemu-iotests/091        |   4 +-
+ tests/qemu-iotests/109        |   2 +-
+ tests/qemu-iotests/147        |   5 +-
+ tests/qemu-iotests/181        |   8 +-
+ tests/qemu-iotests/183        |   4 +-
+ tests/qemu-iotests/185        |  10 +-
+ tests/qemu-iotests/200        |   2 +-
+ tests/qemu-iotests/201        |   8 +-
+ tests/qemu-iotests/check      |  15 +-
+ tests/qemu-iotests/common.rc  |  14 ++
+ tests/qemu-iotests/iotests.py |  12 +-
+ util/async.c                  |  36 +++
+ 35 files changed, 793 insertions(+), 76 deletions(-)
+ create mode 100644 block/io_uring.c
+ create mode 100644 stubs/io_uring.c
+
 --=20
 2.23.0
 
