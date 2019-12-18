@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B194FC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E863C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:41:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B4652146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:41:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38C742146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:41:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uBFEGF9c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4652146E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9VscNrd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C742146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYdl-0000nh-3S
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:41:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57069)
+	id 1ihYdq-0000wl-Ns
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:41:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3w-0007Ol-1h
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:22 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3Q-0006gT-IX
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3s-0003XM-IG
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:19 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42346)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3O-0001W0-CF
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:48 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50302)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3s-0003Sd-91
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:16 -0500
-Received: by mail-wr1-x433.google.com with SMTP id q6so1982349wro.9
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:04:16 -0800 (PST)
+ id 1ihY3O-0001S0-23
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:46 -0500
+Received: by mail-wm1-x334.google.com with SMTP id a5so1563499wmb.0
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=wKT5fGLcBjweK2g0j9x3iDEnS480C/vWZj9Pg704MW0=;
- b=uBFEGF9cpKGqQQW24pCETvFvKQe01KIQ50Ckw6KE2SiW5QFuItoyeNHQwLgz6riuLL
- MwKZZaw2f/UHk1JQC+L/iFzB0P11KDEkxRsP3VM9z+X/kY1QP6dImo3d0cmXr3p2dKWN
- eN9DhiHEF/GUWvyWGMuJCzbVjvVd8pZvQj6/jnFIbrRS7itTO0MwEk5Ycg43QCfFKgsb
- Od4CPz8HhB0QsfeRjzbt4798usSPNJ1QpYET2fu+TTRa5M1QrCvGuX8pzOW1tr6AyoHD
- ZjGpKf5A8lbj598Xm/ac1WIANB5D2BuZem6JBaumyUeEstZQ/PKrtnnFd+8ltLIgsZFi
- MGBw==
+ bh=caRDt6OxCGoej2w718ZKAw/mcjhQpfku4bt3zEwAXZM=;
+ b=A9VscNrdgBypgOF6aUmXN8Q48hq913C78yTdHIQ9c5C48rEo6LaM8qj3INY3Zhi1W+
+ UejwLRoh5O/mdr33PhGri1hy2xt6UaYaRxukBo4MDEmOZIpf7oRdcSFnUMri/dz7LMV1
+ Mtox6f1P3rPkXsjj74Y3cV1/zVYHukXdV+22crzq4055TondJL+4g6qQYIsTFIQaN+HL
+ hXs4rX1kcB3JZgt6AKR8HKBY6bWzSbiUisce11LC6uOw1xhJSCznurDSu92zAvCIIL1j
+ ieC73XpvvQBMOrkVDsqYq7KscZz+Gm1X7VJpd8PsxfvZCgPb79ujQWX5vi1SIP9de1dL
+ Yi5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=wKT5fGLcBjweK2g0j9x3iDEnS480C/vWZj9Pg704MW0=;
- b=gLmKPxB5foap3hlQQfYDbmonmmuhODxph5UAkX+KszIjmqtHVHzkMKGluRoXJl1W+U
- +xeNUx3JIvb99rrXQtfG/s6hX1toh+jv2WDPcGoOi7xHBXVBOqvnentiyjfesbhU8JvW
- 9oaPItMYbpPQ5BDxud+eV27L8H20ivOtALDtVrUSdOsrTQsIrmRekNm9scazMDpQPieQ
- 8ImTwNJy0pkLWLJgmwmnTqUnrg4FFB4WpPQIA26y4IG3uoE5WNUfQF40JdQ4FH+zQ+EF
- LwqaKS0YpV4VBXASjQSahRxB1yNsiHOEpTJU5xYV4TnPbQzLXpNRP+PLfrSg8T3IQw4e
- lMHg==
-X-Gm-Message-State: APjAAAUmGmahhjFNRdr9T4klME8NZcVfjffFDh7O3vSjSbmFXssEhU5G
- ITCfuGtriWrmJR860Vm3P8W90dCq
-X-Google-Smtp-Source: APXvYqyPnT4GBD2x23hiCCRvwgJzih3+z8nN6BygoY6e2h9shmBuQ8Fkrb9CL7f5ApMV8VA2VgCOgQ==
-X-Received: by 2002:a5d:6901:: with SMTP id t1mr2334165wru.94.1576670654720;
- Wed, 18 Dec 2019 04:04:14 -0800 (PST)
+ bh=caRDt6OxCGoej2w718ZKAw/mcjhQpfku4bt3zEwAXZM=;
+ b=e+0HISqx7hCfu9z2oyYKtF9mmF75/9sQKP+nR/fAHbugah7sPaJ/47ybxlSc3Gib2R
+ Nn711px+DpftkV/TjhUMUJsAFO9APQJL8DjOrIXZZz4Bb9ibrkclFG+5TrqAHmjjalVx
+ h32m7XaYbQzeQ6Nq28TRjQw1s5xrYicC1hS1jiIgFwLzrclkZs/ckafIVi1W51HhYPIZ
+ uvmvdrwblMMR36/BWKsTT4kqoqrC5dPXSXodBYu1UquDf8Va7zUnkQXouETW8nTmWKNr
+ vh0NpxjmTulOmI5MuOSkwl1mJlFH73rvzjIJ17iyXpVgV5sy6+3vJF6pbwF0woXbX9dg
+ ZoLA==
+X-Gm-Message-State: APjAAAWLNE+gQ7QZY5TbYCYbVvyd9p3pxYcdnAnKFhs3/a0peNUDv8S7
+ xF5T1khisZCvTZOhg6Ky7W9asvyy
+X-Google-Smtp-Source: APXvYqziSATgk4L63D7ziHAb3PtgggenN7L9Vy/QJAh4+ggzO+8a9zNzn+QtJYcXUPHobd+BxEsMHg==
+X-Received: by 2002:a05:600c:21ce:: with SMTP id
+ x14mr2717656wmj.120.1576670624548; 
+ Wed, 18 Dec 2019 04:03:44 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.04.13
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.43
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:04:14 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:44 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 72/87] memory: include MemoryListener documentation and some
- missing function parameters
-Date: Wed, 18 Dec 2019 13:02:38 +0100
-Message-Id: <1576670573-48048-73-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 46/87] hw: replace hw/i386/pc.h with a header just for the i8259
+Date: Wed, 18 Dec 2019 13:02:12 +0100
+Message-Id: <1576670573-48048-47-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,310 +95,417 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These cover the remaining warnings from kernel-doc.
+Remove the need to include i386/pc.h to get to the i8259 functions.
+This is enough to remove the inclusion of hw/i386/pc.h from all non-x86
+files.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20191029162248.13383-7-pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/exec/memory.h | 218 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 214 insertions(+), 4 deletions(-)
+ hw/alpha/alpha_sys.h            |  3 ++-
+ hw/alpha/dp264.c                |  1 +
+ hw/hppa/hppa_sys.h              |  3 ++-
+ hw/hppa/machine.c               |  1 +
+ hw/i386/kvm/i8259.c             |  1 +
+ hw/i386/microvm.c               |  1 +
+ hw/i386/pc.c                    |  1 +
+ hw/i386/x86.c                   |  1 +
+ hw/input/pckbd.c                |  1 -
+ hw/intc/Kconfig                 |  2 ++
+ hw/intc/apic.c                  |  2 +-
+ hw/intc/i8259.c                 |  2 +-
+ hw/intc/i8259_common.c          |  2 +-
+ hw/intc/ioapic.c                |  3 ++-
+ hw/isa/i82378.c                 |  2 +-
+ hw/isa/lpc_ich9.c               |  1 -
+ hw/isa/piix4.c                  |  2 +-
+ hw/mips/gt64xxx_pci.c           |  2 +-
+ hw/mips/mips_fulong2e.c         |  2 +-
+ hw/mips/mips_jazz.c             |  2 +-
+ hw/mips/mips_r4k.c              |  2 +-
+ hw/pci-host/bonito.c            |  1 -
+ hw/pci-host/prep.c              |  2 +-
+ include/hw/i386/pc.h            |  8 --------
+ include/hw/intc/i8259.h         | 12 ++++++++++++
+ include/hw/isa/i8259_internal.h |  2 +-
+ target/i386/monitor.c           |  1 -
+ 27 files changed, 37 insertions(+), 26 deletions(-)
+ create mode 100644 include/hw/intc/i8259.h
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 4754749..e85b7de 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -423,30 +423,232 @@ struct IOMMUMemoryRegion {
-  * Use with memory_listener_register() and memory_listener_unregister().
-  */
- struct MemoryListener {
-+    /**
-+     * @begin:
-+     *
-+     * Called at the beginning of an address space update transaction.
-+     * Followed by calls to #MemoryListener.region_add(),
-+     * #MemoryListener.region_del(), #MemoryListener.region_nop(),
-+     * #MemoryListener.log_start() and #MemoryListener.log_stop() in
-+     * increasing address order.
-+     *
-+     * @listener: The #MemoryListener.
-+     */
-     void (*begin)(MemoryListener *listener);
-+
-+    /**
-+     * @commit:
-+     *
-+     * Called at the end of an address space update transaction,
-+     * after the last call to #MemoryListener.region_add(),
-+     * #MemoryListener.region_del() or #MemoryListener.region_nop(),
-+     * #MemoryListener.log_start() and #MemoryListener.log_stop().
-+     *
-+     * @listener: The #MemoryListener.
-+     */
-     void (*commit)(MemoryListener *listener);
-+
-+    /**
-+     * @region_add:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that is new in this address space
-+     * space since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The new #MemoryRegionSection.
-+     */
-     void (*region_add)(MemoryListener *listener, MemoryRegionSection *section);
-+
-+    /**
-+     * @region_del:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that has disappeared in the address
-+     * space since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The old #MemoryRegionSection.
-+     */
-     void (*region_del)(MemoryListener *listener, MemoryRegionSection *section);
-+
-+    /**
-+     * @region_nop:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that is in the same place in the address
-+     * space as in the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The #MemoryRegionSection.
-+     */
-     void (*region_nop)(MemoryListener *listener, MemoryRegionSection *section);
-+
-+    /**
-+     * @log_start:
-+     *
-+     * Called during an address space update transaction, after
-+     * one of #MemoryListener.region_add(),#MemoryListener.region_del() or
-+     * #MemoryListener.region_nop(), if dirty memory logging clients have
-+     * become active since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The #MemoryRegionSection.
-+     * @old: A bitmap of dirty memory logging clients that were active in
-+     * the previous transaction.
-+     * @new: A bitmap of dirty memory logging clients that are active in
-+     * the current transaction.
-+     */
-     void (*log_start)(MemoryListener *listener, MemoryRegionSection *section,
-                       int old, int new);
-+
-+    /**
-+     * @log_stop:
-+     *
-+     * Called during an address space update transaction, after
-+     * one of #MemoryListener.region_add(), #MemoryListener.region_del() or
-+     * #MemoryListener.region_nop() and possibly after
-+     * #MemoryListener.log_start(), if dirty memory logging clients have
-+     * become inactive since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The #MemoryRegionSection.
-+     * @old: A bitmap of dirty memory logging clients that were active in
-+     * the previous transaction.
-+     * @new: A bitmap of dirty memory logging clients that are active in
-+     * the current transaction.
-+     */
-     void (*log_stop)(MemoryListener *listener, MemoryRegionSection *section,
-                      int old, int new);
-+
-+    /**
-+     * @log_sync:
-+     *
-+     * Called by memory_region_snapshot_and_clear_dirty() and
-+     * memory_global_dirty_log_sync(), before accessing QEMU's "official"
-+     * copy of the dirty memory bitmap for a #MemoryRegionSection.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The #MemoryRegionSection.
-+     */
-     void (*log_sync)(MemoryListener *listener, MemoryRegionSection *section);
-+
-+    /**
-+     * @log_clear:
-+     *
-+     * Called before reading the dirty memory bitmap for a
-+     * #MemoryRegionSection.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The #MemoryRegionSection.
-+     */
-     void (*log_clear)(MemoryListener *listener, MemoryRegionSection *section);
-+
-+    /**
-+     * @log_global_start:
-+     *
-+     * Called by memory_global_dirty_log_start(), which
-+     * enables the %DIRTY_LOG_MIGRATION client on all memory regions in
-+     * the address space.  #MemoryListener.log_global_start() is also
-+     * called when a #MemoryListener is added, if global dirty logging is
-+     * active at that time.
-+     *
-+     * @listener: The #MemoryListener.
-+     */
-     void (*log_global_start)(MemoryListener *listener);
-+
-+    /**
-+     * @log_global_stop:
-+     *
-+     * Called by memory_global_dirty_log_stop(), which
-+     * disables the %DIRTY_LOG_MIGRATION client on all memory regions in
-+     * the address space.
-+     *
-+     * @listener: The #MemoryListener.
-+     */
-     void (*log_global_stop)(MemoryListener *listener);
-+
-+    /**
-+     * @log_global_after_sync:
-+     *
-+     * Called after reading the dirty memory bitmap
-+     * for any #MemoryRegionSection.
-+     *
-+     * @listener: The #MemoryListener.
-+     */
-     void (*log_global_after_sync)(MemoryListener *listener);
-+
-+    /**
-+     * @eventfd_add:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that has had a new ioeventfd
-+     * registration since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The new #MemoryRegionSection.
-+     * @match_data: The @match_data parameter for the new ioeventfd.
-+     * @data: The @data parameter for the new ioeventfd.
-+     * @e: The #EventNotifier parameter for the new ioeventfd.
-+     */
-     void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *section,
-                         bool match_data, uint64_t data, EventNotifier *e);
-+
-+    /**
-+     * @eventfd_del:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that has dropped an ioeventfd
-+     * registration since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The new #MemoryRegionSection.
-+     * @match_data: The @match_data parameter for the dropped ioeventfd.
-+     * @data: The @data parameter for the dropped ioeventfd.
-+     * @e: The #EventNotifier parameter for the dropped ioeventfd.
-+     */
-     void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection *section,
-                         bool match_data, uint64_t data, EventNotifier *e);
-+
-+    /**
-+     * @coalesced_io_add:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that has had a new coalesced
-+     * MMIO range registration since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The new #MemoryRegionSection.
-+     * @addr: The starting address for the coalesced MMIO range.
-+     * @len: The length of the coalesced MMIO range.
-+     */
-     void (*coalesced_io_add)(MemoryListener *listener, MemoryRegionSection *section,
-                                hwaddr addr, hwaddr len);
-+
-+    /**
-+     * @coalesced_io_del:
-+     *
-+     * Called during an address space update transaction,
-+     * for a section of the address space that has dropped a coalesced
-+     * MMIO range since the last transaction.
-+     *
-+     * @listener: The #MemoryListener.
-+     * @section: The new #MemoryRegionSection.
-+     * @addr: The starting address for the coalesced MMIO range.
-+     * @len: The length of the coalesced MMIO range.
-+     */
-     void (*coalesced_io_del)(MemoryListener *listener, MemoryRegionSection *section,
-                                hwaddr addr, hwaddr len);
--    /* Lower = earlier (during add), later (during del) */
-+    /**
-+     * @priority:
-+     *
-+     * Govern the order in which memory listeners are invoked. Lower priorities
-+     * are invoked earlier for "add" or "start" callbacks, and later for "delete"
-+     * or "stop" callbacks.
-+     */
-     unsigned priority;
-+
-+    /* private: */
-     AddressSpace *address_space;
-     QTAILQ_ENTRY(MemoryListener) link;
-     QTAILQ_ENTRY(MemoryListener) link_as;
-@@ -940,6 +1142,7 @@ void memory_region_init_rom(MemoryRegion *mr,
-  * @mr: the #MemoryRegion to be initialized.
-  * @owner: the object that tracks the region's reference count
-  * @ops: callbacks for write access handling (must not be NULL).
-+ * @opaque: passed to the read and write callbacks of the @ops structure.
-  * @name: Region name, becomes part of RAMBlock name used in migration stream
-  *        must be unique within any device
-  * @size: size of the region.
-@@ -1028,7 +1231,7 @@ static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
-  * Returns pointer to IOMMUMemoryRegionClass if a memory region is an iommu,
-  * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
-  *
-- * @mr: the memory region being queried
-+ * @iommu_mr: the memory region being queried
-  */
- static inline IOMMUMemoryRegionClass *memory_region_get_iommu_class_nocheck(
-         IOMMUMemoryRegion *iommu_mr)
-@@ -1098,6 +1301,7 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
-  * @n: the IOMMUNotifier to be added; the notify callback receives a
-  *     pointer to an #IOMMUTLBEntry as the opaque value; the pointer
-  *     ceases to be valid on exit from the notifier.
-+ * @errp: pointer to Error*, to store an error if it happens.
-  */
- int memory_region_register_iommu_notifier(MemoryRegion *mr,
-                                           IOMMUNotifier *n, Error **errp);
-@@ -1270,9 +1474,12 @@ void *memory_region_get_ram_ptr(MemoryRegion *mr);
- void memory_region_ram_resize(MemoryRegion *mr, ram_addr_t newsize,
-                               Error **errp);
- /**
-- * memory_region_do_writeback: Trigger writeback for selected address range
-- * [addr, addr + size]
-+ * memory_region_do_writeback: Trigger cache writeback or msync for
-+ * selected address range
-  *
-+ * @mr: the memory region to be updated
-+ * @addr: the initial address of the range to be written back
-+ * @size: the size of the range to be written back
-  */
- void memory_region_do_writeback(MemoryRegion *mr, hwaddr addr, hwaddr size);
+diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
+index 4e127a6..95033d7 100644
+--- a/hw/alpha/alpha_sys.h
++++ b/hw/alpha/alpha_sys.h
+@@ -7,7 +7,8 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/ide.h"
+-#include "hw/i386/pc.h"
++#include "hw/boards.h"
++#include "hw/intc/i8259.h"
  
-@@ -1591,6 +1798,8 @@ void memory_region_add_subregion_overlap(MemoryRegion *mr,
- /**
-  * memory_region_get_ram_addr: Get the ram address associated with a memory
-  *                             region
-+ *
-+ * @mr: the region to be queried
-  */
- ram_addr_t memory_region_get_ram_addr(MemoryRegion *mr);
  
-@@ -2161,6 +2370,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
-  * @addr: address within that address space
-  * @attrs: memory transaction attributes
-  * @buf: buffer with the data transferred
-+ * @len: length of the data transferred
+ PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+index 51b3cf7..f2026fd 100644
+--- a/hw/alpha/dp264.c
++++ b/hw/alpha/dp264.c
+@@ -19,6 +19,7 @@
+ #include "hw/timer/i8254.h"
+ #include "hw/isa/superio.h"
+ #include "hw/dma/i8257.h"
++#include "net/net.h"
+ #include "qemu/cutils.h"
+ 
+ #define MAX_IDE_BUS 2
+diff --git a/hw/hppa/hppa_sys.h b/hw/hppa/hppa_sys.h
+index 43d25d2..4e50196 100644
+--- a/hw/hppa/hppa_sys.h
++++ b/hw/hppa/hppa_sys.h
+@@ -6,7 +6,8 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/ide.h"
+-#include "hw/i386/pc.h"
++#include "hw/boards.h"
++#include "hw/intc/i8259.h"
+ 
+ #include "hppa_hardware.h"
+ 
+diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+index b30aba6..5d0de26 100644
+--- a/hw/hppa/machine.c
++++ b/hw/hppa/machine.c
+@@ -19,6 +19,7 @@
+ #include "hppa_sys.h"
+ #include "qemu/units.h"
+ #include "qapi/error.h"
++#include "net/net.h"
+ #include "qemu/log.h"
+ 
+ #define MAX_IDE_BUS 2
+diff --git a/hw/i386/kvm/i8259.c b/hw/i386/kvm/i8259.c
+index d0c1b1d..e404fdc 100644
+--- a/hw/i386/kvm/i8259.c
++++ b/hw/i386/kvm/i8259.c
+@@ -12,6 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/isa/i8259_internal.h"
++#include "hw/intc/i8259.h"
+ #include "qemu/module.h"
+ #include "hw/i386/apic_internal.h"
+ #include "hw/irq.h"
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index def37e6..2068319 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -34,6 +34,7 @@
+ #include "hw/i386/x86.h"
+ #include "hw/i386/pc.h"
+ #include "target/i386/cpu.h"
++#include "hw/intc/i8259.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/rtc/mc146818rtc.h"
+ #include "hw/char/serial.h"
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4bb1710..b4384e2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -44,6 +44,7 @@
+ #include "migration/vmstate.h"
+ #include "multiboot.h"
+ #include "hw/rtc/mc146818rtc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/input/i8042.h"
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 394edc2..3e4aee5 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -39,6 +39,7 @@
+ #include "target/i386/cpu.h"
+ #include "hw/i386/topology.h"
+ #include "hw/i386/fw_cfg.h"
++#include "hw/intc/i8259.h"
+ 
+ #include "hw/acpi/cpu_hotplug.h"
+ #include "hw/nmi.h"
+diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+index f0acfd8..2f09f78 100644
+--- a/hw/input/pckbd.c
++++ b/hw/input/pckbd.c
+@@ -26,7 +26,6 @@
+ #include "qemu/log.h"
+ #include "hw/isa/isa.h"
+ #include "migration/vmstate.h"
+-#include "hw/i386/pc.h"
+ #include "hw/input/ps2.h"
+ #include "hw/irq.h"
+ #include "hw/input/i8042.h"
+diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+index 5347f84..10a680b 100644
+--- a/hw/intc/Kconfig
++++ b/hw/intc/Kconfig
+@@ -9,6 +9,7 @@ config PL190
+ 
+ config IOAPIC
+     bool
++    select I8259
+ 
+ config ARM_GIC
+     bool
+@@ -21,6 +22,7 @@ config OPENPIC
+ config APIC
+     bool
+     select MSI_NONBROKEN
++    select I8259
+ 
+ config ARM_GIC_KVM
+     bool
+diff --git a/hw/intc/apic.c b/hw/intc/apic.c
+index 2a74f7b..bd40467 100644
+--- a/hw/intc/apic.c
++++ b/hw/intc/apic.c
+@@ -22,10 +22,10 @@
+ #include "hw/i386/apic_internal.h"
+ #include "hw/i386/apic.h"
+ #include "hw/i386/ioapic.h"
++#include "hw/intc/i8259.h"
+ #include "hw/pci/msi.h"
+ #include "qemu/host-utils.h"
+ #include "trace.h"
+-#include "hw/i386/pc.h"
+ #include "hw/i386/apic-msidef.h"
+ #include "qapi/error.h"
+ 
+diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
+index 211a989..51b27f6 100644
+--- a/hw/intc/i8259.c
++++ b/hw/intc/i8259.c
+@@ -23,7 +23,7 @@
   */
- static inline __attribute__((__always_inline__))
- MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+ 
+ #include "qemu/osdep.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "qemu/timer.h"
+diff --git a/hw/intc/i8259_common.c b/hw/intc/i8259_common.c
+index bd37bb5..e7b1a10 100644
+--- a/hw/intc/i8259_common.c
++++ b/hw/intc/i8259_common.c
+@@ -24,7 +24,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/isa/i8259_internal.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index ead14e1..4f55776 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -23,10 +23,11 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "monitor/monitor.h"
+-#include "hw/i386/pc.h"
+ #include "hw/i386/apic.h"
+ #include "hw/i386/ioapic.h"
+ #include "hw/i386/ioapic_internal.h"
++#include "hw/i386/x86.h"
++#include "hw/intc/i8259.h"
+ #include "hw/pci/msi.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/kvm.h"
+diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
+index de276cd..dcb6b47 100644
+--- a/hw/isa/i82378.c
++++ b/hw/isa/i82378.c
+@@ -19,8 +19,8 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/pci/pci.h"
+-#include "hw/i386/pc.h"
+ #include "hw/irq.h"
++#include "hw/intc/i8259.h"
+ #include "hw/timer/i8254.h"
+ #include "migration/vmstate.h"
+ #include "hw/audio/pcspk.h"
+diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+index 17c292e..170792a 100644
+--- a/hw/isa/lpc_ich9.c
++++ b/hw/isa/lpc_ich9.c
+@@ -35,7 +35,6 @@
+ #include "hw/isa/isa.h"
+ #include "hw/sysbus.h"
+ #include "migration/vmstate.h"
+-#include "hw/i386/pc.h"
+ #include "hw/irq.h"
+ #include "hw/isa/apm.h"
+ #include "hw/i386/ioapic.h"
+diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
+index 86678e6..7edec5e 100644
+--- a/hw/isa/piix4.c
++++ b/hw/isa/piix4.c
+@@ -26,11 +26,11 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/irq.h"
+-#include "hw/i386/pc.h"
+ #include "hw/southbridge/piix.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+ #include "hw/sysbus.h"
++#include "hw/intc/i8259.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/rtc/mc146818rtc.h"
+diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+index f1af840..b2ea13f 100644
+--- a/hw/mips/gt64xxx_pci.c
++++ b/hw/mips/gt64xxx_pci.c
+@@ -30,7 +30,7 @@
+ #include "hw/pci/pci_host.h"
+ #include "hw/southbridge/piix.h"
+ #include "migration/vmstate.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/irq.h"
+ #include "exec/address-spaces.h"
+ #include "trace.h"
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 03a27e1..9eaa6e2 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -23,7 +23,7 @@
+ #include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/isa/superio.h"
+ #include "net/net.h"
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index ac4d7ac..291fd6c 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -26,7 +26,7 @@
+ #include "qemu-common.h"
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/dma/i8257.h"
+ #include "hw/char/serial.h"
+ #include "hw/char/parallel.h"
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 3891be6..fd926a3 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -15,7 +15,7 @@
+ #include "cpu.h"
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/char/serial.h"
+ #include "hw/isa/isa.h"
+ #include "net/net.h"
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index 4692d41..cc6545c 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -41,7 +41,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
+ #include "hw/pci/pci.h"
+-#include "hw/i386/pc.h"
+ #include "hw/irq.h"
+ #include "hw/mips/mips.h"
+ #include "hw/pci/pci_host.h"
+diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
+index 85d7ba9..afa136d 100644
+--- a/hw/pci-host/prep.c
++++ b/hw/pci-host/prep.c
+@@ -32,7 +32,7 @@
+ #include "hw/pci/pci_host.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+-#include "hw/i386/pc.h"
++#include "hw/intc/i8259.h"
+ #include "hw/irq.h"
+ #include "hw/loader.h"
+ #include "hw/or-irq.h"
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 61a998d..e2cd453 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -134,14 +134,6 @@ typedef struct PCMachineClass {
+ #define PC_MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)
+ 
+-/* i8259.c */
+-
+-extern DeviceState *isa_pic;
+-qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
+-qemu_irq *kvm_i8259_init(ISABus *bus);
+-int pic_read_irq(DeviceState *d);
+-int pic_get_output(DeviceState *d);
+-
+ /* ioapic.c */
+ 
+ /* Global System Interrupts */
+diff --git a/include/hw/intc/i8259.h b/include/hw/intc/i8259.h
+new file mode 100644
+index 0000000..e2b1e8c
+--- /dev/null
++++ b/include/hw/intc/i8259.h
+@@ -0,0 +1,12 @@
++#ifndef HW_I8259_H
++#define HW_I8259_H
++
++/* i8259.c */
++
++extern DeviceState *isa_pic;
++qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
++qemu_irq *kvm_i8259_init(ISABus *bus);
++int pic_get_output(DeviceState *d);
++int pic_read_irq(DeviceState *d);
++
++#endif
+diff --git a/include/hw/isa/i8259_internal.h b/include/hw/isa/i8259_internal.h
+index ee189e4..861d70d 100644
+--- a/include/hw/isa/i8259_internal.h
++++ b/include/hw/isa/i8259_internal.h
+@@ -25,9 +25,9 @@
+ #ifndef QEMU_I8259_INTERNAL_H
+ #define QEMU_I8259_INTERNAL_H
+ 
+-#include "hw/i386/pc.h"
+ #include "hw/isa/isa.h"
+ #include "hw/intc/intc.h"
++#include "hw/intc/i8259.h"
+ 
+ typedef struct PICCommonState PICCommonState;
+ 
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 9fb4d64..27ebfa3 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -28,7 +28,6 @@
+ #include "monitor/hmp-target.h"
+ #include "monitor/hmp.h"
+ #include "qapi/qmp/qdict.h"
+-#include "hw/i386/pc.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/sev.h"
+ #include "qapi/error.h"
 -- 
 1.8.3.1
 
