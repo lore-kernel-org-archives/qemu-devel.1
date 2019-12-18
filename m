@@ -2,61 +2,82 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E54B9C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42650C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:01:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8FB82072B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:00:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8FB82072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 04ED52072B
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:01:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JMpkN3LD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04ED52072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihUGG-0005wq-Lf
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:00:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35572)
+	id 1ihUH3-0006hL-3e
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:01:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38590)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ihUFR-0005OC-KH
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:59:58 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ihUFt-0005m5-Ot
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ihUFQ-0005Zb-6L
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:59:57 -0500
-Received: from 10.mo3.mail-out.ovh.net ([87.98.165.232]:33265)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ihUFP-0005Hl-Vj
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:59:56 -0500
-Received: from player755.ha.ovh.net (unknown [10.108.16.187])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 80A2A239ACF
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 08:59:45 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player755.ha.ovh.net (Postfix) with ESMTPSA id A6B91D81C0A3;
- Wed, 18 Dec 2019 07:59:43 +0000 (UTC)
-Date: Wed, 18 Dec 2019 08:59:37 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH 0/9] 9pfs: readdir optimization
-Message-ID: <20191218085937.53a59594@bahia.lan>
-In-Reply-To: <E1ihMuX-00076B-Qf@lizzy.crudebyte.com>
-References: <E1ihMuX-00076B-Qf@lizzy.crudebyte.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ihUFo-0006It-EQ
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:00:25 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41642)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ihUFn-0006HM-Re; Wed, 18 Dec 2019 03:00:20 -0500
+Received: by mail-ot1-x342.google.com with SMTP id r27so1365501otc.8;
+ Wed, 18 Dec 2019 00:00:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=JVg5swbti9AOC9j2cReONmB/j54YHwCcla5puT1Fw9k=;
+ b=JMpkN3LDA9P1R3Nz6bjWK0wdn/gYJ9F8Hc2kiNbWI9z8zdVx85D3oF4/Y9jRE7+hvn
+ pg5GU3qnqfU0pVZE8DA47f1s8F10/Vi8H3qPu7SMs+7jOUNmqdgkZ8V/6OVrkavbO6Pc
+ FdvasuscH4/449gcawLtsHO8AEal0gQmwh81OZnLvKC4QIMllxkd0sCBn3CKmGHZQev2
+ UlC1gk5P/9WkHpo2AhfLReQhsuIw2ppe+gvCcLWF8EsmR+nCazf3RnhL90OHUK4LctcV
+ QVlilYx6cgDpSeK/TlGCsHq5I8kpr7wCYncPlWTWJLreU3DNuHyavQo+bKmDVRRwZBO7
+ osqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=JVg5swbti9AOC9j2cReONmB/j54YHwCcla5puT1Fw9k=;
+ b=AJdNZgQEwD9E5CiALp/9VHGTmyAdocF3AjuAlfvAuOGLWm35uBEf6RA3VGcYeEBzCB
+ 5ZWpfwxbEqef4Hw0KaBJ/6jTukFwMZ1RHSsgVEApJcJTfYuCew9Mgrhvciiw+cEw5I6q
+ 7JrNeDw98Yo8BzYUDMgWLcHjeBF8L+BUKo6LRyimACjtdXnbnJf3IXGSbpw9th7Veq/I
+ SaBgtN6OokT81n9JuoKmXdlmlGUcerI+OrGK9hxNUMdu8cQhsjbR4c9jtTH3BzoIFInC
+ yLq2HX4EmIKRs0OoyuCVww3OCMokg3+G+Mnh6Iu/5ZgHqnKwazwqF6FlQD/5khWTvvxh
+ tVfQ==
+X-Gm-Message-State: APjAAAWOwzeCIkTknxWaHDmfYuHV8dKg5M363zNcdZOG9uYCDIdDi9Tg
+ lhg/S1D6Cko/wR6znvuYNY9t2r0vg65UhMMvsZo=
+X-Google-Smtp-Source: APXvYqz2Cf4NRh6bsfKgT8Mqda057xivdINKLU+mwyKu3rxpJemaCJt9VVBH3r22KVjLscppbsHsEafl6ydALrVDxR0=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr1251528otk.64.1576656018700;
+ Wed, 18 Dec 2019 00:00:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 15884477363284908352
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtkedgudduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 87.98.165.232
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Wed, 18 Dec 2019 00:00:18 -0800 (PST)
+In-Reply-To: <20191217173425.5082-4-philmd@redhat.com>
+References: <20191217173425.5082-1-philmd@redhat.com>
+ <20191217173425.5082-4-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 18 Dec 2019 09:00:18 +0100
+Message-ID: <CAL1e-=ixaEP6o6=OfPuYsj=b-wuuUsk6Y7bMwosLhRsPqfw7yQ@mail.gmail.com>
+Subject: Re: [PATCH 3/6] hw/net/imx_fec: Rewrite fall through comments
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000ed7c3f0599f5d58f"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,78 +89,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Christian,
+--000000000000ed7c3f0599f5d58f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-It seems that there was an issue with the posting of these series. Threading
-is inexistant. All the emails appear scattered and unsorted in my mailbox,
-between 12/16 and 12/18... which is a bit painful. I'll try to find some time
-to have a look anyway, but this greatly lowers the odds for these series to get
-multiple reviews, which seems problematic given the ** NOTE: ** section you've
-added to the cover. Please fix this.
+On Tuesday, December 17, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om>
+wrote:
 
-Cheers,
+> GCC9 is confused by this comment when building with CFLAG
+> -Wimplicit-fallthrough=3D2:
+>
+>   hw/net/imx_fec.c: In function =E2=80=98imx_eth_write=E2=80=99:
+>   hw/net/imx_fec.c:906:12: error: this statement may fall through
+> [-Werror=3Dimplicit-fallthrough=3D]
+>     906 |         if (unlikely(single_tx_ring)) {
+>         |            ^
+>   hw/net/imx_fec.c:912:5: note: here
+>     912 |     case ENET_TDAR:     /* FALLTHROUGH */
+>         |     ^~~~
+>   cc1: all warnings being treated as errors
+>
+> Rewrite the comments in the correct place,  using 'fall through'
+> which is recognized by GCC and static analyzers.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> Cc: Peter Chubb <peter.chubb@nicta.com.au>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: qemu-arm@nongnu.org
+> ---
+>  hw/net/imx_fec.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+>
+Here we can truly say that gcc is confused (as opposed to another patch
+from this series).
 
---
-Greg
+The new positions of comments/annotations are good.
 
-On Wed, 18 Dec 2019 00:11:10 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-> As previously mentioned, I was investigating performance issues with 9pfs.
-> Raw file read/write of 9pfs is actually quite good, provided that client
-> picked a reasonable high msize (maximum message size). I would recommend
-> to log a warning on 9p server side if a client attached with a small msize
-> that would cause performance issues for that reason.
-> 
-> However there other aspects where 9pfs currently performs suboptimally,
-> especially readdir handling of 9pfs is extremely slow, a simple readdir
-> request of a guest typically blocks for several hundred milliseconds or
-> even several seconds, no matter how powerful the underlying hardware is.
-> The reason for this performance issue: latency.
-> Currently 9pfs is heavily dispatching a T_readdir request numerous times
-> between main I/O thread and a background I/O thread back and forth; in fact
-> it is actually hopping between threads even multiple times for every single
-> directory entry during T_readdir request handling which leads in total to
-> huge latencies for a single T_readdir request.
-> 
-> This patch series aims to address this severe performance issue of 9pfs
-> T_readdir request handling. The actual performance fix is patch 8. I also
-> provided a convenient benchmark for comparing the performance improvements
-> by using the 9pfs "synth" driver (see patch 6 for instructions how to run
-> the benchmark), so no guest OS installation is required to peform this
-> benchmark A/B comparison. With patch 8 I achieved a performance improvement
-> of factor 40 on my test machine.
-> 
-> ** NOTE: ** These patches are not heavily tested yet, nor thouroughly
-> reviewed for potential security issues yet. I decided to post them already
-> though, because I won't have the time in the next few weeks for polishing
-> them. The benchmark results should demonstrate though that it is worth the
-> hassle. So any testing/reviews/fixes appreciated!
-> 
-> Christian Schoenebeck (9):
->   tests/virtio-9p: v9fs_string_read() didn't terminate string
->   9pfs: validate count sent by client with T_readdir
->   hw/9pfs/9p-synth: added directory for readdir test
->   tests/virtio-9p: added READDIR test
->   tests/virtio-9p: check file names of READDIR response
->   9pfs: READDIR benchmark
->   hw/9pfs/9p-synth: avoid n-square issue in synth_readdir()
->   9pfs: T_readdir latency optimization
->   hw/9pfs/9p.c: benchmark time on T_readdir request
-> 
->  hw/9pfs/9p-synth.c     |  46 ++++++++++-
->  hw/9pfs/9p-synth.h     |   5 ++
->  hw/9pfs/9p.c           | 150 ++++++++++++++++++---------------
->  hw/9pfs/9p.h           |  23 ++++++
->  hw/9pfs/codir.c        | 183 ++++++++++++++++++++++++++++++++++++++---
->  hw/9pfs/coth.h         |   3 +
->  tests/virtio-9p-test.c | 182 +++++++++++++++++++++++++++++++++++++++-
->  7 files changed, 509 insertions(+), 83 deletions(-)
-> 
 
+
+> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+> index bd99236864..30cc07753d 100644
+> --- a/hw/net/imx_fec.c
+> +++ b/hw/net/imx_fec.c
+> @@ -901,15 +901,17 @@ static void imx_eth_write(void *opaque, hwaddr
+> offset, uint64_t value,
+>              s->regs[index] =3D 0;
+>          }
+>          break;
+> -    case ENET_TDAR1:    /* FALLTHROUGH */
+> -    case ENET_TDAR2:    /* FALLTHROUGH */
+> +        /* fall through */
+> +    case ENET_TDAR1:
+> +    case ENET_TDAR2:
+>          if (unlikely(single_tx_ring)) {
+>              qemu_log_mask(LOG_GUEST_ERROR,
+>                            "[%s]%s: trying to access TDAR2 or TDAR1\n",
+>                            TYPE_IMX_FEC, __func__);
+>              return;
+>          }
+> -    case ENET_TDAR:     /* FALLTHROUGH */
+> +        /* fall through */
+> +    case ENET_TDAR:
+>          if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+>              s->regs[index] =3D ENET_TDAR_TDAR;
+>              imx_eth_do_tx(s, index);
+> --
+> 2.21.0
+>
+>
+>
+
+--000000000000ed7c3f0599f5d58f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, December 17, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a h=
+ref=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><block=
+quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
+ solid;padding-left:1ex">GCC9 is confused by this comment when building wit=
+h CFLAG<br>
+-Wimplicit-fallthrough=3D2:<br>
+<br>
+=C2=A0 hw/net/imx_fec.c: In function =E2=80=98imx_eth_write=E2=80=99:<br>
+=C2=A0 hw/net/imx_fec.c:906:12: error: this statement may fall through [-We=
+rror=3Dimplicit-fallthrough=3D<wbr>]<br>
+=C2=A0 =C2=A0 906 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely(single_tx=
+_ring)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^<br=
+>
+=C2=A0 hw/net/imx_fec.c:912:5: note: here<br>
+=C2=A0 =C2=A0 912 |=C2=A0 =C2=A0 =C2=A0case ENET_TDAR:=C2=A0 =C2=A0 =C2=A0/=
+* FALLTHROUGH */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0^~~~<br>
+=C2=A0 cc1: all warnings being treated as errors<br>
+<br>
+Rewrite the comments in the correct place,=C2=A0 using &#39;fall through&#3=
+9;<br>
+which is recognized by GCC and static analyzers.<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
+hat.com">philmd@redhat.com</a>&gt;<br>
+---<br>
+Cc: Peter Chubb &lt;<a href=3D"mailto:peter.chubb@nicta.com.au">peter.chubb=
+@nicta.com.au</a>&gt;<br>
+Cc: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.may=
+dell@linaro.org</a>&gt;<br>
+Cc: Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com">jasowang@redhat.c=
+om</a>&gt;<br>
+Cc: <a href=3D"mailto:qemu-arm@nongnu.org">qemu-arm@nongnu.org</a><br>
+---<br>
+=C2=A0hw/net/imx_fec.c | 8 +++++---<br>
+=C2=A01 file changed, 5 insertions(+), 3 deletions(-)<br>
+<br></blockquote><div><br></div><div>Here we can truly say that gcc is conf=
+used (as opposed to another patch from this series).</div><div><br></div><d=
+iv>The new positions of comments/annotations are good.</div><div><br></div>=
+<div>Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavec=
+omp.com">amarkovic@wavecomp.com</a>&gt;</div><div><br></div><div>=C2=A0</di=
+v><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:=
+1px #ccc solid;padding-left:1ex">
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c<br>
+index bd99236864..30cc07753d 100644<br>
+--- a/hw/net/imx_fec.c<br>
++++ b/hw/net/imx_fec.c<br>
+@@ -901,15 +901,17 @@ static void imx_eth_write(void *opaque, hwaddr offset=
+, uint64_t value,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;regs[index] =3D 0;<br=
+>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+-=C2=A0 =C2=A0 case ENET_TDAR1:=C2=A0 =C2=A0 /* FALLTHROUGH */<br>
+-=C2=A0 =C2=A0 case ENET_TDAR2:=C2=A0 =C2=A0 /* FALLTHROUGH */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fall through */<br>
++=C2=A0 =C2=A0 case ENET_TDAR1:<br>
++=C2=A0 =C2=A0 case ENET_TDAR2:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (unlikely(single_tx_ring)) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_log_mask(LOG_GUEST_ERR=
+OR,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0&quot;[%s]%s: trying to access TDAR2 or TDAR1\n&quo=
+t;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0TYPE_IMX_FEC, __func__);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+-=C2=A0 =C2=A0 case ENET_TDAR:=C2=A0 =C2=A0 =C2=A0/* FALLTHROUGH */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fall through */<br>
++=C2=A0 =C2=A0 case ENET_TDAR:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (s-&gt;regs[ENET_ECR] &amp; ENET_ECR_E=
+THEREN) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;regs[index] =3D ENET_=
+TDAR_TDAR;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0imx_eth_do_tx(s, index);<br=
+>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000ed7c3f0599f5d58f--
 
