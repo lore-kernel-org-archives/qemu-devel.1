@@ -2,80 +2,92 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2118CC3F68F
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF1CC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:17:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E19C2218AC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:16:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E74532146E
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 04:17:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pnvPTOs4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E19C2218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mbo78YQV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74532146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihQkt-00044B-V2
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 23:16:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36767)
+	id 1ihQlj-0004dL-2N
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 23:17:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41286)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1ihQjD-0002er-U3
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:14:28 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihQkE-0003il-ES
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:15:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1ihQjC-0006Xe-OQ
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:14:27 -0500
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:33497)
+ (envelope-from <richard.henderson@linaro.org>) id 1ihQkA-0008Gd-Jc
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:15:29 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:32822)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1ihQjC-0006WO-CZ; Tue, 17 Dec 2019 23:14:26 -0500
-Received: by mail-lf1-x141.google.com with SMTP id n25so642654lfl.0;
- Tue, 17 Dec 2019 20:14:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gqJcASg9fWaiY51VT0yBYeRUW0LCqDwhoxU/57LYi1o=;
- b=pnvPTOs4gOnztIMN0fnJF90cWRS0Th7ouPshuUe/KKtG/pNJUIW97L7nJW8sq6UJW5
- kFxSaRDrmTRhPYpgYYpezy8SoYosnvY0udgAHAuqp/pOwL2upagPqAhR7RCKfuP/1CDp
- hG+KLus61eWTSZu4MZVYqNf5qHs3OJNUh9p6JkxPnncSmF6NbZWX3vy31iiU4+R7nix6
- Lf0pS67oBxxG37Tf6m65TtbAKfdRJG3LYKYaCwODJzIIY/nRWnoG5///SveSdpvYFaXL
- jLVW9uxhqhC7OAw5M6yU581kDP6OCDnXerW8BejpNPdY7SMqvtT3n2O47gmi5dEUhHmS
- 3N+g==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ihQkA-0008FP-BY
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 23:15:26 -0500
+Received: by mail-pg1-x542.google.com with SMTP id 6so534464pgk.0
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 20:15:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9C/NllXt+IiMcTKuUu1KalZGcyy4YxFtVK0hNJJKSu8=;
+ b=Mbo78YQV18F6yKgC0YqWhsSg64m6s3WkylVPQTiaXvbMV68K/GAxghjgo7pUZC1Io1
+ SJPzkZ6eyKFZU64CMJkk0+p112O6+S//qA9H8Hwg0zsRfIller0eB4FkUFwHUvR8533Y
+ mOULpqmWvTerrU6pAerBKovqrrblyZuo3D5xJ/3dlY40u/bbLKmUO5bUHyGEXP/SBMfv
+ SX3OGN6CsNBgZVm+rfJfTwO2wbwxXwy9Qy5FRWyRDQvI+XantGdABp2HlqGQIqVOCemR
+ nvEPyEACr7cPQYmWxBeZ/NYUEG5rmZ5pt1+kdMlUDXrh/2jltIUKoWPX3vGhNAMFaimr
+ l9VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gqJcASg9fWaiY51VT0yBYeRUW0LCqDwhoxU/57LYi1o=;
- b=S3mFHaH5NQtjk0q6YeRF+tBiTT6ZDOa5NNuU0613q8hWR1mwH7qFIkI9+sor52SJ6B
- 0bLmBlj9niTW3fWIbk/A78Yk37ddWk/EB+LHhoNB8FC3e3rz0adwbg/qZGxY4ViX9Pwq
- 6aBRL8rcuKRX7MJ/D5zhJL4CVrxW7GEF0rpB7IsqnY2bFT3FvMlkzGJzErSo6uVysKjn
- yIq/RUq5lU/hCEXUhAjiJO6XE7HmTBOUSsDFM3gDanXIW3malcFy6KRxI7Aic0eymYtu
- +pdEa//aXpTI95yu36iIkcPV5ZX8MEzh49kj+mSyRSz50CHwiE/eAPsorRrNf80ZuzTd
- mDdg==
-X-Gm-Message-State: APjAAAUgzgCF3cwrkyCM4XMTsnKqBdVTyE+D5UCpyg49QVDrjL5TJ4KN
- IeyYONs/w3e47FJ026pcKMI4fxibEyni7j0szjI=
-X-Google-Smtp-Source: APXvYqy39MP/1DtLP0ie8Kmtm+bKwmGNIjOIuqz9KXHXCcaMVOTo/ggQQvrgJVvFOAsM3Kysro/o8Hp/zVyRQikCEo4=
-X-Received: by 2002:ac2:4945:: with SMTP id o5mr284247lfi.93.1576642464995;
- Tue, 17 Dec 2019 20:14:24 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9C/NllXt+IiMcTKuUu1KalZGcyy4YxFtVK0hNJJKSu8=;
+ b=X0cslgdZ8Q/4J/cXkHo45UJJhhtpA3bG2nTGMQlk3HcOpVURBb0IYrkJtovqATc2Ca
+ pCgo+gVJiFsOla1LLvs0fCz3xnS+HYffrjX01PUmroW/ijcayt9uw5RAJGdBZUmtNwh0
+ uLJPoFl+dcMqsQ9D7Iu5E/xpXkHSrU2y3WyYWY8scVqBD0b/y8KzZk3cazNdMzTYQbcY
+ 21eq3C+1H6vEyt3tjjZAsKuGkAmzgybuWPiX5jTKcFaLAgQEOVqUetvYIrA4WhJxecsY
+ vFY5oCtOGsOPaWl25hpqeHFDzDhUP67s5VQmX3J1BPU8YTWQnhimyri5b2ylXr11RGz4
+ IBaQ==
+X-Gm-Message-State: APjAAAUdiC9Y5jsNJQhdZz4kpguCRsSRxvBH12dpxNw/V8zkJmksVZQC
+ RaNrTNVxv9sNmAavNPux8uFWqA==
+X-Google-Smtp-Source: APXvYqwYAD4pd6h6l6Qs56nhZ9VCMA43ro3PTrHjKnumX0gkC05+9kc1EaR1YJZbquNLgs+0tAxGxw==
+X-Received: by 2002:a63:134e:: with SMTP id 14mr566737pgt.115.1576642525108;
+ Tue, 17 Dec 2019 20:15:25 -0800 (PST)
+Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
+ ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
+ by smtp.gmail.com with ESMTPSA id a6sm657309pgg.25.2019.12.17.20.15.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Dec 2019 20:15:24 -0800 (PST)
+Subject: Re: [PATCH 6/6] qemu-io-cmds: Silent GCC9 format-overflow warning
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191217173425.5082-1-philmd@redhat.com>
+ <20191217173425.5082-7-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0bd64884-03fd-68e1-a790-c9ceb7710fd9@linaro.org>
+Date: Tue, 17 Dec 2019 18:15:21 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <cover.1576227325.git.alistair@alistair23.me>
- <40f97ae32a6f21d8184c1cc46fad2defb302238d.1576227325.git.alistair@alistair23.me>
- <CAFEAcA8rZtJQsUXJ1E1gOAXzrHihzYvMoodgHhpro1Jd7jkVUg@mail.gmail.com>
-In-Reply-To: <CAFEAcA8rZtJQsUXJ1E1gOAXzrHihzYvMoodgHhpro1Jd7jkVUg@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 17 Dec 2019 20:13:55 -0800
-Message-ID: <CAKmqyKOb05HRUGw=h76dM_X9Ke1WT24kJn6Mh0XuRJFYkQ1aQA@mail.gmail.com>
-Subject: Re: [PATCH v6 4/4] hw/arm: Add the Netduino Plus 2
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191217173425.5082-7-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::141
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,65 +99,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 17, 2019 at 8:03 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Sat, 14 Dec 2019 at 02:44, Alistair Francis <alistair@alistair23.me> wrote:
-> >
-> > Signed-off-by: Alistair Francis <alistair@alistair23.me>
-> > ---
-> >  MAINTAINERS            |  6 +++++
-> >  hw/arm/Kconfig         |  3 +++
-> >  hw/arm/Makefile.objs   |  1 +
-> >  hw/arm/netduinoplus2.c | 52 ++++++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 62 insertions(+)
-> >  create mode 100644 hw/arm/netduinoplus2.c
-> >
-> > diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> > index 7bfdc3a7ac..881e7f56e7 100644
-> > --- a/hw/arm/Kconfig
-> > +++ b/hw/arm/Kconfig
-> > @@ -105,6 +105,9 @@ config NETDUINOPLUS2
-> >      bool
-> >      select STM32F405_SOC
-> >
-> > +config NETDUINOPLUS2
-> > +    bool
-> > +
-> >  config NSERIES
-> >      bool
-> >      select OMAP
->
-> Something odd has happened here -- your patch 1/4 already
-> had a stanza:
->
-> +config NETDUINOPLUS2
-> +    bool
-> +    select STM32F405_SOC
->
-> so either that should be in this patch or this fragment here
-> should just be deleted.
+On 12/17/19 7:34 AM, Philippe Mathieu-Daudé wrote:
+> GCC9 is confused when building with CFLAG -O3:
+> 
+>   In function ‘help_oneline’,
+>       inlined from ‘help_all’ at qemu-io-cmds.c:2414:9,
+>       inlined from ‘help_f’ at qemu-io-cmds.c:2424:9:
+>   qemu-io-cmds.c:2389:9: error: ‘%s’ directive argument is null [-Werror=format-overflow=]
+>    2389 |         printf("%s ", ct->name);
+>         |         ^~~~~~~~~~~~~~~~~~~~~~~
+> 
+> Audit shows this can't happen. Give a hint to GCC adding an
+> assert() call.
 
-Good catch.
+This deserves more investigation.  From my glance it appears you are right --
+and moreover impossible for gcc to have come to this conclusion.  Which begs
+the question of how that is.
 
-It kind of makes sense to have that fragment in this patch, but then I
-don't see a nice way to build the flies as they are added, so I
-removed the fragment from this patch.
+Did you file a gcc bug report?
 
->
-> Assuming you sort that out,
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thanks Peter
+r~
 
-Alistair
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: qemu-block@nongnu.org
+> ---
+>  qemu-io-cmds.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+> index 1b7e700020..9e956a5dd4 100644
+> --- a/qemu-io-cmds.c
+> +++ b/qemu-io-cmds.c
+> @@ -2411,6 +2411,7 @@ static void help_all(void)
+>      const cmdinfo_t *ct;
+>  
+>      for (ct = cmdtab; ct < &cmdtab[ncmds]; ct++) {
+> +        assert(ct->name);
+>          help_oneline(ct->name, ct);
+>      }
+>      printf("\nUse 'help commandname' for extended help.\n");
+> 
 
->
-> thanks
-> -- PMM
 
