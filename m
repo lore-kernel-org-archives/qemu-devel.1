@@ -6,73 +6,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4B9FC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE609C2D0CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:32:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D1F220717
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB708218AC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 08:32:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P161O7sj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1F220717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="POWD+u6Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB708218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihUl8-0001RA-SE
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:32:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35789)
+	id 1ihUlA-0001QH-5Q
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 03:32:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ihUWW-00061l-Ke
+ (envelope-from <armbru@redhat.com>) id 1ihUWX-000621-2F
  for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ihUWT-0002Vo-FB
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:17:34 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30725
+ (envelope-from <armbru@redhat.com>) id 1ihUWU-0002WE-ES
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:17:36 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40684
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihUWS-0002Qh-RL
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ihUWT-0002U7-24
  for qemu-devel@nongnu.org; Wed, 18 Dec 2019 03:17:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576657049;
+ s=mimecast20190719; t=1576657052;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q1CnObZCuv/cFSZsXlRHdOzpAh988JMecv6ABbyxGUk=;
- b=P161O7sjbfXBSsW6qI4h52ftLlf4L+gbOVj/I1SD92QXUME51728UCJCbCkzQRb6Bn/esf
- 6NnD+boy83tM1OtGpxsXWkgeXKpHadCRJ9kFBZvjE/1mwBqrEpv0Cy3XsGnvBjZiuYStW7
- 4fa4HM7ZvCT2NPzq60J0SNHuqRpK4Iw=
+ bh=C93fgCuYkcySyFZzbNYaKAJAO/+ByfBxZR60vnYOo/s=;
+ b=POWD+u6ZkM3OF1QQSHOhiPi7OP6H2M3hdvQKyMW3TP12wPvkZT6oprhaH5mu6o3qnfkgtc
+ NJ9C/MddOpeliJqa54tL0rFaobBFjpQVNHeC4r8USF3T+L2iiPRpSjkBfmNWIaepOYTNDw
+ gVsw7+rRlV2yveyw5wdMBxoN1OPzSZI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-iFchBCkyNdWFWXCuaBhyKA-1; Wed, 18 Dec 2019 03:17:26 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-293-NWwVYIJ3Mt-OlFxdTGo2Qw-1; Wed, 18 Dec 2019 03:17:31 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90A591005514;
- Wed, 18 Dec 2019 08:17:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20AE4185432C;
+ Wed, 18 Dec 2019 08:17:30 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
  [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D05360C81;
- Wed, 18 Dec 2019 08:17:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67F167D8FA;
+ Wed, 18 Dec 2019 08:17:27 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 83EF21138406; Wed, 18 Dec 2019 09:17:21 +0100 (CET)
+ id AE3FD1136427; Wed, 18 Dec 2019 09:17:21 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 13/35] hw/intc/s390: Simplify error handling in
- kvm_s390_flic_realize()
-Date: Wed, 18 Dec 2019 09:16:59 +0100
-Message-Id: <20191218081721.23520-14-armbru@redhat.com>
+Subject: [PULL v2 23/35] hw/core/qdev: cleanup Error ** variables
+Date: Wed, 18 Dec 2019 09:17:09 +0100
+Message-Id: <20191218081721.23520-24-armbru@redhat.com>
 In-Reply-To: <20191218081721.23520-1-armbru@redhat.com>
 References: <20191218081721.23520-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: iFchBCkyNdWFWXCuaBhyKA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: NWwVYIJ3Mt-OlFxdTGo2Qw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -88,62 +87,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
-Message-Id: <20191204093625.14836-18-armbru@redhat.com>
----
- hw/intc/s390_flic_kvm.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-index 30d50c2369..dddd33ea61 100644
---- a/hw/intc/s390_flic_kvm.c
-+++ b/hw/intc/s390_flic_kvm.c
-@@ -586,16 +586,17 @@ static void kvm_s390_flic_realize(DeviceState *dev, E=
-rror **errp)
-=20
-     KVM_S390_FLIC_GET_CLASS(dev)->parent_realize(dev, &err);
-     if (err) {
--        goto fail;
-+        error_propagate(errp, err);
-+        return;
-     }
-     flic_state->fd =3D -1;
-=20
-     cd.type =3D KVM_DEV_TYPE_FLIC;
-     ret =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &cd);
-     if (ret < 0) {
--        error_setg_errno(&err, errno, "Creating the KVM device failed");
-+        error_setg_errno(errp, errno, "Creating the KVM device failed");
-         trace_flic_create_device(errno);
--        goto fail;
-+        return;
-     }
-     flic_state->fd =3D cd.fd;
-=20
-@@ -603,9 +604,6 @@ static void kvm_s390_flic_realize(DeviceState *dev, Err=
-or **errp)
-     test_attr.group =3D KVM_DEV_FLIC_CLEAR_IO_IRQ;
-     flic_state->clear_io_supported =3D !ioctl(flic_state->fd,
-                                             KVM_HAS_DEVICE_ATTR, test_attr=
-);
--    return;
--fail:
--    error_propagate(errp, err);
+Rename Error ** parameter in check_only_migratable to common errp.
+
+In device_set_realized:
+
+ - Move "if (local_err !=3D NULL)" closer to error setters.
+
+ - Drop 'Error **local_errp': it doesn't save any LoCs, but it's very
+   unusual.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20191205174635.18758-10-vsementsov@virtuozzo.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/core/qdev.c | 28 +++++++++++++---------------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index cf1ba28fe3..82d3ee590a 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -820,12 +820,12 @@ static bool device_get_realized(Object *obj, Error **=
+errp)
+     return dev->realized;
  }
 =20
- static void kvm_s390_flic_reset(DeviceState *dev)
+-static bool check_only_migratable(Object *obj, Error **err)
++static bool check_only_migratable(Object *obj, Error **errp)
+ {
+     DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
+=20
+     if (!vmstate_check_only_migratable(dc->vmsd)) {
+-        error_setg(err, "Device %s is not migratable, but "
++        error_setg(errp, "Device %s is not migratable, but "
+                    "--only-migratable was specified",
+                    object_get_typename(obj));
+         return false;
+@@ -874,10 +874,9 @@ static void device_set_realized(Object *obj, bool valu=
+e, Error **errp)
+=20
+         if (dc->realize) {
+             dc->realize(dev, &local_err);
+-        }
+-
+-        if (local_err !=3D NULL) {
+-            goto fail;
++            if (local_err !=3D NULL) {
++                goto fail;
++            }
+         }
+=20
+         DEVICE_LISTENER_CALL(realize, Forward, dev);
+@@ -918,27 +917,26 @@ static void device_set_realized(Object *obj, bool val=
+ue, Error **errp)
+        }
+=20
+     } else if (!value && dev->realized) {
+-        Error **local_errp =3D NULL;
++        /* We want local_err to track only the first error */
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+-            local_errp =3D local_err ? NULL : &local_err;
+             object_property_set_bool(OBJECT(bus), false, "realized",
+-                                     local_errp);
++                                     local_err ? NULL : &local_err);
+         }
+         if (qdev_get_vmsd(dev)) {
+             vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
+         }
+         if (dc->unrealize) {
+-            local_errp =3D local_err ? NULL : &local_err;
+-            dc->unrealize(dev, local_errp);
++            dc->unrealize(dev, local_err ? NULL : &local_err);
+         }
+         dev->pending_deleted_event =3D true;
+         DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
+-    }
+=20
+-    if (local_err !=3D NULL) {
+-        goto fail;
++        if (local_err !=3D NULL) {
++            goto fail;
++        }
+     }
+=20
++    assert(local_err =3D=3D NULL);
+     dev->realized =3D value;
+     return;
+=20
+@@ -976,7 +974,7 @@ static bool device_get_hotpluggable(Object *obj, Error =
+**errp)
+                                 qbus_is_hotpluggable(dev->parent_bus));
+ }
+=20
+-static bool device_get_hotplugged(Object *obj, Error **err)
++static bool device_get_hotplugged(Object *obj, Error **errp)
+ {
+     DeviceState *dev =3D DEVICE(obj);
+=20
 --=20
 2.21.0
 
