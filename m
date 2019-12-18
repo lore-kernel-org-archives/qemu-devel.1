@@ -2,64 +2,88 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97E0C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0275AC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:54:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C6521D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:36:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE3C02176D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:54:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fNy6yF46"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C6521D7D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fd0oQBIF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE3C02176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihkjl-0004rg-Jj
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 20:36:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52085)
+	id 1ihl12-0002FQ-Iy
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 20:54:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ihkiw-0003xO-Nk
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:35:34 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1ihl0R-0001oN-RS
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ihkiu-0001Ul-Cl
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:35:30 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:59041 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ihkip-0001M6-Gv; Wed, 18 Dec 2019 20:35:24 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47dZFD1wccz9sP3; Thu, 19 Dec 2019 12:35:12 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576719312;
- bh=yBVFp5h4djotC6XSWt5jHHe55Jux5li9vAYC0lGcPu4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=fNy6yF46TDCBc1mhEMqdMR/iOry6ORQyMjSRzKQg/rak9xka4bMd/7vCxOJNUsEFO
- avTS+ELRFzGy0I2101lFXmrlKjtIol3rn1gMn2p7MQqRKMX8wVKOPb0WKR48IkvRiL
- Fi63cd9fdzTYVR6QohFGq+z2i6Iph80og2Nj5ZtI=
-Date: Thu, 19 Dec 2019 12:35:05 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v3 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
- pseries guest
-Message-ID: <20191219013505.GB2321@umbus.fritz.box>
-References: <20191218043208.28613-1-bharata@linux.ibm.com>
- <20191218043208.28613-3-bharata@linux.ibm.com>
- <20191218142249.6bcf5ab4@bahia.lan>
+ (envelope-from <mrolnik@gmail.com>) id 1ihl0P-0006WW-Vz
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:53:35 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53492)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ihgUE-0000k7-Ja
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:04:02 -0500
+Received: by mail-wm1-x343.google.com with SMTP id m24so3291157wmc.3
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 13:04:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=4elmzpyjEWZ2TlxId0BYmFQrIAFgm4zvXTVXDj+S/7w=;
+ b=fd0oQBIFrXiE2RefFO9A9g4+WKKdsR8G7qoO5hoepWPzJvvNU6mvTUN+90FbYAZgjd
+ k/BNnSL8pSNuGrzRLqZ7XIICROLOgbV0taMOxclpeZgCFIaYJPbBA7vpngb1EiG45lQe
+ SxqY6gA/v9knWY0wGiYJxIwI8HhpDOyVf2p5TYUa73+hTO1NHCNmOlkKXXcCTPZblM4W
+ g41dv+QFE77QuVzu00h8XmNNfUyrJdOVqeYlkByaXq+eBWp8YvxOncq8AWSvhHV7ijMt
+ kDSRlBKSFsAi0o2j7lNqH7UUy67rsCO/lwyZr71xmc4nAhkSLxWQdGtbw9aKm0K2mGxi
+ VpDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=4elmzpyjEWZ2TlxId0BYmFQrIAFgm4zvXTVXDj+S/7w=;
+ b=ODz88kb1hWRjIwtelvQBDCFe4WVvEI23WFQtLYSSa4tzHX6m3HW4EnGW09+B/qHxdM
+ Uydw6YJdySD5fA/8+MYEqaYKhtXkocASETujPvvuZ3FrkG574jNOwJRJWqpPcw4IrVAz
+ Y4wnyTEhOSvSj4SzxTVwmBbDHaBOKWbNDnNOy5tIPQwdsLNoQe7hQ4g1HAasX/zU1e5b
+ z1DQFp+LNidlvnxdco+MSlsXmV9t1QJH2LmfEncVPgu6wZi5heg163c7pbBv204JgqSS
+ q2m2IXPXTNOTNoR0GxIiq8XSD0b6J2Q5F5PCk+yq1Gs/pWqZlwRDH6a+Y+8KTrLY9GxR
+ KXWw==
+X-Gm-Message-State: APjAAAVYWvY5Q2AHFYDTFH0xkoavn/6s4SD9csfS94KEUFT49sQ3i6do
+ gRREWBn84HsvYavcUHsoaajQhxuqHUk+xA==
+X-Google-Smtp-Source: APXvYqxXd7t2XWM4uOKGy6r9rWxur2pKlFj/h5ftnFf9ku7qkTk62s/Dk7bPJQTdRLORFbvhyhEUJw==
+X-Received: by 2002:a05:600c:2046:: with SMTP id
+ p6mr5625357wmg.110.1576703041104; 
+ Wed, 18 Dec 2019 13:04:01 -0800 (PST)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-109-65-2-109.red.bezeqint.net. [109.65.2.109])
+ by smtp.gmail.com with ESMTPSA id a133sm3808933wme.29.2019.12.18.13.03.58
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Wed, 18 Dec 2019 13:04:00 -0800 (PST)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v39 03/22] target/avr: Add instruction decoding
+Date: Wed, 18 Dec 2019 23:03:10 +0200
+Message-Id: <20191218210329.1960-4-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20191218210329.1960-1-mrolnik@gmail.com>
+References: <20191218210329.1960-1-mrolnik@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BwCQnh7xodEAoBMC"
-Content-Disposition: inline
-In-Reply-To: <20191218142249.6bcf5ab4@bahia.lan>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,141 +95,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, qemu-ppc@nongnu.org, linuxram@us.ibm.com,
- qemu-devel@nongnu.org, Bharata B Rao <bharata@linux.ibm.com>
+Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
+ me@xcancerberox.com.ar, richard.henderson@linaro.org, dovgaluk@ispras.ru,
+ imammedo@redhat.com, philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This includes:
+- encoding of all 16 bit instructions
+- encoding of all 32 bit instructions
 
---BwCQnh7xodEAoBMC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ target/avr/insn.decode | 183 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 183 insertions(+)
+ create mode 100644 target/avr/insn.decode
 
-On Wed, Dec 18, 2019 at 02:22:49PM +0100, Greg Kurz wrote:
-> On Wed, 18 Dec 2019 10:02:08 +0530
-> Bharata B Rao <bharata@linux.ibm.com> wrote:
->=20
-> > A pseries guest can be run as a secure guest on Ultravisor-enabled
-> > POWER platforms. When such a secure guest is reset, we need to
-> > release/reset a few resources both on ultravisor and hypervisor side.
-> > This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF from the
-> > machine reset path.
-> >=20
-> > As part of this ioctl, the secure guest is essentially transitioned
-> > back to normal mode so that it can reboot like a regular guest and
-> > become secure again.
-> >=20
-> > This ioctl has no effect when invoked for a normal guest. If this ioctl
-> > fails for a secure guest, the guest is terminated.
-> >=20
-> > Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> > ---
-> >  hw/ppc/spapr.c       |  1 +
-> >  target/ppc/kvm.c     | 15 +++++++++++++++
-> >  target/ppc/kvm_ppc.h |  6 ++++++
-> >  3 files changed, 22 insertions(+)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index f11422fc41..e62c89b3dd 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1597,6 +1597,7 @@ static void spapr_machine_reset(MachineState *mac=
-hine)
-> >      void *fdt;
-> >      int rc;
-> > =20
-> > +    kvmppc_svm_off(&error_fatal);
-> >      spapr_caps_apply(spapr);
-> > =20
-> >      first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > index 7406d18945..ae920ec310 100644
-> > --- a/target/ppc/kvm.c
-> > +++ b/target/ppc/kvm.c
-> > @@ -2900,3 +2900,18 @@ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, i=
-nt64_t tb_offset)
-> >          kvm_set_one_reg(cs, KVM_REG_PPC_TB_OFFSET, &tb_offset);
-> >      }
-> >  }
-> > +
-> > +/*
-> > + * Don't set error if KVM_PPC_SVM_OFF ioctl is invoked on kernels
-> > + * that don't support this ioctl.
-> > + */
-> > +void kvmppc_svm_off(Error **errp)
-> > +{
-> > +    int rc;
-> > +    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-> > +
-> > +    rc =3D kvm_vm_ioctl(s, KVM_PPC_SVM_OFF);
-> > +    if (rc && rc !=3D -ENOTTY) {
-> > +        error_setg(errp, "KVM_PPC_SVM_OFF ioctl failed");
->=20
-> It could have made sense to use error_setg_errno(errp, -rc, ...) here
-> but never mind.
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+new file mode 100644
+index 0000000000..0e4ec9ddf0
+--- /dev/null
++++ b/target/avr/insn.decode
+@@ -0,0 +1,183 @@
++#
++# AVR instruction decode definitions.
++#
++# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licenses/>.
++#
++
++#
++#   regs_16_31_by_one = [16 .. 31]
++#   regs_16_23_by_one = [16 .. 23]
++#   regs_24_30_by_two = [24, 26, 28, 30]
++#   regs_00_30_by_two = [0, 2, 4, 6, 8, .. 30]
++
++%rd             4:5
++%rr             9:1 0:4
++
++%rd_a           4:4                         !function=to_regs_16_31_by_one
++%rd_b           4:3                         !function=to_regs_16_23_by_one
++%rd_c           4:2                         !function=to_regs_24_30_by_two
++%rd_d           4:4                         !function=to_regs_00_30_by_two
++%rr_a           0:4                         !function=to_regs_16_31_by_one
++%rr_b           0:3                         !function=to_regs_16_23_by_one
++%rr_d           0:4                         !function=to_regs_00_30_by_two
++
++%imm6           6:2 0:4
++%imm8           8:4 0:4
++
++%io_imm         9:2 0:4
++%ldst_d_imm     13:1 10:2 0:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=append_16
++
++
++&rd_rr          rd rr
++&rd_imm         rd imm
++
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
++@op_bit         .... .... . bit:3 ....
++@op_bit_imm     .... .. imm:s7 bit:3
++@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=0
++
++#
++# Arithmetic Instructions
++#
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SUB             0001 10 . ..... ....        @op_rd_rr
++SUBI            0101 .... .... ....         @op_rd_imm8
++SBC             0000 10 . ..... ....        @op_rd_rr
++SBCI            0100 .... .... ....         @op_rd_imm8
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
++AND             0010 00 . ..... ....        @op_rd_rr
++ANDI            0111 .... .... ....         @op_rd_imm8
++OR              0010 10 . ..... ....        @op_rd_rr
++ORI             0110 .... .... ....         @op_rd_imm8
++EOR             0010 01 . ..... ....        @op_rd_rr
++COM             1001 010 rd:5 0000
++NEG             1001 010 rd:5 0001
++INC             1001 010 rd:5 0011
++DEC             1001 010 rd:5 1010
++MUL             1001 11 . ..... ....        @op_rd_rr
++MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
++MULSU           0000 0011 0 ... 0 ...       @fmul
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++DES             1001 0100 imm:4 1011
++
++#
++# Branch Instructions
++#
++RJMP            1100 imm:s12
++IJMP            1001 0100 0000 1001
++EIJMP           1001 0100 0001 1001
++JMP             1001 010 ..... 110 .        imm=%imm_call
++RCALL           1101 imm:s12
++ICALL           1001 0101 0000 1001
++EICALL          1001 0101 0001 1001
++CALL            1001 010 ..... 111 .        imm=%imm_call
++RET             1001 0101 0000 1000
++RETI            1001 0101 0001 1000
++CPSE            0001 00 . ..... ....        @op_rd_rr
++CP              0001 01 . ..... ....        @op_rd_rr
++CPC             0000 01 . ..... ....        @op_rd_rr
++CPI             0011 .... .... ....         @op_rd_imm8
++SBRC            1111 110 rr:5 0 bit:3
++SBRS            1111 111 rr:5 0 bit:3
++SBIC            1001 1001 reg:5 bit:3
++SBIS            1001 1011 reg:5 bit:3
++BRBS            1111 00 ....... ...         @op_bit_imm
++BRBC            1111 01 ....... ...         @op_bit_imm
++
++#
++# Data Transfer Instructions
++#
++MOV             0010 11 . ..... ....        @op_rd_rr
++MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
++LDI             1110 .... .... ....         @op_rd_imm8
++LDS             1001 000 ..... 0000         @ldst_s
++LDX1            1001 000 rd:5 1100
++LDX2            1001 000 rd:5 1101
++LDX3            1001 000 rd:5 1110
++LDY2            1001 000 rd:5 1001
++LDY3            1001 000 rd:5 1010
++LDZ2            1001 000 rd:5 0001
++LDZ3            1001 000 rd:5 0010
++LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
++LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
++STS             1001 001 ..... 0000         @ldst_s
++STX1            1001 001 rr:5 1100
++STX2            1001 001 rr:5 1101
++STX3            1001 001 rr:5 1110
++STY2            1001 001 rd:5 1001
++STY3            1001 001 rd:5 1010
++STZ2            1001 001 rd:5 0001
++STZ3            1001 001 rd:5 0010
++STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
++STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
++LPM1            1001 0101 1100 1000
++LPM2            1001 000 rd:5 0100
++LPMX            1001 000 rd:5 0101
++ELPM1           1001 0101 1101 1000
++ELPM2           1001 000 rd:5 0110
++ELPMX           1001 000 rd:5 0111
++SPM             1001 0101 1110 1000
++SPMX            1001 0101 1111 1000
++IN              1011 0 .. ..... ....        @io_rd_imm
++OUT             1011 1 .. ..... ....        @io_rd_imm
++PUSH            1001 001 rd:5 1111
++POP             1001 000 rd:5 1111
++XCH             1001 001 rd:5 0100
++LAC             1001 001 rd:5 0110
++LAS             1001 001 rd:5 0101
++LAT             1001 001 rd:5 0111
++
++#
++# Bit and Bit-test Instructions
++#
++LSR             1001 010 rd:5 0110
++ROR             1001 010 rd:5 0111
++ASR             1001 010 rd:5 0101
++SWAP            1001 010 rd:5 0010
++SBI             1001 1010 reg:5 bit:3
++CBI             1001 1000 reg:5 bit:3
++BST             1111 101 rd:5 0 bit:3
++BLD             1111 100 rd:5 0 bit:3
++BSET            1001 0100 0 bit:3 1000
++BCLR            1001 0100 1 bit:3 1000
++
++#
++# MCU Control Instructions
++#
++BREAK           1001 0101 1001 1000
++NOP             0000 0000 0000 0000
++SLEEP           1001 0101 1000 1000
++WDR             1001 0101 1010 1000
++
+-- 
+2.17.2 (Apple Git-113)
 
-Please update for this.  Otherwise we get no indication of what the
-kernel level error was in the qemu error.
-
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> > +    }
-> > +}
-> > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> > index 47b08a4030..9a9bca1b72 100644
-> > --- a/target/ppc/kvm_ppc.h
-> > +++ b/target/ppc/kvm_ppc.h
-> > @@ -37,6 +37,7 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
-> >  target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-> >                                       bool radix, bool gtse,
-> >                                       uint64_t proc_tbl);
-> > +void kvmppc_svm_off(Error **errp);
-> >  #ifndef CONFIG_USER_ONLY
-> >  bool kvmppc_spapr_use_multitce(void);
-> >  int kvmppc_spapr_enable_inkernel_multitce(void);
-> > @@ -201,6 +202,11 @@ static inline target_ulong kvmppc_configure_v3_mmu=
-(PowerPCCPU *cpu,
-> >      return 0;
-> >  }
-> > =20
-> > +static inline void kvmppc_svm_off(Error **errp)
-> > +{
-> > +    return;
-> > +}
-> > +
-> >  static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
-> >                                               unsigned int online)
-> >  {
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---BwCQnh7xodEAoBMC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3608kACgkQbDjKyiDZ
-s5LU2Q//bNHq16dIsp6R/LQqA7ibOkzaUbzg9yeHeb4Qys0zoKLe/dhJhpOf7u/P
-0GKcw46v2KmKWY9ZE+Oyeg2H1GHrkUl/8l6+ZVodqjzeywutDJBKXSMHikkgakPg
-rSM8pS7UgNVOBPVPYc4+nuE/TnWbhXaNjWQ8+M+awUvrtXGVC48n5f9jdmS7O1LT
-rY1CNp0RuRrs1z8wahIrjdp81xUvxD/T9jBMDEL8Im2ah/LGyyvTa/vculTP2IjX
-svrsNwqvdsfQZoqPoQCNAAUc5aKnmYgPxnbvweepOA7171dyhLRKiWfmDWzsCyK8
-5mWVhvGKVTolUu4tsf7FG7YR37lXINPvXS09Qcm9qlqmdHvnfYDABwtR6PSaYMRV
-fny02dIbRZJRZmDmuRf4YruLTlMxniF+AzNuMatKBJPMFD3fmgyTCz03KkjjV2rL
-VoQr21Qksh59bN2QkBLZrLkfrup8VBrOChCQA8KpBWtC7rMd3WcabtEmbOTfN2yF
-YN59OdfSR9Vv3HKtkdyRmv46tkyiIpt332dEFq3wrCqig8Z6v6lzx9pwkAaEv+xS
-5nScdJc58Ya7pzLzMIqcM74uUPI0CYBi+K2q2a/MJwNCmBdxPejmnYWglmwWWOtX
-h66vyw3ww2cQBFupk2LR/NwiKErP+qeZMbfEJVKEWM22213VB7g=
-=8hSS
------END PGP SIGNATURE-----
-
---BwCQnh7xodEAoBMC--
 
