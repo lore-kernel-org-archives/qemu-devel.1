@@ -2,91 +2,77 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3B6C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 19:24:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EBBC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 19:27:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03A90206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 19:24:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0BF4206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 19:27:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GdbO/SBc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A90206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eGGn/XXZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0BF4206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihevR-0006w4-64
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 14:24:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34150)
+	id 1ihezC-0001Og-F6
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 14:27:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iheuY-0006Kx-FL
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 14:23:08 -0500
+ (envelope-from <philmd@redhat.com>) id 1ihexP-0007wZ-1j
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 14:26:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iheuX-00010N-7m
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 14:23:06 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iheuW-0000uK-OQ
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 14:23:05 -0500
-Received: by mail-pf1-x443.google.com with SMTP id y14so1734921pfm.13
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 11:23:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=0LaDis55yTgfxkxt4kH4JxiDjjx7xs1BGFeMPP9ls4k=;
- b=GdbO/SBcj+w1mRUJJZnwlayR/OK6KNlV6PttRKqKAXdHxOg+AV3ai6NBooP7GHVmfV
- jb+qYF5wOE3vVShz36Xs9swNhi/9EG13OgCc+d8ygR1+f4ce93X5lI7wckuiJc1divLP
- NC4xXIh3HQ1aJqK/jI2reszoy0BhVhaiOLhhhrJPggefQm5Ee9BIT+VV1F7B7GejjDnZ
- BHwDWX9h2oPFGmh9J02y/GbIAqvgZ8EQfUhtd9l/j6HRJwi2jpPdBBbFpUWuGp9xilvf
- zKHaGRw4A0//uuPvzZC80QRfC1jUI6aB4+VUk+RCZf9CG9wO+KZaf4lFNbK+KpksB4zd
- jFVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0LaDis55yTgfxkxt4kH4JxiDjjx7xs1BGFeMPP9ls4k=;
- b=a0yuTDwT9vyc04W+ExZwl86s6VaOab+1bCgPAkOpG5RC6H3wqNLqcNWSHCnsIMQUl4
- RAPishVxzr7EVDsRgfNKyiv3lY1bGEruTAAIRkm2hqtjtGnqtThNKwBONMDb7XrKBKHH
- Ieq6Jg2bwEbwAfYmkg1HW/QDh2fjsw4c1Wd9i2jrkipUFoNjZNfxPhhUT5Hs3LWZ65sJ
- JL7GLbDEbPdJXcJWpbFHsRUMjSifDJNqn4c8GMY7K1nOi2uO4xRpKlGB/65iR6kmoVFe
- DX4yk2CZtAixJ874korRYwxDXrzZVtlNt6dfzIK+Y532xYABKbhVMeHn20tpAfPlE20Y
- N3tQ==
-X-Gm-Message-State: APjAAAUWFvozeILQEgYNqEc8P3f7orgQWfsrCheIpUW+fHXfJkP58arf
- 32WwdTVH/46NKcmXRe2apd0TVQ==
-X-Google-Smtp-Source: APXvYqybLE8+gjgKM71h8YTE5qzKgmHmveeum7USJal9uWOJROTrl0fzLVML3WjLs0oDEPqzV5qGzw==
-X-Received: by 2002:a62:1d52:: with SMTP id d79mr4843359pfd.144.1576696983535; 
- Wed, 18 Dec 2019 11:23:03 -0800 (PST)
-Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
- ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id q22sm4473049pfg.170.2019.12.18.11.23.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Dec 2019 11:23:02 -0800 (PST)
-Subject: Re: [PATCH 3/7] configure: Do not force pie=no for non-x86
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20191218031920.6414-1-richard.henderson@linaro.org>
- <20191218031920.6414-4-richard.henderson@linaro.org>
- <19a90c1c-3407-522c-72c7-1612ba66147c@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <73905ca5-bc1f-27ed-8315-c8b73c58cabc@linaro.org>
-Date: Wed, 18 Dec 2019 09:23:00 -1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <philmd@redhat.com>) id 1ihexN-0003Gw-HG
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 14:26:02 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36041
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihexN-0003E3-Cx
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 14:26:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576697160;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EBUSnrX9Xj4Cd46mcJUhEO/KAuVtcVoqZZfjQwOzsSI=;
+ b=eGGn/XXZuJ7SNNRzUKr19GeY7UuelKYRIML088ReGjS8X36W0D18cntLx3dVXvjj4IymKY
+ JKViGDsBfzc5rixkmtJrqW/ufv9NP9D1raYxnW5x6Jl+RJhtSEqF0MFle2qlqc/5p210lt
+ lZUPWOLp9KmXm0o7BfUV4vPbcSIi0N8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-fccG64bLMmC8M51TdRLDmQ-1; Wed, 18 Dec 2019 14:25:59 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 368F812BA80;
+ Wed, 18 Dec 2019 19:25:58 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-116-235.ams2.redhat.com [10.36.116.235])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 10B4F60C81;
+ Wed, 18 Dec 2019 19:25:55 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 2/6] hw/display/tcx: Add missing fall through comments
+Date: Wed, 18 Dec 2019 20:25:22 +0100
+Message-Id: <20191218192526.13845-3-philmd@redhat.com>
+In-Reply-To: <20191218192526.13845-1-philmd@redhat.com>
+References: <20191218192526.13845-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <19a90c1c-3407-522c-72c7-1612ba66147c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: fccG64bLMmC8M51TdRLDmQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,28 +84,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Olivier Danet <odanet@caramail.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/17/19 9:05 PM, Thomas Huth wrote:
-> On 18/12/2019 04.19, Richard Henderson wrote:
->> PIE is supported on many other hosts besides x86.
->>
->> The default for non-x86 is now the same as x86: pie is used
->> if supported, and may be forced via --enable/--disable-pie.
-> 
-> The original commit that introduce this code (40d6444e91c) said:
-> 
->  "Non-x86 are not changed, as they require TCG changes"
-> 
-> ... are these "TCG changes" in place nowadays? Did you check on non-x86
-> systems? If so, please mention this in the commit message.
+When building with GCC9 using CFLAG -Wimplicit-fallthrough=3D2 we get:
 
-I have no idea what those "tcg changes" would be.  I have checked aarch64
-(bionic) and ppc64le (centos 7).  I'll update the commit message.
+  hw/display/tcx.c: In function =E2=80=98tcx_dac_writel=E2=80=99:
+  hw/display/tcx.c:453:26: error: this statement may fall through [-Werror=
+=3Dimplicit-fallthrough=3D]
+    453 |             s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index =
+autoincrement */
+        |             ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  hw/display/tcx.c:454:9: note: here
+    454 |         default:
+        |         ^~~~~~~
+  hw/display/tcx.c: In function =E2=80=98tcx_dac_readl=E2=80=99:
+  hw/display/tcx.c:412:22: error: this statement may fall through [-Werror=
+=3Dimplicit-fallthrough=3D]
+    412 |         s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index auto=
+increment */
+        |         ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  hw/display/tcx.c:413:5: note: here
+    413 |     default:
+        |     ^~~~~~~
+  cc1: all warnings being treated as errors
 
+Give a hint to GCC by adding the missing fall through comments.
 
-r~
+Fixes: 55d7bfe22
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+v2: Reword the description (Aleksandar)
+
+Cc: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Olivier Danet <odanet@caramail.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/display/tcx.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+index 14e829d3fa..abbeb30284 100644
+--- a/hw/display/tcx.c
++++ b/hw/display/tcx.c
+@@ -410,6 +410,7 @@ static uint64_t tcx_dac_readl(void *opaque, hwaddr addr=
+,
+     case 2:
+         val =3D s->b[s->dac_index] << 24;
+         s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index autoincrement=
+ */
++        /* fall through */
+     default:
+         s->dac_state =3D 0;
+         break;
+@@ -451,6 +452,7 @@ static void tcx_dac_writel(void *opaque, hwaddr addr, u=
+int64_t val,
+             s->b[index] =3D val >> 24;
+             update_palette_entries(s, index, index + 1);
+             s->dac_index =3D (s->dac_index + 1) & 0xff; /* Index autoincre=
+ment */
++            /* fall through */
+         default:
+             s->dac_state =3D 0;
+             break;
+--=20
+2.21.0
+
 
