@@ -2,61 +2,93 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB76C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 00:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55731C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 01:04:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CB382176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 00:41:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CB60206D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 01:04:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="psYblPjd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB382176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lJUv67jz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB60206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihNOu-0000dl-Ve
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 19:41:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53754)
+	id 1ihNky-0005pX-9f
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 20:04:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48610)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bbee54ae01647acca557d827a1ec9de2cdc7fc6a@lizzy.crudebyte.com>)
- id 1ihNLN-0004rR-11
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 19:37:38 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihNkL-0005Ik-Hk
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:03:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bbee54ae01647acca557d827a1ec9de2cdc7fc6a@lizzy.crudebyte.com>)
- id 1ihNLJ-0006Ln-HF
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 19:37:36 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:36367)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <bbee54ae01647acca557d827a1ec9de2cdc7fc6a@lizzy.crudebyte.com>)
- id 1ihNLJ-0005Ix-9u
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 19:37:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Message-Id:Subject:Date:Cc:To:From:Content-Type:
- Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
- Content-Description; bh=xxA8A/71VZmo/4tDAr7RZXyWuvgQX3RtHseCV2fExEs=; b=psYbl
- PjdYBNGwc0pGiyCd4G1exF2sTeT4kzRxAKE0UpDHp79/iV1hhDIZLKcym1S57TEOHQreE4Immc7j3
- fk8rs9fyqxqDHN+CgDz1fZ30JaZwM+q9r0Fk/DWAJefowHpPk5zugkMlGt3aU8uk951HHPalRNMWl
- 84O3boOv7FGoFqGgAGplz2CyndbP4Bd9jF2J9rYf2BnUCTc0oLf/hRN7Wqlj5ZHIBinog3ogXBbLE
- R575DHcdzggRj6sbpd1Sa9m9qjOVUTTnlo+XSSDDJlwzdjfxBKUekW4m3NyMMlOfQ3asARNipS7ly
- 67ypeKHry260eMV5bjujMNqIPHT0A==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Date: Mon, 16 Dec 2019 00:53:42 +0100
-Subject: [PATCH 4/9] tests/virtio-9p: added READDIR test
-Message-Id: <E1ihMv0-00077V-0K@lizzy.crudebyte.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.194.90.13
+ (envelope-from <richard.henderson@linaro.org>) id 1ihNkI-000050-9g
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:03:24 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:55160)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ihNkI-0008Ux-25
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 20:03:22 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id ep17so58477pjb.4
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 17:03:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=qDktnqJFILHEe9UmAzxJWXQjAQ6RxhjYlF1ehUzBsNk=;
+ b=lJUv67jzPq4LKQonclJjvnnyhUhhAIy9tGQrdLTOsjQxF7iZbkt84zeRZhP3d1tBcv
+ k85ICsohSFopESlOZuQjOItYNN1d94TIG/yKM6l2mIwGYpuSfB2Z6cQOxcBEIZtACicG
+ 12Ilzr6J7TVL8yLGG29S2Q9Ynpk6q8u/BO2UB6s+k1duiyuZ+4gP4TBOx+tZXL2SOqw8
+ ZzksMZvD7bPG4LvzW069p/Ls1+f/6Oo3POaJnVyLU3Pz/nXgAUUJf+yenw5RB+l0JWc7
+ eMXC8Jn26fDDq7uqzvXsLQ6IiFuQWdRubbUAMI+FF9vDj8TA+zkDnYn4u7ln9WHeV5d/
+ ozwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qDktnqJFILHEe9UmAzxJWXQjAQ6RxhjYlF1ehUzBsNk=;
+ b=iJJmvFzAi32k4kdlfcW04XoX+oJk1MfUIfhxq+2Kp1dmLmnz6r6FzzZigYjj1Wb926
+ v/FqEdJp379va5fzELV5cF9+pLlRdiiB/hAxCUL9A5jPrcsMh7IK32GlkUcaLaeol4WD
+ MQKq+R2otACOr7dbv02/d6H6znMORPe9az+9WmewH84E7X9ZoMnkOB38LZDYoeb9387F
+ GebNaXUr1HODe5EtAAhFRkY76h2J//raNnbBP7rLFMFLtEi3E+P08ohTFAQSfaQtSboO
+ rquIvVKYr6vfaMqVJhG/2LM09uz+DUWlM67q9K0MWlopFBffRrQfZ3V/k9sdijiDsO7D
+ 8skg==
+X-Gm-Message-State: APjAAAXynr91RRIXNVrQTmX1zfpwyc3Cs6qC6Cubfv2hzqI28AvRU8BR
+ AM0d1cpBIQvsql2SuAdmCX7Zug==
+X-Google-Smtp-Source: APXvYqxnZmkqQRgcxw31QdkFyaBeasPChr58EeAao/NwDX9By51ZylYy6wOPucD7LXGKKnGCIl/GTg==
+X-Received: by 2002:a17:90a:26ec:: with SMTP id
+ m99mr279651pje.130.1576631000487; 
+ Tue, 17 Dec 2019 17:03:20 -0800 (PST)
+Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
+ ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
+ by smtp.gmail.com with ESMTPSA id o8sm177926pjo.7.2019.12.17.17.03.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Dec 2019 17:03:19 -0800 (PST)
+Subject: Re: [PATCH] target/arm: fix IL bit for data abort exceptions
+To: Jeff Kubascik <jeff.kubascik@dornerworks.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20191217210230.99559-1-jeff.kubascik@dornerworks.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7a274247-e593-5828-73f8-2042971e8633@linaro.org>
+Date: Tue, 17 Dec 2019 15:03:16 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <20191217210230.99559-1-jeff.kubascik@dornerworks.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,191 +100,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>,
+ Jarvis Roach <Jarvis.Roach@dornerworks.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This first READDIR test simply checks the amount of directory
-entries returned, according to the created amount on 9p synth
-driver side.
+On 12/17/19 11:02 AM, Jeff Kubascik wrote:
+> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+> index 5feb312941..e63f8bda29 100644
+> --- a/target/arm/tlb_helper.c
+> +++ b/target/arm/tlb_helper.c
+> @@ -44,7 +44,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+>          syn = syn_data_abort_with_iss(same_el,
+>                                        0, 0, 0, 0, 0,
+>                                        ea, 0, s1ptw, is_write, fsc,
+> -                                      false);
+> +                                      true);
+>          /* Merge the runtime syndrome with the template syndrome.  */
+>          syn |= template_syn;
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- tests/virtio-9p-test.c | 125 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 125 insertions(+)
+This doesn't look correct.  Surely the IL bit should come from template_syn?
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 880b4ff567..ab5926527a 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
-     req->r_off += len;
- }
- 
-+static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-+{
-+    v9fs_memread(req, val, 1);
-+}
-+
- static void v9fs_uint16_write(P9Req *req, uint16_t val)
- {
-     uint16_t le_val = cpu_to_le16(val);
-@@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
-     le32_to_cpus(val);
- }
- 
-+static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-+{
-+    v9fs_memread(req, val, 8);
-+    le64_to_cpus(val);
-+}
-+
- /* len[2] string[len] */
- static uint16_t v9fs_string_size(const char *string)
- {
-@@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RLOPEN ? "RLOPEN" :
-         id == P9_RWRITE ? "RWRITE" :
-         id == P9_RFLUSH ? "RFLUSH" :
-+        id == P9_RREADDIR ? "READDIR" :
-         "<unknown>";
- }
- 
-@@ -348,6 +360,77 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
-     v9fs_req_free(req);
- }
- 
-+/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-+static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-+                            uint32_t count, uint16_t tag)
-+{
-+    P9Req *req;
-+
-+    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-+    v9fs_uint32_write(req, fid);
-+    v9fs_uint64_write(req, offset);
-+    v9fs_uint32_write(req, count);
-+    v9fs_req_send(req);
-+    return req;
-+}
-+
-+struct v9fs_dirent {
-+    v9fs_qid qid;
-+    uint64_t offset;
-+    uint8_t type;
-+    char* name;
-+    struct v9fs_dirent* next;
-+};
-+
-+/* size[4] Rreaddir tag[2] count[4] data[count] */
-+static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
-+                          struct v9fs_dirent **entries)
-+{
-+    uint32_t sz;
-+    struct v9fs_dirent *e = NULL;
-+    uint16_t slen;
-+    uint32_t n = 0;
-+
-+    v9fs_req_recv(req, P9_RREADDIR);
-+    v9fs_uint32_read(req, &sz);
-+
-+    if (count)
-+        *count = sz;
-+
-+    for (int32_t togo = (int32_t)sz;
-+         togo >= 13 + 8 + 1 + 2;
-+         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-+    {
-+        if (!e) {
-+            e = g_malloc(sizeof(struct v9fs_dirent));
-+            if (entries)
-+                *entries = e;
-+        } else {
-+            e = e->next = g_malloc(sizeof(struct v9fs_dirent));
-+        }
-+        e->next = NULL;
-+        /* qid[13] offset[8] type[1] name[s] */
-+        v9fs_memread(req, &e->qid, 13);
-+        v9fs_uint64_read(req, &e->offset);
-+        v9fs_uint8_read(req, &e->type);
-+        v9fs_string_read(req, &slen, &e->name);
-+    }
-+
-+    if (nentries)
-+        *nentries = n;
-+}
-+
-+static void v9fs_free_dirents(struct v9fs_dirent *e)
-+{
-+    struct v9fs_dirent *next = NULL;
-+
-+    for (; e; e = next) {
-+        next = e->next;
-+        g_free(e->name);
-+        g_free(e);
-+    }
-+}
-+
- /* size[4] Tlopen tag[2] fid[4] flags[4] */
- static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
-                           uint16_t tag)
-@@ -480,6 +563,47 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(wqid);
- }
- 
-+static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-+{
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-+    uint16_t nqid;
-+    v9fs_qid qid;
-+    uint32_t count, nentries;
-+    struct v9fs_dirent *entries = NULL;
-+    P9Req *req;
-+
-+    fs_attach(v9p, NULL, t_alloc);
-+    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rwalk(req, &nqid, NULL);
-+    g_assert_cmpint(nqid, ==, 1);
-+
-+    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rlopen(req, &qid, NULL);
-+
-+    req = v9fs_treaddir(
-+        v9p, 1/*fid*/, 0/*offset*/, P9_MAX_SIZE - P9_IOHDRSZ/*count*/,
-+        0/*tag*/
-+    );
-+    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rreaddir(req, &count, &nentries, &entries);
-+
-+    /*
-+     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
-+     * dir entries with only one readdir request.
-+     */
-+    g_assert_cmpint(
-+        nentries, ==,
-+        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-+    );
-+
-+    v9fs_free_dirents(entries);
-+    g_free(wnames[0]);
-+}
-+
- static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
- {
-     QVirtio9P *v9p = obj;
-@@ -658,6 +782,7 @@ static void register_virtio_9p_test(void)
-                  NULL);
-     qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
-                  NULL);
-+    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
- }
- 
- libqos_init(register_virtio_9p_test);
--- 
-2.20.1
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index d4bebbe629..a3c618fdd9 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -14045,6 +14045,7 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+>      s->pc_curr = s->base.pc_next;
+>      insn = arm_ldl_code(env, s->base.pc_next, s->sctlr_b);
+>      s->insn = insn;
+> +    s->is_16bit = false;
+>      s->base.pc_next += 4;
 
+Should not be necessary, as the field is not read along any a64 path.  (Also,
+while it's not yet in master, there's a patch on list that zero initializes the
+entire structure.)
+
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 2b6c1f91bf..300480f1b7 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -8555,7 +8555,7 @@ static ISSInfo make_issinfo(DisasContext *s, int rd, bool p, bool w)
+>  
+>      /* ISS not valid if writeback */
+>      if (p && !w) {
+> -        ret = rd;
+> +        ret = rd | (s->is_16bit ? ISSIs16Bit : 0);
+>      } else {
+>          ret = ISSInvalid;
+>      }
+> @@ -11057,6 +11057,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+>      dc->pc_curr = dc->base.pc_next;
+>      insn = arm_ldl_code(env, dc->base.pc_next, dc->sctlr_b);
+>      dc->insn = insn;
+> +    dc->is_16bit = false;
+>      dc->base.pc_next += 4;
+>      disas_arm_insn(dc, insn);
+>  
+> @@ -11126,6 +11127,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+>      dc->pc_curr = dc->base.pc_next;
+>      insn = arm_lduw_code(env, dc->base.pc_next, dc->sctlr_b);
+>      is_16bit = thumb_insn_is_16bit(dc, dc->base.pc_next, insn);
+> +    dc->is_16bit = is_16bit;
+>      dc->base.pc_next += 2;
+>      if (!is_16bit) {
+>          uint32_t insn2 = arm_lduw_code(env, dc->base.pc_next, dc->sctlr_b);
+> diff --git a/target/arm/translate.h b/target/arm/translate.h
+> index b837b7fcbf..c16f434477 100644
+> --- a/target/arm/translate.h
+> +++ b/target/arm/translate.h
+> @@ -14,6 +14,8 @@ typedef struct DisasContext {
+>      target_ulong pc_curr;
+>      target_ulong page_start;
+>      uint32_t insn;
+> +    /* 16-bit instruction flag */
+> +    bool is_16bit;
+>      /* Nonzero if this instruction has been conditionally skipped.  */
+>      int condjmp;
+>      /* The label that will be jumped to when the instruction is skipped.  */
+
+The rest of this looks both correct and necessary.
+
+
+r~
 
