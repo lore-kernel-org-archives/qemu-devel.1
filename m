@@ -2,86 +2,70 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E671AC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D9D9C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2BB7206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:02:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QejMMHHB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2BB7206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42AB8206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:03:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42AB8206D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYyI-0002lW-5c
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 08:02:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57633)
+	id 1ihYyw-0004Bk-JV
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 08:03:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3z-0007Sn-2D
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:24 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihYx1-0001qQ-0m
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:01:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3x-0003rb-Td
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:22 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:39539)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3x-0003ny-Hl
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:04:21 -0500
-Received: by mail-wm1-x332.google.com with SMTP id 20so1485214wmj.4
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:04:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+3NmuoiiOR4K6FlJJ+4sxocF9vH1N56yvHdXlcbt7s0=;
- b=QejMMHHB97lxBKsD0u/CCrHMpcIW1W8wwX5PYp1wmUksDIJKFwbnUTM0KW7Rh59Mvw
- XFbWfN4onuG5NkCtOdloiVMVqaX/91FOdd1DCOy7ep+rOt2/GA7PmLQRznf1S2YmfGfD
- nlh1rcfNX1a9tDPXFGPPSo3MNSN+BvQC/EenThnPCWL/HiIwDxXiP0PFsGvVwlgyrWOj
- XrEweoyJP2/TGGuyyRQbT27L2TN0pB7biebvIA4XF6enX1nk19FSKKprsqHSCWq1Nyhy
- EKmaM4dKq5C6ZYciOVdnxIWGvABjrmqSyVMvaSk2h5/DpAhDEyOtRZvXVos0P1TK+iAO
- kKyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=+3NmuoiiOR4K6FlJJ+4sxocF9vH1N56yvHdXlcbt7s0=;
- b=J/NRinzIOz2T/QtIYMFwQ4tPhD3jeySV+DrxN8/WUmfPZSUXcValo3LIbIOG1Aj7t+
- zV8JaMLpiE+zWxfubHtMT5enFfHFPoOjooZ86LulXGJ6/BYH5mLFeRL5hnczjKiK8MxW
- OZiJQuYssaz+Xo7Hu+wzJKsjV/BXABNCCp364W/13Ni2gwsMr9iQFIe4y38YqhfuBMzB
- hmDoV5YHaZ3a5sikTZeyUb75g+W/Km+3Tj48jc+pj+Ohm6N+BRR4n0yGXs3a1XHOZTlC
- eYXvFewZ4xQkNSWFz/hv5FngAxlpWglS/CJDbqMNpuZIhSw1QQ17aCAE3trXwRlmahfN
- w4qw==
-X-Gm-Message-State: APjAAAU+hKZmqSp8dH7ks/NPNT6m2XvtnIxx3NLuEJf9Is9OEyfq6AT3
- z99PkUKmfyX+fldnhhZZYhUyt2gV
-X-Google-Smtp-Source: APXvYqzQ20VgKws9PDX1GHC5VtZm1UzClNUMjIYOUfV0NUOhLO1dzl/VhxE4SMqhP2R+uSv+b1DAJw==
-X-Received: by 2002:a7b:c936:: with SMTP id h22mr2729219wml.115.1576670660057; 
- Wed, 18 Dec 2019 04:04:20 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.04.19
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:04:19 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1ihYwz-0007bj-N9
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:01:14 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:43969)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1ihYwz-0007RE-CV; Wed, 18 Dec 2019 08:01:13 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MVe1U-1iIIsB22tQ-00RXmI; Wed, 18 Dec 2019 14:01:07 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 77/87] hw/pci-host/i440fx: Correct the header description
-Date: Wed, 18 Dec 2019 13:02:43 +0100
-Message-Id: <1576670573-48048-78-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
-References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 0/7] Trivial branch patches
+Date: Wed, 18 Dec 2019 14:00:58 +0100
+Message-Id: <20191218130105.125981-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Provags-ID: V03:K1:B8ZplYw8Glwj/6TNTnw3i/jgYCZxpqTday4Nxs0wogksvukWWMY
+ 55PWF6TQMB+b+NphNvRtrnYVLpVevgFGnhdjS0YoYTuqIekxUyBTBxUnEqxSaor8O/9uVn1
+ pKkZsqj3jDorgb2iRTs0p3jpOfp4ApdvLsV6FRTO47CKKe8u74Mm6wPb+KBGmhE/92gZ3Qv
+ M4NYAzhzpxBLu31WZ5hhA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:OA/PsERFB7c=:tMyEkbshoBsP+4fcxRK/gm
+ P/VdNt7Pi0emnb4sbmHUcjTn8sITNTTk8fuIe166ZRVvUZ0bMmr0n9oF4/fTm05Qp5+Xk8SNH
+ dNKhcGN3D61VUnWl2Nwdm4kLSKGf/7LZS+zp09Fw6vpeaedGF4wUzsSRUxfh6SDdWxkwFUCDW
+ PW6Lqv8Y6LjxuSOjd4rATzKOYD4pmQsEJ6z6QlwJP8v/J+xIpm3P6XaQAILqiZU97LTOw832Q
+ 5qt59DbSHk4ox/N9mKHMFEdFjDXbXEFUBfAk/JTTM+A78mOOZZazFAgBKy/Q7pLWQUaH8dx/+
+ SHItFqABWeoVkmmEiDk0MjgQSdj4ZTMdSX9Kcgtm6fI0RNU1o4mGkgoV4zjHkzsILcU93I27R
+ dcdvypagLNFzjj89x3ZNWDWisu5cE1rTOBvocoC8J8O51HAazfKbPdXBWfO/Mt1WhzYPiRdkG
+ DAQDVDlwRMxepiXTWM/SWit29SsEPMeLc0si/4wtQBYfnW8AU8HQOr77UmYwa5e6Cv0vXniA7
+ wqE3lnjaDaT2NxvdgMI2rPj0PgEvT5h6f7NKlxU/4fr76PtrTTXeYQOBubm3HvalKvpP/agLH
+ 5lkXupnzY6e8Xr/3jXnsOvgdEcbWuGUwonVq4SVXBFr9HzTppSCQwJKBQDyB2RFmfvn3GK48t
+ Da65+0TvT6K2ALdtPs0Bt6aTqwzWMVVesjMZPhiZbNpNdaBDKowsrrP9Dc1dzPUf0kxJXB/8K
+ 4piPMd1ChPR3V08zwnfac/O42QRaNGcKIXxmTmESy/9HX9rAyGeFMXitdNW4bPn8F414BdON1
+ 32QtBvI4mQ4vTKUa5ng84Z9A0cyHaSM6ZlS12+DUaFSvrXgEdZ6CPIh1dCWWQVfHAWpWzpHyD
+ gbdeA+2uJO1Ym5vUmENkdctNcVxqIQS+lvzzF8BE4=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,37 +77,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+The following changes since commit aceeaa69d28e6f08a24395d0aa6915b687d0a681:
 
-Missed during the refactor in commits 14a026dd58 and 0f25d865a,
-this file is now only about the i440FX chipset.
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-12-17' into staging (2019-12-17 15:55:20 +0000)
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20191209095002.32194-2-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/pci-host/i440fx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
-index f271311..3fc9442 100644
---- a/hw/pci-host/i440fx.c
-+++ b/hw/pci-host/i440fx.c
-@@ -1,5 +1,5 @@
- /*
-- * QEMU i440FX/PIIX3 PCI Bridge Emulation
-+ * QEMU i440FX PCI Bridge Emulation
-  *
-  * Copyright (c) 2006 Fabrice Bellard
-  *
+  git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
+
+for you to fetch changes up to 80bc935eaaf93e5b9a4efe97abd7c51d645f2612:
+
+  qemu-doc: Remove the unused "Guest Agent" node (2019-12-18 13:31:01 +0100)
+
+----------------------------------------------------------------
+Trivial fixes (20191218)
+
+----------------------------------------------------------------
+
+Han Han (1):
+  Revert "qemu-options.hx: Update for reboot-timeout parameter"
+
+Markus Armbruster (2):
+  util/cutils: Turn FIXME comment into QEMU_BUILD_BUG_ON()
+  test-keyval: Tighten test of trailing crap after size
+
+Philippe Mathieu-Daudé (1):
+  MAINTAINERS: Add hw/sd/ssi-sd.c in the SD section
+
+Thomas Huth (2):
+  target/sparc: Remove old TODO file
+  qemu-doc: Remove the unused "Guest Agent" node
+
+Yury Kotov (1):
+  monitor: Remove unused define
+
+ MAINTAINERS         |  1 +
+ monitor/misc.c      |  3 --
+ qemu-doc.texi       |  1 -
+ qemu-options.hx     |  4 +--
+ target/sparc/TODO   | 88 ---------------------------------------------
+ tests/test-keyval.c |  2 +-
+ util/cutils.c       |  8 +++--
+ 7 files changed, 9 insertions(+), 98 deletions(-)
+ delete mode 100644 target/sparc/TODO
+
 -- 
-1.8.3.1
-
+2.24.1
 
 
