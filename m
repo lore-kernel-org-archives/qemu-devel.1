@@ -2,85 +2,93 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C810EC2D0BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED33C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:31:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9788924676
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:26:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ThpvG2sH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9788924676
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A400218AC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 16:31:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A400218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56865 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihc9R-00071l-ON
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:26:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55849)
+	id 1ihcEr-0001rE-OZ
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 11:31:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58317)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ihc8Y-0006U7-Tp
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:25:25 -0500
+ (envelope-from <bounces@canonical.com>) id 1ihcDz-00014K-WE
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ihc8W-0007bL-Fz
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:25:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26250
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ihc8W-0007U2-8L
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:25:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576686319;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VEqcJFxPxpbB2LhVtq4tLKqu3IMEohqJlDAzqLPUR4w=;
- b=ThpvG2sHuERWp5+w0lJ4VstU9I7dhT702VIZ2T8otl6TY+nhB54fYFgTPzXVRhyLmW8+5/
- Sm10xfpE7D1LIubnk1y2UJz5QN2bk5pAWiBn6AQFv3tTA7nQ7FOc60bWSvTQb1/7rPiUGj
- gS72ifHqsg4iHMRVFgpY76RnIa5Nv6o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-367-Bcn6N8H7N0uqr2YeUWHdgA-1; Wed, 18 Dec 2019 11:25:17 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D94FF801A34
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 16:25:16 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A7E3826DC5;
- Wed, 18 Dec 2019 16:25:15 +0000 (UTC)
-Date: Wed, 18 Dec 2019 16:25:13 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH 3/4] migration-test: Make sure that multifd and cancel
- works
-Message-ID: <20191218162513.GI3707@work-vm>
-References: <20191218050439.5989-1-quintela@redhat.com>
- <20191218050439.5989-4-quintela@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1ihcDy-0004TR-8I
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:30:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60186)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ihcDx-0004JB-W9
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 11:30:58 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ihcDu-0007tZ-R2
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 16:30:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 567DD2E80D6
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 16:30:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191218050439.5989-4-quintela@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Bcn6N8H7N0uqr2YeUWHdgA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Wed, 18 Dec 2019 16:21:29 -0000
+From: Ubuntu Foundations Team Bug Bot <1805256@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=kunpeng920; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Confirmed; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
+ component=main; status=Confirmed; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
+ component=main; status=Confirmed; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=In Progress; importance=Medium;
+ assignee=rafaeldtinoco@kernelpath.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Confirmed; importance=Medium;
+ assignee=None; 
+X-Launchpad-Bug-Tags: patch qemu-img
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dannf iveskim jan-glauber-i jnsnow kongzizaixian
+ lizhengui rafaeldtinoco
+X-Launchpad-Bug-Reporter: dann frazier (dannf)
+X-Launchpad-Bug-Modifier: Ubuntu Foundations Team Bug Bot (crichton)
+References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
+Message-Id: <157668609041.5472.6481771447072730829.launchpad@gac.canonical.com>
+Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
+ Aarch64 when converting images
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 044728e437ff85cb0be05beb261007ab38f26902
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,202 +97,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Test that this sequerce works:
->=20
-> - launch source
-> - launch target
-> - start migration
-> - cancel migration
-> - relaunch target
-> - do migration again
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  tests/migration-test.c | 108 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 107 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/migration-test.c b/tests/migration-test.c
-> index 7588f50b9b..1c93b3e5bc 100644
-> --- a/tests/migration-test.c
-> +++ b/tests/migration-test.c
-> @@ -527,6 +527,14 @@ static void migrate_recover(QTestState *who, const c=
-har *uri)
->      qobject_unref(rsp);
->  }
-> =20
-> +static void migrate_cancel(QTestState *who)
-> +{
-> +    QDict *rsp;
-> +
-> +    rsp =3D wait_command(who, "{ 'execute': 'migrate_cancel' }");
-> +    qobject_unref(rsp);
-> +}
-> +
->  static void migrate_set_capability(QTestState *who, const char *capabili=
-ty,
->                                     bool value)
->  {
-> @@ -583,6 +591,8 @@ static void migrate_postcopy_start(QTestState *from, =
-QTestState *to)
->  typedef struct {
->      bool hide_stderr;
->      bool use_shmem;
-> +    /* only launch the target process */
-> +    bool only_target;
->      char *opts_source;
->      char *opts_target;
->  } MigrateStart;
-> @@ -704,7 +714,9 @@ static int test_migrate_start(QTestState **from, QTes=
-tState **to,
->                                   arch_source, shmem_opts, args->opts_sou=
-rce,
->                                   ignore_stderr);
->      g_free(arch_source);
-> -    *from =3D qtest_init(cmd_source);
-> +    if (!args->only_target) {
-> +        *from =3D qtest_init(cmd_source);
-> +    }
->      g_free(cmd_source);
-> =20
->      cmd_target =3D g_strdup_printf("-machine %saccel=3Dkvm:tcg%s "
-> @@ -1470,6 +1482,99 @@ static void test_multifd_tcp_zstd(void)
->      test_multifd_tcp("zstd");
->  }
-> =20
-> +/*
-> + * This test does:
-> + *  source               target
-> + *                       migrate_incoming
-> + *     migrate
-> + *     migrate_cancel
-> + *                       launch another target
-> + *     migrate
-> + *
-> + *  And see that it works
-> + */
-> +
-> +static void test_multifd_tcp_cancel(void)
-> +{
-> +    MigrateStart *args =3D migrate_start_new();
-> +    QTestState *from, *to;
-> +    QDict *rsp;
-> +    char *uri;
-> +
-> +    if (test_migrate_start(&from, &to, "defer", args)) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * We want to pick a speed slow enough that the test completes
-> +     * quickly, but that it doesn't complete precopy even on a slow
-> +     * machine, so also set the downtime.
-> +     */
-> +    /* 1 ms should make it not converge*/
-> +    migrate_set_parameter_int(from, "downtime-limit", 1);
-> +    /* 1GB/s */
-> +    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
+** Tags added: patch
 
-This is copied from postcopy_prepare, note that I dropped that bandwidth
-quite a bit in 513aa2c because we were seeing TCG on slow hosts converge
-even at 1ms, because the vCPU wasn't dirtying pages quickly.
+-- =
 
-> +    migrate_set_parameter_int(from, "multifd-channels", 16);
-> +    migrate_set_parameter_int(to, "multifd-channels", 16);
-> +
-> +    migrate_set_capability(from, "multifd", "true");
-> +    migrate_set_capability(to, "multifd", "true");
-> +
-> +    /* Start incoming migration from the 1st socket */
-> +    rsp =3D wait_command(to, "{ 'execute': 'migrate-incoming',"
-> +                           "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}=
-");
-> +    qobject_unref(rsp);
-> +
-> +    /* Wait for the first serial output from the source */
-> +    wait_for_serial("src_serial");
-> +
-> +    uri =3D migrate_get_socket_address(to, "socket-address");
-> +
-> +    migrate(from, uri, "{}");
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    printf("before cancel\n");
-> +    migrate_cancel(from);
-> +    printf("after cancel\n");
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805256
 
-Do you really want those printf's for normal operation?
+Title:
+  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
+  converting images
 
-> +    args =3D migrate_start_new();
-> +    args->only_target =3D true;
-> +
-> +    if (test_migrate_start(&from, &to, "defer", args)) {
-> +        return;
-> +    }
-> +
-> +    migrate_set_parameter_int(to, "multifd-channels", 16);
-> +
-> +    migrate_set_capability(to, "multifd", "true");
-> +
-> +    /* Start incoming migration from the 1st socket */
-> +    rsp =3D wait_command(to, "{ 'execute': 'migrate-incoming',"
-> +                           "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}=
-");
-> +    qobject_unref(rsp);
-> +
-> +    /* 300ms it should converge */
-> +    migrate_set_parameter_int(from, "downtime-limit", 600);
+Status in kunpeng920:
+  Confirmed
+Status in QEMU:
+  In Progress
+Status in qemu package in Ubuntu:
+  Confirmed
+Status in qemu source package in Bionic:
+  Confirmed
+Status in qemu source package in Disco:
+  Confirmed
+Status in qemu source package in Eoan:
+  In Progress
+Status in qemu source package in Focal:
+  Confirmed
 
-Comment doesn't match parameter!
+Bug description:
+  Command:
 
-With those fixed;
+  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
 
+  Hangs indefinitely approximately 30% of the runs.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+  ----
 
-> +    uri =3D migrate_get_socket_address(to, "socket-address");
-> +
-> +    migrate(from, uri, "{}");
-> +
-> +    wait_for_migration_pass(from);
-> +
-> +    if (!got_stop) {
-> +        qtest_qmp_eventwait(from, "STOP");
-> +    }
-> +    qtest_qmp_eventwait(to, "RESUME");
-> +
-> +    wait_for_serial("dest_serial");
-> +    wait_for_migration_complete(from);
-> +    test_migrate_end(from, to, true);
-> +    free(uri);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      char template[] =3D "/tmp/migration-test-XXXXXX";
-> @@ -1537,6 +1642,7 @@ int main(int argc, char **argv)
->      qtest_add_func("/migration/multifd/tcp/none", test_multifd_tcp_none)=
-;
->      qtest_add_func("/migration/multifd/tcp/zlib", test_multifd_tcp_zlib)=
-;
->      qtest_add_func("/migration/multifd/tcp/zstd", test_multifd_tcp_zstd)=
-;
-> +    qtest_add_func("/migration/multifd/tcp/cancel", test_multifd_tcp_can=
-cel);
-> =20
->      ret =3D g_test_run();
-> =20
-> --=20
-> 2.23.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  Workaround:
 
+  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
+
+  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
+
+  ----
+
+  (gdb) thread 1
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf1ad81c in __GI_ppoll
+  #1 0x0000aaaaaabcf73c in ppoll
+  #2 qemu_poll_ns
+  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
+  #4 main_loop_wait
+  ...
+
+  (gdb) thread 2
+  ...
+  (gdb) bt
+  #0 syscall ()
+  #1 0x0000aaaaaabd41cc in qemu_futex_wait
+  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
+  #3 0x0000aaaaaabed05c in call_rcu_thread
+  #4 0x0000aaaaaabd34c8 in qemu_thread_start
+  #5 0x0000ffffbf25c880 in start_thread
+  #6 0x0000ffffbf1b6b9c in thread_start ()
+
+  (gdb) thread 3
+  ...
+  (gdb) bt
+  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
+  #1 0x0000ffffbf2671b4 in __sigwait
+  #2 0x0000aaaaaabd1ddc in sigwait_compat
+  #3 0x0000aaaaaabd34c8 in qemu_thread_start
+  #4 0x0000ffffbf25c880 in start_thread
+  #5 0x0000ffffbf1b6b9c in thread_start
+
+  ----
+
+  (gdb) run
+  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
+  ./disk01.ext4.qcow2 ./output.qcow2
+
+  [New Thread 0xffffbec5ad90 (LWP 72839)]
+  [New Thread 0xffffbe459d90 (LWP 72840)]
+  [New Thread 0xffffbdb57d90 (LWP 72841)]
+  [New Thread 0xffffacac9d90 (LWP 72859)]
+  [New Thread 0xffffa7ffed90 (LWP 72860)]
+  [New Thread 0xffffa77fdd90 (LWP 72861)]
+  [New Thread 0xffffa6ffcd90 (LWP 72862)]
+  [New Thread 0xffffa67fbd90 (LWP 72863)]
+  [New Thread 0xffffa5ffad90 (LWP 72864)]
+
+  [Thread 0xffffa5ffad90 (LWP 72864) exited]
+  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
+  [Thread 0xffffa77fdd90 (LWP 72861) exited]
+  [Thread 0xffffbdb57d90 (LWP 72841) exited]
+  [Thread 0xffffa67fbd90 (LWP 72863) exited]
+  [Thread 0xffffacac9d90 (LWP 72859) exited]
+  [Thread 0xffffa7ffed90 (LWP 72860) exited]
+
+  <HUNG w/ 3 threads in the stack trace showed before>
+  """
+
+  All the tasks left are blocked in a system call, so no task left to call
+  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
+  thread #1 (doing poll() in a pipe with thread #2).
+
+  Those 7 threads exit before disk conversion is complete (sometimes in
+  the beginning, sometimes at the end).
+
+  ----
+
+  [ Original Description ]
+
+  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
+  frequently hangs (~50% of the time) with this command:
+
+  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
+
+  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
+  qcow2->qcow2 conversion happens to be something uvtool does every time
+  it fetches images.
+
+  Once hung, attaching gdb gives the following backtrace:
+
+  (gdb) bt
+  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
+274213760,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
+igmask=3D0xffffc123b950)
+  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
+  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
+ptimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
+linux-gnu/bits/poll2.h:77
+  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
+  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
+c:322
+  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
+  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
+  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
+  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
+g.c:1980
+  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
+img.c:2456
+  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
+-img.c:4975
+
+  Reproduced w/ latest QEMU git (@ 53744e0a182)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
