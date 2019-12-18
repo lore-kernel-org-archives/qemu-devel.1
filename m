@@ -2,95 +2,99 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A07C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FA5C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:51:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D664421582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07167218AC
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:51:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vt7d/Wjx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D664421582
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tofwp4cs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07167218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihikT-0003hH-VY
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 18:28:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35555)
+	id 1ihj66-0003C9-2O
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 18:51:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ihihM-0007j7-NU
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:45 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihj5C-0002AY-KX
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:50:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ihihL-0003lz-DW
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:44 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36595)
+ (envelope-from <richard.henderson@linaro.org>) id 1ihj5B-0001kM-HR
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:50:22 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37613)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ihihL-0003kd-6w
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:43 -0500
-Received: by mail-pg1-x542.google.com with SMTP id k3so2094069pgc.3
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 15:25:43 -0800 (PST)
+ id 1ihj5B-0001jq-9Q
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:50:21 -0500
+Received: by mail-pf1-x441.google.com with SMTP id p14so2104904pfn.4
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 15:50:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Eren9MLX7bzFjzWNgpuKzO0ZxiULws5PT2XeNzaV3mk=;
- b=vt7d/WjxHgqZ4rfBM2Boqfjy0fqwZRtQnv6QVXOQfkKRb1RVQ7OBoYYrBA0e0zHO/v
- F1ILRgO982EiuNMkkflR3gIjfnQNIIwRsu1nihJEqaNxN+VDYmVRictlAlttajZ0sNUD
- l4HMhVBYYvsO72WcTiFOc3cT1Jxx9Xg3gygVPk98QkVgwWOC2h9RSPk59WpB5NNZwsv0
- hR6vVQUgafApwPiemnZcW7fXDdxN3yVRbyGNgy9yokLoaZpdBdnNkonhDnE1uF0hFYJf
- idRyj/eBBTmxHkdJdrmUfReOxcZwOpz8Sr+rQgPfoxR+h68En5+xIi9zutCxtpKuYufS
- yQpA==
+ bh=qgRcloLlbvGNG+SlyqQqhUxVaOx55mkNHJe+/ur/HJo=;
+ b=tofwp4cs8GaCrbghyYvGagjkZeFwSbfbkeNlKlXkGvVp9nt8Q7sDOvqRo+ZOnCvqWB
+ YESbdKB9J/Od7lcb0dm8uN/g7x0RJFvh3fIjMongx59UBYhv670c7VUwFw8ib2PSnvSv
+ QjSgoMn+z3fktpltXMyhXckeZQ4wBvZyT3GWfiFAzZK9H+anv8jgim753UDW7zXNfXdW
+ pshisIKXLA6+5n0eYGSgnEVo1+bJhGJ6/KokOSZfolq6CGRWTkDKcE+4ueNrEkZWSw5m
+ 1rmM2QXgqjUVPaXCB6AwE5OpaYq2ZasvhbBptUYUeU/+p1tALzFmXkoTo7uQ31yKo58R
+ wBhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Eren9MLX7bzFjzWNgpuKzO0ZxiULws5PT2XeNzaV3mk=;
- b=Z4plq+Zv9jkDLXYaop54ulyxwqwYGRadBJ4lz9Ami1HFsz0PBRoCoUK96nxXWqPZiE
- n37DnnHJGs93qKvTT/dCgodoo//94ugohOdau8M02NssbeXkW0PYMZk73+BerItx8sAy
- 2muxjrgdil89TYF9tnHgnHaCOhEsYXPnuivYJeLjhknrfy9KkGLIo3Wx9PPU4pLaBVRY
- pjjkL3lPYaNvPh1eI5B3sr22qemzxXvjnJG9qtocCQmyC1GdMVHI+qB0CC4aEkn0Or3F
- QNJOU1gZTm4YYj+HpMum5rxerbDaCmG2VUaFGR3VaR3mckctdeGd9dNxCamcN+EKaMW/
- oI0w==
-X-Gm-Message-State: APjAAAUYoLX94zoxrXn5luE8g8vBZXOU/EK4pYsgsKZXe9BsQD+DEll1
- pTimfjr7xNqteH471ch+PtTUXeOQgx4=
-X-Google-Smtp-Source: APXvYqzPfxbrhkosH1bAF1xjw5Fd+MK03TPU/srZz7hsp7GX1cRPwkh6K3QYcL6gBoQFSEzjVUpZ0Q==
-X-Received: by 2002:a63:d00f:: with SMTP id z15mr5779169pgf.143.1576711541896; 
- Wed, 18 Dec 2019 15:25:41 -0800 (PST)
+ bh=qgRcloLlbvGNG+SlyqQqhUxVaOx55mkNHJe+/ur/HJo=;
+ b=YyVigPtxQAD3lPSduzIuCGU9aegHqdqAvJiUE4wuQacS0ll/J6zmQUB8okgP5Uqj/9
+ yULrHEzB0LiWJqBD+lWtuOe98P/CJgz7VynhQHKYo2PIuABBusXKXuZrG0Od/bFd1RaP
+ rEVgcClxoMj/5jmbnes9RN1OGnzO1NYcu5pusJzJIbh73cBAyRxWYGfV/ljDSNfC14MA
+ cWbookMuRqAFYG936mqPheMWkWeUsC/t569lkioQ0uJjWy8ZEOPM0pSguiNRIHolB6J+
+ /3Mh3jZWtZRcln5VWQ9xMdICF20CEPVN4pwTv0tJyJ7qmTd/fdqHGHQGdrySWqxgRQpC
+ W99w==
+X-Gm-Message-State: APjAAAUXBfvUj+HBsGgbJLjkHIowIsiAoEsE683f7m+scCwBk83+6woE
+ T80AFO/ertinOv00K5kXFucEuQ==
+X-Google-Smtp-Source: APXvYqwsXA75WyNbDGbj6QmvwksohLs+vNjoFcFOIrOTb/vi3hmksO8MFN93wF1iTyhxJ3N7bNomqA==
+X-Received: by 2002:a63:3cb:: with SMTP id 194mr6026611pgd.123.1576713019757; 
+ Wed, 18 Dec 2019 15:50:19 -0800 (PST)
 Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
  ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
- by smtp.gmail.com with ESMTPSA id i127sm5108224pfe.54.2019.12.18.15.25.40
+ by smtp.gmail.com with ESMTPSA id bo9sm4156341pjb.21.2019.12.18.15.50.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Dec 2019 15:25:41 -0800 (PST)
-Subject: Re: [PATCH v2 06/10] arm/arm-powerctl: rebuild hflags after setting
- CP15 bits in arm_set_cpu_on()
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-References: <20191216233519.29030-1-nieklinnenbank@gmail.com>
- <20191216233519.29030-7-nieklinnenbank@gmail.com>
- <CAPan3WpW1Q3zpnqgk=MWRWe99=MQ4XoW2kw8L3tioFxfEBXd+Q@mail.gmail.com>
- <CAFEAcA8Viii4Em_bf4Y=AG0jU+EFFFTX6dO-52qd=RT4uHbCVw@mail.gmail.com>
- <19e4f2ac-6067-f61f-f340-108545fb0f02@linaro.org>
- <CAPan3WrcvE_43=3+b4Ybn==TEQcKj+F_VWjJRBJ6MyXNrcpUbw@mail.gmail.com>
+ Wed, 18 Dec 2019 15:50:19 -0800 (PST)
+Subject: Re: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Taylor Simpson <tsimpson@quicinc.com>
+References: <BYAPR02MB48863165DEE32E5C563E93F4DE650@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <CAL1e-=jvmJNiZR4iLDL-97qm=v+2s0cwn5YTzJQ=JZ_gwOe4tQ@mail.gmail.com>
+ <BYAPR02MB4886C8D82898F1E406C124F8DE7E0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <BYAPR02MB48865884056A88B660B620FCDE770@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <87d0dw83uz.fsf@linaro.org>
+ <BYAPR02MB48866E2D82D9C76ABBECA842DE760@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <ffe58977-f251-df34-4bd0-62e32f78cc1a@linaro.org>
+ <SN6PR02MB48953397AA553FA7456E7CFCDE700@SN6PR02MB4895.namprd02.prod.outlook.com>
+ <BYAPR02MB488640DD7CC887E5FCC0F167DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <CAFEAcA-TpZfqbWjGX-tD0Osapt_K4yuTBg6+B=ZxU4MuVr7omg@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6ec61650-30e1-4377-6b22-5b6ef827e69c@linaro.org>
-Date: Wed, 18 Dec 2019 13:25:37 -1000
+Message-ID: <ba5ef3ee-aafe-0770-10c8-4a020cc423e9@linaro.org>
+Date: Wed, 18 Dec 2019 13:50:15 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAPan3WrcvE_43=3+b4Ybn==TEQcKj+F_VWjJRBJ6MyXNrcpUbw@mail.gmail.com>
+In-Reply-To: <CAFEAcA-TpZfqbWjGX-tD0Osapt_K4yuTBg6+B=ZxU4MuVr7omg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,46 +106,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Alessandro Di Federico <ale@rev.ng>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Niccol=c3=b2_Izzo?= <izzoniccolo@gmail.com>,
+ "nizzo@rev.ng" <nizzo@rev.ng>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/18/19 11:01 AM, Niek Linnenbank wrote:
-> Hello Richard,
+On 12/17/19 8:21 AM, Peter Maydell wrote:
+> On Tue, 17 Dec 2019 at 18:16, Taylor Simpson <tsimpson@quicinc.com> wrote:
+>> Question 2:
+>> What is the best source of guidance on breaking down support for a new target into a patch series?
 > 
-> On Tue, Dec 17, 2019 at 5:41 PM Richard Henderson <richard.henderson@linaro.org
-> <mailto:richard.henderson@linaro.org>> wrote:
-> 
->     On 12/17/19 6:12 AM, Peter Maydell wrote:
->     > Cc'ing Richard : this is one for you I think... (surely we
->     > need to rebuild the hflags from scratch when we power up
->     > a CPU anyway?)
-> 
->     We do compute hflags from scratch in reset.
-> 
->     It has also turned out that there were a few board models that poked at the
->     contents of the cpu and needed special help.  Some of that I would imagine
->     would be fixed properly with the multi-phase reset patches, where we could
->     rebuild hflags when *leaving* reset.
-> 
->     In arm_set_cpu_on_async_work, we start by resetting the cpu and then start
->     poking at the contents of some system registers.  So, yes, we do need to
->     rebuild after doing that.  Also, I'm not sure how this function should fit into
->     the multi-phase reset future.
-> 
-> 
-> Great, thanks a lot for confirming and clarifying this!
-> You mention the multi-phase reset feature, is that going to replace the
-> arm_set_cpu_on() functionality?
+> Look at how previous ports did it.
 
-I don't think so, but I'm not sure.  As I said above, I don't immediately see
-how arm_set_cpu_on() will integrate.
+E.g. the hppa-linux-user port.  The initial merge ends at ebe9383caefd.
 
-In any case, multi-phase reset is still pending, though I believe it is high on
-Peter's priority queue for the 5.0 development cycle.
+There are 15 patches -- mostly in linux-user -- before the one that enables
+compilation.  At which point exactly zero instructions are actually implemented.
+
+The actual cpu emulation comes afterwards in 8 patches (hppa 1.1 isn't terribly
+complicated).
 
 
 r~
