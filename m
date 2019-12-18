@@ -2,82 +2,82 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE777C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:30:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA8AC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 786542146E
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:30:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 264312176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 13:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pXV6sZgM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 786542146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPQx0/ew"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264312176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihZPL-0002tl-L4
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 08:30:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57875)
+	id 1ihZqp-00016a-6t
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 08:58:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihZCS-0006d8-TJ
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:17:14 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ihZq6-0000Qs-5h
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:58:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihZCR-0008OE-Ed
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:17:12 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42338)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihZCR-0008IQ-1y
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:17:11 -0500
-Received: by mail-wr1-x443.google.com with SMTP id q6so2233931wro.9
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 05:17:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=LiKPIkxf4u448xcJDFJUScrzTd5CAwun/iplBg2FxZw=;
- b=pXV6sZgMB0+2Em8h2/ws+/4SdmKHKKp6aztznYIe1KsBilsvLf0hdp9TlqsdE/sgxb
- A0KLZ9GVLeM8uNGztfWByu1zrIzG5Qk5t5lZwMRoWuAqZDB6idhSdfOPI2UJK7UCcPlr
- lIqDatk4WGS3QKemSFdzljfK2HkoPS+DY9Fn4ZuzL3bOjuPuWJh2gyxx0hdFKywgLMaN
- mDx2akzvZNQBa5sV7/Y/IlcCR1klJxZDS0rt40VbBET1/l8aT/guC/F9cQKM5FHJtMqO
- RQZ0rcoT43Kq2TzHxWE5Y2J6zM+LEp7Gqh4X3705bUkpFWgcmTtyB6m5eh/BsV+LutEK
- ETTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=LiKPIkxf4u448xcJDFJUScrzTd5CAwun/iplBg2FxZw=;
- b=qDbqe9lT7FrdjyNpAxEHyk5AfGOEoGbYn7No9zU0QMNQmNwebqXi+j3dFR8tuZ9Jog
- v2nYsJe6+ZWoGbeJu0cFngDhH46NhdJY4F3PHnuTmRgkUJA8m58BPSXpD7dkYdwc31/g
- v8M677KftK0+Mm3+PD+6HP8Vj4PqT9AJpO31cUWxXRu5hIXpEZuQiRLWYWLhbH8QnQx+
- wzWiQ8j+CtxvNLs1RYFfRemIFRi56/+PUlkir0BQIlDRBWy/CYt0vOjDb8PKU7VDiHdF
- t2qvB1MOSwAyuCccTa+lN1mvPxtMJgTafVtdXaWV0/DcKhreYi33q0QK3Pc1CJxuMzss
- V8Iw==
-X-Gm-Message-State: APjAAAVKZWrGWjeOE545Pzxn4ol/LHIPwizA141U7X8BnGkjFVHUHWvv
- ttsiDjbAedR5qkSmDgA5GyFq3OXR
-X-Google-Smtp-Source: APXvYqxQ62WfkgbO1rWH/lcaLvaoPh7dlOVzGEkJqADVUIQwce61/FukPik6mv9F4p59eE7cdMDZ6A==
-X-Received: by 2002:a5d:6a02:: with SMTP id m2mr2777061wru.52.1576675029597;
- Wed, 18 Dec 2019 05:17:09 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id t1sm2447980wma.43.2019.12.18.05.17.08
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 05:17:09 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] block: eliminate BDRV_REQ_NO_SERIALISING
-Date: Wed, 18 Dec 2019 14:17:04 +0100
-Message-Id: <1576675026-25046-2-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576675026-25046-1-git-send-email-pbonzini@redhat.com>
-References: <1576675026-25046-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+ (envelope-from <dgilbert@redhat.com>) id 1ihZq2-0004ps-8G
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:58:08 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42982
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ihZq1-0004ZD-JU
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 08:58:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576677483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=to+nYckjyZPzjza1ahOrP/9nFc/ZIc+LIBKYYGHVQZI=;
+ b=fPQx0/ew9OTQMEi1YNIfiEB9iCM+8yjgWw7uDo60CJ2H81R3g0Rd9Tlq9gEf5w10QlBskn
+ 3Ol3Hv8oOMjTABTtr69+R6wJynMiY4CmQk8/A80EefrKg9B2/n0gETwGPKwJ8fZa/N8UvL
+ ALZLwLIolaPV0Vm7jTpnTGWOuwKiE1E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-E-yFdpSOOEGBYcS-OouJ-w-1; Wed, 18 Dec 2019 08:58:01 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDEA992455
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 13:58:00 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 63210808E4;
+ Wed, 18 Dec 2019 13:57:56 +0000 (UTC)
+Date: Wed, 18 Dec 2019 13:57:54 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH 2/4] multifd: Make sure that we don't do any IO after an
+ error
+Message-ID: <20191218135754.GG3707@work-vm>
+References: <20191218050439.5989-1-quintela@redhat.com>
+ <20191218050439.5989-3-quintela@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20191218050439.5989-3-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: E-yFdpSOOEGBYcS-OouJ-w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,104 +89,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Peter Lieven <pl@kamp.de>, qemu-block@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is unused since commit 00e30f0 ("block/backup: use backup-top instead
-of write notifiers", 2019-10-01), drop it to simplify the code.
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-While at it, drop redundant assertions on flags.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/io.c            | 18 ++++--------------
- include/block/block.h | 12 ------------
- 2 files changed, 4 insertions(+), 26 deletions(-)
+I wonder if the fflush's should happen anyway?
 
-diff --git a/block/io.c b/block/io.c
-index f75777f..b3a67fe 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1445,8 +1445,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-      * potential fallback support, if we ever implement any read flags
-      * to pass through to drivers.  For now, there aren't any
-      * passthrough flags.  */
--    assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ |
--                       BDRV_REQ_PREFETCH)));
-+    assert(!(flags & ~(BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH)));
- 
-     /* Handle Copy on Read and associated serialisation */
-     if (flags & BDRV_REQ_COPY_ON_READ) {
-@@ -1458,12 +1457,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
-         bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
-     }
- 
--    /* BDRV_REQ_SERIALISING is only for write operation */
--    assert(!(flags & BDRV_REQ_SERIALISING));
--
--    if (!(flags & BDRV_REQ_NO_SERIALISING)) {
--        bdrv_wait_serialising_requests(req);
--    }
-+    bdrv_wait_serialising_requests(req);
- 
-     if (flags & BDRV_REQ_COPY_ON_READ) {
-         int64_t pnum;
-@@ -1711,7 +1705,7 @@ int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
-     bdrv_inc_in_flight(bs);
- 
-     /* Don't do copy-on-read if we read data before write operation */
--    if (atomic_read(&bs->copy_on_read) && !(flags & BDRV_REQ_NO_SERIALISING)) {
-+    if (atomic_read(&bs->copy_on_read)) {
-         flags |= BDRV_REQ_COPY_ON_READ;
-     }
- 
-@@ -1852,8 +1846,6 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
-         return -EPERM;
-     }
- 
--    /* BDRV_REQ_NO_SERIALISING is only for read operation */
--    assert(!(flags & BDRV_REQ_NO_SERIALISING));
-     assert(!(bs->open_flags & BDRV_O_INACTIVE));
-     assert((bs->open_flags & BDRV_O_NO_IO) == 0);
-     assert(!(flags & ~BDRV_REQ_MASK));
-@@ -3222,9 +3214,7 @@ static int coroutine_fn bdrv_co_copy_range_internal(
- 
-         /* BDRV_REQ_SERIALISING is only for write operation */
-         assert(!(read_flags & BDRV_REQ_SERIALISING));
--        if (!(read_flags & BDRV_REQ_NO_SERIALISING)) {
--            bdrv_wait_serialising_requests(&req);
--        }
-+        bdrv_wait_serialising_requests(&req);
- 
-         ret = src->bs->drv->bdrv_co_copy_range_from(src->bs,
-                                                     src, src_offset,
-diff --git a/include/block/block.h b/include/block/block.h
-index 1df9848..9d43c02 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -51,18 +51,6 @@ typedef enum {
-      */
-     BDRV_REQ_MAY_UNMAP          = 0x4,
- 
--    /*
--     * The BDRV_REQ_NO_SERIALISING flag is only valid for reads and means that
--     * we don't want wait_serialising_requests() during the read operation.
--     *
--     * This flag is used for backup copy-on-write operations, when we need to
--     * read old data before write (write notifier triggered). It is okay since
--     * we already waited for other serializing requests in the initiating write
--     * (see bdrv_aligned_pwritev), and it is necessary if the initiating write
--     * is already serializing (without the flag, the read would deadlock
--     * waiting for the serialising write to complete).
--     */
--    BDRV_REQ_NO_SERIALISING     = 0x8,
-     BDRV_REQ_FUA                = 0x10,
-     BDRV_REQ_WRITE_COMPRESSED   = 0x20,
- 
--- 
-1.8.3.1
-
+> ---
+>  migration/ram.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index db90237977..4b44578e57 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -4132,7 +4132,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaq=
+ue)
+>  {
+>      RAMState **temp =3D opaque;
+>      RAMState *rs =3D *temp;
+> -    int ret;
+> +    int ret =3D 0;
+>      int i;
+>      int64_t t0;
+>      int done =3D 0;
+> @@ -4203,12 +4203,14 @@ static int ram_save_iterate(QEMUFile *f, void *op=
+aque)
+>      ram_control_after_iterate(f, RAM_CONTROL_ROUND);
+> =20
+>  out:
+> -    multifd_send_sync_main(rs);
+> -    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> -    qemu_fflush(f);
+> -    ram_counters.transferred +=3D 8;
+> +    if (ret >=3D 0) {
+> +        multifd_send_sync_main(rs);
+> +        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> +        qemu_fflush(f);
+> +        ram_counters.transferred +=3D 8;
+> =20
+> -    ret =3D qemu_file_get_error(f);
+> +        ret =3D qemu_file_get_error(f);
+> +    }
+>      if (ret < 0) {
+>          return ret;
+>      }
+> @@ -4260,9 +4262,11 @@ static int ram_save_complete(QEMUFile *f, void *op=
+aque)
+>          ram_control_after_iterate(f, RAM_CONTROL_FINISH);
+>      }
+> =20
+> -    multifd_send_sync_main(rs);
+> -    qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> -    qemu_fflush(f);
+> +    if (ret >=3D 0) {
+> +        multifd_send_sync_main(rs);
+> +        qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
+> +        qemu_fflush(f);
+> +    }
+> =20
+>      return ret;
+>  }
+> --=20
+> 2.23.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
