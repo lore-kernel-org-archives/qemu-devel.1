@@ -7,81 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E79C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5F5C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 307FA206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:20:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49B6B206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 12:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miA0lScl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307FA206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oYb+ZgPv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B6B206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihYJj-0004CV-Re
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:20:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48852)
+	id 1ihYK5-0004mR-03
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 07:21:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3D-0006QG-D7
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:36 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2t-0006BO-Kd
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihY3C-0000s2-3r
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:35 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45881)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ihY2s-0000Bx-AG
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:15 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:43632)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihY3B-0000oB-M4
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:33 -0500
-Received: by mail-wr1-x442.google.com with SMTP id j42so1973029wrj.12
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:33 -0800 (PST)
+ id 1ihY2s-00008e-0d
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 07:03:14 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id d16so1982743wre.10
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 04:03:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=6P+O7fP7RdRxtrVlibSaBNIUsO6tN03n2SE/FwGlPpk=;
- b=miA0lSclqjGTCqb16hKq7TUktdbqTH6EHMZ0cO9YhwK56Tet4Lpkad0yOMsLx3o35B
- EbPjQmLDuREmFaFc5yblwlVZWLTMo6l3c7ggiTUEusGORrmb3Y/3WYaUWkdGsEbTuu5U
- mXh7BPUqnuR0ueMPyXVrIMrJE4ppSal7s03CquV8N4PfJ1UQezfnSNrOw5V6lDzZ7RIw
- rE16sda+6sJwEyNKXI4ZcQk/1jMtKwJO88kMLvEDq/HR8Ags07+9as3xTVyAIax32h6v
- 9jL6yu4g0Pcy2kdJqjWEEsEaDYSLC+UoelYWVrD1l0YCZU3yjnVoj+cn1DM07wdFUplF
- uHVg==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=+astimZn8Je4fKicS3bRyHB/lJlYx/kgk/kvsdzU+FM=;
+ b=oYb+ZgPv4c/bxGsXNkBw4AOzjvdL94VPOt5cDS9+q0pHdognWh7XNwRCp4H+rYnS6I
+ Z4X9nDPm7t5d0HWt+gJKNzA+Bfl8KlahSmaHskP+dbSK7HBv9UuFAmCx/Hu0aGeIrYCx
+ +b5aFfo234G/Euz1iSVka9Ch4nuC/CXuH6AJO87GXHN/uDMyhxurJNDms/mO24tcz6UW
+ xpP1ahZnG2ez6kYhXw6fHvq30pDXi+0EmjBV5hlMgiPx5vlWvuPb9qdGXOMz9YslZvs+
+ ItnGbWqotqatN6LFmMP9MF2kLd7H4tXHW4mpKBNgixTtvDhGDOkflO6buWup8bk6P4iQ
+ qr1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6P+O7fP7RdRxtrVlibSaBNIUsO6tN03n2SE/FwGlPpk=;
- b=M+JgVYP595UoQPOlJx9Z5tj42srwJLLp1CrFlLN+Tdf38ZUfCQLXgT1S3w9sXgje+6
- I66bcf/oonU5VclmPGdKUEOv1jKkxd/3He5ujn+FXk2F7zZeKrmP/BkkD/m7Pfpg36P8
- kBLyzqElK9vedO0ZuUBJ7qWa1GdKtxGtm1KAIe2i1DgI2rip1k7mBM7whh5mZkhs/v7Z
- 9YcOB208V5xhd4mTKqZLnZeZTYZ7MhB2ImFVTQvlDpseSqUKR5HWDEmANw+tVIxtN2gb
- H6i9r75NW5k05k+nFEFX9MJjr6cDzf3BHs5eEL+7i1xPQn+urrjl1GkXVtQ51bGiK8iK
- rbqQ==
-X-Gm-Message-State: APjAAAVP6dor6LT2jugh9rprRSpt0kdPfOIhDsJxebCsgOF3hf6FJknM
- TvP1WnJO+0K/LXk4RdMXHbx8QUJV
-X-Google-Smtp-Source: APXvYqxoQCnU/nZNlnbJF3WG5vf098NEyOV8+e4CbePt/kVlJvX8VOvZm1T6AWMumYA5rSrXynUJ8g==
-X-Received: by 2002:a5d:50cf:: with SMTP id f15mr2430490wrt.381.1576670612469; 
- Wed, 18 Dec 2019 04:03:32 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references;
+ bh=+astimZn8Je4fKicS3bRyHB/lJlYx/kgk/kvsdzU+FM=;
+ b=Xp4rfur6yDyH9K6y8w86dYq8vVj3aFYIdRcqFDCotS05IHTu02mvUIGvZLRVGjB7le
+ SVyeN/CL6ICErZ6Elkmmd+276YY+aGxyPJn8ZZsvfbUOAs0ZIaGxxSPguY6ej2EMo230
+ MgMYTGx/WIs1gtTy8TyNBxYbh5OXjNSxWUuFUm5/vLsJG5D8pr1u00dXr9Zn5fryb6m0
+ 2wIybLkJPcqSVvxHa7sOA/4AzpBAXA9qdVYTK+MTYrZuSSFnbBtCwO5ODooRF7umDwty
+ GO4vGA7Wj8Uxhg5TenVf/TPl51+qEu32i7WAjhu17SAq0fOBj28WnsTzpnVuk0LL0qFK
+ ZhuA==
+X-Gm-Message-State: APjAAAUvgOb0vgxQxrL8QMl9ZOrADiLaknZpkGhGmK+jerIHr90g49OO
+ w1W9p0QjsHR6CV4Fw+m8agUcM0F6
+X-Google-Smtp-Source: APXvYqyzFhBOcFtDIZniGhEagoJCKQ7/O0eZDTx6QNHVpEUIAk/5xqIOf2cqv+P+GOqwXpuoN/lTmg==
+X-Received: by 2002:a5d:50cf:: with SMTP id f15mr2428379wrt.381.1576670592241; 
+ Wed, 18 Dec 2019 04:03:12 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.31
+ by smtp.gmail.com with ESMTPSA id n67sm2236838wmf.46.2019.12.18.04.03.11
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 18 Dec 2019 04:03:31 -0800 (PST)
+ Wed, 18 Dec 2019 04:03:11 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 37/87] os-posix: simplify os_find_datadir
-Date: Wed, 18 Dec 2019 13:02:03 +0100
-Message-Id: <1576670573-48048-38-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 17/87] accel: compile accel/accel.c just once
+Date: Wed, 18 Dec 2019 13:01:43 +0100
+Message-Id: <1576670573-48048-18-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,81 +90,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Now that accel/accel.c does not use CONFIG_TCG or CONFIG_KVM anymore,
+it need not be compiled once for every softmmu target.
 
-Use g_build_filename instead of sprintf, and g_autofree instead of
-manual freeing.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- os-posix.c | 41 +++++++++++++----------------------------
- 1 file changed, 13 insertions(+), 28 deletions(-)
+ Makefile.objs       | 1 +
+ accel/Makefile.objs | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/os-posix.c b/os-posix.c
-index 86cffd2..3cd52e1 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -80,41 +80,26 @@ void os_setup_signal_handling(void)
-     sigaction(SIGTERM, &act, NULL);
- }
+diff --git a/Makefile.objs b/Makefile.objs
+index 4e4d6dd..c4bc783 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -55,6 +55,7 @@ common-obj-$(CONFIG_POSIX) += os-posix.o
  
--/* Find a likely location for support files using the location of the binary.
--   For installed binaries this will be "$bindir/../share/qemu".  When
--   running from the build tree this will be "$bindir/../pc-bios".  */
--#define SHARE_SUFFIX "/share/qemu"
--#define BUILD_SUFFIX "/pc-bios"
-+/*
-+ * Find a likely location for support files using the location of the binary.
-+ * When running from the build tree this will be "$bindir/../pc-bios".
-+ * Otherwise, this is CONFIG_QEMU_DATADIR.
-+ */
- char *os_find_datadir(void)
- {
--    char *dir, *exec_dir;
--    char *res;
--    size_t max_len;
-+    g_autofree char *exec_dir = NULL;
-+    g_autofree char *dir = NULL;
+ common-obj-$(CONFIG_LINUX) += fsdev/
  
-     exec_dir = qemu_get_exec_dir();
--    if (exec_dir == NULL) {
--        return NULL;
--    }
--    dir = g_path_get_dirname(exec_dir);
--
--    max_len = strlen(dir) +
--        MAX(strlen(SHARE_SUFFIX), strlen(BUILD_SUFFIX)) + 1;
--    res = g_malloc0(max_len);
--    snprintf(res, max_len, "%s%s", dir, SHARE_SUFFIX);
--    if (access(res, R_OK)) {
--        snprintf(res, max_len, "%s%s", dir, BUILD_SUFFIX);
--        if (access(res, R_OK)) {
--            g_free(res);
--            res = NULL;
--        }
-+    g_return_val_if_fail(exec_dir != NULL, NULL);
-+
-+    dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
-+    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
-+        return g_steal_pointer(&dir);
-     }
++common-obj-y += accel/
+ common-obj-y += migration/
  
--    g_free(dir);
--    g_free(exec_dir);
--    return res;
-+    return g_strdup(CONFIG_QEMU_DATADIR);
- }
--#undef SHARE_SUFFIX
--#undef BUILD_SUFFIX
- 
- void os_set_proc_name(const char *s)
- {
+ common-obj-y += audio/
+diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+index 8b498d3..17e5ac6 100644
+--- a/accel/Makefile.objs
++++ b/accel/Makefile.objs
+@@ -1,4 +1,4 @@
+-obj-$(CONFIG_SOFTMMU) += accel.o
++common-obj-$(CONFIG_SOFTMMU) += accel.o
+ obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest.o
+ obj-$(CONFIG_KVM) += kvm/
+ obj-$(CONFIG_TCG) += tcg/
 -- 
 1.8.3.1
 
