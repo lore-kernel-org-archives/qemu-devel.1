@@ -2,87 +2,80 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D320EC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8325DC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:33:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D0A321582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DE2D21582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 09:33:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="C9ye+cTo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D0A321582
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZPo+m0n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE2D21582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihVgN-0003WB-EH
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 04:31:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53777)
+	id 1ihViF-0004VE-Hk
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 04:33:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1ihVcV-0002jC-5X
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:27:52 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ihVhW-0003wJ-9S
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1ihVcU-0003oG-2M
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:27:51 -0500
-Received: from mout.web.de ([212.227.17.12]:33581)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1ihVcT-0003gD-P1
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:27:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1576661235;
- bh=nfHGuiE4HL/UYFYQafT5rCuyPPNdBBdV3WSojeKHE8s=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=C9ye+cTosgpa/vD5qh59w3HJefcCgkFt4varBCwBIF2UlP6Cs+6dJVkjinSSzvQjn
- pgRVxTImnPzTeZRQsTJ0oOH+ZDzbhWEacKdeKd/qlvExTGUpUB98w21HKzRpac0VEn
- 8oVIauScaG7I4bHUwI+T5KqYFRjWleB9SnsWyXm0=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.213]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0LmcnP-1i8S2a2kaZ-00aDuT; Wed, 18
- Dec 2019 10:27:15 +0100
-Date: Wed, 18 Dec 2019 10:27:11 +0100
-From: Lukas Straub <lukasstraub2@web.de>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 0/4] colo: Introduce resource agent and high-level test
-Message-ID: <20191218102711.19e321ac@luklap>
-In-Reply-To: <20191127221134.2b439e00@luklap>
-References: <cover.1574356137.git.lukasstraub2@web.de>
- <20191122094646.GA2785@work-vm> <20191127221134.2b439e00@luklap>
+ (envelope-from <kwolf@redhat.com>) id 1ihVhS-0001EM-O8
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:32:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47892
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihVhS-00018i-7K
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 04:32:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576661577;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pfoRo5KRxYSKs9LinVK0+21c+9/p5zdHPvKdelxjoX8=;
+ b=AZPo+m0nxDO+8gePy5fjjswanhtyauTG3P9JHtI0ak6WBzTnhk4CgaQ8k+7E6oeJJk1NIh
+ iS+n+7fT0+wXSgNYvjmkTCfea9PJsDD+v/vLImkUhakZMWHtrzJwEoXbxebCmENzoxW8pY
+ 4qwsw5ukUGikjfm5lOnbQ9uK/Igo9U8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-srk2Q29lPk6vGKK87eSMTQ-1; Wed, 18 Dec 2019 04:32:55 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1945940D8;
+ Wed, 18 Dec 2019 09:32:54 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-210.ams2.redhat.com [10.36.116.210])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B55C68889;
+ Wed, 18 Dec 2019 09:32:53 +0000 (UTC)
+Date: Wed, 18 Dec 2019 10:32:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Tuguoyi <tu.guoyi@h3c.com>
+Subject: Re: [PATCH] qcow2: Move error check of local_err near its assignment
+Message-ID: <20191218093252.GB4632@linux.fritz.box>
+References: <c9d3fc7246ec4c1f9a6cde9ed3c3ae57@h3c.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <c9d3fc7246ec4c1f9a6cde9ed3c3ae57@h3c.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: srk2Q29lPk6vGKK87eSMTQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:0HAe07AkK4CEWugBH+8ReY1g1Ouf+hUGEjsE49W7HMgNmNv1VFf
- YTEH650uPkHOChOaug4UDyCW2VI/LBObGAWN+s37ZM0qpXv46ONGklI2UGZdZq+VBiMsy2E
- PLJpTpvpD9elF4l9PAst3ICbroys8yV6GRxX2YgkXpPtNdlzCjgNHbrCTfeqzR9Vug6Bjv/
- a/O2bxSqWvJEE2v4spqMQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:muM7CnRRTPA=:0TNKPFz8p7JBl6aOissm9j
- DfeDUbfYNI1eXuVu9hUx7zsMxlyMybyzjd+/vncV3sz9sFFvlArGtSsYXzEqIn1Tn48ufYYM2
- 1KgBgziOS/BwvhU55ZRbx17WfJz89nXC3u9AX/NMEpeMHrSYm2brLqBDtWstbIh1GX+Vm0TC+
- JmOoRRLN7eN6R9osTAr2pLfXwf25psl3zhorOdV164UBcJrOcHIdiIdQG+MZXrmCN7apZySaU
- fy6htH8Y7iza44PAbA5nUyqj7hOX+Xid50pU7mXNEgZEMpqKRhzTX58emQ6njjBo4S7/2R+Dz
- lc2x48TgaAji5DMmwA3mkNwiWaFsD2Czn/o8R85zhBblxu7swj8CrDIvUjxWjSBZrLK3QajBj
- PCVZXH+WS9J43Y1mfW2Re7Qfy1ph4H9use8B0mW/ZquBOYlLSwDO0J/v+E8w3rAbH3L/QitO2
- NbrN0QqyHiTbXgM3K/bT89HXaD1hNzZksh4TizVUORiJnQYqLGjf6YEhe2MLQyjjnilRgcIE0
- f+cEBFDaAILO5zIX7N7VL66NZOEZHTXikYRRhToklm162kUTSYSpZF9E15PgrsNZQNPsdBz3X
- EeoxF/YCXUwWJeRkNEqEl89yx/BFN5VHvXBwKodpxU3pCTnaxQbfbWkq+1NwCFAXcZvoAgCZl
- Ahht5V0+gNxpmbOxEU3zEFyoSy1OIChOZJ3cwWbZ+ZxCV4cJ6hetfo5zASvM8+uBa0XiPgsYH
- eqsqZOHblg4Ns841RNkjU5MSM9P1IekHl0TyXr6y5c50NpVy3GGrPwqNhE2HktWBCCfbB4u9r
- 1ABDnz6uLKxuUcsIkUaMEw8YEUk4TnR1Z00B6t3kF5On+U8herGmfFHmW2EI2u9NJUlZkONER
- A45XQ/OEwuyP25Nkj4adso8MXFtSa2GFlQYXm/7aFFNumrAEonb2WeHcWHXFcJPCJKSJt8fAJ
- xyt3tIRgIr/4TKPFF1u+iMJtdwprSG9jmsi081+hgeVZTDY8h1pTm8XpQ/nbGAi+BjCuNWp12
- H5B2Y60D3Ab5AaY7hNRhy6fGIrDttKNcTme2QHMOrOoZLrbTWH9HRhZOuCNTCa3kEo/FFYET5
- VuPq6N+UrVPfCqxH5hYWyXHan5CZ+mU1qmJg0vX7LonfbgqfqTj3Z36mxDyYoCEXGB1E/jpSm
- 9o1HnO+zp358BtI+2GjvGqUCul35a4kQ36Ycrgmlxt3XCShvuxnF8KFrYvLyPmUH/dJh5ZVAz
- EvXfg7QtHgOqCZjUUb4F5rfEuUlTR7Dgcjlxpy7yQlYDFk8noH2ohQqyLuKA=
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.12
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,61 +87,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, "Zhang, Chen" <chen.zhang@intel.com>
+Cc: vsementsov@virtuozzo.com, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 27 Nov 2019 22:11:34 +0100
-Lukas Straub <lukasstraub2@web.de> wrote:
+Am 18.12.2019 um 03:26 hat Tuguoyi geschrieben:
+>=20
+> Signed-off-by: Guoyi Tu <tu.guoyi@h3c.com>
 
-> On Fri, 22 Nov 2019 09:46:46 +0000
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->
-> > * Lukas Straub (lukasstraub2@web.de) wrote:
-> > > Hello Everyone,
-> > > These patches introduce a resource agent for use with the Pacemaker =
-CRM and a
-> > > high-level test utilizing it for testing qemu COLO.
-> > >
-> > > The resource agent manages qemu COLO including continuous replicatio=
-n.
-> > >
-> > > Currently the second test case (where the peer qemu is frozen) fails=
- on primary
-> > > failover, because qemu hangs while removing the replication related =
-block nodes.
-> > > Note that this also happens in real world test when cutting power to=
- the peer
-> > > host, so this needs to be fixed.
-> >
-> > Do you understand why that happens? Is this it's trying to finish a
-> > read/write to the dead partner?
-> >
-> > Dave
->
-> I haven't looked into it too closely yet, but it's often hanging in bdrv=
-_flush()
-> while removing the replication blockdev and of course thats probably bec=
-ause the
-> nbd client waits for a reply. So I tried with the workaround below, whic=
-h will
-> actively kill the TCP connection and with it the test passes, though I h=
-aven't
-> tested it in real world yet.
->
+Empty commit messages are rarely acceptable. You should explain here
+why you are making the change and why it's correct (for example by
+comparing with when it was introduced).
 
-In the real cluster, sometimes qemu even hangs while connecting to qmp (af=
-ter remote
-poweroff). But I currently don't have the time to look into it.
+In this case, the local_err check outside of the if block was necessary
+when it was introduced in commit d1258dd0c87 because it needed to be
+executed even if qcow2_load_autoloading_dirty_bitmaps() returned false.
 
-Still a failing test is better than no test. Could we mark this test as kn=
-own-bad and
-fix this issue later? How should I mark it as known-bad? By tag? Or warn i=
-n the log?
+After some modifications that all required the error check to remain
+where it is, commit 9c98f145dfb finally moved the
+qcow2_load_dirty_bitmaps() call into the if block, so now the error
+check should be there, too.
 
-Regards,
-Lukas Straub
+This is information that should be in the commit message rather than
+requiring each reader to do the research.
+
+Please also make sure to CC the author of the code that you're
+modifying, in this case Vladimir.
+
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 7c18721..ce3db29 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1705,14 +1705,14 @@ static int coroutine_fn qcow2_do_open(BlockDriver=
+State *bs, QDict *options,
+>      if (!(bdrv_get_flags(bs) & BDRV_O_INACTIVE)) {
+>          /* It's case 1, 2 or 3.2. Or 3.1 which is BUG in management laye=
+r. */
+>          bool header_updated =3D qcow2_load_dirty_bitmaps(bs, &local_err)=
+;
+> +        if (local_err !=3D NULL) {
+> +            error_propagate(errp, local_err);
+> +            ret =3D -EINVAL;
+> +            goto fail;
+> +        }
+> =20
+>          update_header =3D update_header && !header_updated;
+>      }
+> -    if (local_err !=3D NULL) {
+> -        error_propagate(errp, local_err);
+> -        ret =3D -EINVAL;
+> -        goto fail;
+> -    }
+> =20
+>      if (update_header) {
+>          ret =3D qcow2_update_header(bs);
+
+The change itself looks good to me, but I'll let Vladimir have a look as
+well. If there are no more comments, I'm looking forward to a v2 patch
+with a non-empty commit message.
+
+Kevin
+
 
