@@ -2,82 +2,72 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA08C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F15A1C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:29:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94F612176D
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:05:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M9ccheZJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94F612176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5F0221582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 07:29:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5F0221582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihTP8-0002cv-N5
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 02:05:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39995)
+	id 1ihTm6-0006iw-0w
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 02:29:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53215)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ihTOX-000273-3C
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:05:17 -0500
+ (envelope-from <emacsray@gmail.com>) id 1ihTlS-0006KM-Hh
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:28:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ihTOV-0002DQ-6H
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:05:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40282
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihTOU-0002A5-ML
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:05:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576652713;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=OUKa4oOowAAkvE9sZVsmE2Dmq4VwkDBs8aDu/k9ioa8=;
- b=M9ccheZJbP8duQwbkZ/HfHmhtF+AvT5yKVra40gooLrZw2tuqiMAPbnHjxpV6bTSLsXywT
- 8geNonOBJAIwLuULrsnEz3m9iexpexJ/XWVSMjD+E61LeQ7tIErk0OuXt1GjQ5llK2tup8
- wk9rv4gP/w1bE12jVzbUs+sClP4Bnzs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-Zuu03WIZPfy1YPK6YqtXVA-1; Wed, 18 Dec 2019 02:05:12 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08FC210054E3;
- Wed, 18 Dec 2019 07:05:11 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-150.ams2.redhat.com [10.36.116.150])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 48711384;
- Wed, 18 Dec 2019 07:05:07 +0000 (UTC)
-Subject: Re: [PATCH 3/7] configure: Do not force pie=no for non-x86
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+ (envelope-from <emacsray@gmail.com>) id 1ihTlR-0001rX-Ew
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:28:58 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:43254)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1ihTlR-0001q3-90
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 02:28:57 -0500
+Received: by mail-pg1-f196.google.com with SMTP id k197so775535pga.10
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 23:28:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=rpRSIrQzYUtT04Bq9+TA2kfih33jB33fRgfkZXrcHW4=;
+ b=URorQaSMlYTxtcFD8cd6w4FPScj12nmEi3X4HYxFrRVggy9U89x7scF0mPT7kZ+EAO
+ 42MMf9vda13SYINmxuboN+M5WhGqAvuecD1q4TqC80WY7RrajiZTW2eHi9V/jhJIZkhu
+ OL5o7WsL+xmty122swoajlvC+OV0EfoZ0oWKE+hr/yDbnMDrYf4nyLuwKC5HB1iZaxDh
+ /0FcuGYdKLOJq6/GkK+eawtMXkNczevQSykUjAQai1XcRR2Ipu0AtcrIAxaXvHpaFggX
+ eXdPRSYeXb8XL1QqHPSzCWNUBj5B5zM+WFxhH177an+BWw4iWE0xdcaJ5aq//ic0gZYv
+ ta3w==
+X-Gm-Message-State: APjAAAX2vYRayssC+YdmdkoMVPmW1Za1LwQ8Qyx5lf/GP/MhrxOUQhY1
+ g7GlNf71DZGj5lZLFA0ZgkY=
+X-Google-Smtp-Source: APXvYqzXb0sCdCb3eaTfGmcbFLwDo6dZT+QOy+VcVAonJR82VSOM03WwdEiok0vMrALZ2bsDrrF20A==
+X-Received: by 2002:a63:cd06:: with SMTP id i6mr1485257pgg.48.1576654135855;
+ Tue, 17 Dec 2019 23:28:55 -0800 (PST)
+Received: from localhost (c-71-204-169-238.hsd1.ca.comcast.net.
+ [71.204.169.238])
+ by smtp.gmail.com with ESMTPSA id bo9sm1427694pjb.21.2019.12.17.23.28.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 Dec 2019 23:28:55 -0800 (PST)
+Date: Tue, 17 Dec 2019 23:28:54 -0800
+From: Fangrui Song <i@maskray.me>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 0/7] configure: Improve PIE and other linkage
+Message-ID: <20191218072854.3j3sld6dsikgqjtx@gmail.com>
 References: <20191218031920.6414-1-richard.henderson@linaro.org>
- <20191218031920.6414-4-richard.henderson@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <19a90c1c-3407-522c-72c7-1612ba66147c@redhat.com>
-Date: Wed, 18 Dec 2019 08:05:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191218031920.6414-4-richard.henderson@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Zuu03WIZPfy1YPK6YqtXVA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191218031920.6414-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.85.215.196
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,24 +79,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
+Cc: philmd@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/12/2019 04.19, Richard Henderson wrote:
-> PIE is supported on many other hosts besides x86.
-> 
-> The default for non-x86 is now the same as x86: pie is used
-> if supported, and may be forced via --enable/--disable-pie.
+On 2019-12-17, Richard Henderson wrote:
+>This begins by dropping the -Ttext-segment stuff, which Fangrui Song
+>correctly points out does not work with lld.  But it's also obsolete,
+>so instead of adding support for lld's --image-base, remove it all.
+>
+>Then, remove some other legacy random addresses that were supposed
+>to apply to softmmu, but didn't really make any sense, and aren't
+>used anyway when PIE is used, which is the default with a modern
+>linux distribution.
+>
+>Then, clean up some of the configure logic surrounding PIE, and its
+>current non-application to non-x86.
+>
+>Finally, add support for static-pie linking.
+>
+>
+>r~
+>
+>
+>Richard Henderson (7):
+>  configure: Drop adjustment of textseg
+>  tcg: Remove softmmu code_gen_buffer fixed address
+>  configure: Do not force pie=no for non-x86
+>  configure: Always detect -no-pie toolchain support
+>  configure: Unnest detection of -z,relro and -z,now
+>  configure: Override the os default with --disable-pie
+>  configure: Support -static-pie if requested
+>
+> accel/tcg/translate-all.c |  37 ++----------
+> configure                 | 120 ++++++++++++--------------------------
+> 2 files changed, 41 insertions(+), 116 deletions(-)
+>
+>-- 
+>2.20.1
 
-The original commit that introduce this code (40d6444e91c) said:
+Thank you for the patch set. I hope this will make that lld qemu user
+happy.
 
- "Non-x86 are not changed, as they require TCG changes"
-
-... are these "TCG changes" in place nowadays? Did you check on non-x86
-systems? If so, please mention this in the commit message.
-
- Thomas
-
+How will this patch set affect statically linked user mode binaries?
+(qemu-user-static packages on Debian, CentOS, ...)
 
