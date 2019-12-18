@@ -2,78 +2,95 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EBCC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A07C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3133D21582
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:28:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D664421582
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:28:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3wrjEZV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3133D21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vt7d/Wjx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D664421582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihikQ-0003bi-7z
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 18:28:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35093)
+	id 1ihikT-0003hH-VY
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 18:28:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1ihih4-0007Cu-NN
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:27 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihihM-0007j7-NU
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1ihih3-0003cp-Kg
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:26 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46647
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ihih3-0003ch-Gg
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576711525;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HeLcqgAJ0jMqwtYDErQXdX2IVnm/UfYy9v1fDBynv5E=;
- b=f3wrjEZV4e0HReNyASuRP5qCWiJ6lZg+ME00nb1UH5Bds8Wkp3F2tElZEcgm1VArIIEZtu
- FIJbtQLb4PEAA0n6YpBWP7y4siY+ygVZNW+H/kxfVjO5pZhZMF2cML+r0lqKc+Abs8aPfH
- XBxShp0it3kLsOR/nOnX1bJSwwcDQS0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-119-CmnEsEOjMhe6kY_rhWczlA-1; Wed, 18 Dec 2019 18:25:21 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A73CEDBE6;
- Wed, 18 Dec 2019 23:25:20 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-25.gru2.redhat.com
- [10.97.116.25])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D46A1001281;
- Wed, 18 Dec 2019 23:25:18 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v8 3/4] Acceptance tests: add make targets to download images
-Date: Wed, 18 Dec 2019 18:24:59 -0500
-Message-Id: <20191218232500.23530-4-crosa@redhat.com>
-In-Reply-To: <20191218232500.23530-1-crosa@redhat.com>
-References: <20191218232500.23530-1-crosa@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1ihihL-0003lz-DW
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:44 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36595)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ihihL-0003kd-6w
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:25:43 -0500
+Received: by mail-pg1-x542.google.com with SMTP id k3so2094069pgc.3
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 15:25:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Eren9MLX7bzFjzWNgpuKzO0ZxiULws5PT2XeNzaV3mk=;
+ b=vt7d/WjxHgqZ4rfBM2Boqfjy0fqwZRtQnv6QVXOQfkKRb1RVQ7OBoYYrBA0e0zHO/v
+ F1ILRgO982EiuNMkkflR3gIjfnQNIIwRsu1nihJEqaNxN+VDYmVRictlAlttajZ0sNUD
+ l4HMhVBYYvsO72WcTiFOc3cT1Jxx9Xg3gygVPk98QkVgwWOC2h9RSPk59WpB5NNZwsv0
+ hR6vVQUgafApwPiemnZcW7fXDdxN3yVRbyGNgy9yokLoaZpdBdnNkonhDnE1uF0hFYJf
+ idRyj/eBBTmxHkdJdrmUfReOxcZwOpz8Sr+rQgPfoxR+h68En5+xIi9zutCxtpKuYufS
+ yQpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Eren9MLX7bzFjzWNgpuKzO0ZxiULws5PT2XeNzaV3mk=;
+ b=Z4plq+Zv9jkDLXYaop54ulyxwqwYGRadBJ4lz9Ami1HFsz0PBRoCoUK96nxXWqPZiE
+ n37DnnHJGs93qKvTT/dCgodoo//94ugohOdau8M02NssbeXkW0PYMZk73+BerItx8sAy
+ 2muxjrgdil89TYF9tnHgnHaCOhEsYXPnuivYJeLjhknrfy9KkGLIo3Wx9PPU4pLaBVRY
+ pjjkL3lPYaNvPh1eI5B3sr22qemzxXvjnJG9qtocCQmyC1GdMVHI+qB0CC4aEkn0Or3F
+ QNJOU1gZTm4YYj+HpMum5rxerbDaCmG2VUaFGR3VaR3mckctdeGd9dNxCamcN+EKaMW/
+ oI0w==
+X-Gm-Message-State: APjAAAUYoLX94zoxrXn5luE8g8vBZXOU/EK4pYsgsKZXe9BsQD+DEll1
+ pTimfjr7xNqteH471ch+PtTUXeOQgx4=
+X-Google-Smtp-Source: APXvYqzPfxbrhkosH1bAF1xjw5Fd+MK03TPU/srZz7hsp7GX1cRPwkh6K3QYcL6gBoQFSEzjVUpZ0Q==
+X-Received: by 2002:a63:d00f:: with SMTP id z15mr5779169pgf.143.1576711541896; 
+ Wed, 18 Dec 2019 15:25:41 -0800 (PST)
+Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
+ ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
+ by smtp.gmail.com with ESMTPSA id i127sm5108224pfe.54.2019.12.18.15.25.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Dec 2019 15:25:41 -0800 (PST)
+Subject: Re: [PATCH v2 06/10] arm/arm-powerctl: rebuild hflags after setting
+ CP15 bits in arm_set_cpu_on()
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+References: <20191216233519.29030-1-nieklinnenbank@gmail.com>
+ <20191216233519.29030-7-nieklinnenbank@gmail.com>
+ <CAPan3WpW1Q3zpnqgk=MWRWe99=MQ4XoW2kw8L3tioFxfEBXd+Q@mail.gmail.com>
+ <CAFEAcA8Viii4Em_bf4Y=AG0jU+EFFFTX6dO-52qd=RT4uHbCVw@mail.gmail.com>
+ <19e4f2ac-6067-f61f-f340-108545fb0f02@linaro.org>
+ <CAPan3WrcvE_43=3+b4Ybn==TEQcKj+F_VWjJRBJ6MyXNrcpUbw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6ec61650-30e1-4377-6b22-5b6ef827e69c@linaro.org>
+Date: Wed, 18 Dec 2019 13:25:37 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: CmnEsEOjMhe6kY_rhWczlA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <CAPan3WrcvE_43=3+b4Ybn==TEQcKj+F_VWjJRBJ6MyXNrcpUbw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,72 +102,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The newly introduced "boot linux" tests make use of Linux images that
-are larger than usual, and fall into what Avocado calls "vmimages",
-and can be referred to by name, version and architecture.
+On 12/18/19 11:01 AM, Niek Linnenbank wrote:
+> Hello Richard,
+> 
+> On Tue, Dec 17, 2019 at 5:41 PM Richard Henderson <richard.henderson@linaro.org
+> <mailto:richard.henderson@linaro.org>> wrote:
+> 
+>     On 12/17/19 6:12 AM, Peter Maydell wrote:
+>     > Cc'ing Richard : this is one for you I think... (surely we
+>     > need to rebuild the hflags from scratch when we power up
+>     > a CPU anyway?)
+> 
+>     We do compute hflags from scratch in reset.
+> 
+>     It has also turned out that there were a few board models that poked at the
+>     contents of the cpu and needed special help.  Some of that I would imagine
+>     would be fixed properly with the multi-phase reset patches, where we could
+>     rebuild hflags when *leaving* reset.
+> 
+>     In arm_set_cpu_on_async_work, we start by resetting the cpu and then start
+>     poking at the contents of some system registers.  So, yes, we do need to
+>     rebuild after doing that.  Also, I'm not sure how this function should fit into
+>     the multi-phase reset future.
+> 
+> 
+> Great, thanks a lot for confirming and clarifying this!
+> You mention the multi-phase reset feature, is that going to replace the
+> arm_set_cpu_on() functionality?
 
-The images can be downloaded automatically during the test. But, to
-make for more reliable test results, this introduces a target that
-will download the vmimages for the architectures that have been
-configured and are available for the currently used distro (Fedora
-31).
+I don't think so, but I'm not sure.  As I said above, I don't immediately see
+how arm_set_cpu_on() will integrate.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/Makefile.include | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+In any case, multi-phase reset is still pending, though I believe it is high on
+Peter's priority queue for the 5.0 development cycle.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b381387048..78a6f089ff 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1177,7 +1177,20 @@ $(TESTS_RESULTS_DIR):
-=20
- check-venv: $(TESTS_VENV_DIR)
-=20
--check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-+FEDORA_31_ARCHES_CANDIDATES=3D$(patsubst ppc64,ppc64le,$(TARGETS))
-+FEDORA_31_ARCHES :=3D x86_64 aarch64 ppc64le s390x
-+FEDORA_31_DOWNLOAD=3D$(filter $(FEDORA_31_ARCHES),$(FEDORA_31_ARCHES_CANDI=
-DATES))
-+
-+# download one specific Fedora 31 image
-+get-vmimage-fedora-31-%: $(check-venv)
-+=09$(call quiet-command, \
-+             $(TESTS_VENV_DIR)/bin/python -m avocado vmimage get \
-+             --distro=3Dfedora --distro-version=3D31 --arch=3D$*)
-+
-+# download all vm images, according to defined targets
-+get-vmimage: $(patsubst %,get-vmimage-fedora-31-%, $(FEDORA_31_DOWNLOAD))
-+
-+check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vmimage
- =09$(call quiet-command, \
-             $(TESTS_VENV_DIR)/bin/python -m avocado \
-             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RESUL=
-TS_DIR) \
-@@ -1188,7 +1201,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-=20
- # Consolidated targets
-=20
--.PHONY: check-block check-qapi-schema check-qtest check-unit check check-c=
-lean
-+.PHONY: check-block check-qapi-schema check-qtest check-unit check check-c=
-lean get-vmimage
- check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schem=
-a/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
- check-block: $(patsubst %,check-%, $(check-block-y))
---=20
-2.21.0
 
+r~
 
