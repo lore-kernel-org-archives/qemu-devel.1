@@ -2,62 +2,91 @@ Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B027DC2D0BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 22:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81503C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 22:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F3562467B
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 22:13:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F3562467B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 48CE42176D
+	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 22:33:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jOBfVgWS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48CE42176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihhZB-0002jB-Jw
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 17:13:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56289)
+	id 1ihhtD-0000Am-7b
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 17:33:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1ihhYV-0002Cx-Mm
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 17:12:32 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihhsM-0007y1-GI
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 17:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1ihhYO-0008ES-Nd
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 17:12:30 -0500
-Received: from home.keithp.com ([63.227.221.253]:34876 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>) id 1ihhYO-0008BC-Hf
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 17:12:24 -0500
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id B0B513F2A0A6;
- Wed, 18 Dec 2019 14:12:12 -0800 (PST)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id ERxuSXDkITRp; Wed, 18 Dec 2019 14:12:12 -0800 (PST)
-Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 4F9723F2A0A4;
- Wed, 18 Dec 2019 14:12:12 -0800 (PST)
-Received: by keithp.com (Postfix, from userid 1000)
- id 094161582169; Wed, 18 Dec 2019 14:12:12 -0800 (PST)
-From: "Keith Packard" <keithp@keithp.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Subject: Re: [PATCH  v1 0/4] semihosting read console support
-In-Reply-To: <20191218180029.6744-1-alex.bennee@linaro.org>
-References: <20191218180029.6744-1-alex.bennee@linaro.org>
-Date: Wed, 18 Dec 2019 14:12:11 -0800
-Message-ID: <87h81xz3k4.fsf@keithp.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1ihhsL-00033W-6I
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 17:33:02 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:53746)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ihhsK-00032q-V8
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 17:33:01 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id n96so1534379pjc.3
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 14:33:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=p4xZIPSEISN+K4dVk04GghIr7RQHoYZISOMSsq/1TH8=;
+ b=jOBfVgWS4riJLcZ3BxUtj9JjmZ/L/uvDhlVVI8AYjBSwrWLjHmRvV6oEj2zrb22ond
+ LzRL/U5k3sgWo5PTgM01uGXMToUfOdwlOl8w4mAQrI9IncSAoJBoyPGGKz98v7aF+NWK
+ 8775wT9mzWn4pI8OHK3Ipbixh1Jvqnx+CBY6iZ1xIcDBlAikIS4PWLZd5v52uonGnWM6
+ OEUFex0/8XiUmVGecmdLWVQH2s3vuJ4kGxMIa5LJuvomC/x/NOEeKNwlOkR2uI41ACSr
+ k+MCxDJom4+fB+EeuIQDHNhWNI6InvjtDinbiJnj+eC6z77N0TQy3RK5jCEwzGEMpaFT
+ ++Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=p4xZIPSEISN+K4dVk04GghIr7RQHoYZISOMSsq/1TH8=;
+ b=gqLOcOjr+T1CzrQZqb68smgQrDr7W7tUrCcNEeAcBl7iQ7xbMYBe7AaItogLi7Mf9+
+ LKkfpDkNNMXGSuRlfv5CUxTBDo22rmr4+xSuU5WMuYKhYIljhGbRNFjfbgcX6BLQDQqk
+ sgcerHr6dR2J9YFeyEz6Qij2UUJhW7DUcLtXDdZlAj8I4Ebxgh99I3JGFcH1Xr9Kwl1h
+ 5X3WSZVU1rvDuQ5xMTI3EUbuQxtd3CD7svAw9+7ve8a/JFFJK6m+zkS5eQtMzeBRHNS5
+ hYyLQsUWZSqJN1kI8Nfe4CcBciG9sRJQy3/HftmgCw/5XerQcBhjvG941Ok0onRwZm1/
+ b+tg==
+X-Gm-Message-State: APjAAAVRMr51COKTj40o+ukhypZm6gqP5mtLPnrPBcBYB5VaETphXFbt
+ 9+V2cGkhNtH5Xhud8M7iXB6jwvqtKHg=
+X-Google-Smtp-Source: APXvYqyinlZ8zI54zXfY4kABCJ75CeoVqYYuIXJM4HAJpWx1SqF50uYDYDXk8YfXERjJURlzlh0PSQ==
+X-Received: by 2002:a17:90a:1b45:: with SMTP id
+ q63mr5823123pjq.118.1576708379708; 
+ Wed, 18 Dec 2019 14:32:59 -0800 (PST)
+Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
+ ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
+ by smtp.gmail.com with ESMTPSA id r1sm4392660pgp.15.2019.12.18.14.32.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Dec 2019 14:32:59 -0800 (PST)
+Subject: Re: [PATCH 0/7] configure: Improve PIE and other linkage
+To: Fangrui Song <i@maskray.me>
+References: <20191218031920.6414-1-richard.henderson@linaro.org>
+ <20191218072854.3j3sld6dsikgqjtx@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <96a57644-de4c-71e1-1674-d28e943d8aa6@linaro.org>
+Date: Wed, 18 Dec 2019 12:32:56 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 63.227.221.253
+In-Reply-To: <20191218072854.3j3sld6dsikgqjtx@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,61 +98,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: philmd@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 12/17/19 9:28 PM, Fangrui Song wrote:
+> How will this patch set affect statically linked user mode binaries?
+> (qemu-user-static packages on Debian, CentOS, ...)
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+The statically linked user mode binaries will still build, and should still be
+able to run any guest binary that could be run before.
 
-> Hi,
->
-> This series introduces a new "blocking" console read function for
-> semihosting and plumbs it in to the ARM semihosting code. The main bit
-> of work is Keith's patch (with a few tweaks by me). The other
-> preparatory patches make sure the PC is updated after semihosting
-> succeeds and a little bit of clean-up.
->
-> The following patches need review
->    01 - target arm remove unused EXCP_SEMIHOST leg
->    02 - target arm only update pc after semihosting compl
->    04 - tests tcg add a dumb as bricks semihosting consol
+If the distribution is new enough to support -static-pie, then that will be
+automatically used.
 
-I've reviewed all four of these patches to the best of my (limited)
-ability. I've also tested this with picolibc's semihosting support for
-cortex-m3
-
-Reviewed-by: Keith Packard <keithp@keithp.com>
-Tested-by: Keith Packard <keithp@keithp.com>
-
-Thanks much for the rework, definitely beyond my understanding of QEMU
-internals.
-
-=2D-=20
-=2Dkeith
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl36pDsACgkQ2yIaaQAA
-ABH56Q/7B6cTe7VThnjjyW+LuuKgsdIBo7Ikigg8F6DBhoVIs8UdJJMsLRe/VYej
-k9eWwFs/btgzG26p6aL1LClCTo0iElHnkcMqaLq1V2zE4gdga0oWYUQ9qjtycACL
-1kAUD8iluZbf91lmU+OO8bTEtaqZ894Ig6lah53glGDkfTfDX0q+skn3rhW97jvQ
-b12BMuFMahFt2QpOmv5XMpFPqhqoLjm4XSGdeykIVDsyke+0o0lJRPD9RKMAMlAI
-iixM3nERO5eho1BbgJHNS4Th7tOixxclRjy4NRUZOZvULbbshxpqtETRze+RvhEB
-Bv1caDSFX7ESFtVuhp/JzA9QXFvlp0hHXnbW5mGdp6ox4d84ArJYkd6Qz5mGG3Ls
-YXTIa4KGGWawC7KLHRgNqsodRd07Q8JTDBtLCmZJ0SvJBwaMRpXIgGjpYIYIpIif
-jPqqrTXvMfTyE/Wzsbp4SH4J+bn1EMo2kH2b2uklfWVw9imJ9DiqJcEeeZNkAFCN
-IA+g1qZz95biI5GMBlnafkCB58o0S38KypgY7hLtaykEzqEmSrTsn15RTVI6HQxu
-L4nYDBFUIvpucQeE5dj38dlic89XvurjNq6qsdgFu83Zloy0Bnz7/i/DsjfUK/w1
-h5ABliSyIFsZFdfD+Jraww09HiatdP0iYCb1wZTS5xfkIlVUVk8=
-=wx7h
------END PGP SIGNATURE-----
---=-=-=--
+r~
 
