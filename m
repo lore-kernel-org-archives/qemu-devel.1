@@ -2,78 +2,79 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 072ECC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D94D4C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:51:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5BB7206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0EFD2082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:51:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJncbNz/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5BB7206D7
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5xIQHof"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0EFD2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihvEs-0006PD-21
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:49:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40371)
+	id 1ihvGo-0000bP-8d
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:51:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35674)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ihuxS-000897-Uv
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:31:12 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ihurt-0000RU-7W
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ihuxR-0000Am-Bj
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:31:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45637
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1ihurr-0002KJ-EP
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52167
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ihuxR-00006X-5H
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:31:09 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihurq-0002Em-LC
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576758668;
+ s=mimecast20190719; t=1576758318;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vCHO9ERRT5i+5ymbnbgqq02uxG5UeMhV/3W94nXH/tI=;
- b=RJncbNz/VF5Q5xJNEUhg5b4QXJZQSSXgDlfWEx6HIzBKYJPcqobdvlA2EwFGKCV4Z6u6m/
- Hqth++dT/1DFp4GvOHDIegjFB3j6onUHhkCfaEVtme/QtlwFlOJZQjsYkK1crThgpiryEu
- Nw64K6HYLkfq+L1a8R9FTMHeCe1Psao=
+ bh=6vJv+3RorrvWn+cJmBlppbndFpDtm/N3rUqEtwJZ7Wg=;
+ b=R5xIQHofTi8Gb+MT2/V/BTGFe/Z5DU8vRBLrQ9Pc/QSCPgFoplRmtBBIOUoRcBIqnM1sx1
+ IOdUu/Iq4M5WBxoIiouiVsB56kv88mYaH6z12kelF/NCW1V0aWbIvD+dmIuQN4REkJFpcs
+ W4vQHxjyYj2otoRwOIRpCmWIl4bp2Fw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-5-A2r3TON5qRRAEoeuz4PQ-1; Thu, 19 Dec 2019 07:31:04 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-122-AmuHFdzxNwaCa9qX9pS_bw-1; Thu, 19 Dec 2019 07:25:16 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E479D800D41
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:31:03 +0000 (UTC)
-Received: from localhost (ovpn-112-22.ams2.redhat.com [10.36.112.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E449D5C1B0;
- Thu, 19 Dec 2019 12:30:53 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20773800EBF
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:25:16 +0000 (UTC)
+Received: from 640k.localdomain.com (ovpn-112-55.ams2.redhat.com
+ [10.36.112.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E87B260C18;
+ Thu, 19 Dec 2019 12:25:14 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 1/9] vmstate: add qom interface to get id
-Date: Thu, 19 Dec 2019 16:30:21 +0400
-Message-Id: <20191219123029.200788-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20191219123029.200788-1-marcandre.lureau@redhat.com>
-References: <20191219123029.200788-1-marcandre.lureau@redhat.com>
+Subject: [PATCH 119/132] meson: add NSIS building
+Date: Thu, 19 Dec 2019 13:23:39 +0100
+Message-Id: <1576758232-12439-28-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
+References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 5-A2r3TON5qRRAEoeuz4PQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: AmuHFdzxNwaCa9qX9pS_bw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,217 +86,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com, pbonzini@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add an interface to get the instance id, instead of depending on
-Device and qdev_get_dev_path().
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- MAINTAINERS                  |  2 ++
- hw/core/Makefile.objs        |  1 +
- hw/core/qdev.c               | 14 +++++++++++++
- hw/core/vmstate-if.c         | 23 +++++++++++++++++++++
- include/hw/vmstate-if.h      | 40 ++++++++++++++++++++++++++++++++++++
- include/migration/register.h |  2 ++
- include/migration/vmstate.h  |  2 ++
- tests/Makefile.include       |  1 +
- 8 files changed, 85 insertions(+)
- create mode 100644 hw/core/vmstate-if.c
- create mode 100644 include/hw/vmstate-if.h
+ Makefile        | 57 -----------------------------------------------------=
+---
+ meson.build     | 23 +++++++++++++++++++++++
+ scripts/nsis.sh | 58 +++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ 3 files changed, 81 insertions(+), 57 deletions(-)
+ create mode 100755 scripts/nsis.sh
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 740401bcbb..7a0ea36717 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2194,6 +2194,8 @@ Migration
- M: Juan Quintela <quintela@redhat.com>
- M: Dr. David Alan Gilbert <dgilbert@redhat.com>
- S: Maintained
-+F: hw/core/vmstate-if.c
-+F: include/hw/vmstate-if.h
- F: include/migration/
- F: migration/
- F: scripts/vmstate-static-checker.py
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index fd0550d1d9..0edd9e635d 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -9,6 +9,7 @@ common-obj-y +=3D hotplug.o
- common-obj-$(CONFIG_SOFTMMU) +=3D nmi.o
- common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-handler.o
- common-obj-y +=3D cpu.o
-+common-obj-y +=3D vmstate-if.o
+diff --git a/Makefile b/Makefile
+index ac21e14..710659b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -335,62 +335,6 @@ cscope:
+ =09find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed 's,^\./,,' > "$(SRC_P=
+ATH)/cscope.files"
+ =09cscope -b -i"$(SRC_PATH)/cscope.files"
 =20
- common-obj-$(CONFIG_EMPTY_SLOT) +=3D empty_slot.o
- common-obj-$(CONFIG_XILINX_AXI) +=3D stream.o
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index cf1ba28fe3..add43d460e 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -1089,9 +1089,18 @@ static void device_unparent(Object *obj)
-     }
- }
-=20
-+static char *
-+device_vmstate_if_get_id(VMStateIf *obj)
-+{
-+    DeviceState *dev =3D DEVICE(obj);
+-ifdef CONFIG_WIN32
+-
+-INSTALLER =3D qemu-setup-$(VERSION)$(EXESUF)
+-
+-nsisflags =3D -V2 -NOCD
+-
+-ifneq ($(wildcard $(SRC_PATH)/dll),)
+-ifeq ($(ARCH),x86_64)
+-# 64 bit executables
+-DLL_PATH =3D $(SRC_PATH)/dll/w64
+-nsisflags +=3D -DW64
+-else
+-# 32 bit executables
+-DLL_PATH =3D $(SRC_PATH)/dll/w32
+-endif
+-endif
+-
+-.PHONY: installer
+-installer: $(INSTALLER)
+-
+-INSTDIR=3D/tmp/qemu-nsis
+-
+-$(INSTALLER): $(SRC_PATH)/qemu.nsi
+-=09$(MAKE) install prefix=3D${INSTDIR}
+-ifdef SIGNCODE
+-=09(cd ${INSTDIR}; \
+-         for i in *.exe; do \
+-           $(SIGNCODE) $${i}; \
+-         done \
+-        )
+-endif # SIGNCODE
+-=09(cd ${INSTDIR}; \
+-         for i in qemu-system-*.exe; do \
+-           arch=3D$${i%.exe}; \
+-           arch=3D$${arch#qemu-system-}; \
+-           echo Section \"$$arch\" Section_$$arch; \
+-           echo SetOutPath \"\$$INSTDIR\"; \
+-           echo File \"\$${BINDIR}\\$$i\"; \
+-           echo SectionEnd; \
+-         done \
+-        ) >${INSTDIR}/system-emulations.nsh
+-=09makensis $(nsisflags) \
+-                $(if $(BUILD_DOCS),-DCONFIG_DOCUMENTATION=3D"y") \
+-                $(if $(CONFIG_GTK),-DCONFIG_GTK=3D"y") \
+-                -DBINDIR=3D"${INSTDIR}" \
+-                $(if $(DLL_PATH),-DDLLDIR=3D"$(DLL_PATH)") \
+-                -DSRCDIR=3D"$(SRC_PATH)" \
+-                -DOUTFILE=3D"$(INSTALLER)" \
+-                -DDISPLAYVERSION=3D"$(VERSION)" \
+-                $(SRC_PATH)/qemu.nsi
+-=09rm -r ${INSTDIR}
+-ifdef SIGNCODE
+-=09$(SIGNCODE) $(INSTALLER)
+-endif # SIGNCODE
+-endif # CONFIG_WIN
+-
+ # Add a dependency on the generated files, so that they are always
+ # rebuilt before other object files
+ ifneq ($(wildcard config-host.mak),)
+@@ -430,7 +374,6 @@ endif
+ =09@echo  ''
+ ifdef CONFIG_WIN32
+ =09@echo  'Windows targets:'
+-=09@echo  '  installer       - Build NSIS-based installer for QEMU'
+ ifdef QEMU_GA_MSI_ENABLED
+ =09@echo  '  msi             - Build MSI-based installer for qemu-ga'
+ endif
+diff --git a/meson.build b/meson.build
+index 40ba735..ce67e4c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1040,3 +1040,26 @@ if pod2man.found() and build_docs
+                                   '--release=3D" "', '@INPUT@'])
+   endforeach
+ endif
 +
-+    return qdev_get_dev_path(dev);
-+}
++if host_machine.system() =3D=3D 'windows'
++  nsis_cmd =3D [
++    find_program('scripts/nsis.sh'),
++    '@OUTPUT@',
++    get_option('prefix'),
++    meson.current_source_dir(),
++    host_machine.cpu_family(),
++    '-DDISPLAYVERSION=3D@0@'.format(config_host['VERSION']),
++  ]
++  if build_docs
++    nsis_cmd +=3D '-DCONFIG_DOCUMENTATION=3Dy'
++  endif
++  if 'CONFIG_GTK' in config_host
++    nsis_cmd +=3D '-DCONFIG_GTK=3Dy'
++  endif
 +
- static void device_class_init(ObjectClass *class, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(class);
-+    VMStateIfClass *vc =3D VMSTATE_IF_CLASS(class);
-=20
-     class->unparent =3D device_unparent;
-=20
-@@ -1103,6 +1112,7 @@ static void device_class_init(ObjectClass *class, voi=
-d *data)
-      */
-     dc->hotpluggable =3D true;
-     dc->user_creatable =3D true;
-+    vc->get_id =3D device_vmstate_if_get_id;
- }
-=20
- void device_class_set_parent_reset(DeviceClass *dc,
-@@ -1160,6 +1170,10 @@ static const TypeInfo device_type_info =3D {
-     .class_init =3D device_class_init,
-     .abstract =3D true,
-     .class_size =3D sizeof(DeviceClass),
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_VMSTATE_IF },
-+        { }
-+    }
- };
-=20
- static void qdev_register_types(void)
-diff --git a/hw/core/vmstate-if.c b/hw/core/vmstate-if.c
-new file mode 100644
-index 0000000000..bf453620fe
++  custom_target('nsis',
++                output: 'qemu-setup-' + config_host['VERSION'] + '.exe',
++                input: files('qemu.nsi'),
++                build_always_stale: true,
++                command: nsis_cmd + ['@INPUT@'])
++endif
+diff --git a/scripts/nsis.sh b/scripts/nsis.sh
+new file mode 100755
+index 0000000..ad23708
 --- /dev/null
-+++ b/hw/core/vmstate-if.c
-@@ -0,0 +1,23 @@
-+/*
-+ * VMState interface
-+ *
-+ * Copyright (c) 2009-2019 Red Hat Inc
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ */
++++ b/scripts/nsis.sh
+@@ -0,0 +1,58 @@
++#!/bin/bash
 +
-+#include "qemu/osdep.h"
-+#include "hw/vmstate-if.h"
++OUTFILE=3D"$1"
++shift
++PREFIX=3D"$1"
++shift
++SRCDIR=3D"$1"
++shift
++CPU=3D"$1"
++shift
 +
-+static const TypeInfo vmstate_if_info =3D {
-+    .name =3D TYPE_VMSTATE_IF,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(VMStateIfClass),
-+};
++DESTDIR=3D$(mktemp -d)
++trap "rm -rf $DESTDIR" EXIT
++make DESTDIR=3D"$DESTDIR" install
 +
-+static void vmstate_register_types(void)
-+{
-+    type_register_static(&vmstate_if_info);
++signcode() {
++    if [ -z "$SIGNCODE" ]; then
++        return
++    fi
++    "$SIGNCODE" "$@"
 +}
 +
-+type_init(vmstate_register_types);
-diff --git a/include/hw/vmstate-if.h b/include/hw/vmstate-if.h
-new file mode 100644
-index 0000000000..8ff7f0f292
---- /dev/null
-+++ b/include/hw/vmstate-if.h
-@@ -0,0 +1,40 @@
-+/*
-+ * VMState interface
-+ *
-+ * Copyright (c) 2009-2019 Red Hat Inc
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ */
++shopt -s nullglob
 +
-+#ifndef VMSTATE_IF_H
-+#define VMSTATE_IF_H
++(
++    cd "$DESTDIR$PREFIX"
++    for i in qemu-system-*.exe; do
++        arch=3D${i%.exe}
++        arch=3D${arch#qemu-system-}
++        echo Section \"$arch\" Section_$arch
++        echo SetOutPath \"\$INSTDIR\"
++        echo File \"\${BINDIR}\\$i\"
++        echo SectionEnd
++    done
++) > "$DESTDIR$PREFIX/system-emulations.nsh"
 +
-+#include "qom/object.h"
++(
++    cd "$DESTDIR$PREFIX"
++    for i in *.exe; do
++        signcode "$i"
++    done
++)
 +
-+#define TYPE_VMSTATE_IF "vmstate-if"
++if [ "$CPU" =3D "x86_64" ]; then
++    CPUARG=3D"-DW64"
++    DLLDIR=3D"w64"
++else
++    DLLDIR=3D"w32"
++fi
 +
-+#define VMSTATE_IF_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(VMStateIfClass, (klass), TYPE_VMSTATE_IF)
-+#define VMSTATE_IF_GET_CLASS(obj)                           \
-+    OBJECT_GET_CLASS(VMStateIfClass, (obj), TYPE_VMSTATE_IF)
-+#define VMSTATE_IF(obj)                             \
-+    INTERFACE_CHECK(VMStateIf, (obj), TYPE_VMSTATE_IF)
++if [ -d "$SRCDIR/dll" ]; then
++   DLLARG=3D"-DDLLDIR=3D$SRCDIR/dll/$DLLDIR"
++fi
 +
-+typedef struct VMStateIf VMStateIf;
++makensis -V2 -NOCD -DSRCDIR=3D"$SRCDIR" -DBINDIR=3D"$DESTDIR$PREFIX" \
++         $CPUARG $DLLARG -DOUTFILE=3D"$OUTFILE" "$@"
 +
-+typedef struct VMStateIfClass {
-+    InterfaceClass parent_class;
-+
-+    char * (*get_id)(VMStateIf *obj);
-+} VMStateIfClass;
-+
-+static inline char *vmstate_if_get_id(VMStateIf *vmif)
-+{
-+    if (!vmif) {
-+        return NULL;
-+    }
-+
-+    return VMSTATE_IF_GET_CLASS(vmif)->get_id(vmif);
-+}
-+
-+#endif /* VMSTATE_IF_H */
-diff --git a/include/migration/register.h b/include/migration/register.h
-index a13359a08d..73149c9a01 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -14,6 +14,8 @@
- #ifndef MIGRATION_REGISTER_H
- #define MIGRATION_REGISTER_H
-=20
-+#include "hw/vmstate-if.h"
-+
- typedef struct SaveVMHandlers {
-     /* This runs inside the iothread lock.  */
-     SaveStateHandler *save_state;
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index ac4f46a67d..f546f61c5e 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -27,6 +27,8 @@
- #ifndef QEMU_VMSTATE_H
- #define QEMU_VMSTATE_H
-=20
-+#include "hw/vmstate-if.h"
-+
- typedef struct VMStateInfo VMStateInfo;
- typedef struct VMStateField VMStateField;
-=20
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b381387048..fa4140cbde 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -579,6 +579,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-=
-global-props.o \
- =09hw/core/irq.o \
- =09hw/core/fw-path-provider.o \
- =09hw/core/reset.o \
-+=09hw/core/vmstate-if.o \
- =09$(test-qapi-obj-y)
- tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
- =09migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
++signcode "$OUTFILE"
 --=20
-2.24.0.308.g228f53135a
+1.8.3.1
+
 
 
