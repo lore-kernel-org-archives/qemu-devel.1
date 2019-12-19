@@ -7,124 +7,124 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A55C2C2D0C1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8844CC43603
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:07:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 747F2227BF
+	by mail.kernel.org (Postfix) with ESMTPS id 56077206D8
 	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:07:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hGEr2HJs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 747F2227BF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="IV+HsRqk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56077206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwSf-0001Qo-V8
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:07:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36364)
+	id 1ihwSf-0001ON-SE
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:07:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.jensen@samsung.com>) id 1ihvZG-00021f-B4
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:15 -0500
+ (envelope-from <k.jensen@samsung.com>) id 1ihvYm-0001TQ-R9
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.jensen@samsung.com>) id 1ihvZA-0007RC-QJ
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:13 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:56025)
+ (envelope-from <k.jensen@samsung.com>) id 1ihvYj-0006Jy-Rh
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:43 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:47846)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <k.jensen@samsung.com>)
- id 1ihvZ8-00071v-Tb
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:07 -0500
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
- by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20191219130950euoutp02a8cbbfbb81c94c17add1c1a06a5d0160~hx8Q0F2ZV0700607006euoutp02Y
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:09:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20191219130950euoutp02a8cbbfbb81c94c17add1c1a06a5d0160~hx8Q0F2ZV0700607006euoutp02Y
+ id 1ihvYj-0006Fe-9z
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:41 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+ by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id
+ 20191219130939euoutp0133952596f82501bf1f18008d2465205a~hx8HPkHna1327713277euoutp01y
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:09:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com
+ 20191219130939euoutp0133952596f82501bf1f18008d2465205a~hx8HPkHna1327713277euoutp01y
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1576760990;
- bh=CYRrHfKw1K9Ro4e7lTpoMGBBGlKMP9JOUCvEIyKYx08=;
+ s=mail20170921; t=1576760979;
+ bh=FJgBsP4niZXtmHBkIg8Zp3iXBAnhFys7NaMTVC75fyo=;
  h=From:To:CC:Subject:Date:In-Reply-To:References:From;
- b=hGEr2HJs9PZtwULSB6ECF0tc7u9qWdwT1/wOlbDhbkCidsv0RuoOVF8G7X1cqPBap
- 0xgRlGjx8gQu55NRRCTifeGaT7p0mdFDxheTN7glQVJyxTUoPs1MkDGuDEcuqSDAWD
- 745B1bsY7i6QJnSDaBghD5/5a41QpXUCet26uFjo=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+ b=IV+HsRqktv96pdYovhSyVl7w5hmJ30CyGYEp8ecekZysoy2zX4stmFfe82LLjXdEr
+ iBcJ+gZrMkSIek7UaGEJNRAa47RqoazGnZjCT2auFAhQCy/NigyQJjxa2kKEu4TqGa
+ RoXU/hxk8DbqQ7xDiM9YRk6jES+86+amQHt2heB8=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
  eucas1p2.samsung.com (KnoxPortal) with ESMTP id
- 20191219130949eucas1p26a52179a5d011456874e9d3b79a7c936~hx8Qp8C9j3066830668eucas1p2p;
- Thu, 19 Dec 2019 13:09:49 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
- eusmges3new.samsung.com (EUCPMTA) with SMTP id BB.5F.60698.D967BFD5; Thu, 19
- Dec 2019 13:09:49 +0000 (GMT)
+ 20191219130939eucas1p24c6bf9e85fd1819348fc7d7f1cf2f099~hx8HHSpOZ0341303413eucas1p2v;
+ Thu, 19 Dec 2019 13:09:39 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+ eusmges2new.samsung.com (EUCPMTA) with SMTP id D4.05.60679.3967BFD5; Thu, 19
+ Dec 2019 13:09:39 +0000 (GMT)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
- 20191219130949eucas1p172304dc579f8bda43a8febd234064799~hx8QWGndM1260812608eucas1p1n;
- Thu, 19 Dec 2019 13:09:49 +0000 (GMT)
+ eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+ 20191219130939eucas1p2234cbe31c7a027e6ccf1b4ceafd19c30~hx8Gpv6A_1986019860eucas1p2E;
+ Thu, 19 Dec 2019 13:09:39 +0000 (GMT)
 Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
  eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20191219130949eusmtrp25b9e013f5a81a6afbc25bb8f511a758f~hx8QViM1f3120131201eusmtrp2Y;
- Thu, 19 Dec 2019 13:09:49 +0000 (GMT)
-X-AuditID: cbfec7f5-a0fff7000001ed1a-79-5dfb769d8cff
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
- eusmgms1.samsung.com (EUCPMTA) with SMTP id FE.4D.08375.D967BFD5; Thu, 19
- Dec 2019 13:09:49 +0000 (GMT)
+ 20191219130939eusmtrp238a61a1eb3309aa5fe1afc41ddaa2a3a~hx8GpKdQf3097130971eusmtrp2-;
+ Thu, 19 Dec 2019 13:09:39 +0000 (GMT)
+X-AuditID: cbfec7f4-0e5ff7000001ed07-d1-5dfb76938fa2
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+ eusmgms1.samsung.com (EUCPMTA) with SMTP id D2.4D.08375.3967BFD5; Thu, 19
+ Dec 2019 13:09:39 +0000 (GMT)
 Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
- eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
- 20191219130949eusmtip15b753a1cc4586914247515b7af33fc90~hx8QP_5Ce2151321513eusmtip1e;
- Thu, 19 Dec 2019 13:09:49 +0000 (GMT)
+ eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+ 20191219130939eusmtip250063af71795420badab1320ab0ca1cd~hx8GjFXZk2680126801eusmtip2Q;
+ Thu, 19 Dec 2019 13:09:39 +0000 (GMT)
 Received: from CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) by
  CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
- Server (TLS) id 15.0.1320.4; Thu, 19 Dec 2019 13:09:48 +0000
+ Server (TLS) id 15.0.1320.4; Thu, 19 Dec 2019 13:09:38 +0000
 Received: from apples.local (106.110.32.41) by CAMSVWEXC01.scsc.local
  (106.1.227.71) with Microsoft SMTP Server id 15.0.1320.4 via Frontend
- Transport; Thu, 19 Dec 2019 13:09:48 +0000
+ Transport; Thu, 19 Dec 2019 13:09:37 +0000
 From: Klaus Jensen <k.jensen@samsung.com>
 To: <qemu-block@nongnu.org>
-Subject: [PATCH v4 22/24] nvme: bump controller pci device id
-Date: Thu, 19 Dec 2019 14:09:19 +0100
-Message-ID: <20191219130921.309264-23-k.jensen@samsung.com>
+Subject: [PATCH v4 07/24] nvme: add support for the abort command
+Date: Thu, 19 Dec 2019 14:09:04 +0100
+Message-ID: <20191219130921.309264-8-k.jensen@samsung.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191219130921.309264-1-k.jensen@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGKsWRmVeSWpSXmKPExsWy7djP87pzy37HGrT0mlhs7m9ntJh06Bqj
- xZKLqRbzbilbzHrXzmZxvHcHiwObx6ZVnWwed67tYfN4cm0zk8f7fVfZAliiuGxSUnMyy1KL
- 9O0SuDLW/jvMXvCZq+LE9BlMDYw/OboYOTkkBEwkXl+5z9rFyMUhJLCCUeL2vH3MEM4XRom/
- pyeyQTifGSVenTwA5HCAtbzfZgMRX84ocX3RR2aQUWBFL866QyTOMEq8bLzKCOHsYpSY8qWF
- BaSKTUBTYvuf/2C2iIC0RPvVSWDLmQWuM0oc+n2RHSQhLGArsfr3RVYQm0VAVeLJ9KlgcV4B
- a4nNOw6xQVwuL7H12yewGk6g+Jbe24wQNYISJ2c+AVvADFTTvHU2M4QtIXHwxQtmiN5V7BKr
- OqshbBegp38xQtjCEq+Ob2GHsGUk/u+czwRynIRAN6NE34evzBDODEaJ6cu+QwPDWqLvTA5E
- g6PEqZ777BBhPokbbwUh9vJJTNo2nRkizCvR0SYEUa0msaNpK+MERuVZSK6eheTqWUiuXsDI
- vIpRPLW0ODc9tdg4L7Vcrzgxt7g0L10vOT93EyMwtZz+d/zrDsZ9f5IOMQpwMCrx8Dqk/Y4V
- Yk0sK67MPcQowcGsJMJ7u+NnrBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFe40UvY4UE0hNLUrNT
- UwtSi2CyTBycUg2MgU42EeI3f8ctnH2tzLq09oQRW2sLy883P2I6zjy9PT11bUDZ8tJNF2xM
- bVIP8vX6zLPqX8u52OGFGJvYvXnvFz5/235fW2F+afaikuXsucJHmq9PYK0wExYp0Mm8cFzi
- zPZJYjkXM9V/7nn6Sj0ljEe4g2Pusj/P5oRblM4oMZxTuWSOiF2FEktxRqKhFnNRcSIA7CXD
- 6ikDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCIsWRmVeSWpSXmKPExsVy+t/xu7pzy37HGhxsULDY3N/OaDHp0DVG
- iyUXUy3m3VK2mPWunc3ieO8OFgc2j02rOtk87lzbw+bx5NpmJo/3+66yBbBE6dkU5ZeWpCpk
- 5BeX2CpFG1oY6RlaWugZmVjqGRqbx1oZmSrp29mkpOZklqUW6dsl6GWs/XeYveAzV8WJ6TOY
- Ghh/cnQxcnBICJhIvN9m08XIxSEksJRRYsWtVrYuRk6guIzEpysf2SFsYYk/17rYIIo+Mkq0
- Lb/HAuGcYZQ4ubaDEcLZxSjR/2YeWAubgKbE9j//WUBsEQFpifark1hBipgFrjNKHPp9EaxI
- WMBWYvXvi6wgNouAqsST6VPB4rwC1hKbdxyCukNeYuu3T2A1nEDxLb23GUFsIQEricc/P7JA
- 1AtKnJz5BMxmBqpv3jqbGcKWkDj44gXzBEbhWUjKZiEpm4WkbAEj8ypGkdTS4tz03GJDveLE
- 3OLSvHS95PzcTYzAGNt27OfmHYyXNgYfYhTgYFTi4X2Z/DtWiDWxrLgy9xCjBAezkgjv7Y6f
- sUK8KYmVValF+fFFpTmpxYcYTYGem8gsJZqcD4z/vJJ4Q1NDcwtLQ3Njc2MzCyVx3g6BgzFC
- AumJJanZqakFqUUwfUwcnFINjC566VsmX/mb2hn440jP3/MuN6XZj//uqe0tD2ZL87stybTq
- 0uzAxUcSyhb+jLC+9fnmpyXPtK6mtNi2ZV5fGHNUVEuR0+DfG+MV1493l3A89Z62894Jrn/z
- L93PXnA+c2VQGsMeibaq0xrzbnuLP0qy0EmKsNsvxyc/oTPL0qihNmqfRMW+E0osxRmJhlrM
- RcWJAHo/kqTHAgAA
-X-CMS-MailID: 20191219130949eucas1p172304dc579f8bda43a8febd234064799
+X-Brightmail-Tracker: H4sIAAAAAAAAA01SaUwTYRD16263S2PL0pIwAaOmKEYM4BVThagkHjX6w98mRVZYgdgW0uUQ
+ f3Ek5RKQArbWM3iAEDWcVgImVKQKhIpKIXKYYFGEKETuFEW2i4Z/M/Pem3kzGRKTmYT+ZIIu
+ mdHraI2CEONNHUs9IaWpbvXuBds2ZX1xDlIabU6kfNDLKO98ClRafuYQSnuhFT9KqOqq8wjV
+ kLOFULmc9QLV1Ms+4ix+ThwRy2gSUhl92OFocbyjpEeUNCO/nPXEjGWgCu98RJJA7YesmuB8
+ JCZlVBUCy+RdAZ/MInD0XhfyyQyCkbJ2PB95eRTDAwaCByoRXJ11YP9Zj2unBRxLRnUjmOcU
+ HNCMoHPxFcYBBLUTni+veFr5UgGQ02f0zMCofgQ2d6+IA+RUJNR/7vB0wqnt0O8yecQS6hBM
+ 3bILeB9boHH+l5CLvahwaCgcRDzHB97ecHkGYKuc7MabGB8DtI2Pe6wCVS2C3LFJxDc6BubW
+ ubXl5DBhbxDx8SZYecGfA6gCBEXTc2tqMwLTowWCP2A4FHVreEEkdNlHcL4shYEfPvxgKRib
+ uAW4sgRyDTKeHQTWrEZ0DQVa1tm2rLNtWWf7HsKqkR+TwmrjGHavjkkLZWktm6KLC41J1Nah
+ 1Xfp+mOftaLm5Qs2RJFIsVEyHuNWy4R0KpuutSEgMYWvZDB3SS2TxNLpVxh94nl9ioZhbSiA
+ xBV+kn0V39UyKo5OZi4xTBKj/4cKSC//DJR9ZPTbw7Z3hrFYA7OhNPJ3+bBf9nH9QcNCa8+A
+ 3BjdeTtKdcoME3RNxeQH76XKE2f05ZkG6a7Xb2rCIu5by6UXd7z3L9Bu/jiUnkSqw4pPdiy6
+ MkuqnAGqqebagtKWvFHd1wxdQlZQmUHrmDn99EvIimnoAOHTvjXKXfVsmU1T4Gw8vScY07P0
+ XxQ57bwqAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMIsWRmVeSWpSXmKPExsVy+t/xe7qTy37HGrxZy26xub+d0WLSoWuM
+ FksuplrMu6VsMetdO5vF8d4dLA5sHptWdbJ53Lm2h83jybXNTB7v911lC2CJ0rMpyi8tSVXI
+ yC8usVWKNrQw0jO0tNAzMrHUMzQ2j7UyMlXSt7NJSc3JLEst0rdL0Ms4P/Ece8Fn4YqmtTOY
+ GxgX8XcxcnJICJhI3L3RxtbFyMUhJLCUUeLGhC+sEAkZiU9XPrJD2MISf651sYHYQgIfGSV+
+ zleHaDjDKNH88yozRGIXo8Sf9mAQm01AU2L7n/8sILaIgLRE+9VJrCANzALXGSUO/b4INlVY
+ wFFi8/1jTCA2i4CqxPUn08EG8QpYSbyfc5wJYrO8xNZvn8Au4hSwltjSe5sRYpmVxOOfH1kg
+ 6gUlTs58AmYzA9U3b53NDGFLSBx88YJ5AqPwLCRls5CUzUJStoCReRWjSGppcW56brGhXnFi
+ bnFpXrpecn7uJkZghG079nPzDsZLG4MPMQpwMCrx8L5M/h0rxJpYVlyZe4hRgoNZSYT3dsfP
+ WCHelMTKqtSi/Pii0pzU4kOMpkDPTWSWEk3OB0Z/Xkm8oamhuYWlobmxubGZhZI4b4fAwRgh
+ gfTEktTs1NSC1CKYPiYOTqkGxtx1Bz9fD6y51js1b8+XiB9/eAIZ9k06GeMZsqlnu+FPkcoA
+ 16SWoxpS/u9+bzGT3ru28u408WcVLF+/vF9dfyXlbMsv8YeztfZPUN/46lhGcuVSL6fsMJW4
+ o7XqOsVzTFqNXDic1/dNfdlWpLn7z6uvYlmv+nPmC+vvXj6vLfGWUn6eatAiDyWW4oxEQy3m
+ ouJEAANtyzfGAgAA
+X-CMS-MailID: 20191219130939eucas1p2234cbe31c7a027e6ccf1b4ceafd19c30
 X-Msg-Generator: CA
-X-RootMTR: 20191219130949eucas1p172304dc579f8bda43a8febd234064799
+X-RootMTR: 20191219130939eucas1p2234cbe31c7a027e6ccf1b4ceafd19c30
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20191219130949eucas1p172304dc579f8bda43a8febd234064799
+X-CMS-RootMailID: 20191219130939eucas1p2234cbe31c7a027e6ccf1b4ceafd19c30
 References: <20191219130921.309264-1-k.jensen@samsung.com>
- <CGME20191219130949eucas1p172304dc579f8bda43a8febd234064799@eucas1p1.samsung.com>
+ <CGME20191219130939eucas1p2234cbe31c7a027e6ccf1b4ceafd19c30@eucas1p2.samsung.com>
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 210.118.77.12
+X-Received-From: 210.118.77.11
 X-Mailman-Approved-At: Thu, 19 Dec 2019 08:56:47 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,42 +144,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commits 9d6459d21a6e ("nvme: fix write zeroes offset and count")
-and c7fe50bcf1f1 ("nvme: support multiple namespaces") the controller
-device no longer has the quirks that the Linux kernel think it has.
+Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
+Section 5.1 ("Abort command").
 
-As the quirks are applied based on pci vendor and device id, bump the
-device id to get rid of them.
+The Abort command is a best effort command; for now, the device always
+fails to abort the given command.
 
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 ---
- hw/block/nvme.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/block/nvme.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index e1bf9bf3798b..68c433415169 100644
+index a41ebf578f04..d41ea5beab08 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -2480,7 +2480,7 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevice *p=
-ci_dev)
-     pci_conf[PCI_INTERRUPT_PIN] =3D 1;
-     pci_config_set_prog_interface(pci_conf, 0x2);
-     pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
--    pci_config_set_device_id(pci_conf, 0x5845);
-+    pci_config_set_device_id(pci_conf, 0x5846);
-     pci_config_set_class(pci_conf, PCI_CLASS_STORAGE_EXPRESS);
-     pcie_endpoint_cap_init(pci_dev, 0x80);
+@@ -731,6 +731,18 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *=
+cmd)
+     }
+ }
 =20
-@@ -2651,7 +2651,7 @@ static void nvme_class_init(ObjectClass *oc, void *=
-data)
-     pc->exit =3D nvme_exit;
-     pc->class_id =3D PCI_CLASS_STORAGE_EXPRESS;
-     pc->vendor_id =3D PCI_VENDOR_ID_INTEL;
--    pc->device_id =3D 0x5845;
-+    pc->device_id =3D 0x5846;
-     pc->revision =3D 2;
++static uint16_t nvme_abort(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++{
++    uint16_t sqid =3D le32_to_cpu(cmd->cdw10) & 0xffff;
++
++    req->cqe.result =3D 1;
++    if (nvme_check_sqid(n, sqid)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
++
++    return NVME_SUCCESS;
++}
++
+ static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
+ {
+     trace_nvme_dev_setfeat_timestamp(ts);
+@@ -848,6 +860,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd=
+ *cmd, NvmeRequest *req)
+         trace_nvme_dev_err_invalid_setfeat(dw10);
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
++
+     return NVME_SUCCESS;
+ }
 =20
-     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -864,6 +877,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *=
+cmd, NvmeRequest *req)
+         return nvme_create_cq(n, cmd);
+     case NVME_ADM_CMD_IDENTIFY:
+         return nvme_identify(n, cmd);
++    case NVME_ADM_CMD_ABORT:
++        return nvme_abort(n, cmd, req);
+     case NVME_ADM_CMD_SET_FEATURES:
+         return nvme_set_feature(n, cmd, req);
+     case NVME_ADM_CMD_GET_FEATURES:
+@@ -1377,6 +1392,19 @@ static void nvme_realize(PCIDevice *pci_dev, Error=
+ **errp)
+     id->ieee[2] =3D 0xb3;
+     id->ver =3D cpu_to_le32(NVME_SPEC_VER);
+     id->oacs =3D cpu_to_le16(0);
++
++    /*
++     * Because the controller always completes the Abort command immedia=
+tely,
++     * there can never be more than one concurrently executing Abort com=
+mand,
++     * so this value is never used for anything. Note that there can eas=
+ily be
++     * many Abort commands in the queues, but they are not considered
++     * "executing" until processed by nvme_abort.
++     *
++     * The specification recommends a value of 3 for Abort Command Limit=
+ (four
++     * concurrently outstanding Abort commands), so lets use that though=
+ it is
++     * inconsequential.
++     */
++    id->acl =3D 3;
+     id->frmw =3D 7 << 1;
+     id->lpa =3D 1 << 0;
+     id->sqes =3D (0x6 << 4) | 0x6;
 --=20
 2.24.1
 
