@@ -2,115 +2,93 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 507CDC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41554C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:56:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD40624672
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:40:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A4EA222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:56:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YBZATOMc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD40624672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWnYodxv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A4EA222C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihuAr-0003M7-IY
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 06:40:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41489)
+	id 1ihuPz-0000Hq-3N
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 06:56:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ihu9y-0002lS-PY
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:40:08 -0500
+ (envelope-from <stefanha@gmail.com>) id 1ihuPI-0008Ic-LO
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ihu9w-0001gW-Nv
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:40:01 -0500
-Received: from mail-eopbgr150113.outbound.protection.outlook.com
- ([40.107.15.113]:23950 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ihu9v-0001TM-UW; Thu, 19 Dec 2019 06:40:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q7JSvhuNSeFdz9FyjVprlC4syToiNpaGZDg2ZqJznqklKWJlJZNx600GZQa04yLSQI+hnm1tiiqKNppV9kH4zjmSdujFAtFY+Pw4CX9M+r5cLzJQ5R5Zr4QWAWaCxFOdKjBOTtSpA027cGnI6yfZG+Vy0ZMH+S+RbIyDeLnZlycAUDwoUzIeeWiKP8cmVpOfXNDEALqQpChIui2Z+179EiYj663cL5BtqS6fViMQ4X1Vv7zo+TolwwK3FMoCmA7996MghGbb/6vhwjo0iuEuyBCKGi4gxDdiJWSn9zqv88PyAEGU9KFQBTZ+/lJVT3ESGu75jMOtEN5WhVgJmFGUQQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8uos4dCmZrxAL1csNPFKccI644bjrWrqD3IR+3RIQPw=;
- b=gWhp//A1JTIrrnvQHlDFSVJQSeCXiSwl0+zPmUC3eXK8tenBioEoYH08sYrRrduob4xhECQcCqTaSzn5ha+BQfGAJfXcwnRVjwQcJD6H/ZxnWpTh3QzG0ctbE5SkpQnkNbjqMmSAx0XVCh//V0SGuiytWoAPcZYC5gByPHc2ZV5UPv6w4NhX7cd5CtilBSTajNff7on4YEkjriRfKFeXKaD0fkaN2bAQuF75DZJtqG8IeZpMUZP22PmEzVtKlhRne+EZzhWhBLeXTeEtLE61XxyMXq1K9RBAAIkRrvwU1P8xhae4NCvW9SQkMNkYM0GjQsWrh3xut4TWf1wfv1W7wA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8uos4dCmZrxAL1csNPFKccI644bjrWrqD3IR+3RIQPw=;
- b=YBZATOMcdRTTukKKmwQvNaUd5neld4iN10p1uP1yIE3CloFW0IXI2OFUNL+2Tw4NiGHwePZDsNICHy5yGIGIJumy8n/6oOibQJ8g2CrWGqsVvVmlLqv0PPHl3dhG1t1WRxTX7MJHy3zZc0OWiTqATo5L4XibMhYV2BmdO9M3CAA=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4439.eurprd08.prod.outlook.com (20.179.7.78) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2559.14; Thu, 19 Dec 2019 11:39:57 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2559.012; Thu, 19 Dec 2019
- 11:39:57 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Peter Krempa <pkrempa@redhat.com>
-Subject: Re: [PATCH v2 0/5] fix migration with bitmaps and mirror
-Thread-Topic: [PATCH v2 0/5] fix migration with bitmaps and mirror
-Thread-Index: AQHVtkmClxBjAFsANkahPv5xTkXxQqfBQ88AgAARrgA=
-Date: Thu, 19 Dec 2019 11:39:57 +0000
-Message-ID: <a3a53642-200a-c70c-9b05-24d0697329bb@virtuozzo.com>
-References: <20191219085106.22309-1-vsementsov@virtuozzo.com>
- <20191219103638.GJ4914@andariel.pipo.sk>
-In-Reply-To: <20191219103638.GJ4914@andariel.pipo.sk>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0259.eurprd05.prod.outlook.com
- (2603:10a6:3:fc::11) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191219143954710
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 11bbed5f-9ce2-4292-a3d6-08d784782c5e
-x-ms-traffictypediagnostic: AM6PR08MB4439:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB4439F0F239D42A1ECA4A972DC1520@AM6PR08MB4439.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0256C18696
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(376002)(136003)(39850400004)(396003)(346002)(53754006)(189003)(199004)(966005)(6512007)(478600001)(31686004)(2906002)(86362001)(31696002)(54906003)(71200400001)(316002)(6916009)(52116002)(81156014)(66446008)(8676002)(6486002)(66946007)(186003)(5660300002)(64756008)(6506007)(66476007)(2616005)(53546011)(8936002)(4326008)(26005)(81166006)(36756003)(66556008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4439;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: j87SLt0RXemIlGGVrE4k7PkXU3p8u34dr0fE6s2ttaJRwmcinRPqE2aBJmMcxtWFB95EXjrZfsBVBOKOQsXN75NJemR8lu4SVFFhK/53qh1/mxCLXxCMTdiI6gBnz6cJNeSb56LqP2wWvKF4cQBnkjftcZwuDQC7XBccbye4pLrFes2z96hTZ7EapElbKkbOxB6oauuxQoAzdpdzd6CAztz1b6IBdDSPqgHzfcfMSSHCo3s1fJrEw/HE6vJVfboEX63Bxwg7laQV2wGRiaLYnOfQAS/1NyMRfpmjkm9JLSRSLY1o3BpEY3OP0l9OP+F6CLpF/PdcUkDb9+F+AQ8zmf7art49O/laeN3dS+IKDTHLDaDGhatD+Jmh5H8mW8+ykWPw8LzTFSW+Iwn+3sVQQFBzSh8W1sk0PEPgemRVbjm5pcUVXmOXOE0mIgCCKxQ2Zbumhv1xirU4Xu6bCtfRyeS80RVL2NvOsJKkFKo9XT7H807HwZtQ0AfUr4z3JRfQijmdTAceZhsdkVoCDm5XE5u9jhdSE5vade41GdfvMIk=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EB6BF8B7EA28714B887124AE4BCFD0ED@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <stefanha@gmail.com>) id 1ihuPG-0005ce-WE
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:55:52 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53049)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ihuPG-0005W7-Nk
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:55:50 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p9so5151341wmc.2
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 03:55:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=6VKHYPvpRWsLMgCXnnJp4BSZ2RXylJ4J9ObKVirO2NI=;
+ b=CWnYodxvRu/jayrpifxnvp+Gkwlm1HL0QzkEc32r0rK3lBx6k9aCMaJzYqlFdGieCX
+ yWVVPG0Xtk+gzWbFK1nK2aZjWZNcI3ytCkyCgyeAvGNttgOMshJs4WhS6Qv9KPKvkGty
+ K76ZCjST6hiy8fQJiy9GnkAexfgie06GFmNrUnKiTV6QSmyFhl1LmI8zMOufeCLx08Md
+ xEHzjRsFSk2EaYHIAQ/cbQWQ+ldxGiood9VMLr1nrq0BbcSsHzTbiVSIWVXCsqdupvRS
+ dEGpvuRgYgfd2/TiST9eMJWrzRbkvWEiVUZ+JI/CaMmV6HQ7jc6AuWUmkSqqqehir7Zs
+ uGAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=6VKHYPvpRWsLMgCXnnJp4BSZ2RXylJ4J9ObKVirO2NI=;
+ b=S8uqCJezguvAS8N5I2BxI5TAGtpkat4Ye1MWcHE0j9H+8nv2NhJq1GXZ42zSwzJNMU
+ BVJHSeuTvGCdPRu03sw759PUrnqSRBvkWaviCt/Ekx6CLoKV083qC2Ft1vWEX4M8UbVJ
+ U/yZfUvrRjX/aH3a09t08KeE+Csdj0tnCn/DK3v77lk3YK0jU+F6WZI0CA1knfr/zFra
+ j7+HgRckRqjAp9nZftkeaIm1/Yk0tu+bJXQSwr/Tcs5Rlo1Cwbeg/zilCT1Cd8mcQdzq
+ Cm4pdc8jWTxXsDiOP1FLzIVNfVkO6HpZdRyvFc8Mukg7igVkH08R9zvD1qOHBGu8+7UW
+ D3TQ==
+X-Gm-Message-State: APjAAAWA5AksPClLnkp8DLa+X/S2HV/DEiqFGuzzD6OpJMzVJcqkeWKy
+ lufV4WLlUrsor2wITkPUibw=
+X-Google-Smtp-Source: APXvYqzxNoIVSzG/EiEMyng+LExvoaroxBOIaWWuYublxBdClAfoeNnNwMFuB8SNsDVsQisLaUd1Uw==
+X-Received: by 2002:a1c:4c5:: with SMTP id 188mr9494554wme.82.1576756549114;
+ Thu, 19 Dec 2019 03:55:49 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id z11sm5906877wrt.82.2019.12.19.03.55.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Dec 2019 03:55:47 -0800 (PST)
+Date: Thu, 19 Dec 2019 11:55:45 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
+ status update
+Message-ID: <20191219115545.GD1624084@stefanha-x1.localdomain>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <20191210064716.GA6401@flaka>
+ <20191213104116.GB1180977@stefanha-x1.localdomain>
+ <20191216194655.GA5922@flaka>
+ <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
+ <20191217163316.GB1333385@stefanha-x1.localdomain>
+ <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11bbed5f-9ce2-4292-a3d6-08d784782c5e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Dec 2019 11:39:57.3065 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JN7HUJQkF4Au8k8YPAMBdONuT1s/AQCMo3wPcQS0lKx5ZpkiazaEUQgW3gY486ZfYxs/W3hhyLooLuS9K47iOmjzIaMAjcr/Ri01zaNXI2k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4439
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.113
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="BRE3mIcgqKzpedwo"
+Content-Disposition: inline
+In-Reply-To: <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,59 +100,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ "fam@euphon.net" <fam@euphon.net>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "jag.raman@oracle.com" <jag.raman@oracle.com>,
+ "quintela@redhat.com" <quintela@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
+ "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "liran.alon@oracle.com" <liran.alon@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
+ "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTkuMTIuMjAxOSAxMzozNiwgUGV0ZXIgS3JlbXBhIHdyb3RlOg0KPiBPbiBUaHUsIERlYyAxOSwg
-MjAxOSBhdCAxMTo1MTowMSArMDMwMCwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90
-ZToNCj4+IEhpIGFsbCENCj4+DQo+PiBJdCdzIGEgY29udGludWF0aW9uIGZvcg0KPj4gImJpdG1h
-cCBtaWdyYXRpb24gYnVnIHdpdGggLWRyaXZlIHdoaWxlIGJsb2NrIG1pcnJvciBydW5zIg0KPj4g
-PDMxNWNmZjc4LWRjZGItYTNjZS0yNzQyLWRhM2NjOWYwY2E5N0ByZWRoYXQuY29tPg0KPj4gaHR0
-cHM6Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDkvbXNnMDcy
-NDEuaHRtbA0KPj4NCj4+IFRoZSBwcm9ibGVtIGlzIHRoYXQgYml0bWFwcyBtaWdyYXRlZCB0byBu
-b2RlIHdpdGggc2FtZSBub2RlLW5hbWUgb3INCj4+IGJsay1wYXJlbnQgbmFtZS4gQW5kIGN1cnJl
-bnRseSBvbmx5IHRoZSBsYXR0ZXIgYWN0dWFsbHkgd29yayBpbiBsaWJ2aXJ0Lg0KPj4gQW5kIHdp
-dGggbWlycm9yLXRvcCBmaWx0ZXIgaXQgZG9lc24ndCB3b3JrLCBiZWNhdXNlDQo+PiBiZHJ2X2dl
-dF9kZXZpY2Vfb3Jfbm9kZV9uYW1lIGRvbid0IGdvIHRocm91Z2ggZmlsdGVycy4NCj4gDQo+IEkg
-d2FudCB0byBwb2ludCBvdXQgdGhhdCBzaW5jZSBsaWJ2aXJ0LTUuMTAgd2UgdXNlIC1ibG9ja2Rl
-diB0bw0KPiBjb25maWd1cmUgdGhlIGJhY2tlbmQgb2Ygc3RvcmFnZSBkZXZpY2VzIHdpdGggcWVt
-dS00LjIgYW5kIGxhdGVyLiBUaGlzDQo+IG1lYW5zIHVuZm9ydHVuYXRlbHkgdGhhdCB0aGUgQmxv
-Y2tCYWNrZW5kIG9mIHRoZSBkcml2ZSBkb2VzIG5vdCBoYXZlIGENCj4gbmFtZSBhbnkgbW9yZSBh
-bmQgdGh1cyB0aGUgYWJvdmUgd2lsbCBub3Qgd29yayBldmVuIGlmIHlvdSBtYWtlIHRoZQ0KPiBs
-b29rdXAgY29kZSB0byBzZWUgdGhyb3VnaCBmaWx0ZXJzLg0KDQpTaG91bGQgd2Ugc3VwcG9ydCBx
-ZW11LTQuMiBhbmQgbGF0ZXIgZm9yIGVhcmxpZXIgdmVyc2lvbnMgb2YgbGlidmlydD8NCg0KPiAN
-Cj4gQXMgSSd2ZSBwb2ludGVkIG91dCBzZXBhcmF0ZWx5IG5vZGUtbmFtZXMgYXJlIG5vdCBnb29k
-IGlkZWEgdG8gdXNlIGZvcg0KPiBtYXRjaGluZyBlaXRoZXIgYXMgdGhleSBjYW4gYmUgZGlzdGlu
-Y3Qgb24gdGhlIGRlc3RpbmF0aW9uIG9mIG1pZ3JhdGlvbi4NCj4gDQo+IEhhdmluZyBzYW1lIG5v
-ZGUgbmFtZXMgZm9yIGltYWdlcyBkdXJpbmcgbWlncmF0aW9uIHdhcyBub3QgZG9jdW1lbnRlZCBh
-cw0KPiBhIHJlcXVpcmVtZW5kIGFuZCBldmVuIGlmIGl0IHdhcyB0aGUgY2FzZSB3aGVuIHRoZSBt
-aXJyb3Igam9iIGlzIHVzZWQNCj4gdGhlIGRlc3RpbmF0aW9uIGlzIGEgZGlmZmVyZW50IGltYWdl
-IGFuZCB0aHVzIGhhdmluZyBhIGRpZmZlcmVudCBub2RlDQo+IG5hbWUgaXMgZXhwZWN0ZWQuDQo+
-IA0KPiBTaW5jZSBpdCdzIG5vdCBkb2N1bWVudGVkLCBleHBlY3QgdGhlIHNhbWUgc2l0dWF0aW9u
-IGFzIHdpdGgNCj4gYXV0b2dlbmVyYXRlZCBub2RlbmFtZXMsIHRoZSBkZXN0aW5hdGlvbiBtYXkg
-aGF2ZSBkaWZmZXJlbnQgbm9kZS1uYW1lcw0KPiBhbmQgdGhlIHNhbWUgbm9kZS1uYW1lIG1heSBy
-ZWZlciB0byBhIGRpZmZlcmVudCBpbWFnZS4gSW1wbGljaXQgbWF0Y2hpbmcNCj4gYmFzZWQgb24g
-bm9kZS1uYW1lcyBpcyB0aHVzIGltcG9zc2libGUuDQo+IA0KDQpTbywgaXQncyB0aW1lIHRvIGlt
-cGxlbWVudCBleHBsaWNpdCBtYXRjaGluZy4uDQoNCkkgcmVtZW1iZXIgd2UgZGlzY3Vzc2VkIGEg
-Y29tbWFuZCB0byBzZXQgdGhpcyBtYXRjaGluZyBvbiBzb3VyY2UuIFNvIHdlIGNhbGwNCnFtcCBj
-b21tYW5kIG9uIHNvdXJjZSwgd2hpY2ggc3BlY2lmaWVzIHdoZXJlIGJpdG1hcHMgZ28gb24gdGFy
-Z2V0Li4NCg0KSXMgaXQgT0s/DQoNCk9yLCBpcyBpdCBiZXR0ZXIgdG8gZG8gaXQgc3ltbWV0cmlj
-YWxseSwgY2FsbGluZyBvbiBzb3VyY2UgY29tbWFuZCwgd2hpY2gNCmp1c3QgYmluZHMgc29tZSBt
-aWdyYXRpb24taWRzIHRvIHRoZSBiaXRtYXBzLiBBbmQgc2FtZSBjb21tYW5kIG9uIHRhcmdldCwg
-dG8NCmJpbmQgdGhlc2UgaWRzIHRvIGJpdG1hcHMgb24gdGFyZ2V0Li4NCg0KSG1tbS4NCg0KSSB0
-aGluayBiZXR0ZXIsIHRvIHN0aWxsIHNldCBtYXRjaGluZyBub3QgdG8gaWRzIGJ1dCB0byB7bm9k
-ZV9uYW1lLCBiaXRtYXBfbmFtZX0NCnBhaXIsIGJ1dCBhbGxvdyBkbyBpdCBlaXRoZXIgb24gc291
-cmNlIG9yIG9uIHRhcmdldCAob3IgYm90aCksIHdoaWNoIHdpbGwgYWxsb3cNCnRvIG1pZ3JhdGUg
-ZnJvbSBvbGQgcWVtdSB2ZXJzaW9uIHdpdGhvdXQgc3VjaCBjb21tYW5kIHRvIG5ldyBxZW11IHZl
-cnNpb24gd2hpY2gNCnN1cHBvcnRzIGl0Lg0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGlt
-aXINCg==
+
+--BRE3mIcgqKzpedwo
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Dec 17, 2019 at 10:57:17PM +0000, Felipe Franciosi wrote:
+> > On Dec 17, 2019, at 5:33 PM, Stefan Hajnoczi <stefanha@redhat.com> wrot=
+e:
+> > On Mon, Dec 16, 2019 at 07:57:32PM +0000, Felipe Franciosi wrote:
+> >>> On 16 Dec 2019, at 20:47, Elena Ufimtseva <elena.ufimtseva@oracle.com=
+> wrote:
+> >>> =EF=BB=BFOn Fri, Dec 13, 2019 at 10:41:16AM +0000, Stefan Hajnoczi wr=
+ote:
+> > Questions I've seen when discussing muser with people have been:
+> >=20
+> > 1. Can unprivileged containers create muser devices?  If not, this is a
+> >   blocker for use cases that want to avoid root privileges entirely.
+>=20
+> Yes you can. Muser device creation follows the same process as general
+> mdev device creation (ie. you write to a sysfs path). That creates an
+> entry in /dev/vfio and the control plane can further drop privileges
+> there (set selinux contexts, &c.)
+
+In this case there is still a privileged step during setup.  What about
+completely unprivileged scenarios like a regular user without root or a
+rootless container?
+
+> > 2. Does muser need to be in the kernel (e.g. slower to develop/ship,
+> >   security reasons)?  A similar library could be implemented in
+> >   userspace along the lines of the vhost-user protocol.  Although VMMs
+> >   would then need to use a new libmuser-client library instead of
+> >   reusing their VFIO code to access the device.
+>=20
+> Doing it in userspace was the flow we proposed back in last year's KVM
+> Forum (Edinburgh), but it got turned down. That's why we procured the
+> kernel approach, which turned out to have some advantages:
+> - No changes needed to Qemu
+> - No Qemu needed at all for userspace drivers
+> - Device emulation process restart is trivial
+>   (it therefore makes device code upgrades much easier)
+>=20
+> Having said that, nothing stops us from enhancing libmuser to talk
+> directly to Qemu (for the Qemu case). I envision at least two ways of
+> doing that:
+> - Hooking up libmuser with Qemu directly (eg. over a unix socket)
+> - Hooking Qemu with CUSE and implementing the muser.ko interface
+>=20
+> For the latter, libmuser would talk to a character device just like it
+> talks to the vfio character device. We "just" need to implement that
+> backend in Qemu. :)
+
+What about:
+ * libmuser's API stays mostly unchanged but the library speaks a
+   VFIO-over-UNIX domain sockets protocol instead of talking to
+   mdev/vfio in the host kernel.
+ * VMMs can implement this protocol directly for POSIX-portable and
+   unprivileged operation.
+ * A CUSE VFIO adapter simulates /dev/vfio so that VFIO-only VMMs can
+   still take advantage of libmuser devices.
+
+Assuming this is feasible, would you lose any important
+features/advantages of the muser.ko approach?  I don't know enough about
+VFIO to identify any blocker or obvious performance problems.
+
+Regarding recovery, it seems straightforward to keep state in a tmpfs
+file that can be reopened when the device is restarted.  I don't think
+kernel code is necessary?
+
+Stefan
+
+--BRE3mIcgqKzpedwo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl37ZUEACgkQnKSrs4Gr
+c8gCgggAlD45AcFJEst3u1vtz9Cso94uDZ+2+mHK3+7argBzEgeRTml10u6ta1OM
+FPvx8/qh6UtrjzXvfPhKjb22jRUt7KlB/gtepJ9XMScteielZm0irHnA83INVS1h
+ekBleGkg5ObSH0MNNx4DZFqkxHlStydZnRsIIcFDcbT5rL4wIWaRB+3cnXbk9ZPC
+tsy9HOoswNgeVPkUFVLDYB4H1f6BRhBFmwctWjYlIwaDjrFSUSl7jHAJBRC/7fN8
+aFrxN2oYzXSrgX7W/cOL0r6rG7BRt7IbJkNarbYGMV3On1ShbFM5iTU+7qW+x0vt
+c4TuWwTTcH1jyJ22/ecdH2NT5R7zJg==
+=5WqR
+-----END PGP SIGNATURE-----
+
+--BRE3mIcgqKzpedwo--
 
