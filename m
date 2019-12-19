@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D11C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 07:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA7CC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 07:42:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AECA02146E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 07:41:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AECA02146E
+	by mail.kernel.org (Postfix) with ESMTPS id D5E232146E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 07:42:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5E232146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihqQt-0000Pd-QP
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 02:41:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45797)
+	id 1ihqRv-0001Rq-W4
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 02:42:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50615)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ihqGW-0006Gy-Fa
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 02:30:33 -0500
+ (envelope-from <clg@kaod.org>) id 1ihqGz-0007Az-03
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 02:31:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ihqGV-0001qw-4C
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 02:30:32 -0500
-Received: from 13.mo3.mail-out.ovh.net ([188.165.33.202]:41583)
+ (envelope-from <clg@kaod.org>) id 1ihqGx-0004X3-NK
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 02:31:00 -0500
+Received: from 18.mo6.mail-out.ovh.net ([46.105.73.110]:34102)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ihqGU-0001ij-R6
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 02:30:30 -0500
-Received: from player714.ha.ovh.net (unknown [10.108.57.150])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 1CC2B23523D
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 08:30:29 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ihqGx-0004NX-Dk
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 02:30:59 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.146.173])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id B70D61EF8A0
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 08:30:57 +0100 (CET)
 Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
  [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player714.ha.ovh.net (Postfix) with ESMTPSA id 54A85D671DA5;
- Thu, 19 Dec 2019 07:30:23 +0000 (UTC)
+ by player714.ha.ovh.net (Postfix) with ESMTPSA id 2F7C7D671F1E;
+ Thu, 19 Dec 2019 07:30:52 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH 03/10] ppc/pnv: Introduce a "xics" property alias under the
- PSI model
-Date: Thu, 19 Dec 2019 08:29:54 +0100
-Message-Id: <20191219073001.26790-4-clg@kaod.org>
+Subject: [PATCH 08/10] xive: Use the XIVE fabric link under the XIVE router
+Date: Thu, 19 Dec 2019 08:29:59 +0100
+Message-Id: <20191219073001.26790-9-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191219073001.26790-1-clg@kaod.org>
 References: <20191219073001.26790-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2815875669784497126
+X-Ovh-Tracer-Id: 2824038442277112806
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddutddguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedugedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddutddguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedugedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgepge
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.33.202
+X-Received-From: 46.105.73.110
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,84 +74,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This removes the need of the intermediate link under PSI to pass the
-XICS link to the underlying ICSState object.
+From: Greg Kurz <groug@kaod.org>
 
+Now that the spapr and pnv machines do set the "xive-fabric" link, the
+use of the XIVE fabric pointer becomes mandatory. This is checked with
+an assert() in a new realize hook. Since the XIVE router is realized at
+machine init for the all the machine's life time, no risk to abort an
+already running guest (ie. not a hotplug path).
+
+This gets rid of a qdev_get_machine() call.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv.c     |  4 ++--
- hw/ppc/pnv_psi.c | 11 ++---------
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ hw/intc/xive.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 2f611bfdda46..d6fe5ba13535 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -999,8 +999,6 @@ static void pnv_chip_power8_instance_init(Object *obj=
-)
-=20
-     object_initialize_child(obj, "psi",  &chip8->psi, sizeof(chip8->psi)=
-,
-                             TYPE_PNV8_PSI, &error_abort, NULL);
--    object_property_add_const_link(OBJECT(&chip8->psi), "xics",
--                                   OBJECT(qdev_get_machine()), &error_ab=
-ort);
-=20
-     object_initialize_child(obj, "lpc",  &chip8->lpc, sizeof(chip8->lpc)=
-,
-                             TYPE_PNV8_LPC, &error_abort, NULL);
-@@ -1069,6 +1067,8 @@ static void pnv_chip_power8_realize(DeviceState *de=
-v, Error **errp)
-                             "bar", &error_fatal);
-     object_property_set_link(OBJECT(&chip8->psi), OBJECT(chip->system_me=
-mory),
-                              "system-memory", &error_abort);
-+    object_property_set_link(OBJECT(&chip8->psi), OBJECT(qdev_get_machin=
-e()),
-+                             ICS_PROP_XICS, &error_abort);
-     object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &loc=
-al_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 28d34e5c193a..d3124f673571 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -470,6 +470,8 @@ static void pnv_psi_power8_instance_init(Object *obj)
-=20
-     object_initialize_child(obj, "ics-psi",  &psi8->ics, sizeof(psi8->ic=
-s),
-                             TYPE_ICS, &error_abort, NULL);
-+    object_property_add_alias(obj, ICS_PROP_XICS, OBJECT(&psi8->ics),
-+                              ICS_PROP_XICS, &error_abort);
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 6df89b06da38..12a362b681a6 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1378,6 +1378,13 @@ static int xive_router_get_block_id(XiveRouter *xr=
+tr)
+    return xrc->get_block_id(xrtr);
  }
 =20
- static const uint8_t irq_to_xivr[] =3D {
-@@ -485,21 +487,12 @@ static void pnv_psi_power8_realize(DeviceState *dev=
-, Error **errp)
++static void xive_router_realize(DeviceState *dev, Error **errp)
++{
++    XiveRouter *xrtr =3D XIVE_ROUTER(dev);
++
++    assert(xrtr->xfb);
++}
++
+ /*
+  * Encode the HW CAM line in the block group mode format :
+  *
+@@ -1470,12 +1477,11 @@ int xive_presenter_tctx_match(XivePresenter *xptr=
+, XiveTCTX *tctx,
+  *
+  * The parameters represent what is sent on the PowerBus
+  */
+-static bool xive_presenter_notify(uint8_t format,
++static bool xive_presenter_notify(XiveFabric *xfb, uint8_t format,
+                                   uint8_t nvt_blk, uint32_t nvt_idx,
+                                   bool cam_ignore, uint8_t priority,
+                                   uint32_t logic_serv)
  {
-     PnvPsi *psi =3D PNV_PSI(dev);
-     ICSState *ics =3D &PNV8_PSI(psi)->ics;
--    Object *obj;
-     Error *err =3D NULL;
-     unsigned int i;
+-    XiveFabric *xfb =3D XIVE_FABRIC(qdev_get_machine());
+     XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xfb);
+     XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
+     int count;
+@@ -1607,7 +1613,7 @@ static void xive_router_end_notify(XiveRouter *xrtr=
+, uint8_t end_blk,
+         return;
+     }
 =20
-     assert(psi->system_memory);
+-    found =3D xive_presenter_notify(format, nvt_blk, nvt_idx,
++    found =3D xive_presenter_notify(xrtr->xfb, format, nvt_blk, nvt_idx,
+                           xive_get_field32(END_W7_F0_IGNORE, end.w7),
+                           priority,
+                           xive_get_field32(END_W7_F1_LOG_SERVER_ID, end.=
+w7));
+@@ -1727,6 +1733,8 @@ static void xive_router_class_init(ObjectClass *kla=
+ss, void *data)
 =20
--    obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
--    if (!obj) {
--        error_setg(errp, "%s: required link 'xics' not found: %s",
--                   __func__, error_get_pretty(err));
--        return;
--    }
--
-     /* Create PSI interrupt control source */
--    object_property_set_link(OBJECT(ics), obj, ICS_PROP_XICS, &error_abo=
-rt);
-     object_property_set_int(OBJECT(ics), PSI_NUM_INTERRUPTS, "nr-irqs", =
-&err);
-     if (err) {
-         error_propagate(errp, err);
+     dc->desc    =3D "XIVE Router Engine";
+     dc->props   =3D xive_router_properties;
++    /* Parent is SysBusDeviceClass. No need to call its realize hook */
++    dc->realize =3D xive_router_realize;
+     xnc->notify =3D xive_router_notify;
+ }
+=20
 --=20
 2.21.0
 
