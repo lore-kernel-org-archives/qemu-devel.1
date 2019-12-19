@@ -2,89 +2,80 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D34AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C12FBC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4666621D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:50:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B2B422314
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mo8MSyIX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4666621D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjclOZ88"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B2B422314
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihk1N-0005li-Dk
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 19:50:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50635)
+	id 1ihkGc-0000eO-L6
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 20:06:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1ihk0h-0005CS-TN
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:49:49 -0500
+ (envelope-from <crosa@redhat.com>) id 1ihkFs-00008g-9l
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:05:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1ihk0g-0004oB-EO
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:49:47 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:55213)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ihgUH-0000kf-6P
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 16:04:05 -0500
-Received: by mail-wm1-x336.google.com with SMTP id b19so3291776wmj.4
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 13:04:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=7ACWPIiwb1OnjUxWJCNQY1YhmvZfMvPFy7qV6Dou5t8=;
- b=mo8MSyIXkYZW3J6GnGfkVnKGugI84Fj31EuY39HldRt7aaWlwzkFos6Gz74wtIZTQW
- 5SzyM/ztso7utMHjSXq4v7paMHlcwyzbkkZ/l3P65n1+jOcdVIeaHV5z5BNNfkZzlxSb
- vzQwhnoJG/4t5aaReTFy68AgDbL+ixbZJnx9JcWOP80JitxiYQa821m06ICuWV4ZXTts
- QHjl7FmpsARzkaxm/c8990uMCOJCEZ1ANNuaczlE7b/WMCHhVgv1SJlxqcdbVfJe+61J
- VH2WObKynpbi9pbh6rbGGZvrHgGvrDKen5493ofiPi02S4CXvcYcpeA5VQt/vbJXqt7e
- OQWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=7ACWPIiwb1OnjUxWJCNQY1YhmvZfMvPFy7qV6Dou5t8=;
- b=kSy7PvvY3iNtgPIEZq/ZipqXyrcgFpiI6ty2BpCvk+zpHqYbbXHP2GR/n/A82GQr9s
- 7oBd93wmN2mmjEna9j8MUDgDPX9F4Feawg0SxhbNGuNR2grTR3dWzm/m2Riw1v226hqV
- hUC7oYn01FG76GF7m2S/sHPc10ZcG0Ri+v/TYiuWcDUrAEFT3LsMQjJ5fqqcQPNTccxU
- g60cOhbOhvEMJ1NO2gp7y++ugLU3IHR+aPo30HzfY4d+EZmhvRFXC6EDKZOpssnjHuqw
- NM6O5WW7OLFFEsc8g68oZTtZtdPGgi3Z2gS7/bzI5Cge043EFzEnwaZnFb90tT3OlcaZ
- paXA==
-X-Gm-Message-State: APjAAAVdlts4zEbXIGunDjmymA5Vswq9wI5sKumiALrSlXAhzP9VTBmI
- Lnpwe6XkhWyAZmYbKGy1Enee+UFe6pKCMw==
-X-Google-Smtp-Source: APXvYqxo3ifGnPnj6G2N1i7NBeCaQc4ecPQxiR0KzaOJmdaaRIMSnyUIsWO4Aj3h0shoeUiB0+nO/g==
-X-Received: by 2002:a05:600c:d6:: with SMTP id
- u22mr5781281wmm.77.1576703043638; 
- Wed, 18 Dec 2019 13:04:03 -0800 (PST)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-109-65-2-109.red.bezeqint.net. [109.65.2.109])
- by smtp.gmail.com with ESMTPSA id a133sm3808933wme.29.2019.12.18.13.04.01
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Wed, 18 Dec 2019 13:04:03 -0800 (PST)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v39 04/22] target/avr: Add instruction translation - Registers
- definition
-Date: Wed, 18 Dec 2019 23:03:11 +0200
-Message-Id: <20191218210329.1960-5-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191218210329.1960-1-mrolnik@gmail.com>
-References: <20191218210329.1960-1-mrolnik@gmail.com>
+ (envelope-from <crosa@redhat.com>) id 1ihkFo-0002KJ-Ta
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:05:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38264
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ihkFo-0002IJ-CX
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:05:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576717523;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=68fSqYCY47UGUagdKMmhGH8yB2hUE4pNbQBVVoPPpU0=;
+ b=UjclOZ88v0Tq+ZAZRQ4oYLaOmHn+eARiHBV/z6CjBb4XKamn/Oi8Krxwhg8KMkOR6JbkyO
+ 4lfWwiVNwK99++s6lgTmnNfHGFI49jdZq9GOlSlmKWJyJLwBrhE2K0b+1sD+exBg7ZBQWg
+ S+QHtls2fJi4o9Sdiizojh45TrAW7h4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-f-uCtzv9OWWQHgiRUfh74Q-1; Wed, 18 Dec 2019 20:05:17 -0500
+X-MC-Unique: f-uCtzv9OWWQHgiRUfh74Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D62F1800D4E;
+ Thu, 19 Dec 2019 01:05:15 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-25.gru2.redhat.com
+ [10.97.116.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 21EA119C58;
+ Thu, 19 Dec 2019 01:05:13 +0000 (UTC)
+Date: Wed, 18 Dec 2019 20:05:11 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 1/5] tests/boot_linux_console: Add a quick test for the
+ OrangePi PC board
+Message-ID: <20191219010511.GA3582@localhost.localdomain>
+References: <20191217182730.943-1-f4bug@amsat.org>
+ <20191217182730.943-2-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::336
+In-Reply-To: <20191217182730.943-2-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="T4sUOijqQbZv57TR"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,171 +87,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- me@xcancerberox.com.ar, richard.henderson@linaro.org, dovgaluk@ispras.ru,
- imammedo@redhat.com, philmd@redhat.com, aleksandar.m.mail@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Guenter Roeck <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- target/avr/translate.c | 143 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 143 insertions(+)
- create mode 100644 target/avr/translate.c
+--T4sUOijqQbZv57TR
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-new file mode 100644
-index 0000000000..0139bcabb1
---- /dev/null
-+++ b/target/avr/translate.c
-@@ -0,0 +1,143 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "tcg/tcg.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "tcg-op.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "exec/helper-gen.h"
-+#include "exec/log.h"
-+#include "exec/translator.h"
-+#include "exec/gen-icount.h"
-+
-+/*
-+ *  Define if you want a BREAK instruction translated to a breakpoint
-+ *  Active debugging connection is assumed
-+ *  This is for
-+ *  https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests
-+ *  tests
-+ */
-+#undef BREAKPOINT_ON_BREAK
-+
-+static TCGv cpu_pc;
-+
-+static TCGv cpu_Cf;
-+static TCGv cpu_Zf;
-+static TCGv cpu_Nf;
-+static TCGv cpu_Vf;
-+static TCGv cpu_Sf;
-+static TCGv cpu_Hf;
-+static TCGv cpu_Tf;
-+static TCGv cpu_If;
-+
-+static TCGv cpu_rampD;
-+static TCGv cpu_rampX;
-+static TCGv cpu_rampY;
-+static TCGv cpu_rampZ;
-+
-+static TCGv cpu_r[NUMBER_OF_CPU_REGISTERS];
-+static TCGv cpu_eind;
-+static TCGv cpu_sp;
-+
-+static TCGv cpu_skip;
-+
-+static const char reg_names[NUMBER_OF_CPU_REGISTERS][8] = {
-+    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
-+    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
-+    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-+    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
-+};
-+#define REG(x) (cpu_r[x])
-+
-+enum {
-+    DISAS_EXIT   = DISAS_TARGET_0,  /* We want return to the cpu main loop.  */
-+    DISAS_LOOKUP = DISAS_TARGET_1,  /* We have a variable condition exit.  */
-+    DISAS_CHAIN  = DISAS_TARGET_2,  /* We have a single condition exit.  */
-+};
-+
-+typedef struct DisasContext DisasContext;
-+
-+/* This is the state at translation time. */
-+struct DisasContext {
-+    TranslationBlock *tb;
-+
-+    CPUAVRState *env;
-+    CPUState *cs;
-+
-+    target_long npc;
-+    uint32_t opcode;
-+
-+    /* Routine used to access memory */
-+    int memidx;
-+    int bstate;
-+    int singlestep;
-+
-+    TCGv skip_var0;
-+    TCGv skip_var1;
-+    TCGCond skip_cond;
-+    bool free_skip_var0;
-+};
-+
-+static int to_regs_16_31_by_one(DisasContext *ctx, int indx)
-+{
-+    return 16 + (indx % 16);
-+}
-+
-+static int to_regs_16_23_by_one(DisasContext *ctx, int indx)
-+{
-+    return 16 + (indx % 8);
-+}
-+static int to_regs_24_30_by_two(DisasContext *ctx, int indx)
-+{
-+    return 24 + (indx % 4) * 2;
-+}
-+static int to_regs_00_30_by_two(DisasContext *ctx, int indx)
-+{
-+    return (indx % 16) * 2;
-+}
-+
-+static uint16_t next_word(DisasContext *ctx)
-+{
-+    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
-+}
-+
-+static int append_16(DisasContext *ctx, int x)
-+{
-+    return x << 16 | next_word(ctx);
-+}
-+
-+
-+static bool avr_have_feature(DisasContext *ctx, int feature)
-+{
-+    if (!avr_feature(ctx->env, feature)) {
-+        gen_helper_unsupported(cpu_env);
-+        ctx->bstate = DISAS_NORETURN;
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);
-+#include "decode_insn.inc.c"
-+
--- 
-2.17.2 (Apple Git-113)
+On Tue, Dec 17, 2019 at 07:27:26PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> This test boots a Linux kernel on a OrangePi PC board and verify
+> the serial output is working.
+>=20
+> The kernel image and DeviceTree blob are built by the Raspbian
+> project (based on Debian):
+> https://www.raspbian.org/RaspbianImages
+>=20
+> If ARM is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:arm" tags.
+>=20
+> Alternatively, this test can be run using:
+>=20
+>   $ make check-venv
+>   $ ./tests/venv/bin/avocado --show=3Dconsole,app run -t machine:orangepi=
+-pc tests/acceptance/boot_linux_console.py
+>   JOB ID     : 2e4d15eceb13c33672af406f08171e6e9de1414a
+>   JOB LOG    : ~/job-results/job-2019-12-17T05.46-2e4d15e/job.log
+>   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_=
+orangepi:
+>   console: Uncompressing Linux... done, booting the kernel.
+>   console: Booting Linux on physical CPU 0x0
+>   console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.2=
+.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019
+>   console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D50c53=
+87d
+>   console: CPU: div instructions available: patching division code
+>   console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruc=
+tion cache
+>   console: OF: fdt: Machine model: Xunlong Orange Pi PC
+>   console: Memory policy: Data cache writealloc
+>   console: OF: reserved mem: failed to allocate memory for node 'cma@4a00=
+0000'
+>   console: cma: Failed to reserve 128 MiB
+>   console: psci: probing for conduit method from DT.
+>   console: psci: PSCIv0.2 detected in firmware.
+>   console: psci: Using standard PSCI v0.2 function IDs
+>   console: psci: Trusted OS migration not required
+>   console: random: get_random_bytes called from start_kernel+0x8d/0x3c2 w=
+ith crng_init=3D0
+>   console: percpu: Embedded 18 pages/cpu @(ptrval) s41228 r8192 d24308 u7=
+3728
+>   console: Built 1 zonelists, mobility grouping on.  Total pages: 32480
+>   console: Kernel command line: printk.time=3D0 console=3DttyS0,115200
+>   PASS (8.59 s)
+>   JOB TIME   : 8.81 s
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>=20
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index 7e41cebd47..820239e439 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -411,6 +411,32 @@ class BootLinuxConsole(Test):
+>          self.wait_for_console_pattern('Boot successful.')
+>          # TODO user command, for now the uart is stuck
+> =20
+> +    def test_arm_orangepi(self):
+
+Maybe rename the test to include the full machine type?  I mean,
+"test_arm_orangepi_pc"?
+
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:orangepi-pc
+> +        """
+> +        deb_url =3D ('https://apt.armbian.com/pool/main/l/'
+> +                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.=
+deb')
+> +        deb_hash =3D '1334c29c44d984ffa05ed10de8c3361f33d78315'
+> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+> +        kernel_path =3D self.extract_from_deb(deb_path,
+> +                                            '/boot/vmlinuz-4.20.7-sunxi'=
+)
+> +        dtb_path =3D '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-p=
+c.dtb'
+> +        dtb_path =3D self.extract_from_deb(deb_path, dtb_path)
+> +
+> +        self.vm.set_machine('orangepi-pc')
+> +        self.vm.set_console()
+> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> +                               'console=3DttyS0,115200n8 '
+> +                               'earlycon=3Duart,mmio32,0x1c28000')
+> +        self.vm.add_args('-kernel', kernel_path,
+> +                         '-dtb', dtb_path,
+> +                         '-append', kernel_command_line)
+> +        self.vm.launch()
+> +        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+> +        self.wait_for_console_pattern(console_pattern)
+> +
+>      def test_s390x_s390_ccw_virtio(self):
+>          """
+>          :avocado: tags=3Darch:s390x
+> --=20
+> 2.21.0
+>=20
+
+Either way,
+
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+
+--T4sUOijqQbZv57TR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl36zMQACgkQZX6NM6Xy
+CfOHow/5AVRnYJoVicGYtyIp9Mq6PvE+zCWD5RDQpsBlS619LYFfDdtVb3GRDIpj
+fQQkbht019M2r4F+wV3G4LZRAjnbwGPXJBB1dg29yLdGwp4T3/TvnNyUiIlIonAM
+HrzlyCVicOMkX35oHIMIXWVXaP26Oi8qosGr1oSTuYuJd25ay4sLmm0S0W9AODfF
+RGcO3gbbiosO7Mx0oz1yy/T2ehdfVzrkJ9dr08CKEoY53BRCLhlspSCVAOztdc4a
+Nh52stypvyxvp91QkS2OQraXycOYtWRPCxAZ0c0tZykOdhWJAjDF68yON2OsyoZv
+pEB9NPFKKtY2b2ifPoCOHEMyhyoZ38kM1afM2XzGtWh1bM8yTtns6JW2dy6MYbLO
+WjW1MyTNb7Nuyo1YanSUthxKwgcaNvJl2soqYp1oPnD4ikwyAS7aRn8CVDCFMKC7
+jODmos/UDS/UmeHee8wXgvwJJySiKh9+OgXh4n2vbKj8vuywAla5iGvKjnH1sft3
+ZtfTxgnO8hA17lU8gNqfqy6GbxPTAxmaSCOe0RP6bo7N/joIpqRyFd4s6unTJISd
+NvUHORrDlA6nFqKSVL8i8iT5sBeEEyZTKbd8fnKF0LKm6CIxrpuwaFxPR0lAta0V
+/tbz/km59QaZzPZQ6quYM3YbOA/hj8y2SnuZCsZZ+uOKIR8mm4U=
+=A1AX
+-----END PGP SIGNATURE-----
+
+--T4sUOijqQbZv57TR--
 
 
