@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E267C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF31C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:27:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4C79222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:26:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25B3B222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:27:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="bozbNvei";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="c87CV1gk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C79222C2
+	dkim=pass (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="q6CLkcWN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NGzn1KMs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25B3B222C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihoKN-0008K4-UJ
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 00:26:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58029)
+	id 1ihoLp-00011a-9d
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 00:27:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58208)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair@alistair23.me>) id 1ihoH9-0004hr-5n
+ (envelope-from <alistair@alistair23.me>) id 1ihoHA-0004j3-9I
  for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:23:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair@alistair23.me>) id 1ihoH6-0003SD-Ok
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:23:03 -0500
-Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:52107)
+ (envelope-from <alistair@alistair23.me>) id 1ihoH7-0003Yd-VT
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:23:04 -0500
+Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:36931)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alistair@alistair23.me>)
- id 1ihoH1-0002qf-6U; Thu, 19 Dec 2019 00:22:55 -0500
+ id 1ihoH5-0003CM-0z; Thu, 19 Dec 2019 00:22:59 -0500
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailout.west.internal (Postfix) with ESMTP id 1001F567;
- Thu, 19 Dec 2019 00:22:54 -0500 (EST)
+ by mailout.west.internal (Postfix) with ESMTP id CEF54489;
+ Thu, 19 Dec 2019 00:22:57 -0500 (EST)
 Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Thu, 19 Dec 2019 00:22:54 -0500
+ by compute7.internal (MEProxy); Thu, 19 Dec 2019 00:22:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm2; bh=6RHuwo5pGYT2U
- K5SBHhz3Pj6gJwYbfnXjsnlsNgPp3w=; b=bozbNveiaB4F+BsnL22lt7G8qZHzw
- VrDpWtr3zpyZnufIZJFVEhM4RRmLzmz22ejVJUddfnWCKOCR41fZDJYJpIrvT2nK
- PRmOm3F2RdKV1xjsM3OOjhupLisz4xZ/04tnuZpeOUcLFOy8KfJrdsSGO5rzrkvA
- uq2E2v2jb90eFppUm+mxjhPd9evob+jCqonWYa2hItj5l4Dwhs+mqhPvzLg0ajhG
- r0J6vP3uXaxA9Q6l8XM46jIS86OTCcSgSs3kqViSGv5rdumbLwfRVBgpM25eS8cT
- RSnbrhNLv2bStarmChRj6UkVQctGtCuX59CTUWVS908CTNsHnFy7bdi5A==
+ :mime-version:content-transfer-encoding; s=fm2; bh=fqnBMewqCOATa
+ fjXZmyB+vZHiX5owZHz7dR6tUsw22Y=; b=q6CLkcWNePuJvyfd4Z6BVPbGBJlvj
+ zWP5YX9uV8JgTlCa2ukwFe0h0ymCkSiWmihJVUgocDBbKmWyG63seE6igj+Asebh
+ f+gPWK2kaDW/7xJtVYgQ43wTYcZaLMKMEJLYYZ3QlJpE32Kro+4O0H9eweJNS8e/
+ 9S9QTX6yMuIkGC5fQ/3j1joYS0y0MRprFPgQohp4p0e/Vv0B8ELiQvNtxnf+W8EE
+ 2tXEgcgjW6EC3hlS64V87ivUQqmPGrl02sB+++dd+kZrx1ba3CYgWmkPfPGvbQSp
+ dihSfv0cXzTyP0F3WAUmu2zr9Zi4nfkDp4pYHoj+6XupnBW75ytegJ46g==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
  :in-reply-to:message-id:mime-version:references:subject:to
  :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=6RHuwo5pGYT2UK5SBHhz3Pj6gJwYbfnXjsnlsNgPp3w=; b=c87CV1gk
- UcGRak8BEVbjB+Lc6btfCcXbbmY5IOAgxKliwjmj18eeHW0Zeu7g7fGqkZRLHjc9
- GsFW0qhQl/89ueHgpGCDE9ocZdAMqY+S/iqknADqF5TDJnqVHVIFbkR9yxkHAtim
- X3GHaFazwoLKAwzhgOcY48qSThUNEH9djxce3zeXkxgHtTSCB/JfqKjVFx9SwofO
- CwPFzGXjdN0ZxXIZBWI59eK2hQpGOOVpbZHBvhJPzQxoLtuX0nvjaEBQyKgV/Hbl
- xh8AWvSQYrW7WrGuvDgwx5WAweQsgMic4Xb0WtzbmMwF0NJT8GhK03pcci2pXWQ+
- PEnFeg0jOrshIg==
-X-ME-Sender: <xms:LQn7XYXbWYDQqQyicJ6aUn9GohyXj8lco3gn88hfIHcdVD4-nv_W6A>
+ fm1; bh=fqnBMewqCOATafjXZmyB+vZHiX5owZHz7dR6tUsw22Y=; b=NGzn1KMs
+ eq2d6UNtlWCMmQbpMYnO5qiFOtnFmBn0nHFV5jW7A90ki6368mJjTKEPkFvjUCbs
+ oSKWtU+yhj9J6WPXjTMns+m5dBpflkO9lsNgP/Z4739Wl2Fz+79svPWxlRGMHi7L
+ og3KqGnok4ALHZ6+Eawy8gLma5DmcdgqokJO2Au2Zu+Ir+FIDgSvTOFD9lDnahR1
+ HN/Qw0lI/fxEKMlIY7L8ZIyavow8GN2Qwz5NXBbmxpe2ewC1oD31NpeK6KN2taMM
+ vO0h/Flzj/Rqjhuga+baMt67hA4vVXwyF88qrdsWTy6n1VZerJ564asAyxlgEOq8
+ hcwYRQXi5Ny9rw==
+X-ME-Sender: <xms:MQn7XaRncktuIFwIygiYGnIe3_w8_KWdzCK-EH5OzJWDUv70KTjwrQ>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrvddutddgkeduucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgjfhgggfestdekre
@@ -69,20 +69,20 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrvddutddgkeduucetufdoteggod
  ihhrsegrlhhishhtrghirhdvfedrmhgvqeenucfkphepjeefrdelfedrkeegrddvtdekne
  curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishhtrghirhesrghlihhsthgrihhrvdef
  rdhmvgenucevlhhushhtvghrufhiiigvpedv
-X-ME-Proxy: <xmx:LQn7XQi1zrFvUxu8P-2pTap2HmD-sbAVAiaIzK5ObFKypjb9KFIqeQ>
- <xmx:LQn7XQ_7_kLuU7IeV-LKvly8UfzGNGSPwon7tNewHjfP2gRf0t2jnA>
- <xmx:LQn7XfRomiVP19rylBIqNkd3lsOY41LUHfi2RzmxbsrwvRnmnqrDjA>
- <xmx:LQn7XUTNfJPz2Yq2ojXLFs_jtxfsa2nVKgf2B_-7Ex5YCvW19DpX3w>
+X-ME-Proxy: <xmx:MQn7XdmGI4VwGuNUOtniK09tG66jxoIJcvAgvxaw_5nn_ueYK0vUAw>
+ <xmx:MQn7XSSWlMZH-t0pjfVtwPuThH_HJdcpyFkivGC1e9PIi1tu5OwP6w>
+ <xmx:MQn7XTOT7vvK9N-Zo7oi1P4uMuOuo5uYI1465VwuW9xYDfpiDg7yPQ>
+ <xmx:MQn7XeclT1D6iCTRI0oX-2cJYovGl7MA10QFUImohXMbKmhjTQ99Mw>
 Received: from alistair-xps-14z.alistair23.me
  (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
- by mail.messagingengine.com (Postfix) with ESMTPA id C5F1980059;
- Thu, 19 Dec 2019 00:22:52 -0500 (EST)
+ by mail.messagingengine.com (Postfix) with ESMTPA id 9632080059;
+ Thu, 19 Dec 2019 00:22:56 -0500 (EST)
 From: Alistair Francis <alistair@alistair23.me>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org,
  philmd@redhat.com
-Subject: [PATCH v7 3/4] hw/arm: Add the STM32F4xx SoC
-Date: Wed, 18 Dec 2019 21:22:52 -0800
-Message-Id: <1d145c4c13e5fa140caf131232a6f524c88fcd72.1576658572.git.alistair@alistair23.me>
+Subject: [PATCH v7 4/4] hw/arm: Add the Netduino Plus 2
+Date: Wed, 18 Dec 2019 21:22:55 -0800
+Message-Id: <dad8d8d47f7625913e35e27a1c00f603a6b08f9a.1576658572.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <cover.1576658572.git.alistair@alistair23.me>
 References: <cover.1576658572.git.alistair@alistair23.me>
@@ -110,53 +110,49 @@ Sender: "Qemu-devel"
 Signed-off-by: Alistair Francis <alistair@alistair23.me>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- MAINTAINERS                    |   8 +
- hw/arm/Makefile.objs           |   1 +
- hw/arm/stm32f405_soc.c         | 302 +++++++++++++++++++++++++++++++++
- include/hw/arm/stm32f405_soc.h |  73 ++++++++
- 4 files changed, 384 insertions(+)
- create mode 100644 hw/arm/stm32f405_soc.c
- create mode 100644 include/hw/arm/stm32f405_soc.h
+ MAINTAINERS            |  6 +++++
+ hw/arm/Makefile.objs   |  1 +
+ hw/arm/netduinoplus2.c | 52 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 59 insertions(+)
+ create mode 100644 hw/arm/netduinoplus2.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 740401bcbb..bda53628a5 100644
+index bda53628a5..203ced66e0 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -815,6 +815,14 @@ F: hw/adc/*
- F: hw/ssi/stm32f2xx_spi.c
- F: include/hw/*/stm32*.h
+@@ -829,6 +829,12 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ S: Maintained
+ F: hw/arm/netduino2.c
  
-+STM32F405
++Netduino Plus 2
 +M: Alistair Francis <alistair@alistair23.me>
 +M: Peter Maydell <peter.maydell@linaro.org>
 +S: Maintained
-+F: hw/arm/stm32f405_soc.c
-+F: hw/misc/stm32f4xx_syscfg.c
-+F: hw/misc/stm32f4xx_exti.c
++F: hw/arm/netduinoplus2.c
 +
- Netduino 2
- M: Alistair Francis <alistair@alistair23.me>
+ SmartFusion2
+ M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
  M: Peter Maydell <peter.maydell@linaro.org>
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index fe749f65fd..d9d54da7cf 100644
+index d9d54da7cf..336f6dd374 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -36,6 +36,7 @@ obj-$(CONFIG_STRONGARM) += strongarm.o
- obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
- obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
- obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
-+obj-$(CONFIG_STM32F405_SOC) += stm32f405_soc.o
- obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
- obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o xlnx-versal-virt.o
- obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
-diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
+@@ -11,6 +11,7 @@ obj-$(CONFIG_MAINSTONE) += mainstone.o
+ obj-$(CONFIG_MICROBIT) += microbit.o
+ obj-$(CONFIG_MUSICPAL) += musicpal.o
+ obj-$(CONFIG_NETDUINO2) += netduino2.o
++obj-$(CONFIG_NETDUINOPLUS2) += netduinoplus2.o
+ obj-$(CONFIG_NSERIES) += nseries.o
+ obj-$(CONFIG_SX1) += omap_sx1.o
+ obj-$(CONFIG_CHEETAH) += palm.o
+diff --git a/hw/arm/netduinoplus2.c b/hw/arm/netduinoplus2.c
 new file mode 100644
-index 0000000000..f22516fdf7
+index 0000000000..e5e247edbe
 --- /dev/null
-+++ b/hw/arm/stm32f405_soc.c
-@@ -0,0 +1,302 @@
++++ b/hw/arm/netduinoplus2.c
+@@ -0,0 +1,52 @@
 +/*
-+ * STM32F405 SoC
++ * Netduino Plus 2 Machine Model
 + *
 + * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
 + *
@@ -181,361 +177,32 @@ index 0000000000..f22516fdf7
 +
 +#include "qemu/osdep.h"
 +#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "exec/address-spaces.h"
-+#include "sysemu/sysemu.h"
++#include "hw/boards.h"
++#include "hw/qdev-properties.h"
++#include "qemu/error-report.h"
 +#include "hw/arm/stm32f405_soc.h"
-+#include "hw/misc/unimp.h"
++#include "hw/arm/boot.h"
 +
-+#define SYSCFG_ADD                     0x40013800
-+static const uint32_t usart_addr[] = { 0x40011000, 0x40004400, 0x40004800,
-+                                       0x40004C00, 0x40005000, 0x40011400,
-+                                       0x40007800, 0x40007C00 };
-+/* At the moment only Timer 2 to 5 are modelled */
-+static const uint32_t timer_addr[] = { 0x40000000, 0x40000400,
-+                                       0x40000800, 0x40000C00 };
-+#define ADC_ADDR                       0x40012000
-+static const uint32_t spi_addr[] =   { 0x40013000, 0x40003800, 0x40003C00,
-+                                       0x40013400, 0x40015000, 0x40015400 };
-+#define EXTI_ADDR                      0x40013C00
-+
-+#define SYSCFG_IRQ               71
-+static const int usart_irq[] = { 37, 38, 39, 52, 53, 71, 82, 83 };
-+static const int timer_irq[] = { 28, 29, 30, 50 };
-+#define ADC_IRQ 18
-+static const int spi_irq[] =   { 35, 36, 51, 0, 0, 0 };
-+static const int exti_irq[] =  { 6, 7, 8, 9, 10, 23, 23, 23, 23, 23, 40,
-+                                 40, 40, 40, 40, 40} ;
-+
-+
-+static void stm32f405_soc_initfn(Object *obj)
++static void netduinoplus2_init(MachineState *machine)
 +{
-+    STM32F405State *s = STM32F405_SOC(obj);
-+    int i;
++    DeviceState *dev;
 +
-+    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
-+                          TYPE_ARMV7M);
++    dev = qdev_create(NULL, TYPE_STM32F405_SOC);
++    qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m4"));
++    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
 +
-+    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
-+                          TYPE_STM32F4XX_SYSCFG);
-+
-+    for (i = 0; i < STM_NUM_USARTS; i++) {
-+        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
-+                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
-+    }
-+
-+    for (i = 0; i < STM_NUM_TIMERS; i++) {
-+        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
-+                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
-+    }
-+
-+    for (i = 0; i < STM_NUM_ADCS; i++) {
-+        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
-+                              TYPE_STM32F2XX_ADC);
-+    }
-+
-+    for (i = 0; i < STM_NUM_SPIS; i++) {
-+        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
-+                              TYPE_STM32F2XX_SPI);
-+    }
-+
-+    sysbus_init_child_obj(obj, "exti", &s->exti, sizeof(s->exti),
-+                          TYPE_STM32F4XX_EXTI);
++    armv7m_load_kernel(ARM_CPU(first_cpu),
++                       machine->kernel_filename,
++                       FLASH_SIZE);
 +}
 +
-+static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
++static void netduinoplus2_machine_init(MachineClass *mc)
 +{
-+    STM32F405State *s = STM32F405_SOC(dev_soc);
-+    MemoryRegion *system_memory = get_system_memory();
-+    DeviceState *dev, *armv7m;
-+    SysBusDevice *busdev;
-+    Error *err = NULL;
-+    int i;
-+
-+    memory_region_init_ram(&s->flash, NULL, "STM32F405.flash", FLASH_SIZE,
-+                           &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    memory_region_init_alias(&s->flash_alias, NULL, "STM32F405.flash.alias",
-+                             &s->flash, 0, FLASH_SIZE);
-+
-+    memory_region_set_readonly(&s->flash, true);
-+    memory_region_set_readonly(&s->flash_alias, true);
-+
-+    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, &s->flash);
-+    memory_region_add_subregion(system_memory, 0, &s->flash_alias);
-+
-+    memory_region_init_ram(&s->sram, NULL, "STM32F405.sram", SRAM_SIZE,
-+                           &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sram);
-+
-+    armv7m = DEVICE(&s->armv7m);
-+    qdev_prop_set_uint32(armv7m, "num-irq", 96);
-+    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-+    qdev_prop_set_bit(armv7m, "enable-bitband", true);
-+    object_property_set_link(OBJECT(&s->armv7m), OBJECT(system_memory),
-+                                     "memory", &error_abort);
-+    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    /* System configuration controller */
-+    dev = DEVICE(&s->syscfg);
-+    object_property_set_bool(OBJECT(&s->syscfg), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    busdev = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(busdev, 0, SYSCFG_ADD);
-+    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, SYSCFG_IRQ));
-+
-+    /* Attach UART (uses USART registers) and USART controllers */
-+    for (i = 0; i < STM_NUM_USARTS; i++) {
-+        dev = DEVICE(&(s->usart[i]));
-+        qdev_prop_set_chr(dev, "chardev", serial_hd(i));
-+        object_property_set_bool(OBJECT(&s->usart[i]), true, "realized", &err);
-+        if (err != NULL) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        busdev = SYS_BUS_DEVICE(dev);
-+        sysbus_mmio_map(busdev, 0, usart_addr[i]);
-+        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
-+    }
-+
-+    /* Timer 2 to 5 */
-+    for (i = 0; i < STM_NUM_TIMERS; i++) {
-+        dev = DEVICE(&(s->timer[i]));
-+        qdev_prop_set_uint64(dev, "clock-frequency", 1000000000);
-+        object_property_set_bool(OBJECT(&s->timer[i]), true, "realized", &err);
-+        if (err != NULL) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        busdev = SYS_BUS_DEVICE(dev);
-+        sysbus_mmio_map(busdev, 0, timer_addr[i]);
-+        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
-+    }
-+
-+    /* ADC device, the IRQs are ORed together */
-+    object_initialize_child(OBJECT(s), "adc-orirq", &s->adc_irqs,
-+                            sizeof(s->adc_irqs), TYPE_OR_IRQ,
-+                            &err, NULL);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    object_property_set_int(OBJECT(&s->adc_irqs), STM_NUM_ADCS,
-+                            "num-lines", &err);
-+    object_property_set_bool(OBJECT(&s->adc_irqs), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    qdev_connect_gpio_out(DEVICE(&s->adc_irqs), 0,
-+                          qdev_get_gpio_in(armv7m, ADC_IRQ));
-+
-+    dev = DEVICE(&(s->adc[i]));
-+    object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    busdev = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(busdev, 0, ADC_ADDR);
-+    sysbus_connect_irq(busdev, 0,
-+                       qdev_get_gpio_in(DEVICE(&s->adc_irqs), i));
-+
-+    /* SPI devices */
-+    for (i = 0; i < STM_NUM_SPIS; i++) {
-+        dev = DEVICE(&(s->spi[i]));
-+        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
-+        if (err != NULL) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        busdev = SYS_BUS_DEVICE(dev);
-+        sysbus_mmio_map(busdev, 0, spi_addr[i]);
-+        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
-+    }
-+
-+    /* EXTI device */
-+    dev = DEVICE(&s->exti);
-+    object_property_set_bool(OBJECT(&s->exti), true, "realized", &err);
-+    if (err != NULL) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    busdev = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(busdev, 0, EXTI_ADDR);
-+    for (i = 0; i < 16; i++) {
-+        sysbus_connect_irq(busdev, i, qdev_get_gpio_in(armv7m, exti_irq[i]));
-+    }
-+    for (i = 0; i < 16; i++) {
-+        qdev_connect_gpio_out(DEVICE(&s->syscfg), i, qdev_get_gpio_in(dev, i));
-+    }
-+
-+    create_unimplemented_device("timer[7]",    0x40001400, 0x400);
-+    create_unimplemented_device("timer[12]",   0x40001800, 0x400);
-+    create_unimplemented_device("timer[6]",    0x40001000, 0x400);
-+    create_unimplemented_device("timer[13]",   0x40001C00, 0x400);
-+    create_unimplemented_device("timer[14]",   0x40002000, 0x400);
-+    create_unimplemented_device("RTC and BKP", 0x40002800, 0x400);
-+    create_unimplemented_device("WWDG",        0x40002C00, 0x400);
-+    create_unimplemented_device("IWDG",        0x40003000, 0x400);
-+    create_unimplemented_device("I2S2ext",     0x40003000, 0x400);
-+    create_unimplemented_device("I2S3ext",     0x40004000, 0x400);
-+    create_unimplemented_device("I2C1",        0x40005400, 0x400);
-+    create_unimplemented_device("I2C2",        0x40005800, 0x400);
-+    create_unimplemented_device("I2C3",        0x40005C00, 0x400);
-+    create_unimplemented_device("CAN1",        0x40006400, 0x400);
-+    create_unimplemented_device("CAN2",        0x40006800, 0x400);
-+    create_unimplemented_device("PWR",         0x40007000, 0x400);
-+    create_unimplemented_device("DAC",         0x40007400, 0x400);
-+    create_unimplemented_device("timer[1]",    0x40010000, 0x400);
-+    create_unimplemented_device("timer[8]",    0x40010400, 0x400);
-+    create_unimplemented_device("SDIO",        0x40012C00, 0x400);
-+    create_unimplemented_device("timer[9]",    0x40014000, 0x400);
-+    create_unimplemented_device("timer[10]",   0x40014400, 0x400);
-+    create_unimplemented_device("timer[11]",   0x40014800, 0x400);
-+    create_unimplemented_device("GPIOA",       0x40020000, 0x400);
-+    create_unimplemented_device("GPIOB",       0x40020400, 0x400);
-+    create_unimplemented_device("GPIOC",       0x40020800, 0x400);
-+    create_unimplemented_device("GPIOD",       0x40020C00, 0x400);
-+    create_unimplemented_device("GPIOE",       0x40021000, 0x400);
-+    create_unimplemented_device("GPIOF",       0x40021400, 0x400);
-+    create_unimplemented_device("GPIOG",       0x40021800, 0x400);
-+    create_unimplemented_device("GPIOH",       0x40021C00, 0x400);
-+    create_unimplemented_device("GPIOI",       0x40022000, 0x400);
-+    create_unimplemented_device("CRC",         0x40023000, 0x400);
-+    create_unimplemented_device("RCC",         0x40023800, 0x400);
-+    create_unimplemented_device("Flash Int",   0x40023C00, 0x400);
-+    create_unimplemented_device("BKPSRAM",     0x40024000, 0x400);
-+    create_unimplemented_device("DMA1",        0x40026000, 0x400);
-+    create_unimplemented_device("DMA2",        0x40026400, 0x400);
-+    create_unimplemented_device("Ethernet",    0x40028000, 0x1400);
-+    create_unimplemented_device("USB OTG HS",  0x40040000, 0x30000);
-+    create_unimplemented_device("USB OTG FS",  0x50000000, 0x31000);
-+    create_unimplemented_device("DCMI",        0x50050000, 0x400);
-+    create_unimplemented_device("RNG",         0x50060800, 0x400);
++    mc->desc = "Netduino Plus 2 Machine";
++    mc->init = netduinoplus2_init;
 +}
 +
-+static Property stm32f405_soc_properties[] = {
-+    DEFINE_PROP_STRING("cpu-type", STM32F405State, cpu_type),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void stm32f405_soc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = stm32f405_soc_realize;
-+    dc->props = stm32f405_soc_properties;
-+    /* No vmstate or reset required: device has no internal state */
-+}
-+
-+static const TypeInfo stm32f405_soc_info = {
-+    .name          = TYPE_STM32F405_SOC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(STM32F405State),
-+    .instance_init = stm32f405_soc_initfn,
-+    .class_init    = stm32f405_soc_class_init,
-+};
-+
-+static void stm32f405_soc_types(void)
-+{
-+    type_register_static(&stm32f405_soc_info);
-+}
-+
-+type_init(stm32f405_soc_types)
-diff --git a/include/hw/arm/stm32f405_soc.h b/include/hw/arm/stm32f405_soc.h
-new file mode 100644
-index 0000000000..1fe97f8c3a
---- /dev/null
-+++ b/include/hw/arm/stm32f405_soc.h
-@@ -0,0 +1,73 @@
-+/*
-+ * STM32F405 SoC
-+ *
-+ * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#ifndef HW_ARM_STM32F405_SOC_H
-+#define HW_ARM_STM32F405_SOC_H
-+
-+#include "hw/misc/stm32f4xx_syscfg.h"
-+#include "hw/timer/stm32f2xx_timer.h"
-+#include "hw/char/stm32f2xx_usart.h"
-+#include "hw/adc/stm32f2xx_adc.h"
-+#include "hw/misc/stm32f4xx_exti.h"
-+#include "hw/or-irq.h"
-+#include "hw/ssi/stm32f2xx_spi.h"
-+#include "hw/arm/armv7m.h"
-+
-+#define TYPE_STM32F405_SOC "stm32f405-soc"
-+#define STM32F405_SOC(obj) \
-+    OBJECT_CHECK(STM32F405State, (obj), TYPE_STM32F405_SOC)
-+
-+#define STM_NUM_USARTS 7
-+#define STM_NUM_TIMERS 4
-+#define STM_NUM_ADCS 6
-+#define STM_NUM_SPIS 6
-+
-+#define FLASH_BASE_ADDRESS 0x08000000
-+#define FLASH_SIZE (1024 * 1024)
-+#define SRAM_BASE_ADDRESS 0x20000000
-+#define SRAM_SIZE (192 * 1024)
-+
-+typedef struct STM32F405State {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    char *cpu_type;
-+
-+    ARMv7MState armv7m;
-+
-+    STM32F4xxSyscfgState syscfg;
-+    STM32F4xxExtiState exti;
-+    STM32F2XXUsartState usart[STM_NUM_USARTS];
-+    STM32F2XXTimerState timer[STM_NUM_TIMERS];
-+    qemu_or_irq adc_irqs;
-+    STM32F2XXADCState adc[STM_NUM_ADCS];
-+    STM32F2XXSPIState spi[STM_NUM_SPIS];
-+
-+    MemoryRegion sram;
-+    MemoryRegion flash;
-+    MemoryRegion flash_alias;
-+} STM32F405State;
-+
-+#endif
++DEFINE_MACHINE("netduinoplus2", netduinoplus2_machine_init)
 -- 
 2.24.0
 
