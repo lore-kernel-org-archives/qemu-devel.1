@@ -2,66 +2,81 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E86A9C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E699CC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3E7E24676
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC3F024672
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:55:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="oknEmw2u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E7E24676
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+YbVnlq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3F024672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii4Pc-0004t2-Rx
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 17:36:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39684)
+	id 1ii4hy-0004J0-Sz
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 17:55:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sstabellini@kernel.org>) id 1ii4Ox-0004Ua-Ty
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:36:13 -0500
+ (envelope-from <crosa@redhat.com>) id 1ii4h3-0003bM-SK
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sstabellini@kernel.org>) id 1ii4Ow-0006aU-3m
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:36:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55802)
+ (envelope-from <crosa@redhat.com>) id 1ii4h0-0001gU-M9
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:54:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20801
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sstabellini@kernel.org>)
- id 1ii4Ov-0006Ts-Or
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:36:10 -0500
-Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 22AED206EC;
- Thu, 19 Dec 2019 22:36:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1576794968;
- bh=jnhZinny5FDsNaBpY5u/Ewx8bBBI6DkcRM+qOj8ivNA=;
- h=Date:From:To:cc:Subject:In-Reply-To:References:From;
- b=oknEmw2us6FqBnGdr9Eisbm1oZmC25dlhZnLHbPPSajXyLbzpIiJ3rIImLRDDbDcs
- i2nWdVYuqH7RAgQ70sbVqJRjrLgH/sPmO5NF3mpM+s08J6BrP4zFHSuCi4usZ5ilVy
- wOpgQM+zODuL/cnYv9X2CXtEpG27O08VUx+JWfh0=
-Date: Thu, 19 Dec 2019 14:36:07 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH] 9p: init_in_iov_from_pdu can truncate the size
-In-Reply-To: <2734053.qHGH40kZ6z@silver>
-Message-ID: <alpine.DEB.2.21.1912191434260.9832@sstabellini-ThinkPad-T480s>
-References: <20191219004251.23763-1-sstabellini@kernel.org>
- <2734053.qHGH40kZ6z@silver>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ii4h0-0001XS-4b
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:54:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576796088;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=A03OQWvwtY1YMWfx6msRqrki4ud0DkqE7Ww37rYfCdU=;
+ b=f+YbVnlq7/Z1r3FaWxyDyJlRhJz1i+0EwTBe2GumYEnKAk27X7d6ENRK4dMjaRTDSj/jYo
+ xz2Mb04L/ewOs0ypLujyS/GP7/H9Itzn9fPIwdDgiBPeTzvY3F0Yxdz5Vgqyym5irTY3Sm
+ hAsy/HPX6Sph/WmJuBheSnJ8v+j/RzM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-hLHPCOmKOSOMh7M0vxkLVA-1; Thu, 19 Dec 2019 17:54:32 -0500
+X-MC-Unique: hLHPCOmKOSOMh7M0vxkLVA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5C57800EB8;
+ Thu, 19 Dec 2019 22:54:30 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-70.gru2.redhat.com
+ [10.97.116.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C42A95D9E2;
+ Thu, 19 Dec 2019 22:54:28 +0000 (UTC)
+Date: Thu, 19 Dec 2019 17:54:25 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+Subject: Re: [RFC PATCH 5/5] tests/boot_linux_console: Add a SLOW test
+ booting Ubuntu on OrangePi PC
+Message-ID: <20191219225425.GB28892@localhost.localdomain>
+References: <20191217182730.943-1-f4bug@amsat.org>
+ <20191217182730.943-6-f4bug@amsat.org>
+ <CAPan3WrgL-ULAMQPTHj7zbNMS_xaTuNprp1W4GzhryQbMcPQOA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAPan3WrgL-ULAMQPTHj7zbNMS_xaTuNprp1W4GzhryQbMcPQOA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 198.145.29.99
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,210 +88,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: anthony.perard@citrix.com, groug@kaod.org,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org,
- Stefano Stabellini <stefano.stabellini@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Dec 2019, Christian Schoenebeck wrote:
-> On Donnerstag, 19. Dezember 2019 01:42:51 CET Stefano Stabellini wrote:
-> > From: Stefano Stabellini <stefano.stabellini@xilinx.com>
-> > 
-> > init_in_iov_from_pdu might not be able to allocate the full buffer size
-> > requested, which comes from the client and could be larger than the
-> > transport has available at the time of the request. Specifically, this
-> > can happen with read operations, with the client requesting a read up to
-> > the max allowed, which might be more than the transport has available at
-> > the time.
-> 
-> I haven't looked thoroughly at this yet, but that's about addressing a 
-> temporary, not a permanent transport buffer size limitation, right? 
+--dc+cDN39EJAMEtIO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, that is correct.
+On Wed, Dec 18, 2019 at 10:26:08PM +0100, Niek Linnenbank wrote:
+> Hi Philippe,
+>=20
+> This test has some problems on my host (Ubuntu 18.04.3 LTS, avocado 73.0,
+> python 3.6.9):
+>=20
+>  (4/4) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_o=
+rangepi_bionic:
+> ERROR: Input format not supported by decoder (3.25 s)
+> RESULTS    : PASS 3 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0
+> | CANCEL 0
+> JOB TIME   : 46.22 s
+>=20
+> I suspect it didn't download the image correctly.
+>
 
+I don't think it's download related, because the
+"archive.lzma_uncompress(image_path_xz, image_path)" line is not
+capable of uncompressing that 7z archive.
 
-> Because if it was a permanent one, then probably an adjusted (lowered)
-> msize should be returned on R_version response to client as well.
-> 
-> I wonder why I never triggered this issue, because I was experimenting with 
-> huge msize values for 9pfs performance checks. Was there anything specific to 
-> trigger this issue?
-
-Lots of heavy usage by a Java application booting. Nothing like Java to
-stress the system :-)
-
-
-> > Today the implementation of init_in_iov_from_pdu throws an error, both
-> > Xen and Virtio.
-> > 
-> > Instead, change the V9fsTransport interface so that the size becomes a
-> > pointer and can be limited by the implementation of
-> > init_in_iov_from_pdu.
-> > 
-> > Change both the Xen and Virtio implementations to set the size to the
-> > size of the buffer they managed to allocate, instead of throwing an
-> > error.
-> > 
-> > Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
-> > CC: groug@kaod.org
-> > CC: anthony.perard@citrix.com
-> > ---
-> >  hw/9pfs/9p.c               | 22 +++++++++++++++-------
-> >  hw/9pfs/9p.h               |  2 +-
-> >  hw/9pfs/virtio-9p-device.c | 10 +++-------
-> >  hw/9pfs/xen-9p-backend.c   | 12 ++++--------
-> >  4 files changed, 23 insertions(+), 23 deletions(-)
-> > 
-> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > index bdf7919abf..d6c89ce608 100644
-> > --- a/hw/9pfs/9p.c
-> > +++ b/hw/9pfs/9p.c
-> > @@ -1682,22 +1682,30 @@ out_nofid:
-> >   * with qemu_iovec_destroy().
-> >   */
-> >  static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
-> > -                                    size_t skip, size_t size,
-> > +                                    size_t skip, size_t *size,
-> >                                      bool is_write)
-> >  {
-> >      QEMUIOVector elem;
-> >      struct iovec *iov;
-> >      unsigned int niov;
-> > +    size_t alloc_size = *size + skip;
-> > 
-> >      if (is_write) {
-> > -        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, size +
-> > skip); +        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov,
-> > alloc_size); } else {
-> > -        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size +
-> > skip); +        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov,
-> > &alloc_size); +    }
-> > +
-> > +    if (alloc_size < skip)
-> > +    {
-> > +        *size = 0;
-> > +    } else {
-> > +        *size = alloc_size - skip;
-> >      }
+> Regards,
+> Niek
+>=20
+> On Tue, Dec 17, 2019 at 7:27 PM Philippe Mathieu-Daud=E9 <f4bug@amsat.org=
+>
+> wrote:
+>=20
+> > This test boots Ubuntu Bionic on a OrangePi PC board.
 > >
-> 
-> Code style nitpicking:  
-> 
-> ERROR: that open brace { should be on the previous line
-> #56: FILE: hw/9pfs/9p.c:1699:
-> +    if (alloc_size < skip)
-> +    {
+> > As it requires 1GB of storage, and is slow, this test is disabled
+> > on automatic CI testing.
+> >
+> > It is useful for workstation testing. Currently Avocado timeouts too
+> > quickly, so we can't run userland commands.
+> >
+> > The kernel image and DeviceTree blob are built by the Raspbian
+> > project (based on Debian):
+> > https://www.raspbian.org/RaspbianImages
+> >
+> > The Ubuntu image is downloaded from:
+> > https://dl.armbian.com/orangepipc/Bionic_current
+> >
+> > This test can be run using:
+> >
+> >   $ AVOCADO_ALLOW_LARGE_STORAGE=3Dyes \
+> >     avocado --show=3Dapp,console run -t machine:orangepi-pc \
+> >       tests/acceptance/boot_linux_console.py
+> >   console: Uncompressing Linux... done, booting the kernel.
+> >   console: Booting Linux on physical CPU 0x0
+> >   console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version
+> > 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 C=
+ET
+> > 2019
+> >   console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D50c=
+5387d
+> >   console: CPU: div instructions available: patching division code
+> >   console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing
+> > instruction cache
+> >   console: OF: fdt: Machine model: Xunlong Orange Pi PC
+> >   [...]
+> >   console: sunxi-mmc 1c0f000.mmc: initialized, max. request size: 16384=
+ KB
+> >   console: NET: Registered protocol family 10
+> >   console: mmc0: host does not support reading read-only switch, assumi=
+ng
+> > write-enable
+> >   console: mmc0: Problem switching card into high-speed mode!
+> >   console: mmc0: new SD card at address 4567
+> >   console: mmcblk0: mmc0:4567 QEMU! 932 MiB
+> >   console: Segment Routing with IPv6
+> >   console: NET: Registered protocol family 17
+> >   console: NET: Registered protocol family 15
+> >   console: bridge: filtering via arp/ip/ip6tables is no longer availabl=
+e
+> > by default. Update your scripts to load br_netfilter if you need this.
+> >   console: 8021q: 802.1Q VLAN Support v1.8
+> >   console: Key type dns_resolver registered
+> >   console: Registering SWP/SWPB emulation handler
+> >   console: mmcblk0: p1
+> >   [...]
+> >   console: Freeing unused kernel memory: 1024K
+> >   console: Run /sbin/init as init process
+> >   console: random: fast init done
+> >   console: systemd[1]: System time before build time, advancing clock.
+> >   console: systemd[1]: systemd 237 running in system mode. (+PAM +AUDIT
+> > +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT
+> > +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD -IDN2 +IDN -PCRE2
+> > default-hierarchy=3Dhybrid)
+> >   console: systemd[1]: Detected architecture arm.
+> >   console: Welcome to Ubuntu 18.04.3 LTS!
+> >   console: systemd[1]: Set hostname to <orangepipc>.
+> >   console: random: systemd: uninitialized urandom read (16 bytes read)
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > ---
+> > RFC because this is not the definitive test, but it is helpful so
+> > for for testing Niek work.
+> > ---
+> >  tests/acceptance/boot_linux_console.py | 41 ++++++++++++++++++++++++++
+> >  1 file changed, 41 insertions(+)
+> >
+> > diff --git a/tests/acceptance/boot_linux_console.py
+> > b/tests/acceptance/boot_linux_console.py
+> > index 8179b45910..663290e0c7 100644
+> > --- a/tests/acceptance/boot_linux_console.py
+> > +++ b/tests/acceptance/boot_linux_console.py
+> > @@ -520,6 +520,47 @@ class BootLinuxConsole(Test):
+> >          exec_command_and_wait_for_pattern(self, 'reboot',
+> >                                                  'reboot: Restarting
+> > system')
+> >
+> > +    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage
+> > limited')
+> > +    def test_arm_orangepi_bionic(self):
+> > +        """
+> > +        :avocado: tags=3Darch:arm
+> > +        :avocado: tags=3Dmachine:orangepi-pc
+> > +        """
+> > +        # This test download a 196MB compressed image and expand it to
+> > 932MB...
+> > +        deb_url =3D ('https://apt.armbian.com/pool/main/l/'
+> > +
+> >  'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
+> > +        deb_hash =3D '1334c29c44d984ffa05ed10de8c3361f33d78315'
+> > +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+> > +        kernel_path =3D self.extract_from_deb(deb_path,
+> > +                                            '/boot/vmlinuz-4.20.7-sunx=
+i')
+> > +        dtb_path =3D
+> > '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
+> > +        dtb_path =3D self.extract_from_deb(deb_path, dtb_path)
+> > +        image_url =3D ('https://dl.armbian.com/orangepipc/archive/'
+> > +                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.=
+7z')
+> > +        image_hash =3D '196a8ffb72b0123d92cea4a070894813d305c71e'
+> > +        image_path_xz =3D self.fetch_asset(image_url, asset_hash=3Dima=
+ge_hash)
+> > +        image_name =3D 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.=
+9.img'
+> > +        image_path =3D os.path.join(self.workdir, image_name)
+> > +        archive.lzma_uncompress(image_path_xz, image_path)
 
-Oops, sorry! I can fix that.
+I'm not sure what magic Philippe was able to do here, but I can not
+uncompress this file with lzma_uncompress.  I'm looking into adding
+proper 7z support to avocado.utils.archive module, by means of either
+the 7z library or the py7zr Python module.
 
+- Cleber.
 
-> > 
-> >  static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-> > @@ -1722,7 +1730,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu,
-> > V9fsFidState *fidp, }
-> >      offset += err;
-> > 
-> > -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
-> > +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
-> >      err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
-> >                      ((char *)fidp->fs.xattr.value) + off,
-> >                      read_count);
-> > @@ -1852,7 +1860,7 @@ static void coroutine_fn v9fs_read(void *opaque)
-> >          QEMUIOVector qiov;
-> >          int32_t len;
-> > 
-> > -        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, max_count,
-> > false); +        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4,
-> > &max_count, false); qemu_iovec_init(&qiov, qiov_full.niov);
-> >          do {
-> >              qemu_iovec_reset(&qiov);
-> > @@ -2085,7 +2093,7 @@ static void coroutine_fn v9fs_write(void *opaque)
-> >          return;
-> >      }
-> >      offset += err;
-> > -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, count, true);
-> > +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &count, true);
-> >      trace_v9fs_write(pdu->tag, pdu->id, fid, off, count, qiov_full.niov);
-> > 
-> >      fidp = get_fid(pdu, fid);
-> > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> > index 8883761b2c..50f7e21da6 100644
-> > --- a/hw/9pfs/9p.h
-> > +++ b/hw/9pfs/9p.h
-> > @@ -365,7 +365,7 @@ struct V9fsTransport {
-> >      ssize_t     (*pdu_vunmarshal)(V9fsPDU *pdu, size_t offset, const char
-> > *fmt, va_list ap);
-> >      void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-> > -                                        unsigned int *pniov, size_t size);
-> > +                                        unsigned int *pniov, size_t *size);
-> > void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
-> > unsigned int *pniov, size_t size); void        (*push_and_notify)(V9fsPDU
-> > *pdu);
-> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> > index 775e8ff766..68873c3f5f 100644
-> > --- a/hw/9pfs/virtio-9p-device.c
-> > +++ b/hw/9pfs/virtio-9p-device.c
-> > @@ -145,19 +145,15 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu,
-> > size_t offset, }
-> > 
-> >  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
-> > -                                        unsigned int *pniov, size_t size)
-> > +                                        unsigned int *pniov, size_t *size)
-> >  {
-> >      V9fsState *s = pdu->s;
-> >      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
-> >      VirtQueueElement *elem = v->elems[pdu->idx];
-> >      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
-> > 
-> > -    if (buf_size < size) {
-> > -        VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> > -
-> > -        virtio_error(vdev,
-> > -                     "VirtFS reply type %d needs %zu bytes, buffer has
-> > %zu", -                     pdu->id + 1, size, buf_size);
-> > +    if (buf_size < *size) {
-> > +        *size = buf_size;
-> >      }
-> > 
-> >      *piov = elem->in_sg;
-> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-> > index 3f54a21c76..3994a356d4 100644
-> > --- a/hw/9pfs/xen-9p-backend.c
-> > +++ b/hw/9pfs/xen-9p-backend.c
-> > @@ -187,7 +187,7 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
-> > static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-> >                                            struct iovec **piov,
-> >                                            unsigned int *pniov,
-> > -                                          size_t size)
-> > +                                          size_t *size)
-> >  {
-> >      Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
-> >      Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
-> > @@ -197,15 +197,11 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU
-> > *pdu, g_free(ring->sg);
-> > 
-> >      ring->sg = g_malloc0(sizeof(*ring->sg) * 2);
-> > -    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
-> > +    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
-> > 
-> >      buf_size = iov_size(ring->sg, num);
-> > -    if (buf_size  < size) {
-> > -        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
-> > -                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
-> > -                buf_size);
-> > -        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
-> > -        xen_9pfs_disconnect(&xen_9pfs->xendev);
-> > +    if (buf_size  < *size) {
-> > +        *size = buf_size;
-> >      }
-> > 
-> >      *piov = ring->sg;
-> 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
-> 
+> > +
+> > +        self.vm.set_machine('orangepi-pc')
+> > +        self.vm.set_console()
+> > +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> > +                               'console=3DttyS0,115200 '
+> > +                               'root=3D/dev/mmcblk0p1 rootwait rw '
+> > +                               'systemd.mask=3Ddev-ttyS0.device '
+> > +                               'systemd.mask=3Darmbian-zram-config.ser=
+vice '
+> > +                               'systemd.mask=3Darmbian-ramlog.service'=
+)
+> > +        self.vm.add_args('-kernel', kernel_path,
+> > +                         '-dtb', dtb_path,
+> > +                         '-drive', 'file=3D' + image_path +
+> > ',if=3Dsd,format=3Draw',
+> > +                         '-append', kernel_command_line,
+> > +                         '-nic', 'user',
+> > +                         '-no-reboot')
+> > +        self.vm.launch()
+> > +        self.wait_for_console_pattern('Welcome to Ubuntu 18.04.3 LTS!'=
+)
+> > +        self.wait_for_console_pattern('Started Armbian filesystem
+> > resize.')
+> > +
+> >      def test_s390x_s390_ccw_virtio(self):
+> >          """
+> >          :avocado: tags=3Darch:s390x
+> > --
+> > 2.21.0
+> >
+> >
+>=20
+> --=20
+> Niek Linnenbank
+
+--dc+cDN39EJAMEtIO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl37/54ACgkQZX6NM6Xy
+CfMEvQ/+PsiPjMkjihxXJCuq45EIl8L+BOQhHzZ/wEO3GJZFg/Isq4w3BSlwgf5C
+W3HZU7BC0nPIZ7SCyQF7wq39Y9+8KiziiM0TxtgOs3UhR9JsFCZNu5RAXND36Tkn
+oWuq0WTneYTFXsCTlVzTxXwQfCaMYzbO+m699oE561EN91OL61uQqlq1pV/MpVKm
+lTyuNIR4ssyO7mtH/IF+EiFbLzN+XefyhzxCLmFChbRcmobn3CGuwdec7oHu9V5o
+FkJfAkOHtR6WuVS6DdYyymSHQmMwJjwzuWqJIBrFVikLNaoV0lxeoOxSUHPBrgtC
+iy61IqHEuJWT4JnKoVAff8ciS8t8vt2VMbs/f4ijSVj0N40bkxnQghJwDVrDCSZ0
+NSZN2ezS+OnpgnMJFCfqyuHOxBbhmSlf4VApxrdxd/phEmHvaAnz8QhfUDWPLNhO
+BQ99C2+EDm+Mah9i+vndO4fYjNRgyhaQF2ro4++31cHunEUFODnV5OkKzlgfo7gf
+unAs/cjHEt10lND+Mqdoq7smc/zwnN1SU3u3xsdlRGjiT+mUSGuszl3sS4mpVbcR
+BDYBA/r2PR+e/iH8IPBKljRIcDpmXqswmj0tGKqBq0HjXGsY4CHph1nrRf3mD2Ml
+nJrbqA/FjHRJZv6+26Bvu5H3J29PoFi/H58Ur+waz3u+Vim5CUQ=
+=0fgK
+-----END PGP SIGNATURE-----
+
+--dc+cDN39EJAMEtIO--
+
 
