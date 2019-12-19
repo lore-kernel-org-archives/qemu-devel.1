@@ -2,66 +2,75 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D577CC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 15:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE74C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 15:32:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA51E206EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 15:29:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA51E206EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2D167206EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 15:32:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D167206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihxjh-0001Dn-Sj
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 10:29:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44955)
+	id 1ihxn6-0002sK-9Y
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 10:32:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ihxiu-0000f1-5w
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 10:28:21 -0500
+ (envelope-from <bounces@canonical.com>) id 1ihxmK-0002Sq-Gz
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 10:31:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ihxir-0002yR-Sq
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 10:28:20 -0500
-Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:52555)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ihxir-0002ne-M1
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 10:28:17 -0500
-Received: from player787.ha.ovh.net (unknown [10.108.42.83])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id E65981A5ED0
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 16:28:14 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id 78953D98D173;
- Thu, 19 Dec 2019 15:28:10 +0000 (UTC)
-Date: Thu, 19 Dec 2019 16:28:08 +0100
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 04/10] ppc/pnv: Introduce a "xics" property under the
- POWER8 chip
-Message-ID: <20191219162808.19f1da11@bahia.lan>
-In-Reply-To: <20191219073001.26790-5-clg@kaod.org>
-References: <20191219073001.26790-1-clg@kaod.org>
- <20191219073001.26790-5-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <bounces@canonical.com>) id 1ihxmJ-0001X3-6N
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 10:31:52 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46192)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ihxmI-0001U6-Tk
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 10:31:51 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ihxmF-0000Ti-CX
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 15:31:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id ED8EF2E8BD4
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 15:31:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 10884637352940312971
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdduuddgjeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+Date: Thu, 19 Dec 2019 15:16:51 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm kvm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell skandal
+X-Launchpad-Bug-Reporter: Lutz (skandal)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156313770910.15255.7682693906978508241.malonedeb@soybean.canonical.com>
+Message-Id: <157676861111.2622.6992323931847539652.malone@soybean.canonical.com>
+Subject: [Bug 1836501] Re: cpu_address_space_init fails with assertion
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c78b1fb36dc5d0c4d1a7a2aa6f4ff14ca8eb6577
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.60.232
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,136 +79,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1836501 <1836501@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 19 Dec 2019 08:29:55 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+I'm marking this bug 'incomplete' since as in comment #8 I was unable to
+reproduce, and I'm no longer sure how the assert could be being hit. If
+you can provide repro instructions and images that work on current head-
+of-git I can investigate.
 
-> POWER8 is the only chip using the XICS interface. Add a "xics" link
-> and a XICSFabric attribute under this chip to remove the use of
-> qdev_get_machine()
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+** Changed in: qemu
+       Status: Confirmed =3D> Incomplete
 
->  include/hw/ppc/pnv.h |  2 ++
->  hw/ppc/pnv.c         | 26 ++++++++++++++++++++------
->  2 files changed, 22 insertions(+), 6 deletions(-)
->=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index f31180618672..8b957dfb5736 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -74,6 +74,8 @@ typedef struct Pnv8Chip {
->      Pnv8Psi      psi;
->      PnvOCC       occ;
->      PnvHomer     homer;
-> +
-> +    XICSFabric    *xics;
->  } Pnv8Chip;
-> =20
->  #define TYPE_PNV9_CHIP "pnv9-chip"
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index d6fe5ba13535..6500efba1317 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -797,6 +797,13 @@ static void pnv_init(MachineState *machine)
->           */
->          object_property_set_link(chip, OBJECT(sysmem), "system-memory",
->                                   &error_abort);
-> +        /*
-> +         * The POWER8 machine use the XICS interrupt interface.
-> +         * Propagate the XICS fabric to the chip and its controllers.
-> +         */
-> +        if (object_dynamic_cast(OBJECT(pnv), TYPE_XICS_FABRIC)) {
-> +            object_property_set_link(chip, OBJECT(pnv), "xics", &error_a=
-bort);
-> +        }
->          object_property_set_bool(chip, true, "realized", &error_fatal);
->      }
->      g_free(chip_typename);
-> @@ -838,12 +845,12 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip,=
- uint32_t core_id)
->  static void pnv_chip_power8_intc_create(PnvChip *chip, PowerPCCPU *cpu,
->                                          Error **errp)
->  {
-> +    Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
->      Error *local_err =3D NULL;
->      Object *obj;
->      PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> =20
-> -    obj =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, XICS_FABRIC(qdev_get_m=
-achine()),
-> -                     &local_err);
-> +    obj =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, chip8->xics, &local_er=
-r);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> @@ -997,6 +1004,12 @@ static void pnv_chip_power8_instance_init(Object *o=
-bj)
->  {
->      Pnv8Chip *chip8 =3D PNV8_CHIP(obj);
-> =20
-> +    object_property_add_link(obj, "xics", TYPE_XICS_FABRIC,
-> +                             (Object **)&chip8->xics,
-> +                             object_property_allow_set_link,
-> +                             OBJ_PROP_LINK_STRONG,
-> +                             &error_abort);
-> +
->      object_initialize_child(obj, "psi",  &chip8->psi, sizeof(chip8->psi),
->                              TYPE_PNV8_PSI, &error_abort, NULL);
-> =20
-> @@ -1016,7 +1029,6 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, E=
-rror **errp)
->      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
->      int i, j;
->      char *name;
-> -    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-> =20
->      name =3D g_strdup_printf("icp-%x", chip->chip_id);
->      memory_region_init(&chip8->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZ=
-E);
-> @@ -1032,7 +1044,7 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, E=
-rror **errp)
-> =20
->          for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
->              uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
-> -            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
-> +            PnvICPState *icp =3D PNV_ICP(xics_icp_get(chip8->xics, pir));
-> =20
->              memory_region_add_subregion(&chip8->icp_mmio, pir << 12,
->                                          &icp->mmio);
-> @@ -1048,6 +1060,8 @@ static void pnv_chip_power8_realize(DeviceState *de=
-v, Error **errp)
->      Pnv8Psi *psi8 =3D &chip8->psi;
->      Error *local_err =3D NULL;
-> =20
-> +    assert(chip8->xics);
-> +
->      /* XSCOM bridge is first */
->      pnv_xscom_realize(chip, PNV_XSCOM_SIZE, &local_err);
->      if (local_err) {
-> @@ -1067,8 +1081,8 @@ static void pnv_chip_power8_realize(DeviceState *de=
-v, Error **errp)
->                              "bar", &error_fatal);
->      object_property_set_link(OBJECT(&chip8->psi), OBJECT(chip->system_me=
-mory),
->                               "system-memory", &error_abort);
-> -    object_property_set_link(OBJECT(&chip8->psi), OBJECT(qdev_get_machin=
-e()),
-> -                             ICS_PROP_XICS, &error_abort);
-> +    object_property_set_link(OBJECT(&chip8->psi), OBJECT(chip8->xics),
-> +                              ICS_PROP_XICS, &error_abort);
->      object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &loc=
-al_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836501
+
+Title:
+  cpu_address_space_init fails with assertion
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  qemu-system-arm does not start with version >=3D 2.6 and KVM enabled.
+
+    cpu_address_space_init: Assertion `asidx =3D=3D 0 || !kvm_enabled()'
+  failed.
+
+  Hardware is Odroid XU4 with Exynos with 4.9.61+ Tested with Debian
+  Stretch (9) or Buster (10).
+
+  Without KVM it is running fine but slow. I'm operating Debian Jessie
+  with qemu 2.1 for a long time with KVM virtualization working
+  flawlessly. When I upgraded to Stretch I ran into the trouble
+  described before. I tried Debian Stretch and Buster with all Kernels
+  provided by the Board manufacturer (Hardkernel).
+
+  It seems to be related to the feature introduced in Version 2.6:
+  https://wiki.qemu.org/ChangeLog/2.6
+  - Support for a separate EL3 address space
+
+  KVM is enabled, so I assume the adress space index asidx to be causing
+  the assert to fail.
+
+  dmesg | grep -i KVM
+  [    0.741714] kvm [1]: 8-bit VMID
+  [    0.741721] kvm [1]: IDMAP page: 40201000
+  [    0.741729] kvm [1]: HYP VA range: c0000000:ffffffff
+  [    0.742543] kvm [1]: Hyp mode initialized successfully
+  [    0.742600] kvm [1]: vgic-v2@10484000
+  [    0.742924] kvm [1]: vgic interrupt IRQ16
+  [    0.742943] kvm [1]: virtual timer IRQ60
+
+  Full command line is:
+  qemu-system-arm -M vexpress-a15 -smp 2 -m 512 -cpu host -enable-kvm -kern=
+el vmlinuz -initrd initrd.gz -dtb vexpress-v2p-ca15-tc1.dtb -device virtio-=
+blk-device,drive=3Dinst-blk -drive file=3DPATHTOFILE,id=3Dinst-blk,if=3Dnon=
+e,format=3Draw -append "vga=3Dnormal rw console=3DttyAMA0" -nographic
+
+  Is there anything to do to understand, if this is a hardware related
+  failure or probably just a missing parameter?
+
+  Regards
+
+  Lutz
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836501/+subscriptions
 
