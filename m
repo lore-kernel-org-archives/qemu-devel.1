@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C67C47409
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFCBC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:53:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51BC7227BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9741227BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:53:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tQ/bknCA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51BC7227BF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Na0l5nj4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9741227BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihtQr-0003of-NV
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:53:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38079)
+	id 1ihtQx-0003x3-AS
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:53:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ihtNF-0006Xo-Di
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:42 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ihtNI-0006Z0-3b
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ihtND-0007x3-0K
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:41 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:56156)
+ (envelope-from <alex.bennee@linaro.org>) id 1ihtNG-0008I2-NY
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:43 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42623)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ihtNC-0007pp-Mk
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:38 -0500
-Received: by mail-wm1-x333.google.com with SMTP id q9so4939770wmj.5
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 02:49:38 -0800 (PST)
+ id 1ihtNG-0008Bu-DL
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:42 -0500
+Received: by mail-wr1-x432.google.com with SMTP id q6so5457391wro.9
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 02:49:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=d+Pda+ZdRPcyYkSjIEt1t/uTnpjt9VwcL/O1cE3PJHI=;
- b=tQ/bknCAq+PpnYB7kbXeP4NjPYiW/CwVoYYMVxVjktHTyxk0BNO3JulfdMxU3Z7FzN
- Ku1HRRzJgACzIJp2ZOF/3TJczpsDEtdepaYFhDOWW8OQBcA3NWC2QZdUQF6mLyAZrQp9
- PtG3Ecu1/g/fjG+RdnZkkiFuTa4JyoAr6o+1YBnxZdTSx0DidcsEEfiAgtqGIyJHIvni
- FTV3BBrqkVieItxjsLW+2rEPA1APj3/LyYRNZuItNSV+VFJp4fhuoHYkRq08W3P1mW8J
- KTXov3IxcHV89oQ6NNkz73vFdbTvXnHSZ1s2FvvZ/xQnpoCKvepxaAtYqLTrsX8rkW1B
- EizQ==
+ bh=aKHmlXVnEdxblPaY0W1a7lGdL9lrMsXlAG76mAyvLB0=;
+ b=Na0l5nj4hsrrKx0LC54oQSHzoqJeVqjZ9Zcw1rqB0PImGZkYVpu+lQ6X26MPPqI7B4
+ ZyMJFZKIRmcWCylm2x4ifIZMpqzkyD+WXYgJHECowd5fEaAHwbcbyusHPnrZU99dWWy7
+ oSTkQeKeSrV+k23+0+mlhO1neGnEkair68rl+0GaSN/vJqA5WUkr5eA/pCx6Eln9g/k2
+ /8iJS5mMLA8DGi79vjGLeHnQQFHdbMOI1N4pCdMYoQ5XhnIoF6nHXZHqvPv7yeWTctd9
+ 1gG4aWZ8q6ua6L8nPD862NrFs9thsnmJLscspyRCCXQoGNts3/uaQK8LMje87cLuYsDm
+ 2f3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=d+Pda+ZdRPcyYkSjIEt1t/uTnpjt9VwcL/O1cE3PJHI=;
- b=hULz8Qf4jqx0xShhE4BKr/xC+0TLo7n5EHTkA7/74xIHs8nY6adlBQrpAkrHsRa1m3
- PLKEJmT3tWXhxF89QtlBihW+at4BJeeqv8p0myL7+vUTRvN30vzu9/AnaOpRHCFKYyzS
- D5N3NWyA27j6bSyyU0Ph3uxWNRe5RReApwEzFL0NV4ykY0ZJ1wXLTGrnaabmvKxNyVQl
- Z0K3h+JKkW99+XRbcNb1uMsdAvoacT1M46En8H8+dK6HvLFNDiwKzjd4vSjE4qJ4p1Tz
- KbtP2qxGbMuUnJEypPxWw83vsXykN9Ds+3nTvjwLzAmLxjiofYhSwLwRNa/z1U3HaSOR
- 0ZdQ==
-X-Gm-Message-State: APjAAAV561rtH0s1QOjpZsLOxQifu/Jaos+OrPRb+ORYtX3htocG1AUn
- lYaOwC92aUHrPCeS8tMhNhvbVg==
-X-Google-Smtp-Source: APXvYqyOlbiRHcRcTOggup4wtytu9l0sKcr+3hm0NTgofQxfNTj20OGold+p3sE0xOJipq3j8NoDzw==
-X-Received: by 2002:a7b:cd91:: with SMTP id y17mr8990781wmj.140.1576752576877; 
- Thu, 19 Dec 2019 02:49:36 -0800 (PST)
+ bh=aKHmlXVnEdxblPaY0W1a7lGdL9lrMsXlAG76mAyvLB0=;
+ b=g+gCpogFeIVgtOMAvvoXIKe3S/nDLA8D7rGmtqJYNHwnMKf7hrgB6YVxhsKsLMJWk+
+ aDcCCwv8SBuDkWJKvksVkJopHGfuT/KTX8F4yn/M76rCY49+LyiO7SCF4SZdjhC4B1J7
+ bGpqidPuA1JC+oDu9arZJavgvamsCU+zBVurr6wL2SyOcJqYbT0rZmMXjw+pxkpw1a58
+ oenTRnMPlMwhSb5EcYsl+DM2bm44O7886MADidKp+7PNS0MXiigzDLRf6VCIUN7/RsSy
+ SVfQdigNkhWHPH2v3c2kxPX/dsmx3ueKsQe1MdOsCpoZAXsluk4wdjJTN82o/ewdiHU1
+ NvNA==
+X-Gm-Message-State: APjAAAWxTf0pCsDNzzVA9GPR74Rjm3vkDGLiiZFJurUgpmeVDSUrjZ13
+ CUZIvGASTV+hIfA+oa7yXBiRrQ==
+X-Google-Smtp-Source: APXvYqzZjg2+JW4KO66zB/EINWeWe8D1sIQqZ5/mu3IWhx6pNHu7xEfQFRfyJQHLv3fdEhjzPk55EQ==
+X-Received: by 2002:adf:ef8b:: with SMTP id d11mr8330316wro.45.1576752581233; 
+ Thu, 19 Dec 2019 02:49:41 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f1sm5938897wru.6.2019.12.19.02.49.35
+ by smtp.gmail.com with ESMTPSA id c195sm6275377wmd.45.2019.12.19.02.49.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Thu, 19 Dec 2019 02:49:35 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7F9001FF8C;
+ by zen.linaroharston (Postfix) with ESMTP id CF9CD1FF91;
  Thu, 19 Dec 2019 10:49:34 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 01/25] configure: allow disable of cross compilation containers
-Date: Thu, 19 Dec 2019 10:49:10 +0000
-Message-Id: <20191219104934.866-2-alex.bennee@linaro.org>
+Subject: [PULL 04/25] iotests: Provide a function for checking the creation of
+ huge files
+Date: Thu, 19 Dec 2019 10:49:13 +0000
+Message-Id: <20191219104934.866-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191219104934.866-1-alex.bennee@linaro.org>
 References: <20191219104934.866-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,84 +97,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Cleber Rosa <crosa@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Our docker infrastructure isn't quite as multiarch as we would wish so
-lets allow the user to disable it if they want. This will allow us to
-use still run check-tcg on non-x86 CI setups.
+From: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Some tests create huge (but sparse) files, and to be able to run those
+tests in certain limited environments (like CI containers), we have to
+check for the possibility to create such files first. Thus let's introduce
+a common function to check for large files, and replace the already
+existing checks in the iotests 005 and 220 with this function.
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Cleber Rosa <crosa@redhat.com>
 Tested-by: Cleber Rosa <crosa@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20191204154618.23560-2-thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/configure b/configure
-index 84b413dbfcf..e0c66ee9b68 100755
---- a/configure
-+++ b/configure
-@@ -302,6 +302,7 @@ audio_win_int=""
- libs_qga=""
- debug_info="yes"
- stack_protector=""
-+use_containers="yes"
- 
- if test -e "$source_path/.git"
- then
-@@ -1534,6 +1535,10 @@ for opt do
-   ;;
-   --disable-plugins) plugins="no"
-   ;;
-+  --enable-containers) use_containers="yes"
-+  ;;
-+  --disable-containers) use_containers="no"
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -1717,6 +1722,7 @@ Advanced options (experts only):
-                            track the maximum stack usage of stacks created by qemu_alloc_stack
-   --enable-plugins
-                            enable plugins via shared library loading
-+  --disable-containers     don't use containers for cross-building
- 
- Optional features, enabled with --enable-FEATURE and
- disabled with --disable-FEATURE, default is enabled if available:
-@@ -7992,7 +7998,7 @@ done
- (for i in $cross_cc_vars; do
-   export $i
- done
--export target_list source_path
-+export target_list source_path use_containers
- $source_path/tests/tcg/configure.sh)
- 
- # temporary config to build submodules
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index 6c4a471aeae..210e68396f2 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -36,8 +36,10 @@ TMPC="${TMPDIR1}/qemu-conf.c"
- TMPE="${TMPDIR1}/qemu-conf.exe"
- 
- container="no"
--if has "docker" || has "podman"; then
--  container=$($python $source_path/tests/docker/docker.py probe)
-+if test $use_containers = "yes"; then
-+    if has "docker" || has "podman"; then
-+        container=$($python $source_path/tests/docker/docker.py probe)
-+    fi
+diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
+index 58442762fe3..b6d03ac37de 100755
+--- a/tests/qemu-iotests/005
++++ b/tests/qemu-iotests/005
+@@ -59,10 +59,7 @@ fi
+ # Sanity check: For raw, we require a file system that permits the creation
+ # of a HUGE (but very sparse) file. Check we can create it before continuing.
+ if [ "$IMGFMT" = "raw" ]; then
+-    if ! truncate --size=5T "$TEST_IMG"; then
+-        _notrun "file system on $TEST_DIR does not support large enough files"
+-    fi
+-    rm "$TEST_IMG"
++    _require_large_file 5T
  fi
  
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
+ echo
+diff --git a/tests/qemu-iotests/220 b/tests/qemu-iotests/220
+index 2d62c5dcac2..15159270d33 100755
+--- a/tests/qemu-iotests/220
++++ b/tests/qemu-iotests/220
+@@ -42,10 +42,8 @@ echo "== Creating huge file =="
+ 
+ # Sanity check: We require a file system that permits the creation
+ # of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
+-if ! truncate --size=513T "$TEST_IMG"; then
+-    _notrun "file system on $TEST_DIR does not support large enough files"
+-fi
+-rm "$TEST_IMG"
++_require_large_file 513T
++
+ IMGOPTS='cluster_size=2M,refcount_bits=1' _make_test_img 513T
+ 
+ echo "== Populating refcounts =="
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index 0cc8acc9edd..6f0582c79af 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -643,5 +643,15 @@ _require_drivers()
+     done
+ }
+ 
++# Check that we have a file system that allows huge (but very sparse) files
++#
++_require_large_file()
++{
++    if ! truncate --size="$1" "$TEST_IMG"; then
++        _notrun "file system on $TEST_DIR does not support large enough files"
++    fi
++    rm "$TEST_IMG"
++}
++
+ # make sure this script returns success
+ true
 -- 
 2.20.1
 
