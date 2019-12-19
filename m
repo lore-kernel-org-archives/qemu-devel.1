@@ -2,90 +2,103 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ABB3C2D0C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4237C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:15:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAB162465E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E8AC206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:15:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LUs4vp65"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAB162465E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FTXWYLeD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E8AC206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihtkB-0005lM-Uv
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 06:13:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57933)
+	id 1ihtm2-00009E-53
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 06:15:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ihtWj-0003zR-TU
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:59:31 -0500
+ (envelope-from <philmd@redhat.com>) id 1ihtj6-0004NX-Cx
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:12:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ihtWg-0001OE-M8
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:59:29 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36970)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ihtWg-0001Ib-Bd
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:59:26 -0500
-Received: by mail-wr1-x441.google.com with SMTP id w15so5531113wru.4
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 02:59:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=xNVbpe55d79tM9HPZIL8ONzXUawfaxOna0fvaAKgXs0=;
- b=LUs4vp65PtEDA6szHARnD6wtKvFhVL/uudkk0bPPrlJkwDdqf7kPUo/e72EqYrT94D
- KTzuNmi3ZRFdtirCCvXOsY4yv4pzI/t2YK/iluMBAar9LVDlPRbEHvDKQfsi69cc1ajZ
- VjhvirNVSPR+xzuLtoyr1TDaQi0Dk68NCgwkvwQMuTLFaJ1DVGJF16Kfn7XuZ6piMWe6
- ik1FiZtrBbojxlGtYXKh09L0iBKJ3ubtb4se1pF23lYQRN8zP18jbFFbiS5LTtAKMS/d
- /waP7QynN2SuhdOnt/TnvpjLfaBiOv104XT6F8vEL+IjrrR5Mj3abMGxFBsMgZEB25zd
- Vylg==
+ (envelope-from <philmd@redhat.com>) id 1ihtj3-00033o-Iy
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:12:15 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35804
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihtj3-000311-3s
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:12:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576753931;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1g5pi4hp6gqHZ8DFxclQTjsmnPlys216sRd5vj+hVAY=;
+ b=FTXWYLeDMTE+dZRTF7i2E+9s+Hp50/j+Jc/tozbrlIGecGes9U+8xpCo2CDa9PmeHIY6tz
+ 8YgiIevFmrYM2yB8i859HX/DqEBTrlBZLSxgv3UmG7GqgwEplFNzObjn9T4Nvtdnwgzwp+
+ TGk7lovdXxqfYmrAWEZ7aM3SsR8EbKk=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-sgnX5-_hPoqVTS6FGPFLIw-1; Thu, 19 Dec 2019 06:12:10 -0500
+Received: by mail-ed1-f71.google.com with SMTP id y26so3305059eds.5
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 03:12:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xNVbpe55d79tM9HPZIL8ONzXUawfaxOna0fvaAKgXs0=;
- b=d91pzp9rCTUQM3ndK7w5rFNXzdcFWAU62BBquh4VWAo4ywQDo8jtMsaKRR4I1kxmOh
- NC0DMz3h5rpLL3UHhKral4/W8jGjXq4T8MoFwU45+MOTuFvyCAEKbgL9bkSwx5QqF0Ag
- b2ttNPQfEDIlT6MwJA9yl9pTArIvD75zQsjTtaVXiqaY5UwLECdljLlprZ1qWtqJW19G
- Az5CkZ6fMt+dZMF9gXT5UxywI8dpJsTxWSCvt2Ei3fG3YS50gJIRmY6A4OzHztERG+ie
- GJsZTKGVebUh7V8Mz3YoJy5jqvujz8DTKHDijD9rhsADXdMfALxHbkIgDlTN6T3DXrRJ
- MEbg==
-X-Gm-Message-State: APjAAAUq5fBFOg6jQA52l88PRVtavvflxIByumPobh0moF+UdPAHZ+vX
- y/O+x99VzHiVQYG8I33tjQJeyg==
-X-Google-Smtp-Source: APXvYqw6G9V9ksQYGURYhdkGrlZA7xWgz+u40e3H5ymd6ysEABIeGANIFRoXTn9Lb3gZrJHRBFaj0w==
-X-Received: by 2002:adf:a308:: with SMTP id c8mr8523626wrb.240.1576753165118; 
- Thu, 19 Dec 2019 02:59:25 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c17sm5963609wrr.87.2019.12.19.02.59.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 02:59:20 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CAD911FF9E;
- Thu, 19 Dec 2019 10:49:35 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 14/25] qemu_log_lock/unlock now preserves the qemu_logfile
- handle.
-Date: Thu, 19 Dec 2019 10:49:23 +0000
-Message-Id: <20191219104934.866-15-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191219104934.866-1-alex.bennee@linaro.org>
-References: <20191219104934.866-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8USiJNxg29+iVGEwRviVamr5n06M50bnccsfaM/5ZCY=;
+ b=Ua17HzFPKpVUekKP8/x4Cm08ffob72uGocusDO2H/TLRfLPGMkKv2laBKZe07kWfSN
+ axp3bvEaNsuqjitNra0Gqn79NoZCpzb5jNVuh2y9b0ITi0UON4IwreQISccyWnygtzXu
+ 3zJs9sJ8uWE6MDE1SU7+6OUrhZxgZgFbzj2juMXXRX3OCz05rBmrxKhXXLQqO/bFQWOg
+ sIgBrLK/aOZMELkeHHqF3SLCehJhIbUWJf3gDOayzPFFqBlIzoQf9DLxB4Mw/JjuitxE
+ uRbQSXoviE3ZCK1a/rm6diGIpOrzXDCNR9dh8ktUGTgktOd81Exxk/yqOT+jeOghkkRO
+ 49rQ==
+X-Gm-Message-State: APjAAAUKYvxoHQStYkv8omMFpdpg/d7a1BjUHcEZ957hrlvrM1RzASaj
+ Q4olOWegKbl9pc7XSSFZyR+SB113tQVGI5FPFPQLql6dWcyCJsR5VZuxe5+g+LYz5+y7ERSHvJk
+ 4UjGxrHhgCGI0xss=
+X-Received: by 2002:a17:906:4bcb:: with SMTP id
+ x11mr8905083ejv.100.1576753929422; 
+ Thu, 19 Dec 2019 03:12:09 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyuyzenKTDcLxh5UH6vbDHaBEpwsCCSnT0dA93KzfYKQR+MUN01wfzi+MJTrNHUUQYHj7VfXg==
+X-Received: by 2002:a17:906:4bcb:: with SMTP id
+ x11mr8905052ejv.100.1576753929205; 
+ Thu, 19 Dec 2019 03:12:09 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id dc5sm319423edb.61.2019.12.19.03.12.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Dec 2019 03:12:08 -0800 (PST)
+Subject: Re: [PATCH v8 1/4] Acceptance tests: introduce BLD_DIR, SRC_DIR and
+ LNK_DIR
+To: Cleber Rosa <crosa@redhat.com>
+References: <20191218232500.23530-1-crosa@redhat.com>
+ <20191218232500.23530-2-crosa@redhat.com>
+ <3362e435-73be-f5c3-a672-6208f2bacd95@redhat.com>
+ <20191219002539.GA29918@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1d90bf81-7acb-f80c-959f-95ab8fee899b@redhat.com>
+Date: Thu, 19 Dec 2019 12:12:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <20191219002539.GA29918@localhost.localdomain>
+Content-Language: en-US
+X-MC-Unique: sgnX5-_hPoqVTS6FGPFLIw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,387 +110,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Robert Foley <robert.foley@linaro.org>,
- Jason Wang <jasowang@redhat.com>, Chris Wulff <crwulff@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Robert Foley <robert.foley@linaro.org>
+On 12/19/19 1:25 AM, Cleber Rosa wrote:
+> On Thu, Dec 19, 2019 at 01:02:39AM +0100, Philippe Mathieu-Daud=E9 wrote:
+>> On 12/19/19 12:24 AM, Cleber Rosa wrote:
+>>> Some tests may benefit from using resources from a build directory.
+>>> This introduces three variables that can help tests find resources in
+>>> those directories.
+>>>
+>>> First, a BLD_DIR is assumed to exist, given that the primary form of
+>>> running the acceptance tests is from a build directory (which may or
+>>> may not be the same as the source tree, that is, the SRC_DIR).
+>>
+>> Can we name this BUILD_DIR?
+>>
+>=20
+> Yes, of course.
+>=20
+>> This would be more in line with the other buildsys files (configure/make=
+).
+>>
+>=20
+> That's a good point.
+>=20
+>>> If the directory containing the acceptance tests happens to be a link
+>>> to a directory (kept as LNK_DIR), it's assumed to it points to the
+>>> source tree (SRC_DIR), which is the behavior defined on the QEMU
+>>> Makefiles.  If the directory containing the acceptance tests is not a
+>>> link, then a in-tree build is assumed, and the BLD_DIR and SRC_DIR are
+>>> the same and LNK_DIR is set None.
+>>
+>> Similarly, can we name this CURRENT_DIR instead of LNK_DIR?
+>>
+>=20
+> Yes, or maybe even drop it?  TBH, I can only see use cases for build
 
-qemu_log_lock() now returns a handle and qemu_log_unlock() receives a
-handle to unlock.  This allows for changing the handle during logging
-and ensures the lock() and unlock() are for the same file.
+I haven't checked why you needed to add it, so if we don't need it,=20
+let's drop it :)
 
-Also in target/tilegx/translate.c removed the qemu_log_lock()/unlock()
-calls (and the log("\n")), since the translator can longjmp out of the
-loop if it attempts to translate an instruction in an inaccessible page.
+> and source dirs.  So, I assume you'd propose SRC_DIR would be
+> SOURCE_DIR?
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20191118211528.3221-5-robert.foley@linaro.org>
+This one is understandable as it, but SOURCE_DIR is cleaner indeed.
 
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index a91105b2adc..a7c5b01571f 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -53,14 +53,17 @@ static inline bool qemu_log_separate(void)
-  * qemu_loglevel is never set when qemu_logfile is unset.
-  */
- 
--static inline void qemu_log_lock(void)
-+static inline FILE *qemu_log_lock(void)
- {
-     qemu_flockfile(qemu_logfile);
-+    return logfile->fd;
- }
- 
--static inline void qemu_log_unlock(void)
-+static inline void qemu_log_unlock(FILE *fd)
- {
--    qemu_funlockfile(qemu_logfile);
-+    if (fd) {
-+        qemu_funlockfile(fd);
-+    }
- }
- 
- /* Logging functions: */
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index c01f59c7433..62068d10c3c 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -156,7 +156,7 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
- #if defined(DEBUG_DISAS)
-     if (qemu_loglevel_mask(CPU_LOG_TB_CPU)
-         && qemu_log_in_addr_range(itb->pc)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         int flags = 0;
-         if (qemu_loglevel_mask(CPU_LOG_TB_FPU)) {
-             flags |= CPU_DUMP_FPU;
-@@ -165,7 +165,7 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
-         flags |= CPU_DUMP_CCOP;
- #endif
-         log_cpu_state(cpu, flags);
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif /* DEBUG_DISAS */
- 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 9f48da94721..bb325a2bc44 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1804,7 +1804,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM) &&
-         qemu_log_in_addr_range(tb->pc)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("OUT: [size=%d]\n", gen_code_size);
-         if (tcg_ctx->data_gen_ptr) {
-             size_t code_size = tcg_ctx->data_gen_ptr - tb->tc.ptr;
-@@ -1829,7 +1829,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         }
-         qemu_log("\n");
-         qemu_log_flush();
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- 
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index f977682be79..603d17ff831 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -138,11 +138,11 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(db->pc_first)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("----------------\n");
-         ops->disas_log(db, cpu);
-         qemu_log("\n");
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- }
-diff --git a/exec.c b/exec.c
-index a34c3481840..edafdebeecc 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1225,13 +1225,13 @@ void cpu_abort(CPUState *cpu, const char *fmt, ...)
-     fprintf(stderr, "\n");
-     cpu_dump_state(cpu, stderr, CPU_DUMP_FPU | CPU_DUMP_CCOP);
-     if (qemu_log_separate()) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("qemu: fatal: ");
-         qemu_log_vprintf(fmt, ap2);
-         qemu_log("\n");
-         log_cpu_state(cpu, CPU_DUMP_FPU | CPU_DUMP_CCOP);
-         qemu_log_flush();
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-         qemu_log_close();
-     }
-     va_end(ap2);
-diff --git a/hw/net/can/can_sja1000.c b/hw/net/can/can_sja1000.c
-index 1f81341554f..39c78faf9b2 100644
---- a/hw/net/can/can_sja1000.c
-+++ b/hw/net/can/can_sja1000.c
-@@ -247,8 +247,8 @@ int can_sja_accept_filter(CanSJA1000State *s,
- static void can_display_msg(const char *prefix, const qemu_can_frame *msg)
- {
-     int i;
-+    FILE *logfile = qemu_log_lock();
- 
--    qemu_log_lock();
-     qemu_log("%s%03X [%01d] %s %s",
-              prefix,
-              msg->can_id & QEMU_CAN_EFF_MASK,
-@@ -261,7 +261,7 @@ static void can_display_msg(const char *prefix, const qemu_can_frame *msg)
-     }
-     qemu_log("\n");
-     qemu_log_flush();
--    qemu_log_unlock();
-+    qemu_log_unlock(logfile);
- }
- 
- static void buff2frame_pel(const uint8_t *buff, qemu_can_frame *frame)
-diff --git a/net/can/can_socketcan.c b/net/can/can_socketcan.c
-index 8a6ffad40c8..29bfacd4f8a 100644
---- a/net/can/can_socketcan.c
-+++ b/net/can/can_socketcan.c
-@@ -76,8 +76,7 @@ QEMU_BUILD_BUG_ON(offsetof(qemu_can_frame, data)
- static void can_host_socketcan_display_msg(struct qemu_can_frame *msg)
- {
-     int i;
--
--    qemu_log_lock();
-+    FILE *logfile = qemu_log_lock();
-     qemu_log("[cansocketcan]: %03X [%01d] %s %s",
-              msg->can_id & QEMU_CAN_EFF_MASK,
-              msg->can_dlc,
-@@ -89,7 +88,7 @@ static void can_host_socketcan_display_msg(struct qemu_can_frame *msg)
-     }
-     qemu_log("\n");
-     qemu_log_flush();
--    qemu_log_unlock();
-+    qemu_log_unlock(logfile);
- }
- 
- static void can_host_socketcan_read(void *opaque)
-diff --git a/target/cris/translate.c b/target/cris/translate.c
-index e752bd06093..cb57516a445 100644
---- a/target/cris/translate.c
-+++ b/target/cris/translate.c
-@@ -3273,11 +3273,11 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- #if !DISAS_CRIS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("--------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- #endif
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 77e932d8276..7c99ef13854 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -2502,14 +2502,15 @@ static void gen_unknown_opcode(CPUX86State *env, DisasContext *s)
-     gen_illegal_opcode(s);
- 
-     if (qemu_loglevel_mask(LOG_UNIMP)) {
-+        FILE *logfile = qemu_log_lock();
-         target_ulong pc = s->pc_start, end = s->pc;
--        qemu_log_lock();
-+
-         qemu_log("ILLOPC: " TARGET_FMT_lx ":", pc);
-         for (; pc < end; ++pc) {
-             qemu_log(" %02x", cpu_ldub_code(env, pc));
-         }
-         qemu_log("\n");
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- }
- 
-diff --git a/target/lm32/translate.c b/target/lm32/translate.c
-index 778cae1e817..73db9654d66 100644
---- a/target/lm32/translate.c
-+++ b/target/lm32/translate.c
-@@ -1137,10 +1137,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("\n");
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- }
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index bdc7d5326a6..525115b0413 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1765,10 +1765,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- #if !SIM_COMPAT
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("--------------\n");
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- #endif
-diff --git a/target/nios2/translate.c b/target/nios2/translate.c
-index e17656e66fb..82107bf270f 100644
---- a/target/nios2/translate.c
-+++ b/target/nios2/translate.c
-@@ -892,11 +892,11 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(tb->pc)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(tb->pc));
-         log_target_disas(cs, tb->pc, dc->pc - tb->pc);
-         qemu_log("\n");
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- }
-diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
-index 68dd4aa2d8e..abce7e1c757 100644
---- a/target/tilegx/translate.c
-+++ b/target/tilegx/translate.c
-@@ -2388,7 +2388,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-     dc->zero = NULL;
- 
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
--        qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
-     }
-     gen_tb_start(tb);
-@@ -2417,11 +2416,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-     gen_tb_end(tb, num_insns);
-     tb->size = dc->pc - pc_start;
-     tb->icount = num_insns;
--
--    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
--        qemu_log("\n");
--        qemu_log_unlock();
--    }
- }
- 
- void restore_state_to_opc(CPUTLGState *env, TranslationBlock *tb,
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index 0e01f35856f..0f6891b8aa3 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -1994,12 +1994,12 @@ done_generating:
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-         && qemu_log_in_addr_range(pc_start)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
-         log_target_disas(cs, pc_start, dc->pc - pc_start);
-         qemu_log("\n");
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
-     tb->size = dc->pc - pc_start;
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 5475d49ed11..0511266d85d 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1085,7 +1085,7 @@ void tcg_prologue_init(TCGContext *s)
- 
- #ifdef DEBUG_DISAS
-     if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM)) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("PROLOGUE: [size=%zu]\n", prologue_size);
-         if (s->data_gen_ptr) {
-             size_t code_size = s->data_gen_ptr - buf0;
-@@ -1110,7 +1110,7 @@ void tcg_prologue_init(TCGContext *s)
-         }
-         qemu_log("\n");
-         qemu_log_flush();
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- 
-@@ -4041,11 +4041,11 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #ifdef DEBUG_DISAS
-     if (unlikely(qemu_loglevel_mask(CPU_LOG_TB_OP)
-                  && qemu_log_in_addr_range(tb->pc))) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("OP:\n");
-         tcg_dump_ops(s, false);
-         qemu_log("\n");
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- 
-@@ -4086,11 +4086,11 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #ifdef DEBUG_DISAS
-         if (unlikely(qemu_loglevel_mask(CPU_LOG_TB_OP_IND)
-                      && qemu_log_in_addr_range(tb->pc))) {
--            qemu_log_lock();
-+            FILE *logfile = qemu_log_lock();
-             qemu_log("OP before indirect lowering:\n");
-             tcg_dump_ops(s, false);
-             qemu_log("\n");
--            qemu_log_unlock();
-+            qemu_log_unlock(logfile);
-         }
- #endif
-         /* Replace indirect temps with direct temps.  */
-@@ -4107,11 +4107,11 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
- #ifdef DEBUG_DISAS
-     if (unlikely(qemu_loglevel_mask(CPU_LOG_TB_OP_OPT)
-                  && qemu_log_in_addr_range(tb->pc))) {
--        qemu_log_lock();
-+        FILE *logfile = qemu_log_lock();
-         qemu_log("OP after optimization and liveness analysis:\n");
-         tcg_dump_ops(s, true);
-         qemu_log("\n");
--        qemu_log_unlock();
-+        qemu_log_unlock(logfile);
-     }
- #endif
- 
--- 
-2.20.1
+Thanks,
+
+Phil.
 
 
