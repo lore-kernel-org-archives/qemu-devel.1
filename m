@@ -2,84 +2,74 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC942C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B69C6C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:58:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4288218AC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:54:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 826BA218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YjCU03iq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4288218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SU2Q5kkL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826BA218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwFb-0003Fs-US
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:53:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50853)
+	id 1ihwJx-0006gh-CV
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:58:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ihwEy-0002os-2p
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:53:21 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ihwI7-0004Kd-4V
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:56:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ihwEw-0000DS-T1
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:53:19 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43679)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1ihwEw-00006E-IJ
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:53:18 -0500
-Received: by mail-wr1-x443.google.com with SMTP id d16so6035366wre.10
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:53:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Hg+oOcpP5bFaYXf4GJ1sLxu4YJq+UZWaCc3c9eYBEbk=;
- b=YjCU03iqKBwK1Kiz0PuVjVNWBZm8Jbky3MQOz970b5+KNUtOVJlEhwskcj4Wpf/55E
- aisaJCTO9V8ruXjI1jPP9hReT+cTrMN21F1bQKEzOLeRjnkiH0f3iyG/jhqglSNCygIM
- ITLluO2UfL7YP8YnLmH8kV8PXct8CSeTTmHNVtnlNq4LSRNsbDGpSJ4AHv3/nCsaOVXq
- od2CYRd+ni0MrGw64ucELd0cEX/Rr04m0Ujzdr+lULg/ywj7t7s0YoQNuw6/vyxElhtu
- clbsd4MdewwP+ftOaX4fQLk5QOsFVxvuAJo+6sXb1NGrUd4UugkvbVjqYvQxIg1XnYxq
- RYRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Hg+oOcpP5bFaYXf4GJ1sLxu4YJq+UZWaCc3c9eYBEbk=;
- b=RhEOHX41eoJQb+9wWcXllM2aoD03L/HUXo/DI1sWhoIrmQieRpCnYNje2u/BHo+LYb
- A1p11fSXTJhOcp6ygjCwRIhVZiaJTA7yHYa+hAP0tw+iulV5Q5W0PbQ4UM8c8grLzPfZ
- wn5ZEKRzETi+HvERCArkn1M83zOsJ0TXN5j9hEiomtuCe6u91CbAX3P5Z1zjwT6z2cl+
- hRX06t3OCSAHkNXyfhzH4aiiy0TdpUVyDF3amK1XeMK7aVhuxvtfiYP+OEcUZOcYe+l7
- /EYTfe4vFt0ShcCZQOjY9oREjeTJ7NarW/YUyOj9+dwO80DnTEcAKPf7bluIQWyHIpIz
- 9Qiw==
-X-Gm-Message-State: APjAAAVZ3jAzCR4yivMXz8s7pJbUVQj+EJyGEgxKUi0Dn7467HqMQvNG
- IUhvMGX5lX9KkEqnsr6B/ZrwT1rNDghzPyhgGM2t7hdkmfE=
-X-Google-Smtp-Source: APXvYqztexRD0eGlxy5byPO+pFhOHh4rS6BZ/0RCw5uUbgQRB7Ww3S5Cg7g8gMUcFF3p6HT2Kqg6N0QgFtxqLhxYFKE=
-X-Received: by 2002:a5d:66c3:: with SMTP id k3mr8993194wrw.370.1576763596044; 
- Thu, 19 Dec 2019 05:53:16 -0800 (PST)
+ (envelope-from <stefanha@redhat.com>) id 1ihwI3-0006R6-BL
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:56:32 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32560
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ihwI2-0006JA-V8
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:56:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576763789;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Xu2SS5d3B9ghiw5I2mwzyuILj2kDLW9L9c3Ai/O7Ass=;
+ b=SU2Q5kkL1HGVkxA/ufqGqOj0T3dqvzzpaCwtmYi75sxtO4w37FiKUiGKGoYk6n3fxwba6j
+ Bi9ddZEjOnA/M3hDYhpd3+QW7BcHZEf+zengWWA1zhswiSwOZkz/gno0fJCAMcy0Sr7yKY
+ vUP6i4hGZE6Ntjz23zSflecAtOg4f7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-gWy7XR_ANCK0BeoPuIn2RQ-1; Thu, 19 Dec 2019 08:56:25 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A770DB61;
+ Thu, 19 Dec 2019 13:56:24 +0000 (UTC)
+Received: from localhost (ovpn-117-102.ams2.redhat.com [10.36.117.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B69417C823;
+ Thu, 19 Dec 2019 13:56:21 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] docs: build an index page for the HTML docs
+Date: Thu, 19 Dec 2019 13:56:20 +0000
+Message-Id: <20191219135620.1626608-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <CAJ+F1CLV_JRhXX=tB7ZXYxa1En4LzYgJr+7egKzVRNBOLY2nSA@mail.gmail.com>
- <CAJ+F1CLS4HV-SckggfYNRKXxPa0R2BxSQrpPv8CRVkfvRB3E4w@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLS4HV-SckggfYNRKXxPa0R2BxSQrpPv8CRVkfvRB3E4w@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 19 Dec 2019 17:53:03 +0400
-Message-ID: <CAJ+F1CJO7wsz7WaxZybasWj9H8m1sbwtQBvVjG1cuOPH3MECnQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/37] Clean-ups: qom-ify serial and remove
- QDEV_PROP_PTR
-To: QEMU <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: gWy7XR_ANCK0BeoPuIn2RQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,71 +81,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Daniel Berrange <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+There is no index.html start page for the QEMU HTML documentation.  An
+index page is needed so that documentation can be browsed easily on the
+web.
 
-Still trying to make progress on this series (which is preliminary to
-other pending work..):
+This patch adds an index.html.in template file where the QEMU version
+number is expanded.  It is written in HTML instead of using the existing
+sphinx (rST) and texi documentation generators because they are
+heavyweight and would make this harder.
 
-On Wed, Dec 11, 2019 at 4:01 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v3:
+ * Add <html lang=3D"en"> attribute to satisfy the W3 Validator [Thomas Hut=
+h]
+---
+ Makefile           |  6 ++++++
+ docs/index.html.in | 17 +++++++++++++++++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 docs/index.html.in
+
+diff --git a/Makefile b/Makefile
+index 1361def144..9da9cfda73 100644
+--- a/Makefile
++++ b/Makefile
+@@ -347,6 +347,7 @@ DOCS+=3Ddocs/interop/qemu-qmp-ref.html docs/interop/qem=
+u-qmp-ref.txt docs/interop/
+ DOCS+=3Ddocs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/in=
+terop/qemu-ga-ref.7
+ DOCS+=3Ddocs/qemu-block-drivers.7
+ DOCS+=3Ddocs/qemu-cpu-models.7
++DOCS+=3D$(MANUAL_BUILDDIR)/index.html
+ ifdef CONFIG_VIRTFS
+ DOCS+=3Dfsdev/virtfs-proxy-helper.1
+ endif
+@@ -819,6 +820,7 @@ install-sphinxdocs: sphinxdocs
+=20
+ install-doc: $(DOCS) install-sphinxdocs
+ =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
++=09$(INSTALL_DATA) $(MANUAL_BUILDDIR)/index.html "$(DESTDIR)$(qemu_docdir)=
+"
+ =09$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
+ =09$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
+ =09$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir=
+)"
+@@ -1025,6 +1027,10 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-d=
+eps,specs)
+ $(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
+ =09$(call build-manual,interop,man)
+=20
++$(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version=
+.h
++=09$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
++             "GEN","$@")
++
+ qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ =09$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","=
+$@")
+=20
+diff --git a/docs/index.html.in b/docs/index.html.in
+new file mode 100644
+index 0000000000..94eb782cf7
+--- /dev/null
++++ b/docs/index.html.in
+@@ -0,0 +1,17 @@
++<!DOCTYPE html>
++<html lang=3D"en">
++    <head>
++        <meta charset=3D"UTF-8">
++        <title>QEMU @@VERSION@@ Documentation</title>
++    </head>
++    <body>
++        <h1>QEMU @@VERSION@@ Documentation</h1>
++        <ul>
++            <li><a href=3D"qemu-doc.html">User Documentation</a></li>
++            <li><a href=3D"qemu-qmp-ref.html">QMP Reference Manual</a></li=
 >
-> Hi
->
-> On Sun, Dec 1, 2019 at 2:19 PM Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
-> >
-> >
-> > - "chardev: generate an internal id when none given"
-> >
-> > As explained, this is necessary for qdev_prop_set_chr()
->
-> ping
->
-
-ping
-
-> >
-> > - "serial: register vmsd with DeviceClass"
-> >
-> > This is standard qdev-ification, however it breaks backward migration,
-> > but that's just how qdev_set_legacy_instance_id() works.
->
-> See thread, someone could review or nack (if backward migration is a prob=
-lem).
->
-
-ping
-
-> >
-> > - "sm501: make SerialMM a child, export chardev property"
-> >
-> > review?
->
-> ping
->
-
-rebased on top of "hw/display/sm501: Always map the UART0" as
-requested by Philippe. Can wait for v5 to get review.
-
-
-> >
-> > - "qdev/qom: remove some TODO limitations now that PROP_PTR is gone"
-> >
-> > This should be straightforward.
->
-> ping
-
-ping
-
-
-thanks
-
-
++            <li><a href=3D"qemu-ga-ref.html">Guest Agent Protocol Referenc=
+e</a></li>
++            <li><a href=3D"interop/index.html">System Emulation Management=
+ and Interoperability Guide</a></li>
++            <li><a href=3D"specs/index.html">System Emulation Guest Hardwa=
+re Specifications</a></li>
++        </ul>
++    </body>
++</html>
 --=20
-Marc-Andr=C3=A9 Lureau
+2.23.0
+
 
