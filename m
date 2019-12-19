@@ -2,55 +2,86 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C785C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC43C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:36:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1635D222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:34:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1635D222C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id E025124676
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:36:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z+pb/ta8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E025124676
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwtA-0007fV-R6
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:34:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55029)
+	id 1ihwv7-0002BU-2U
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:36:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ihwba-0000BG-Nr
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:16:44 -0500
+ (envelope-from <stefanha@gmail.com>) id 1ihwqC-0004pu-5Q
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ihwbZ-00007c-1e
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:16:42 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:60266 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ihwbY-0003zI-KA
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:16:40 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 6F2571A2277;
- Thu, 19 Dec 2019 15:15:37 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4E0D11A2190;
- Thu, 19 Dec 2019 15:15:37 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] target/mips: Add support for MIPS<32|64>R6 CRC32 ISA
-Date: Thu, 19 Dec 2019 15:15:19 +0100
-Message-Id: <1576764920-24514-2-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1576764920-24514-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1576764920-24514-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (envelope-from <stefanha@gmail.com>) id 1ihwqA-0000S4-GV
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:31:47 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40420)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ihwqA-0000HG-1D
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:31:46 -0500
+Received: by mail-wm1-x341.google.com with SMTP id t14so5819897wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 06:31:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=L1XHzR3L0UKWQWfjmW2ug1sO8EYNVNufKA/2pud2anY=;
+ b=Z+pb/ta8AkUNy98XvBuvvkKM5fcx2EwXCm+QpGrQx+8qr87l4Urrqz7HrXkIvVB7D9
+ cKHnbfqaeNPgDuZqKQkTRJiWfyK00mfv3B/2HUOVH5CSVREFYl6MJVTlVwBH1Y8yYOM6
+ /ysOtY+aQQ/iYF7X7IJveM0AMrX0tQWfIfR+Ff2W5nmZgqfmzMegAYW+usojfte+ti9j
+ /1/N2IjjS96s/vNpCaC8YwQ1xhXu3h8hOkL0XxdZwaa61SPhY2dgQk54SKqcSSXVtpdN
+ QDy67eAuJIB4gyBRmh78F/UCeEEzr8QkAq3yCc6W03TGYdN9qyO8wYHGyXsZ9P49eCYq
+ 7T4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=L1XHzR3L0UKWQWfjmW2ug1sO8EYNVNufKA/2pud2anY=;
+ b=jH0VISJNPLm8aFIbzduCs0QS1BhZ+OBThXHHeAnGGkJlonvO1udHQFt2xTuFryroxS
+ KwmcDC23kCtAxV7QZUHhmoG+x/Nh6ttb1WdJWkpeH2g6QQ8qv4Na9bSl40a++cSYoxc8
+ so0HbOqO8O6gNnEUrThkPxNr8rv0nTmX2TFAiXXYtex+HGESwhHlNNV/5DEm7xlaO1Dn
+ X+Hp5lNX71U/DR0ZPyMplzh3Ss7yYSfiN3GZSkcVazY7WVRv8wt9lHu/c3ptACV0ZCfc
+ 3yGkxLiA/x8uu02u0tPRl3GHaW0iOzn6NCGqZbWZQMMHVlrFLOOeWx47WQKcmdQVaoav
+ FtyQ==
+X-Gm-Message-State: APjAAAXDAdxhsC2r6t/sdMid/r7bZwGhd1ZI/F5wI+P/MhpOszibQjMC
+ Htzd7BMrJ9YcrLWi77AoqXE=
+X-Google-Smtp-Source: APXvYqyO3Bq33GKouNG8LDJHsqu2POyyDNRpDLJuBtWjrMtfFsWHitF52j+qkn6wS6G4CG3M01H/Xg==
+X-Received: by 2002:a1c:e90e:: with SMTP id q14mr10485058wmc.108.1576765904102; 
+ Thu, 19 Dec 2019 06:31:44 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id d12sm6503974wrp.62.2019.12.19.06.31.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Dec 2019 06:31:43 -0800 (PST)
+Date: Thu, 19 Dec 2019 14:31:41 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Coiby Xu <coiby.xu@gmail.com>
+Subject: Re: [RFC] Implementing vhost-user-blk device backend
+Message-ID: <20191219143141.GF1624084@stefanha-x1.localdomain>
+References: <CAJAkqrWm28qXtsFmaENAcsDNQV7gE=sd+YyA5ADmm2Vo9DKrUQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="z0eOaCaDLjvTGF2l"
+Content-Disposition: inline
+In-Reply-To: <CAJAkqrWm28qXtsFmaENAcsDNQV7gE=sd+YyA5ADmm2Vo9DKrUQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,265 +93,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@rt-rk.com, Aleksandar Markovic <amarkovic@wavecomp.com>,
- aurelien@aurel32.net
+Cc: Kevin Wolf <kwolf@redhat.com>, Bharat Singh <bharatlkmlkvm@gmail.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add support for eight CRC-related MIPS<32|64>R6 instructions.
+--z0eOaCaDLjvTGF2l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- disas/mips.c            |   8 +++
- target/mips/helper.h    |   2 +
- target/mips/op_helper.c |  19 ++++++++
- target/mips/translate.c | 127 ++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 156 insertions(+)
+On Mon, Nov 18, 2019 at 10:27:28PM +0800, Coiby Xu wrote:
+> Hi all,
+>=20
+> This is an implementation of vhost-user-blk device backend by
+> following https://wiki.qemu.org/Google_Summer_of_Code_2019#vhost-user-blk=
+_device_backend.
+> raw/qcow2 disk images can now be shared via vhost user protocol. In
+> this way, it could provide better performance than QEMU's existing NBD
+> support.
 
-diff --git a/disas/mips.c b/disas/mips.c
-index dfefe5e..75c48b3 100644
---- a/disas/mips.c
-+++ b/disas/mips.c
-@@ -1409,6 +1409,14 @@ const struct mips_opcode mips_builtin_opcodes[] =
- {"dvp",        "t",     0x41600024, 0xffe0ffff, TRAP|WR_t,            0, I32R6},
- {"evp",        "",      0x41600004, 0xffffffff, TRAP,                 0, I32R6},
- {"evp",        "t",     0x41600004, 0xffe0ffff, TRAP|WR_t,            0, I32R6},
-+{"crc32b",     "t,v,t", 0x7c00000f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
-+{"crc32h",     "t,v,t", 0x7c00004f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
-+{"crc32w",     "t,v,t", 0x7c00008f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
-+{"crc32d",     "t,v,t", 0x7c0000cf, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I64R6},
-+{"crc32cb",    "t,v,t", 0x7c00010f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
-+{"crc32ch",    "t,v,t", 0x7c00014f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
-+{"crc32cw",    "t,v,t", 0x7c00018f, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I32R6},
-+{"crc32cd",    "t,v,t", 0x7c0001cf, 0xfc00ff3f, WR_d | RD_s | RD_t,   0, I64R6},
- 
- /* MSA */
- {"sll.b",   "+d,+e,+f", 0x7800000d, 0xffe0003f, WR_VD|RD_VS|RD_VT,  0, MSA},
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 7b8ad74..2095330 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -40,6 +40,8 @@ DEF_HELPER_FLAGS_1(bitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- DEF_HELPER_FLAGS_1(dbitswap, TCG_CALL_NO_RWG_SE, tl, tl)
- #endif
- 
-+DEF_HELPER_3(crc32, tl, tl, tl, i32)
-+DEF_HELPER_3(crc32c, tl, tl, tl, i32)
- DEF_HELPER_FLAGS_4(rotx, TCG_CALL_NO_RWG_SE, tl, tl, i32, i32, i32)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 18fcee4..5cd396d 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -27,6 +27,8 @@
- #include "exec/memop.h"
- #include "sysemu/kvm.h"
- #include "fpu/softfloat.h"
-+#include "qemu/crc32c.h"
-+#include <zlib.h>
- 
- /*****************************************************************************/
- /* Exceptions processing helpers */
-@@ -350,6 +352,23 @@ target_ulong helper_rotx(target_ulong rs, uint32_t shift, uint32_t shiftx,
-     return (int64_t)(int32_t)(uint32_t)tmp5;
- }
- 
-+/* these crc32 functions are based on target/arm/helper-a64.c */
-+target_ulong helper_crc32(target_ulong val, target_ulong m, uint32_t sz)
-+{
-+    uint8_t buf[8];
-+
-+    stq_le_p(buf, m);
-+    return (int32_t) (crc32(val ^ 0xffffffff, buf, sz) ^ 0xffffffff);
-+}
-+
-+target_ulong helper_crc32c(target_ulong val, target_ulong m, uint32_t sz)
-+{
-+    uint8_t buf[8];
-+
-+    stq_le_p(buf, m);
-+    return (int32_t) (crc32c(val, buf, sz) ^ 0xffffffff);
-+}
-+
- #ifndef CONFIG_USER_ONLY
- 
- static inline hwaddr do_translate_address(CPUMIPSState *env,
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4bff585..1b38356 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -451,6 +451,7 @@ enum {
-     OPC_LWE            = 0x2F | OPC_SPECIAL3,
- 
-     /* R6 */
-+    OPC_CRC32          = 0x0F | OPC_SPECIAL3,
-     R6_OPC_PREF        = 0x35 | OPC_SPECIAL3,
-     R6_OPC_CACHE       = 0x25 | OPC_SPECIAL3,
-     R6_OPC_LL          = 0x36 | OPC_SPECIAL3,
-@@ -2547,6 +2548,7 @@ typedef struct DisasContext {
-     bool nan2008;
-     bool abs2008;
-     bool saar;
-+    bool crcp;
- } DisasContext;
- 
- #define DISAS_STOP       DISAS_TARGET_0
-@@ -27117,11 +27119,96 @@ static void decode_opc_special2_legacy(CPUMIPSState *env, DisasContext *ctx)
-     }
- }
- 
-+static void gen_crc32(DisasContext *ctx, int rd, int rs, int rt, int sz,
-+                      int crc32c)
-+{
-+    TCGv t0;
-+    TCGv t1;
-+    TCGv_i32 tsz = tcg_const_i32(1 << sz);
-+    uint64_t mask = 0;
-+
-+    if (rd == 0) {
-+        /* Treat as NOP. */
-+        return;
-+    }
-+    t0 = tcg_temp_new();
-+    t1 = tcg_temp_new();
-+
-+    gen_load_gpr(t0, rt);
-+    gen_load_gpr(t1, rs);
-+
-+    if (sz != 3) {
-+        switch (sz) {
-+        case 0:
-+            mask = 0xFF;
-+            break;
-+        case 1:
-+            mask = 0xFFFF;
-+            break;
-+        case 2:
-+            mask = 0xFFFFFFFF;
-+            break;
-+        }
-+        tcg_gen_andi_tl(t1, t1, mask);
-+    }
-+
-+    if (crc32c) {
-+        gen_helper_crc32c(cpu_gpr[rd], t0, t1, tsz);
-+    } else {
-+        gen_helper_crc32(cpu_gpr[rd], t0, t1, tsz);
-+    }
-+
-+    tcg_temp_free(t0);
-+    tcg_temp_free(t1);
-+    tcg_temp_free_i32(tsz);
-+}
-+
-+static void gen_crc32b(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 0, 0);
-+}
-+
-+static void gen_crc32h(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 1, 0);
-+}
-+
-+static void gen_crc32w(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 2, 0);
-+}
-+
-+static void gen_crc32d(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 3, 0);
-+}
-+
-+static void gen_crc32cb(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 0, 1);
-+}
-+
-+static void gen_crc32ch(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 1, 1);
-+}
-+
-+static void gen_crc32cw(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 2, 1);
-+}
-+
-+static void gen_crc32cd(DisasContext *ctx, int rd, int rs, int rt)
-+{
-+    gen_crc32(ctx, rd, rs, rt, 3, 1);
-+}
-+
- static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
- {
-     int rs, rt, rd, sa;
-     uint32_t op1, op2;
-     int16_t imm;
-+    int sz, crc32c;
- 
-     rs = (ctx->opcode >> 21) & 0x1f;
-     rt = (ctx->opcode >> 16) & 0x1f;
-@@ -27131,6 +27218,45 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
- 
-     op1 = MASK_SPECIAL3(ctx->opcode);
-     switch (op1) {
-+    case OPC_CRC32:
-+        sz = extract32(ctx->opcode, 6, 2);
-+        crc32c = extract32(ctx->opcode, 8, 3);
-+        if (unlikely(!ctx->crcp) ||
-+            unlikely((sz == 3) && (!(ctx->hflags & MIPS_HFLAG_64))) ||
-+            unlikely((crc32c >= 2))) {
-+            generate_exception_end(ctx, EXCP_RI);
-+        }
-+        switch (sz) {
-+        case 0:
-+            if (crc32c) {
-+                gen_crc32cb(ctx, rt, rs, rt);
-+            } else {
-+                gen_crc32b(ctx, rt, rs, rt);
-+            }
-+            break;
-+        case 1:
-+            if (crc32c) {
-+                gen_crc32ch(ctx, rt, rs, rt);
-+            } else {
-+                gen_crc32h(ctx, rt, rs, rt);
-+            }
-+            break;
-+        case 2:
-+            if (crc32c) {
-+                gen_crc32cw(ctx, rt, rs, rt);
-+            } else {
-+                gen_crc32w(ctx, rt, rs, rt);
-+            }
-+            break;
-+        case 3:
-+            if (crc32c) {
-+                gen_crc32cd(ctx, rt, rs, rt);
-+            } else {
-+                gen_crc32d(ctx, rt, rs, rt);
-+            }
-+            break;
-+        }
-+        break;
-     case R6_OPC_PREF:
-         if (rt >= 24) {
-             /* hint codes 24-31 are reserved and signal RI */
-@@ -30727,6 +30853,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
-     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
-     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-+    ctx->crcp = (env->CP0_Config5 >> CP0C5_CRCP) & 1;
-     restore_cpu_state(env, ctx);
- #ifdef CONFIG_USER_ONLY
-         ctx->mem_idx = MIPS_HFLAG_UM;
--- 
-2.7.4
+Thank you for working on this feature!
 
+> +static size_t vub_iov_to_buf(const struct iovec *iov,
+> +                             const unsigned int iov_cnt, void *buf)
+
+Please take a look at utils/iov.c.  iov_to_buf_full() can be used
+instead of defining this function.
+
+> +{
+> +    size_t len;
+> +    unsigned int i;
+> +
+> +    len =3D 0;
+> +    for (i =3D 0; i < iov_cnt; i++) {
+> +        memcpy(buf + len,  iov[i].iov_base, iov[i].iov_len);
+> +        len +=3D iov[i].iov_len;
+> +    }
+> +    return len;
+> +}
+> +
+> +static  VubDev *vub_device;
+
+If you switch to -object (see below) then this global pointer will go
+away so I won't comment on it throughout this patch.
+
+> +static void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
+> +                       gpointer opaque)
+> +{
+> +    /* only one connection */
+> +    if (vub_device->sioc) {
+> +        return;
+> +    }
+> +
+> +    vub_device->sioc =3D sioc;
+> +    vub_device->listener =3D listener;
+> +    /*
+> +     * increase the object reference, so cioc will not freeed by
+> +     * qio_net_listener_channel_func which will call object_unref(OBJECT=
+(sioc))
+> +     */
+> +    object_ref(OBJECT(sioc));
+> +
+> +    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-server");
+> +    if (!vug_init(&vub_device->parent, VHOST_USER_BLK_MAX_QUEUES, sioc->=
+fd,
+> +                  vub_panic_cb, &vub_iface)) {
+> +        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+> +    }
+
+vug_init() uses the default GMainContext, which is bad for performance
+when there are many devices because it cannot take advantage of
+multi-core CPUs.  vhost-user-server should support IOThread so that
+devices can be run in dedicated threads.
+
+The nbd/server.c:NBDExport->ctx field serves this purpose in the NBD
+server.  It's a little trickier with libvhost-user-glib because the API
+currently doesn't allow passing in a GMainContext and will need to be
+extended.
+
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index cfcc044ce4..d8de179747 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1614,6 +1614,33 @@ STEXI
+>  @findex acl_reset
+>  Remove all matches from the access control list, and set the default
+>  policy back to @code{deny}.
+> +ETEXI
+> +
+> +    {
+> +        .name       =3D "vhost_user_server_stop",
+> +        .args_type  =3D "",
+> +        .params     =3D "vhost_user_server_stop",
+> +        .help       =3D "stop vhost-user-blk device backend",
+> +        .cmd        =3D hmp_vhost_user_server_stop,
+> +    },
+> +STEXI
+> +@item vhost_user_server_stop
+> +@findex vhost_user_server_stop
+> +Stop the QEMU embedded vhost-user-blk device backend server.
+> +ETEXI
+
+The NBD server supports multiple client connections and exports
+(drives).  A vhost-user socket only supports one connection and one
+device.  I think it will be necessary to assign a unique identifier to
+every vhost-user server.
+
+By the way, I think the server should be a UserCreatable Object so the
+following syntax works:
+
+  $ qemu -object vhost-user-server,id=3DID,chardev=3DCHARDEV,writable=3Don|=
+off
+
+And existing HMP/QMP commands can be used:
+
+  (qemu) object_add vhost-user-server,id=3DID,chardev=3DCHARDEV,writable=3D=
+on|off
+  (qemu) object_del ID
+
+This way we don't need to define new HMP/QMP/command-line syntax for
+vhost-user-server.
+
+If you grep for UserCreatable you'll find examples like "iothread",
+"secret", "throttle-group", etc.
+
+--z0eOaCaDLjvTGF2l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl37ic0ACgkQnKSrs4Gr
+c8jnswf9HhH67QT9cBavA2DzBhCpkMTYNJcKeybYFM6omrZZesQJGjU1xfte4F2h
+Dbk5WEvrRnCV6+p1UC2PsuC7sCEOImjVdIrTSW/JmgEWYMGMac7RWCOLhP5+J9PA
+I4P3wtW7lUBv9Kf2jWrGOlleJZ0QvASk1RcXEL3wr0Bv5rToYPnz4rKQp9vxCusC
+ptIaEoCLiux8DGkbAELh7+ewHyBpBURFqWnW0+mV5I1NtNRolHAvvyTa82rI1qzX
+X8j5HQnpvASzQkcMQML0yI2RtByMQEFVBX9ssygmoEh2ypnklQ1Qk+XJp2sqBjnN
+XRu5ZplMb4BNV/gfbUUTDH26UxqkNA==
+=Qa3N
+-----END PGP SIGNATURE-----
+
+--z0eOaCaDLjvTGF2l--
 
