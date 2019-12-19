@@ -6,62 +6,55 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBE8C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED903C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:18:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC87E2146E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:16:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B30342146E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 05:18:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k4oeFBIs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC87E2146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="c71gdxJI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B30342146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihoAv-0001HP-U2
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 00:16:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50143)
+	id 1ihoD0-0002zs-Pk
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 00:18:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iho9O-00009F-8a
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:15:03 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ihoCM-0002JQ-3L
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:18:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iho9M-000300-SO
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:15:02 -0500
-Received: from ozlabs.org ([203.11.71.1]:52071)
+ (envelope-from <dgibson@ozlabs.org>) id 1ihoCK-0005QU-VV
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 00:18:06 -0500
+Received: from ozlabs.org ([203.11.71.1]:51909)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iho9M-0002jv-ES; Thu, 19 Dec 2019 00:15:00 -0500
+ id 1ihoCK-0005CJ-Hd; Thu, 19 Dec 2019 00:18:04 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47dg6n2Z4mz9sPh; Thu, 19 Dec 2019 16:14:57 +1100 (AEDT)
+ id 47dgBJ60mcz9sPn; Thu, 19 Dec 2019 16:17:59 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576732497;
- bh=PEdzqCLmj1ylRXrUzoLhQ9R0MFzB7Jy1nWj8wfZkOfU=;
+ d=gibson.dropbear.id.au; s=201602; t=1576732680;
+ bh=NQiSztyPAbPgulkIn1a2Wkf8nWAKJwxdUxEUoj2JqM0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=k4oeFBIstRFySwVbL7Q2H2ZClO+jJVkyO4c7RH5HnIEOa05uqwrJsqQfRHtVkKVTm
- RUj4Lg2pl47GVcPWgHrwLUgfYZUXtBySaaljiyyFvqIDlXlGwrycZeqRCXmjhvLlf4
- YwtuC80Fmqvu8pCX+r4FIevrrt0ImdcoI+EmUZQg=
-Date: Thu, 19 Dec 2019 16:13:57 +1100
+ b=c71gdxJIO2ZIkVGT+4TFUuYhTmRxhjZsdaHAEewpfjjnxlEmqVN0KfS1SwpxkEVkK
+ +p+DL8fiL5S/WU2amHM3DUyFMne/Y6L2NMRqFz6dZuDhncpslRRSVlrkvVIQpF9naN
+ VdFv4zhln0IOzo65jHH1GXEZ3Bs9NqPiT9TOlcVA=
+Date: Thu, 19 Dec 2019 16:15:57 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v5 1/5] tpm_spapr: Support TPM for ppc64 using CRQ based
- interface
-Message-ID: <20191219051357.GG2321@umbus.fritz.box>
-References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
- <20191212202430.1079725-2-stefanb@linux.vnet.ibm.com>
- <20191213053453.GD207300@umbus.fritz.box>
- <75fd3e95-d72f-069b-22ce-f354e1c34660@linux.ibm.com>
- <20191217002954.GH6242@umbus.fritz.box>
- <1efef315-cb85-79ea-9c46-ff318e05a543@linux.ibm.com>
- <20191219015414.GC2321@umbus.fritz.box>
- <db0d3dbe-3b01-e62b-2cf0-3d0c50e3c4fb@linux.ibm.com>
+To: Bharata B Rao <bharata@linux.ibm.com>
+Subject: Re: [PATCH v4 ppc-for-5.0 0/2] ppc/spapr: Support reboot of secure
+ pseries guest
+Message-ID: <20191219051557.GI2321@umbus.fritz.box>
+References: <20191219031445.8949-1-bharata@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="reI/iBAAp9kzkmX4"
+ protocol="application/pgp-signature"; boundary="X0cz4bGbQuRbxrVl"
 Content-Disposition: inline
-In-Reply-To: <db0d3dbe-3b01-e62b-2cf0-3d0c50e3c4fb@linux.ibm.com>
+In-Reply-To: <20191219031445.8949-1-bharata@linux.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -76,47 +69,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: paulus@ozlabs.org, linuxram@us.ibm.com, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---reI/iBAAp9kzkmX4
+--X0cz4bGbQuRbxrVl
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2019 at 08:59:18PM -0500, Stefan Berger wrote:
-> On 12/18/19 8:54 PM, David Gibson wrote:
-> > On Tue, Dec 17, 2019 at 02:44:04PM -0500, Stefan Berger wrote:
-> > > On 12/16/19 7:29 PM, David Gibson wrote:
-> > >=20
-> > >=20
-> > > > Since you need to change compatible based on an internal variable,
-> > > > we'd need to replace the static dt_compatible in the class with a
-> > > > callback.
-> > >=20
-> > > Why can we not initialize it once we know the version of TPM? From the
-> > > perspective of SLOF at least this seems to be building the device tre=
-e fine
-> > > since it sees the proper value...
-> > Because it's a serious layering / isolation violation.  You're
-> > modifying QOM type information from the runtime code of a specific
-> > instance.  You get away with it (now) because there's only one
-> > instance and the ordering of things happens to let it work, but that's
-> > assuming way too much about QOM's implementation details.
-> >=20
-> > As a rule, once the QOM classes are set up with their class_init
-> > function, they should never be modified.
+On Thu, Dec 19, 2019 at 08:44:43AM +0530, Bharata B Rao wrote:
+> This patchset adds KVM_PPC_SVM_OFF ioctl which is required to support
+> reset of secure guest. This includes linux-headers update so that we get
+> the newly introduced ioctl.
 >=20
->=20
-> If we now add a get_dt_compatible() callback to the class that gets invok=
-ed
-> when dt_compatible is NULL, does this then solve the issue?
+> v3:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03685.html
 
-Yes, that's what I'm suggesting.
+Applied to ppc-for-5.0, thanks.
+
+>=20
+> Changes in v4:
+> -------------
+> - s/error_setg/error_setg_errno (Greg Kurz)
+>=20
+> Bharata B Rao (2):
+>   linux-headers: Update
+>   ppc/spapr: Support reboot of secure pseries guest
+>=20
+>  hw/ppc/spapr.c                                |  1 +
+>  include/standard-headers/asm-x86/bootparam.h  |  7 +-
+>  .../infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h | 15 +++-
+>  include/standard-headers/drm/drm_fourcc.h     | 28 ++++++-
+>  .../linux/input-event-codes.h                 | 77 +++++++++++++++++++
+>  include/standard-headers/linux/pci_regs.h     |  3 +
+>  .../standard-headers/rdma/vmw_pvrdma-abi.h    |  5 ++
+>  linux-headers/linux/kvm.h                     |  1 +
+>  target/ppc/kvm.c                              | 15 ++++
+>  target/ppc/kvm_ppc.h                          |  6 ++
+>  10 files changed, 154 insertions(+), 4 deletions(-)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -124,25 +119,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---reI/iBAAp9kzkmX4
+--X0cz4bGbQuRbxrVl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl37BxUACgkQbDjKyiDZ
-s5J7FhAAwbbNugdWDl+Fyg7ffBmIDBl02mlNjFdIMOiGVoU6tkXc/ONSRZJYJUT+
-MJq1Xh/KJCLUEV4HjAsFZq9uKYfeo8dlIWD8rq663VMGuFkiR3tBPKLg1V9E2XH6
-p4hBLioPAOUN73XMUXbUZoK383Glmbykx6SfEE6oYbcOQeJ7W83YVIp1Vcll0n7c
-NDzRXFMhmQzXiWH20ePnWuxh1g/VOsiAK106L+/gm87G/uND0CZM88vOuOdDA4JU
-f1FPskktk98MOx9Z9lWVL/m6Jmu9ok9Auyis7+M4AFvd43pb0yp2F6YTojq5wZRt
-MZgDcVNGIRetT7ET8eBuchLURSjQNtteVXaeyw/lmXFPJhSuEix4eFRnA5TkYM7j
-QR7tspE2TI2oW22h4q4VGGtl1vnI/SW47IC1pwnU/SAUufhdi4ir4Jdad/Rq/L1/
-kGcD/IgmgCmetcwOhYGSbM00ebDb5CaPz2ecImzc9BAoAueBraQoUxcbWk/dimC+
-E5xXDrA6n6Xaji/5Upvt4AvRA0FNKbCiycz3NCvkF1lsFZiGKXqViMJe0kzbM23a
-NHmnIrGSYPtp173b2bGDgjqYVBKDbyNwgkG9RBtDhUuAkHpUhqN9nmC97SQI4oTM
-hYcqY25sKKdYmvPlj5drwgT9xVUS1xrIxj4qtM8zxOGKgzQFPpw=
-=naMA
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl37B40ACgkQbDjKyiDZ
+s5KWnA//edH8hqUlSLT9TaATQlqSx7OBOookvCHD4e7FPem1CrDmTACq74MxGG2c
++UBUrD+N0WXEz65sUNp8evCv+k1yTD30TlWY+HtNlsieau4whesQpZwhiMywNIbv
+WW93hRnj+53GW0ldm673h8TmtM0EBAyh7KZY6PRQXmFBfwIbd9Bt/T3o6KPk6aMR
+Ky51NhZyvqwPMX1WIUjqgcYDOnyZDEvUHbEA8IZQe4wpr5c871qR+LZ7Yn8vna+3
+0SFIw2NLkAC7PPqWItrUOlx6+Dpaw0pJm3FAMKR/M2fY3VNAsNG5wC8PKtZVtZus
+aIINmGCZxAvpW5Dvhhv7/9JlQ1bBvHdAJETFX9fquLhIbaEENb+DOCWHB+WGqGHb
+vVL+f94h5Z41LniTWBtGn6NlD7TD4tP8MVZdryEucCqTj+2xD2siAzZ9OM+OxNno
+lA+JRg3gZupj78mbVtm+eb8v2m2FET4wc/wSgjoKy/Nvkuj4r2fWeeXZSISXtao3
+MaGVkHsXIaD1Wj+GxZgF0s+xSNhGfNbFp07I4d7urS5pZ/M9iQRqJSqt1uUIaq1b
+sqNekhZlFNggcSmcYaG5KxdJ7EeYiqmMr2RzzAZ7+NVsYLuFODHojT3CfWZwPa50
+qisQtVzHNkedD7x6ViHd1t2qDNg9JtSBJlhAK68+fTR80Pg7zH0=
+=AlLs
 -----END PGP SIGNATURE-----
 
---reI/iBAAp9kzkmX4--
+--X0cz4bGbQuRbxrVl--
 
