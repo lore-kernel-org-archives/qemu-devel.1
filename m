@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2156C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 06:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDB3C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 06:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 782F92146E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 06:50:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782F92146E
+	by mail.kernel.org (Postfix) with ESMTPS id 5EBF3222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 06:51:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EBF3222C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihpe4-0001xX-Fr
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 01:50:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39619)
+	id 1ihpf9-0003eg-In
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 01:51:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39845)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1ihpco-0000ec-Pb
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 01:49:31 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1ihpcq-0000gc-0B
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 01:49:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1ihpcn-0006Yw-Hc
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 01:49:30 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42606 helo=huawei.com)
+ (envelope-from <guoheyi@huawei.com>) id 1ihpco-0006fP-Jm
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 01:49:31 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:42764 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1ihpck-0005iX-JF; Thu, 19 Dec 2019 01:49:26 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 64E7DF7544FEBC85BDD4;
- Thu, 19 Dec 2019 14:49:19 +0800 (CST)
+ id 1ihpcl-00067O-Nb; Thu, 19 Dec 2019 01:49:28 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 474A6F41EA539C7D2369;
+ Thu, 19 Dec 2019 14:49:24 +0800 (CST)
 Received: from linux-CPUxgZ.huawei.com (10.175.104.212) by
  DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 19 Dec 2019 14:49:13 +0800
+ 14.3.439.0; Thu, 19 Dec 2019 14:49:14 +0800
 From: Heyi Guo <guoheyi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH 1/2] arm/virt/acpi: remove meaningless sub device "PR0" from
- PCI0
-Date: Thu, 19 Dec 2019 14:47:58 +0800
-Message-ID: <20191219064759.35053-2-guoheyi@huawei.com>
+Subject: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified by _HID
+Date: Thu, 19 Dec 2019 14:47:59 +0800
+Message-ID: <20191219064759.35053-3-guoheyi@huawei.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20191219064759.35053-1-guoheyi@huawei.com>
 References: <20191219064759.35053-1-guoheyi@huawei.com>
@@ -74,75 +73,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The sub device "PR0" under PCI0 in ACPI/DSDT does not make any sense,
-so simply remote it.
+According to ACPI spec, _ADR should be used for device which is on a
+bus that has a standard enumeration algorithm. It does not make sense
+to have a _ADR object for devices which already have _HID and will be
+enumerated by OSPM.
 
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 
 ---
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 Cc: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org
 ---
- hw/arm/virt-acpi-build.c          |   4 ----
- tests/data/acpi/virt/DSDT         | Bin 18462 -> 18449 bytes
- tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19786 bytes
- tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18449 bytes
- 4 files changed, 4 deletions(-)
+ hw/arm/virt-acpi-build.c          |   8 --------
+ tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
+ tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
+ tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
+ 4 files changed, 8 deletions(-)
 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index bd5f771e9b..9f4c7d1889 100644
+index 9f4c7d1889..be752c0ad8 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemM=
-apEntry *memmap,
-     aml_append(method, aml_return(buf));
-     aml_append(dev, method);
+@@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMa=
+pEntry *uart_memmap,
+                              AML_EXCLUSIVE, &uart_irq, 1));
+     aml_append(dev, aml_name_decl("_CRS", crs));
 =20
--    Aml *dev_rp0 =3D aml_device("%s", "RP0");
--    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
--    aml_append(dev, dev_rp0);
+-    /* The _ADR entry is used to link this device to the UART described
+-     * in the SPCR table, i.e. SPCR.base_address.address =3D=3D _ADR.
+-     */
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)));
 -
-     Aml *dev_res0 =3D aml_device("%s", "RES0");
-     aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
-     crs =3D aml_resource_template();
+     aml_append(scope, dev);
+ }
+=20
+@@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
+pEntry *memmap,
+     aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+     aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+     aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+     aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
+     aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
+;
+     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+@@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemM=
+apEntry *gpio_memmap,
+ {
+     Aml *dev =3D aml_device("GPO0");
+     aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+     aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+=20
+     Aml *crs =3D aml_resource_template();
+@@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+ {
+     Aml *dev =3D aml_device(ACPI_POWER_BUTTON_DEVICE);
+     aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+     aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+     aml_append(scope, dev);
+ }
 diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3d32=
-ec856feb388be4c 100644
+index b5895cb22446860a0b9be3d32ec856feb388be4c..a759ff739a071d5fbf50519a6=
+aea296e5e0f1e0c 100644
 GIT binary patch
-delta 39
-vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
+delta 72
+zcmbO@f$>*ABbQ6COUN&G1_q{66S<_BT5Bh&t1wzk^tIeLL4lL8ZSqD=3DgU!!5x$Pt+
+c1HyxxIO07#U3dfh0t}oDoEbRcLp@y>07w882mk;8
 
-delta 50
-zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
-G{V4!>hYx%J
+delta 94
+zcmey>&p2@cBbQ6CONgKc0|V26iCof5J#`b+RhV2^Ci+-%al|{i1o1F1FmP^cRp4ao
+tnY@hCfEg&X`7$S;oxFTNc#soEyoaX?Z-8HbfwO@#16Tu)4E1zj005fm7mWY_
 
 diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSDT.=
 memhp
-index 41ccc6431b917252bcbaac86c33b340c796be5ce..69ad844f65d047973a3e55198=
-beecd45a35b8fce 100644
+index 69ad844f65d047973a3e55198beecd45a35b8fce..6e5cc61977e4cd24f765fec06=
+93f75a528c144c1 100644
 GIT binary patch
-delta 40
-wcmcaUi}BPfMlP3Nmk=3D*s1_q}3iCof5t(P{ccXBfI+}XT|v(|RAjk`1(02g)*ivR!s
+delta 72
+zcmX>#i*fTTMlP3Nmk?uL1_q|eiCof5eHSLGt1wzk^tIeLL4lL8ZSqD=3DgU!!5U7RH)
+c1HyxxIO07#U3dfh0t}oDoEbRcLp@y>03)CjmjD0&
 
-delta 51
-zcmX>#i}Cs_MlP3NmymE@1_mbiiCof5O_w*ScXBdy-rc;3v(}c2J1D>)o+IATC1|sb
-HyBr$;t7;Fc
+delta 94
+zcmdlyi}BPfMlP3Nmk=3D*s1_q}3iCof5t(PXMt1!8;O!Tqj;)r*23F2X3VBp-?s=3D&$E
+tGkF=3DO0W(l&^JPwVXL<R6@E|9Scn?n(-T=3DP<17`zg2CxPo8S3f6006qZ7#siq
 
 diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/DSD=
 T.numamem
-index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3d32=
-ec856feb388be4c 100644
+index b5895cb22446860a0b9be3d32ec856feb388be4c..a759ff739a071d5fbf50519a6=
+aea296e5e0f1e0c 100644
 GIT binary patch
-delta 39
-vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)
+delta 72
+zcmbO@f$>*ABbQ6COUN&G1_q{66S<_BT5Bh&t1wzk^tIeLL4lL8ZSqD=3DgU!!5x$Pt+
+c1HyxxIO07#U3dfh0t}oDoEbRcLp@y>07w882mk;8
 
-delta 50
-zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I
-G{V4!>hYx%J
+delta 94
+zcmey>&p2@cBbQ6CONgKc0|V26iCof5J#`b+RhV2^Ci+-%al|{i1o1F1FmP^cRp4ao
+tnY@hCfEg&X`7$S;oxFTNc#soEyoaX?Z-8HbfwO@#16Tu)4E1zj005fm7mWY_
 
 --=20
 2.19.1
