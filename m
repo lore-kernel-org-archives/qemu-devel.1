@@ -7,122 +7,121 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F01C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E49EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:10:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47ABF20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:09:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27E1420663
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:10:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="Q47VskJD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47ABF20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="L3YZWQuq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27E1420663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwUd-0004TP-VR
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:09:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34819)
+	id 1ihwV7-0005Cm-Rp
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:10:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36158)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.jensen@samsung.com>) id 1ihvYr-0001bY-Cr
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:52 -0500
+ (envelope-from <k.jensen@samsung.com>) id 1ihvZD-0001wl-F8
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.jensen@samsung.com>) id 1ihvYn-0006UK-P6
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:49 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:55878)
+ (envelope-from <k.jensen@samsung.com>) id 1ihvZ8-0007Ns-IH
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:10 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:56026)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <k.jensen@samsung.com>)
- id 1ihvYm-0006N3-E9
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:44 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+ id 1ihvZ7-00071z-Vm
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:06 -0500
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
  by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20191219130942euoutp02e78b1364ac2779c955faed3f66aab6c5~hx8Jvd5mZ0697606976euoutp02K
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:09:42 +0000 (GMT)
+ 20191219130951euoutp029e2dbd1ffaa9af638e8cf612eb8d7f3a~hx8RvtPlG0791707917euoutp02D
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:09:51 +0000 (GMT)
 DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20191219130942euoutp02e78b1364ac2779c955faed3f66aab6c5~hx8Jvd5mZ0697606976euoutp02K
+ 20191219130951euoutp029e2dbd1ffaa9af638e8cf612eb8d7f3a~hx8RvtPlG0791707917euoutp02D
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1576760982;
- bh=D7Uu7H/O9k9KLHgU07viEjq4vsmzlQf+Wl5TTb2p8b8=;
+ s=mail20170921; t=1576760991;
+ bh=vYoVWM25vloxEIG2CPdP0C89+YmfF6tF705MuMM7siA=;
  h=From:To:CC:Subject:Date:In-Reply-To:References:From;
- b=Q47VskJDdEAqem9wI6Crwq64pODm8zX5zvXqcjXMdeWu90PFSXlXEWbKo7vJsUuzA
- 2yG72sPFVi2kSy4+OTeQa7cYe72osAnWybHb0MYkFYigreSa30GKF0pg7Q0GKuEJPv
- XE2S57cLSW9GOlxIW+sTeYq0PI2gILSBrr9qPcAM=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTP id
- 20191219130942eucas1p2dca05af2a5d6dd528ee87984274017ec~hx8JiPYsu0349703497eucas1p2K;
- Thu, 19 Dec 2019 13:09:42 +0000 (GMT)
+ b=L3YZWQuqBQNjJjN/ZcC2whMx6LFcD10v21cwvBrbXFrEuPMIe1aqGZRkdMvU/kIfg
+ LABGxgrY+IsTB1NNxGF3GnRao5p6eggPK68ZCWna26V2XAOUNEQQszRRfHNYP0HpvN
+ f1OubzOjXewm88jZdXfu1zqtJC2ADnTl4qkLp2FY=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+ eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+ 20191219130950eucas1p1d3cbfd465eaa16af953a956972811c91~hx8RagrV91797517975eucas1p1r;
+ Thu, 19 Dec 2019 13:09:50 +0000 (GMT)
 Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
- eusmges2new.samsung.com (EUCPMTA) with SMTP id 86.05.60679.6967BFD5; Thu, 19
- Dec 2019 13:09:42 +0000 (GMT)
+ eusmges1new.samsung.com (EUCPMTA) with SMTP id 35.00.61286.E967BFD5; Thu, 19
+ Dec 2019 13:09:50 +0000 (GMT)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
- 20191219130941eucas1p1ac686ade1ad42395500069d8884f9179~hx8JQnQWA1176311763eucas1p13;
- Thu, 19 Dec 2019 13:09:41 +0000 (GMT)
+ eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+ 20191219130950eucas1p2333a6d25cb3539362b4e8dc77ebde1d6~hx8Q-7dfs0349703497eucas1p2Z;
+ Thu, 19 Dec 2019 13:09:50 +0000 (GMT)
 Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
  eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20191219130941eusmtrp23ef7b14dadba4e1457017f149e7d671a~hx8JQEnIN3097130971eusmtrp2Q;
- Thu, 19 Dec 2019 13:09:41 +0000 (GMT)
-X-AuditID: cbfec7f4-0e5ff7000001ed07-db-5dfb76960c53
+ 20191219130950eusmtrp245ee9e2138aa40c0c174c1b52cc8fc9d~hx8Q-Wk373120131201eusmtrp2d;
+ Thu, 19 Dec 2019 13:09:50 +0000 (GMT)
+X-AuditID: cbfec7f2-f0bff7000001ef66-7d-5dfb769ec557
 Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms1.samsung.com (EUCPMTA) with SMTP id B5.4D.08375.5967BFD5; Thu, 19
- Dec 2019 13:09:41 +0000 (GMT)
+ eusmgms1.samsung.com (EUCPMTA) with SMTP id FF.4D.08375.E967BFD5; Thu, 19
+ Dec 2019 13:09:50 +0000 (GMT)
 Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
  eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20191219130941eusmtip2de339237da17c35856c1118405ea9a27~hx8JHVkrq2556225562eusmtip2b;
- Thu, 19 Dec 2019 13:09:41 +0000 (GMT)
+ 20191219130950eusmtip2fe52749635bd8e3ac848de0f2a846ff7~hx8QzWQ4U3240732407eusmtip27;
+ Thu, 19 Dec 2019 13:09:50 +0000 (GMT)
 Received: from CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) by
  CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348) with Microsoft SMTP
- Server (TLS) id 15.0.1320.4; Thu, 19 Dec 2019 13:09:41 +0000
+ Server (TLS) id 15.0.1320.4; Thu, 19 Dec 2019 13:09:49 +0000
 Received: from apples.local (106.110.32.41) by CAMSVWEXC01.scsc.local
  (106.1.227.71) with Microsoft SMTP Server id 15.0.1320.4 via Frontend
- Transport; Thu, 19 Dec 2019 13:09:40 +0000
+ Transport; Thu, 19 Dec 2019 13:09:49 +0000
 From: Klaus Jensen <k.jensen@samsung.com>
 To: <qemu-block@nongnu.org>
-Subject: [PATCH v4 11/24] nvme: add support for the asynchronous event
- request command
-Date: Thu, 19 Dec 2019 14:09:08 +0100
-Message-ID: <20191219130921.309264-12-k.jensen@samsung.com>
+Subject: [PATCH v4 23/24] nvme: remove redundant NvmeCmd pointer parameter
+Date: Thu, 19 Dec 2019 14:09:20 +0100
+Message-ID: <20191219130921.309264-24-k.jensen@samsung.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191219130921.309264-1-k.jensen@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBKsWRmVeSWpSXmKPExsWy7djPc7rTyn7HGrQ947bY3N/OaDHp0DVG
- iyUXUy3m3VK2mPWunc3ieO8OFgc2j02rOtk87lzbw+bx5NpmJo/3+66yBbBEcdmkpOZklqUW
- 6dslcGVsf7yctWBaecXjP2/YGhhnR3QxcnJICJhIfPyygbmLkYtDSGAFo8SFE3vZIZwvjBIX
- 52xkhHA+M0qcfdvMDtPSceAhE0RiOaPE9YdP2eGqJu66A5U5wyix99lhVghnF6PE1a9/2UD6
- 2QQ0Jbb/+c8CYosISEu0X50EVsQscJ1R4tDvi2BLhAUiJNad+sAMYrMIqErc/nIUrIFXwFri
- 8ckLzBCHyEts/faJFcTmBIpv6b3NCFEjKHFy5hOwemagmuats5khbAmJgy9egP0qIbCKXeJ+
- 316gWzmAHBeJUzskIGYKS7w6vgXqURmJ/zvnM0HUdzNK9H34CtU8g1Fi+rLvbBDN1hJ9Z3Ig
- GhwltjWcZIUI80nceCsIsZdPYtK26cwQYV6JjjYhiGo1iR1NWxknMCrPQnL1LCRXz0Jy9QJG
- 5lWM4qmlxbnpqcVGeanlesWJucWleel6yfm5mxiB6eX0v+NfdjDu+pN0iFGAg1GJh/dF8u9Y
- IdbEsuLK3EOMEhzMSiK8tzt+xgrxpiRWVqUW5ccXleakFh9ilOZgURLnNV70MlZIID2xJDU7
- NbUgtQgmy8TBKdXAWLrTQytr3+znJS8dGbnvvOjmX1AQc0Gt1d/+e5DUE66peqtz+Ko7T07j
- mMUjEaAkE7BmW45O9J4YiV67BUIJvPM+XWW8on0qa24Ry562Rub53xpmnXlonXzpm3Faz8y4
- vzseF2aKTyrKmfXmLPv+9Z9zFT/WXtp0uGHbAx/PYzP+Hb1XUj/VT4mlOCPRUIu5qDgRAMkj
- C2grAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCIsWRmVeSWpSXmKPExsVy+t/xe7pTy37HGnxdZGaxub+d0WLSoWuM
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJKsWRmVeSWpSXmKPExsWy7djPc7rzyn7HGjx9r2yxub+d0WLSoWuM
+ FksuplrMu6VsMetdO5vF8d4dLA5sHptWdbJ53Lm2h83jybXNTB7v911lC2CJ4rJJSc3JLEst
+ 0rdL4MqY3r+YpWDFTMaKrUe3sDUwzivrYuTkkBAwkfix5gZTFyMXh5DACkaJ5/Mb2SGcL4wS
+ rd/vsEE4nxklpt58zQrT8unAe0aIxHJGib5l31jgqr6vecwIUiUkcIZRYtpZRYjELkaJVauf
+ g7WzCWhKbP/znwXEFhGQlmi/OokVpIhZ4DqjxKHfF9lBEsICXhJzVu8HK2IRUJWY0PqDGcTm
+ FbCWuLGniR3iDnmJrd8+gQ3lBIpv6b3NCFEjKHFy5hOwXmagmuats5khbAmJgy9eMIMskxBY
+ xS5x6/gdRohBLhJfl62Bek5Y4tXxLVALZCT+75zPBNHQDfToh69Q3TMYJaYv+w4MGw4gx1qi
+ 70wORIOjxIsmkM0gYT6JG28FIRbzSUzaNp0ZIswr0dEmBFGtJrGjaSvjBEblWUjOnoXk7FlI
+ zl7AyLyKUTy1tDg3PbXYMC+1XK84Mbe4NC9dLzk/dxMjMMGc/nf80w7Gr5eSDjEKcDAq8fA6
+ pP2OFWJNLCuuzD3EKMHBrCTCe7vjZ6wQb0piZVVqUX58UWlOavEhRmkOFiVxXuNFL2OFBNIT
+ S1KzU1MLUotgskwcnFINjBZbj/4S3f9pSsr858a6DIwe+eX/bhw7reZQ73r2f9G/ymNf/R/l
+ ZeXuVpqTUaBTtvLitgl7O27J3jrltjagpqX0QYLbk0Os5bJd5aeYp0w6XOn47HSyr9tCpa1T
+ jf/t7ymunjG9WjjXyqtbziHk5NTINSEhO39d3f7/9vITAjecl9zKe2h9tluJpTgj0VCLuag4
+ EQDBCXc7LAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrGIsWRmVeSWpSXmKPExsVy+t/xe7rzyn7HGpxYxGWxub+d0WLSoWuM
  FksuplrMu6VsMetdO5vF8d4dLA5sHptWdbJ53Lm2h83jybXNTB7v911lC2CJ0rMpyi8tSVXI
- yC8usVWKNrQw0jO0tNAzMrHUMzQ2j7UyMlXSt7NJSc3JLEst0rdL0MvY/ng5a8G08orHf96w
- NTDOjuhi5OSQEDCR6DjwkKmLkYtDSGApo8SrvysYIRIyEp+ufGSHsIUl/lzrYoMo+sgosXLW
- XnYI5wyjxJ/Nu5hBqoQEdjFK/PuXBGKzCWhKbP/znwXEFhGQlmi/OokVpIFZ4DqjxKHfF8HG
- CguESWyY2csEYrMIqErc/nIUrIFXwFri8ckLzBCr5SW2fvvECmJzAsW39N5mhFhmJfH450eo
- ekGJkzOfgNnMQPXNW2czQ9gSEgdfvGCewCg8C0nZLCRls5CULWBkXsUoklpanJueW2yoV5yY
- W1yal66XnJ+7iREYY9uO/dy8g/HSxuBDjAIcjEo8vC+Tf8cKsSaWFVfmHmKU4GBWEuG93fEz
- Vog3JbGyKrUoP76oNCe1+BCjKdBzE5mlRJPzgfGfVxJvaGpobmFpaG5sbmxmoSTO2yFwMEZI
- ID2xJDU7NbUgtQimj4mDU6qBsT/y9u9Zh+Z0C6wr+23d6Z3aH7acna9vB1e7bYifcs636pNR
- 5go52jfWtW568+B1VOOCtB8Sk3OzJjz70VTE/+HbpJ8/dkftsEwQ4P/Ce+3PO01RIeHt19YV
- 7ZE1EKk4fei0Hk+rhuJHy7XLDlpYllgvrGic4BkVpaBS9qp3rtlPYaVrx7ZlKbEUZyQaajEX
- FScCAP7AmRTHAgAA
-X-CMS-MailID: 20191219130941eucas1p1ac686ade1ad42395500069d8884f9179
+ yC8usVWKNrQw0jO0tNAzMrHUMzQ2j7UyMlXSt7NJSc3JLEst0rdL0MuY3r+YpWDFTMaKrUe3
+ sDUwzivrYuTkkBAwkfh04D1jFyMXh5DAUkaJpzsOM0MkZCQ+XfnIDmELS/y51sUGUfSRUeLx
+ lkfMEM4ZRokrH9dAte9ilHiz/x4bSAubgKbE9j//WUBsEQFpifark1hBipgFrjNKHPp9EWyu
+ sICXxJzV+8GKWARUJSa0/gDbzStgLXFjTxPUbnmJrd8+sYLYnEDxLb23GUFsIQEricc/P7JA
+ 1AtKnJz5BMxmBqpv3jqbGcKWkDj44gXzBEbhWUjKZiEpm4WkbAEj8ypGkdTS4tz03GJDveLE
+ 3OLSvHS95PzcTYzAONt27OfmHYyXNgYfYhTgYFTi4X2Z/DtWiDWxrLgy9xCjBAezkgjv7Y6f
+ sUK8KYmVValF+fFFpTmpxYcYTYGem8gsJZqcD0wBeSXxhqaG5haWhubG5sZmFkrivB0CB2OE
+ BNITS1KzU1MLUotg+pg4OKUaGCWX3WaLSt4g/1tC6PKqTUZ3ZD7+2rXwn8u1HMbH4qv5bOyn
+ L7D4a/qhdn7Ffcfv7H5ZaSvXHj9pa6r+r/Gf35bl3pv8jGO/ndCfISLxh6fnbE/DZ4+FsUE1
+ vb9nm3MGT44PPFn+pCb0za6pL8snaB0uEWdYaxv9tNbMIHP+zooj5nXsb7zVlZRYijMSDbWY
+ i4oTAfs67UnJAgAA
+X-CMS-MailID: 20191219130950eucas1p2333a6d25cb3539362b4e8dc77ebde1d6
 X-Msg-Generator: CA
-X-RootMTR: 20191219130941eucas1p1ac686ade1ad42395500069d8884f9179
+X-RootMTR: 20191219130950eucas1p2333a6d25cb3539362b4e8dc77ebde1d6
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20191219130941eucas1p1ac686ade1ad42395500069d8884f9179
+X-CMS-RootMailID: 20191219130950eucas1p2333a6d25cb3539362b4e8dc77ebde1d6
 References: <20191219130921.309264-1-k.jensen@samsung.com>
- <CGME20191219130941eucas1p1ac686ade1ad42395500069d8884f9179@eucas1p1.samsung.com>
+ <CGME20191219130950eucas1p2333a6d25cb3539362b4e8dc77ebde1d6@eucas1p2.samsung.com>
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 210.118.77.12
@@ -145,451 +144,582 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Required for compliance with NVMe revision 1.2.1. See NVM Express 1.2.1,
-Section 5.2 ("Asynchronous Event Request command").
+The command struct is available in the NvmeRequest that we generally
+pass around anyway.
 
-Mostly imported from Keith's qemu-nvme tree. Modified with a max number
-of queued events (controllable with the aer_max_queued device
-parameter). The spec states that the controller *should* retain
-events, so we do best effort here.
-
-Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c       | 167 +++++++++++++++++++++++++++++++++++++++++-
- hw/block/nvme.h       |  14 +++-
- hw/block/trace-events |   9 +++
- include/block/nvme.h  |   8 +-
- 4 files changed, 191 insertions(+), 7 deletions(-)
+ hw/block/nvme.c | 198 ++++++++++++++++++++++++------------------------
+ 1 file changed, 99 insertions(+), 99 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 38a555c047d3..113b64ea1843 100644
+index 68c433415169..0ebb9aabbeb2 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -323,6 +323,85 @@ static void nvme_enqueue_req_completion(NvmeCQueue *=
-cq, NvmeRequest *req)
-     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
+@@ -568,17 +568,20 @@ unmap:
  }
 =20
-+static void nvme_process_aers(void *opaque)
-+{
-+    NvmeCtrl *n =3D opaque;
-+    NvmeAsyncEvent *event, *next;
-+
-+    trace_nvme_dev_process_aers(n->aer_queued);
-+
-+    QTAILQ_FOREACH_SAFE(event, &n->aer_queue, entry, next) {
-+        NvmeRequest *req;
-+        NvmeAerResult *result;
-+
-+        /* can't post cqe if there is nothing to complete */
-+        if (!n->outstanding_aers) {
-+            trace_nvme_dev_no_outstanding_aers();
-+            break;
-+        }
-+
-+        /* ignore if masked (cqe posted, but event not cleared) */
-+        if (n->aer_mask & (1 << event->result.event_type)) {
-+            trace_nvme_dev_aer_masked(event->result.event_type, n->aer_m=
-ask);
-+            continue;
-+        }
-+
-+        QTAILQ_REMOVE(&n->aer_queue, event, entry);
-+        n->aer_queued--;
-+
-+        n->aer_mask |=3D 1 << event->result.event_type;
-+        n->outstanding_aers--;
-+
-+        req =3D n->aer_reqs[n->outstanding_aers];
-+
-+        result =3D (NvmeAerResult *) &req->cqe.result;
-+        result->event_type =3D event->result.event_type;
-+        result->event_info =3D event->result.event_info;
-+        result->log_page =3D event->result.log_page;
-+        g_free(event);
-+
-+        req->status =3D NVME_SUCCESS;
-+
-+        trace_nvme_dev_aer_post_cqe(result->event_type, result->event_in=
-fo,
-+            result->log_page);
-+
-+        nvme_enqueue_req_completion(&n->admin_cq, req);
-+    }
-+}
-+
-+static void nvme_enqueue_event(NvmeCtrl *n, uint8_t event_type,
-+    uint8_t event_info, uint8_t log_page)
-+{
-+    NvmeAsyncEvent *event;
-+
-+    trace_nvme_dev_enqueue_event(event_type, event_info, log_page);
-+
-+    if (n->aer_queued =3D=3D n->params.aer_max_queued) {
-+        trace_nvme_dev_enqueue_event_noqueue(n->aer_queued);
-+        return;
-+    }
-+
-+    event =3D g_new(NvmeAsyncEvent, 1);
-+    event->result =3D (NvmeAerResult) {
-+        .event_type =3D event_type,
-+        .event_info =3D event_info,
-+        .log_page   =3D log_page,
-+    };
-+
-+    QTAILQ_INSERT_TAIL(&n->aer_queue, event, entry);
-+    n->aer_queued++;
-+
-+    nvme_process_aers(n);
-+}
-+
-+static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
-+{
-+    n->aer_mask &=3D ~(1 << event_type);
-+    if (!QTAILQ_EMPTY(&n->aer_queue)) {
-+        nvme_process_aers(n);
-+    }
-+}
-+
- static void nvme_rw_cb(void *opaque, int ret)
+ static uint16_t nvme_dma(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+-    NvmeCmd *cmd, DMADirection dir, NvmeRequest *req)
++    DMADirection dir, NvmeRequest *req)
  {
-     NvmeRequest *req =3D opaque;
-@@ -567,8 +646,8 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *=
-cmd)
+     QEMUSGList qsg;
+     QEMUIOVector iov;
+     uint16_t status =3D NVME_SUCCESS;
+     size_t bytes;
++    uint64_t prp1, prp2;
+=20
+-    switch (NVME_CMD_FLAGS_PSDT(cmd->flags)) {
++    switch (NVME_CMD_FLAGS_PSDT(req->cmd.flags)) {
+     case PSDT_PRP:
+-        status =3D nvme_map_prp(n, &qsg, &iov, le64_to_cpu(cmd->dptr.prp=
+.prp1),
+-            le64_to_cpu(cmd->dptr.prp.prp2), len, req);
++        prp1 =3D le64_to_cpu(req->cmd.dptr.prp.prp1);
++        prp2 =3D le64_to_cpu(req->cmd.dptr.prp.prp2);
++
++        status =3D nvme_map_prp(n, &qsg, &iov, prp1, prp2, len, req);
+         if (status) {
+             return status;
+         }
+@@ -592,7 +595,7 @@ static uint16_t nvme_dma(NvmeCtrl *n, uint8_t *ptr, u=
+int32_t len,
+             return NVME_INVALID_FIELD;
+         }
+=20
+-        status =3D nvme_map_sgl(n, &qsg, &iov, cmd->dptr.sgl, len, req);
++        status =3D nvme_map_sgl(n, &qsg, &iov, req->cmd.dptr.sgl, len, r=
+eq);
+         if (status) {
+             return status;
+         }
+@@ -638,20 +641,21 @@ static uint16_t nvme_dma(NvmeCtrl *n, uint8_t *ptr,=
+ uint32_t len,
+     return status;
+ }
+=20
+-static uint16_t nvme_map(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static uint16_t nvme_map(NvmeCtrl *n, NvmeRequest *req)
+ {
+     uint32_t len =3D req->nlb << nvme_ns_lbads(req->ns);
+     uint64_t prp1, prp2;
+=20
+-    switch (NVME_CMD_FLAGS_PSDT(cmd->flags)) {
++    switch (NVME_CMD_FLAGS_PSDT(req->cmd.flags)) {
+     case PSDT_PRP:
+-        prp1 =3D le64_to_cpu(cmd->dptr.prp.prp1);
+-        prp2 =3D le64_to_cpu(cmd->dptr.prp.prp2);
++        prp1 =3D le64_to_cpu(req->cmd.dptr.prp.prp1);
++        prp2 =3D le64_to_cpu(req->cmd.dptr.prp.prp2);
+=20
+         return nvme_map_prp(n, &req->qsg, &req->iov, prp1, prp2, len, re=
+q);
+     case PSDT_SGL_MPTR_CONTIGUOUS:
+     case PSDT_SGL_MPTR_SGL:
+-        return nvme_map_sgl(n, &req->qsg, &req->iov, cmd->dptr.sgl, len,=
+ req);
++        return nvme_map_sgl(n, &req->qsg, &req->iov, req->cmd.dptr.sgl, =
+len,
++            req);
+     default:
+         return NVME_INVALID_FIELD;
+     }
+@@ -1047,7 +1051,7 @@ static void nvme_aio_cb(void *opaque, int ret)
+     nvme_aio_destroy(aio);
+ }
+=20
+-static uint16_t nvme_flush(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static uint16_t nvme_flush(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeNamespace *ns =3D req->ns;
+     NvmeAIO *aio =3D nvme_aio_new(ns->blk, 0x0, 0, NULL, NULL, req, NULL=
+);
+@@ -1058,12 +1062,12 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeCmd *=
+cmd, NvmeRequest *req)
+     return NVME_NO_COMPLETE;
+ }
+=20
+-static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
+*req)
++static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeAIO *aio;
+=20
+     NvmeNamespace *ns =3D req->ns;
+-    NvmeRwCmd *rw =3D (NvmeRwCmd *) cmd;
++    NvmeRwCmd *rw =3D (NvmeRwCmd *) &req->cmd;
+=20
+     int64_t offset;
+     size_t count;
+@@ -1092,9 +1096,9 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+     return NVME_NO_COMPLETE;
+ }
+=20
+-static uint16_t nvme_rw(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    NvmeRwCmd *rw =3D (NvmeRwCmd *) cmd;
++    NvmeRwCmd *rw =3D (NvmeRwCmd *) &req->cmd;
+     NvmeNamespace *ns =3D req->ns;
+     int status;
+=20
+@@ -1114,7 +1118,7 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeCmd *cmd, =
+NvmeRequest *req)
+         return status;
+     }
+=20
+-    status =3D nvme_map(n, cmd, req);
++    status =3D nvme_map(n, req);
+     if (status) {
+         block_acct_invalid(blk_get_stats(ns->blk), acct);
+         return status;
+@@ -1126,11 +1130,12 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeCmd *cmd=
+, NvmeRequest *req)
+     return NVME_NO_COMPLETE;
+ }
+=20
+-static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    uint32_t nsid =3D le32_to_cpu(cmd->nsid);
++    uint32_t nsid =3D le32_to_cpu(req->cmd.nsid);
+=20
+-    trace_nvme_dev_io_cmd(nvme_cid(req), nsid, le16_to_cpu(req->sq->sqid=
+), cmd->opcode);
++    trace_nvme_dev_io_cmd(nvme_cid(req), nsid, le16_to_cpu(req->sq->sqid=
+),
++        req->cmd.opcode);
+=20
+     req->ns =3D nvme_ns(n, nsid);
+=20
+@@ -1138,16 +1143,16 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd =
+*cmd, NvmeRequest *req)
+         return nvme_nsid_err(n, nsid);
+     }
+=20
+-    switch (cmd->opcode) {
++    switch (req->cmd.opcode) {
+     case NVME_CMD_FLUSH:
+-        return nvme_flush(n, cmd, req);
++        return nvme_flush(n, req);
+     case NVME_CMD_WRITE_ZEROS:
+-        return nvme_write_zeros(n, cmd, req);
++        return nvme_write_zeros(n, req);
+     case NVME_CMD_WRITE:
+     case NVME_CMD_READ:
+-        return nvme_rw(n, cmd, req);
++        return nvme_rw(n, req);
+     default:
+-        trace_nvme_dev_err_invalid_opc(cmd->opcode);
++        trace_nvme_dev_err_invalid_opc(req->cmd.opcode);
+         return NVME_INVALID_OPCODE | NVME_DNR;
+     }
+ }
+@@ -1163,10 +1168,10 @@ static void nvme_free_sq(NvmeSQueue *sq, NvmeCtrl=
+ *n)
+     }
+ }
+=20
+-static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeCmd *cmd)
++static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    NvmeDeleteQ *c =3D (NvmeDeleteQ *)cmd;
+-    NvmeRequest *req, *next;
++    NvmeDeleteQ *c =3D (NvmeDeleteQ *) &req->cmd;
++    NvmeRequest *next;
+     NvmeSQueue *sq;
+     NvmeCQueue *cq;
+     NvmeAIO *aio;
+@@ -1234,10 +1239,10 @@ static void nvme_init_sq(NvmeSQueue *sq, NvmeCtrl=
+ *n, uint64_t dma_addr,
+     n->sq[sqid] =3D sq;
+ }
+=20
+-static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeCmd *cmd)
++static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeSQueue *sq;
+-    NvmeCreateSq *c =3D (NvmeCreateSq *)cmd;
++    NvmeCreateSq *c =3D (NvmeCreateSq *) &req->cmd;
+=20
+     uint16_t cqid =3D le16_to_cpu(c->cqid);
+     uint16_t sqid =3D le16_to_cpu(c->sqid);
+@@ -1272,10 +1277,10 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeC=
+md *cmd)
      return NVME_SUCCESS;
  }
 =20
--static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf_=
-len,
--    uint64_t off, NvmeRequest *req)
-+static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
-+    uint32_t buf_len, uint64_t off, NvmeRequest *req)
+-static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd *cmd, uint8_t rae,
+-    uint32_t buf_len, uint64_t off, NvmeRequest *req)
++static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_l=
+en,
++    uint64_t off, NvmeRequest *req)
  {
-     uint64_t prp1 =3D le64_to_cpu(cmd->prp1);
-     uint64_t prp2 =3D le64_to_cpu(cmd->prp2);
-@@ -617,6 +696,10 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, NvmeCmd=
- *cmd, uint32_t buf_len,
-     smart.power_on_hours[0] =3D cpu_to_le64(
-         (((current_ms - n->starttime_ms) / 1000) / 60) / 60);
+-    uint32_t nsid =3D le32_to_cpu(cmd->nsid);
++    uint32_t nsid =3D le32_to_cpu(req->cmd.nsid);
 =20
-+    if (!rae) {
-+        nvme_clear_events(n, NVME_AER_TYPE_SMART);
-+    }
-+
-     return nvme_dma_read_prp(n, (uint8_t *) &smart + off, trans_len, prp=
-1,
-         prp2);
+     uint32_t trans_len;
+     time_t current_ms;
+@@ -1330,12 +1335,12 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, Nvme=
+Cmd *cmd, uint8_t rae,
+         nvme_clear_events(n, NVME_AER_TYPE_SMART);
+     }
+=20
+-    return nvme_dma(n, (uint8_t *) &smart + off, trans_len, cmd,
++    return nvme_dma(n, (uint8_t *) &smart + off, trans_len,
+         DMA_DIRECTION_FROM_DEVICE, req);
  }
-@@ -669,13 +752,17 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *=
-cmd, NvmeRequest *req)
 =20
-     switch (lid) {
-     case NVME_LOG_ERROR_INFO:
-+        if (!rae) {
-+            nvme_clear_events(n, NVME_AER_TYPE_ERROR);
-+        }
-+
-         if (off) {
-             return NVME_INVALID_FIELD | NVME_DNR;
-         }
+-static uint16_t nvme_fw_log_info(NvmeCtrl *n, NvmeCmd *cmd, uint32_t buf=
+_len,
+-    uint64_t off, NvmeRequest *req)
++static uint16_t nvme_fw_log_info(NvmeCtrl *n, uint32_t buf_len, uint64_t=
+ off,
++    NvmeRequest *req)
+ {
+     uint32_t trans_len;
+     NvmeFwSlotInfoLog fw_log;
+@@ -1348,16 +1353,16 @@ static uint16_t nvme_fw_log_info(NvmeCtrl *n, Nvm=
+eCmd *cmd, uint32_t buf_len,
+=20
+     trans_len =3D MIN(sizeof(fw_log) - off, buf_len);
+=20
+-    return nvme_dma(n, (uint8_t *) &fw_log + off, trans_len, cmd,
++    return nvme_dma(n, (uint8_t *) &fw_log + off, trans_len,
+         DMA_DIRECTION_FROM_DEVICE, req);
+ }
+=20
+-static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req=
+)
++static uint16_t nvme_get_log(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
+-    uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
+-    uint32_t dw12 =3D le32_to_cpu(cmd->cdw12);
+-    uint32_t dw13 =3D le32_to_cpu(cmd->cdw13);
++    uint32_t dw10 =3D le32_to_cpu(req->cmd.cdw10);
++    uint32_t dw11 =3D le32_to_cpu(req->cmd.cdw11);
++    uint32_t dw12 =3D le32_to_cpu(req->cmd.cdw12);
++    uint32_t dw13 =3D le32_to_cpu(req->cmd.cdw13);
+     uint8_t  lid =3D dw10 & 0xff;
+     uint8_t  lsp =3D (dw10 >> 8) & 0xf;
+     uint8_t  rae =3D (dw10 >> 15) & 0x1;
+@@ -1397,9 +1402,9 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *=
+cmd, NvmeRequest *req)
 =20
          return NVME_SUCCESS;
      case NVME_LOG_SMART_INFO:
--        return nvme_smart_info(n, cmd, len, off, req);
-+        return nvme_smart_info(n, cmd, rae, len, off, req);
+-        return nvme_smart_info(n, cmd, rae, len, off, req);
++        return nvme_smart_info(n, rae, len, off, req);
      case NVME_LOG_FW_SLOT_INFO:
-         return nvme_fw_log_info(n, cmd, len, off, req);
+-        return nvme_fw_log_info(n, cmd, len, off, req);
++        return nvme_fw_log_info(n, len, off, req);
      default:
-@@ -951,6 +1038,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCm=
-d *cmd, NvmeRequest *req)
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_get_feature_timestamp(n, cmd);
-+    case NVME_ASYNCHRONOUS_EVENT_CONF:
-+        result =3D cpu_to_le32(n->features.async_config);
-+        break;
-     default:
-         trace_nvme_dev_err_invalid_getfeat(dw10);
+         trace_nvme_dev_err_invalid_log_page(nvme_cid(req), lid);
          return NVME_INVALID_FIELD | NVME_DNR;
-@@ -1000,6 +1090,13 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
-             return NVME_INVALID_FIELD | NVME_DNR;
-         }
+@@ -1417,9 +1422,9 @@ static void nvme_free_cq(NvmeCQueue *cq, NvmeCtrl *=
+n)
+     }
+ }
 =20
-+        if (((n->temperature > n->features.temp_thresh_hi) ||
-+            (n->temperature < n->features.temp_thresh_low)) &&
-+            NVME_AEC_SMART(n->features.async_config) & NVME_SMART_TEMPER=
-ATURE) {
-+            nvme_enqueue_event(n, NVME_AER_TYPE_SMART,
-+                NVME_AER_INFO_SMART_TEMP_THRESH, NVME_LOG_SMART_INFO);
-+        }
-+
-         break;
-     case NVME_VOLATILE_WRITE_CACHE:
-         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
-@@ -1013,6 +1110,9 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
-md *cmd, NvmeRequest *req)
-         break;
-     case NVME_TIMESTAMP:
-         return nvme_set_feature_timestamp(n, cmd);
-+    case NVME_ASYNCHRONOUS_EVENT_CONF:
-+        n->features.async_config =3D dw11;
-+        break;
-     default:
-         trace_nvme_dev_err_invalid_setfeat(dw10);
-         return NVME_INVALID_FIELD | NVME_DNR;
-@@ -1021,6 +1121,25 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
-Cmd *cmd, NvmeRequest *req)
+-static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeCmd *cmd)
++static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    NvmeDeleteQ *c =3D (NvmeDeleteQ *)cmd;
++    NvmeDeleteQ *c =3D (NvmeDeleteQ *) &req->cmd;
+     NvmeCQueue *cq;
+     uint16_t qid =3D le16_to_cpu(c->qid);
+=20
+@@ -1457,10 +1462,10 @@ static void nvme_init_cq(NvmeCQueue *cq, NvmeCtrl=
+ *n, uint64_t dma_addr,
+     cq->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, nvme_post_cqes, cq);
+ }
+=20
+-static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeCmd *cmd)
++static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeCQueue *cq;
+-    NvmeCreateCq *c =3D (NvmeCreateCq *)cmd;
++    NvmeCreateCq *c =3D (NvmeCreateCq *) &req->cmd;
+     uint16_t cqid =3D le16_to_cpu(c->cqid);
+     uint16_t vector =3D le16_to_cpu(c->irq_vector);
+     uint16_t qsize =3D le16_to_cpu(c->qsize);
+@@ -1499,18 +1504,18 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeC=
+md *cmd)
      return NVME_SUCCESS;
  }
 =20
-+static uint16_t nvme_aer(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-+{
-+    trace_nvme_dev_aer(nvme_cid(req));
-+
-+    if (n->outstanding_aers > n->params.aerl) {
-+        trace_nvme_dev_aer_aerl_exceeded();
-+        return NVME_AER_LIMIT_EXCEEDED;
-+    }
-+
-+    n->aer_reqs[n->outstanding_aers] =3D req;
-+    n->outstanding_aers++;
-+
-+    if (!QTAILQ_EMPTY(&n->aer_queue)) {
-+        nvme_process_aers(n);
-+    }
-+
-+    return NVME_NO_COMPLETE;
-+}
-+
- static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *r=
-eq)
+-static uint16_t nvme_identify_ctrl(NvmeCtrl *n, NvmeCmd *cmd, NvmeReques=
+t *req)
++static uint16_t nvme_identify_ctrl(NvmeCtrl *n, NvmeRequest *req)
  {
-     switch (cmd->opcode) {
-@@ -1042,6 +1161,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd=
- *cmd, NvmeRequest *req)
-         return nvme_set_feature(n, cmd, req);
-     case NVME_ADM_CMD_GET_FEATURES:
-         return nvme_get_feature(n, cmd, req);
-+    case NVME_ADM_CMD_ASYNC_EV_REQ:
-+        return nvme_aer(n, cmd, req);
-     default:
-         trace_nvme_dev_err_invalid_admin_opc(cmd->opcode);
-         return NVME_INVALID_OPCODE | NVME_DNR;
-@@ -1096,6 +1217,15 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
-         }
+     trace_nvme_dev_identify_ctrl();
+=20
+-    return nvme_dma(n, (uint8_t *) &n->id_ctrl, sizeof(n->id_ctrl), cmd,
++    return nvme_dma(n, (uint8_t *) &n->id_ctrl, sizeof(n->id_ctrl),
+         DMA_DIRECTION_FROM_DEVICE, req);
+ }
+=20
+-static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
+*req)
++static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeIdNs *id_ns, inactive =3D { 0 };
+-    uint32_t nsid =3D le32_to_cpu(cmd->nsid);
++    uint32_t nsid =3D le32_to_cpu(req->cmd.nsid);
+     NvmeNamespace *ns =3D nvme_ns(n, nsid);
+=20
+     trace_nvme_dev_identify_ns(nsid);
+@@ -1527,15 +1532,14 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, Nvm=
+eCmd *cmd, NvmeRequest *req)
+         id_ns =3D &ns->id_ns;
      }
 =20
-+    while (!QTAILQ_EMPTY(&n->aer_queue)) {
-+        NvmeAsyncEvent *event =3D QTAILQ_FIRST(&n->aer_queue);
-+        QTAILQ_REMOVE(&n->aer_queue, event, entry);
-+        g_free(event);
-+    }
-+
-+    n->aer_queued =3D 0;
-+    n->outstanding_aers =3D 0;
-+
-     blk_flush(n->conf.blk);
-     n->bar.cc =3D 0;
- }
-@@ -1192,6 +1322,8 @@ static int nvme_start_ctrl(NvmeCtrl *n)
-=20
-     nvme_set_timestamp(n, 0ULL);
-=20
-+    QTAILQ_INIT(&n->aer_queue);
-+
-     return 0;
+-    return nvme_dma(n, (uint8_t *) id_ns, sizeof(NvmeIdNs), cmd,
++    return nvme_dma(n, (uint8_t *) id_ns, sizeof(NvmeIdNs),
+         DMA_DIRECTION_FROM_DEVICE, req);
  }
 =20
-@@ -1384,6 +1516,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
-dr, int val)
-                            "completion queue doorbell write"
-                            " for nonexistent queue,"
-                            " sqid=3D%"PRIu32", ignoring", qid);
-+
-+            if (n->outstanding_aers) {
-+                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
-+                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
-+                    NVME_LOG_ERROR_INFO);
-+            }
-+
-             return;
+-static uint16_t nvme_identify_ns_list(NvmeCtrl *n, NvmeCmd *cmd,
+-    NvmeRequest *req)
++static uint16_t nvme_identify_ns_list(NvmeCtrl *n, NvmeRequest *req)
+ {
+     static const int data_len =3D 4 * KiB;
+-    uint32_t min_nsid =3D le32_to_cpu(cmd->nsid);
++    uint32_t min_nsid =3D le32_to_cpu(req->cmd.nsid);
+     uint32_t *list;
+     uint16_t ret;
+     int i, j =3D 0;
+@@ -1552,14 +1556,13 @@ static uint16_t nvme_identify_ns_list(NvmeCtrl *n=
+, NvmeCmd *cmd,
+             break;
          }
-=20
-@@ -1394,6 +1533,12 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
-dr, int val)
-                            " beyond queue size, sqid=3D%"PRIu32","
-                            " new_head=3D%"PRIu16", ignoring",
-                            qid, new_head);
-+
-+            if (n->outstanding_aers) {
-+                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
-+                    NVME_AER_INFO_ERR_INVALID_DB_VALUE, NVME_LOG_ERROR_I=
-NFO);
-+            }
-+
-             return;
-         }
-=20
-@@ -1422,6 +1567,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
-dr, int val)
-                            "submission queue doorbell write"
-                            " for nonexistent queue,"
-                            " sqid=3D%"PRIu32", ignoring", qid);
-+
-+            if (n->outstanding_aers) {
-+                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
-+                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
-+                    NVME_LOG_ERROR_INFO);
-+            }
-+
-             return;
-         }
-=20
-@@ -1432,6 +1584,12 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr ad=
-dr, int val)
-                            " beyond queue size, sqid=3D%"PRIu32","
-                            " new_tail=3D%"PRIu16", ignoring",
-                            qid, new_tail);
-+
-+            if (n->outstanding_aers) {
-+                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
-+                    NVME_AER_INFO_ERR_INVALID_DB_VALUE, NVME_LOG_ERROR_I=
-NFO);
-+            }
-+
-             return;
-         }
-=20
-@@ -1528,6 +1686,7 @@ static void nvme_init_state(NvmeCtrl *n)
-     n->temperature =3D NVME_TEMPERATURE;
-     n->features.temp_thresh_hi =3D le16_to_cpu(n->id_ctrl.wctemp);
-     n->starttime_ms =3D qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    n->aer_reqs =3D g_new0(NvmeRequest *, n->params.aerl + 1);
+     }
+-    ret =3D nvme_dma(n, (uint8_t *) list, data_len, cmd,
++    ret =3D nvme_dma(n, (uint8_t *) list, data_len,
+         DMA_DIRECTION_FROM_DEVICE, req);
+     g_free(list);
+     return ret;
  }
 =20
- static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
-@@ -1607,6 +1766,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-      * inconsequential.
-      */
-     id->acl =3D 3;
-+    id->aerl =3D n->params.aerl;
-     id->frmw =3D 7 << 1;
-     id->lpa =3D 1 << 2;
+-static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeCmd *cmd,
+-    NvmeRequest *req)
++static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *re=
+q)
+ {
+     static const int len =3D 4096;
 =20
-@@ -1697,6 +1857,7 @@ static void nvme_exit(PCIDevice *pci_dev)
-     g_free(n->namespaces);
-     g_free(n->cq);
-     g_free(n->sq);
-+    g_free(n->aer_reqs);
+@@ -1570,7 +1573,7 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtr=
+l *n, NvmeCmd *cmd,
+         uint8_t nid[16];
+     };
 =20
-     if (n->params.cmb_size_mb) {
-         g_free(n->cmbuf);
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 89b0aafa02a2..1e715ab1d75c 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -6,16 +6,20 @@
- #define DEFINE_NVME_PROPERTIES(_state, _props) \
-     DEFINE_PROP_STRING("serial", _state, _props.serial), \
-     DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
--    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64)
-+    DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
-+    DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3), \
-+    DEFINE_PROP_UINT32("aer_max_queued", _state, _props.aer_max_queued, =
-64)
+-    uint32_t nsid =3D le32_to_cpu(cmd->nsid);
++    uint32_t nsid =3D le32_to_cpu(req->cmd.nsid);
 =20
- typedef struct NvmeParams {
-     char     *serial;
-     uint32_t num_queues;
-     uint32_t cmb_size_mb;
-+    uint8_t  aerl;
-+    uint32_t aer_max_queued;
- } NvmeParams;
+     struct ns_descr *list;
+     uint16_t ret;
+@@ -1592,34 +1595,33 @@ static uint16_t nvme_identify_ns_descr_list(NvmeC=
+trl *n, NvmeCmd *cmd,
+     list->nidl =3D 0x10;
+     *(uint32_t *) &list->nid[12] =3D cpu_to_be32(nsid);
 =20
- typedef struct NvmeAsyncEvent {
--    QSIMPLEQ_ENTRY(NvmeAsyncEvent) entry;
-+    QTAILQ_ENTRY(NvmeAsyncEvent) entry;
-     NvmeAerResult result;
- } NvmeAsyncEvent;
+-    ret =3D nvme_dma(n, (uint8_t *) list, len, cmd, DMA_DIRECTION_FROM_D=
+EVICE,
+-        req);
++    ret =3D nvme_dma(n, (uint8_t *) list, len, DMA_DIRECTION_FROM_DEVICE=
+, req);
+     g_free(list);
+     return ret;
+ }
 =20
-@@ -102,6 +106,7 @@ typedef struct NvmeCtrl {
-     uint32_t    num_namespaces;
-     uint32_t    max_q_ents;
-     uint64_t    ns_size;
-+    uint8_t     outstanding_aers;
-     uint32_t    cmbsz;
-     uint32_t    cmbloc;
-     uint8_t     *cmbuf;
-@@ -111,6 +116,11 @@ typedef struct NvmeCtrl {
-     uint16_t    temperature;
-     uint64_t    starttime_ms;
+-static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *re=
+q)
++static uint16_t nvme_identify(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    NvmeIdentify *c =3D (NvmeIdentify *)cmd;
++    NvmeIdentify *c =3D (NvmeIdentify *) &req->cmd;
 =20
-+    uint8_t     aer_mask;
-+    NvmeRequest **aer_reqs;
-+    QTAILQ_HEAD(, NvmeAsyncEvent) aer_queue;
-+    int         aer_queued;
-+
-     NvmeNamespace   *namespaces;
-     NvmeSQueue      **sq;
-     NvmeCQueue      **cq;
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 7da088479f39..3952c36774cf 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -47,6 +47,15 @@ nvme_dev_setfeat_numq(int reqcq, int reqsq, int gotcq,=
- int gotsq) "requested cq_
- nvme_dev_setfeat_timestamp(uint64_t ts) "set feature timestamp =3D 0x%"P=
-RIx64""
- nvme_dev_getfeat_timestamp(uint64_t ts) "get feature timestamp =3D 0x%"P=
-RIx64""
- nvme_dev_get_log(uint16_t cid, uint8_t lid, uint8_t rae, uint32_t len, u=
-int64_t off) "cid %"PRIu16" lid 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" o=
-ff %"PRIu64""
-+nvme_dev_process_aers(int queued) "queued %d"
-+nvme_dev_aer(uint16_t cid) "cid %"PRIu16""
-+nvme_dev_aer_aerl_exceeded(void) "aerl exceeded"
-+nvme_dev_aer_masked(uint8_t type, uint8_t mask) "type 0x%"PRIx8" mask 0x=
-%"PRIx8""
-+nvme_dev_aer_post_cqe(uint8_t typ, uint8_t info, uint8_t log_page) "type=
- 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
-+nvme_dev_enqueue_event(uint8_t typ, uint8_t info, uint8_t log_page) "typ=
-e 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
-+nvme_dev_enqueue_event_noqueue(int queued) "queued %d"
-+nvme_dev_enqueue_event_masked(uint8_t typ) "type 0x%"PRIx8""
-+nvme_dev_no_outstanding_aers(void) "ignoring event; no outstanding AERs"
- nvme_dev_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, in=
-terrupt mask set, data=3D0x%"PRIx64", new_mask=3D0x%"PRIx64""
- nvme_dev_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, in=
-terrupt mask clr, data=3D0x%"PRIx64", new_mask=3D0x%"PRIx64""
- nvme_dev_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=3D=
-0x%"PRIx64""
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 9a6055adeb61..a24be047a311 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -386,8 +386,8 @@ enum NvmeAsyncEventRequest {
-     NVME_AER_TYPE_SMART                     =3D 1,
-     NVME_AER_TYPE_IO_SPECIFIC               =3D 6,
-     NVME_AER_TYPE_VENDOR_SPECIFIC           =3D 7,
--    NVME_AER_INFO_ERR_INVALID_SQ            =3D 0,
--    NVME_AER_INFO_ERR_INVALID_DB            =3D 1,
-+    NVME_AER_INFO_ERR_INVALID_DB_REGISTER   =3D 0,
-+    NVME_AER_INFO_ERR_INVALID_DB_VALUE      =3D 1,
-     NVME_AER_INFO_ERR_DIAG_FAIL             =3D 2,
-     NVME_AER_INFO_ERR_PERS_INTERNAL_ERR     =3D 3,
-     NVME_AER_INFO_ERR_TRANS_INTERNAL_ERR    =3D 4,
-@@ -640,6 +640,10 @@ typedef struct NvmeFeatureVal {
- #define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
- #define NVME_TEMP_TMPTH(temp)  (temp & 0xffff)
+     switch (le32_to_cpu(c->cns)) {
+     case 0x00:
+-        return nvme_identify_ns(n, cmd, req);
++        return nvme_identify_ns(n, req);
+     case 0x01:
+-        return nvme_identify_ctrl(n, cmd, req);
++        return nvme_identify_ctrl(n, req);
+     case 0x02:
+-        return nvme_identify_ns_list(n, cmd, req);
++        return nvme_identify_ns_list(n, req);
+     case 0x03:
+-        return nvme_identify_ns_descr_list(n, cmd, req);
++        return nvme_identify_ns_descr_list(n, req);
+     default:
+         trace_nvme_dev_err_invalid_identify_cns(le32_to_cpu(c->cns));
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ }
 =20
-+#define NVME_AEC_SMART(aec)         (aec & 0xff)
-+#define NVME_AEC_NS_ATTR(aec)       ((aec >> 8) & 0x1)
-+#define NVME_AEC_FW_ACTIVATION(aec) ((aec >> 9) & 0x1)
-+
- enum NvmeFeatureIds {
-     NVME_ARBITRATION                =3D 0x1,
-     NVME_POWER_MANAGEMENT           =3D 0x2,
+-static uint16_t nvme_abort(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static uint16_t nvme_abort(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    uint16_t sqid =3D le32_to_cpu(cmd->cdw10) & 0xffff;
++    uint16_t sqid =3D le32_to_cpu(req->cmd.cdw10) & 0xffff;
+=20
+     req->cqe.result =3D 1;
+     if (nvme_check_sqid(n, sqid)) {
+@@ -1669,19 +1671,18 @@ static inline uint64_t nvme_get_timestamp(const N=
+vmeCtrl *n)
+     return cpu_to_le64(ts.all);
+ }
+=20
+-static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd,
+-    NvmeRequest *req)
++static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeRequest *req=
+)
+ {
+     uint64_t timestamp =3D nvme_get_timestamp(n);
+=20
+-    return nvme_dma(n, (uint8_t *)&timestamp, sizeof(timestamp), cmd,
++    return nvme_dma(n, (uint8_t *)&timestamp, sizeof(timestamp),
+         DMA_DIRECTION_FROM_DEVICE, req);
+ }
+=20
+-static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
+*req)
++static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
+-    uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
++    uint32_t dw10 =3D le32_to_cpu(req->cmd.cdw10);
++    uint32_t dw11 =3D le32_to_cpu(req->cmd.cdw11);
+     uint32_t result;
+=20
+     trace_nvme_dev_getfeat(nvme_cid(req), dw10);
+@@ -1727,7 +1728,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+         trace_nvme_dev_getfeat_numq(result);
+         break;
+     case NVME_TIMESTAMP:
+-        return nvme_get_feature_timestamp(n, cmd, req);
++        return nvme_get_feature_timestamp(n, req);
+     case NVME_INTERRUPT_COALESCING:
+         result =3D cpu_to_le32(n->features.int_coalescing);
+         break;
+@@ -1753,13 +1754,12 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, Nvm=
+eCmd *cmd, NvmeRequest *req)
+     return NVME_SUCCESS;
+ }
+=20
+-static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd,
+-    NvmeRequest *req)
++static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeRequest *req=
+)
+ {
+     uint16_t ret;
+     uint64_t timestamp;
+=20
+-    ret =3D nvme_dma(n, (uint8_t *) &timestamp, sizeof(timestamp), cmd,
++    ret =3D nvme_dma(n, (uint8_t *) &timestamp, sizeof(timestamp),
+         DMA_DIRECTION_TO_DEVICE, req);
+     if (ret !=3D NVME_SUCCESS) {
+         return ret;
+@@ -1770,12 +1770,12 @@ static uint16_t nvme_set_feature_timestamp(NvmeCt=
+rl *n, NvmeCmd *cmd,
+     return NVME_SUCCESS;
+ }
+=20
+-static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
+*req)
++static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeNamespace *ns;
+=20
+-    uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
+-    uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
++    uint32_t dw10 =3D le32_to_cpu(req->cmd.cdw10);
++    uint32_t dw11 =3D le32_to_cpu(req->cmd.cdw11);
+=20
+     trace_nvme_dev_setfeat(nvme_cid(req), dw10, dw11);
+=20
+@@ -1834,7 +1834,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+             ((n->params.num_queues - 2) << 16));
+         break;
+     case NVME_TIMESTAMP:
+-        return nvme_set_feature_timestamp(n, cmd, req);
++        return nvme_set_feature_timestamp(n, req);
+     case NVME_ASYNCHRONOUS_EVENT_CONF:
+         n->features.async_config =3D dw11;
+         break;
+@@ -1853,7 +1853,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+     return NVME_SUCCESS;
+ }
+=20
+-static uint16_t nvme_aer(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
++static uint16_t nvme_aer(NvmeCtrl *n, NvmeRequest *req)
+ {
+     trace_nvme_dev_aer(nvme_cid(req));
+=20
+@@ -1872,31 +1872,31 @@ static uint16_t nvme_aer(NvmeCtrl *n, NvmeCmd *cm=
+d, NvmeRequest *req)
+     return NVME_NO_COMPLETE;
+ }
+=20
+-static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *r=
+eq)
++static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeRequest *req)
+ {
+-    switch (cmd->opcode) {
++    switch (req->cmd.opcode) {
+     case NVME_ADM_CMD_DELETE_SQ:
+-        return nvme_del_sq(n, cmd);
++        return nvme_del_sq(n, req);
+     case NVME_ADM_CMD_CREATE_SQ:
+-        return nvme_create_sq(n, cmd);
++        return nvme_create_sq(n, req);
+     case NVME_ADM_CMD_GET_LOG_PAGE:
+-        return nvme_get_log(n, cmd, req);
++        return nvme_get_log(n, req);
+     case NVME_ADM_CMD_DELETE_CQ:
+-        return nvme_del_cq(n, cmd);
++        return nvme_del_cq(n, req);
+     case NVME_ADM_CMD_CREATE_CQ:
+-        return nvme_create_cq(n, cmd);
++        return nvme_create_cq(n, req);
+     case NVME_ADM_CMD_IDENTIFY:
+-        return nvme_identify(n, cmd, req);
++        return nvme_identify(n, req);
+     case NVME_ADM_CMD_ABORT:
+-        return nvme_abort(n, cmd, req);
++        return nvme_abort(n, req);
+     case NVME_ADM_CMD_SET_FEATURES:
+-        return nvme_set_feature(n, cmd, req);
++        return nvme_set_feature(n, req);
+     case NVME_ADM_CMD_GET_FEATURES:
+-        return nvme_get_feature(n, cmd, req);
++        return nvme_get_feature(n, req);
+     case NVME_ADM_CMD_ASYNC_EV_REQ:
+-        return nvme_aer(n, cmd, req);
++        return nvme_aer(n, req);
+     default:
+-        trace_nvme_dev_err_invalid_admin_opc(cmd->opcode);
++        trace_nvme_dev_err_invalid_admin_opc(req->cmd.opcode);
+         return NVME_INVALID_OPCODE | NVME_DNR;
+     }
+ }
+@@ -1931,8 +1931,8 @@ static void nvme_process_sq(void *opaque)
+         req->cqe.cid =3D cmd.cid;
+         memcpy(&req->cmd, &cmd, sizeof(NvmeCmd));
+=20
+-        status =3D sq->sqid ? nvme_io_cmd(n, &cmd, req) :
+-            nvme_admin_cmd(n, &cmd, req);
++        status =3D sq->sqid ? nvme_io_cmd(n, req) :
++            nvme_admin_cmd(n, req);
+         if (status !=3D NVME_NO_COMPLETE) {
+             req->status =3D status;
+             nvme_enqueue_req_completion(cq, req);
 --=20
 2.24.1
 
