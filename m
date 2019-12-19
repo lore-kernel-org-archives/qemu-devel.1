@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 198C2C2D0C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9008C2D0C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:59:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7FBC206EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:59:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 730802465E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DOOoXp7w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7FBC206EC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzQc9jaV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 730802465E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii10m-0007tG-Hh
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 13:59:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39372)
+	id 1ii11B-0008NO-2F
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 13:59:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ii0td-00070L-BC
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:51:38 -0500
+ id 1ii0ti-00077z-5Z
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:51:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ii0tc-0007cm-0Q
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:51:37 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53867)
+ id 1ii0th-00084p-16
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:51:42 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40375)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ii0tb-0007Xp-PD; Thu, 19 Dec 2019 13:51:35 -0500
-Received: by mail-wm1-x343.google.com with SMTP id m24so6507350wmc.3;
- Thu, 19 Dec 2019 10:51:35 -0800 (PST)
+ id 1ii0tg-00080F-Pl; Thu, 19 Dec 2019 13:51:40 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c14so7044400wrn.7;
+ Thu, 19 Dec 2019 10:51:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=jIg+33KeWZZoVU4KTC1Qs/cBS+U2tDHwXFCUA5+HzbM=;
- b=DOOoXp7wOhfRVuo831S05oCEi09rbGM+mhvGwoAW9kVI0AW+Oi4238dlMdG1HOQLPi
- fv1sR8UjxVUOg9aff+Rn+lxEEBAqc4IWv8QwbdkXnkjj1xZMT8iYSKrthF2l7zzOTr+f
- kSuwqJcEKaudzWgZISsd9EjkoaD+uKrDdGo54li47kwOPP/+gvfVHoNifBXg9VmFaeUm
- wIqWtyMYSnb/S/bYWWX3fNHNxI1dnDqTD5KQhO61QRvJOZmWmqYvUwrVYoBqSmnmQ/tw
- Ltilcsgh3Db1J+pjsZg4GO1nShWstMrzDDMz/AbdPwCOLkQgcINIA0f1COTK23QyDxzg
- mwow==
+ bh=tW8l9xeWxnpc6CHLbxLBaneaw92aGrVjK1sQT+wYwbY=;
+ b=AzQc9jaV4e6K0Ae50LqzRDyN7zrg+wj6NVaot8/qY7K0pLOCo5Rtp6tqvjqbpKDTm2
+ fTMIBzM4FVzuxpO4hMGutBUi6Xtqsf5SCwaMtXnojiuWtGe1SQlPnN5T1M4DSmy02EVH
+ +A4hMFZkYsWYA3Vf24mB1dt8CmzD0Ea+fwKGbipdPQt5xkPdzWQ2/uUT3lWwqQolPJ0l
+ d67XERN8WOFO2PaAn0jElM+Uc/fSmnkniVPKv4hQTRIS2j7Aw8kw0N3Rd94FECsCwU+3
+ FDEUY0zCisGQxzl027f9YOjQAWIOPw26U17WPwIg9ube9s8fXcC4Z65PdCgcDFI73bUi
+ ymJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=jIg+33KeWZZoVU4KTC1Qs/cBS+U2tDHwXFCUA5+HzbM=;
- b=g6rH1vb0qUz2V/LctLMY0bRjoukLHEKNrHaJ5/wLhWJ8MuOxvwZ+jhR2yDn3FBFFf9
- jZgEDXd69zznrvo4Z8Flrx0xTOhh/dftH8xmWMes3uVprBFqi3AWIz/dMOqpPaqgnax3
- +zo4yTfyv9CjtrPS+4ZHBk06kcdo8UPK58ugH2GaEObtn6SaupRLMHthjVKm/h0iS4T7
- Eqv2a+6L5J1zM1fjK/bl+kUhWGl2QszMZkr6CQqnQiCS6jU+tzUuX+rm+Tv15uDOhruy
- dORsHThzVzmBkeA1FjVAV1pgJH5Urbfjat7HYUWGJtnABkXff61myXZj8TsWBDa3wjZr
- kdHw==
-X-Gm-Message-State: APjAAAXXO31ZbwhRw2O7PQ2k958YCFObxARqlVSTJdPEnGkvH/cKntAh
- 22H4gY1KGRjy466RmVvvKAWc3pSm
-X-Google-Smtp-Source: APXvYqx4/zuBzYIXCe0BcvOfXwN1MN94M8leEwqrgzY3pRbmv0q7FlOQyPpkYLKO5pfpunluWXKUUA==
-X-Received: by 2002:a1c:4b09:: with SMTP id y9mr12136089wma.103.1576781494368; 
- Thu, 19 Dec 2019 10:51:34 -0800 (PST)
+ bh=tW8l9xeWxnpc6CHLbxLBaneaw92aGrVjK1sQT+wYwbY=;
+ b=jExws7hmiQOIEbiG9DqZohrad8oW7iCu5GddJHa5sJLtDf9KRV0aZvZU0MologoHml
+ xSgm7R8BConv1XVLDF4yFqJD/OalcRqKXLLrCkTLJsUArWRT9HKaQ4T/Lm3bqnB27aE1
+ xMpRkWomCHqLP4KbtPi0uEzy5RBlW++Vi/DHghfYDPaDHFLcG7tTRFcwnvPuhtablHYM
+ iVMSs6hyX1AFq8fEUftxOKQg8wDjezm8CbmaGeJyzOQVGrXoIxVMjBu3SxN2bPyNaeIp
+ qc0qtUFN0tgH1q4OVTJcRAj7NJlU+BeohIU/O/rC/BVnmjEXhb/F+P65S4g6+YjM9IWf
+ qTgQ==
+X-Gm-Message-State: APjAAAUecWFvhAd9saLav/LdBq4e6WIvzjr6o+nrhCNOSTy0aYoEgcEp
+ tidnso+5czSMmyKLbEUUmF/LLeJt
+X-Google-Smtp-Source: APXvYqzS0NVHipIhcYaLjA7fvBbKiu9b6OCALSCEevmOk+oHbcvaEqyp9DFVU0bR9Gict0k9lljKnQ==
+X-Received: by 2002:a5d:6b88:: with SMTP id n8mr11401748wrx.288.1576781499364; 
+ Thu, 19 Dec 2019 10:51:39 -0800 (PST)
 Received: from x1w.redhat.com (34.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id b67sm7435494wmc.38.2019.12.19.10.51.33
+ by smtp.gmail.com with ESMTPSA id b67sm7435494wmc.38.2019.12.19.10.51.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 10:51:33 -0800 (PST)
+ Thu, 19 Dec 2019 10:51:38 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: [PATCH 04/13] hw/timer/allwinner: Move definitions from header to
- source
-Date: Thu, 19 Dec 2019 19:51:18 +0100
-Message-Id: <20191219185127.24388-5-f4bug@amsat.org>
+Subject: [RFC PATCH 08/13] hw/timer/allwinner: Add a timer_count field
+Date: Thu, 19 Dec 2019 19:51:22 +0100
+Message-Id: <20191219185127.24388-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191219185127.24388-1-f4bug@amsat.org>
 References: <20191219185127.24388-1-f4bug@amsat.org>
@@ -86,7 +85,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,98 +104,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These definitions are only used in the implementation, thus don't
-need to be exported. Move them in the source file.
+To be able to support controllers with less than 6 timers, we
+need a field to be able to iterate over the different count.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/timer/allwinner-a10-pit.h | 28 --------------------------
- hw/timer/allwinner-a10-pit.c         | 30 ++++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 28 deletions(-)
+ include/hw/timer/allwinner-a10-pit.h |  1 +
+ hw/timer/allwinner-a10-pit.c         | 10 ++++++----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/include/hw/timer/allwinner-a10-pit.h b/include/hw/timer/allwinner-a10-pit.h
-index e4a644add9..c28ee5ca47 100644
+index e0f864a954..8c64c33f01 100644
 --- a/include/hw/timer/allwinner-a10-pit.h
 +++ b/include/hw/timer/allwinner-a10-pit.h
-@@ -5,37 +5,9 @@
- #include "hw/sysbus.h"
- 
- #define TYPE_AW_A10_PIT "allwinner-A10-timer"
--#define AW_A10_PIT(obj) OBJECT_CHECK(AwA10PITState, (obj), TYPE_AW_A10_PIT)
- 
- #define AW_PIT_TIMER_MAX        6
- 
--#define AW_A10_PIT_TIMER_NR    6
--
--#define AW_A10_PIT_TIMER_IRQ_EN    0
--#define AW_A10_PIT_TIMER_IRQ_ST    0x4
--
--#define AW_A10_PIT_TIMER_CONTROL   0x0
--#define AW_A10_PIT_TIMER_EN        0x1
--#define AW_A10_PIT_TIMER_RELOAD    0x2
--#define AW_A10_PIT_TIMER_MODE      0x80
--
--#define AW_A10_PIT_TIMER_INTERVAL  0x4
--#define AW_A10_PIT_TIMER_COUNT     0x8
--#define AW_A10_PIT_WDOG_CONTROL    0x90
--#define AW_A10_PIT_WDOG_MODE       0x94
--
--#define AW_A10_PIT_COUNT_CTL       0xa0
--#define AW_A10_PIT_COUNT_RL_EN     0x2
--#define AW_A10_PIT_COUNT_CLR_EN    0x1
--#define AW_A10_PIT_COUNT_LO        0xa4
--#define AW_A10_PIT_COUNT_HI        0xa8
--
--#define AW_A10_PIT_TIMER_BASE      0x10
--#define AW_A10_PIT_TIMER_BASE_END  \
--    (AW_A10_PIT_TIMER_BASE * AW_A10_PIT_TIMER_NR + AW_A10_PIT_TIMER_COUNT)
--
--#define AW_A10_PIT_DEFAULT_CLOCK   0x4
--
- typedef struct AwA10PITState AwA10PITState;
- 
- typedef struct AwA10TimerContext {
+@@ -24,6 +24,7 @@ struct AwA10PITState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+     /*< public >*/
++    size_t timer_count;
+     AwA10TimerContext timer[AW_PIT_TIMER_MAX];
+     MemoryRegion iomem;
+     uint32_t clk_freq[4];
 diff --git a/hw/timer/allwinner-a10-pit.c b/hw/timer/allwinner-a10-pit.c
-index b31a0bcd43..00f7cc492d 100644
+index ea92fdda32..3f47588703 100644
 --- a/hw/timer/allwinner-a10-pit.c
 +++ b/hw/timer/allwinner-a10-pit.c
-@@ -24,6 +24,36 @@
- #include "qemu/log.h"
- #include "qemu/module.h"
- 
-+#define AW_A10_PIT_TIMER_NR         6
-+
-+#define AW_A10_PIT_TIMER_IRQ_EN     0
-+#define AW_A10_PIT_TIMER_IRQ_ST     0x4
-+
-+#define AW_A10_PIT_TIMER_CONTROL    0x0
-+#define AW_A10_PIT_TIMER_EN         0x1
-+#define AW_A10_PIT_TIMER_RELOAD     0x2
-+#define AW_A10_PIT_TIMER_MODE       0x80
-+
-+#define AW_A10_PIT_TIMER_INTERVAL   0x4
-+#define AW_A10_PIT_TIMER_COUNT      0x8
-+#define AW_A10_PIT_WDOG_CONTROL     0x90
-+#define AW_A10_PIT_WDOG_MODE        0x94
-+
-+#define AW_A10_PIT_COUNT_CTL        0xa0
-+#define AW_A10_PIT_COUNT_RL_EN      0x2
-+#define AW_A10_PIT_COUNT_CLR_EN     0x1
-+#define AW_A10_PIT_COUNT_LO         0xa4
-+#define AW_A10_PIT_COUNT_HI         0xa8
-+
-+#define AW_A10_PIT_TIMER_BASE       0x10
-+#define AW_A10_PIT_TIMER_BASE_END   \
-+    (AW_A10_PIT_TIMER_BASE * AW_A10_PIT_TIMER_NR + AW_A10_PIT_TIMER_COUNT)
-+
-+#define AW_A10_PIT_DEFAULT_CLOCK    0x4
-+
-+#define AW_A10_PIT(obj) \
-+    OBJECT_CHECK(AwA10PITState, (obj), TYPE_AW_A10_PIT)
-+
- static void a10_pit_update_irq(AwA10PITState *s)
+@@ -58,7 +58,7 @@ static void a10_pit_update_irq(AwA10PITState *s)
  {
      int i;
+ 
+-    for (i = 0; i < AW_A10_PIT_TIMER_NR; i++) {
++    for (i = 0; i < s->timer_count; i++) {
+         qemu_set_irq(s->timer[i].irq,
+                      !!(s->irq_status & s->irq_enable & (1 << i)));
+     }
+@@ -271,7 +271,7 @@ static void a10_pit_reset(DeviceState *dev)
+     s->irq_status = 0;
+     a10_pit_update_irq(s);
+ 
+-    for (i = 0; i < AW_A10_PIT_TIMER_NR; i++) {
++    for (i = 0; i < s->timer_count; i++) {
+         s->timer[i].control = AW_A10_PIT_DEFAULT_CLOCK;
+         s->timer[i].interval = 0;
+         s->timer[i].count = 0;
+@@ -309,14 +309,16 @@ static void a10_pit_init(Object *obj)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     uint8_t i;
+ 
+-    for (i = 0; i < AW_A10_PIT_TIMER_NR; i++) {
++    s->timer_count = AW_A10_PIT_TIMER_NR;
++
++    for (i = 0; i < s->timer_count; i++) {
+         sysbus_init_irq(sbd, &s->timer[i].irq);
+     }
+     memory_region_init_io(&s->iomem, OBJECT(s), &a10_pit_ops, s,
+                           TYPE_AW_A10_PIT, 0x400);
+     sysbus_init_mmio(sbd, &s->iomem);
+ 
+-    for (i = 0; i < AW_A10_PIT_TIMER_NR; i++) {
++    for (i = 0; i < s->timer_count; i++) {
+         AwA10TimerContext *tc = &s->timer[i];
+ 
+         tc->container = s;
 -- 
 2.21.0
 
