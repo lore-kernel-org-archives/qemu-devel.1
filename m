@@ -2,80 +2,90 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644D2C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9D6C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:00:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D65424650
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB10224650
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:59:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fe/00OkQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D65424650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L40IF6uZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB10224650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihtVq-0002Im-2g
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:58:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47623)
+	id 1ihtXC-0004AJ-LD
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:59:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40617)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ihtRT-0005C4-UN
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:54:05 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ihtNU-0006vs-PR
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ihtRR-0004GL-09
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:54:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60483
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihtRQ-00046E-7J
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:54:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576752839;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=X7JQHJqpSE94r/hcxYv/KAfSo3Nkw8dKpmnEAlhICqI=;
- b=Fe/00OkQyeYZvRa6tKBhTyDtfVE+ebErzlY48QqVD3FzUY9NoPmBf4EeOn94nKUjb4doWj
- DfiEkRLNrHz4pMOeb8GVHUqYikBevT9Qa97S6StN/gzwSnqcHViZHeRhH7XnpoqyPHwSTZ
- EsrJW/Bjqn2xghPmhHSsHtlY0lfI5p8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-w3YvkL1oPHm8IoRmpDsb0Q-1; Thu, 19 Dec 2019 05:53:52 -0500
-X-MC-Unique: w3YvkL1oPHm8IoRmpDsb0Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B47C185432C;
- Thu, 19 Dec 2019 10:53:51 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-53.ams2.redhat.com [10.36.117.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CFD269401;
- Thu, 19 Dec 2019 10:53:50 +0000 (UTC)
-Date: Thu, 19 Dec 2019 11:53:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: qcow2 api not secured by mutex lock
-Message-ID: <20191219105347.GE5230@linux.fritz.box>
-References: <1ea7f93d-8f48-d565-70e7-0d66f1b80c1e@virtuozzo.com>
- <20191219100230.GC5230@linux.fritz.box>
- <28355f81-2eb3-4883-f05d-03e4fde4f74b@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1ihtNT-0000zm-Bq
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:56 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:53495)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ihtNT-0000uv-47
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:49:55 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id m24so4930791wmc.3
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 02:49:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=mUysB+KCVNDJImTrn1g1Sf4sZ1iooDukb6kMQuinDJU=;
+ b=L40IF6uZCGZS14txqiYJXwjArg8XcaWe4PMZnAXkRUPHNUdj+todE42Soo70HZB/ck
+ I0T6t/ILA0Bnj9yZZWQhen/ZzE8sQpN5D4psFQZb1Kz3RGkIr8BpRpLNhqh3nlPwjY+t
+ 7aBEpJS1uLi4t4GZ0IkBYsiSHgpHtUIo9r26cVs7Pv5NSVYqzNWWgOsA22kp+8PY1DRi
+ fjFPMvPNQWcRilcc/ge/P9qZi5ATlkhcq7bnABSw3KG8xX4jSbIQOjVeYCVH/Xx6G3Jg
+ DsONUKiYjldLoLZpymZthsX0cifKl3rgkYsO5DbsrQc9jg8bDde7dUCu+gdsou6Toa7n
+ e6Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=mUysB+KCVNDJImTrn1g1Sf4sZ1iooDukb6kMQuinDJU=;
+ b=EH6tFuH1KDyCheYruzJx8LCbz9nB1fZjeMyTi+d97YaxYxW0ofbZf7bkhkoGAUytML
+ rEtRWYCs3m0G00LposkDyDpXiZUJ+m4tN+lMGL2MxgpdKXGUt9IMPYwaysKpWUtFLIYH
+ 4Nn6qEFWbzLfI2NUF5UCV/1KhyoM+ztlWhonRndRaoFAwbr5qAzSsFBut8v67o5uLt33
+ jsQRVMl7BfaTYTa7zQryN+1082E149FWxagHnmfQdc5A+T/T37f4uDk8/yfyCO6V3nP9
+ FZY5NTtFT4VGMZW/0TZ/A6/If+tFfEpbd6OfQMzFBwuCpJKNRh65za+CbtLEfRbmleYL
+ 8uOQ==
+X-Gm-Message-State: APjAAAXDHWcs7KcOCcnZXy6N1/ShVd7HLTnCsSxzhKxe8YAqb/V0VxIm
+ IVjtxnrOkihDZllUsrmzThYhyhq1CVU=
+X-Google-Smtp-Source: APXvYqzrAH4TxD2GflO5d0TzrmPW+JwZkMxkCfwLy0FvxDpAgyFinr2w8MXfhhC3Vhf3vrl0+782cg==
+X-Received: by 2002:a1c:9acf:: with SMTP id c198mr8926967wme.175.1576752594098; 
+ Thu, 19 Dec 2019 02:49:54 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id b67sm6052291wmc.38.2019.12.19.02.49.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 19 Dec 2019 02:49:46 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A02001FF9D;
+ Thu, 19 Dec 2019 10:49:35 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Subject: [PULL 13/25] Add a mutex to guarantee single writer to qemu_logfile
+ handle.
+Date: Thu, 19 Dec 2019 10:49:22 +0000
+Message-Id: <20191219104934.866-14-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191219104934.866-1-alex.bennee@linaro.org>
+References: <20191219104934.866-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <28355f81-2eb3-4883-f05d-03e4fde4f74b@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,75 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, Robert Foley <robert.foley@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---YZ5djTAD1cGYuMQK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Robert Foley <robert.foley@linaro.org>
 
-Am 19.12.2019 um 11:35 hat Max Reitz geschrieben:
-> On 19.12.19 11:02, Kevin Wolf wrote:
-> > Am 18.12.2019 um 11:28 hat Vladimir Sementsov-Ogievskiy geschrieben:
->=20
-> [...]
->=20
-> >> qcow2_write_snapshots actually called unlocked from
-> >> qcow2_check_fix_snapshot_table.. It seems unsafe.
-> >=20
-> > This is curious, I'm not sure why you would drop the lock there. Max?
-> >=20
-> > bdrv_flush() calls would have to replaced with qcow2_write_caches() to
-> > avoid a deadlock, but otherwise I don't see why we would want to drop
-> > the lock.
-> >=20
-> > Of course, this should only be called from qemu-img check, so in
-> > practice it's probably not a bug.
->=20
-> Maybe I should have read all of this before replying...  Is
-> qcow2_write_caches() all that we want?  I mean, bdrv_flush() also
-> flushes the children (well, at least the file child right now).
+Also added qemu_logfile_init() for initializing the logfile mutex.
 
-You're probably right and we want to call qcow2_cache_flush() instead. I
-forgot that we split these functions.
+Note that inside qemu_set_log() we needed to add a pair of
+qemu_mutex_unlock() calls in order to avoid a double lock in
+qemu_log_close().  This unavoidable temporary ugliness will be
+cleaned up in a later patch in this series.
 
-> OTOH qcow2_write_snapshots() probably does not need to take care of
-> actually flushing @bs, does it?
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20191118211528.3221-4-robert.foley@linaro.org>
 
-I think it wants to get the right ordering to avoid corruption on
-crashes, so we certainly do want to flush all the way down to the disk.
-
-At least after qcow2_alloc_clusters(), it needs to flush bs itself; for
-the second one, it could be enough to flush bs->file, but flushing bs
-can't hurt.
-
-Kevin
-
---YZ5djTAD1cGYuMQK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJd+1a7AAoJEH8JsnLIjy/WNasQAMnuH6ltCWo1rqB9dr63QjKt
-W7DZhkTiCHOP1+3OUF6j9pI+fCsZrcQmcZNSRQdRcHxeOetdX9g3A7xJVzvzxIjP
-KO7sSHXCblGpAtN0OzqU5HUFn+LdMUIGiWTpv1NcrBE0NTxTYQ7eibyzVTkUxJJE
-fmQ/h7taDnKKvtbOu0Kgn99Mzyz4z2ZjBiQ3C4c8r/nK4PpXc+w4OCx6/BKGoB86
-BX9oNPGQlzVqPCAet43YiE/e3PmpORgrPmqwd73mviIadl5upAClJ7NDwvNQpiLk
-oia/LrboAfNclUFNAxAVzlRze2T29zQX6l2e5UtMDOfvUz/AtPrNWQ3nGwRCUPpk
-0ihSHguYz7O3sMA6mvIJmkRHI1YdVzvK49FY1q/ICjUULc8hnLkAqJVA0fdwgcOQ
-/fpgSETuCy/uKKXW2QBSXa2d9v/Qui9M4Z1rX0rNz8fA/3dcdsxxHWS4ycMk2Zm5
-fsfdxpbXWLURueulNA6qGLHquOPAb6paw40Ofa2ECPuVGjg8sazyNyYjKFJXSZPx
-kbW1LKtrZcdUNBJh6H/kiPYQhoh9riXKEepHjoTBKBwaRCPitLD7kKFLrGD5Ybrv
-4Cl3Mkr854q5P+0jeKc7QT9hiC6iOEPREvw1lIIzmlJUzSPYM3HpjFtRSVpoASbv
-vgcC9n30W54D3P/1VlDs
-=c29w
------END PGP SIGNATURE-----
-
---YZ5djTAD1cGYuMQK--
+diff --git a/util/log.c b/util/log.c
+index 417d16ec66e..953a66b5a8d 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -24,8 +24,10 @@
+ #include "qapi/error.h"
+ #include "qemu/cutils.h"
+ #include "trace/control.h"
++#include "qemu/thread.h"
+ 
+ static char *logfilename;
++static QemuMutex qemu_logfile_mutex;
+ FILE *qemu_logfile;
+ int qemu_loglevel;
+ static int log_append = 0;
+@@ -49,6 +51,11 @@ int qemu_log(const char *fmt, ...)
+     return ret;
+ }
+ 
++static void __attribute__((__constructor__)) qemu_logfile_init(void)
++{
++    qemu_mutex_init(&qemu_logfile_mutex);
++}
++
+ static bool log_uses_own_buffers;
+ 
+ /* enable or disable low levels log */
+@@ -70,7 +77,9 @@ void qemu_set_log(int log_flags)
+     if (qemu_loglevel && (!is_daemonized() || logfilename)) {
+         need_to_open_file = true;
+     }
++    qemu_mutex_lock(&qemu_logfile_mutex);
+     if (qemu_logfile && !need_to_open_file) {
++        qemu_mutex_unlock(&qemu_logfile_mutex);
+         qemu_log_close();
+     } else if (!qemu_logfile && need_to_open_file) {
+         if (logfilename) {
+@@ -105,6 +114,7 @@ void qemu_set_log(int log_flags)
+ #endif
+             log_append = 1;
+         }
++        qemu_mutex_unlock(&qemu_logfile_mutex);
+     }
+ }
+ 
+@@ -240,12 +250,14 @@ void qemu_log_flush(void)
+ /* Close the log file */
+ void qemu_log_close(void)
+ {
++    qemu_mutex_lock(&qemu_logfile_mutex);
+     if (qemu_logfile) {
+         if (qemu_logfile != stderr) {
+             fclose(qemu_logfile);
+         }
+         qemu_logfile = NULL;
+     }
++    qemu_mutex_unlock(&qemu_logfile_mutex);
+ }
+ 
+ const QEMULogItem qemu_log_items[] = {
+-- 
+2.20.1
 
 
