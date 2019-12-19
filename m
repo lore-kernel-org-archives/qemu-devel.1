@@ -2,77 +2,66 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C946BC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:20:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86A9C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:36:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92F942465E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:20:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3E7E24676
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:36:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=comstyle.com header.i=@comstyle.com header.b="rFp3s7tJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92F942465E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=comstyle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="oknEmw2u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E7E24676
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii49M-0006Zt-Kj
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 17:20:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37287)
+	id 1ii4Pc-0004t2-Rx
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 17:36:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <brad@comstyle.com>) id 1ii48Y-00066H-K2
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:19:15 -0500
+ (envelope-from <sstabellini@kernel.org>) id 1ii4Ox-0004Ua-Ty
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:36:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <brad@comstyle.com>) id 1ii48X-0000TY-FI
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:19:14 -0500
-Received: from speedy.comstyle.com ([206.51.28.2]:43508 helo=mail.comstyle.com)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <brad@comstyle.com>) id 1ii48X-0008Jw-5T
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:19:13 -0500
-Received: from mail.comstyle.com (localhost [127.0.0.1])
- by mail.comstyle.com (Postfix) with ESMTP id 47f5gJ2Pm4z4glt;
- Thu, 19 Dec 2019 17:11:08 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=comstyle.com; h=subject
- :from:to:cc:references:message-id:date:mime-version:in-reply-to
- :content-type; s=selector1; bh=izCzLK/jCFUstwtvV3SzYgyxqsE=; b=r
- Fp3s7tJ51h1384aA2AUGPgX5EKiP/gmKvy/BDFwPKLCMKEaLFxqZ/Th+UkdXxgZv
- qH0pDV19Rowri4QFnke8M3o4M/Sk5J6AB1T0TKGgXr36Xrc7TMuQWSOR5rbeoIN3
- SOD0b5I5Zi947ldWP27VmRk5CEXPBCmxDvkU0pB3fo=
-DomainKey-Signature: a=rsa-sha1; c=nofws; d=comstyle.com; h=subject:from
- :to:cc:references:message-id:date:mime-version:in-reply-to
- :content-type; q=dns; s=selector1; b=N1mFxd/78ii8uUErWo0OTx7CclC
- 1cBaYdJKfq7TDXcC+4IwGvBWADfWMeDGZjbXl+idHPvG8kHqqjh36B9fT70KERfM
- DdnLcMQ6AX8DMMC7DMRpfk2dy9w083kouBr5/fizLGNwCZGlAazNlBAylCEZtju9
- MGRVW0/daPdivMU0=
-Received: from [192.168.100.236]
- (toroon0812w-lp140-02-64-229-180-196.dsl.bell.ca [64.229.180.196])
- (using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
- (No client certificate requested) (Authenticated sender: brad)
- by mail.comstyle.com (Postfix) with ESMTPSA id 47f5gJ15zGz4gls;
- Thu, 19 Dec 2019 17:11:08 -0500 (EST)
-Subject: Re: [PATCH] tests/vm: update openbsd to release 6.6
-From: Brad Smith <brad@comstyle.com>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20191018102443.26469-1-kraxel@redhat.com>
- <ca7e9094-bb0b-08f5-7523-778f89c4b333@comstyle.com>
-Message-ID: <7dd63098-305e-331a-08c3-63c58366d7f1@comstyle.com>
-Date: Thu, 19 Dec 2019 17:11:39 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101
- Thunderbird/72.0
+ (envelope-from <sstabellini@kernel.org>) id 1ii4Ow-0006aU-3m
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:36:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55802)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+ id 1ii4Ov-0006Ts-Or
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:36:10 -0500
+Received: from localhost (c-67-164-102-47.hsd1.ca.comcast.net [67.164.102.47])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
+ bits)) (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 22AED206EC;
+ Thu, 19 Dec 2019 22:36:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1576794968;
+ bh=jnhZinny5FDsNaBpY5u/Ewx8bBBI6DkcRM+qOj8ivNA=;
+ h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+ b=oknEmw2us6FqBnGdr9Eisbm1oZmC25dlhZnLHbPPSajXyLbzpIiJ3rIImLRDDbDcs
+ i2nWdVYuqH7RAgQ70sbVqJRjrLgH/sPmO5NF3mpM+s08J6BrP4zFHSuCi4usZ5ilVy
+ wOpgQM+zODuL/cnYv9X2CXtEpG27O08VUx+JWfh0=
+Date: Thu, 19 Dec 2019 14:36:07 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+X-X-Sender: sstabellini@sstabellini-ThinkPad-T480s
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH] 9p: init_in_iov_from_pdu can truncate the size
+In-Reply-To: <2734053.qHGH40kZ6z@silver>
+Message-ID: <alpine.DEB.2.21.1912191434260.9832@sstabellini-ThinkPad-T480s>
+References: <20191219004251.23763-1-sstabellini@kernel.org>
+ <2734053.qHGH40kZ6z@silver>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-In-Reply-To: <ca7e9094-bb0b-08f5-7523-778f89c4b333@comstyle.com>
-Content-Type: multipart/alternative;
- boundary="------------68CC689081D27CE271FB7145"
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 206.51.28.2
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 198.145.29.99
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,97 +73,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: anthony.perard@citrix.com, groug@kaod.org,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-devel@nongnu.org,
+ Stefano Stabellini <stefano.stabellini@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------68CC689081D27CE271FB7145
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On Thu, 19 Dec 2019, Christian Schoenebeck wrote:
+> On Donnerstag, 19. Dezember 2019 01:42:51 CET Stefano Stabellini wrote:
+> > From: Stefano Stabellini <stefano.stabellini@xilinx.com>
+> > 
+> > init_in_iov_from_pdu might not be able to allocate the full buffer size
+> > requested, which comes from the client and could be larger than the
+> > transport has available at the time of the request. Specifically, this
+> > can happen with read operations, with the client requesting a read up to
+> > the max allowed, which might be more than the transport has available at
+> > the time.
+> 
+> I haven't looked thoroughly at this yet, but that's about addressing a 
+> temporary, not a permanent transport buffer size limitation, right? 
 
-ping.
+Yes, that is correct.
 
-On 11/13/2019 10:33 PM, Brad Smith wrote:
-> Thanks.
->
-> Reviewed-by: Brad Smith<brad@comstyle.com>
-> On 10/18/2019 6:24 AM, Gerd Hoffmann wrote:
->> Signed-off-by: Gerd Hoffmann<kraxel@redhat.com>
->> ---
->>   tests/vm/openbsd | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
->> index b92c39f89a6f..9f82cd459fde 100755
->> --- a/tests/vm/openbsd
->> +++ b/tests/vm/openbsd
->> @@ -22,8 +22,8 @@ class OpenBSDVM(basevm.BaseVM):
->>       name = "openbsd"
->>       arch = "x86_64"
->>   
->> -    link ="https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso"
->> -    csum = "38d1f8cadd502f1c27bf05c5abde6cc505dd28f3f34f8a941048ff9a54f9f608"
->> +    link ="https://cdn.openbsd.org/pub/OpenBSD/6.6/amd64/install66.iso"
->> +    csum = "b22e63df56e6266de6bbeed8e9be0fbe9ee2291551c5bc03f3cc2e4ab9436ee3"
->>       size = "20G"
->>       pkgs = [
->>           # tools
 
---------------68CC689081D27CE271FB7145
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 7bit
+> Because if it was a permanent one, then probably an adjusted (lowered)
+> msize should be returned on R_version response to client as well.
+> 
+> I wonder why I never triggered this issue, because I was experimenting with 
+> huge msize values for 9pfs performance checks. Was there anything specific to 
+> trigger this issue?
 
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    <p>ping.<br>
-    </p>
-    <div class="moz-cite-prefix">On 11/13/2019 10:33 PM, Brad Smith
-      wrote:<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:ca7e9094-bb0b-08f5-7523-778f89c4b333@comstyle.com">
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-      <pre>Thanks.
+Lots of heavy usage by a Java application booting. Nothing like Java to
+stress the system :-)
 
-Reviewed-by: Brad Smith <a class="moz-txt-link-rfc2396E" href="mailto:brad@comstyle.com" moz-do-not-send="true">&lt;brad@comstyle.com&gt;</a>
-</pre>
-      <div class="moz-cite-prefix">On 10/18/2019 6:24 AM, Gerd Hoffmann
-        wrote:<br>
-      </div>
-      <blockquote type="cite"
-        cite="mid:20191018102443.26469-1-kraxel@redhat.com">
-        <pre class="moz-quote-pre" wrap="">Signed-off-by: Gerd Hoffmann <a class="moz-txt-link-rfc2396E" href="mailto:kraxel@redhat.com" moz-do-not-send="true">&lt;kraxel@redhat.com&gt;</a>
----
- tests/vm/openbsd | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index b92c39f89a6f..9f82cd459fde 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -22,8 +22,8 @@ class OpenBSDVM(basevm.BaseVM):
-     name = "openbsd"
-     arch = "x86_64"
- 
--    link = <a class="moz-txt-link-rfc2396E" href="https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso" moz-do-not-send="true">"https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso"</a>
--    csum = "38d1f8cadd502f1c27bf05c5abde6cc505dd28f3f34f8a941048ff9a54f9f608"
-+    link = <a class="moz-txt-link-rfc2396E" href="https://cdn.openbsd.org/pub/OpenBSD/6.6/amd64/install66.iso" moz-do-not-send="true">"https://cdn.openbsd.org/pub/OpenBSD/6.6/amd64/install66.iso"</a>
-+    csum = "b22e63df56e6266de6bbeed8e9be0fbe9ee2291551c5bc03f3cc2e4ab9436ee3"
-     size = "20G"
-     pkgs = [
-         # tools
-</pre>
-      </blockquote>
-    </blockquote>
-  </body>
-</html>
+> > Today the implementation of init_in_iov_from_pdu throws an error, both
+> > Xen and Virtio.
+> > 
+> > Instead, change the V9fsTransport interface so that the size becomes a
+> > pointer and can be limited by the implementation of
+> > init_in_iov_from_pdu.
+> > 
+> > Change both the Xen and Virtio implementations to set the size to the
+> > size of the buffer they managed to allocate, instead of throwing an
+> > error.
+> > 
+> > Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+> > CC: groug@kaod.org
+> > CC: anthony.perard@citrix.com
+> > ---
+> >  hw/9pfs/9p.c               | 22 +++++++++++++++-------
+> >  hw/9pfs/9p.h               |  2 +-
+> >  hw/9pfs/virtio-9p-device.c | 10 +++-------
+> >  hw/9pfs/xen-9p-backend.c   | 12 ++++--------
+> >  4 files changed, 23 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index bdf7919abf..d6c89ce608 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -1682,22 +1682,30 @@ out_nofid:
+> >   * with qemu_iovec_destroy().
+> >   */
+> >  static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
+> > -                                    size_t skip, size_t size,
+> > +                                    size_t skip, size_t *size,
+> >                                      bool is_write)
+> >  {
+> >      QEMUIOVector elem;
+> >      struct iovec *iov;
+> >      unsigned int niov;
+> > +    size_t alloc_size = *size + skip;
+> > 
+> >      if (is_write) {
+> > -        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, size +
+> > skip); +        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov,
+> > alloc_size); } else {
+> > -        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size +
+> > skip); +        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov,
+> > &alloc_size); +    }
+> > +
+> > +    if (alloc_size < skip)
+> > +    {
+> > +        *size = 0;
+> > +    } else {
+> > +        *size = alloc_size - skip;
+> >      }
+> >
+> 
+> Code style nitpicking:  
+> 
+> ERROR: that open brace { should be on the previous line
+> #56: FILE: hw/9pfs/9p.c:1699:
+> +    if (alloc_size < skip)
+> +    {
 
---------------68CC689081D27CE271FB7145--
+Oops, sorry! I can fix that.
+
+
+> > 
+> >  static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
+> > @@ -1722,7 +1730,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu,
+> > V9fsFidState *fidp, }
+> >      offset += err;
+> > 
+> > -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
+> > +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
+> >      err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
+> >                      ((char *)fidp->fs.xattr.value) + off,
+> >                      read_count);
+> > @@ -1852,7 +1860,7 @@ static void coroutine_fn v9fs_read(void *opaque)
+> >          QEMUIOVector qiov;
+> >          int32_t len;
+> > 
+> > -        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, max_count,
+> > false); +        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4,
+> > &max_count, false); qemu_iovec_init(&qiov, qiov_full.niov);
+> >          do {
+> >              qemu_iovec_reset(&qiov);
+> > @@ -2085,7 +2093,7 @@ static void coroutine_fn v9fs_write(void *opaque)
+> >          return;
+> >      }
+> >      offset += err;
+> > -    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, count, true);
+> > +    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &count, true);
+> >      trace_v9fs_write(pdu->tag, pdu->id, fid, off, count, qiov_full.niov);
+> > 
+> >      fidp = get_fid(pdu, fid);
+> > diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> > index 8883761b2c..50f7e21da6 100644
+> > --- a/hw/9pfs/9p.h
+> > +++ b/hw/9pfs/9p.h
+> > @@ -365,7 +365,7 @@ struct V9fsTransport {
+> >      ssize_t     (*pdu_vunmarshal)(V9fsPDU *pdu, size_t offset, const char
+> > *fmt, va_list ap);
+> >      void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+> > -                                        unsigned int *pniov, size_t size);
+> > +                                        unsigned int *pniov, size_t *size);
+> > void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+> > unsigned int *pniov, size_t size); void        (*push_and_notify)(V9fsPDU
+> > *pdu);
+> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> > index 775e8ff766..68873c3f5f 100644
+> > --- a/hw/9pfs/virtio-9p-device.c
+> > +++ b/hw/9pfs/virtio-9p-device.c
+> > @@ -145,19 +145,15 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu,
+> > size_t offset, }
+> > 
+> >  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
+> > -                                        unsigned int *pniov, size_t size)
+> > +                                        unsigned int *pniov, size_t *size)
+> >  {
+> >      V9fsState *s = pdu->s;
+> >      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem = v->elems[pdu->idx];
+> >      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
+> > 
+> > -    if (buf_size < size) {
+> > -        VirtIODevice *vdev = VIRTIO_DEVICE(v);
+> > -
+> > -        virtio_error(vdev,
+> > -                     "VirtFS reply type %d needs %zu bytes, buffer has
+> > %zu", -                     pdu->id + 1, size, buf_size);
+> > +    if (buf_size < *size) {
+> > +        *size = buf_size;
+> >      }
+> > 
+> >      *piov = elem->in_sg;
+> > diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+> > index 3f54a21c76..3994a356d4 100644
+> > --- a/hw/9pfs/xen-9p-backend.c
+> > +++ b/hw/9pfs/xen-9p-backend.c
+> > @@ -187,7 +187,7 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+> > static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+> >                                            struct iovec **piov,
+> >                                            unsigned int *pniov,
+> > -                                          size_t size)
+> > +                                          size_t *size)
+> >  {
+> >      Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
+> >      Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
+> > @@ -197,15 +197,11 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU
+> > *pdu, g_free(ring->sg);
+> > 
+> >      ring->sg = g_malloc0(sizeof(*ring->sg) * 2);
+> > -    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
+> > +    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
+> > 
+> >      buf_size = iov_size(ring->sg, num);
+> > -    if (buf_size  < size) {
+> > -        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+> > -                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
+> > -                buf_size);
+> > -        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
+> > -        xen_9pfs_disconnect(&xen_9pfs->xendev);
+> > +    if (buf_size  < *size) {
+> > +        *size = buf_size;
+> >      }
+> > 
+> >      *piov = ring->sg;
+> 
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
+> 
 
