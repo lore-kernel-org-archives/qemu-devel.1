@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51AA5C2D0C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EC7C2D0D1
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:23:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B46E222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:23:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B46E222C2
+	by mail.kernel.org (Postfix) with ESMTPS id 022F5222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:23:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 022F5222C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii0S6-0004QU-VM
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 13:23:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43285)
+	id 1ii0ST-00051P-Sj
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 13:23:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40739)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ii0IN-0001DM-H7
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:13:08 -0500
+ (envelope-from <clg@kaod.org>) id 1ii0I0-0000bN-FQ
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:12:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ii0IL-000667-6C
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:13:07 -0500
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:43930)
+ (envelope-from <clg@kaod.org>) id 1ii0Hz-0004HZ-5a
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:12:44 -0500
+Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:54552)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ii0IK-0005ye-U6
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:13:05 -0500
-Received: from player734.ha.ovh.net (unknown [10.108.1.15])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7BE6211B861
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 19:13:03 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ii0Hy-0004CE-Rl
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:12:43 -0500
+Received: from player734.ha.ovh.net (unknown [10.108.54.97])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 60CCE129E37
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 19:12:41 +0100 (CET)
 Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
  [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player734.ha.ovh.net (Postfix) with ESMTPSA id 18CC7D6D63F9;
- Thu, 19 Dec 2019 18:12:58 +0000 (UTC)
+ by player734.ha.ovh.net (Postfix) with ESMTPSA id E93AFD6D6398;
+ Thu, 19 Dec 2019 18:12:35 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v2 10/13] ppc/pnv: Add a "pnor" const link property to the BMC
- internal simulator
-Date: Thu, 19 Dec 2019 19:11:52 +0100
-Message-Id: <20191219181155.32530-11-clg@kaod.org>
+Subject: [PATCH v2 06/13] pnv/xive: Use device_class_set_parent_realize()
+Date: Thu, 19 Dec 2019 19:11:48 +0100
+Message-Id: <20191219181155.32530-7-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191219181155.32530-1-clg@kaod.org>
 References: <20191219181155.32530-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 13668143398012816358
+X-Ovh-Tracer-Id: 13661950946887699430
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdduuddguddtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgephe
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdduuddguddtkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgepud
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.73.133
+X-Received-From: 46.105.34.219
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,75 +76,91 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-This allows to get rid of a call to qdev_get_machine().
+The XIVE router base class currently inherits an empty realize hook
+from the sysbus device base class, but it will soon implement one
+of its own to perform some sanity checks. Do the preliminary plumbing
+to have it called.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/pnv.h | 2 +-
- hw/ppc/pnv.c         | 2 +-
- hw/ppc/pnv_bmc.c     | 8 +++++---
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ include/hw/ppc/pnv_xive.h | 10 ++++++++++
+ hw/intc/pnv_xive.c        | 10 ++++++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 4c13d4394a11..d016ab0d0319 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -231,7 +231,7 @@ PnvChip *pnv_get_chip(uint32_t chip_id);
-  */
- void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
- void pnv_bmc_powerdown(IPMIBmc *bmc);
--IPMIBmc *pnv_bmc_create(void);
-+IPMIBmc *pnv_bmc_create(PnvPnor *pnor);
+diff --git a/include/hw/ppc/pnv_xive.h b/include/hw/ppc/pnv_xive.h
+index 4d641db691c8..ba9bbeab88c3 100644
+--- a/include/hw/ppc/pnv_xive.h
++++ b/include/hw/ppc/pnv_xive.h
+@@ -16,6 +16,10 @@ struct PnvChip;
 =20
- /*
-  * POWER8 MMIO base addresses
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index e638cdc93091..34549aefa2fc 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -815,7 +815,7 @@ static void pnv_init(MachineState *machine)
-     g_free(chip_typename);
+ #define TYPE_PNV_XIVE "pnv-xive"
+ #define PNV_XIVE(obj) OBJECT_CHECK(PnvXive, (obj), TYPE_PNV_XIVE)
++#define PNV_XIVE_CLASS(klass)                                   \
++    OBJECT_CLASS_CHECK(PnvXiveClass, (klass), TYPE_PNV_XIVE)
++#define PNV_XIVE_GET_CLASS(obj)                                 \
++    OBJECT_GET_CLASS(PnvXiveClass, (obj), TYPE_PNV_XIVE)
 =20
-     /* Create the machine BMC simulator */
--    pnv->bmc =3D pnv_bmc_create();
-+    pnv->bmc =3D pnv_bmc_create(pnv->pnor);
+ #define XIVE_BLOCK_MAX      16
 =20
-     /* Instantiate ISA bus on chip 0 */
-     pnv->isa_bus =3D pnv_isa_create(pnv->chips[0], &error_fatal);
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-index 07fa1e1c7e45..8863354c1c08 100644
---- a/hw/ppc/pnv_bmc.c
-+++ b/hw/ppc/pnv_bmc.c
-@@ -143,8 +143,8 @@ static uint16_t bytes_to_blocks(uint32_t bytes)
- static void hiomap_cmd(IPMIBmcSim *ibs, uint8_t *cmd, unsigned int cmd_l=
-en,
-                        RspBuffer *rsp)
+@@ -87,6 +91,12 @@ typedef struct PnvXive {
+     uint64_t      edt[XIVE_TABLE_EDT_MAX];
+ } PnvXive;
+=20
++typedef struct PnvXiveClass {
++    XiveRouterClass parent_class;
++
++    DeviceRealize parent_realize;
++} PnvXiveClass;
++
+ void pnv_xive_pic_print_info(PnvXive *xive, Monitor *mon);
+=20
+ #endif /* PPC_PNV_XIVE_H */
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 66970a60733b..1962f884d6de 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1816,10 +1816,17 @@ static void pnv_xive_init(Object *obj)
+ static void pnv_xive_realize(DeviceState *dev, Error **errp)
  {
--    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
--    PnvPnor *pnor =3D pnv->pnor;
-+    PnvPnor *pnor =3D PNV_PNOR(object_property_get_link(OBJECT(ibs), "pn=
-or",
-+                                                      &error_abort));
-     uint32_t pnor_size =3D pnor->size;
-     uint32_t pnor_addr =3D PNOR_SPI_OFFSET;
-     bool readonly =3D false;
-@@ -217,11 +217,13 @@ static const IPMINetfn hiomap_netfn =3D {
-  * Instantiate the machine BMC. PowerNV uses the QEMU internal
-  * simulator but it could also be external.
-  */
--IPMIBmc *pnv_bmc_create(void)
-+IPMIBmc *pnv_bmc_create(PnvPnor *pnor)
- {
-     Object *obj;
+     PnvXive *xive =3D PNV_XIVE(dev);
++    PnvXiveClass *pxc =3D PNV_XIVE_GET_CLASS(dev);
+     XiveSource *xsrc =3D &xive->ipi_source;
+     XiveENDSource *end_xsrc =3D &xive->end_source;
+     Error *local_err =3D NULL;
 =20
-     obj =3D object_new(TYPE_IPMI_BMC_SIMULATOR);
-+    object_ref(OBJECT(pnor));
-+    object_property_add_const_link(obj, "pnor", OBJECT(pnor), &error_abo=
-rt);
-     object_property_set_bool(obj, true, "realized", &error_fatal);
++    pxc->parent_realize(dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     assert(xive->chip);
+     assert(xive->system_memory);
 =20
-     /* Install the HIOMAP protocol handlers to access the PNOR */
+@@ -1950,10 +1957,12 @@ static void pnv_xive_class_init(ObjectClass *klas=
+s, void *data)
+     XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
+     XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
+     XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
++    PnvXiveClass *pxc =3D PNV_XIVE_CLASS(klass);
+=20
+     xdc->dt_xscom =3D pnv_xive_dt_xscom;
+=20
+     dc->desc =3D "PowerNV XIVE Interrupt Controller";
++    device_class_set_parent_realize(dc, pnv_xive_realize, &pxc->parent_r=
+ealize);
+     dc->realize =3D pnv_xive_realize;
+     dc->props =3D pnv_xive_properties;
+=20
+@@ -1974,6 +1983,7 @@ static const TypeInfo pnv_xive_info =3D {
+     .instance_init =3D pnv_xive_init,
+     .instance_size =3D sizeof(PnvXive),
+     .class_init    =3D pnv_xive_class_init,
++    .class_size    =3D sizeof(PnvXiveClass),
+     .interfaces    =3D (InterfaceInfo[]) {
+         { TYPE_PNV_XSCOM_INTERFACE },
+         { }
 --=20
 2.21.0
 
