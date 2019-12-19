@@ -2,48 +2,46 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CBFC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF258C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:05:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B88752465E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:05:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B88752465E
+	by mail.kernel.org (Postfix) with ESMTPS id 885FA227BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:05:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 885FA227BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38083 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihsgf-0004lm-6h
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:05:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39778)
+	id 1ihsgg-0004p8-Q5
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:05:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ihsf9-0002of-2x
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:04:07 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ihsf3-0002el-KI
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:04:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ihsf3-0007xx-Lu
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:04:06 -0500
-Received: from relay.sw.ru ([185.231.240.75]:57636)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ihsf2-0007uF-6I
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:04:01 -0500
+Received: from relay.sw.ru ([185.231.240.75]:57606)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ihsev-0007gM-MA; Thu, 19 Dec 2019 05:03:53 -0500
+ id 1ihsev-0007Y6-Fn; Thu, 19 Dec 2019 05:03:53 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ihseu-0004j2-6p; Thu, 19 Dec 2019 13:03:52 +0300
+ id 1ihser-0004j2-2a; Thu, 19 Dec 2019 13:03:49 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 10/10] block/qcow2-bitmap: use bdrv_dirty_bitmap_next_dirty
-Date: Thu, 19 Dec 2019 13:03:48 +0300
-Message-Id: <20191219100348.24827-11-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 00/10] Further bitmaps improvements
+Date: Thu, 19 Dec 2019 13:03:38 +0300
+Message-Id: <20191219100348.24827-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191219100348.24827-1-vsementsov@virtuozzo.com>
-References: <20191219100348.24827-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
@@ -65,65 +63,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-store_bitmap_data() loop does bdrv_set_dirty_iter() on each iteration,
-which means that we actually don't need iterator itself and we can use
-simpler bitmap API.
+Hi!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2-bitmap.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+The main feature here is improvement of _next_dirty_area API, which I'm
+going to use then for backup / block-copy.
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index c6c8ebbe89..015f5d18d2 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1289,7 +1289,6 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
-     const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
-     uint8_t *buf = NULL;
--    BdrvDirtyBitmapIter *dbi;
-     uint64_t *tb;
-     uint64_t tb_size =
-             size_to_clusters(s,
-@@ -1308,12 +1307,14 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-         return NULL;
-     }
- 
--    dbi = bdrv_dirty_iter_new(bitmap);
-     buf = g_malloc(s->cluster_size);
-     limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-     assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
- 
--    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
-+    offset = 0;
-+    while ((offset = bdrv_dirty_bitmap_next_dirty(bitmap, offset, INT64_MAX))
-+           >= 0)
-+    {
-         uint64_t cluster = offset / limit;
-         uint64_t end, write_size;
-         int64_t off;
-@@ -1360,19 +1361,17 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-             break;
-         }
- 
--        bdrv_set_dirty_iter(dbi, end);
-+        offset = end;
-     }
- 
-     *bitmap_table_size = tb_size;
-     g_free(buf);
--    bdrv_dirty_iter_free(dbi);
- 
-     return tb;
- 
- fail:
-     clear_bitmap_table(bs, tb, tb_size);
-     g_free(buf);
--    bdrv_dirty_iter_free(dbi);
-     g_free(tb);
- 
-     return NULL;
+v3: rebase on current master. Mirror don't use _next_dirty_area any
+more, so mirror chunks dropped (patches 05 and 07) and 07 commit message
+changed.
+
+Vladimir Sementsov-Ogievskiy (10):
+  hbitmap: assert that we don't create bitmap larger than INT64_MAX
+  hbitmap: move hbitmap_iter_next_word to hbitmap.c
+  hbitmap: unpublish hbitmap_iter_skip_words
+  hbitmap: drop meta bitmaps as they are unused
+  block/dirty-bitmap: switch _next_dirty_area and _next_zero to int64_t
+  block/dirty-bitmap: add _next_dirty API
+  block/dirty-bitmap: improve _next_dirty_area API
+  nbd/server: introduce NBDExtentArray
+  nbd/server: use bdrv_dirty_bitmap_next_dirty_area
+  block/qcow2-bitmap: use bdrv_dirty_bitmap_next_dirty
+
+ include/block/dirty-bitmap.h |   9 +-
+ include/qemu/hbitmap.h       |  97 +++--------
+ block/dirty-bitmap.c         |  16 +-
+ block/qcow2-bitmap.c         |  11 +-
+ nbd/server.c                 | 242 +++++++++++++--------------
+ tests/test-hbitmap.c         | 314 +++++++++++++----------------------
+ util/hbitmap.c               | 133 +++++++++------
+ 7 files changed, 366 insertions(+), 456 deletions(-)
+
 -- 
 2.21.0
 
