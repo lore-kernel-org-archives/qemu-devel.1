@@ -2,100 +2,81 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EEB0C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:17:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B632BC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:26:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A0622465E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:17:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 819932176D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:26:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I4do1gvU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0622465E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWottMKG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819932176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihjVF-0000TT-KO
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 19:17:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36282)
+	id 1ihjeV-0003fT-Ml
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 19:26:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihjUI-0007zx-SZ
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:16:21 -0500
+ (envelope-from <crosa@redhat.com>) id 1ihjdd-0002kY-Q5
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:25:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihjUH-0003Hc-Kn
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:16:18 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33613
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <crosa@redhat.com>) id 1ihjdb-0002O6-IX
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:25:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39421
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihjUH-0003H2-G4
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:16:17 -0500
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ihjda-0002Mi-Up
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:25:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576714576;
+ s=mimecast20190719; t=1576715154;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hHwP+/ukecQmU1fm7oQoSQBEw1AB6ka1bNyk7IMCrj8=;
- b=I4do1gvUWi4dGOuWZA3atIfy1OkNh9VdsBH44AGno5/Mp5VfbxaV3Fqdt1rDUw8kGVJxrv
- lHfW9qzkpA0YfzW3U3XmxBptFPtCOszXhnfy1AUevp/rFvs6sirCLL2amkKoYKk2KqKbfA
- pTRL029rKOmViWZdszhiyZnnulUDHyQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-1AKacpo4O0WCL5S1nSY53A-1; Wed, 18 Dec 2019 19:16:15 -0500
-Received: by mail-wr1-f69.google.com with SMTP id h30so1575808wrh.5
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 16:16:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=hHwP+/ukecQmU1fm7oQoSQBEw1AB6ka1bNyk7IMCrj8=;
- b=H2I4LUW0TtoJwnDnOaJMltx+gw2jcg9TRa90kYhPwA71Gesfr4mAUq6qGPtzwpU/GB
- dgARVjo37THckVF1BwCL3O5RUGQo4bBBjCMvRoVC2t1qGKCklCZv/uM6LusHd2846sv2
- p6uFCHdwdveV6CULl9aSWniAPIs45EAM9SUFlXU9fQOtANqShAv6bhIAzU+djVI4orb8
- h9H1DBi+LSgg4V/OGStGin34mKQIwZjCheFZr6dDvzNSvj1cgwrQ+B/RAyE/4EbxJ9A+
- pMQRaaRj47TPVIVcStCPqO4MhP6xw+fGXEm3zWWOI1Cg/YwQhi/NJk4zZ5jsopB9ccEV
- lszg==
-X-Gm-Message-State: APjAAAUMscKEucHdC1IEvkqNtL0yRkrxqIZqg+fmDLYIHp+XYGYqhBlQ
- drBTWiME0Wgq7pShCH0vA0cX+zB/hKHHAfrrHW19ej/9lpa1wCSrO0t8lW7mmOQcM8HpYdnvXP/
- KKZ4HrpXVmm4zvF4=
-X-Received: by 2002:a7b:cd07:: with SMTP id f7mr6184604wmj.37.1576714574219;
- Wed, 18 Dec 2019 16:16:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx+Y7xRBWqA3f4ES0CHK8SyqK6ZQDnjbhba91gJG6kNlDdqv8V87l7P3N0hkojekhnNKMa9lw==
-X-Received: by 2002:a7b:cd07:: with SMTP id f7mr6184592wmj.37.1576714574021;
- Wed, 18 Dec 2019 16:16:14 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id t125sm760678wmf.17.2019.12.18.16.16.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 18 Dec 2019 16:16:13 -0800 (PST)
-Subject: Re: [PATCH v8 3/4] Acceptance tests: add make targets to download
- images
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+ bh=wzqDzRfFCR1o3Y9Ndmz5oBeJ1T0sEEHyyL2/A5Iu3hw=;
+ b=BWottMKGGypShOfs+fjXm4Rll9M/2DFkTw8Wso2YkTd8mEEQDwNhUqWpgkh5LXTuDCA3O5
+ uHneJ1Mynu1wYGcPsRF2gy7St2JVa1+O2TmufKGN4jNXxzjipg+rYMS4H2o7Ncry16vYo/
+ 5AZYk2wtRQniDIGT1NiwyckVTpGAfOM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-B9jN7OdQPQ6vL_7uUk59zA-1; Wed, 18 Dec 2019 19:25:51 -0500
+X-MC-Unique: B9jN7OdQPQ6vL_7uUk59zA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0741801E6D;
+ Thu, 19 Dec 2019 00:25:49 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-25.gru2.redhat.com
+ [10.97.116.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 28D5F26E43;
+ Thu, 19 Dec 2019 00:25:42 +0000 (UTC)
+Date: Wed, 18 Dec 2019 19:25:39 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v8 1/4] Acceptance tests: introduce BLD_DIR, SRC_DIR and
+ LNK_DIR
+Message-ID: <20191219002539.GA29918@localhost.localdomain>
 References: <20191218232500.23530-1-crosa@redhat.com>
- <20191218232500.23530-4-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e1dc21f1-a349-508e-db11-5aee59f31f2e@redhat.com>
-Date: Thu, 19 Dec 2019 01:16:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ <20191218232500.23530-2-crosa@redhat.com>
+ <3362e435-73be-f5c3-a672-6208f2bacd95@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191218232500.23530-4-crosa@redhat.com>
-Content-Language: en-US
-X-MC-Unique: 1AKacpo4O0WCL5S1nSY53A-1
+In-Reply-To: <3362e435-73be-f5c3-a672-6208f2bacd95@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,73 +88,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/19/19 12:24 AM, Cleber Rosa wrote:
-> The newly introduced "boot linux" tests make use of Linux images that
-> are larger than usual, and fall into what Avocado calls "vmimages",
-> and can be referred to by name, version and architecture.
-> 
-> The images can be downloaded automatically during the test. But, to
-> make for more reliable test results, this introduces a target that
-> will download the vmimages for the architectures that have been
-> configured and are available for the currently used distro (Fedora
-> 31).
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   tests/Makefile.include | 17 +++++++++++++++--
->   1 file changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index b381387048..78a6f089ff 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -1177,7 +1177,20 @@ $(TESTS_RESULTS_DIR):
->   
->   check-venv: $(TESTS_VENV_DIR)
->   
-> -check-acceptance: check-venv $(TESTS_RESULTS_DIR)
-> +FEDORA_31_ARCHES_CANDIDATES=$(patsubst ppc64,ppc64le,$(TARGETS))
-> +FEDORA_31_ARCHES := x86_64 aarch64 ppc64le s390x
-> +FEDORA_31_DOWNLOAD=$(filter $(FEDORA_31_ARCHES),$(FEDORA_31_ARCHES_CANDIDATES))
-> +
-> +# download one specific Fedora 31 image
-> +get-vmimage-fedora-31-%: $(check-venv)
-> +	$(call quiet-command, \
-> +             $(TESTS_VENV_DIR)/bin/python -m avocado vmimage get \
-> +             --distro=fedora --distro-version=31 --arch=$*)
-> +
-> +# download all vm images, according to defined targets
-> +get-vmimage: $(patsubst %,get-vmimage-fedora-31-%, $(FEDORA_31_DOWNLOAD))
-> +
-> +check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vmimage
->   	$(call quiet-command, \
->               $(TESTS_VENV_DIR)/bin/python -m avocado \
->               --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
-> @@ -1188,7 +1201,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
->   
->   # Consolidated targets
->   
-> -.PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean
-> +.PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean get-vmimage
->   check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schema/doc-good.texi
->   check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
->   check-block: $(patsubst %,check-%, $(check-block-y))
-> 
+--lrZ03NoBR/3+SXJZ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We have both 'make vm-help' and 'make check-help'. The check-acceptance 
-target is in check-help. We get vm image... confusing.
+On Thu, Dec 19, 2019 at 01:02:39AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> On 12/19/19 12:24 AM, Cleber Rosa wrote:
+> > Some tests may benefit from using resources from a build directory.
+> > This introduces three variables that can help tests find resources in
+> > those directories.
+> >=20
+> > First, a BLD_DIR is assumed to exist, given that the primary form of
+> > running the acceptance tests is from a build directory (which may or
+> > may not be the same as the source tree, that is, the SRC_DIR).
+>=20
+> Can we name this BUILD_DIR?
+>
 
-Anyway, can you list this new target, with a hint about the storage size 
-required?
-Can you add an entry in the 'make
+Yes, of course.
+
+> This would be more in line with the other buildsys files (configure/make)=
+.
+>
+
+That's a good point.
+
+> > If the directory containing the acceptance tests happens to be a link
+> > to a directory (kept as LNK_DIR), it's assumed to it points to the
+> > source tree (SRC_DIR), which is the behavior defined on the QEMU
+> > Makefiles.  If the directory containing the acceptance tests is not a
+> > link, then a in-tree build is assumed, and the BLD_DIR and SRC_DIR are
+> > the same and LNK_DIR is set None.
+>=20
+> Similarly, can we name this CURRENT_DIR instead of LNK_DIR?
+>
+
+Yes, or maybe even drop it?  TBH, I can only see use cases for build
+and source dirs.  So, I assume you'd propose SRC_DIR would be
+SOURCE_DIR?
+
+Cheers,
+- Cleber.
+
+--lrZ03NoBR/3+SXJZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl36w4EACgkQZX6NM6Xy
+CfO0+hAAuR0Hog/pBJ7nPKMp1iGWS9SdIGMWx2LGWi/fLQmdxmjaI8yYtZqf0hu1
+Mr4wKmAzDyVXByZFhLvs6mVrv7y3rqVZDbdKK9yswaleausVqL6bkTgjnFnAXEkT
+QZKUY1NpdSUeBePCp6eOItGtDGg/Ef0a/1vCPNdl+mX0z+VFgnwu4af2X79gHaYd
+uOPuGbcS9DvitjJNrw0F6CnJPObCeWI9E/k6cBKBtT7tSqEOBa3ty2dl+HAMJNDt
+iCDu3SeCSdLYYdqGhifEsHQLlECv4DQh0yWYjOprPMkSEA6A9PQY5oHpjewcr+Bn
+xtvFScgqD0eRDQ3XV3xVdZsAsiFND0AIF15Z81UA/rhTjCp7jn00sdzKagVCRcWa
+IfCuuaeQr2Cwnvnc3HTgoFbcAuZFxckdYUUbKR8fNtZj1BDe0ylr5qzxb5qbMBEF
+XL742xW9SpRem6iGBh59D7V+c2wj4sSjvOMYoBUtszXKCTo7U99iy2kf3WEXaPV0
+gyco9M4OL+M3Qw5IJE+7VPaxLK7aZTzXJAJw0fAFzBKdkNSUwdj4JIwH71qG5aPu
+Pzyx2yWctdJHfEeGi4gYlckWfm9t5S0gyDnNqPp1HqYs9H9q/At7E2VhoXLRW9hI
+TZ9KSHP/hdLaIY4BrXT7KuBNcPQ6PDPGnDEhaozUeWfwe0lwB/I=
+=FSmf
+-----END PGP SIGNATURE-----
+
+--lrZ03NoBR/3+SXJZ--
 
 
