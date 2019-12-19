@@ -2,96 +2,98 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0738CC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 638AFC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9F492067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23E7E20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:37:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6IkgA4u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9F492067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBQ2IoGZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23E7E20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihvxf-0002rA-G4
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:35:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53128)
+	id 1ihvzB-00058I-OY
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:37:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ihvqL-0001XQ-2c
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:27:54 -0500
+ (envelope-from <mst@redhat.com>) id 1ihvqy-0002YK-N0
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ihvqJ-0004gB-GF
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:27:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44020
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1ihvqx-0008DU-9A
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:32 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35075
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvqJ-0004da-Bj
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:27:51 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvqx-0008BE-1n
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576762070;
+ s=mimecast20190719; t=1576762110;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lKKnmIlMXAiHs2ciw2UuZ4upMkVLi7gPIVS0NfnoTbA=;
- b=F6IkgA4uE/kKQcmbFa+71bgDiQWAyANR5VamGwP9yygaL1FS7gme3N+IrnQndwKna6WPpW
- Cqgf5L+5puxkhEiOgHwInWiUPLhRK8wklqnu6lMslt0mU69Rrpxs6Ofc+cONQ3tVCTluev
- mQkBiFKU1eiHKMaKURMsaKBMrn97rso=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-277-UCoA-7y-NvmSnfIY6KMszA-1; Thu, 19 Dec 2019 08:27:49 -0500
-Received: by mail-qk1-f200.google.com with SMTP id 11so1358671qkk.11
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:27:49 -0800 (PST)
+ bh=9TnHo7VvJZaLFzHYDnog4vzTE/uU8KgG0+PD95HCZAE=;
+ b=IBQ2IoGZo5J6qNHexwHYPenOVO5bIIisloXzklr18MTedXVgHrlUOIJsxwwhp7iJTY3JaD
+ BDbMBW0Ej3/thCW6OJQSY1ol3Vja1pD6OM2zvkcBSGCf/4rOZbmp9pBlkQup2htwlIu5zw
+ fRPstW+vAs6QZ2BQcmdKL3J1ntaHgQw=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-RtLigwRtM9ebhVYi5uljAA-1; Thu, 19 Dec 2019 08:28:26 -0500
+Received: by mail-qv1-f72.google.com with SMTP id dw11so3590567qvb.16
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:28:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=5GbppUzD6Fm8YJOtPEK4xw/kFiMIjjx9zvi6lU+LCW4=;
- b=QyMJCEaaX3E/7FIK9JF1aCCuoXRkyUk/0cpAx7NEYsp7NwQkmSPvsKV1uXSmGjRDTJ
- Zh8iFUR9aYIjt5kv0cScJCfBjM7zRRLSiU5DpZPGsjEYeyjMPbwVCBEyo7tdsM+UTHUU
- 3UppOBEOT7Ti/dM8BWgKvsSbHnxPWsdgzh2r/DG5rEdhI+N4lMX/tSV8DDxVV647x71F
- O0YcHoQ68fMJwwkoz9QzwQbuilVCYaZncnZyuxO6IK/m/i4ttfH9nWQH4bejWpGHm5Os
- SpuXzo/c6uAeZ7o04VhjpOemhBnTTZF6DRGINpd1JRiuuWVHN8PIRREsH9HucPi3Gs3C
- J2eA==
-X-Gm-Message-State: APjAAAVpU0Sv5lWnaUZCqTtWh7nXOqdQf5dJ3AteIiNty5nN1NmliWam
- vDYm8PMtI1qHx9li41V+A7x8mPlU3EftyL6sv/fTNUchuG7visBo8DjkinAPHOsYIWMZKmMAsTs
- tMEeAb9+EveDo64I=
-X-Received: by 2002:a37:7cc7:: with SMTP id x190mr8061380qkc.10.1576762068728; 
- Thu, 19 Dec 2019 05:27:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyl+ePPzdRdfeYDPONNpTljMD15lgAxbD+kaz3E0DXkyaEzvJAVkye7+vT1khgdrcYRT8/2/g==
-X-Received: by 2002:a37:7cc7:: with SMTP id x190mr8061349qkc.10.1576762068465; 
- Thu, 19 Dec 2019 05:27:48 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=yLxJY7rN1k5OoWYN8rEjFXzk7p6lyE6U8ZaTa83HTg0=;
+ b=bQc73j7jHrQRlgpcjBHWDlWrlqZ0cAA1DTgD5FMHOa6M24+P2aHN7uKqR1/iFKSZ9H
+ 3ymKcwaWR8unYCerwV0tiUlJfRNN39kXk+e+pAL3FP0vFfD3IOvsY/sygRd2j7X7PWOp
+ Mbb7RIWtYNrsCxjy//NEfcdJyk9wEmIAil0NowXo34LVAHzHarRposBriqoOy5ZYsbc6
+ ouHLRQT03yG3s6LpX/EefdlH/J0Ni85UB/vpZkjGFGgrwO/l5fqvgYg6LxekGxPt42yc
+ zEL/bv+WawYS5qyLSdQ5ioO2QWEceGrKNqx8npF/NdTy6XSwvaJqIrMhVjGEq73Q7uOc
+ Tjfg==
+X-Gm-Message-State: APjAAAVO73BZaz6ZSd45N+TGSvC31+1cFMCsemM1scoTDRI84H/lZWhi
+ +f2GWN8KKg3Lqup/AdDZigh5Ov+k6ve3Xjh06ycJxqh+MT+Tr/BbfMY2wXv2p46S24iNLlVNtLj
+ GUAaqI/TvWhiDYzY=
+X-Received: by 2002:a0c:c389:: with SMTP id o9mr7601388qvi.232.1576762104153; 
+ Thu, 19 Dec 2019 05:28:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwM7ha9P8MMuBct7HkWloorJVvXOXiC3l+pb0wjbxcrjT+TFNJJFgaazcjfYaXTq0Nw9RFthQ==
+X-Received: by 2002:a0c:c389:: with SMTP id o9mr7601368qvi.232.1576762103922; 
+ Thu, 19 Dec 2019 05:28:23 -0800 (PST)
 Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id 200sm1732921qkn.79.2019.12.19.05.27.45
+ by smtp.gmail.com with ESMTPSA id c20sm1935269qtc.13.2019.12.19.05.28.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 05:27:47 -0800 (PST)
-Date: Thu, 19 Dec 2019 08:27:43 -0500
+ Thu, 19 Dec 2019 05:28:23 -0800 (PST)
+Date: Thu, 19 Dec 2019 08:28:18 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/24] virtio: don't enable notifications during polling
-Message-ID: <20191219132621.16595-11-mst@redhat.com>
+Subject: [PULL 16/24] hmat acpi: Build Memory Side Cache Information
+ Structure(s)
+Message-ID: <20191219132621.16595-17-mst@redhat.com>
 References: <20191219132621.16595-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20191219132621.16595-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: UCoA-7y-NvmSnfIY6KMszA-1
+X-MC-Unique: RtLigwRtM9ebhVYi5uljAA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,161 +105,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Liu Jingqi <jingqi.liu@intel.com>,
+ Tao Xu <tao3.xu@intel.com>, Markus Armbruster <armbru@redhat.com>,
+ Daniel Black <daniel@linux.ibm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Virtqueue notifications are not necessary during polling, so we disable
-them.  This allows the guest driver to avoid MMIO vmexits.
-Unfortunately the virtio-blk and virtio-scsi handler functions re-enable
-notifications, defeating this optimization.
+This structure describes memory side cache information for memory
+proximity domains if the memory side cache is present and the
+physical device forms the memory side cache.
+The software could use this information to effectively place
+the data in memory to maximize the performance of the system
+memory that use the memory side cache.
 
-Fix virtio-blk and virtio-scsi emulation so they leave notifications
-disabled.  The key thing to remember for correctness is that polling
-always checks one last time after ending its loop, therefore it's safe
-to lose the race when re-enabling notifications at the end of polling.
-
-There is a measurable performance improvement of 5-10% with the null-co
-block driver.  Real-life storage configurations will see a smaller
-improvement because the MMIO vmexit overhead contributes less to
-latency.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20191209210957.65087-1-stefanha@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Message-Id: <20191213011929.2520-7-tao3.xu@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/virtio.h |  1 +
- hw/block/virtio-blk.c      |  9 +++++++--
- hw/scsi/virtio-scsi.c      |  9 +++++++--
- hw/virtio/virtio.c         | 12 ++++++------
- 4 files changed, 21 insertions(+), 10 deletions(-)
+ hw/acpi/hmat.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 68 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 777772475c..b69d517496 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -228,6 +228,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int ve=
-rsion_id);
-=20
- void virtio_notify_config(VirtIODevice *vdev);
-=20
-+bool virtio_queue_get_notification(VirtQueue *vq);
- void virtio_queue_set_notification(VirtQueue *vq, int enable);
-=20
- int virtio_queue_ready(VirtQueue *vq);
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 4c357d2928..c4e55fb3de 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -764,13 +764,16 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *=
-vq)
- {
-     VirtIOBlockReq *req;
-     MultiReqBuffer mrb =3D {};
-+    bool suppress_notifications =3D virtio_queue_get_notification(vq);
-     bool progress =3D false;
-=20
-     aio_context_acquire(blk_get_aio_context(s->blk));
-     blk_io_plug(s->blk);
-=20
-     do {
--        virtio_queue_set_notification(vq, 0);
-+        if (suppress_notifications) {
-+            virtio_queue_set_notification(vq, 0);
-+        }
-=20
-         while ((req =3D virtio_blk_get_request(s, vq))) {
-             progress =3D true;
-@@ -781,7 +784,9 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq=
-)
-             }
-         }
-=20
--        virtio_queue_set_notification(vq, 1);
-+        if (suppress_notifications) {
-+            virtio_queue_set_notification(vq, 1);
-+        }
-     } while (!virtio_queue_empty(vq));
-=20
-     if (mrb.num_reqs) {
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index e8b2b64d09..f080545f48 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -597,12 +597,15 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQue=
-ue *vq)
- {
-     VirtIOSCSIReq *req, *next;
-     int ret =3D 0;
-+    bool suppress_notifications =3D virtio_queue_get_notification(vq);
-     bool progress =3D false;
-=20
-     QTAILQ_HEAD(, VirtIOSCSIReq) reqs =3D QTAILQ_HEAD_INITIALIZER(reqs);
-=20
-     do {
--        virtio_queue_set_notification(vq, 0);
-+        if (suppress_notifications) {
-+            virtio_queue_set_notification(vq, 0);
-+        }
-=20
-         while ((req =3D virtio_scsi_pop_req(s, vq))) {
-             progress =3D true;
-@@ -622,7 +625,9 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue=
- *vq)
-             }
-         }
-=20
--        virtio_queue_set_notification(vq, 1);
-+        if (suppress_notifications) {
-+            virtio_queue_set_notification(vq, 1);
-+        }
-     } while (ret !=3D -EINVAL && !virtio_queue_empty(vq));
-=20
-     QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 7bc6a9455e..95d8ff8508 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -432,6 +432,11 @@ static void virtio_queue_packed_set_notification(VirtQ=
-ueue *vq, int enable)
-     }
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index 4635d45dee..7c24bb5371 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -143,14 +143,62 @@ static void build_hmat_lb(GArray *table_data, HMAT_LB=
+_Info *hmat_lb,
+     g_free(entry_list);
  }
 =20
-+bool virtio_queue_get_notification(VirtQueue *vq)
++/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-147=
+ */
++static void build_hmat_cache(GArray *table_data, uint8_t total_levels,
++                             NumaHmatCacheOptions *hmat_cache)
 +{
-+    return vq->notification;
++    /*
++     * Cache Attributes: Bits [3:0] =E2=80=93 Total Cache Levels
++     * for this Memory Proximity Domain
++     */
++    uint32_t cache_attr =3D total_levels;
++
++    /* Bits [7:4] : Cache Level described in this structure */
++    cache_attr |=3D (uint32_t) hmat_cache->level << 4;
++
++    /* Bits [11:8] - Cache Associativity */
++    cache_attr |=3D (uint32_t) hmat_cache->associativity << 8;
++
++    /* Bits [15:12] - Write Policy */
++    cache_attr |=3D (uint32_t) hmat_cache->policy << 12;
++
++    /* Bits [31:16] - Cache Line size in bytes */
++    cache_attr |=3D (uint32_t) hmat_cache->line << 16;
++
++    /* Type */
++    build_append_int_noprefix(table_data, 2, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Length */
++    build_append_int_noprefix(table_data, 32, 4);
++    /* Proximity Domain for the Memory */
++    build_append_int_noprefix(table_data, hmat_cache->node_id, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
++    /* Memory Side Cache Size */
++    build_append_int_noprefix(table_data, hmat_cache->size, 8);
++    /* Cache Attributes */
++    build_append_int_noprefix(table_data, cache_attr, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /*
++     * Number of SMBIOS handles (n)
++     * Linux kernel uses Memory Side Cache Information Structure
++     * without SMBIOS entries for now, so set Number of SMBIOS handles
++     * as 0.
++     */
++    build_append_int_noprefix(table_data, 0, 2);
 +}
 +
- void virtio_queue_set_notification(VirtQueue *vq, int enable)
+ /* Build HMAT sub table structures */
+ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_s=
+tate)
  {
-     vq->notification =3D enable;
-@@ -3410,17 +3415,12 @@ static bool virtio_queue_host_notifier_aio_poll(voi=
-d *opaque)
- {
-     EventNotifier *n =3D opaque;
-     VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
--    bool progress;
+     uint16_t flags;
+     uint32_t num_initiator =3D 0;
+     uint32_t initiator_list[MAX_NODES];
+-    int i, hierarchy, type;
++    int i, hierarchy, type, cache_level, total_levels;
+     HMAT_LB_Info *hmat_lb;
++    NumaHmatCacheOptions *hmat_cache;
 =20
-     if (!vq->vring.desc || virtio_queue_empty(vq)) {
-         return false;
+     for (i =3D 0; i < numa_state->num_nodes; i++) {
+         flags =3D 0;
+@@ -184,6 +232,25 @@ static void hmat_build_table_structs(GArray *table_dat=
+a, NumaState *numa_state)
+             }
+         }
      }
-=20
--    progress =3D virtio_queue_notify_aio_vq(vq);
--
--    /* In case the handler function re-enabled notifications */
--    virtio_queue_set_notification(vq, 0);
--    return progress;
-+    return virtio_queue_notify_aio_vq(vq);
++
++    /*
++     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
++     * Table 5-147
++     */
++    for (i =3D 0; i < numa_state->num_nodes; i++) {
++        total_levels =3D 0;
++        for (cache_level =3D 1; cache_level < HMAT_LB_LEVELS; cache_level+=
++) {
++            if (numa_state->hmat_cache[i][cache_level]) {
++                total_levels++;
++            }
++        }
++        for (cache_level =3D 0; cache_level <=3D total_levels; cache_level=
+++) {
++            hmat_cache =3D numa_state->hmat_cache[i][cache_level];
++            if (hmat_cache) {
++                build_hmat_cache(table_data, total_levels, hmat_cache);
++            }
++        }
++    }
  }
 =20
- static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_st=
+ate)
 --=20
 MST
 
