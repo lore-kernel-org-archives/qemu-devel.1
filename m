@@ -2,97 +2,79 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42101C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A545EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:50:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 005A124679
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F4882467E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:50:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKgwFfWq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 005A124679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UP33kVx+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F4882467E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwAe-0004Tk-P4
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:48:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39186)
+	id 1ihwC4-00075R-Er
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:50:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45724)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ihvsf-00053M-Hw
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:30:19 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ihw4M-0004Qa-Ic
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:42:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ihvsc-0007Qp-R0
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:30:17 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58050
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ihw4K-0007Om-1x
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:42:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26242
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvsc-0007Nn-Gw
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:30:14 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ihw4J-0007Ic-QP
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:42:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576762213;
+ s=mimecast20190719; t=1576762938;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qRixv/P79kxY74uYbLq18UmxPGC6mi06pOMRV9g5ikg=;
- b=JKgwFfWqAtdZh2Y5AtH7rWiLIRS+hkdiuscP8nYOgD8XM2uwcZA2xU9OIMUH2WeLzUoyls
- RXj0Psie3o8gJhA8hYh388yvPjQ8lC+2IpEzr3x4g2hNRn1dFV8c2e2mibIZGXGFBFgLpp
- 5EGA+SSlTN3t/dDHWrW9DjWOn5Epmqg=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-413-UguUD9rlMJGKiCxiN1H_QQ-1; Thu, 19 Dec 2019 08:27:39 -0500
-Received: by mail-qk1-f199.google.com with SMTP id 65so3587049qkl.23
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:27:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=OAefkcAtOZgXGyKa55BHKeK0Ha6uDf6rtRTKOYAg8DI=;
- b=Qcz3ZMXDcO1Ftx69VUBh/m1OGaFEWZKu60RvKTf4KBK6ZNFVHKqIQW0HRTvQS4eTsW
- /6Rf7e9qeONUoMg2En0a2hK9YKWoHsWROyapjV/nJn+UpksA2uoIdMeoMj6jE67eA696
- 68dPvXiB88K7nuD80MWeNujfTlEB4DIIy2DufkZ5QvE93OSEhGf0WQ+jhn8sp6TnsQKy
- nmILf2z96c6kTYlCLi5CCIjr8mAyYy4OdwPSDIL0XWVBtp049VqZ04JaiQwHZ6Of1tAs
- HzGD9DwkVSmoddHIHSrCsy+1AYhG/MufnOdJaTsks8RpvlI98V9kHQxNjjs9ejGg6qFM
- vhmQ==
-X-Gm-Message-State: APjAAAWg81FBBTZ2fOl7RxzWIZhC0Xeb1wMGHNrjYrq5APUWpW4qliCl
- vZqUbEDjl4EGxA9GxdcUMY+fhg0UnFcFZ24T0gja3bggvCcMfEC0GMINv/GUitFt8/br+JA6rlo
- JHdT4twFeetHhG0Y=
-X-Received: by 2002:a0c:9e6d:: with SMTP id z45mr7575475qve.65.1576762058154; 
- Thu, 19 Dec 2019 05:27:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwuRLaL+bf0/Vh60qsaI6YPdMNz5CAt2HinJ03tsRTmkEVvGnY6O4FQSijWmfvMK46d5mWUPQ==
-X-Received: by 2002:a0c:9e6d:: with SMTP id z45mr7575421qve.65.1576762057717; 
- Thu, 19 Dec 2019 05:27:37 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id g16sm1715392qkk.61.2019.12.19.05.27.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 05:27:36 -0800 (PST)
-Date: Thu, 19 Dec 2019 08:27:32 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 08/24] virtio-pci: disable vring processing when bus-mastering
- is disabled
-Message-ID: <20191219132621.16595-9-mst@redhat.com>
-References: <20191219132621.16595-1-mst@redhat.com>
+ bh=mlF+ruUrfIzeWXyr2bW4B8+XSuSxJurnJTbcrMLPShg=;
+ b=UP33kVx+YSGyecE05ooIAB3DyvNwJUJ8aKaESaIhRSAOyzDAQhACUV/JdQEFMq9XqxOJxl
+ FImD8dmYDBQeHs2RXeWpikR5lNOWjxc7TWiPR9DZnlgyfhlKS+zrCk5wtHTQ5QoDAUOZF1
+ ksM8GMFMBx1UzmYWDRZvK5BWn5Z/fD0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-TdnHyEPMM2SDAQQBjcfxMw-1; Thu, 19 Dec 2019 08:42:15 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 948AD18552AA;
+ Thu, 19 Dec 2019 13:42:14 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8CEDB60C87;
+ Thu, 19 Dec 2019 13:42:10 +0000 (UTC)
+Date: Thu, 19 Dec 2019 14:42:09 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 0/2] numa: stop abusing numa_mem_supported
+Message-ID: <20191219144209.3c80dd69@redhat.com>
+In-Reply-To: <20191219083024-mutt-send-email-mst@kernel.org>
+References: <1576154936-178362-1-git-send-email-imammedo@redhat.com>
+ <20191219142851.42cd33ff@redhat.com>
+ <20191219083024-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20191219132621.16595-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: UguUD9rlMJGKiCxiN1H_QQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: TdnHyEPMM2SDAQQBjcfxMw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,373 +86,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: pbonzini@redhat.com, Tao Xu <tao3.xu@intel.com>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
+On Thu, 19 Dec 2019 08:30:34 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Currently the SLOF firmware for pseries guests will disable/re-enable
-a PCI device multiple times via IO/MEM/MASTER bits of PCI_COMMAND
-register after the initial probe/feature negotiation, as it tends to
-work with a single device at a time at various stages like probing
-and running block/network bootloaders without doing a full reset
-in-between.
+> On Thu, Dec 19, 2019 at 02:28:51PM +0100, Igor Mammedov wrote:
+> > On Thu, 12 Dec 2019 13:48:54 +0100
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > A fix  and cleanup for a mistakes that slipped by me in
+> > >   aa57020774 (numa: move numa global variable nb_numa_nodes into MachineState)  
+> > 
+> > ping,
+> > 
+> > could someone pick it up please?  
+> 
+> Looks more like Eduardo's thing.
 
-In QEMU, when PCI_COMMAND_MASTER is disabled we disable the
-corresponding IOMMU memory region, so DMA accesses (including to vring
-fields like idx/flags) will no longer undergo the necessary
-translation. Normally we wouldn't expect this to happen since it would
-be misbehavior on the driver side to continue driving DMA requests.
+Yep if he is still available,
+but I wasn't sure with coming winter break.
 
-However, in the case of pseries, with iommu_platform=3Don, we trigger the
-following sequence when tearing down the virtio-blk dataplane ioeventfd
-in response to the guest unsetting PCI_COMMAND_MASTER:
+In addition, this patch will be prerequisite for disabling
+deprecated '-numa node,mem'
+hence broadcast ping to make sure it won't get lost.
 
-  #2  0x0000555555922651 in virtqueue_map_desc (vdev=3Dvdev@entry=3D0x55555=
-6dbcfb0, p_num_sg=3Dp_num_sg@entry=3D0x7fffe657e1a8, addr=3Daddr@entry=3D0x=
-7fffe657e240, iov=3Diov@entry=3D0x7fffe6580240, max_num_sg=3Dmax_num_sg@ent=
-ry=3D1024, is_write=3Dis_write@entry=3Dfalse, pa=3D0, sz=3D0)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:757
-  #3  0x0000555555922a89 in virtqueue_pop (vq=3Dvq@entry=3D0x555556dc8660, =
-sz=3Dsz@entry=3D184)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:950
-  #4  0x00005555558d3eca in virtio_blk_get_request (vq=3D0x555556dc8660, s=
-=3D0x555556dbcfb0)
-      at /home/mdroth/w/qemu.git/hw/block/virtio-blk.c:255
-  #5  0x00005555558d3eca in virtio_blk_handle_vq (s=3D0x555556dbcfb0, vq=3D=
-0x555556dc8660)
-      at /home/mdroth/w/qemu.git/hw/block/virtio-blk.c:776
-  #6  0x000055555591dd66 in virtio_queue_notify_aio_vq (vq=3Dvq@entry=3D0x5=
-55556dc8660)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:1550
-  #7  0x000055555591ecef in virtio_queue_notify_aio_vq (vq=3D0x555556dc8660=
-)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:1546
-  #8  0x000055555591ecef in virtio_queue_host_notifier_aio_poll (opaque=3D0=
-x555556dc86c8)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:2527
-  #9  0x0000555555d02164 in run_poll_handlers_once (ctx=3Dctx@entry=3D0x555=
-55688bfc0, timeout=3Dtimeout@entry=3D0x7fffe65844a8)
-      at /home/mdroth/w/qemu.git/util/aio-posix.c:520
-  #10 0x0000555555d02d1b in try_poll_mode (timeout=3D0x7fffe65844a8, ctx=3D=
-0x55555688bfc0)
-      at /home/mdroth/w/qemu.git/util/aio-posix.c:607
-  #11 0x0000555555d02d1b in aio_poll (ctx=3Dctx@entry=3D0x55555688bfc0, blo=
-cking=3Dblocking@entry=3Dtrue)
-      at /home/mdroth/w/qemu.git/util/aio-posix.c:639
-  #12 0x0000555555d0004d in aio_wait_bh_oneshot (ctx=3D0x55555688bfc0, cb=
-=3Dcb@entry=3D0x5555558d5130 <virtio_blk_data_plane_stop_bh>, opaque=3Dopaq=
-ue@entry=3D0x555556de86f0)
-      at /home/mdroth/w/qemu.git/util/aio-wait.c:71
-  #13 0x00005555558d59bf in virtio_blk_data_plane_stop (vdev=3D<optimized o=
-ut>)
-      at /home/mdroth/w/qemu.git/hw/block/dataplane/virtio-blk.c:288
-  #14 0x0000555555b906a1 in virtio_bus_stop_ioeventfd (bus=3Dbus@entry=3D0x=
-555556dbcf38)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio-bus.c:245
-  #15 0x0000555555b90dbb in virtio_bus_stop_ioeventfd (bus=3Dbus@entry=3D0x=
-555556dbcf38)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio-bus.c:237
-  #16 0x0000555555b92a8e in virtio_pci_stop_ioeventfd (proxy=3D0x555556db4e=
-40)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio-pci.c:292
-  #17 0x0000555555b92a8e in virtio_write_config (pci_dev=3D0x555556db4e40, =
-address=3D<optimized out>, val=3D1048832, len=3D<optimized out>)
-      at /home/mdroth/w/qemu.git/hw/virtio/virtio-pci.c:613
-
-I.e. the calling code is only scheduling a one-shot BH for
-virtio_blk_data_plane_stop_bh, but somehow we end up trying to process
-an additional virtqueue entry before we get there. This is likely due
-to the following check in virtio_queue_host_notifier_aio_poll:
-
-  static bool virtio_queue_host_notifier_aio_poll(void *opaque)
-  {
-      EventNotifier *n =3D opaque;
-      VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
-      bool progress;
-
-      if (!vq->vring.desc || virtio_queue_empty(vq)) {
-          return false;
-      }
-
-      progress =3D virtio_queue_notify_aio_vq(vq);
-
-namely the call to virtio_queue_empty(). In this case, since no new
-requests have actually been issued, shadow_avail_idx =3D=3D last_avail_idx,
-so we actually try to access the vring via vring_avail_idx() to get
-the latest non-shadowed idx:
-
-  int virtio_queue_empty(VirtQueue *vq)
-  {
-      bool empty;
-      ...
-
-      if (vq->shadow_avail_idx !=3D vq->last_avail_idx) {
-          return 0;
-      }
-
-      rcu_read_lock();
-      empty =3D vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
-      rcu_read_unlock();
-      return empty;
-
-but since the IOMMU region has been disabled we get a bogus value (0
-usually), which causes virtio_queue_empty() to falsely report that
-there are entries to be processed, which causes errors such as:
-
-  "virtio: zero sized buffers are not allowed"
-
-or
-
-  "virtio-blk missing headers"
-
-and puts the device in an error state.
-
-This patch works around the issue by introducing virtio_set_disabled(),
-which sets a 'disabled' flag to bypass checks like virtio_queue_empty()
-when bus-mastering is disabled. Since we'd check this flag at all the
-same sites as vdev->broken, we replace those checks with an inline
-function which checks for either vdev->broken or vdev->disabled.
-
-The 'disabled' flag is only migrated when set, which should be fairly
-rare, but to maintain migration compatibility we disable it's use for
-older machine types. Users requiring the use of the flag in conjunction
-with older machine types can set it explicitly as a virtio-device
-option.
-
-NOTES:
-
- - This leaves some other oddities in play, like the fact that
-   DRIVER_OK also gets unset in response to bus-mastering being
-   disabled, but not restored (however the device seems to continue
-   working)
- - Similarly, we disable the host notifier via
-   virtio_bus_stop_ioeventfd(), which seems to move the handling out
-   of virtio-blk dataplane and back into the main IO thread, and it
-   ends up staying there till a reset (but otherwise continues working
-   normally)
-
-Cc: David Gibson <david@gibson.dropbear.id.au>,
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Message-Id: <20191120005003.27035-1-mdroth@linux.vnet.ibm.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/hw/virtio/virtio.h | 15 +++++++++++++++
- hw/core/machine.c          |  1 +
- hw/virtio/virtio-pci.c     | 12 ++++++++----
- hw/virtio/virtio.c         | 35 ++++++++++++++++++++++++++++-------
- 4 files changed, 52 insertions(+), 11 deletions(-)
-
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index e18756d50d..777772475c 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -100,6 +100,8 @@ struct VirtIODevice
-     uint16_t device_id;
-     bool vm_running;
-     bool broken; /* device in invalid state, needs reset */
-+    bool use_disabled_flag; /* allow use of 'disable' flag when needed */
-+    bool disabled; /* device in temporarily disabled state */
-     bool use_started;
-     bool started;
-     bool start_on_kick; /* when virtio 1.0 feature has not been negotiated=
- */
-@@ -380,4 +382,17 @@ static inline void virtio_set_started(VirtIODevice *vd=
-ev, bool started)
-         vdev->started =3D started;
-     }
- }
-+
-+static inline void virtio_set_disabled(VirtIODevice *vdev, bool disable)
-+{
-+    if (vdev->use_disabled_flag) {
-+        vdev->disabled =3D disable;
-+    }
-+}
-+
-+static inline bool virtio_device_disabled(VirtIODevice *vdev)
-+{
-+    return unlikely(vdev->disabled || vdev->broken);
-+}
-+
- #endif
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1689ad3bf8..9f3073b23b 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -29,6 +29,7 @@
-=20
- GlobalProperty hw_compat_4_1[] =3D {
-     { "virtio-pci", "x-pcie-flr-init", "off" },
-+    { "virtio-device", "use-disabled-flag", "false" },
- };
- const size_t hw_compat_4_1_len =3D G_N_ELEMENTS(hw_compat_4_1);
-=20
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index e5c759e19e..f723b9f631 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -608,10 +608,14 @@ static void virtio_write_config(PCIDevice *pci_dev, u=
-int32_t address,
-         pcie_cap_flr_write_config(pci_dev, address, val, len);
-     }
-=20
--    if (range_covers_byte(address, len, PCI_COMMAND) &&
--        !(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
--        virtio_pci_stop_ioeventfd(proxy);
--        virtio_set_status(vdev, vdev->status & ~VIRTIO_CONFIG_S_DRIVER_OK)=
-;
-+    if (range_covers_byte(address, len, PCI_COMMAND)) {
-+        if (!(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
-+            virtio_set_disabled(vdev, true);
-+            virtio_pci_stop_ioeventfd(proxy);
-+            virtio_set_status(vdev, vdev->status & ~VIRTIO_CONFIG_S_DRIVER=
-_OK);
-+        } else {
-+            virtio_set_disabled(vdev, false);
-+        }
-     }
-=20
-     if (proxy->config_cap &&
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 6de3cfdc2c..7bc6a9455e 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -546,7 +546,7 @@ static inline bool is_desc_avail(uint16_t flags, bool w=
-rap_counter)
-  * Called within rcu_read_lock().  */
- static int virtio_queue_empty_rcu(VirtQueue *vq)
- {
--    if (unlikely(vq->vdev->broken)) {
-+    if (virtio_device_disabled(vq->vdev)) {
-         return 1;
-     }
-=20
-@@ -565,7 +565,7 @@ static int virtio_queue_split_empty(VirtQueue *vq)
- {
-     bool empty;
-=20
--    if (unlikely(vq->vdev->broken)) {
-+    if (virtio_device_disabled(vq->vdev)) {
-         return 1;
-     }
-=20
-@@ -783,7 +783,7 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueEleme=
-nt *elem,
-=20
-     virtqueue_unmap_sg(vq, elem, len);
-=20
--    if (unlikely(vq->vdev->broken)) {
-+    if (virtio_device_disabled(vq->vdev)) {
-         return;
-     }
-=20
-@@ -839,7 +839,7 @@ static void virtqueue_packed_flush(VirtQueue *vq, unsig=
-ned int count)
-=20
- void virtqueue_flush(VirtQueue *vq, unsigned int count)
- {
--    if (unlikely(vq->vdev->broken)) {
-+    if (virtio_device_disabled(vq->vdev)) {
-         vq->inuse -=3D count;
-         return;
-     }
-@@ -1602,7 +1602,7 @@ err_undo_map:
-=20
- void *virtqueue_pop(VirtQueue *vq, size_t sz)
- {
--    if (unlikely(vq->vdev->broken)) {
-+    if (virtio_device_disabled(vq->vdev)) {
-         return NULL;
-     }
-=20
-@@ -1698,7 +1698,7 @@ unsigned int virtqueue_drop_all(VirtQueue *vq)
- {
-     struct VirtIODevice *vdev =3D vq->vdev;
-=20
--    if (unlikely(vdev->broken)) {
-+    if (virtio_device_disabled(vq->vdev)) {
-         return 0;
-     }
-=20
-@@ -1816,7 +1816,7 @@ static void virtio_notify_vector(VirtIODevice *vdev, =
-uint16_t vector)
-     BusState *qbus =3D qdev_get_parent_bus(DEVICE(vdev));
-     VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-=20
--    if (unlikely(vdev->broken)) {
-+    if (virtio_device_disabled(vdev)) {
-         return;
-     }
-=20
-@@ -1920,6 +1920,7 @@ void virtio_reset(void *opaque)
-     vdev->guest_features =3D 0;
-     vdev->queue_sel =3D 0;
-     vdev->status =3D 0;
-+    vdev->disabled =3D false;
-     atomic_set(&vdev->isr, 0);
-     vdev->config_vector =3D VIRTIO_NO_VECTOR;
-     virtio_notify_vector(vdev, vdev->config_vector);
-@@ -2559,6 +2560,13 @@ static bool virtio_started_needed(void *opaque)
-     return vdev->started;
- }
-=20
-+static bool virtio_disabled_needed(void *opaque)
-+{
-+    VirtIODevice *vdev =3D opaque;
-+
-+    return vdev->disabled;
-+}
-+
- static const VMStateDescription vmstate_virtqueue =3D {
-     .name =3D "virtqueue_state",
-     .version_id =3D 1,
-@@ -2724,6 +2732,17 @@ static const VMStateDescription vmstate_virtio_start=
-ed =3D {
-     }
- };
-=20
-+static const VMStateDescription vmstate_virtio_disabled =3D {
-+    .name =3D "virtio/disabled",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .needed =3D &virtio_disabled_needed,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_BOOL(disabled, VirtIODevice),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_virtio =3D {
-     .name =3D "virtio",
-     .version_id =3D 1,
-@@ -2741,6 +2760,7 @@ static const VMStateDescription vmstate_virtio =3D {
-         &vmstate_virtio_extra_state,
-         &vmstate_virtio_started,
-         &vmstate_virtio_packed_virtqueues,
-+        &vmstate_virtio_disabled,
-         NULL
-     }
- };
-@@ -3575,6 +3595,7 @@ static void virtio_device_instance_finalize(Object *o=
-bj)
- static Property virtio_properties[] =3D {
-     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
-     DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
-+    DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag,=
- true),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
---=20
-MST
+> 
+> > > 
+> > > 
+> > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > > CC: Tao Xu <tao3.xu@intel.com>
+> > > 
+> > > Igor Mammedov (2):
+> > >   numa: remove not needed check
+> > >   numa: properly check if numa is supported
+> > > 
+> > >  hw/arm/sbsa-ref.c | 1 -
+> > >  hw/core/machine.c | 4 ++--
+> > >  hw/core/numa.c    | 7 +------
+> > >  3 files changed, 3 insertions(+), 9 deletions(-)
+> > >   
+> 
 
 
