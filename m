@@ -2,90 +2,92 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB01C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68469C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE4232146E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:15:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 340E52146E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:16:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7AZTF4w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE4232146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KboSgGoa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340E52146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44187 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihySL-0002Kd-U5
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 11:15:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44872)
+	id 1ihyTZ-0003UG-RK
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 11:16:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1ihyRe-0001t1-Iz
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:14:35 -0500
+ (envelope-from <nsoffer@redhat.com>) id 1ihySD-0002Mh-8u
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:15:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1ihyRc-00079z-PR
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:14:34 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55057)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ihyRc-00071k-Au
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:14:32 -0500
-Received: by mail-wm1-x341.google.com with SMTP id b19so6012615wmj.4
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 08:14:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=Ab/Jk3SSsWeaCBWMLoecVZqoUNqvSUKrPgb7UIjWBP8=;
- b=k7AZTF4wgH17DCfMANQF+oxpl/GD7sMnYlz0uwliXWKCsgyTk2ytP4A1YUQnzAxlBG
- eyvtXtfYV2+XxbntnbvouCcw5SbBuRLwD1WXGgklYr71aQoC2DPAyIDxhXRjkfJe8fnj
- w+i9pZZXTRWIS4lkaTUA8g49ITA1rk6xo8JIrp/edcNIjW5oVPkOrHfbV49b20kCuznI
- qXpYJEt4S/mNUQb2xG5qrCs+D6K5gwLVteabDgfGqSXRiBkH+sVpljO8STM+yJj/03xt
- uES5x7xePDx1y+b64pyv+mRW0TSzswPTzlBRGSiUwcrHqx7eM45xd8fvokmLlh7v+nxY
- M27A==
+ (envelope-from <nsoffer@redhat.com>) id 1ihyS9-0001cu-Pn
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:15:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39950
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <nsoffer@redhat.com>) id 1ihyS9-0001ZV-J6
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:15:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576772104;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5+bGGSfDG4BXgbPwGORThGyXrz3Cw31EQTo7i1ymPrE=;
+ b=KboSgGoai26IsVLbpCPsnzfotPzlMp7WWwOkgZbWKWlaAtXCYa7ct/oVuajbX6lcC5eWTa
+ 540WEf3ogbe6jhk3Wr8oTX9kxkvSCMA4n7Re6+0/bxlIG9Uk9TKw2QoI+xXyiV/MzTnejB
+ o4D2UtO9Pn4vxADPuDGComIY5os5W0M=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-DLZgbtT6P3W5QrzW5r637w-1; Thu, 19 Dec 2019 11:15:02 -0500
+Received: by mail-oi1-f198.google.com with SMTP id m7so3008387oim.14
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 08:15:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=Ab/Jk3SSsWeaCBWMLoecVZqoUNqvSUKrPgb7UIjWBP8=;
- b=IViZAEtlwEriNXMDcw6koQfFfg7fWzflfrMgMN0E9oxCCaeUBIDpJEnBYBscLe3ZHw
- guN+cd+nBaOzIM8sjpByIfCDIqa4soWeOaaonh5KaK1ZgtfjLongw8MB43xuMu4cfAC0
- 70pz/gCRsFShCodxPvN8CaCPzv+W2genN1vdc+O8jXFECkPMYoWrP1GeqLG4CX77sFdL
- 0hr5PRGnyDQkhB46QIsVqIRn7wP7hPWMRayE2O1KkvgUtkTlZOW2MWopuK9vaEUZ91vZ
- oM4+YTM+wEBJXcNe/GDd7Tkf0QNNKXTT338Vqa9HvKlbaO9woXNGNx8yybxs5dW4vbpr
- C5VA==
-X-Gm-Message-State: APjAAAUVRY03YBvL9u816mLLjBwhI91DGEq/iusMw+dQpNqZ4mAlq7oH
- +rniV8gHu79oQkGlANYISgE=
-X-Google-Smtp-Source: APXvYqzr0Z4BOWt7zXNEv2QPcnzBBGbx/uiO/WnpyA5GsGC9Ah6OorPa4YPGOYD+gZyhIzZ6jBmFQg==
-X-Received: by 2002:a05:600c:a:: with SMTP id
- g10mr11337379wmc.14.1576772070501; 
- Thu, 19 Dec 2019 08:14:30 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id p26sm6437664wmc.24.2019.12.19.08.14.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 08:14:28 -0800 (PST)
-Date: Thu, 19 Dec 2019 16:14:26 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v8] Implement backend program convention command for
- vhost-user-blk
-Message-ID: <20191219161426.GH1624084@stefanha-x1.localdomain>
-References: <20191209015331.5455-1-chanmickyyun@gmail.com>
- <20191211105916-mutt-send-email-mst@kernel.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PC+km+KrYjCiOegQvZeOGv2pUZ8zFieculUSdFYM98I=;
+ b=uGZ9pwG27W5KZqyO4ORyM7M4QzmTfk3D9pdkZDGxClIa8mBvc4LEYDaj2zKo7mb2IR
+ /1y/YnEAkUtFIuCVYZB2HuIelxUYRGUUzT/DTbt9aZYSsJA7uQw50/JSCX8WRz8Ka8Wh
+ Oa9Gn0kISiahb4B8Kan16Jb9QJbwliw8wrUnVm3kM+Q+EeKATF4o/gdDhJ5xKZPJr5e9
+ MsAqleshZVJwN9cqYkBpgdvCYisOg8Ad7HXUc1LLnvGzXMTz57q1KoVMBv9NeRKX6X3H
+ 67fR6N1qgmzqdyAq6w+Nnf/fZq0XUa5zPJdAY3lamCDghoZUu4NeIE/jR552jfsO0COv
+ R5CA==
+X-Gm-Message-State: APjAAAUlZXHoTuuJHfhaJlPLogTZrwqzWM8w/05FMPwBl/njGrmMrn+U
+ xNIllTCF0EW5IGD9vxjI3oukHgWWn31wJzJK1TqEpUYY1LRlgUnwRLilhLW5FEMn1MDf/5nzQ3V
+ k78pWl4pILwb2FIp/q+HouirA0n1wE2E=
+X-Received: by 2002:a9d:5885:: with SMTP id x5mr9380326otg.132.1576772100104; 
+ Thu, 19 Dec 2019 08:15:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwwV9yAPvdpePCpprHpOA055cuQSnjBdP593totXfNTNZi2tzEFmQL68KN+WYJjjaEg3sys8LJ+MCd/vA70xN8=
+X-Received: by 2002:a9d:5885:: with SMTP id x5mr9380283otg.132.1576772099592; 
+ Thu, 19 Dec 2019 08:14:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="17/8oYur5Y32USnW"
-Content-Disposition: inline
-In-Reply-To: <20191211105916-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+References: <20191219143415.28490-1-vsementsov@virtuozzo.com>
+ <CAMRbyyt8Y8DFV5=72+GvHrAWbdUO5Mys5JGn7D8es+w2SVcRMA@mail.gmail.com>
+ <c97f28de-c924-bc42-4725-09b633a28674@virtuozzo.com>
+ <CAMRbyyv+h7UrR-vPJVMeGQpp-8Di-VuAZJit798L0Wda0BiE7A@mail.gmail.com>
+ <0d6ea2fe-2f4f-00d4-2f13-20591b56310d@virtuozzo.com>
+In-Reply-To: <0d6ea2fe-2f4f-00d4-2f13-20591b56310d@virtuozzo.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Thu, 19 Dec 2019 18:14:43 +0200
+Message-ID: <CAMRbyys6na7S4q00VR81LNhfNvtEXUAFQV=2R1O506+p_U+VKA@mail.gmail.com>
+Subject: Re: [PATCH] qapi/block: fix nbd-server-add spec
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+X-MC-Unique: DLZgbtT6P3W5QrzW5r637w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,279 +99,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org,
- "Micky Yun Chan\(michiboo\)" <chanmickyyun@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Dec 19, 2019 at 5:25 PM Vladimir Sementsov-Ogievskiy
+<vsementsov@virtuozzo.com> wrote:
+>
+> 19.12.2019 18:08, Nir Soffer wrote:
+> > On Thu, Dec 19, 2019 at 5:00 PM Vladimir Sementsov-Ogievskiy
+> > <vsementsov@virtuozzo.com> wrote:
+> >>
+> >> 19.12.2019 17:42, Nir Soffer wrote:
+> >>> On Thu, Dec 19, 2019 at 4:34 PM Vladimir Sementsov-Ogievskiy
+> >>> <vsementsov@virtuozzo.com> wrote:
+> >>>>
+> >>>> "NAME" here may be interpreted like it should match @name, which is
+> >>>> export name. But it was never mentioned in such way. Make it obvious=
+,
+> >>>> that actual "<dirty-bitmap-export-name>" (see docs/interop/nbd.txt)
+> >>>> will match @bitmap parameter.
+> >>>
+> >>> But this is wrong, dirty-bitmap-export-name does not mean the actual =
+bitmap
+> >>> name but the name exposed to the NBD client, which can be anything.
+> >>
+> >> Yes. What is wrong? It can be enything. Currently by default it is bit=
+map name.
+> >> It purely documented (okay, even confusingly documented), but it was s=
+o since
+> >> 4.0. And existing users obviously knows how it work (otherwise, they c=
+an't use
+> >> the feature)
+> >>
+> >> So, I think it's OK to fix spec to directly show implementation, that =
+was here
+> >> since feature introducing.
+> >>
+> >>>
+> >>>> Fixes: 5fcbeb06812685a2
+> >>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+> >>>> ---
+> >>>>
+> >>>> Hi all.
+> >>>>
+> >>>> This patch follows discussion on Nir's patch
+> >>>>    [PATCH] block: nbd: Fix dirty bitmap context name
+> >>>>    ( https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04309.=
+html )
+> >>>>
+> >>>> Let's just fix qapi spec now.
+> >>>
+> >>> But qapi documents a better behavior for users. We should fix the cod=
+e instead
+> >>> to mach the docs.
+> >>
+> >> 1. Using disk name as a bitmap name is a bad behavior, as they are com=
+pletely
+> >> different concepts. Especially keeping in mind that user already knows=
+ disk name anyway
+> >> and no reason to write this export name inside metadata context of thi=
+s export.
+> >
+> > The different concept is expressed by the "qemu:dirty-bitmap:" prefix.
+> > "qemu:dirty-bitmap:export-name" means the dirty bitmap for this export.
+>
+> Why do you think so? Did you read NBD specification?
 
---17/8oYur5Y32USnW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes - the name of the bitmap does not have any meaning.
+But for nbd_server_add we allow only single bitmap for export.
 
-On Wed, Dec 11, 2019 at 10:59:38AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Dec 09, 2019 at 09:53:31AM +0800, Micky Yun Chan(michiboo) wrote:
-> > From: Micky Yun Chan <chanmickyyun@gmail.com>
-> >=20
-> > This patch is to add standard commands defined in docs/interop/vhost-us=
-er.rst
-> > For vhost-user-* program
-> >=20
-> > Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
->=20
-> Thanks!
-> I'll queue it for merge after the release. If possible please ping me
-> after the release to help make sure it didn't get dropped.
+> Metadata context is always owned by some export.
 
-Ping, just in case :)
+Of course.
 
-> > ---
-> >  contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
-> >  docs/interop/vhost-user.json            |  31 +++++++
-> >  docs/interop/vhost-user.rst             |  17 ++++
-> >  3 files changed, 112 insertions(+), 44 deletions(-)
-> >=20
-> > diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-us=
-er-blk/vhost-user-blk.c
-> > index ae61034656..6fd91c7e99 100644
-> > --- a/contrib/vhost-user-blk/vhost-user-blk.c
-> > +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> > @@ -576,70 +576,90 @@ vub_new(char *blk_file)
-> >      return vdev_blk;
-> >  }
-> > =20
-> > +static int opt_fdnum =3D -1;
-> > +static char *opt_socket_path;
-> > +static char *opt_blk_file;
-> > +static gboolean opt_print_caps;
-> > +static gboolean opt_read_only;
-> > +
-> > +static GOptionEntry entries[] =3D {
-> > +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-> > +      "Print capabilities", NULL },
-> > +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-> > +      "Use inherited fd socket", "FDNUM" },
-> > +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-> > +      "Use UNIX socket path", "PATH" },
-> > +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-> > +     "block device or file path", "PATH"},
-> > +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-> > +      "Enable read-only", NULL }
-> > +};
-> > +
-> >  int main(int argc, char **argv)
-> >  {
-> > -    int opt;
-> > -    char *unix_socket =3D NULL;
-> > -    char *blk_file =3D NULL;
-> > -    bool enable_ro =3D false;
-> >      int lsock =3D -1, csock =3D -1;
-> >      VubDev *vdev_blk =3D NULL;
-> > +    GError *error =3D NULL;
-> > +    GOptionContext *context;
-> > =20
-> > -    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
-> > -        switch (opt) {
-> > -        case 'b':
-> > -            blk_file =3D g_strdup(optarg);
-> > -            break;
-> > -        case 's':
-> > -            unix_socket =3D g_strdup(optarg);
-> > -            break;
-> > -        case 'r':
-> > -            enable_ro =3D true;
-> > -            break;
-> > -        case 'h':
-> > -        default:
-> > -            printf("Usage: %s [ -b block device or file, -s UNIX domai=
-n socket"
-> > -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-> > -            return 0;
-> > +    context =3D g_option_context_new(NULL);
-> > +    g_option_context_add_main_entries(context, entries, NULL);
-> > +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-> > +        g_printerr("Option parsing failed: %s\n", error->message);
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +    if (opt_print_caps) {
-> > +        g_print("{\n");
-> > +        g_print("  \"type\": \"block\",\n");
-> > +        g_print("  \"features\": [\n");
-> > +        g_print("    \"read-only\",\n");
-> > +        g_print("    \"blk-file\"\n");
-> > +        g_print("  ]\n");
-> > +        g_print("}\n");
-> > +        exit(EXIT_SUCCESS);
-> > +    }
-> > +
-> > +    if (!opt_blk_file) {
-> > +        g_print("%s\n", g_option_context_get_help(context, true, NULL)=
-);
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +
-> > +    if (opt_socket_path) {
-> > +        lsock =3D unix_sock_new(opt_socket_path);
-> > +        if (lsock < 0) {
-> > +            exit(EXIT_FAILURE);
-> >          }
-> > +    } else if (opt_fdnum < 0) {
-> > +        g_print("%s\n", g_option_context_get_help(context, true, NULL)=
-);
-> > +        exit(EXIT_FAILURE);
-> > +    } else {
-> > +        lsock =3D opt_fdnum;
-> >      }
-> > =20
-> > -    if (!unix_socket || !blk_file) {
-> > -        printf("Usage: %s [ -b block device or file, -s UNIX domain so=
-cket"
-> > -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-> > -        return -1;
-> > -    }
-> > -
-> > -    lsock =3D unix_sock_new(unix_socket);
-> > -    if (lsock < 0) {
-> > -        goto err;
-> > -    }
-> > -
-> > -    csock =3D accept(lsock, (void *)0, (void *)0);
-> > +    csock =3D accept(lsock, NULL, NULL);
-> >      if (csock < 0) {
-> > -        fprintf(stderr, "Accept error %s\n", strerror(errno));
-> > -        goto err;
-> > +        g_printerr("Accept error %s\n", strerror(errno));
-> > +        exit(EXIT_FAILURE);
-> >      }
-> > =20
-> > -    vdev_blk =3D vub_new(blk_file);
-> > +    vdev_blk =3D vub_new(opt_blk_file);
-> >      if (!vdev_blk) {
-> > -        goto err;
-> > +        exit(EXIT_FAILURE);
-> >      }
-> > -    if (enable_ro) {
-> > +    if (opt_read_only) {
-> >          vdev_blk->enable_ro =3D true;
-> >      }
-> > =20
-> >      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
-> >                    vub_panic_cb, &vub_iface)) {
-> > -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
-> > -        goto err;
-> > +        g_printerr("Failed to initialize libvhost-user-glib\n");
-> > +        exit(EXIT_FAILURE);
-> >      }
-> > =20
-> >      g_main_loop_run(vdev_blk->loop);
-> > -
-> > +    g_main_loop_unref(vdev_blk->loop);
-> > +    g_option_context_free(context);
-> >      vug_deinit(&vdev_blk->parent);
-> > -
-> > -err:
-> >      vub_free(vdev_blk);
-> >      if (csock >=3D 0) {
-> >          close(csock);
-> > @@ -647,8 +667,8 @@ err:
-> >      if (lsock >=3D 0) {
-> >          close(lsock);
-> >      }
-> > -    g_free(unix_socket);
-> > -    g_free(blk_file);
-> > +    g_free(opt_socket_path);
-> > +    g_free(opt_blk_file);
-> > =20
-> >      return 0;
-> >  }
-> > diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-> > index da6aaf51c8..ce0ef74db5 100644
-> > --- a/docs/interop/vhost-user.json
-> > +++ b/docs/interop/vhost-user.json
-> > @@ -54,6 +54,37 @@
-> >    ]
-> >  }
-> > =20
-> > +##
-> > +# @VHostUserBackendBlockFeature:
-> > +#
-> > +# List of vhost user "block" features.
-> > +#
-> > +# @read-only: The --read-only command line option is supported.
-> > +# @blk-file: The --blk-file command line option is supported.
-> > +#
-> > +# Since: 5.0
-> > +##
-> > +{
-> > +  'enum': 'VHostUserBackendBlockFeature',
-> > +  'data': [ 'read-only', 'blk-file' ]
-> > +}
-> > +
-> > +##
-> > +# @VHostUserBackendCapabilitiesBlock:
-> > +#
-> > +# Capabilities reported by vhost user "block" backends
-> > +#
-> > +# @features: list of supported features.
-> > +#
-> > +# Since: 5.0
-> > +##
-> > +{
-> > +  'struct': 'VHostUserBackendCapabilitiesBlock',
-> > +  'data': {
-> > +    'features': [ 'VHostUserBackendBlockFeature' ]
-> > +  }
-> > +}
-> > +
-> >  ##
-> >  # @VHostUserBackendInputFeature:
-> >  #
-> > diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> > index 7827b710aa..015ac08177 100644
-> > --- a/docs/interop/vhost-user.rst
-> > +++ b/docs/interop/vhost-user.rst
-> > @@ -1376,3 +1376,20 @@ Command line options:
-> >    Enable virgl rendering support.
-> > =20
-> >    (optional)
-> > +
-> > +vhost-user-blk
-> > +--------------
-> > +
-> > +Command line options:
-> > +
-> > +--blk-file=3DPATH
-> > +
-> > +  Specify block device or file path.
-> > +
-> > +  (optional)
-> > +
-> > +--read-only
-> > +
-> > +  Enable read-only.
-> > +
-> > +  (optional)
-> > --=20
-> > 2.21.0
->=20
->=20
+> Do you mean that there will bemetadata contexts
+>
+> qemu:dirty-bitmap:export-A
+> qemu:dirty-bitmap:export-B
+>
+> both defined for export-A?
 
---17/8oYur5Y32USnW
-Content-Type: application/pgp-signature; name="signature.asc"
+It does not make sense, but it is valid.
 
------BEGIN PGP SIGNATURE-----
+> >> 2. It's not directly documented. You assume that NAME =3D=3D @name. I =
+understand that
+> >> it may be assumed.. But it's not documented.
+> >
+> > But NAME is likely to be understood as the name argument, and unlikely =
+to be the
+> > bitmap name.
+>
+> Yes likely. But it's still bad specification, which should be fixed.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl37oeIACgkQnKSrs4Gr
-c8hUmQf/fOrrOSy5b5q+iFPzpKG4h46JKPDpBirvsJ6RvJfDa9NAm6D9cUpukjRT
-ZZjbbuSQAf1UHjd+/Ajpj1WbH8CVEUNr89nQD2mgreaqp+IpiZysf6xxMKMkRn0U
-ooJu0ka7eS34DspmSK73O+fKJUL+GlcxcS1NxNz631E0Me0kVGmp+bM9psFbFo/y
-5Gw3ljqDrWOculZ/gw4wjSvaE9S+USIpx7tcBVFn+7Nvm4hC8nD7qN0AjgWet+wZ
-L93PxPFGRkVAuFPxWaj4hC8D/NN8mNC/MmJ3p3mHU5fexOQOelLFntaon+Nq4678
-im065MhkHcSvrA0eoaOeoQqIvNfT4w==
-=mBu5
------END PGP SIGNATURE-----
+If we cannot change the current behavior since it will break current users,
+I agree fixing the spec to describe the current behavior is a good idea.
 
---17/8oYur5Y32USnW--
+
+
+
+> >
+> >> 3. It's never worked like you write. So if we change the behavior, we'=
+ll break
+> >> existing users.
+> >
+> > Do we have existing users? isn't this new feature in 4.2?
+>
+> No, it's since 4.0
+>
+> >
+> > Before we had experimental x-block-dirty-bitmap APIs, which are stable,=
+ so users
+> > could not depend on them.
+> >
+> >>> With this we still have the issue of leaking internal bitmap name to
+> >>> users who do not
+> >>> control the name, and do not care about it.
+> >>>
+> >>>>    qapi/block.json | 3 ++-
+> >>>>    1 file changed, 2 insertions(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/qapi/block.json b/qapi/block.json
+> >>>> index 145c268bb6..8042ef78f0 100644
+> >>>> --- a/qapi/block.json
+> >>>> +++ b/qapi/block.json
+> >>>> @@ -255,7 +255,8 @@
+> >>>>
+> >>>>    # @bitmap: Also export the dirty bitmap reachable from @device, s=
+o the
+> >>>>    #          NBD client can use NBD_OPT_SET_META_CONTEXT with
+> >>>> -#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4=
+.0)
+> >>>> +#          "qemu:dirty-bitmap:BITMAP" to inspect the bitmap (BITMAP=
+ here
+> >>>> +#          matches @bitmap parameter). (since 4.0)
+> >>>>    #
+> >>>>    # Returns: error if the server is not running, or export with the=
+ same name
+> >>>>    #          already exists.
+> >>>> --
+> >>>> 2.21.0
+> >>>>
+> >>>
+> >>
+> >>
+> >> --
+> >> Best regards,
+> >> Vladimir
+> >
+>
+>
+> --
+> Best regards,
+> Vladimir
+
 
