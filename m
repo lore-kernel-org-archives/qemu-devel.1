@@ -1,76 +1,104 @@
-Return-Path: <SRS0=xKpV=2I=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 521FCC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A374C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:03:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CD3B218AC
-	for <qemu-devel@archiver.kernel.org>; Wed, 18 Dec 2019 23:51:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CD3B218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CA29B21D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 00:03:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeXqIazZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA29B21D7D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihj6I-0003We-7j
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 18:51:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58426)
+	id 1ihjIJ-00027K-0K
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 19:03:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ihj5P-0002PB-2a
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:50:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1ihjHH-00017h-58
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:02:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ihj5N-0001t4-PL
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:50:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47524)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ihj5N-0001pk-Jl
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 18:50:33 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ihj5M-0000Ld-1C
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 23:50:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E6DC72E8079
- for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 23:50:31 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1ihjHD-0001Lv-Ed
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:02:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25853
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihjHB-0001Jx-CR
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 19:02:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576713764;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WHsFh5eJSfMeu4wPfvJ+K1fpKQDGAOLYcMoi3cHlETA=;
+ b=aeXqIazZcnu55GspQV3SZiUE9H1+59/3ukff3pk9FHD68sJfaf6IeGDEHZkeAmUpxdPQrk
+ cw67GWZhktBmFLYb5Mbl9I0+19QSEAokJHIqjZE3uZxkrP4A1p2qG7fmkxiCLY7bHqMoqM
+ oY5+CsvN1XFhN2znhppowPqHC1JHSJU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-4d7TVy19PcacewJKqYFOqA-1; Wed, 18 Dec 2019 19:02:42 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z10so241955wrt.21
+ for <qemu-devel@nongnu.org>; Wed, 18 Dec 2019 16:02:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WHsFh5eJSfMeu4wPfvJ+K1fpKQDGAOLYcMoi3cHlETA=;
+ b=nK20dCvGbU8Tfcykv1U5yvEToi3cQU7DppJgYjRTeL5o+oQad2yUoy/rz6qpvMEb/T
+ Wi59X1CL5NofkmRsNT2AifmWsDqa2g9wYxipHlTP64bEZSOYvMskIxJw6TX3bofmtfm8
+ oe8XZaKSqFWwu9UuGIQsaK5pkTm1orP0+0DGFR9Xz/05t+WQ0CZX9lDqG2uYD/kY4OKg
+ sQxOYYU0KhEevgmvOt9x4YRnGDjKi5QTbHk+yNJnAADYObTt/DTC2aX7db//VCwMoyc5
+ PswHgkPGpy2Yr5OQnRZLn3ArizpuZk3+xMGasWag4lndrFikx63iK/sw5wPVJVZyjETe
+ W93w==
+X-Gm-Message-State: APjAAAWIx0lb5ogFY5dPKQcWb9ViRwxIumP9cjgnlcz5srndmcxC43jw
+ frwxmpPhfuIZQkjMtqt9+h10NQuXRRB3tLo7woxRaBk1qoxILQqBgIoGJ9xOzYWFvGnrEsyXUBy
+ dLhnv5N8MzlmxoUU=
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr6158475wrq.232.1576713761455; 
+ Wed, 18 Dec 2019 16:02:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwyXVlbK6SedZTYLGPyXfMtx1BsyfwMTJb2VhglaAecSctx7rR3OHHOOGUwW0jc0+S8TYq5gQ==
+X-Received: by 2002:a5d:4a91:: with SMTP id o17mr6158448wrq.232.1576713761179; 
+ Wed, 18 Dec 2019 16:02:41 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id j130sm4518107wmb.18.2019.12.18.16.02.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 18 Dec 2019 16:02:40 -0800 (PST)
+Subject: Re: [PATCH v8 1/4] Acceptance tests: introduce BLD_DIR, SRC_DIR and
+ LNK_DIR
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20191218232500.23530-1-crosa@redhat.com>
+ <20191218232500.23530-2-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3362e435-73be-f5c3-a672-6208f2bacd95@redhat.com>
+Date: Thu, 19 Dec 2019 01:02:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 18 Dec 2019 23:45:03 -0000
-From: ecsdn <1856834@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ecsdn
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <157671270370.3236.17782661545018180385.malone@soybean.canonical.com>
-Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 68d65886b1d3107eedab49d49a61cd5f31c1ebd3
+In-Reply-To: <20191218232500.23530-2-crosa@redhat.com>
+Content-Language: en-US
+X-MC-Unique: 4d7TVy19PcacewJKqYFOqA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,74 +107,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also tested on another system (Debian GNU/Linux 9 \n \l with kernel SMP
-Debian 3.16.56-1+deb8u1 (2018-05-08) x86_64) besides the previous Ubuntu
-17.04 and confirmed even Qemu 2.8.1 is working but Qemu 3.1.10 and
-higher not working, virtio fails/freezes guest at vda as on the other
-system.
+On 12/19/19 12:24 AM, Cleber Rosa wrote:
+> Some tests may benefit from using resources from a build directory.
+> This introduces three variables that can help tests find resources in
+> those directories.
+> 
+> First, a BLD_DIR is assumed to exist, given that the primary form of
+> running the acceptance tests is from a build directory (which may or
+> may not be the same as the source tree, that is, the SRC_DIR).
 
--- =
+Can we name this BUILD_DIR?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
+This would be more in line with the other buildsys files (configure/make).
 
-Title:
-  Virtio broken in qemu ppc in 4.2.0 and other versions
+> If the directory containing the acceptance tests happens to be a link
+> to a directory (kept as LNK_DIR), it's assumed to it points to the
+> source tree (SRC_DIR), which is the behavior defined on the QEMU
+> Makefiles.  If the directory containing the acceptance tests is not a
+> link, then a in-tree build is assumed, and the BLD_DIR and SRC_DIR are
+> the same and LNK_DIR is set None.
 
-Status in QEMU:
-  New
+Similarly, can we name this CURRENT_DIR instead of LNK_DIR?
 
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/acceptance/avocado_qemu/__init__.py | 27 ++++++++++++++++++-----
+>   1 file changed, 21 insertions(+), 6 deletions(-)
+> 
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+> index 6618ea67c1..ac7597f7fe 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -16,8 +16,23 @@ import tempfile
+>   
+>   import avocado
+>   
+> -SRC_ROOT_DIR = os.path.join(os.path.dirname(__file__), '..', '..', '..')
+> -sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+> +#: The QEMU build root directory.  It may also be the source directory
+> +#: if building from the source dir, but it's safer to use BLD_DIR for
+> +#: that purpose.  Be aware that if this code is moved outside of a source
+> +#: and build tree, it will not be accurate.
+> +BLD_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+> +
+> +if os.path.islink(os.path.dirname(os.path.dirname(__file__))):
+> +    #: The link to the acceptance tests dir in the source code directory.  If
+> +    #: build dir is the same as the source dir, this is set to None
+> +    LNK_DIR = os.path.dirname(os.path.dirname(__file__))
+> +    #: The QEMU root source directory
+> +    SRC_DIR = os.path.dirname(os.path.dirname(os.readlink(LNK_DIR)))
+> +else:
+> +    LNK_DIR = None
+> +    SRC_DIR = BLD_DIR
+> +
+> +sys.path.append(os.path.join(SRC_DIR, 'python'))
+>   
+>   from qemu.machine import QEMUMachine
+>   
+> @@ -49,10 +64,10 @@ def pick_default_qemu_bin(arch=None):
+>       if is_readable_executable_file(qemu_bin_relative_path):
+>           return qemu_bin_relative_path
+>   
+> -    qemu_bin_from_src_dir_path = os.path.join(SRC_ROOT_DIR,
+> +    qemu_bin_from_bld_dir_path = os.path.join(BLD_DIR,
+>                                                 qemu_bin_relative_path)
+> -    if is_readable_executable_file(qemu_bin_from_src_dir_path):
+> -        return qemu_bin_from_src_dir_path
+> +    if is_readable_executable_file(qemu_bin_from_bld_dir_path):
+> +        return qemu_bin_from_bld_dir_path
+>   
+>   
+>   def wait_for_console_pattern(test, success_message, failure_message=None):
+> @@ -122,7 +137,7 @@ class Test(avocado.Test):
+>           self.qemu_bin = self.params.get('qemu_bin',
+>                                           default=default_qemu_bin)
+>           if self.qemu_bin is None:
+> -            self.cancel("No QEMU binary defined or found in the source tree")
+> +            self.cancel("No QEMU binary defined or found in the build tree")
+>   
+>       def _new_vm(self, *args):
+>           vm = QEMUMachine(self.qemu_bin, sock_dir=tempfile.mkdtemp())
+> 
 
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
-
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
-
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
