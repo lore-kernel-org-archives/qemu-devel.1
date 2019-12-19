@@ -2,96 +2,95 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF96C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC70DC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:44:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E6BC20684
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:43:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A645F20684
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:44:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkLh3MXY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E6BC20684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCw93670"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A645F20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihw5l-0005Xn-S1
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:43:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53210)
+	id 1ihw6R-0006hT-IQ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:44:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1ihvva-0000AJ-1o
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:33:19 -0500
+ (envelope-from <mst@redhat.com>) id 1ihvrI-00038B-Lv
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1ihvvX-0001OJ-Iv
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:33:17 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49544
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1ihvrH-0001At-7m
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53709
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ihvvX-0001Lm-CN
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:33:15 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvrH-00018S-1O
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576762394;
+ s=mimecast20190719; t=1576762130;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TK4RywertGHU5YvngQqidrycj5zwSBQzF1+NiySvZmY=;
- b=IkLh3MXYoooAUK6HIBAgqQTC+VwQYviky9kriXPmzg8HuIhE71lpYEq3wlBIQ/YM5jEhze
- PUFUG9lK+yGLOnWkbt6d1LtAfxoHfgTDltPAXMaLUAxyv7uLs6Av4Pk/il2kvvSqMRZcaM
- YVJvE+D+BObPn9duOrPjpNwLJXyEgO8=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-CDxVGYiRMlCipkBidCqlaQ-1; Thu, 19 Dec 2019 08:33:14 -0500
-Received: by mail-qk1-f200.google.com with SMTP id g28so3604339qkl.6
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:33:14 -0800 (PST)
+ bh=75DSOPWG53BQMc2DQp8pZrGaf6WLAio2xZatEQc8yH4=;
+ b=bCw93670+cKN95kV1tGrsJIdEP+XnOy1/gNZgO9cOSY/UH93ZFIYEZxcxjyUuwfjKIsBJB
+ JoxEkQoDOYubQikQBvpz95cdtaQ0zrx2kzsxEHyjjXFhksDrvR204bBnEPqECUXdhdYhOq
+ FCTBgCP8nXlHy+H2+nHfsUUQ3QQJbyk=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-qT_j1qUPM5aF4VeMou0eBg-1; Thu, 19 Dec 2019 08:28:46 -0500
+Received: by mail-qk1-f198.google.com with SMTP id n128so3603113qke.19
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:28:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=+VFciNyicxTJ/a/4QmIxoALs8sCDRyGU5BBU/c2HPL0=;
- b=r47MsRQf2ypfIRUgMa93klK5EmLTXQ/YqNmUe9FAgLlhui/cDysW2mZCM6OukAsWMN
- ABfaiYtZqoiRPXOXBAlUErJjffZFhykRNS6OSJhihULrFUSyMfsGPqhVbxDIIYlfn4Ce
- OWguSWDMbs+jJAfzm66AW6Pyk8R8pEkQmc3huFEnOYgDeU7eW7QweQDZ3cShoT1PluzO
- K2eWikx6gd34bS4fEYyEi8hPRlV6TBVXHYv+N3M+8WCbmWOw2/0Q615sbR8j2ghn4F0D
- DGXjxpRXV3Q4oPlJR/mg7J6u9pxvFbcRoRCSH92hjoVfTdch6k/AYOTV3ddmeBCQh0Bg
- Sc5w==
-X-Gm-Message-State: APjAAAXEMa3+IPxJnrKD1AYSd9FRoT3CvSwRAHD2FF4M4foRKlbE1PAd
- /zIFGhEciB2/qXqtvT3R3v1noH2vI39z79M0rpm3CnPDy7ErmebNVrdbSfI1F1uBNgdMIlUnMnU
- A/sey5HibZAn1zfg=
-X-Received: by 2002:ac8:461a:: with SMTP id p26mr6702212qtn.317.1576762390803; 
- Thu, 19 Dec 2019 05:33:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy+Y10/rRZvyBzfotd49vjBuDPt/SmkpwCsOiXKB3hnaDeEBf6axwtUUnl1kQv4fFZv7T7trQ==
-X-Received: by 2002:ac8:461a:: with SMTP id p26mr6702178qtn.317.1576762390528; 
- Thu, 19 Dec 2019 05:33:10 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:3f::2])
- by smtp.gmail.com with ESMTPSA id j7sm1735320qkd.46.2019.12.19.05.33.08
+ bh=ilfUa7pwbD2DsrhFhXRw/VkM07xbn4jtSmYjKOWR/YA=;
+ b=Ef7bBZp6vnpmW+e4AlJ9Odhx5bwo5T4ep8DpiUCufhmWyxmumdBsX9zvaSTwtkAvJ8
+ 3vQvuc2O1ZPHcKgLxsbgcvitHSShCXF5SJV/I18efDXI60Cs0FeQKfhSSPT7CWAxDA/t
+ jezBngeGhti46yQrrH2r2JXBFJ44vGgF8kTMsrIMvrpnuF31yzaBV8L6L7LAlyxwJtEy
+ yjTRVyDtiki+ZO/0r6a2/DP9jKhw8HGdvOpbymskcBwhQERyS1tchci7dgu7SQl0fDB4
+ 5OYycfGwt3yOBynx3p4kBPeSLhCnb7DZIwYY526aLFT2cMYaYn8ysnR3SzbjVyau7An2
+ TRPw==
+X-Gm-Message-State: APjAAAWSz62qSNRDQM2u4aNWjGSuqYouNZiOEMvodnT1rjG7YZ9d2ABX
+ SlSDQ80QqTm9wKcig+1l7v7Twp4f86/bagIuAz6dByK4zeNn7ZKlfQSm64Mb5LFXR8++871GCLR
+ bMBbzO5/Y467rjow=
+X-Received: by 2002:ad4:59c2:: with SMTP id el2mr7209425qvb.152.1576762125891; 
+ Thu, 19 Dec 2019 05:28:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyKyddGWs+xFzcbGcIZNKYRgVlVtE005Yc3m9Xih4kCiABUio0P6iSUjYdg0PBEUcsYYfgBaw==
+X-Received: by 2002:ad4:59c2:: with SMTP id el2mr7209407qvb.152.1576762125640; 
+ Thu, 19 Dec 2019 05:28:45 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+ by smtp.gmail.com with ESMTPSA id i6sm1707884qkk.7.2019.12.19.05.28.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 05:33:09 -0800 (PST)
-Date: Thu, 19 Dec 2019 08:33:08 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH for-5.0 v11 08/20] virtio-iommu: Implement translate
-Message-ID: <20191219133308.GA4246@xz-x1>
-References: <20191122182943.4656-1-eric.auger@redhat.com>
- <20191122182943.4656-9-eric.auger@redhat.com>
- <20191210193342.GJ3352@xz-x1>
- <44c0041d-68ad-796f-16cc-4bab7ba0f164@redhat.com>
+ Thu, 19 Dec 2019 05:28:44 -0800 (PST)
+Date: Thu, 19 Dec 2019 08:28:41 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 20/24] virtio-mmio: Clear v2 transport state on soft reset
+Message-ID: <20191219132621.16595-21-mst@redhat.com>
+References: <20191219132621.16595-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <44c0041d-68ad-796f-16cc-4bab7ba0f164@redhat.com>
-X-MC-Unique: CDxVGYiRMlCipkBidCqlaQ-1
+In-Reply-To: <20191219132621.16595-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-MC-Unique: qT_j1qUPM5aF4VeMou0eBg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,112 +102,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- bharatb.linux@gmail.com, qemu-arm@nongnu.org, dgilbert@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 19, 2019 at 11:30:40AM +0100, Auger Eric wrote:
-> Hi Peter,
-> On 12/10/19 8:33 PM, Peter Xu wrote:
-> > On Fri, Nov 22, 2019 at 07:29:31PM +0100, Eric Auger wrote:
-> >> This patch implements the translate callback
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >>
-> >> ---
-> >>
-> >> v10 -> v11:
-> >> - take into account the new value struct and use
-> >>   g_tree_lookup_extended
-> >> - switched to error_report_once
-> >>
-> >> v6 -> v7:
-> >> - implemented bypass-mode
-> >>
-> >> v5 -> v6:
-> >> - replace error_report by qemu_log_mask
-> >>
-> >> v4 -> v5:
-> >> - check the device domain is not NULL
-> >> - s/printf/error_report
-> >> - set flags to IOMMU_NONE in case of all translation faults
-> >> ---
-> >>  hw/virtio/trace-events   |  1 +
-> >>  hw/virtio/virtio-iommu.c | 63 +++++++++++++++++++++++++++++++++++++++=
--
-> >>  2 files changed, 63 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> >> index f25359cee2..de7cbb3c8f 100644
-> >> --- a/hw/virtio/trace-events
-> >> +++ b/hw/virtio/trace-events
-> >> @@ -72,3 +72,4 @@ virtio_iommu_get_endpoint(uint32_t ep_id) "Alloc end=
-point=3D%d"
-> >>  virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=3D%d"
-> >>  virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=3D%d"
-> >>  virtio_iommu_put_domain(uint32_t domain_id) "Free domain=3D%d"
-> >> +virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, ui=
-nt32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=3D%d"
-> >> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> >> index f0a56833a2..a83666557b 100644
-> >> --- a/hw/virtio/virtio-iommu.c
-> >> +++ b/hw/virtio/virtio-iommu.c
-> >> @@ -412,19 +412,80 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMM=
-UMemoryRegion *mr, hwaddr addr,
-> >>                                              int iommu_idx)
-> >>  {
-> >>      IOMMUDevice *sdev =3D container_of(mr, IOMMUDevice, iommu_mr);
-> >> +    viommu_interval interval, *mapping_key;
-> >> +    viommu_mapping *mapping_value;
-> >> +    VirtIOIOMMU *s =3D sdev->viommu;
-> >> +    viommu_endpoint *ep;
-> >> +    bool bypass_allowed;
-> >>      uint32_t sid;
-> >> +    bool found;
-> >> +
-> >> +    interval.low =3D addr;
-> >> +    interval.high =3D addr + 1;
-> >> =20
-> >>      IOMMUTLBEntry entry =3D {
-> >>          .target_as =3D &address_space_memory,
-> >>          .iova =3D addr,
-> >>          .translated_addr =3D addr,
-> >> -        .addr_mask =3D ~(hwaddr)0,
-> >> +        .addr_mask =3D (1 << ctz32(s->config.page_size_mask)) - 1,
-> >>          .perm =3D IOMMU_NONE,
-> >>      };
-> >> =20
-> >> +    bypass_allowed =3D virtio_has_feature(s->acked_features,
-> >> +                                        VIRTIO_IOMMU_F_BYPASS);
-> >> +
-> >=20
-> > Would it be easier to check bypass_allowed here once and then drop the
-> > latter [1] and [2] check?
-> bypass_allowed does not mean you systematically bypass. You bypass if
-> the SID is unknown or if the device is not attached to any domain.
-> Otherwise you translate. But maybe I miss your point.
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-Ah ok, then could I ask how will this VIRTIO_IOMMU_F_BYPASS be used?
-For example, I think VT-d defines passthrough in a totally different
-way in that the PT mark will be stored in the per-device context
-entries, then we can allow a specific device to be pass-through when
-doing DMA.  That information is explicit (e.g., unknown SID will
-always fail the DMA), and per-device.
+At the moment when the guest writes a status of 0, we only reset the
+virtio core state but not the virtio-mmio state. The virtio-mmio
+specification says (v1.1 cs01, 4.2.2.1 Device Requirements:
+MMIO Device Register Layout):
 
-Here do you mean that you just don't put a device into any domain to
-show it wants to use PT?  Then I'm not sure how do you identify
-whether this is a legal PT or a malicious device (e.g., an unknown
-device that even does not have any driver bound to it, which will also
-satisfy "unknown SID" and "not attached to any domain", iiuc).
+    Upon reset, the device MUST clear all bits in InterruptStatus and
+    ready bits in the QueueReady register for all queues in the device.
 
-Thanks,
+The core already takes care of InterruptStatus by clearing isr, but we
+still need to clear QueueReady.
 
+It would be tempting to clean all registers, but since the specification
+doesn't say anything more, guests could rely on the registers keeping
+their state across reset. Linux for example, relies on this for
+GuestPageSize in the legacy MMIO tranport.
+
+Fixes: 44e687a4d9ab ("virtio-mmio: implement modern (v2) personality (virti=
+o-1)")
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Message-Id: <20191213095410.1516119-1-jean-philippe@linaro.org>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio-mmio.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 94d934c44b..ef40b7a9b2 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -65,6 +65,19 @@ static void virtio_mmio_stop_ioeventfd(VirtIOMMIOProxy *=
+proxy)
+     virtio_bus_stop_ioeventfd(&proxy->bus);
+ }
+=20
++static void virtio_mmio_soft_reset(VirtIOMMIOProxy *proxy)
++{
++    int i;
++
++    if (proxy->legacy) {
++        return;
++    }
++
++    for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
++        proxy->vqs[i].enabled =3D 0;
++    }
++}
++
+ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned siz=
+e)
+ {
+     VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
+@@ -378,6 +391,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offs=
+et, uint64_t value,
+=20
+         if (vdev->status =3D=3D 0) {
+             virtio_reset(vdev);
++            virtio_mmio_soft_reset(proxy);
+         }
+         break;
+     case VIRTIO_MMIO_QUEUE_DESC_LOW:
 --=20
-Peter Xu
+MST
 
 
