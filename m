@@ -2,60 +2,63 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E6AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 20:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4321C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 20:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46C002467B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 20:01:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46C002467B
+	by mail.kernel.org (Postfix) with ESMTPS id AF51B2467B
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 20:03:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF51B2467B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii1zI-0006KG-6o
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 15:01:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33079)
+	id 1ii21G-0007uA-PW
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 15:03:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vr_qemu@t-online.de>) id 1ii1yT-0005la-Uo
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 15:00:43 -0500
+ (envelope-from <vr_qemu@t-online.de>) id 1ii20R-0007T8-OW
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 15:02:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vr_qemu@t-online.de>) id 1ii1yS-0002Wt-NE
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 15:00:41 -0500
-Received: from mailout10.t-online.de ([194.25.134.21]:53114)
+ (envelope-from <vr_qemu@t-online.de>) id 1ii20Q-0002uM-Gp
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 15:02:43 -0500
+Received: from mailout07.t-online.de ([194.25.134.83]:43240)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1ii1yS-0002OG-F8
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 15:00:40 -0500
-Received: from fwd13.aul.t-online.de (fwd13.aul.t-online.de [172.20.27.62])
- by mailout10.t-online.de (Postfix) with SMTP id B5EE2416C754;
- Thu, 19 Dec 2019 21:00:36 +0100 (CET)
+ (Exim 4.71) (envelope-from <vr_qemu@t-online.de>) id 1ii20Q-0002l0-9L
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 15:02:42 -0500
+Received: from fwd17.aul.t-online.de (fwd17.aul.t-online.de [172.20.27.64])
+ by mailout07.t-online.de (Postfix) with SMTP id 0494D424FF80;
+ Thu, 19 Dec 2019 21:02:40 +0100 (CET)
 Received: from [192.168.211.200]
- (TJKyPqZerhccG50u6-CgfpTYjwjvgRi6rPOCcT3nSR-ukEfYytgXpHQoUfWE4vWgVl@[46.86.55.2])
- by fwd13.t-online.de
+ (ZZRWJ-ZBghl4kMXOpLip6IQ485LcTk0fXQ4pIegyr19fKWnM8Q74G5VZ5xn+AbhQIW@[46.86.55.2])
+ by fwd17.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1ii1yN-0xgA640; Thu, 19 Dec 2019 21:00:35 +0100
-To: Gerd Hoffmann <kraxel@redhat.com>
+ esmtp id 1ii20N-1kl7J20; Thu, 19 Dec 2019 21:02:39 +0100
+Subject: [PATCH 1/5] hda-codec: fix playback rate control
 From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
-Subject: [PATCH 0/5] audio fixes
-Message-ID: <fe427705-ef37-d48e-526c-7dc8025425b6@t-online.de>
-Date: Thu, 19 Dec 2019 21:00:35 +0100
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <fe427705-ef37-d48e-526c-7dc8025425b6@t-online.de>
+Message-ID: <494a02d8-c4de-958a-6fd6-c6df95943293@t-online.de>
+Date: Thu, 19 Dec 2019 21:02:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
+In-Reply-To: <fe427705-ef37-d48e-526c-7dc8025425b6@t-online.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Language: de-DE
-X-ID: TJKyPqZerhccG50u6-CgfpTYjwjvgRi6rPOCcT3nSR-ukEfYytgXpHQoUfWE4vWgVl
-X-TOI-MSGID: fb55c1f9-f6e4-417b-b362-e009ce6d5cfd
+X-ID: ZZRWJ-ZBghl4kMXOpLip6IQ485LcTk0fXQ4pIegyr19fKWnM8Q74G5VZ5xn+AbhQIW
+X-TOI-MSGID: 0662df15-6a1c-4f08-87c5-9098d0c10c74
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 194.25.134.21
+X-Received-From: 194.25.134.83
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,21 +76,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here are five patches to fix PulseAudio playback/recording with
-the mixing engine off.
+Since commit 1930616b98 "audio: make mixeng optional" the
+function hda_audio_output_cb can no longer assume the function
+parameter avail contains the free buffer size. With the playback
+mixing-engine turned off this leads to a broken playback rate
+control and playback buffer drops in regular intervals.
 
-Volker R=C3=BCmelin (5):
-  hda-codec: fix playback rate control
-  hda-codec: fix recording rate control
-  paaudio: drop recording stream in qpa_fini_in
-  paaudio: try to drain the recording stream
-  paaudio: wait until the recording stream is ready
+This patch moves down the rate calculation, so the correct
+buffer fill level is used for the calculation.
 
- audio/paaudio.c      | 70 ++++++++++++++++++++++++++++++++++++----------=
-------
- hw/audio/hda-codec.c |  8 +++---
- 2 files changed, 53 insertions(+), 25 deletions(-)
+Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
+---
+ hw/audio/hda-codec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index f17e8d8dce..768ba31e79 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -338,8 +338,6 @@ static void hda_audio_output_cb(void *opaque, int ava=
+il)
+         return;
+     }
+=20
+-    hda_timer_sync_adjust(st, (wpos - rpos) - to_transfer - (B_SIZE >> 1=
+));
+-
+     while (to_transfer) {
+         uint32_t start =3D (uint32_t) (rpos & B_MASK);
+         uint32_t chunk =3D (uint32_t) MIN(B_SIZE - start, to_transfer);
+@@ -351,6 +349,8 @@ static void hda_audio_output_cb(void *opaque, int ava=
+il)
+             break;
+         }
+     }
++
++    hda_timer_sync_adjust(st, (wpos - rpos) - (B_SIZE >> 1));
+ }
+=20
+ static void hda_audio_compat_input_cb(void *opaque, int avail)
 --=20
 2.16.4
 
