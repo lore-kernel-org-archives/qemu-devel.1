@@ -2,94 +2,77 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946B0C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC0DC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DEBF2467E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 452E9218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/by5EVb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEBF2467E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJN2PEil"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 452E9218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwCJ-0007bI-JL
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:50:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40933)
+	id 1ihwDJ-0001DJ-Gk
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:51:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ihvt7-0005YK-Hy
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:30:46 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ihvtS-00061X-Dj
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:31:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ihvt6-0000cW-Nd
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:30:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54943
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ihvtQ-0002Lx-Qn
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:31:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35073
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvt5-0000Z2-Qy
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:30:44 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ihvtQ-0002HX-I8
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:31:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576762243;
+ s=mimecast20190719; t=1576762263;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O0kkToBSsV4lC7fUOrXQnyUufjTfp/jAHZI7pYL7RFo=;
- b=a/by5EVbHK9CB/1Qk9tjJwkVOH/kw+DGbq+C5UfJO1ZrYlzMkt99/PsQon0JG5rFRA3N+Y
- 7tpt1T7BvX8yrGw0oH+EaMWc95e364z9ihllaFSe8f6wuaeJD8th+bOQ9sH3iLZOlQURIB
- TcuoktFieIFmIabqIjTUFPcAipf2M1g=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-t1eZJVyeNjek26QAQRjlzQ-1; Thu, 19 Dec 2019 08:30:41 -0500
-Received: by mail-qk1-f199.google.com with SMTP id i135so2946033qke.14
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:30:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=e58ZDOEpQ/Xl9I50RD0ywf5riBr5Vg9Ex8K5Of0ACys=;
- b=JB6DKS4D7p7Jhz19YT1f3oACJFe5617z/To1fiksSJifScLhZiC4H69IX8lQXQWeW/
- Vz/bVaUfL1i78ni3lBENvsyUh3BbHiI7ETHMWUh0SJjarp5Lbd9Nz+LyNAFIvCBkWFI7
- QVQjCL8osmOEmNRgtMycJ/GbbavZZYGK2p2pePIZt+265EbWlgcyGEC1TW+Jv1Ic83oe
- NRii+bPoa6WY66KUUPu8xNEywKvrGHqmz5tFgY0QxEzH7K4uXeat3b338AbZT4/s7Noz
- xxiAvmzDoeI+Ee2b8jLbE+q2jM7l/Q3hafaZX2omyZuhU5k+7Uiiy8Z/XrQngbJMcyMV
- zjqw==
-X-Gm-Message-State: APjAAAV2k1WFgGrRqiUhnXOmg7VfpkvYr8wHNqHHun/jDdkh1gwxgGEF
- MXuCaDXyJ6JRky13zW0/7Pse2gwVBQLoE9q0NXjttOFanTafO8x4TM0n8jHixzMOBucdJhuKWiU
- SZhGptxOddYF0Mek=
-X-Received: by 2002:aed:3c5b:: with SMTP id u27mr7026476qte.287.1576762241220; 
- Thu, 19 Dec 2019 05:30:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz3DkQhEzi9sCEUdm1EEP+LSL9jhx9eOYILP2Rca+G0zwtavbxBG8BpLUDFvu2iVyeOPNYoWA==
-X-Received: by 2002:aed:3c5b:: with SMTP id u27mr7026462qte.287.1576762241078; 
- Thu, 19 Dec 2019 05:30:41 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id m27sm1882093qta.21.2019.12.19.05.30.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 05:30:38 -0800 (PST)
-Date: Thu, 19 Dec 2019 08:30:34 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH 0/2] numa: stop abusing numa_mem_supported
-Message-ID: <20191219083024-mutt-send-email-mst@kernel.org>
-References: <1576154936-178362-1-git-send-email-imammedo@redhat.com>
- <20191219142851.42cd33ff@redhat.com>
+ bh=CkYORcQ/e98hznUetPpS+PDKQnMi6OE1cRXLP39neRE=;
+ b=VJN2PEilraAlYC1AW8+s/+EiXW9+kugB1zEHHb1MrlFDYibM0puSeynGgc0wpY+rcsPnvv
+ HvStw+v2DDhyF1e1FNg7AlKEq2fldbTUaHtwTsf/5VLu46YEXBUx0suxLFkGiwHgIE+P2m
+ xpPQUxGVt1aF2iPcLt/f9VC+lHVuQCw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-jfpegpyKMsKPNXdDc0nN7A-1; Thu, 19 Dec 2019 08:30:59 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB9C1801E76
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:30:58 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABD2F5DA2C;
+ Thu, 19 Dec 2019 13:30:52 +0000 (UTC)
+Date: Thu, 19 Dec 2019 14:30:51 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org, mst@redhat.com
+Subject: Re: [PATCH for-5.0 v2 0/9] q35: CPU hotplug with secure boot, part 1+2
+Message-ID: <20191219143051.506bf945@redhat.com>
+In-Reply-To: <1575896942-331151-1-git-send-email-imammedo@redhat.com>
+References: <1575896942-331151-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191219142851.42cd33ff@redhat.com>
-X-MC-Unique: t1eZJVyeNjek26QAQRjlzQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: jfpegpyKMsKPNXdDc0nN7A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,40 +84,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Tao Xu <tao3.xu@intel.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: pbonzini@redhat.com, philmd@redhat.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 19, 2019 at 02:28:51PM +0100, Igor Mammedov wrote:
-> On Thu, 12 Dec 2019 13:48:54 +0100
-> Igor Mammedov <imammedo@redhat.com> wrote:
->=20
-> > A fix  and cleanup for a mistakes that slipped by me in
-> >   aa57020774 (numa: move numa global variable nb_numa_nodes into Machin=
-eState)
->=20
-> ping,
->=20
-> could someone pick it up please?
+On Mon,  9 Dec 2019 14:08:53 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-Looks more like Eduardo's thing.
+> ChangeLog:
+>   * since v1:
+>       - include "hw: add compat machines for 5.0" to provide
+>         compat context for 4.2 machine types
+>       - add comment that SMRAM at SMBASE is QEMU hack
+>         and why it was used
+>       - split command data 2 into a separate patch
+>           "acpi: cpuhp: introduce 'Command data 2' field"
+>       - rewrite enabling/detecting modern CPU hotplug interface
+>         to use existing CPHP_GET_NEXT_CPU_WITH_EVENT_CMD and
+>         squash it into "acpi: cpuhp: spec: add typical usecases" patch
+>       - "acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command"
+>         modulo 'Command data 2' being moved out into separate patch,
+>         rewrite commit message to explain better why new command is needed.
+>   
+> 
+> Series consists of 2 parts: 1st is lockable SMRAM at SMBASE
+> and the 2nd better documents interface and adds means to
+> enumerate APIC IDs for possible CPUs.
+> 
+> 1st part [1-2/9]:
+>  In order to support CPU hotplug in secure boot mode,
+>  UEFI firmware needs to relocate SMI handler of hotplugged CPU,
+>  in a way that won't allow ring 0 user to break in priveleged
+>  SMM mode that firmware maintains during runtime.
+>  Used approach allows to hide RAM at default SMBASE to make it
+>  accessible only to SMM mode, which lets us to make sure that
+>  SMI handler installed by firmware can not be hijacked by
+>  unpriveleged user (similar to TSEG behavior). 
+> 
+> 2nd part:
+>  mostly fixes and extra documentation on how to detect and use
+>  modern CPU hotplug interface (MMIO block).
+>  So firmware could reuse it for enumerating possible CPUs and
+>  detecting hotplugged CPU(s). It also adds support for
+>  CPHP_GET_CPU_ID_CMD command [7/8], which should allow firmware
+>  to fetch APIC IDs for possible CPUs which is necessary for
+>  initializing internal structures for possible CPUs on boot.
 
-> >=20
-> >=20
-> > CC: Eduardo Habkost <ehabkost@redhat.com>
-> > CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > CC: Tao Xu <tao3.xu@intel.com>
-> >=20
-> > Igor Mammedov (2):
-> >   numa: remove not needed check
-> >   numa: properly check if numa is supported
-> >=20
-> >  hw/arm/sbsa-ref.c | 1 -
-> >  hw/core/machine.c | 4 ++--
-> >  hw/core/numa.c    | 7 +------
-> >  3 files changed, 3 insertions(+), 9 deletions(-)
-> >=20
+Michael,
+
+could you pick it up please?
+
+> 
+> CC: mst@redhat.com
+> CC: pbonzini@redhat.com
+> CC: lersek@redhat.com
+> CC: philmd@redhat.com
+> 
+> 
+> Cornelia Huck (1):
+>   hw: add compat machines for 5.0
+> 
+> Igor Mammedov (8):
+>   q35: implement 128K SMRAM at default SMBASE address
+>   tests: q35: MCH: add default SMBASE SMRAM lock test
+>   acpi: cpuhp: spec: clarify 'CPU selector' register usage and
+>     endianness
+>   acpi: cpuhp: spec: fix 'Command data' description
+>   acpi: cpuhp: spec: clarify store into 'Command data' when 'Command
+>     field' == 0
+>   acpi: cpuhp: introduce 'Command data 2' field
+>   acpi: cpuhp: spec: add typical usecases
+>   acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
+> 
+>  include/hw/boards.h             |   3 ++
+>  include/hw/i386/pc.h            |   3 ++
+>  include/hw/pci-host/q35.h       |  10 ++++
+>  docs/specs/acpi_cpu_hotplug.txt |  89 +++++++++++++++++++++++++++-------
+>  hw/acpi/cpu.c                   |  18 +++++++
+>  hw/acpi/trace-events            |   1 +
+>  hw/arm/virt.c                   |   7 ++-
+>  hw/core/machine.c               |   3 ++
+>  hw/i386/pc.c                    |   5 ++
+>  hw/i386/pc_piix.c               |  14 +++++-
+>  hw/i386/pc_q35.c                |  13 ++++-
+>  hw/pci-host/q35.c               |  84 +++++++++++++++++++++++++++++---
+>  hw/ppc/spapr.c                  |  15 +++++-
+>  hw/s390x/s390-virtio-ccw.c      |  14 +++++-
+>  tests/q35-test.c                | 105 ++++++++++++++++++++++++++++++++++++++++
+>  15 files changed, 354 insertions(+), 30 deletions(-)
+> 
 
 
