@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23467C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 970B8C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1C4A218AC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:33:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D7FE218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:34:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iW7WWw8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1C4A218AC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOveZFXP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D7FE218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihuzn-0002Ac-FU
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:33:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59943)
+	id 1ihv0p-0003Xt-3v
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:34:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ihur2-0007mu-PC
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:33 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ihurb-0008Vh-AE
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ihur1-0007aN-6r
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25490
+ (envelope-from <pbonzini@redhat.com>) id 1ihurZ-0001Q4-RL
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30332
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihur0-0007XJ-VH
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:31 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihurZ-0001NB-K0
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576758270;
+ s=mimecast20190719; t=1576758305;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hzzv/OgiqADH7KAChwWwmBUi+2fw7rFny0fFHFYO0ng=;
- b=iW7WWw8qDViqjWNnPJe84ylulm8z8wz9UiVR+kXQ2I5Z+baAjNNNBvsoDYqnBtjW/SYBdL
- dXiD738JTtGigRDMTCOhIT9K6Y8HaBIrlmdajXY3/FWSEx1ZvR/8mJi7g1b9Rc1NXNdCaR
- Kjw7RsKUYK8RyD93imLQ6XKGHsdA5pk=
+ bh=9X/QHYeeNuH4098z9sf5qGPqF8ZS5vX+fP9s1JD1Nvc=;
+ b=DOveZFXPIE/JamKEfInFO7riEuUWMe+Tl8qENDD4MJRSdzM2SJgeNyWJD9ubFdlPfkPJrF
+ 7Jnc8w6MUBvzUN5FWgrEwsM6XKXHm0XAodbwHtz+XgqaUmrK0Ui7MS1wD0afo1aaheBaVS
+ ufPGsMSOr7Oxo1eZPyoqM7l5C384jUs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-Kq-17XzfN6CKUCb9DcxLFA-1; Thu, 19 Dec 2019 07:24:29 -0500
+ us-mta-363-f6eAdgX8Pz2Nwec6AySnhw-1; Thu, 19 Dec 2019 07:25:03 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A3AA1005514
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:24:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F07D2477
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:25:02 +0000 (UTC)
 Received: from 640k.localdomain.com (ovpn-112-55.ams2.redhat.com
  [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B1DF760C18;
- Thu, 19 Dec 2019 12:24:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD2AA60C18;
+ Thu, 19 Dec 2019 12:25:01 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 102/132] meson: convert hw/acpi
-Date: Thu, 19 Dec 2019 13:23:22 +0100
-Message-Id: <1576758232-12439-11-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 114/132] build-sys/rules.mak: remove version.o
+Date: Thu, 19 Dec 2019 13:23:34 +0100
+Message-Id: <1576758232-12439-23-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Kq-17XzfN6CKUCb9DcxLFA-1
+X-MC-Unique: f6eAdgX8Pz2Nwec6AySnhw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -95,96 +95,66 @@ From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/acpi/Makefile.objs | 22 ----------------------
- hw/acpi/meson.build   | 21 +++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 22 insertions(+), 23 deletions(-)
- delete mode 100644 hw/acpi/Makefile.objs
- create mode 100644 hw/acpi/meson.build
+ Makefile      | 5 -----
+ Makefile.objs | 4 ----
+ rules.mak     | 4 +---
+ 3 files changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 5823867..3dc4dec 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,6 +1,5 @@
- ifeq ($(CONFIG_SOFTMMU), y)
- devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$=
-(CONFIG_XEN))) +=3D 9pfs/
--devices-dirs-y +=3D acpi/
- endif
+diff --git a/Makefile b/Makefile
+index 71c3352..afb5e26 100644
+--- a/Makefile
++++ b/Makefile
+@@ -189,11 +189,6 @@ recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(RO=
+M_DIRS))
+ recurse-install: $(addsuffix /install, $(TARGET_DIRS))
+ $(addsuffix /install, $(TARGET_DIRS)): all
 =20
- common-obj-y +=3D $(devices-dirs-y)
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-deleted file mode 100644
-index 9bb2101..0000000
---- a/hw/acpi/Makefile.objs
-+++ /dev/null
-@@ -1,22 +0,0 @@
--ifeq ($(CONFIG_ACPI),y)
--common-obj-$(CONFIG_ACPI_X86) +=3D core.o piix4.o pcihp.o
--common-obj-$(CONFIG_ACPI_X86_ICH) +=3D ich9.o tco.o
--common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu_hotplug.o
--common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) +=3D memory_hotplug.o
--common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
--common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
--common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
--common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
+-$(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
+-=09$(call quiet-command,$(WINDRES) -I$(BUILD_DIR) -o $@ $<,"RC","version.o=
+")
 -
--common-obj-y +=3D acpi_interface.o
--common-obj-y +=3D bios-linker-loader.o
--common-obj-y +=3D aml-build.o utils.o
--common-obj-$(CONFIG_ACPI_PCI) +=3D pci.o
--common-obj-$(CONFIG_TPM) +=3D tpm.o
+-Makefile: $(version-obj-y)
 -
--common-obj-$(CONFIG_IPMI) +=3D ipmi.o
--common-obj-$(call lnot,$(CONFIG_IPMI)) +=3D ipmi-stub.o
--else
--common-obj-y +=3D acpi-stub.o
--endif
--common-obj-$(CONFIG_ALL) +=3D acpi-stub.o ipmi-stub.o
-diff --git a/hw/acpi/meson.build b/hw/acpi/meson.build
-new file mode 100644
-index 0000000..7d160c2
---- /dev/null
-+++ b/hw/acpi/meson.build
-@@ -0,0 +1,21 @@
-+acpi_ss =3D ss.source_set()
-+acpi_ss.add(files(
-+  'acpi_interface.c',
-+  'aml-build.c',
-+  'bios-linker-loader.c',
-+  'utils.c',
-+))
-+acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu_hotplug.c=
-'))
-+acpi_ss.add(when: 'CONFIG_ACPI_MEMORY_HOTPLUG', if_true: files('memory_hot=
-plug.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_NVDIMM', if_true: files('nvdimm.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_PCI', if_true: files('pci.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_VMGENID', if_true: files('vmgenid.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_X86', if_true: files('core.c', 'piix4.c', '=
-pcihp.c'), if_false: files('acpi-stub.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('ich9.c', 'tco.c')=
-)
-+acpi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c'), if_false: files=
-('ipmi-stub.c'))
-+acpi_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
-+softmmu_ss.add_all(when: 'CONFIG_ACPI', if_true: acpi_ss)
-+
-+softmmu_ss.add(when: 'CONFIG_ACPI', if_false: files('acpi-stub.c'))
-+softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('acpi-stub.c', 'ipmi-stu=
-b.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index 33d5f9f..b2f8d6c 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,3 +1,4 @@
-+subdir('acpi')
- subdir('adc')
- subdir('audio')
- subdir('block')
+ ######################################################################
+=20
+ COMMON_LDADDS =3D libqemuutil.a
+diff --git a/Makefile.objs b/Makefile.objs
+index 76326e9..9fd3932 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -55,7 +55,3 @@ common-obj-$(if $(CONFIG_RBD),m) +=3D block-rbd$(DSOSUF)
+ common-obj-$(if $(CONFIG_LZFSE),m) +=3D block-dmg-lzfse$(DSOSUF)
+ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) +=3D block-dmg-bz2=
+$(DSOSUF)
+ endif
+-
+-######################################################################
+-# Resource file for Windows executables
+-version-obj-$(CONFIG_WIN32) +=3D $(BUILD_DIR)/version.o
+diff --git a/rules.mak b/rules.mak
+index 162ecb5..6c6b909 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -78,8 +78,6 @@ expand-objs =3D $(strip $(sort $(filter %.o,$1)) \
+ =09$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+ =09       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
+ =09       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+-%.o: %.rc
+-=09$(call quiet-command,$(WINDRES) -I. -o $@ $<,"RC","$(TARGET_DIR)$@")
+=20
+ # If we have a CXX we might have some C++ objects, in which case we
+ # must link with the C++ compiler, not the plain C compiler.
+@@ -87,7 +85,7 @@ LINKPROG =3D $(or $(CXX),$(CC))
+=20
+ LINK =3D $(call quiet-command, $(LINKPROG) $(QEMU_LDFLAGS) $(QEMU_CFLAGS) =
+$(CFLAGS) $(LDFLAGS) -o $@ \
+        $(call process-archive-undefs, $1) \
+-       $(version-obj-y) $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_D=
+IR)$@")
++       $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_DIR)$@")
+=20
+ %.o: %.S
+ =09$(call quiet-command,$(CCAS) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
 --=20
 1.8.3.1
 
