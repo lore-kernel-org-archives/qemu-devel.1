@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94113C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81924C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:58:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AF0920716
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:58:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F72E20716
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:58:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqK3e2xI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AF0920716
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCiY7KuU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F72E20716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihvO5-0003m8-TA
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:58:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36494)
+	id 1ihvO9-0003t4-4g
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:58:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ihus8-0000gs-Qi
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:42 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ihusC-0000kc-Ar
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ihus6-0002vx-Rq
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57348
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1ihusA-00030G-Iv
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44251
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihus6-0002tG-JV
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:38 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihus8-0002xr-MF
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576758337;
+ s=mimecast20190719; t=1576758340;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oLE1nfwKXyX6lNaiMKq8XXlNtJf3EUmUtJk4eewFxvc=;
- b=WqK3e2xIybnn9Ix03PsXt+E10Scd7YKmCjjIOpvr51tJN6fbqTfM+KuktliGeP4ThuSz/g
- ZgRCyj0r0+bX6h8ndTqlfDF+KtUgcnvA7W10muRdAws3gMRPIJ0iQwByurLEKASOC4XJAn
- 7NTMxcLVf35kkdbCIbNUcq7N72mZqnI=
+ bh=t7UDH8pkl4r3jOup0r+QeLxo6bRKR2Bxv6cfZ6kMSKk=;
+ b=WCiY7KuUg9Em+K4SBoA+w2qLn4cPk0PuE5nKmF7TDHnCD3XexiMbjUZM96Oq7/rb4Yyuoq
+ 2cyytYzG4ZfT3sOhRTLXOACRuTOFB+X4KXpDy6cIxrkyccFqHfNbRKPo9zwniEbgNO047o
+ 9Qvl58IYyh0yVZ9yUZSsIfViMGS38Ws=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-iwmHs8uYOUeioGbCANWqag-1; Thu, 19 Dec 2019 07:25:35 -0500
+ us-mta-317-qgR8pb5gPQaNywiR3xrQ5A-1; Thu, 19 Dec 2019 07:25:38 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 232F1107ACC7
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:25:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA05D1005516
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:25:37 +0000 (UTC)
 Received: from 640k.localdomain.com (ovpn-112-55.ams2.redhat.com
  [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E44C460C18;
- Thu, 19 Dec 2019 12:25:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4396460C18;
+ Thu, 19 Dec 2019 12:25:35 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 127/132] meson: convert po/
-Date: Thu, 19 Dec 2019 13:23:47 +0100
-Message-Id: <1576758232-12439-36-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 128/132] meson: replace pc-bios/keymaps/Makefile
+Date: Thu, 19 Dec 2019 13:23:48 +0100
+Message-Id: <1576758232-12439-37-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: iwmHs8uYOUeioGbCANWqag-1
+X-MC-Unique: qgR8pb5gPQaNywiR3xrQ5A-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,221 +95,214 @@ From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile       |  3 ---
- meson.build    |  4 ++++
- po/LINGUAS     |  7 ++++++
- po/Makefile    | 52 -----------------------------------------
- po/POTFILES    |  1 +
- po/meson.build |  5 ++++
- po/messages.po | 74 ------------------------------------------------------=
+ meson.build                 | 13 ++++---
+ pc-bios/keymaps/Makefile    | 56 ---------------------------
+ pc-bios/keymaps/meson.build | 94 +++++++++++++++++++++++++++--------------=
 ----
- 7 files changed, 17 insertions(+), 129 deletions(-)
- create mode 100644 po/LINGUAS
- delete mode 100644 po/Makefile
- create mode 100644 po/POTFILES
- create mode 100644 po/meson.build
- delete mode 100644 po/messages.po
+ 3 files changed, 65 insertions(+), 98 deletions(-)
+ delete mode 100644 pc-bios/keymaps/Makefile
 
-diff --git a/Makefile b/Makefile
-index 3faf6a4..0493a3b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -235,9 +235,6 @@ ifneq ($(vhost-user-json-y),)
- =09=09$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)/vhost-user/"; \
- =09done
- endif
--ifdef CONFIG_GTK
--=09$(MAKE) -C po $@
--endif
-=20
- .PHONY: ctags
- ctags:
 diff --git a/meson.build b/meson.build
-index 32b9430..9a5b9d9 100644
+index 9a5b9d9..884aa6c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1064,3 +1064,7 @@ if host_machine.system() =3D=3D 'windows'
-                 build_always_stale: true,
-                 command: nsis_cmd + ['@INPUT@'])
+@@ -897,6 +897,14 @@ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
  endif
-+
-+if 'CONFIG_GTK' in config_host
-+  subdir('po')
+=20
++# used for the update-keymaps target
++if xkbcommon.found()
++  qemu_keymap =3D executable('qemu-keymap', files('qemu-keymap.c', 'ui/inp=
+ut-keymap.c'),
++                           dependencies: [qemuutil, xkbcommon], install: h=
+ave_tools)
++else
++  qemu_keymap =3D disabler()
 +endif
-diff --git a/po/LINGUAS b/po/LINGUAS
-new file mode 100644
-index 0000000..054930d
---- /dev/null
-+++ b/po/LINGUAS
-@@ -0,0 +1,7 @@
-+bg
-+de_DE
-+fr_FR
-+hu
-+it
-+tr
-+zh_CN
-diff --git a/po/Makefile b/po/Makefile
++
+ if have_tools
+   executable('qemu-img', [files('qemu-img.c'), hxdep], dependencies: [bloc=
+k, qemuutil], install: true)
+   if host_machine.system() =3D=3D 'linux' or host_machine.system() =3D=3D =
+'sunos' or host_machine.system().endswith('bsd')
+@@ -907,11 +915,6 @@ if have_tools
+   subdir('contrib/rdmacm-mux')
+   subdir('contrib/elf2dmp')
+=20
+-  if xkbcommon.found()
+-    executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c'),
+-               dependencies: [qemuutil, xkbcommon], install: true)
+-  endif
+-
+   executable('qemu-edid', files('qemu-edid.c', 'hw/display/edid-generate.c=
+'),
+              dependencies: qemuutil)
+=20
+diff --git a/pc-bios/keymaps/Makefile b/pc-bios/keymaps/Makefile
 deleted file mode 100644
-index c041f4c..0000000
---- a/po/Makefile
+index 76217b0..0000000
+--- a/pc-bios/keymaps/Makefile
 +++ /dev/null
-@@ -1,52 +0,0 @@
--# This makefile is very special as it's meant to build as part of the buil=
-d
--# process and also within the source tree to update the translation files.
+@@ -1,56 +0,0 @@
 -
--# Set SRC_PATH for in-tree builds without configuration.
--SRC_PATH=3D..
+-KEYMAP=09:=3D $(shell which qemu-keymap 2>/dev/null)
 -
--# The default target must come before any include statements.
+-MAPS=09:=3D ar bepo cz da de de-ch en-us en-gb es et fi fo \
+-=09   fr fr-be fr-ca fr-ch \
+-=09   hr hu is it ja lt lv mk nl no pl pt pt-br ru th tr
+-
+-ar=09: MAP_FLAGS :=3D=09-l ar
+-bepo=09: MAP_FLAGS :=3D=09-l fr -v dvorak
+-cz=09: MAP_FLAGS :=3D=09-l cz
+-da=09: MAP_FLAGS :=3D=09-l dk
+-de=09: MAP_FLAGS :=3D=09-l de -v nodeadkeys
+-de-ch=09: MAP_FLAGS :=3D=09-l ch
+-en-us=09: MAP_FLAGS :=3D=09-l us
+-en-gb=09: MAP_FLAGS :=3D=09-l gb
+-es=09: MAP_FLAGS :=3D=09-l es
+-et=09: MAP_FLAGS :=3D=09-l et
+-fi=09: MAP_FLAGS :=3D=09-l fi
+-fo=09: MAP_FLAGS :=3D=09-l fo
+-fr=09: MAP_FLAGS :=3D=09-l fr -v nodeadkeys
+-fr-be=09: MAP_FLAGS :=3D=09-l be
+-fr-ca=09: MAP_FLAGS :=3D=09-l ca -v fr
+-fr-ch=09: MAP_FLAGS :=3D=09-l ch -v fr
+-hr=09: MAP_FLAGS :=3D=09-l hr
+-hu=09: MAP_FLAGS :=3D=09-l hu
+-is=09: MAP_FLAGS :=3D=09-l is
+-it=09: MAP_FLAGS :=3D=09-l it
+-ja=09: MAP_FLAGS :=3D=09-l jp -m jp106
+-lt=09: MAP_FLAGS :=3D=09-l lt
+-lv=09: MAP_FLAGS :=3D=09-l lv
+-mk=09: MAP_FLAGS :=3D=09-l mk
+-nl=09: MAP_FLAGS :=3D=09-l nl
+-no=09: MAP_FLAGS :=3D=09-l no
+-pl=09: MAP_FLAGS :=3D=09-l pl
+-pt=09: MAP_FLAGS :=3D=09-l pt
+-pt-br=09: MAP_FLAGS :=3D=09-l br
+-ru=09: MAP_FLAGS :=3D=09-l ru
+-th=09: MAP_FLAGS :=3D=09-l th
+-tr=09: MAP_FLAGS :=3D=09-l tr
+-
+-ifeq ($(KEYMAP),)
+-
 -all:
+-=09@echo "nothing to do (qemu-keymap not found)"
 -
--.PHONY:=09all build clean install update
+-else
 -
--%.mo: %.po
--=09$(call quiet-command, msgfmt -o $@ $<,"GEN","$@")
--
---include ../config-host.mak
--include $(SRC_PATH)/rules.mak
--
--PO_PATH=3D$(SRC_PATH)/po
--
--VERSION=3D$(shell cat $(SRC_PATH)/VERSION)
--SRCS=3D$(filter-out $(PO_PATH)/messages.po,$(wildcard $(PO_PATH)/*.po))
--OBJS=3D$(patsubst $(PO_PATH)/%.po,%.mo,$(SRCS))
--
--vpath %.po $(PO_PATH)
--
--all:
--=09@echo "Use 'make update' to update translation files or use 'make build=
-'"
--=09@echo "or 'make install' to build and install the translation files."
--
--update: $(SRCS)
--
--build: $(OBJS)
+-all: $(MAPS)
 -
 -clean:
--=09rm -f $(OBJS)
+-=09rm -f $(MAPS)
 -
--install: $(OBJS)
--=09for obj in $(OBJS); do \
--=09    base=3D$$(basename $$obj .mo); \
--=09    $(INSTALL) -d $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES; =
-\
--=09    $(INSTALL) -m644 $$obj $(DESTDIR)$(prefix)/share/locale/$$base/LC_M=
-ESSAGES/qemu.mo; \
--=09done
+-$(MAPS): $(KEYMAP) Makefile
+-=09$(KEYMAP) -f $@ $(MAP_FLAGS)
 -
--$(PO_PATH)/messages.po: $(SRC_PATH)/ui/gtk.c
--=09$(call quiet-command, ( cd $(SRC_PATH) && \
--          xgettext -o - --from-code=3DUTF-8 --foreign-user --no-location \
--=09    --package-name=3DQEMU --package-version=3D$(VERSION) \
--=09    --msgid-bugs-address=3Dqemu-devel@nongnu.org -k_ -C ui/gtk.c | \
--=09  sed -e s/CHARSET/UTF-8/) >$@,"GEN","$@")
--
--$(PO_PATH)/%.po: $(PO_PATH)/messages.po
--=09$(call quiet-command, msgmerge -q $@ $< > $@.bak && mv $@.bak $@,"GEN",=
-"$@")
-diff --git a/po/POTFILES b/po/POTFILES
-new file mode 100644
-index 0000000..d34d5ed
---- /dev/null
-+++ b/po/POTFILES
-@@ -0,0 +1 @@
-+ui/gtk.c
-diff --git a/po/meson.build b/po/meson.build
-new file mode 100644
-index 0000000..b99d8e2
---- /dev/null
-+++ b/po/meson.build
-@@ -0,0 +1,5 @@
-+i18n =3D import('i18n')
+-endif
+diff --git a/pc-bios/keymaps/meson.build b/pc-bios/keymaps/meson.build
+index 04c2a17..99cccd7 100644
+--- a/pc-bios/keymaps/meson.build
++++ b/pc-bios/keymaps/meson.build
+@@ -1,38 +1,58 @@
+-keymaps =3D [
+-  'ar',
+-  'bepo',
+-  'cz',
+-  'da',
+-  'de',
+-  'de-ch',
+-  'en-gb',
+-  'en-us',
+-  'es',
+-  'et',
+-  'fi',
+-  'fo',
+-  'fr',
+-  'fr-be',
+-  'fr-ca',
+-  'fr-ch',
+-  'hr',
+-  'hu',
+-  'is',
+-  'it',
+-  'ja',
+-  'lt',
+-  'lv',
+-  'mk',
+-  'nl',
+-  'no',
+-  'pl',
+-  'pt',
+-  'pt-br',
+-  'ru',
+-  'sl',
+-  'sv',
+-  'th',
+-  'tr',
+-]
++keymaps =3D {
++  'ar': '-l ar',
++  'bepo': '-l fr -v dvorak',
++  'cz': '-l cz',
++  'da': '-l dk',
++  'de': '-l de -v nodeadkeys',
++  'de-ch': '-l ch',
++  'en-gb': '-l us',
++  'en-us': '-l gb',
++  'es': '-l es',
++  'et': '-l et',
++  'fi': '-l fi',
++  'fo': '-l fo',
++  'fr': '-l fr -v nodeadkeys',
++  'fr-be': '-l be',
++  'fr-ca': '-l ca -v fr',
++  'fr-ch': '-l ch -v fr',
++  'hr': '-l hr',
++  'hu': '-l hu',
++  'is': '-l is',
++  'it': '-l it',
++  'ja': '-l jp -m jp106',
++  'lt': '-l lt',
++  'lv': '-l lv',
++  'mk': '-l mk',
++  'nl': '-l nl',
++  'no': '-l no',
++  'pl': '-l pl',
++  'pt': '-l pt',
++  'pt-br': '-l br',
++  'ru': '-l ru',
++  'sl': '',
++  'sv': '',
++  'th': '-l th',
++  'tr': '-l tr',
++}
+=20
+-install_data(keymaps, install_dir: config_host['qemu_datadir'] / 'keymaps'=
+)
++install_data(keymaps.keys(), install_dir: config_host['qemu_datadir'] / 'k=
+eymaps')
 +
-+i18n.gettext(meson.project_name(),
-+             args: '--msgid-bugs-address=3Dqemu-devel@nongnu.org',
-+             preset: 'glib')
-diff --git a/po/messages.po b/po/messages.po
-deleted file mode 100644
-index 065bd45..0000000
---- a/po/messages.po
-+++ /dev/null
-@@ -1,74 +0,0 @@
--# SOME DESCRIPTIVE TITLE.
--# This file is put in the public domain.
--# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
--#
--#, fuzzy
--msgid ""
--msgstr ""
--"Project-Id-Version: QEMU 2.12.91\n"
--"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
--"POT-Creation-Date: 2018-07-18 07:56+0200\n"
--"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
--"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
--"Language-Team: LANGUAGE <LL@li.org>\n"
--"Language: \n"
--"MIME-Version: 1.0\n"
--"Content-Type: text/plain; charset=3DUTF-8\n"
--"Content-Transfer-Encoding: 8bit\n"
--
--msgid " - Press Ctrl+Alt+G to release grab"
--msgstr ""
--
--msgid " [Paused]"
--msgstr ""
--
--msgid "_Pause"
--msgstr ""
--
--msgid "_Reset"
--msgstr ""
--
--msgid "Power _Down"
--msgstr ""
--
--msgid "_Quit"
--msgstr ""
--
--msgid "_Fullscreen"
--msgstr ""
--
--msgid "_Copy"
--msgstr ""
--
--msgid "Zoom _In"
--msgstr ""
--
--msgid "Zoom _Out"
--msgstr ""
--
--msgid "Best _Fit"
--msgstr ""
--
--msgid "Zoom To _Fit"
--msgstr ""
--
--msgid "Grab On _Hover"
--msgstr ""
--
--msgid "_Grab Input"
--msgstr ""
--
--msgid "Show _Tabs"
--msgstr ""
--
--msgid "Detach Tab"
--msgstr ""
--
--msgid "Show Menubar"
--msgstr ""
--
--msgid "_Machine"
--msgstr ""
--
--msgid "_View"
--msgstr ""
++if meson.is_cross_build()
++  native_qemu_keymap =3D find_program('qemu-keymap', required: false)
++  have_qemu_keymap =3D native_qemu_keymap.found()
++else
++  native_qemu_keymap =3D qemu_keymap
++  # disabler disables everything below
++  have_qemu_keymap =3D true
++endif
++if have_qemu_keymap
++  t =3D []
++  foreach km, args: keymaps
++    t +=3D custom_target(km,
++                       output: km,
++                       command: [qemu_keymap, '-f', '@OUTPUT@', args.split=
+()])
++  endforeach
++  if t.length() > 0
++    alias_target('update-keymaps', t)
++  endif
++endif
 --=20
 1.8.3.1
 
