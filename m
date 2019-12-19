@@ -2,81 +2,165 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E699CC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E43C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 23:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC3F024672
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 22:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 990C021927
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 23:57:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+YbVnlq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3F024672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="SDzQUkql"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 990C021927
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii4hy-0004J0-Sz
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 17:55:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42708)
+	id 1ii5fp-0005hO-My
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 18:57:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50421)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1ii4h3-0003bM-SK
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:54:55 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1ii5et-0005G7-RP
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 18:56:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1ii4h0-0001gU-M9
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:54:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20801
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ii4h0-0001XS-4b
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 17:54:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576796088;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=A03OQWvwtY1YMWfx6msRqrki4ud0DkqE7Ww37rYfCdU=;
- b=f+YbVnlq7/Z1r3FaWxyDyJlRhJz1i+0EwTBe2GumYEnKAk27X7d6ENRK4dMjaRTDSj/jYo
- xz2Mb04L/ewOs0ypLujyS/GP7/H9Itzn9fPIwdDgiBPeTzvY3F0Yxdz5Vgqyym5irTY3Sm
- hAsy/HPX6Sph/WmJuBheSnJ8v+j/RzM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-hLHPCOmKOSOMh7M0vxkLVA-1; Thu, 19 Dec 2019 17:54:32 -0500
-X-MC-Unique: hLHPCOmKOSOMh7M0vxkLVA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5C57800EB8;
- Thu, 19 Dec 2019 22:54:30 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-70.gru2.redhat.com
- [10.97.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C42A95D9E2;
- Thu, 19 Dec 2019 22:54:28 +0000 (UTC)
-Date: Thu, 19 Dec 2019 17:54:25 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: Re: [RFC PATCH 5/5] tests/boot_linux_console: Add a SLOW test
- booting Ubuntu on OrangePi PC
-Message-ID: <20191219225425.GB28892@localhost.localdomain>
-References: <20191217182730.943-1-f4bug@amsat.org>
- <20191217182730.943-6-f4bug@amsat.org>
- <CAPan3WrgL-ULAMQPTHj7zbNMS_xaTuNprp1W4GzhryQbMcPQOA@mail.gmail.com>
+ (envelope-from <aik@ozlabs.ru>) id 1ii5er-0004xN-Sa
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 18:56:43 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33820)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ii5er-0004nO-7d
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 18:56:41 -0500
+Received: by mail-pf1-x444.google.com with SMTP id l127so4196167pfl.1
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 15:56:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4WCaVg5haeyrZGE1mHK2ZF4kCT3XqMlMLdUu1v6nvKY=;
+ b=SDzQUkqlUI1B2riO+2+TQenHdQn06J/KEueDc0lsnLibbgIQhp9Tv/N2KQs4Et24PX
+ mUhFYrU47Qf8D6IrfOxKtGQDdIjhqWbl509d5ubmdW/x1W6nlJdPm2VYF6O8ML0//vjI
+ dercSojTYsIanH22EoEflxBFaXnGrFwpxvkfw0RfwCgqzJ6Fllw24DwiMsprZpmqYhFh
+ fALDnR3/k79tUfnyINfMkfW6ovYdXoAea/eCh4ymzC1fvE8n84P0zI7BtCwD3BELj8du
+ HgLFzZ2srR8HC4GHmYcsZWgN01LGzc5G2NghUS9PQ4v5pObon52MZJ3V5tUp2DSLSIt1
+ ZuKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=4WCaVg5haeyrZGE1mHK2ZF4kCT3XqMlMLdUu1v6nvKY=;
+ b=K9DIL8+d4FYnb/KAtraw8fTORCbzO8zbxP6xOs5HgurieLXelfmwDW/A+Or6Sph7ae
+ fmWbpQuPX5M8Q2AUkys6rIFL3MfFXeJYoUiUjWtbduyPgAoKPmAhu5sGFHsPXCzVwVtw
+ J4lK05uSQSqy/fbMTUasiDLnamAcBZTHykm3qPThgzjYxK3bnCNl2xDzI0Bp06YEY+pF
+ eF3M+NS5ffOFStDPDcOFsSDfnLOGiLAp00C6M3kNTyHRhG19Zi1dssESWwJTJb8W81IM
+ RqZMI7XJXYEdoTRCn/rcvGZOx/vdrBg3Xu76M3TKNp+IPxiz/NtPyJ/4yYt4CgE03AJ3
+ fEWg==
+X-Gm-Message-State: APjAAAVsY9ZWl1D9yxbHHl8JVe20+qVjZMDtCnmm8lKiLvoAYs3nwbOv
+ lTTek4gkaR70OMv99rNQqRWq0gh6/D0=
+X-Google-Smtp-Source: APXvYqzj0ykOr8ciiZgZta8ZR4nNkIQYbL+AWrILO4QXAWUKU7hquh1stZwR4xleXphoYQHMK+FImg==
+X-Received: by 2002:a62:cece:: with SMTP id y197mr13043736pfg.9.1576799798920; 
+ Thu, 19 Dec 2019 15:56:38 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id j21sm9277320pfe.175.2019.12.19.15.56.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 19 Dec 2019 15:56:38 -0800 (PST)
+Subject: Re: [PATCH v4 0/4] Improve default object property_add uint helpers
+To: Felipe Franciosi <felipe@nutanix.com>,
+ Marc-Andre Lureau <marcandre.lureau@gmail.com>,
+ Phillipe Mathieu-Daude <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost
+ <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+References: <20191219180205.25191-1-felipe@nutanix.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
+ EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
+ /pS4v4G9eOrw1v09lEKHB9WtiBVhhxKK1LnUjPEH3ifkOkgW7jFfoYgTdtB3XaXVgYnNPDFo
+ PTBYsJy+wr89XfyHr2Ev7BB3Xaf7qICXdBF8MEVY8t/UFsesg4wFWOuzCfqxFmKEaPDZlTuR
+ tfLAeVpslNfWCi5ybPlowLx6KJqOsI9R2a9o4qRXWGP7IwiMRAC3iiPyk9cknt8ee6EUIxI6
+ t847eFaVKI/6WcxhszI0R6Cj+N4y+1rHfkGWYWupCiHwj9DjILW9iEAncVgQmkNPpUsZECLT
+ WQzMuVSxjuXW4nJ6f4OFHqL2dU//qR+BM/eJ0TT3OnfLcPqfucGxubhT7n/CXUxEy+mvWwnm
+ s9p4uqVpTfEuzQ0/bE6t7dZdPBua7eYox1AQnk8JQDwC3Rn9kZq2O7u5KuJP5MfludMmQevm
+ pHYEMF4vZuIpWcOrrSctJfIIEyhDoDmR34bCXAZfNJ4p4H6TPqPh671uMQV82CfTxTrMhGFq
+ 8WYU2AH86FrVQfWoH09z1WqhlOm/KZhAV5FndwVjQJs1MRXD8QARAQABtCRBbGV4ZXkgS2Fy
+ ZGFzaGV2c2tpeSA8YWlrQG96bGFicy5ydT6JAjgEEwECACIFAk+rT0sCGwMGCwkIBwMCBhUI
+ AgkKCwQWAgMBAh4BAheAAAoJEIYTPdgrwSC5fAIP/0wf/oSYaCq9PhO0UP9zLSEz66SSZUf7
+ AM9O1rau1lJpT8RoNa0hXFXIVbqPPKPZgorQV8SVmYRLr0oSmPnTiZC82x2dJGOR8x4E01gK
+ TanY53J/Z6+CpYykqcIpOlGsytUTBA+AFOpdaFxnJ9a8p2wA586fhCZHVpV7W6EtUPH1SFTQ
+ q5xvBmr3KkWGjz1FSLH4FeB70zP6uyuf/B2KPmdlPkyuoafl2UrU8LBADi/efc53PZUAREih
+ sm3ch4AxaL4QIWOmlE93S+9nHZSRo9jgGXB1LzAiMRII3/2Leg7O4hBHZ9Nki8/fbDo5///+
+ kD4L7UNbSUM/ACWHhd4m1zkzTbyRzvL8NAVQ3rckLOmju7Eu9whiPueGMi5sihy9VQKHmEOx
+ OMEhxLRQbzj4ypRLS9a+oxk1BMMu9cd/TccNy0uwx2UUjDQw/cXw2rRWTRCxoKmUsQ+eNWEd
+ iYLW6TCfl9CfHlT6A7Zmeqx2DCeFafqEd69DqR9A8W5rx6LQcl0iOlkNqJxxbbW3ddDsLU/Y
+ r4cY20++WwOhSNghhtrroP+gouTOIrNE/tvG16jHs8nrYBZuc02nfX1/gd8eguNfVX/ZTHiR
+ gHBWe40xBKwBEK2UeqSpeVTohYWGBkcd64naGtK9qHdo1zY1P55lHEc5Uhlk743PgAnOi27Q
+ ns5zuQINBE+rT0sBEACnV6GBSm+25ACT+XAE0t6HHAwDy+UKfPNaQBNTTt31GIk5aXb2Kl/p
+ AgwZhQFEjZwDbl9D/f2GtmUHWKcCmWsYd5M/6Ljnbp0Ti5/xi6FyfqnO+G/wD2VhGcKBId1X
+ Em/B5y1kZVbzcGVjgD3HiRTqE63UPld45bgK2XVbi2+x8lFvzuFq56E3ZsJZ+WrXpArQXib2
+ hzNFwQleq/KLBDOqTT7H+NpjPFR09Qzfa7wIU6pMNF2uFg5ihb+KatxgRDHg70+BzQfa6PPA
+ o1xioKXW1eHeRGMmULM0Eweuvpc7/STD3K7EJ5bBq8svoXKuRxoWRkAp9Ll65KTUXgfS+c0x
+ gkzJAn8aTG0z/oEJCKPJ08CtYQ5j7AgWJBIqG+PpYrEkhjzSn+DZ5Yl8r+JnZ2cJlYsUHAB9
+ jwBnWmLCR3gfop65q84zLXRQKWkASRhBp4JK3IS2Zz7Nd/Sqsowwh8x+3/IUxVEIMaVoUaxk
+ Wt8kx40h3VrnLTFRQwQChm/TBtXqVFIuv7/Mhvvcq11xnzKjm2FCnTvCh6T2wJw3de6kYjCO
+ 7wsaQ2y3i1Gkad45S0hzag/AuhQJbieowKecuI7WSeV8AOFVHmgfhKti8t4Ff758Z0tw5Fpc
+ BFDngh6Lty9yR/fKrbkkp6ux1gJ2QncwK1v5kFks82Cgj+DSXK6GUQARAQABiQIfBBgBAgAJ
+ BQJPq09LAhsMAAoJEIYTPdgrwSC5NYEP/2DmcEa7K9A+BT2+G5GXaaiFa098DeDrnjmRvumJ
+ BhA1UdZRdfqICBADmKHlJjj2xYo387sZpS6ABbhrFxM6s37g/pGPvFUFn49C47SqkoGcbeDz
+ Ha7JHyYUC+Tz1dpB8EQDh5xHMXj7t59mRDgsZ2uVBKtXj2ZkbizSHlyoeCfs1gZKQgQE8Ffc
+ F8eWKoqAQtn3j4nE3RXbxzTJJfExjFB53vy2wV48fUBdyoXKwE85fiPglQ8bU++0XdOr9oyy
+ j1llZlB9t3tKVv401JAdX8EN0++ETiOovQdzE1m+6ioDCtKEx84ObZJM0yGSEGEanrWjiwsa
+ nzeK0pJQM9EwoEYi8TBGhHC9ksaAAQipSH7F2OHSYIlYtd91QoiemgclZcSgrxKSJhyFhmLr
+ QEiEILTKn/pqJfhHU/7R7UtlDAmFMUp7ByywB4JLcyD10lTmrEJ0iyRRTVfDrfVP82aMBXgF
+ tKQaCxcmLCaEtrSrYGzd1sSPwJne9ssfq0SE/LM1J7VdCjm6OWV33SwKrfd6rOtvOzgadrG6
+ 3bgUVBw+bsXhWDd8tvuCXmdY4bnUblxF2B6GOwSY43v6suugBttIyW5Bl2tXSTwP+zQisOJo
+ +dpVG2pRr39h+buHB3NY83NEPXm1kUOhduJUA17XUY6QQCAaN4sdwPqHq938S3EmtVhsuQIN
+ BFq54uIBEACtPWrRdrvqfwQF+KMieDAMGdWKGSYSfoEGGJ+iNR8v255IyCMkty+yaHafvzpl
+ PFtBQ/D7Fjv+PoHdFq1BnNTk8u2ngfbre9wd9MvTDsyP/TmpF0wyyTXhhtYvE267Av4X/BQT
+ lT9IXKyAf1fP4BGYdTNgQZmAjrRsVUW0j6gFDrN0rq2J9emkGIPvt9rQt6xGzrd6aXonbg5V
+ j6Uac1F42ESOZkIh5cN6cgnGdqAQb8CgLK92Yc8eiCVCH3cGowtzQ2m6U32qf30cBWmzfSH0
+ HeYmTP9+5L8qSTA9s3z0228vlaY0cFGcXjdodBeVbhqQYseMF9FXiEyRs28uHAJEyvVZwI49
+ CnAgVV/n1eZa5qOBpBL+ZSURm8Ii0vgfvGSijPGbvc32UAeAmBWISm7QOmc6sWa1tobCiVmY
+ SNzj5MCNk8z4cddoKIc7Wt197+X/X5JPUF5nQRvg3SEHvfjkS4uEst9GwQBpsbQYH9MYWq2P
+ PdxZ+xQE6v7cNB/pGGyXqKjYCm6v70JOzJFmheuUq0Ljnfhfs15DmZaLCGSMC0Amr+rtefpA
+ y9FO5KaARgdhVjP2svc1F9KmTUGinSfuFm3quadGcQbJw+lJNYIfM7PMS9fftq6vCUBoGu3L
+ j4xlgA/uQl/LPneu9mcvit8JqcWGS3fO+YeagUOon1TRqQARAQABiQRsBBgBCAAgFiEEZSrP
+ ibrORRTHQ99dhhM92CvBILkFAlq54uICGwICQAkQhhM92CvBILnBdCAEGQEIAB0WIQQIhvWx
+ rCU+BGX+nH3N7sq0YorTbQUCWrni4gAKCRDN7sq0YorTbVVSD/9V1xkVFyUCZfWlRuryBRZm
+ S4GVaNtiV2nfUfcThQBfF0sSW/aFkLP6y+35wlOGJE65Riw1C2Ca9WQYk0xKvcZrmuYkK3DZ
+ 0M9/Ikkj5/2v0vxz5Z5w/9+IaCrnk7pTnHZuZqOh23NeVZGBls/IDIvvLEjpD5UYicH0wxv+
+ X6cl1RoP2Kiyvenf0cS73O22qSEw0Qb9SId8wh0+ClWet2E7hkjWFkQfgJ3hujR/JtwDT/8h
+ 3oCZFR0KuMPHRDsCepaqb/k7VSGTLBjVDOmr6/C9FHSjq0WrVB9LGOkdnr/xcISDZcMIpbRm
+ EkIQ91LkT/HYIImL33ynPB0SmA+1TyMgOMZ4bakFCEn1vxB8Ir8qx5O0lHMOiWMJAp/PAZB2
+ r4XSSHNlXUaWUg1w3SG2CQKMFX7vzA31ZeEiWO8tj/c2ZjQmYjTLlfDK04WpOy1vTeP45LG2
+ wwtMA1pKvQ9UdbYbovz92oyZXHq81+k5Fj/YA1y2PI4MdHO4QobzgREoPGDkn6QlbJUBf4To
+ pEbIGgW5LRPLuFlOPWHmIS/sdXDrllPc29aX2P7zdD/ivHABslHmt7vN3QY+hG0xgsCO1JG5
+ pLORF2N5XpM95zxkZqvYfC5tS/qhKyMcn1kC0fcRySVVeR3tUkU8/caCqxOqeMe2B6yTiU1P
+ aNDq25qYFLeYxg67D/4w/P6BvNxNxk8hx6oQ10TOlnmeWp1q0cuutccblU3ryRFLDJSngTEu
+ ZgnOt5dUFuOZxmMkqXGPHP1iOb+YDznHmC0FYZFG2KAc9pO0WuO7uT70lL6larTQrEneTDxQ
+ CMQLP3qAJ/2aBH6SzHIQ7sfbsxy/63jAiHiT3cOaxAKsWkoV2HQpnmPOJ9u02TPjYmdpeIfa
+ X2tXyeBixa3i/6dWJ4nIp3vGQicQkut1YBwR7dJq67/FCV3Mlj94jI0myHT5PIrCS2S8LtWX
+ ikTJSxWUKmh7OP5mrqhwNe0ezgGiWxxvyNwThOHc5JvpzJLd32VDFilbxgu4Hhnf6LcgZJ2c
+ Zd44XWqUu7FzVOYaSgIvTP0hNrBYm/E6M7yrLbs3JY74fGzPWGRbBUHTZXQEqQnZglXaVB5V
+ ZhSFtHopZnBSCUSNDbB+QGy4B/E++Bb02IBTGl/JxmOwG+kZUnymsPvTtnNIeTLHxN/H/ae0
+ c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
+ DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
+ XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
+Message-ID: <c6289c52-aa93-c403-57d0-7cfcfbc99d9b@ozlabs.ru>
+Date: Fri, 20 Dec 2019 10:56:32 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <CAPan3WrgL-ULAMQPTHj7zbNMS_xaTuNprp1W4GzhryQbMcPQOA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20191219180205.25191-1-felipe@nutanix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,222 +172,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Guenter Roeck <linux@roeck-us.net>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---dc+cDN39EJAMEtIO
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 18, 2019 at 10:26:08PM +0100, Niek Linnenbank wrote:
-> Hi Philippe,
->=20
-> This test has some problems on my host (Ubuntu 18.04.3 LTS, avocado 73.0,
-> python 3.6.9):
->=20
->  (4/4) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_o=
-rangepi_bionic:
-> ERROR: Input format not supported by decoder (3.25 s)
-> RESULTS    : PASS 3 | ERROR 1 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0
-> | CANCEL 0
-> JOB TIME   : 46.22 s
->=20
-> I suspect it didn't download the image correctly.
->
 
-I don't think it's download related, because the
-"archive.lzma_uncompress(image_path_xz, image_path)" line is not
-capable of uncompressing that 7z archive.
+On 20/12/2019 05:02, Felipe Franciosi wrote:
+> This improves the family of object_property_add_uintXX_ptr helpers by enabling
+> a default getter/setter only when desired. To prevent an API behavioural change
+> (from clients that already used these helpers and did not want a setter), we
+> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter. Patch 1
+> enhances the API and modify current users.
+> 
+> While modifying the clients of the API, a couple of improvement opportunities
+> were observed in ich9. These were added in separate patches (2 and 3).
+> 
+> Patch 3 cleans up a lot of existing code by moving various objects to the
+> enhanced API. Previously, those objects had their own getters/setters that only
+> updated the values without further checks. Some of them actually lacked a check
+> for setting overflows, which could have resulted in undesired values being set.
+> The new default setters include a check for that, not updating the values in
+> case of errors (and propagating them). If they did not provide an error
+> pointer, then that behaviour was maintained.
 
-> Regards,
-> Niek
->=20
-> On Tue, Dec 17, 2019 at 7:27 PM Philippe Mathieu-Daud=E9 <f4bug@amsat.org=
->
-> wrote:
->=20
-> > This test boots Ubuntu Bionic on a OrangePi PC board.
-> >
-> > As it requires 1GB of storage, and is slow, this test is disabled
-> > on automatic CI testing.
-> >
-> > It is useful for workstation testing. Currently Avocado timeouts too
-> > quickly, so we can't run userland commands.
-> >
-> > The kernel image and DeviceTree blob are built by the Raspbian
-> > project (based on Debian):
-> > https://www.raspbian.org/RaspbianImages
-> >
-> > The Ubuntu image is downloaded from:
-> > https://dl.armbian.com/orangepipc/Bionic_current
-> >
-> > This test can be run using:
-> >
-> >   $ AVOCADO_ALLOW_LARGE_STORAGE=3Dyes \
-> >     avocado --show=3Dapp,console run -t machine:orangepi-pc \
-> >       tests/acceptance/boot_linux_console.py
-> >   console: Uncompressing Linux... done, booting the kernel.
-> >   console: Booting Linux on physical CPU 0x0
-> >   console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version
-> > 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 C=
-ET
-> > 2019
-> >   console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D50c=
-5387d
-> >   console: CPU: div instructions available: patching division code
-> >   console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing
-> > instruction cache
-> >   console: OF: fdt: Machine model: Xunlong Orange Pi PC
-> >   [...]
-> >   console: sunxi-mmc 1c0f000.mmc: initialized, max. request size: 16384=
- KB
-> >   console: NET: Registered protocol family 10
-> >   console: mmc0: host does not support reading read-only switch, assumi=
-ng
-> > write-enable
-> >   console: mmc0: Problem switching card into high-speed mode!
-> >   console: mmc0: new SD card at address 4567
-> >   console: mmcblk0: mmc0:4567 QEMU! 932 MiB
-> >   console: Segment Routing with IPv6
-> >   console: NET: Registered protocol family 17
-> >   console: NET: Registered protocol family 15
-> >   console: bridge: filtering via arp/ip/ip6tables is no longer availabl=
-e
-> > by default. Update your scripts to load br_netfilter if you need this.
-> >   console: 8021q: 802.1Q VLAN Support v1.8
-> >   console: Key type dns_resolver registered
-> >   console: Registering SWP/SWPB emulation handler
-> >   console: mmcblk0: p1
-> >   [...]
-> >   console: Freeing unused kernel memory: 1024K
-> >   console: Run /sbin/init as init process
-> >   console: random: fast init done
-> >   console: systemd[1]: System time before build time, advancing clock.
-> >   console: systemd[1]: systemd 237 running in system mode. (+PAM +AUDIT
-> > +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT
-> > +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD -IDN2 +IDN -PCRE2
-> > default-hierarchy=3Dhybrid)
-> >   console: systemd[1]: Detected architecture arm.
-> >   console: Welcome to Ubuntu 18.04.3 LTS!
-> >   console: systemd[1]: Set hostname to <orangepipc>.
-> >   console: random: systemd: uninitialized urandom read (16 bytes read)
-> >
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> > ---
-> > RFC because this is not the definitive test, but it is helpful so
-> > for for testing Niek work.
-> > ---
-> >  tests/acceptance/boot_linux_console.py | 41 ++++++++++++++++++++++++++
-> >  1 file changed, 41 insertions(+)
-> >
-> > diff --git a/tests/acceptance/boot_linux_console.py
-> > b/tests/acceptance/boot_linux_console.py
-> > index 8179b45910..663290e0c7 100644
-> > --- a/tests/acceptance/boot_linux_console.py
-> > +++ b/tests/acceptance/boot_linux_console.py
-> > @@ -520,6 +520,47 @@ class BootLinuxConsole(Test):
-> >          exec_command_and_wait_for_pattern(self, 'reboot',
-> >                                                  'reboot: Restarting
-> > system')
-> >
-> > +    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage
-> > limited')
-> > +    def test_arm_orangepi_bionic(self):
-> > +        """
-> > +        :avocado: tags=3Darch:arm
-> > +        :avocado: tags=3Dmachine:orangepi-pc
-> > +        """
-> > +        # This test download a 196MB compressed image and expand it to
-> > 932MB...
-> > +        deb_url =3D ('https://apt.armbian.com/pool/main/l/'
-> > +
-> >  'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > +        deb_hash =3D '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-> > +        kernel_path =3D self.extract_from_deb(deb_path,
-> > +                                            '/boot/vmlinuz-4.20.7-sunx=
-i')
-> > +        dtb_path =3D
-> > '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
-> > +        dtb_path =3D self.extract_from_deb(deb_path, dtb_path)
-> > +        image_url =3D ('https://dl.armbian.com/orangepipc/archive/'
-> > +                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.=
-7z')
-> > +        image_hash =3D '196a8ffb72b0123d92cea4a070894813d305c71e'
-> > +        image_path_xz =3D self.fetch_asset(image_url, asset_hash=3Dima=
-ge_hash)
-> > +        image_name =3D 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.=
-9.img'
-> > +        image_path =3D os.path.join(self.workdir, image_name)
-> > +        archive.lzma_uncompress(image_path_xz, image_path)
+A weird thing happens - when I apply patches from my mailer (thunderbird
+-> open the source -> cut-n-paste to "git am") - they fail to apply. And
+the mails themselves look suspicious - too many "MS-Exchange" and
+"X-Proofpoint" :)
 
-I'm not sure what magic Philippe was able to do here, but I can not
-uncompress this file with lzma_uncompress.  I'm looking into adding
-proper 7z support to avocado.utils.archive module, by means of either
-the 7z library or the py7zr Python module.
+A bundle from
+https://patchwork.ozlabs.org/project/qemu-devel/list/?series=149673
+applies fine though.
 
-- Cleber.
 
-> > +
-> > +        self.vm.set_machine('orangepi-pc')
-> > +        self.vm.set_console()
-> > +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
-> > +                               'console=3DttyS0,115200 '
-> > +                               'root=3D/dev/mmcblk0p1 rootwait rw '
-> > +                               'systemd.mask=3Ddev-ttyS0.device '
-> > +                               'systemd.mask=3Darmbian-zram-config.ser=
-vice '
-> > +                               'systemd.mask=3Darmbian-ramlog.service'=
-)
-> > +        self.vm.add_args('-kernel', kernel_path,
-> > +                         '-dtb', dtb_path,
-> > +                         '-drive', 'file=3D' + image_path +
-> > ',if=3Dsd,format=3Draw',
-> > +                         '-append', kernel_command_line,
-> > +                         '-nic', 'user',
-> > +                         '-no-reboot')
-> > +        self.vm.launch()
-> > +        self.wait_for_console_pattern('Welcome to Ubuntu 18.04.3 LTS!'=
-)
-> > +        self.wait_for_console_pattern('Started Armbian filesystem
-> > resize.')
-> > +
-> >      def test_s390x_s390_ccw_virtio(self):
-> >          """
-> >          :avocado: tags=3Darch:s390x
-> > --
-> > 2.21.0
-> >
-> >
->=20
-> --=20
-> Niek Linnenbank
+Anyway, this works on powerpc. Thanks,
 
---dc+cDN39EJAMEtIO
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl37/54ACgkQZX6NM6Xy
-CfMEvQ/+PsiPjMkjihxXJCuq45EIl8L+BOQhHzZ/wEO3GJZFg/Isq4w3BSlwgf5C
-W3HZU7BC0nPIZ7SCyQF7wq39Y9+8KiziiM0TxtgOs3UhR9JsFCZNu5RAXND36Tkn
-oWuq0WTneYTFXsCTlVzTxXwQfCaMYzbO+m699oE561EN91OL61uQqlq1pV/MpVKm
-lTyuNIR4ssyO7mtH/IF+EiFbLzN+XefyhzxCLmFChbRcmobn3CGuwdec7oHu9V5o
-FkJfAkOHtR6WuVS6DdYyymSHQmMwJjwzuWqJIBrFVikLNaoV0lxeoOxSUHPBrgtC
-iy61IqHEuJWT4JnKoVAff8ciS8t8vt2VMbs/f4ijSVj0N40bkxnQghJwDVrDCSZ0
-NSZN2ezS+OnpgnMJFCfqyuHOxBbhmSlf4VApxrdxd/phEmHvaAnz8QhfUDWPLNhO
-BQ99C2+EDm+Mah9i+vndO4fYjNRgyhaQF2ro4++31cHunEUFODnV5OkKzlgfo7gf
-unAs/cjHEt10lND+Mqdoq7smc/zwnN1SU3u3xsdlRGjiT+mUSGuszl3sS4mpVbcR
-BDYBA/r2PR+e/iH8IPBKljRIcDpmXqswmj0tGKqBq0HjXGsY4CHph1nrRf3mD2Ml
-nJrbqA/FjHRJZv6+26Bvu5H3J29PoFi/H58Ur+waz3u+Vim5CUQ=
-=0fgK
------END PGP SIGNATURE-----
+> 
+> Felipe Franciosi (4):
+>   qom/object: enable setter for uint types
+>   ich9: fix getter type for sci_int property
+>   ich9: Simplify ich9_lpc_initfn
+>   qom/object: Use common get/set uint helpers
+> 
+>  hw/acpi/ich9.c       |  99 ++------------------
+>  hw/acpi/pcihp.c      |   7 +-
+>  hw/acpi/piix4.c      |  12 +--
+>  hw/isa/lpc_ich9.c    |  27 ++----
+>  hw/misc/edu.c        |  13 +--
+>  hw/pci-host/q35.c    |  14 +--
+>  hw/ppc/spapr.c       |  18 +---
+>  hw/ppc/spapr_drc.c   |   3 +-
+>  include/qom/object.h |  44 +++++++--
+>  memory.c             |  15 +--
+>  qom/object.c         | 216 ++++++++++++++++++++++++++++++++++++++-----
+>  target/arm/cpu.c     |  22 +----
+>  target/i386/sev.c    | 106 ++-------------------
+>  ui/console.c         |   4 +-
+>  14 files changed, 282 insertions(+), 318 deletions(-)
+> 
 
---dc+cDN39EJAMEtIO--
-
+-- 
+Alexey
 
