@@ -2,61 +2,118 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0BEEC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5E9C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:25:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 868C721D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:17:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 868C721D7D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id DAF712465E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:25:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="iCbCwPJG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAF712465E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihrwM-0004Ba-J6
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 04:17:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37100)
+	id 1ihs3L-0006mA-W8
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 04:25:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48012)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1ihrvU-0003Y1-Fc
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:16:58 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ihs2h-0006H5-F4
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:24:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1ihrvS-0003ZT-Fa
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:16:56 -0500
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:47570)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1ihrvR-0002vn-Tn
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:16:54 -0500
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06436282|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.373768-0.00822152-0.618011;
- DS=CONTINUE|ham_regular_dialog|0.063209-0.00200723-0.934784;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01l07447; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=5; RT=5; SR=0; TI=SMTPD_---.GKIATES_1576746692; 
-Received: from 172.16.31.150(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GKIATES_1576746692)
- by smtp.aliyun-inc.com(10.147.44.118);
- Thu, 19 Dec 2019 17:11:36 +0800
-Subject: Re: [Qemu-devel] [PATCH] RISCV: support riscv vector extension 0.7.1
-To: Richard Henderson <richard.henderson@linaro.org>
-References: <1566959818-38369-1-git-send-email-zhiwei_liu@c-sky.com>
- <ba8c7451-b0a7-0405-f881-0c6d0d8574fb@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <1b1826c3-50e4-2481-56a2-4ebb01e04498@c-sky.com>
-Date: Thu, 19 Dec 2019 17:11:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ihs2f-0005VR-Q1
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:24:22 -0500
+Received: from mail-eopbgr20101.outbound.protection.outlook.com
+ ([40.107.2.101]:29750 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ihs2f-0005Hx-4E; Thu, 19 Dec 2019 04:24:21 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aEJxsuOjKagVeLvYAxyrOZv8ti4MuWis5vboXWSfLH5U8Y81BEDPKJELws4L3rnS8y6X2GkBJTV0wfy2T6kFhzdi4bHT7OP4DuCIboXT6QRZUee2ZJ1HrLWhoVNVaH0sJeW1bJzuT/C2y7akItcx+Ueg+iBMqpzDEk2k9QVnmdXQGoFC7k9+RLLLydJJ++2Eo1qC9GY8qku+fHrE4BzAZcB4/TfFqSJ4R+nVRhC2RyiJUBqwQulfd35U4/Akd3XgY4dGP0zboJ3hoAU9bhxTUmozmphNhv5RNxXCYBeKYneynJogizrbNiT26nBbYcS4e+Vku+HHBNJGiC0PxYjspg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WDccCRgu5eKnzQUPXrai/H1nMdYBFyTLXYDhjVi0GBs=;
+ b=Bhir9SWoVe6E5LyJcv982a4Sa59T4xsOW864rdfHknDnBGSl6j3Witi5v1g3o5APTqnZJgH4rJ5wz8kc/gVOOUjTFjUHmxkC+ymhBMhWhmt4SPZTICWiJwB7+4a8rPVWvWYeQcQ6LUQQjhqKFzBbGHCDx+tR7q7TXIcyLsQvNO6x75gMDhrryBoZYuMhjmexn4BAj6uRBx/SIvblHqY/4a5oCiftWPK2rzfOL3YYteigVwAAcCzusLYhd2X8s5BaailI3UGVhtJ5a2L7FEwbEA2WXipU4FkVzS2Ob/QLpojcFJmhqrxArBqGftzeOIMpwPRyd9egTZKnpfPSmweD/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WDccCRgu5eKnzQUPXrai/H1nMdYBFyTLXYDhjVi0GBs=;
+ b=iCbCwPJGqFK3BODhmI49DuSmgh5n+1BQcR8oVSrdvDibWCbr+o2wa1pkyM5b79mDCPdpN4P9cpvL6lqtZGL/qAJMJGnrOamXm1mCZIAG4oQ2mMfewTC34fFyfVELujQjytpGmAJqwqDFpSFl8npAGmGx9vXN4NCS8tMJkK6AYOU=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3301.eurprd08.prod.outlook.com (52.135.164.158) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2559.14; Thu, 19 Dec 2019 09:24:18 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2559.012; Thu, 19 Dec 2019
+ 09:24:18 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH for-4.2? v3 0/8] block: Fix resize (extending) of short
+ overlays
+Thread-Topic: [PATCH for-4.2? v3 0/8] block: Fix resize (extending) of short
+ overlays
+Thread-Index: AQHVoU6neqv907dUcE6t1HvrHyi33qezwPUAgA2Yl4A=
+Date: Thu, 19 Dec 2019 09:24:17 +0000
+Message-ID: <eed0efba-aa38-4901-8f10-6ec3ee339437@virtuozzo.com>
+References: <20191122160511.8377-1-kwolf@redhat.com>
+ <20191210174644.GC7103@linux.fritz.box>
+In-Reply-To: <20191210174644.GC7103@linux.fritz.box>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0044.eurprd04.prod.outlook.com
+ (2603:10a6:7:7c::33) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191219122414944
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 612dcf34-667c-40f9-b89b-08d7846538ef
+x-ms-traffictypediagnostic: AM6PR08MB3301:
+x-microsoft-antispam-prvs: <AM6PR08MB33016A133D6A9F025678B0C7C1520@AM6PR08MB3301.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0256C18696
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(366004)(39850400004)(376002)(346002)(396003)(189003)(199004)(186003)(66946007)(31696002)(66476007)(8676002)(66556008)(64756008)(66446008)(8936002)(316002)(26005)(2616005)(81156014)(81166006)(4326008)(6486002)(110136005)(54906003)(86362001)(71200400001)(6506007)(31686004)(6512007)(5660300002)(478600001)(2906002)(52116002)(36756003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3301;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /yeDhgHGSbnJ8+NiUshCj5YiRL0YSeRDAkJ+7Gd53layTQiLnVSStQxmPhHc7dhzMhIs+y3ogVJHXFz16oC/ljkqtnRy1hVXrp21zFjQhv42H2IZwnPxtKGNqQ5qTupJvK/v28f+S2DUICEHbwAiwjETjTHtIEMTMHTZ9PY2fzGJ18TjVl0emwNIGg5Nr3pt1+nUPXLGVyquS91Xts5/kxYO12KdJSrMQN/oBx02lORGGjN+lL/7SU7pou1JlVQNNtrHT27HUSyVyXcKFXFahAatyK+pDjVwvwrJ1WE1NEHxPKpW/ebiDt7Lk4nARlV71eW98tjYmoNFCfQc+6RbPWV/265AfpeZ0KoJUg3MmJ6C3W8uRXDce9q+oEmJUgIBKA8/tYJ7SWTuoqt8X08mIgOrJcJWM1ngw8UAonNezzeKavH6rF2sZ6Cp3+0ARmXA
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C2200D8AC572824CBB8662F19CBDF609@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <ba8c7451-b0a7-0405-f881-0c6d0d8574fb@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 612dcf34-667c-40f9-b89b-08d7846538ef
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Dec 2019 09:24:18.0011 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: M/tyTolOaK/u/TM+pX0vJgnOb30IN9r8smmu53GvBXImK/53ivpIsEX2XSsce0WWgGNalUp3JMx38WOZBD1vseFDMC/dkiB70kC87RGwtQI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3301
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.2.101
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,266 +125,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chih-Min Chao <chihmin.chao@sifive.com>, palmer@sifive.com,
- Alistair.Francis@wdc.com, qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard，
-
-Sorry to reply so late.
-
-Upstream is really difficult . I was really frustrated to recieve so 
-many difficult comments.
-
-It is hard for me to absorb them and will take a lot of time to fixup. 
-Now I will move on.
-
-On 2019/8/29 2:54, Richard Henderson wrote:
-> On 8/27/19 7:36 PM, liuzhiwei wrote:
->> Change-Id: I3cf891bc400713b95f47ecca82b1bf773f3dcb25
->> Signed-off-by: liuzhiwei <zhiwei_liu@c-sky.com>
->> ---
->>   fpu/softfloat.c                         |   119 +
->>   include/fpu/softfloat.h                 |     4 +
->>   linux-user/riscv/cpu_loop.c             |     8 +-
->>   target/riscv/Makefile.objs              |     2 +-
->>   target/riscv/cpu.h                      |    30 +
->>   target/riscv/cpu_bits.h                 |    15 +
->>   target/riscv/cpu_helper.c               |     7 +
->>   target/riscv/csr.c                      |    65 +-
->>   target/riscv/helper.h                   |   354 +
->>   target/riscv/insn32.decode              |   374 +-
->>   target/riscv/insn_trans/trans_rvv.inc.c |   484 +
->>   target/riscv/translate.c                |     1 +
->>   target/riscv/vector_helper.c            | 26563 ++++++++++++++++++++++++++++++
->>   13 files changed, 28017 insertions(+), 9 deletions(-)
->> +    /* vector coprocessor state.  */
->> +    struct {
->> +        union VECTOR {
->> +            float64  f64[VUNIT(64)];
->> +            float32  f32[VUNIT(32)];
->> +            float16  f16[VUNIT(16)];
->> +            target_ulong ul[VUNIT(sizeof(target_ulong))];
->> +            uint64_t u64[VUNIT(64)];
->> +            int64_t  s64[VUNIT(64)];
->> +            uint32_t u32[VUNIT(32)];
->> +            int32_t  s32[VUNIT(32)];
->> +            uint16_t u16[VUNIT(16)];
->> +            int16_t  s16[VUNIT(16)];
->> +            uint8_t  u8[VUNIT(8)];
->> +            int8_t   s8[VUNIT(8)];
->> +        } vreg[32];
->> +        target_ulong vxrm;
->> +        target_ulong vxsat;
->> +        target_ulong vl;
->> +        target_ulong vstart;
->> +        target_ulong vtype;
->> +        float_status fp_status;
->> +    } vfp;
-> You've obviously copied "vfp" from target/arm.  Drop that.  It makes no sense
-> in the context of risc-v.
->
-> I'm not sure that vreg[].element[] really makes the most sense in the context
-> of how risc-v rearranges its elements.
-
-Use vreg[].element[] is my gut feeling.  It will be easiest to 
-understand the code.
-
-As you said, view all vector registers as a single block of memory is 
-good for programing.
-
-> It will almost certainly fail clang
-> validators, if enabled, since you'll be indexing beyond the end of vreg[n] into
-> vreg[n+1].
-
-I'm sorry that it's really hard to absorb your opinion. I don't know why 
-clang will fail
-
-when index beyond the end of vreg[n] into vreg[n+1].
-
-> It might be best to have a single array:
->
->      union {
->          uint64_t u64[32 * VLEN / 64];
->          ...
->          uint8_t u8[32 * VLEN / 8];
->      } velt;
->
-> This is clearer to the compiler that this is a single block of memory that we
-> can index as we please.
-
-As Chih-Min Chao said in another part of PATCH V2 thread,  VLEN will be 
-a property which can be
-
-specified from command line.  So the sub-struct maybe defined as
-
-struct {
-     union{
-         uint64_t *u64 ;
-         int64_t  *s64;
-         uint32_t *u32;
-         int32_t  *s32;
-         uint16_t *u16;
-         int16_t  *s16;
-         uint8_t  *u8;
-         int8_t   *s8;
-     } mem;
-     target_ulong vxrm;
-     target_ulong vxsat;
-     target_ulong vl;
-     target_ulong vstart;
-     target_ulong vtype;
-} vext;
-
-Will that be OK?
-
->> +static inline bool vector_vtype_ill(CPURISCVState *env)
->> +{
->> +    if ((env->vfp.vtype >> (sizeof(target_ulong) - 1)) & 0x1) {
->> +        return true;
->> +    }
->> +    return false;
->> +}
->> +
->> +static inline void vector_vtype_set_ill(CPURISCVState *env)
->> +{
->> +    env->vfp.vtype = ((target_ulong)1) << (sizeof(target_ulong) - 1);
->> +    return;
->> +}
->> +
->> +static inline int vector_vtype_get_sew(CPURISCVState *env)
->> +{
->> +    return (env->vfp.vtype >> 2) & 0x7;
->> +}
->> +
->> +static inline int vector_get_width(CPURISCVState *env)
->> +{
->> +    return  8 * (1 << vector_vtype_get_sew(env));
->> +}
->> +
->> +static inline int vector_get_lmul(CPURISCVState *env)
->> +{
->> +    return 1 << (env->vfp.vtype & 0x3);
->> +}
->> +
->> +static inline int vector_get_vlmax(CPURISCVState *env)
->> +{
->> +    return vector_get_lmul(env) * VLEN / vector_get_width(env);
->> +}
->> +
->> +static inline int vector_elem_mask(CPURISCVState *env, uint32_t vm, int width,
->> +    int lmul, int index)
->> +{
->> +    int mlen = width / lmul;
->> +    int idx = (index * mlen) / 8;
->> +    int pos = (index * mlen) % 8;
->> +
->> +    return vm || ((env->vfp.vreg[0].u8[idx] >> pos) & 0x1);
->> +}
-> I would strongly encourage you place the components of vtype within tb_flags
-> via cpu_get_tb_cpu_state.  This would allow you to move quite a few checks from
-> run-time to translation-time.
->
-> Recall that translation happens once (per configuration), whereas execution
-> happens many times.  Obviously, the more configurations that we create, the
-> more translation that must happen.
-All check code will be moved from execution time to translation.
-> But the vtypei argument to vsetvli is a good choice, because it is constant,
-> relates directly to the compiled code, and is unrelated to the length of the
-> data being processed.
->
-> With that, you can verify at translation:
->
-> (1) vill
-> (2) v[n], for (n % lmul) != 0
-> (3) v[n] overlapping v[0] for masked/carry operations, with lmul > 1
->
-> and
->
-> (4) you can arrange the helpers so that instead of 1 helper that has to
->      handle all SEW, you have N helpers, each handling a different SEW.
->
-> And with all of this done, I believe you no longer need to pass the register
-> number to the helper.  You can pass the address of v[n], which is much more
-> like how the tcg generic vector support works.
->
-> Whether or not to include VL in tb_flags is a harder choice.  Certainly not the
-> exact value of VL, as that would lead to different translations for every loop
-> tail.  But it might be reasonable to include (VSTART == 0 && VL == VLMAX) as a
-> single bit.  Knowing that this condition is true would allow some use of the
-> tcg generic vector support.
-
-The (ill, lmul, sew ) of vtype  will be placed within tb_flags, also the 
-bit of (VSTART == 0 && VL == VLMAX).
-
-So it will take 8 bits of tb flags for vector extension at least.
-
-> E.g. vadd.vv could be
->
->      if (masked) {
->          switch (SEW) {
->          case MO_8:
->              gen_helper_vadd8_mask(...);
->              break;
->          ...
->          }
->      } else if (vl_eq_vlmax) {
->          tcg_gen_gvec_add(SEW, vreg_ofs(vd), vreg_ofs(vs2), vreg_ofs(vs1),
->                           VLEN * LMUL, VLEN * LMUL);
->      } else {
->          switch (SEW) {
->          case MO_8:
->              gen_helper_vadd8(...);
->              break;
->          ...
->          }
->      }
->
-> Or, equivalently, pack pointers to the actual generator functions into a
-> structure so that this code structure can be shared between many instructions.
-
-It's quiker to use generic vector of TCG.
-
-However, I have one problem to support both command line VLEN and vreg_ofs.
-
-As in SVE,  vreg ofs is the offset from cpu_env. If the structure of 
-vector extension (to support command line VLEN） is
-
-struct {
-     union{
-         uint64_t *u64 ;
-         int64_t  *s64;
-         uint32_t *u32;
-         int32_t  *s32;
-         uint16_t *u16;
-         int16_t  *s16;
-         uint8_t  *u8;
-         int8_t   *s8;
-     } mem;
-     target_ulong vxrm;
-     target_ulong vxsat;
-     target_ulong vl;
-     target_ulong vstart;
-     target_ulong vtype;
-} vext
-
-I can't find the way to get the direct offset of vreg from cpu_env.
-
-Maybe I should specify a max VLEN like the way of SVE?
-
-Best Regards,
-
-LIU Zhiwei
-
-> Bear in mind that all tcg gvec operations operate strictly upon lanes.  I.e.
->
->     vd[x] = vs1[x] op vs2[x]
->
-> thus the actual arrangement of the elements in storage is irrelevant and SLEN
-> need not be considered here.
->
->
-> r~
+MTAuMTIuMjAxOSAyMDo0NiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjIuMTEuMjAxOSB1bSAx
+NzowNSBoYXQgS2V2aW4gV29sZiBnZXNjaHJpZWJlbjoNCj4+IFNlZSBwYXRjaCA0IGZvciB0aGUg
+ZGVzY3JpcHRpb24gb2YgdGhlIGJ1ZyBmaXhlZC4NCj4gDQo+IEknbSBhcHBseWluZyBwYXRjaGVz
+IDMgYW5kIDUtNyB0byB0aGUgYmxvY2sgYnJhbmNoIGJlY2F1c2UgdGhleSBtYWtlDQo+IHNlbnNl
+IG9uIHRoZWlyIG93bi4NCj4gDQo+IFRoZSByZWFsIGZpeCB3aWxsIG5lZWQgYW5vdGhlciBhcHBy
+b2FjaCBiZWNhdXNlIHRoZSBlcnJvciBoYW5kbGluZyBpcw0KPiBicm9rZW4gaW4gdGhpcyBvbmU6
+IElmIHplcm9pbmcgb3V0IGZhaWxzIChlaXRoZXIgYmVjYXVzZSBvZiBOT19GQUxMQkFDSw0KPiBv
+ciBiZWNhdXNlIG9mIHNvbWUgb3RoZXIgSS9PIGVycm9yKSwgYmRydl9jb190cnVuY2F0ZSgpIHdp
+bGwgcmV0dXJuDQo+IGZhaWx1cmUsIGJ1dCB0aGUgaW1hZ2Ugc2l6ZSBoYXMgYWxyZWFkeSBiZWVu
+IGluY3JlYXNlZCwgd2l0aCBwb3RlbnRpYWxseQ0KPiBpbmNvcnJlY3QgZGF0YSBpbiB0aGUgbmV3
+IGFyZWEuDQo+IA0KPiBUbyBmaXggdGhpcywgd2UgbmVlZCB0byBtYWtlIHN1cmUgdGhhdCB6ZXJv
+cyB3aWxsIGJlIHJlYWQgYmVmb3JlIHdlDQo+IGNvbW1pdCB0aGUgbmV3IGltYWdlIHNpemUgdG8g
+dGhlIGltYWdlIGZpbGUgKGUuZy4gcWNvdzIgaGVhZGVyKSBhbmQgdG8NCj4gYnMtPnRvdGFsX3Nl
+Y3RvcnMuIEluIG90aGVyIHdvcmRzLCBpdCBtdXN0IGJlY29tZSB0aGUgcmVzcG9uc2liaWxpdHkg
+b2YNCj4gdGhlIGJsb2NrIGRyaXZlci4NCj4gDQo+IFRvIHRoaXMgZWZmZWN0LCBJJ20gcGxhbm5p
+bmcgdG8gaW50cm9kdWNlIGEgUFJFQUxMT0NfTU9ERV9aRVJPX0lOSVQgZmxhZw0KPiB0aGF0IGNh
+biBiZSBvcidlZCB0byB0aGUgcHJlYWxsb2NhdGlvbiBtb2RlLiBUaGlzIHdpbGwgZmFpbCBieSBk
+ZWZhdWx0DQo+IGJlY2F1c2UgaXQgbG9va3MgbGlrZSBqdXN0IGFub3RoZXIgdW5pbXBsZW1lbnRl
+ZCBwcmVhbGxvY2F0aW9uIG1vZGUgdG8NCj4gYmxvY2sgZHJpdmVycy4gSXQgd2lsbCBiZSByZXF1
+ZXN0ZWQgZXhwbGljaXRseSBieSBjb21taXQgam9icyBhbmQNCj4gYXV0b21hdGljYWxseSBhZGRl
+ZCBieSBiZHJ2X2NvX3RydW5jYXRlKCkgaWYgdGhlIGJhY2tpbmcgZmlsZSB3b3VsZA0KPiBiZWNv
+bWUgdmlzaWJsZSAobGlrZSBpbiB0aGlzIHNlcmllcywgYnV0IG5vdyBmb3IgYWxsIHByZWFsbG9j
+YXRpb24NCj4gbW9kZXMpLiBJJ20gcGxhbm5pbmcgdG8gaW1wbGVtZW50IGl0IGZvciBxY293MiBh
+bmQgZmlsZS1wb3NpeCBmb3Igbm93LA0KPiB3aGljaCBzaG91bGQgY292ZXIgbW9zdCBpbnRlcmVz
+dGluZyBjYXNlcy4NCj4gDQo+IERvZXMgdGhpcyBtYWtlIHNlbnNlIHRvIHlvdT8NCj4gDQoNClRo
+aXMgc2hvdWxkIHdvcmsuIERvIHlvdSBzdGlsbCBoYXZlIHRoaXMgcGxhbiBpbiBhIHRpbWVsaW5l
+Pw0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
