@@ -2,98 +2,85 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A942C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A106FC2D0C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:25:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 224572068F
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:24:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F53D24650
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:25:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4HgzpEK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 224572068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o0Xqco/M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F53D24650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihur7-0007PC-S0
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:24:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45412)
+	id 1ihusO-0000JP-HR
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:25:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ihuor-0004kf-Lr
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:22:18 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ihuqb-00075O-84
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ihuoq-0005h0-El
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:22:17 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32938
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihuoq-0005cT-74
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:22:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576758135;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mykNxRokFfeiWSocSQ+QyCiIaNXut8etci4IhLewmnc=;
- b=C4HgzpEK58yCicsAtYpP06Ci3iSXDxT4m8SjSgjyK3kMzATbG4UhnUfRFA4jm4/pG9dd6c
- YwjWeCCkvtJM+s6vbjxBhjK21WZJml4pNe+UMopXz5GwF8V5PDaLeud4AVC5Zb40fpSJFy
- MctBdD6vBE1yIoLzMi5y7dtZcMFHmes=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-qhaN0gx6OSGkbm4fNlb3Xw-1; Thu, 19 Dec 2019 07:22:14 -0500
-Received: by mail-qk1-f198.google.com with SMTP id 143so3483575qkg.12
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 04:22:14 -0800 (PST)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ihuqa-00055D-0Q
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:04 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54090)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1ihuqZ-0004pm-OU
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:03 -0500
+Received: by mail-wm1-x342.google.com with SMTP id m24so5222911wmc.3
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 04:24:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=zYnrdkYzWtj4IvXDNVBh3Tn5uVa2SwLvkll/UF2YdH8=;
+ b=o0Xqco/MBusUgV0lHiOBk+I3ATcH7sC5Wvp3cRhFLXTFK+CaXWdHf8m3MVu9XGr2fj
+ gRPw3PuzmD7vQJbKBro1kV5wJfQQP13upjIJ1vQZiO0XlSmDx5ij+tTghOEvcQePGnNX
+ gtH9HTSJDbSWZm/WaJ6m7102tZln2J6lsCiWLn9sA/5hRMfhczKzpidxP1EvA2k4fRxo
+ iw0krWsE1998aXDA+edBWZM+FJbf6i+JgxS2lugKM5peRxDovEuiHjqFlUlZQcNn0M/x
+ HPc95n3NXiwxqBuFfnI+THmC5tSW5HVrLPdxaFI7zGy5rIqaYZ3z0fK773t717Bae0JG
+ Nl1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=dYmJmwr+JHIzIM49SSWWyD96bOQbA2BPR1Ye5EXEH6I=;
- b=qVHcVNCJpc8a9dg46Jt1K4RSzdMGUmI5/rs9zkrMMwUXUokkkrqR5wEeBahq3xDOJe
- O6JOV8KykbpfHMfOvtLT7sH5aZxBOC50Wznx98mDeXiACThPqiSutafb+UXdg7qClA8+
- th2EXEgy4z7EDl4JoU5pRGmFjeCtNfb5YyqV3LwTehh8t35fQZwLxj9yTvjgE5YNjX/B
- 8KUjKBUenSVTaU2r5f4iMuTq/rzGVPFfJbEZFC2jz8g+W7BaSR0Rvjs3SO1cr4ValRDR
- Ie/JXjxM06P8Qp13rjAiIPiHBmMa3u0GhCK8nWIZA3yDYDtJSk3SlDMob3JjZsTKlPuk
- n6Mg==
-X-Gm-Message-State: APjAAAUiH6zQu52EjePdA6Z6lkfN/IXI6kSsyaqdZm4VtOSC20e8bf/J
- HWizUogO2ZSiBPvftgUUc0bkaMjCxQE6EOo9Zy0nXdhHw+QEkjNObhkff/bW+hZz0swYBdgiauE
- 6w4bP8zS+8NOsk8Y=
-X-Received: by 2002:a05:620a:1010:: with SMTP id
- z16mr6175165qkj.237.1576758133758; 
- Thu, 19 Dec 2019 04:22:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw6TrNLgKcpfV+4fst6v2LkHF79HCtaYBbNW0tQPfOxUf9u/oqj6j0d4zCV1yv42EMgearNDg==
-X-Received: by 2002:a05:620a:1010:: with SMTP id
- z16mr6175144qkj.237.1576758133543; 
- Thu, 19 Dec 2019 04:22:13 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id m68sm1209115qke.17.2019.12.19.04.22.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 04:22:12 -0800 (PST)
-Date: Thu, 19 Dec 2019 07:22:08 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [RFC PATCH v2 09/14] vhost-user-blk: Explicit we ignore few
- QEMUChrEvent in IOEventHandler
-Message-ID: <20191219072203-mutt-send-email-mst@kernel.org>
-References: <20191218172009.8868-1-philmd@redhat.com>
- <20191218172009.8868-10-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zYnrdkYzWtj4IvXDNVBh3Tn5uVa2SwLvkll/UF2YdH8=;
+ b=sIo75D+oIH3VSjAQq2dTCqxd4qwWSKr6YVQJdUkOdGBaiyX/0HEvUtzDF2L2qfw0Jh
+ Hji7O05ET6lvfGzGQGzYbPct09SDYxrIcDKnAp/xhmNKPXI2QM7D2cBkuiBzVLA1DQsJ
+ nttAJBchQdvk18lSX6225ymCS9zHfDmTXoDsx2cFrTpUkyDIQW648QQiWhk8BU+Nz5Zj
+ jLl9qJ1H89CGP2ZwhxSO5bfrkG0ncHNeHcs7g0c734HuKlJVeXfeMBOj4N5utATMZmyS
+ /zFm2EKShS+Lgh9mC2kTUY3QkhAnxFsOq4HLpqLnrtSWg3WgxSK/0AJMbEi07HdN2bWx
+ /UCQ==
+X-Gm-Message-State: APjAAAUE7onrMB/qKvGWHOrLRI7qYFUJCrBz0oNKsOyIgpmq9ai+3b1G
+ V7633JJEaYFc70/ZW/QqXapngCUpLV7HSAGxFXI=
+X-Google-Smtp-Source: APXvYqw22dOmjkYJP6docI+faTIi4zJpxCPANXfSXaMSukR1tycFG1UFW4eGsfT/y4bptUge4LbmS19Rv9HchhbW9Ds=
+X-Received: by 2002:a1c:750f:: with SMTP id o15mr9916425wmc.161.1576758241089; 
+ Thu, 19 Dec 2019 04:24:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191218172009.8868-10-philmd@redhat.com>
-X-MC-Unique: qhaN0gx6OSGkbm4fNlb3Xw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+References: <20191211134506.1803403-1-marcandre.lureau@redhat.com>
+ <20191211134506.1803403-8-marcandre.lureau@redhat.com>
+ <20191212120642.GK1829331@redhat.com>
+In-Reply-To: <20191212120642.GK1829331@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 19 Dec 2019 16:23:48 +0400
+Message-ID: <CAJ+F1CK7KynVifnO_G7VOWURYyXQgyZX+jNzXwN6-m-Gh6SmhQ@mail.gmail.com>
+Subject: Re: [PATCH v6 7/8] dockerfiles: add dbus-daemon to some of latest
+ distributions
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,65 +92,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 18, 2019 at 06:20:04PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
-:
-> The Chardev events are listed in the QEMUChrEvent enum. To be
-> able to use this enum in the IOEventHandler typedef, we need to
-> explicit all the events ignored by this frontend, to silent the
-> following GCC warning:
->=20
->     CC      s390x-softmmu/hw/block/vhost-user-blk.o
->   hw/block/vhost-user-blk.c: In function =E2=80=98vhost_user_blk_event=E2=
-=80=99:
->   hw/block/vhost-user-blk.c:370:5: error: enumeration value =E2=80=98CHR_=
-EVENT_BREAK=E2=80=99 not handled in switch [-Werror=3Dswitch]
->     370 |     switch (event) {
->         |     ^~~~~~
->   hw/block/vhost-user-blk.c:370:5: error: enumeration value =E2=80=98CHR_=
-EVENT_MUX_IN=E2=80=99 not handled in switch [-Werror=3Dswitch]
->   hw/block/vhost-user-blk.c:370:5: error: enumeration value =E2=80=98CHR_=
-EVENT_MUX_OUT=E2=80=99 not handled in switch [-Werror=3Dswitch]
->   cc1: all warnings being treated as errors
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> v2: Add all missing enums
->=20
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: qemu-block@nongnu.org
+Hi
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+On Thu, Dec 12, 2019 at 4:07 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+>
+> On Wed, Dec 11, 2019 at 05:45:05PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > To get dbus-vmstate test covered.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  tests/docker/dockerfiles/centos7.docker  | 1 +
+> >  tests/docker/dockerfiles/debian10.docker | 1 +
+> >  tests/docker/dockerfiles/fedora.docker   | 1 +
+> >  tests/docker/dockerfiles/ubuntu.docker   | 1 +
+> >  4 files changed, 4 insertions(+)
+>
+> For docker
+>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>
+>
+> Does it need adding to travis, gitlab, shippable, etc CI configs
+> too ?
 
-> ---
->  hw/block/vhost-user-blk.c | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 63da9bb619..ccaf2ad978 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -383,6 +383,11 @@ static void vhost_user_blk_event(void *opaque, int e=
-vent)
->              s->watch =3D 0;
->          }
->          break;
-> +    case CHR_EVENT_BREAK:
-> +    case CHR_EVENT_MUX_IN:
-> +    case CHR_EVENT_MUX_OUT:
-> +        /* Ignore */
-> +        break;
->      }
->  }
-> =20
-> --=20
-> 2.21.0
+Those are all good, only shippable has an issue with w64 build:
 
+backends/dbus-vmstate.c:313:22: error: format '%u' expects argument of
+type 'unsigned int', but argument 3 has type 'gsize {aka long long
+unsigned int}' [-Werror=3Dformat=3D]
+error_report("%s: Too large vmstate data to save: %" G_GSIZE_FORMAT,
+
+This seems to be a MXE build issue, since build correctly includes
+"/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/glib-2.0", and
+fedora mingw works. Philippe, any idea?
+
+And I didn't manage to run a Cirrus CI build, help welcome.
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
