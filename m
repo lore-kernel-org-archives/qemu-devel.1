@@ -2,90 +2,84 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0EDC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:56:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCEFC2D0D1
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:58:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58C54222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:56:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7ABD24679
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 18:58:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CiqPXITD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58C54222C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UMVp1uj/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7ABD24679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii0y4-0004KJ-6S
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 13:56:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39382)
+	id 1ii10Q-0007EJ-Lo
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 13:58:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ii0td-00070O-BU
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:51:38 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1ii0yR-0005J2-4o
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:56:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ii0tc-0007cs-1E
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:51:37 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55406)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ii0ta-0007JT-OD; Thu, 19 Dec 2019 13:51:35 -0500
-Received: by mail-wm1-x341.google.com with SMTP id q9so6525516wmj.5;
- Thu, 19 Dec 2019 10:51:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=fXYp8lEUsOTs8WcsQwwp+b/Rx/W+yTQjD5EmKm5HZkQ=;
- b=CiqPXITD7Q6zjfjsVt8EFYgzvZiiPThER8xHaLyNLRpa42ZGuYzQ0RWvJzRYg/v564
- wbF/PUl806Sb8yrqrkQPrnyYdmh7JEelLgNbMH/TR+EtdcL5E96Mcfh+h9OrIvrjcv8K
- IAaVUWzFVnImTSfDERTduPXzw0OZCA6y7tNs6+6A7DHnN8/d2FYiOAg6zSC553C7IVeG
- bXFIhQFAqQ747RPP93c0P+LhUOD3snmkEO81gDtzbDSmowFruBhwzqHhkj1DWMfrQyBU
- fn+OcjRJz1OKZQfxVnJRVMvtIolHAMjpq+kbdHsrXESFRDaI1o+VoY4TNy0QLXg2UjDe
- Um9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=fXYp8lEUsOTs8WcsQwwp+b/Rx/W+yTQjD5EmKm5HZkQ=;
- b=kuIDvQ5S7BkonxO0HFl/5gaztqoBEi+BVVM8p2cC2mp8+bBYStKx3S3Q9A2xKa5+Y1
- MDhHPSE1GUR+RRcIBJz4wqGLYxhOJJ2Kjhx7bYGSZx3ynuaTgVjOcJn4N71GqkqV/l/f
- K9XTpSPJ2/+OU8nJZ/n9KJRVgmErdx9rZopklCtmg+eW6C9F2oveSRKl6q7Ym2V03PI3
- VwK//mm/3WBa1CIXnx1EZ+tSZfr0GG397f6WQ7ce/84OMXjfCX1WiQs0AkB7lGHZQUKT
- orYIwjWDmBX6XvyLyMI3kXky6GIQfKK6E3wW3XGv/tA15Mt8adDMkVQNmT5LXSKnGqWe
- TQXA==
-X-Gm-Message-State: APjAAAXUQzijNjMiE2FABUbqYWsUeKqUIPO2NgcnKiN9DpiTl/jpr5Ix
- Y+mKP/Bm5/aQ+1c+ej3grON0COsW
-X-Google-Smtp-Source: APXvYqyBP+csHZWV31aWT9PUtc9oSAzojq4IR+0YaAAAV132U+rS7oQtg+AaY6Qgehx1lhQ+kKItYg==
-X-Received: by 2002:a1c:4d03:: with SMTP id o3mr11881092wmh.164.1576781491873; 
- Thu, 19 Dec 2019 10:51:31 -0800 (PST)
-Received: from x1w.redhat.com (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id b67sm7435494wmc.38.2019.12.19.10.51.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 10:51:31 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org,
-	Niek Linnenbank <nieklinnenbank@gmail.com>
-Subject: [PATCH 02/13] hw/timer/allwinner: Add AW_PIT_TIMER_MAX definition
-Date: Thu, 19 Dec 2019 19:51:16 +0100
-Message-Id: <20191219185127.24388-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191219185127.24388-1-f4bug@amsat.org>
-References: <20191219185127.24388-1-f4bug@amsat.org>
+ (envelope-from <alex.williamson@redhat.com>) id 1ii0yO-00023b-4k
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:56:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42259
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1ii0yN-0001ui-IC
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 13:56:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576781790;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=50ypp4twcT7h3+0B/Lg/fNtkFrCt7aoByDDwvMuuMiQ=;
+ b=UMVp1uj/8lekcWC7bYg83gA1r3mrlTp4DcKXsdgNKKi+8y/74TYDlqxdrhdNq/J9m2Akf+
+ ceyUGY4n59N/ERy+49oQW0wYW1aVazhgbREkQzjDO0hR/fHDRQo06eiOTd8g1XXbWG6Lxl
+ CGHybQegGPtcSmSHcu0de4IkICr/ftE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-w_dsgI9dOZK8MOwxNR9XOA-1; Thu, 19 Dec 2019 13:56:26 -0500
+X-MC-Unique: w_dsgI9dOZK8MOwxNR9XOA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04ABA107ACC9;
+ Thu, 19 Dec 2019 18:56:24 +0000 (UTC)
+Received: from x1.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D127100EBAA;
+ Thu, 19 Dec 2019 18:56:22 +0000 (UTC)
+Date: Thu, 19 Dec 2019 11:56:21 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20191219115621.67e2fe7c@x1.home>
+In-Reply-To: <6667e0b4-f3da-6283-3f27-c1cba3d13117@nvidia.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ <20191217051513.GE21868@joy-OptiPlex-7040>
+ <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+ <20191218143902.3c9b06df@x1.home>
+ <6667e0b4-f3da-6283-3f27-c1cba3d13117@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,86 +91,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
+ "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This controller is able to use up to 6 timers.
-Later we will reuse part of it to model other similar controllers
-but with less timers. To simplify the VMSTATE, we'll keep a max
-of 6 timers. Add a definition for that value.
+On Fri, 20 Dec 2019 00:12:30 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/timer/allwinner-a10-pit.h | 14 ++++++++------
- hw/timer/allwinner-a10-pit.c         |  8 ++++----
- 2 files changed, 12 insertions(+), 10 deletions(-)
+> On 12/19/2019 3:09 AM, Alex Williamson wrote:
+> > On Tue, 17 Dec 2019 14:54:14 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 12/17/2019 10:45 AM, Yan Zhao wrote:  
+> >>> On Tue, Dec 17, 2019 at 04:21:39AM +0800, Kirti Wankhede wrote:  
+> >>>> +		} else if (range.flags &
+> >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> >>>> +			uint64_t iommu_pgmask;
+> >>>> +			unsigned long pgshift = __ffs(range.pgsize);
+> >>>> +			unsigned long *bitmap;
+> >>>> +			long bsize;
+> >>>> +
+> >>>> +			iommu_pgmask =
+> >>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> >>>> +
+> >>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> >>>> +			    (range.pgsize - 1))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			if (range.iova & iommu_pgmask)
+> >>>> +				return -EINVAL;
+> >>>> +			if (!range.size || range.size > SIZE_MAX)
+> >>>> +				return -EINVAL;
+> >>>> +			if (range.iova + range.size < range.iova)
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> >>>> +						   range.bitmap_size);
+> >>>> +			if (bsize)
+> >>>> +				return ret;
+> >>>> +
+> >>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> >>>> +			if (!bitmap)
+> >>>> +				return -ENOMEM;
+> >>>> +
+> >>>> +			ret = copy_from_user(bitmap,
+> >>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> >>>> +			if (ret)
+> >>>> +				goto bitmap_exit;
+> >>>> +
+> >>>> +			iommu->dirty_page_tracking = false;  
+> >>> why iommu->dirty_page_tracking is false here?
+> >>> suppose this ioctl can be called several times.
+> >>>      
+> >>
+> >> This ioctl can be called several times, but once this ioctl is called
+> >> that means vCPUs are stopped and VFIO devices are stopped (i.e. in
+> >> stop-and-copy phase) and dirty pages bitmap are being queried by user.  
+> > 
+> > Do not assume how userspace works or its intent.  If dirty tracking is
+> > on, it should remain on until the user turns it off.  We cannot assume
+> > userspace uses a one-shot approach.  Thanks,
+> >   
+> 
+> Dirty tracking should be on until user turns it off or user reads 
+> bitmap, right? This ioctl is used to read bitmap.
 
-diff --git a/include/hw/timer/allwinner-a10-pit.h b/include/hw/timer/allwinner-a10-pit.h
-index 6aceda81ee..54c40c7db6 100644
---- a/include/hw/timer/allwinner-a10-pit.h
-+++ b/include/hw/timer/allwinner-a10-pit.h
-@@ -7,6 +7,8 @@
- #define TYPE_AW_A10_PIT "allwinner-A10-timer"
- #define AW_A10_PIT(obj) OBJECT_CHECK(AwA10PITState, (obj), TYPE_AW_A10_PIT)
- 
-+#define AW_PIT_TIMER_MAX        6
-+
- #define AW_A10_PIT_TIMER_NR    6
- #define AW_A10_PIT_TIMER_IRQ   0x1
- #define AW_A10_PIT_WDOG_IRQ    0x100
-@@ -47,17 +49,17 @@ struct AwA10PITState {
-     /*< private >*/
-     SysBusDevice parent_obj;
-     /*< public >*/
--    qemu_irq irq[AW_A10_PIT_TIMER_NR];
--    ptimer_state * timer[AW_A10_PIT_TIMER_NR];
--    AwA10TimerContext timer_context[AW_A10_PIT_TIMER_NR];
-+    qemu_irq irq[AW_PIT_TIMER_MAX];
-+    ptimer_state * timer[AW_PIT_TIMER_MAX];
-+    AwA10TimerContext timer_context[AW_PIT_TIMER_MAX];
-     MemoryRegion iomem;
-     uint32_t clk_freq[4];
- 
-     uint32_t irq_enable;
-     uint32_t irq_status;
--    uint32_t control[AW_A10_PIT_TIMER_NR];
--    uint32_t interval[AW_A10_PIT_TIMER_NR];
--    uint32_t count[AW_A10_PIT_TIMER_NR];
-+    uint32_t control[AW_PIT_TIMER_MAX];
-+    uint32_t interval[AW_PIT_TIMER_MAX];
-+    uint32_t count[AW_PIT_TIMER_MAX];
-     uint32_t watch_dog_mode;
-     uint32_t watch_dog_control;
-     uint32_t count_lo;
-diff --git a/hw/timer/allwinner-a10-pit.c b/hw/timer/allwinner-a10-pit.c
-index 117e5c7bf8..b31a0bcd43 100644
---- a/hw/timer/allwinner-a10-pit.c
-+++ b/hw/timer/allwinner-a10-pit.c
-@@ -203,15 +203,15 @@ static const VMStateDescription vmstate_a10_pit = {
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(irq_enable, AwA10PITState),
-         VMSTATE_UINT32(irq_status, AwA10PITState),
--        VMSTATE_UINT32_ARRAY(control, AwA10PITState, AW_A10_PIT_TIMER_NR),
--        VMSTATE_UINT32_ARRAY(interval, AwA10PITState, AW_A10_PIT_TIMER_NR),
--        VMSTATE_UINT32_ARRAY(count, AwA10PITState, AW_A10_PIT_TIMER_NR),
-+        VMSTATE_UINT32_ARRAY(control, AwA10PITState, AW_PIT_TIMER_MAX),
-+        VMSTATE_UINT32_ARRAY(interval, AwA10PITState, AW_PIT_TIMER_MAX),
-+        VMSTATE_UINT32_ARRAY(count, AwA10PITState, AW_PIT_TIMER_MAX),
-         VMSTATE_UINT32(watch_dog_mode, AwA10PITState),
-         VMSTATE_UINT32(watch_dog_control, AwA10PITState),
-         VMSTATE_UINT32(count_lo, AwA10PITState),
-         VMSTATE_UINT32(count_hi, AwA10PITState),
-         VMSTATE_UINT32(count_ctl, AwA10PITState),
--        VMSTATE_PTIMER_ARRAY(timer, AwA10PITState, AW_A10_PIT_TIMER_NR),
-+        VMSTATE_PTIMER_ARRAY(timer, AwA10PITState, AW_PIT_TIMER_MAX),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.21.0
+No, dirty bitmap tracking is on until the user turns it off, period.
+Retrieving the bitmap is probably only looking at a portion of the
+container address space at a time, anything else would place
+impractical requirements on the user allocated bitmap.  We also need to
+support a usage model where the user is making successive calls, where
+each should report pages dirtied since the previous call.  If the user
+is required to re-enable tracking, there's an irreconcilable gap
+between the call to retrieve the dirty bitmap and their opportunity to
+re-enable dirty tracking.  It's fundamentally broken to automatically
+disable tracking on read.  Thanks,
+
+Alex
 
 
