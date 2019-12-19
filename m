@@ -2,89 +2,77 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C54EBC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C5CC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E527222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:11:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19E5324672
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 11:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qsiq10gG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E527222C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eQ7e4EXZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19E5324672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihtiV-0003bR-K8
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 06:11:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57951)
+	id 1ihtjD-0004Bh-RV
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 06:12:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43522)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ihtWk-0003zZ-1V
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:59:31 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ihtYq-0006oh-Ss
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ihtWi-0001Yy-KE
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:59:29 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33658)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ihtWi-0001U0-BS
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:59:28 -0500
-Received: by mail-wr1-x444.google.com with SMTP id b6so5547414wrq.0
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 02:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=rjDJrz6x/SGN471YkmM/0ztom5/w9/oR2o+AFj80PtQ=;
- b=qsiq10gGXkKpkjtndeMa0YzmhXow3734kohC5sUAoc+NbOyXSEzhywOPk86eu2yIil
- wx9RZ2A49xYkCZdNyf36zWGyOPWCv2rWCXOho0tS7ifS4H4VDPbsiP+f2cX/aKnQb/wS
- WPc74fdkKGk27dnJ5wBrXCSvc4gViMIM1daantBQPc4fSbL+Ba1uN51J9x5209zoBk7b
- LQv7zlVrhd0dmTqQHRaE2WEUzxfEJy8DJCsZqHP5ibLh6IF33srDAYaY5YuDEE2Dpd3t
- FnMcy47LQDrpto978sYIZCSgZGI28PQ11Hh0D80ibWuLciFwtPwzavLysfsMltJe/LmA
- 2QJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=rjDJrz6x/SGN471YkmM/0ztom5/w9/oR2o+AFj80PtQ=;
- b=XgxBVS6FHWulWHrpZvZQNHGitoXFhXgfjpgH7+uSNO0xC5KvXCfyvlgm2AYk2ouJnV
- 4wKTxm0kLf120HYGcmt4Nb48a2C0oq+DT8YiyuMZq4wGty2o8xp93d9UaJyX7gaSQXAC
- Yei7pSBW4ps5a5xIeN751PFRkkf8Q28Nb6m3/4eng9tjVYR4uQHliUzOWWfK5kft8DRw
- 5txmg42tiF+NUShaX1kqaVWWqVOt+qBO+abmVDLy7IBMwfdhtJxtCKF9Td4pzUvXypTD
- haNaLYS649Hgb6qnUMuQisvzluQRctL04iMsP4QilIKdNuE/+KoBtJERsdUrLlj6TQPy
- PUaw==
-X-Gm-Message-State: APjAAAVMfnOE5b9wLNba+BEOzP0nHBai9dMe4XN2gf2X4osnBTvRAtcA
- 5dfW0STPxAxgz4C4r5jyG2MTIQ==
-X-Google-Smtp-Source: APXvYqzJUuHh6e0ivXkD6Lj4XxopvEtWbAo5NzhW01wJFb9yZKsAkfotOQSk7ZUdoC/L/zEgwIR5Rg==
-X-Received: by 2002:adf:ffc5:: with SMTP id x5mr8876623wrs.92.1576753167174;
- Thu, 19 Dec 2019 02:59:27 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a1sm5967336wrr.80.2019.12.19.02.59.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 02:59:20 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8D2E81FFAC;
- Thu, 19 Dec 2019 10:49:36 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 22/25] linux-user: log page table changes under -d page
-Date: Thu, 19 Dec 2019 10:49:31 +0000
-Message-Id: <20191219104934.866-23-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191219104934.866-1-alex.bennee@linaro.org>
-References: <20191219104934.866-1-alex.bennee@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1ihtYp-00010V-HJ
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:01:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60890
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ihtYp-0000y1-At
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 06:01:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576753298;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xHpMM384RdXLzpFE6SjAZkdl42OK3Or+UxwQ8vHaGjs=;
+ b=eQ7e4EXZVlf3oSi0mZEditzL1Jt0wc3hd/n29QF7L1RIkIlxY+zkD3hsQyh8Y2ft7hCGdi
+ lvExeX1CUaSlcNykuRWCArvrr7ghQN++QuQ0AEP9CsMqMVGbQl2gREHWwA/kh8soLwCZji
+ /QNVqEMfQkvQ6D2uYXsIetCwKXUWYnM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-V4CIXPzsOm6JY6G4ARcCYw-1; Thu, 19 Dec 2019 06:01:29 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 289011005514;
+ Thu, 19 Dec 2019 11:01:28 +0000 (UTC)
+Received: from localhost (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B32F710013A1;
+ Thu, 19 Dec 2019 11:01:27 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 3/6] tests/boot-sector: Fix the bad s390x assembler code
+Date: Thu, 19 Dec 2019 12:01:09 +0100
+Message-Id: <20191219110112.8343-4-cohuck@redhat.com>
+In-Reply-To: <20191219110112.8343-1-cohuck@redhat.com>
+References: <20191219110112.8343-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: V4CIXPzsOm6JY6G4ARcCYw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,104 +84,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <thuth@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CPU_LOG_PAGE flag is woefully underused and could stand to do
-extra duty tracking page changes. If the user doesn't want to see the
-details as things change they still have the tracepoints available.
+From: Thomas Huth <thuth@redhat.com>
 
-We push the locking into log_page_dump and pass a reason for the
-banner text.
+There are currently two bugs in s390x_code[]: First, the initial jump
+uses the wrong offset, so it was jumping to 0x10014 instead of 0x10010.
+Second, LHI only loads the lower 32-bit of the register.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20191205122518.10010-5-alex.bennee@linaro.org>
+Everything worked fine as long as the s390-ccw bios code was jumping
+here with r3 containing zeroes in the uppermost 48 bit - which just
+happened to be the case so far by accident. But we can not rely on this
+fact, and indeed one of the recent suggested patches to jump2ipl.c cause
+the newer GCCs to put different values into r3. In that case the code
+from s390x_code[] crashes very ungracefully.
 
-diff --git a/include/exec/log.h b/include/exec/log.h
-index 9bd1e4aa20b..fcc7b9e00ba 100644
---- a/include/exec/log.h
-+++ b/include/exec/log.h
-@@ -69,15 +69,14 @@ static inline void log_disas(void *code, unsigned long size)
- 
- #if defined(CONFIG_USER_ONLY)
- /* page_dump() output to the log file: */
--static inline void log_page_dump(void)
-+static inline void log_page_dump(const char *operation)
- {
--    QemuLogFile *logfile;
--    rcu_read_lock();
--    logfile = atomic_rcu_read(&qemu_logfile);
-+    FILE *logfile = qemu_log_lock();
-     if (logfile) {
--        page_dump(logfile->fd);
-+        qemu_log("page layout changed following %s\n", operation);
-+        page_dump(logfile);
-     }
--    rcu_read_unlock();
-+    qemu_log_unlock(logfile);
- }
- #endif
- #endif
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 470a8bf79ed..7f4e3cd6271 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -963,7 +963,7 @@ int main(int argc, char **argv)
- 
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
--        log_page_dump();
-+        log_page_dump("binary load");
- 
-         qemu_log("start_brk   0x" TARGET_ABI_FMT_lx "\n", info->start_brk);
-         qemu_log("end_code    0x" TARGET_ABI_FMT_lx "\n", info->end_code);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 6ff7851e86f..8718d03ee21 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -826,7 +826,7 @@ int main(int argc, char **argv, char **envp)
- 
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
--        log_page_dump();
-+        log_page_dump("binary load");
- 
-         qemu_log("start_brk   0x" TARGET_ABI_FMT_lx "\n", info->start_brk);
-         qemu_log("end_code    0x" TARGET_ABI_FMT_lx "\n", info->end_code);
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 0b1b43ac3c0..3d90fa459ca 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -18,6 +18,7 @@
-  */
- #include "qemu/osdep.h"
- #include "trace.h"
-+#include "exec/log.h"
- #include "qemu.h"
- 
- //#define DEBUG_MMAP
-@@ -539,10 +540,9 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
-     page_set_flags(start, start + len, prot | PAGE_VALID);
-  the_end:
-     trace_target_mmap_complete(start);
--#ifdef DEBUG_MMAP
--    page_dump(stdout);
--    printf("\n");
--#endif
-+    if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-+        log_page_dump(__func__);
-+    }
-     tb_invalidate_phys_range(start, start + len);
-     mmap_unlock();
-     return start;
--- 
-2.20.1
+Thus let's make sure to jump to the right instruction, and use LGHI
+instead of LHI to make sure that we always zero out the upper bits
+of the register.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20191217150642.27946-1-thuth@redhat.com>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ tests/boot-sector.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+index 7824286b9a4e..9e66c6d0130a 100644
+--- a/tests/boot-sector.c
++++ b/tests/boot-sector.c
+@@ -75,11 +75,11 @@ static const uint8_t s390x_psw_and_magic[] =3D {
+     0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40   /* in the s390-ccw bi=
+os */
+ };
+ static const uint8_t s390x_code[] =3D {
+-    0xa7, 0xf4, 0x00, 0x0a,                                /* j 0x10010 */
++    0xa7, 0xf4, 0x00, 0x08,                                /* j 0x10010 */
+     0x00, 0x00, 0x00, 0x00,
+     'S', '3', '9', '0',
+     'E', 'P', 0x00, 0x01,
+-    0xa7, 0x38, HIGH(SIGNATURE_ADDR), LOW(SIGNATURE_ADDR), /* lhi r3,0x7c1=
+0 */
++    0xa7, 0x39, HIGH(SIGNATURE_ADDR), LOW(SIGNATURE_ADDR), /* lghi r3,0x7c=
+10 */
+     0xa7, 0x48, LOW(SIGNATURE), HIGH(SIGNATURE),           /* lhi r4,0xadd=
+e */
+     0x40, 0x40, 0x30, 0x00,                                /* sth r4,0(r3)=
+ */
+     0xa7, 0xf4, 0xff, 0xfa                                 /* j 0x10010 */
+--=20
+2.21.0
 
 
