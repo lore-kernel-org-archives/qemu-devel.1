@@ -2,94 +2,80 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9B1C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C984C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35C60206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:18:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35C60206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58504206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:18:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GAtRlNdf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58504206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwd2-0001WG-Kl
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:18:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37954)
+	id 1ihwdA-0001a0-AU
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:18:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ihwSc-0001s0-L2
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:07:27 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ihwQ4-0006QV-V3
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:04:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ihwSX-0006eh-8i
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:07:26 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62138)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1ihwSW-0005W1-Ss; Thu, 19 Dec 2019 09:07:21 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBJE2Qee122565; Thu, 19 Dec 2019 09:07:04 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2x09a3uqj6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 19 Dec 2019 09:07:03 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBJE2VOZ123035;
- Thu, 19 Dec 2019 09:06:58 -0500
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2x09a3uqfv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 19 Dec 2019 09:06:57 -0500
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBJE4rdf023134;
- Thu, 19 Dec 2019 14:06:56 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
- [9.57.198.29]) by ppma01dal.us.ibm.com with ESMTP id 2wvqc7ajp1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 19 Dec 2019 14:06:56 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBJE6thv29163906
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 19 Dec 2019 14:06:55 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 08358AC05E;
- Thu, 19 Dec 2019 14:06:55 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E470CAC062;
- Thu, 19 Dec 2019 14:06:54 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 19 Dec 2019 14:06:54 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-ppc@nongnu.org
-Subject: [PATCH v7 1/6] tpm: Move tpm_tis_show_buffer to tpm_util.c
-Date: Thu, 19 Dec 2019 09:06:00 -0500
-Message-Id: <20191219140605.3243321-2-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191219140605.3243321-1-stefanb@linux.vnet.ibm.com>
-References: <20191219140605.3243321-1-stefanb@linux.vnet.ibm.com>
+ (envelope-from <kwolf@redhat.com>) id 1ihwPz-0000zg-RU
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:04:48 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31066
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihwPz-0000wq-LC
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 09:04:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576764283;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zRavHMNMrAnCq6s1aCzlexZE1Ud+L01GZLTpSyv3La0=;
+ b=GAtRlNdfnLxx8GQLYTUSUoBddP1DwWisqBuNcdendgtpNESKy6BM1kFsVlQEMaSG8R37Gv
+ oQJrh0S+o66cWQVvS9NYTCoezpkY48G2KfdfnA4Dy+zZr3wvJ/wLVw8OHj2nozzBlmuohl
+ i392hP8KvUPzKgRLP+V79Gkpao4ZThs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-dE3Xrr-jOq-xOhgNJkq2oQ-1; Thu, 19 Dec 2019 09:04:40 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2074107ACC4;
+ Thu, 19 Dec 2019 14:04:38 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-53.ams2.redhat.com [10.36.117.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C2176940E;
+ Thu, 19 Dec 2019 14:04:37 +0000 (UTC)
+Date: Thu, 19 Dec 2019 15:04:33 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH] block: nbd: Fix dirty bitmap context name
+Message-ID: <20191219140433.GK5230@linux.fritz.box>
+References: <20191219125151.21482-1-nsoffer@redhat.com>
+ <443c32b3-0e0c-ef9e-4d5b-9404b16eaa02@virtuozzo.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-19_01:2019-12-17,2019-12-19 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 clxscore=1015
- spamscore=0 mlxlogscore=999 suspectscore=3 impostorscore=0 phishscore=0
- bulkscore=0 adultscore=0 priorityscore=1501 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912190119
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+In-Reply-To: <443c32b3-0e0c-ef9e-4d5b-9404b16eaa02@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: dE3Xrr-jOq-xOhgNJkq2oQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,144 +87,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: Nir Soffer <nsoffer@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Nir Soffer <nirsof@gmail.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
----
- hw/tpm/tpm_tis.c    | 32 ++++----------------------------
- hw/tpm/tpm_util.c   | 25 +++++++++++++++++++++++++
- hw/tpm/tpm_util.h   |  3 +++
- hw/tpm/trace-events |  2 +-
- 4 files changed, 33 insertions(+), 29 deletions(-)
+Am 19.12.2019 um 14:41 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Ahh, I see, it's documented as
+>=20
+> +# @bitmap: Also export the dirty bitmap reachable from @device, so the
+> +#          NBD client can use NBD_OPT_SET_META_CONTEXT with
+> +#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4.0)
+>=20
+> and it is logical to assume that export name (which is @name argument) is
+> mentioned. But we never mentioned it. This is just documented after
+> removed experimenatl command x-nbd-server-add-bitmap,
+>=20
+> look at
+>=20
+> commit 7dc570b3806e5b0a4c9219061556ed5a4a0de80c
+> Author: Eric Blake <eblake@redhat.com>
+> Date:   Fri Jan 11 13:47:18 2019 -0600
+>=20
+>      nbd: Remove x-nbd-server-add-bitmap
+>=20
+> ...
+>=20
+> -# @bitmap-export-name: How the bitmap will be seen by nbd clients
+> -#                      (default @bitmap)
+> -#
+> -# Note: the client must use NBD_OPT_SET_META_CONTEXT with a query of
+> -# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-name) to a=
+ccess
+> -# the exposed bitmap.
+>=20
+>=20
+> So, this "NAME" is saved and now looks incorrect. What should be fixed, i=
+s Qapi
+> documentation.
 
-diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-index 7aaf9b946d..5b17c88a7d 100644
---- a/hw/tpm/tpm_tis.c
-+++ b/hw/tpm/tpm_tis.c
-@@ -107,30 +107,6 @@ static uint8_t tpm_tis_locality_from_addr(hwaddr addr)
-     return (uint8_t)((addr >> TPM_TIS_LOCALITY_SHIFT) & 0x7);
- }
- 
--static void tpm_tis_show_buffer(const unsigned char *buffer,
--                                size_t buffer_size, const char *string)
--{
--    size_t len, i;
--    char *line_buffer, *p;
--
--    len = MIN(tpm_cmd_get_size(buffer), buffer_size);
--
--    /*
--     * allocate enough room for 3 chars per buffer entry plus a
--     * newline after every 16 chars and a final null terminator.
--     */
--    line_buffer = g_malloc(len * 3 + (len / 16) + 1);
--
--    for (i = 0, p = line_buffer; i < len; i++) {
--        if (i && !(i % 16)) {
--            p += sprintf(p, "\n");
--        }
--        p += sprintf(p, "%.2X ", buffer[i]);
--    }
--    trace_tpm_tis_show_buffer(string, len, line_buffer);
--
--    g_free(line_buffer);
--}
- 
- /*
-  * Set the given flags in the STS register by clearing the register but
-@@ -156,8 +132,8 @@ static void tpm_tis_sts_set(TPMLocality *l, uint32_t flags)
-  */
- static void tpm_tis_tpm_send(TPMState *s, uint8_t locty)
- {
--    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
--        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
-+    if (trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
-+        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
-     }
- 
-     /*
-@@ -325,8 +301,8 @@ static void tpm_tis_request_completed(TPMIf *ti, int ret)
-     s->loc[locty].state = TPM_TIS_STATE_COMPLETION;
-     s->rw_offset = 0;
- 
--    if (trace_event_get_state_backends(TRACE_TPM_TIS_SHOW_BUFFER)) {
--        tpm_tis_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
-+    if (trace_event_get_state_backends(TRACE_TPM_UTIL_SHOW_BUFFER)) {
-+        tpm_util_show_buffer(s->buffer, s->be_buffer_size, "From TPM");
-     }
- 
-     if (TPM_TIS_IS_VALID_LOCTY(s->next_locty)) {
-diff --git a/hw/tpm/tpm_util.c b/hw/tpm/tpm_util.c
-index 62b091f0c0..c0a0f3d71f 100644
---- a/hw/tpm/tpm_util.c
-+++ b/hw/tpm/tpm_util.c
-@@ -350,3 +350,28 @@ void tpm_sized_buffer_reset(TPMSizedBuffer *tsb)
-     tsb->buffer = NULL;
-     tsb->size = 0;
- }
-+
-+void tpm_util_show_buffer(const unsigned char *buffer,
-+                          size_t buffer_size, const char *string)
-+{
-+    size_t len, i;
-+    char *line_buffer, *p;
-+
-+    len = MIN(tpm_cmd_get_size(buffer), buffer_size);
-+
-+    /*
-+     * allocate enough room for 3 chars per buffer entry plus a
-+     * newline after every 16 chars and a final null terminator.
-+     */
-+    line_buffer = g_malloc(len * 3 + (len / 16) + 1);
-+
-+    for (i = 0, p = line_buffer; i < len; i++) {
-+        if (i && !(i % 16)) {
-+            p += sprintf(p, "\n");
-+        }
-+        p += sprintf(p, "%.2X ", buffer[i]);
-+    }
-+    trace_tpm_util_show_buffer(string, len, line_buffer);
-+
-+    g_free(line_buffer);
-+}
-diff --git a/hw/tpm/tpm_util.h b/hw/tpm/tpm_util.h
-index f397ac21b8..7889081fba 100644
---- a/hw/tpm/tpm_util.h
-+++ b/hw/tpm/tpm_util.h
-@@ -79,4 +79,7 @@ typedef struct TPMSizedBuffer {
- 
- void tpm_sized_buffer_reset(TPMSizedBuffer *tsb);
- 
-+void tpm_util_show_buffer(const unsigned char *buffer,
-+                          size_t buffer_size, const char *string);
-+
- #endif /* TPM_TPM_UTIL_H */
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 89804bcd64..357c9e9a84 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -14,6 +14,7 @@ tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp->len = %u,
- tpm_util_get_buffer_size_hdr_len2(uint32_t len, size_t expected) "tpm2_resp->hdr.len = %u, expected = %zu"
- tpm_util_get_buffer_size_len2(uint32_t len, size_t expected) "tpm2_resp->len = %u, expected = %zu"
- tpm_util_get_buffer_size(size_t len) "buffersize of device: %zu"
-+tpm_util_show_buffer(const char *direction, size_t len, const char *buf) "direction: %s len: %zu\n%s"
- 
- # tpm_emulator.c
- tpm_emulator_set_locality(uint8_t locty) "setting locality to %d"
-@@ -36,7 +37,6 @@ tpm_emulator_pre_save(void) ""
- tpm_emulator_inst_init(void) ""
- 
- # tpm_tis.c
--tpm_tis_show_buffer(const char *direction, size_t len, const char *buf) "direction: %s len: %zu\nbuf: %s"
- tpm_tis_raise_irq(uint32_t irqmask) "Raising IRQ for flag 0x%08x"
- tpm_tis_new_active_locality(uint8_t locty) "Active locality is now %d"
- tpm_tis_abort(uint8_t locty) "New active locality is %d"
--- 
-2.21.0
+Hm, I don't know these interfaces very well, but from you explanation it
+looks to me as if having a bitmap name made sense with
+x-nbd-server-add-bitmap because it could be called more than once for
+exporting multiple bitmaps.
+
+But now, we have only nbd-server-add, which takes a single bitmap name.
+As we don't have to distinguish multiple bitmaps any more, wouldn't it
+make more sense to use "qemu:dirty-bitmap" without any other
+information? Both export name and bitmap name are already identified by
+the connection.
+
+But if we have to have something there, using the bitmap name (which may
+or may not be the same as used in the image file) makes a little more
+sense because it makes the interface extensible for the case that we
+ever want to re-introduce an nbd-server-add-bitmap.
+
+(By the way, even if the patch were correct, it lacks a Signed-off-by.)
+
+Kevin
 
 
