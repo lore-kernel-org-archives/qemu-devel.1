@@ -7,70 +7,69 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6F2C2D0C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 17:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFEBC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 17:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AF83227BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 17:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D4C4227BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 17:27:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMvnBkQZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AF83227BF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbL46uJ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4C4227BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihzZq-0008Os-0b
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 12:27:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42942)
+	id 1ihzaM-0000VE-2B
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 12:27:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ihzXj-000671-EC
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 12:24:56 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ihzXr-0006G8-1V
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 12:25:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ihzXg-0005Pl-Oc
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 12:24:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31129
+ (envelope-from <kwolf@redhat.com>) id 1ihzXp-00063H-26
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 12:25:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24116
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihzXg-0005Jo-IA
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 12:24:52 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihzXo-00060U-SO
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 12:25:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576776291;
+ s=mimecast20190719; t=1576776300;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FC+5ANwUnUTOhltzSZFm3ttJ4/0HCjiTAYrnNTZpJCE=;
- b=LMvnBkQZ3AN36maydWI8THoNjys3cnhW1a/XphF3vdOSwK8h1r7auORE/CHrxrrc+DSWwi
- 4afCPYxDKp+lsss3+LtBIFOU4102oqtbln4qE5jysxQXJIoep9JDdeR0tBFXTyw8FI+gYl
- SJAaHVtGMXKn06BhHW7G2ER4RTdFCBk=
+ bh=CN28InvE40S6icR90JvYy808t2h2ocVy/jxeJ0DcvKc=;
+ b=gbL46uJ4XOCYGyHWtwa5u22bZ2jR/sjPG9Gt5/9jApLgKP/j8t2LDD3tJ3DK1k/rBb4K+t
+ lf1xhzyLSTUT8I2C7OPliRdDlNxaHQebhf0Hl5oNVTEkVFvcrX++oFvKppjrrAXqQ/dhPx
+ VPyLw+xkPBUupXAuSomROAElWRLRgq4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-aCypv3kqNf6YLYW5L-bihA-1; Thu, 19 Dec 2019 12:24:49 -0500
+ us-mta-338-4LeXxaG4PQmVFyal_wRBLw-1; Thu, 19 Dec 2019 12:24:56 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3B28DB64;
- Thu, 19 Dec 2019 17:24:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19F57800EB8;
+ Thu, 19 Dec 2019 17:24:55 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-117-53.ams2.redhat.com [10.36.117.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE39C620C0;
- Thu, 19 Dec 2019 17:24:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 23308620C0;
+ Thu, 19 Dec 2019 17:24:53 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 01/30] iotests: Provide a function for checking the creation of
- huge files
-Date: Thu, 19 Dec 2019 18:24:12 +0100
-Message-Id: <20191219172441.7289-2-kwolf@redhat.com>
+Subject: [PULL 05/30] qemu-img: fix info --backing-chain --image-opts
+Date: Thu, 19 Dec 2019 18:24:16 +0100
+Message-Id: <20191219172441.7289-6-kwolf@redhat.com>
 In-Reply-To: <20191219172441.7289-1-kwolf@redhat.com>
 References: <20191219172441.7289-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: aCypv3kqNf6YLYW5L-bihA-1
+X-MC-Unique: 4LeXxaG4PQmVFyal_wRBLw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -91,81 +90,163 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Some tests create huge (but sparse) files, and to be able to run those
-tests in certain limited environments (like CI containers), we have to
-check for the possibility to create such files first. Thus let's introduce
-a common function to check for large files, and replace the already
-existing checks in the iotests 005 and 220 with this function.
+Only apply --image-opts to the topmost image when listing an entire
+backing chain.  It is incorrect to treat backing filenames as image
+options.  Assuming we have the backing chain t.IMGFMT.base <-
+t.IMGFMT.mid <- t.IMGFMT, qemu-img info fails as follows:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+  $ qemu-img info --backing-chain --image-opts \
+      driver=3Dqcow2,file.driver=3Dfile,file.filename=3Dt.IMGFMT
+  qemu-img: Could not open 'TEST_DIR/t.IMGFMT.mid': Cannot find device=3DTE=
+ST_DIR/t.IMGFMT.mid nor node_name=3DTEST_DIR/t.IMGFMT.mid
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/005       |  5 +----
- tests/qemu-iotests/220       |  6 ++----
- tests/qemu-iotests/common.rc | 10 ++++++++++
- 3 files changed, 13 insertions(+), 8 deletions(-)
+ qemu-img.c                 |  3 ++
+ tests/qemu-iotests/279     | 57 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/279.out | 35 +++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 4 files changed, 96 insertions(+)
+ create mode 100755 tests/qemu-iotests/279
+ create mode 100644 tests/qemu-iotests/279.out
 
-diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index 58442762fe..b6d03ac37d 100755
---- a/tests/qemu-iotests/005
-+++ b/tests/qemu-iotests/005
-@@ -59,10 +59,7 @@ fi
- # Sanity check: For raw, we require a file system that permits the creatio=
-n
- # of a HUGE (but very sparse) file. Check we can create it before continui=
-ng.
- if [ "$IMGFMT" =3D "raw" ]; then
--    if ! truncate --size=3D5T "$TEST_IMG"; then
--        _notrun "file system on $TEST_DIR does not support large enough fi=
-les"
--    fi
--    rm "$TEST_IMG"
-+    _require_large_file 5T
- fi
+diff --git a/qemu-img.c b/qemu-img.c
+index 95a24b9762..6233b8ca56 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -2680,7 +2680,10 @@ static ImageInfoList *collect_image_info_list(bool i=
+mage_opts,
 =20
- echo
-diff --git a/tests/qemu-iotests/220 b/tests/qemu-iotests/220
-index 2d62c5dcac..15159270d3 100755
---- a/tests/qemu-iotests/220
-+++ b/tests/qemu-iotests/220
-@@ -42,10 +42,8 @@ echo "=3D=3D Creating huge file =3D=3D"
+         blk_unref(blk);
 =20
- # Sanity check: We require a file system that permits the creation
- # of a HUGE (but very sparse) file.  tmpfs works, ext4 does not.
--if ! truncate --size=3D513T "$TEST_IMG"; then
--    _notrun "file system on $TEST_DIR does not support large enough files"
--fi
--rm "$TEST_IMG"
-+_require_large_file 513T
++        /* Clear parameters that only apply to the topmost image */
+         filename =3D fmt =3D NULL;
++        image_opts =3D false;
 +
- IMGOPTS=3D'cluster_size=3D2M,refcount_bits=3D1' _make_test_img 513T
-=20
- echo "=3D=3D Populating refcounts =3D=3D"
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 0cc8acc9ed..6f0582c79a 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -643,5 +643,15 @@ _require_drivers()
-     done
- }
-=20
-+# Check that we have a file system that allows huge (but very sparse) file=
-s
+         if (chain) {
+             if (info->has_full_backing_filename) {
+                 filename =3D info->full_backing_filename;
+diff --git a/tests/qemu-iotests/279 b/tests/qemu-iotests/279
+new file mode 100755
+index 0000000000..6682376808
+--- /dev/null
++++ b/tests/qemu-iotests/279
+@@ -0,0 +1,57 @@
++#!/usr/bin/env bash
 +#
-+_require_large_file()
-+{
-+    if ! truncate --size=3D"$1" "$TEST_IMG"; then
-+        _notrun "file system on $TEST_DIR does not support large enough fi=
-les"
-+    fi
-+    rm "$TEST_IMG"
-+}
++# Test qemu-img --backing-chain --image-opts
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- # make sure this script returns success
- true
++seq=3D$(basename "$0")
++echo "QA output created by $seq"
++
++status=3D1=09# failure is the default!
++
++_cleanup()
++{
++    _cleanup_test_img
++    rm -f "$TEST_IMG.mid"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++
++# Backing files are required...
++_supported_fmt qcow qcow2 vmdk qed
++_supported_proto file
++_supported_os Linux
++
++TEST_IMG=3D"$TEST_IMG.base" _make_test_img 64M
++TEST_IMG=3D"$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
++_make_test_img -b "$TEST_IMG.mid"
++
++echo
++echo '=3D=3D qemu-img info --backing-chain =3D=3D'
++_img_info --backing-chain | _filter_img_info
++
++echo
++echo '=3D=3D qemu-img info --backing-chain --image-opts =3D=3D'
++TEST_IMG=3D"driver=3Dqcow2,file.driver=3Dfile,file.filename=3D$TEST_IMG" _=
+img_info --backing-chain --image-opts | _filter_img_info
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/279.out b/tests/qemu-iotests/279.out
+new file mode 100644
+index 0000000000..f4dc6c69cb
+--- /dev/null
++++ b/tests/qemu-iotests/279.out
+@@ -0,0 +1,35 @@
++QA output created by 279
++Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D67108864
++Formatting 'TEST_DIR/t.IMGFMT.mid', fmt=3DIMGFMT size=3D67108864 backing_f=
+ile=3DTEST_DIR/t.IMGFMT.base
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864 backing_file=
+=3DTEST_DIR/t.IMGFMT.mid
++
++=3D=3D qemu-img info --backing-chain =3D=3D
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 64 MiB (67108864 bytes)
++backing file: TEST_DIR/t.IMGFMT.mid
++
++image: TEST_DIR/t.IMGFMT.mid
++file format: IMGFMT
++virtual size: 64 MiB (67108864 bytes)
++backing file: TEST_DIR/t.IMGFMT.base
++
++image: TEST_DIR/t.IMGFMT.base
++file format: IMGFMT
++virtual size: 64 MiB (67108864 bytes)
++
++=3D=3D qemu-img info --backing-chain --image-opts =3D=3D
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 64 MiB (67108864 bytes)
++backing file: TEST_DIR/t.IMGFMT.mid
++
++image: TEST_DIR/t.IMGFMT.mid
++file format: IMGFMT
++virtual size: 64 MiB (67108864 bytes)
++backing file: TEST_DIR/t.IMGFMT.base
++
++image: TEST_DIR/t.IMGFMT.base
++file format: IMGFMT
++virtual size: 64 MiB (67108864 bytes)
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 6b10a6a762..eb57ddc72c 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -286,3 +286,4 @@
+ 272 rw
+ 273 backing quick
+ 277 rw quick
++279 rw backing quick
 --=20
 2.20.1
 
