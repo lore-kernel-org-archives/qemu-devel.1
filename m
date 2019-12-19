@@ -2,118 +2,83 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 034B7C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC10C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8DAE206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DAE206D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id CB081206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:52:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FisYIX4g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB081206D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihsPB-0005PT-VP
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 04:47:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40308)
+	id 1ihsUJ-0007Y9-V3
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 04:52:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ihsOJ-0004ar-D7
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:46:44 -0500
+ (envelope-from <quintela@redhat.com>) id 1ihsTh-0006gp-0Q
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ihsOI-0000Mm-Bt
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:46:43 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:36335)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ihsOF-0008WP-SA; Thu, 19 Dec 2019 04:46:40 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N2mS2-1hhHq71YA0-0136E5; Thu, 19 Dec 2019 10:46:31 +0100
-Subject: Re: [PATCH] MAINTAINERS: Update Yuval Shaia's email address
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20191126102637.2038-1-yuval.shaia@oracle.com>
- <df5ed556-f636-0d8e-5882-89560e90e884@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <cefbec21-8b62-f04d-f5ad-b211fa596569@vivier.eu>
-Date: Thu, 19 Dec 2019 10:46:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <quintela@redhat.com>) id 1ihsTd-0007yx-Lp
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:52:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54897
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ihsTd-0007tJ-CM
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:52:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576749132;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pgmS/kN1YzmVsEiG8rSyDHONHXymsnIUDqvPYjpzLp4=;
+ b=FisYIX4gtECoKQSWJG51UAVx4x+DbZfwyTcnUe8gOjG5d2OlV6ZkpyIZC5qaHDtg7qlgMd
+ HOCG564vApM9pyD9pbi2G0+XkWcwLB7ECvSQbEe+xhJraDN2nDWMPutEGQ6RnaDzRTgmE2
+ POoj8NpapjSTPekGNserj6OJHust2Wg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-6Hw4nI0xMeSd-p8dobrZFg-1; Thu, 19 Dec 2019 04:52:10 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33A381883524;
+ Thu, 19 Dec 2019 09:52:09 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3F0863B92;
+ Thu, 19 Dec 2019 09:52:08 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 00/62] Misc patches for 2019-12-16
+In-Reply-To: <63ea9d45-cf98-661a-8788-fbe0c17e9566@redhat.com> (Paolo
+ Bonzini's message of "Wed, 18 Dec 2019 12:53:00 +0100")
+References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA_kFsxDKY-ktQ5E4gHxpkQq0Go38DPevKxgf3pTimRxeg@mail.gmail.com>
+ <20191217112236.GA2826@work-vm> <877e2u6mjr.fsf@trasno.org>
+ <63ea9d45-cf98-661a-8788-fbe0c17e9566@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Thu, 19 Dec 2019 10:52:06 +0100
+Message-ID: <87sglg1w3d.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <df5ed556-f636-0d8e-5882-89560e90e884@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hOtyJoc+nCcTSJBaQ/alLL2RSwklkjh3CC54lW2V07PiKEYtMwm
- u9+tiCknNaozuH0GzoeWfQUQ+LIZ9qEuyr+vUdLTwU3SN3Rlr02aZCjF01w+ful7uZFjvre
- 1z/3gEvkStizEeCoqFdI2IO9Tuwjp27YkxBUzQSgraDopc4qn/as2vt7wdIC4mLu76kXN0A
- BV6JPNMOnlzP2ZxtcpFwQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:GxMM9kq8Vhk=:pZMsT/sGRu01yUCl0GSFN8
- Z9QDAjHA5tG8alDT1Uvq3H0lCL/MzDmaAZzr+RPi4wKUGsXa6vRWdjIAA6c5yzDOU2hStS688
- 2h0noOadpiFANTzJ5fOUZNZ5GohUiHfBxH6//fhdrtS+uvkPkgIsQMvomzFCQg8Ytq3Skf+Gx
- fxmLeEfb9QoIdXCnQPcDsnhmaJwJ7XDlZ7UyIa/pe3Wwpj1o4MhP7967yS23QyFmg+hQ5qCpC
- Yh42+XA9NDDe0TzhDETQ4Ffr8Y2wjuTRMLvP4UQGZdmf+LPENvJLz3RVPjC0m0hrnKNdTiWM1
- Z+mtzxk015srnG4wsmJHGIGGtgAwoF4cTYNGu9R6uUDfHtt9UTN/WpIPmo3T32z2PyLxikYf7
- OAKCotG2GfmItRolIsCkJMt15Mu0C+1xCsDgkcHgmEllu31iLf3pEDtDvAaRou1oqGV6WJfBI
- Vhni7PsslRtMRtL6FlgTfzZkARizK4CBK02ApqZTYe4mHkQcWbO7Y6cFIk6EGU3KecjnAjpUO
- 6n2efHh47b7oYjOvt3h8KsABVo9DE1e3dtVIli4L88neP/r08Po5vm3nLtUHr6hAt5tYVYWGa
- D4oNnbms+bEa2rEOS1dj88WgLl1cofuuzgwOyoabAlLmPHCx4qYlUDYW6JPaakVDFuWH5qe76
- LVnRZ3MEce3ouz6s9w9U9WZrwjRhZkT7hn3b1/SDwM7gYqxShY/qYrtiCKbts4FvqbNal1BIa
- ipZxAOBo6Rt1jUKo4JMNoTgZefviMRk/wMEwbs55RfrfO0xOP5vioXIpL4+Tit9Vpm8rBF9l3
- /UwZNVv2vJJpR+aa57P3G3PB74i22rBhbegv1UnJyun35pTuP2g14kbeGUgCkfTKq1/a1B8Us
- x7VvGcN9Wokc5qacQiQHDBEP1qfaHSW+O7K7yrnrc=
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 6Hw4nI0xMeSd-p8dobrZFg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.10
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,43 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: quintela@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 18/12/2019 à 20:50, Marcel Apfelbaum a écrit :
-> 
-> 
-> On 11/26/19 12:26 PM, Yuval Shaia wrote:
->> Use gmail account for maintainer tasks.
->>
->> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->> ---
->>   MAINTAINERS | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 5e5e3e52d6..4297b54fcb 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -2640,7 +2640,7 @@ F: tests/test-replication.c
->>   F: docs/block-replication.txt
->>     PVRDMA
->> -M: Yuval Shaia <yuval.shaia@oracle.com>
->> +M: Yuval Shaia <yuval.shaia.ml@gmail.com>
->>   M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>   S: Maintained
->>   F: hw/rdma/*
-> 
-> Hi,
-> 
-> Can someone grab this patch ?
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 18/12/19 09:54, Juan Quintela wrote:
+>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+>>>> (and others similar)
+>>>>
+>>>> and in the migration-test:
+>>>> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+>>>> QTEST_QEMU_BINARY=3Di386-softmmu/qemu-system-i386
+>>>> QTEST_QEMU_IMG=3Dqemu-img tests/migration-test -m=3Dquick -k --tap <
+>>>> /dev/null | ./scripts/tap-driver.pl --test-name=3D"migration-test"
+>>>> PASS 1 migration-test /i386/migration/deprecated
+>>>> /home/petmay01/linaro/qemu-for-merges/tests/migration-test.c:689:15:
+>>>> runtime error: load of value 255, which is not a valid value for type
+>>>> 'bool'
+>>>> /home/petmay01/linaro/qemu-for-merges/tests/migration-test.c:690:16:
+>>>> runtime error: null pointer passed as argument 1, which is declared to
+>>>> never be null
+>>>> /usr/include/unistd.h:828:48: note: nonnull attribute specified here
+>>>
+>>> That's a use-after-free from Juan's 'migration-test: Use a struct for
+>>> test_migrate_start parameters';  it's calling migrate_start_destroy and
+>>> then checks args->use_shmem.
+>>=20
+>> Hi
+>>=20
+>> New series with the fix posted upstream.
+>>=20
+>> Paolo, should I did the pull requset, or will you do it?
+>
+> I can do it.
 
-I can take this in a trivial-branch PR, but the next one will not be
-before next week.
+Thanks
 
-Could you add your Acked-by?
+>> PD.  Just curious, how should I launch clang to give me that error?
+>
+> "make docker-test-debug@fedora".
 
-Thanks,
-Laurent
+Double thanks.
+
+Later, Juan.
+
 
