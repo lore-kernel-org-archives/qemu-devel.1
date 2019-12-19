@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6900C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1B3C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F44F222C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59F2D222C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 12:37:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/V6hbe2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F44F222C2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GgiKpaj9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F2D222C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihv3R-0007nQ-CX
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:37:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35865)
+	id 1ihv3u-0008Jh-Nx
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 07:37:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ihurx-0000VC-4G
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:30 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ihuqt-0007YQ-U9
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ihurv-0002Ow-IG
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:28 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21745
+ (envelope-from <pbonzini@redhat.com>) id 1ihuqs-0006nJ-GE
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:23 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45188
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihurt-0002L0-53
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:25:27 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ihuqs-0006k7-9j
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:24:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576758323;
+ s=mimecast20190719; t=1576758261;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HjtTPaAIcdrp3lmVBw8yg0yqaiOzTbq0fvZ7/rAOgBI=;
- b=X/V6hbe2rnhK73W1jPH8KqIEE07j36QgffWfpld7LFDiGQKKOTxGj8xgfDd8IgRpzl5WyE
- gywhvO/ahDY0EPXHq89uvPiIQ4K1PUhsNiNw6PV6P7mTHfYTR0t1xKqi0MyEBO5A8ONB6v
- KA8gyORlNupwNleo7+fI1ud1CcyQyBA=
+ bh=GY8eV7vOM/DBZpy9+Eb4dk6x6aTcb4shyecE+wleKs4=;
+ b=GgiKpaj9gyyqfEpKCnLva6abs2i5CcNw4VD3ulylZE6s2eGts4SOIeX1fviMFkxV4WSIpk
+ OM4GR56ljskujEEqM3FgS1zNDr02vwXgXeU3vk/lseFHrUOkPbS18psExT4KlBrDRlMl7v
+ /5aWtuDGynAcr6DBbdLMChAD7VQFci8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-NRxnPPfPO2-pkzojzd_ACg-1; Thu, 19 Dec 2019 07:25:22 -0500
+ us-mta-32-cgb9Z8Z1NGiAdYf0UkuNFA-1; Thu, 19 Dec 2019 07:24:20 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F907107ACC4
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:25:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B98E6107ACC5
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:24:19 +0000 (UTC)
 Received: from 640k.localdomain.com (ovpn-112-55.ams2.redhat.com
  [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0725C60C18;
- Thu, 19 Dec 2019 12:25:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5DAAB60C18;
+ Thu, 19 Dec 2019 12:24:16 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 122/132] meson: install blobs
-Date: Thu, 19 Dec 2019 13:23:42 +0100
-Message-Id: <1576758232-12439-31-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 099/132] meson: convert hw/block
+Date: Thu, 19 Dec 2019 13:23:19 +0100
+Message-Id: <1576758232-12439-8-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: NRxnPPfPO2-pkzojzd_ACg-1
+X-MC-Unique: cgb9Z8Z1NGiAdYf0UkuNFA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -95,135 +95,110 @@ From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile            | 29 -------------------------
- pc-bios/meson.build | 61 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- 2 files changed, 61 insertions(+), 29 deletions(-)
+ hw/Makefile.objs                 |  1 -
+ hw/block/Makefile.objs           | 17 -----------------
+ hw/block/dataplane/Makefile.objs |  2 --
+ hw/block/dataplane/meson.build   |  2 ++
+ hw/block/meson.build             | 20 ++++++++++++++++++++
+ hw/meson.build                   |  1 +
+ 6 files changed, 23 insertions(+), 20 deletions(-)
+ delete mode 100644 hw/block/Makefile.objs
+ delete mode 100644 hw/block/dataplane/Makefile.objs
+ create mode 100644 hw/block/dataplane/meson.build
+ create mode 100644 hw/block/meson.build
 
-diff --git a/Makefile b/Makefile
-index e961286..b88110b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -223,33 +223,9 @@ de-ch  es     fo  fr-ca  hu     ja  mk  pt  sl     tr =
-\
- bepo    cz
-=20
- ifdef INSTALL_BLOBS
--BLOBS=3Dbios.bin bios-256k.bin sgabios.bin vgabios.bin vgabios-cirrus.bin =
-\
--vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
--vgabios-ramfb.bin vgabios-bochs-display.bin vgabios-ati.bin \
--ppc_rom.bin openbios-sparc32 openbios-sparc64 openbios-ppc QEMU,tcx.bin QE=
-MU,cgthree.bin \
--pxe-e1000.rom pxe-eepro100.rom pxe-ne2k_pci.rom \
--pxe-pcnet.rom pxe-rtl8139.rom pxe-virtio.rom \
--efi-e1000.rom efi-eepro100.rom efi-ne2k_pci.rom \
--efi-pcnet.rom efi-rtl8139.rom efi-virtio.rom \
--efi-e1000e.rom efi-vmxnet3.rom \
--qemu-nsis.bmp \
--bamboo.dtb canyonlands.dtb petalogix-s3adsp1800.dtb petalogix-ml605.dtb \
--multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin \
--s390-ccw.img s390-netboot.img \
--slof.bin skiboot.lid \
--palcode-clipper \
--u-boot.e500 u-boot-sam460-20100605.bin \
--qemu_vga.ndrv \
--edk2-licenses.txt \
--hppa-firmware.img \
--opensbi-riscv32-virt-fw_jump.bin \
--opensbi-riscv64-sifive_u-fw_jump.bin opensbi-riscv64-virt-fw_jump.bin
--
--
- DESCS=3D50-edk2-i386-secure.json 50-edk2-x86_64-secure.json \
- 60-edk2-aarch64.json 60-edk2-arm.json 60-edk2-i386.json 60-edk2-x86_64.jso=
-n
- else
--BLOBS=3D
- DESCS=3D
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 6ddffce..0c92a04 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -3,7 +3,6 @@ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(C=
+ONFIG_VIRTFS),$(CONFI
+ devices-dirs-y +=3D acpi/
+ devices-dirs-y +=3D adc/
+ devices-dirs-y +=3D audio/
+-devices-dirs-y +=3D block/
  endif
 =20
-@@ -273,11 +249,6 @@ ifneq ($(vhost-user-json-y),)
- =09=09$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)/vhost-user/"; \
- =09done
- endif
--ifneq ($(BLOBS),)
--=09set -e; for x in $(BLOBS); do \
--=09=09$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)";=
- \
--=09done
--endif
- ifneq ($(DESCS),)
- =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/firmware"
- =09set -e; tmpf=3D$$(mktemp); trap 'rm -f -- "$$tmpf"' EXIT; \
-diff --git a/pc-bios/meson.build b/pc-bios/meson.build
-index 18201b0..dc7de21 100644
---- a/pc-bios/meson.build
-+++ b/pc-bios/meson.build
-@@ -23,3 +23,64 @@ foreach f: fds
-                 install: install_blobs,
-                 install_dir: config_host['qemu_datadir'])
- endforeach
+ common-obj-y +=3D $(devices-dirs-y)
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+deleted file mode 100644
+index f5f643f..0000000
+--- a/hw/block/Makefile.objs
++++ /dev/null
+@@ -1,17 +0,0 @@
+-common-obj-y +=3D block.o cdrom.o hd-geometry.o
+-common-obj-$(CONFIG_FDC) +=3D fdc.o
+-common-obj-$(CONFIG_SSI_M25P80) +=3D m25p80.o
+-common-obj-$(CONFIG_NAND) +=3D nand.o
+-common-obj-$(CONFIG_PFLASH_CFI01) +=3D pflash_cfi01.o
+-common-obj-$(CONFIG_PFLASH_CFI02) +=3D pflash_cfi02.o
+-common-obj-$(CONFIG_XEN) +=3D xen-block.o
+-common-obj-$(CONFIG_ECC) +=3D ecc.o
+-common-obj-$(CONFIG_ONENAND) +=3D onenand.o
+-common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o
+-
+-obj-$(CONFIG_SH4) +=3D tc58128.o
+-
+-obj-$(CONFIG_VIRTIO_BLK) +=3D virtio-blk.o
+-obj-$(CONFIG_VHOST_USER_BLK) +=3D vhost-user-blk.o
+-
+-obj-y +=3D dataplane/
+diff --git a/hw/block/dataplane/Makefile.objs b/hw/block/dataplane/Makefile=
+.objs
+deleted file mode 100644
+index 0c52702..0000000
+--- a/hw/block/dataplane/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-obj-$(CONFIG_VIRTIO_BLK) +=3D virtio-blk.o
+-obj-$(CONFIG_XEN) +=3D xen-block.o
+diff --git a/hw/block/dataplane/meson.build b/hw/block/dataplane/meson.buil=
+d
+new file mode 100644
+index 0000000..12c6a26
+--- /dev/null
++++ b/hw/block/dataplane/meson.build
+@@ -0,0 +1,2 @@
++specific_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk.c'))
++specific_ss.add(when: 'CONFIG_XEN', if_true: files('xen-block.c'))
+diff --git a/hw/block/meson.build b/hw/block/meson.build
+new file mode 100644
+index 0000000..a435ab4
+--- /dev/null
++++ b/hw/block/meson.build
+@@ -0,0 +1,20 @@
++softmmu_ss.add(files(
++  'block.c',
++  'cdrom.c',
++  'hd-geometry.c'
++))
++softmmu_ss.add(when: 'CONFIG_ECC', if_true: files('ecc.c'))
++softmmu_ss.add(when: 'CONFIG_FDC', if_true: files('fdc.c'))
++softmmu_ss.add(when: 'CONFIG_NAND', if_true: files('nand.c'))
++softmmu_ss.add(when: 'CONFIG_NVME_PCI', if_true: files('nvme.c'))
++softmmu_ss.add(when: 'CONFIG_ONENAND', if_true: files('onenand.c'))
++softmmu_ss.add(when: 'CONFIG_PFLASH_CFI01', if_true: files('pflash_cfi01.c=
+'))
++softmmu_ss.add(when: 'CONFIG_PFLASH_CFI02', if_true: files('pflash_cfi02.c=
+'))
++softmmu_ss.add(when: 'CONFIG_SSI_M25P80', if_true: files('m25p80.c'))
++softmmu_ss.add(when: 'CONFIG_XEN', if_true: files('xen-block.c'))
 +
-+blobs =3D files(
-+  'QEMU,cgthree.bin',
-+  'QEMU,tcx.bin',
-+  'bamboo.dtb',
-+  'bios-256k.bin',
-+  'bios.bin',
-+  'canyonlands.dtb',
-+  'edk2-licenses.txt',
-+  'efi-e1000.rom',
-+  'efi-e1000e.rom',
-+  'efi-eepro100.rom',
-+  'efi-ne2k_pci.rom',
-+  'efi-pcnet.rom',
-+  'efi-rtl8139.rom',
-+  'efi-virtio.rom',
-+  'efi-vmxnet3.rom',
-+  'hppa-firmware.img',
-+  'kvmvapic.bin',
-+  'linuxboot.bin',
-+  'linuxboot_dma.bin',
-+  'multiboot.bin',
-+  'openbios-ppc',
-+  'openbios-sparc32',
-+  'openbios-sparc64',
-+  'opensbi-riscv32-virt-fw_jump.bin',
-+  'opensbi-riscv64-sifive_u-fw_jump.bin',
-+  'opensbi-riscv64-virt-fw_jump.bin',
-+  'palcode-clipper',
-+  'petalogix-ml605.dtb',
-+  'petalogix-s3adsp1800.dtb',
-+  'ppc_rom.bin',
-+  'pvh.bin',
-+  'pxe-e1000.rom',
-+  'pxe-eepro100.rom',
-+  'pxe-ne2k_pci.rom',
-+  'pxe-pcnet.rom',
-+  'pxe-rtl8139.rom',
-+  'pxe-virtio.rom',
-+  'qemu-nsis.bmp',
-+  'qemu_vga.ndrv',
-+  's390-ccw.img',
-+  's390-netboot.img',
-+  'sgabios.bin',
-+  'skiboot.lid',
-+  'slof.bin',
-+  'u-boot-sam460-20100605.bin',
-+  'u-boot.e500',
-+  'vgabios-ati.bin',
-+  'vgabios-bochs-display.bin',
-+  'vgabios-cirrus.bin',
-+  'vgabios-qxl.bin',
-+  'vgabios-ramfb.bin',
-+  'vgabios-stdvga.bin',
-+  'vgabios-virtio.bin',
-+  'vgabios-vmware.bin',
-+)
++specific_ss.add(when: 'CONFIG_SH4', if_true: files('tc58128.c'))
++specific_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk.c'))
++specific_ss.add(when: 'CONFIG_VHOST_USER_BLK', if_true: files('vhost-user-=
+blk.c'))
 +
-+if install_blobs
-+  install_data(blobs, install_dir: config_host['qemu_datadir'])
-+endif
++subdir('dataplane')
+diff --git a/hw/meson.build b/hw/meson.build
+index 54414a6..a6782a5 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('block')
+ subdir('bt')
+ subdir('char')
+ subdir('core')
 --=20
 1.8.3.1
 
