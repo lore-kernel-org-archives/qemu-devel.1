@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 583A8C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D7AC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:36:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 240DF21D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:34:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D9F621D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:36:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LxMxOAyp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 240DF21D7D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBpdOkx7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D9F621D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iht8R-0008VR-90
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:34:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54852)
+	id 1ihtAO-0001dQ-6j
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:36:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43316)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iht7M-0007Ma-Jh
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:33:17 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iht9I-0000vo-QU
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:35:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iht7L-0006EI-By
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:33:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40833
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iht9H-0006SQ-NM
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:35:16 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32044
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iht7L-0006Ax-5w
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:33:15 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iht9H-0006PF-EP
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:35:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576751594;
+ s=mimecast20190719; t=1576751715;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7dBpi92deU78GDVGs7pnvt2NwA65u9mAj1BisJg+Sgs=;
- b=LxMxOAypzah7XoBHWjhzyjwMmoV1KuMgYlubslrSDkEsLkRKlMuna1s1noYkz7JdbUiCZ8
- 1arqvHFyGlTs2tDMRHah3BoFQlgO5/or10Xfef65MSqJGbqp3XCm2xmTI7AunB5L8XEKlE
- 000LODm+LhLJOeHBIfgONGIF1nSwswU=
+ bh=rBbHYGOcmiQJwG8n8IHsWLvLPderYiA8yx5NLzqb7cQ=;
+ b=UBpdOkx7+HhPtWL6YgP9HefPS3dwCev3H4/72jc3YrYxWnNLsO9XG21/u3uqsROmpaHs9w
+ Da0mgWyLnEs3jGVScnKKGpVVnbbyH/xNVlXuBMUUbS68P6Y6rtgWl6zFbW4WLDD0HVwE2v
+ S3Jr/vVeJYysplUkzFgBgI4GF/9mMys=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-wqmzhOaOMHKePHM29X-NIA-1; Thu, 19 Dec 2019 05:33:10 -0500
-X-MC-Unique: wqmzhOaOMHKePHM29X-NIA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-126-Swm7U2SYO4ef59b6bPNVHA-1; Thu, 19 Dec 2019 05:35:07 -0500
+X-MC-Unique: Swm7U2SYO4ef59b6bPNVHA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 828EF107ACCD;
- Thu, 19 Dec 2019 10:33:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5EEBDBE6;
+ Thu, 19 Dec 2019 10:35:06 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-205-138.brq.redhat.com
  [10.40.205.138])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ED367675B8;
- Thu, 19 Dec 2019 10:33:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BAE826E51;
+ Thu, 19 Dec 2019 10:35:05 +0000 (UTC)
 Subject: Re: qcow2 api not secured by mutex lock
 To: Kevin Wolf <kwolf@redhat.com>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
@@ -88,20 +88,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7604ffdd-69b5-5968-1736-bb20736be135@redhat.com>
-Date: Thu, 19 Dec 2019 11:33:05 +0100
+Message-ID: <28355f81-2eb3-4883-f05d-03e4fde4f74b@redhat.com>
+Date: Thu, 19 Dec 2019 11:35:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
 In-Reply-To: <20191219100230.GC5230@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="ZKIx9se1B9Qhx5G6UWhcwvi3w52Uxfdx1"
+ boundary="WzrAwVn4TqVExdVo05aVoZ7NcaTnYPj13"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,10 +120,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZKIx9se1B9Qhx5G6UWhcwvi3w52Uxfdx1
-Content-Type: multipart/mixed; boundary="IPYxxIUw5paJCymqeh0mgomjbw1e6NyEL"
+--WzrAwVn4TqVExdVo05aVoZ7NcaTnYPj13
+Content-Type: multipart/mixed; boundary="AxAsqKSFB4N4VUEFNZPN8YTHhDoLPwZOA"
 
---IPYxxIUw5paJCymqeh0mgomjbw1e6NyEL
+--AxAsqKSFB4N4VUEFNZPN8YTHhDoLPwZOA
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -137,57 +137,43 @@ On 19.12.19 11:02, Kevin Wolf wrote:
 >> qcow2_check_fix_snapshot_table.. It seems unsafe.
 >=20
 > This is curious, I'm not sure why you would drop the lock there. Max?
+>=20
+> bdrv_flush() calls would have to replaced with qcow2_write_caches() to
+> avoid a deadlock, but otherwise I don't see why we would want to drop
+> the lock.
+>=20
+> Of course, this should only be called from qemu-img check, so in
+> practice it's probably not a bug.
 
-I don=E2=80=99t remember why but it may certainly have to do with the fact =
-that
-everything that calls qcow2_write_snapshots() (i.e., qcow2_snapshot_*)
-does so without having taken the lock.  I suppose I simply assumed this
-would have to be how it=E2=80=99s done.
+Maybe I should have read all of this before replying...  Is
+qcow2_write_caches() all that we want?  I mean, bdrv_flush() also
+flushes the children (well, at least the file child right now).
 
-I don=E2=80=99t think it=E2=80=99s a problem right now because you can only=
- check (and
-repair) the image from qemu-img (or when it is opened with the dirty
-flag set), so there shouldn=E2=80=99t be concurrent I/O.
-
-Anyway.  I tried to remove it and then 261 hangs.  This is because
-qcow2_write_snapshots() calls bdrv_flush(bs) twice.  It would have to
-drop the lock around those calls at least.  I=E2=80=99m actually not sure
-whether this is safe to do (in the sense of whether it=E2=80=99s fundamenta=
-lly
-safer than just not holding the lock at all and trusting that there are
-no concurrent requests).
-
-In any case, it=E2=80=99s also not purely trivial, because if we were to ma=
-ke
-qcow2_write_snapshots() drop the locks around bdrv_flush(), all of its
-callers would in turn need to take the lock around it.  (I=E2=80=99m not sa=
-ying
-that is difficult, I=E2=80=99m just saying it=E2=80=99s more difficult than=
- dropping
-three lines in qcow2_write_snapshots()).
+OTOH qcow2_write_snapshots() probably does not need to take care of
+actually flushing @bs, does it?
 
 Max
 
 
---IPYxxIUw5paJCymqeh0mgomjbw1e6NyEL--
+--AxAsqKSFB4N4VUEFNZPN8YTHhDoLPwZOA--
 
---ZKIx9se1B9Qhx5G6UWhcwvi3w52Uxfdx1
+--WzrAwVn4TqVExdVo05aVoZ7NcaTnYPj13
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl37UeEACgkQ9AfbAGHV
-z0CJKAf/fx+JpfClEzIziMNtbbPiWAOq7Kvtp3krVvIg3QesQdLWSIHf03G61Syd
-8Jl1WpQC8lzAxc3WfWBBzAh3STxj0e91n3tUx3gb38HtRpGpR1EIE/QMbdYPRwl9
-iNB3l0S4f59MWIVN+fGNH3psY5JdI1/ll+kbLcwW4UzVH891ba4I/UTj2Ls9FkF8
-JuvSQKOlOdPkk1CWxeYJ298PaaF0J8axRhfTey8xzN0bO5/1q0AGepr7VagDsv4r
-920lA72xPppfpXAdY6nKO4BZqFrI0clc8NE4EZKkUY+vFR5LrjUbZMnFecQFm5Yr
-NptRb3/4hvQTI/G7a2HZPQjobiQvGg==
-=rLhF
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl37UlcACgkQ9AfbAGHV
+z0Au0AgAoRE1DBw90xG9JJiTlJmxVNWbyTa+AMClW0IkT1oGOFMFD/AJ9Q+b7vTK
+28ZiX1hTgixCmCoh7+EwMBUBbghKC3YRuJ8FExQmazoXPMq6Ne4ZLymOzfG6PN89
+rR6d9t2jCCbfTglxY7J8J6HCXe4snGy+1UYHpMp84q7HCWJgonznntS/ftjIIYUn
+9yF3ZLxo3gIINZxaBcXDbyDI+1Clh4k9GZpEamnK0yzA8zpfcLp/K1wseQAM1NAn
+uLJ2NAJ+BkJWQzm4ROurCjUcnt5g3kiz/HbRcnulnxgqPpFaJEzctuHamGAadFfg
+T3DOFkCZlnJPfcWK3neTIw4PEluVeg==
+=pEN1
 -----END PGP SIGNATURE-----
 
---ZKIx9se1B9Qhx5G6UWhcwvi3w52Uxfdx1--
+--WzrAwVn4TqVExdVo05aVoZ7NcaTnYPj13--
 
 
