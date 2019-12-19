@@ -2,80 +2,84 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3773BC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC942C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00174218AC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4288218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:54:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Psx1/Qap"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00174218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YjCU03iq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4288218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwEU-0002Js-4h
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:52:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51030)
+	id 1ihwFb-0003Fs-US
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:53:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ihvv6-0007nT-Uq
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:32:50 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ihwEy-0002os-2p
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:53:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ihvv4-0008FI-Ep
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:32:48 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28140
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihvv4-0008AJ-9F
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:32:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576762365;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UbBKytEdEEGRHx3+BjPaI+XkJq85rItn/54wFTPJnxE=;
- b=Psx1/QapimmP+3+MrsdGY8T+blPZ0u9kytKpnyr7p7CbpoL9Co1qW/kfZJs/gA5E8vgHJd
- F9dtytbHYgwQyJAuiCURtUbEzQyCbGT/8ieL4UmpwyC5Ot10yNqe1WgmeY5GkjrFdFqM5n
- ovTD3lGGnKY9VzIXiNEMk/jQTvNRaI4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-U-aHLfASNJS6cQXuTzRSuw-1; Thu, 19 Dec 2019 08:32:42 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 174A41009607;
- Thu, 19 Dec 2019 13:32:41 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-53.ams2.redhat.com [10.36.117.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DF5087D97D;
- Thu, 19 Dec 2019 13:32:39 +0000 (UTC)
-Date: Thu, 19 Dec 2019 14:32:37 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Tuguoyi <tu.guoyi@h3c.com>
-Subject: Re: [PATCH v2] qcow2: Move error check of local_err near its
- assignment
-Message-ID: <20191219133237.GJ5230@linux.fritz.box>
-References: <d7301bf410e04b50a494a82679335158@h3c.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ihwEw-0000DS-T1
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:53:19 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43679)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1ihwEw-00006E-IJ
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:53:18 -0500
+Received: by mail-wr1-x443.google.com with SMTP id d16so6035366wre.10
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:53:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Hg+oOcpP5bFaYXf4GJ1sLxu4YJq+UZWaCc3c9eYBEbk=;
+ b=YjCU03iqKBwK1Kiz0PuVjVNWBZm8Jbky3MQOz970b5+KNUtOVJlEhwskcj4Wpf/55E
+ aisaJCTO9V8ruXjI1jPP9hReT+cTrMN21F1bQKEzOLeRjnkiH0f3iyG/jhqglSNCygIM
+ ITLluO2UfL7YP8YnLmH8kV8PXct8CSeTTmHNVtnlNq4LSRNsbDGpSJ4AHv3/nCsaOVXq
+ od2CYRd+ni0MrGw64ucELd0cEX/Rr04m0Ujzdr+lULg/ywj7t7s0YoQNuw6/vyxElhtu
+ clbsd4MdewwP+ftOaX4fQLk5QOsFVxvuAJo+6sXb1NGrUd4UugkvbVjqYvQxIg1XnYxq
+ RYRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Hg+oOcpP5bFaYXf4GJ1sLxu4YJq+UZWaCc3c9eYBEbk=;
+ b=RhEOHX41eoJQb+9wWcXllM2aoD03L/HUXo/DI1sWhoIrmQieRpCnYNje2u/BHo+LYb
+ A1p11fSXTJhOcp6ygjCwRIhVZiaJTA7yHYa+hAP0tw+iulV5Q5W0PbQ4UM8c8grLzPfZ
+ wn5ZEKRzETi+HvERCArkn1M83zOsJ0TXN5j9hEiomtuCe6u91CbAX3P5Z1zjwT6z2cl+
+ hRX06t3OCSAHkNXyfhzH4aiiy0TdpUVyDF3amK1XeMK7aVhuxvtfiYP+OEcUZOcYe+l7
+ /EYTfe4vFt0ShcCZQOjY9oREjeTJ7NarW/YUyOj9+dwO80DnTEcAKPf7bluIQWyHIpIz
+ 9Qiw==
+X-Gm-Message-State: APjAAAVZ3jAzCR4yivMXz8s7pJbUVQj+EJyGEgxKUi0Dn7467HqMQvNG
+ IUhvMGX5lX9KkEqnsr6B/ZrwT1rNDghzPyhgGM2t7hdkmfE=
+X-Google-Smtp-Source: APXvYqztexRD0eGlxy5byPO+pFhOHh4rS6BZ/0RCw5uUbgQRB7Ww3S5Cg7g8gMUcFF3p6HT2Kqg6N0QgFtxqLhxYFKE=
+X-Received: by 2002:a5d:66c3:: with SMTP id k3mr8993194wrw.370.1576763596044; 
+ Thu, 19 Dec 2019 05:53:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d7301bf410e04b50a494a82679335158@h3c.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: U-aHLfASNJS6cQXuTzRSuw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <CAJ+F1CLV_JRhXX=tB7ZXYxa1En4LzYgJr+7egKzVRNBOLY2nSA@mail.gmail.com>
+ <CAJ+F1CLS4HV-SckggfYNRKXxPa0R2BxSQrpPv8CRVkfvRB3E4w@mail.gmail.com>
+In-Reply-To: <CAJ+F1CLS4HV-SckggfYNRKXxPa0R2BxSQrpPv8CRVkfvRB3E4w@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 19 Dec 2019 17:53:03 +0400
+Message-ID: <CAJ+F1CJO7wsz7WaxZybasWj9H8m1sbwtQBvVjG1cuOPH3MECnQ@mail.gmail.com>
+Subject: Re: [PATCH v4 00/37] Clean-ups: qom-ify serial and remove
+ QDEV_PROP_PTR
+To: QEMU <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,28 +91,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 18.12.2019 um 12:53 hat Tuguoyi geschrieben:
-> The local_err check outside of the if block was necessary
-> when it was introduced in commit d1258dd0c87 because it needed to be
-> executed even if qcow2_load_autoloading_dirty_bitmaps() returned false.
->=20
-> After some modifications that all required the error check to remain
-> where it is, commit 9c98f145dfb finally moved the
-> qcow2_load_dirty_bitmaps() call into the if block, so now the error
-> check should be there, too.
->=20
-> Signed-off-by: Guoyi Tu <tu.guoyi@h3c.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Hi
 
-Thanks, applied to the block branch.
+Still trying to make progress on this series (which is preliminary to
+other pending work..):
 
-Kevin
+On Wed, Dec 11, 2019 at 4:01 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Sun, Dec 1, 2019 at 2:19 PM Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@gmail.com> wrote:
+> >
+> >
+> > - "chardev: generate an internal id when none given"
+> >
+> > As explained, this is necessary for qdev_prop_set_chr()
+>
+> ping
+>
 
+ping
+
+> >
+> > - "serial: register vmsd with DeviceClass"
+> >
+> > This is standard qdev-ification, however it breaks backward migration,
+> > but that's just how qdev_set_legacy_instance_id() works.
+>
+> See thread, someone could review or nack (if backward migration is a prob=
+lem).
+>
+
+ping
+
+> >
+> > - "sm501: make SerialMM a child, export chardev property"
+> >
+> > review?
+>
+> ping
+>
+
+rebased on top of "hw/display/sm501: Always map the UART0" as
+requested by Philippe. Can wait for v5 to get review.
+
+
+> >
+> > - "qdev/qom: remove some TODO limitations now that PROP_PTR is gone"
+> >
+> > This should be straightforward.
+>
+> ping
+
+ping
+
+
+thanks
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
