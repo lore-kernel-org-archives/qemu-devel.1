@@ -2,79 +2,90 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 017BFC2D0C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32292C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:11:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4D6E206D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:09:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E16DA2146E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 16:11:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="OopHGsxZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D6E206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="LdBXmDb6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16DA2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihyMr-0005J3-N9
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 11:09:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41120)
+	id 1ihyOf-0007UI-SJ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 11:11:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1ihyLc-0003uS-Na
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:08:22 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1ihyMM-00056M-HY
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1ihyLZ-0006Fl-Ns
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:08:19 -0500
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:46866)
+ (envelope-from <kwankhede@nvidia.com>) id 1ihyME-0001OI-JA
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:09:05 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:10489)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1ihyLZ-000615-3b
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:08:17 -0500
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net
- [IPv6:2a02:6b8:0:1a2d::301])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 81BF52E1493;
- Thu, 19 Dec 2019 19:08:14 +0300 (MSK)
-Received: from vla5-58875c36c028.qloud-c.yandex.net
- (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
- by mxbackcorp1o.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- 0yeyPctI5T-8DHaLskw; Thu, 19 Dec 2019 19:08:14 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1576771694; bh=z2hT4uxB4lgvxQPgqzPtE0H3GBeW1yfyZNoga34aikw=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=OopHGsxZLH5Gp5DC6zKNHy/fW949kWjMzxzYet1qIeni5M4XxQUqOuyXMX7bJ9M2x
- VzIsP/xNXjBeQipuKiS9YHLwLEQJywc8LxgP1wpFtSF+pHmZlr202RpNoWYiGWCERq
- +nIDwqyO6vi+8S9iQWFPJJXbiZWetZgDWBAQ3rbM=
-Authentication-Results: mxbackcorp1o.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:408:9915:7a93:bd7b:686c])
- by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- FfZMqtXGzo-8DWengHw; Thu, 19 Dec 2019 19:08:13 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] monitor: Add an input buffer for QMP reading
-Date: Thu, 19 Dec 2019 19:07:56 +0300
-Message-Id: <20191219160756.22389-3-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20191219160756.22389-1-yury-kotov@yandex-team.ru>
-References: <20191219160756.22389-1-yury-kotov@yandex-team.ru>
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1ihyME-0001BG-3M
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 11:08:58 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5dfba08d0000>; Thu, 19 Dec 2019 08:08:45 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 19 Dec 2019 08:08:55 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 19 Dec 2019 08:08:55 -0800
+Received: from [10.24.243.167] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 19 Dec
+ 2019 16:08:47 +0000
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+ <20191216154406.023f912b@x1.home>
+ <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+ <20191217114357.6496f748@x1.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+Date: Thu, 19 Dec 2019 21:38:44 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 77.88.29.217
+In-Reply-To: <20191217114357.6496f748@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL111.nvidia.com (172.20.187.18) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1576771725; bh=2tge3ZzCXbzPDewCav20YBRDQ+XTYrnxQbeky+/o53I=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=LdBXmDb6yda1YTo9catAGMfVaNyUmOKIcolGDoFIqlth0Rx1x9GLOh7QoPSnM4GmT
+ tObotU7Z1cFnT8WT/MUTdCze5E2Yq+NUrv/Zm17BrX9IHyogGpKGuDgU0iP9mAKHTi
+ DzbdYvsXdxqgl/hcrXJQHMomyFv1x5I0eqZT7JVFzlIrzegK+kjeSCIQ9KlF8tgFhz
+ sDvhfZrgWskG222vzkttrbKfMy1kbe0s5CKSlIIzrmyI514H60R5KR0l9vgYooxNub
+ xpiZ1vb6wbtNFPP2u+dYEA3odZIsSxtrRMkbkOOQKpV+uVycVjUF/EguRYCRgvp44j
+ TR1Wo8EQ82NtQ==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,154 +94,566 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, yc-core@yandex-team.ru,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- "Denis V. Lunev" <den@openvz.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The monitor_qmp_can_read (as a callback of qemu_chr_fe_set_handlers)
-should return size of buffer which monitor_qmp_read can process.
-Currently, monitor_can_read returns 1, because it guarantees that
-only one QMP command can be handled at a time.
-Thus, for each QMP command, len(QMD) iterations of the main loop
-are required to handle a command.
 
-This patch adds an input buffer to speed up reading and to keep
-the guarantee of executing one command at a time.
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
----
- monitor/monitor-internal.h | 11 +++++++++++
- monitor/monitor.c          | 27 +++++++++++++++++++++++++++
- monitor/qmp.c              | 17 +++++++++++++++--
- 3 files changed, 53 insertions(+), 2 deletions(-)
+On 12/18/2019 12:13 AM, Alex Williamson wrote:
+> On Tue, 17 Dec 2019 11:58:44 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 12/17/2019 4:14 AM, Alex Williamson wrote:
+>>> On Tue, 17 Dec 2019 01:51:36 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>>> - Defined MIGRATION region type and sub-type.
+>>>>
+>>>> - Defined vfio_device_migration_info structure which will be placed at 0th
+>>>>     offset of migration region to get/set VFIO device related information.
+>>>>     Defined members of structure and usage on read/write access.
+>>>>
+>>>> - Defined device states and added state transition details in the comment.
+>>>>
+>>>> - Added sequence to be followed while saving and resuming VFIO device state
+>>>>
+>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>> ---
+>>>>    include/uapi/linux/vfio.h | 180 ++++++++++++++++++++++++++++++++++++++++++++++
+>>>>    1 file changed, 180 insertions(+)
+>>>>
+>>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>>>> index 9e843a147ead..a0817ba267c1 100644
+>>>> --- a/include/uapi/linux/vfio.h
+>>>> +++ b/include/uapi/linux/vfio.h
+>>>> @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+>>>>    #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+>>>>    #define VFIO_REGION_TYPE_GFX                    (1)
+>>>>    #define VFIO_REGION_TYPE_CCW			(2)
+>>>> +#define VFIO_REGION_TYPE_MIGRATION              (3)
+>>>>    
+>>>>    /* sub-types for VFIO_REGION_TYPE_PCI_* */
+>>>>    
+>>>> @@ -379,6 +380,185 @@ struct vfio_region_gfx_edid {
+>>>>    /* sub-types for VFIO_REGION_TYPE_CCW */
+>>>>    #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+>>>>    
+>>>> +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
+>>>> +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+>>>> +
+>>>> +/*
+>>>> + * Structure vfio_device_migration_info is placed at 0th offset of
+>>>> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
+>>>> + * information. Field accesses from this structure are only supported at their
+>>>> + * native width and alignment, otherwise the result is undefined and vendor
+>>>> + * drivers should return an error.
+>>>> + *
+>>>> + * device_state: (read/write)
+>>>> + *      To indicate vendor driver the state VFIO device should be transitioned
+>>>> + *      to. If device state transition fails, write on this field return error.
+>>>> + *      It consists of 3 bits:
+>>>> + *      - If bit 0 set, indicates _RUNNING state. When its clear, that indicates
+>>>
+>>> s/its/it's/
+>>>    
+>>>> + *        _STOP state. When device is changed to _STOP, driver should stop
+>>>> + *        device before write() returns.
+>>>> + *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
+>>>> + *        should start gathering device state information which will be provided
+>>>> + *        to VFIO user space application to save device's state.
+>>>> + *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
+>>>> + *        prepare to resume device, data provided through migration region
+>>>> + *        should be used to resume device.
+>>>> + *      Bits 3 - 31 are reserved for future use. User should perform
+>>>> + *      read-modify-write operation on this field.
+>>>> + *
+>>>> + *  +------- _RESUMING
+>>>> + *  |+------ _SAVING
+>>>> + *  ||+----- _RUNNING
+>>>> + *  |||
+>>>> + *  000b => Device Stopped, not saving or resuming
+>>>> + *  001b => Device running state, default state
+>>>> + *  010b => Stop Device & save device state, stop-and-copy state
+>>>> + *  011b => Device running and save device state, pre-copy state
+>>>> + *  100b => Device stopped and device state is resuming
+>>>> + *  101b => Invalid state
+>>>
+>>> Eventually this would be intended for post-copy, if supported by the
+>>> device, right?
+>>>    
+>>
+>> No, as per Yan mentioned in earlier version, _RESUMING + _RUNNING can't
+>> be used for post-copy. New flag will be required for post-copy.
+>>
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg658768.html
+>>
+>>>> + *  110b => Invalid state
+>>>> + *  111b => Invalid state
+>>>> + *
+>>>> + * State transitions:
+>>>> + *
+>>>> + *              _RESUMING  _RUNNING    Pre-copy    Stop-and-copy   _STOP
+>>>> + *                (100b)     (001b)     (011b)        (010b)       (000b)
+>>>> + * 0. Running or Default state
+>>>> + *                             |
+>>>> + *
+>>>> + * 1. Normal Shutdown
+>>>
+>>> Optional, userspace is under no obligation.
+>>>    
+>>>> + *                             |------------------------------------->|
+>>>> + *
+>>>> + * 2. Save state or Suspend
+>>>> + *                             |------------------------->|---------->|
+>>>> + *
+>>>> + * 3. Save state during live migration
+>>>> + *                             |----------->|------------>|---------->|
+>>>> + *
+>>>> + * 4. Resuming
+>>>> + *                  |<---------|
+>>>> + *
+>>>> + * 5. Resumed
+>>>> + *                  |--------->|
+>>>> + *
+>>>> + * 0. Default state of VFIO device is _RUNNNG when VFIO application starts.
+>>>> + * 1. During normal VFIO application shutdown, vfio device state changes
+>>>> + *    from _RUNNING to _STOP.
+>>>
+>>> We cannot impose this requirement on existing userspace.  Userspace may
+>>> perform this action, but they are not required to and the vendor driver
+>>> must not require it.
+>>
+>> Updated comment.
+>>
+>>>    
+>>>> + * 2. When VFIO application save state or suspend application, VFIO device
+>>>> + *    state transition is from _RUNNING to stop-and-copy state and then to
+>>>> + *    _STOP.
+>>>> + *    On state transition from _RUNNING to stop-and-copy, driver must
+>>>> + *    stop device, save device state and send it to application through
+>>>> + *    migration region.
+>>>> + *    On _RUNNING to stop-and-copy state transition failure, application should
+>>>> + *    set VFIO device state to _RUNNING.
+>>>
+>>> A state transition failure means that the user's write to device_state
+>>> failed, so is it the user's responsibility to set the next state?
+>>
+>> Right.
+> 
+> If a transition failure occurs, ie. errno from write(2), what value is
+> reported by a read(2) of device_state in the interim between the failure
+> and a next state written by the user? 
 
-diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
-index c0ba29abf1..22983b9dda 100644
---- a/monitor/monitor-internal.h
-+++ b/monitor/monitor-internal.h
-@@ -32,6 +32,8 @@
- #include "qemu/readline.h"
- #include "sysemu/iothread.h"
-=20
-+#define MON_INPUT_BUFFER_SIZE   1024
-+
- /*
-  * Supported types:
-  *
-@@ -93,6 +95,11 @@ struct Monitor {
-     gchar *mon_cpu_path;
-     QTAILQ_ENTRY(Monitor) entry;
-=20
-+    /* Must be accessed only by monitor's iothread */
-+    char inbuf[MON_INPUT_BUFFER_SIZE];
-+    int inbuf_pos;
-+    int inbuf_len;
-+
-     /*
-      * The per-monitor lock. We can't access guest memory when holding
-      * the lock.
-@@ -169,9 +176,13 @@ void monitor_data_destroy(Monitor *mon);
- void monitor_list_append(Monitor *mon);
- void monitor_fdsets_cleanup(void);
-=20
-+void monitor_inbuf_write(Monitor *mon, const char *buf, int size);
-+int monitor_inbuf_read(Monitor *mon, char *buf, int size);
-+
- void qmp_send_response(MonitorQMP *mon, const QDict *rsp);
- void monitor_data_destroy_qmp(MonitorQMP *mon);
- void monitor_qmp_bh_dispatcher(void *data);
-+void monitor_qmp_handle_inbuf(Monitor *mon);
-=20
- int get_monitor_def(int64_t *pval, const char *name);
- void help_cmd(Monitor *mon, const char *name);
-diff --git a/monitor/monitor.c b/monitor/monitor.c
-index d25cc8ea4a..9eb258ac2f 100644
---- a/monitor/monitor.c
-+++ b/monitor/monitor.c
-@@ -440,6 +440,29 @@ static gboolean qapi_event_throttle_equal(const void=
- *a, const void *b)
-     return TRUE;
- }
-=20
-+void monitor_inbuf_write(Monitor *mon, const char *buf, int size)
-+{
-+    int pos =3D mon->inbuf_pos + mon->inbuf_len;
-+
-+    assert(size <=3D sizeof(mon->inbuf) - mon->inbuf_len);
-+    while (size-- > 0) {
-+        mon->inbuf[pos++ % sizeof(mon->inbuf)] =3D *buf++;
-+        mon->inbuf_len++;
-+    }
-+}
-+
-+int monitor_inbuf_read(Monitor *mon, char *buf, int size)
-+{
-+    int read_bytes =3D 0;
-+
-+    while (read_bytes < size && mon->inbuf_len > 0) {
-+        buf[read_bytes++] =3D mon->inbuf[mon->inbuf_pos++];
-+        mon->inbuf_pos %=3D sizeof(mon->inbuf);
-+        mon->inbuf_len--;
-+    }
-+    return read_bytes;
-+}
-+
- int monitor_suspend(Monitor *mon)
- {
-     if (monitor_is_hmp_non_interactive(mon)) {
-@@ -465,6 +488,10 @@ static void monitor_accept_input(void *opaque)
-     Monitor *mon =3D opaque;
-=20
-     qemu_chr_fe_accept_input(&mon->chr);
-+
-+    if (mon->is_qmp) {
-+        monitor_qmp_handle_inbuf(mon);
-+    }
- }
-=20
- void monitor_resume(Monitor *mon)
-diff --git a/monitor/qmp.c b/monitor/qmp.c
-index 37884c6c43..9d2634eeb3 100644
---- a/monitor/qmp.c
-+++ b/monitor/qmp.c
-@@ -315,14 +315,27 @@ static int monitor_qmp_can_read(void *opaque)
- {
-     Monitor *mon =3D opaque;
-=20
--    return !atomic_mb_read(&mon->suspend_cnt);
-+    return sizeof(mon->inbuf) - mon->inbuf_len;
-+}
-+
-+void monitor_qmp_handle_inbuf(Monitor *mon)
-+{
-+    MonitorQMP *mon_qmp =3D container_of(mon, MonitorQMP, common);
-+    char ch;
-+
-+    /* Handle only one byte at a time, because monitor may become suspen=
-ed */
-+    while (!atomic_mb_read(&mon->suspend_cnt) &&
-+           monitor_inbuf_read(mon, &ch, 1)) {
-+        json_message_parser_feed(&mon_qmp->parser, &ch, 1);
-+    }
- }
-=20
- static void monitor_qmp_read(void *opaque, const uint8_t *buf, int size)
- {
-     MonitorQMP *mon =3D opaque;
-=20
--    json_message_parser_feed(&mon->parser, (const char *) buf, size);
-+    monitor_inbuf_write(&mon->common, (const char *)buf, size);
-+    monitor_qmp_handle_inbuf(&mon->common);
- }
-=20
- static QDict *qmp_greeting(MonitorQMP *mon)
---=20
-2.24.1
+Since state transition has failed, driver should return previous state.
+
+> If this is a valid state,
+> wouldn't it be reasonable for the user to assume the device is already
+> operating in that state?  If it's an invalid state, do we need to
+> define the use cases for those invalid states?  If the user needs to
+> set the state back to _RUNNING, that suggests the device might be
+> stopped, which has implications beyond the migration state.
+> 
+
+Not necessarily stopped. For example, during live migration:
+
+*              _RESUMING  _RUNNING    Pre-copy    Stop-and-copy   _STOP
+*                (100b)     (001b)     (011b)        (010b)       (000b)
+*
+* 3. Save state during live migration
+*                             |----------->|------------>|---------->|
+
+on any state transition failure, user should set _RUNNING state.
+pre-copy (011b) -> stop-and-copy(010b)  =====> _SAVING flag is cleared 
+and device returned back to _RUNNING.
+Stop-and-copy(010b) -> STOP (000b) ====> device is already stopped.
+
+
+>>>   Why
+>>> is it necessarily _RUNNING vs _STOP?
+>>>   
+>>
+>> While changing From pre-copy to stop-and-copy transition, device is
+>> still running, only saving of device state started. Now if transition to
+>> stop-and-copy fails, from user point of view application or VM is still
+>> running, device state should be set to _RUNNING so that whatever the
+>> application/VM is running should continue at source.
+> 
+> Seems it's the users discretion whether to consider this continuable or
+> fatal, the vfio interface specification should support a given usage
+> model, not prescribe it.
+> 
+
+Updating comment.
+
+>>>> + * 3. In VFIO application live migration, state transition is from _RUNNING
+>>>> + *    to pre-copy to stop-and-copy to _STOP.
+>>>> + *    On state transition from _RUNNING to pre-copy, driver should start
+>>>> + *    gathering device state while application is still running and send device
+>>>> + *    state data to application through migration region.
+>>>> + *    On state transition from pre-copy to stop-and-copy, driver must stop
+>>>> + *    device, save device state and send it to application through migration
+>>>> + *    region.
+>>>> + *    On any failure during any of these state transition, VFIO device state
+>>>> + *    should be set to _RUNNING.
+>>>
+>>> Same comment as above regarding next state on failure.
+>>>    
+>>
+>> If application or VM migration fails, it should continue to run at
+>> source. In case of VM, guest user isn't aware of migration, and from his
+>> point VM should be running.
+> 
+> vfio is not prescribing the migration semantics to userspace, it's
+> presenting an interface that support the user semantics.  Therefore,
+> while it's useful to understand the expected usage model, I think we
+> also need a mechanism that the user can always determine the
+> device_state after a fault
+
+If state transition fails, device is in previous state and driver should 
+return previous state
+
+> and allowable state transitions independent
+> of the expected usage model.  
+
+Do you mean to define array of ['from','to'], same as runstate 
+transition array in QEMU?
+  static const RunStateTransition runstate_transitions_def[]
+
+
+> For example, I think a user should always
+> be allowed to transition a device to stopped regardless of the expected
+> migration flow.  An error might have occurred elsewhere and we want to
+> stop everything for debugging.  I think it's also allowable to switch
+> directly from running to stop-and-copy, for example to save and resume
+> a VM offline.
+>   
+>>> Also, it seems like it's the vendor driver's discretion to actually
+>>> provide data during the pre-copy phase.  As we've defined it, the
+>>> vendor driver needs to participate in the migration region regardless,
+>>> they might just always report no pending_bytes until we enter
+>>> stop-and-copy.
+>>>    
+>>
+>> Yes. And if pending_bytes are reported as 0 in pre-copy by vendor driver
+>> then QEMU doesn't reiterate for that device.
+> 
+> Maybe we can state that as the expected mechanism to avoid a vendor
+> driver trying to invent alternative means, ex. failing transition to
+> pre-copy, requesting new flags, etc.
+> 
+
+Isn't Sequence to be followed below sufficient to state that?
+
+
+>>>> + * 4. To start resuming phase, VFIO device state should be transitioned from
+>>>> + *    _RUNNING to _RESUMING state.
+>>>> + *    In _RESUMING state, driver should use received device state data through
+>>>> + *    migration region to resume device.
+>>>> + *    On failure during this state transition, application should set _RUNNING
+>>>> + *    state.
+>>>
+>>> Same comment regarding setting next state after failure.
+>>
+>> If device couldn't be transitioned to _RESUMING, then it should be set
+>> to default state, that is _RUNNING.
+>>
+>>>    
+>>>> + * 5. On providing saved device data to driver, appliation should change state
+>>>> + *    from _RESUMING to _RUNNING.
+>>>> + *    On failure to transition to _RUNNING state, VFIO application should reset
+>>>> + *    the device and set _RUNNING state so that device doesn't remain in unknown
+>>>> + *    or bad state. On reset, driver must reset device and device should be
+>>>> + *    available in default usable state.
+>>>
+>>> Didn't we discuss that the reset ioctl should return the device to the
+>>> initial state, including the transition to _RUNNING?
+>>
+>> Yes, that's default usable state, rewording it to initial state.
+>>
+>>>   Also, as above,
+>>> it's the user write that triggers the failure, this register is listed
+>>> as read-write, so what value does the vendor driver report for the
+>>> state when read after a transition failure?  Is it reported as _RESUMING
+>>> as it was prior to the attempted transition, or may the invalid states
+>>> be used by the vendor driver to indicate the device is broken?
+>>>    
+>>
+>> If transition as failed, device should report its previous state and
+>> reset device should bring back to usable _RUNNING state.
+> 
+> If device_state reports previous state then user should reasonably
+> infer that the device is already in that sate without a need for them
+> to set it, IMO.
+
+But if there is any error in read()/write() then user should device 
+which next state device should be put in, which would be different that 
+previous state.
+
+> 
+>>>> + *
+>>>> + * pending bytes: (read only)
+>>>> + *      Number of pending bytes yet to be migrated from vendor driver
+>>>> + *
+>>>> + * data_offset: (read only)
+>>>> + *      User application should read data_offset in migration region from where
+>>>> + *      user application should read device data during _SAVING state or write
+>>>> + *      device data during _RESUMING state. See below for detail of sequence to
+>>>> + *      be followed.
+>>>> + *
+>>>> + * data_size: (read/write)
+>>>> + *      User application should read data_size to get size of data copied in
+>>>> + *      bytes in migration region during _SAVING state and write size of data
+>>>> + *      copied in bytes in migration region during _RESUMING state.
+>>>> + *
+>>>> + * Migration region looks like:
+>>>> + *  ------------------------------------------------------------------
+>>>> + * |vfio_device_migration_info|    data section                      |
+>>>> + * |                          |     ///////////////////////////////  |
+>>>> + * ------------------------------------------------------------------
+>>>> + *   ^                              ^
+>>>> + *  offset 0-trapped part        data_offset
+>>>> + *
+>>>> + * Structure vfio_device_migration_info is always followed by data section in
+>>>> + * the region, so data_offset will always be non-0. Offset from where data is
+>>>> + * copied is decided by kernel driver, data section can be trapped or mapped
+>>>> + * or partitioned, depending on how kernel driver defines data section.
+>>>> + * Data section partition can be defined as mapped by sparse mmap capability.
+>>>> + * If mmapped, then data_offset should be page aligned, where as initial section
+>>>> + * which contain vfio_device_migration_info structure might not end at offset
+>>>> + * which is page aligned. The user is not required to access via mmap regardless
+>>>> + * of the region mmap capabilities.
+>>>> + * Vendor driver should decide whether to partition data section and how to
+>>>> + * partition the data section. Vendor driver should return data_offset
+>>>> + * accordingly.
+>>>> + *
+>>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
+>>>> + * and for _SAVING device state or stop-and-copy phase:
+>>>> + * a. read pending_bytes, indicates start of new iteration to get device data.
+>>>> + *    If there was previous iteration, then this read operation indicates
+>>>> + *    previous iteration is done. If pending_bytes > 0, go through below steps.
+>>>> + * b. read data_offset, indicates kernel driver to make data available through
+>>>> + *    data section. Kernel driver should return this read operation only after
+>>>> + *    data is available from (region + data_offset) to (region + data_offset +
+>>>> + *    data_size).
+>>>> + * c. read data_size, amount of data in bytes available through migration
+>>>> + *    region.
+>>>> + * d. read data of data_size bytes from (region + data_offset) from migration
+>>>> + *    region.
+>>>> + * e. process data.
+>>>> + * f. Loop through a to e.
+>>>
+>>> It seems we always need to end an iteration by reading pending_bytes to
+>>> signal to the vendor driver to release resources, so should the end of
+>>> the loop be:
+>>>
+>>> e. Read pending_bytes
+>>> f. Goto b. or optionally restart next iteration at a.
+>>>
+>>> I think this is defined such that reading data_offset commits resources
+>>> and reading pending_bytes frees them, allowing userspace to restart at
+>>> reading pending_bytes with no side-effects.  Therefore reading
+>>> pending_bytes repeatedly is supported.  Is the same true for
+>>> data_offset and data_size?  It seems reasonable that the vendor driver
+>>> can simply return offset and size for the current buffer if the user
+>>> reads these more than once.
+>>>   
+>>
+>> Right.
+> 
+> Can we add that to the spec?
+> 
+
+ok.
+
+>>> How is a protocol or device error signaled?  For example, we can have a
+>>> user error where they read data_size before data_offset.  Should the
+>>> vendor driver generate a fault reading data_size in this case.  We can
+>>> also have internal errors in the vendor driver, should the vendor
+>>> driver use a special errno or update device_state autonomously to
+>>> indicate such an error?
+>>
+>> If there is any error during the sequence, vendor driver can return
+>> error code for next read/write operation, that will terminate the loop
+>> and migration would fail.
+> 
+> Please add to spec.
+> 
+
+Ok
+
+>>> I believe it's also part of the intended protocol that the user can
+>>> transition from _SAVING|_RUNNING to _SAVING at any point, regardless of
+>>> pending_bytes.  This should be noted.
+>>>    
+>>
+>> Ok. Updating comment.
+>>
+>>>> + *
+>>>> + * Sequence to be followed while _RESUMING device state:
+>>>> + * While data for this device is available, repeat below steps:
+>>>> + * a. read data_offset from where user application should write data.
+>>>> + * b. write data of data_size to migration region from data_offset.
+>>>
+>>> Whose's data_size, the _SAVING end or the _RESUMING end?  I think this
+>>> is intended to be the transaction size from the _SAVING source,
+>>
+>> Not necessarily. data_size could be MIN(transaction size of source,
+>> migration data section). If migration data section is smaller than data
+>> packet size at source, then it has to be broken and iteratively sent.
+> 
+> So you're saying that a transaction from the source is divisible by the
+> user under certain conditions.  What other conditions exist?
+
+I don't think there are any other conditions than above.
+
+>  Can the
+> user decide arbitrary sizes less than the MIN() stated above?  This
+> needs to be specified.
+>
+
+No, User can't decide arbitrary sizes.
+
+
+>>> but it
+>>> could easily be misinterpreted as reading data_size on the _RESUMING
+>>> end.
+>>>    
+>>>> + * c. write data_size which indicates vendor driver that data is written in
+>>>> + *    staging buffer. Vendor driver should read this data from migration
+>>>> + *    region and resume device's state.
+>>>
+>>> I think we also need to define the error protocol.  The user could
+>>> mis-order transactions or there could be an internal error in the
+>>> vendor driver or device.  Are all read(2)/write(2) operations
+>>> susceptible to defined errnos to signal this?
+>>
+>> Yes.
+> 
+> And those defined errnos are specified...
+> 
+
+Those could be standard errors like -EINVAL, ENOMEM....
+
+>>>   Is it reflected in
+>>> device_state?
+>>
+>> No.
+> 
+> So a user should do what, just keep trying?
+>
+
+No, fail migration process. If error is at source or destination then 
+user can decide either resume at source or terminate application.
+
+>>> What's the recovery protocol?
+>>>    
+>>
+>> On read()/write() failure user should take necessary action.
+> 
+> Where is that necessary action defined?  Can they just try again?  Do
+> they transition in and out of _RESUMING to try again?  Do they need to
+> reset the device?
+> 
+
+User application should decide what action to take on failure, right?
+  "vfio is not prescribing the migration semantics to userspace, it's
+presenting an interface that support the user semantics."
+
+>>>> + *
+>>>> + * For user application, data is opaque. User should write data in the same
+>>>> + * order as received.
+>>>
+>>> Order and transaction size, ie. each data_size chunk is indivisible by
+>>> the user.
+>>
+>> Transaction size can differ, but order should remain same.
+> 
+> Under what circumstances and to what extent can transaction size
+> differ?
+
+It depends in migration region size.
+
+>  Is the MIN() algorithm above the absolute lower bound or just
+> a suggestion?
+
+
+
+>  Is the user allowed to concatenate transactions from the
+> source together on the target if the region is sufficiently large?
+
+Yes that can be done, because data is just byte stream for user. Vendor 
+driver receives the byte stream and knows how to decode it.
+
+>  It
+> seems like quite an imposition on the vendor driver to support this
+> flexibility.
+> 
+>>>> + */
+>>>> +
+>>>> +struct vfio_device_migration_info {
+>>>> +	__u32 device_state;         /* VFIO device state */
+>>>> +#define VFIO_DEVICE_STATE_STOP      (1 << 0)
+>>>> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+>>>
+>>> Huh?  We should probably just refer to it consistently, ie. _RUNNING
+>>> and !_RUNNING, otherwise we have the incongruity that setting the _STOP
+>>> value is actually the opposite of the necessary logic value (_STOP = 1
+>>> is _RUNNING, _STOP = 0 is !_RUNNING).
+>>
+>> Ops, my mistake, forgot to update to
+>> #define VFIO_DEVICE_STATE_STOP      (0)
+>>
+>>>    
+>>>> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+>>>> +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+>>>> +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
+>>>> +				     VFIO_DEVICE_STATE_SAVING |  \
+>>>> +				     VFIO_DEVICE_STATE_RESUMING)
+>>>> +
+>>>> +#define VFIO_DEVICE_STATE_INVALID_CASE1    (VFIO_DEVICE_STATE_SAVING | \
+>>>> +					    VFIO_DEVICE_STATE_RESUMING)
+>>>> +
+>>>> +#define VFIO_DEVICE_STATE_INVALID_CASE2    (VFIO_DEVICE_STATE_RUNNING | \
+>>>> +					    VFIO_DEVICE_STATE_RESUMING)
+>>>
+>>> Gack, we fixed these in the last iteration!
+>>>    
+>>
+>> That solution doesn't scale when new flags will be added. I still prefer
+>> to define as above.
+> 
+> I see, the argument was buried in a reply to Yan, sorry if I missed it:
+> 
+>>>> These seem difficult to use, maybe we just need a
+>>>> VFIO_DEVICE_STATE_VALID macro?
+>>>>
+>>>> #define VFIO_DEVICE_STATE_VALID(state) \
+>>>>     (state & VFIO_DEVICE_STATE_RESUMING ? \
+>>>>     (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+>>>>   
+>>
+>> This will not be work when use of other bits gets added in future.
+>> That's the reason I preferred to add individual invalid states which
+>> user should check.
+> 
+> I would argue that what doesn't scale is having numerous CASE1, CASE2,
+> CASEn conditions elsewhere in the kernel rather than have a unified,
+> single macro that defines a valid state.  How do you worry this will be
+> a problem when new flags are added, can't we just update the macro?
+
+Adding macro you suggested above. Lets figure out how to solve problem 
+with new flags when new flags gets added.
+
+Thanks,
+Kirti
 
 
