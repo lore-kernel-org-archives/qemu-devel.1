@@ -7,121 +7,121 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B00C2D0D2
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC2CC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:04:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1155121D7D
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:02:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1459121D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 14:04:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MA/VnLVy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1155121D7D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="LSMyQNI/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1459121D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihwOF-0003Qx-Ib
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:02:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35694)
+	id 1ihwPu-0005d1-I9
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 09:04:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.jensen@samsung.com>) id 1ihvZ5-0001pV-2R
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:10:06 -0500
+ (envelope-from <k.jensen@samsung.com>) id 1ihvYo-0001XH-S4
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.jensen@samsung.com>) id 1ihvYy-000791-Lu
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:59 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:55892)
+ (envelope-from <k.jensen@samsung.com>) id 1ihvYl-0006P0-EP
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:46 -0500
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:55863)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <k.jensen@samsung.com>)
- id 1ihvYx-0006R1-IF
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:55 -0500
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+ id 1ihvYk-0006It-Vv
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:09:43 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
  by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20191219130943euoutp02c5fc9efa12bc54beea5e4982ae62fb0e~hx8LDq5Zl0700607006euoutp02J
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:09:43 +0000 (GMT)
+ 20191219130941euoutp02765f9b765b4a79e09a1fdc76fb382510~hx8IqVB1V0697606976euoutp02I
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 13:09:41 +0000 (GMT)
 DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20191219130943euoutp02c5fc9efa12bc54beea5e4982ae62fb0e~hx8LDq5Zl0700607006euoutp02J
+ 20191219130941euoutp02765f9b765b4a79e09a1fdc76fb382510~hx8IqVB1V0697606976euoutp02I
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1576760983;
- bh=MYU0OwqRdBbZsZZBA9ne4go+tCBRq+fqhlYs60wTftk=;
+ s=mail20170921; t=1576760981;
+ bh=1Vx5l5dqYuHG6gTUMzpASbOeY3/CxjIqdBbYMM6xbJ0=;
  h=From:To:CC:Subject:Date:In-Reply-To:References:From;
- b=MA/VnLVytPZngiUXP0QdSOxa4sOTXdH5EQYBs/SuzgnIvr/RxG2rF9mzJMC9cCcSX
- O06/rSHERq99tTL/PuKyqN2L4AF0pXLarrjszwx1fHZjmqWG/JMUWBFyGEM+x9Ocm4
- a4+HnZFI8BCvsJwMVoJK2uljShRfft27IEbVEwx4=
+ b=LSMyQNI/VUoVPm1B1xLwv8Qz9RRQaoT6WMo6VknX2VNwYJLoScgeeg9GGO6MIoLDe
+ a0q/ZwieofMpE+yDVwFxvq6h815o2aWt9BerZKiTcQ/ACP3dEjwGNz+IZLKdOGH+ka
+ Ws9xJcr6b2ChE1edRw8xk5xQrdTl4gA+lxB+BS9w=
 Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
  eucas1p2.samsung.com (KnoxPortal) with ESMTP id
- 20191219130943eucas1p2277b5f0cf4b1ef6202665a0784193e2c~hx8K4UXYf0340903409eucas1p2H;
- Thu, 19 Dec 2019 13:09:43 +0000 (GMT)
+ 20191219130941eucas1p23830aae141acacc13f90d65ae6687895~hx8Ia0jC93066830668eucas1p2g;
+ Thu, 19 Dec 2019 13:09:41 +0000 (GMT)
 Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
- eusmges3new.samsung.com (EUCPMTA) with SMTP id 08.5F.60698.7967BFD5; Thu, 19
- Dec 2019 13:09:43 +0000 (GMT)
+ eusmges3new.samsung.com (EUCPMTA) with SMTP id B5.5F.60698.4967BFD5; Thu, 19
+ Dec 2019 13:09:41 +0000 (GMT)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
- eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
- 20191219130943eucas1p1dd4a7fd7ff94ee679832838b5d61f611~hx8KkI3kI1459314593eucas1p1I;
- Thu, 19 Dec 2019 13:09:43 +0000 (GMT)
+ eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+ 20191219130940eucas1p2ed4053766595fbef6b5ddee13565f22f~hx8IDHK820341303413eucas1p2x;
+ Thu, 19 Dec 2019 13:09:40 +0000 (GMT)
 Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
  eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20191219130943eusmtrp26fd19e5c83ddcfc37081256834eabc03~hx8KjjOQq3097130971eusmtrp2Y;
- Thu, 19 Dec 2019 13:09:43 +0000 (GMT)
-X-AuditID: cbfec7f5-a29ff7000001ed1a-66-5dfb7697e055
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms1.samsung.com (EUCPMTA) with SMTP id 67.4D.08375.7967BFD5; Thu, 19
- Dec 2019 13:09:43 +0000 (GMT)
+ 20191219130940eusmtrp26e9a9b2d56c946cd2043559e7df8a8ba~hx8ICkKAQ3097130971eusmtrp2G;
+ Thu, 19 Dec 2019 13:09:40 +0000 (GMT)
+X-AuditID: cbfec7f5-a0fff7000001ed1a-5d-5dfb76942c74
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+ eusmgms1.samsung.com (EUCPMTA) with SMTP id 04.4D.08375.4967BFD5; Thu, 19
+ Dec 2019 13:09:40 +0000 (GMT)
 Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
- eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20191219130943eusmtip2330261d2858ca61cf9da4c1444901be9~hx8KWRBJv3240732407eusmtip22;
- Thu, 19 Dec 2019 13:09:43 +0000 (GMT)
+ eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+ 20191219130940eusmtip1e706f12adce089f511e2dccfd9d85b21~hx8H5I9dP2511425114eusmtip1h;
+ Thu, 19 Dec 2019 13:09:40 +0000 (GMT)
 Received: from CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) by
  CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
- Server (TLS) id 15.0.1320.4; Thu, 19 Dec 2019 13:09:42 +0000
+ Server (TLS) id 15.0.1320.4; Thu, 19 Dec 2019 13:09:39 +0000
 Received: from apples.local (106.110.32.41) by CAMSVWEXC01.scsc.local
  (106.1.227.71) with Microsoft SMTP Server id 15.0.1320.4 via Frontend
- Transport; Thu, 19 Dec 2019 13:09:41 +0000
+ Transport; Thu, 19 Dec 2019 13:09:39 +0000
 From: Klaus Jensen <k.jensen@samsung.com>
 To: <qemu-block@nongnu.org>
-Subject: [PATCH v4 13/24] nvme: additional tracing
-Date: Thu, 19 Dec 2019 14:09:10 +0100
-Message-ID: <20191219130921.309264-14-k.jensen@samsung.com>
+Subject: [PATCH v4 09/24] nvme: add temperature threshold feature
+Date: Thu, 19 Dec 2019 14:09:06 +0100
+Message-ID: <20191219130921.309264-10-k.jensen@samsung.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191219130921.309264-1-k.jensen@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKKsWRmVeSWpSXmKPExsWy7djPc7rTy37HGrzboGyxub+d0WLSoWuM
- FksuplrMu6VsMetdO5vF8d4dLA5sHptWdbJ53Lm2h83jybXNTB7v911lC2CJ4rJJSc3JLEst
- 0rdL4Mp49OQ4U0GrbMW17ztYGxh3SXQxcnJICJhIHLy4n7WLkYtDSGAFo8TLfxOYQBJCAl8Y
- JQ7v8IFIfGaUWP+ihQWm496uvWwQieWMEssvHWCCq3r1/C8LhHOGUWLz0a9sELN2MUqs/F0I
- YrMJaEps//MfbJSIgLRE+9VJYMuZBa4zShz6fZEdJCEsYCTx5OxuZhCbRUBV4sThm4xdjBwc
- vALWEi+n1kCcIS+x9dsnVhCbEyi8pfc2I4jNKyAocXLmE7D5zEA1zVtnM0PYEhIHX7xgBtkl
- IbCOXWJ7/zKwmRICLhJrd4ZCzBSWeHV8CzuELSPxf+d8Joj6bkaJvg9foZpnMEpMX/adDaLZ
- WqLvTA5Eg6NEz4F+Fogwn8SNt4IQe/kkJm2bzgwR5pXoaBOCqFaT2NG0lXECo/IsJFfPQnL1
- LCRXL2BkXsUonlpanJueWmycl1quV5yYW1yal66XnJ+7iRGYWE7/O/51B+O+P0mHGAU4GJV4
- eB3SfscKsSaWFVfmHmKU4GBWEuG93fEzVog3JbGyKrUoP76oNCe1+BCjNAeLkjiv8aKXsUIC
- 6YklqdmpqQWpRTBZJg5OqQbG9JQbFhHybjIv5h0teqD0wtSOa1qn0TqmnEfBV09mVIbb1cZs
- vHH9wzbLA65h7Q0LJ9/+17DaPKhq5a1dgWV1uzd07lToCIpPiXfx+ZpmNYH7ZDX/nXWle0+t
- PnK6cLunlNak+Jb7EoIL98oc42CTNevi2r78/p/9BsKf+u5cnld1fKW16G52JZbijERDLeai
- 4kQA7c4l/SgDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCIsWRmVeSWpSXmKPExsVy+t/xe7rTy37HGnTs5LPY3N/OaDHp0DVG
- iyUXUy3m3VK2mPWunc3ieO8OFgc2j02rOtk87lzbw+bx5NpmJo/3+66yBbBE6dkU5ZeWpCpk
- 5BeX2CpFG1oY6RlaWugZmVjqGRqbx1oZmSrp29mkpOZklqUW6dsl6GU8enKcqaBVtuLa9x2s
- DYy7JLoYOTkkBEwk7u3ay9bFyMUhJLCUUaLt0wxmiISMxKcrH9khbGGJP9e6oIo+Mkp8vHGY
- GcI5wyixtG82K4Szi1Hi3pw5YC1sApoS2//8ZwGxRQSkJdqvTgIrYha4zihx6PdFsCJhASOJ
- J2d3g+1jEVCVOHH4JmMXIwcHr4C1xMupNRCr5SW2fvvECmJzAoW39N5mBLGFBKwkHv/8CDaf
- V0BQ4uTMJ2A2M1B989bZzBC2hMTBFy+YJzAKz0JSNgtJ2SwkZQsYmVcxiqSWFuem5xYb6hUn
- 5haX5qXrJefnbmIExti2Yz8372C8tDH4EKMAB6MSD+/L5N+xQqyJZcWVuYcYJTiYlUR4b3f8
- jBXiTUmsrEotyo8vKs1JLT7EaAr020RmKdHkfGD855XEG5oamltYGpobmxubWSiJ83YIHIwR
- EkhPLEnNTk0tSC2C6WPi4JRqYGRK/dvU+aY9y7jvUMzcP+c/ejk4tzxfofT3fVnY/MO8eq7c
- JyRZciUcRblDT+/eGMMv+F5CTbt4Q/O9vVFz/PZcOH9Y8tDMw65Pv54xvTnv66kpDyZcMv8p
- w3Y1fcWuELP1spcWcn5r9jbK/sljpqaZ3RDXdEvDet118ZulRw8XLLHmb33X4arEUpyRaKjF
- XFScCADxnUl4xwIAAA==
-X-CMS-MailID: 20191219130943eucas1p1dd4a7fd7ff94ee679832838b5d61f611
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SXUhTcRjG+e+cnR1Hk9MUfFNDmmgYZYkShxylILHLbgyJhk096mqbY0ct
+ u0mm+YlWZswmfiTmbBHR5pZlGo3IIhGtNMtgjKRm2fIjnUtxbR4N7573fZ7n/f8u/iQmNvAj
+ SaWmmNFpFCoJIcTtr3yjh26VrsmPGK2Itl6rRnSTYxLR3eMM3f45ljZ6qgl6uKEfTyNkFnMt
+ Ifsy+YyQzUxaebLfQxPEKfyMUJrHqJSljO7w8XPCwrHuB7jWGn+pzXODV46ao+tQCAlUCrge
+ mVAdEpJiqheB3rLE44Y/CD4sDuDcsITg3tde/nbFduf+lmFC0O7yYf9TCxtuATeMIOjx3dxy
+ niL46fTygn2CSoDH6348qMOpKKieaOIHQxj1EYFjbVwQNMKodLBbVgNcJIlTcWA0KoJrEZUK
+ c852jOOIAdvK4iZTSGDf1zCNuMxueHN7ZvM+FshU2FoxTgO8cLs3gYAyC2B+8DvBHcqASu8c
+ 4nQY/BjuE3A6GvxPOnhcoR5B4/zyVrsFgaHHSwTpIPB044iKk+nw3JvFyVCY+rWbezcUmuwG
+ jFuLoKZKzF2Ph369DV1HscYd1MYd1MYd1J0IM6MIpoRVFzBssoa5mMgq1GyJpiAxt0htQYHv
+ 8nZjeLkfDa3nOBBFIskuUVr+mlzMV5SyZWoHAhKThIuma3xysShPUXaZ0RVl60pUDOtAUSQu
+ iRAld83KxVSBopi5wDBaRrft8siQyHKk7hB3vZy92tX6Or/hbptUcl55YuVKdnEm7dqLPSyL
+ S8pV6t9p9dHuo/565+zYuJKeapa6UpNM0o33RdNVWTl7Kvd5eirnTw+uns2oT/hr8H86ZvbY
+ nZ0Gcj9/6GBLMy/vJDJV6HrTRyMXhI4UIlXKZkZpY2r98YMxA99atRKcLVQkHcB0rOIfJ2qU
+ lioDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCIsWRmVeSWpSXmKPExsVy+t/xu7pTyn7HGkydpmSxub+d0WLSoWuM
+ FksuplrMu6VsMetdO5vF8d4dLA5sHptWdbJ53Lm2h83jybXNTB7v911lC2CJ0rMpyi8tSVXI
+ yC8usVWKNrQw0jO0tNAzMrHUMzQ2j7UyMlXSt7NJSc3JLEst0rdL0Mu4sGQtS8FmtYq57yYy
+ NTBOkeli5OSQEDCR2LpwNUsXIxeHkMBSRok3P16wQiRkJD5d+cgOYQtL/LnWxQZR9JFRYtqH
+ NijnDKPEjZMv2SGcXYwSs5pWM4K0sAloSmz/858FxBYRkJZovzqJFaSIWeA6o8Sh3xfB5goL
+ OEps2/QDqIGDg0VAVWLWrESQMK+AtcSb+/OYIVbLS2z99gnsJE6g+Jbe22DzhQSsJB7//MgC
+ US8ocXLmEzCbGai+eetsZghbQuLgixfMExiFZyEpm4WkbBaSsgWMzKsYRVJLi3PTc4sN9YoT
+ c4tL89L1kvNzNzECY2zbsZ+bdzBe2hh8iFGAg1GJh/dl8u9YIdbEsuLK3EOMEhzMSiK8tzt+
+ xgrxpiRWVqUW5ccXleakFh9iNAX6bSKzlGhyPjD+80riDU0NzS0sDc2NzY3NLJTEeTsEDsYI
+ CaQnlqRmp6YWpBbB9DFxcEo1MC7SvTbl0Zd/fI3pnxUzqjzOhxxKnRwVeP7Y49tPBOrDCt+X
+ XtjxcMWl/gS9gqudF73t/W5slNwWv9svNe20x4HkX/aexeaJK1cZcQvKfexa5X9d/zmT51ov
+ u9pam+ZzG5hEi4Q5cheu+zlHvnAHr+uBtUuTztvoxZzx9xVwZA+qkBGPP+XtocRSnJFoqMVc
+ VJwIADCn7z3HAgAA
+X-CMS-MailID: 20191219130940eucas1p2ed4053766595fbef6b5ddee13565f22f
 X-Msg-Generator: CA
-X-RootMTR: 20191219130943eucas1p1dd4a7fd7ff94ee679832838b5d61f611
+X-RootMTR: 20191219130940eucas1p2ed4053766595fbef6b5ddee13565f22f
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20191219130943eucas1p1dd4a7fd7ff94ee679832838b5d61f611
+X-CMS-RootMailID: 20191219130940eucas1p2ed4053766595fbef6b5ddee13565f22f
 References: <20191219130921.309264-1-k.jensen@samsung.com>
- <CGME20191219130943eucas1p1dd4a7fd7ff94ee679832838b5d61f611@eucas1p1.samsung.com>
+ <CGME20191219130940eucas1p2ed4053766595fbef6b5ddee13565f22f@eucas1p2.samsung.com>
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 210.118.77.12
@@ -144,95 +144,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a trace call for nvme_enqueue_req_completion.
-
-Also, streamline nvme_identify_ns and nvme_identify_ns_list. They do not
-need to repeat the command, it is already in the trace name.
+It might seem wierd to implement this feature for an emulated device,
+but it is mandatory to support and the feature is useful for testing
+asynchronous event request support, which will be added in a later
+patch.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c       | 8 +++++---
- hw/block/trace-events | 5 +++--
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ hw/block/nvme.c      | 47 ++++++++++++++++++++++++++++++++++++++++++++
+ hw/block/nvme.h      |  2 ++
+ include/block/nvme.h |  7 ++++++-
+ 3 files changed, 55 insertions(+), 1 deletion(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 3d870ac55984..fbf6a52c7103 100644
+index f9b9344f1376..13d412d76c8e 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -318,6 +318,8 @@ static void nvme_post_cqes(void *opaque)
- static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req=
-)
- {
-     assert(cq->cqid =3D=3D req->sq->cqid);
-+    trace_nvme_dev_enqueue_req_completion(nvme_cid(req), cq->cqid,
-+        req->status);
-     QTAILQ_REMOVE(&req->sq->out_req_list, req, entry);
-     QTAILQ_INSERT_TAIL(&cq->req_list, req, entry);
-     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
-@@ -893,7 +895,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIde=
-ntify *c)
-         prp1, prp2);
+@@ -45,6 +45,7 @@
+=20
+ #define NVME_SPEC_VER 0x00010201
+ #define NVME_MAX_QS PCI_MSIX_FLAGS_QSIZE
++#define NVME_TEMPERATURE 0x143
+=20
+ #define NVME_GUEST_ERR(trace, fmt, ...) \
+     do { \
+@@ -801,6 +802,27 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCm=
+d *cmd, NvmeRequest *req)
+     uint32_t result;
+=20
+     switch (dw10) {
++    case NVME_TEMPERATURE_THRESHOLD:
++        result =3D 0;
++
++        /*
++         * The controller only implements the Composite Temperature sens=
+or, so
++         * return 0 for all other sensors.
++         */
++        if (NVME_TEMP_TMPSEL(dw10)) {
++            break;
++        }
++
++        switch (NVME_TEMP_THSEL(dw10)) {
++        case 0x0:
++            result =3D cpu_to_le16(n->features.temp_thresh_hi);
++            break;
++        case 0x1:
++            result =3D cpu_to_le16(n->features.temp_thresh_low);
++            break;
++        }
++
++        break;
+     case NVME_VOLATILE_WRITE_CACHE:
+         result =3D blk_enable_write_cache(n->conf.blk);
+         trace_nvme_dev_getfeat_vwcache(result ? "enabled" : "disabled");
+@@ -845,6 +867,23 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCm=
+d *cmd, NvmeRequest *req)
+     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
+=20
+     switch (dw10) {
++    case NVME_TEMPERATURE_THRESHOLD:
++        if (NVME_TEMP_TMPSEL(dw11)) {
++            break;
++        }
++
++        switch (NVME_TEMP_THSEL(dw11)) {
++        case 0x0:
++            n->features.temp_thresh_hi =3D NVME_TEMP_TMPTH(dw11);
++            break;
++        case 0x1:
++            n->features.temp_thresh_low =3D NVME_TEMP_TMPTH(dw11);
++            break;
++        default:
++            return NVME_INVALID_FIELD | NVME_DNR;
++        }
++
++        break;
+     case NVME_VOLATILE_WRITE_CACHE:
+         blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+         break;
+@@ -1366,6 +1405,9 @@ static void nvme_init_state(NvmeCtrl *n)
+     n->namespaces =3D g_new0(NvmeNamespace, n->num_namespaces);
+     n->sq =3D g_new0(NvmeSQueue *, n->params.num_queues);
+     n->cq =3D g_new0(NvmeCQueue *, n->params.num_queues);
++
++    n->temperature =3D NVME_TEMPERATURE;
++    n->features.temp_thresh_hi =3D le16_to_cpu(n->id_ctrl.wctemp);
  }
 =20
--static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
-+static uint16_t nvme_identify_ns_list(NvmeCtrl *n, NvmeIdentify *c)
- {
-     static const int data_len =3D 4 * KiB;
-     uint32_t min_nsid =3D le32_to_cpu(c->nsid);
-@@ -903,7 +905,7 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, Nvm=
-eIdentify *c)
-     uint16_t ret;
-     int i, j =3D 0;
+ static void nvme_init_cmb(NvmeCtrl *n, PCIDevice *pci_dev)
+@@ -1447,6 +1489,11 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+     id->acl =3D 3;
+     id->frmw =3D 7 << 1;
+     id->lpa =3D 1 << 0;
++
++    /* recommended default value (~70 C) */
++    id->wctemp =3D cpu_to_le16(0x157);
++    id->cctemp =3D cpu_to_le16(0x175);
++
+     id->sqes =3D (0x6 << 4) | 0x6;
+     id->cqes =3D (0x4 << 4) | 0x4;
+     id->nn =3D cpu_to_le32(n->num_namespaces);
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index a867bdfabafd..1518f32557a3 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -108,6 +108,7 @@ typedef struct NvmeCtrl {
+     uint64_t    irq_status;
+     uint64_t    host_timestamp;                 /* Timestamp sent by the=
+ host */
+     uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
++    uint16_t    temperature;
 =20
--    trace_nvme_dev_identify_nslist(min_nsid);
-+    trace_nvme_dev_identify_ns_list(min_nsid);
+     NvmeNamespace   *namespaces;
+     NvmeSQueue      **sq;
+@@ -115,6 +116,7 @@ typedef struct NvmeCtrl {
+     NvmeSQueue      admin_sq;
+     NvmeCQueue      admin_cq;
+     NvmeIdCtrl      id_ctrl;
++    NvmeFeatureVal  features;
+ } NvmeCtrl;
 =20
-     list =3D g_malloc0(data_len);
-     for (i =3D 0; i < n->num_namespaces; i++) {
-@@ -930,7 +932,7 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *c=
-md)
-     case 0x01:
-         return nvme_identify_ctrl(n, c);
-     case 0x02:
--        return nvme_identify_nslist(n, c);
-+        return nvme_identify_ns_list(n, c);
-     default:
-         trace_nvme_dev_err_invalid_identify_cns(le32_to_cpu(c->cns));
-         return NVME_INVALID_FIELD | NVME_DNR;
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 4cf39961989d..f982ec1a3221 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -39,8 +39,8 @@ nvme_dev_create_cq(uint64_t addr, uint16_t cqid, uint16=
-_t vector, uint16_t size,
- nvme_dev_del_sq(uint16_t qid) "deleting submission queue sqid=3D%"PRIu16=
-""
- nvme_dev_del_cq(uint16_t cqid) "deleted completion queue, sqid=3D%"PRIu1=
-6""
- nvme_dev_identify_ctrl(void) "identify controller"
--nvme_dev_identify_ns(uint16_t ns) "identify namespace, nsid=3D%"PRIu16""
--nvme_dev_identify_nslist(uint16_t ns) "identify namespace list, nsid=3D%=
-"PRIu16""
-+nvme_dev_identify_ns(uint32_t ns) "nsid %"PRIu32""
-+nvme_dev_identify_ns_list(uint32_t ns) "nsid %"PRIu32""
- nvme_dev_getfeat(uint16_t cid, uint32_t fid) "cid %"PRIu16" fid 0x%"PRIx=
-32""
- nvme_dev_setfeat(uint16_t cid, uint32_t fid, uint32_t val) "cid %"PRIu16=
-" fid 0x%"PRIx32" val 0x%"PRIx32""
- nvme_dev_getfeat_vwcache(const char* result) "get feature volatile write=
- cache, result=3D%s"
-@@ -54,6 +54,7 @@ nvme_dev_aer(uint16_t cid) "cid %"PRIu16""
- nvme_dev_aer_aerl_exceeded(void) "aerl exceeded"
- nvme_dev_aer_masked(uint8_t type, uint8_t mask) "type 0x%"PRIx8" mask 0x=
-%"PRIx8""
- nvme_dev_aer_post_cqe(uint8_t typ, uint8_t info, uint8_t log_page) "type=
- 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
-+nvme_dev_enqueue_req_completion(uint16_t cid, uint16_t cqid, uint16_t st=
-atus) "cid %"PRIu16" cqid %"PRIu16" status 0x%"PRIx16""
- nvme_dev_enqueue_event(uint8_t typ, uint8_t info, uint8_t log_page) "typ=
-e 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
- nvme_dev_enqueue_event_noqueue(int queued) "queued %d"
- nvme_dev_enqueue_event_masked(uint8_t typ) "type 0x%"PRIx8""
+ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index d2f65e8fe496..ff31cb32117c 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -616,7 +616,8 @@ enum NvmeIdCtrlOncs {
+ typedef struct NvmeFeatureVal {
+     uint32_t    arbitration;
+     uint32_t    power_mgmt;
+-    uint32_t    temp_thresh;
++    uint16_t    temp_thresh_hi;
++    uint16_t    temp_thresh_low;
+     uint32_t    err_rec;
+     uint32_t    volatile_wc;
+     uint32_t    num_queues;
+@@ -635,6 +636,10 @@ typedef struct NvmeFeatureVal {
+ #define NVME_INTC_THR(intc)     (intc & 0xff)
+ #define NVME_INTC_TIME(intc)    ((intc >> 8) & 0xff)
+=20
++#define NVME_TEMP_THSEL(temp)  ((temp >> 20) & 0x3)
++#define NVME_TEMP_TMPSEL(temp) ((temp >> 16) & 0xf)
++#define NVME_TEMP_TMPTH(temp)  (temp & 0xffff)
++
+ enum NvmeFeatureIds {
+     NVME_ARBITRATION                =3D 0x1,
+     NVME_POWER_MANAGEMENT           =3D 0x2,
 --=20
 2.24.1
 
