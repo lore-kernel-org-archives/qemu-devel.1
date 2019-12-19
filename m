@@ -2,106 +2,75 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F08C8C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BD9C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1B1C218AC
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:07:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE5C0218AC
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:08:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pe3vdkpv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B1C218AC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOKK1uiV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE5C0218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihvWC-0005O0-GG
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:07:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33729)
+	id 1ihvXG-0007en-Qm
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:08:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihvUL-0002zj-Bk
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:05:14 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ihuxE-0007pj-0a
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihvUI-0002a2-Eo
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:05:07 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30652
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ihuxC-0007PD-6s
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:30:55 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47186
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihvUI-0002TG-8V
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:05:06 -0500
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1ihuxA-0007Ks-Bl
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 07:30:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576760705;
+ s=mimecast20190719; t=1576758650;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZgBCxUVb0Libd/JSUw7uTFBdCttTbaWw1zp84vhxh60=;
- b=Pe3vdkpvcVLg4ud/7kPwo15AZdXE2lsG5RDlmw9pR2hYBMOU0+ECsPj8tpONK0yyTTJ0yo
- FGJJdJ40Ia706n/Sz1PjC16pLVAI5y+DxUPVEGtDzFpLvc4xWy9K1KFNBE0yxRpvM+gcoU
- bxVRLC4TQb72Uv6CTGHFq3u62sR++PA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-KhIvQYykMQabm04tz9ccsQ-1; Thu, 19 Dec 2019 08:04:59 -0500
-Received: by mail-ed1-f69.google.com with SMTP id cy24so1225824edb.12
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:04:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JSHBYqZNJp+jEmSTQKaaXlWnb6FSSnjROA/aDLpAI6Y=;
- b=bciKsCiPw/oiL51PapRPAQ7JR55xBXc0kWRzt5C6E5eRTS7orIpDDNBe9+syVXdfVL
- Sngno2YkhnE3hOfoZkrvjwsBxhMj7UGxJkgh+db37InWGHKolN5VW/kiJy7+Loume/XB
- x1P3ojKqQu8XFK6gRNosbRYELt0qhV94wNeT/IyJrAnl3NL4EWPCa8YdnuMr8khWufh1
- 9nntsGJk18P4af4IzZ7aeY/pdzyoGlyxfW/vOUvgD+A1kmrirwamLIWNEtT4q8qFZISO
- AGHMO26XwC9Ee98upDo64N9/PU096ca1VXjB1Lnm8BlaQdgOblMVa6Aor9RpYY8gUP71
- KAzA==
-X-Gm-Message-State: APjAAAWHsBgekx8IB84nN1yBqIqfuS1SFSj/h1YwAR6gGnCBUQo44cQ5
- G0vDrm7CNf5WWOHT5va1xbEa84ALwGU5OB7QMA26vIW+APIEmLMBtkkTxfC93R/c43bdhE9N2PT
- JNAJEbntrkGYFWhQ=
-X-Received: by 2002:a17:906:bcf5:: with SMTP id
- op21mr9151065ejb.160.1576760697621; 
- Thu, 19 Dec 2019 05:04:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzbqqm/wuRTCpiPRFG2W42OQ7zBnrwcJiefEA+USi8Tn8NMcbXHFzOwNx4YmzYWvtOlC7JYbQ==
-X-Received: by 2002:a17:906:bcf5:: with SMTP id
- op21mr9151038ejb.160.1576760697384; 
- Thu, 19 Dec 2019 05:04:57 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id bs4sm475652ejb.39.2019.12.19.05.04.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Dec 2019 05:04:56 -0800 (PST)
-Subject: Re: [EXTERNAL]Re: [PATCH v4 29/37] RFC: mips/cps: fix setting saar
- property
-To: Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-30-marcandre.lureau@redhat.com>
- <41a2531e-b887-6f72-fd51-a7e1d5688670@redhat.com>
- <BN6PR2201MB1251016B3D5948ABEFAAC117C6510@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <ed819b44-fd59-46c0-d6ea-4f162d564209@redhat.com>
-Date: Thu, 19 Dec 2019 14:04:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uQrK8BLt6FtOFxS1SL03fl3thAvL2ksFKfJco8A6dB0=;
+ b=fOKK1uiVDczgEHZxqA6a0p6005Myh+0mBKxa5tyazoxKgejby2grV/g4VnMtlo40NH+6Qs
+ eb01iCOv+jINDGfQCEZqNX1f+O+SvcS0iocZSUvPI05LUYQT/EDJRwxkdwQIu5fLxZSWot
+ rQT39fxL6F38GrH1H6kncMUwFspw4UY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-Xal_y18aNZ6NBTam-or3fw-1; Thu, 19 Dec 2019 07:30:45 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF74EDB60
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 12:30:44 +0000 (UTC)
+Received: from localhost (ovpn-112-22.ams2.redhat.com [10.36.112.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9936326E46;
+ Thu, 19 Dec 2019 12:30:37 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 0/9] Add dbus-vmstate
+Date: Thu, 19 Dec 2019 16:30:20 +0400
+Message-Id: <20191219123029.200788-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <BN6PR2201MB1251016B3D5948ABEFAAC117C6510@BN6PR2201MB1251.namprd22.prod.outlook.com>
-Content-Language: en-US
-X-MC-Unique: KhIvQYykMQabm04tz9ccsQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Xal_y18aNZ6NBTam-or3fw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,84 +82,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
+ dgilbert@redhat.com, pbonzini@redhat.com,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/16/19 8:36 PM, Aleksandar Markovic wrote:
->> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
->> Sent: Sunday, December 15, 2019 6:56 AM
->>> On 11/20/19 4:24 PM, Marc-Andr=E9 Lureau wrote:
->>> There is no "saar" property. Note: I haven't been able to test this
->>> code. Help welcome.
->>>
->>> May fix commit 043715d1e0fbb3e3411be3f898c5b77b7f90327a ("target/mips:
->>> Update ITU to utilize SAARI and SAAR CP0 registers")
->>>
->>> Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
->>> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>    hw/mips/cps.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
->>> index 1660f86908..c49868d5da 100644
->>> --- a/hw/mips/cps.c
->>> +++ b/hw/mips/cps.c
->>> @@ -106,7 +106,7 @@ static void mips_cps_realize(DeviceState *dev, Erro=
-r **errp)
->>>            object_property_set_bool(OBJECT(&s->itu), saar_present, "saa=
-r-present",
->>>                                     &err);
->>>            if (saar_present) {
->>> -            qdev_prop_set_ptr(DEVICE(&s->itu), "saar", (void *)&env->C=
-P0_SAAR);
->>> +            s->itu.saar =3D &env->CP0_SAAR;
->>
->> Hmmm this could be what the author of 043715d1e wanted to do indeed.
->>
->> Since this feature is incomplete (see comments in previous versions of
->> this series:
->>     $ git grep saarp
->>     hw/mips/cps.c:98:    saar_present =3D (bool)env->saarp;
->>     target/mips/cpu.h:1103:    int saarp;
->> and I don't know how to test this, I'll defer to Aleksandar regarding
->> this patch.
->=20
-> Hello, Philippe,
->=20
-> Good that you brought this to my attention - but Marc-Andr=E9 and
-> I already had a discussion about this in this series' cover letter
-> responses (unfortunately not followed up by me as a response to
-> this patch, sorry about that):
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg00056.html
->=20
-> In essence, our conclusion was that the real fix would be certainly
-> outside of the scope of this series, since it requires some really
-> (non-straightforward) mips-specific code changes, so we agreed
-> that Marc-Andr=E9 submit this patch as-is, and later on (certainly
-> within timeframe of 5.0) I will submit the fix addressing the root
-> cause (absence of "saar" property, and incomplete handling of
-> SAAR and SAARI config registers).
+Hi,
 
-OK, thanks for clarifying again!
+With external processes or helpers participating to the VM support, it
+becomes necessary to handle their migration. Various options exist to
+transfer their state:
+1) as the VM memory, RAM or devices (we could say that's how
+   vhost-user devices can be handled today, they are expected to
+   restore from ring state)
+2) other "vmstate" (as with TPM emulator state blobs)
+3) left to be handled by management layer
 
-> In other words, this patch is fine at this moment, and formally:
->=20
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->=20
-> (Marc-Andr=E9, just please remove "RFC" from the title, and remove
-> the sentence "Note: I haven't been able to test this code. Help
-> welcome." from the commit message, since we have the deal on
-> how and who will fix the underlining problem.)
->=20
-> Thanks to both of you!
->=20
-> Aleksandar
->=20
+1) is not practical, since an external processes may legitimatelly
+need arbitrary state date to back a device or a service, or may not
+even have an associated device.
+
+2) needs ad-hoc code for each helper, but is simple and working
+
+3) is complicated for management layer, QEMU has the migration timing
+
+The proposed "dbus-vmstate" object will connect to a given D-Bus
+address, and save/load from org.qemu.VMState1 owners on migration.
+
+Thus helpers can easily have their state migrated with QEMU, without
+implementing ad-hoc support (such as done for TPM emulation)
+
+D-Bus is ubiquitous on Linux (it is systemd IPC), and can be made to
+work on various other OSes. There are several implementations and good
+bindings for various languages.  (the tests/dbus-vmstate-test.c is a
+good example of how simple the implementation of services can be, even
+in C)
+
+dbus-vmstate is put into use by the libvirt series "[PATCH 00/23] Use
+a slirp helper process".
+
+v7: after Daniel & David reviews
+- some docs improvements
+- changed qemu_dbus_get_queued_owners() to take errp
+- added __func__ to error_report() and some traces
+- new patch "tests: add migration-helpers unit" and adapt
+  dbus-vmstate-test to use it
+- use dbus-vmstate-test temporary directory for dbus listen path
+
+v6:
+- rebased (minor change in patch 2)
+
+v5:
+- trying to fix patchew/ci: install dbus-daemon in containers, skip
+  test if unavailable
+
+v4:
+- add Daniel security scenarios to the D-Bus document
+- misc doc improvements
+- add "util: add dbus helper unit" patch, with
+  qemu_dbus_get_queued_owners()
+- add "configure: add GDBUS_CODEGEN", explaining why gio-unix is
+  required when available
+- silence the expected failing tests
+- update copyright headers, MAINTAINERS
+- add r-b/a-b tags
+- rebased
+
+(Note: patchew dbus test fails for unclear reasons, but I can't
+reproduce locally nor on travis)
+
+v3:
+- after various discussions on helper processes, we settled on a
+  preference for having a bus for communications. This version is
+  actually v1 updated.
+- added a dbus.rst document to describe D-Bus recommendations for QEMU
+- added dbus-vmstate-daemon.sh to play with the dbus-daemon configuration
+  (although it is not very useful in the context of a single UID)
+- added a new vmstate interface, so that any object can implement
+  VMStateDescription, and converted dbus-vmstate
+- added "migration: fix vmdesc leak on vmstate_save() error"
+- convert to g_auto
+
+v2:
+- D-Bus is most common and practical through a bus, but it requires a
+  daemon to be running. I argue that the benefits outweight the cost
+  of running an extra daemon in v1 in the context of multi-process
+  qemu, but it is also possible to connect in p2p mode as done in this
+  new version.
+
+Marc-Andr=C3=A9 Lureau (9):
+  vmstate: add qom interface to get id
+  vmstate: replace DeviceState with VMStateIf
+  docs: start a document to describe D-Bus usage
+  util: add dbus helper unit
+  Add dbus-vmstate object
+  configure: add GDBUS_CODEGEN
+  dockerfiles: add dbus-daemon to some of latest distributions
+  tests: add migration-helpers unit
+  tests: add dbus-vmstate-test
+
+ MAINTAINERS                              |  12 +
+ Makefile.objs                            |   1 +
+ backends/Makefile.objs                   |   4 +
+ backends/dbus-vmstate.c                  | 510 +++++++++++++++++++++++
+ backends/trace-events                    |   7 +
+ configure                                |   7 +
+ docs/interop/dbus-vmstate.rst            |  74 ++++
+ docs/interop/dbus.rst                    | 110 +++++
+ docs/interop/index.rst                   |   2 +
+ hw/block/onenand.c                       |   2 +-
+ hw/core/Makefile.objs                    |   1 +
+ hw/core/qdev.c                           |  21 +-
+ hw/core/vmstate-if.c                     |  23 +
+ hw/ide/cmd646.c                          |   2 +-
+ hw/ide/isa.c                             |   2 +-
+ hw/ide/piix.c                            |   2 +-
+ hw/ide/via.c                             |   2 +-
+ hw/misc/max111x.c                        |   2 +-
+ hw/net/eepro100.c                        |   4 +-
+ hw/net/virtio-net.c                      |   3 +-
+ hw/nvram/eeprom93xx.c                    |   4 +-
+ hw/ppc/spapr_drc.c                       |   9 +-
+ hw/ppc/spapr_iommu.c                     |   4 +-
+ hw/s390x/s390-skeys.c                    |   2 +-
+ include/hw/vmstate-if.h                  |  40 ++
+ include/migration/register.h             |   4 +-
+ include/migration/vmstate.h              |  10 +-
+ include/qemu/dbus.h                      |  19 +
+ migration/savevm.c                       |  20 +-
+ roms/SLOF                                |   2 +-
+ stubs/vmstate.c                          |   4 +-
+ tests/Makefile.include                   |  25 +-
+ tests/dbus-vmstate-daemon.sh             |  95 +++++
+ tests/dbus-vmstate-test.c                | 382 +++++++++++++++++
+ tests/dbus-vmstate1.xml                  |  12 +
+ tests/docker/dockerfiles/centos7.docker  |   1 +
+ tests/docker/dockerfiles/debian10.docker |   1 +
+ tests/docker/dockerfiles/fedora.docker   |   1 +
+ tests/docker/dockerfiles/ubuntu.docker   |   1 +
+ tests/migration-helpers.c                | 167 ++++++++
+ tests/migration-helpers.h                |  37 ++
+ tests/migration-test.c                   | 176 +-------
+ util/Makefile.objs                       |   3 +
+ util/dbus.c                              |  57 +++
+ 44 files changed, 1661 insertions(+), 206 deletions(-)
+ create mode 100644 backends/dbus-vmstate.c
+ create mode 100644 backends/trace-events
+ create mode 100644 docs/interop/dbus-vmstate.rst
+ create mode 100644 docs/interop/dbus.rst
+ create mode 100644 hw/core/vmstate-if.c
+ create mode 100644 include/hw/vmstate-if.h
+ create mode 100644 include/qemu/dbus.h
+ create mode 100755 tests/dbus-vmstate-daemon.sh
+ create mode 100644 tests/dbus-vmstate-test.c
+ create mode 100644 tests/dbus-vmstate1.xml
+ create mode 100644 tests/migration-helpers.c
+ create mode 100644 tests/migration-helpers.h
+ create mode 100644 util/dbus.c
+
+--=20
+2.24.0.308.g228f53135a
 
 
