@@ -7,91 +7,91 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C75CEC3F68F
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93959C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:39:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FD0620684
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:38:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59E6320684
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 13:39:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E6dsUfRN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD0620684
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5xDHfB7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59E6320684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41661 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihw10-0007ss-6s
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:38:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58463)
+	id 1ihw1e-0000IO-Cg
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 08:39:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ihvr9-0002og-NM
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:45 -0500
+ (envelope-from <mst@redhat.com>) id 1ihvrY-0003ZD-Hi
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:29:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ihvr7-0000aO-V7
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56788
+ (envelope-from <mst@redhat.com>) id 1ihvrT-0002GD-8Y
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:29:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47495
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvr6-0000YP-4l
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:28:41 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ihvrT-0002E8-3M
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 08:29:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576762119;
+ s=mimecast20190719; t=1576762142;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r0mT2tK5RxGEzjJ+ngzjeka5vepbie8k6lkBxlC/UtY=;
- b=E6dsUfRNvuiYdk8MZk8/HV4Fw25umQEzUcr1yAIAf81HS52QXCf7S7WjEOxgL+uRsumQAQ
- OVezsJwIsOo9Jok5DuQSfEuWH0ZZqBBjG8beKpwOM+GY4q0LGQ28us3TmQqRpsE0CS2Alg
- UCcQ58M3wbKYmLUOgz37wH1lINx3CqQ=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-pEjLrW1EMDyHXkm2niicfw-1; Thu, 19 Dec 2019 08:28:38 -0500
-Received: by mail-qt1-f198.google.com with SMTP id c8so3632851qte.22
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:28:38 -0800 (PST)
+ bh=51WDbq+PBwGZb4DLRjFJvXY/baMy4xbXgzhN6b6J6AM=;
+ b=N5xDHfB7D+JqMHPbGTNaHLGYlmzTsg3gqzQcDzWgLcXiwohW/tjFL9wnIWJ9LZSTOUv8mO
+ 73KC/hEO9vUlsoh/LF3Pa9l/Hh81hBl0G341H6Ui71g9jx2g+XfeSFiyG7f0yZKB5LVLVc
+ lj9p9k9v88GVPmqs8H7j/eRC4eXkimM=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-89-1OYjnvGtMUmTZlmTY2eMWA-1; Thu, 19 Dec 2019 08:29:01 -0500
+Received: by mail-qv1-f70.google.com with SMTP id v3so623742qvm.2
+ for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 05:29:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=kqRad/Uza3VmDCeEjm17UGUfOA6jrRJCCY76mhTVGsg=;
- b=qXrT4+G8VcaOWGBl2jK3SeRx/qklqbTr8wb5kEGt38mhWj70yx9haaWInyuzLNL2M2
- +OjsiX6rHQ8onM08a0+e2vqVkNiYfyuJH7BGJ403JXAZW5o/0bJAato5CDmX6vPQqxEZ
- KqE4bV/OhCDkKhVFvw+iJKDz/P4tnmplPG97yHPyehiEfluH0WkadoDeOpygSdxs50gc
- HDOSocun9DoFdnUgKTZJhLFjxEAoVtygREetN9F/qxjofX5sDaSGlIUi49y//+4dvfbZ
- brTPeLLr+/EiAgFbMTec/kYuOZIfsFfC4ezo05WMnFGVxMzvLHN3ryWWPLzFYuneCJb9
- BLmQ==
-X-Gm-Message-State: APjAAAVyRHKlDl1ZuhweHGWMpjrcmHI4xAJaFjHdXxTU0F0xRYI1Ecnt
- 6HtdO7/MaSZgs4khFMrKYPWfp52HlhNcj12TRNKc3IP69nRfRe6yERNAkUWWUrvB8fz4CV/2grY
- i48toiyYcbYhta4o=
-X-Received: by 2002:a0c:aacb:: with SMTP id g11mr6965116qvb.108.1576762116200; 
- Thu, 19 Dec 2019 05:28:36 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwAlgrKjMuQlAI2TIpLXu6O0vFUs6YjB4OjkGmfrytnPJbZYdGoJ4UnJCTOjAq3yL/4tWXNaA==
-X-Received: by 2002:a0c:aacb:: with SMTP id g11mr6965088qvb.108.1576762115931; 
- Thu, 19 Dec 2019 05:28:35 -0800 (PST)
+ bh=o8odu1UwTWT4bWPiNG9EYA27yURxcpg5mIlh0CMeiVA=;
+ b=SXBaLYxVmU8K9Vj8j2+8PSNx//3Tnn+lDtTsNHjH9ulFlS2+RKVkKdJX5R89rWP29x
+ zBM+EbxwazDiSVj9ThXyxjn1SVX1T86A6qvqXNklEili9sYr0elhfq3eXsD490FO+5NT
+ /vQoLcQLOhg/Cw1U7/YUpSsTN3WM8BZVoEnlOMMzWPXUJECwf9J+rBTTHxe0roqY0meJ
+ uEeBPefYpWmrQlOeDlM6C7OGr3rXQUwjqomGoQo6zQhfFW/bfNUcLJ+ce9ef8+Q5qiM+
+ hzmCSAjoRYUXDqfcATb70dCWarwNNx0hYXWzHs774hgpp3lXk66jsRJPT/4cN4cUZaCm
+ il2Q==
+X-Gm-Message-State: APjAAAXgcmLkueT5ZiayJB2ugSzMoUTfoz+jrrRrImrzcxnwtDGnKfBD
+ vG2hfqzX++q86rT0ni7kiAh9N9oZS6BIRW0pmeRufdyKwu+zwjVjlG4L/+quWbCwd9rRia7VP3A
+ ZCRFWuIDZ7nKmH+U=
+X-Received: by 2002:a37:98c6:: with SMTP id a189mr8136605qke.500.1576762140420; 
+ Thu, 19 Dec 2019 05:29:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz9fPT3y+a9XwjOCQhYfL9erAj7ft8zFn5rKGEOB4gKChIFoyuY4Y/fIXkKRJgkdWeX4Guc8w==
+X-Received: by 2002:a37:98c6:: with SMTP id a189mr8136579qke.500.1576762140173; 
+ Thu, 19 Dec 2019 05:29:00 -0800 (PST)
 Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id k29sm1850888qtu.54.2019.12.19.05.28.32
+ by smtp.gmail.com with ESMTPSA id d8sm1802324qtr.53.2019.12.19.05.28.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 19 Dec 2019 05:28:35 -0800 (PST)
-Date: Thu, 19 Dec 2019 08:28:30 -0500
+ Thu, 19 Dec 2019 05:28:59 -0800 (PST)
+Date: Thu, 19 Dec 2019 08:28:56 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/24] tests/bios-tables-test: add test cases for ACPI HMAT
-Message-ID: <20191219132621.16595-19-mst@redhat.com>
+Subject: [PULL 23/24] vhost-user: add VHOST_USER_RESET_DEVICE to reset devices
+Message-ID: <20191219132621.16595-24-mst@redhat.com>
 References: <20191219132621.16595-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20191219132621.16595-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: pEjLrW1EMDyHXkm2niicfw-1
+X-MC-Unique: 1OYjnvGtMUmTZlmTY2eMWA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,177 +103,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Jingqi Liu <Jingqi.liu@intel.com>, Tao Xu <tao3.xu@intel.com>,
- Markus Armbruster <armbru@redhat.com>, Daniel Black <daniel@linux.ibm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Vrabel <david.vrabel@nutanix.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tao Xu <tao3.xu@intel.com>
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
-Heterogeneous Memory with boot option '-numa node'.
+Add a VHOST_USER_RESET_DEVICE message which will reset the vhost user
+backend. Disabling all rings, and resetting all internal state, ready
+for the backend to be reinitialized.
 
-Add test cases on PC and Q35 machines with 2 numa nodes.
-Because HMAT is generated when system enable numa, the
-following tables need to be added for this test:
-    tests/data/acpi/pc/APIC.acpihmat
-    tests/data/acpi/pc/SRAT.acpihmat
-    tests/data/acpi/pc/HMAT.acpihmat
-    tests/data/acpi/pc/DSDT.acpihmat
-    tests/data/acpi/q35/APIC.acpihmat
-    tests/data/acpi/q35/SRAT.acpihmat
-    tests/data/acpi/q35/HMAT.acpihmat
-    tests/data/acpi/q35/DSDT.acpihmat
+A backend has to report it supports this features with the
+VHOST_USER_PROTOCOL_F_RESET_DEVICE protocol feature bit. If it does
+so, the new message is used instead of sending a RESET_OWNER which has
+had inconsistent implementations.
 
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
-Message-Id: <20191213011929.2520-9-tao3.xu@intel.com>
+Signed-off-by: David Vrabel <david.vrabel@nutanix.com>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <1572385083-5254-2-git-send-email-raphael.norwitz@nutanix.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/bios-tables-test-allowed-diff.h |  8 +++++
- tests/bios-tables-test.c              | 44 +++++++++++++++++++++++++++
- tests/data/acpi/pc/APIC.acpihmat      |  0
- tests/data/acpi/pc/DSDT.acpihmat      |  0
- tests/data/acpi/pc/HMAT.acpihmat      |  0
- tests/data/acpi/pc/SRAT.acpihmat      |  0
- tests/data/acpi/q35/APIC.acpihmat     |  0
- tests/data/acpi/q35/DSDT.acpihmat     |  0
- tests/data/acpi/q35/HMAT.acpihmat     |  0
- tests/data/acpi/q35/SRAT.acpihmat     |  0
- 10 files changed, 52 insertions(+)
- create mode 100644 tests/data/acpi/pc/APIC.acpihmat
- create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
- create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
- create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
- create mode 100644 tests/data/acpi/q35/APIC.acpihmat
- create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
- create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
- create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
+ hw/virtio/vhost-user.c      |  8 +++++++-
+ docs/interop/vhost-user.rst | 15 +++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test=
--allowed-diff.h
-index dfb8523c8b..3c9e0c979b 100644
---- a/tests/bios-tables-test-allowed-diff.h
-+++ b/tests/bios-tables-test-allowed-diff.h
-@@ -1 +1,9 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/pc/APIC.acpihmat",
-+"tests/data/acpi/pc/SRAT.acpihmat",
-+"tests/data/acpi/pc/HMAT.acpihmat",
-+"tests/data/acpi/pc/DSDT.acpihmat",
-+"tests/data/acpi/q35/APIC.acpihmat",
-+"tests/data/acpi/q35/SRAT.acpihmat",
-+"tests/data/acpi/q35/HMAT.acpihmat",
-+"tests/data/acpi/q35/DSDT.acpihmat",
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 79f5da092f..9823820043 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -947,6 +947,48 @@ static void test_acpi_virt_tcg_numamem(void)
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 02a9b25199..d27a10fcc6 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -58,6 +58,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD =3D 10,
+     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER =3D 11,
+     VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD =3D 12,
++    VHOST_USER_PROTOCOL_F_RESET_DEVICE =3D 13,
+     VHOST_USER_PROTOCOL_F_MAX
+ };
 =20
- }
+@@ -98,6 +99,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
+     VHOST_USER_GPU_SET_SOCKET =3D 33,
++    VHOST_USER_RESET_DEVICE =3D 34,
+     VHOST_USER_MAX
+ } VhostUserRequest;
 =20
-+static void test_acpi_tcg_acpi_hmat(const char *machine)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine =3D machine;
-+    data.variant =3D ".acpihmat";
-+    test_acpi_one(" -machine hmat=3Don"
-+                  " -smp 2,sockets=3D2"
-+                  " -m 128M,slots=3D2,maxmem=3D1G"
-+                  " -object memory-backend-ram,size=3D64M,id=3Dm0"
-+                  " -object memory-backend-ram,size=3D64M,id=3Dm1"
-+                  " -numa node,nodeid=3D0,memdev=3Dm0"
-+                  " -numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0"
-+                  " -numa cpu,node-id=3D0,socket-id=3D0"
-+                  " -numa cpu,node-id=3D0,socket-id=3D1"
-+                  " -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmem=
-ory,"
-+                  "data-type=3Daccess-latency,latency=3D1"
-+                  " -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmem=
-ory,"
-+                  "data-type=3Daccess-bandwidth,bandwidth=3D65534M"
-+                  " -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmem=
-ory,"
-+                  "data-type=3Daccess-latency,latency=3D65534"
-+                  " -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmem=
-ory,"
-+                  "data-type=3Daccess-bandwidth,bandwidth=3D32767M"
-+                  " -numa hmat-cache,node-id=3D0,size=3D10K,level=3D1,"
-+                  "associativity=3Ddirect,policy=3Dwrite-back,line=3D8"
-+                  " -numa hmat-cache,node-id=3D1,size=3D10K,level=3D1,"
-+                  "associativity=3Ddirect,policy=3Dwrite-back,line=3D8",
-+                  &data);
-+    free_test_data(&data);
-+}
-+
-+static void test_acpi_q35_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
-+}
-+
-+static void test_acpi_piix4_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_PC);
-+}
-+
- static void test_acpi_virt_tcg(void)
+@@ -890,10 +892,14 @@ static int vhost_user_set_owner(struct vhost_dev *dev=
+)
+ static int vhost_user_reset_device(struct vhost_dev *dev)
  {
-     test_data data =3D {
-@@ -991,6 +1033,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
-         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm)=
-;
-         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-+        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hma=
-t);
-+        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
-     } else if (strcmp(arch, "aarch64") =3D=3D 0) {
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
-diff --git a/tests/data/acpi/pc/APIC.acpihmat b/tests/data/acpi/pc/APIC.acp=
-ihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/pc/DSDT.acpihmat b/tests/data/acpi/pc/DSDT.acp=
-ihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/pc/HMAT.acpihmat b/tests/data/acpi/pc/HMAT.acp=
-ihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/pc/SRAT.acpihmat b/tests/data/acpi/pc/SRAT.acp=
-ihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/APIC.acpihmat b/tests/data/acpi/q35/APIC.a=
-cpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT.a=
-cpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/HMAT.acpihmat b/tests/data/acpi/q35/HMAT.a=
-cpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/SRAT.acpihmat b/tests/data/acpi/q35/SRAT.a=
-cpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
+     VhostUserMsg msg =3D {
+-        .hdr.request =3D VHOST_USER_RESET_OWNER,
+         .hdr.flags =3D VHOST_USER_VERSION,
+     };
+=20
++    msg.hdr.request =3D virtio_has_feature(dev->protocol_features,
++                                         VHOST_USER_PROTOCOL_F_RESET_DEVIC=
+E)
++        ? VHOST_USER_RESET_DEVICE
++        : VHOST_USER_RESET_OWNER;
++
+     if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+         return -1;
+     }
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index 015ac08177..5f8b3a456b 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -785,6 +785,7 @@ Protocol features
+   #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+   #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+   #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
++  #define VHOST_USER_PROTOCOL_F_RESET_DEVICE   13
+=20
+ Master message types
+ --------------------
+@@ -1190,6 +1191,20 @@ Master message types
+   ancillary data. The GPU protocol is used to inform the master of
+   rendering state and updates. See vhost-user-gpu.rst for details.
+=20
++``VHOST_USER_RESET_DEVICE``
++  :id: 34
++  :equivalent ioctl: N/A
++  :master payload: N/A
++  :slave payload: N/A
++
++  Ask the vhost user backend to disable all rings and reset all
++  internal device state to the initial state, ready to be
++  reinitialized. The backend retains ownership of the device
++  throughout the reset operation.
++
++  Only valid if the ``VHOST_USER_PROTOCOL_F_RESET_DEVICE`` protocol
++  feature is set by the backend.
++
+ Slave message types
+ -------------------
+=20
 --=20
 MST
 
