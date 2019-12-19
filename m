@@ -2,116 +2,83 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D65C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91161C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:32:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50C2A2064B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C6D721D7D
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 10:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EoCeT0qB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50C2A2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LuTBZJz+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C6D721D7D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iht0z-0004Ut-Hr
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:26:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55642)
+	id 1iht6W-0006ZB-Ca
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 05:32:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ihszw-0003XB-MZ
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:25:37 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iht57-0005h0-Ul
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:31:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ihszu-0008Mc-Su
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:25:36 -0500
-Received: from mail-eopbgr50104.outbound.protection.outlook.com
- ([40.107.5.104]:5764 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ihszu-00087g-2J; Thu, 19 Dec 2019 05:25:34 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E0QBsIqDWjS1vFFhPVunljQPmiJjqWkRdw9Ml/aj2FmDUXSlHp2FV8Q1mQcI1ltGv71y/ZgaYO+25tWPUZ0qAWIaKydzjkWJAncrVP/83oiJH//L278cAvPwU/9Qx9Sd12VVtfXLpW/Wwzrl4OFs5MbNwuuWpApq27dFqXzbvDF6gaY40yE4CrY9J71yq5xIkQ20A7SP4TiCQ/lnXAn+2H0ukafMoRASHevpLLA9Oi7r5nAdMTJyULiwmsVh3qTeMngUZjx2kFwDouc+JC7xZiyfKurSELPwWc6p/FgXcYW7vyFXmX3CNWw+pjeOEEotuYbVHTa4Tq3+JnQbaolcHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xDrIkCfLO797HM4Ojlr1Fw2quJG64sj6pNY1nWeNnQw=;
- b=cOSzUacyTRENcAPleNnjfp9F+6HvqAOiKbVI8fCBfgaNJVSYFZ4JdfuyPAXSw4s4Fae0kAaI5NmrwHlOcMeov8G2IvJI+ukfu1Wnw9z/Wm9pI42CigUYSnzxqOHfupowc/JSmjuyiPe2xhXofSFENep7LdtwSrV62fkQLm2SDhE/H+Osi1maGzQtOctm2ab9itgryvyAsvmo9ves3PxXxPKy/JHELugqa/W52siCvkqUU61ksIZGibqkv/G8MvjabJywD+Dh6bAfGq6rkgS2vEwXjKwDgbu2id4PM/9XPJmzNSUdVx51esOAY8AeDs7ERaaB7pvj9VZvWOiUGhsTRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xDrIkCfLO797HM4Ojlr1Fw2quJG64sj6pNY1nWeNnQw=;
- b=EoCeT0qBq00QbdwE5edJsFSkA6V3H8kT6s4QmxKSpTjRRxYgaLAIk200gq5DgIGILQT7Pz4Xu4tsXQFq/BYhS4Jrl+5iJAalckaFAKmW2Q4H8nWidCjL7VkXDfxXMQGStZmOe2/xrASzT1AllKjK4LlDmmL+AGD8GzOgpGb2mWg=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4102.eurprd08.prod.outlook.com (20.179.2.155) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2538.14; Thu, 19 Dec 2019 10:25:31 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2559.012; Thu, 19 Dec 2019
- 10:25:30 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: qcow2 api not secured by mutex lock
-Thread-Topic: qcow2 api not secured by mutex lock
-Thread-Index: AQHVtY3ue6JcAc0xJEiq/6zDmRijnqfBO70AgAAGawA=
-Date: Thu, 19 Dec 2019 10:25:30 +0000
-Message-ID: <1a976490-452c-04b6-8dbb-b8122acae9f7@virtuozzo.com>
-References: <1ea7f93d-8f48-d565-70e7-0d66f1b80c1e@virtuozzo.com>
- <20191219100230.GC5230@linux.fritz.box>
-In-Reply-To: <20191219100230.GC5230@linux.fritz.box>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P195CA0015.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::25)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191219132528543
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9366abac-9e4a-4ec0-4b47-08d7846dc634
-x-ms-traffictypediagnostic: AM6PR08MB4102:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB410259912DD073E17B6EB3DBC1520@AM6PR08MB4102.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0256C18696
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(346002)(136003)(396003)(39830400003)(189003)(199004)(2906002)(31686004)(71200400001)(36756003)(66946007)(478600001)(5660300002)(66476007)(64756008)(66556008)(6512007)(54906003)(6486002)(66446008)(2616005)(107886003)(316002)(52116002)(6916009)(6506007)(8676002)(26005)(81156014)(31696002)(4326008)(8936002)(186003)(81166006)(86362001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4102;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Bx36jVB4Lk9dIzDVNBAlzVv7SnAMOr424G5Gt8NsVmn+dsbeZq9auaFUn92Qatt0ERTusmd7Lrk6ZRPBi/E5PTTXYrwe1dNZ9vSlo1tth4ZdtAfl9MP3e3epRXMyQIplgygTfZMnXnvq3jXimOwgLk1ZGNqOMfmYKtAU+Ds0E9k+Lo+ji2E5fCKgDFDh5FCJmwxu+tyQw/5TEoO7lyH8/YeexXoWPVdPLRvRs3L7Xxwfd5g4t4dUx5QScPEW0t5FUdoVK7M+zTDyn/oqI5QG5aGvGZRN85KfXVAalgN+XFUa0pxCqwBJB3OustqX7cU5Wc8ItXu5pFIN+arOkSWbsauDcvznTUdAkHj4ysvPd6DgTTUanXUGD8jQZLdncSvsm1BUP9er8KKgKDNneeBYSsz6BMnIrwtx38STZnOi74CBYJg7ItvPH0y8nxNEG2ZL
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B6300D8CFF72A14390C6FE64F77AE109@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <eric.auger@redhat.com>) id 1iht55-0007uj-87
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:30:56 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25792
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iht54-0007np-P5
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 05:30:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576751453;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tygimuW6/XhKjBMlfyKJvIAh68dK23wap9XfVLQOs0Q=;
+ b=LuTBZJz+RX+p7Hl9KLQSpiM4dWl97Zqp8YqNBdjd72zxE88n4xK2UZxYZ9rdQWp7CBRYwH
+ xSBuSt1dSy50npeXHP6t4/X362t1OrmHDiX8ezjIFkWDTFLJFyhJR3XwYTD7udA0QEP9d+
+ +kzo6CeC91+jbAPHYVhOFrZ9PRZORNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-FsVGmdpaPqKk1x9Eqj-ylw-1; Thu, 19 Dec 2019 05:30:52 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5CCB800D5B;
+ Thu, 19 Dec 2019 10:30:50 +0000 (UTC)
+Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 890516888D;
+ Thu, 19 Dec 2019 10:30:42 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v11 08/20] virtio-iommu: Implement translate
+To: Peter Xu <peterx@redhat.com>
+References: <20191122182943.4656-1-eric.auger@redhat.com>
+ <20191122182943.4656-9-eric.auger@redhat.com> <20191210193342.GJ3352@xz-x1>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <44c0041d-68ad-796f-16cc-4bab7ba0f164@redhat.com>
+Date: Thu, 19 Dec 2019 11:30:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9366abac-9e4a-4ec0-4b47-08d7846dc634
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Dec 2019 10:25:30.9151 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ikCSpFq+9RpxoaypxYnYKtRLcOdBwhqMmT7lc6jqpviMms5JTf/rP+EjIRRbT6AcAK45phBs4UtPbV6ovHisedPc0eEzr9j1MXbZvKOlrdM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4102
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Received-From: 40.107.5.104
+In-Reply-To: <20191210193342.GJ3352@xz-x1>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: FsVGmdpaPqKk1x9Eqj-ylw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,68 +90,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Lunev <den@virtuozzo.com>, qemu-devel <qemu-devel@nongnu.org>,
- qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ bharatb.linux@gmail.com, qemu-arm@nongnu.org, dgilbert@redhat.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTkuMTIuMjAxOSAxMzowMiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTguMTIuMjAxOSB1bSAx
-MToyOCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IEhp
-IQ0KPj4NCj4+IFNvbWUgdGltZSBhZ28sIHdlJ3ZlIGZhY2VkIGFuZCBmaXhlZCB0aGUgZmFjdCB0
-aGF0IHFjb3cyIGJpdG1hcCBhcGkgZG9lc24ndA0KPj4gY2FsbCBxY293Ml9jb19tdXRleF9sb2Nr
-LCBiZWZvcmUgYWNjZXNzaW5nIHFjb3cyIG1ldGFkYXRhLiBUaGlzIHdhcyBzb2x2ZWQgYnkNCj4+
-IG1vdmluZyBxY293Ml9jb19yZW1vdmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRtYXAgYW5kDQo+PiBx
-Y293Ml9jb19jYW5fc3RvcmVfbmV3X2RpcnR5X2JpdG1hcCB0byBjb3JvdXRpbmUgYW5kIGNhbGwg
-cWNvdzJfY29fbXV0ZXhfbG9jay4NCj4+DQo+PiBOb3cgSSBkZWNpZGVkIHRvIGxvb2sgYXQgYmln
-IHBpY3R1cmUgKGl0IGlzIGF0dGFjaGVkKS4NCj4+DQo+PiBCb3hlcyBhcmUgcWNvdzIgZHJpdmVy
-IGFwaSwgZ3JlZW4gYm9yZGVyIG1lYW5zIHRoYXQgZnVuY3Rpb24gY2FsbHMgcWNvdzJfY29fbXV0
-ZXhfbG9jaw0KPj4gKGl0IGRvZXNuJ3QgZ3VhcmFudGVlLCB0aGF0IGV4YWN0bHkgY2hpbGQgbm9k
-ZSBjYWxsIGlzIGxvY2tlZCwgYnV0IGl0IGlzIHNvbWV0aGluZykuDQo+Pg0KPj4gSW4gdGhlIHBp
-Y3R1cmUgdGhlcmUgYXJlIGp1c3QgYWxsIGZ1bmN0aW9ucywgY2FsbGluZyBxY293Ml9jYWNoZV9n
-ZXQvcHV0Li4gTm90IGFsbCB0aGUNCj4+IGZ1bmN0aW9ucywgdGhhdCBuZWVkcyBsb2NraW5nLCBi
-dXQgYWdhaW4sIGl0IGlzIHNvbWV0aGluZy4NCj4+DQo+PiBTbywgYWNjb3JkaW5nbHkgdG8gdGhl
-IHBpY3R1cmUsIGl0IHNlZW1zIHRoYXQgdGhlIGZvbGxvd2luZyBmdW5jdGlvbnMgbGFja3MgbG9j
-a2luZzoNCj4+DQo+PiBxY293Ml9jb19jcmVhdGUNCj4gDQo+IFRoaXMgc2hvdWxkIGJlIGVhc3kg
-dG8gZml4LiBJdCdzIGFsc28gcmVsYXRpdmVseSBoYXJtbGVzcyBiZWNhdXNlIGl0J3MNCj4gdW5s
-aWtlbHkgdGhhdCB0aGUgaW1hZ2UgdGhhdCBpcyBiZWluZyBjcmVhdGVkIGlzIGFjY2Vzc2VkIGJ5
-IHNvbWVvbmUNCj4gZWxzZSAodGhlIHVzZXIgd291bGQgaGF2ZSB0byBxdWVyeSB0aGUgYXV0by1n
-ZW5lcmF0ZWQgbm9kZSBuYW1lIGFuZA0KPiBzdGFydCBzb21ldGhpbmcgb24gaXQgLSBhdCB3aGlj
-aCBwb2ludCB0aGV5IGRlc2VydmUgd2hhdCB0aGV5IGdldCkuDQo+IA0KPj4gcWNvdzJfc25hcHNo
-b3RfKg0KPj4gICAgIChidXQgaXQgaXMgYm90aCBkcmFpbmVkIGFuZCBhaW8gY29udGV4dCBsb2Nr
-ZWQsIHNvIHNob3VsZCBiZSBzYWZlLCB5ZXM/KQ0KPiANCj4gSWYgeW91IGNoZWNrZWQgdGhhdCB0
-aGVzZSBjb25kaXRpb25zIGFyZSB0cnVlLCBpdCBzaG91bGQgYmUgc2FmZS4NCj4gDQo+PiBxY293
-Ml9yZW9wZW5fYml0bWFwc19ydw0KPj4gcWNvdzJfc3RvcmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRt
-YXBzDQo+IA0KPiBSZW9wZW4gZHJhaW5zIHRoZSBpbWFnZSwgc28gSSB0aGluayB0aGlzIGlzIHNh
-ZmUgaW4gcHJhY3RpY2UuDQo+IA0KPiBJZiB3ZSB3YW50IHRvIGRvIHNvbWV0aGluZyBhYm91dCBp
-dCBhbnl3YXkgKGUuZy4gbW92ZSBpdCB0byBhIGNvcm91dGluZQ0KPiBzbyBpdCBjYW4gdGFrZSBh
-IGxvY2spIHRoZSBxdWVzdGlvbiBpcyB3aGVyZSB0byBkbyB0aGF0LiBNYXliZSBldmVuIGZvcg0K
-PiAuYmRydl9yZW9wZW5fKiBpbiBnZW5lcmFsPw0KPiANCj4+IHFjb3cyX2FtZW5kX29wdGlvbnMN
-Cj4gDQo+IE9ubHkgcWVtdS1pbWcgc28gZmFyLCBzbyBubyBjb25jdXJyZW5jeS4gV2UncmUgYWJv
-dXQgdG8gYWRkDQo+IGJsb2NrZGV2LWFtZW5kIGluIFFNUCwgdGhvdWdoLCBzbyB0aGlzIGxvb2tz
-IGxpa2Ugc29tZXRoaW5nIHRoYXQgc2hvdWxkDQo+IHRha2UgdGhlIGxvY2suDQo+IA0KPiBJbiBm
-YWN0LCBpcyB0YWtpbmcgdGhlIGxvY2sgZW5vdWdoIG9yIHNob3VsZCBpdCBhY3R1YWxseSBkcmFp
-biB0aGUgbm9kZSwNCj4gdG9vPw0KPiANCj4+IHFjb3cyX21ha2VfZW1wdHkNCj4gDQo+IFRoaXMg
-b25lIHNob3VsZCBjZXJ0YWlubHkgZHJhaW4uIEl0IGlzIHVzZWQgbm90IG9ubHkgaW4gcWVtdS1p
-bWcsIGJ1dA0KPiBhbHNvIGluIEhNUCBjb21taXQgYW5kIGFwcGFyZW50bHkgYWxzbyBpbiByZXBs
-aWNhdGlvbi4NCj4gDQo+IFRoaXMgb25lIG1pZ2h0IGJlIGEgYnVnIHRoYXQgY291bGQgYmVjb21l
-IHZpc2libGUgaW4gcHJhY3RpY2UuIFVubGlrZWx5DQo+IGZvciBITVAgY29tbWl0IChiZWNhdXNl
-IGl0IHRha2VzIGEgd2hpbGUgYW5kIGlzIGhvbGRpbmcgdGhlIEJRTCwgc28gbm8NCj4gbmV3IGd1
-ZXN0IHJlcXVlc3RzIHdpbGwgYmUgcHJvY2Vzc2VkKSwgZXhjZXB0IG1heWJlIGZvciBjYXNlcyB3
-aGVyZQ0KPiB0aGVyZSBpcyBub3RoaW5nIHRvIGNvbW1pdC4NCj4gDQo+PiA9PT0NCj4+DQo+PiBD
-aGVja2luZyBncmVlbiBub2RlczoNCj4+DQo+PiBxY293Ml9jb19pbnZhbGlkYXRlX2NhY2hlIGFj
-dHVhbGx5IGNhbGxzIHFjb3cyX2Nsb3NlIHVubG9ja2VkLCBpdCdzDQo+PiBhbm90aGVyIHJlYXNv
-biB0byBmaXggcWNvdzJfc3RvcmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRtYXBzDQo+IA0KPiBNaWdo
-dCBiZS4gRG8gd2Ugd2FudCBhIC5iZHJ2X2NvX2Nsb3NlPw0KPiANCj4+IHFjb3cyX3dyaXRlX3Nu
-YXBzaG90cyBhY3R1YWxseSBjYWxsZWQgdW5sb2NrZWQgZnJvbQ0KPj4gcWNvdzJfY2hlY2tfZml4
-X3NuYXBzaG90X3RhYmxlLi4gSXQgc2VlbXMgdW5zYWZlLg0KPiANCj4gVGhpcyBpcyBjdXJpb3Vz
-LCBJJ20gbm90IHN1cmUgd2h5IHlvdSB3b3VsZCBkcm9wIHRoZSBsb2NrIHRoZXJlLiBNYXg/DQo+
-IA0KPiBiZHJ2X2ZsdXNoKCkgY2FsbHMgd291bGQgaGF2ZSB0byByZXBsYWNlZCB3aXRoIHFjb3cy
-X3dyaXRlX2NhY2hlcygpIHRvDQo+IGF2b2lkIGEgZGVhZGxvY2ssIGJ1dCBvdGhlcndpc2UgSSBk
-b24ndCBzZWUgd2h5IHdlIHdvdWxkIHdhbnQgdG8gZHJvcA0KPiB0aGUgbG9jay4NCj4gDQo+IE9m
-IGNvdXJzZSwgdGhpcyBzaG91bGQgb25seSBiZSBjYWxsZWQgZnJvbSBxZW11LWltZyBjaGVjaywg
-c28gaW4NCj4gcHJhY3RpY2UgaXQncyBwcm9iYWJseSBub3QgYSBidWcuDQo+IA0KDQpUaGFua3Mg
-Zm9yIGFuYWx5c2lzISBJJ2xsIGNvbnRpbnVlIHRoaW5raW5nIG9uIHRoaXMgYW5kIGNvbWUgd2l0
-aCBwYXRjaGVzDQoob3IgbmV3IHF1ZXN0aW9ucykuDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpW
-bGFkaW1pcg0K
+Hi Peter,
+On 12/10/19 8:33 PM, Peter Xu wrote:
+> On Fri, Nov 22, 2019 at 07:29:31PM +0100, Eric Auger wrote:
+>> This patch implements the translate callback
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v10 -> v11:
+>> - take into account the new value struct and use
+>>   g_tree_lookup_extended
+>> - switched to error_report_once
+>>
+>> v6 -> v7:
+>> - implemented bypass-mode
+>>
+>> v5 -> v6:
+>> - replace error_report by qemu_log_mask
+>>
+>> v4 -> v5:
+>> - check the device domain is not NULL
+>> - s/printf/error_report
+>> - set flags to IOMMU_NONE in case of all translation faults
+>> ---
+>>  hw/virtio/trace-events   |  1 +
+>>  hw/virtio/virtio-iommu.c | 63 +++++++++++++++++++++++++++++++++++++++-
+>>  2 files changed, 63 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+>> index f25359cee2..de7cbb3c8f 100644
+>> --- a/hw/virtio/trace-events
+>> +++ b/hw/virtio/trace-events
+>> @@ -72,3 +72,4 @@ virtio_iommu_get_endpoint(uint32_t ep_id) "Alloc endpoint=%d"
+>>  virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=%d"
+>>  virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=%d"
+>>  virtio_iommu_put_domain(uint32_t domain_id) "Free domain=%d"
+>> +virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=%d"
+>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+>> index f0a56833a2..a83666557b 100644
+>> --- a/hw/virtio/virtio-iommu.c
+>> +++ b/hw/virtio/virtio-iommu.c
+>> @@ -412,19 +412,80 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+>>                                              int iommu_idx)
+>>  {
+>>      IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
+>> +    viommu_interval interval, *mapping_key;
+>> +    viommu_mapping *mapping_value;
+>> +    VirtIOIOMMU *s = sdev->viommu;
+>> +    viommu_endpoint *ep;
+>> +    bool bypass_allowed;
+>>      uint32_t sid;
+>> +    bool found;
+>> +
+>> +    interval.low = addr;
+>> +    interval.high = addr + 1;
+>>  
+>>      IOMMUTLBEntry entry = {
+>>          .target_as = &address_space_memory,
+>>          .iova = addr,
+>>          .translated_addr = addr,
+>> -        .addr_mask = ~(hwaddr)0,
+>> +        .addr_mask = (1 << ctz32(s->config.page_size_mask)) - 1,
+>>          .perm = IOMMU_NONE,
+>>      };
+>>  
+>> +    bypass_allowed = virtio_has_feature(s->acked_features,
+>> +                                        VIRTIO_IOMMU_F_BYPASS);
+>> +
+> 
+> Would it be easier to check bypass_allowed here once and then drop the
+> latter [1] and [2] check?
+bypass_allowed does not mean you systematically bypass. You bypass if
+the SID is unknown or if the device is not attached to any domain.
+Otherwise you translate. But maybe I miss your point.
+> 
+>>      sid = virtio_iommu_get_sid(sdev);
+>>  
+>>      trace_virtio_iommu_translate(mr->parent_obj.name, sid, addr, flag);
+>> +    qemu_mutex_lock(&s->mutex);
+>> +
+>> +    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(sid));
+>> +    if (!ep) {
+>> +        if (!bypass_allowed) {
+> 
+> [1]
+> 
+>> +            error_report_once("%s sid=%d is not known!!", __func__, sid);
+>> +        } else {
+>> +            entry.perm = flag;
+>> +        }
+>> +        goto unlock;
+>> +    }
+>> +
+>> +    if (!ep->domain) {
+>> +        if (!bypass_allowed) {
+> 
+> [2]
+> 
+>> +            qemu_log_mask(LOG_GUEST_ERROR,
+>> +                          "%s %02x:%02x.%01x not attached to any domain\n",
+>> +                          __func__, PCI_BUS_NUM(sid),
+>> +                          PCI_SLOT(sid), PCI_FUNC(sid));
+>> +        } else {
+>> +            entry.perm = flag;
+>> +        }
+>> +        goto unlock;
+>> +    }
+>> +
+>> +    found = g_tree_lookup_extended(ep->domain->mappings, (gpointer)(&interval),
+>> +                                   (void **)&mapping_key,
+>> +                                   (void **)&mapping_value);
+>> +    if (!found) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                      "%s no mapping for 0x%"PRIx64" for sid=%d\n",
+>> +                      __func__, addr, sid);
+> 
+> I would still suggest that we use the same logging interface (either
+> error_report_once() or qemu_log_mask(), not use them randomly).
+OK I will switch to error_report_once() then
+> 
+>> +        goto unlock;
+>> +    }
+>> +
+>> +    if (((flag & IOMMU_RO) &&
+>> +            !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
+>> +        ((flag & IOMMU_WO) &&
+>> +            !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                      "Permission error on 0x%"PRIx64"(%d): allowed=%d\n",
+>> +                      addr, flag, mapping_value->flags);
+> 
+> (Btw, IIUC this may not be a guest error. Say, what if the device is
+>  simply broken?)
+> 
+>> +        goto unlock;
+>> +    }
+>> +    entry.translated_addr = addr - mapping_key->low + mapping_value->phys_addr;
+>> +    entry.perm = flag;
+>> +    trace_virtio_iommu_translate_out(addr, entry.translated_addr, sid);
+>> +
+>> +unlock:
+>> +    qemu_mutex_unlock(&s->mutex);
+>>      return entry;
+>>  }
+>>  
+>> -- 
+>> 2.20.1
+>>
+> 
+Thanks
+
+Eric
+
 
