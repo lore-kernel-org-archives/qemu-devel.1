@@ -2,67 +2,106 @@ Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FD0C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9220AC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 02:00:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FA022072B
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 01:55:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mbqHWKtf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA022072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 67C162082E
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 02:00:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C162082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihl1y-0003dm-CU
-	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 20:55:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48604)
+	id 1ihl76-0005GQ-Ii
+	for qemu-devel@archiver.kernel.org; Wed, 18 Dec 2019 21:00:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48335)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ihl1H-0002ma-GG
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:54:29 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1ihl6J-0004lm-8K
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:59:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ihl1F-0007a9-SG
- for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:54:27 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:47733 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ihl1F-0007V0-11; Wed, 18 Dec 2019 20:54:25 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47dZgK4ZgXz9sPh; Thu, 19 Dec 2019 12:54:21 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576720461;
- bh=Avr8Aoh7KspcQ0ZcczQlY0smkIoUvCXEsgEDxwwkzJ4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=mbqHWKtfqMBJJ1/EaTKeYEAPiiuAI7j31+2+cNxp6pJB2vjxdjy5+2hHRo50il+ZX
- iP1e9ZqBr+6IPhxbPNA/GB6FWinyqP5htyzaF/PkD8hUBmquqx18t8z9wxeLle9CAn
- 9ROV7rNiywNzdxsIIQwbVuqgQWZU008KXTrOq+UI=
-Date: Thu, 19 Dec 2019 12:54:14 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Stefan Berger <stefanb@linux.ibm.com>
+ (envelope-from <stefanb@linux.ibm.com>) id 1ihl6I-0006GH-4B
+ for qemu-devel@nongnu.org; Wed, 18 Dec 2019 20:59:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5058
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+ id 1ihl6H-0006CZ-UO; Wed, 18 Dec 2019 20:59:38 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBJ1vos5122330; Wed, 18 Dec 2019 20:59:28 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wyux35y1v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 18 Dec 2019 20:59:28 -0500
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBJ1vo92122323;
+ Wed, 18 Dec 2019 20:59:27 -0500
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wyux35y1h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 18 Dec 2019 20:59:27 -0500
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBJ1wc12006408;
+ Thu, 19 Dec 2019 01:59:26 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma04dal.us.ibm.com with ESMTP id 2wvqc757uv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 19 Dec 2019 01:59:26 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBJ1xOT047382908
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 19 Dec 2019 01:59:24 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8E8E6136053;
+ Thu, 19 Dec 2019 01:59:24 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1855613604F;
+ Thu, 19 Dec 2019 01:59:23 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu, 19 Dec 2019 01:59:23 +0000 (GMT)
 Subject: Re: [PATCH v5 1/5] tpm_spapr: Support TPM for ppc64 using CRQ based
  interface
-Message-ID: <20191219015414.GC2321@umbus.fritz.box>
+To: David Gibson <david@gibson.dropbear.id.au>
 References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
  <20191212202430.1079725-2-stefanb@linux.vnet.ibm.com>
  <20191213053453.GD207300@umbus.fritz.box>
  <75fd3e95-d72f-069b-22ce-f354e1c34660@linux.ibm.com>
  <20191217002954.GH6242@umbus.fritz.box>
  <1efef315-cb85-79ea-9c46-ff318e05a543@linux.ibm.com>
+ <20191219015414.GC2321@umbus.fritz.box>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <db0d3dbe-3b01-e62b-2cf0-3d0c50e3c4fb@linux.ibm.com>
+Date: Wed, 18 Dec 2019 20:59:18 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ZwgA9U+XZDXt4+m+"
-Content-Disposition: inline
-In-Reply-To: <1efef315-cb85-79ea-9c46-ff318e05a543@linux.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <20191219015414.GC2321@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-18_08:2019-12-17,2019-12-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999
+ lowpriorityscore=0 phishscore=0 mlxscore=0 suspectscore=0 spamscore=0
+ bulkscore=0 malwarescore=0 priorityscore=1501 impostorscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912190014
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,129 +119,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 12/18/19 8:54 PM, David Gibson wrote:
+> On Tue, Dec 17, 2019 at 02:44:04PM -0500, Stefan Berger wrote:
+>> On 12/16/19 7:29 PM, David Gibson wrote:
+>>
+>>
+>>> Since you need to change compatible based on an internal variable,
+>>> we'd need to replace the static dt_compatible in the class with a
+>>> callback.
+>>
+>> Why can we not initialize it once we know the version of TPM? From the
+>> perspective of SLOF at least this seems to be building the device tree fine
+>> since it sees the proper value...
+> Because it's a serious layering / isolation violation.  You're
+> modifying QOM type information from the runtime code of a specific
+> instance.  You get away with it (now) because there's only one
+> instance and the ordering of things happens to let it work, but that's
+> assuming way too much about QOM's implementation details.
+>
+> As a rule, once the QOM classes are set up with their class_init
+> function, they should never be modified.
 
---ZwgA9U+XZDXt4+m+
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 17, 2019 at 02:44:04PM -0500, Stefan Berger wrote:
-> On 12/16/19 7:29 PM, David Gibson wrote:
-> > On Fri, Dec 13, 2019 at 08:03:36AM -0500, Stefan Berger wrote:
-> > > On 12/13/19 12:34 AM, David Gibson wrote:
-> > >=20
-> > > The existing one looks like this:
-> > >=20
-> > > typedef struct SpaprVioCrq {
-> > >  =A0=A0=A0 uint64_t qladdr;
-> > >  =A0=A0=A0 uint32_t qsize;
-> > >  =A0=A0=A0 uint32_t qnext;
-> > >  =A0=A0=A0 int(*SendFunc)(struct SpaprVioDevice *vdev, uint8_t *crq);
-> > > } SpaprVioCrq;
-> > >=20
-> > > I don't seem to find the fields there that we need for vTPM support.
-> > Yeah, I can see the difference in the structures.  What I'm after is
-> > what is the difference in purpose which means they have different
-> > content.
-> >=20
-> > Having read through the whole series now, I *think* the answer is that
-> > the tpm specific structure is one entry in the request queue for the
-> > vtpm, whereas the VioCrq structure is a handle on an entire queue.
-> >=20
-> > I think the tpm one needs a rename to reflect that a) it's vtpm
-> > specific and b) it's not actually a queue, just part of it.
->=20
->=20
-> v6 has it as TpmCrq. It's local to the file, so from that perspective it's
-> specific to (v)TPM.
+If we now add a get_dt_compatible() callback to the class that gets 
+invoked when dt_compatible is NULL, does this then solve the issue?
 
-Ok.
 
-> > > This is a 1:1 copy from the existing TIS driver.
-> > Hm, right.  Probably not a bad idea to move that out as a helper
-> > function then.
->=20
->=20
-> In V7 then.
-
-Ok.
-
-> > > > > +static void tpm_spapr_update_deviceclass(SpaprVioDevice *dev)
-> > > > > +{
-> > > > > +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
-> > > > > +    SpaprVioDeviceClass *k =3D VIO_SPAPR_DEVICE_GET_CLASS(dev);
-> > > > > +
-> > > > > +    switch (s->be_tpm_version) {
-> > > > > +    case TPM_VERSION_UNSPEC:
-> > > > > +        assert(false);
-> > > > > +        break;
-> > > > > +    case TPM_VERSION_1_2:
-> > > > > +        k->dt_name =3D "vtpm";
-> > > > > +        k->dt_type =3D "IBM,vtpm";
-> > > > > +        k->dt_compatible =3D "IBM,vtpm";
-> > > > > +        break;
-> > > > > +    case TPM_VERSION_2_0:
-> > > > > +        k->dt_name =3D "vtpm";
-> > > > > +        k->dt_type =3D "IBM,vtpm";
-> > > > > +        k->dt_compatible =3D "IBM,vtpm20";
-> > > > > +        break;
-> > > > Erk.  Updating DeviceClass structures on the fly is hideously ugly.
-> > > > We might need to take a different approach for this.
-> > > Make a suggestion... Obviously, we can hard-initialize dt_name and dt=
-_type
-> > > but dt_compatible can only be set after we have determined the versio=
-n of
-> > > TPM.
-> > As you say name and type can just be put into the class statically.
->=20
->=20
-> I did this in v6.
->=20
->=20
-> > Since you need to change compatible based on an internal variable,
-> > we'd need to replace the static dt_compatible in the class with a
-> > callback.
->=20
->=20
-> Why can we not initialize it once we know the version of TPM? From the
-> perspective of SLOF at least this seems to be building the device tree fi=
-ne
-> since it sees the proper value...
-
-Because it's a serious layering / isolation violation.  You're
-modifying QOM type information from the runtime code of a specific
-instance.  You get away with it (now) because there's only one
-instance and the ordering of things happens to let it work, but that's
-assuming way too much about QOM's implementation details.
-
-As a rule, once the QOM classes are set up with their class_init
-function, they should never be modified.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ZwgA9U+XZDXt4+m+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl362EQACgkQbDjKyiDZ
-s5LGrBAA4sZIJsoSQofpPcPud+uJmR6XLUxWV6ArcFnX2PEYODgKnp16Fp/dsqay
-wL+BBvgBK7DuXCWpI1x+/MGOhmvwgM72iaIghUTv+PYkboASv28tgYg4nmWxJVNS
-yZmJra4DB9hnLHpPQJpdAJy7tOI9YfUO3UUSzZolgzR2z2/q0GgZiAfjqHzmUmr+
-cODNYCspRRj4HLCk7zrOwLawgzaE4bQDVCLkYQkQUk8M6cusFVx2PdOO1SjVIlaG
-+bPRkK0q/jsguNZmb/AEsAfuUYcuBz8ea1krNTED0R2MBwi+iysTv9FiBg+LzmIH
-Wuo635bsNZtDWQJO76Xqy1R0hXE3BcC3WUX4x6+rSWXQHjh7FLqHW+ZoPAJsqXtm
-SCVfxBz6PiKmJDwRpaW7Y/mmsSckLm83rEIWK6W8/z7ibI9UnGxvtXvchMr+lqsS
-qdtuykTlT2FDzezxnyr98C4zC5AyNQ5xDJCYNC1HU40ab+pXgSraRAtNrh4MuCKt
-Czudk4DdtfMa+m7Bv6ydVw7Q3ov64eF9FUNrwNq1jWmjmqg2yWdeu1goWdZ9kUjt
-HwaMYaVuRpGSmw3T3bd7vgbWrXBN+dLRYIiK/od2/LmILdB1+QqLNfWkrLYJmSyA
-cD4Zff5O7LEMR5L+fcoTqAxoOFPClZqMxg02CfVc+mnf4qGsN6s=
-=D3Vs
------END PGP SIGNATURE-----
-
---ZwgA9U+XZDXt4+m+--
 
