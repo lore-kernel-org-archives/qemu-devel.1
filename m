@@ -6,38 +6,41 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54826C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034B7C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A5E12465E
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:26:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5E12465E
+	by mail.kernel.org (Postfix) with ESMTPS id C8DAE206D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 09:47:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DAE206D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihs4R-0007ka-9w
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 04:26:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58733)
+	id 1ihsPB-0005PT-VP
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 04:47:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ihs3q-0007Il-B0
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:25:35 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ihsOJ-0004ar-D7
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ihs3o-0002DK-WD
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:25:34 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:43487)
+ (envelope-from <laurent@vivier.eu>) id 1ihsOI-0000Mm-Bt
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:46:43 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:36335)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ihs3o-00024x-L7
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 04:25:32 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1ihsOF-0008WP-SA; Thu, 19 Dec 2019 04:46:40 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MHFsE-1iUitF31kW-00DJ19; Thu, 19 Dec 2019 10:25:05 +0100
-Subject: Re: [PATCH] linux-user:Fix align mistake when mmap guest space
-To: Xinyu Li <precinct@mail.ustc.edu.cn>, qemu-devel@nongnu.org
-References: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
+ 1N2mS2-1hhHq71YA0-0136E5; Thu, 19 Dec 2019 10:46:31 +0100
+Subject: Re: [PATCH] MAINTAINERS: Update Yuval Shaia's email address
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Yuval Shaia <yuval.shaia@oracle.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20191126102637.2038-1-yuval.shaia@oracle.com>
+ <df5ed556-f636-0d8e-5882-89560e90e884@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <698f1386-b706-16ff-60b2-779247f68ba5@vivier.eu>
-Date: Thu, 19 Dec 2019 10:24:59 +0100
+Message-ID: <cefbec21-8b62-f04d-f5ad-b211fa596569@vivier.eu>
+Date: Thu, 19 Dec 2019 10:46:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
+In-Reply-To: <df5ed556-f636-0d8e-5882-89560e90e884@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VjSysxu1gI6dkypq4VtTkJwIrRN/DDFhPTyE3ac9thPniSSC5b5
- bDfcYPrZEzhp6NKSNBrRfdFxMgoJq9qg8QxFOESkHIVnK88udpX1cBwy/ldMevilyWIdUfu
- CobohLVzqi9AU1dqsUBcHoqSiv38wPAOHYpH96knRKc6J8rBVi9YeCva0tXfasOlYTspTZM
- WISci7niEZ09w044WB0zw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:N1HWqyXlg4A=:MMXWhWdvWRzF0azTRbQnWt
- M6Ue+xt+oyLjrI077LFcejg20UZb2QnyptcX/8sr141yfEH/BEUNxfKelfBL0aUbuEwhSmp3Z
- orxYVjEp6JNI1AzhL5g9KEweUce7PbkoaUVtHOIRWtcmG+fmuagxPOMpP0EXGkB0FQ563IkQ+
- rlEP5lgAfv81iYMgD7m1QbQ5k8D/4O8uAu/f7sfmSsAxGtaaU0i2RziyTugwXV9MOlkK4GjLb
- lsAX7cmqMF2qubY9yb7jAguEtss+WooFSGWUBzjFAZnOqOCBLCrL7xvbmcg3LX10cWfnfgTRa
- NdtqDk951NWCXlMdwUVbd1bAoFHpXS3JqyuXCOCs+oe1AJdqHGvD82EQtFnhYjjzhTmFw+KlI
- fa+JE//smerdOFVk06EXJ1YbjnFrC4R3pJww8OCT3WOelBjxzzYDlx2cxbkfHtSekaSwC7Xkd
- UOb+kDx5XUh5cz0MpO7j4R2hxofNZWt/jzK5RsgIG5LJ/uUkvYbHvPe+clGZTnIyqRDwf1Gm0
- 35dIrD+gfxVqzfcLx0a9/UlQr+OTXF8QMtJiLA8E2NnndRvEBlWIJIV1/Twsf8+Jo2Ouwl7GE
- mjU4mtsuUpvSuOdVZyZ0931IuYYAeZhXTs0dUZ4awtZ0VSXp7bSQk5P2idiBfrhtzaLnoynok
- 0lGi2ZXcm31gMdRWJSF6fKx0GhlFobk6QVbgPX8Mvbz4E7/r7y5qAnbflSkKItcJ1GVMcgI8f
- 1U8ExT0iqijWE91J9mZieoLOZ5R3bNIGSjddbdy9mO1wECOaywKSrKlSkAI0k9aGIFbhGxgRR
- VTvCa3m74d+GBu1UQszF/YpTr2ZVvfg4FYnB87PKbkiZw6lH/bgD9CQW3ohacx2SHRr5DWl6N
- C02+rOYlO08ia4lqLcWg==
+X-Provags-ID: V03:K1:hOtyJoc+nCcTSJBaQ/alLL2RSwklkjh3CC54lW2V07PiKEYtMwm
+ u9+tiCknNaozuH0GzoeWfQUQ+LIZ9qEuyr+vUdLTwU3SN3Rlr02aZCjF01w+ful7uZFjvre
+ 1z/3gEvkStizEeCoqFdI2IO9Tuwjp27YkxBUzQSgraDopc4qn/as2vt7wdIC4mLu76kXN0A
+ BV6JPNMOnlzP2ZxtcpFwQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:GxMM9kq8Vhk=:pZMsT/sGRu01yUCl0GSFN8
+ Z9QDAjHA5tG8alDT1Uvq3H0lCL/MzDmaAZzr+RPi4wKUGsXa6vRWdjIAA6c5yzDOU2hStS688
+ 2h0noOadpiFANTzJ5fOUZNZ5GohUiHfBxH6//fhdrtS+uvkPkgIsQMvomzFCQg8Ytq3Skf+Gx
+ fxmLeEfb9QoIdXCnQPcDsnhmaJwJ7XDlZ7UyIa/pe3Wwpj1o4MhP7967yS23QyFmg+hQ5qCpC
+ Yh42+XA9NDDe0TzhDETQ4Ffr8Y2wjuTRMLvP4UQGZdmf+LPENvJLz3RVPjC0m0hrnKNdTiWM1
+ Z+mtzxk015srnG4wsmJHGIGGtgAwoF4cTYNGu9R6uUDfHtt9UTN/WpIPmo3T32z2PyLxikYf7
+ OAKCotG2GfmItRolIsCkJMt15Mu0C+1xCsDgkcHgmEllu31iLf3pEDtDvAaRou1oqGV6WJfBI
+ Vhni7PsslRtMRtL6FlgTfzZkARizK4CBK02ApqZTYe4mHkQcWbO7Y6cFIk6EGU3KecjnAjpUO
+ 6n2efHh47b7oYjOvt3h8KsABVo9DE1e3dtVIli4L88neP/r08Po5vm3nLtUHr6hAt5tYVYWGa
+ D4oNnbms+bEa2rEOS1dj88WgLl1cofuuzgwOyoabAlLmPHCx4qYlUDYW6JPaakVDFuWH5qe76
+ LVnRZ3MEce3ouz6s9w9U9WZrwjRhZkT7hn3b1/SDwM7gYqxShY/qYrtiCKbts4FvqbNal1BIa
+ ipZxAOBo6Rt1jUKo4JMNoTgZefviMRk/wMEwbs55RfrfO0xOP5vioXIpL4+Tit9Vpm8rBF9l3
+ /UwZNVv2vJJpR+aa57P3G3PB74i22rBhbegv1UnJyun35pTuP2g14kbeGUgCkfTKq1/a1B8Us
+ x7VvGcN9Wokc5qacQiQHDBEP1qfaHSW+O7K7yrnrc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.13
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,47 +125,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/12/2019 à 03:29, Xinyu Li a écrit :
-> In init_guest_space, we need to mmap guest space. If the return address
-> of first mmap is not aligned with align, which was set to MAX(SHMLBA,
-> qemu_host_page_size), we need unmap and a new mmap(space is larger than
-> first size). The new size is named real_size, which is aligned_size +
-> qemu_host_page_size. alugned_size is the guest space size. And add a
-> qemu_host_page_size to avoid memory error when we align real_start
-> manually (ROUND_UP(real_start, align)). But when SHMLBA >
-> qemu_host_page_size, the added size will smaller than the size to align,
-> which can make a mistake(in a mips machine, it appears). So change
-> real_size from aligned_size +qemu_host_page_size
-> to aligned_size + align will solve it.
+Le 18/12/2019 à 20:50, Marcel Apfelbaum a écrit :
 > 
-> Signed-off-by: Xinyu Li <precinct@mail.ustc.edu.cn>
-> ---
->  linux-user/elfload.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index f6693e5760..312ded0779 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2189,7 +2189,7 @@ unsigned long init_guest_space(unsigned long host_start,
->               * to where we need to put the commpage.
->               */
->              munmap((void *)real_start, host_size);
-> -            real_size = aligned_size + qemu_host_page_size;
-> +            real_size = aligned_size + align;
->              real_start = (unsigned long)
->                  mmap((void *)real_start, real_size, PROT_NONE, flags, -1, 0);
->              if (real_start == (unsigned long)-1) {
+> On 11/26/19 12:26 PM, Yuval Shaia wrote:
+>> Use gmail account for maintainer tasks.
+>>
+>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+>> ---
+>>   MAINTAINERS | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 5e5e3e52d6..4297b54fcb 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -2640,7 +2640,7 @@ F: tests/test-replication.c
+>>   F: docs/block-replication.txt
+>>     PVRDMA
+>> -M: Yuval Shaia <yuval.shaia@oracle.com>
+>> +M: Yuval Shaia <yuval.shaia.ml@gmail.com>
+>>   M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+>>   S: Maintained
+>>   F: hw/rdma/*
 > 
+> Hi,
+> 
+> Can someone grab this patch ?
 
-Applied to my linux-user branch.
+I can take this in a trivial-branch PR, but the next one will not be
+before next week.
+
+Could you add your Acked-by?
 
 Thanks,
 Laurent
-
 
