@@ -2,76 +2,78 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90E9C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFA1C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:21:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9687621655
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFC8F21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQWQI+jz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9687621655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KsLPHJ+D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC8F21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJ8j-0003a3-Jx
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:20:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47419)
+	id 1iiJ9c-0004uQ-Jd
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:21:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59318)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiIhd-00044m-Ik
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:52:26 -0500
+ (envelope-from <berrange@redhat.com>) id 1iiIzO-0006qW-F0
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:10:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiIhc-0007ZJ-3u
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:52:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48967
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1iiIzM-00040t-If
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:10:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30508
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iiIhb-0007X2-TY
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:52:24 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iiIzK-0003zB-QG
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:10:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576849943;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1576851041;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3MdcmcIGRBu7yC0nFlRdq11GjU0cBWKn+3toxrMtEyY=;
- b=OQWQI+jzWwQqu1fHqW1pGOECbKBzLB3BwjHT3mJaTtB2rBYEf54rnYMYvCv29O0Cl2wB/H
- /hgM/v3IKQtC3IZFXuV1QKnuIJsxvDnA/DDQIyQT6ChXAxz6g97svxWonPcSgq3zm6YYuk
- uguv0QMw3Hny0zr1yptCM3XhddlzlZA=
+ bh=V8+UZygBtHDPknkB2JS64RDvGVAaCeRXBajYnp8Oi4w=;
+ b=KsLPHJ+D3phKFnySiOO/wFNBwmvdd7L3thB7oRaCDWOMNY/L59R79gyB9NmDG4I8uxbzJR
+ HPxGppPmp1vsde+U92cKS3luxox/Xmh1osnwEHcoAzIRUro4gMfrZxWRzY4tXjzfRui5RA
+ cgs3vP5zJzmW8JffaA/pMt4GCxaiQIc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-Xv_ajuvEPH61b6iqCVbndw-1; Fri, 20 Dec 2019 08:52:20 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-135-lunk3_AvPjSyCIi8JFEBmA-1; Fri, 20 Dec 2019 09:10:40 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BE68185432D;
- Fri, 20 Dec 2019 13:52:19 +0000 (UTC)
-Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 87D5A26FB9;
- Fri, 20 Dec 2019 13:52:14 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 36/37] qdev: remove QDEV_PROP_PTR
-Date: Fri, 20 Dec 2019 17:46:00 +0400
-Message-Id: <20191220134601.571905-37-marcandre.lureau@redhat.com>
-In-Reply-To: <20191220134601.571905-1-marcandre.lureau@redhat.com>
-References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77540801E66
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 14:10:38 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6458C10021B2;
+ Fri, 20 Dec 2019 14:10:33 +0000 (UTC)
+Date: Fri, 20 Dec 2019 14:10:32 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH v7 8/9] tests: add migration-helpers unit
+Message-ID: <20191220141032.GO1699760@redhat.com>
+References: <20191219123029.200788-1-marcandre.lureau@redhat.com>
+ <20191219123029.200788-9-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Xv_ajuvEPH61b6iqCVbndw-1
+In-Reply-To: <20191219123029.200788-9-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: lunk3_AvPjSyCIi8JFEBmA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -86,108 +88,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: mprivozn@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No longer used in the tree. The comment about user_creatable is still
-quite relevant, but there is already a similar comment in qdev-core.h.
+On Thu, Dec 19, 2019 at 04:30:28PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Move a few helper functions from migration-test.c to migration-helpers.c
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/Makefile.include    |   2 +-
+>  tests/migration-helpers.c | 167 ++++++++++++++++++++++++++++++++++++
+>  tests/migration-helpers.h |  37 ++++++++
+>  tests/migration-test.c    | 176 +++-----------------------------------
+>  4 files changed, 216 insertions(+), 166 deletions(-)
+>  create mode 100644 tests/migration-helpers.c
+>  create mode 100644 tests/migration-helpers.h
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- hw/core/qdev-properties.c    | 18 ------------------
- include/hw/qdev-properties.h | 22 ----------------------
- 2 files changed, 40 deletions(-)
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index ac28890e5a..6ca7697599 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -501,13 +501,6 @@ const PropertyInfo qdev_prop_string =3D {
-     .set   =3D set_string,
- };
-=20
--/* --- pointer --- */
--
--/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
--const PropertyInfo qdev_prop_ptr =3D {
--    .name  =3D "ptr",
--};
--
- /* --- mac address --- */
-=20
- /*
-@@ -1165,17 +1158,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char=
- *name, int value)
-                             name, &error_abort);
- }
-=20
--void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
--{
--    Property *prop;
--    void **ptr;
--
--    prop =3D qdev_prop_find(dev, name);
--    assert(prop && prop->info =3D=3D &qdev_prop_ptr);
--    ptr =3D qdev_get_prop_ptr(dev, prop);
--    *ptr =3D value;
--}
--
- static GPtrArray *global_props(void)
- {
-     static GPtrArray *gp;
-diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-index 16837ab5dd..a90a9cec80 100644
---- a/include/hw/qdev-properties.h
-+++ b/include/hw/qdev-properties.h
-@@ -18,7 +18,6 @@ extern const PropertyInfo qdev_prop_size;
- extern const PropertyInfo qdev_prop_string;
- extern const PropertyInfo qdev_prop_chr;
- extern const PropertyInfo qdev_prop_tpm;
--extern const PropertyInfo qdev_prop_ptr;
- extern const PropertyInfo qdev_prop_macaddr;
- extern const PropertyInfo qdev_prop_on_off_auto;
- extern const PropertyInfo qdev_prop_losttickpolicy;
-@@ -171,25 +170,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
- #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
-     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
-=20
--/*
-- * Please avoid pointer properties.  If you must use them, you must
-- * cover them in their device's class init function as follows:
-- *
-- * - If the property must be set, the device cannot be used with
-- *   device_add, so add code like this:
-- *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
-- *   DeviceClass *dc =3D DEVICE_CLASS(class);
-- *   dc->user_creatable =3D false;
-- *
-- * - If the property may safely remain null, document it like this:
-- *   |*
-- *    * Note: pointer property "interrupt_vector" may remain null, thus
-- *    * no need for dc->user_creatable =3D false;
-- *    *|
-- */
--#define DEFINE_PROP_PTR(_n, _s, _f)             \
--    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
--
- #define DEFINE_PROP_CHR(_n, _s, _f)             \
-     DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
- #define DEFINE_PROP_STRING(_n, _s, _f)             \
-@@ -262,8 +242,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *=
-name,
- void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
-                            const uint8_t *value);
- void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
--/* FIXME: Remove opaque pointer properties.  */
--void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
-=20
- void qdev_prop_register_global(GlobalProperty *prop);
- int qdev_prop_check_globals(void);
+Regards,
+Daniel
 --=20
-2.24.0.308.g228f53135a
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
