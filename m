@@ -2,80 +2,82 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C60C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 11:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E321CC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 11:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C9A924679
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 11:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE61E2465E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 11:25:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f68eeP0O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C9A924679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+yAYa4t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE61E2465E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiGL9-0004Xh-I2
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 06:21:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44349)
+	id 1iiGPJ-0006lF-N6
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 06:25:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iiGKX-00041Y-MP
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:20:26 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iiGOB-00064i-Fc
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iiGKW-0002lO-0B
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:20:25 -0500
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:37997)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iiGKV-0002dk-NN
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:20:23 -0500
-Received: by mail-ot1-x336.google.com with SMTP id d7so7099157otf.5
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 03:20:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=O0I6D1IRvPzYKxLemJ/qpUMYhDMNUnBFYpy1JXR1Y9U=;
- b=f68eeP0Oop+yprowBezPZML05zgSbbxovlJGU3NALwPMy76yv0zesE6A74UzHPXA2P
- Kxhbjr4w9KZ6MS1ebhtaPmjJZZbLr/dPo8zPgt8Me3rBXDPwr2iURphfs7yFyJd8XqrH
- CRh9qWejR8kOfvXNXKZCogzJL1nGgQT2XocYc2xMqzHKtnhq6ZU9MpWDpNEjPcC2CI+d
- tga2KpiXBufnfw5G/fdJIs9dpwNV8zlB/FdzIkjE7XO2DS1GDQAw2Kw66rPhHzweSWGr
- RXCSzSH9FQjKWgI9gtKpxynaC/JxIV7CNB46dwHwRCV/XHL6qeHgW0Q/QknkGAqYZCQA
- 7TAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=O0I6D1IRvPzYKxLemJ/qpUMYhDMNUnBFYpy1JXR1Y9U=;
- b=IS8/vi+6pzTEVGboXMWIfK1MImUdU7tdOtpNBkhLKGBoAglINA0hmEw9Z5FrG4JJm3
- VJggZsxbjqCBUcrNicXIIbKMJa+5eMCvEBAM0ROJkQ9ckAR9ok/EcPMCjElQJWHlQr74
- Hu/79aunePdbFyfcJpqVWoIAGXStsz++IocZ9j97HSeYQ7MJPoQ0z/YAA1Jl6PN1u+L3
- 2ZmB7Uo50C840oy/fZi/NnltMblWtEI7UcYw+0+tkqXg+2bux9kR8JPgwHJXp/P/zds9
- SzcvTqXui2q3DjpzkOTHo0RMwHR/loK01oyu2PrF4iZOVv8Re59fl8XUIAi9PsqjdZrW
- 8o1Q==
-X-Gm-Message-State: APjAAAXOYckZYZuoygPJ81kJRQHtylhX2bVqj+xNwI/9eu+o+abTYHZ1
- x7G6TxSN6djiHP9572APOMIetSD5yz7XcpfHjQEgpw==
-X-Google-Smtp-Source: APXvYqyagk0rqfSiDJL9xKISXfI1jzEhVf5l+dkyJ8ZzriPDuT7S9zYcbl0HVHCOC4geDyDyzNMdFaHFMu6oMNkuOQE=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr14580435otd.91.1576840821814; 
- Fri, 20 Dec 2019 03:20:21 -0800 (PST)
+ (envelope-from <kwolf@redhat.com>) id 1iiGO8-0005iB-Oe
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:24:09 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60702)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iiGO8-0005bv-4n
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:24:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576841047;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Kn6hOzgwUAX76JObcNAb9wWKeZNmZjG5/1ELqPvf4TU=;
+ b=K+yAYa4tdC8++4+o+rCOtbDeQy4vW0LyfhnAvvK9i2GWT7qcYROEv3l4Q9Z35IIrDon3/F
+ FXOISxllYpBqyiFkpsEQg7iHexRcyQwK8I+ibnrclY4Ay+BWzy5koWhx8Lo8T8YY3Hi76k
+ f8fP+ynuTTrT6KswS7qSZMufU8Y06Hg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1-LXyhQzNyMouqmTma62Ct2g-1; Fri, 20 Dec 2019 06:24:05 -0500
+X-MC-Unique: LXyhQzNyMouqmTma62Ct2g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C86818552A0;
+ Fri, 20 Dec 2019 11:24:04 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A453526FB3;
+ Fri, 20 Dec 2019 11:24:03 +0000 (UTC)
+Date: Fri, 20 Dec 2019 12:24:02 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH 02/18] fuse: Allow exporting BDSs via FUSE
+Message-ID: <20191220112402.GE4019@dhcp-200-226.str.redhat.com>
+References: <20191219143818.1646168-1-mreitz@redhat.com>
+ <20191219143818.1646168-3-mreitz@redhat.com>
+ <20191220102656.GD4019@dhcp-200-226.str.redhat.com>
+ <1812e968-1197-523e-7039-caf29e3bbc4b@redhat.com>
 MIME-Version: 1.0
-References: <20191218081721.23520-1-armbru@redhat.com>
-In-Reply-To: <20191218081721.23520-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Dec 2019 11:20:11 +0000
-Message-ID: <CAFEAcA_p-2Z4v29SJmnjthb6GaJhvhb5h+nGd-ywfoiPS_w9jA@mail.gmail.com>
-Subject: Re: [PULL v2 00/35] Error reporting patches for 2019-12-17
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::336
+In-Reply-To: <1812e968-1197-523e-7039-caf29e3bbc4b@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="PmA2V3Z32TCmWXqI"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,37 +89,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Dec 2019 at 08:19, Markus Armbruster <armbru@redhat.com> wrote:
->
-> v2:
-> * New PATCH 20: Resolve conflict with David Gibson's pull request
->
-> The following changes since commit aceeaa69d28e6f08a24395d0aa6915b687d0a681:
->
->   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-12-17' into staging (2019-12-17 15:55:20 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-error-2019-12-17-v2
->
-> for you to fetch changes up to d936613547aec49b0b80193cee0b9df05cd8a2ae:
->
->   nbd: assert that Error** is not NULL in nbd_iter_channel_error (2019-12-18 08:43:19 +0100)
->
-> ----------------------------------------------------------------
-> Error reporting patches for 2019-12-17
->
+--PmA2V3Z32TCmWXqI
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 20.12.2019 um 11:48 hat Max Reitz geschrieben:
+> On 20.12.19 11:26, Kevin Wolf wrote:
+> > Am 19.12.2019 um 15:38 hat Max Reitz geschrieben:
+> >> fuse-export-add allows mounting block graph nodes via FUSE on some
+> >> existing regular file.  That file should then appears like a raw disk
+> >> image, and accesses to it result in accesses to the exported BDS.
+> >>
+> >> Right now, we only set up the mount point and tear all mount points do=
+wn
+> >> in bdrv_close_all().  We do not implement any access functions, so
+> >> accessing the mount point only results in errors.  This will be
+> >> addressed by a followup patch.
+> >>
+> >> The set of exported nodes is kept in a hash table so we can later add =
+a
+> >> fuse-export-remove that allows unmounting.
+> >>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >=20
+> >> diff --git a/qapi/block.json b/qapi/block.json
+> >> index 145c268bb6..03f8d1b537 100644
+> >> --- a/qapi/block.json
+> >> +++ b/qapi/block.json
+> >> @@ -317,6 +317,29 @@
+> >>  ##
+> >>  { 'command': 'nbd-server-stop' }
+> >> =20
+> >> +##
+> >> +# @fuse-export-add:
+> >> +#
+> >> +# Exports a block graph node on some (file) mountpoint as a raw image=
+.
+> >> +#
+> >> +# @node-name: Node to be exported
+> >> +#
+> >> +# @mountpoint: Path on which to export the block device via FUSE.
+> >> +#              This must point to an existing regular file.
+> >> +#
+> >> +# @writable: Whether clients should be able to write to the block
+> >> +#            device via the FUSE export. (default: false)
+> >> +#
+> >> +# Since: 5.0
+> >> +##
+> >> +{ 'command': 'fuse-export-add',
+> >> +  'data': {
+> >> +      'node-name': 'str',
+> >> +      'mountpoint': 'str',
+> >> +      '*writable': 'bool'
+> >> +  },
+> >> +  'if': 'defined(CONFIG_FUSE)' }
+> >=20
+> > Can this use a BlockExport union from the start like I'm introducing in
+> > the storage daemon series, together with a generic block-export-add?
+>=20
+> Hm, you mean still adding a FuseExport structure that would be part of
+> BlockExport and then dropping fuse-export-add in favor of a
+> block-export-add that we want anyway?
+
+Yes.
+
+> > It also looks like node-name and writable should be part of the common
+> > base of BlockExport.
+>=20
+> node-name definitely, I=E2=80=99m not so sure about writable.  Or, to be =
+more
+> precise, I think that if we want writable to be in the base, we also
+> want growable to be there: Both are primarily options for the
+> BlockBackend that the exports use.
+>=20
+> But both of course also need to be supported by the export
+> implementation.  nbd can make its BB growable all it wants, but that
+> doesn=E2=80=99t make it work.
+
+Right. Pragmatically, I think exports are very like to support writable,
+but probably rather unlikely to support growable. So I do think there
+would be a point for making writable part of the common base, but not
+growable.
+
+> So if we kept writable and growable in the common base, then the schema
+> would give no information about what exports actually support them.
+>=20
+> On one hand, I don=E2=80=99t know whether it=E2=80=99s important to have =
+this
+> information in a static form, or whether it=E2=80=99s sufficient to learn=
+ at
+> runtime.
+>=20
+> On the other, I don=E2=80=99t know whether it=E2=80=99s important to have=
+ those fields
+> in the base or not.  Would it make a difference on the wire?
+
+Not for the command itself, so I think we're free to change it later. It
+might make a difference for introspection, though, not sure. Markus?
+
+Having it in the base might allow us to remove some duplication in the
+code. Probably not much, though, so not too important.
+
+> > Unfortunately this would mean that I can't use the
+> > same BlockExportNbd for the existing nbd-server-add command any more. I
+> > guess I could somehow get a shared base type for both, though.
+>=20
+> Hm.  This sounds like you want to make it your problem.  Can I take that
+> to mean that you want to implement block-export-add and I can wait with
+> v2 until that=E2=80=99s done? :-)
+
+The NBD integration, yes. I already added the BlockExport type to my
+patches, too, but I expect you would beat me to it. I'm not currently
+planning to write a block-export-add because it doesn't add anything new
+for the storage daemon, so FuseExport and the command this is your part.
+The type currently only exists for --export.
+
+Kevin
 
 
-Applied, thanks.
+--PmA2V3Z32TCmWXqI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+-----BEGIN PGP SIGNATURE-----
 
--- PMM
+iQIcBAEBAgAGBQJd/K9SAAoJEH8JsnLIjy/WfTYP/1pvBX2oQbNzz/pZ8lfudm8G
+BDO6C4gXf4j5QPH/JHpgsTuUeUfmcC3RF9N8mj38AJhEDggydh3r9yHt8FrSU99A
+PwyEXHZwbqsuCnH8Ck2AVs71/97siqRaZBWRj2BFlWb7xU4LAC08ZLOpjD6oij5Q
+wm5z9JbeCSzi6IfPn3fVmI2GzFS2Ma34y+yP7ymDSmo+KFxVAoA9Pf9grEU030Cb
+Ek4xtFiXHxqI9V8OvNUvhCiLTZyqGNWsJK34aAS44S3iQCKqHSPFlrYkTto5TSVb
+xQEkaZNpqjR4znY/ejovDL3JPNVSMR8xgl+D5su26DveJlD25izipV2IvajxPXTI
+YQMD+HYPzrPo45/BLDP0TAUdVog+6rvCLYpKiFKbhfFxnMtvHn+IcuOOgT35nG6c
+TO2gB0qp3K4EqiFbPjaD6oOiuTUZS5OjA/m7fQ146GtqyxpUtg1EfUWLRxzZRd81
+bpVCExFMq7feMQOvYaFjudcnWYJKpACQMrIS1lGDIchH6hO21eGC0Kh9MCS6BtyC
+YWlcJeIftNOu40Ikgnv3FuGarzu62+hbWfvi1Ej/ZnUBeKBrav1Jp4C7z1MBaY7P
+JUztPqDisdA4Hi20MPWkoY93drSSw80fHa8ugb6UErikiOK1TXkxE1STkVYP8J7X
+vnz2yHx7iTLn1M/vQnrf
+=A8Ij
+-----END PGP SIGNATURE-----
+
+--PmA2V3Z32TCmWXqI--
+
 
