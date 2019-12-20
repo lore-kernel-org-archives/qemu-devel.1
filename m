@@ -2,92 +2,76 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8074C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 18:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C783C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 18:58:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90733206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 18:37:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69B9220866
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 18:58:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sx6sZFIo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90733206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHIZU6bx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B9220866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiN9E-00060H-OP
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 13:37:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47337)
+	id 1iiNTr-0005Fz-Fr
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 13:58:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45227)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiN8c-0005ZK-32
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:36:35 -0500
+ (envelope-from <quintela@redhat.com>) id 1iiNSh-0004Ts-IT
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:57:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiN8a-0006kS-JC
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:36:33 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55475)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiN8a-0006ip-B2
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:36:32 -0500
-Received: by mail-wm1-x342.google.com with SMTP id q9so9921700wmj.5
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 10:36:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:subject:in-reply-to:date:message-id
- :mime-version:content-transfer-encoding;
- bh=Td5Tt5v/QBljYvWLGWrUC9uoovYeIA19v3tcKumQbcw=;
- b=Sx6sZFIo+ZA+8S5nIbaVL+e4nfby/CyUCgjQeHEWzWwg4BpkTAYWDyiEdRzrl8GNF7
- 2Ztcpq82iDyu7M7SAyem4euJKoRIphaaARpYZj15HytkIFapyLjfBstvZ8oQj502qwyT
- U9Q0vVgAvMKAo8SdXL+T/Dp3zet82rwZ5uXP4V3z5bSWHlXopnKG3r0vzuqRGVE4uUbT
- LImYb72vrXUF5b99ARbMPzehY1mSvSAhZKvzgJ4Uap91No12oA5PzaA0MyMQI7oO/Oyb
- 2E9VFKcI8TsHMlNcU6z12fcNO703cH+8LaCyXpll9Qkjlu7Ue5mZAbxmrG0WsZ1ee5ZY
- AEqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Td5Tt5v/QBljYvWLGWrUC9uoovYeIA19v3tcKumQbcw=;
- b=PEkRPxQFcPEWHTBlTeeIyHG5dyEOn3A1Jtowjld062Lnuv4pQ1pikONXOx28CQ+IgW
- Czsnkg2w73U5sfQ4vZm47tUgP9+/PZzFsEpaex7oB6zqiK4qtXapwN5UBgI7s4sETvW8
- 3aqBc0t2IeLVJni3+YswlVW81r9KSl7kzEJklyxJS9uBkPzl+2Iqar81YHbJIjkDCegS
- U3va5ea+Axx3tQMeV34E2FmLNgu9IXV1rTQOvUum2V4H7uDAaHjBsJnmbGpMa/U0G9b5
- gtQ/Tm5TWh9vObqp7OPut1I5JG/2O1fZIJblhlciSLydywhXyKPTww4b8JdvtTMOhHXV
- YmHg==
-X-Gm-Message-State: APjAAAV9UHEDXiD+AgiSKQKkP5zywGM6O951zmSqPAuziGy0eBEeZqsg
- km82I8yorL7vkncLrAokMq9023mARH4=
-X-Google-Smtp-Source: APXvYqx4IWbcIjrH0pMlM7VTbmkDmocT+70AIIVhcQiY5qoBC/LDhQelwWXMucI9xTZh+df1WkFAaA==
-X-Received: by 2002:a1c:4e10:: with SMTP id g16mr17529959wmh.94.1576866990316; 
- Fri, 20 Dec 2019 10:36:30 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z8sm10563333wrq.22.2019.12.20.10.36.28
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 10:36:28 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AE7261FF87
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 18:36:27 +0000 (GMT)
-References: <20191216221158.29572-1-richard.henderson@linaro.org>
- <20191216221158.29572-5-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 04/28] cputlb: Move body of cpu_ldst_template.h out
- of line
-In-reply-to: <20191216221158.29572-5-richard.henderson@linaro.org>
-Date: Fri, 20 Dec 2019 18:36:27 +0000
-Message-ID: <87k16qc09g.fsf@linaro.org>
+ (envelope-from <quintela@redhat.com>) id 1iiNSe-0006iy-Bg
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:57:18 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32292
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iiNSe-0006f3-7g
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:57:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576868234;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=cFh8F4XAF89lvEmScuXu4am01Qq5Q9wcAjX2EcomoIw=;
+ b=EHIZU6bxM6uhB29by1nM4+n4xLi8YIkncyrfRJJ/uBH8SwiZC6jSUNR7/KCgWnYAGXO1FB
+ Xt3E8+8taTyzAhQd5Bm7BCZSH93EYbEl15mxkPwtKM5KR8Im55NglTsJlXHHyMp/wy6kF1
+ omCsMqLE2raSpIF+QJuwDVNenognUrk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-349-sj1FOLOxMNmaPaLAlpUiSA-1; Fri, 20 Dec 2019 13:57:12 -0500
+X-MC-Unique: sj1FOLOxMNmaPaLAlpUiSA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1A1918B5F6A;
+ Fri, 20 Dec 2019 18:57:09 +0000 (UTC)
+Received: from redhat.com (ovpn-116-65.ams2.redhat.com [10.36.116.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3615649A5;
+ Fri, 20 Dec 2019 18:57:00 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Can we retire Python 2 now?
+In-Reply-To: <8736dfdkph.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Fri, 20 Dec 2019 17:29:30 +0100")
+References: <8736dfdkph.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Fri, 20 Dec 2019 19:56:58 +0100
+Message-ID: <877e2qakqt.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,99 +83,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: quintela@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-block@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Markus Armbruster <armbru@redhat.com> wrote:
+> Python 2 EOL is only a few days away[*].  We made configure bitch about
+> it in commit e5abf59eae "Deprecate Python 2 support", 2019-07-01.  Any
+> objections to retiring it now, i.e. in 5.0?
+>
+> Cc'ing everyone who appears to be maintaining something that looks like
+> a Python script.
+>
+> [*] https://pythonclock.org/
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+I am pretty sure that I am not a python maintaainer at all.
 
-> With the tracing hooks, the inline functions are no longer
-> so simple.  Once out-of-line, the current tlb_entry lookup
-> is redundant with the one in the main load/store_helper.
->
-> This also begins the introduction of a new target facing
-> interface, with suffix *_mmuidx_ra.  This is not yet
-> official because the interface is not done for user-only.
->
-> Use abi_ptr instead of target_ulong in preparation for
-> user-only; the two types are identical for softmmu.
->
-> What remains in cpu_ldst_template.h are the expansions
-> for _code, _data, and MMU_MODE<N>_SUFFIX.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/exec/cpu_ldst.h          |  25 ++++++-
->  include/exec/cpu_ldst_template.h | 125 +++++++------------------------
->  accel/tcg/cputlb.c               | 116 ++++++++++++++++++++++++++++
->  3 files changed, 166 insertions(+), 100 deletions(-)
->
-> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-> index fd499f7e2f..cf8af36dbc 100644
-> --- a/include/exec/cpu_ldst.h
-> +++ b/include/exec/cpu_ldst.h
-> @@ -152,7 +152,7 @@ static inline void clear_helper_retaddr(void)
->=20=20
->  #else
->=20=20
-> -/* The memory helpers for tcg-generated code need tcg_target_long etc.  =
-*/
-> +/* Needed for TCG_OVERSIZED_GUEST */
->  #include "tcg.h"
->=20=20
->  static inline target_ulong tlb_addr_write(const CPUTLBEntry *entry)
-> @@ -185,6 +185,29 @@ static inline CPUTLBEntry *tlb_entry(CPUArchState *e=
-nv, uintptr_t mmu_idx,
->      return &env_tlb(env)->f[mmu_idx].table[tlb_index(env, mmu_idx, addr)=
-];
->  }
->=20=20
-> +uint32_t cpu_ldub_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-> +                            int mmu_idx, uintptr_t ra);
-> +uint32_t cpu_lduw_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-> +                            int mmu_idx, uintptr_t ra);
-> +uint32_t cpu_ldl_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-> +                           int mmu_idx, uintptr_t ra);
-> +uint64_t cpu_ldq_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-> +                           int mmu_idx, uintptr_t ra);
-> +
-> +int cpu_ldsb_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-> +                       int mmu_idx, uintptr_t ra);
-> +int cpu_ldsw_mmuidx_ra(CPUArchState *env, abi_ptr addr,
-> +                       int mmu_idx, uintptr_t ra);
-> +
-> +void cpu_stb_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint32_t val,
-> +                       int mmu_idx, uintptr_t retaddr);
-> +void cpu_stw_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint32_t val,
-> +                       int mmu_idx, uintptr_t retaddr);
-> +void cpu_stl_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint32_t val,
-> +                       int mmu_idx, uintptr_t retaddr);
-> +void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint64_t val,
-> +                       int mmu_idx, uintptr_t retaddr);
-> +
->  #ifdef MMU_MODE0_SUFFIX
->  #define CPU_MMU_INDEX 0
->  #define MEMSUFFIX MMU_MODE0_SUFFIX
-> diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_tem=
-plate.h
-> index 0ad5de3ef9..ea39e29c19 100644
-> --- a/include/exec/cpu_ldst_template.h
-> +++ b/include/exec/cpu_ldst_template.h
-> @@ -24,13 +24,6 @@
->   * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
->   */
->=20=20
-> -#if !defined(SOFTMMU_CODE_ACCESS)
-> -#include "trace-root.h"
-> -#endif
-> -
-> -#include "qemu/plugin.h"
-> -#include "trace/mem.h"
+But anyways, python3 is only at python3.7.
+python3.0 debuted at 2008, so ...
 
-I think api.c needs to include trace/mem.h
+Acked-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
---=20
-Alex Benn=C3=A9e
+And anything else that you can think that endorses the change.
+
+Later, Juan.
+
 
