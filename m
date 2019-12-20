@@ -7,86 +7,87 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1017BC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17598C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:36:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D05D8206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:26:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7E09206CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:36:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a6+xVirU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D05D8206A5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EMiXDc1p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7E09206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiM3A-00072Z-Vs
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:26:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34986)
+	id 1iiMCp-00037g-VX
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:36:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiM2C-0005NR-4f
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:25:53 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iiMCC-0002gx-1K
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:36:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiM2A-00040x-HF
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:25:51 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38514)
+ (envelope-from <alex.bennee@linaro.org>) id 1iiMC9-0001FG-Nc
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:36:11 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33978)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiM2A-0003yD-7u
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:25:50 -0500
-Received: by mail-wm1-x342.google.com with SMTP id u2so10013688wmc.3
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 09:25:49 -0800 (PST)
+ id 1iiMC8-0001CT-2x
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:36:09 -0500
+Received: by mail-wr1-x442.google.com with SMTP id t2so10213169wrr.1
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 09:36:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=K21r017gDulrh6T3JODsgXBSTYtPvjZ41nwKK+er0Gs=;
- b=a6+xVirUif60nZcm94IhOtlUBc+keYeTIJlUaCNFpYyyit/GESrXmfx+KnZLgcfomX
- aVob7R+1zYtmUeNaPv5lX5p/VHHNFtqLkVMdKra3fUI0G899OTeV3Ev6o47jvQzS13wP
- cVD2kf9ZS2mkbkCvqm9F0KOTZkkuU80jDMypC20nxaurVtgkKzNdpT2bkBtMTTQ4m5Bv
- gBPPuMxgCVtbpUq8mrXMoKTkTbXR63WHpDfNn1UW8ZVCQD7U9/FK1dvXf8SCzMDhnCLd
- iM53LOKhgT7Aa1qRc6n51tOuo3+kjLBNUWLfiDoOIFKelDebNNQXUgX0C/okM8VmmOAB
- dTyQ==
+ h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=ZH8W+/KC9HVeCFqx53Cdh0lIQE99GnzsrvkKPbWcrmM=;
+ b=EMiXDc1p+gidJGbATi6WgEYEFhJXoQdluO+/w4EPtefaGfQFVFUDmjPExxG7DJ8X4J
+ N9SaUTFVmcCd4vKEhIPEfVEw+QRWIBP+0JCvFh372/cn6QnG+l8n2erDPk/KiDQU6Mg+
+ 3a2FG35DrEASFLokKx6CdDR6IjfcMhxrZVJhAh+niKEQmrpJ5mqh9fGjbZBKwbYuvViL
+ 37WbawXYI+gJg1RODoKvauzdRwwUso9vo8LjTyENBZLX1OWqv98rr96m1AT3wFyl4MGP
+ 4JuN3DyKyDuc4XuIhKhnkZ7dKIozVHk3tf9FSVBG6WkNTaqpOcVboxSHTCtUHgtxR0i+
+ clXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ h=x-gm-message-state:references:user-agent:from:to:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=K21r017gDulrh6T3JODsgXBSTYtPvjZ41nwKK+er0Gs=;
- b=l3Q1o2BD6dodSjSq4kjrEFIv6ffx/Dy9HamOZlecAniKIs/x8Ua8Y8zQ4r7wop7eR4
- yiWpxVJ2jxX6McsBwrmKZ8e9HCINvh8ETjCk+RRVa3VQEBf/fJ4XX/vm40z3uhY6L3cK
- UZMTi6g0DxGuUZvxlPrsuGkwwEzJOxLPtM3LF7UiIBDGsMuYGFsxzbu1GRyXzSPTJSzm
- 4UBPDKZgzSFd1jNM8+nstJ408YUH5FdpJe5jPXIIHaCyN3UmwuhSNoLGwRjyBqKYjWwX
- Vpnjv132qwdwHYbw22knEE7jWTJMTHl7b4AaKXS/8N/IIVcfeL28yKyoMHnWJLOMALgz
- xFmQ==
-X-Gm-Message-State: APjAAAU/RRtftnlSicfokkPBA6HcXMf7fg2kg/ShpWt/tesUaxnqyEDO
- gBj5PMd4ZGymNXm+aMSF0S7J/snqAts=
-X-Google-Smtp-Source: APXvYqy4SK8B01jp1hxae/bG3BT5EOpI+Q02OW6LUFHLF3rRkDRNKqwFc6ouGJopGk2zJ7lifyLCFQ==
-X-Received: by 2002:a1c:7ed0:: with SMTP id z199mr17365634wmc.58.1576862747927; 
- Fri, 20 Dec 2019 09:25:47 -0800 (PST)
+ bh=ZH8W+/KC9HVeCFqx53Cdh0lIQE99GnzsrvkKPbWcrmM=;
+ b=VbspLUU9X6bvuLvro+s6v8Q/RTMrQFCmd/vHeCEkFnEvsj0Y7s8Wy2anoc3PvKrZGD
+ dld+H/UdjCXPSJlst405MTONkXxP+DQrZ+FzPDa/+lZouOi/upbLNC3KR0KYLZfGRkP6
+ YmRBOV4hlzFgL68+ujgufGqA8NhOKpJPAnmZZ8Q2LitKAjXahEO6zbJwciP/YlBRGmPZ
+ hXFXPBXd62hVvssizjD5i43RETaGkhY42NHkDtj+HGWgKETDU5i9C+ouTFg8z0OoUREd
+ YDBg5WU7Dx9q5JjkBt2FnzeWzyONahu8M61lpvQmLa+NA6X2zH0UCXzfQiR0+UwfyA+c
+ 3UCA==
+X-Gm-Message-State: APjAAAVOZM7CQoEnO7OtlNsXgGYP3e65q5SzRRHHSW+pWCxaDCVYSP1U
+ W0JUZNU45HIQM+zPBkeI78P+RgGiHuc=
+X-Google-Smtp-Source: APXvYqyyS0Sz7/jYL2WdZxemB8e8FWB19XNsHzkS27Ii+X4Lwq2cQE1HOFfkxoOEFQQn01SsPcDfwQ==
+X-Received: by 2002:a5d:4cc9:: with SMTP id c9mr16098723wrt.70.1576863363024; 
+ Fri, 20 Dec 2019 09:36:03 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r62sm6505145wma.32.2019.12.20.09.25.46
+ by smtp.gmail.com with ESMTPSA id a1sm10300744wmj.40.2019.12.20.09.36.01
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 09:25:46 -0800 (PST)
+ Fri, 20 Dec 2019 09:36:01 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 880F11FF87;
- Fri, 20 Dec 2019 17:25:45 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id A4EDE1FF87
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:36:00 +0000 (GMT)
 References: <20191216221158.29572-1-richard.henderson@linaro.org>
- <20191216221158.29572-7-richard.henderson@linaro.org>
+ <20191216221158.29572-8-richard.henderson@linaro.org>
 User-agent: mu4e 1.3.5; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 06/28] cputlb: Rename helper_ret_ld*_cmmu to
- cpu_ld*_code
-In-reply-to: <20191216221158.29572-7-richard.henderson@linaro.org>
-Date: Fri, 20 Dec 2019 17:25:45 +0000
-Message-ID: <87tv5udi3q.fsf@linaro.org>
+Subject: Re: [PATCH v2 07/28] cputlb: Provide cpu_(ld, st}*_mmuidx_ra for
+ user-only
+In-reply-to: <20191216221158.29572-8-richard.henderson@linaro.org>
+Date: Fri, 20 Dec 2019 17:36:00 +0000
+Message-ID: <87r20ydhmn.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,7 +99,6 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -106,82 +106,391 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> There are no uses of the *_cmmu names other than the bare wrapping
-> within the *_code inlines.  Therefore rename the functions so we
-> can drop the inlines.
+> This finishes the new interface began with the previous patch.
+> Document the interface and deprecate MMU_MODE<N>_SUFFIX.
 >
-> Use abi_ptr instead of target_ulong in preparation for user-only;
-> the two types are identical for softmmu.
->
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  include/exec/cpu_ldst.h          | 29 ++++------
->  include/exec/cpu_ldst_template.h | 21 -------
->  tcg/tcg.h                        | 29 ----------
->  accel/tcg/cputlb.c               | 94 ++++++++------------------------
->  docs/devel/loads-stores.rst      |  4 +-
->  5 files changed, 36 insertions(+), 141 deletions(-)
+>  include/exec/cpu_ldst.h     |  80 +++++++++++++-
+>  docs/devel/loads-stores.rst | 211 ++++++++++++++++++++++++++----------
+>  2 files changed, 230 insertions(+), 61 deletions(-)
 >
 > diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-> index 399ff6c3da..ef59ed61e4 100644
+> index ef59ed61e4..41b98ba801 100644
 > --- a/include/exec/cpu_ldst.h
 > +++ b/include/exec/cpu_ldst.h
-> @@ -450,25 +450,20 @@ void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr a=
-ddr, uint64_t val,
->  #undef CPU_MMU_INDEX
+> @@ -25,9 +25,13 @@
+>   *
+>   * The syntax for the accessors is:
+>   *
+> - * load: cpu_ld{sign}{size}_{mmusuffix}(env, ptr)
+> + * load:  cpu_ld{sign}{size}_{mmusuffix}(env, ptr)
+> + *        cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)
+> + *        cpu_ld{sign}{size}_mmuidx_ra(env, ptr, mmu_idx, retaddr)
+>   *
+> - * store: cpu_st{sign}{size}_{mmusuffix}(env, ptr, val)
+> + * store: cpu_st{size}_{mmusuffix}(env, ptr, val)
+> + *        cpu_st{size}_{mmusuffix}_ra(env, ptr, val, retaddr)
+> + *        cpu_st{size}_mmuidx_ra(env, ptr, val, mmu_idx, retaddr)
+>   *
+>   * sign is:
+>   * (empty): for 32 and 64 bit sizes
+> @@ -40,9 +44,10 @@
+>   *   l: 32 bits
+>   *   q: 64 bits
+>   *
+> - * mmusuffix is one of the generic suffixes "data" or "code", or
+> - * (for softmmu configs)  a target-specific MMU mode suffix as defined
+> - * in target cpu.h.
+> + * mmusuffix is one of the generic suffixes "data" or "code", or "mmuidx=
+".
+> + * The "mmuidx" suffix carries an extra mmu_idx argument that specifies
+> + * the index to use; the "data" and "code" suffixes take the index from
+> + * cpu_mmu_index().
+>   */
+>  #ifndef CPU_LDST_H
+>  #define CPU_LDST_H
+> @@ -145,6 +150,71 @@ static inline void clear_helper_retaddr(void)
 >  #undef MEMSUFFIX
->
-> -#define CPU_MMU_INDEX (cpu_mmu_index(env, true))
-> -#define MEMSUFFIX _code
-> -#define SOFTMMU_CODE_ACCESS
-> +uint32_t cpu_ldub_code(CPUArchState *env, abi_ptr addr);
-> +uint32_t cpu_lduw_code(CPUArchState *env, abi_ptr addr);
-> +uint32_t cpu_ldl_code(CPUArchState *env, abi_ptr addr);
-> +uint64_t cpu_ldq_code(CPUArchState *env, abi_ptr addr);
->
-> -#define DATA_SIZE 1
-> -#include "exec/cpu_ldst_template.h"
-> +static inline int cpu_ldsb_code(CPUArchState *env, abi_ptr addr)
+>  #undef CODE_ACCESS
+>=20=20
+> +/*
+> + * Provide the same *_mmuidx_ra interface as for softmmu.
+> + * The mmu_idx argument is ignored.
+> + */
+> +
+> +static inline uint32_t cpu_ldub_mmuidx_ra(CPUArchState *env, abi_ptr add=
+r,
+> +                                          int mmu_idx, uintptr_t ra)
 > +{
-> +    return (int8_t)cpu_ldub_code(env, addr);
+> +    return cpu_ldub_data_ra(env, addr, ra);
 > +}
-<snip>
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -1290,27 +1290,6 @@ void helper_be_stl_mmu(CPUArchState *env, target_u=
-long addr, uint32_t val,
->  void helper_be_stq_mmu(CPUArchState *env, target_ulong addr, uint64_t va=
-l,
->                         TCGMemOpIdx oi, uintptr_t retaddr);
->
-> -uint8_t helper_ret_ldub_cmmu(CPUArchState *env, target_ulong addr,
-> -                            TCGMemOpIdx oi, uintptr_t retaddr);
-> -int8_t helper_ret_ldsb_cmmu(CPUArchState *env, target_ulong addr,
-> -                            TCGMemOpIdx oi, uintptr_t retaddr);
-> -uint16_t helper_le_lduw_cmmu(CPUArchState *env, target_ulong addr,
-> -                             TCGMemOpIdx oi, uintptr_t retaddr);
-> -int16_t helper_le_ldsw_cmmu(CPUArchState *env, target_ulong addr,
-> -                             TCGMemOpIdx oi, uintptr_t retaddr);
-> -uint32_t helper_le_ldl_cmmu(CPUArchState *env, target_ulong addr,
-> -                            TCGMemOpIdx oi, uintptr_t retaddr);
-> -uint64_t helper_le_ldq_cmmu(CPUArchState *env, target_ulong addr,
-> -                            TCGMemOpIdx oi, uintptr_t retaddr);
-> -uint16_t helper_be_lduw_cmmu(CPUArchState *env, target_ulong addr,
-> -                             TCGMemOpIdx oi, uintptr_t retaddr);
-> -int16_t helper_be_ldsw_cmmu(CPUArchState *env, target_ulong addr,
-> -                             TCGMemOpIdx oi, uintptr_t retaddr);
-> -uint32_t helper_be_ldl_cmmu(CPUArchState *env, target_ulong addr,
-> -                            TCGMemOpIdx oi, uintptr_t retaddr);
-> -uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
-> -                            TCGMemOpIdx oi, uintptr_t retaddr);
+> +
+> +static inline uint32_t cpu_lduw_mmuidx_ra(CPUArchState *env, abi_ptr add=
+r,
+> +                                          int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_lduw_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline uint32_t cpu_ldl_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                         int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldl_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline uint64_t cpu_ldq_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                         int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldq_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline int cpu_ldsb_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldsb_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline int cpu_ldsw_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldsw_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline void cpu_stb_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint32_t val, int mmu_idx, uintptr_=
+t ra)
+> +{
+> +    cpu_stb_data_ra(env, addr, val, ra);
+> +}
+> +
+> +static inline void cpu_stw_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint32_t val, int mmu_idx, uintptr_=
+t ra)
+> +{
+> +    cpu_stw_data_ra(env, addr, val, ra);
+> +}
+> +
+> +static inline void cpu_stl_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint32_t val, int mmu_idx, uintptr_=
+t ra)
+> +{
+> +    cpu_stl_data_ra(env, addr, val, ra);
+> +}
+> +
+> +static inline void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint64_t val, int mmu_idx, uintptr_=
+t ra)
+> +{
+> +    cpu_stq_data_ra(env, addr, val, ra);
+> +}
+> +
+>  #else
+>=20=20
+>  /* Needed for TCG_OVERSIZED_GUEST */
+> diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+> index 8a5bc912a5..03aa9e7ff8 100644
+> --- a/docs/devel/loads-stores.rst
+> +++ b/docs/devel/loads-stores.rst
+> @@ -72,31 +72,34 @@ Regexes for git grep
+>   - ``\<ldn_\([hbl]e\)?_p\>``
+>   - ``\<stn_\([hbl]e\)?_p\>``
+>=20=20
+> -``cpu_{ld,st}_*``
+> -~~~~~~~~~~~~~~~~~
+> +``cpu_{ld,st}*_mmuidx_ra``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~
+>=20=20
+> -These functions operate on a guest virtual address. Be aware
+> -that these functions may cause a guest CPU exception to be
+> -taken (e.g. for an alignment fault or MMU fault) which will
+> -result in guest CPU state being updated and control longjumping
+> -out of the function call. They should therefore only be used
+> -in code that is implementing emulation of the target CPU.
+> +These functions operate on a guest virtual address plus a context,
+> +known as a "mmu index" or ``mmuidx``, which controls how that virtual
+> +address is translated.  The meaning of the indexes are target specific,
+> +but specifying a particular index might be necessary if, for instance,
+> +the helper requires an "always as non-privileged" access rather that
+> +the default access for the current state of the guest CPU.
+>=20=20
+> -These functions may throw an exception (longjmp() back out
+> -to the top level TCG loop). This means they must only be used
+> -from helper functions where the translator has saved all
+> -necessary CPU state before generating the helper function call.
+> -It's usually better to use the ``_ra`` variants described below
+> -from helper functions, but these functions are the right choice
+> -for calls made from hooks like the CPU do_interrupt hook or
+> -when you know for certain that the translator had to save all
+> -the CPU state that ``cpu_restore_state()`` would restore anyway.
+> +These functions may cause a guest CPU exception to be taken
+> +(e.g. for an alignment fault or MMU fault) which will result in
+> +guest CPU state being updated and control longjmp'ing out of the
+> +function call.  They should therefore only be used in code that is
+> +implementing emulation of the guest CPU.
+> +
+> +The ``retaddr`` parameter is used to control unwinding of the
+> +guest CPU state in case of a guest CPU exception.  This is passed
+> +to ``cpu_restore_state()``.  Therefore the value should either be 0,
+> +to indicate that the guest CPU state is already synchronized, or
+> +the result of ``GETPC()`` from the top level ``HELPER(foo)``
+> +function, which is a return address into the generated code.
+>=20=20
+>  Function names follow the pattern:
+>=20=20
+> -load: ``cpu_ld{sign}{size}_{mmusuffix}(env, ptr)``
+> +load: ``cpu_ld{sign}{size}_mmuidx_ra(env, ptr, mmuidx, retaddr)``
+>=20=20
+> -store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
+> +store: ``cpu_st{size}_mmuidx_ra(env, ptr, val, mmuidx, retaddr)``
+>=20=20
+>  ``sign``
+>   - (empty) : for 32 or 64 bit sizes
+> @@ -109,56 +112,151 @@ store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
+>   - ``l`` : 32 bits
+>   - ``q`` : 64 bits
+>=20=20
+> -``mmusuffix`` is one of the generic suffixes ``data`` or ``code``, or
+> -(for softmmu configs) a target-specific MMU mode suffix as defined
+> -in the target's ``cpu.h``.
+> +Regexes for git grep:
+> + - ``\<cpu_ld[us]\?[bwlq]_mmuidx_ra\>``
+> + - ``\<cpu_st[bwlq]_mmuidx_ra\>``
+>=20=20
+> -Regexes for git grep
+> - - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+\>``
+> - - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+\>``
+> +``cpu_{ld,st}*_data_ra``
+> +~~~~~~~~~~~~~~~~~~~~~~~~
+>=20=20
+> -``cpu_{ld,st}_*_ra``
+> -~~~~~~~~~~~~~~~~~~~~
 > -
-<snip>
+> -These functions work like the ``cpu_{ld,st}_*`` functions except
+> -that they also take a ``retaddr`` argument. This extra argument
+> -allows for correct unwinding of any exception that is taken,
+> -and should generally be the result of GETPC() called directly
+> -from the top level HELPER(foo) function (i.e. the return address
+> -in the generated code).
+> +These functions work like the ``cpu_{ld,st}_mmuidx_ra`` functions
+> +except that the ``mmuidx`` parameter is taken from the current mode
+> +of the guest CPU, as determined by ``cpu_mmu_index(env, false)``.
+>=20=20
+>  These are generally the preferred way to do accesses by guest
+> -virtual address from helper functions; see the documentation
+> -of the non-``_ra`` variants for when those would be better.
+> -
+> -Calling these functions with a ``retaddr`` argument of 0 is
+> -equivalent to calling the non-``_ra`` version of the function.
+> +virtual address from helper functions, unless the access should
+> +be performed with a context other than the default.
+>=20=20
+>  Function names follow the pattern:
+>=20=20
+> -load: ``cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)``
+> +load: ``cpu_ld{sign}{size}_data_ra(env, ptr, ra)``
+>=20=20
+> -store: ``cpu_st{sign}{size}_{mmusuffix}_ra(env, ptr, val, retaddr)``
+> +store: ``cpu_st{size}_data_ra(env, ptr, val, ra)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+> +
+> +Regexes for git grep:
+> + - ``\<cpu_ld[us]\?[bwlq]_data_ra\>``
+> + - ``\<cpu_st[bwlq]_data_ra\>``
+> +
+> +``cpu_{ld,st}*_data``
+> +~~~~~~~~~~~~~~~~~~~~~
+> +
+> +These functions work like the ``cpu_{ld,st}_data_ra`` functions
+> +except that the ``retaddr`` parameter is 0, and thus does not
+> +unwind guest CPU state.
+> +
+> +This means they must only be used from helper functions where the
+> +translator has saved all necessary CPU state.  These functions are
+> +the right choice for calls made from hooks like the CPU ``do_interrupt``
+> +hook or when you know for certain that the translator had to save all
+> +the CPU state anyway.
+> +
+> +Function names follow the pattern:
+> +
+> +load: ``cpu_ld{sign}{size}_data(env, ptr)``
+> +
+> +store: ``cpu_st{size}_data(env, ptr, val)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+>=20=20
+>  Regexes for git grep
+> - - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+_ra\>``
+> - - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+_ra\>``
+> + - ``\<cpu_ld[us]\?[bwlq]_data\>``
+> + - ``\<cpu_st[bwlq]_data\+\>``
+>=20=20
+> -``helper_*_{ld,st}*mmu``
+> -~~~~~~~~~~~~~~~~~~~~~~~~
+> +``cpu_ld*_code``
+> +~~~~~~~~~~~~~~~~
+> +
+> +These functions perform a read for instruction execution.  The ``mmuidx``
+> +parameter is taken from the current mode of the guest CPU, as determined
+> +by ``cpu_mmu_index(env, true)``.  The ``retaddr`` parameter is 0, and
+> +thus does not unwind guest CPU state, because CPU state is always
+> +synchronized while translating instructions.  Any guest CPU exception
+> +that is raised will indicate an instruction execution fault rather than
+> +a data read fault.
+> +
+> +In general these functions should not be used directly during translatio=
+n.
+> +There are wrapper functions that are to be used which also take care of
+> +plugins for tracing.
+> +
+> +Function names follow the pattern:
+> +
+> +load: ``cpu_ld{sign}{size}_code(env, ptr)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+> +
+> +Regexes for git grep:
+> + - ``\<cpu_ld[us]\?[bwlq]_code\>``
+> +
+> +``translator_ld*``
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +These functions are a wrapper for ``cpu_ld*_code`` which also perform
+> +any actions required by any tracing plugins.  They are only to be
+> +called during the translator callback ``translate_insn``.
+> +
+> +There is a set of functions ending in ``_swap`` which, if the parameter
+> +is true, returns the value in the endianness that is the reverse of
+> +the guest native endianness, as determined by ``TARGET_WORDS_BIGENDIAN``.
+> +
+> +Function names follow the pattern:
+> +
+> +load: ``translator_ld{sign}{size}(env, ptr)``
+> +
+> +swap: ``translator_ld{sign}{size}_swap(env, ptr, swap)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+> +
+> +Regexes for git grep
+> + - ``\<translator_ld[us]\?[bwlq]\(_swap\)\?\>``
+> +
+> +``helper_*_{ld,st}*_mmu``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~
+>=20=20
+>  These functions are intended primarily to be called by the code
+>  generated by the TCG backend. They may also be called by target
+> -CPU helper function code. Like the ``cpu_{ld,st}_*_ra`` functions
+> -they perform accesses by guest virtual address; the difference is
+> -that these functions allow you to specify an ``opindex`` parameter
+> -which encodes (among other things) the mmu index to use for the
+> -access. This is necessary if your helper needs to make an access
+> -via a specific mmu index (for instance, an "always as non-privileged"
+> -access) rather than using the default mmu index for the current state
+> -of the guest CPU.
+> +CPU helper function code. Like the ``cpu_{ld,st}_mmuidx_ra`` functions
+> +they perform accesses by guest virtual address, with a given ``mmuidx``.
+>=20=20
+> -The ``opindex`` parameter should be created by calling ``make_memop_idx(=
+)``.
+> +These functions specify an ``opindex`` parameter which encodes
+> +(among other things) the mmu index to use for the access.  This parameter
+> +should be created by calling ``make_memop_idx()``.
+>=20=20
+>  The ``retaddr`` parameter should be the result of GETPC() called directly
+>  from the top level HELPER(foo) function (or 0 if no guest CPU state
+> @@ -166,8 +264,9 @@ unwinding is required).
+>=20=20
+>  **TODO** The names of these functions are a bit odd for historical
+>  reasons because they were originally expected to be called only from
+> -within generated code. We should rename them to bring them
+> -more in line with the other memory access functions.
+> +within generated code. We should rename them to bring them more in
+> +line with the other memory access functions. The explicit endianness
+> +is the only feature they have beyond ``*_mmuidx_ra``.
+>=20=20
+>  load: ``helper_{endian}_ld{sign}{size}_mmu(env, addr, opindex, retaddr)``
 
-Why have we dropped the final type and stuck to uint32/64? Do we rely on
-the caller truncating any data by casting the result of their eventual
-cpu_ldFoo?
 
---
+--=20
 Alex Benn=C3=A9e
 
