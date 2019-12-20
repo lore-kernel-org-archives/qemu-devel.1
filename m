@@ -2,80 +2,79 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A42FC2D0D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA9EBC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:10:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 485532072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:09:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 82A262072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:10:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6iNTKU7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485532072B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="atmZal39"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82A262072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJuV-0003vw-8Y
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:09:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46494)
+	id 1iiJut-0004Yo-MT
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:10:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45113)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiJre-00083t-8Y
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:06:53 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iiJr9-0007Av-CB
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:06:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiJrb-0000lC-FI
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:06:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27040
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iiJr7-00009K-RE
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:06:19 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40121
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iiJrb-0000kZ-9H
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:06:47 -0500
+ id 1iiJr7-00008P-Mc
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:06:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576854406;
+ s=mimecast20190719; t=1576854377;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=effoCluQjetDMtiGJN1mk73/sHpzXD9jUuYLQcldAZk=;
- b=N6iNTKU7Zvsa8KtAqYoQDDd6MN+fjrzc6w9gkkWdxUC69n7fxBNmQzjvu2PTr+Wu/NR9ge
- tp2EUqOjrIOIv88pBA2tP/T0mNpXf8alL3t2xg+/pCtYt5DpJSqvxK2XsdO+K3zP9na10H
- HDJLnqKfThR4AvN57GquQGmOfOrts4c=
+ bh=8khN/Yw4pybLPkt+SaIgtu20Dc95X9OgJvI+VEpF70g=;
+ b=atmZal39GnImpbVd4rEdYOrrSCtiCtmMHP9lkFtSENPflkttr5WSe1xfYA13zP9X/Slfqh
+ KmVV0DMBQoVNNPhnEsEwQR9vqXJjv5Rovuz0k7jW1ZfvN6nGtJCYD1IsQ+bEsI9Jqj0MH3
+ XOgePhwUnQfsQIEE/g7Vfv+7yyNObFs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-alIF_HoGMN2rtlGQc8wryQ-1; Fri, 20 Dec 2019 10:06:28 -0500
+ us-mta-288-d3_5E9afN4uKwZqBHc0y3g-1; Fri, 20 Dec 2019 10:06:04 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F94B80068B;
- Fri, 20 Dec 2019 15:06:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63065184BED5;
+ Fri, 20 Dec 2019 15:06:03 +0000 (UTC)
 Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5D5C226FC4;
- Fri, 20 Dec 2019 15:06:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 10CD326FBF;
+ Fri, 20 Dec 2019 15:05:58 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 5/9] Add dbus-vmstate object
-Date: Fri, 20 Dec 2019 19:05:18 +0400
-Message-Id: <20191220150522.633032-6-marcandre.lureau@redhat.com>
+Subject: [PULL 3/9] docs: start a document to describe D-Bus usage
+Date: Fri, 20 Dec 2019 19:05:16 +0400
+Message-Id: <20191220150522.633032-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20191220150522.633032-1-marcandre.lureau@redhat.com>
 References: <20191220150522.633032-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: alIF_HoGMN2rtlGQc8wryQ-1
+X-MC-Unique: d3_5E9afN4uKwZqBHc0y3g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,715 +94,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When instantiated, this object will connect to the given D-Bus bus
-"addr". During migration, it will take/restore the data from
-org.qemu.VMState1 instances. See documentation for details.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- MAINTAINERS                   |   2 +
- Makefile.objs                 |   1 +
- backends/Makefile.objs        |   4 +
- backends/dbus-vmstate.c       | 510 ++++++++++++++++++++++++++++++++++
- backends/trace-events         |   7 +
- docs/interop/dbus-vmstate.rst |  74 +++++
- docs/interop/dbus.rst         |   5 +
- docs/interop/index.rst        |   1 +
- 8 files changed, 604 insertions(+)
- create mode 100644 backends/dbus-vmstate.c
- create mode 100644 backends/trace-events
- create mode 100644 docs/interop/dbus-vmstate.rst
+ MAINTAINERS            |   5 ++
+ docs/interop/dbus.rst  | 105 +++++++++++++++++++++++++++++++++++++++++
+ docs/interop/index.rst |   1 +
+ 3 files changed, 111 insertions(+)
+ create mode 100644 docs/interop/dbus.rst
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index a3519a8ec8..d19b9de064 100644
+index 0d2c909070..a722d030d9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2209,9 +2209,11 @@ F: qapi/migration.json
- D-Bus
- M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
- S: Maintained
-+F: backends/dbus-vmstate.c
- F: util/dbus.c
- F: include/qemu/dbus.h
- F: docs/interop/dbus.rst
-+F: docs/interop/dbus-vmstate.rst
+@@ -2206,6 +2206,11 @@ F: tests/migration-test.c
+ F: docs/devel/migration.rst
+ F: qapi/migration.json
 =20
++D-Bus
++M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++S: Maintained
++F: docs/interop/dbus.rst
++
  Seccomp
  M: Eduardo Otubo <otubo@redhat.com>
-diff --git a/Makefile.objs b/Makefile.objs
-index 02bf5ce11d..7c1e50f9d6 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -128,6 +128,7 @@ vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
- trace-events-subdirs =3D
- trace-events-subdirs +=3D accel/kvm
- trace-events-subdirs +=3D accel/tcg
-+trace-events-subdirs +=3D backends
- trace-events-subdirs +=3D crypto
- trace-events-subdirs +=3D monitor
- ifeq ($(CONFIG_USER_ONLY),y)
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index f0691116e8..28a847cd57 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -17,3 +17,7 @@ endif
- common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_VIRTIO)) +=3D vhost-u=
-ser.o
-=20
- common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
-+
-+common-obj-$(CONFIG_GIO) +=3D dbus-vmstate.o
-+dbus-vmstate.o-cflags =3D $(GIO_CFLAGS)
-+dbus-vmstate.o-libs =3D $(GIO_LIBS)
-diff --git a/backends/dbus-vmstate.c b/backends/dbus-vmstate.c
+ S: Supported
+diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
 new file mode 100644
-index 0000000000..8116181fc0
+index 0000000000..ef80d4204d
 --- /dev/null
-+++ b/backends/dbus-vmstate.c
-@@ -0,0 +1,510 @@
-+/*
-+ * QEMU dbus-vmstate
-+ *
-+ * Copyright (C) 2019 Red Hat Inc
-+ *
-+ * Authors:
-+ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "qemu/dbus.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "qom/object_interfaces.h"
-+#include "qapi/qmp/qerror.h"
-+#include "migration/vmstate.h"
-+#include "trace.h"
-+
-+typedef struct DBusVMState DBusVMState;
-+typedef struct DBusVMStateClass DBusVMStateClass;
-+
-+#define TYPE_DBUS_VMSTATE "dbus-vmstate"
-+#define DBUS_VMSTATE(obj)                                \
-+    OBJECT_CHECK(DBusVMState, (obj), TYPE_DBUS_VMSTATE)
-+#define DBUS_VMSTATE_GET_CLASS(obj)                              \
-+    OBJECT_GET_CLASS(DBusVMStateClass, (obj), TYPE_DBUS_VMSTATE)
-+#define DBUS_VMSTATE_CLASS(klass)                                    \
-+    OBJECT_CLASS_CHECK(DBusVMStateClass, (klass), TYPE_DBUS_VMSTATE)
-+
-+struct DBusVMStateClass {
-+    ObjectClass parent_class;
-+};
-+
-+struct DBusVMState {
-+    Object parent;
-+
-+    GDBusConnection *bus;
-+    char *dbus_addr;
-+    char *id_list;
-+
-+    uint32_t data_size;
-+    uint8_t *data;
-+};
-+
-+static const GDBusPropertyInfo vmstate_property_info[] =3D {
-+    { -1, (char *) "Id", (char *) "s",
-+      G_DBUS_PROPERTY_INFO_FLAGS_READABLE, NULL },
-+};
-+
-+static const GDBusPropertyInfo * const vmstate_property_info_pointers[] =
-=3D {
-+    &vmstate_property_info[0],
-+    NULL
-+};
-+
-+static const GDBusInterfaceInfo vmstate1_interface_info =3D {
-+    -1,
-+    (char *) "org.qemu.VMState1",
-+    (GDBusMethodInfo **) NULL,
-+    (GDBusSignalInfo **) NULL,
-+    (GDBusPropertyInfo **) &vmstate_property_info_pointers,
-+    NULL,
-+};
-+
-+#define DBUS_VMSTATE_SIZE_LIMIT (1 * MiB)
-+
-+static GHashTable *
-+get_id_list_set(DBusVMState *self)
-+{
-+    g_auto(GStrv) ids =3D NULL;
-+    g_autoptr(GHashTable) set =3D NULL;
-+    int i;
-+
-+    if (!self->id_list) {
-+        return NULL;
-+    }
-+
-+    ids =3D g_strsplit(self->id_list, ",", -1);
-+    set =3D g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-+    for (i =3D 0; ids[i]; i++) {
-+        g_hash_table_add(set, ids[i]);
-+        ids[i] =3D NULL;
-+    }
-+
-+    return g_steal_pointer(&set);
-+}
-+
-+static GHashTable *
-+dbus_get_proxies(DBusVMState *self, GError **err)
-+{
-+    g_autoptr(GHashTable) proxies =3D NULL;
-+    g_autoptr(GHashTable) ids =3D NULL;
-+    g_auto(GStrv) names =3D NULL;
-+    Error *error =3D NULL;
-+    size_t i;
-+
-+    ids =3D get_id_list_set(self);
-+    proxies =3D g_hash_table_new_full(g_str_hash, g_str_equal,
-+                                    g_free, g_object_unref);
-+
-+    names =3D qemu_dbus_get_queued_owners(self->bus, "org.qemu.VMState1", =
-&error);
-+    if (!names) {
-+        g_set_error(err, G_IO_ERROR, G_IO_ERROR_FAILED, "%s",
-+                    error_get_pretty(error));
-+        error_free(error);
-+        return NULL;
-+    }
-+
-+    for (i =3D 0; names[i]; i++) {
-+        g_autoptr(GDBusProxy) proxy =3D NULL;
-+        g_autoptr(GVariant) result =3D NULL;
-+        g_autofree char *id =3D NULL;
-+        size_t size;
-+
-+        proxy =3D g_dbus_proxy_new_sync(self->bus, G_DBUS_PROXY_FLAGS_NONE=
-,
-+                    (GDBusInterfaceInfo *) &vmstate1_interface_info,
-+                    names[i],
-+                    "/org/qemu/VMState1",
-+                    "org.qemu.VMState1",
-+                    NULL, err);
-+        if (!proxy) {
-+            return NULL;
-+        }
-+
-+        result =3D g_dbus_proxy_get_cached_property(proxy, "Id");
-+        if (!result) {
-+            g_set_error_literal(err, G_IO_ERROR, G_IO_ERROR_FAILED,
-+                                "VMState Id property is missing.");
-+            return NULL;
-+        }
-+
-+        id =3D g_variant_dup_string(result, &size);
-+        if (ids && !g_hash_table_remove(ids, id)) {
-+            g_clear_pointer(&id, g_free);
-+            g_clear_object(&proxy);
-+            continue;
-+        }
-+        if (size =3D=3D 0 || size >=3D 256) {
-+            g_set_error(err, G_IO_ERROR, G_IO_ERROR_FAILED,
-+                        "VMState Id '%s' is invalid.", id);
-+            return NULL;
-+        }
-+
-+        if (!g_hash_table_insert(proxies, id, proxy)) {
-+            g_set_error(err, G_IO_ERROR, G_IO_ERROR_FAILED,
-+                        "Duplicated VMState Id '%s'", id);
-+            return NULL;
-+        }
-+        id =3D NULL;
-+        proxy =3D NULL;
-+
-+        g_clear_pointer(&result, g_variant_unref);
-+    }
-+
-+    if (ids) {
-+        g_autofree char **left =3D NULL;
-+
-+        left =3D (char **)g_hash_table_get_keys_as_array(ids, NULL);
-+        if (*left) {
-+            g_autofree char *leftids =3D g_strjoinv(",", left);
-+            g_set_error(err, G_IO_ERROR, G_IO_ERROR_FAILED,
-+                        "Required VMState Id are missing: %s", leftids);
-+            return NULL;
-+        }
-+    }
-+
-+    return g_steal_pointer(&proxies);
-+}
-+
-+static int
-+dbus_load_state_proxy(GDBusProxy *proxy, const uint8_t *data, size_t size)
-+{
-+    g_autoptr(GError) err =3D NULL;
-+    g_autoptr(GVariant) result =3D NULL;
-+    g_autoptr(GVariant) value =3D NULL;
-+
-+    value =3D g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE,
-+                                      data, size, sizeof(char));
-+    result =3D g_dbus_proxy_call_sync(proxy, "Load",
-+                                    g_variant_new("(@ay)",
-+                                                  g_steal_pointer(&value))=
-,
-+                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
-+                                    -1, NULL, &err);
-+    if (!result) {
-+        error_report("%s: Failed to Load: %s", __func__, err->message);
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int dbus_vmstate_post_load(void *opaque, int version_id)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(opaque);
-+    g_autoptr(GInputStream) m =3D NULL;
-+    g_autoptr(GDataInputStream) s =3D NULL;
-+    g_autoptr(GError) err =3D NULL;
-+    g_autoptr(GHashTable) proxies =3D NULL;
-+    uint32_t nelem;
-+
-+    trace_dbus_vmstate_post_load(version_id);
-+
-+    proxies =3D dbus_get_proxies(self, &err);
-+    if (!proxies) {
-+        error_report("%s: Failed to get proxies: %s", __func__, err->messa=
-ge);
-+        return -1;
-+    }
-+
-+    m =3D g_memory_input_stream_new_from_data(self->data, self->data_size,=
- NULL);
-+    s =3D g_data_input_stream_new(m);
-+    g_data_input_stream_set_byte_order(s, G_DATA_STREAM_BYTE_ORDER_BIG_END=
-IAN);
-+
-+    nelem =3D g_data_input_stream_read_uint32(s, NULL, &err);
-+    if (err) {
-+        goto error;
-+    }
-+
-+    while (nelem > 0) {
-+        GDBusProxy *proxy =3D NULL;
-+        uint32_t len;
-+        gsize bytes_read, avail;
-+        char id[256];
-+
-+        len =3D g_data_input_stream_read_uint32(s, NULL, &err);
-+        if (err) {
-+            goto error;
-+        }
-+        if (len >=3D 256) {
-+            error_report("%s: Invalid DBus vmstate proxy name %u",
-+                         __func__, len);
-+            return -1;
-+        }
-+        if (!g_input_stream_read_all(G_INPUT_STREAM(s), id, len,
-+                                     &bytes_read, NULL, &err)) {
-+            goto error;
-+        }
-+        g_return_val_if_fail(bytes_read =3D=3D len, -1);
-+        id[len] =3D 0;
-+
-+        trace_dbus_vmstate_loading(id);
-+
-+        proxy =3D g_hash_table_lookup(proxies, id);
-+        if (!proxy) {
-+            error_report("%s: Failed to find proxy Id '%s'", __func__, id)=
-;
-+            return -1;
-+        }
-+
-+        len =3D g_data_input_stream_read_uint32(s, NULL, &err);
-+        avail =3D g_buffered_input_stream_get_available(
-+            G_BUFFERED_INPUT_STREAM(s));
-+
-+        if (len > DBUS_VMSTATE_SIZE_LIMIT || len > avail) {
-+            error_report("%s: Invalid vmstate size: %u", __func__, len);
-+            return -1;
-+        }
-+
-+        if (dbus_load_state_proxy(proxy,
-+                g_buffered_input_stream_peek_buffer(G_BUFFERED_INPUT_STREA=
-M(s),
-+                                                    NULL),
-+                len) < 0) {
-+            error_report("%s: Failed to restore Id '%s'", __func__, id);
-+            return -1;
-+        }
-+
-+        if (!g_seekable_seek(G_SEEKABLE(s), len, G_SEEK_CUR, NULL, &err)) =
-{
-+            goto error;
-+        }
-+
-+        nelem -=3D 1;
-+    }
-+
-+    return 0;
-+
-+error:
-+    error_report("%s: Failed to read from stream: %s", __func__, err->mess=
-age);
-+    return -1;
-+}
-+
-+static void
-+dbus_save_state_proxy(gpointer key,
-+                      gpointer value,
-+                      gpointer user_data)
-+{
-+    GDataOutputStream *s =3D user_data;
-+    const char *id =3D key;
-+    GDBusProxy *proxy =3D value;
-+    g_autoptr(GVariant) result =3D NULL;
-+    g_autoptr(GVariant) child =3D NULL;
-+    g_autoptr(GError) err =3D NULL;
-+    const uint8_t *data;
-+    gsize size;
-+
-+    trace_dbus_vmstate_saving(id);
-+
-+    result =3D g_dbus_proxy_call_sync(proxy, "Save",
-+                                    NULL, G_DBUS_CALL_FLAGS_NO_AUTO_START,
-+                                    -1, NULL, &err);
-+    if (!result) {
-+        error_report("%s: Failed to Save: %s", __func__, err->message);
-+        return;
-+    }
-+
-+    child =3D g_variant_get_child_value(result, 0);
-+    data =3D g_variant_get_fixed_array(child, &size, sizeof(char));
-+    if (!data) {
-+        error_report("%s: Failed to Save: not a byte array", __func__);
-+        return;
-+    }
-+    if (size > DBUS_VMSTATE_SIZE_LIMIT) {
-+        error_report("%s: Too large vmstate data to save: %" G_GSIZE_FORMA=
-T,
-+                     __func__, size);
-+        return;
-+    }
-+
-+    if (!g_data_output_stream_put_uint32(s, strlen(id), NULL, &err) ||
-+        !g_data_output_stream_put_string(s, id, NULL, &err) ||
-+        !g_data_output_stream_put_uint32(s, size, NULL, &err) ||
-+        !g_output_stream_write_all(G_OUTPUT_STREAM(s),
-+                                   data, size, NULL, NULL, &err)) {
-+        error_report("%s: Failed to write to stream: %s",
-+                     __func__, err->message);
-+    }
-+}
-+
-+static int dbus_vmstate_pre_save(void *opaque)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(opaque);
-+    g_autoptr(GOutputStream) m =3D NULL;
-+    g_autoptr(GDataOutputStream) s =3D NULL;
-+    g_autoptr(GHashTable) proxies =3D NULL;
-+    g_autoptr(GError) err =3D NULL;
-+
-+    trace_dbus_vmstate_pre_save();
-+
-+    proxies =3D dbus_get_proxies(self, &err);
-+    if (!proxies) {
-+        error_report("%s: Failed to get proxies: %s", __func__, err->messa=
-ge);
-+        return -1;
-+    }
-+
-+    m =3D g_memory_output_stream_new_resizable();
-+    s =3D g_data_output_stream_new(m);
-+    g_data_output_stream_set_byte_order(s, G_DATA_STREAM_BYTE_ORDER_BIG_EN=
-DIAN);
-+
-+    if (!g_data_output_stream_put_uint32(s, g_hash_table_size(proxies),
-+                                         NULL, &err)) {
-+        error_report("%s: Failed to write to stream: %s",
-+                     __func__, err->message);
-+        return -1;
-+    }
-+
-+    g_hash_table_foreach(proxies, dbus_save_state_proxy, s);
-+
-+    if (g_memory_output_stream_get_size(G_MEMORY_OUTPUT_STREAM(m))
-+        > UINT32_MAX) {
-+        error_report("%s: DBus vmstate buffer is too large", __func__);
-+        return -1;
-+    }
-+
-+    if (!g_output_stream_close(G_OUTPUT_STREAM(m), NULL, &err)) {
-+        error_report("%s: Failed to close stream: %s", __func__, err->mess=
-age);
-+        return -1;
-+    }
-+
-+    g_free(self->data);
-+    self->data_size =3D
-+        g_memory_output_stream_get_size(G_MEMORY_OUTPUT_STREAM(m));
-+    self->data =3D
-+        g_memory_output_stream_steal_data(G_MEMORY_OUTPUT_STREAM(m));
-+
-+    return 0;
-+}
-+
-+static const VMStateDescription dbus_vmstate =3D {
-+    .name =3D TYPE_DBUS_VMSTATE,
-+    .version_id =3D 0,
-+    .pre_save =3D dbus_vmstate_pre_save,
-+    .post_load =3D dbus_vmstate_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(data_size, DBusVMState),
-+        VMSTATE_VBUFFER_ALLOC_UINT32(data, DBusVMState, 0, 0, data_size),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void
-+dbus_vmstate_complete(UserCreatable *uc, Error **errp)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(uc);
-+    g_autoptr(GError) err =3D NULL;
-+
-+    if (!object_resolve_path_type("", TYPE_DBUS_VMSTATE, NULL)) {
-+        error_setg(errp, "There is already an instance of %s",
-+                   TYPE_DBUS_VMSTATE);
-+        return;
-+    }
-+
-+    if (!self->dbus_addr) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, "addr");
-+        return;
-+    }
-+
-+    self->bus =3D g_dbus_connection_new_for_address_sync(self->dbus_addr,
-+                    G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT |
-+                    G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION,
-+                    NULL, NULL, &err);
-+    if (err) {
-+        error_setg(errp, "failed to connect to DBus: '%s'", err->message);
-+        return;
-+    }
-+
-+    if (vmstate_register(VMSTATE_IF(self), -1, &dbus_vmstate, self) < 0) {
-+        error_setg(errp, "Failed to register vmstate");
-+    }
-+}
-+
-+static void
-+dbus_vmstate_finalize(Object *o)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(o);
-+
-+    vmstate_unregister(VMSTATE_IF(self), &dbus_vmstate, self);
-+
-+    g_clear_object(&self->bus);
-+    g_free(self->dbus_addr);
-+    g_free(self->id_list);
-+    g_free(self->data);
-+}
-+
-+static char *
-+get_dbus_addr(Object *o, Error **errp)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(o);
-+
-+    return g_strdup(self->dbus_addr);
-+}
-+
-+static void
-+set_dbus_addr(Object *o, const char *str, Error **errp)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(o);
-+
-+    g_free(self->dbus_addr);
-+    self->dbus_addr =3D g_strdup(str);
-+}
-+
-+static char *
-+get_id_list(Object *o, Error **errp)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(o);
-+
-+    return g_strdup(self->id_list);
-+}
-+
-+static void
-+set_id_list(Object *o, const char *str, Error **errp)
-+{
-+    DBusVMState *self =3D DBUS_VMSTATE(o);
-+
-+    g_free(self->id_list);
-+    self->id_list =3D g_strdup(str);
-+}
-+
-+static char *
-+dbus_vmstate_get_id(VMStateIf *vmif)
-+{
-+    return g_strdup(TYPE_DBUS_VMSTATE);
-+}
-+
-+static void
-+dbus_vmstate_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-+    VMStateIfClass *vc =3D VMSTATE_IF_CLASS(oc);
-+
-+    ucc->complete =3D dbus_vmstate_complete;
-+    vc->get_id =3D dbus_vmstate_get_id;
-+
-+    object_class_property_add_str(oc, "addr",
-+                                  get_dbus_addr, set_dbus_addr,
-+                                  &error_abort);
-+    object_class_property_add_str(oc, "id-list",
-+                                  get_id_list, set_id_list,
-+                                  &error_abort);
-+}
-+
-+static const TypeInfo dbus_vmstate_info =3D {
-+    .name =3D TYPE_DBUS_VMSTATE,
-+    .parent =3D TYPE_OBJECT,
-+    .instance_size =3D sizeof(DBusVMState),
-+    .instance_finalize =3D dbus_vmstate_finalize,
-+    .class_size =3D sizeof(DBusVMStateClass),
-+    .class_init =3D dbus_vmstate_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { TYPE_VMSTATE_IF },
-+        { }
-+    }
-+};
-+
-+static void
-+register_types(void)
-+{
-+    type_register_static(&dbus_vmstate_info);
-+}
-+
-+type_init(register_types);
-diff --git a/backends/trace-events b/backends/trace-events
-new file mode 100644
-index 0000000000..59058f7630
---- /dev/null
-+++ b/backends/trace-events
-@@ -0,0 +1,7 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# dbus-vmstate.c
-+dbus_vmstate_pre_save(void)
-+dbus_vmstate_post_load(int version_id) "version_id: %d"
-+dbus_vmstate_loading(const char *id) "id: %s"
-+dbus_vmstate_saving(const char *id) "id: %s"
-diff --git a/docs/interop/dbus-vmstate.rst b/docs/interop/dbus-vmstate.rst
-new file mode 100644
-index 0000000000..1d719c1c60
---- /dev/null
-+++ b/docs/interop/dbus-vmstate.rst
-@@ -0,0 +1,74 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+D-Bus VMState
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++++ b/docs/interop/dbus.rst
+@@ -0,0 +1,105 @@
++=3D=3D=3D=3D=3D
++D-Bus
++=3D=3D=3D=3D=3D
 +
 +Introduction
 +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+The QEMU dbus-vmstate object's aim is to migrate helpers' data running
-+on a QEMU D-Bus bus. (refer to the :doc:`dbus` document for
-+some recommendations on D-Bus usage)
++QEMU may be running with various helper processes involved:
++ - vhost-user* processes (gpu, virtfs, input, etc...)
++ - TPM emulation (or other devices)
++ - user networking (slirp)
++ - network services (DHCP/DNS, samba/ftp etc)
++ - background tasks (compression, streaming etc)
++ - client UI
++ - admin & cli
 +
-+Upon migration, QEMU will go through the queue of
-+``org.qemu.VMState1`` D-Bus name owners and query their ``Id``. It
-+must be unique among the helpers.
++Having several processes allows stricter security rules, as well as
++greater modularity.
 +
-+It will then save arbitrary data of each Id to be transferred in the
-+migration stream and restored/loaded at the corresponding destination
-+helper.
++While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
++display), D-Bus is the de facto IPC of choice on Unix systems. The
++wire format is machine friendly, good bindings exist for various
++languages, and there are various tools available.
 +
-+For now, the data amount to be transferred is arbitrarily limited to
-+1Mb. The state must be saved quickly (a fraction of a second). (D-Bus
-+imposes a time limit on reply anyway, and migration would fail if data
-+isn't given quickly enough.)
++Using a bus, helper processes can discover and communicate with each
++other easily, without going through QEMU. The bus topology is also
++easier to apprehend and debug than a mesh. However, it is wise to
++consider the security aspects of it.
 +
-+dbus-vmstate object can be configured with the expected list of
-+helpers by setting its ``id-list`` property, with a comma-separated
-+``Id`` list.
++Security
++=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+Interface
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D
++A QEMU D-Bus bus should be private to a single VM. Thus, only
++cooperative tasks are running on the same bus to serve the VM.
 +
-+On object path ``/org/qemu/VMState1``, the following
-+``org.qemu.VMState1`` interface should be implemented:
++D-Bus, the protocol and standard, doesn't have mechanisms to enforce
++security between peers once the connection is established. Peers may
++have additional mechanisms to enforce security rules, based for
++example on UNIX credentials.
++
++The daemon can control which peers can send/recv messages using
++various metadata attributes, however, this is alone is not generally
++sufficient to make the deployment secure.  The semantics of the actual
++methods implemented using D-Bus are just as critical. Peers need to
++carefully validate any information they received from a peer with a
++different trust level.
++
++dbus-daemon policy
++------------------
++
++dbus-daemon can enforce various policies based on the UID/GID of the
++processes that are connected to it. It is thus a good idea to run
++helpers as different UID from QEMU and set appropriate policies.
++
++Depending on the use case, you may choose different scenarios:
++
++ - Everything the same UID
++
++   - Convenient for developers
++   - Improved reliability - crash of one part doens't take
++     out entire VM
++   - No security benefit over traditional QEMU, unless additional
++     unless additional controls such as SELinux or AppArmor are
++     applied
++
++ - Two UIDs, one for QEMU, one for dbus & helpers
++
++   - Moderately improved user based security isolation
++
++ - Many UIDs, one for QEMU one for dbus and one for each helpers
++
++   - Best user based security isolation
++   - Complex to manager distinct UIDs needed for each VM
++
++For example, to allow only ``qemu`` user to talk to ``qemu-helper``
++``org.qemu.Helper1`` service, a dbus-daemon policy may contain:
 +
 +.. code:: xml
 +
-+  <interface name=3D"org.qemu.VMState1">
-+    <property name=3D"Id" type=3D"s" access=3D"read"/>
-+    <method name=3D"Load">
-+      <arg type=3D"ay" name=3D"data" direction=3D"in"/>
-+    </method>
-+    <method name=3D"Save">
-+      <arg type=3D"ay" name=3D"data" direction=3D"out"/>
-+    </method>
-+  </interface>
++  <policy user=3D"qemu">
++     <allow send_destination=3D"org.qemu.Helper1"/>
++     <allow receive_sender=3D"org.qemu.Helper1"/>
++  </policy>
 +
-+"Id" property
-+-------------
++  <policy user=3D"qemu-helper">
++     <allow own=3D"org.qemu.Helper1"/>
++  </policy>
 +
-+A string that identifies the helper uniquely. (maximum 256 bytes
-+including terminating NUL byte)
 +
-+.. note::
++dbus-daemon can also perfom SELinux checks based on the security
++context of the source and the target. For example, ``virtiofs_t``
++could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
++wouldn't be allowed to send a message to ``virtiofs_t``.
 +
-+   The helper ID namespace is a separate namespace. In particular, it is n=
-ot
-+   related to QEMU "id" used in -object/-device objects.
++See dbus-daemon man page for details.
 +
-+Load(in u8[] bytes) method
-+--------------------------
++Guidelines
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 +
-+The method called on destination with the state to restore.
++When implementing new D-Bus interfaces, it is recommended to follow
++the "D-Bus API Design Guidelines":
++https://dbus.freedesktop.org/doc/dbus-api-design.html
 +
-+The helper may be initially started in a waiting state (with
-+an --incoming argument for example), and it may resume on success.
-+
-+An error may be returned to the caller.
-+
-+Save(out u8[] bytes) method
-+---------------------------
-+
-+The method called on the source to get the current state to be
-+migrated. The helper should continue to run normally.
-+
-+An error may be returned to the caller.
-diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
-index ef80d4204d..76a5bde625 100644
---- a/docs/interop/dbus.rst
-+++ b/docs/interop/dbus.rst
-@@ -103,3 +103,8 @@ https://dbus.freedesktop.org/doc/dbus-api-design.html
-=20
- The "org.qemu.*" prefix is reserved for services implemented &
- distributed by the QEMU project.
-+
-+QEMU Interfaces
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+:doc:`dbus-vmstate`
++The "org.qemu.*" prefix is reserved for services implemented &
++distributed by the QEMU project.
 diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index ded134ea75..049387ac6d 100644
+index 3e33fb5933..ded134ea75 100644
 --- a/docs/interop/index.rst
 +++ b/docs/interop/index.rst
-@@ -14,6 +14,7 @@ Contents:
+@@ -13,6 +13,7 @@ Contents:
+    :maxdepth: 2
 =20
     bitmaps
-    dbus
-+   dbus-vmstate
++   dbus
     live-block-operations
     pr-helper
     qemu-ga
