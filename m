@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9769C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 22:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E9CC2D0D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 22:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACEE62082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 22:00:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DB8A2146E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 22:05:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M3DdkaCr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACEE62082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYOjuCn+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DB8A2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiQJV-00027D-M8
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 17:00:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36117)
+	id 1iiQOz-0004FZ-CS
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 17:05:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iiQIM-0000no-LB
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:59:12 -0500
+ (envelope-from <eblake@redhat.com>) id 1iiQO1-0003ce-MP
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 17:04:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iiQI1-000099-6A
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:58:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23819
+ (envelope-from <eblake@redhat.com>) id 1iiQO0-0005wq-75
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 17:04:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43988
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iiQI0-0008Uf-RJ
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:58:29 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iiQO0-0005qy-1G
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 17:04:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576879107;
+ s=mimecast20190719; t=1576879478;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CXgcWYExOz2HeuQSzSPZEw7iwzRIvdSCDl54l+JjxB4=;
- b=M3DdkaCrg9DJU3ix8OQuT7+hNOzmaaWf5H/qvHzbqeIXMpn6AzAKtwTQB1AjVmN21aGd7U
- +I9GaLFF90iPe7QqqDPBrs7i2x45RE8NIvm3yKGDcPzTWCiwjwa65vnbI1JweuMZKtYdHN
- 47eyVJzfhPffljsGLwHBJVXRtkm4bOI=
+ bh=hnlyTZgOJHAsuOfa5IIIVZoQbVuOJQdF4irQMuSvRUI=;
+ b=LYOjuCn+BdMscxUjxuTYOiPWLrc84fa3HeFCryzI6p6ASsIq84/iOSHWZM8Dmd5skAXvXp
+ U6wEAlxXUS0z6lNtvKQFrCfCM2AZHbKHdu9bN+lrwYP2qN2fkGAgDJ1R2gggSwUt9czQ1e
+ FZF6P2vo94+MO1oFMbwded8IHE8SbqQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-126-GYD1a1gaMBK38ZeS0HNAyg-1; Fri, 20 Dec 2019 16:58:24 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-123-WdqA6BXMMmyj-AVouyQswg-1; Fri, 20 Dec 2019 17:04:37 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F22582EE3;
- Fri, 20 Dec 2019 21:58:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 344C2107ACC4;
+ Fri, 20 Dec 2019 22:04:36 +0000 (UTC)
 Received: from [10.3.116.246] (ovpn-116-246.phx2.redhat.com [10.3.116.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4067619C68;
- Fri, 20 Dec 2019 21:58:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E29B5D729;
+ Fri, 20 Dec 2019 22:04:35 +0000 (UTC)
 Subject: Re: [PATCH] qapi/block: fix nbd-server-add spec
 To: Nir Soffer <nsoffer@redhat.com>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
@@ -64,23 +64,25 @@ References: <20191219143415.28490-1-vsementsov@virtuozzo.com>
  <CAMRbyyt8Y8DFV5=72+GvHrAWbdUO5Mys5JGn7D8es+w2SVcRMA@mail.gmail.com>
  <c97f28de-c924-bc42-4725-09b633a28674@virtuozzo.com>
  <CAMRbyyv+h7UrR-vPJVMeGQpp-8Di-VuAZJit798L0Wda0BiE7A@mail.gmail.com>
+ <0d6ea2fe-2f4f-00d4-2f13-20591b56310d@virtuozzo.com>
+ <CAMRbyys6na7S4q00VR81LNhfNvtEXUAFQV=2R1O506+p_U+VKA@mail.gmail.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <dce85cb2-7ade-879f-52eb-82157048e0e0@redhat.com>
-Date: Fri, 20 Dec 2019 15:58:21 -0600
+Message-ID: <6a3120ba-fcb1-568c-5e1c-8226623e416b@redhat.com>
+Date: Fri, 20 Dec 2019 16:04:35 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAMRbyyv+h7UrR-vPJVMeGQpp-8Di-VuAZJit798L0Wda0BiE7A@mail.gmail.com>
+In-Reply-To: <CAMRbyys6na7S4q00VR81LNhfNvtEXUAFQV=2R1O506+p_U+VKA@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: GYD1a1gaMBK38ZeS0HNAyg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: WdqA6BXMMmyj-AVouyQswg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,65 +101,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/19/19 9:08 AM, Nir Soffer wrote:
+On 12/19/19 10:14 AM, Nir Soffer wrote:
 
->>>> Let's just fix qapi spec now.
+>>>> 1. Using disk name as a bitmap name is a bad behavior, as they are completely
+>>>> different concepts. Especially keeping in mind that user already knows disk name anyway
+>>>> and no reason to write this export name inside metadata context of this export.
 >>>
->>> But qapi documents a better behavior for users. We should fix the code instead
->>> to mach the docs.
+>>> The different concept is expressed by the "qemu:dirty-bitmap:" prefix.
+>>> "qemu:dirty-bitmap:export-name" means the dirty bitmap for this export.
 >>
->> 1. Using disk name as a bitmap name is a bad behavior, as they are completely
->> different concepts. Especially keeping in mind that user already knows disk name anyway
->> and no reason to write this export name inside metadata context of this export.
+>> Why do you think so? Did you read NBD specification?
 > 
-> The different concept is expressed by the "qemu:dirty-bitmap:" prefix.
-> "qemu:dirty-bitmap:export-name" means the dirty bitmap for this export.
-> 
->> 2. It's not directly documented. You assume that NAME == @name. I understand that
->> it may be assumed.. But it's not documented.
-> 
-> But NAME is likely to be understood as the name argument, and unlikely to be the
-> bitmap name.
+> Yes - the name of the bitmap does not have any meaning.
+> But for nbd_server_add we allow only single bitmap for export.
 
-That's a misunderstanding due to poor docs.  The bitmap name has always 
-been what was exposed, ever since we promoted things to stable by 
-getting rid of x-.
+Just because qemu is currently limited to only exposing one bitmap at 
+the moment does not mean that a future version can't expose multiple 
+bitmaps. It may very well be that we have reason to expose both 
+"qemu:dirty-bitmap:timeA" and "qemu:dirty-bitmap:timeB" on the same 
+export, for exposing two bitmaps at once.  To get to that point, we'd 
+have to refactor the QAPI command to allow attaching more than one 
+bitmap at the time of creating the NBD export, but it's not impossible.
 
 > 
->> 3. It's never worked like you write. So if we change the behavior, we'll break
->> existing users.
+>> Metadata context is always owned by some export.
 > 
-> Do we have existing users? isn't this new feature in 4.2?
+> Of course.
+> 
+>> Do you mean that there will bemetadata contexts
+>>
+>> qemu:dirty-bitmap:export-A
+>> qemu:dirty-bitmap:export-B
+>>
+>> both defined for export-A?
+> 
+> It does not make sense, but it is valid.
 
-No, the feature stems back to 4.0, when we got rid of x-.  There are 
-other reasons that dirty bitmaps aren't really usable for incremental 
-backups without qemu 4.2, but qemu 4.0 was the first time we exposed a 
-stable interface for a bitmap over an NBD export, and that release used 
-the bitmap name (and not the export name), so at this point, a code 
-change would break expectations of any 4.0 client using bitmaps for 
-other reasons.  Libvirt currently has absolute control over the bitmap 
-name (my initial code in libvirt created a temporary bitmap with my 
-desired name, then merged the contents from the permanent bitmaps 
-corresponding to the actual libvirt Checkpoint objects into the 
-temporary, so that it could then call nbd-export-add with the temporary 
-bitmap name).  But, as you point out...
+If an image has multiple bitmaps, exposing all of those as separate 
+contexts at the same time for a single export can indeed make sense.
 
 > 
-> Before we had experimental x-block-dirty-bitmap APIs, which are stable, so users
-> could not depend on them.
+>>>> 2. It's not directly documented. You assume that NAME == @name. I understand that
+>>>> it may be assumed.. But it's not documented.
+>>>
+>>> But NAME is likely to be understood as the name argument, and unlikely to be the
+>>> bitmap name.
+>>
+>> Yes likely. But it's still bad specification, which should be fixed.
+> 
+> If we cannot change the current behavior since it will break current users,
+> I agree fixing the spec to describe the current behavior is a good idea.
 
-The unstable x-block-dirty-bitmap APIs _did_ have a way to export a 
-user-controlled name SEPARATE from the bitmap name.  At the time I was 
-removing the x- prefix, I asked if anyone had a strong use case for 
-keeping that functionality.  No one spoke up in favor of keeping it 
-(Nikolay mentioned using the old interface, but not being stumped by its 
-removal), so we nuked it at the time.  We can always add it back (now 
-that it sounds like you have a use case where it may be more 
-compelling), but it was easier to stabilize less and add more later as 
-needed, than to stabilize too much and regret that we had to support the 
-flexibility that no one needed.
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg02373.html
-https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg01970.html
+We need the doc fix. Whether we also want an additional fix adding an 
+optional parameter allowing user control over the export name is also 
+under debate (the fact that the old x-nbd-server-add-bitmap supported it 
+shows that it may be useful, but it is not minimal, and as I pointed out 
+at the time of removing x-, libvirt can always control what name is 
+exposed by creating a temporary bitmap and merging from other bitmaps 
+into the temporary).
+
+We also have to think about a future of parallel backup jobs: libvirt 
+can create a single temporary bitmap to expose whatever name it wants 
+under one job, but if libvirt wants to expose the SAME user-visible name 
+to two parallel jobs, it cannot create two bitmaps with the same name, 
+so having a way to set the user-visible name of an arbitrary bitmap when 
+producing the NBD export makes sense on that front.
+
+
+>>>
+>>>> 3. It's never worked like you write. So if we change the behavior, we'll break
+>>>> existing users.
+>>>
+>>> Do we have existing users? isn't this new feature in 4.2?
+>>
+>> No, it's since 4.0
+
+As long as altering the exported name is controlled by a new optional 
+parameter, it does not hurt older 4.0 clients that do not use the new 
+parameter.
 
 -- 
 Eric Blake, Principal Software Engineer
