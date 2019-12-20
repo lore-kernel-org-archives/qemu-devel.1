@@ -2,81 +2,82 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E3DC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A07F8C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACFAC206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AD5F206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C2WsHvtX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACFAC206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjnSp6im"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AD5F206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJBp-0000Qq-Jg
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:23:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58762)
+	id 1iiJCu-000281-Eh
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:24:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iiIow-0007fP-Tq
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:00:00 -0500
+ (envelope-from <berrange@redhat.com>) id 1iiJ3V-00052E-MH
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:15:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iiIov-0001l2-Kl
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:59:58 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33822)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iiIou-0001fN-W4
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:59:57 -0500
-Received: by mail-ot1-x341.google.com with SMTP id a15so12008858otf.1
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 05:59:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ELpgbcB63eyC8D0t7Z4Fvx7gbMm7zBoq3zJjp0z7mJs=;
- b=C2WsHvtXy749gvkXphiJQTFHdm/9pOO9gjYmzXfaMLqdg68HFmS3occ6TK1MSzXdyb
- uUmtq1l2Po1yfQpIgwdvSzEpC1uFhJAh+kyjBMD+mNCVzYn6dXscMcqBrGEh3zzEnZsO
- 8JyRWZtXbDIB5QdXXP2eFjy4UT5TlMOPrJZUCExUXpdPXMejY+y9M+Xwr0Vvkd4AxszA
- z28XwAmP270e3O4nXANpuVyISK8HH/ZfARLCWsT8YvVejQkspcLyKx/t/uPMDb6bULvj
- P6l0OlDwUPI+f/VomsNt6imSbigMkNHTUseeuFb0hbKpa91s00rtXGiGZOTJcW9tAMTr
- jATw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ELpgbcB63eyC8D0t7Z4Fvx7gbMm7zBoq3zJjp0z7mJs=;
- b=O2MI0MciVvvCYPpv2/MX+7GFURzwDFBs8nPIDvyJuTUgq3rXA8xxazNQ4Xp7Qo+Uub
- j3gk7WnAh+psJWiHWFWo70PeAbblrqtpYrJl8leYxGEzdTcQoH7um9ytrpsZJAL9LIZb
- Xp7mXncoZ6UmDJbDV9YYGiAJF9pfZrya35kK3ESYcs1KjhXqhg7nnavEINAXVfKhsEx1
- Pfplou7wUl56zUm2yPwpG00wnNFtuVAUnkQ7KxgA3sFcCjXNJl3cNHsbuihV9slfovIJ
- a/p2cXZWuGHqf+qtuC3Zj7C2H49YXaHQiugSMcdB1uwNSTeKcFFac/p75+WgLVDR3Y8v
- QQDA==
-X-Gm-Message-State: APjAAAUB2F/Vze583Ok8IIMB55xhzC/IC7HyXWPx8ABAnAIIHM5oygeA
- Re3NvejNKfihU8Qn5VajPQZkqPZWgr0A8j6IgM1dog==
-X-Google-Smtp-Source: APXvYqx7n0BA5B96/Ii01kjGjFm+xgRen7pmR5PfmX7v1txRP32lWTBvNQpd//WBSZzfX7adDf5Ee80hbYzlEgEMyeU=
-X-Received: by 2002:a9d:8cb:: with SMTP id 69mr1308538otf.221.1576850395953;
- Fri, 20 Dec 2019 05:59:55 -0800 (PST)
+ (envelope-from <berrange@redhat.com>) id 1iiJ3U-0008LU-3w
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:15:01 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46511
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iiJ3T-0008GA-Qy
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:14:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576851298;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9jxY4miomDHkY4F0FFdrif+0ChwGYNeHA+/kgneSacg=;
+ b=WjnSp6imOnLG+B6GmHi32rPF7dN+oCTWjC1N4j7mdcDCcGTB78fUxcaUlLahVzIiRNyKBI
+ ENlvk3/AMB7gQVM+DMD1bhgDmQ/OfHdDoVvPZgfczegLBIUouMN9KPKsmc/KXdE4wl+XFK
+ Lc1in7v7GJUqMUgpVv6H14sZsO0Cuy0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-8pMd4ZJrMvyZQndvrZuotQ-1; Fri, 20 Dec 2019 09:14:57 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1B41DB60
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 14:14:56 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D91D6FDCE;
+ Fri, 20 Dec 2019 14:14:53 +0000 (UTC)
+Date: Fri, 20 Dec 2019 14:14:52 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH v7 9/9] tests: add dbus-vmstate-test
+Message-ID: <20191220141452.GP1699760@redhat.com>
+References: <20191219123029.200788-1-marcandre.lureau@redhat.com>
+ <20191219123029.200788-10-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20191217210230.99559-1-jeff.kubascik@dornerworks.com>
- <7a274247-e593-5828-73f8-2042971e8633@linaro.org>
- <CAFEAcA8Egy=Jkw8yKSumkeX=+Qxi8bPy-0fJjopHR6gCmz3FLQ@mail.gmail.com>
- <e8daa5c4-ba9a-a6dc-1037-7eec6335ad0b@dornerworks.com>
-In-Reply-To: <e8daa5c4-ba9a-a6dc-1037-7eec6335ad0b@dornerworks.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 20 Dec 2019 13:59:45 +0000
-Message-ID: <CAFEAcA8Dxwsx4dUuq4YjD9zYCJEW5gsYc=99nH=YgZTF4Ay2aw@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: fix IL bit for data abort exceptions
-To: Jeff Kubascik <jeff.kubascik@dornerworks.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <20191219123029.200788-10-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 8pMd4ZJrMvyZQndvrZuotQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,57 +89,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Jarvis Roach <Jarvis.Roach@dornerworks.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: mprivozn@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Dec 2019 at 13:53, Jeff Kubascik
-<jeff.kubascik@dornerworks.com> wrote:
->
-> On 12/19/2019 7:43 AM, Peter Maydell wrote:
-> > On Wed, 18 Dec 2019 at 01:03, Richard Henderson
-> > <richard.henderson@linaro.org> wrote:
-> >>
-> >> On 12/17/19 11:02 AM, Jeff Kubascik wrote:
-> >>> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
-> >>> index 5feb312941..e63f8bda29 100644
-> >>> --- a/target/arm/tlb_helper.c
-> >>> +++ b/target/arm/tlb_helper.c
-> >>> @@ -44,7 +44,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
-> >>>          syn = syn_data_abort_with_iss(same_el,
-> >>>                                        0, 0, 0, 0, 0,
-> >>>                                        ea, 0, s1ptw, is_write, fsc,
-> >>> -                                      false);
-> >>> +                                      true);
-> >>>          /* Merge the runtime syndrome with the template syndrome.  */
-> >>>          syn |= template_syn;
-> >>
-> >> This doesn't look correct.  Surely the IL bit should come from template_syn?
-> >
-> > Yes. In translate.c we put it into the syndrome information by
-> > passing true/false to syn_data_abort_with_iss() depending on
-> > whether the issinfo passed in to disas_set_da_iss() has the
-> > ISSIs16Bit flag set.
-> >
-> > I think this is a regression introduced in commit 46beb58efbb8a2a32
-> > when we converted the Thumb decoder over to decodetree. Before that
-> > 16 bit Thumb insns were in a different place in the old decoder and
-> > the 16-bit Thumb path passed ISSIs16Bit in with its issflags.
-> > (We should cc: qemu-stable@nongnu.org on the fix for this.)
->
-> The problem here was syn_data_abort_with_iss would return syn with the IL bit
-> set, which carries through when it gets or'd with template_syn. I had to change
-> the is_16bit argument to true so that it clear the IL bit.
+On Thu, Dec 19, 2019 at 04:30:29PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  MAINTAINERS                  |   1 +
+>  roms/SLOF                    |   2 +-
+>  tests/Makefile.include       |  22 +-
+>  tests/dbus-vmstate-daemon.sh |  95 +++++++++
+>  tests/dbus-vmstate-test.c    | 382 +++++++++++++++++++++++++++++++++++
+>  tests/dbus-vmstate1.xml      |  12 ++
+>  6 files changed, 512 insertions(+), 2 deletions(-)
+>  create mode 100755 tests/dbus-vmstate-daemon.sh
+>  create mode 100644 tests/dbus-vmstate-test.c
+>  create mode 100644 tests/dbus-vmstate1.xml
 
-Interesting. I think that's an entirely separate (and long
-standing) bug to the regression where we forgot to fill in ISSIs16Bit
-in the issinfo field, and it masks the other bug...
 
-thanks
--- PMM
+> diff --git a/roms/SLOF b/roms/SLOF
+> index 9546892a80..8ebf2f55e1 160000
+> --- a/roms/SLOF
+> +++ b/roms/SLOF
+> @@ -1 +1 @@
+> -Subproject commit 9546892a80d5a4c73deea6719de46372f007f4a6
+> +Subproject commit 8ebf2f55e1ba1492b942ba4b682160e644fc0f98
+
+Accidental change. With that removed
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
