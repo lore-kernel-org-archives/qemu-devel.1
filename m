@@ -2,90 +2,88 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B683FC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB13C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:32:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8231D206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:30:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24BC5206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:32:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V3ktwIJC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8231D206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JgWmrhjT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24BC5206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiIMA-0000B8-DQ
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 08:30:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42995)
+	id 1iiINu-0002yC-Ba
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 08:32:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiIF7-0007Wz-2w
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:58 -0500
+ (envelope-from <armbru@redhat.com>) id 1iiIHt-0003KR-7H
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:25:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiIF5-0005dH-Hx
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:56 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46275)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiIF5-0005Yf-58
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:55 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z7so9361041wrl.13
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 05:22:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=tWCHuSggB5szQdLA+HidJI7cGodm3lgcmToLZIxmHFk=;
- b=V3ktwIJCtO2n9oJK7KwaYijwukdLxDfE24R88UvTsU3NDWkbMn/So8kJg0gq3Q0fMD
- /QN4lV9GaKWwd5Z8h5qR3gZ2Qr8xGQVDHRXIMKbomug9YfrwqP+YVy8a1O3plJYTTxZL
- 9PPf3cfWhxH2VLSq6g171VNZSK7ZzXSD5CNvM60CN4vVc05sLiHgrT7j9ri7GKklgY0p
- xM4p51wo1VwTpLKxluqGfIrPcVbTYLWuwFjnV2RiOf5ZX+0EFSl/lSfKRKIEHdFpfzso
- B0rPP95jSvsZDi22kfoQdTXjmEU4K7Fq3uKsMG3F+TVvx4ZwtQoWfPLRg+G4b/6a15JF
- Obaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=tWCHuSggB5szQdLA+HidJI7cGodm3lgcmToLZIxmHFk=;
- b=m9sApvWawVKWCo0taqzbW3ceiYBinSZ/Sg0W8++OKj6CyyoJKc28ujagxwybKWGXav
- wC8YvJmqRWo8gSqC3Tv9GtucKpoENBJ1vY8HMc+U3sl9MQVvKUX6eeIz4XfZ/Mu3JJTK
- 2Kdn4ipCVszW92pNpBdZ7lzhpabmsxjeO7PgYHDjDsNwUstz/ACACFmz4zltfYo+aN7R
- 0r05zS7wp4ZqZM9mqQ1m7HngftfGT58u2HLIMwzao0T+nF7Vn5aIHtpe7Y/oHpmS+Jy+
- OGpYMqBy6U37mS4nx2hfK8DEqI1B/isPunuJbz+t4EU3z88etpjGsIs9Ubp7CICTQ+W7
- 659Q==
-X-Gm-Message-State: APjAAAUq5BxAYcVVmoHKha0bcxyjzbd/9rZFVqXMKxE4zSmy8bqh6LtP
- UD6RBr2q9Kl9fCAlb1n7nDxVwQ==
-X-Google-Smtp-Source: APXvYqxUKjMRQFj6C9Oe7b6xQzSLyDeyPE3MHbkZsmx/Km5T19B17j9M9tRSMYwDSYGXH68I2gMXbg==
-X-Received: by 2002:a5d:5091:: with SMTP id a17mr15166170wrt.362.1576848173831; 
- Fri, 20 Dec 2019 05:22:53 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n16sm9986070wro.88.2019.12.20.05.22.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 05:22:47 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0C7811FF91;
- Fri, 20 Dec 2019 13:22:47 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/5] tests/tcg: add a dumb-as-bricks semihosting console
- test
-Date: Fri, 20 Dec 2019 13:22:45 +0000
-Message-Id: <20191220132246.6759-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191220132246.6759-1-alex.bennee@linaro.org>
-References: <20191220132246.6759-1-alex.bennee@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1iiIHr-0006Oj-5l
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:25:47 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45805
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iiIHo-0006Id-Ij
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:25:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576848341;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xP6ZNvU3p4VNzD0xUSwdP2abxVGRKcAb23hyeO2ftw4=;
+ b=JgWmrhjTF/b5PP1BF9JCqKjAwuzXi6dR3AYsq2JDRt1crurzMyxYA26Z/xv4rJDFJu/sE5
+ eRBiSteSsbq9Z5DVLuj9ZkhfGEhiGwtEliqDz2Ly21LhJ74rmJFS3/hiS2v3+PJeKoRM/l
+ UYUeE9grku1pjVE91R0eZWH4jcechNI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-h_EWPvN1MISkdbs-vqsIgw-1; Fri, 20 Dec 2019 08:25:37 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD473800D4C;
+ Fri, 20 Dec 2019 13:25:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
+ [10.36.116.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AC72210016E8;
+ Fri, 20 Dec 2019 13:25:36 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A0F2911386A7; Fri, 20 Dec 2019 14:25:34 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 02/18] fuse: Allow exporting BDSs via FUSE
+References: <20191219143818.1646168-1-mreitz@redhat.com>
+ <20191219143818.1646168-3-mreitz@redhat.com>
+ <20191220102656.GD4019@dhcp-200-226.str.redhat.com>
+ <1812e968-1197-523e-7039-caf29e3bbc4b@redhat.com>
+ <20191220112402.GE4019@dhcp-200-226.str.redhat.com>
+ <87pngjgo2h.fsf@dusky.pond.sub.org>
+ <20191220125839.GG4019@dhcp-200-226.str.redhat.com>
+Date: Fri, 20 Dec 2019 14:25:34 +0100
+In-Reply-To: <20191220125839.GG4019@dhcp-200-226.str.redhat.com> (Kevin Wolf's
+ message of "Fri, 20 Dec 2019 13:58:39 +0100")
+Message-ID: <877e2rf7sh.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: h_EWPvN1MISkdbs-vqsIgw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,95 +95,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, keithp@keithp.com,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We don't run this during check-tcg as we would need to check stuff is
-echoed back. However we can still build the binary so people can test
-it manually.
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Am 20.12.2019 um 13:48 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>>=20
+>> > Am 20.12.2019 um 11:48 hat Max Reitz geschrieben:
+>> >> So if we kept writable and growable in the common base, then the sche=
+ma
+>> >> would give no information about what exports actually support them.
+>> >>=20
+>> >> On one hand, I don=E2=80=99t know whether it=E2=80=99s important to h=
+ave this
+>> >> information in a static form, or whether it=E2=80=99s sufficient to l=
+earn at
+>> >> runtime.
+>> >>=20
+>> >> On the other, I don=E2=80=99t know whether it=E2=80=99s important to =
+have those fields
+>> >> in the base or not.  Would it make a difference on the wire?
+>> >
+>> > Not for the command itself, so I think we're free to change it later. =
+It
+>> > might make a difference for introspection, though, not sure. Markus?
+>>=20
+>> QAPI schema introspection is designed to hide the difference between
+>> local members and base members.  You can move members to or from a base
+>> type freely without affecting introspection.  Even if that creates or
+>> deletes the base type.
+>
+> Good, that's helpful. So I can split the nbd-server-add argument type
+> into a base that is reused as a union branch and the rest without
+> potentially breaking anything.
+>
+> I suppose moving a field between a union base and all variants does
+> still result in different introspection even though the accepted inputs
+> are the same.
 
----
-v8
-  - actually return the result!
----
- tests/tcg/aarch64/system/semiconsole.c    | 38 +++++++++++++++++++++++
- tests/tcg/aarch64/Makefile.softmmu-target |  9 +++++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/aarch64/system/semiconsole.c
+Correct.  A common member (whether it's local or from the base) is in
+SchemaInfoObject.members[].  Moving it to all the variants moves it to
+the variant types' .members[].
 
-diff --git a/tests/tcg/aarch64/system/semiconsole.c b/tests/tcg/aarch64/system/semiconsole.c
-new file mode 100644
-index 00000000000..bfe7c9e26b4
---- /dev/null
-+++ b/tests/tcg/aarch64/system/semiconsole.c
-@@ -0,0 +1,38 @@
-+/*
-+ * Semihosting Console Test
-+ *
-+ * Copyright (c) 2019 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include <inttypes.h>
-+#include <minilib.h>
-+
-+#define SYS_READC 0x7
-+
-+uintptr_t __semi_call(uintptr_t type, uintptr_t arg0)
-+{
-+    register uintptr_t t asm("x0") = type;
-+    register uintptr_t a0 asm("x1") = arg0;
-+    asm("hlt 0xf000"
-+        : "=r" (t)
-+        : "r" (t), "r" (a0));
-+
-+    return t;
-+}
-+
-+int main(void)
-+{
-+    char c;
-+
-+    ml_printf("Semihosting Console Test\n");
-+    ml_printf("hit X to exit:");
-+
-+    do {
-+        c = __semi_call(SYS_READC, 0);
-+        __sys_outc(c);
-+    } while (c != 'X');
-+
-+    return 0;
-+}
-diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
-index 950dbb4bac2..9bdcfd9e7e4 100644
---- a/tests/tcg/aarch64/Makefile.softmmu-target
-+++ b/tests/tcg/aarch64/Makefile.softmmu-target
-@@ -31,7 +31,14 @@ LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
- memory: CFLAGS+=-DCHECK_UNALIGNED=1
- 
- # Running
--QEMU_OPTS+=-M virt -cpu max -display none -semihosting-config enable=on,target=native,chardev=output -kernel
-+QEMU_BASE_MACHINE=-M virt -cpu max -display none
-+QEMU_OPTS+=$(QEMU_BASE_MACHINE) -semihosting-config enable=on,target=native,chardev=output -kernel
-+
-+# console test is manual only
-+QEMU_SEMIHOST=-chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -mon chardev=stdio0,mode=readline
-+run-semiconsole: QEMU_OPTS=$(QEMU_BASE_MACHINE) $(QEMU_SEMIHOST)  -kernel
-+run-semiconsole: semiconsole
-+	$(call skip-test, $<, "MANUAL ONLY")
- 
- # Simple Record/Replay Test
- .PHONY: memory-record
--- 
-2.20.1
+>               Is this kind of movement still allowed unconditionally or
+> should we be more careful with something like this?
+
+QMP's backward compatibility promise does not include "introspection
+value won't change".  Still, such changes can conceivably confuse
+clients.  Care is advisable.  But it's not a hard "no".
 
 
