@@ -2,92 +2,90 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DA1DC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7DFC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 551342146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:26:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7EE221655
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:40:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CUm0vUm5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 551342146E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RwqwpzU3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7EE221655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiKB6-0003bo-GB
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:26:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41123)
+	id 1iiKNs-0001Io-Qk
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:40:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iiKAM-000316-8W
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:26:11 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iiKNH-0000rt-9S
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:39:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iiKAJ-0005yf-W6
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:26:09 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49102
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iiKNE-0000RF-3F
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:39:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24742
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iiKAJ-0005wj-Ig
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:26:07 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iiKND-0000Pl-VL
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:39:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576855566;
+ s=mimecast20190719; t=1576856366;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gQpEdr0kUnB88BOXWfeLZ68KniGGWxl9+xjrqXwINhw=;
- b=CUm0vUm5JhnJiysnKwR9reliKMdBoK2VjItg4UMdEvRLvXdHUjRE8RuhB2Pavf6jIbHzHd
- Ei7B6qiVITAGsvNXvswxn/iXCcQOwCPaoBObY8AKXHfbP6N/9TkodusnLpdN3mKE5aumBY
- 2aXyVyBL9czyk4rELqFMboA0WC5ICjE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-cdf4pC_xPMiQEhIsVkzSkA-1; Fri, 20 Dec 2019 10:26:04 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A2C5DC20;
- Fri, 20 Dec 2019 15:26:02 +0000 (UTC)
-Received: from x1.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E8B7100194E;
- Fri, 20 Dec 2019 15:25:54 +0000 (UTC)
-Date: Fri, 20 Dec 2019 08:25:54 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Felipe Franciosi <felipe@nutanix.com>
-Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
- status update
-Message-ID: <20191220082554.0c1bc63a@x1.home>
-In-Reply-To: <9540FF2A-FC7E-40AE-9259-46EF431ED65F@nutanix.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <20191210064716.GA6401@flaka>
- <20191213104116.GB1180977@stefanha-x1.localdomain>
- <20191216194655.GA5922@flaka>
- <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
- <20191217163316.GB1333385@stefanha-x1.localdomain>
- <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
- <20191219115545.GD1624084@stefanha-x1.localdomain>
- <772D9CF3-D15D-42D1-B9CF-1279619D7C20@nutanix.com>
- <20191219125504.GI1190276@redhat.com>
- <20191220094712.GA1635864@stefanha-x1.localdomain>
- <bfaf0b42-513c-08f2-2d4f-d99437b7041d@redhat.com>
- <9540FF2A-FC7E-40AE-9259-46EF431ED65F@nutanix.com>
-Organization: Red Hat
+ bh=f5gtgAbpBYgOB4pxz86Va3aJ0avkTlQUsFdHI0cgBRc=;
+ b=RwqwpzU3emosiCJpVy9/92w2YID3Qn+LSMV2crx3paXc99BtgnqZpOlQuIqfxtkT9TTDEu
+ jMq/C8plCn7csiPCT4q4EsQe4mkdkuT+rM6JXS7FohCgZtyXLSUZiY6yGbFYmCkJx41KTf
+ 36pux/IY6n/4AjfRhMBRHQtja2ECZXQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-YQ3StpM_P7qn-T4VXBjPGA-1; Fri, 20 Dec 2019 10:39:24 -0500
+Received: by mail-ed1-f70.google.com with SMTP id cy24so3845472edb.12
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 07:39:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZNOGi6D8Z2v5GvuunSizo/nTz3VMeb7awNsthN4DHbw=;
+ b=BFQOHjH1uNvCBHF5rWSnsKYYWUwjk78LGHODKhiXGBJTOXt07EbO0/ZmTpj8oD6/3S
+ ETi+RxwpAqRQm13I7KEWBRIYVARf0diRR6eeMrO8IvPIUXgqPS+b1TbsZyoFzO3nMp/P
+ ADrQC3FsdiIe+stnozdUtTf7YPO+lgSm3rqRLxkHkSA+4g7tdMzuIMPYn4FHp7nFAeVa
+ O57+ipdGa4qM0cNFL+E/9zmNFgCd3BUHkfqdY7byPsUNqygLw9IDqcyAUJBnJb5aeSzU
+ KEzJDZ+kqnYOUd+a2BqeB3I89eIK3rYFU/+oYLDxAQwPpuOw+nFp8hr3WQ7xmtw+VMx4
+ QXwA==
+X-Gm-Message-State: APjAAAXvGBH1zyFXPBVF+PUdJ2R3zZSt/5mzi4l56fxRwWpHhAvnFAEp
+ /n+0cmzVeDVkMsUd46mIIZ3NIRXfIE9DvEhRoTPASswz942ks3gTH1BtW7dgqcqBMmnLTX0zvrK
+ zmrKhrHcx9YiWTZDBJY8viKBvEMtsjZY=
+X-Received: by 2002:a05:6402:c9c:: with SMTP id
+ cm28mr16461692edb.88.1576856363859; 
+ Fri, 20 Dec 2019 07:39:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxuZGRu3e2kaEIGY3HNxVjXe7imrQDMzA6m386yfCVSar+kFgEA0YBlX3RnBId4Qpxd0pA18e5JwtmaWsKIBUg=
+X-Received: by 2002:a05:6402:c9c:: with SMTP id
+ cm28mr16461674edb.88.1576856363636; 
+ Fri, 20 Dec 2019 07:39:23 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: cdf4pC_xPMiQEhIsVkzSkA-1
+References: <87eewz84ts.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87eewz84ts.fsf@vitty.brq.redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 20 Dec 2019 16:39:11 +0100
+Message-ID: <CABgObfbKM_QNXJaAk7m2JYOoZgAAa+98d2x3==eYUkTi_CGw6Q@mail.gmail.com>
+Subject: Re: [BUG] No irqchip created after commit 11bc4a13d1f4 ("kvm: convert
+ "-machine kernel_irqchip" to an accelerator property")
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+X-MC-Unique: YQ3StpM_P7qn-T4VXBjPGA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/alternative; boundary="0000000000006ab95e059a247b28"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,114 +97,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- "fam@euphon.net" <fam@euphon.net>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Walker,
- Benjamin" <benjamin.walker@intel.com>, "kraxel@redhat.com" <kraxel@redhat.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>, "Harris,
- James R" <james.r.harris@intel.com>,
- "quintela@redhat.com" <quintela@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "liran.alon@oracle.com" <liran.alon@oracle.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
- "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Dec 2019 14:14:33 +0000
-Felipe Franciosi <felipe@nutanix.com> wrote:
+--0000000000006ab95e059a247b28
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > On Dec 20, 2019, at 9:50 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> > 
-> > On 20/12/19 10:47, Stefan Hajnoczi wrote:  
-> >>> If it doesn't create too large of a burden to support both, then I think
-> >>> it is very desirable. IIUC, this is saying a kernel based solution as the
-> >>> optimized/optimal solution, and userspace UNIX socket based option as the
-> >>> generic "works everywhere" fallback solution.  
-> >> I'm slightly in favor of the kernel implementation because it keeps us
-> >> better aligned with VFIO.  That means solving problems in one place only
-> >> and less reinventing the wheel.  
-> > 
-> > I think there are anyway going to be some differences with VFIO.
-> > 
-> > For example, currently VFIO requires pinning user memory.  Is that a
-> > limitation for muser too?  If so, that would be a big disadvantage; if
-> > not, however, management tools need to learn that muser devices unlike
-> > other VFIO devices do not prevent overcommit.  
-> 
-> More or less. We pin them today, but I think we don't really have to.
-> I created an issue to look into it:
-> https://github.com/nutanix/muser/issues/28
-> 
-> In any case, if Qemu is ballooning and calls UNMAP_DMA for memory that
-> has been ballooned out, then we would release it.
+No, absolutely not. I was sure I had tested it, but I will take a look.
 
-That's exactly the problem with ballooning and vfio, it doesn't unmap
-memory, it just zaps it out of the VM, to be demand faulted back in
-later.  It's very vCPU-centric.  Memory hotplug is the only case where
-we'll see a memory region get unmapped.
- 
-> The reason we keep it pinned is to support libmuser restarts. IIRC,
-> VFIO doesn't need to pin pages for mdev devices (that's the job of the
-> mdev driver on the other end via vfio_pin_pages()). It only keeps the
-> DMA entries in a RB tree.
-> 
-> If my understanding is right, then we can probably just keep the map
-> Qemu registered (without holding the pages) and call vfio_pin_pages()
-> on demand when libmuser restarts.
-> 
-> For context, this is how the DMA memory registration works today:
-> 
-> 1) Qemu calls ioctl(vfio_fd, IOMMU_MAP_DMA, &vm_map);
-> 
-> 2) The iommu driver notifies muser.ko
-> 
-> 3) Muser.ko pins the pages (in get_dma_map(), called from below)
-> (https://github.com/nutanix/muser/blob/master/kmod/muser.c#L711)
+Paolo
 
-Yikes, it pins every page??  vfio_pin_pages() intends for the vendor
-driver to be much smarter than this :-\  Thanks,
+Il ven 20 dic 2019, 15:11 Vitaly Kuznetsov <vkuznets@redhat.com> ha scritto=
+:
 
-Alex
- 
-> 4) Muser.ko notifies libmuser about the memory registration
-> (The iommu driver context goes to sleep, hence the pinning)
-> 
-> 5) Libmuser wakes up and calls mmap() on muser.ko
-> 
-> 6) Muser.ko inserts the VM memory in libmuser's context
-> (https://github.com/nutanix/muser/blob/master/kmod/muser.c#L543)
-> 
-> 7) Libmuser tells muser.ko that it's done
-> 
-> 8) Muser.ko iommu callback context that was sleeping wakes up
-> 
-> 9) Muser.ko places the memory in a "dma_list" for the mudev and returns.
-> 
-> We could potentially modify the last step to unpin and keep only what
-> we need for a future call to vfio_pin_pages(), but I need to check if
-> that works.
-> 
-> Cheers,
-> Felipe
-> 
-> > 
-> > Paolo
-> >   
-> 
-> 
+> I apologize if this was already reported,
+>
+> I just noticed that with the latest updates QEMU doesn't start with the
+> following configuration:
+>
+> qemu-system-x86_64 -name guest=3Dwin10 -machine pc,accel=3Dkvm -cpu
+> host,hv_vpindex,hv_synic ...
+>
+> qemu-system-x86_64: failed to turn on HyperV SynIC in KVM: Invalid argume=
+nt
+> qemu-system-x86_64: kvm_init_vcpu failed: Invalid argument
+>
+> If I add 'kernel-irqchip=3Dsplit' or ',kernel-irqchip=3Don' it starts as
+> usual. I bisected this to the following commit:
+>
+> commit 11bc4a13d1f4b07dafbd1dda4d4bf0fdd7ad65f2 (HEAD, refs/bisect/bad)
+> Author: Paolo Bonzini <pbonzini@redhat.com>
+> Date:   Wed Nov 13 10:56:53 2019 +0100
+>
+>     kvm: convert "-machine kernel_irqchip" to an accelerator property
+>
+> so aparently we now default to 'kernel_irqchip=3Doff'. Is this the desire=
+d
+> behavior?
+>
+> --
+> Vitaly
+>
+>
+
+--0000000000006ab95e059a247b28
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div dir=3D"auto">No, absolutely not. I was sure I had te=
+sted it, but I will take a look.</div><div dir=3D"auto"><br></div><div dir=
+=3D"auto">Paolo</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">Il ven 20 dic 2019, 15:11 Vitaly Kuznetsov &lt;<a href=3D"m=
+ailto:vkuznets@redhat.com" target=3D"_blank" rel=3D"noreferrer">vkuznets@re=
+dhat.com</a>&gt; ha scritto:<br></div><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">I apol=
+ogize if this was already reported,<br>
+<br>
+I just noticed that with the latest updates QEMU doesn&#39;t start with the=
+<br>
+following configuration:<br>
+<br>
+qemu-system-x86_64 -name guest=3Dwin10 -machine pc,accel=3Dkvm -cpu host,hv=
+_vpindex,hv_synic ...<br>
+<br>
+qemu-system-x86_64: failed to turn on HyperV SynIC in KVM: Invalid argument=
+<br>
+qemu-system-x86_64: kvm_init_vcpu failed: Invalid argument<br>
+<br>
+If I add &#39;kernel-irqchip=3Dsplit&#39; or &#39;,kernel-irqchip=3Don&#39;=
+ it starts as<br>
+usual. I bisected this to the following commit:<br>
+<br>
+commit 11bc4a13d1f4b07dafbd1dda4d4bf0fdd7ad65f2 (HEAD, refs/bisect/bad)<br>
+Author: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" rel=3D"nor=
+eferrer noreferrer" target=3D"_blank">pbonzini@redhat.com</a>&gt;<br>
+Date:=C2=A0 =C2=A0Wed Nov 13 10:56:53 2019 +0100<br>
+<br>
+=C2=A0 =C2=A0 kvm: convert &quot;-machine kernel_irqchip&quot; to an accele=
+rator property<br>
+<br>
+so aparently we now default to &#39;kernel_irqchip=3Doff&#39;. Is this the =
+desired<br>
+behavior?<br>
+<br>
+-- <br>
+Vitaly<br>
+<br>
+</blockquote></div></div>
+
+--0000000000006ab95e059a247b28--
 
 
