@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CBB3C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2282C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:27:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52E7721D7D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:25:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E7721D7D
+	by mail.kernel.org (Postfix) with ESMTPS id 85F9721D7D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:27:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85F9721D7D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii9rP-0005cH-Uv
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:25:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55776)
+	id 1ii9se-0007sA-3h
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:27:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9ng-0008Tr-IA
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:05 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9o0-0000bh-On
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9ne-00020u-Tx
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:04 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34436)
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9nz-0003Pt-Pk
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:24 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34470)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1ii9ne-0001y5-EA; Thu, 19 Dec 2019 23:22:02 -0500
+ id 1ii9nz-00022I-GW; Thu, 19 Dec 2019 23:22:23 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id 216B928CD6; Thu, 19 Dec 2019 23:22:02 -0500 (EST)
+ id F10F128D4D; Thu, 19 Dec 2019 23:22:02 -0500 (EST)
 To: Jason Wang <jasowang@redhat.com>,
     qemu-devel@nongnu.org
-Message-Id: <6e980c3ffe0a9a1f4e112ad16b1003e1f620d0ca.1576815466.git.fthain@telegraphics.com.au>
+Message-Id: <05a689e082735b2ad972b3372ceeb7cfe47d4bd4.1576815466.git.fthain@telegraphics.com.au>
 In-Reply-To: <cover.1576815466.git.fthain@telegraphics.com.au>
 References: <cover.1576815466.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 04/13] dp8393x: Update LLFA and CRDA registers from rx
- descriptor
+Subject: [PATCH v2 13/13] dp8393x: Correctly advance RRP
 Date: Fri, 20 Dec 2019 15:17:46 +1100
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
@@ -63,62 +62,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Follow the algorithm given in the National Semiconductor DP83932C
-datasheet in section 3.4.7:
-
-    At the next reception, the SONIC re-reads the last RXpkt.link field,
-    and updates its CRDA register to point to the next descriptor.
-
-The chip is designed to allow the host to provide a new list of
-descriptors in this way.
+The last entry in the RRA is at the address given by the REA register.
+The address wrap-around logic is off-by-one entry. The last resource
+never gets used and RRP can jump over the RWP. The guest driver fails
+badly because the SONIC starts re-using old buffer addresses. Fix this.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
 ---
-Changed since v1:
- - Update CRDA register from LLFA register after EOL is cleared.
----
- hw/net/dp8393x.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ hw/net/dp8393x.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index a3e3a82ff4..1ead502a8f 100644
+index bd92fa28f6..92a30f9f69 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -773,12 +773,13 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)s->data, size, 0);
--        if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
-+        s->regs[SONIC_LLFA] = dp8393x_get(s, width, 0);
-+        if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
-             /* Still EOL ; stop reception */
-             return -1;
--        } else {
--            s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         }
-+        /* Link has been updated by host */
-+        s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+@@ -340,7 +340,7 @@ static void dp8393x_do_read_rra(dp8393xState *s)
+     s->regs[SONIC_RRP] += size;
+ 
+     /* Handle wrap */
+-    if (s->regs[SONIC_RRP] == s->regs[SONIC_REA]) {
++    if (s->regs[SONIC_RRP] == s->regs[SONIC_REA] + size) {
+         s->regs[SONIC_RRP] = s->regs[SONIC_RSA];
      }
  
-     /* Save current position */
-@@ -826,7 +827,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     address_space_rw(&s->as, dp8393x_crda(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
- 
--    /* Move to next descriptor */
-+    /* Check link field */
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-@@ -841,6 +842,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         dp8393x_put(s, width, 0, 0);
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)s->data, size, 1);
-+
-+        /* Move to next descriptor */
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
-         s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
 -- 
 2.23.0
 
