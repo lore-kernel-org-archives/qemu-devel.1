@@ -6,43 +6,45 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8825C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06729C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:30:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFE2021D7D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:29:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFE2021D7D
+	by mail.kernel.org (Postfix) with ESMTPS id CD24821D7D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:30:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD24821D7D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii9ud-0002cK-Gp
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:29:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59815)
+	id 1ii9vU-0003f1-B7
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:30:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9o1-0000c4-31
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9o0-0000bk-QS
  for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9nz-0003PB-JT
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9nz-0003OZ-Cu
  for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:24 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34448)
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34406)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1ii9nz-00020K-9q; Thu, 19 Dec 2019 23:22:23 -0500
+ id 1ii9nz-0001xA-61; Thu, 19 Dec 2019 23:22:23 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id DFF8B28D67; Thu, 19 Dec 2019 23:22:02 -0500 (EST)
+ id E82152290B; Thu, 19 Dec 2019 23:22:01 -0500 (EST)
 To: Jason Wang <jasowang@redhat.com>,
     qemu-devel@nongnu.org
-Message-Id: <1367b9572494f04722aebcf4b90d3ff31b935ab1.1576815466.git.fthain@telegraphics.com.au>
+Message-Id: <e764963f2ea1b070e05d99f37de58ef193e5af7b.1576815466.git.fthain@telegraphics.com.au>
 In-Reply-To: <cover.1576815466.git.fthain@telegraphics.com.au>
 References: <cover.1576815466.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 12/13] dp8393x: Always update RRA pointers and sequence
- numbers
+Subject: [PATCH v2 01/13] dp8393x: Mask EOL bit from descriptor addresses
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Date: Fri, 20 Dec 2019 15:17:46 +1100
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
@@ -63,39 +65,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These operations have to take place regardless of whether or not rx
-descriptors have been used up (that is, EOL flag was observed).
+The LSB of descriptor address registers is used as an EOL flag.
+It has to be masked when those registers are to be used as actual
+addresses for copying memory around. But when the registers are
+to be updated the EOL bit should not be masked.
 
 Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
 ---
- hw/net/dp8393x.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Changed since v1:
+ - Added macros to name constants as requested by Philippe Mathieu-Daud=C3=
+=A9.
+---
+ hw/net/dp8393x.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 6b69cca329..bd92fa28f6 100644
+index 3d991af163..1957bd391e 100644
 --- a/hw/net/dp8393x.c
 +++ b/hw/net/dp8393x.c
-@@ -893,12 +893,14 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         /* Move to next descriptor */
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
--        s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
-+    }
- 
--        if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
--            /* Read next RRA */
--            dp8393x_do_read_rra(s);
--        }
-+    s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) |
-+                         ((s->regs[SONIC_RSC] + 1) & 0x00ff);
+@@ -145,6 +145,9 @@ do { printf("sonic ERROR: %s: " fmt, __func__ , ## __=
+VA_ARGS__); } while (0)
+ #define SONIC_ISR_PINT   0x0800
+ #define SONIC_ISR_LCD    0x1000
+=20
++#define SONIC_DESC_EOL   0x0001
++#define SONIC_DESC_ADDR  0xFFFE
 +
-+    if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
-+        /* Read next RRA */
-+        dp8393x_do_read_rra(s);
-     }
- 
-     /* Done */
--- 
+ #define TYPE_DP8393X "dp8393x"
+ #define DP8393X(obj) OBJECT_CHECK(dp8393xState, (obj), TYPE_DP8393X)
+=20
+@@ -197,7 +200,8 @@ static uint32_t dp8393x_crba(dp8393xState *s)
+=20
+ static uint32_t dp8393x_crda(dp8393xState *s)
+ {
+-    return (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA];
++    return (s->regs[SONIC_URDA] << 16) |
++           (s->regs[SONIC_CRDA] & SONIC_DESC_ADDR);
+ }
+=20
+ static uint32_t dp8393x_rbwc(dp8393xState *s)
+@@ -217,7 +221,8 @@ static uint32_t dp8393x_tsa(dp8393xState *s)
+=20
+ static uint32_t dp8393x_ttda(dp8393xState *s)
+ {
+-    return (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA];
++    return (s->regs[SONIC_UTDA] << 16) |
++           (s->regs[SONIC_TTDA] & SONIC_DESC_ADDR);
+ }
+=20
+ static uint32_t dp8393x_wt(dp8393xState *s)
+@@ -506,8 +511,8 @@ static void dp8393x_do_transmit_packets(dp8393xState =
+*s)
+                              sizeof(uint16_t) *
+                              (4 + 3 * s->regs[SONIC_TFC]) * width,
+                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+-            s->regs[SONIC_CTDA] =3D dp8393x_get(s, width, 0) & ~0x1;
+-            if (dp8393x_get(s, width, 0) & 0x1) {
++            s->regs[SONIC_CTDA] =3D dp8393x_get(s, width, 0);
++            if (s->regs[SONIC_CTDA] & SONIC_DESC_EOL) {
+                 /* EOL detected */
+                 break;
+             }
+@@ -763,13 +768,13 @@ static ssize_t dp8393x_receive(NetClientState *nc, =
+const uint8_t * buf,
+     /* XXX: Check byte ordering */
+=20
+     /* Check for EOL */
+-    if (s->regs[SONIC_LLFA] & 0x1) {
++    if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
+         /* Are we still in resource exhaustion? */
+         size =3D sizeof(uint16_t) * 1 * width;
+         address =3D dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
+         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+                          (uint8_t *)s->data, size, 0);
+-        if (dp8393x_get(s, width, 0) & 0x1) {
++        if (dp8393x_get(s, width, 0) & SONIC_DESC_EOL) {
+             /* Still EOL ; stop reception */
+             return -1;
+         } else {
+@@ -827,7 +832,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
+nst uint8_t * buf,
+     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * wi=
+dth,
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
+     s->regs[SONIC_LLFA] =3D dp8393x_get(s, width, 0);
+-    if (s->regs[SONIC_LLFA] & 0x1) {
++    if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
+         /* EOL detected */
+         s->regs[SONIC_ISR] |=3D SONIC_ISR_RDE;
+     } else {
+--=20
 2.23.0
 
 
