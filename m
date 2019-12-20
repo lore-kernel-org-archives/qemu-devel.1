@@ -1,90 +1,125 @@
 Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Level: *
+X-Spam-Status: No, score=1.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLACK autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2FAC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FBCC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:47:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 377B02465E
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:41:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91E542465E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:47:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3wVUUcl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 377B02465E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="QVkcFqfX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91E542465E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiFip-0004ax-BC
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 05:41:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
+	id 1iiFof-0007xT-OU
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 05:47:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iiFhy-0003nm-RW
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:40:36 -0500
+ (envelope-from <felipe@nutanix.com>) id 1iiFnN-0006Z4-VI
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:46:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iiFhw-000488-AV
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:40:34 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50613
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iiFhv-00041G-W4
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:40:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576838430;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=X3Vb64JyzecrG3PZ5SCzYB+5PwEz191yESrWY+6bAww=;
- b=I3wVUUclxgheWSqKFj92jUuTsxERTUBBbBoEKHpx6Swfgvw29AGzDA9txEIfr93Nf7ArpI
- vjr2sjBwb3nTvX/5ZXHEmlmq6YdVcYUDoBtj1hFu3q+3iaauhlmzLdTkqU899BYohzMbQX
- eBOy35THPq1kul/rUXKqFbdgGGUqEqE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-DgeOI6ejN1SsMoDADNMdhA-1; Fri, 20 Dec 2019 05:40:29 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1BA2800C74;
- Fri, 20 Dec 2019 10:40:27 +0000 (UTC)
-Received: from andariel.pipo.sk (ovpn-205-6.brq.redhat.com [10.40.205.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A1A135DA70;
- Fri, 20 Dec 2019 10:40:25 +0000 (UTC)
-Date: Fri, 20 Dec 2019 11:40:22 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH] block: nbd: Fix dirty bitmap context name
-Message-ID: <20191220104022.GL4914@andariel.pipo.sk>
-References: <20191219125151.21482-1-nsoffer@redhat.com>
- <443c32b3-0e0c-ef9e-4d5b-9404b16eaa02@virtuozzo.com>
- <20191219140433.GK5230@linux.fritz.box>
- <CAMRbyyvqa1_3U=2Q7HmCrRcEq+yJjxUP7MM-GM5hUdrZw=yBOw@mail.gmail.com>
- <ddf58827-72e8-f853-e6bc-05d19100c62d@virtuozzo.com>
- <CAMRbyysHGjsWaCWXW2+iNSwU03DhavRF6sJ9-POUx3Mky6LK7Q@mail.gmail.com>
- <42c73579-fdaa-5590-39f9-ca9cacfeaa5e@virtuozzo.com>
- <20191220095617.GK4914@andariel.pipo.sk>
- <a372b586-17a4-9984-68d2-a1131fc219f2@virtuozzo.com>
-MIME-Version: 1.0
-In-Reply-To: <a372b586-17a4-9984-68d2-a1131fc219f2@virtuozzo.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: DgeOI6ejN1SsMoDADNMdhA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+ (envelope-from <felipe@nutanix.com>) id 1iiFnL-0007dI-Kk
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:46:08 -0500
+Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:39738)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iiFnL-0007Yw-7p
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:46:07 -0500
+Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
+ by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBKAeMa1020121; Fri, 20 Dec 2019 02:46:05 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=B5JUyxzzZF4aLITocszqFAu6Ndb7Nwn69IZrU11ce04=;
+ b=QVkcFqfX8SjpK0e2PYtZqHFWq6XoxpimGw/MZKNXibWW6BfeJ0ZDiviHNKA/Bz3/nGtR
+ h9q4RxQaKWkNXs65UDRA2pcdLd4iIfn6VRNTm/ifwtoAJSRcGdtfwIAGKVHuY25Toe7I
+ 2FNlec7u4S/Q1GrHGbm+vymSJLidKQIu7X5oJqwaWDHo+ww7G6v3taaPZjjv3B4MGSBw
+ euVpTKtbKLiF77iOf3f1lP4zUNwr1mJsdytKxWJC0WaXwpP7UjEr/Rm36uG4jUKfZo7Z
+ 2z/E/R3DuccdwwLzjGQd8kCH524KELkCIdsNODcc964PfiaU3c42mBQ8h6jBfBK/KE0K tA== 
+Received: from nam02-bl2-obe.outbound.protection.outlook.com
+ (mail-bl2nam02lp2052.outbound.protection.outlook.com [104.47.38.52])
+ by mx0b-002c1b01.pphosted.com with ESMTP id 2ww056n060-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 20 Dec 2019 02:46:05 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=duMN/PMdLQ0lOZj7lASnzr+ipHJzqpQUTHr7mz1XStCZtgPjwKwjoBmo0LpoSYYyb6Olto4H+EYiQVmrs6t9jUo3eT8Lxl7UTUNCtVQKuXmVlz3fOdinZcdG42Bx4fIW3sIaTcCbpyvJVWwI8w2HVeJXklG2kfQ4Q2K7uv4dSDLDeQ9GyZ12ZygNImfvf3iKJ/yIoD/qixYSfXB7zN25VGXU6nIkGems4nLQ+M8EBAa+YsPGjMHPmn/9wCt9txqLx9UPff1pl5d1MGZQbWFzZM+QRaUoC+rY5daByYK/3X/ZTUTe1odzhSW4o4zNrTjXmY72dNu9SGIGIjMI9XhP2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=B5JUyxzzZF4aLITocszqFAu6Ndb7Nwn69IZrU11ce04=;
+ b=iikf41ARaKnmt6TIjumiVpu9fchOz7rQWTUhch/PlZSG0LYcfWwTQbCGJ0mBLMS8pDi0Kkg8U7yWWokZnt3KI0qcX9DAAORDskhuc4ZlEuaTqQS1yJG2P6wZQ7awcXHW+hWXBN9IotwT+V7y7nauJ3P0jhClwTIfOQW9dwXd9Sb1goLKjbVgAltJwZxf0Dw8BKM90Xx6Ad//Q/JofDeYbybEbi4s8GUOosJB7Pt3IMoX0PUWXEwt/U4K2Sho9m1eRlL0qFM0YhPMJ5T/QvSu6hz8wGje7Qzp3aLRcugB/Gn59CU6p6ERdPoQOhput06gwp6qo7a/+Yx2qCXkIdEPTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB2685.namprd02.prod.outlook.com (10.175.50.14) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2559.16; Fri, 20 Dec 2019 10:46:03 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2559.016; Fri, 20 Dec
+ 2019 10:46:03 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH v4 0/4] Improve default object property_add uint helpers
+Thread-Topic: [PATCH v4 0/4] Improve default object property_add uint helpers
+Thread-Index: AQHVtpZ6lIuRGF0HJ0OIoqz7XKz+uqfCIrMAgAC1eYA=
+Date: Fri, 20 Dec 2019 10:46:03 +0000
+Message-ID: <834B69F1-93C5-40A6-915F-B0CE91BA2FCC@nutanix.com>
+References: <20191219180205.25191-1-felipe@nutanix.com>
+ <c6289c52-aa93-c403-57d0-7cfcfbc99d9b@ozlabs.ru>
+In-Reply-To: <c6289c52-aa93-c403-57d0-7cfcfbc99d9b@ozlabs.ru>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5d6dbab8-a7c3-4768-0015-08d78539cf6a
+x-ms-traffictypediagnostic: MWHPR02MB2685:
+x-microsoft-antispam-prvs: <MWHPR02MB26855D1BB349C3B05D34C6D2D72D0@MWHPR02MB2685.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 025796F161
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(136003)(376002)(396003)(39860400002)(366004)(52314003)(40764003)(199004)(189003)(71200400001)(8936002)(66574012)(86362001)(36756003)(66946007)(2616005)(66446008)(64756008)(186003)(66556008)(66476007)(966005)(5660300002)(76116006)(4326008)(91956017)(478600001)(316002)(54906003)(6506007)(53546011)(26005)(6916009)(2906002)(8676002)(6512007)(6486002)(81156014)(81166006)(33656002)(64030200001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2685;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9J4R9uv0MyAw+8HBPF2/wyMW3WjIzPJzVYPVmP49xd7c3H+WqO0PSx9utx5eGJMA8QS3Lx5QRi/Xy/HfxfnCy8jeiu43eHZMO+suaUZMA/L524pquaYqHNTRh+cqKiPNeGB3XHX4vM/ok+oQJJX+0TYR6aYb7auKm46q+nScTlchkpqf1IyIfyFfW6L9+MMqSA46Hp2cOEfyYhqPUY+lQ8BCyfW2VQpRIdSE6mQzp0gO64zzjWS2Y15rQjB1KclKODgFO/d4NrxKm6C/nWOhQhjQtjweEheKbfkQvvENIiEp5bJgTOJKoViuSPCwot5RdJx7LJvg0gDQ9GpYyQqiI6gxnDRjWd4BO2aW69VdgWyydwwVHz+3Rmk3DkRj6XHPGBHb1pVJ1lX+6yLtu3roucO3ODQdGZqav77E6aSvZS4vitF+11Esk+ck7sBHZij0dKCqHYYXBDV59X2VZS2TFuBT9juvZCLTV8Cg8xPdngMc+YMcyprKz8QzqZ4i+p1xqonyiIMrcCh3qELVxjz3TCbRa5qSpHs68A2AHeipYCSozRG3vYS+mNwN+xM2PQEDqIrfyNFzOUlM3rz1VPhizg==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <0ACCC6E341311D49A6F023B7C41A8318@namprd02.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d6dbab8-a7c3-4768-0015-08d78539cf6a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2019 10:46:03.3995 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mEVifQo1/7zkH+TCe73Zua5YELZuiNKR/bWRWHtQDO7pyvNa7tBJE7cox49wHbIPa/aW0j7r47lBQEqvADYPcm5fWrfki2okLrJ7uaKGuDQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2685
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-20_01:2019-12-17,2019-12-20 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.155.12
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,199 +131,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nirsof@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Marc-Andre Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Phillipe Mathieu-Daude <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 20, 2019 at 10:06:17 +0000, Vladimir Sementsov-Ogievskiy wrote:
-> 20.12.2019 12:56, Peter Krempa wrote:
-> > On Fri, Dec 20, 2019 at 09:39:17 +0000, Vladimir Sementsov-Ogievskiy wr=
-ote:
-> >> 19.12.2019 18:55, Nir Soffer wrote:
-> >>> On Thu, Dec 19, 2019 at 5:17 PM Vladimir Sementsov-Ogievskiy
-> >>> <vsementsov@virtuozzo.com> wrote:
-> >>>>
-> >>>> 19.12.2019 17:59, Nir Soffer wrote:
-> >>>>> On Thu, Dec 19, 2019 at 4:04 PM Kevin Wolf <kwolf@redhat.com> wrote=
-:
-> >>>>>>
-> >>>>>> Am 19.12.2019 um 14:41 hat Vladimir Sementsov-Ogievskiy geschriebe=
-n:
-> >>>>>>> Ahh, I see, it's documented as
-> >>>>>>>
-> >>>>>>> +# @bitmap: Also export the dirty bitmap reachable from @device, =
-so the
-> >>>>>>> +#          NBD client can use NBD_OPT_SET_META_CONTEXT with
-> >>>>>>> +#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (sinc=
-e 4.0)
-> >>>>>>>
-> >>>>>>> and it is logical to assume that export name (which is @name argu=
-ment) is
-> >>>>>>> mentioned. But we never mentioned it. This is just documented aft=
-er
-> >>>>>>> removed experimenatl command x-nbd-server-add-bitmap,
-> >>>>>>>
-> >>>>>>> look at
-> >>>>>>>
-> >>>>>>> commit 7dc570b3806e5b0a4c9219061556ed5a4a0de80c
-> >>>>>>> Author: Eric Blake <eblake@redhat.com>
-> >>>>>>> Date:   Fri Jan 11 13:47:18 2019 -0600
-> >>>>>>>
-> >>>>>>>         nbd: Remove x-nbd-server-add-bitmap
-> >>>>>>>
-> >>>>>>> ...
-> >>>>>>>
-> >>>>>>> -# @bitmap-export-name: How the bitmap will be seen by nbd client=
-s
-> >>>>>>> -#                      (default @bitmap)
-> >>>>>>> -#
-> >>>>>>> -# Note: the client must use NBD_OPT_SET_META_CONTEXT with a quer=
-y of
-> >>>>>>> -# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-na=
-me) to access
-> >>>>>>> -# the exposed bitmap.
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> So, this "NAME" is saved and now looks incorrect. What should be =
-fixed, is Qapi
-> >>>>>>> documentation.
-> >>>>>>
-> >>>>>> Hm, I don't know these interfaces very well, but from you explanat=
-ion it
-> >>>>>> looks to me as if having a bitmap name made sense with
-> >>>>>> x-nbd-server-add-bitmap because it could be called more than once =
-for
-> >>>>>> exporting multiple bitmaps.
-> >>>>>>
-> >>>>>> But now, we have only nbd-server-add, which takes a single bitmap =
-name.
-> >>>>>> As we don't have to distinguish multiple bitmaps any more, wouldn'=
-t it
-> >>>>>> make more sense to use "qemu:dirty-bitmap" without any other
-> >>>>>> information? Both export name and bitmap name are already identifi=
-ed by
-> >>>>>> the connection.
-> >>>>>
-> >>>>> We can use empty string (like the default export name), so the bitm=
-ap
-> >>>>> would be exposed as:
-> >>>>>
-> >>>>>        "qemu:dirty-bitmap:"
-> >>>>>
-> >>>>> This would solve the issue for users, and keep the API extensible.
-> >>>>
-> >>>> As I already said, we can not. If we really wont such thing, use ano=
-ther name,
-> >>>> likq qemu:default-dirty-bitmap..
-> >>>>
-> >>>> Or call bitmap export "default", to produce
-> >>>>     "qemu:dirty-bitmaps:default"
-> >>>>
-> >>>> But don't change default behavior of nbd-server-add
-> >>>>
-> >>>>>
-> >>>>>> But if we have to have something there, using the bitmap name (whi=
-ch may
-> >>>>>> or may not be the same as used in the image file) makes a little m=
-ore
-> >>>>>> sense because it makes the interface extensible for the case that =
-we
-> >>>>>> ever want to re-introduce an nbd-server-add-bitmap.
-> >>>>>
-> >>>>> But using the bitmap name means user of the NBD server need to know=
- this name.
-> >>>>
-> >>>> Why not? What is your case exactly? User knows, what kind of bitmap =
-you are
-> >>>> exporting, so user is in some relation with exporting process anyway=
-. Why
-> >>>> shouldn't it know the name?
-> >>>
-> >>> Because the user configuring qemu (libvirt) is not the same user
-> >>> accessing qemu NBD
-> >>> server (ovirt, or some backup application).
-> >>>
-> >>>> This name may be defined in you exporting protocol.. What are you ex=
-porting?
-> >>>
-> >>> We export HTTP API, allowing getting dirty extents and reading data:
-> >>> https://www.ovirt.org/develop/release-management/features/storage/inc=
-remental-backup.html#map-request
-> >>> (this document is outdated, but it gives the general idea)
-> >>>
-> >>> Or provide the NBD URL directly to user (future).
-> >>>
-> >>>> Note also, that client may use NBD_OPT_LIST_META_CONTEXT with query
-> >>>> "qemu:dirty-bitmap:", to get list of all exported bitmaps.
-> >>>
-> >>> This is another option, I did not try to use this yet. We can use the=
- single
-> >>> exported bitmap and fail if we get more than one. This is probably be=
-tter
-> >>> than changing the entire stack to support bitmap name.
-> >>>
-> >>>>> One option is that libvirt would publish the name of the bitmap in =
-the
-> >>>>> xml describing
-> >>>>> the backup, and oVirt will have to propagate this name to the actua=
-l
-> >>>>> program accessing
-> >>>>> the NBD server, which may be a user program in the case when we exp=
-ose the NBD
-> >>>>> URL to users (planned for future version).
-> >>>>>
-> >>>>> Another option is that the user will control this name, and libvirt
-> >>>>> will use the name specified
-> >>>>> by the user. This means oVirt will have to provide API to set this
-> >>>>> name and pass it to libvirt.
-> >>>>>
-> >>>>> Both cases require lot of effort which does not help anyone in the
-> >>>>> task of getting dirty
-> >>>>> extents from an image - which is our current goal. We need to have
-> >>>>> good defaults that
-> >>>>> save unneeded effort in the entire stack.
-> >>>>
-> >>>> So, you implementing some protocol, and need to export only one bitm=
-ap for
-> >>>> your specified scenario. Why not just give a constant name? Like ovi=
-rt-bitmap,
-> >>>> or something like this?
-> >>>
-> >>> But we don't use qemu directly. We use libvirt, and libvirt does not =
-expose
-> >>> the name of the bitmap, or let use control this name.
-> >>>
-> >>> This is a simplified flow:
-> >>> 1. libvirt starts a backup, creating the "backup-exportname" bitmap
-> >>
-> >> But do you manage exportname, or not?
-> >=20
-> > They can't manage the export name either, but apparently the default
-> > that libvirt uses suits them.
-> >=20
-> > I can add possibility to name the actual backup output bitmap
-> > arbitrarily. Obviously the user then has to pass a sensible name of a
-> > non existant bitmap to proceed.
-> >=20
-> > Making both configurable at the same time may be worth doing as it will
-> > be basically the same code.
-> >=20
+Hi,
+
+> On Dec 19, 2019, at 11:56 PM, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 >=20
-> Intuitively, I think it's better leave bitmap name as is: libvirt manages
-> bitmaps, so let it manage their names as it wants. And I don't think that
-> Nir want to care about existing bitmaps.
+>=20
+>=20
+> On 20/12/2019 05:02, Felipe Franciosi wrote:
+>> This improves the family of object_property_add_uintXX_ptr helpers by en=
+abling
+>> a default getter/setter only when desired. To prevent an API behavioural=
+ change
+>> (from clients that already used these helpers and did not want a setter)=
+, we
+>> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter. =
+Patch 1
+>> enhances the API and modify current users.
+>>=20
+>> While modifying the clients of the API, a couple of improvement opportun=
+ities
+>> were observed in ich9. These were added in separate patches (2 and 3).
+>>=20
+>> Patch 3 cleans up a lot of existing code by moving various objects to th=
+e
+>> enhanced API. Previously, those objects had their own getters/setters th=
+at only
+>> updated the values without further checks. Some of them actually lacked =
+a check
+>> for setting overflows, which could have resulted in undesired values bei=
+ng set.
+>> The new default setters include a check for that, not updating the value=
+s in
+>> case of errors (and propagating them). If they did not provide an error
+>> pointer, then that behaviour was maintained.
+>=20
+> A weird thing happens - when I apply patches from my mailer (thunderbird
+> -> open the source -> cut-n-paste to "git am") - they fail to apply. And
+> the mails themselves look suspicious - too many "MS-Exchange" and
+> "X-Proofpoint" :)
 
-Actually for an incremental backup we are creating a new bitmap which is
-used for merging all the appropriate bitmaps for the expected backup
-range. This is done also when only one bitmap would be selected this way
-as there's no point in optimizing this algorithm.
+I apologise for that... as you can see from below, our company's
+"anti-spam" / "anti-virus" mail servers tend to mangle incoming
+e-mails in ways that make it challenging to work with MLs:
 
-This means we can name the new bitmap arbitrarily (if it doesn't clash
-with existing bitmap) and since that name will be also exported it's the
-same they request.
+>=20
+> A bundle from
+> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__patchwork.ozlabs.o=
+rg_project_qemu-2Ddevel_list_-3Fseries-3D149673&d=3DDwICaQ&c=3Ds883GpUCOChK=
+OHiocYtGcg&r=3DCCrJKVC5zGot8PrnI-iYe00MdX4pgdQfMRigp14Ptmk&m=3DTxZxCvPIyfiA=
+MkXeqOwUO_oYhAWFHAG66jA3SeEldzU&s=3DvMLzvHMGCJ9VeW3wSKvJVPrthKmVoud-ACf5eh6=
+w2Rg&e=3D=20
+> applies fine though.
+
+Now I know why both you and Marc-Andre had problems applying my
+patches: apparently our servers also mangle with outgoing e-mails too.
+
+I heard that pulling the patches from mbox work, but I'll make sure to
+post patches on Github in the future to make things easier for others.
+I've already asked them to look into this and whitelist e-mails on
+various criteria.
+
+Thanks for your help in making sure these patches work for you despite
+the extra hurdles!
+
+F.
+
+>=20
+>=20
+> Anyway, this works on powerpc. Thanks,
+>=20
+>=20
+>=20
+>>=20
+>> Felipe Franciosi (4):
+>>  qom/object: enable setter for uint types
+>>  ich9: fix getter type for sci_int property
+>>  ich9: Simplify ich9_lpc_initfn
+>>  qom/object: Use common get/set uint helpers
+>>=20
+>> hw/acpi/ich9.c       |  99 ++------------------
+>> hw/acpi/pcihp.c      |   7 +-
+>> hw/acpi/piix4.c      |  12 +--
+>> hw/isa/lpc_ich9.c    |  27 ++----
+>> hw/misc/edu.c        |  13 +--
+>> hw/pci-host/q35.c    |  14 +--
+>> hw/ppc/spapr.c       |  18 +---
+>> hw/ppc/spapr_drc.c   |   3 +-
+>> include/qom/object.h |  44 +++++++--
+>> memory.c             |  15 +--
+>> qom/object.c         | 216 ++++++++++++++++++++++++++++++++++++++-----
+>> target/arm/cpu.c     |  22 +----
+>> target/i386/sev.c    | 106 ++-------------------
+>> ui/console.c         |   4 +-
+>> 14 files changed, 282 insertions(+), 318 deletions(-)
+>>=20
+>=20
+> --=20
+> Alexey
 
 
