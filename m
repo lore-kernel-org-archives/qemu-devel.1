@@ -2,87 +2,78 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C1AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 09:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D09E2C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2588206EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 09:57:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AC212465E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:02:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WEnzhErZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2588206EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3tAff2r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AC212465E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiF2I-0005PF-TQ
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 04:57:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32929)
+	id 1iiF6n-0006yv-Ro
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 05:02:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iiF1K-0004u7-T5
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 04:56:32 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iiF5y-0006XV-DG
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:01:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iiF1I-0005jo-TE
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 04:56:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44215
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iiF5s-0003pi-8U
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:01:17 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21662
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iiF1I-0005eX-L5
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 04:56:28 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iiF5r-0003kj-ST
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:01:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576835787;
+ s=mimecast20190719; t=1576836070;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=w7ZCGZMqLhATZGrPALj/IyoQCqSs02c1xAeqghZJ0Xw=;
- b=WEnzhErZmuSXdvMutL3baa+bbjw+Aj3vJflHgC0jzcqpvADcxw+kzjjymg5DUC9NBgd56k
- b5ICArWXBZv7Hadv8JCjQML75VZ+IkT8Df55ziym2R4qKWefRUjpadVS5IwLyUTU6lFZ7T
- odMDvDGEZccOnwhOL3O6UGP7De8vEhQ=
+ bh=/99O1y5T3rg4A8lX54V5FCbLG1no9r3rUg3Ondcmp8s=;
+ b=f3tAff2rWmQ1lIipQlrZLOJaZt3IXa5hc/mUjhcMAWot/7pUaj/eL764GBVP/JC9mhOBUb
+ 6kLVMEI+xpYQ3F7YkQvIun4MM0OS6fzojS43oorZKC80dYpFq34Q+ddSBk+l2jzHPFi+aU
+ Qn9nDEm1eFYoatwkcVH7Los6mUJY92k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-pyvnaXtIOzmwue96tOMI6A-1; Fri, 20 Dec 2019 04:56:23 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-161-sN14FnVaNgOeL4afW5TtFA-1; Fri, 20 Dec 2019 05:01:09 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20F92102CE1E;
- Fri, 20 Dec 2019 09:56:22 +0000 (UTC)
-Received: from andariel.pipo.sk (ovpn-205-6.brq.redhat.com [10.40.205.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5570963B89;
- Fri, 20 Dec 2019 09:56:20 +0000 (UTC)
-Date: Fri, 20 Dec 2019 10:56:17 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH] block: nbd: Fix dirty bitmap context name
-Message-ID: <20191220095617.GK4914@andariel.pipo.sk>
-References: <20191219125151.21482-1-nsoffer@redhat.com>
- <443c32b3-0e0c-ef9e-4d5b-9404b16eaa02@virtuozzo.com>
- <20191219140433.GK5230@linux.fritz.box>
- <CAMRbyyvqa1_3U=2Q7HmCrRcEq+yJjxUP7MM-GM5hUdrZw=yBOw@mail.gmail.com>
- <ddf58827-72e8-f853-e6bc-05d19100c62d@virtuozzo.com>
- <CAMRbyysHGjsWaCWXW2+iNSwU03DhavRF6sJ9-POUx3Mky6LK7Q@mail.gmail.com>
- <42c73579-fdaa-5590-39f9-ca9cacfeaa5e@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15CBD107ACC9;
+ Fri, 20 Dec 2019 10:01:07 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC0E41A7E3;
+ Fri, 20 Dec 2019 10:01:01 +0000 (UTC)
+Date: Fri, 20 Dec 2019 11:01:00 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [RFC PATCH 07/10] hw/avr: Add few Arduino boards
+Message-ID: <20191220110100.4528a3ea@redhat.com>
+In-Reply-To: <20191128015030.27543-8-f4bug@amsat.org>
+References: <20191128015030.27543-1-f4bug@amsat.org>
+ <20191128015030.27543-8-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <42c73579-fdaa-5590-39f9-ca9cacfeaa5e@virtuozzo.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: pyvnaXtIOzmwue96tOMI6A-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: sN14FnVaNgOeL4afW5TtFA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,175 +85,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nirsof@gmail.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Thomas Huth <huth@tuxfamily.org>, Joaquin de Andres <me@xcancerberox.com.ar>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Michael Rolnik <mrolnik@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 20, 2019 at 09:39:17 +0000, Vladimir Sementsov-Ogievskiy wrote:
-> 19.12.2019 18:55, Nir Soffer wrote:
-> > On Thu, Dec 19, 2019 at 5:17 PM Vladimir Sementsov-Ogievskiy
-> > <vsementsov@virtuozzo.com> wrote:
-> >>
-> >> 19.12.2019 17:59, Nir Soffer wrote:
-> >>> On Thu, Dec 19, 2019 at 4:04 PM Kevin Wolf <kwolf@redhat.com> wrote:
-> >>>>
-> >>>> Am 19.12.2019 um 14:41 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >>>>> Ahh, I see, it's documented as
-> >>>>>
-> >>>>> +# @bitmap: Also export the dirty bitmap reachable from @device, so=
- the
-> >>>>> +#          NBD client can use NBD_OPT_SET_META_CONTEXT with
-> >>>>> +#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since =
-4.0)
-> >>>>>
-> >>>>> and it is logical to assume that export name (which is @name argume=
-nt) is
-> >>>>> mentioned. But we never mentioned it. This is just documented after
-> >>>>> removed experimenatl command x-nbd-server-add-bitmap,
-> >>>>>
-> >>>>> look at
-> >>>>>
-> >>>>> commit 7dc570b3806e5b0a4c9219061556ed5a4a0de80c
-> >>>>> Author: Eric Blake <eblake@redhat.com>
-> >>>>> Date:   Fri Jan 11 13:47:18 2019 -0600
-> >>>>>
-> >>>>>        nbd: Remove x-nbd-server-add-bitmap
-> >>>>>
-> >>>>> ...
-> >>>>>
-> >>>>> -# @bitmap-export-name: How the bitmap will be seen by nbd clients
-> >>>>> -#                      (default @bitmap)
-> >>>>> -#
-> >>>>> -# Note: the client must use NBD_OPT_SET_META_CONTEXT with a query =
-of
-> >>>>> -# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-name=
-) to access
-> >>>>> -# the exposed bitmap.
-> >>>>>
-> >>>>>
-> >>>>> So, this "NAME" is saved and now looks incorrect. What should be fi=
-xed, is Qapi
-> >>>>> documentation.
-> >>>>
-> >>>> Hm, I don't know these interfaces very well, but from you explanatio=
-n it
-> >>>> looks to me as if having a bitmap name made sense with
-> >>>> x-nbd-server-add-bitmap because it could be called more than once fo=
-r
-> >>>> exporting multiple bitmaps.
-> >>>>
-> >>>> But now, we have only nbd-server-add, which takes a single bitmap na=
-me.
-> >>>> As we don't have to distinguish multiple bitmaps any more, wouldn't =
-it
-> >>>> make more sense to use "qemu:dirty-bitmap" without any other
-> >>>> information? Both export name and bitmap name are already identified=
- by
-> >>>> the connection.
-> >>>
-> >>> We can use empty string (like the default export name), so the bitmap
-> >>> would be exposed as:
-> >>>
-> >>>       "qemu:dirty-bitmap:"
-> >>>
-> >>> This would solve the issue for users, and keep the API extensible.
-> >>
-> >> As I already said, we can not. If we really wont such thing, use anoth=
-er name,
-> >> likq qemu:default-dirty-bitmap..
-> >>
-> >> Or call bitmap export "default", to produce
-> >>    "qemu:dirty-bitmaps:default"
-> >>
-> >> But don't change default behavior of nbd-server-add
-> >>
-> >>>
-> >>>> But if we have to have something there, using the bitmap name (which=
- may
-> >>>> or may not be the same as used in the image file) makes a little mor=
-e
-> >>>> sense because it makes the interface extensible for the case that we
-> >>>> ever want to re-introduce an nbd-server-add-bitmap.
-> >>>
-> >>> But using the bitmap name means user of the NBD server need to know t=
-his name.
-> >>
-> >> Why not? What is your case exactly? User knows, what kind of bitmap yo=
-u are
-> >> exporting, so user is in some relation with exporting process anyway. =
-Why
-> >> shouldn't it know the name?
-> >=20
-> > Because the user configuring qemu (libvirt) is not the same user
-> > accessing qemu NBD
-> > server (ovirt, or some backup application).
-> >=20
-> >> This name may be defined in you exporting protocol.. What are you expo=
-rting?
-> >=20
-> > We export HTTP API, allowing getting dirty extents and reading data:
-> > https://www.ovirt.org/develop/release-management/features/storage/incre=
-mental-backup.html#map-request
-> > (this document is outdated, but it gives the general idea)
-> >=20
-> > Or provide the NBD URL directly to user (future).
-> >=20
-> >> Note also, that client may use NBD_OPT_LIST_META_CONTEXT with query
-> >> "qemu:dirty-bitmap:", to get list of all exported bitmaps.
-> >=20
-> > This is another option, I did not try to use this yet. We can use the s=
-ingle
-> > exported bitmap and fail if we get more than one. This is probably bett=
-er
-> > than changing the entire stack to support bitmap name.
-> >=20
-> >>> One option is that libvirt would publish the name of the bitmap in th=
-e
-> >>> xml describing
-> >>> the backup, and oVirt will have to propagate this name to the actual
-> >>> program accessing
-> >>> the NBD server, which may be a user program in the case when we expos=
-e the NBD
-> >>> URL to users (planned for future version).
-> >>>
-> >>> Another option is that the user will control this name, and libvirt
-> >>> will use the name specified
-> >>> by the user. This means oVirt will have to provide API to set this
-> >>> name and pass it to libvirt.
-> >>>
-> >>> Both cases require lot of effort which does not help anyone in the
-> >>> task of getting dirty
-> >>> extents from an image - which is our current goal. We need to have
-> >>> good defaults that
-> >>> save unneeded effort in the entire stack.
-> >>
-> >> So, you implementing some protocol, and need to export only one bitmap=
- for
-> >> your specified scenario. Why not just give a constant name? Like ovirt=
--bitmap,
-> >> or something like this?
-> >=20
-> > But we don't use qemu directly. We use libvirt, and libvirt does not ex=
-pose
-> > the name of the bitmap, or let use control this name.
-> >=20
-> > This is a simplified flow:
-> > 1. libvirt starts a backup, creating the "backup-exportname" bitmap
+On Thu, 28 Nov 2019 02:50:27 +0100
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+
+> Add famous Arduino boards:
 >=20
-> But do you manage exportname, or not?
+> - Arduino Duemilanove
+> - Arduino Mega
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/avr/arduino.c     | 173 +++++++++++++++++++++++++++++++++++++++++++
+>  hw/avr/Makefile.objs |   1 +
+>  2 files changed, 174 insertions(+)
+>  create mode 100644 hw/avr/arduino.c
+>=20
+> diff --git a/hw/avr/arduino.c b/hw/avr/arduino.c
+> new file mode 100644
+> index 0000000000..191193d614
+> --- /dev/null
+> +++ b/hw/avr/arduino.c
+> @@ -0,0 +1,173 @@
+> +/*
+> + * QEMU Arduino boards
+> + *
+> + * Copyright (c) 2019 Philippe Mathieu-Daud=C3=A9
+> + *
+> + * This work is licensed under the terms of the GNU GPLv2 or later.
+> + * See the COPYING file in the top-level directory.
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +/* TODO: Implement the use of EXTRAM */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qapi/error.h"
+> +#include "hw/boards.h"
+> +#include "hw/loader.h"
+> +#include "elf.h"
+> +#include "atmega.h"
+> +
+> +typedef struct ArduinoBoardConfig {
+> +    const char *name;
+> +    const char *desc;
+> +    const char *alias;
+> +    const char *mcu_type;
+> +    uint64_t xtal_hz;
+> +    size_t extram_size;
+> +    bool is_default;
+> +} ArduinoBoardConfig;
+> +
+> +static const ArduinoBoardConfig arduino_boards[] =3D {
+> +    {
+> +        /* https://www.arduino.cc/en/Main/ArduinoBoardDuemilanove */
+> +        .name       =3D MACHINE_TYPE_NAME("arduino-duemilanove"),
+> +        .desc       =3D "Arduino Duemilanove (ATmega168)",
+> +        .alias      =3D "2009",
+> +        .mcu_type    =3D TYPE_ATMEGA168,
+> +        .xtal_hz    =3D 16 * 1000 * 1000,
+> +    }, {
+> +        /* https://store.arduino.cc/arduino-uno-rev3 */
+> +        .name       =3D MACHINE_TYPE_NAME("arduino-uno"),
+> +        .desc       =3D "Arduino Duemilanove (ATmega328P)",
+> +        .alias      =3D "UNO",
+> +        .mcu_type    =3D TYPE_ATMEGA328,
+> +        .xtal_hz    =3D 16 * 1000 * 1000,
+> +    }, {
+> +        /* https://www.arduino.cc/en/Main/ArduinoBoardMega */
+> +        .name       =3D MACHINE_TYPE_NAME("arduino-mega"),
+> +        .desc       =3D "Arduino Mega (ATmega1280)",
+> +        .alias      =3D "MEGA",
+> +        .mcu_type    =3D TYPE_ATMEGA1280,
+> +        .xtal_hz    =3D 16 * 1000 * 1000,
+> +    }, {
+> +        /* https://store.arduino.cc/arduino-mega-2560-rev3 */
+> +        .name       =3D MACHINE_TYPE_NAME("arduino-mega-2560-v3"),
+> +        .desc       =3D "Arduino Mega 2560 (ATmega2560)",
+> +        .alias      =3D "MEGA2560",
+> +        .mcu_type    =3D TYPE_ATMEGA2560,
+> +        .xtal_hz    =3D 16 * 1000 * 1000, /* CSTCE16M0V53-R0 */
+> +        .is_default =3D true,
+> +    },
+> +};
 
-They can't manage the export name either, but apparently the default
-that libvirt uses suits them.
+It's common pre QOM pattern, but it would be better use machine class
+for defining machine properties. See
+ baa4732bc10b3fd7 aspeed: Remove AspeedBoardConfig array and use AspeedMach=
+ineClass
+that recently did conversion.
 
-I can add possibility to name the actual backup output bitmap
-arbitrarily. Obviously the user then has to pass a sensible name of a
-non existant bitmap to proceed.
 
-Making both configurable at the same time may be worth doing as it will
-be basically the same code.
+> +
+> +typedef struct ArduinoMachineState {
+> +    /*< private >*/
+> +    MachineState parent_obj;
+> +    /*< public >*/
+> +    AtmegaState mcu;
+> +    MemoryRegion extram;
+> +} ArduinoMachineState;
+> +
+> +typedef struct ArduinoMachineClass {
+> +    /*< private >*/
+> +    MachineClass parent_class;
+> +    /*< public >*/
+> +    const ArduinoBoardConfig *config;
+> +} ArduinoMachineClass;
+> +
+> +#define TYPE_ARDUINO_MACHINE \
+> +        MACHINE_TYPE_NAME("arduino")
+> +#define ARDUINO_MACHINE(obj) \
+> +        OBJECT_CHECK(ArduinoMachineState, (obj), TYPE_ARDUINO_MACHINE)
+> +#define ARDUINO_MACHINE_CLASS(klass) \
+> +        OBJECT_CLASS_CHECK(ArduinoMachineClass, (klass), TYPE_ARDUINO_MA=
+CHINE)
+> +#define ARDUINO_MACHINE_GET_CLASS(obj) \
+> +        OBJECT_GET_CLASS(ArduinoMachineClass, (obj), TYPE_ARDUINO_MACHIN=
+E)
+> +
+> +static void load_firmware(const char *firmware, uint64_t flash_size)
+> +{
+> +    const char *filename;
+> +    int bytes_loaded;
+> +
+> +    /* Load firmware (contents of flash) trying to auto-detect format */
+> +    filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
+> +    if (filename =3D=3D NULL) {
+> +        error_report("Unable to find %s", firmware);
+> +        exit(1);
+> +    }
+> +
+> +    bytes_loaded =3D load_elf(filename, NULL, NULL, NULL, NULL, NULL, NU=
+LL,
+> +                            0, EM_NONE, 0, 0);
+> +    if (bytes_loaded < 0) {
+> +        bytes_loaded =3D load_image_targphys(filename, OFFSET_CODE, flas=
+h_size);
+> +    }
+> +    if (bytes_loaded < 0) {
+> +        error_report("Unable to load firmware image %s as ELF or raw bin=
+ary",
+> +                     firmware);
+> +        exit(1);
+> +    }
+> +}
+> +
+> +static void arduino_machine_init(MachineState *machine)
+> +{
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_GET_CLASS(machine);
+> +    ArduinoMachineState *ams =3D ARDUINO_MACHINE(machine);
+> +
+> +    sysbus_init_child_obj(OBJECT(machine), "mcu", &ams->mcu, sizeof(ams-=
+>mcu),
+> +                          amc->config->mcu_type);
+> +    object_property_set_uint(OBJECT(&ams->mcu), amc->config->xtal_hz,
+> +                             "xtal-frequency-hz", &error_abort);
+> +    object_property_set_bool(OBJECT(&ams->mcu), true, "realized",
+> +                             &error_abort);
+> +
+> +    if (machine->firmware) {
+> +        load_firmware(machine->firmware, memory_region_size(&ams->mcu.fl=
+ash));
+> +    }
+> +}
+> +
+> +static void arduino_machine_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    ArduinoMachineClass *amc =3D ARDUINO_MACHINE_CLASS(oc);
+> +    const ArduinoBoardConfig *cfg =3D data;
+> +
+> +    mc->desc =3D cfg->desc;
+> +    mc->alias =3D cfg->alias;
+> +    mc->init =3D arduino_machine_init;
+> +    mc->default_cpus =3D 1;
+> +    mc->min_cpus =3D mc->default_cpus;
+> +    mc->max_cpus =3D mc->default_cpus;
+> +    mc->no_floppy =3D 1;
+> +    mc->no_cdrom =3D 1;
+> +    mc->no_parallel =3D 1;
+> +    mc->is_default =3D cfg->is_default;
+> +    mc->default_ram_size =3D cfg->extram_size;
+> +    amc->config =3D cfg;
+> +}
+> +
+> +static const TypeInfo arduino_machine_type =3D {
+> +    .name =3D TYPE_ARDUINO_MACHINE,
+> +    .parent =3D TYPE_MACHINE,
+> +    .instance_size =3D sizeof(ArduinoMachineState),
+> +    .class_size =3D sizeof(ArduinoMachineClass),
+> +    .abstract =3D true,
+> +};
+> +
+> +static void arduino_machine_types(void)
+> +{
+> +    size_t i;
+> +
+> +    type_register_static(&arduino_machine_type);
+> +    for (i =3D 0; i < ARRAY_SIZE(arduino_boards); ++i) {
+> +        TypeInfo ti =3D {
+> +            .name       =3D arduino_boards[i].name,
+> +            .parent     =3D TYPE_ARDUINO_MACHINE,
+> +            .class_init =3D arduino_machine_class_init,
+> +            .class_data =3D (void *)&arduino_boards[i],
+> +        };
+> +        type_register(&ti);
+> +    }
+> +}
+> +
+> +type_init(arduino_machine_types)
+> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+> index 4b6b911820..39ee3c32b2 100644
+> --- a/hw/avr/Makefile.objs
+> +++ b/hw/avr/Makefile.objs
+> @@ -1,2 +1,3 @@
+>  obj-y +=3D sample.o
+>  obj-y +=3D atmega.o
+> +obj-y +=3D arduino.o
 
 
