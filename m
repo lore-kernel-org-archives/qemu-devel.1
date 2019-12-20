@@ -2,89 +2,85 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B9DC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D35C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A58A221655
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:36:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F6B82467F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:37:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qA2Nbbnk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A58A221655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxfbZFy9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F6B82467F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiHW0-0002fr-Ro
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:36:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36706)
+	id 1iiHXO-0003yz-DM
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:37:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiHAu-0000jj-RM
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:14:34 -0500
+ (envelope-from <armbru@redhat.com>) id 1iiHWm-0003Mj-1e
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:37:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiHAt-0001Q9-39
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:14:32 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34042)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiHAs-0001M9-Oa
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:14:30 -0500
-Received: by mail-wm1-x343.google.com with SMTP id c127so1632092wme.1
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 04:14:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oMQw6t6tRzlw6HQPCH1hJECHMvald9wcRxGqG3qpIY0=;
- b=qA2Nbbnkf7t7LSKkmijtFigfij9EhBRtlf6+zLdSkH420XupqFUbMgVl9WcotKQEir
- fQYZXiwOwqXHl89D5VpT2YUiZK23e1DYjanfr7ZN4N2+JIOLltDI2tEx+Hel7HmfOakt
- ngHiiPj1zFQx5T8UFC9WvVXxphsrCHps0FzUznXpSsTf2DUPXut5jBeQQoZMB4i9ELGh
- rDLF6ELs8bZObKdDbNrU21jjHbV0Bkwjm2Vn36a1zANq2zbvk2xcbraG4XxL5GHhGZyQ
- Hv1ZiF3c2ReAx3O/Gbi9duUuFjpeaEFKa+ccTVpAPzWlM14mh7zUFzU3ak5iQEW7icOI
- kNtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=oMQw6t6tRzlw6HQPCH1hJECHMvald9wcRxGqG3qpIY0=;
- b=hXMRQuLQ3FOCB5cdbII9D2bV4o41R+MUwV/L7ZRWLapFUbNrrUkQpZHAsvYv5g+vcy
- 8buCAuNLLbx4Z6Ql/JlHKYJzcChiqOWMz+s2bZJYZh4ScnEDb7xSkMV4wNoet55GDnDZ
- oKgvgu/QiotzTqSsgoFuXKG7M+iOfdELz3nHjYgQJLukv8kmwM4Od4w3iwqal7b8Cgtn
- emk6DeQdePYYYnTcgtqJi8Uadgx2CsOt2KwhIKPMWPWgcyybWnezNgnd6NYUGC4M/QVG
- pJrFa+aZqCV5BPGA/XdNPz3Yv8O7f8lyEiNDHdi7ppop4Cu2s65Mqrsbaj3T2n8LQYHF
- b8Vw==
-X-Gm-Message-State: APjAAAW7tfzy1CtDDcVN1XRtbAvruNf8xvAlsE3uY3DrxDAC/4od7Bo7
- I7ZLqQW9nVmfWhWsR7B4z/opaA==
-X-Google-Smtp-Source: APXvYqz2KFWAVDMx6rIGJxR4Rpz3GK8a75aRWcEmmGM3w2lvzgLhn+N1hOmT4VT+K0VgSWJYqvZr7A==
-X-Received: by 2002:a7b:cd0a:: with SMTP id f10mr16703426wmj.56.1576844069376; 
- Fri, 20 Dec 2019 04:14:29 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s10sm9517124wrw.12.2019.12.20.04.14.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 04:14:25 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 00A021FFAA;
- Fri, 20 Dec 2019 12:04:41 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v4 20/21] gdbstub: change GDBState.last_packet to GByteArray
-Date: Fri, 20 Dec 2019 12:04:37 +0000
-Message-Id: <20191220120438.16114-21-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191220120438.16114-1-alex.bennee@linaro.org>
-References: <20191220120438.16114-1-alex.bennee@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1iiHWj-0004Be-AR
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:37:06 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36563
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iiHWi-00045i-O8
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:37:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576845423;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZURHf47599Oiqaj5pNcilS7XuQaE5mSWf5ACWnpwbXo=;
+ b=RxfbZFy9T7zbHRd145cqIoHCzrBNnSBbRAy5m8wdrSDyqC0ykzVDT+mDQx+SFT8PmD3nrE
+ 8lX+DlyOh1ifdDTPRuoE/959OkEefR9pwEOnuCNm23NirMTrERlG7xnuawjpSl0XRqCncC
+ i9Ga1RbgWavRR1SNOVjxM7kMC9utYtc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-uHoDzBo6P8mfJ0XtotAa9g-1; Fri, 20 Dec 2019 07:37:02 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D84B800053;
+ Fri, 20 Dec 2019 12:37:01 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
+ [10.36.116.42])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DB05E60BEC;
+ Fri, 20 Dec 2019 12:37:00 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0C1C411386A7; Fri, 20 Dec 2019 13:36:58 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 0/6] QAPI patches for 2019-12-17
+References: <20191217081454.8072-1-armbru@redhat.com>
+ <CAFEAcA8r-wai+vMa8WiCjUFyRGwTQQs9fZo_ddRmAdr_6GAcTw@mail.gmail.com>
+ <875zie81ov.fsf@dusky.pond.sub.org>
+ <CAFEAcA-TiK6y+VhYw5iaRWgxoWc+qk+gHwEusa74pDd4+Dtf9Q@mail.gmail.com>
+Date: Fri, 20 Dec 2019 13:36:58 +0100
+In-Reply-To: <CAFEAcA-TiK6y+VhYw5iaRWgxoWc+qk+gHwEusa74pDd4+Dtf9Q@mail.gmail.com>
+ (Peter Maydell's message of "Thu, 19 Dec 2019 17:05:22 +0000")
+Message-ID: <87y2v7golx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: uHoDzBo6P8mfJ0XtotAa9g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,131 +92,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- luis.machado@linaro.org, alan.hayward@arm.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Damien Hedde <damien.hedde@greensocs.com>
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Remove the packet size upper limit by using a GByteArray
-instead of a statically allocated array for last_packet.
-Thus we can now send big packets.
+> On Wed, 18 Dec 2019 at 08:42, Markus Armbruster <armbru@redhat.com> wrote=
+:
+>> Perplexing.  None of the files involved gets changed by this pull
+>> request.  My qapi-types-crypto.h has
+>>
+>>     typedef struct QCryptoBlockOptionsQCow QCryptoBlockOptionsQCow;
+>>     [...]
+>>     struct QCryptoBlockOptionsQCow {
+>>         bool has_key_secret;
+>>         char *key_secret;
+>>     };
+>>     [...]
+>>     struct QCryptoBlockOpenOptions {
+>>         /* Members inherited from QCryptoBlockOptionsBase: */
+>>         QCryptoBlockFormat format;
+>>         /* Own members: */
+>>         union { /* union tag is @format */
+>>             QCryptoBlockOptionsQCow qcow;
+>>             QCryptoBlockOptionsLUKS luks;
+>>         } u;
+>>     };
+>>
+>> before and after.  May I see yours?
+>
+> Unfortunately not -- I've already discarded this build attempt
+> and continued with processing other merge requests.
 
-Also remove the last_packet_len field and use last_packet->len
-instead.
+Alright, I closed the curtains, lighted some incense sticks, stared deep
+into the crystal ball, and beheld the number two.  Two as in Python 2.
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191211160514.58373-2-damien.hedde@greensocs.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- gdbstub.c | 39 +++++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 18 deletions(-)
-
-diff --git a/gdbstub.c b/gdbstub.c
-index 287d0535b12..49e760283db 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -351,8 +351,7 @@ typedef struct GDBState {
-     int line_buf_index;
-     int line_sum; /* running checksum */
-     int line_csum; /* checksum at the end of the packet */
--    uint8_t last_packet[MAX_PACKET_LENGTH + 4];
--    int last_packet_len;
-+    GByteArray *last_packet;
-     int signal;
- #ifdef CONFIG_USER_ONLY
-     int fd;
-@@ -384,6 +383,7 @@ static void init_gdbserver_state(void)
-     gdbserver_state.init = true;
-     gdbserver_state.str_buf = g_string_new(NULL);
-     gdbserver_state.mem_buf = g_byte_array_sized_new(MAX_PACKET_LENGTH);
-+    gdbserver_state.last_packet = g_byte_array_sized_new(MAX_PACKET_LENGTH + 4);
- }
- 
- #ifndef CONFIG_USER_ONLY
-@@ -626,28 +626,29 @@ static void hexdump(const char *buf, int len,
- static int put_packet_binary(const char *buf, int len, bool dump)
- {
-     int csum, i;
--    uint8_t *p;
--    uint8_t *ps = &gdbserver_state.last_packet[0];
-+    uint8_t footer[3];
- 
-     if (dump && trace_event_get_state_backends(TRACE_GDBSTUB_IO_BINARYREPLY)) {
-         hexdump(buf, len, trace_gdbstub_io_binaryreply);
-     }
- 
-     for(;;) {
--        p = ps;
--        *(p++) = '$';
--        memcpy(p, buf, len);
--        p += len;
-+        g_byte_array_set_size(gdbserver_state.last_packet, 0);
-+        g_byte_array_append(gdbserver_state.last_packet,
-+                            (const uint8_t *) "$", 1);
-+        g_byte_array_append(gdbserver_state.last_packet,
-+                            (const uint8_t *) buf, len);
-         csum = 0;
-         for(i = 0; i < len; i++) {
-             csum += buf[i];
-         }
--        *(p++) = '#';
--        *(p++) = tohex((csum >> 4) & 0xf);
--        *(p++) = tohex((csum) & 0xf);
-+        footer[0] = '#';
-+        footer[1] = tohex((csum >> 4) & 0xf);
-+        footer[2] = tohex((csum) & 0xf);
-+        g_byte_array_append(gdbserver_state.last_packet, footer, 3);
- 
--        gdbserver_state.last_packet_len = p - ps;
--        put_buffer(ps, gdbserver_state.last_packet_len);
-+        put_buffer(gdbserver_state.last_packet->data,
-+                   gdbserver_state.last_packet->len);
- 
- #ifdef CONFIG_USER_ONLY
-         i = get_char();
-@@ -2812,20 +2813,22 @@ static void gdb_read_byte(uint8_t ch)
-     uint8_t reply;
- 
- #ifndef CONFIG_USER_ONLY
--    if (gdbserver_state.last_packet_len) {
-+    if (gdbserver_state.last_packet->len) {
-         /* Waiting for a response to the last packet.  If we see the start
-            of a new command then abandon the previous response.  */
-         if (ch == '-') {
-             trace_gdbstub_err_got_nack();
--            put_buffer((uint8_t *)gdbserver_state.last_packet, gdbserver_state.last_packet_len);
-+            put_buffer(gdbserver_state.last_packet->data,
-+                       gdbserver_state.last_packet->len);
-         } else if (ch == '+') {
-             trace_gdbstub_io_got_ack();
-         } else {
-             trace_gdbstub_io_got_unexpected(ch);
-         }
- 
--        if (ch == '+' || ch == '$')
--            gdbserver_state.last_packet_len = 0;
-+        if (ch == '+' || ch == '$') {
-+            g_byte_array_set_size(gdbserver_state.last_packet, 0);
-+        }
-         if (ch != '$')
-             return;
-     }
-@@ -3209,7 +3212,7 @@ static int gdb_monitor_write(Chardev *chr, const uint8_t *buf, int len)
-     const char *p = (const char *)buf;
-     int max_sz;
- 
--    max_sz = (sizeof(gdbserver_state.last_packet) - 2) / 2;
-+    max_sz = (MAX_PACKET_LENGTH / 2) + 1;
-     for (;;) {
-         if (len <= max_sz) {
-             gdb_monitor_output(p, len);
--- 
-2.20.1
+Are we ready to ditch Python 2 in 5.0?
 
 
