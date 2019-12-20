@@ -2,51 +2,79 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55276C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90E9C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:20:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A5432467F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:20:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A5432467F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9687621655
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:20:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OQWQI+jz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9687621655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJ8T-00036i-Vl
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:20:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43458)
+	id 1iiJ8j-0003a3-Jx
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:20:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47419)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iiIuE-0006Oh-K2
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:05:28 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iiIhd-00044m-Ik
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:52:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iiIuC-000242-LX
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:05:26 -0500
-Received: from relay.sw.ru ([185.231.240.75]:58170)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iiIhc-0007ZJ-3u
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:52:25 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48967
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iiIuC-0001qr-3F
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:05:24 -0500
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iiIte-0007S2-F4; Fri, 20 Dec 2019 17:04:50 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iiIhb-0007X2-TY
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:52:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576849943;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3MdcmcIGRBu7yC0nFlRdq11GjU0cBWKn+3toxrMtEyY=;
+ b=OQWQI+jzWwQqu1fHqW1pGOECbKBzLB3BwjHT3mJaTtB2rBYEf54rnYMYvCv29O0Cl2wB/H
+ /hgM/v3IKQtC3IZFXuV1QKnuIJsxvDnA/DDQIyQT6ChXAxz6g97svxWonPcSgq3zm6YYuk
+ uguv0QMw3Hny0zr1yptCM3XhddlzlZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-Xv_ajuvEPH61b6iqCVbndw-1; Fri, 20 Dec 2019 08:52:20 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BE68185432D;
+ Fri, 20 Dec 2019 13:52:19 +0000 (UTC)
+Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 87D5A26FB9;
+ Fri, 20 Dec 2019 13:52:14 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 1/2] virtio: make seg_max virtqueue size dependent
-Date: Fri, 20 Dec 2019 17:04:42 +0300
-Message-Id: <20191220140443.1399-2-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20191220140443.1399-1-dplotnikov@virtuozzo.com>
-References: <20191220140443.1399-1-dplotnikov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+Subject: [PATCH v5 36/37] qdev: remove QDEV_PROP_PTR
+Date: Fri, 20 Dec 2019 17:46:00 +0400
+Message-Id: <20191220134601.571905-37-marcandre.lureau@redhat.com>
+In-Reply-To: <20191220134601.571905-1-marcandre.lureau@redhat.com>
+References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Xv_ajuvEPH61b6iqCVbndw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,165 +86,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, ehabkost@redhat.com, kwolf@radhat.com, mreitz@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, mst@radhat.com, den@virtuozzo.com
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before the patch, seg_max parameter was immutable and hardcoded
-to 126 (128 - 2) without respect to queue size. This has two negative effects:
+No longer used in the tree. The comment about user_creatable is still
+quite relevant, but there is already a similar comment in qdev-core.h.
 
-1. when queue size is < 128, we have Virtio 1.1 specfication violation:
-   (2.6.5.3.1 Driver Requirements) seq_max must be <= queue_size.
-   This violation affects the old Linux guests (ver < 4.14). These guests
-   crash on these queue_size setups.
-
-2. when queue_size > 128, as was pointed out by Denis Lunev <den@virtuozzo.com>,
-   seg_max restrics guest's block request length which affects guests'
-   performance making them issues more block request than needed.
-   https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.html
-
-To mitigate this two effects, the patch adds the property adjusting seg_max
-to queue size automaticaly. Since seg_max is a guest visible parameter,
-the property is machine type managable and allows to choose between
-old (seg_max = 126 always) and new (seg_max = queue_size - 2) behaviors.
-
-Not to change the behavior of the older VMs, prevent setting the default
-seg_max_adjust value for older machine types.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/block/virtio-blk.c           |  9 ++++++++-
- hw/core/machine.c               |  3 +++
- hw/scsi/vhost-scsi.c            |  2 ++
- hw/scsi/virtio-scsi.c           | 10 +++++++++-
- include/hw/virtio/virtio-blk.h  |  1 +
- include/hw/virtio/virtio-scsi.h |  1 +
- 6 files changed, 24 insertions(+), 2 deletions(-)
+ hw/core/qdev-properties.c    | 18 ------------------
+ include/hw/qdev-properties.h | 22 ----------------------
+ 2 files changed, 40 deletions(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index d62e6377c2..0f6f8113b7 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -908,7 +908,8 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-     blk_get_geometry(s->blk, &capacity);
-     memset(&blkcfg, 0, sizeof(blkcfg));
-     virtio_stq_p(vdev, &blkcfg.capacity, capacity);
--    virtio_stl_p(vdev, &blkcfg.seg_max, 128 - 2);
-+    virtio_stl_p(vdev, &blkcfg.seg_max,
-+                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 - 2);
-     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
-     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
-     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
-@@ -1133,6 +1134,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "num-queues property must be larger than 0");
-         return;
-     }
-+    if (conf->queue_size <= 2) {
-+        error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-+                   "must be > 2", conf->queue_size);
-+        return;
-+    }
-     if (!is_power_of_2(conf->queue_size) ||
-         conf->queue_size > VIRTQUEUE_MAX_SIZE) {
-         error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-@@ -1262,6 +1268,7 @@ static Property virtio_blk_properties[] = {
-                     true),
-     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
-     DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-+    DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_BIT64("discard", VirtIOBlock, host_features,
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 023548b4f3..bfa320387e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -29,6 +29,9 @@
- 
- GlobalProperty hw_compat_4_2[] = {
-     { "virtio-blk-device", "x-enable-wce-if-config-wce", "off" },
-+    { "virtio-blk-device", "seg-max-adjust", "off"},
-+    { "virtio-scsi-device", "seg_max_adjust", "off"},
-+    { "vhost-blk-device", "seg_max_adjust", "off"},
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index ac28890e5a..6ca7697599 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -501,13 +501,6 @@ const PropertyInfo qdev_prop_string =3D {
+     .set   =3D set_string,
  };
- const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
- 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index c693fc748a..26f710d3ec 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -275,6 +275,8 @@ static Property vhost_scsi_properties[] = {
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-                        128),
-+    DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSICommon, conf.seg_max_adjust,
-+                      true),
-     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
-                        0xFFFF),
-     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index e8b2b64d09..405cb6c953 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -654,7 +654,8 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
-     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(vdev);
- 
-     virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
--    virtio_stl_p(vdev, &scsiconf->seg_max, 128 - 2);
-+    virtio_stl_p(vdev, &scsiconf->seg_max,
-+                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 : 128 - 2);
-     virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
-     virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
-     virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
-@@ -893,6 +894,11 @@ void virtio_scsi_common_realize(DeviceState *dev,
-         virtio_cleanup(vdev);
-         return;
-     }
-+    if (s->conf.virtqueue_size <= 2) {
-+        error_setg(errp, "invalid virtqueue_size property (= %" PRIu16 "), "
-+                   "must be > 2", s->conf.virtqueue_size);
-+        return;
-+    }
-     s->cmd_vqs = g_new0(VirtQueue *, s->conf.num_queues);
-     s->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
-     s->cdb_size = VIRTIO_SCSI_CDB_DEFAULT_SIZE;
-@@ -949,6 +955,8 @@ static Property virtio_scsi_properties[] = {
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
-     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
-                                          parent_obj.conf.virtqueue_size, 128),
-+    DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
-+                      parent_obj.conf.seg_max_adjust, true),
-     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
-                                                   0xFFFF),
-     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSI, parent_obj.conf.cmd_per_lun,
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-index 9c19f5b634..1e62f869b2 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -38,6 +38,7 @@ struct VirtIOBlkConf
-     uint32_t request_merging;
-     uint16_t num_queues;
-     uint16_t queue_size;
-+    bool seg_max_adjust;
-     uint32_t max_discard_sectors;
-     uint32_t max_write_zeroes_sectors;
-     bool x_enable_wce_if_config_wce;
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index 122f7c4b6f..24e768909d 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -48,6 +48,7 @@ typedef struct virtio_scsi_config VirtIOSCSIConfig;
- struct VirtIOSCSIConf {
-     uint32_t num_queues;
-     uint32_t virtqueue_size;
-+    bool seg_max_adjust;
-     uint32_t max_sectors;
-     uint32_t cmd_per_lun;
- #ifdef CONFIG_VHOST_SCSI
--- 
-2.17.0
+=20
+-/* --- pointer --- */
+-
+-/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
+-const PropertyInfo qdev_prop_ptr =3D {
+-    .name  =3D "ptr",
+-};
+-
+ /* --- mac address --- */
+=20
+ /*
+@@ -1165,17 +1158,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char=
+ *name, int value)
+                             name, &error_abort);
+ }
+=20
+-void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
+-{
+-    Property *prop;
+-    void **ptr;
+-
+-    prop =3D qdev_prop_find(dev, name);
+-    assert(prop && prop->info =3D=3D &qdev_prop_ptr);
+-    ptr =3D qdev_get_prop_ptr(dev, prop);
+-    *ptr =3D value;
+-}
+-
+ static GPtrArray *global_props(void)
+ {
+     static GPtrArray *gp;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 16837ab5dd..a90a9cec80 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -18,7 +18,6 @@ extern const PropertyInfo qdev_prop_size;
+ extern const PropertyInfo qdev_prop_string;
+ extern const PropertyInfo qdev_prop_chr;
+ extern const PropertyInfo qdev_prop_tpm;
+-extern const PropertyInfo qdev_prop_ptr;
+ extern const PropertyInfo qdev_prop_macaddr;
+ extern const PropertyInfo qdev_prop_on_off_auto;
+ extern const PropertyInfo qdev_prop_losttickpolicy;
+@@ -171,25 +170,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+ #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+=20
+-/*
+- * Please avoid pointer properties.  If you must use them, you must
+- * cover them in their device's class init function as follows:
+- *
+- * - If the property must be set, the device cannot be used with
+- *   device_add, so add code like this:
+- *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
+- *   DeviceClass *dc =3D DEVICE_CLASS(class);
+- *   dc->user_creatable =3D false;
+- *
+- * - If the property may safely remain null, document it like this:
+- *   |*
+- *    * Note: pointer property "interrupt_vector" may remain null, thus
+- *    * no need for dc->user_creatable =3D false;
+- *    *|
+- */
+-#define DEFINE_PROP_PTR(_n, _s, _f)             \
+-    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
+-
+ #define DEFINE_PROP_CHR(_n, _s, _f)             \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
+ #define DEFINE_PROP_STRING(_n, _s, _f)             \
+@@ -262,8 +242,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *=
+name,
+ void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
+                            const uint8_t *value);
+ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
+-/* FIXME: Remove opaque pointer properties.  */
+-void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
+=20
+ void qdev_prop_register_global(GlobalProperty *prop);
+ int qdev_prop_check_globals(void);
+--=20
+2.24.0.308.g228f53135a
 
 
