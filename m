@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 877C4C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 06:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D5AC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 07:01:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B2AC24680
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 06:50:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B2AC24680
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 735E0227BF
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 07:01:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 735E0227BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiC79-0001dz-EB
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 01:50:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54185)
+	id 1iiCHZ-0005RQ-Je
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 02:01:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iiC6J-000170-ME
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 01:49:29 -0500
+ (envelope-from <yuzenghui@huawei.com>) id 1iiCG6-0004n6-4d
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 01:59:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iiC6H-0003Du-9L
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 01:49:27 -0500
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:59135)
+ (envelope-from <yuzenghui@huawei.com>) id 1iiCG3-0005Qb-Ag
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 01:59:33 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42154 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iiC6G-00032Y-Ow
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 01:49:25 -0500
-Received: from player789.ha.ovh.net (unknown [10.108.1.191])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 2B102153171
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 07:49:21 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player789.ha.ovh.net (Postfix) with ESMTPSA id DABBED778F4C;
- Fri, 20 Dec 2019 06:49:17 +0000 (UTC)
-Subject: Re: [PATCH v2 02/13] ppc/pnv: Introduce a "system-memory" property
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20191219181155.32530-1-clg@kaod.org>
- <20191219181155.32530-3-clg@kaod.org> <20191220003106.GL2321@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b2313032-9c60-8c45-ed1b-2d5ddb0a9a65@kaod.org>
-Date: Fri, 20 Dec 2019 07:49:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <yuzenghui@huawei.com>)
+ id 1iiCFz-0004kK-KR; Fri, 20 Dec 2019 01:59:27 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 9298DCC466B9D8C9D7BB;
+ Fri, 20 Dec 2019 14:59:16 +0800 (CST)
+Received: from [127.0.0.1] (10.173.222.27) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Dec 2019
+ 14:59:09 +0800
+Subject: Re: [kvm-unit-tests PATCH 06/16] arm/arm64: ITS: Test BASER
+To: Eric Auger <eric.auger@redhat.com>, <eric.auger.pro@gmail.com>,
+ <maz@kernel.org>, <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+ <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>
+References: <20191216140235.10751-1-eric.auger@redhat.com>
+ <20191216140235.10751-7-eric.auger@redhat.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
+Message-ID: <172f58d7-5a7c-43e0-c647-a7935f5d4b43@huawei.com>
+Date: Fri, 20 Dec 2019 14:59:07 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191220003106.GL2321@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20191216140235.10751-7-eric.auger@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-Ovh-Tracer-Id: 7994170817659702080
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdduvddgleejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefheenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.173.222.27]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.251.175
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,362 +70,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
+ thuth@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/12/2019 01:31, David Gibson wrote:
-> On Thu, Dec 19, 2019 at 07:11:44PM +0100, C=E9dric Le Goater wrote:
->> and use a link to pass the system memory to the device models that
->> require it to map/unmap BARs. This replace the use of get_system_memor=
-y()
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> I don't really see the rationale for this.  The system memory really
-> is global, not per-chip in any way, and just using get_system_memory()
-> appears to be idiomatic throughout qemu.
+Hi Eric,
 
-OK. Let's drop it.
+On 2019/12/16 22:02, Eric Auger wrote:
+> Add helper routines to parse and set up BASER registers.
+> Add a new test dedicated to BASER<n> accesses.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>   arm/gic.c                | 20 ++++++++++
+>   arm/unittests.cfg        |  6 +++
+>   lib/arm/asm/gic-v3-its.h | 17 ++++++++
+>   lib/arm/gic-v3-its.c     | 84 ++++++++++++++++++++++++++++++++++++++++
+>   4 files changed, 127 insertions(+)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index adeb981..8b56fce 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -536,6 +536,22 @@ static void test_its_introspection(void)
+>   			typer->pta ? "Redist basse address" : "PE #");
+>   }
+>   
+> +static void test_its_baser(void)
+> +{
+> +	struct its_baser *dev_baser, *coll_baser;
+> +
+> +	if (!gicv3_its_base()) {
+> +		report_skip("No ITS, skip ...");
+> +		return;
+> +	}
+> +
+> +	dev_baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
+> +	coll_baser = its_lookup_baser(GITS_BASER_TYPE_COLLECTION);
+> +	report(dev_baser && coll_baser, "detect device and collection BASER");
+> +	report_info("device baser entry_size = 0x%x", dev_baser->esz);
+> +	report_info("collection baser entry_size = 0x%x", dev_baser->esz);
 
-C.=20
+s/dev_baser/coll_baser/
 
->=20
->> ---
->>  include/hw/ppc/pnv.h      |  2 ++
->>  include/hw/ppc/pnv_psi.h  |  1 +
->>  include/hw/ppc/pnv_xive.h |  2 ++
->>  hw/intc/pnv_xive.c        |  5 ++++-
->>  hw/ppc/pnv.c              | 33 ++++++++++++++++++++++++++-------
->>  hw/ppc/pnv_psi.c          | 13 ++++++++++---
->>  6 files changed, 45 insertions(+), 11 deletions(-)
->>
->> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
->> index f78fd0dd967c..f31180618672 100644
->> --- a/include/hw/ppc/pnv.h
->> +++ b/include/hw/ppc/pnv.h
->> @@ -56,6 +56,8 @@ typedef struct PnvChip {
->>      AddressSpace xscom_as;
->> =20
->>      gchar        *dt_isa_nodename;
->> +
->> +    MemoryRegion *system_memory;
->>  } PnvChip;
->> =20
->>  #define TYPE_PNV8_CHIP "pnv8-chip"
->> diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
->> index f0f5b5519767..f85babaff0be 100644
->> --- a/include/hw/ppc/pnv_psi.h
->> +++ b/include/hw/ppc/pnv_psi.h
->> @@ -35,6 +35,7 @@ typedef struct PnvPsi {
->> =20
->>      MemoryRegion regs_mr;
->>      uint64_t bar;
->> +    MemoryRegion *system_memory;
->> =20
->>      /* FSP region not supported */
->>      /* MemoryRegion fsp_mr; */
->> diff --git a/include/hw/ppc/pnv_xive.h b/include/hw/ppc/pnv_xive.h
->> index f4c7caad40ee..4d641db691c8 100644
->> --- a/include/hw/ppc/pnv_xive.h
->> +++ b/include/hw/ppc/pnv_xive.h
->> @@ -30,6 +30,8 @@ typedef struct PnvXive {
->>      /* Owning chip */
->>      struct PnvChip *chip;
->> =20
->> +    MemoryRegion *system_memory;
->> +
->>      /* XSCOM addresses giving access to the controller registers */
->>      MemoryRegion  xscom_regs;
->> =20
->> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
->> index a0a69b98a713..66970a60733b 100644
->> --- a/hw/intc/pnv_xive.c
->> +++ b/hw/intc/pnv_xive.c
->> @@ -853,7 +853,7 @@ static void pnv_xive_ic_reg_write(void *opaque, hw=
-addr offset,
->>                                    uint64_t val, unsigned size)
->>  {
->>      PnvXive *xive =3D PNV_XIVE(opaque);
->> -    MemoryRegion *sysmem =3D get_system_memory();
->> +    MemoryRegion *sysmem =3D xive->system_memory;
->>      uint32_t reg =3D offset >> 3;
->>      bool is_chip0 =3D xive->chip->chip_id =3D=3D 0;
->> =20
->> @@ -1821,6 +1821,7 @@ static void pnv_xive_realize(DeviceState *dev, E=
-rror **errp)
->>      Error *local_err =3D NULL;
->> =20
->>      assert(xive->chip);
->> +    assert(xive->system_memory);
->> =20
->>      /*
->>       * The XiveSource and XiveENDSource objects are realized with the
->> @@ -1937,6 +1938,8 @@ static Property pnv_xive_properties[] =3D {
->>      DEFINE_PROP_UINT64("tm-bar", PnvXive, tm_base, 0),
->>      /* The PnvChip id identifies the XIVE interrupt controller. */
->>      DEFINE_PROP_LINK("chip", PnvXive, chip, TYPE_PNV_CHIP, PnvChip *)=
-,
->> +    DEFINE_PROP_LINK("system-memory", PnvXive, system_memory,
->> +                     TYPE_MEMORY_REGION, MemoryRegion *),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->> =20
->> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
->> index 855254f28263..1d8bfb164a32 100644
->> --- a/hw/ppc/pnv.c
->> +++ b/hw/ppc/pnv.c
->> @@ -674,6 +674,7 @@ static void pnv_chip_power10_pic_print_info(PnvChi=
-p *chip, Monitor *mon)
->> =20
->>  static void pnv_init(MachineState *machine)
->>  {
->> +    MemoryRegion *sysmem =3D get_system_memory();
->>      PnvMachineState *pnv =3D PNV_MACHINE(machine);
->>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
->>      MemoryRegion *ram;
->> @@ -692,7 +693,7 @@ static void pnv_init(MachineState *machine)
->>      ram =3D g_new(MemoryRegion, 1);
->>      memory_region_allocate_system_memory(ram, NULL, "pnv.ram",
->>                                           machine->ram_size);
->> -    memory_region_add_subregion(get_system_memory(), 0, ram);
->> +    memory_region_add_subregion(sysmem, 0, ram);
->> =20
->>      /*
->>       * Create our simple PNOR device
->> @@ -790,6 +791,12 @@ static void pnv_init(MachineState *machine)
->>                                  &error_fatal);
->>          object_property_set_int(chip, machine->smp.cores,
->>                                  "nr-cores", &error_fatal);
->> +        /*
->> +         * TODO: Only the MMIO range should be of interest for the
->> +         * controllers
->> +         */
->> +        object_property_set_link(chip, OBJECT(sysmem), "system-memory=
-",
->> +                                 &error_abort);
->>          object_property_set_bool(chip, true, "realized", &error_fatal=
-);
->>      }
->>      g_free(chip_typename);
->> @@ -1060,6 +1067,8 @@ static void pnv_chip_power8_realize(DeviceState =
-*dev, Error **errp)
->>      /* Processor Service Interface (PSI) Host Bridge */
->>      object_property_set_int(OBJECT(&chip8->psi), PNV_PSIHB_BASE(chip)=
-,
->>                              "bar", &error_fatal);
->> +    object_property_set_link(OBJECT(&chip8->psi), OBJECT(chip->system=
-_memory),
->> +                             "system-memory", &error_abort);
->>      object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &=
-local_err);
->>      if (local_err) {
->>          error_propagate(errp, local_err);
->> @@ -1100,7 +1109,7 @@ static void pnv_chip_power8_realize(DeviceState =
-*dev, Error **errp)
->>      pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xsc=
-om_regs);
->> =20
->>      /* OCC SRAM model */
->> -    memory_region_add_subregion(get_system_memory(), PNV_OCC_SENSOR_B=
-ASE(chip),
->> +    memory_region_add_subregion(chip->system_memory, PNV_OCC_SENSOR_B=
-ASE(chip),
->>                                  &chip8->occ.sram_regs);
->> =20
->>      /* HOMER */
->> @@ -1116,7 +1125,7 @@ static void pnv_chip_power8_realize(DeviceState =
-*dev, Error **errp)
->>      pnv_xscom_add_subregion(chip, PNV_XSCOM_PBA_BASE, &chip8->homer.p=
-ba_regs);
->> =20
->>      /* Homer mmio region */
->> -    memory_region_add_subregion(get_system_memory(), PNV_HOMER_BASE(c=
-hip),
->> +    memory_region_add_subregion(chip->system_memory, PNV_HOMER_BASE(c=
-hip),
->>                                  &chip8->homer.regs);
->>  }
->> =20
->> @@ -1280,6 +1289,8 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->>                              "tm-bar", &error_fatal);
->>      object_property_set_link(OBJECT(&chip9->xive), OBJECT(chip), "chi=
-p",
->>                               &error_abort);
->> +    object_property_set_link(OBJECT(&chip9->xive), OBJECT(chip->syste=
-m_memory),
->> +                             "system-memory", &error_abort);
->>      object_property_set_bool(OBJECT(&chip9->xive), true, "realized",
->>                               &local_err);
->>      if (local_err) {
->> @@ -1292,6 +1303,8 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->>      /* Processor Service Interface (PSI) Host Bridge */
->>      object_property_set_int(OBJECT(&chip9->psi), PNV9_PSIHB_BASE(chip=
-),
->>                              "bar", &error_fatal);
->> +    object_property_set_link(OBJECT(&chip9->psi), OBJECT(chip->system=
-_memory),
->> +                             "system-memory", &error_abort);
->>      object_property_set_bool(OBJECT(&chip9->psi), true, "realized", &=
-local_err);
->>      if (local_err) {
->>          error_propagate(errp, local_err);
->> @@ -1308,7 +1321,7 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->>          error_propagate(errp, local_err);
->>          return;
->>      }
->> -    memory_region_add_subregion(get_system_memory(), PNV9_LPCM_BASE(c=
-hip),
->> +    memory_region_add_subregion(chip->system_memory, PNV9_LPCM_BASE(c=
-hip),
->>                                  &chip9->lpc.xscom_regs);
->> =20
->>      chip->dt_isa_nodename =3D g_strdup_printf("/lpcm-opb@%" PRIx64 "/=
-lpc@0",
->> @@ -1325,7 +1338,7 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->>      pnv_xscom_add_subregion(chip, PNV9_XSCOM_OCC_BASE, &chip9->occ.xs=
-com_regs);
->> =20
->>      /* OCC SRAM model */
->> -    memory_region_add_subregion(get_system_memory(), PNV9_OCC_SENSOR_=
-BASE(chip),
->> +    memory_region_add_subregion(chip->system_memory, PNV9_OCC_SENSOR_=
-BASE(chip),
->>                                  &chip9->occ.sram_regs);
->> =20
->>      /* HOMER */
->> @@ -1341,7 +1354,7 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->>      pnv_xscom_add_subregion(chip, PNV9_XSCOM_PBA_BASE, &chip9->homer.=
-pba_regs);
->> =20
->>      /* Homer mmio region */
->> -    memory_region_add_subregion(get_system_memory(), PNV9_HOMER_BASE(=
-chip),
->> +    memory_region_add_subregion(chip->system_memory, PNV9_HOMER_BASE(=
-chip),
->>                                  &chip9->homer.regs);
->>  }
->> =20
->> @@ -1408,6 +1421,8 @@ static void pnv_chip_power10_realize(DeviceState=
- *dev, Error **errp)
->>      /* Processor Service Interface (PSI) Host Bridge */
->>      object_property_set_int(OBJECT(&chip10->psi), PNV10_PSIHB_BASE(ch=
-ip),
->>                              "bar", &error_fatal);
->> +    object_property_set_link(OBJECT(&chip10->psi), OBJECT(chip->syste=
-m_memory),
->> +                             "system-memory", &error_abort);
->>      object_property_set_bool(OBJECT(&chip10->psi), true, "realized",
->>                               &local_err);
->>      if (local_err) {
->> @@ -1426,7 +1441,7 @@ static void pnv_chip_power10_realize(DeviceState=
- *dev, Error **errp)
->>          error_propagate(errp, local_err);
->>          return;
->>      }
->> -    memory_region_add_subregion(get_system_memory(), PNV10_LPCM_BASE(=
-chip),
->> +    memory_region_add_subregion(chip->system_memory, PNV10_LPCM_BASE(=
-chip),
->>                                  &chip10->lpc.xscom_regs);
->> =20
->>      chip->dt_isa_nodename =3D g_strdup_printf("/lpcm-opb@%" PRIx64 "/=
-lpc@0",
->> @@ -1556,6 +1571,8 @@ static void pnv_chip_realize(DeviceState *dev, E=
-rror **errp)
->>      PnvChip *chip =3D PNV_CHIP(dev);
->>      Error *error =3D NULL;
->> =20
->> +    assert(chip->system_memory);
->> +
->>      /* Cores */
->>      pnv_chip_core_realize(chip, &error);
->>      if (error) {
->> @@ -1570,6 +1587,8 @@ static Property pnv_chip_properties[] =3D {
->>      DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
->>      DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
->>      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
->> +    DEFINE_PROP_LINK("system-memory", PnvChip, system_memory,
->> +                     TYPE_MEMORY_REGION, MemoryRegion *),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->> =20
->> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
->> index 75e20d9da08b..28d34e5c193a 100644
->> --- a/hw/ppc/pnv_psi.c
->> +++ b/hw/ppc/pnv_psi.c
->> @@ -126,7 +126,7 @@
->>  static void pnv_psi_set_bar(PnvPsi *psi, uint64_t bar)
->>  {
->>      PnvPsiClass *ppc =3D PNV_PSI_GET_CLASS(psi);
->> -    MemoryRegion *sysmem =3D get_system_memory();
->> +    MemoryRegion *sysmem =3D psi->system_memory;
->>      uint64_t old =3D psi->regs[PSIHB_XSCOM_BAR];
->> =20
->>      psi->regs[PSIHB_XSCOM_BAR] =3D bar & (ppc->bar_mask | PSIHB_BAR_E=
-N);
->> @@ -489,6 +489,8 @@ static void pnv_psi_power8_realize(DeviceState *de=
-v, Error **errp)
->>      Error *err =3D NULL;
->>      unsigned int i;
->> =20
->> +    assert(psi->system_memory);
->> +
->>      obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
->>      if (!obj) {
->>          error_setg(errp, "%s: required link 'xics' not found: %s",
->> @@ -562,6 +564,8 @@ static int pnv_psi_dt_xscom(PnvXScomInterface *dev=
-, void *fdt, int xscom_offset)
->>  static Property pnv_psi_properties[] =3D {
->>      DEFINE_PROP_UINT64("bar", PnvPsi, bar, 0),
->>      DEFINE_PROP_UINT64("fsp-bar", PnvPsi, fsp_bar, 0),
->> +    DEFINE_PROP_LINK("system-memory", PnvPsi, system_memory,
->> +                     TYPE_MEMORY_REGION, MemoryRegion *),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->> =20
->> @@ -701,7 +705,7 @@ static void pnv_psi_p9_mmio_write(void *opaque, hw=
-addr addr,
->>      PnvPsi *psi =3D PNV_PSI(opaque);
->>      Pnv9Psi *psi9 =3D PNV9_PSI(psi);
->>      uint32_t reg =3D PSIHB_REG(addr);
->> -    MemoryRegion *sysmem =3D get_system_memory();
->> +    MemoryRegion *sysmem =3D psi->system_memory;
->> =20
->>      switch (addr) {
->>      case PSIHB9_CR:
->> @@ -819,11 +823,12 @@ static void pnv_psi_power9_irq_set(PnvPsi *psi, =
-int irq, bool state)
->>  static void pnv_psi_power9_reset(void *dev)
->>  {
->>      Pnv9Psi *psi =3D PNV9_PSI(dev);
->> +    MemoryRegion *sysmem =3D PNV_PSI(psi)->system_memory;
->> =20
->>      pnv_psi_reset(dev);
->> =20
->>      if (memory_region_is_mapped(&psi->source.esb_mmio)) {
->> -        memory_region_del_subregion(get_system_memory(), &psi->source=
-.esb_mmio);
->> +        memory_region_del_subregion(sysmem, &psi->source.esb_mmio);
->>      }
->>  }
->> =20
->> @@ -842,6 +847,8 @@ static void pnv_psi_power9_realize(DeviceState *de=
-v, Error **errp)
->>      Error *local_err =3D NULL;
->>      int i;
->> =20
->> +    assert(psi->system_memory);
->> +
->>      /* This is the only device with 4k ESB pages */
->>      object_property_set_int(OBJECT(xsrc), XIVE_ESB_4K, "shift",
->>                              &error_fatal);
->=20
+> +}
+> +
+>   int main(int argc, char **argv)
+>   {
+>   	if (!gic_init()) {
+> @@ -571,6 +587,10 @@ int main(int argc, char **argv)
+>   		report_prefix_push(argv[1]);
+>   		test_its_introspection();
+>   		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "its-baser") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_its_baser();
+> +		report_prefix_pop();
+>   	} else {
+>   		report_abort("Unknown subtest '%s'", argv[1]);
+>   	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index bd20460..2234a0f 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -128,6 +128,12 @@ smp = $MAX_SMP
+>   extra_params = -machine gic-version=3 -append 'its-introspection'
+>   groups = its
+>   
+> +[its-baser]
+> +file = gic.flat
+> +smp = $MAX_SMP
+> +extra_params = -machine gic-version=3 -append 'its-baser'
+> +groups = its
+> +
+>   # Test PSCI emulation
+>   [psci]
+>   file = psci.flat
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 2ce483e..0c0178d 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -100,9 +100,23 @@ struct its_typer {
+>   	bool virt_lpi;
+>   };
+>   
+> +struct its_baser {
+> +	unsigned int index;
+
+We've already maintained an array of GITS_BASERs, so 'index' is
+not needed.
+
+> +	int type;
+> +	u64 cache;
+> +	int shr;
+> +	size_t psz;
+> +	int nr_pages;
+> +	bool indirect;
+> +	phys_addr_t table_addr;
+> +	bool valid;
+> +	int esz;
+> +};
+> +
+>   struct its_data {
+>   	void *base;
+>   	struct its_typer typer;
+> +	struct its_baser baser[GITS_BASER_NR_REGS];
+>   };
+>   
+>   extern struct its_data its_data;
+> @@ -111,6 +125,9 @@ extern struct its_data its_data;
+>   
+>   extern void its_parse_typer(void);
+>   extern void its_init(void);
+> +extern int its_parse_baser(int i, struct its_baser *baser);
+> +extern void its_setup_baser(int i, struct its_baser *baser);
+> +extern struct its_baser *its_lookup_baser(int type);
+>   
+>   #endif /* !__ASSEMBLY__ */
+>   #endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> index 34f4d0e..303022f 100644
+> --- a/lib/arm/gic-v3-its.c
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -4,6 +4,7 @@
+>    * This work is licensed under the terms of the GNU LGPL, version 2.
+>    */
+>   #include <asm/gic.h>
+> +#include <alloc_page.h>
+>   
+>   struct its_data its_data;
+>   
+> @@ -31,11 +32,94 @@ void its_parse_typer(void)
+>   	its_data.typer.phys_lpi = typer & GITS_TYPER_PLPIS;
+>   }
+>   
+> +int its_parse_baser(int i, struct its_baser *baser)
+> +{
+> +	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
+> +	u64 val = readq(reg_addr);
+> +
+> +	if (!val) {
+> +		memset(baser, 0, sizeof(*baser));
+> +		return -1;
+> +	}
+> +
+> +	baser->valid = val & GITS_BASER_VALID;
+> +	baser->indirect = val & GITS_BASER_INDIRECT;
+> +	baser->type = GITS_BASER_TYPE(val);
+> +	baser->esz = GITS_BASER_ENTRY_SIZE(val);
+> +	baser->nr_pages = GITS_BASER_NR_PAGES(val);
+> +	baser->table_addr = val & GITS_BASER_PHYS_ADDR_MASK;
+> +	baser->cache = (val >> GITS_BASER_INNER_CACHEABILITY_SHIFT) &
+> +			GITS_BASER_CACHEABILITY_MASK;
+> +	switch (val & GITS_BASER_PAGE_SIZE_MASK) {
+> +	case GITS_BASER_PAGE_SIZE_4K:
+> +		baser->psz = SZ_4K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_16K:
+> +		baser->psz = SZ_16K;
+> +		break;
+> +	case GITS_BASER_PAGE_SIZE_64K:
+> +		baser->psz = SZ_64K;
+> +		break;
+> +	default:
+> +		baser->psz = SZ_64K;
+> +	}
+> +	baser->shr = (val >> 10) & 0x3;
+> +	return 0;
+> +}
+> +
+> +struct its_baser *its_lookup_baser(int type)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+> +		struct its_baser *baser = &its_data.baser[i];
+> +
+> +		if (baser->type == type)
+> +			return baser;
+> +	}
+> +	return NULL;
+> +}
+> +
+>   void its_init(void)
+>   {
+> +	int i;
+
+Please add a blank line here.
+
+>   	if (!its_data.base)
+>   		return;
+>   
+>   	its_parse_typer();
+> +	for (i = 0; i < GITS_BASER_NR_REGS; i++)
+> +		its_parse_baser(i, &its_data.baser[i]);
+> +}
+> +
+> +void its_setup_baser(int i, struct its_baser *baser)
+> +{
+> +	unsigned long n = (baser->nr_pages * baser->psz) >> PAGE_SHIFT;
+> +	unsigned long order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
+> +	u64 val;
+> +
+> +	baser->table_addr = (u64)virt_to_phys(alloc_pages(order));
+> +
+> +	val = ((u64)baser->table_addr					|
+> +		((u64)baser->type	<< GITS_BASER_TYPE_SHIFT)	|
+> +		((u64)(baser->esz - 1)	<< GITS_BASER_ENTRY_SIZE_SHIFT)	|
+> +		((baser->nr_pages - 1)	<< GITS_BASER_PAGES_SHIFT)	|
+> +		baser->cache						|
+> +		baser->shr						|
+
+baser->cache << GITS_BASER_INNER_CACHEABILITY_SHIFT |
+baser->shr << 10 (GITS_BASER_SHAREABILITY_SHIFT) ?
+
+
+Thanks,
+Zenghui
+
+> +		(u64)baser->indirect	<< 62				|
+> +		(u64)baser->valid	<< 63);
+> +
+> +	switch (baser->psz) {
+> +	case SZ_4K:
+> +		val |= GITS_BASER_PAGE_SIZE_4K;
+> +		break;
+> +	case SZ_16K:
+> +		val |= GITS_BASER_PAGE_SIZE_16K;
+> +		break;
+> +	case SZ_64K:
+> +		val |= GITS_BASER_PAGE_SIZE_64K;
+> +		break;
+> +	}
+> +
+> +	writeq(val, gicv3_its_base() + GITS_BASER + i * 8);
+>   }
+>   
+> 
 
 
