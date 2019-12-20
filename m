@@ -2,84 +2,121 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB65C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97957C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:10:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8971924679
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 547642467F
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:10:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="SIkX7bQy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8971924679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RTwmBZVb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 547642467F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiH6T-0001UY-6l
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:09:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51328)
+	id 1iiH71-0002mP-31
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:10:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iiGo2-00029I-2a
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:50:56 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iiGsJ-0005zH-8w
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:55:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iiGnz-0006Yg-KN
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:50:53 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:45234)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iiGny-0006Pe-NM; Fri, 20 Dec 2019 06:50:51 -0500
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 9419996F56;
- Fri, 20 Dec 2019 11:50:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1576842648;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xATRzriY+Bk+xzL4h6JVAufxwQ9Rbhp6gwbGofE36yI=;
- b=SIkX7bQyPapj6bGoxAoWGgBW20G9C+GqiYT5O4XvMOs6985BYKia6ALQrs4k4rrSkVCL5g
- rjcmKWFaPEZKZRGBndXgJyvPm3h039HcpsQpZuWzGGRYX/lXuLpUJcai3IfrvIUMhELmrb
- zx+kBp3U7isg15qQ+jODPNEZwc6MIco=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 07/11] hw/core/qdev: update hotplug reset regarding
- resettable
-Date: Fri, 20 Dec 2019 12:50:31 +0100
-Message-Id: <20191220115035.709876-8-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191220115035.709876-1-damien.hedde@greensocs.com>
-References: <20191220115035.709876-1-damien.hedde@greensocs.com>
-MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1576842648;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xATRzriY+Bk+xzL4h6JVAufxwQ9Rbhp6gwbGofE36yI=;
- b=5piUw0xMq6i+C63qlx3099S8F28hII0RpRMo/s9BUMacCaViUUejLlFg2mXdIPyadJf04W
- Cr373JLbLVszdPusa5AVe3ZsyrYXBI7+fFvNxnSYZSKhEEdMOOGCBqffPNkFKKi8oYm1pN
- hh41H5zZYAKjwWDEPLjLY0Fn62pZ/iE=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576842648; a=rsa-sha256; cv=none;
- b=tYDKsTiMZWxeTFNhgnFlrietGIx/vVDh1cXCdXovTlLCgCv4wvhGyUOLSX2d1pnDvznp90
- TeVb9zAeqGUM0CtLvT8KresHmVebMAyaeQF2lbzDyFGiuXmKKUcTCk91JWmixCYnr91Osx
- 2xdnxRUGJ9xFpPPB3R5NDw6X9fuMToM=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iiGsG-0003lK-8V
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:55:18 -0500
+Received: from mail-eopbgr00094.outbound.protection.outlook.com
+ ([40.107.0.94]:55989 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iiGsF-0003bu-2W; Fri, 20 Dec 2019 06:55:15 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ECh/TrIeekuDLrrpudzYxzWtKcnuxSNKgLFbBXk+YfqbU+CDDFcXbooJu1luvRUbRIPlnrunOgfttSIyYWNkvv2GURx8MoDXAm8257h5DkRest6EviaVxOUnehbUfX2jAb52CJuXGuilXSdy5NOgLi6mmINRzzSW8eLI83CMYNNOBiyIsa49mD/ktktrP/BDSGReKp4604JGzn3haOdopDQScO40h3PKX2W0dy0CYutkk6cHvQfcrQgN20U74GNhyZnN2hQMahmHo/5PXMKZT/6Mja8eFcMJk19A/2gT7aL/gaJ3ghnwWOYp1wmBsXu/fiPLuZtOM7MWocMAOR0Wcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ov0bNpwr7R+JljVbRNdNfbmza+SM36RXEdFh0k4sDgo=;
+ b=ZsCgOrUaNGASt3V7a+pLgpGwGYM8lCIXtPYH/G4h6uwsdZZpMePcI9WhNPwWC0qXoQ702Vqi1bDc4/v7Twbi+cg+YwagGbjF7GjXmkpOcxo5Ij8ajgXsXB2HSdBtux6ty3rvSE4VVDTqaoUsHD+KO7Y1EZkszH7B2U2NZRc1ZPkaE66E6WfbTFrB1B1EjxWujGbHD9NLDSt/GeFlOgOvlRDPb5mDdrsLLisIknBt964egoJsq37B3UL6kIpKTOstqUDv/xnyd2XLPTOBrQDPzpo4YdF7LnDjcpAVYO+e1MHE3Xa4RKvCUjuw6HKHzJqt3ZoPNMM67SF/YOHk1qJeJw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ov0bNpwr7R+JljVbRNdNfbmza+SM36RXEdFh0k4sDgo=;
+ b=RTwmBZVb0KY7rStqGlSI+804X4kcwMyeQ9TPW26yNGZ1zU0sMoCvuo3X1UIyH1vNU1PbDAKigt0wadPbK+Wh8ja2bRIZKkF8T9cIfHgiH4NzA5WUwL25RaeBMrqdoZKGHGUsKiCQoxmvvYm3yWhD5WCjNdUs0hQfB0DTBXYXWgI=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4820.eurprd08.prod.outlook.com (10.255.99.209) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2559.14; Fri, 20 Dec 2019 11:55:12 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2559.016; Fri, 20 Dec 2019
+ 11:55:12 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH for-5.0 v2 15/23] mirror: Prevent loops
+Thread-Topic: [PATCH for-5.0 v2 15/23] mirror: Prevent loops
+Thread-Index: AQHVmKmF9vX+IDkOrkmVWASxqmj2taenFHcAgAr4WQCABhAWAIALBfwAgAAEcoA=
+Date: Fri, 20 Dec 2019 11:55:12 +0000
+Message-ID: <e2e89921-9121-a67a-474c-1f7f11a305ef@virtuozzo.com>
+References: <20191111160216.197086-1-mreitz@redhat.com>
+ <20191111160216.197086-16-mreitz@redhat.com>
+ <7f50c050-38ca-a7f2-361b-a08e82b420af@virtuozzo.com>
+ <c2fde7aa-21fc-f8bb-02fa-af28ddd297f7@redhat.com>
+ <9c1b3378-3509-23cc-a83a-f34d39fef239@virtuozzo.com>
+ <0ef67269-4744-dc1e-cc71-09d947d8635b@redhat.com>
+In-Reply-To: <0ef67269-4744-dc1e-cc71-09d947d8635b@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0101CA0024.eurprd01.prod.exchangelabs.com
+ (2603:10a6:3:77::34) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191220145509832
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8f8a694e-2920-491a-3ff5-08d78543780b
+x-ms-traffictypediagnostic: AM6PR08MB4820:
+x-microsoft-antispam-prvs: <AM6PR08MB4820F5F5C83D49A241074DE7C12D0@AM6PR08MB4820.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 025796F161
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(39850400004)(376002)(346002)(366004)(396003)(189003)(199004)(71200400001)(186003)(8936002)(26005)(110136005)(86362001)(6506007)(81166006)(66946007)(316002)(6486002)(66556008)(64756008)(6512007)(66476007)(2906002)(36756003)(66446008)(81156014)(52116002)(31696002)(2616005)(53546011)(4326008)(8676002)(478600001)(54906003)(31686004)(5660300002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4820;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DO06H9DGImLE7GUC7QgxHjyfxBwb0l2GdRkPwS1mFQUdYEvIr0z57VAD9+HMNFTJaot1fkehMOxPv+Hbi3iF4o7i4xvQsyj2fQl6L4RdLQxMi6IzjNS+sAmGoODr8ll2AGBjvhBnVvzg4NOVO8l4EfN9xRvP+rodq4/+dnS1Llswew/zr16sPb8Gzs2mMeNPj7qrZcSv1bh7xeaFhnge+CWQKlEYQRrhDrVTNJkqRdt1kRxgMqLRXUd/hDJEjfQNfbJxC70c3YTqzoJREe+Pmwi2bRBbtV0s+5nBL6P1aAGiRMXjbZ8P5ZrYF43ZguIQPmEsEp/miHvalCCVCLKsF5xkkBvQFvfsTW5EiJcw6FebjQHjEufihq5O/1pvvLZ8yQTfTCAag3F1u1/dR5aZotk3rUVCDyaTf8vqfagfLpxcoJNYWiFKri9qGwER2Eva
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <55B10187469B6F46A71A5A46C9F21C52@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.135.226.135
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f8a694e-2920-491a-3ff5-08d78543780b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2019 11:55:12.0620 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xnWwlBJeeRwn04C7oK13gzdAcLsh3e8iHgAlAcWXxXFxZ70Kg1VXxl/VsUXjPd29Ej49WpFb0BuBtukHSof3HGsj9nlugRyIVodu87r1tng=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4820
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.94
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,120 +128,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com, cohuck@redhat.com,
- mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
- pbonzini@redhat.com, philmd@redhat.com, david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit make use of the resettable API to reset the device being
-hotplugged when it is realized. Also it ensures it is put in a reset
-state coherent with the parent it is plugged into.
+20.12.2019 14:39, Max Reitz wrote:
+> On 13.12.19 12:18, Vladimir Sementsov-Ogievskiy wrote:
+>> 09.12.2019 17:43, Max Reitz wrote:
+>>> On 02.12.19 13:12, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 11.11.2019 19:02, Max Reitz wrote:
+>>>>> While bdrv_replace_node() will not follow through with it, a specific
+>>>>> @replaces asks the mirror job to create a loop.
+>>>>>
+>>>>> For example, say both the source and the target share a child where t=
+he
+>>>>> source is a filter; by letting @replaces point to the common child, y=
+ou
+>>>>> ask for a loop.
+>>>>>
+>>>>> Or if you use @replaces in drive-mirror with sync=3Dnone and
+>>>>> mode=3Dabsolute-paths, you generally ask for a loop (@replaces must p=
+oint
+>>>>> to a child of the source, and sync=3Dnone makes the source the backin=
+g
+>>>>> file of the target after the job).
+>>>>>
+>>>>> bdrv_replace_node() will not create those loops, but by doing so, it
+>>>>> ignores the user-requested configuration, which is not ideally either=
+.
+>>>>> (In the first example above, the target's child will remain what it w=
+as,
+>>>>> which may still be reasonable.  But in the second example, the target
+>>>>> will just not become a child of the source, which is precisely what w=
+as
+>>>>> requested with @replaces.)
+>>>>>
+>>>>> So prevent such configurations, both before the job, and before it
+>>>>> actually completes.
+>>>>>
+>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>> ---
+>>>>>     block.c                   | 30 ++++++++++++++++++++++++
+>>>>>     block/mirror.c            | 19 +++++++++++++++-
+>>>>>     blockdev.c                | 48 ++++++++++++++++++++++++++++++++++=
+++++-
+>>>>>     include/block/block_int.h |  3 +++
+>>>>>     4 files changed, 98 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/block.c b/block.c
+>>>>> index 0159f8e510..e3922a0474 100644
+>>>>> --- a/block.c
+>>>>> +++ b/block.c
+>>>>> @@ -6259,6 +6259,36 @@ out:
+>>>>>         return to_replace_bs;
+>>>>>     }
+>>>>>    =20
+>>>>> +/*
+>>>>> + * Return true iff @child is a (recursive) child of @parent, with at
+>>>>> + * least @min_level edges between them.
+>>>>> + *
+>>>>> + * (If @min_level =3D=3D 0, return true if @child =3D=3D @parent.  F=
+or
+>>>>> + * @min_level =3D=3D 1, @child needs to be at least a real child; fo=
+r
+>>>>> + * @min_level =3D=3D 2, it needs to be at least a grand-child; and s=
+o on.)
+>>>>> + */
+>>>>> +bool bdrv_is_child_of(BlockDriverState *child, BlockDriverState *par=
+ent,
+>>>>> +                      int min_level)
+>>>>> +{
+>>>>> +    BdrvChild *c;
+>>>>> +
+>>>>> +    if (child =3D=3D parent && min_level <=3D 0) {
+>>>>> +        return true;
+>>>>> +    }
+>>>>> +
+>>>>> +    if (!parent) {
+>>>>> +        return false;
+>>>>> +    }
+>>>>> +
+>>>>> +    QLIST_FOREACH(c, &parent->children, next) {
+>>>>> +        if (bdrv_is_child_of(child, c->bs, min_level - 1)) {
+>>>>> +            return true;
+>>>>> +        }
+>>>>> +    }
+>>>>> +
+>>>>> +    return false;
+>>>>> +}
+>>>>> +
+>>>>>     /**
+>>>>>      * Iterates through the list of runtime option keys that are said=
+ to
+>>>>>      * be "strong" for a BDS.  An option is called "strong" if it cha=
+nges
+>>>>> diff --git a/block/mirror.c b/block/mirror.c
+>>>>> index 68a4404666..b258c7e98b 100644
+>>>>> --- a/block/mirror.c
+>>>>> +++ b/block/mirror.c
+>>>>> @@ -701,7 +701,24 @@ static int mirror_exit_common(Job *job)
+>>>>>              * there.
+>>>>>              */
+>>>>>             if (bdrv_recurse_can_replace(src, to_replace)) {
+>>>>> -            bdrv_replace_node(to_replace, target_bs, &local_err);
+>>>>> +            /*
+>>>>> +             * It is OK for @to_replace to be an immediate child of
+>>>>> +             * @target_bs, because that is what happens with
+>>>>> +             * drive-mirror sync=3Dnone mode=3Dabsolute-paths: targe=
+t_bs's
+>>>>> +             * backing file will be the source node, which is also
+>>>>> +             * to_replace (by default).
+>>>>> +             * bdrv_replace_node() handles this case by not letting
+>>>>> +             * target_bs->backing point to itself, but to the source
+>>>>> +             * still.
+>>>>> +             */
+>>>>> +            if (!bdrv_is_child_of(to_replace, target_bs, 2)) {
+>>>>> +                bdrv_replace_node(to_replace, target_bs, &local_err)=
+;
+>>>>> +            } else {
+>>>>> +                error_setg(&local_err, "Can no longer replace '%s' b=
+y '%s', "
+>>>>> +                           "because the former is now a child of the=
+ latter, "
+>>>>> +                           "and doing so would thus create a loop",
+>>>>> +                           to_replace->node_name, target_bs->node_na=
+me);
+>>>>> +            }
+>>>>
+>>>> you may swap if and else branch, dropping "!" mark..
+>>>
+>>> Yes, but I just personally prefer to have the error case in the else br=
+anch.
+>>>
+>>>>>             } else {
+>>>>>                 error_setg(&local_err, "Can no longer replace '%s' by=
+ '%s', "
+>>>>>                            "because it can no longer be guaranteed th=
+at doing so "
+>>>>> diff --git a/blockdev.c b/blockdev.c
+>>>>> index 9dc2238bf3..d29f147f72 100644
+>>>>> --- a/blockdev.c
+>>>>> +++ b/blockdev.c
+>>>>> @@ -3824,7 +3824,7 @@ static void blockdev_mirror_common(const char *=
+job_id, BlockDriverState *bs,
+>>>>>         }
+>>>>>    =20
+>>>>>         if (has_replaces) {
+>>>>> -        BlockDriverState *to_replace_bs;
+>>>>> +        BlockDriverState *to_replace_bs, *target_backing_bs;
+>>>>>             AioContext *replace_aio_context;
+>>>>>             int64_t bs_size, replace_size;
+>>>>>    =20
+>>>>> @@ -3839,6 +3839,52 @@ static void blockdev_mirror_common(const char =
+*job_id, BlockDriverState *bs,
+>>>>>                 return;
+>>>>>             }
+>>>>>    =20
+>>>>> +        if (bdrv_is_child_of(to_replace_bs, target, 1)) {
+>>>>> +            error_setg(errp, "Replacing %s by %s would result in a l=
+oop, "
+>>>>> +                       "because the former is a child of the latter"=
+,
+>>>>> +                       to_replace_bs->node_name, target->node_name);
+>>>>> +            return;
+>>>>> +        }
+>>>>
+>>>> here min_level=3D1, so we don't handle the case, described in mirror_e=
+xit_common..
+>>>> I don't see why.. blockdev_mirror_common is called from qmp_drive_mirr=
+or,
+>>>> including the case with MIRROR_SYNC_MODE_NONE and NEW_IMAGE_MODE_ABSOL=
+UTE_PATHS..
+>>>>
+>>>> What I'm missing?
+>>>
+>>> Hmm.  Well.
+>>>
+>>> If it broke drive-mirror sync=3Dnone, I suppose I would have noticed by
+>>> running the iotests.  But I didn=92t, and that=92s because this code he=
+re is
+>>> reached only if the user actually specified @replaces.  (As opposed to
+>>> the mirror_exit_common code, where @to_replace may simply be @src if no=
+t
+>>> overridden by the user.)
+>>>
+>>> The only reason why I allow it in mirror_exit_common is because we have
+>>> to.  But if the user manually specifies this configuration, we can=92t
+>>> guarantee it=92s safe.
+>>>
+>>> OTOH, well, if we allow it for drive-mirror sync=3Dnone, why not allow =
+it
+>>> when manually specified with blockdev-mirror?
+>>>
+>>> What=92s your opinion?
+>>
+>> Hmm, I think, that allowing to_replaces to be direct backing child of ta=
+rget
+>> (like in mirror_exit_common) is safe enough. User doesn't know that
+>> such replacing includes also replacing own child of the target,
+>> which leads to the loop.. It's not obvious. And behavior of
+>> bdrv_replace_node() which just doesn't create this loop, doesn't
+>> seem something too tricky. Hmm..
+>>
+>> We could mention in qapi spec, that replacing doesn't break backing
+>> link of the target, for it to be absolutely defined.
+>>
+>> But should we allow replaces to be some other (not backing and not filte=
+red)
+>> child of target?..
+>=20
+> Well, my opinion is that this is a bit of weird thing to do and that it
+> basically does ask for a loop.
+>=20
+> I=92m OK with excluding the sync=3Dnone case, because (1) that=92s so
+> obviously a loop that it can=92t be what the user honestly wants; (2) how
+> it=92s resolved is rather obvious, too: There is exactly one edge that
+> causes the loop, so you simply don=92t change that one; (3) drive-mirror
+> sync=3Dnone does this case automatically, so we should probably allow
+> users to do it manually with blockdev-mirror, too.
+>=20
+>>>>> +
+>>>>> +        if (backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN ||
+>>>>> +            backing_mode =3D=3D MIRROR_OPEN_BACKING_CHAIN)
+>>>>> +        {
+>>>>> +            /*
+>>>>> +             * While we do not quite know what OPEN_BACKING_CHAIN
+>>>>> +             * (used for mode=3Dexisting) will yield, it is probably
+>>>>> +             * best to restrict it exactly like SOURCE_BACKING_CHAIN=
+,
+>>>>> +             * because that is our best guess.
+>>>>> +             */
+>>>>> +            switch (sync) {
+>>>>> +            case MIRROR_SYNC_MODE_FULL:
+>>>>> +                target_backing_bs =3D NULL;
+>>>>> +                break;
+>>>>> +
+>>>>> +            case MIRROR_SYNC_MODE_TOP:
+>>>>> +                target_backing_bs =3D backing_bs(bs);
+>>>>> +                break;
+>>>>> +
+>>>>> +            case MIRROR_SYNC_MODE_NONE:
+>>>>> +                target_backing_bs =3D bs;
+>>>>> +                break;
+>>>>> +
+>>>>> +            default:
+>>>>> +                abort();
+>>>>> +            }
+>>>>> +        } else {
+>>>>> +            assert(backing_mode =3D=3D MIRROR_LEAVE_BACKING_CHAIN);
+>>>>> +            target_backing_bs =3D backing_bs(target);
+>>>>> +        }
+>>>>> +
+>>>>> +        if (bdrv_is_child_of(to_replace_bs, target_backing_bs, 0)) {
+>>>>> +            error_setg(errp, "Replacing '%s' by '%s' with this sync =
+mode would "
+>>>>> +                       "result in a loop, because the former would b=
+e a child "
+>>>>> +                       "of the latter's backing file ('%s') after th=
+e mirror "
+>>>>> +                       "job", to_replace_bs->node_name, target->node=
+_name,
+>>>>> +                       target_backing_bs->node_name);
+>>>>> +            return;
+>>>>> +        }
+>>>>
+>>>> hmm.. so for MODE_NONE we disallow to_replace =3D=3D src?
+>>>
+>>> I suppose that=92s basically the same as above.  Should we allow this c=
+ase
+>>> when specified explicitly by the user?
+>>>
+>>
+>> I'm a bit more closer to allowing it, for consistency with automatic pat=
+h, with
+>> unspecified replaces. Are we sure that nobody uses it?
+>=20
+> Well, there are multiple cases, as shown in the commit message.  I think
+> that for drive-mirror sync=3Dnone, nobody uses @replaces, because it just
+> doesn=92t work.
+>=20
+> But, well, that=92s just because drive-mirror does graph manipulation tha=
+t
+> blockdev-mirror doesn=92t (i.e., changing the target=92s backing file on
+> completion).  So maybe we should just prevent loops for drive-mirror,
+> but let the user do what they want when they use blockdev-mirror?
+>=20
 
-Note that there is a difference in the reset. Instead of resetting
-only the hotplugged device, we reset also its subtree (switch to
-resettable API). This is not expected to be a problem because
-sub-buses are just realized too. If a hotplugged device has any
-sub-buses it is logical to reset them too at this point.
+Well, the question finally is, how much to restrict from things for which w=
+e
+don't know are they useful or not. I don't know) I think, finally, I'm OK w=
+ith
+either way we discussed, or with this patch as is. If it breaks some existi=
+ng
+scenario it will be easy to fix.
 
-The recently added should_be_hidden and PCI's partially_hotplugged
-mechanisms do not interfere with realize operation:
-+ In the should_be_hidden use case, device creation is
-delayed.
-+ The partially_hotplugged mechanism prevents a device to be
-unplugged and unrealized from qdev POV and unrealized.
-
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
----
-
-v6 update: clear the reset state before doing any reset. Although it
-is apparently highly improbable that a device be realized again after
-being unrealized. See here for a discussion about this point and the
-partially_hotplugged/shoud_be_hidden cases.
-https://lists.nongnu.org/archive/html/qemu-devel/2019-11/msg04897.html
----
- include/hw/resettable.h |  8 ++++++++
- hw/core/qdev.c          | 15 ++++++++++++++-
- hw/core/resettable.c    |  5 +++++
- 3 files changed, 27 insertions(+), 1 deletion(-)
-
-diff --git a/include/hw/resettable.h b/include/hw/resettable.h
-index 2227c654a5..4ae2a3363c 100644
---- a/include/hw/resettable.h
-+++ b/include/hw/resettable.h
-@@ -153,6 +153,14 @@ struct ResettableState {
-     bool exit_phase_in_progress;
- };
-=20
-+/**
-+ * resettable_state_clear:
-+ * Clear the state. It puts the state to the initial (zeroed) state requ=
-ired
-+ * to reuse an object. Typically used in realize step of base classes
-+ * implementing the interface.
-+ */
-+void resettable_state_clear(ResettableState *state);
-+
- /**
-  * resettable_reset:
-  * Trigger a reset on an object @obj of type @type. @obj must implement
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 9b22c7c879..495b5338e2 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -948,6 +948,12 @@ static void device_set_realized(Object *obj, bool va=
-lue, Error **errp)
-             }
-         }
-=20
-+        /*
-+         * Clear the reset state, in case the object was previously unre=
-alized
-+         * with a dirty state.
-+         */
-+        resettable_state_clear(&dev->reset);
-+
-         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
-             object_property_set_bool(OBJECT(bus), true, "realized",
-                                          &local_err);
-@@ -956,7 +962,14 @@ static void device_set_realized(Object *obj, bool va=
-lue, Error **errp)
-             }
-         }
-         if (dev->hotplugged) {
--            device_legacy_reset(dev);
-+            /*
-+             * Reset the device, as well as its subtree which, at this p=
-oint,
-+             * should be realized too.
-+             */
-+            resettable_assert_reset(OBJECT(dev), RESET_TYPE_COLD);
-+            resettable_change_parent(OBJECT(dev), OBJECT(dev->parent_bus=
-),
-+                                     NULL);
-+            resettable_release_reset(OBJECT(dev), RESET_TYPE_COLD);
-         }
-         dev->pending_deleted_event =3D false;
-=20
-diff --git a/hw/core/resettable.c b/hw/core/resettable.c
-index 9104a84b99..9f6d586fce 100644
---- a/hw/core/resettable.c
-+++ b/hw/core/resettable.c
-@@ -15,6 +15,11 @@
- #include "hw/resettable.h"
- #include "trace.h"
-=20
-+void resettable_state_clear(ResettableState *state)
-+{
-+    memset(state, 0, sizeof(ResettableState));
-+}
-+
- /**
-  * resettable_phase_enter/hold/exit:
-  * Function executing a phase recursively in a resettable object and its
 --=20
-2.24.0
-
+Best regards,
+Vladimir
 
