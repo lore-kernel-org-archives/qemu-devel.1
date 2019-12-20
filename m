@@ -2,81 +2,78 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0F7C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C8AC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:54:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8554206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:28:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3ACAC20866
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:54:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WJHVnI6L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8554206D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p1GITxy0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ACAC20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiOt4-0006Uk-1M
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 15:28:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50948)
+	id 1iiPI8-0000xT-E8
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 15:54:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1iiOs4-0005Mx-G0
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:27:38 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iiPHH-0000Fc-9c
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:53:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1iiOs2-0001Rg-K6
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:27:36 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44603)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iiPHF-0005UB-0p
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:53:39 -0500
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:40729)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1iiOs2-0001Oc-9B
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:27:34 -0500
-Received: by mail-lf1-x142.google.com with SMTP id v201so7953215lfa.11
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 12:27:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=cRpSiBbQozDmyYgJRa0I9YSzeC8XG/jZayq+30fJx3E=;
- b=WJHVnI6L78/ZVkBh0jEK/DmML47DTl/cF+Sp7lG64oOvpW615FqzqSl3V5bg1d1Lu0
- wMSnkJLmd1wyrqhX1SsYXGEkr2kAxGVZUt31ORKQbx6adTNJg2t2pPaLLzmDZjs/i9kn
- OozMmQ46BBOKwCBAIuUAWqqNQpW0lv8wwCP4BxGN/vSE16El7BWr7Ku47Qmn0xOa+Cf+
- 26ImWFIOJM0gyhGkNp0AG3scipjDlwv7q9Ks8wa9aQkNlwApFeUXzDft2ThAXl4Txv09
- n5RX5TkOi/8OXwgC35Aff4cIfAF6HbPhU/szAQWDXjcovVxDKoiOSBzvfy10KSCHxNj1
- UjGw==
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1iiPHE-0005Lx-Me; Fri, 20 Dec 2019 15:53:36 -0500
+Received: by mail-il1-x142.google.com with SMTP id c4so9086565ilo.7;
+ Fri, 20 Dec 2019 12:53:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FtM6QrrcIKciVwrC1mDDncSHnEooOIfjatjv3KovqFg=;
+ b=p1GITxy0voPm4Nwn6qrvc43gBRnquFokzniG0K8nVveu9QqtQxF+yeqs5hU4o9knmD
+ H2A1RYpnRT9Zk3x+nRLpEYfVJRHEl0vGzRltFhE6QAPG77vlJbvqkvLe5yFNN1FuPhgP
+ z771CcRdpm1flHLbrcLtTYLJDidhEB3Ju2pGuuKsfjkGcYZi1oUkh2f3mLn7SdPr7PVP
+ ZbsVD1WIgHHK85lN5mLSidiONZ4H8J1ZLszpfjqOKRq8hPqVGpVsb/M8lUQMo8QxrPkI
+ VCHw3XmuJHHFtqeYvBvR7cVsgWNcfUTZd2g0+drx3P8pJupS6iWvzotGHvhcI48WwjV4
+ /mrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=cRpSiBbQozDmyYgJRa0I9YSzeC8XG/jZayq+30fJx3E=;
- b=d5cafqthMvFiS2MkcZLQYBvgal1S5ROlHduXt5CQevR8s1m54ram7gPTCirGqodu5k
- 0Yxh/kVjuHlCUbglGpq9i+MqQBVkGKaLnwaLH5Kx+HfZ5wjPs9cc85/XJhYG3lbfY5Fu
- jZ8BlUDufAM925mod7kHys5hDsbRPIyYrFwq71pztFuXyCxnp8SsovZe/BXSRzIuID54
- Uv7UIngHParEyG5tnV20h2yXl6usUev2jC/pDek+T34uCMRptVPvslpQoXFWn4NDGUsL
- SlGq6Da0pI159IQqGWfMFzIy+dYkvtYB8QAHvEmU1o5extIndRXlPjZAcHANsjK/zc2U
- JSAg==
-X-Gm-Message-State: APjAAAVSL4oBXTrgYN7V9IIiVno0NFsvQh+B4a/Mp6ZQDKeRNWHZ7x45
- Sp75CSfWtkEntaO+vyc4bZVnEp0i9Af0tw==
-X-Google-Smtp-Source: APXvYqw1rEQ4Qf2bq7sRNo/PD3v4StFCkIUoDTB/R6Iy7iyQTYfklYncyaY8xeEsy6o01ed7sCh9Tg==
-X-Received: by 2002:ac2:47ec:: with SMTP id b12mr9689410lfp.162.1576873652736; 
- Fri, 20 Dec 2019 12:27:32 -0800 (PST)
-Received: from moi-limbo-9350.arm.com (user44-177.satfilm.com.pl.
- [77.91.44.177])
- by smtp.gmail.com with ESMTPSA id g27sm4482353lfj.49.2019.12.20.12.27.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 12:27:32 -0800 (PST)
-From: Beata Michalska <beata.michalska@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 1/1] target/arm: kvm: Handle DABT with no valid ISS
-Date: Fri, 20 Dec 2019 20:27:07 +0000
-Message-Id: <20191220202707.30641-2-beata.michalska@linaro.org>
-In-Reply-To: <20191220202707.30641-1-beata.michalska@linaro.org>
-References: <20191220202707.30641-1-beata.michalska@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FtM6QrrcIKciVwrC1mDDncSHnEooOIfjatjv3KovqFg=;
+ b=JOwZWUM3r97D5ucm6VcKEP7GddNHOqOouaT/dK8RfcJ694P5imuZszHZ63y+f/D6Yv
+ +v450MaqiIadDj9gN2lTEBq1K8/t89iN5z3qJChHUJKwVCS7j+wKSZM9/EhWUshm+oBn
+ bzdRSv1z0iirUx9MpPQtWso5mDJ06I3/J1jW+y/3rHUAfTOjUAzeS8LMSHQf+/nNzSPn
+ wXSRe2jeeq3gC0DEduIj8BhFHKxP78ewbZnhzn433GGXxXnpPrFKDyXZKp8owCOyGHzF
+ YxVo4zgcD0hH6YHwcFlSve4ahL4AQST2gdL2iYv6cDH/btUi6H+2HkqaAp+4V2ma1leS
+ 9tnw==
+X-Gm-Message-State: APjAAAVeP3zjQeBgE8m6tqNT1o766knwLi+c8EU/hOtsK2O/67B9DZA0
+ gN/SAMYykx6EfVznx5qm6QjYNt/yVyBhOHfVx2M=
+X-Google-Smtp-Source: APXvYqzMYNww3znOxAKOseSz2nJ8/ZiZToe22wjxuW2UonpP0V15XL6J3QWGY1gFcTjLKOzbo7n9Iv1wYkscynsc3KM=
+X-Received: by 2002:a92:c647:: with SMTP id 7mr14409560ill.28.1576875214621;
+ Fri, 20 Dec 2019 12:53:34 -0800 (PST)
+MIME-Version: 1.0
+References: <20191219185127.24388-1-f4bug@amsat.org>
+In-Reply-To: <20191219185127.24388-1-f4bug@amsat.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Fri, 20 Dec 2019 21:53:23 +0100
+Message-ID: <CAPan3Wop2qT6PS4XEqe=9OjpA34kJkO-PqNB74tfjyRfYTThLA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/13] hw/timer/allwinner: Make it reusable
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: multipart/alternative; boundary="00000000000005d230059a28df59"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2607:f8b0:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,317 +85,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, Christoffer.Dall@arm.com,
- pbonzini@redhat.com
+Cc: Beniamino Galvani <b.galvani@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
-exception with no valid ISS info to be decoded. The lack of decode info
-makes it at least tricky to emulate those instruction which is one of the
-(many) reasons why KVM will not even try to do so.
+--00000000000005d230059a28df59
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add suport for handling those by requesting KVM to inject external
-dabt into the quest.
+Hi Philippe,
 
-Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
----
- accel/kvm/kvm-all.c    | 15 +++++++
- accel/stubs/kvm-stub.c |  4 ++
- include/sysemu/kvm.h   |  1 +
- target/arm/cpu.h       |  3 +-
- target/arm/kvm.c       | 95 ++++++++++++++++++++++++++++++++++++++++++
- target/arm/kvm32.c     |  3 ++
- target/arm/kvm64.c     |  3 ++
- target/arm/kvm_arm.h   | 19 +++++++++
- 8 files changed, 142 insertions(+), 1 deletion(-)
+On Thu, Dec 19, 2019 at 7:51 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g>
+wrote:
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index ca00daa2f5..a3ee038142 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2174,6 +2174,14 @@ static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
-     }
- }
- 
-+static void do_kvm_cpu_synchronize_state_force(CPUState *cpu,
-+                                               run_on_cpu_data arg)
-+{
-+    kvm_arch_get_registers(cpu);
-+    cpu->vcpu_dirty = true;
-+}
-+
-+
- void kvm_cpu_synchronize_state(CPUState *cpu)
- {
-     if (!cpu->vcpu_dirty) {
-@@ -2181,6 +2189,13 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
-     }
- }
- 
-+void kvm_cpu_synchronize_state_force(CPUState *cpu)
-+{
-+    /* Force the sync */
-+    run_on_cpu(cpu, do_kvm_cpu_synchronize_state_force, RUN_ON_CPU_NULL);
-+}
-+
-+
- static void do_kvm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
- {
-     kvm_arch_put_registers(cpu, KVM_PUT_RESET_STATE);
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 82f118d2df..e917d1d55e 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -58,6 +58,10 @@ void kvm_cpu_synchronize_post_init(CPUState *cpu)
- {
- }
- 
-+void kvm_cpu_synchronize_state_force(CPUState *cpu)
-+{
-+}
-+
- int kvm_cpu_exec(CPUState *cpu)
- {
-     abort();
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 9fe233b9bf..0cacc61d8a 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -483,6 +483,7 @@ void kvm_cpu_synchronize_state(CPUState *cpu);
- void kvm_cpu_synchronize_post_reset(CPUState *cpu);
- void kvm_cpu_synchronize_post_init(CPUState *cpu);
- void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
-+void kvm_cpu_synchronize_state_force(CPUState *cpu);
- 
- void kvm_init_cpu_signals(CPUState *cpu);
- 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 5f70e9e043..e11b5e7438 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -558,7 +558,8 @@ typedef struct CPUARMState {
-         uint8_t has_esr;
-         uint64_t esr;
-     } serror;
--
-+    /* Status field for pending extarnal dabt */
-+    uint8_t ext_dabt_pending;
-     /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
-     uint32_t irq_line_state;
- 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 5b82cefef6..10fe739c2d 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -37,6 +37,7 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
- 
- static bool cap_has_mp_state;
- static bool cap_has_inject_serror_esr;
-+static bool cap_has_inject_ext_dabt; /* KVM_CAP_ARM_INJECT_EXT_DABT */
- 
- static ARMHostCPUFeatures arm_host_cpu_features;
- 
-@@ -62,6 +63,12 @@ void kvm_arm_init_serror_injection(CPUState *cs)
-                                     KVM_CAP_ARM_INJECT_SERROR_ESR);
- }
- 
-+void kvm_arm_init_ext_dabt_injection(CPUState *cs)
-+{
-+    cap_has_inject_ext_dabt = kvm_check_extension(cs->kvm_state,
-+                                    KVM_CAP_ARM_INJECT_EXT_DABT);
-+}
-+
- bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-                                       int *fdarray,
-                                       struct kvm_vcpu_init *init)
-@@ -218,6 +225,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         ret = -EINVAL;
-     }
- 
-+    if (kvm_check_extension(s, KVM_CAP_ARM_NISV_TO_USER))
-+        if (kvm_vm_enable_cap(s, KVM_CAP_ARM_NISV_TO_USER, 0)) {
-+            warn_report("Failed to enable DABT NISV cap");
-+        }
-+
-     return ret;
- }
- 
-@@ -600,6 +612,10 @@ int kvm_put_vcpu_events(ARMCPU *cpu)
-         events.exception.serror_esr = env->serror.esr;
-     }
- 
-+    if (cap_has_inject_ext_dabt) {
-+        events.exception.ext_dabt_pending = env->ext_dabt_pending;
-+    }
-+
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
-     if (ret) {
-         error_report("failed to put vcpu events");
-@@ -629,6 +645,8 @@ int kvm_get_vcpu_events(ARMCPU *cpu)
-     env->serror.has_esr = events.exception.serror_has_esr;
-     env->serror.esr = events.exception.serror_esr;
- 
-+    env->ext_dabt_pending = events.exception.ext_dabt_pending;
-+
-     return 0;
- }
- 
-@@ -701,6 +719,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
-             ret = EXCP_DEBUG;
-         } /* otherwise return to guest */
-         break;
-+    case KVM_EXIT_ARM_NISV:
-+        /* External DAB with no valid iss to decode */
-+        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
-+                                 run->arm_nisv.fault_ipa);
-+        break;
-     default:
-         qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-                       __func__, run->exit_reason);
-@@ -835,3 +858,75 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
- {
-     return (data - 32) & 0xffff;
- }
-+
-+int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-+                              uint64_t fault_ipa)
-+{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+    hwaddr xlat, len;
-+    AddressSpace *as = cs->as ? cs->as : &address_space_memory;
-+    int store_ins = ((esr_iss >> 6) & 1); /* WnR bit */
-+    int ret;
-+
-+    /*
-+     * Note: The ioctl for SET_EVENTS will be triggered before next
-+     * KVM_RUN call though the vcpu regs need to be updated before hand
-+     * so to not to overwrite changes done by KVM upon injecting the abort.
-+     * This sadly requires running sync twice - shame ...
-+     */
-+    kvm_cpu_synchronize_state(cs);
-+   /*
-+    * ISS [23:14] is invalid so there is a limited info
-+    * on what has just happened so the only *useful* thing that can
-+    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
-+    * might be less of a value as well)
-+    */
-+    /* Verify whether the memory being accessed is even recognisable */
-+    if (!address_space_translate(as, fault_ipa, &xlat, &len,
-+                                 store_ins, MEMTXATTRS_UNSPECIFIED)) {
-+        error_report("An attemp to access memory outside of the boundries"
-+                     "at 0x" TARGET_FMT_lx, (target_ulong) fault_ipa);
-+    } else {
-+        uint32_t ins;
-+        uint8_t ins_fetched;
-+
-+        /*
-+         * Get current PC before it will get updated to except vector entry
-+         */
-+        target_ulong ins_addr = is_a64(env) ? env->pc
-+                                /* AArch32 mode vs T32 aka Thumb mode */
-+                                : env->regs[15] - (env->thumb ? 4 : 8);
-+
-+        /*
-+         * Get the faulting instruction
-+         * Instructions have a fixed length of 32 bits
-+         * and are always little-endian
-+         */
-+        ins_fetched = !cpu_memory_rw_debug(cs, ins_addr, (uint8_t *) &ins,
-+                                           sizeof(uint32_t), store_ins) ;
-+
-+        error_report("Data abort exception with no valid ISS generated by "
-+                     "memory access at 0x" TARGET_FMT_lx,
-+                     (target_ulong)fault_ipa);
-+        error_report(ins_fetched ? "%s: 0x%" PRIx32 " (encoded)" : "%s",
-+                     "Unable to emulate memory instruction",
-+                     (!ins_fetched ? 0 : ldl_le_p(&ins)));
-+
-+        error_report("Faulting instruction at 0x" TARGET_FMT_lx, ins_addr);
-+    }
-+    /*
-+     * Set pending ext dabt amd trigger SET_EVENTS so that
-+     * KVM can inject the abort
-+     */
-+    env->ext_dabt_pending = 1;
-+
-+    ret = kvm_put_vcpu_events(cpu);
-+
-+    /* Get the most up-tp-date state */
-+    if (!ret) {
-+        /* Hacky but the sync needs to be forced */
-+        kvm_cpu_synchronize_state_force(cs);
-+    }
-+    return ret;
-+}
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 32bf8d6757..5539c3a3f2 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -240,6 +240,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     /* Check whether userspace can specify guest syndrome value */
-     kvm_arm_init_serror_injection(cs);
- 
-+    /* Set status for supporting the extarnal dabt injection */
-+    kvm_arm_init_ext_dabt_injection(cs);
-+
-     return kvm_arm_init_cpreg_list(cpu);
- }
- 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 876184b8fe..3da4e2e70e 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -792,6 +792,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     /* Check whether user space can specify guest syndrome value */
-     kvm_arm_init_serror_injection(cs);
- 
-+    /* Set status for supporting the extarnal dabt injection */
-+    kvm_arm_init_ext_dabt_injection(cs);
-+
-     return kvm_arm_init_cpreg_list(cpu);
- }
- 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 8e14d400e8..fe019f2fc9 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -143,6 +143,14 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu);
-  */
- void kvm_arm_init_serror_injection(CPUState *cs);
- 
-+/**
-+ * kvm_arm_init_ext_dabt_injection
-+ * @cs: CPUState
-+ *
-+ * Set status for KVM support for Ext DABT injection
-+ */
-+void kvm_arm_init_ext_dabt_injection(CPUState *cs);
-+
- /**
-  * kvm_get_vcpu_events:
-  * @cpu: ARMCPU
-@@ -371,6 +379,17 @@ static inline const char *gicv3_class_name(void)
-  */
- bool kvm_arm_handle_debug(CPUState *cs, struct kvm_debug_exit_arch *debug_exit);
- 
-+/**
-+ * kvm_arm_handle_dabt_nisv
-+ * @cs: CPUState
-+ * @esr_iss: ISS encoding (limited) for the exception from Data Abort
-+ *           ISV bit set to '0b0' -> no valid instruction syndrome
-+ * @fault_ipa: faulting address for the synch data abort
-+ *
-+ * Returns: 0 if the exception has been handled
-+ */
-+int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
-+                             uint64_t fault_ipa);
- /**
-  * kvm_arm_hw_debug_active:
-  * @cs: CPU State
--- 
-2.17.1
+> Hi,
+>
+> Niek added the H3 SoC in [1] and noticed in [2] the timer
+> controller is very similar (less timers, watchdog register
+> placed at different address).
+>
+> On 12/18/19 9:14 PM, Niek Linnenbank wrote:
+> > Actually, I copied the timer support code from the existing cubieboard.=
+c
+> > that has
+> > the Allwinner A10, so potentially the same problem is there.
+> >
+> > While looking more closer at this part, I now also discovered that the
+> > timer module from the Allwinner H3 is
+> > mostly a stripped down version of the timer module in the Allwinner A10=
+:
+> >
+> >    Allwinner A10, 10.2 Timer Register List, page 85:
+> > https://linux-sunxi.org/images/1/1e/Allwinner_A10_User_manual_V1.5.pdf
+> >
+> > The A10 version has six timers, where the H3 has only two. That should
+> > be fine I would say, the guest would simply
+> > use those available on H3 and ignore the rest. There is however one
+> > conflicting difference: the WDOG0 registers in the Allwinner H3 start
+> > at a different offset and are also different. The current A10 timer doe=
+s
+> > not currently implement the watchdog part.
+> [...]
+> > So in my opinion its a bit of a trade off here: we can keep it like thi=
+s
+> > and re-use the A10 timer for now, and perhaps
+> > attempt to generalize that module for proper use in both SoCs. Or we ca=
+n
+> > introduce a new H3 specific timer module.
+> > What do you think?
+>
+> As an answer to his question, this series is to help him to
+> reuse the A10 timer controller instead of adding a new model
+> to the codebase.
+>
 
+Great!! This certainly answers my question indeed!
+
+I've applied this patch on top of the allwinner H3 v2 series to test it,
+and after
+changing the type from AwA10PITState to the new AllwinnerTmrCtrlState,
+the code compiled and ran linux/u-boot without any problems:
+
+diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
+index 357bdfa711..fa0219fa1b 100644
+--- a/include/hw/arm/allwinner-h3.h
++++ b/include/hw/arm/allwinner-h3.h
+@@ -76,7 +76,7 @@ typedef struct AwH3State {
+
+     ARMCPU cpus[AW_H3_NUM_CPUS];
+     const hwaddr *memmap;
+-    AwA10PITState timer;
++    AllwinnerTmrCtrlState timer;
+     AwH3ClockState ccu;
+     AwH3CpuCfgState cpucfg;
+     AwH3SysconState syscon;
+
+Also, I tested with the A10 cubieboard machine, and it also still works
+fine:
+
+./arm-softmmu/qemu-system-arm -M cubieboard -kernel zImage -nographic
+-append 'console=3DttyS0,115200 earlyprintk usbcore.nousb root=3D/dev/sda r=
+o
+init=3D/sbin/init' -dtb sun4i-a10-cubieboard.dtb -m 512 -drive
+file=3Drootfs.ext2,if=3Dnone,id=3Ddrive-sata0-0-0,format=3Draw -device
+ide-hd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0 -nic user
+[    0.000000] Booting Linux on physical CPU 0x0
+[    0.000000] Linux version 5.2.11 (me@host) (gcc version 5.4.0 20160609
+(Ubuntu/Linaro 5.4.0-6ubuntu1~16.04.9)) #1 SMP Fri Sep 13 22:48:39 CEST 201=
+9
+[    0.000000] CPU: ARMv7 Processor [410fc080] revision 0 (ARMv7),
+cr=3D10c5387d
+[    0.000000] CPU: PIPT / VIPT nonaliasing data cache, VIPT nonaliasing
+instruction cache
+[    0.000000] OF: fdt: Machine model: Cubietech Cubieboard
+...
+
+So for me this works with both the H3 and A10:
+  Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+
+Regards,
+Niek
+
+>
+> [1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg665532.html
+> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg666304.html
+>
+> Philippe Mathieu-Daud=C3=A9 (13):
+>   hw/timer/allwinner: Use the AW_A10_PIT_TIMER_NR definition
+>   hw/timer/allwinner: Add AW_PIT_TIMER_MAX definition
+>   hw/timer/allwinner: Remove unused definitions
+>   hw/timer/allwinner: Move definitions from header to source
+>   hw/timer/allwinner: Rename the ptimer field
+>   hw/timer/allwinner: Rename 'timer_context' as 'timer'
+>   hw/timer/allwinner: Move timer specific fields into AwA10TimerContext
+>   hw/timer/allwinner: Add a timer_count field
+>   hw/timer/allwinner: Rename AwA10TimerContext as AllwinnerTmrState
+>   hw/timer/allwinner: Rename AwA10PITState as AllwinnerTmrCtrlState
+>   hw/timer/allwinner: Introduce TYPE_AW_COMMON_PIT abstract device
+>   hw/timer/allwinner: Rename AW_A10_PIT() as AW_TIMER_CTRL()
+>   hw/timer/allwinner: Rename functions not specific to the A10 SoC
+>
+>  include/hw/arm/allwinner-a10.h       |   2 +-
+>  include/hw/timer/allwinner-a10-pit.h |  54 ++----
+>  hw/timer/allwinner-a10-pit.c         | 271 +++++++++++++++++----------
+>  3 files changed, 192 insertions(+), 135 deletions(-)
+>
+> --
+> 2.21.0
+>
+>
+
+--=20
+Niek Linnenbank
+
+--00000000000005d230059a28df59
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi Philippe,</div><div><br></div><div class=3D"gmail_=
+quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Dec 19, 2019 at 7:51 P=
+M Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@=
+amsat.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">Hi,<br>
+<br>
+Niek added the H3 SoC in [1] and noticed in [2] the timer<br>
+controller is very similar (less timers, watchdog register<br>
+placed at different address).<br>
+<br>
+On 12/18/19 9:14 PM, Niek Linnenbank wrote:<br>
+&gt; Actually, I copied the timer support code from the existing cubieboard=
+.c<br>
+&gt; that has<br>
+&gt; the Allwinner A10, so potentially the same problem is there.<br>
+&gt;<br>
+&gt; While looking more closer at this part, I now also discovered that the=
+<br>
+&gt; timer module from the Allwinner H3 is<br>
+&gt; mostly a stripped down version of the timer module in the Allwinner A1=
+0:<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0 Allwinner A10, 10.2 Timer Register List, page 85:<br>
+&gt; <a href=3D"https://linux-sunxi.org/images/1/1e/Allwinner_A10_User_manu=
+al_V1.5.pdf" rel=3D"noreferrer" target=3D"_blank">https://linux-sunxi.org/i=
+mages/1/1e/Allwinner_A10_User_manual_V1.5.pdf</a><br>
+&gt;<br>
+&gt; The A10 version has six timers, where the H3 has only two. That should=
+<br>
+&gt; be fine I would say, the guest would simply<br>
+&gt; use those available on H3 and ignore the rest. There is however one<br=
+>
+&gt; conflicting difference: the WDOG0 registers in the Allwinner H3 start<=
+br>
+&gt; at a different offset and are also different. The current A10 timer do=
+es<br>
+&gt; not currently implement the watchdog part.<br>
+[...]<br>
+&gt; So in my opinion its a bit of a trade off here: we can keep it like th=
+is<br>
+&gt; and re-use the A10 timer for now, and perhaps<br>
+&gt; attempt to generalize that module for proper use in both SoCs. Or we c=
+an<br>
+&gt; introduce a new H3 specific timer module.<br>
+&gt; What do you think?<br>
+<br>
+As an answer to his question, this series is to help him to<br>
+reuse the A10 timer controller instead of adding a new model<br>
+to the codebase.<br></blockquote><div><br></div><div>Great!! This certainly=
+ answers my question indeed!</div><div><br></div><div>I&#39;ve applied this=
+ patch on top of the allwinner H3 v2 series to test it, and after</div><div=
+>changing the type from AwA10PITState to the new AllwinnerTmrCtrlState,</di=
+v><div>the code compiled and ran linux/u-boot without any problems:</div><d=
+iv><br></div><div><span style=3D"font-family:monospace">diff --git a/includ=
+e/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h<br>index 357bdfa711=
+..fa0219fa1b 100644<br>--- a/include/hw/arm/allwinner-h3.h<br>+++ b/include=
+/hw/arm/allwinner-h3.h<br>@@ -76,7 +76,7 @@ typedef struct AwH3State {<br>=
+=C2=A0<br>=C2=A0 =C2=A0 =C2=A0ARMCPU cpus[AW_H3_NUM_CPUS];<br>=C2=A0 =C2=A0=
+ =C2=A0const hwaddr *memmap;<br>- =C2=A0 =C2=A0AwA10PITState timer;<br>+ =
+=C2=A0 =C2=A0AllwinnerTmrCtrlState timer;<br>=C2=A0 =C2=A0 =C2=A0AwH3ClockS=
+tate ccu;<br>=C2=A0 =C2=A0 =C2=A0AwH3CpuCfgState cpucfg;<br>=C2=A0 =C2=A0 =
+=C2=A0AwH3SysconState syscon;<br></span></div><div><br></div><div>Also, I t=
+ested with the A10 cubieboard machine, and it also still works fine:</div><=
+div><br></div><div><span style=3D"font-family:monospace">./arm-softmmu/qemu=
+-system-arm -M cubieboard -kernel zImage -nographic -append &#39;console=3D=
+ttyS0,115200 earlyprintk usbcore.nousb root=3D/dev/sda ro init=3D/sbin/init=
+&#39; -dtb sun4i-a10-cubieboard.dtb -m 512 -drive file=3Drootfs.ext2,if=3Dn=
+one,id=3Ddrive-sata0-0-0,format=3Draw -device ide-hd,bus=3Dide.0,drive=3Ddr=
+ive-sata0-0-0,id=3Dsata0-0-0 -nic user<br></span></div><div><span style=3D"=
+font-family:monospace"> [ =C2=A0 =C2=A00.000000] Booting Linux on physical =
+CPU 0x0<br>[ =C2=A0 =C2=A00.000000] Linux version 5.2.11 (me@host) (gcc ver=
+sion 5.4.0 20160609 (Ubuntu/Linaro 5.4.0-6ubuntu1~16.04.9)) #1 SMP Fri Sep =
+13 22:48:39 CEST 2019<br>[ =C2=A0 =C2=A00.000000] CPU: ARMv7 Processor [410=
+fc080] revision 0 (ARMv7), cr=3D10c5387d<br>[ =C2=A0 =C2=A00.000000] CPU: P=
+IPT / VIPT nonaliasing data cache, VIPT nonaliasing instruction cache<br>[ =
+=C2=A0 =C2=A00.000000] OF: fdt: Machine model: Cubietech Cubieboard<br></sp=
+an></div><div><span style=3D"font-family:monospace">...</span></div><div><s=
+pan style=3D"font-family:monospace"><br></span></div><div><span style=3D"fo=
+nt-family:monospace"><font face=3D"arial,sans-serif">So for me this works w=
+ith both the H3 and A10: <br></font></span></div><div><span style=3D"font-f=
+amily:monospace"><font face=3D"arial,sans-serif">=C2=A0 Tested-by: Niek Lin=
+nenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">nieklinnenbank@gmai=
+l.com</a>&gt;</font><br></span></div><div>=C2=A0</div><div>Regards,</div><d=
+iv>Niek<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
+0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+[1] <a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg665532=
+.html" rel=3D"noreferrer" target=3D"_blank">https://www.mail-archive.com/qe=
+mu-devel@nongnu.org/msg665532.html</a><br>
+[2] <a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg666304=
+.html" rel=3D"noreferrer" target=3D"_blank">https://www.mail-archive.com/qe=
+mu-devel@nongnu.org/msg666304.html</a><br>
+<br>
+Philippe Mathieu-Daud=C3=A9 (13):<br>
+=C2=A0 hw/timer/allwinner: Use the AW_A10_PIT_TIMER_NR definition<br>
+=C2=A0 hw/timer/allwinner: Add AW_PIT_TIMER_MAX definition<br>
+=C2=A0 hw/timer/allwinner: Remove unused definitions<br>
+=C2=A0 hw/timer/allwinner: Move definitions from header to source<br>
+=C2=A0 hw/timer/allwinner: Rename the ptimer field<br>
+=C2=A0 hw/timer/allwinner: Rename &#39;timer_context&#39; as &#39;timer&#39=
+;<br>
+=C2=A0 hw/timer/allwinner: Move timer specific fields into AwA10TimerContex=
+t<br>
+=C2=A0 hw/timer/allwinner: Add a timer_count field<br>
+=C2=A0 hw/timer/allwinner: Rename AwA10TimerContext as AllwinnerTmrState<br=
+>
+=C2=A0 hw/timer/allwinner: Rename AwA10PITState as AllwinnerTmrCtrlState<br=
+>
+=C2=A0 hw/timer/allwinner: Introduce TYPE_AW_COMMON_PIT abstract device<br>
+=C2=A0 hw/timer/allwinner: Rename AW_A10_PIT() as AW_TIMER_CTRL()<br>
+=C2=A0 hw/timer/allwinner: Rename functions not specific to the A10 SoC<br>
+<br>
+=C2=A0include/hw/arm/allwinner-a10.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
+=A02 +-<br>
+=C2=A0include/hw/timer/allwinner-a10-pit.h |=C2=A0 54 ++----<br>
+=C2=A0hw/timer/allwinner-a10-pit.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 271 +=
+++++++++++++++++----------<br>
+=C2=A03 files changed, 192 insertions(+), 135 deletions(-)<br>
+<br>
+-- <br>
+2.21.0<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
+
+--00000000000005d230059a28df59--
 
