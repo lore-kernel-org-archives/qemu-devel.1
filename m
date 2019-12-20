@@ -1,166 +1,64 @@
-Return-Path: <SRS0=p/0J=2J=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E43C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 23:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FA3C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 00:30:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 990C021927
-	for <qemu-devel@archiver.kernel.org>; Thu, 19 Dec 2019 23:57:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9E282465E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 00:30:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="SDzQUkql"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 990C021927
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pEa+D1SM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E282465E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii5fp-0005hO-My
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 18:57:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50421)
+	id 1ii6BN-0000XE-UA
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 19:30:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57766)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1ii5et-0005G7-RP
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 18:56:45 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ii6AJ-0008LU-EX
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 19:29:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ii5er-0004xN-Sa
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 18:56:43 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33820)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ii5er-0004nO-7d
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 18:56:41 -0500
-Received: by mail-pf1-x444.google.com with SMTP id l127so4196167pfl.1
- for <qemu-devel@nongnu.org>; Thu, 19 Dec 2019 15:56:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4WCaVg5haeyrZGE1mHK2ZF4kCT3XqMlMLdUu1v6nvKY=;
- b=SDzQUkqlUI1B2riO+2+TQenHdQn06J/KEueDc0lsnLibbgIQhp9Tv/N2KQs4Et24PX
- mUhFYrU47Qf8D6IrfOxKtGQDdIjhqWbl509d5ubmdW/x1W6nlJdPm2VYF6O8ML0//vjI
- dercSojTYsIanH22EoEflxBFaXnGrFwpxvkfw0RfwCgqzJ6Fllw24DwiMsprZpmqYhFh
- fALDnR3/k79tUfnyINfMkfW6ovYdXoAea/eCh4ymzC1fvE8n84P0zI7BtCwD3BELj8du
- HgLFzZ2srR8HC4GHmYcsZWgN01LGzc5G2NghUS9PQ4v5pObon52MZJ3V5tUp2DSLSIt1
- ZuKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=4WCaVg5haeyrZGE1mHK2ZF4kCT3XqMlMLdUu1v6nvKY=;
- b=K9DIL8+d4FYnb/KAtraw8fTORCbzO8zbxP6xOs5HgurieLXelfmwDW/A+Or6Sph7ae
- fmWbpQuPX5M8Q2AUkys6rIFL3MfFXeJYoUiUjWtbduyPgAoKPmAhu5sGFHsPXCzVwVtw
- J4lK05uSQSqy/fbMTUasiDLnamAcBZTHykm3qPThgzjYxK3bnCNl2xDzI0Bp06YEY+pF
- eF3M+NS5ffOFStDPDcOFsSDfnLOGiLAp00C6M3kNTyHRhG19Zi1dssESWwJTJb8W81IM
- RqZMI7XJXYEdoTRCn/rcvGZOx/vdrBg3Xu76M3TKNp+IPxiz/NtPyJ/4yYt4CgE03AJ3
- fEWg==
-X-Gm-Message-State: APjAAAVsY9ZWl1D9yxbHHl8JVe20+qVjZMDtCnmm8lKiLvoAYs3nwbOv
- lTTek4gkaR70OMv99rNQqRWq0gh6/D0=
-X-Google-Smtp-Source: APXvYqzj0ykOr8ciiZgZta8ZR4nNkIQYbL+AWrILO4QXAWUKU7hquh1stZwR4xleXphoYQHMK+FImg==
-X-Received: by 2002:a62:cece:: with SMTP id y197mr13043736pfg.9.1576799798920; 
- Thu, 19 Dec 2019 15:56:38 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id j21sm9277320pfe.175.2019.12.19.15.56.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 19 Dec 2019 15:56:38 -0800 (PST)
-Subject: Re: [PATCH v4 0/4] Improve default object property_add uint helpers
-To: Felipe Franciosi <felipe@nutanix.com>,
- Marc-Andre Lureau <marcandre.lureau@gmail.com>,
- Phillipe Mathieu-Daude <philmd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost
- <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20191219180205.25191-1-felipe@nutanix.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <c6289c52-aa93-c403-57d0-7cfcfbc99d9b@ozlabs.ru>
-Date: Fri, 20 Dec 2019 10:56:32 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <dgibson@ozlabs.org>) id 1ii6AG-0007dv-5R
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 19:29:11 -0500
+Received: from ozlabs.org ([203.11.71.1]:40423)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ii6AF-0007MS-2Y; Thu, 19 Dec 2019 19:29:08 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47f8kR2cDQz9sPW; Fri, 20 Dec 2019 11:29:03 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1576801743;
+ bh=Tr3TC7IDOK5lSRhu3oDFcU8JlKCSygNgOHpIJ9/p2PA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=pEa+D1SMwaQOy0b67ZZDBvWoPluKY+ZTkot/uUQ3G3EPHlcJGBa/0rS1q5XQT6MuT
+ kOll66wn2ClGk5H793ugvC/rWaNQsdafgaiDHBSl+LJMAt9lTKIlDERaMunjO8V1nO
+ BiV1UXn8fYrWnbwXu8TKGK362JTDXy/7RkPobRkE=
+Date: Fri, 20 Dec 2019 11:26:37 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 01/13] ppc/pnv: Modify the powerdown notifier to get
+ the PowerNV machine
+Message-ID: <20191220002637.GK2321@umbus.fritz.box>
+References: <20191219181155.32530-1-clg@kaod.org>
+ <20191219181155.32530-2-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20191219180205.25191-1-felipe@nutanix.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="hl1kWnBARzJiTscN"
+Content-Disposition: inline
+In-Reply-To: <20191219181155.32530-2-clg@kaod.org>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -172,69 +70,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--hl1kWnBARzJiTscN
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 20/12/2019 05:02, Felipe Franciosi wrote:
-> This improves the family of object_property_add_uintXX_ptr helpers by enabling
-> a default getter/setter only when desired. To prevent an API behavioural change
-> (from clients that already used these helpers and did not want a setter), we
-> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter. Patch 1
-> enhances the API and modify current users.
-> 
-> While modifying the clients of the API, a couple of improvement opportunities
-> were observed in ich9. These were added in separate patches (2 and 3).
-> 
-> Patch 3 cleans up a lot of existing code by moving various objects to the
-> enhanced API. Previously, those objects had their own getters/setters that only
-> updated the values without further checks. Some of them actually lacked a check
-> for setting overflows, which could have resulted in undesired values being set.
-> The new default setters include a check for that, not updating the values in
-> case of errors (and propagating them). If they did not provide an error
-> pointer, then that behaviour was maintained.
+On Thu, Dec 19, 2019 at 07:11:43PM +0100, C=E9dric Le Goater wrote:
+> Use container_of() instead of qdev_get_machine()
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-A weird thing happens - when I apply patches from my mailer (thunderbird
--> open the source -> cut-n-paste to "git am") - they fail to apply. And
-the mails themselves look suspicious - too many "MS-Exchange" and
-"X-Proofpoint" :)
+Applied to ppc-for-5.0.
 
-A bundle from
-https://patchwork.ozlabs.org/project/qemu-devel/list/?series=149673
-applies fine though.
+> ---
+>  hw/ppc/pnv.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index f77e7ca84ede..855254f28263 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -561,7 +561,7 @@ static void *pnv_dt_create(MachineState *machine)
+> =20
+>  static void pnv_powerdown_notify(Notifier *n, void *opaque)
+>  {
+> -    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
+> +    PnvMachineState *pnv =3D container_of(n, PnvMachineState, powerdown_=
+notifier);
+> =20
+>      if (pnv->bmc) {
+>          pnv_bmc_powerdown(pnv->bmc);
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Anyway, this works on powerpc. Thanks,
+--hl1kWnBARzJiTscN
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl38FT0ACgkQbDjKyiDZ
+s5Iu0A//ZwtM/8JrCk+S8CUs6SueG0wh/Yyf2f9/cXWbC2PoRzInImmhCOUi71td
++a0/Yp8w4myFcEsPdfHMlQLktHdldA2wsgElztq3ypvRl7B4+kGNG/zyRR2wWQrL
+yCDokkw4jigg5IHwGcV55eOy6NLJ/5xkW+R00ActRR/sYbaZyoA8dCXvdMSCQJRP
+qX1ZFIRN6Rvay+ESsWow3pIOGFRe5YqK9H8YSQBosBEnZx22le/qqoZ4xMcHMH6O
+WgSENkI94aWGL6sB+A30fW3ZhlpIui7KA2ZwQ5vshk84iAXX0w6xGQheCV7mj1+4
+66CqOgoioLTOpUuGQGs74JvRxPSLCZtymcsBFWanBuAx8wLeILSCS5Y2a0wohy0D
+vgknORwbtYrkNvOUy3u3//wfe/t5WkzFU8g/bc+l4ZwHGYOqfb2znPBz56QLWkuo
+13ZaekztrQ9fyXvweM9SehfZ/FI1ShcZw1ZChNdwIIJ/yVuIrxxR9cHXr0R1I4mU
+tSE6PuFdG1K7lzkDZf+Cwxp83J2UTG6ZQOL9oTqskhkirggDL7SrWn8JzoEeMbTa
+LTSW7bQAhXIYP/4/pgnZPgCHfJW/c7D+/9hUC9eWpwREZZsy5sQzN31YNYPIy0AP
+icBtWsfE8gVPOyGwCjFcIL2FcMEP8qIVuKWm8YbbRV02UrE0tv4=
+=c0Jp
+-----END PGP SIGNATURE-----
 
-> 
-> Felipe Franciosi (4):
->   qom/object: enable setter for uint types
->   ich9: fix getter type for sci_int property
->   ich9: Simplify ich9_lpc_initfn
->   qom/object: Use common get/set uint helpers
-> 
->  hw/acpi/ich9.c       |  99 ++------------------
->  hw/acpi/pcihp.c      |   7 +-
->  hw/acpi/piix4.c      |  12 +--
->  hw/isa/lpc_ich9.c    |  27 ++----
->  hw/misc/edu.c        |  13 +--
->  hw/pci-host/q35.c    |  14 +--
->  hw/ppc/spapr.c       |  18 +---
->  hw/ppc/spapr_drc.c   |   3 +-
->  include/qom/object.h |  44 +++++++--
->  memory.c             |  15 +--
->  qom/object.c         | 216 ++++++++++++++++++++++++++++++++++++++-----
->  target/arm/cpu.c     |  22 +----
->  target/i386/sev.c    | 106 ++-------------------
->  ui/console.c         |   4 +-
->  14 files changed, 282 insertions(+), 318 deletions(-)
-> 
-
--- 
-Alexey
+--hl1kWnBARzJiTscN--
 
