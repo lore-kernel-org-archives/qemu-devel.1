@@ -2,124 +2,99 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B641C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:56:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7A9C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:57:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 491C321D7E
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:56:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0905621D7E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:57:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="0ynoRu1A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491C321D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MdbUu+Bz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0905621D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiKdV-0006Ri-Cg
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:56:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39085)
+	id 1iiKea-0007Jt-8s
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:57:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <felipe@nutanix.com>) id 1iiKcr-0005xo-AE
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:55:38 -0500
+ (envelope-from <philmd@redhat.com>) id 1iiKdw-0006sv-Hp
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:56:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <felipe@nutanix.com>) id 1iiKco-0005ZH-Sh
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:55:36 -0500
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:61038)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iiKco-0005Xz-Lb
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:55:34 -0500
-Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBKFshvq018396; Fri, 20 Dec 2019 07:55:32 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=DC/lC8IYcG0na4od7nvGHEYLcnHnZVJicZ0y3o5y+Lc=;
- b=0ynoRu1AyFV2LvFFYR34st0SC/jAr5tQjbDnPJaq1znm7oBWYUaOz/IwvI9lOlyVX/m6
- EhS07f/hhq5DEEecWw7i7KwDah3aO7y2B1mnn5pHwDf6Cx9kUeEIKVtvGDZsvBqs3win
- 8AgcV1PYIZQDEb2cZxDF6Zo8Z1atY1z2jGyXxT+/yrxwlbbFwrFZeLuB3belJ/YoJP+4
- 0u8u2dNNx8EmOOPZwNw8ZIZw5MEiHi7wBmZNN5WNtG2yd9rVot1VI5XHsxVWkAGWJkFW
- vMUblrxHhjbsFAG1H2ySbVO0mE3wFoCz5Q1HHIlXAee5K8Zd667zYVo+x4rnN4OeQxlP Ww== 
-Received: from nam12-dm6-obe.outbound.protection.outlook.com
- (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
- by mx0b-002c1b01.pphosted.com with ESMTP id 2wvxqqdmk7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 20 Dec 2019 07:55:32 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N0fMcLgM20Jp9lTAAYJBp92pV7VdrwXGh0iAQR1SV6B+7dYZi8ahdVN126JNjjum+2sftnMt1UDnLIaQKekTO8kHgDiSRFfWwsbz4WPs7VY+Vv/2/TdCCt86W4gGfRqopQzHg4xVTBPjL4XTPbzsrkOJYVvVLRi93M9TKdcInG08/4MX7jwIwMEOm7uNUQBULwyQI8DIYgz84NA/PqWwYqhfifL22SH13v+QNCKKZ0TE4XyDDbofanOX9U63f/xIdKGnD/kPKZX1PjJH0jpMJJtpOh9qPXmVIJVsRVA09ZYdK1JZwOP2IDWLurvVfdC+TaBlvucGiBOLUvC32RX8JQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DC/lC8IYcG0na4od7nvGHEYLcnHnZVJicZ0y3o5y+Lc=;
- b=GX9NHqpOWHHpxKCnetVXJnlumeSeH/1+IyLufZWYByKNhML/bRYYjpzNxNxnZas7Puwapnbpz6eM3OLhvNBLf2fLwCBsmOnWU/lhwas7fhLKz0B5dLvW2YgzCYmwRV+cY25wqRAY+RFjg+wOQWZiIowjPbSonPSfUlEhmT16ZOipotyW0MiDAXiP5rJA6FWhub81oumiuBQzHg6OvVIq7UQX9oCSbPg+STaK4xsC17LJxEAFQfAuhNntLD/36PDxs32eMdvWuvwTEUh/o8Kh8WnPh5FRx9axi84rZ2zUTSAtpQxyYJ7ro3LfjMH+REI6kVocEnG3oEh+zrEz5nXjsg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
- MWHPR02MB3327.namprd02.prod.outlook.com (10.164.187.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2559.14; Fri, 20 Dec 2019 15:55:30 +0000
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2559.016; Fri, 20 Dec
- 2019 15:55:30 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Subject: Re: [PATCH v4 0/4] Improve default object property_add uint helpers
-Thread-Topic: [PATCH v4 0/4] Improve default object property_add uint helpers
-Thread-Index: AQHVtpZ6lIuRGF0HJ0OIoqz7XKz+uqfDI2WAgAALO4A=
-Date: Fri, 20 Dec 2019 15:55:30 +0000
-Message-ID: <191778FA-1A75-4D23-8A41-732FDE2C3AAA@nutanix.com>
-References: <20191219180205.25191-1-felipe@nutanix.com>
- <CAJ+F1C+YmQFnMmWrJOZpKrqp9pEzUqLF7yP-yB2hwsz6h3L3cA@mail.gmail.com>
-In-Reply-To: <CAJ+F1C+YmQFnMmWrJOZpKrqp9pEzUqLF7yP-yB2hwsz6h3L3cA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [62.254.189.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bfa92cd2-1043-4899-3811-08d785650a10
-x-ms-traffictypediagnostic: MWHPR02MB3327:
-x-microsoft-antispam-prvs: <MWHPR02MB332730D74DCEA04996806966D72D0@MWHPR02MB3327.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 025796F161
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(39860400002)(346002)(136003)(396003)(366004)(189003)(199004)(54534003)(36756003)(5660300002)(71200400001)(186003)(26005)(54906003)(53546011)(316002)(6506007)(8936002)(6512007)(81166006)(6916009)(86362001)(8676002)(2616005)(66476007)(91956017)(66556008)(76116006)(33656002)(66446008)(81156014)(64756008)(478600001)(66946007)(2906002)(4326008)(6486002)(64030200001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB3327;
- H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: g0TtF0tF6UY/L8Ks+UjHvEPh8sA5KCDC/f5nOZyrhfSbeOMHmwQQbKsbKK9eyoXgGOpzYTnT924bRa6T3JH78h5Z+xhXAI3VwkmkxDlfSGjPHYdiw0Jl2vkurnPasR4UFhQFesAI/XHmublbo4WY/4o3Q36AO0xyDIwxLUH2jE044a1hp7vA5ZZ6SZPd8PZ5rvPDryyGVYf9GOqH4fUTu9h0+8vJUBAsvt1diwOt9Nd08ntqbbbqKrS9PwNdXE+YcrDcMkhXxH4cFjRA39wA285YzyifyVwhBCkn3UrkJsvv6KUYcKIfiJr38b48QiBl5I9ydpVS9XNbizFcz8Pl9dXqdM12ZZpDSIoBI+p1oCMZ0qpWR06miQjStCGjA3BFoHEnowhtUpZvrpQdUXMXC+NUjrZDcXu+VTcfwHGVStv03EMuOPHBGawF3wEbspCqhaVKSCjfioAniYr2u2ranJXYjTnZGAswmS41yq1qTxSYoB35CWLk/ybZmOMbWCCi7S8zhYAqhn27u5S5nJegSw==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A8F04387A7F9AD46934BF16D156E9EF9@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <philmd@redhat.com>) id 1iiKdt-0006qi-Os
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:56:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24007
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iiKdt-0006pG-DH
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:56:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576857400;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hNWLq8H7DSiXzD2kN3X/z/EfQ2ObIGZnNYP27gsn5bw=;
+ b=MdbUu+BzVMNdOAvbg8nvnaQct4jtsDGUUQh6A4PBNVKmd5EXCRzKuDq3s+8wjRjM3KvMhC
+ VoZHfehVa35NvJ5PIJaBRqXTejoA8Wp8iEju4rR2mFM1VSwZmEB1b8JbF9Mr4sGeCNirRH
+ U/0uSyDs6P7FNYYa4ShHWwrrF5rt7uM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-eddJC1UTOwON1tv4Q7fJSw-1; Fri, 20 Dec 2019 10:56:39 -0500
+Received: by mail-wr1-f72.google.com with SMTP id c17so1296712wrp.10
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 07:56:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hNWLq8H7DSiXzD2kN3X/z/EfQ2ObIGZnNYP27gsn5bw=;
+ b=nNaRVtfGamZOXPphpWXxH+Q6xnLpuyDzqaFbS60i1WcAnt5VduA1cjtnKQ2grVr11K
+ E/wsXhtumDgq4CWzL/g/VH0jNVoNGxgZfqW47P5TIQfa/+iWIZzUXDx/CTMCx6w//3Tc
+ R8esDwH6RsGI/Cnx839Y7nuQk0YPdBPPfhjrn0+nM9l+ijpGFYniwVCE2/g3YYmil7ZX
+ ZdYZIo0EmKHjM10LXNvKVWb8Stk3MZKvtvUrQ5DLFF8tanj9R+YOEjRTpIvNxeeoWWjC
+ 4lSUCeVVc1rY7R2Dg8Fcco8e7JjGuGb5rvk68ej/4qYy9OmUz+UutrWOcxQ5gz0/W1hO
+ eMyg==
+X-Gm-Message-State: APjAAAVPwoUR5vJSXTAaKxz0gl9Qx9uchW+apJ3BFOgg1jzV2AI+AvOo
+ zQPqfP6BsLmq8Kw6V1ksTRtflkGtoTfiNxXxArt+syhN56gsz8M+Smo+0gz2iSCVy6IxH7IF2q8
+ FQrJTjv0uW31mHZY=
+X-Received: by 2002:a7b:c342:: with SMTP id l2mr18358916wmj.159.1576857397929; 
+ Fri, 20 Dec 2019 07:56:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqznEaPT8tNirCHM+8EkJqfMm4GGKEKjc11P+UQMfrBGaj37RodrQPogwInWHQ8iFsyk1z7rUw==
+X-Received: by 2002:a7b:c342:: with SMTP id l2mr18358890wmj.159.1576857397727; 
+ Fri, 20 Dec 2019 07:56:37 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id a1sm10017837wmj.40.2019.12.20.07.56.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 20 Dec 2019 07:56:37 -0800 (PST)
+Subject: Re: [PATCH v39 12/22] target/avr: Add limited support for USART
+ peripheral
+To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20191218210329.1960-1-mrolnik@gmail.com>
+ <20191218210329.1960-13-mrolnik@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0be265cf-da0b-a68d-b8c4-cd7a37ce0940@redhat.com>
+Date: Fri, 20 Dec 2019 16:56:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bfa92cd2-1043-4899-3811-08d785650a10
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2019 15:55:30.0721 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7tDsjBcP+VQxSaFjVZGcwduGOLjQ1Dkj1uFeE/cHlsok/V4luaWjwQ0VDSyz07z0/RucUCYtq6jTIS46PgVYEMofTKLqJ1zUPoCg4aVLzCY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB3327
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-20_03:2019-12-17,2019-12-20 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.155.12
+In-Reply-To: <20191218210329.1960-13-mrolnik@gmail.com>
+Content-Language: en-US
+X-MC-Unique: eddJC1UTOwON1tv4Q7fJSw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,69 +106,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Phillipe Mathieu-Daude <philmd@redhat.com>
+Cc: thuth@redhat.com, me@xcancerberox.com.ar, richard.henderson@linaro.org,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, dovgaluk@ispras.ru, imammedo@redhat.com,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gRGVjIDIwLCAyMDE5LCBhdCAzOjE1IFBNLCBNYXJjLUFuZHLDqSBMdXJlYXUgPG1h
-cmNhbmRyZS5sdXJlYXVAZ21haWwuY29tPiB3cm90ZToNCj4gDQo+IEhpDQo+IA0KPiBPbiBUaHUs
-IERlYyAxOSwgMjAxOSBhdCAxMDowMiBQTSBGZWxpcGUgRnJhbmNpb3NpIDxmZWxpcGVAbnV0YW5p
-eC5jb20+IHdyb3RlOg0KPj4gDQo+PiBUaGlzIGltcHJvdmVzIHRoZSBmYW1pbHkgb2Ygb2JqZWN0
-X3Byb3BlcnR5X2FkZF91aW50WFhfcHRyIGhlbHBlcnMgYnkgZW5hYmxpbmcNCj4+IGEgZGVmYXVs
-dCBnZXR0ZXIvc2V0dGVyIG9ubHkgd2hlbiBkZXNpcmVkLiBUbyBwcmV2ZW50IGFuIEFQSSBiZWhh
-dmlvdXJhbCBjaGFuZ2UNCj4+IChmcm9tIGNsaWVudHMgdGhhdCBhbHJlYWR5IHVzZWQgdGhlc2Ug
-aGVscGVycyBhbmQgZGlkIG5vdCB3YW50IGEgc2V0dGVyKSwgd2UNCj4+IGFkZCBhIE9CSl9QUk9Q
-X0ZMQUdfUkVBRCBmbGFnIHRoYXQgYWxsb3cgY2xpZW50cyB0byBvbmx5IGhhdmUgYSBnZXR0ZXIu
-IFBhdGNoIDENCj4+IGVuaGFuY2VzIHRoZSBBUEkgYW5kIG1vZGlmeSBjdXJyZW50IHVzZXJzLg0K
-Pj4gDQo+PiBXaGlsZSBtb2RpZnlpbmcgdGhlIGNsaWVudHMgb2YgdGhlIEFQSSwgYSBjb3VwbGUg
-b2YgaW1wcm92ZW1lbnQgb3Bwb3J0dW5pdGllcw0KPj4gd2VyZSBvYnNlcnZlZCBpbiBpY2g5LiBU
-aGVzZSB3ZXJlIGFkZGVkIGluIHNlcGFyYXRlIHBhdGNoZXMgKDIgYW5kIDMpLg0KPj4gDQo+PiBQ
-YXRjaCAzIGNsZWFucyB1cCBhIGxvdCBvZiBleGlzdGluZyBjb2RlIGJ5IG1vdmluZyB2YXJpb3Vz
-IG9iamVjdHMgdG8gdGhlDQo+PiBlbmhhbmNlZCBBUEkuIFByZXZpb3VzbHksIHRob3NlIG9iamVj
-dHMgaGFkIHRoZWlyIG93biBnZXR0ZXJzL3NldHRlcnMgdGhhdCBvbmx5DQo+PiB1cGRhdGVkIHRo
-ZSB2YWx1ZXMgd2l0aG91dCBmdXJ0aGVyIGNoZWNrcy4gU29tZSBvZiB0aGVtIGFjdHVhbGx5IGxh
-Y2tlZCBhIGNoZWNrDQo+PiBmb3Igc2V0dGluZyBvdmVyZmxvd3MsIHdoaWNoIGNvdWxkIGhhdmUg
-cmVzdWx0ZWQgaW4gdW5kZXNpcmVkIHZhbHVlcyBiZWluZyBzZXQuDQo+PiBUaGUgbmV3IGRlZmF1
-bHQgc2V0dGVycyBpbmNsdWRlIGEgY2hlY2sgZm9yIHRoYXQsIG5vdCB1cGRhdGluZyB0aGUgdmFs
-dWVzIGluDQo+PiBjYXNlIG9mIGVycm9ycyAoYW5kIHByb3BhZ2F0aW5nIHRoZW0pLiBJZiB0aGV5
-IGRpZCBub3QgcHJvdmlkZSBhbiBlcnJvcg0KPj4gcG9pbnRlciwgdGhlbiB0aGF0IGJlaGF2aW91
-ciB3YXMgbWFpbnRhaW5lZC4NCj4+IA0KPj4gRmVsaXBlIEZyYW5jaW9zaSAoNCk6DQo+PiAgcW9t
-L29iamVjdDogZW5hYmxlIHNldHRlciBmb3IgdWludCB0eXBlcw0KPj4gIGljaDk6IGZpeCBnZXR0
-ZXIgdHlwZSBmb3Igc2NpX2ludCBwcm9wZXJ0eQ0KPj4gIGljaDk6IFNpbXBsaWZ5IGljaDlfbHBj
-X2luaXRmbg0KPj4gIHFvbS9vYmplY3Q6IFVzZSBjb21tb24gZ2V0L3NldCB1aW50IGhlbHBlcnMN
-Cj4+IA0KPj4gaHcvYWNwaS9pY2g5LmMgICAgICAgfCAgOTkgKystLS0tLS0tLS0tLS0tLS0tLS0N
-Cj4+IGh3L2FjcGkvcGNpaHAuYyAgICAgIHwgICA3ICstDQo+PiBody9hY3BpL3BpaXg0LmMgICAg
-ICB8ICAxMiArLS0NCj4+IGh3L2lzYS9scGNfaWNoOS5jICAgIHwgIDI3ICsrLS0tLQ0KPj4gaHcv
-bWlzYy9lZHUuYyAgICAgICAgfCAgMTMgKy0tDQo+PiBody9wY2ktaG9zdC9xMzUuYyAgICB8ICAx
-NCArLS0NCj4+IGh3L3BwYy9zcGFwci5jICAgICAgIHwgIDE4ICstLS0NCj4+IGh3L3BwYy9zcGFw
-cl9kcmMuYyAgIHwgICAzICstDQo+PiBpbmNsdWRlL3FvbS9vYmplY3QuaCB8ICA0NCArKysrKysr
-LS0NCj4+IG1lbW9yeS5jICAgICAgICAgICAgIHwgIDE1ICstLQ0KPj4gcW9tL29iamVjdC5jICAg
-ICAgICAgfCAyMTYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLQ0K
-Pj4gdGFyZ2V0L2FybS9jcHUuYyAgICAgfCAgMjIgKy0tLS0NCj4+IHRhcmdldC9pMzg2L3Nldi5j
-ICAgIHwgMTA2ICsrLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPj4gdWkvY29uc29sZS5jICAgICAgICAg
-fCAgIDQgKy0NCj4+IDE0IGZpbGVzIGNoYW5nZWQsIDI4MiBpbnNlcnRpb25zKCspLCAzMTggZGVs
-ZXRpb25zKC0pDQo+IA0KPiBJdCBjb25mbGljdHMgd2l0aCBzb21lIHJlY2VudCBjaGFuZ2VzLCBz
-byB5b3UnbGwgbmVlZCB0byBzZW5kIGEgbmV3DQo+IHZlcnNpb24sIGJ1dCB0aGF0IG9uZSBsb29r
-cyBnb29kIHRvIG1lOg0KPiBSZXZpZXdlZC1ieTogTWFyYy1BbmRyw6kgTHVyZWF1IDxtYXJjYW5k
-cmUubHVyZWF1QHJlZGhhdC5jb20+DQoNCkFoLCBubyB3b3JyaWVzLg0KDQpJIGRpZCBkbyBhIHJl
-YmFzZSBvbiB0b3Agb2YgbWFzdGVyIGJlZm9yZSBzZW5kaW5nIG91dCB2NCwgdGhvdWdoLg0KV2hp
-Y2ggY29uZmxpY3QgZGlkIHlvdSBzZWU/IEkgY2FuIHJlYmFzZSBsYXRlciBvciBtYXliZSB3aG9t
-ZXZlciBpcw0KcHVsbGluZyBjYW4gZml4IHRoZSBtZXJnZSBpZiBpdCdzIHN0cmFpZ2h0Zm9yd2Fy
-ZD8NCg0KRi4NCg0KDQo+IA0KPiBQYW9sbywgaXMgaXQgZ29pbmcgdGhyb3VnaCB5b3VyIHF1ZXVl
-Pw0KPiANCj4+IA0KPj4gLS0NCj4+IDIuMjAuMQ0KPj4gDQo+PiBDaGFuZ2Vsb2c6DQo+PiB2MS0+
-djI6DQo+PiAtIFVwZGF0ZSBzY2lfaW50IGRpcmVjdGx5IGluc3RlYWQgb2YgdXNpbmcgc3RhY2sg
-dmFyaWFibGUNCj4+IC0gRGVmaW5pbmcgYW4gZW5oYW5jZWQgT2JqZWN0UHJvcGVydHlGbGFncyBp
-bnN0ZWFkIG9mIGp1c3QgJ3JlYWRvbmx5Jw0KPj4gLSBFcnJvcmluZyBvdXQgZGlyZWN0bHkgKGlu
-c3RlYWQgb2YgdXNpbmcgZ290b3MpIG9uIGRlZmF1bHQgc2V0dGVycw0KPj4gLSBSZXRhaW5pbmcg
-bGFjayBvZiBlcnJwIHBhc3Npbmcgd2hlbiBpdCB3YXNuJ3QgdGhlcmUNCj4+IHYyLT52MzoNCj4+
-IC0gUmVuYW1lIGZsYWdzIF9SRCB0byBfUkVBRCBhbmQgX1dSIHRvIF9XUklURQ0KPj4gLSBBZGQg
-YSBjb252ZW5pZW5jZSBfUkVBRFdSSVRFIGZsYWcNCj4+IC0gRHJvcCB0aGUgdXNhZ2Ugb2YgVUwg
-aW4gdGhlIGJpdCBmbGFnIGRlZmluaXRpb25zDQo+PiB2My0+djQ6DQo+PiAtIERyb3AgY2hhbmdl
-cyB0byBody92ZmlvL3BjaS1xdWlya3MuYw0KPiANCj4gDQo+IA0KPiAtLSANCj4gTWFyYy1BbmRy
-w6kgTHVyZWF1DQoNCg==
+On 12/18/19 10:03 PM, Michael Rolnik wrote:
+> These were designed to facilitate testing but should provide enough function to be useful in other contexts.
+> Only a subset of the functions of each peripheral is implemented, mainly due to the lack of a standard way to handle electrical connections (like GPIO pins).
+> 
+> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> ---
+>   include/hw/char/avr_usart.h |  93 +++++++++++
+>   hw/char/avr_usart.c         | 320 ++++++++++++++++++++++++++++++++++++
+>   hw/char/Kconfig             |   3 +
+>   hw/char/Makefile.objs       |   1 +
+>   4 files changed, 417 insertions(+)
+>   create mode 100644 include/hw/char/avr_usart.h
+>   create mode 100644 hw/char/avr_usart.c
+
+Note in patch subject (also the next patches:timers, intc, sample board) 
+are not "target/avr" but "hw/avr".
+
 
