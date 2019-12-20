@@ -2,93 +2,74 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4F7C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 19:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F62C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75EC42072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 19:56:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VuyqSaz4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75EC42072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C69B92072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:02:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69B92072B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiONU-0002aJ-JM
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 14:56:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57303)
+	id 1iiOTf-0004jG-02
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 15:02:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55419)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiOLP-0000WR-20
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:53:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1iiOSG-0004Ht-Pw
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:00:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiOLN-0004ua-4F
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:53:50 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37363)
+ (envelope-from <bounces@canonical.com>) id 1iiOSF-0003z6-83
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:00:56 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41116)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiOLM-0004rE-Rk
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:53:49 -0500
-Received: by mail-wm1-x344.google.com with SMTP id f129so10416715wmf.2
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 11:53:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=pXxV1edW/hWzC2yJ5302UuIpHQKgRZIpsZotTu/21J0=;
- b=VuyqSaz4u57EZueAUF7sAu6sSrA9FbcoV0GPP3zJh7l0nX9Y/W3+BNJyTkWU2yFCoH
- XjMdAcFwwVX+lV7RC3fqAZUKQZFJF9ErZMLPzxj6IWB+O260nw2G1WbnPHQcw8ijThdd
- Tro2RVfV3Wxtu9zE63ywMtg4FOylWAMvVvZXmgX/mJbCxYKVwV3/Rejsyfhz032glYFS
- MFubO7C3zP7g44vdZjyZEphm/fIk0JMN+kEpH7mzDxQqA4Aa5Pmjf3HN+fJqn1gS+h95
- qevXARJiZMl1iGWIrMGyOoLpWzu6ApB42YeVOvlgTQIP10nXQtsGV5ky8zlcGKmYn0Ky
- T5Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=pXxV1edW/hWzC2yJ5302UuIpHQKgRZIpsZotTu/21J0=;
- b=DSfT7EOMxMiEku90pZI2yAzp/LAbG/lsKHYbDivEJ0nC5DAZoVMQ/3/bpWin17GONi
- dj9pYPhYszPWlprTI3ihZjfa4no0DuPq6JhmOYGKGAIR1/MY+dFMyKTY7II7Ucx1re9M
- Tadxbz+WwNZnuBu5wMZ/knwAKo6HGPFn7TgLnKv8dUvISogTztwPQl7/eP94/d67bIqM
- WjVC/OQ/WnbfR9qvqQT4tVSt9NzueGiN6Jy2ZDpeuo2Mtr0gwknFhWEgsFw2fP6Ym3Ch
- 8eZYyTJW73DAu0P2TL2b/QEXGsaRKcWeHft66JK8GUxz7ujvl2+qq1cp408kf03PUjmn
- HxGA==
-X-Gm-Message-State: APjAAAWomqYsBvilVMU+JWTYHL/+vZ/gVHtDV60fqqqkeNpPHeW7QLHj
- WYsx/b6ttuTV1vltXA+MkhADa9jBncY=
-X-Google-Smtp-Source: APXvYqyiUlfJRR0y1pPZDMYoBjakfIYUB2MXk/wEgIKAGXDOeJ+LSafxjXhdn3p5XwhNddcuTL3LeQ==
-X-Received: by 2002:a1c:4454:: with SMTP id r81mr4557335wma.117.1576871626766; 
- Fri, 20 Dec 2019 11:53:46 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s65sm11082236wmf.48.2019.12.20.11.53.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 11:53:45 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B817C1FF87;
- Fri, 20 Dec 2019 19:53:44 +0000 (GMT)
-References: <20191216221158.29572-1-richard.henderson@linaro.org>
- <20191216221158.29572-29-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 28/28] cputlb: Expand cpu_ldst_template.h in cputlb.c
-In-reply-to: <20191216221158.29572-29-richard.henderson@linaro.org>
-Date: Fri, 20 Dec 2019 19:53:44 +0000
-Message-ID: <87zhfmai47.fsf@linaro.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iiOSF-0003vs-02
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:00:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iiOS9-0006Vu-UA
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 20:00:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C85B82E802B
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 20:00:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Date: Fri, 20 Dec 2019 19:49:58 -0000
+From: Toolybird <1857143@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gschafer noctavian
+X-Launchpad-Bug-Reporter: =?utf-8?q?N=C4=83stasie_Ion_Octavian_=28noctavian?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Toolybird (gschafer)
+References: <157685586097.27697.14145668174002417681.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157687139856.2533.12222522317606333309.malone@soybean.canonical.com>
+Subject: [Bug 1857143] Re: VMs won't boot from external snapshots on qemu 4.2
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ef867758d7088007ebc0624f9026a77dd92d7640
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,404 +78,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reply-To: Bug 1857143 <1857143@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is due to the new way of configuring block devices in 4.2.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+You'll need to create your snapshots correctly by using the '-F'
+parameter of qemu-img create.
 
-> Reduce the amount of preprocessor obfuscation by expanding
-> the text of each of the functions generated.  The result is
-> only slightly smaller than the original.
->
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Full details here:
 
-\o/
+https://www.redhat.com/archives/libvirt-
+users/2019-December/msg00016.html
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+-- =
 
-> ---
->  include/exec/cpu_ldst.h          |  67 +++++++-----------
->  include/exec/cpu_ldst_template.h | 117 -------------------------------
->  accel/tcg/cputlb.c               | 107 +++++++++++++++++++++++++++-
->  3 files changed, 130 insertions(+), 161 deletions(-)
->  delete mode 100644 include/exec/cpu_ldst_template.h
->
-> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-> index cf4652bf48..62f38d5a22 100644
-> --- a/include/exec/cpu_ldst.h
-> +++ b/include/exec/cpu_ldst.h
-> @@ -94,32 +94,6 @@ typedef target_ulong abi_ptr;
->  #define TARGET_ABI_FMT_ptr TARGET_ABI_FMT_lx
->  #endif
->=20=20
-> -#if defined(CONFIG_USER_ONLY)
-> -
-> -extern __thread uintptr_t helper_retaddr;
-> -
-> -static inline void set_helper_retaddr(uintptr_t ra)
-> -{
-> -    helper_retaddr =3D ra;
-> -    /*
-> -     * Ensure that this write is visible to the SIGSEGV handler that
-> -     * may be invoked due to a subsequent invalid memory operation.
-> -     */
-> -    signal_barrier();
-> -}
-> -
-> -static inline void clear_helper_retaddr(void)
-> -{
-> -    /*
-> -     * Ensure that previous memory operations have succeeded before
-> -     * removing the data visible to the signal handler.
-> -     */
-> -    signal_barrier();
-> -    helper_retaddr =3D 0;
-> -}
-> -
-> -/* In user-only mode we provide only the _code and _data accessors. */
-> -
->  uint32_t cpu_ldub_data(CPUArchState *env, abi_ptr ptr);
->  uint32_t cpu_lduw_data(CPUArchState *env, abi_ptr ptr);
->  uint32_t cpu_ldl_data(CPUArchState *env, abi_ptr ptr);
-> @@ -148,6 +122,30 @@ void cpu_stl_data_ra(CPUArchState *env, abi_ptr ptr,
->  void cpu_stq_data_ra(CPUArchState *env, abi_ptr ptr,
->                       uint64_t val, uintptr_t retaddr);
->=20=20
-> +#if defined(CONFIG_USER_ONLY)
-> +
-> +extern __thread uintptr_t helper_retaddr;
-> +
-> +static inline void set_helper_retaddr(uintptr_t ra)
-> +{
-> +    helper_retaddr =3D ra;
-> +    /*
-> +     * Ensure that this write is visible to the SIGSEGV handler that
-> +     * may be invoked due to a subsequent invalid memory operation.
-> +     */
-> +    signal_barrier();
-> +}
-> +
-> +static inline void clear_helper_retaddr(void)
-> +{
-> +    /*
-> +     * Ensure that previous memory operations have succeeded before
-> +     * removing the data visible to the signal handler.
-> +     */
-> +    signal_barrier();
-> +    helper_retaddr =3D 0;
-> +}
-> +
->  /*
->   * Provide the same *_mmuidx_ra interface as for softmmu.
->   * The mmu_idx argument is ignored.
-> @@ -271,23 +269,6 @@ void cpu_stl_mmuidx_ra(CPUArchState *env, abi_ptr ad=
-dr, uint32_t val,
->  void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint64_t val,
->                         int mmu_idx, uintptr_t retaddr);
->=20=20
-> -/* these access are slower, they must be as rare as possible */
-> -#define CPU_MMU_INDEX (cpu_mmu_index(env, false))
-> -#define MEMSUFFIX _data
-> -#define DATA_SIZE 1
-> -#include "exec/cpu_ldst_template.h"
-> -
-> -#define DATA_SIZE 2
-> -#include "exec/cpu_ldst_template.h"
-> -
-> -#define DATA_SIZE 4
-> -#include "exec/cpu_ldst_template.h"
-> -
-> -#define DATA_SIZE 8
-> -#include "exec/cpu_ldst_template.h"
-> -#undef CPU_MMU_INDEX
-> -#undef MEMSUFFIX
-> -
->  #endif /* defined(CONFIG_USER_ONLY) */
->=20=20
->  uint32_t cpu_ldub_code(CPUArchState *env, abi_ptr addr);
-> diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_tem=
-plate.h
-> deleted file mode 100644
-> index e400979f23..0000000000
-> --- a/include/exec/cpu_ldst_template.h
-> +++ /dev/null
-> @@ -1,117 +0,0 @@
-> -/*
-> - *  Software MMU support
-> - *
-> - * Generate inline load/store functions for one MMU mode and data
-> - * size.
-> - *
-> - * Generate a store function as well as signed and unsigned loads.
-> - *
-> - * Not used directly but included from cpu_ldst.h.
-> - *
-> - *  Copyright (c) 2003 Fabrice Bellard
-> - *
-> - * This library is free software; you can redistribute it and/or
-> - * modify it under the terms of the GNU Lesser General Public
-> - * License as published by the Free Software Foundation; either
-> - * version 2 of the License, or (at your option) any later version.
-> - *
-> - * This library is distributed in the hope that it will be useful,
-> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> - * Lesser General Public License for more details.
-> - *
-> - * You should have received a copy of the GNU Lesser General Public
-> - * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-> - */
-> -
-> -#if DATA_SIZE =3D=3D 8
-> -#define SUFFIX q
-> -#define USUFFIX q
-> -#define DATA_TYPE uint64_t
-> -#define SHIFT 3
-> -#elif DATA_SIZE =3D=3D 4
-> -#define SUFFIX l
-> -#define USUFFIX l
-> -#define DATA_TYPE uint32_t
-> -#define SHIFT 2
-> -#elif DATA_SIZE =3D=3D 2
-> -#define SUFFIX w
-> -#define USUFFIX uw
-> -#define DATA_TYPE uint16_t
-> -#define DATA_STYPE int16_t
-> -#define SHIFT 1
-> -#elif DATA_SIZE =3D=3D 1
-> -#define SUFFIX b
-> -#define USUFFIX ub
-> -#define DATA_TYPE uint8_t
-> -#define DATA_STYPE int8_t
-> -#define SHIFT 0
-> -#else
-> -#error unsupported data size
-> -#endif
-> -
-> -#if DATA_SIZE =3D=3D 8
-> -#define RES_TYPE uint64_t
-> -#else
-> -#define RES_TYPE uint32_t
-> -#endif
-> -
-> -/* generic load/store macros */
-> -
-> -static inline RES_TYPE
-> -glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-> -                                                  target_ulong ptr,
-> -                                                  uintptr_t retaddr)
-> -{
-> -    return glue(glue(cpu_ld, USUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_IND=
-EX,
-> -                                                   retaddr);
-> -}
-> -
-> -static inline RES_TYPE
-> -glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong p=
-tr)
-> -{
-> -    return glue(glue(cpu_ld, USUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_IND=
-EX, 0);
-> -}
-> -
-> -#if DATA_SIZE <=3D 2
-> -static inline int
-> -glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-> -                                                  target_ulong ptr,
-> -                                                  uintptr_t retaddr)
-> -{
-> -    return glue(glue(cpu_lds, SUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_IND=
-EX,
-> -                                                   retaddr);
-> -}
-> -
-> -static inline int
-> -glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong p=
-tr)
-> -{
-> -    return glue(glue(cpu_lds, SUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_IND=
-EX, 0);
-> -}
-> -#endif
-> -
-> -/* generic store macro */
-> -
-> -static inline void
-> -glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
-> -                                                 target_ulong ptr,
-> -                                                 RES_TYPE v, uintptr_t r=
-etaddr)
-> -{
-> -    glue(glue(cpu_st, SUFFIX), _mmuidx_ra)(env, ptr, v, CPU_MMU_INDEX,
-> -                                           retaddr);
-> -}
-> -
-> -static inline void
-> -glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong pt=
-r,
-> -                                      RES_TYPE v)
-> -{
-> -    glue(glue(cpu_st, SUFFIX), _mmuidx_ra)(env, ptr, v, CPU_MMU_INDEX, 0=
-);
-> -}
-> -
-> -#undef RES_TYPE
-> -#undef DATA_TYPE
-> -#undef DATA_STYPE
-> -#undef SUFFIX
-> -#undef USUFFIX
-> -#undef DATA_SIZE
-> -#undef SHIFT
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index f0e4b0aee4..a991ea2964 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -35,7 +35,6 @@
->  #include "qemu/atomic128.h"
->  #include "translate-all.h"
->  #include "trace-root.h"
-> -#include "qemu/plugin.h"
->  #include "trace/mem.h"
->  #ifdef CONFIG_PLUGIN
->  #include "qemu/plugin-memory.h"
-> @@ -1697,6 +1696,68 @@ uint64_t cpu_ldq_mmuidx_ra(CPUArchState *env, abi_=
-ptr addr,
->                             ? helper_le_ldq_mmu : helper_be_ldq_mmu);
->  }
->=20=20
-> +uint32_t cpu_ldub_data_ra(CPUArchState *env, target_ulong ptr,
-> +                          uintptr_t retaddr)
-> +{
-> +    return cpu_ldub_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retad=
-dr);
-> +}
-> +
-> +int cpu_ldsb_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t reta=
-ddr)
-> +{
-> +    return cpu_ldsb_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retad=
-dr);
-> +}
-> +
-> +uint32_t cpu_lduw_data_ra(CPUArchState *env, target_ulong ptr,
-> +                          uintptr_t retaddr)
-> +{
-> +    return cpu_lduw_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retad=
-dr);
-> +}
-> +
-> +int cpu_ldsw_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t reta=
-ddr)
-> +{
-> +    return cpu_ldsw_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retad=
-dr);
-> +}
-> +
-> +uint32_t cpu_ldl_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t =
-retaddr)
-> +{
-> +    return cpu_ldl_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retadd=
-r);
-> +}
-> +
-> +uint64_t cpu_ldq_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t =
-retaddr)
-> +{
-> +    return cpu_ldq_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retadd=
-r);
-> +}
-> +
-> +uint32_t cpu_ldub_data(CPUArchState *env, target_ulong ptr)
-> +{
-> +    return cpu_ldub_data_ra(env, ptr, 0);
-> +}
-> +
-> +int cpu_ldsb_data(CPUArchState *env, target_ulong ptr)
-> +{
-> +    return cpu_ldsb_data_ra(env, ptr, 0);
-> +}
-> +
-> +uint32_t cpu_lduw_data(CPUArchState *env, target_ulong ptr)
-> +{
-> +    return cpu_lduw_data_ra(env, ptr, 0);
-> +}
-> +
-> +int cpu_ldsw_data(CPUArchState *env, target_ulong ptr)
-> +{
-> +    return cpu_ldsw_data_ra(env, ptr, 0);
-> +}
-> +
-> +uint32_t cpu_ldl_data(CPUArchState *env, target_ulong ptr)
-> +{
-> +    return cpu_ldl_data_ra(env, ptr, 0);
-> +}
-> +
-> +uint64_t cpu_ldq_data(CPUArchState *env, target_ulong ptr)
-> +{
-> +    return cpu_ldq_data_ra(env, ptr, 0);
-> +}
-> +
->  /*
->   * Store Helpers
->   */
-> @@ -1970,6 +2031,50 @@ void cpu_stq_mmuidx_ra(CPUArchState *env, target_u=
-long addr, uint64_t val,
->      cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_TEQ);
->  }
->=20=20
-> +void cpu_stb_data_ra(CPUArchState *env, target_ulong ptr,
-> +                     uint32_t val, uintptr_t retaddr)
-> +{
-> +    cpu_stb_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-> +}
-> +
-> +void cpu_stw_data_ra(CPUArchState *env, target_ulong ptr,
-> +                     uint32_t val, uintptr_t retaddr)
-> +{
-> +    cpu_stw_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-> +}
-> +
-> +void cpu_stl_data_ra(CPUArchState *env, target_ulong ptr,
-> +                     uint32_t val, uintptr_t retaddr)
-> +{
-> +    cpu_stl_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-> +}
-> +
-> +void cpu_stq_data_ra(CPUArchState *env, target_ulong ptr,
-> +                     uint64_t val, uintptr_t retaddr)
-> +{
-> +    cpu_stq_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
-> +}
-> +
-> +void cpu_stb_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-> +{
-> +    cpu_stb_data_ra(env, ptr, val, 0);
-> +}
-> +
-> +void cpu_stw_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-> +{
-> +    cpu_stw_data_ra(env, ptr, val, 0);
-> +}
-> +
-> +void cpu_stl_data(CPUArchState *env, target_ulong ptr, uint32_t val)
-> +{
-> +    cpu_stl_data_ra(env, ptr, val, 0);
-> +}
-> +
-> +void cpu_stq_data(CPUArchState *env, target_ulong ptr, uint64_t val)
-> +{
-> +    cpu_stq_data_ra(env, ptr, val, 0);
-> +}
-> +
->  /* First set of helpers allows passing in of OI and RETADDR.  This makes
->     them callable from other helpers.  */
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1857143
 
+Title:
+  VMs won't boot from external snapshots on qemu 4.2
 
---=20
-Alex Benn=C3=A9e
+Status in QEMU:
+  New
+
+Bug description:
+  After upgrading from qemu 4.1.1-1 to 4.2.0-1, VMs that were set to use
+  an external snapshot as their disk failed to boot.
+
+  Depending on the guest OS and other VM settings the boot fails and you
+  get either the "Boot failed: not a bootable drive" message or the grub
+  rescue shell or the EFI shell. Downgrading back to qemu 4.1 allows the
+  VMs to boot from the external snapshots without any problem and the
+  disk images doesn't appear to be corrupted afterwards.
+
+  From my testing this bug is easily reproducible. Create a VM, install
+  a guest os, confirm that the VM boots the guest os without problems,
+  shutdown the VM, create an external snapshot of the VM disk, set the
+  VM to boot from the snapshot, try to boot the VM with qemu 4.2 and see
+  it fail, try to boot it with qemu 4.1 and see it succeed.
+
+  In my case, to test that this bug is reproducible, I used virt-manager
+  to install Xubuntu 19.10 on a qcow2 disk image, and then used qemu-img
+  create -f qcow2 -b base_image.qcow2 snapshot_image.qcow2 to create the
+  external snapshot and edited the xml in virt-manager to point the VM's
+  disk to snapshot_image.qcow2. It failed to boot with qemu 4.2, but it
+  was working fine with 4.1.
+
+  I booted this test VM off a live distro using the virtual CDROM and
+  fdisk can't seem to find a partition table on the VM disk when qemu
+  4.2 is used, with 4.1 it can see the partition table just fine.
+
+  Internal snapshots don't seem to have this problem.
+
+  I'm using Archlinux, virt-manager 2.2.1-2, libvirt 5.10.0-1, qemu
+  4.2.0-1.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1857143/+subscriptions
 
