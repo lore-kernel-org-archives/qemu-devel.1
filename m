@@ -2,80 +2,68 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E55C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D67BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5AC520866
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:37:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ts5KbL8g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5AC520866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 410F720866
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:41:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410F720866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiPxt-0007Ar-4K
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 16:37:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38581)
+	id 1iiQ1x-00014w-91
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 16:41:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43324)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iiPx3-0006jw-7R
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:36:50 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iiQ1C-0000VH-C3
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:41:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1iiPx1-0000Vv-W9
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:36:49 -0500
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:33708)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1iiPx1-0000Sf-MH; Fri, 20 Dec 2019 16:36:47 -0500
-Received: by mail-il1-x144.google.com with SMTP id v15so9189604iln.0;
- Fri, 20 Dec 2019 13:36:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qaNduU8pI7n8V/CKKVcoUQRc3In0xX5bjD7Gmv/Y+hc=;
- b=ts5KbL8gyyQ/p5//AlI3tqSjROTPVziRDg2LpRLvJ0cF/ZZ/YsEInO9QpS3Y8gSZWT
- MSFrM7ic5tyXr/Zh2K36PRr1ZXbSrKkxeJOymhVuARIIFCLwi3lyJNV2M5pvkfzti9Jx
- 6W1OOthh5u6HCUqFfnRdAbO30u5L5PkE3mkiGj/r+Bvn/RMeHtkZg9rDa2QCBH6Uc/eV
- jELaXUCnrxmKglNhFV4TwL+alSTV0XW9sdWNmxIxQiTWLuwSoogZ6qQhKX74iZ9lCtpa
- FTHkWcN/lIIavRhoznr/xYl9qOCZ0zHw4Dvouo9SGkFlcIFMTdxplym3H1HM/fDymVFD
- Y4cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qaNduU8pI7n8V/CKKVcoUQRc3In0xX5bjD7Gmv/Y+hc=;
- b=sDK0gy5tpFiL1TacigLwHVfrEnDIe4Dyge2kmye1Us0vzMNrCpeXsf76z0jGxcJSfN
- jS4+tPWM74fUgRnlRfoe0QSrDQ33U6HMKiy8iOxqCb2DpzmnaluN8e4QHkqyUNnWkhWw
- Fq10wIEZmHYNwRgE2nxzIL2Uz2FcwzcXRnJNj+KETeOFjz3CA0yqF+nZ/hPV0y344DLB
- hXzZcXiVBcNt239zQ+VigA13XR7ZFbx05PMOTJ7anDJNQGT0ESGpy5WWyy9gNkZdggfm
- 9eS7BLuiv9DkrWLzcXisJMHtRCZ5FgOJknWKJEd3fRwxFbFZ3IexqMxGMVDaIIHoc34G
- LWDg==
-X-Gm-Message-State: APjAAAUwt/pm0VS17Duqn5QZtXw5J7rf3xsxB9rcb99fB9MBvas1iFGL
- CljQsJ8HCdmjSVJTg3kRzlFaziUWTH0XoWtpgBQ=
-X-Google-Smtp-Source: APXvYqy0ejjKb+evxfxYiekibHgX3aK03HXa1usu+LcJM6GlM32fOk4eGuolB2K98JotFfFJJ9oOPHwDaKsmczJP8Bs=
-X-Received: by 2002:a92:af08:: with SMTP id n8mr13914978ili.217.1576877803146; 
- Fri, 20 Dec 2019 13:36:43 -0800 (PST)
+ (envelope-from <laurent@vivier.eu>) id 1iiQ1A-0007oA-Hx
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:41:06 -0500
+Received: from mout.kundenserver.de ([217.72.192.74]:33005)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1iiQ1A-0007m5-63; Fri, 20 Dec 2019 16:41:04 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MOiU5-1iJQkY2Hbr-00QChy; Fri, 20 Dec 2019 22:40:57 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] mos6522: remove anh register
+Date: Fri, 20 Dec 2019 22:40:54 +0100
+Message-Id: <20191220214054.76525-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-References: <20191219185127.24388-1-f4bug@amsat.org>
- <20191219185127.24388-4-f4bug@amsat.org>
-In-Reply-To: <20191219185127.24388-4-f4bug@amsat.org>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Fri, 20 Dec 2019 22:36:32 +0100
-Message-ID: <CAPan3WqzABfVmopUaCNkBxftZsZ=GR=Vts0qE_o7y81mP56EaQ@mail.gmail.com>
-Subject: Re: [PATCH 03/13] hw/timer/allwinner: Remove unused definitions
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="0000000000004f9359059a297968"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::144
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:QWud1jyLQfXmQl+m+wbeYLby1Vy2ySQW3t25qeDl50Sy4utHdXM
+ O9h3X/w9ok5CMehMHZPYdDdnPYQ6AuAFJr6oFbpOfT0MVUqFoMqKSr+6HwI0EFeDQrmCigA
+ +oeQ8cp3MNgzxwyetSUl5kDjRRFw6AXI/GYzmvTsZe/C3kozmPsbTNJEQJdjorwqFLD7eqp
+ EOV1QLjmmLmdG2fy0c4vg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BR8MsWSJLSo=:3efHz0gZVy/mWV0RC+DpOD
+ kS64LlqfP50EdFcFxNfX+wWEVUNgz3wTiOVZjmi1gGFwOAlv2mwSR9VSNDDcaH1lgyFcB2Zm/
+ FP3GH/6zGSrtSW/kTIbhp9GMbuhLafXK/op3y9kUD7m1ESJu+WxkiVAWqwQumQao1EtYDTSsc
+ xWgL4abCX31TT3LfXH16TkWWf9Ybgb3TmM1K4co09dAEEw0AtIP/0jNskQ1Age+6lz6y3cIWo
+ n7qpNSPjBPVIQwevhdJWS4QLH3SNbFf4qCfIMFcD7/dVXoCAQKJVSogXcwcFrWjbByxujW0EB
+ dsKqTtXRoBHHLFOrmiD9jWS0Toh0deBZlf9P+G0PH7Eln+SIKeG3FEMZd+pT6iRBf4zybfbDK
+ Grj9jsoRqArrxKjs+20rL6okhuCQjItF1Ei+udGpyyeUg6Ar7/s8U95/tXPKq2XX+3Ptw4FNE
+ 7Wid+MHOUql6cZjZDQcGluGDMVp9/MtDtbvULM+0LkzKnd4ryku8tNflO68Q8HosDK9cLxh+C
+ XeLTzWxHwWDRswG/nR4rRCxBMqFz1hrkvH+ospqU8Xq8UGRuHLxw3YYIBHqQdpkQFG64Z5445
+ o1Q9E8E5S7FJhmnltoGDVAODmsrT7A5bt5PhVUp9whjYDxZyWecQuos/J6mBFv2lp64mq7tNe
+ akYEzD9rhyxS81BK4+HQi6wuLTbFblzWiS0EDmdv5/owlHPHoJ9ME9JfPYsubYw4Jg4OOzfGp
+ O5cO9jHujI8rRUxEuxl3QIzkSkQZmAdMlQeTOGz2NKZAf0cFkvRv9hD4+NXGgR2SjirBesOjS
+ EUJtN92jsO553i00uinG2jaofgLXtK6mf2H0FPv9VSeJbbhF0EDbKvGlURfpEhjPvdjiFexNQ
+ pg22jhueWcLtTPM/taAw==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 217.72.192.74
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,100 +75,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004f9359059a297968
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Register addr 1 is defined as buffer A with handshake (vBufAH),
+register addr 15 is also defined as buffer A without handshake (vBufA).
 
-On Thu, Dec 19, 2019 at 7:51 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
+As both addresses access the same register, remove the definition of
+'anh' and use only 'a' (with VIA_REG_ANH and VIA_REG_A).
 
-> Keeping unused definition is rather confusing when reviewing.
-> Remove them.
->
-Perhaps make it more clear that the definitions are unused IRQ defines?
+Fixes: 51f233ec92cd ("misc: introduce new mos6522 VIA device and enable it for ppc builds")
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
 
+Notes:
+    v2: update commit message (remove reference to linux)
+        add LOG_UNIMP for VIA_REG_A access
 
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  include/hw/timer/allwinner-a10-pit.h | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/include/hw/timer/allwinner-a10-pit.h
-> b/include/hw/timer/allwinner-a10-pit.h
-> index 54c40c7db6..e4a644add9 100644
-> --- a/include/hw/timer/allwinner-a10-pit.h
-> +++ b/include/hw/timer/allwinner-a10-pit.h
-> @@ -10,8 +10,6 @@
->  #define AW_PIT_TIMER_MAX        6
->
->  #define AW_A10_PIT_TIMER_NR    6
-> -#define AW_A10_PIT_TIMER_IRQ   0x1
-> -#define AW_A10_PIT_WDOG_IRQ    0x100
->
->  #define AW_A10_PIT_TIMER_IRQ_EN    0
->  #define AW_A10_PIT_TIMER_IRQ_ST    0x4
-> --
-> 2.21.0
->
-> Reviewed-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-Tested-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+ hw/misc/mos6522.c         | 16 ++++++++--------
+ include/hw/misc/mos6522.h |  1 -
+ 2 files changed, 8 insertions(+), 9 deletions(-)
 
+diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+index cecf0be59e..10b85bf751 100644
+--- a/hw/misc/mos6522.c
++++ b/hw/misc/mos6522.c
+@@ -244,6 +244,9 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size)
+         val = s->b;
+         break;
+     case VIA_REG_A:
++       qemu_log_mask(LOG_UNIMP, "Read access to register A with handshake");
++       /* fall through */
++    case VIA_REG_ANH:
+         val = s->a;
+         break;
+     case VIA_REG_DIRB:
+@@ -297,9 +300,7 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size)
+         val = s->ier | 0x80;
+         break;
+     default:
+-    case VIA_REG_ANH:
+-        val = s->anh;
+-        break;
++        g_assert_not_reached();
+     }
+ 
+     if (addr != VIA_REG_IFR || val != 0) {
+@@ -322,6 +323,9 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+         mdc->portB_write(s);
+         break;
+     case VIA_REG_A:
++       qemu_log_mask(LOG_UNIMP, "Write access to register A with handshake");
++       /* fall through */
++    case VIA_REG_ANH:
+         s->a = (s->a & ~s->dira) | (val & s->dira);
+         mdc->portA_write(s);
+         break;
+@@ -395,9 +399,7 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+                               qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     default:
+-    case VIA_REG_ANH:
+-        s->anh = val;
+-        break;
++        g_assert_not_reached();
+     }
+ }
+ 
+@@ -439,7 +441,6 @@ const VMStateDescription vmstate_mos6522 = {
+         VMSTATE_UINT8(pcr, MOS6522State),
+         VMSTATE_UINT8(ifr, MOS6522State),
+         VMSTATE_UINT8(ier, MOS6522State),
+-        VMSTATE_UINT8(anh, MOS6522State),
+         VMSTATE_STRUCT_ARRAY(timers, MOS6522State, 2, 0,
+                              vmstate_mos6522_timer, MOS6522Timer),
+         VMSTATE_END_OF_LIST()
+@@ -460,7 +461,6 @@ static void mos6522_reset(DeviceState *dev)
+     s->ifr = 0;
+     s->ier = 0;
+     /* s->ier = T1_INT | SR_INT; */
+-    s->anh = 0;
+ 
+     s->timers[0].frequency = s->frequency;
+     s->timers[0].latch = 0xffff;
+diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
+index 493c907537..97384c6e02 100644
+--- a/include/hw/misc/mos6522.h
++++ b/include/hw/misc/mos6522.h
+@@ -115,7 +115,6 @@ typedef struct MOS6522State {
+     uint8_t pcr;
+     uint8_t ifr;
+     uint8_t ier;
+-    uint8_t anh;
+ 
+     MOS6522Timer timers[2];
+     uint64_t frequency;
+-- 
+2.24.1
 
---=20
-Niek Linnenbank
-
---0000000000004f9359059a297968
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Dec 19, 2019 at 7:51 PM Phili=
-ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.o=
-rg</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">Keeping unused definition is rather confusing when reviewing.<br>
-Remove them.<br></blockquote><div>Perhaps make it more clear that the defin=
-itions are unused IRQ defines?<br></div><div>=C2=A0</div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">
-<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
-t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
----<br>
-=C2=A0include/hw/timer/allwinner-a10-pit.h | 2 --<br>
-=C2=A01 file changed, 2 deletions(-)<br>
-<br>
-diff --git a/include/hw/timer/allwinner-a10-pit.h b/include/hw/timer/allwin=
-ner-a10-pit.h<br>
-index 54c40c7db6..e4a644add9 100644<br>
---- a/include/hw/timer/allwinner-a10-pit.h<br>
-+++ b/include/hw/timer/allwinner-a10-pit.h<br>
-@@ -10,8 +10,6 @@<br>
-=C2=A0#define AW_PIT_TIMER_MAX=C2=A0 =C2=A0 =C2=A0 =C2=A0 6<br>
-<br>
-=C2=A0#define AW_A10_PIT_TIMER_NR=C2=A0 =C2=A0 6<br>
--#define AW_A10_PIT_TIMER_IRQ=C2=A0 =C2=A00x1<br>
--#define AW_A10_PIT_WDOG_IRQ=C2=A0 =C2=A0 0x100<br>
-<br>
-=C2=A0#define AW_A10_PIT_TIMER_IRQ_EN=C2=A0 =C2=A0 0<br>
-=C2=A0#define AW_A10_PIT_TIMER_IRQ_ST=C2=A0 =C2=A0 0x4<br>
--- <br>
-2.21.0<br>
-<br></blockquote><div>Reviewed-by: Niek Linnenbank &lt;<a href=3D"mailto:ni=
-eklinnenbank@gmail.com">nieklinnenbank@gmail.com</a>&gt;</div><div>Tested-b=
-y: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.com">nieklinn=
-enbank@gmail.com</a>&gt;<br></div></div><br clear=3D"all"><br>-- <br><div d=
-ir=3D"ltr" class=3D"gmail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<=
-br><br></div></div></div></div>
-
---0000000000004f9359059a297968--
 
