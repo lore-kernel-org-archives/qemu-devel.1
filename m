@@ -2,82 +2,76 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD991C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C26C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:15:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9351D2146E
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:10:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8052C24679
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:15:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlL1fvrs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9351D2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iBtjhJnB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8052C24679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiKrD-000062-MN
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 11:10:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52810)
+	id 1iiKvu-0004In-MR
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 11:15:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iiKqY-0007qt-K9
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:09:47 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iiKur-0002Vn-D8
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:14:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iiKqV-0003Qq-66
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:09:44 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34896
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iiKqU-0003Q2-VV
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:09:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576858181;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SOTvQ7u3nhQF/D9sVhCfi2MGv/2bL8ujCj6cC8eKtyE=;
- b=GlL1fvrsFNPPqqW9ciqoWPw0NyR0D7t4t/zEEB29WPIdEOZz4EG4cUeStOkTLiMbtNzBx7
- niRa/LnqZHbbjOY3EGANZqZnHzJd39/PauJSHWOpsn5qwe2KcZhiSJ5ISAF0O4NJmrm/gG
- 3u6qOpYGkjK5+4GIz8l002S2bDmJEl8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-6pFd88r0O4i47-b5FSjdBw-1; Fri, 20 Dec 2019 11:09:38 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 221CEB163B;
- Fri, 20 Dec 2019 16:09:37 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
- [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61A6B5DA76;
- Fri, 20 Dec 2019 16:09:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A8F3911386A7; Fri, 20 Dec 2019 17:09:31 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Subject: Re: [PATCH 0/2] Speed up QMP stream reading
-References: <20191219160756.22389-1-yury-kotov@yandex-team.ru>
-Date: Fri, 20 Dec 2019 17:09:31 +0100
-In-Reply-To: <20191219160756.22389-1-yury-kotov@yandex-team.ru> (Yury Kotov's
- message of "Thu, 19 Dec 2019 19:07:54 +0300")
-Message-ID: <87a77ndlms.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <stefanha@gmail.com>) id 1iiKuq-0006q5-1o
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:14:13 -0500
+Received: from mail-qv1-xf35.google.com ([2607:f8b0:4864:20::f35]:33689)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iiKup-0006pd-R8
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:14:11 -0500
+Received: by mail-qv1-xf35.google.com with SMTP id z3so3824227qvn.0
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 08:14:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=dga8GK0tNNZduQ6hsHWxJpGLWJSmov5vi9EQuoBaS0k=;
+ b=iBtjhJnB+PbPbwOE/EsfWgWV9mJKpZRUMCQghmTcA8eTxTsj9SzTrhRM/CFykKzSzY
+ g+EOjivvQGK6hQDYD7U5F15RITD1Qq0wZm07LeWMr8x3PXSi5I9PIps+ixKq+RcBRcHO
+ b0ISlp6t9QlG3Cjj0bkOQYhteUXdrGhD0nxYRtwq5KIwak06BQyxpkU3CdWrIjQqU5tq
+ SLCz8axjIm4K2yOV3n5A4SXTJ19gGwedb7VNoePYchCcRfe9nLVH2uHFQMAktYXTA7Hl
+ q0ULhgagXwIVBYZSJZyXSvW1FAh35DV+hFvEOdlCUocUNRlttil/rjJ9/jJArHrXTdRH
+ /M5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=dga8GK0tNNZduQ6hsHWxJpGLWJSmov5vi9EQuoBaS0k=;
+ b=rPlx/DBs6MvYq2ZxAUgUBGKWwhMBPgZMMFmWXIk5jTykjIQ1sqPpLs/YfgDuPZvgc7
+ HpYvZEGY0dDEATm6/bHsqu9zUfTVsJMQUz3UtR4tSR4S3HtCjZ2Ziyghqc7xqPtw4p3A
+ S9Np/M7yIsSpG/z5mWsg3Mu28k6r1Q/63lqYVm2LefnEK8FHX6y57cv1cPezC388OvV5
+ aOInKsXIfXuiM9gpFzVhbrauVe7cqvLbXBzSflis39eUeZxPRfRwWKiuhdw5WL3Z3cZl
+ C/ItxDLCMx40qYFlTm16MM5Bod05St15tCh1R25aZPaIr9cqFQG1f5vbhbqt1VGUfdt8
+ 0FQA==
+X-Gm-Message-State: APjAAAU1GykvGF2xr0hXjSElqZ2b2XwmgzXK+ZFfyaHtgaZ7WCBZPIt3
+ IgrV60TxqOqKx5UNhZaaqbqN1yz69xJCvQYfJuUlzK9fbUI=
+X-Google-Smtp-Source: APXvYqzI8gK19wLXL8E8e7WhaLOgFw1DHHWnTDwi/Ej+ck+rusiBIUYSEdPlnbWwL4wMxYwsSPF66GFNxlYlT2tRyUg=
+X-Received: by 2002:a05:6214:982:: with SMTP id
+ dt2mr12597377qvb.174.1576858450796; 
+ Fri, 20 Dec 2019 08:14:10 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 6pFd88r0O4i47-b5FSjdBw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 20 Dec 2019 16:13:59 +0000
+Message-ID: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+Subject: Making QEMU easier for management tools and applications
+To: qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,36 +83,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, yc-core@yandex-team.ru, "Denis
- V. Lunev" <den@openvz.org>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yury Kotov <yury-kotov@yandex-team.ru> writes:
+Hi,
+QEMU presents a command-line interface and QMP monitor for
+applications to interact with.  Applications actually need API
+bindings in their programming language.  Bindings avoid reimplementing
+code to spawn a QEMU process and interact with QMP.  QEMU is kind of
+lazy and de facto relies on libvirt for API bindings.
 
-> Hi,
->
-> This series is continuation of another one:
-> [PATCH] monitor: Fix slow reading
-> https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg03722.html
->
-> Which also tried to read more than one byte from a stream at a time,
-> but had some problems with OOB and HMP:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg05018.html
->
-> This series is an attempt to fix problems described.
+Is it time for better QEMU APIs?
 
-Two problems: (1) breaks HMP migrate -d, and (2) need to think through
-how this affects reading of QMP input, in particular OOB.
+1. We have qapi-schema.json.  Let's render to HTML and publish
+versioned documentation online.
 
-This series refrains from changing HMP, thus avoids (1).  Good.
+2. scripts/qmp/ contains command-line tools for QMP communication.
+They could use some polish and then be shipped.
 
-What about (2)?  I'm feeling denser than usual today...  Can you explain
-real slow how QMP input works?  PATCH 2 appears to splice in a ring
-buffer.  Why is that needed?
+3. python/qemu/ contains Python modules for managing a QEMU process
+and QMP communication.  This should be packaged in distros and
+available on PyPI.
 
+4. Go and Rust bindings would also be useful.  There is
+https://github.com/intel/govmm but I think it makes sense to keep it
+in qemu.git and provide an interface similar to our Python modules.
+
+5. A jailer is needed to isolate the QEMU process and vhost-user
+device backends using seccomp, Linux namespaces, and maybe
+SELinux/AppArmor.  We used to be able to rely on libvirt for QEMU
+security, but it's becoming a common task for any device backend and
+IMO should be its own launcher tool.
+
+6. A configuration file format is sorely needed so that guest
+configuration can be persisted and easily launched.  Today you have to
+create a shell script that executes a QEMU command-line, but this is
+suboptimal because sharing executable scripts is dangerous from a
+security perspective and is hard to parse or modify programmatically.
+
+In many of these areas we already have a partial solution.  It just
+needs more work.  I think it would be worth the effort and the mental
+shift to really providing APIs that are easy to use by applications.
+
+What do you think?
+
+Have I missed things that are needed?
+
+Have I included things that are unnecessary?
+
+Stefan
 
