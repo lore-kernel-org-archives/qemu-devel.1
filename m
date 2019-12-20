@@ -2,74 +2,83 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F62C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 454EFC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:13:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C69B92072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:02:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69B92072B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0FFF420866
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 20:13:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="htlECdRm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FFF420866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiOTf-0004jG-02
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 15:02:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55419)
+	id 1iiOem-0000sQ-7b
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 15:13:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iiOSG-0004Ht-Pw
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:00:58 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1iiOeA-0000TQ-2M
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:13:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iiOSF-0003z6-83
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:00:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41116)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iiOSF-0003vs-02
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:00:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iiOS9-0006Vu-UA
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 20:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C85B82E802B
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 20:00:49 +0000 (UTC)
+ (envelope-from <ehabkost@redhat.com>) id 1iiOe7-0007tG-BV
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:13:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28840
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iiOe7-0007p8-2C
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 15:13:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576872789;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uR8Nn/Hdvn1AEG+SUFf4VmXd0caPr/VE15JoTRXMV/U=;
+ b=htlECdRmdGExDfaNJvREPcYr31SeiRrDsfRufRooQlROd1aY3iyTgMuW67T4bC/lD2bIPS
+ 8XG+HSAYaxtjn5RZU/mH1PAbCwNI+gLjg4peHWZr8lhGWj9hR4zwgLsCOnxhJDNazaGk2c
+ JW8JXfdbIi0k+L0JTxw0/T0Ynly+GKw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-11qowwLDMyqOZEbIzNb2uQ-1; Fri, 20 Dec 2019 15:13:07 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B3B2800D4E;
+ Fri, 20 Dec 2019 20:13:06 +0000 (UTC)
+Received: from localhost (ovpn-116-10.gru2.redhat.com [10.97.116.10])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C687A19C68;
+ Fri, 20 Dec 2019 20:13:00 +0000 (UTC)
+Date: Fri, 20 Dec 2019 17:12:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PULL 2/2] configure: Require Python >= 3.5
+Message-ID: <20191220201258.GA498046@habkost.net>
+References: <20191220165141.2207058-1-ehabkost@redhat.com>
+ <20191220165141.2207058-3-ehabkost@redhat.com>
+ <8736deakmn.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <8736deakmn.fsf@trasno.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 11qowwLDMyqOZEbIzNb2uQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Dec 2019 19:49:58 -0000
-From: Toolybird <1857143@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gschafer noctavian
-X-Launchpad-Bug-Reporter: =?utf-8?q?N=C4=83stasie_Ion_Octavian_=28noctavian?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: Toolybird (gschafer)
-References: <157685586097.27697.14145668174002417681.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157687139856.2533.12222522317606333309.malone@soybean.canonical.com>
-Subject: [Bug 1857143] Re: VMs won't boot from external snapshots on qemu 4.2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ef867758d7088007ebc0624f9026a77dd92d7640
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,65 +87,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1857143 <1857143@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is due to the new way of configuring block devices in 4.2.
+On Fri, Dec 20, 2019 at 07:59:28PM +0100, Juan Quintela wrote:
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > Python 3.5 is the oldest Python version available on our
+> > supported build platforms, and Python 2 end of life will be 3
+> > weeks after the planned release date of QEMU 4.2.0.  Drop Python
+> > 2 support from configure completely, and require Python 3.5 or
+> > newer.
+> >
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > Message-Id: <20191016224237.26180-1-ehabkost@redhat.com>
+> > Reviewed-by: John Snow <jsnow@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>=20
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-You'll need to create your snapshots correctly by using the '-F'
-parameter of qemu-img create.
+Thanks!
 
-Full details here:
+>=20
+> But once here, a comment telling why we want 3.5, not 3.4 or 3.6 will
+> have been helpful.
 
-https://www.redhat.com/archives/libvirt-
-users/2019-December/msg00016.html
+Is "Python 3.5 is the oldest Python version available on our
+supported build platforms" a good explanation why we want 3.5?
 
--- =
+--=20
+Eduardo
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1857143
-
-Title:
-  VMs won't boot from external snapshots on qemu 4.2
-
-Status in QEMU:
-  New
-
-Bug description:
-  After upgrading from qemu 4.1.1-1 to 4.2.0-1, VMs that were set to use
-  an external snapshot as their disk failed to boot.
-
-  Depending on the guest OS and other VM settings the boot fails and you
-  get either the "Boot failed: not a bootable drive" message or the grub
-  rescue shell or the EFI shell. Downgrading back to qemu 4.1 allows the
-  VMs to boot from the external snapshots without any problem and the
-  disk images doesn't appear to be corrupted afterwards.
-
-  From my testing this bug is easily reproducible. Create a VM, install
-  a guest os, confirm that the VM boots the guest os without problems,
-  shutdown the VM, create an external snapshot of the VM disk, set the
-  VM to boot from the snapshot, try to boot the VM with qemu 4.2 and see
-  it fail, try to boot it with qemu 4.1 and see it succeed.
-
-  In my case, to test that this bug is reproducible, I used virt-manager
-  to install Xubuntu 19.10 on a qcow2 disk image, and then used qemu-img
-  create -f qcow2 -b base_image.qcow2 snapshot_image.qcow2 to create the
-  external snapshot and edited the xml in virt-manager to point the VM's
-  disk to snapshot_image.qcow2. It failed to boot with qemu 4.2, but it
-  was working fine with 4.1.
-
-  I booted this test VM off a live distro using the virtual CDROM and
-  fdisk can't seem to find a partition table on the VM disk when qemu
-  4.2 is used, with 4.1 it can see the partition table just fine.
-
-  Internal snapshots don't seem to have this problem.
-
-  I'm using Archlinux, virt-manager 2.2.1-2, libvirt 5.10.0-1, qemu
-  4.2.0-1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1857143/+subscriptions
 
