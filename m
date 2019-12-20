@@ -7,88 +7,87 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F687C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE49FC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 18:00:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7FAE206EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69AF32072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 18:00:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uj0dvbk5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7FAE206EF
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IYyPMTHV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69AF32072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiMQT-0005Df-Sj
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:50:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39979)
+	id 1iiMa8-0001Yd-ID
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 13:00:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiMOm-0003w1-5v
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:49:13 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iiMZC-00013M-Az
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 13:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiMOl-00057Q-7B
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:49:12 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36800)
+ (envelope-from <alex.bennee@linaro.org>) id 1iiMZ9-000422-MH
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:59:58 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37690)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiMOl-00054L-0Y
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:49:11 -0500
-Received: by mail-wm1-x344.google.com with SMTP id p17so10104104wma.1
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 09:49:10 -0800 (PST)
+ id 1iiMZ9-0003zB-B7
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:59:55 -0500
+Received: by mail-wm1-x342.google.com with SMTP id f129so10122516wmf.2
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 09:59:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:subject:in-reply-to:date:message-id
  :mime-version:content-transfer-encoding;
- bh=BvLj2aL2dBkN0RhwvRESfw+tmvWO5glUrSWsN2KQ7m0=;
- b=uj0dvbk5KloQm7L/5A7McDD0dcoFiTwv76Uq+T6WSsGlQxdJGB57HVp8qe+vGltEg0
- nunO3x7wQ+8M7JcEaD83i6hzxn5aq65PlFSIlcLug3V1aULdZjOu3tQwMOkwk+aUBF0t
- 2SEPYeaFA7dau8ScsrsGBac0IVJ2GQLKohis/qrKFqioD20ljGYb/D7jLeam4pHXlncc
- tFWfUaOcbq2inpmB/w5TS/0qRDdm6dhQb2iPbX/DX9W9YMFtQjTHR1AUq7Qaq1yoR6V8
- jM0dYy5l20Gyjj/2lCFK13cUqVLnDHPXx/fMQ2EOsEWWYRhE1hobQeTIUFSBRo86zwoo
- njAQ==
+ bh=PCGs2LZNUQ2sPRBQ/e7STcNu0ibbpo4EWiBQuzsxBEY=;
+ b=IYyPMTHVJviNIwVdXNuu056hLlQ1jEnhAOThi1Eja52K76kWsMhck7bZYd/f0EyNhO
+ ZvkKAdfHu40EMhpdGnfv77mPex7dOom/yZ6usfxskWNEeNj+tUCQ4CNFG+nvDJjCGA8m
+ kqoXzYbhFuqN55HrMaIzuQS9l0Pl+uk92pXiRzakfAtmPlxkEubYmpOyoKdLprDcAHwm
+ l4FoUVUDhz03rJOPK6Jec+nqRhpfivNbehE2GhaVs6sjr3sNEntUJ3k8M8DLe5loGaMD
+ FTRwux5WDh046MRlg9Mmi6I3O2cUoVGrq+OgPVUVpl1suyd7KJg7UytYUUKcF3YMxyoA
+ mNLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=BvLj2aL2dBkN0RhwvRESfw+tmvWO5glUrSWsN2KQ7m0=;
- b=i0b8xFynuSSyRT4U6ps9L3qZVpHEVdFWGcTz6S0Zh3g0C2PcLsDJH6dbvfsdYC3jrr
- W6k98DX5+zXoyl1R/t+Mfl4XltWi72ra3sPEqEkiWw8sByReOIVEC9EtYddOGZ8oVc2q
- sIC7o/R2B8Le3LJHj+rYhC8Qh8uGlY1NXXGCnNcMKtD+5Xyhwulqzi2e3pLhGzSPL88G
- VPplnnhFd9K95C2SvEDcbB90Ole6CiUUYXWc2XXtAvvIurkot7YJRo+S/4Jv6+4i+kXA
- mCjIK1kC3Lr5Z4Knphfhf1Qo5Xdt4ACirkpWOXTmfN0xonL+00ecSWNhhBUa8UKzRU0X
- xlVw==
-X-Gm-Message-State: APjAAAVFJ4RMMcW0ynRTOV26eNZ38Iyw01Ay6ArnjUSlB1t+lUvfBW+5
- p4bRm2jFyzSesRj3yfU9YP/oqgVO1+M=
-X-Google-Smtp-Source: APXvYqyu/fa8BQmpmJJxe/ZFJQYw7O10QNhlBma+NhHexIoy+PfHW8IoeF4+a8s9D7fWvvUK28FyBg==
-X-Received: by 2002:a05:600c:246:: with SMTP id
- 6mr18085398wmj.122.1576864148688; 
- Fri, 20 Dec 2019 09:49:08 -0800 (PST)
+ bh=PCGs2LZNUQ2sPRBQ/e7STcNu0ibbpo4EWiBQuzsxBEY=;
+ b=ocjvvyZN+Wj2O8u9xvB0HDFWL7u5lQvjRUB55ivdqfmzGsNe+vw8+1kGnpc1YhI8vu
+ Q2kC6+A2ov5m8TyEFgyUyKOfIn/yV5Dxdhtaus9DkAWJZ6bdIHE3LvsObLs6g5SDzUI2
+ 49MttHCsNcJc5BovFe3LRZtviURe8hrWypLvWP41VBNYXEHFRQcDLy2JovIsWCVrF/U4
+ JvceQxOJrFZp04S5O/Yfka/uvq+UBzAbyjmVCTqaDiph/2VLYedEAcZHq4/qQuq/w42Z
+ 3dkTUb59GqEDdMlrh4GJgX851ogOY7uI8FCT4mDtFS0kFnRN6DW8x1LjYVJB1rzwvGmX
+ jN7Q==
+X-Gm-Message-State: APjAAAUOICk0JmcsLDGcOYpjy2TTSeGS4TVHiahZqEy/yHV15kKFXIcG
+ kqojzICxrySs+NVysmE3FwdIfI81ynY=
+X-Google-Smtp-Source: APXvYqz7T8pSQeFDwe0FU9Oi7savOmKQsx3wlJozHsv71zmWJQ9jsATuFyoE5Nq/35E3VLf3eCQXbg==
+X-Received: by 2002:a7b:c3d2:: with SMTP id t18mr18318797wmj.90.1576864792175; 
+ Fri, 20 Dec 2019 09:59:52 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f127sm9022111wma.4.2019.12.20.09.49.07
+ by smtp.gmail.com with ESMTPSA id 5sm11089272wrh.5.2019.12.20.09.59.50
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 09:49:07 -0800 (PST)
+ Fri, 20 Dec 2019 09:59:51 -0800 (PST)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 974741FF87
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:49:06 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 66C0B1FF87
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:59:50 +0000 (GMT)
 References: <20191216221158.29572-1-richard.henderson@linaro.org>
- <20191216221158.29572-14-richard.henderson@linaro.org>
+ <20191216221158.29572-15-richard.henderson@linaro.org>
 User-agent: mu4e 1.3.5; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 13/28] linux-user: Include trace-root.h in
- syscall-trace.h
-In-reply-to: <20191216221158.29572-14-richard.henderson@linaro.org>
-Date: Fri, 20 Dec 2019 17:49:06 +0000
-Message-ID: <87d0cidh0t.fsf@linaro.org>
+Subject: Re: [PATCH v2 14/28] cputlb: Expand cpu_ldst_useronly_template.h in
+ user-exec.c
+In-reply-to: <20191216221158.29572-15-richard.henderson@linaro.org>
+Date: Fri, 20 Dec 2019 17:59:50 +0000
+Message-ID: <87a77mdgix.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,30 +106,539 @@ Sender: "Qemu-devel"
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> Code movement in an upcoming patch will show that this file
-> was implicitly depending on trace-root.h being included beforehand.
+> With the tracing hooks, the inline functions are no longer
+> so simple.  Reduce the amount of preprocessor obfuscation
+> by expanding the text of each of the functions generated.
+> The result is only slightly larger than the original.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  include/user/syscall-trace.h | 2 ++
->  1 file changed, 2 insertions(+)
+>  include/exec/cpu_ldst.h                   |  54 +++--
+>  include/exec/cpu_ldst_useronly_template.h | 159 ---------------
+>  accel/tcg/user-exec.c                     | 236 ++++++++++++++++++++++
+>  3 files changed, 262 insertions(+), 187 deletions(-)
+>  delete mode 100644 include/exec/cpu_ldst_useronly_template.h
 >
-> diff --git a/include/user/syscall-trace.h b/include/user/syscall-trace.h
-> index 9e60473643..79fd3e5aa9 100644
-> --- a/include/user/syscall-trace.h
-> +++ b/include/user/syscall-trace.h
-> @@ -10,6 +10,8 @@
->  #ifndef _SYSCALL_TRACE_H_
->  #define _SYSCALL_TRACE_H_
+> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+> index 41b98ba801..0f3c49a005 100644
+> --- a/include/exec/cpu_ldst.h
+> +++ b/include/exec/cpu_ldst.h
+> @@ -120,35 +120,33 @@ static inline void clear_helper_retaddr(void)
 >=20=20
-> +#include "trace-root.h"
-> +
+>  /* In user-only mode we provide only the _code and _data accessors. */
+>=20=20
+> -#define MEMSUFFIX _data
+> -#define DATA_SIZE 1
+> -#include "exec/cpu_ldst_useronly_template.h"
+> +uint32_t cpu_ldub_data(CPUArchState *env, abi_ptr ptr);
+> +uint32_t cpu_lduw_data(CPUArchState *env, abi_ptr ptr);
+> +uint32_t cpu_ldl_data(CPUArchState *env, abi_ptr ptr);
+> +uint64_t cpu_ldq_data(CPUArchState *env, abi_ptr ptr);
+> +int cpu_ldsb_data(CPUArchState *env, abi_ptr ptr);
+> +int cpu_ldsw_data(CPUArchState *env, abi_ptr ptr);
+>=20=20
+> -#define DATA_SIZE 2
+> -#include "exec/cpu_ldst_useronly_template.h"
+> +uint32_t cpu_ldub_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t reta=
+ddr);
+> +uint32_t cpu_lduw_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t reta=
+ddr);
+> +uint32_t cpu_ldl_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retad=
+dr);
+> +uint64_t cpu_ldq_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retad=
+dr);
+> +int cpu_ldsb_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retaddr);
+> +int cpu_ldsw_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retaddr);
+>=20=20
+> -#define DATA_SIZE 4
+> -#include "exec/cpu_ldst_useronly_template.h"
+> +void cpu_stb_data(CPUArchState *env, abi_ptr ptr, uint32_t val);
+> +void cpu_stw_data(CPUArchState *env, abi_ptr ptr, uint32_t val);
+> +void cpu_stl_data(CPUArchState *env, abi_ptr ptr, uint32_t val);
+> +void cpu_stq_data(CPUArchState *env, abi_ptr ptr, uint64_t val);
+>=20=20
+> -#define DATA_SIZE 8
+> -#include "exec/cpu_ldst_useronly_template.h"
+> -#undef MEMSUFFIX
+> -
+> -#define MEMSUFFIX _code
+> -#define CODE_ACCESS
+> -#define DATA_SIZE 1
+> -#include "exec/cpu_ldst_useronly_template.h"
+> -
+> -#define DATA_SIZE 2
+> -#include "exec/cpu_ldst_useronly_template.h"
+> -
+> -#define DATA_SIZE 4
+> -#include "exec/cpu_ldst_useronly_template.h"
+> -
+> -#define DATA_SIZE 8
+> -#include "exec/cpu_ldst_useronly_template.h"
+> -#undef MEMSUFFIX
+> -#undef CODE_ACCESS
+> +void cpu_stb_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint32_t val, uintptr_t retaddr);
+> +void cpu_stw_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint32_t val, uintptr_t retaddr);
+> +void cpu_stl_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint32_t val, uintptr_t retaddr);
+> +void cpu_stq_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint64_t val, uintptr_t retaddr);
+>=20=20
 >  /*
->   * These helpers just provide a common place for the various
->   * subsystems that want to track syscalls to put their hooks in. We
+>   * Provide the same *_mmuidx_ra interface as for softmmu.
+> @@ -520,6 +518,8 @@ void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr add=
+r, uint64_t val,
+>  #undef CPU_MMU_INDEX
+>  #undef MEMSUFFIX
+>=20=20
+> +#endif /* defined(CONFIG_USER_ONLY) */
+> +
+>  uint32_t cpu_ldub_code(CPUArchState *env, abi_ptr addr);
+>  uint32_t cpu_lduw_code(CPUArchState *env, abi_ptr addr);
+>  uint32_t cpu_ldl_code(CPUArchState *env, abi_ptr addr);
+> @@ -535,8 +535,6 @@ static inline int cpu_ldsw_code(CPUArchState *env, ab=
+i_ptr addr)
+>      return (int16_t)cpu_lduw_code(env, addr);
+>  }
+>=20=20
+> -#endif /* defined(CONFIG_USER_ONLY) */
+> -
+>  /**
+>   * tlb_vaddr_to_host:
+>   * @env: CPUArchState
+> diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu=
+_ldst_useronly_template.h
+> deleted file mode 100644
+> index e5a3d1983a..0000000000
+> --- a/include/exec/cpu_ldst_useronly_template.h
+> +++ /dev/null
+> @@ -1,159 +0,0 @@
+> -/*
+> - *  User-only accessor function support
+> - *
+> - * Generate inline load/store functions for one data size.
+> - *
+> - * Generate a store function as well as signed and unsigned loads.
+> - *
+> - * Not used directly but included from cpu_ldst.h.
+> - *
+> - *  Copyright (c) 2015 Linaro Limited
+> - *
+> - * This library is free software; you can redistribute it and/or
+> - * modify it under the terms of the GNU Lesser General Public
+> - * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> - *
+> - * This library is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> - * Lesser General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU Lesser General Public
+> - * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+> - */
+> -
+> -#if !defined(CODE_ACCESS)
+> -#include "trace-root.h"
+> -#endif
+> -
+> -#include "trace/mem.h"
+> -
+> -#if DATA_SIZE =3D=3D 8
+> -#define SUFFIX q
+> -#define USUFFIX q
+> -#define DATA_TYPE uint64_t
+> -#define SHIFT 3
+> -#elif DATA_SIZE =3D=3D 4
+> -#define SUFFIX l
+> -#define USUFFIX l
+> -#define DATA_TYPE uint32_t
+> -#define SHIFT 2
+> -#elif DATA_SIZE =3D=3D 2
+> -#define SUFFIX w
+> -#define USUFFIX uw
+> -#define DATA_TYPE uint16_t
+> -#define DATA_STYPE int16_t
+> -#define SHIFT 1
+> -#elif DATA_SIZE =3D=3D 1
+> -#define SUFFIX b
+> -#define USUFFIX ub
+> -#define DATA_TYPE uint8_t
+> -#define DATA_STYPE int8_t
+> -#define SHIFT 0
+> -#else
+> -#error unsupported data size
+> -#endif
+> -
+> -#if DATA_SIZE =3D=3D 8
+> -#define RES_TYPE uint64_t
+> -#else
+> -#define RES_TYPE uint32_t
+> -#endif
+> -
+> -static inline RES_TYPE
+> -glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+> -{
+> -    RES_TYPE ret;
+> -#ifdef CODE_ACCESS
+> -    set_helper_retaddr(1);
+> -    ret =3D glue(glue(ld, USUFFIX), _p)(g2h(ptr));
+> -    clear_helper_retaddr();
+> -#else
+> -    MemOp op =3D MO_TE | SHIFT;
+> -    uint16_t meminfo =3D trace_mem_get_info(op, MMU_USER_IDX, false);
+> -    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> -    ret =3D glue(glue(ld, USUFFIX), _p)(g2h(ptr));
+> -#endif
+> -    return ret;
+> -}
+> -
+> -#ifndef CODE_ACCESS
+> -static inline RES_TYPE
+> -glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+> -                                                  abi_ptr ptr,
+> -                                                  uintptr_t retaddr)
+> -{
+> -    RES_TYPE ret;
+> -    set_helper_retaddr(retaddr);
+> -    ret =3D glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(env, ptr);
+> -    clear_helper_retaddr();
+> -    return ret;
+> -}
+> -#endif
+> -
+> -#if DATA_SIZE <=3D 2
+> -static inline int
+> -glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
+> -{
+> -    int ret;
+> -#ifdef CODE_ACCESS
+> -    set_helper_retaddr(1);
+> -    ret =3D glue(glue(lds, SUFFIX), _p)(g2h(ptr));
+> -    clear_helper_retaddr();
+> -#else
+> -    MemOp op =3D MO_TE | MO_SIGN | SHIFT;
+> -    uint16_t meminfo =3D trace_mem_get_info(op, MMU_USER_IDX, false);
+> -    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> -    ret =3D glue(glue(lds, SUFFIX), _p)(g2h(ptr));
+> -    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> -#endif
+> -    return ret;
+> -}
+> -
+> -#ifndef CODE_ACCESS
+> -static inline int
+> -glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+> -                                                  abi_ptr ptr,
+> -                                                  uintptr_t retaddr)
+> -{
+> -    int ret;
+> -    set_helper_retaddr(retaddr);
+> -    ret =3D glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(env, ptr);
+> -    clear_helper_retaddr();
+> -    return ret;
+> -}
+> -#endif /* CODE_ACCESS */
+> -#endif /* DATA_SIZE <=3D 2 */
+> -
+> -#ifndef CODE_ACCESS
+> -static inline void
+> -glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
+> -                                      RES_TYPE v)
+> -{
+> -    MemOp op =3D MO_TE | SHIFT;
+> -    uint16_t meminfo =3D trace_mem_get_info(op, MMU_USER_IDX, true);
+> -    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> -    glue(glue(st, SUFFIX), _p)(g2h(ptr), v);
+> -    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> -}
+> -
+> -static inline void
+> -glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+> -                                                  abi_ptr ptr,
+> -                                                  RES_TYPE v,
+> -                                                  uintptr_t retaddr)
+> -{
+> -    set_helper_retaddr(retaddr);
+> -    glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(env, ptr, v);
+> -    clear_helper_retaddr();
+> -}
+> -#endif
+> -
+> -#undef RES_TYPE
+> -#undef DATA_TYPE
+> -#undef DATA_STYPE
+> -#undef SUFFIX
+> -#undef USUFFIX
+> -#undef DATA_SIZE
+> -#undef SHIFT
+> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+> index b09f7a1577..79da4219bb 100644
+> --- a/accel/tcg/user-exec.c
+> +++ b/accel/tcg/user-exec.c
+> @@ -26,6 +26,8 @@
+>  #include "translate-all.h"
+>  #include "exec/helper-proto.h"
+>  #include "qemu/atomic128.h"
+> +#include "trace-root.h"
+> +#include "trace/mem.h"
+>=20=20
+>  #undef EAX
+>  #undef ECX
+> @@ -734,6 +736,240 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+>=20=20
+>  /* The softmmu versions of these helpers are in cputlb.c.  */
+>=20=20
+> +uint32_t cpu_ldub_data(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint32_t ret;
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_UB, MMU_USER_IDX, false);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    ret =3D ldub_p(g2h(ptr));
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +    return ret;
+> +}
+> +
+> +int cpu_ldsb_data(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    int ret;
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_SB, MMU_USER_IDX, false);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    ret =3D ldsb_p(g2h(ptr));
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_lduw_data(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint32_t ret;
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TEUW, MMU_USER_IDX, false=
+);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    ret =3D lduw_p(g2h(ptr));
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +    return ret;
+> +}
+> +
+> +int cpu_ldsw_data(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    int ret;
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TESW, MMU_USER_IDX, false=
+);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    ret =3D ldsw_p(g2h(ptr));
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_ldl_data(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint32_t ret;
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TEUL, MMU_USER_IDX, false=
+);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    ret =3D ldl_p(g2h(ptr));
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +    return ret;
+> +}
+> +
+> +uint64_t cpu_ldq_data(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint64_t ret;
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TEQ, MMU_USER_IDX, false);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    ret =3D ldq_p(g2h(ptr));
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_ldub_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t reta=
+ddr)
+> +{
+> +    uint32_t ret;
+> +
+> +    set_helper_retaddr(retaddr);
+> +    ret =3D cpu_ldub_data(env, ptr);
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +int cpu_ldsb_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retaddr)
+> +{
+> +    int ret;
+> +
+> +    set_helper_retaddr(retaddr);
+> +    ret =3D cpu_ldsb_data(env, ptr);
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_lduw_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t reta=
+ddr)
+> +{
+> +    uint32_t ret;
+> +
+> +    set_helper_retaddr(retaddr);
+> +    ret =3D cpu_lduw_data(env, ptr);
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +int cpu_ldsw_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retaddr)
+> +{
+> +    int ret;
+> +
+> +    set_helper_retaddr(retaddr);
+> +    ret =3D cpu_ldsw_data(env, ptr);
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_ldl_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retad=
+dr)
+> +{
+> +    uint32_t ret;
+> +
+> +    set_helper_retaddr(retaddr);
+> +    ret =3D cpu_ldl_data(env, ptr);
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +uint64_t cpu_ldq_data_ra(CPUArchState *env, abi_ptr ptr, uintptr_t retad=
+dr)
+> +{
+> +    uint64_t ret;
+> +
+> +    set_helper_retaddr(retaddr);
+> +    ret =3D cpu_ldq_data(env, ptr);
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +void cpu_stb_data(CPUArchState *env, abi_ptr ptr, uint32_t val)
+> +{
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_UB, MMU_USER_IDX, true);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    stb_p(g2h(ptr), val);
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +}
+> +
+> +void cpu_stw_data(CPUArchState *env, abi_ptr ptr, uint32_t val)
+> +{
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TEUW, MMU_USER_IDX, true);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    stw_p(g2h(ptr), val);
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +}
+> +
+> +void cpu_stl_data(CPUArchState *env, abi_ptr ptr, uint32_t val)
+> +{
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TEUL, MMU_USER_IDX, true);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    stl_p(g2h(ptr), val);
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +}
+> +
+> +void cpu_stq_data(CPUArchState *env, abi_ptr ptr, uint64_t val)
+> +{
+> +    uint16_t meminfo =3D trace_mem_get_info(MO_TEQ, MMU_USER_IDX, true);
+> +
+> +    trace_guest_mem_before_exec(env_cpu(env), ptr, meminfo);
+> +    stq_p(g2h(ptr), val);
+> +    qemu_plugin_vcpu_mem_cb(env_cpu(env), ptr, meminfo);
+> +}
+> +
+> +void cpu_stb_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint32_t val, uintptr_t retaddr)
+> +{
+> +    set_helper_retaddr(retaddr);
+> +    cpu_stb_data(env, ptr, val);
+> +    clear_helper_retaddr();
+> +}
+> +
+> +void cpu_stw_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint32_t val, uintptr_t retaddr)
+> +{
+> +    set_helper_retaddr(retaddr);
+> +    cpu_stw_data(env, ptr, val);
+> +    clear_helper_retaddr();
+> +}
+> +
+> +void cpu_stl_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint32_t val, uintptr_t retaddr)
+> +{
+> +    set_helper_retaddr(retaddr);
+> +    cpu_stl_data(env, ptr, val);
+> +    clear_helper_retaddr();
+> +}
+> +
+> +void cpu_stq_data_ra(CPUArchState *env, abi_ptr ptr,
+> +                     uint64_t val, uintptr_t retaddr)
+> +{
+> +    set_helper_retaddr(retaddr);
+> +    cpu_stq_data(env, ptr, val);
+> +    clear_helper_retaddr();
+> +}
+> +
+> +uint32_t cpu_ldub_code(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint32_t ret;
+> +
+> +    set_helper_retaddr(1);
+> +    ret =3D ldub_p(g2h(ptr));
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_lduw_code(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint32_t ret;
+> +
+> +    set_helper_retaddr(1);
+> +    ret =3D lduw_p(g2h(ptr));
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +uint32_t cpu_ldl_code(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint32_t ret;
+> +
+> +    set_helper_retaddr(1);
+> +    ret =3D ldl_p(g2h(ptr));
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+> +uint64_t cpu_ldq_code(CPUArchState *env, abi_ptr ptr)
+> +{
+> +    uint64_t ret;
+> +
+> +    set_helper_retaddr(1);
+> +    ret =3D ldq_p(g2h(ptr));
+> +    clear_helper_retaddr();
+> +    return ret;
+> +}
+> +
+>  /* Do not allow unaligned operations to proceed.  Return the host addres=
+s.  */
+>  static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+>                                 int size, uintptr_t retaddr)
 
 
 --=20
