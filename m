@@ -2,49 +2,46 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8C9C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8444DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53CF1206EF
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:23:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53CF1206EF
+	by mail.kernel.org (Postfix) with ESMTPS id 56F4421D7D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:23:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56F4421D7D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii9p9-00023c-0e
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:23:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55685)
+	id 1ii9pB-00028j-0u
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:23:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55893)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9nf-0008T9-WB
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:05 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9nh-0008Ub-8F
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9ne-0001z6-HI
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:03 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34426)
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9nf-00023e-Fs
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:04 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34398)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1ii9ne-0001xo-9T; Thu, 19 Dec 2019 23:22:02 -0500
+ id 1ii9nf-0001x1-4e; Thu, 19 Dec 2019 23:22:03 -0500
 Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
- id 1041628CC5; Thu, 19 Dec 2019 23:22:02 -0500 (EST)
-To: Jason Wang <jasowang@redhat.com>,
-    qemu-devel@nongnu.org
-Message-Id: <73bc39e93a9480aa5ed3ef2f85447c2504e4d8c8.1576815466.git.fthain@telegraphics.com.au>
-In-Reply-To: <cover.1576815466.git.fthain@telegraphics.com.au>
-References: <cover.1576815466.git.fthain@telegraphics.com.au>
+ id DA3EA27FF9; Thu, 19 Dec 2019 23:22:01 -0500 (EST)
+Message-Id: <cover.1576815466.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-Subject: [PATCH v2 03/13] dp8393x: Have dp8393x_receive() return the packet
- size
+Subject: [PATCH v2 00/13] Fixes for DP8393X SONIC device emulation
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Date: Fri, 20 Dec 2019 15:17:46 +1100
+To: Jason Wang <jasowang@redhat.com>,
+    qemu-devel@nongnu.org
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
@@ -66,57 +63,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function re-uses its 'size' argument as a scratch variable.
-Instead, declare a local 'size' variable for that purpose so that the
-function result doesn't get messed up.
+Hi All,
 
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+There are bugs in the DP8393X emulation that can stop packet reception.
+
+Whilst debugging the device I found that the receiver algorithm differs
+from the one described in the National Semiconductor datasheet.
+
+These issues and others are addressed by this patch series.
+
+This series has only been tested with Linux/m68k guests. It needs further
+testing with MIPS Magnum guests such as NetBSD or Windows NT.
+
+Note that the mainline Linux sonic driver also has bugs.
+Those bugs have been fixed in a series of patches at,
+https://github.com/fthain/linux/commits/mac68k
+
 ---
- hw/net/dp8393x.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Changed since v1:
+ - Minor revisions described in patch descriptions.
+ - Dropped patches 4/10 and 7/10.
+ - Added 5 new patches.
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index b2cc768d9b..a3e3a82ff4 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -746,20 +746,21 @@ static int dp8393x_receive_filter(dp8393xState *s, =
-const uint8_t * buf,
- }
-=20
- static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
--                               size_t size)
-+                               size_t pkt_size)
- {
-     dp8393xState *s =3D qemu_get_nic_opaque(nc);
-     int packet_type;
-     uint32_t available, address;
--    int width, rx_len =3D size;
-+    int width, rx_len =3D pkt_size;
-     uint32_t checksum;
-+    int size;
-=20
-     width =3D (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-=20
-     s->regs[SONIC_RCR] &=3D ~(SONIC_RCR_PRX | SONIC_RCR_LBK | SONIC_RCR_=
-FAER |
-         SONIC_RCR_CRCR | SONIC_RCR_LPKT | SONIC_RCR_BC | SONIC_RCR_MC);
-=20
--    packet_type =3D dp8393x_receive_filter(s, buf, size);
-+    packet_type =3D dp8393x_receive_filter(s, buf, pkt_size);
-     if (packet_type < 0) {
-         DPRINTF("packet not for netcard\n");
-         return -1;
-@@ -853,7 +854,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, co=
-nst uint8_t * buf,
-     /* Done */
-     dp8393x_update_irq(s);
-=20
--    return size;
-+    return pkt_size;
- }
-=20
- static void dp8393x_reset(DeviceState *dev)
+
+Finn Thain (13):
+  dp8393x: Mask EOL bit from descriptor addresses
+  dp8393x: Clean up endianness hacks
+  dp8393x: Have dp8393x_receive() return the packet size
+  dp8393x: Update LLFA and CRDA registers from rx descriptor
+  dp8393x: Clear RRRA command register bit only when appropriate
+  dp8393x: Implement packet size limit and RBAE interrupt
+  dp8393x: Don't stop reception upon RBE interrupt assertion
+  dp8393x: Don't clobber packet checksum
+  dp8393x: Use long-word-aligned RRA pointers in 32-bit mode
+  dp8393x: Pad frames to word or long word boundary
+  dp8393x: Clear descriptor in_use field when necessary
+  dp8393x: Always update RRA pointers and sequence numbers
+  dp8393x: Correctly advance RRP
+
+ hw/net/dp8393x.c | 147 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 100 insertions(+), 47 deletions(-)
+
 --=20
 2.23.0
 
