@@ -2,76 +2,93 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E06C2D0D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75106C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:53:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B426D20716
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:53:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fv4qTB5e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B426D20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4747920716
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 16:53:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4747920716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59007 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiLWh-00075R-MU
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 11:53:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60593)
+	id 1iiLXI-0007sZ-4j
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 11:53:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iiLVL-0005g5-H2
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:51:56 -0500
+ (envelope-from <groug@kaod.org>) id 1iiLVD-0005T0-2m
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iiLVK-0005Re-FV
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:51:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60907
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iiLVK-0005Qo-C9
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:51:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576860713;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=BIW2ofsh+9yupKvIEl6YUdx4NiYu0P/YW5UE9eORwrw=;
- b=Fv4qTB5enUQ/W3XzFl0P3CvuXetx1kxCoY66BUav/78ELpAYrgBXVEkqzjZxIGnDjxi7l3
- PA/nta/0knyOnuRnNaEV8737+fnxECQwSA7WWgRo3yyMVOFI6AEOLKKYkiFU9nDjtsU1Rw
- 1ij5fcAKNIcy7qzao5ljyg8K1GaTbuQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-U_vBHCgLPqqgO-O7kSeLiA-1; Fri, 20 Dec 2019 11:51:49 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1557B800D48;
- Fri, 20 Dec 2019 16:51:47 +0000 (UTC)
-Received: from localhost (ovpn-116-10.gru2.redhat.com [10.97.116.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F3D975F77C;
- Fri, 20 Dec 2019 16:51:43 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 0/2] Require Python >= 3.5 to build QEMU
-Date: Fri, 20 Dec 2019 13:51:39 -0300
-Message-Id: <20191220165141.2207058-1-ehabkost@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1iiLVC-0005Gu-09
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:51:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20200)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iiLVB-0005Ey-Mz
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 11:51:45 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBKGRgCw134530
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 11:51:43 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2x0y9yeksy-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 11:51:43 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 20 Dec 2019 16:51:41 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 20 Dec 2019 16:51:38 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xBKGord435979728
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 20 Dec 2019 16:50:53 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 376B64C052;
+ Fri, 20 Dec 2019 16:51:37 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 08C9F4C044;
+ Fri, 20 Dec 2019 16:51:37 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.169.241])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 20 Dec 2019 16:51:36 +0000 (GMT)
+Subject: [PATCH 0/2] ppc/pnv: Improve command line experience with multi-chip
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Date: Fri, 20 Dec 2019 17:51:36 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: U_vBHCgLPqqgO-O7kSeLiA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19122016-0016-0000-0000-000002D6F683
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19122016-0017-0000-0000-0000333941AC
+Message-Id: <157686069624.97184.12603452056634667288.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-20_04:2019-12-17,2019-12-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0
+ bulkscore=0 priorityscore=1501 clxscore=1034 lowpriorityscore=0
+ impostorscore=0 adultscore=0 mlxlogscore=555 mlxscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912200127
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,54 +100,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Juan Quintela <quintela@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Differences from the previous Python 3.5 pull request
-that was rejected:
+Patch 1 adds a sanity check of the CPU topology to avoid an assertion in
+the multi TCG code that can be easily triggered with the "num-chips" property
+of the powernv machine.
 
-* Now tests/vm/netbsd was fixed
-* .travis.yml is being updated to replace Python 3.4 job with 3.5
+This still leaves us with the fact that the number of chips must be specified
+twice on the command line: once for the "num-chips" property and once for the
+CPU topology with '-smp sockets'. Patch 2 tries to tackle that by changing the
+default value of "num-chips" (currently 1) to the number of "sockets" of the
+CPU topology, computed at startup time as:
 
-The following changes since commit f59b31e6d0c69792b5d817c5aa0a6ed64fba42e0=
-:
+           smp.max_cpus / (smp.cores * smp.threads)
 
-  Merge remote-tracking branch 'remotes/stsquad/tags/pull-tesing-and-misc-1=
-91219-1' into staging (2019-12-20 14:00:49 +0000)
+This allow to indirectly configure the number of chips and have a valid
+CPU topology with a single '-smp sockets'.
 
-are available in the Git repository at:
+--
+Greg
 
-  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+---
 
-for you to fetch changes up to ddf90699631db53c981b6a5a63d31c08e0eaeec7:
+Greg Kurz (2):
+      ppc/pnv: Exit gracefully if CPU topology doesn't match the machine capacities
+      ppc/pnv: Use the CPU topology to compute the default number of chips
 
-  configure: Require Python >=3D 3.5 (2019-12-20 13:45:59 -0300)
 
-----------------------------------------------------------------
-Require Python >=3D 3.5 to build QEMU
-
-Python 2 EOL is 11 days away, we will stop supporting
-it in QEMU 5.0.
-
-----------------------------------------------------------------
-
-Eduardo Habkost (2):
-  travis: Replace Python 3.4 build with 3.5
-  configure: Require Python >=3D 3.5
-
- .travis.yml            |  2 +-
- configure              | 18 ++++--------------
- tests/Makefile.include |  5 -----
- 3 files changed, 5 insertions(+), 20 deletions(-)
-
---=20
-2.23.0
+ hw/ppc/pnv.c |   33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
 
