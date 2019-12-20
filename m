@@ -2,78 +2,90 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F99AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 19:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A093C2D0D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 19:31:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CB59206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 19:22:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 697C92064B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 19:31:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QvXKhYs1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB59206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zc4fRFBQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697C92064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiNr4-0000ac-Jg
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 14:22:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33522)
+	id 1iiNzb-0005O1-KL
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 14:31:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iiNpX-0007FH-9P
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:20:56 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iiNyo-0004pz-0I
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:30:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iiNpV-00065p-KV
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:20:55 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26314
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iiNpV-00064N-GU
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:20:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576869652;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=047QDZ7MEcEODejWVJcX4yQRTyXLQpY0SHXb+5Ij/5M=;
- b=QvXKhYs1H9rIt2uJb9JxtLJuQe47FwbdDdPwGCR+yRGA88LOFgeCg3rMTlpvWkpqjcs+q3
- zzLn+nQ8W9wboCf/HYJyU7CgXXVyuwgTJT/sVyDFac7lO3ixO/1WUBa8sjnDm8/KltWntp
- BFYXuAFwRkAoL1oHSz4OWIepNq7jHko=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-85yPauv1MeKXac_BPKRh8Q-1; Fri, 20 Dec 2019 14:20:51 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60D6C1883522;
- Fri, 20 Dec 2019 19:20:49 +0000 (UTC)
-Received: from localhost (ovpn-116-10.gru2.redhat.com [10.97.116.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 490DE60BEC;
- Fri, 20 Dec 2019 19:20:45 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 3/3] numa: properly check if numa is supported
-Date: Fri, 20 Dec 2019 16:20:31 -0300
-Message-Id: <20191220192031.2226378-4-ehabkost@redhat.com>
-In-Reply-To: <20191220192031.2226378-1-ehabkost@redhat.com>
-References: <20191220192031.2226378-1-ehabkost@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iiNyl-0005Te-MW
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:30:29 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46386)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iiNyl-0005QJ-F5
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 14:30:27 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z7so10439679wrl.13
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 11:30:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=fVBS/jEpnraqYTazribvXULx/qw9cupenQEeYs0rQqk=;
+ b=Zc4fRFBQu/QARyZ5C8MrHqisLy2xA+bm3BuTfeBsjK79+Bvy3cVRuyHemJkArG7rTO
+ up5mfwB4sETFZyLtUzzws05Ya0hWIqaGUMe0KuUcA3JtpugEd6ELF7n9GKoPgF7R/wl6
+ jOJciaPyANhdixmrCgW+A2EkKupM4a+KAyERjdhsSrM8lVuoDoVcNHW4ZXgVak2fDN7I
+ 6MMnFQQ96m/FFJZctSmedyOcHrnGXFRKXaVFLSAMXE2tEM3yNQYBc2Daeq6xUXztUALv
+ 8aBBnO+b1wrMq0agnYmdjQrhClatFVsjeV+RWYHjCR0Xj+0X1CwyvzDGy0Cgi1qGi+yZ
+ XAhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=fVBS/jEpnraqYTazribvXULx/qw9cupenQEeYs0rQqk=;
+ b=PpTEDmc8ZwtIUXBsqd153mJ4yaOtFkn9cYcUiAzl4OOM8GXfd72gz5MQatFpprzek5
+ XNCjkiCpoqADAm/KctWvzK3HzAq7HvO0j2wQ4lRsDqYYuz87WLye7b1m+HjGoIblhftI
+ SRTxKBAy3dQSPQxF8369rklSHYmVt7SGahuWlgak16KG44wxnOb8EVfgeyS8DvXI4sh+
+ 0guRVOl4ghZMcepM9sYD0RrB/ZHI/ApfiLDGyttDtDTJHpHZYuKI696FmdHTnGiG8cQp
+ GYNoFyyyPsMfSvdJ6ca+eAPVAjPk8cjbr4cQbUOwq/Qu2LTzs1oZckZLY2Py/ls+jwiy
+ E0qQ==
+X-Gm-Message-State: APjAAAVzGm7YN2xINMZIKmOK15ILCM0QckY3s3zIXBos7ofDwjzooiHl
+ 9L/EzGI5pHAUrh+j5SDg/yH5mg==
+X-Google-Smtp-Source: APXvYqxE4Wvrt6myEvAlFuGPgyxuFLbMVgIUyz498KDprEt5hxCqrH9NVEzwl3WnYDJ1HeBTl7Y1gg==
+X-Received: by 2002:adf:fbc9:: with SMTP id d9mr17521615wrs.20.1576870226070; 
+ Fri, 20 Dec 2019 11:30:26 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x132sm14603657wmg.0.2019.12.20.11.30.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Dec 2019 11:30:24 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 1203E1FF87;
+ Fri, 20 Dec 2019 19:30:24 +0000 (GMT)
+References: <20191216221158.29572-1-richard.henderson@linaro.org>
+ <20191216221158.29572-23-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 22/28] target/xtensa: Remove MMU_MODE{0,1,2,3}_SUFFIX
+In-reply-to: <20191216221158.29572-23-richard.henderson@linaro.org>
+Date: Fri, 20 Dec 2019 19:30:24 +0000
+Message-ID: <87h81ubxrj.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 85yPauv1MeKXac_BPKRh8Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,76 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Igor Mammedov <imammedo@redhat.com>
 
-Commit aa57020774b, by mistake used MachineClass::numa_mem_supported
-to check if NUMA is supported by machine and also as unrelated change
-set it to true for sbsa-ref board.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Luckily change didn't break machines that support NUMA, as the field
-is set to true for them.
+> The functions generated by these macros are unused.
+>
+> Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-But the field is not intended for checking if NUMA is supported and
-will be flipped to false within this release for new machine types.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Fix it:
- - by using previously used condition
-      !mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id
-   the first time and then use MachineState::numa_state down the road
-   to check if NUMA is supported
- - dropping stray sbsa-ref chunk
+> ---
+>  target/xtensa/cpu.h | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+> index b363ffcf10..f5a7ea48bb 100644
+> --- a/target/xtensa/cpu.h
+> +++ b/target/xtensa/cpu.h
+> @@ -685,10 +685,6 @@ static inline uint32_t xtensa_replicate_windowstart(=
+CPUXtensaState *env)
+>  }
+>=20=20
+>  /* MMU modes definitions */
+> -#define MMU_MODE0_SUFFIX _ring0
+> -#define MMU_MODE1_SUFFIX _ring1
+> -#define MMU_MODE2_SUFFIX _ring2
+> -#define MMU_MODE3_SUFFIX _ring3
+>  #define MMU_USER_IDX 3
+>=20=20
+>  static inline int cpu_mmu_index(CPUXtensaState *env, bool ifetch)
 
-Fixes: aa57020774b690a22be72453b8e91c9b5a68c516
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1576154936-178362-3-git-send-email-imammedo@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/arm/sbsa-ref.c | 1 -
- hw/core/machine.c | 4 ++--
- 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index 5853bdee5c..9b5bcb5634 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -789,7 +789,6 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *=
-data)
-     mc->possible_cpu_arch_ids =3D sbsa_ref_possible_cpu_arch_ids;
-     mc->cpu_index_to_instance_props =3D sbsa_ref_cpu_index_to_props;
-     mc->get_default_cpu_node_id =3D sbsa_ref_get_default_cpu_node_id;
--    mc->numa_mem_supported =3D true;
- }
-=20
- static const TypeInfo sbsa_ref_info =3D {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 023548b4f3..e81f43cd0b 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -963,7 +963,7 @@ static void machine_initfn(Object *obj)
-                                         NULL);
-     }
-=20
--    if (mc->numa_mem_supported) {
-+    if (mc->cpu_index_to_instance_props && mc->get_default_cpu_node_id) {
-         ms->numa_state =3D g_new0(NumaState, 1);
-     }
-=20
-@@ -1107,7 +1107,7 @@ void machine_run_board_init(MachineState *machine)
- {
-     MachineClass *machine_class =3D MACHINE_GET_CLASS(machine);
-=20
--    if (machine_class->numa_mem_supported) {
-+    if (machine->numa_state) {
-         numa_complete_configuration(machine);
-         if (machine->numa_state->num_nodes) {
-             machine_numa_finish_cpu_init(machine);
 --=20
-2.23.0
-
+Alex Benn=C3=A9e
 
