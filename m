@@ -2,92 +2,83 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D5BC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:13:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3025C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:18:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 530A5206D3
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:13:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8302924679
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:18:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JBxpMjpo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 530A5206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=online.net header.i=@online.net header.b="WplczBaH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8302924679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=online.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiLq1-0005UM-Fo
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:13:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59631)
+	id 1iiLuo-0000CQ-JG
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:18:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiLpD-0004J4-VR
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:12:29 -0500
+ (envelope-from <fflorensa@online.net>) id 1iiLtm-0007v5-5D
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:17:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiLpC-0004I4-CA
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:12:27 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37930)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiLpC-0004G1-2P
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:12:26 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y17so10146663wrh.5
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 09:12:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:subject:in-reply-to:date:message-id
- :mime-version:content-transfer-encoding;
- bh=kDBaAcVOCGfiNZOMydGsbOx+i/UwgMxst3L8rRjBDKM=;
- b=JBxpMjpoSUqabqxyjVhip4UhXJNYlbAlT0w6wghF6+S+aycZu60AShxQ8ZJ3CT1ZBM
- N/VjL44csVBSiJPjkyiqTeP7CN5IlvwOfYC+olFh2UMNhgZ1SAJzEAdrPFvb2xcEKiET
- pSnK1DzmuP2/gpnlba7z5YYAL8iqw6FloKaLp3DdHU0z7o0GW6bf3XJK6Wb0dzEqXvbK
- AtDg78TfRMJhc5tSO3BF+oUu1WIhwQtSjYmcIXB5Omc3A6zo1TPP8/bX5EWpDmqSzLGY
- 8aL8Sp71Ll7zS80HBScaDw3LifhioTGCCiK88G5w8EAvTo8Krpr28HuOcJygCo7S57P7
- G8cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=kDBaAcVOCGfiNZOMydGsbOx+i/UwgMxst3L8rRjBDKM=;
- b=CRtKaQ8ZB+jBIRwx7hmpdMhdORXB+iHL6N4QZgNq83TZsjER1tTa0BS8VO8igFQiiz
- jqhN8a9fjn72pkCVilkcJWNJ1etrQ2E6LLHQOMnMvFHJBQgXZ/dzTKH/MGukY4vrlPR8
- wBeWecHdZgt+qNRIGNojMTaDvQne6eTddqKFVUmFgmJ+3DhOEs+pIOmGT3H+f3W2HKcR
- 2CcFgm5M/WMZDXFtK/W3kNeRk9dFe7kQdPU/yZEn/JeLbjdOBe6ZMLa7nyu2EHrXK9Y+
- rmDqYyULRcZEnRBquFIh5n1OIiAC9outohQ/gsEohvn7gHyR4GrtFKFks7XmqXxQBK3M
- Seiw==
-X-Gm-Message-State: APjAAAXdm1bSmPVNWH0S0QuHmuCmgn38fU0TPTcD2iujsI2SJz+KEgeU
- o8uMUcIFON5ld25rXOF8/ykMzKfzyKo=
-X-Google-Smtp-Source: APXvYqwp6U3nzT6GxJ3/fFqOE8wirMreSyoePNH8qELDaVIbtuYHM6TpsvG7WQ/QjfHDYKZ6tKFEQw==
-X-Received: by 2002:adf:f80c:: with SMTP id s12mr16160908wrp.1.1576861943629; 
- Fri, 20 Dec 2019 09:12:23 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x10sm10927373wrp.58.2019.12.20.09.12.22
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 09:12:22 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 97C081FF87
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:12:21 +0000 (GMT)
-References: <20191216221158.29572-1-richard.henderson@linaro.org>
- <20191216221158.29572-6-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 05/28] translator: Use cpu_ld*_code instead of
- open-coding
-In-reply-to: <20191216221158.29572-6-richard.henderson@linaro.org>
-Date: Fri, 20 Dec 2019 17:12:21 +0000
-Message-ID: <87woaqdiq2.fsf@linaro.org>
+ (envelope-from <fflorensa@online.net>) id 1iiLtj-0000p6-GH
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:17:08 -0500
+Received: from mail.online.net ([62.210.16.11]:46008)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <fflorensa@online.net>)
+ id 1iiLti-0000lZ-T4
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:17:07 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.online.net (Postfix) with ESMTP id C0CFDF2B8D49;
+ Fri, 20 Dec 2019 18:17:04 +0100 (CET)
+Received: from mail.online.net ([127.0.0.1])
+ by localhost (mail.online.net [127.0.0.1]) (amavisd-new, port 10032)
+ with ESMTP id CrzPPqzoe8AR; Fri, 20 Dec 2019 18:17:04 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by mail.online.net (Postfix) with ESMTP id 9A4D0F2B8E53;
+ Fri, 20 Dec 2019 18:17:04 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.online.net 9A4D0F2B8E53
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.net;
+ s=4EC61654-9574-11E8-870F-3D38CA7095BF; t=1576862224;
+ bh=zF2MAAx0O3svkEJw/YRXxOrkJrjWtsJISKf1mWOx3DA=;
+ h=Date:From:To:Message-ID:MIME-Version;
+ b=WplczBaH3vqxLVaUYRZG30Hj4jCX1HDS1bp52schnr2k5z/naax6enl2Lnkr70x0W
+ G5foS09Nq768LnHpTqSQZ7y5d/co66KZ1RSN9YFPp9c6HXjLWP41CfWOojnhARF/b/
+ 4oHgs6R8ECp1e6ZgZDA4pLdRNJxZuk6sj8zm4QZAKv5+cVK/ljW0TofLf51xmJLp2O
+ lLuCKXRpIE+G/yef0mjdqJFpNRY3Fl008Cfj1pqLe9Db0Llt4CUkborarjJ/zmU7WK
+ s+I8JqpZGeICbp0S/BUs1XOY14nVGWhm7BqDFUpIS/pUI101gb1ianyTjnl5HVFWwg
+ YPpGQied+21HA==
+X-Virus-Scanned: amavisd-new at mail.online.net
+Received: from mail.online.net ([127.0.0.1])
+ by localhost (mail.online.net [127.0.0.1]) (amavisd-new, port 10026)
+ with ESMTP id yxWJ6v_7i0_U; Fri, 20 Dec 2019 18:17:04 +0100 (CET)
+Received: from localhost (unknown [195.154.229.35])
+ by mail.online.net (Postfix) with ESMTPSA id 6EEC1F2B8D49;
+ Fri, 20 Dec 2019 18:17:04 +0100 (CET)
+Date: Fri, 20 Dec 2019 18:17:04 +0100
+From: Florian Florensa <fflorensa@online.net>
+To: dillaman@redhat.com
+Subject: Re: [PATCH] block/rbd: Add support for ceph namespaces
+Message-ID: <20191220171704.7qlh6gmulsvj45db@flash.localdomain>
+References: <20191219133416.671431-1-fflorensa@online.net>
+ <20191219145125.iwhxhzmt5mow5pea@steredhat>
+ <20191220141125.wxlm4eizbwie6522@flash.localdomain>
+ <CA+aFP1DuNzvWZo7d8sFX6UEYV175HKm0Wo9PJWyHs91dA_WkHQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="j5dba3slve6pqkyu"
+Content-Disposition: inline
+In-Reply-To: <CA+aFP1DuNzvWZo7d8sFX6UEYV175HKm0Wo9PJWyHs91dA_WkHQ@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 62.210.16.11
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,132 +90,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+--j5dba3slve6pqkyu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The DO_LOAD macros replicate the distinction already performed
-> by the cpu_ldst.h functions.  Use them.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Fri, Dec 20, 2019 at 09:56:51AM -0500, Jason Dillaman wrote:
+> On Fri, Dec 20, 2019 at 9:11 AM Florian Florensa <fflorensa@online.net> w=
+rote:
+> >
+> > Hello Stefano and Jason,
+> >
+> > First of all thanks for the quick reply,
+> > Response inline belowe
+> > > Hi Florian,
+> > >
+> > > I think we need to add (Since: 5.0).
+> >
+> > Are you implying by that (Since: 5.0) that we need to specify its
+> > availability target is qemu 5.0 ?
+>=20
+> FWIW, I took this as just a comment to add some documentation that the
+> field is only valid starting w/ qemu v5.
+>=20
+Works for me, will add this in v2.
+> > I guess that maybe a version check would be better ? Like try to do
+> > namespaces stuff only if we have a recent enough librbd in the system ?
+> > Using something like :
+> >
+> > int rbd_major;
+> >
+> > rbd_version(&rbd_major, NULL, NULL);
+> > /*
+> >  * Target only nautilus+ librbd for namespace support
+> > */
+> > if (rbd_major >=3D 14) // tar
+> >  <process namespace>
+>=20
+> Unfortunately, those versions weren't updated in the Mimic nor
+> Nautilus release so it would still return 1/12 (whoops). I think that
+> means you would need to add a probe in "configure" to test for librbd
+> namespace support (e.g. test for the existence of the `rbd_list2`
+> function or the `rbd_linked_image_spec_t` structure). I'll fix this
+> before the forthcoming Octopus release.
+Will see to do this, I originally wanted to do this at runtime so a Qemu
+built against an older librbd would work if the library was updated.
+Else some dlopen + dlsym trickery would work by checking for the
+existence of rbd_list2 in librbd.so, but I guess this might be a bad
+idea, as it would add code that would be useless in sometime
+>=20
+> > > The patch LGTM, but I'd like to use 'namespace' instead of cryptic
+> > > 'nspace'. (as BlockdevOptionsNVMe did)
+> > > What do you think?
+> > >
+> > Yes no worries, I can rename it to 'rbd_namespace' to avoid any possible
+> > confusion, is this Ok for you ?
+>=20
+> We use "pool_namespace" in the rbd CLI if you are trying to avoid the
+> word "namespace".
+>=20
+Yes I wanted to avoid namespace because it looks like the qapi generated
+code changes the name to something like q_namespace, will use
+pool_namespace in the v2.
+> > > With those fixed:
+> > >
+> > > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> > >
+> > > Thanks,
+> > > Stefano
+> >
+> > Regards,
+> > Florian
+>=20
+> --=20
+> Jason
+>=20
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Regards,
+Florian
 
-> ---
->  include/exec/cpu_ldst.h   | 11 ---------
->  include/exec/translator.h | 48 +++++++++++----------------------------
->  2 files changed, 13 insertions(+), 46 deletions(-)
->
-> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-> index cf8af36dbc..399ff6c3da 100644
-> --- a/include/exec/cpu_ldst.h
-> +++ b/include/exec/cpu_ldst.h
-> @@ -129,11 +129,6 @@ static inline void clear_helper_retaddr(void)
->  #include "exec/cpu_ldst_useronly_template.h"
->  #undef MEMSUFFIX
->=20=20
-> -/*
-> - * Code access is deprecated in favour of translator_ld* functions
-> - * (see translator.h). However there are still users that need to
-> - * converted so for now these stay.
-> - */
->  #define MEMSUFFIX _code
->  #define CODE_ACCESS
->  #define DATA_SIZE 1
-> @@ -455,12 +450,6 @@ void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr ad=
-dr, uint64_t val,
->  #undef CPU_MMU_INDEX
->  #undef MEMSUFFIX
->=20=20
-> -/*
-> - * Code access is deprecated in favour of translator_ld* functions
-> - * (see translator.h). However there are still users that need to
-> - * converted so for now these stay.
-> - */
-> -
->  #define CPU_MMU_INDEX (cpu_mmu_index(env, true))
->  #define MEMSUFFIX _code
->  #define SOFTMMU_CODE_ACCESS
-> diff --git a/include/exec/translator.h b/include/exec/translator.h
-> index 459dd72aab..638e1529c5 100644
-> --- a/include/exec/translator.h
-> +++ b/include/exec/translator.h
-> @@ -148,41 +148,19 @@ void translator_loop_temp_check(DisasContextBase *d=
-b);
->  /*
->   * Translator Load Functions
->   *
-> - * These are intended to replace the old cpu_ld*_code functions and
-> - * are mandatory for front-ends that have been migrated to the common
-> - * translator_loop. These functions are only intended to be called
-> - * from the translation stage and should not be called from helper
-> - * functions. Those functions should be converted to encode the
-> - * relevant information at translation time.
-> + * These are intended to replace the direct usage of the cpu_ld*_code
-> + * functions and are mandatory for front-ends that have been migrated
-> + * to the common translator_loop. These functions are only intended
-> + * to be called from the translation stage and should not be called
-> + * from helper functions. Those functions should be converted to encode
-> + * the relevant information at translation time.
->   */
->=20=20
-> -#ifdef CONFIG_USER_ONLY
-> -
-> -#define DO_LOAD(type, name, shift)               \
-> -    do {                                         \
-> -        set_helper_retaddr(1);                   \
-> -        ret =3D name ## _p(g2h(pc));               \
-> -        clear_helper_retaddr();                  \
-> -    } while (0)
-> -
-> -#else
-> -
-> -#define DO_LOAD(type, name, shift)                          \
-> -    do {                                                    \
-> -        int mmu_idx =3D cpu_mmu_index(env, true);             \
-> -        TCGMemOpIdx oi =3D make_memop_idx(shift, mmu_idx);    \
-> -        ret =3D helper_ret_ ## name ## _cmmu(env, pc, oi, 0); \
-> -    } while (0)
-> -
-> -#endif
-> -
-> -#define GEN_TRANSLATOR_LD(fullname, name, type, shift, swap_fn)         \
-> +#define GEN_TRANSLATOR_LD(fullname, type, load_fn, swap_fn)             \
->      static inline type                                                  \
->      fullname ## _swap(CPUArchState *env, abi_ptr pc, bool do_swap)      \
->      {                                                                   \
-> -        type ret;                                                       \
-> -        DO_LOAD(type, name, shift);                                     \
-> -                                                                        \
-> +        type ret =3D load_fn(env, pc);                                  =
-  \
->          if (do_swap) {                                                  \
->              ret =3D swap_fn(ret);                                       =
-  \
->          }                                                               \
-> @@ -195,11 +173,11 @@ void translator_loop_temp_check(DisasContextBase *d=
-b);
->          return fullname ## _swap(env, pc, false);                       \
->      }
->=20=20
-> -GEN_TRANSLATOR_LD(translator_ldub, ldub, uint8_t, 0, /* no swap */ )
-> -GEN_TRANSLATOR_LD(translator_ldsw, ldsw, int16_t, 1, bswap16)
-> -GEN_TRANSLATOR_LD(translator_lduw, lduw, uint16_t, 1, bswap16)
-> -GEN_TRANSLATOR_LD(translator_ldl, ldl, uint32_t, 2, bswap32)
-> -GEN_TRANSLATOR_LD(translator_ldq, ldq, uint64_t, 3, bswap64)
-> +GEN_TRANSLATOR_LD(translator_ldub, uint8_t, cpu_ldub_code, /* no swap */)
-> +GEN_TRANSLATOR_LD(translator_ldsw, int16_t, cpu_ldsw_code, bswap16)
-> +GEN_TRANSLATOR_LD(translator_lduw, uint16_t, cpu_lduw_code, bswap16)
-> +GEN_TRANSLATOR_LD(translator_ldl, uint32_t, cpu_ldl_code, bswap32)
-> +GEN_TRANSLATOR_LD(translator_ldq, uint64_t, cpu_ldq_code, bswap64)
->  #undef GEN_TRANSLATOR_LD
->=20=20
->  #endif  /* EXEC__TRANSLATOR_H */
+--j5dba3slve6pqkyu
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
---=20
-Alex Benn=C3=A9e
+iQIzBAEBCAAdFiEENMOcO22p59MYDr5mpFTgAOO+N4gFAl39AgsACgkQpFTgAOO+
+N4jjXhAAgSVYWGfpQBWX/pUFLhpiQHBC+PfW9lJQqjy7ka1P7JIEAUdLh6uPg0s3
+XX6dAU4TgYbaxt/zQlqn1grNk1MZP2HD/20mFTAftXEwHedf4dYrDW8RIsrYKKJ5
+Lk3SWwMeyNtFhDcKc+5sZA6ldN9vDhlpve8gUUf/QEe95cq9ubFjm1k7WuS/mWtP
+YRo+EYSiPc6+r6Iyzo+QSzgqrhJWuAdxOha4AzyivI3GUxyT6o+MdHSfCPKxLcOa
+Pt21B72eOT7NYubNzsqNWM+c0fPLYKGxKMRE/Zbq6MSYp6bMXMbEWG4+c/x+6v91
+sEEclLmpXMO1cN7Xy6Fb20AXm6zr2VS3Z6DW0cU/K78+w+oaRiFi8JjKPL5kOmpc
+n0Ni0wxatNTKPwCK5+L5nMFQNfPz+Yp+y0EiaUYKTksa9tkXdHTfZ6D4xVYHx32p
+sDzpCXqy6pKKl1w2xrnF/HfyzZoukRldUuW0MidIu+xJuZyzs1JsK2uutpUQrHQ5
+AEMudrX5+pqUUgG/e+AMssV0Un6IDlnYpSolymxTZ1BoMHDzPMlJavmQ00+eUvGo
+x9mB0DOZpkpvYiY1kMHsr4+Ge7QM133TtHDHYn9/gUFfy4B6zxHa6nJ5+L2MUKZM
+OR1V6+WXyrDz3mhaJa/Wv8jXA3cjEZNZgBeKi4LQFJkasP6hgxQ=
+=/dox
+-----END PGP SIGNATURE-----
+
+--j5dba3slve6pqkyu--
 
