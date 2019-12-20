@@ -2,75 +2,95 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C8FC2D0D2
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D5BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 012C621D7D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:12:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 012C621D7D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 530A5206D3
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:13:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JBxpMjpo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 530A5206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiLpK-0004Cs-4j
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:12:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56703)
+	id 1iiLq1-0005UM-Fo
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:13:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iiLoY-0003FG-NX
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:11:48 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iiLpD-0004J4-VR
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:12:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iiLoX-0003SK-AM
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:11:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33970)
+ (envelope-from <alex.bennee@linaro.org>) id 1iiLpC-0004I4-CA
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:12:27 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37930)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iiLoX-0003QQ-0a
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:11:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iiLoU-0007mk-Nd
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:11:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id ACE092E80CE
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:11:39 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 20 Dec 2019 17:02:28 -0000
-From: ecsdn <1856834@bugs.launchpad.net>
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iiLpC-0004G1-2P
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:12:26 -0500
+Received: by mail-wr1-x444.google.com with SMTP id y17so10146663wrh.5
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 09:12:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=kDBaAcVOCGfiNZOMydGsbOx+i/UwgMxst3L8rRjBDKM=;
+ b=JBxpMjpoSUqabqxyjVhip4UhXJNYlbAlT0w6wghF6+S+aycZu60AShxQ8ZJ3CT1ZBM
+ N/VjL44csVBSiJPjkyiqTeP7CN5IlvwOfYC+olFh2UMNhgZ1SAJzEAdrPFvb2xcEKiET
+ pSnK1DzmuP2/gpnlba7z5YYAL8iqw6FloKaLp3DdHU0z7o0GW6bf3XJK6Wb0dzEqXvbK
+ AtDg78TfRMJhc5tSO3BF+oUu1WIhwQtSjYmcIXB5Omc3A6zo1TPP8/bX5EWpDmqSzLGY
+ 8aL8Sp71Ll7zS80HBScaDw3LifhioTGCCiK88G5w8EAvTo8Krpr28HuOcJygCo7S57P7
+ G8cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=kDBaAcVOCGfiNZOMydGsbOx+i/UwgMxst3L8rRjBDKM=;
+ b=CRtKaQ8ZB+jBIRwx7hmpdMhdORXB+iHL6N4QZgNq83TZsjER1tTa0BS8VO8igFQiiz
+ jqhN8a9fjn72pkCVilkcJWNJ1etrQ2E6LLHQOMnMvFHJBQgXZ/dzTKH/MGukY4vrlPR8
+ wBeWecHdZgt+qNRIGNojMTaDvQne6eTddqKFVUmFgmJ+3DhOEs+pIOmGT3H+f3W2HKcR
+ 2CcFgm5M/WMZDXFtK/W3kNeRk9dFe7kQdPU/yZEn/JeLbjdOBe6ZMLa7nyu2EHrXK9Y+
+ rmDqYyULRcZEnRBquFIh5n1OIiAC9outohQ/gsEohvn7gHyR4GrtFKFks7XmqXxQBK3M
+ Seiw==
+X-Gm-Message-State: APjAAAXdm1bSmPVNWH0S0QuHmuCmgn38fU0TPTcD2iujsI2SJz+KEgeU
+ o8uMUcIFON5ld25rXOF8/ykMzKfzyKo=
+X-Google-Smtp-Source: APXvYqwp6U3nzT6GxJ3/fFqOE8wirMreSyoePNH8qELDaVIbtuYHM6TpsvG7WQ/QjfHDYKZ6tKFEQw==
+X-Received: by 2002:adf:f80c:: with SMTP id s12mr16160908wrp.1.1576861943629; 
+ Fri, 20 Dec 2019 09:12:23 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x10sm10927373wrp.58.2019.12.20.09.12.22
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Dec 2019 09:12:22 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 97C081FF87
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:12:21 +0000 (GMT)
+References: <20191216221158.29572-1-richard.henderson@linaro.org>
+ <20191216221158.29572-6-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <157686134861.27735.4167922142644220101.malone@chaenomeles.canonical.com>
-Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0d58c874ea626c549d4eee5ebdbb596155dfbd56
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Subject: Re: [PATCH v2 05/28] translator: Use cpu_ld*_code instead of
+ open-coding
+In-reply-to: <20191216221158.29572-6-richard.henderson@linaro.org>
+Date: Fri, 20 Dec 2019 17:12:21 +0000
+Message-ID: <87woaqdiq2.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,106 +99,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks I tried with:
 
-/root/QEMU/qemu-git-4.2.0rc4/qemu/build/ppc-softmmu/qemu-system-ppc -M
-mpc8544ds -nographic -kernel /home/me/boot/uImage-2.6.32 -append
-"root=3D/dev/vda rw" -device virtio-blk-pci,drive=3Ddrive0,disable-
-modern=3Dtrue -drive
-file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-And again it worked with qemu 2.8.1 but failed with the above 4.2.0rc4
-on the same x86_64 host.
+> The DO_LOAD macros replicate the distinction already performed
+> by the cpu_ldst.h functions.  Use them.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-On another x86_64 host I confirmed that the below works with qemu 2.8.0
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-root@myserver:~# qemu-system-ppc -M mpc8544ds -nographic -kernel
-/home/me/boot/uImage-2.6.32 -append "root=3D/dev/vda rw" -device virtio-
-blk-pci,drive=3Ddrive0,disable-modern=3Dtrue -drive
-file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
+> ---
+>  include/exec/cpu_ldst.h   | 11 ---------
+>  include/exec/translator.h | 48 +++++++++++----------------------------
+>  2 files changed, 13 insertions(+), 46 deletions(-)
+>
+> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+> index cf8af36dbc..399ff6c3da 100644
+> --- a/include/exec/cpu_ldst.h
+> +++ b/include/exec/cpu_ldst.h
+> @@ -129,11 +129,6 @@ static inline void clear_helper_retaddr(void)
+>  #include "exec/cpu_ldst_useronly_template.h"
+>  #undef MEMSUFFIX
+>=20=20
+> -/*
+> - * Code access is deprecated in favour of translator_ld* functions
+> - * (see translator.h). However there are still users that need to
+> - * converted so for now these stay.
+> - */
+>  #define MEMSUFFIX _code
+>  #define CODE_ACCESS
+>  #define DATA_SIZE 1
+> @@ -455,12 +450,6 @@ void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr ad=
+dr, uint64_t val,
+>  #undef CPU_MMU_INDEX
+>  #undef MEMSUFFIX
+>=20=20
+> -/*
+> - * Code access is deprecated in favour of translator_ld* functions
+> - * (see translator.h). However there are still users that need to
+> - * converted so for now these stay.
+> - */
+> -
+>  #define CPU_MMU_INDEX (cpu_mmu_index(env, true))
+>  #define MEMSUFFIX _code
+>  #define SOFTMMU_CODE_ACCESS
+> diff --git a/include/exec/translator.h b/include/exec/translator.h
+> index 459dd72aab..638e1529c5 100644
+> --- a/include/exec/translator.h
+> +++ b/include/exec/translator.h
+> @@ -148,41 +148,19 @@ void translator_loop_temp_check(DisasContextBase *d=
+b);
+>  /*
+>   * Translator Load Functions
+>   *
+> - * These are intended to replace the old cpu_ld*_code functions and
+> - * are mandatory for front-ends that have been migrated to the common
+> - * translator_loop. These functions are only intended to be called
+> - * from the translation stage and should not be called from helper
+> - * functions. Those functions should be converted to encode the
+> - * relevant information at translation time.
+> + * These are intended to replace the direct usage of the cpu_ld*_code
+> + * functions and are mandatory for front-ends that have been migrated
+> + * to the common translator_loop. These functions are only intended
+> + * to be called from the translation stage and should not be called
+> + * from helper functions. Those functions should be converted to encode
+> + * the relevant information at translation time.
+>   */
+>=20=20
+> -#ifdef CONFIG_USER_ONLY
+> -
+> -#define DO_LOAD(type, name, shift)               \
+> -    do {                                         \
+> -        set_helper_retaddr(1);                   \
+> -        ret =3D name ## _p(g2h(pc));               \
+> -        clear_helper_retaddr();                  \
+> -    } while (0)
+> -
+> -#else
+> -
+> -#define DO_LOAD(type, name, shift)                          \
+> -    do {                                                    \
+> -        int mmu_idx =3D cpu_mmu_index(env, true);             \
+> -        TCGMemOpIdx oi =3D make_memop_idx(shift, mmu_idx);    \
+> -        ret =3D helper_ret_ ## name ## _cmmu(env, pc, oi, 0); \
+> -    } while (0)
+> -
+> -#endif
+> -
+> -#define GEN_TRANSLATOR_LD(fullname, name, type, shift, swap_fn)         \
+> +#define GEN_TRANSLATOR_LD(fullname, type, load_fn, swap_fn)             \
+>      static inline type                                                  \
+>      fullname ## _swap(CPUArchState *env, abi_ptr pc, bool do_swap)      \
+>      {                                                                   \
+> -        type ret;                                                       \
+> -        DO_LOAD(type, name, shift);                                     \
+> -                                                                        \
+> +        type ret =3D load_fn(env, pc);                                  =
+  \
+>          if (do_swap) {                                                  \
+>              ret =3D swap_fn(ret);                                       =
+  \
+>          }                                                               \
+> @@ -195,11 +173,11 @@ void translator_loop_temp_check(DisasContextBase *d=
+b);
+>          return fullname ## _swap(env, pc, false);                       \
+>      }
+>=20=20
+> -GEN_TRANSLATOR_LD(translator_ldub, ldub, uint8_t, 0, /* no swap */ )
+> -GEN_TRANSLATOR_LD(translator_ldsw, ldsw, int16_t, 1, bswap16)
+> -GEN_TRANSLATOR_LD(translator_lduw, lduw, uint16_t, 1, bswap16)
+> -GEN_TRANSLATOR_LD(translator_ldl, ldl, uint32_t, 2, bswap32)
+> -GEN_TRANSLATOR_LD(translator_ldq, ldq, uint64_t, 3, bswap64)
+> +GEN_TRANSLATOR_LD(translator_ldub, uint8_t, cpu_ldub_code, /* no swap */)
+> +GEN_TRANSLATOR_LD(translator_ldsw, int16_t, cpu_ldsw_code, bswap16)
+> +GEN_TRANSLATOR_LD(translator_lduw, uint16_t, cpu_lduw_code, bswap16)
+> +GEN_TRANSLATOR_LD(translator_ldl, uint32_t, cpu_ldl_code, bswap32)
+> +GEN_TRANSLATOR_LD(translator_ldq, uint64_t, cpu_ldq_code, bswap64)
+>  #undef GEN_TRANSLATOR_LD
+>=20=20
+>  #endif  /* EXEC__TRANSLATOR_H */
 
-But again even on this system 4.2.0 failes with that same command:
-root@myserver:~# /root/QEMU/qemu-4.2.0/build/ppc-softmmu/qemu-system-ppc -M=
- mpc8544ds -nographic -kernel /home/me/boot/uImage-2.6.32 -append "root=3D/=
-dev/vda rw" -device virtio-blk-pci,drive=3Ddrive0,disable-modern=3Dtrue -dr=
-ive file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
 
-Fails/freezes at the same vda: location.
-
-Running it from its installed location didn't help, the following still
-failed at vda: also.
-
-root@myserver:/opt/qemu4.2.0/bin# ./qemu-system-ppc -M mpc8544ds
--nographic -kernel /home/me/boot/uImage-2.6.32 -append "root=3D/dev/vda
-rw" -device virtio-blk-pci,drive=3Ddrive0,disable-modern=3Dtrue -drive
-file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
-
-Although I didn't think its required for the softmmu qemu "emulation"
-only, ie not "kvm", I even enabled kvm as well as DMAR+IOMMU on the
-kernel and recompiled 4.2.0 but had same vda: failure.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
-
-Title:
-  Virtio broken in qemu ppc in 4.2.0 and other versions
-
-Status in QEMU:
-  New
-
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
-
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
-
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
-
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
