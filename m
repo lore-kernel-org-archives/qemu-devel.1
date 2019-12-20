@@ -2,91 +2,83 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E502AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7843C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADBFE24687
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:37:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96702218AC
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:38:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xBPtiOQm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADBFE24687
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/q6dP0d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96702218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJPg-0003xn-Ph
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:37:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60901)
+	id 1iiJQG-0004zh-Na
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:38:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiJ3d-0005J9-MG
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:15:10 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iiJHF-0000UJ-8N
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:29:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiJ3c-0000CT-AG
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:15:09 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38528)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iiJHD-0007Cp-Pj
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:29:12 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45073)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiJ3b-00009T-OW
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:15:07 -0500
-Received: by mail-wm1-x344.google.com with SMTP id u2so9384687wmc.3
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 06:15:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=sK71ZzdC0Xdg4oImE2x3EkUlnXucYhoEV5hIXb2aFBM=;
- b=xBPtiOQmOa8ce0sgop4hBXqusg8TLmJE3JvcNJvj84JcAbQEQKV2qLC1vXj1ehCRUG
- Egj4TSgLUoNZP4RsEnO8FDszyIsf62e5a47vdgyfa78TY+v42K9fIPabGbnZ6OgdDLXI
- /BFazpB/28So1IzSE4LVLpMfy2aJiwU0Dja6744uKRwU/wo84C/cVOlyWSXas/D+7j7f
- y//lD2hpLezzagYL/fkEQWOGnTaoKkkPNSKUtkQzwNcp9e+4k1POoiXJPx0Pfw4joGlV
- FrZ+sqf1czC0VoPMkC2fUkLjVL1JDS2vsgrYYTcReiOhR5juuqlJSbNHX62ZxTdfdjyT
- lqbQ==
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iiJHD-00076m-Fw
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:29:11 -0500
+Received: by mail-wr1-x443.google.com with SMTP id j42so9574880wrj.12
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 06:29:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=G9Aw4/kNg3vcw8vax8uibZv8AAkyijCI6PeyUx9IoSE=;
+ b=j/q6dP0dzWp/3lQm02lEburUE39mKqImuDYfSwA16cZ7GrkMu3g9+HzkKNgkPbJjTQ
+ 2DPz0pp33Z4qBDRlWLkJDPhufOEN23MlCZOzY49Z+Uym0Dof3xSphaSo3frIGRy/ynF+
+ ao/SDRmMxy9P9sqUNbktQI3RxcjsbumHDq4x/9pNL5P38yVEidMCwpjD544x52hFCYpU
+ kmvoGxTC7oSQxbxBDuncoXTm4JKRNnvUTAoLnpD+ndb8RvhdrvVm2EUzKdB1Ckb8s3T0
+ xxoNbfthCmQ4Ihkckmo8lK49PGJe2XUSxC/xgQmyg2rh60H3ntoXmnm/BQR842K7w+e3
+ +rQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=sK71ZzdC0Xdg4oImE2x3EkUlnXucYhoEV5hIXb2aFBM=;
- b=HPOfUs8c8MoucWbSud397xa8FlShGJmZYOucf+jSl9/qdIG0iE0uRnFEGljsN+z+YE
- dFoNMLkTxhxubGUaWanGzG6fomrn/X9n164eCoWsAybEG/zKpl3iG4wRbeYvyCBEu8kO
- rbd17XXC6+c5czV0NnBIsvIDpZC7Hb5HjnUcjcoYrV+CNsnHPh7a+Shv9qp3TyPbowZ0
- R/Dz6cfYi93AdN+huaY7ndBMOhqumyD5cS5XVTLr4dXlTnZTJbL3bv6/qP3nHwgyushW
- BHQQNU5DrYQYH2rW5daHmuPPBoL2alA5nKaGR+O02LA42mPCluhao4OcySzSqpJXjjyl
- hnMQ==
-X-Gm-Message-State: APjAAAU8bCUkbuxlUMDa5J2jhIUhlI5qM1YxoFsKkpIHdplaMa//0pEc
- OwBI/cHQPDueKWWUYkMdACFdTA==
-X-Google-Smtp-Source: APXvYqxq9E5MagbM9dz40HNpykcKND/58oG9ZbSuuYMSYQDGcSf2VTaXMhG7EpCF/w+hHwI1EXq1DQ==
-X-Received: by 2002:a1c:a9c6:: with SMTP id
- s189mr17155793wme.151.1576851306342; 
- Fri, 20 Dec 2019 06:15:06 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a14sm10371202wrx.81.2019.12.20.06.15.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 06:15:05 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 74C821FF87;
- Fri, 20 Dec 2019 14:15:04 +0000 (GMT)
-References: <20191216221158.29572-1-richard.henderson@linaro.org>
- <20191216221158.29572-2-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 01/28] target/xtensa: Use probe_access for itlb_hit_test
-In-reply-to: <20191216221158.29572-2-richard.henderson@linaro.org>
-Date: Fri, 20 Dec 2019 14:15:04 +0000
-Message-ID: <878sn7dqxj.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=G9Aw4/kNg3vcw8vax8uibZv8AAkyijCI6PeyUx9IoSE=;
+ b=JdBuAUiMAwzhGb2OOto7kizJ3ylew3M6701uE7y7r3NRwBTvqyf5psgU5L/WjMtRJl
+ 3clU1OaSAH4wCiJFjlIP/asCA4rg0mHwc8CVs/txLGEn2tvpe2KHcN4HxuDKNw4JFbWG
+ oxJ+DA4RLKPwrhaBPVzvV8zagPcDy0qtTy0KULMP3N4bByhzYmvabc/qLxypMRboJFTc
+ uCKE1uhtljJEOb95qEBS1oXTKkJVOSLbmskmPw6/GpMTs9LATCUMDKpSbLi7i5GJEEKm
+ RX+PxrdhkdOgjNXkk8K+Z38Mrw9m5VX7a3t5A+sPjfvye6Zgm8lUQ6Io98CMXSqYasaW
+ HiEg==
+X-Gm-Message-State: APjAAAWkSmsVH591F1ibxhVOb8XsEA6XxETc4Da3XWIZT/OI6ERc8tmG
+ ON44JG7LGbGgr9wtSy5DUBs9j5uWqgX7gkwlcew=
+X-Google-Smtp-Source: APXvYqzmWRGO4qUN4k/JBpDAX10a9aQ+tJkCT9jAFjHzkrb2SiK8TH4kIUDHCjegUVG6+JT4C8UXTS4+ET1yRm2F6Jk=
+X-Received: by 2002:a5d:4a84:: with SMTP id o4mr15452496wrq.396.1576852150100; 
+ Fri, 20 Dec 2019 06:29:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20191219123029.200788-1-marcandre.lureau@redhat.com>
+ <20191219123029.200788-10-marcandre.lureau@redhat.com>
+ <20191220141452.GP1699760@redhat.com>
+In-Reply-To: <20191220141452.GP1699760@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 20 Dec 2019 18:28:54 +0400
+Message-ID: <CAJ+F1CJmj6eJcbd0faGRA+wp=06zVprR2HBkiNmLeBPdGdXtOg@mail.gmail.com>
+Subject: Re: [PATCH v7 9/9] tests: add dbus-vmstate-test
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,49 +90,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> We don't actually need the result of the read, only to probe that the
-> memory mapping exists.  This is exactly what probe_access does.
+On Fri, Dec 20, 2019 at 6:24 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
 >
-> This is also the only user of any cpu_ld*_code_ra function.
-> Removing this allows the interface to be removed shortly.
+> On Thu, Dec 19, 2019 at 04:30:29PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  MAINTAINERS                  |   1 +
+> >  roms/SLOF                    |   2 +-
+> >  tests/Makefile.include       |  22 +-
+> >  tests/dbus-vmstate-daemon.sh |  95 +++++++++
+> >  tests/dbus-vmstate-test.c    | 382 +++++++++++++++++++++++++++++++++++
+> >  tests/dbus-vmstate1.xml      |  12 ++
+> >  6 files changed, 512 insertions(+), 2 deletions(-)
+> >  create mode 100755 tests/dbus-vmstate-daemon.sh
+> >  create mode 100644 tests/dbus-vmstate-test.c
+> >  create mode 100644 tests/dbus-vmstate1.xml
 >
-> Acked-by: Max Filippov <jcmvbkbc@gmail.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/xtensa/mmu_helper.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/target/xtensa/mmu_helper.c b/target/xtensa/mmu_helper.c
-> index f15bff306f..b01ff9399a 100644
-> --- a/target/xtensa/mmu_helper.c
-> +++ b/target/xtensa/mmu_helper.c
-> @@ -63,10 +63,11 @@
->  void HELPER(itlb_hit_test)(CPUXtensaState *env, uint32_t vaddr)
->  {
->      /*
-> -     * Attempt the memory load; we don't care about the result but
-> +     * Probe the memory; we don't care about the result but
->       * only the side-effects (ie any MMU or other exception)
->       */
-> -    cpu_ldub_code_ra(env, vaddr, GETPC());
-> +    probe_access(env, vaddr, 1, MMU_INST_FETCH,
-> +                 cpu_mmu_index(env, true), GETPC());
->  }
->=20=20
->  void HELPER(wsr_rasid)(CPUXtensaState *env, uint32_t v)
+> > diff --git a/roms/SLOF b/roms/SLOF
+> > index 9546892a80..8ebf2f55e1 160000
+> > --- a/roms/SLOF
+> > +++ b/roms/SLOF
+> > @@ -1 +1 @@
+> > -Subproject commit 9546892a80d5a4c73deea6719de46372f007f4a6
+> > +Subproject commit 8ebf2f55e1ba1492b942ba4b682160e644fc0f98
+>
+> Accidental change. With that removed
+>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+argh, removed, thanks
+
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+>
+>
 
 
 --=20
-Alex Benn=C3=A9e
+Marc-Andr=C3=A9 Lureau
 
