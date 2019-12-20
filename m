@@ -2,90 +2,81 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E19F9C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E3DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF40E206A5
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACFAC206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:23:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HRklYU2F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF40E206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C2WsHvtX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACFAC206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJBm-0000MM-JE
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:23:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45705)
+	id 1iiJBp-0000Qq-Jg
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:23:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vkuznets@redhat.com>) id 1iiJ1d-0001UO-9V
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:13:06 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iiIow-0007fP-Tq
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vkuznets@redhat.com>) id 1iiJ1b-0001ta-67
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:13:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40395
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1iiJ1a-0001rv-IP
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 09:13:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576851181;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=twfYvP7Rti+Ll6qhjoYOHdpbOLgfz64KQuSFiOtxCqs=;
- b=HRklYU2FwYdBOiFRoOYITQNZuzgA+tanH2UzXydh+g/tqEgrMaTTHUTVBGY/WkcW89+tpX
- IL/BHEzwMoCJtgFFmouTtAxQSXtN7f3lnoSMjQnrcQG7zSJWxHts/z3vjtTLJJfh79AQwe
- XJt9dZIiWesM4fCxKm6bNDGG0mTvan4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-Kck_GJ98MuWwA9m5W8nBWg-1; Fri, 20 Dec 2019 09:11:30 -0500
-Received: by mail-wr1-f72.google.com with SMTP id b13so3815595wrx.22
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 06:11:30 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1iiIov-0001l2-Kl
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:59:58 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33822)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iiIou-0001fN-W4
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:59:57 -0500
+Received: by mail-ot1-x341.google.com with SMTP id a15so12008858otf.1
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 05:59:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ELpgbcB63eyC8D0t7Z4Fvx7gbMm7zBoq3zJjp0z7mJs=;
+ b=C2WsHvtXy749gvkXphiJQTFHdm/9pOO9gjYmzXfaMLqdg68HFmS3occ6TK1MSzXdyb
+ uUmtq1l2Po1yfQpIgwdvSzEpC1uFhJAh+kyjBMD+mNCVzYn6dXscMcqBrGEh3zzEnZsO
+ 8JyRWZtXbDIB5QdXXP2eFjy4UT5TlMOPrJZUCExUXpdPXMejY+y9M+Xwr0Vvkd4AxszA
+ z28XwAmP270e3O4nXANpuVyISK8HH/ZfARLCWsT8YvVejQkspcLyKx/t/uPMDb6bULvj
+ P6l0OlDwUPI+f/VomsNt6imSbigMkNHTUseeuFb0hbKpa91s00rtXGiGZOTJcW9tAMTr
+ jATw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version;
- bh=rSstiuPwsxCdOdbtt6QYA+NFPFZfCutVCRv5Y4LrQtg=;
- b=Z5qAdvJuVTWL6UdWxxFC3jn9knR/0blS4u/7rE0Pc7hsEirFzOjgiCX+ffM2A/+GnB
- zj19Qzp+yz7YWlOjxo8kpZsJrzOaDBjCr1OiAqn1Xf0wGTzoSUTTsesUuTGUKyVGcCQZ
- Md8jMEBH3e+E4gqFVUqVBw5jnd4wa64mcGaZzCe4BdR3JH3FQZgpXxV0vFh0t+u7X4b7
- H9pobkMc0qZBzHfcwrZ8h9Qce1CO1tQVz5iWM19vZ0p9y6T2dUjcZCEjRQbGiGfRPBbr
- eVrlu5e/2kdq4+XFWApgDqkTz3dsq2VSAs5sshhfT8i9bpRxS7fsTQuZDJ5RqdbUGbJ5
- wT/w==
-X-Gm-Message-State: APjAAAUlQR07hGFkKZp8oyGzT3DCj30iHB1rSfUCAWNJ0FnmGG92yjxq
- BYkEyCuwbfgHxgnqiVDNzvyxi86Cb2B8URASt9RRXXSBpirmYUeDKfmYKR5jzKVBeS++y544qiJ
- bn6PPJqJngna4nFk=
-X-Received: by 2002:adf:fc08:: with SMTP id i8mr16345963wrr.82.1576851089424; 
- Fri, 20 Dec 2019 06:11:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwMUu7aoQKbmLpTX1OqBrK+7q5P8Ruf92MUKJlD/sDm5ZPDJF+w+Y74x7f+sZjaU0bPtkdPzw==
-X-Received: by 2002:adf:fc08:: with SMTP id i8mr16345938wrr.82.1576851089223; 
- Fri, 20 Dec 2019 06:11:29 -0800 (PST)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com.
- [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id z124sm3083131wmc.20.2019.12.20.06.11.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 20 Dec 2019 06:11:28 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [BUG] No irqchip created after commit 11bc4a13d1f4 ("kvm: convert
- "-machine kernel_irqchip" to an accelerator property")
-Date: Fri, 20 Dec 2019 15:11:27 +0100
-Message-ID: <87eewz84ts.fsf@vitty.brq.redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ELpgbcB63eyC8D0t7Z4Fvx7gbMm7zBoq3zJjp0z7mJs=;
+ b=O2MI0MciVvvCYPpv2/MX+7GFURzwDFBs8nPIDvyJuTUgq3rXA8xxazNQ4Xp7Qo+Uub
+ j3gk7WnAh+psJWiHWFWo70PeAbblrqtpYrJl8leYxGEzdTcQoH7um9ytrpsZJAL9LIZb
+ Xp7mXncoZ6UmDJbDV9YYGiAJF9pfZrya35kK3ESYcs1KjhXqhg7nnavEINAXVfKhsEx1
+ Pfplou7wUl56zUm2yPwpG00wnNFtuVAUnkQ7KxgA3sFcCjXNJl3cNHsbuihV9slfovIJ
+ a/p2cXZWuGHqf+qtuC3Zj7C2H49YXaHQiugSMcdB1uwNSTeKcFFac/p75+WgLVDR3Y8v
+ QQDA==
+X-Gm-Message-State: APjAAAUB2F/Vze583Ok8IIMB55xhzC/IC7HyXWPx8ABAnAIIHM5oygeA
+ Re3NvejNKfihU8Qn5VajPQZkqPZWgr0A8j6IgM1dog==
+X-Google-Smtp-Source: APXvYqx7n0BA5B96/Ii01kjGjFm+xgRen7pmR5PfmX7v1txRP32lWTBvNQpd//WBSZzfX7adDf5Ee80hbYzlEgEMyeU=
+X-Received: by 2002:a9d:8cb:: with SMTP id 69mr1308538otf.221.1576850395953;
+ Fri, 20 Dec 2019 05:59:55 -0800 (PST)
 MIME-Version: 1.0
-X-MC-Unique: Kck_GJ98MuWwA9m5W8nBWg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191217210230.99559-1-jeff.kubascik@dornerworks.com>
+ <7a274247-e593-5828-73f8-2042971e8633@linaro.org>
+ <CAFEAcA8Egy=Jkw8yKSumkeX=+Qxi8bPy-0fJjopHR6gCmz3FLQ@mail.gmail.com>
+ <e8daa5c4-ba9a-a6dc-1037-7eec6335ad0b@dornerworks.com>
+In-Reply-To: <e8daa5c4-ba9a-a6dc-1037-7eec6335ad0b@dornerworks.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 20 Dec 2019 13:59:45 +0000
+Message-ID: <CAFEAcA8Dxwsx4dUuq4YjD9zYCJEW5gsYc=99nH=YgZTF4Ay2aw@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: fix IL bit for data abort exceptions
+To: Jeff Kubascik <jeff.kubascik@dornerworks.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,35 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Jarvis Roach <Jarvis.Roach@dornerworks.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I apologize if this was already reported,
+On Fri, 20 Dec 2019 at 13:53, Jeff Kubascik
+<jeff.kubascik@dornerworks.com> wrote:
+>
+> On 12/19/2019 7:43 AM, Peter Maydell wrote:
+> > On Wed, 18 Dec 2019 at 01:03, Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> On 12/17/19 11:02 AM, Jeff Kubascik wrote:
+> >>> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+> >>> index 5feb312941..e63f8bda29 100644
+> >>> --- a/target/arm/tlb_helper.c
+> >>> +++ b/target/arm/tlb_helper.c
+> >>> @@ -44,7 +44,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+> >>>          syn = syn_data_abort_with_iss(same_el,
+> >>>                                        0, 0, 0, 0, 0,
+> >>>                                        ea, 0, s1ptw, is_write, fsc,
+> >>> -                                      false);
+> >>> +                                      true);
+> >>>          /* Merge the runtime syndrome with the template syndrome.  */
+> >>>          syn |= template_syn;
+> >>
+> >> This doesn't look correct.  Surely the IL bit should come from template_syn?
+> >
+> > Yes. In translate.c we put it into the syndrome information by
+> > passing true/false to syn_data_abort_with_iss() depending on
+> > whether the issinfo passed in to disas_set_da_iss() has the
+> > ISSIs16Bit flag set.
+> >
+> > I think this is a regression introduced in commit 46beb58efbb8a2a32
+> > when we converted the Thumb decoder over to decodetree. Before that
+> > 16 bit Thumb insns were in a different place in the old decoder and
+> > the 16-bit Thumb path passed ISSIs16Bit in with its issflags.
+> > (We should cc: qemu-stable@nongnu.org on the fix for this.)
+>
+> The problem here was syn_data_abort_with_iss would return syn with the IL bit
+> set, which carries through when it gets or'd with template_syn. I had to change
+> the is_16bit argument to true so that it clear the IL bit.
 
-I just noticed that with the latest updates QEMU doesn't start with the
-following configuration:
+Interesting. I think that's an entirely separate (and long
+standing) bug to the regression where we forgot to fill in ISSIs16Bit
+in the issinfo field, and it masks the other bug...
 
-qemu-system-x86_64 -name guest=3Dwin10 -machine pc,accel=3Dkvm -cpu host,hv=
-_vpindex,hv_synic ...
-
-qemu-system-x86_64: failed to turn on HyperV SynIC in KVM: Invalid argument
-qemu-system-x86_64: kvm_init_vcpu failed: Invalid argument
-
-If I add 'kernel-irqchip=3Dsplit' or ',kernel-irqchip=3Don' it starts as
-usual. I bisected this to the following commit:
-
-commit 11bc4a13d1f4b07dafbd1dda4d4bf0fdd7ad65f2 (HEAD, refs/bisect/bad)
-Author: Paolo Bonzini <pbonzini@redhat.com>
-Date:   Wed Nov 13 10:56:53 2019 +0100
-
-    kvm: convert "-machine kernel_irqchip" to an accelerator property
-   =20
-so aparently we now default to 'kernel_irqchip=3Doff'. Is this the desired
-behavior?
-
---=20
-Vitaly
-
+thanks
+-- PMM
 
