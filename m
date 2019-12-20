@@ -2,79 +2,117 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 770EAC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEBDC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:13:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32CEA2072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:12:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13C692072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 15:13:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="My1pkBHU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32CEA2072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uE/KYG4m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C692072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiJxV-0007w8-Bo
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:12:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47390)
+	id 1iiJy3-0000WG-6x
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 10:13:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60154)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiJrv-000056-Km
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:07:13 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iiJwT-0006pN-6X
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:11:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiJrt-0001AZ-Eo
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:07:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33975
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iiJrt-00019s-8u
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:07:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576854424;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=m3d+YQLgMit//YMa+xYvNdkMlbWxAdGpbAswKH8oIyk=;
- b=My1pkBHUYyR7eExT7cxeVd8yd1rVtfjIqlk7FqCixHDC14jZR6AeT0Jnf2gpYpu6vMXdFQ
- 69oVGt8Cbgu80HzCftDzyCyWeGXb/DBa5fg8SyKK6JXmp2CYE7ea0vmMgmRWfGrmY++nsZ
- z9a9hPVr1RGNGyVcYWXoem3q878jxps=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-mxj-aE8fMtKjMKRE0ErE1g-1; Fri, 20 Dec 2019 10:07:03 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DF02107ACC7;
- Fri, 20 Dec 2019 15:07:02 +0000 (UTC)
-Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E76A1A7E3;
- Fri, 20 Dec 2019 15:06:56 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 8/9] tests: add migration-helpers unit
-Date: Fri, 20 Dec 2019 19:05:21 +0400
-Message-Id: <20191220150522.633032-9-marcandre.lureau@redhat.com>
-In-Reply-To: <20191220150522.633032-1-marcandre.lureau@redhat.com>
-References: <20191220150522.633032-1-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: mxj-aE8fMtKjMKRE0ErE1g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iiJwR-0007FX-OE
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 10:11:49 -0500
+Received: from mail-eopbgr140138.outbound.protection.outlook.com
+ ([40.107.14.138]:40321 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iiJwN-00075x-Ts; Fri, 20 Dec 2019 10:11:44 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PtBzFompYmyaI5EMzqP6APmA0DBvRAxo2/XdaVmeYQBjjOD/nMPW6uBuagsBjgg+Uj6Zc9nqIkDQlg84YqhtvWRhKcFwa3rtShh9i+bA6EwaY4OYA7x16LyiI6V5KOf2gZU49ADHbKXs3buJAZ1ZTGbgwKJftsiry4+7hooz0wC4xk6C07PWQxp4gCL/79QuuQvXlJBrzfc3F0ULZhIy2OXfJ4aFIKeiTTQyLgm/aioLq7LOWlpFhedJYT817ZyRLtNKRw5xsMYM+DcLvek/82KeR4XWgY/BBaH+HP7/9DsEr68WGaYOLN3lKPKCQ3XXj+QxirAKfXEA+5qkIczsDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bmVscH2e0iETGgVpC/Cq6QC9ozQec/bow/n/08ApMD0=;
+ b=VuWcN61zsudl6u6PWesuTVi5FWkuwpGqmDvxg+9AE9P1Ytv05AH4rsE/T2I1NC3+P8oRMlxjtA9YjNc/OHkTeaUrg3IiSo81vcyl3sWT1pakIYCQqkF8Fg5s7TCdO2cnu1akIVhBjKEROH5M8xgRgpooHb5EZDzeXgz79QPeCJmQAoYLjOkX7Z4JzOJH13+xbi7lWSsk0yL6JQeHCBTh+9K8ZEfndZEO3eKSziPXyg77jqUF7SeuNfbt2DAUpsZewCUMFzxSF6iuj0ytorOw8qQwMzbpoQDLVhCKdX+Lkd9H/jnOI6Ldlx26Q2EeWQs5u1xwXUNseJKj0wtKVdl6gQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bmVscH2e0iETGgVpC/Cq6QC9ozQec/bow/n/08ApMD0=;
+ b=uE/KYG4m5pBztkVWqp6jfgNdDEP95uN/EA8RzA52GupZEbbNbe4O8vN4yOfSvlrZY6X2qU7QH02eNVSdMNgczAz1waAwkOO1lQ3UGYPajtjbX0i/KeIShxM9NByK4dobT64mIuTQJpeceCSdiqJGLW7aGUu5k7+hsUGDSVfoAW0=
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com (10.255.123.95) by
+ AM6PR08MB4913.eurprd08.prod.outlook.com (10.255.99.80) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2559.13; Fri, 20 Dec 2019 15:11:39 +0000
+Received: from AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::8805:5633:ca46:c8c8]) by AM6PR08MB5048.eurprd08.prod.outlook.com
+ ([fe80::8805:5633:ca46:c8c8%7]) with mapi id 15.20.2559.016; Fri, 20 Dec 2019
+ 15:11:39 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v12 1/3] block: introduce compress filter driver
+Thread-Topic: [PATCH v12 1/3] block: introduce compress filter driver
+Thread-Index: AQHVqQoqZl0EPV0QuEmkKsougkLlgqfDODUAgAAFQoA=
+Date: Fri, 20 Dec 2019 15:11:39 +0000
+Message-ID: <569ca08c-6718-3914-f875-d96794b02b01@virtuozzo.com>
+References: <1575288906-551879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1575288906-551879-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <4c0f2379-7baf-7aa3-ab5f-a7046793d730@redhat.com>
+In-Reply-To: <4c0f2379-7baf-7aa3-ab5f-a7046793d730@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR09CA0079.eurprd09.prod.outlook.com
+ (2603:10a6:7:3d::23) To AM6PR08MB5048.eurprd08.prod.outlook.com
+ (2603:10a6:20b:ee::31)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0e8a8862-0899-4cea-ecde-08d7855ee9e7
+x-ms-traffictypediagnostic: AM6PR08MB4913:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB491343A2D4E303B440674B54F42D0@AM6PR08MB4913.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1247;
+x-forefront-prvs: 025796F161
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(376002)(39840400004)(346002)(366004)(396003)(189003)(199004)(8936002)(52116002)(66946007)(186003)(64756008)(478600001)(2906002)(44832011)(26005)(8676002)(81156014)(6506007)(53546011)(81166006)(2616005)(5660300002)(6486002)(31696002)(4326008)(107886003)(86362001)(6512007)(71200400001)(110136005)(54906003)(316002)(31686004)(66476007)(66446008)(36756003)(66556008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4913;
+ H:AM6PR08MB5048.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ca93WmI1kTZo7RDKMZkzq1zBuRDlKGW6yOoiuGPF7riFMtCgry32kntR2NqFuZtz8U8dImafQaw867f5FzhtPak2BzBrn0PVxd18LKHkYFpooGZ4GgONPbsr3F1zgR8NQ+2Qt6pf0cycvQZ7JC2eK3i/i3TUmtfnEiiwYwp464woqEJd3m5k0qHo3tVkImQCCMPNb769UAs8fBdeJa6gal4zDWUIGGzojyRGmrAW2VkWQluIlB+LOKIpNvB3Fgbang/bImg3NZ58i4BTSJctUHlhFAkKTaOo+inIZ6YAlhlpuDzKvSo0vsMLLjiyrMybrTVCWaMUKha3eZQ+dgx/H0KiQ199I5ipGbjfEXmFxhXkuQa1b0msWciaXu2WdtFBohyTTxCU7NT/oxpjlC+WCs3Kb3GWo2z3QMx6Y7BiKW4VsW90iL4d7w63tPEOlxM5
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <EA7E083B1974194CA9A175A4F49F0AC0@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0e8a8862-0899-4cea-ecde-08d7855ee9e7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2019 15:11:39.5964 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: f80iAskM+uPgRL+faUKgia9IrdkZFRmKViXpG03M03/GpqVzQQq9MYapjnDfCpP6qKHDiCp53n/DITlg9Uo7aw8u0hTo2NiFIT6tlr5cGew=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4913
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.14.138
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,575 +124,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- pbonzini@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move a few helper functions from migration-test.c to migration-helpers.c
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- tests/Makefile.include    |   2 +-
- tests/migration-helpers.c | 167 ++++++++++++++++++++++++++++++++++++
- tests/migration-helpers.h |  37 ++++++++
- tests/migration-test.c    | 176 +++-----------------------------------
- 4 files changed, 216 insertions(+), 166 deletions(-)
- create mode 100644 tests/migration-helpers.c
- create mode 100644 tests/migration-helpers.h
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 31248fb1c9..933eef4127 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -827,7 +827,7 @@ tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-te=
-st.o $(libqos-usb-obj-y)
- tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-o=
-bj-y)
- tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-o=
-bj-y)
- tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
--tests/migration-test$(EXESUF): tests/migration-test.o
-+tests/migration-test$(EXESUF): tests/migration-test.o tests/migration-help=
-ers.o
- tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_s=
-cm_helper.o
- tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
- tests/test-keyval$(EXESUF): tests/test-keyval.o $(test-util-obj-y) $(test-=
-qapi-obj-y)
-diff --git a/tests/migration-helpers.c b/tests/migration-helpers.c
-new file mode 100644
-index 0000000000..516093b39a
---- /dev/null
-+++ b/tests/migration-helpers.c
-@@ -0,0 +1,167 @@
-+/*
-+ * QTest migration helpers
-+ *
-+ * Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
-+ *   based on the vhost-user-test.c that is:
-+ *      Copyright (c) 2014 Virtual Open Systems Sarl.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/qmp/qjson.h"
-+
-+#include "migration-helpers.h"
-+
-+bool got_stop;
-+
-+static void stop_cb(void *opaque, const char *name, QDict *data)
-+{
-+    if (!strcmp(name, "STOP")) {
-+        got_stop =3D true;
-+    }
-+}
-+
-+/*
-+ * Events can get in the way of responses we are actually waiting for.
-+ */
-+QDict *wait_command_fd(QTestState *who, int fd, const char *command, ...)
-+{
-+    va_list ap;
-+
-+    va_start(ap, command);
-+    qtest_qmp_vsend_fds(who, &fd, 1, command, ap);
-+    va_end(ap);
-+
-+    return qtest_qmp_receive_success(who, stop_cb, NULL);
-+}
-+
-+/*
-+ * Events can get in the way of responses we are actually waiting for.
-+ */
-+QDict *wait_command(QTestState *who, const char *command, ...)
-+{
-+    va_list ap;
-+
-+    va_start(ap, command);
-+    qtest_qmp_vsend(who, command, ap);
-+    va_end(ap);
-+
-+    return qtest_qmp_receive_success(who, stop_cb, NULL);
-+}
-+
-+/*
-+ * Send QMP command "migrate".
-+ * Arguments are built from @fmt... (formatted like
-+ * qobject_from_jsonf_nofail()) with "uri": @uri spliced in.
-+ */
-+void migrate_qmp(QTestState *who, const char *uri, const char *fmt, ...)
-+{
-+    va_list ap;
-+    QDict *args, *rsp;
-+
-+    va_start(ap, fmt);
-+    args =3D qdict_from_vjsonf_nofail(fmt, ap);
-+    va_end(ap);
-+
-+    g_assert(!qdict_haskey(args, "uri"));
-+    qdict_put_str(args, "uri", uri);
-+
-+    rsp =3D qtest_qmp(who, "{ 'execute': 'migrate', 'arguments': %p}", arg=
-s);
-+
-+    g_assert(qdict_haskey(rsp, "return"));
-+    qobject_unref(rsp);
-+}
-+
-+/*
-+ * Note: caller is responsible to free the returned object via
-+ * qobject_unref() after use
-+ */
-+QDict *migrate_query(QTestState *who)
-+{
-+    return wait_command(who, "{ 'execute': 'query-migrate' }");
-+}
-+
-+/*
-+ * Note: caller is responsible to free the returned object via
-+ * g_free() after use
-+ */
-+static gchar *migrate_query_status(QTestState *who)
-+{
-+    QDict *rsp_return =3D migrate_query(who);
-+    gchar *status =3D g_strdup(qdict_get_str(rsp_return, "status"));
-+
-+    g_assert(status);
-+    qobject_unref(rsp_return);
-+
-+    return status;
-+}
-+
-+static bool check_migration_status(QTestState *who, const char *goal,
-+                                   const char **ungoals)
-+{
-+    bool ready;
-+    char *current_status;
-+    const char **ungoal;
-+
-+    current_status =3D migrate_query_status(who);
-+    ready =3D strcmp(current_status, goal) =3D=3D 0;
-+    if (!ungoals) {
-+        g_assert_cmpstr(current_status, !=3D, "failed");
-+        /*
-+         * If looking for a state other than completed,
-+         * completion of migration would cause the test to
-+         * hang.
-+         */
-+        if (strcmp(goal, "completed") !=3D 0) {
-+            g_assert_cmpstr(current_status, !=3D, "completed");
-+        }
-+    } else {
-+        for (ungoal =3D ungoals; *ungoal; ungoal++) {
-+            g_assert_cmpstr(current_status, !=3D,  *ungoal);
-+        }
-+    }
-+    g_free(current_status);
-+    return ready;
-+}
-+
-+void wait_for_migration_status(QTestState *who,
-+                               const char *goal, const char **ungoals)
-+{
-+    while (!check_migration_status(who, goal, ungoals)) {
-+        usleep(1000);
-+    }
-+}
-+
-+void wait_for_migration_complete(QTestState *who)
-+{
-+    wait_for_migration_status(who, "completed", NULL);
-+}
-+
-+void wait_for_migration_fail(QTestState *from, bool allow_active)
-+{
-+    QDict *rsp_return;
-+    char *status;
-+    bool failed;
-+
-+    do {
-+        status =3D migrate_query_status(from);
-+        bool result =3D !strcmp(status, "setup") || !strcmp(status, "faile=
-d") ||
-+            (allow_active && !strcmp(status, "active"));
-+        if (!result) {
-+            fprintf(stderr, "%s: unexpected status status=3D%s allow_activ=
-e=3D%d\n",
-+                    __func__, status, allow_active);
-+        }
-+        g_assert(result);
-+        failed =3D !strcmp(status, "failed");
-+        g_free(status);
-+    } while (!failed);
-+
-+    /* Is the machine currently running? */
-+    rsp_return =3D wait_command(from, "{ 'execute': 'query-status' }");
-+    g_assert(qdict_haskey(rsp_return, "running"));
-+    g_assert(qdict_get_bool(rsp_return, "running"));
-+    qobject_unref(rsp_return);
-+}
-diff --git a/tests/migration-helpers.h b/tests/migration-helpers.h
-new file mode 100644
-index 0000000000..a11808b3b7
---- /dev/null
-+++ b/tests/migration-helpers.h
-@@ -0,0 +1,37 @@
-+/*
-+ * QTest migration helpers
-+ *
-+ * Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
-+ *   based on the vhost-user-test.c that is:
-+ *      Copyright (c) 2014 Virtual Open Systems Sarl.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef MIGRATION_HELPERS_H_
-+#define MIGRATION_HELPERS_H_
-+
-+#include "libqtest.h"
-+
-+extern bool got_stop;
-+
-+GCC_FMT_ATTR(3, 4)
-+QDict *wait_command_fd(QTestState *who, int fd, const char *command, ...);
-+
-+GCC_FMT_ATTR(2, 3)
-+QDict *wait_command(QTestState *who, const char *command, ...);
-+
-+GCC_FMT_ATTR(3, 4)
-+void migrate_qmp(QTestState *who, const char *uri, const char *fmt, ...);
-+
-+QDict *migrate_query(QTestState *who);
-+
-+void wait_for_migration_status(QTestState *who,
-+                               const char *goal, const char **ungoals);
-+
-+void wait_for_migration_complete(QTestState *who);
-+
-+void wait_for_migration_fail(QTestState *from, bool allow_active);
-+
-+#endif /* MIGRATION_HELPERS_H_ */
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index e56e6dcb00..53afec4395 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -14,7 +14,6 @@
-=20
- #include "libqtest.h"
- #include "qapi/qmp/qdict.h"
--#include "qapi/qmp/qjson.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
- #include "qemu/range.h"
-@@ -24,6 +23,7 @@
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qobject-output-visitor.h"
-=20
-+#include "migration-helpers.h"
- #include "migration/migration-test.h"
-=20
- /* TODO actually test the results and get rid of this */
-@@ -31,7 +31,6 @@
-=20
- unsigned start_address;
- unsigned end_address;
--bool got_stop;
- static bool uffd_feature_thread_id;
-=20
- #if defined(__linux__)
-@@ -157,67 +156,6 @@ static void wait_for_serial(const char *side)
-     } while (true);
- }
-=20
--static void stop_cb(void *opaque, const char *name, QDict *data)
--{
--    if (!strcmp(name, "STOP")) {
--        got_stop =3D true;
--    }
--}
--
--/*
-- * Events can get in the way of responses we are actually waiting for.
-- */
--GCC_FMT_ATTR(3, 4)
--static QDict *wait_command_fd(QTestState *who, int fd, const char *command=
-, ...)
--{
--    va_list ap;
--
--    va_start(ap, command);
--    qtest_qmp_vsend_fds(who, &fd, 1, command, ap);
--    va_end(ap);
--
--    return qtest_qmp_receive_success(who, stop_cb, NULL);
--}
--
--/*
-- * Events can get in the way of responses we are actually waiting for.
-- */
--GCC_FMT_ATTR(2, 3)
--static QDict *wait_command(QTestState *who, const char *command, ...)
--{
--    va_list ap;
--
--    va_start(ap, command);
--    qtest_qmp_vsend(who, command, ap);
--    va_end(ap);
--
--    return qtest_qmp_receive_success(who, stop_cb, NULL);
--}
--
--/*
-- * Note: caller is responsible to free the returned object via
-- * qobject_unref() after use
-- */
--static QDict *migrate_query(QTestState *who)
--{
--    return wait_command(who, "{ 'execute': 'query-migrate' }");
--}
--
--/*
-- * Note: caller is responsible to free the returned object via
-- * g_free() after use
-- */
--static gchar *migrate_query_status(QTestState *who)
--{
--    QDict *rsp_return =3D migrate_query(who);
--    gchar *status =3D g_strdup(qdict_get_str(rsp_return, "status"));
--
--    g_assert(status);
--    qobject_unref(rsp_return);
--
--    return status;
--}
--
- /*
-  * It's tricky to use qemu's migration event capability with qtest,
-  * events suddenly appearing confuse the qmp()/hmp() responses.
-@@ -265,48 +203,6 @@ static void read_blocktime(QTestState *who)
-     qobject_unref(rsp_return);
- }
-=20
--static bool check_migration_status(QTestState *who, const char *goal,
--                                   const char **ungoals)
--{
--    bool ready;
--    char *current_status;
--    const char **ungoal;
--
--    current_status =3D migrate_query_status(who);
--    ready =3D strcmp(current_status, goal) =3D=3D 0;
--    if (!ungoals) {
--        g_assert_cmpstr(current_status, !=3D, "failed");
--        /*
--         * If looking for a state other than completed,
--         * completion of migration would cause the test to
--         * hang.
--         */
--        if (strcmp(goal, "completed") !=3D 0) {
--            g_assert_cmpstr(current_status, !=3D, "completed");
--        }
--    } else {
--        for (ungoal =3D ungoals; *ungoal; ungoal++) {
--            g_assert_cmpstr(current_status, !=3D,  *ungoal);
--        }
--    }
--    g_free(current_status);
--    return ready;
--}
--
--static void wait_for_migration_status(QTestState *who,
--                                      const char *goal,
--                                      const char **ungoals)
--{
--    while (!check_migration_status(who, goal, ungoals)) {
--        usleep(1000);
--    }
--}
--
--static void wait_for_migration_complete(QTestState *who)
--{
--    wait_for_migration_status(who, "completed", NULL);
--}
--
- static void wait_for_migration_pass(QTestState *who)
- {
-     uint64_t initial_pass =3D get_migration_pass(who);
-@@ -506,30 +402,6 @@ static void migrate_set_capability(QTestState *who, co=
-nst char *capability,
-     qobject_unref(rsp);
- }
-=20
--/*
-- * Send QMP command "migrate".
-- * Arguments are built from @fmt... (formatted like
-- * qobject_from_jsonf_nofail()) with "uri": @uri spliced in.
-- */
--GCC_FMT_ATTR(3, 4)
--static void migrate(QTestState *who, const char *uri, const char *fmt, ...=
-)
--{
--    va_list ap;
--    QDict *args, *rsp;
--
--    va_start(ap, fmt);
--    args =3D qdict_from_vjsonf_nofail(fmt, ap);
--    va_end(ap);
--
--    g_assert(!qdict_haskey(args, "uri"));
--    qdict_put_str(args, "uri", uri);
--
--    rsp =3D qtest_qmp(who, "{ 'execute': 'migrate', 'arguments': %p}", arg=
-s);
--
--    g_assert(qdict_haskey(rsp, "return"));
--    qobject_unref(rsp);
--}
--
- static void migrate_postcopy_start(QTestState *from, QTestState *to)
- {
-     QDict *rsp;
-@@ -800,7 +672,7 @@ static int migrate_postcopy_prepare(QTestState **from_p=
-tr,
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-     g_free(uri);
-=20
-     wait_for_migration_pass(from);
-@@ -891,7 +763,7 @@ static void test_postcopy_recovery(void)
-     wait_for_migration_status(from, "postcopy-paused",
-                               (const char * []) { "failed", "active",
-                                                   "completed", NULL });
--    migrate(from, uri, "{'resume': true}");
-+    migrate_qmp(from, uri, "{'resume': true}");
-     g_free(uri);
-=20
-     /* Restore the postcopy bandwidth to unlimited */
-@@ -900,32 +772,6 @@ static void test_postcopy_recovery(void)
-     migrate_postcopy_complete(from, to);
- }
-=20
--static void wait_for_migration_fail(QTestState *from, bool allow_active)
--{
--    QDict *rsp_return;
--    char *status;
--    bool failed;
--
--    do {
--        status =3D migrate_query_status(from);
--        bool result =3D !strcmp(status, "setup") || !strcmp(status, "faile=
-d") ||
--                 (allow_active && !strcmp(status, "active"));
--        if (!result) {
--            fprintf(stderr, "%s: unexpected status status=3D%s allow_activ=
-e=3D%d\n",
--                    __func__, status, allow_active);
--        }
--        g_assert(result);
--        failed =3D !strcmp(status, "failed");
--        g_free(status);
--    } while (!failed);
--
--    /* Is the machine currently running? */
--    rsp_return =3D wait_command(from, "{ 'execute': 'query-status' }");
--    g_assert(qdict_haskey(rsp_return, "running"));
--    g_assert(qdict_get_bool(rsp_return, "running"));
--    qobject_unref(rsp_return);
--}
--
- static void test_baddest(void)
- {
-     MigrateStart *args =3D migrate_start_new();
-@@ -936,7 +782,7 @@ static void test_baddest(void)
-     if (test_migrate_start(&from, &to, "tcp:0:0", args)) {
-         return;
-     }
--    migrate(from, "tcp:0:0", "{}");
-+    migrate_qmp(from, "tcp:0:0", "{}");
-     wait_for_migration_fail(from, false);
-     test_migrate_end(from, to, false);
- }
-@@ -963,7 +809,7 @@ static void test_precopy_unix(void)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-=20
-     wait_for_migration_pass(from);
-=20
-@@ -1000,7 +846,7 @@ static void test_ignore_shared(void)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-=20
-     wait_for_migration_pass(from);
-=20
-@@ -1047,7 +893,7 @@ static void test_xbzrle(const char *uri)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-=20
-     wait_for_migration_pass(from);
-=20
-@@ -1098,7 +944,7 @@ static void test_precopy_tcp(void)
-=20
-     uri =3D migrate_get_socket_address(to, "socket-address");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-=20
-     wait_for_migration_pass(from);
-=20
-@@ -1167,7 +1013,7 @@ static void test_migrate_fd_proto(void)
-     close(pair[1]);
-=20
-     /* Start migration to the 2nd socket*/
--    migrate(from, "fd:fd-mig", "{}");
-+    migrate_qmp(from, "fd:fd-mig", "{}");
-=20
-     wait_for_migration_pass(from);
-=20
-@@ -1222,7 +1068,7 @@ static void do_test_validate_uuid(MigrateStart *args,=
- bool should_fail)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-=20
-     if (should_fail) {
-         qtest_set_expected_status(to, 1);
-@@ -1316,7 +1162,7 @@ static void test_migrate_auto_converge(void)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-=20
--    migrate(from, uri, "{}");
-+    migrate_qmp(from, uri, "{}");
-=20
-     /* Wait for throttling begins */
-     percentage =3D 0;
+On 20/12/2019 17:52, Max Reitz wrote:
+> On 02.12.19 13:15, Andrey Shinkevich wrote:
+>> Allow writing all the data compressed through the filter driver.
+>> The written data will be aligned by the cluster size.
+>> Based on the QEMU current implementation, that data can be written to
+>> unallocated clusters only. May be used for a backup job.
+>>
+>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/Makefile.objs     |   1 +
+>>   block/filter-compress.c | 168 ++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>>   qapi/block-core.json    |  10 +--
+>>   3 files changed, 175 insertions(+), 4 deletions(-)
+>>   create mode 100644 block/filter-compress.c
+>=20
+> [...]
+>=20
+>> diff --git a/block/filter-compress.c b/block/filter-compress.c
+>> new file mode 100644
+>> index 0000000..4d756ea
+>> --- /dev/null
+>> +++ b/block/filter-compress.c
+>> @@ -0,0 +1,168 @@
+>=20
+> [...]
+>=20
+>> +static int compress_open(BlockDriverState *bs, QDict *options, int flag=
+s,
+>> +                         Error **errp)
+>> +{
+>> +    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file=
+, false,
+>> +                               errp);
+>> +    if (!bs->file) {
+>> +        return -EINVAL;
+>> +    }
+>> +
+>> +    if (!bs->file->bs->drv || !block_driver_can_compress(bs->file->bs->=
+drv)) {
+>> +        error_setg(errp,
+>> +                   "Compression is not supported for underlying format:=
+ %s",
+>> +                   bdrv_get_format_name(bs->file->bs));
+>=20
+> bdrv_get_format_name() returns NULL if bs->file->bs->drv is NULL.  I=92m
+> sure g_strdup_vprintf() handles %s with a NULL string gracefully in
+> practice, but I can=92t find that specified anywhere.  So even though I=
+=92m
+> well aware I=92m being a bit stupid about a minor edge case, I=92m hesita=
+nt
+> to accept this patch as-is.
+>=20
+> Obviously the solution can be as simple as bdrv_get_format_name(...) ?:
+> "(no format)".
+>=20
+> Well, actually, I can be a bit less stupid about it and just propose
+> merging that change in myself.  Would that be OK for you?
+
+Yes, please.
+Thank you, Max.
+
+Andrey
+
+>=20
+> (The rest looks good to me.)
+>=20
+> Max
+>=20
+
 --=20
-2.24.0.308.g228f53135a
+With the best regards,
+Andrey Shinkevich
 
 
