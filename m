@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1678CC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E77EC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:30:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3BC124680
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:29:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3315821655
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PnGgh0R+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3BC124680
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yI7t60Cn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3315821655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiHOv-0002bq-0T
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:29:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54392)
+	id 1iiHQ2-0003aL-Ar
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:30:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiH1v-00055K-Ax
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:05:16 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iiH20-0005Ay-Ow
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:05:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiH1r-0008UH-SW
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:05:14 -0500
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:34209)
+ (envelope-from <alex.bennee@linaro.org>) id 1iiH1y-00008E-Mj
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:05:20 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40902)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiH1q-0008Qy-1x
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:05:10 -0500
-Received: by mail-wr1-x434.google.com with SMTP id t2so9206000wrr.1
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 04:05:09 -0800 (PST)
+ id 1iiH1u-00005D-HB
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:05:15 -0500
+Received: by mail-wm1-x342.google.com with SMTP id t14so8962161wmi.5
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 04:05:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Fd9ZwTx/nGTAxWisTrByxsrJjTVOwFrJUX5QQ3jkZWE=;
- b=PnGgh0R+FuLJoLXgbUOqWoo88UXexq87sfNDL34DCTUZmg70y4egxTu3eHegGz20LV
- DdBYyM0xfslU5mbvOGCwgn7/Us1mj7ZodKEknlgvGeY9EH5/muHQ9d584zBBYpLozkT+
- 03dTcXtXQvytcRaFRgad8ywVZzSoWz4MHdLbYRlvhJ9qJO2ilVc/divVDsG9qWUbc1nU
- xQdhTadQOHjXsDcdqm1R8YBQwPbGYTBMJoT1Boti1EJXjMDzll5iu0tRys5zm3SVaQhA
- yx2/zsP4BZzohxRkz/jNon4qKSYrv/nh+zhHQfvnZ9gcEiwaBpDRfC9iQTV5zvqobcDR
- PwPg==
+ bh=YCeE2L0TGRZ8+dNyp7Q4Gn+JUeo73/cxEQroPrtcLoY=;
+ b=yI7t60CnVL6775T9HfpwZA3JM2Ww2nGwXk9wQf/Ypb7fNkwzX+m52h10d9jRRnXBya
+ XtYqIFdAykWjmTzycIW/c/RiDs5I4DmrZ+PyF52wbASybJ9vnOMHRQjQLs0RZj2OgVcN
+ qt0l/i6uUw+OrzikFCRkpFwXCvpdCPUvZKp8yAVYHhqSDU/Eqvtq4XLShjbUA0UspFz8
+ tCtsTKwC+StyPh9tBAWbPD7rTJF+r/vNl1aVVPk0cmyxytcHXPszDPLxEPsndED/mBgZ
+ /ppdIn0RI2sipaptiB+REpow0ZZLIoHo8mhSLJyH3J34FFC2Zl/qt4Nfpp3dCgzI/eZC
+ WsJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Fd9ZwTx/nGTAxWisTrByxsrJjTVOwFrJUX5QQ3jkZWE=;
- b=CSkdT2/0HkxwhJORyHOf7XxuqtCWf4KtaiKufSVPEqxE2uOd9XNLFAk24PoV/pgoSJ
- M3FSaWi/ku+5nva7r+1lFT/IBT24o3GA9DP2sbvF+tAAK61r4npFND8DNGVGaE5CSShS
- mYelVdsXmYC12dEaP78hLZcmsI5/qQdv8FMlDhXonJuCD6PEVByCT3laUpHoJ1bkjVVm
- A+w/mqIUF91OLUl2GBJp9QKeMOWJcBB769xsBcIyjRstgduVQShKTC4JhaXGg8aDeIuy
- v6R41apMBUwFmif0V6UT5UUhdtTeTiY1kmhk+rXzzou0W/1WliESB70R+fDzuTu7TZiy
- 4ffw==
-X-Gm-Message-State: APjAAAWPQjByVwaMlbgo5F0PthjUsebIGXmHG9D+UPi30s8bg0nnqaft
- haeuaDIg0G0eVkqrYMhVUmFBnQ==
-X-Google-Smtp-Source: APXvYqzGi3Nnh+YR3AB4Dukt69vquhS0ioJb7+ZUiMFWOTrJuFgJh1ZCMHRwl7Z2cLRWgO8JdH/M9w==
-X-Received: by 2002:a5d:548e:: with SMTP id h14mr15983487wrv.380.1576843508480; 
- Fri, 20 Dec 2019 04:05:08 -0800 (PST)
+ bh=YCeE2L0TGRZ8+dNyp7Q4Gn+JUeo73/cxEQroPrtcLoY=;
+ b=mSJpVtJ08RxJauewysP51eNxXYbiCVvuE4lDzfQHt/z1YYtvhm0bVBqif7oUV+n6L9
+ BreXSXSncnSTjY8JqKpBMwTGw5yIWz9+iBon2vQPiWQs0P72VjWoPt5nj3/NLRozBdtl
+ wNOhog/ya2KtECAzm0weJA2JCL88A5jkdaynEH/c7u8SSxxt+5xyuUEEF7HD/QkPFgXe
+ oSnViPc7gZM+uTLno3Eam0MlB9NfBkb1lZaNUSjWVYvOhM4JSEu/iF8HpOByJ0pR2eUY
+ qbDAFtlb54gkcV/5f9yrRFnBT/j3Rv00xF07oNz5xoc2hDj3Qt0oRdYELyfiRMC4eAH1
+ ZiQA==
+X-Gm-Message-State: APjAAAUxCVUX8oBwCcpwXwMu60hclHIszkV1MNhgWsWD59eBbiRHayV5
+ OdzwAekTs9fQuS16J+9tCXV1sg==
+X-Google-Smtp-Source: APXvYqwdD1HGd1CIxdZAvFuFWZjH7igpkAqbrE7iiRgqBzBqeDjYFHjWlGJR/EbuFzkSROczZqyQDQ==
+X-Received: by 2002:a7b:c183:: with SMTP id y3mr16211076wmi.0.1576843512480;
+ Fri, 20 Dec 2019 04:05:12 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k19sm9331183wmi.42.2019.12.20.04.04.48
+ by smtp.gmail.com with ESMTPSA id w19sm9049230wmc.22.2019.12.20.04.04.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 20 Dec 2019 04:04:53 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9850E1FFA3;
+ by zen.linaroharston (Postfix) with ESMTP id C87411FFA6;
  Fri, 20 Dec 2019 12:04:40 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v4 16/21] tests/guest-debug: add a simple test runner
-Date: Fri, 20 Dec 2019 12:04:33 +0000
-Message-Id: <20191220120438.16114-17-alex.bennee@linaro.org>
+Subject: [PATCH  v4 18/21] tests/tcg/aarch64: add SVE iotcl test
+Date: Fri, 20 Dec 2019 12:04:35 +0000
+Message-Id: <20191220120438.16114-19-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191220120438.16114-1-alex.bennee@linaro.org>
 References: <20191220120438.16114-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::434
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,86 +96,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: damien.hedde@greensocs.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- luis.machado@linaro.org, alan.hayward@arm.com
+Cc: damien.hedde@greensocs.com, Peter Maydell <peter.maydell@linaro.org>,
+ luis.machado@linaro.org, "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ alan.hayward@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test runners job is to start QEMU with guest debug enabled and
-then spawn a gdb process running a test script that exercises the
-functionality it wants to test.
+This is a fairly bare-bones test of setting the various vector sizes
+for SVE which will only fail if the PR_SVE_SET_VL can't reduce the
+user-space vector length by powers of 2.
+
+However we will also be able to use it in a future test which
+exercises the GDB stub.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/guest-debug/run-test.py | 57 +++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
- create mode 100755 tests/guest-debug/run-test.py
 
-diff --git a/tests/guest-debug/run-test.py b/tests/guest-debug/run-test.py
-new file mode 100755
-index 00000000000..8c49ee2f225
+---
+v3
+  - use index to fill zreg
+  - CROSS_CC_HAS_SVE
+---
+ tests/tcg/aarch64/sve-ioctls.c    | 77 +++++++++++++++++++++++++++++++
+ tests/tcg/aarch64/Makefile.target |  4 ++
+ 2 files changed, 81 insertions(+)
+ create mode 100644 tests/tcg/aarch64/sve-ioctls.c
+
+diff --git a/tests/tcg/aarch64/sve-ioctls.c b/tests/tcg/aarch64/sve-ioctls.c
+new file mode 100644
+index 00000000000..d7bb64d53f9
 --- /dev/null
-+++ b/tests/guest-debug/run-test.py
-@@ -0,0 +1,57 @@
-+#!/usr/bin/env python3
-+#
-+# Run a gdbstub test case
-+#
-+# Copyright (c) 2019 Linaro
-+#
-+# Author: Alex Bennée <alex.bennee@linaro.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or later.
-+# See the COPYING file in the top-level directory.
-+#
-+# SPDX-License-Identifier: GPL-2.0-or-later
++++ b/tests/tcg/aarch64/sve-ioctls.c
+@@ -0,0 +1,77 @@
++/*
++ * SVE ioctls tests
++ *
++ * Test the SVE width setting ioctls work and provide a base for
++ * testing the gdbstub.
++ *
++ * Copyright (c) 2019 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#include <sys/prctl.h>
++#include <asm/hwcap.h>
++#include <stdio.h>
++#include <sys/auxv.h>
++#include <stdint.h>
++#include <stdlib.h>
 +
-+import argparse
-+import subprocess
-+import shutil
-+import shlex
++#ifndef HWCAP_CPUID
++#define HWCAP_CPUID (1 << 11)
++#endif
 +
-+def get_args():
-+    parser = argparse.ArgumentParser(description="A gdbstub test runner")
-+    parser.add_argument("--qemu", help="Qemu binary for test",
-+                        required=True)
-+    parser.add_argument("--qargs", help="Qemu arguments for test")
-+    parser.add_argument("--binary", help="Binary to debug",
-+                        required=True)
-+    parser.add_argument("--test", help="GDB test script",
-+                        required=True)
-+    parser.add_argument("--gdb", help="The gdb binary to use", default=None)
++#define SVE_MAX_QUADS  (2048 / 128)
++#define BYTES_PER_QUAD (128 / 8)
 +
-+    return parser.parse_args()
++#define get_cpu_reg(id) ({                                      \
++            unsigned long __val;                                \
++            asm("mrs %0, "#id : "=r" (__val));                  \
++            __val;                                              \
++        })
 +
-+if __name__ == '__main__':
-+    args = get_args()
++static int do_sve_ioctl_test(void)
++{
++    int i, res, init_vq;
 +
-+    # Search for a gdb we can use
-+    if not args.gdb:
-+        args.gdb = shutil.which("gdb-multiarch")
-+    if not args.gdb:
-+        args.gdb = shutil.which("gdb")
-+    if not args.gdb:
-+        print("We need gdb to run the test")
-+        exit(-1)
++    res = prctl(PR_SVE_GET_VL, 0, 0, 0, 0);
++    if (res < 0) {
++        printf("FAILED to PR_SVE_GET_VL (%d)", res);
++        return -1;
++    }
++    init_vq = res & PR_SVE_VL_LEN_MASK;
 +
-+    # Launch QEMU with binary
-+    if "system" in args.qemu:
-+        cmd = "%s %s %s -s -S" % (args.qemu, args.qargs, args.binary)
-+    else:
-+        cmd = "%s %s -g 1234 %s" % (args.qemu, args.qargs, args.binary)
++    for (i = init_vq; i > 15; i /= 2) {
++        printf("Checking PR_SVE_SET_VL=%d\n", i);
++        res = prctl(PR_SVE_SET_VL, i, 0, 0, 0, 0);
++        if (res < 0) {
++            printf("FAILED to PR_SVE_SET_VL (%d)", res);
++            return -1;
++        }
++        asm("index z0.b, #0, #1\n"
++            ".global __sve_ld_done\n"
++            "__sve_ld_done:\n"
++            "mov z0.b, #0\n"
++            : /* no outputs kept */
++            : /* no inputs */
++            : "memory", "z0");
++    }
++    printf("PASS\n");
++    return 0;
++}
 +
-+    inferior = subprocess.Popen(shlex.split(cmd))
++int main(int argc, char **argv)
++{
++    unsigned int sve_feature = (get_cpu_reg(ID_AA64PFR0_EL1) >> 32) & 0xf;
++    /* Exit early if we don't support SVE at all */
++    if (sve_feature == 0x1) {
++        /* we also need to probe for the ioctl support */
++        if (getauxval(AT_HWCAP) & HWCAP_SVE) {
++            return do_sve_ioctl_test();
++        } else {
++            printf("SKIP: no HWCAP_SVE on this system\n");
++            return 0;
++        }
++    } else {
++        printf("SKIP: no SVE on this system\n");
++        return 0;
++    }
++}
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 3f8783ada5c..209c79a1ddb 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -36,6 +36,10 @@ ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_SVE),)
+ # System Registers Tests
+ AARCH64_TESTS += sysregs
+ sysregs: CFLAGS+=-march=armv8.1-a+sve
 +
-+    # Now launch gdb with our test and collect the result
-+    gdb_cmd = "%s %s -ex 'target remote localhost:1234' -x %s" % (args.gdb, args.binary, args.test)
-+
-+    result = subprocess.call(gdb_cmd, shell=True);
-+
-+    exit(result)
++# SVE ioctl test
++AARCH64_TESTS += sve-ioctls
++sve-ioctls: CFLAGS+=-march=armv8.1-a+sve
+ endif
+ 
+ TESTS += $(AARCH64_TESTS)
 -- 
 2.20.1
 
