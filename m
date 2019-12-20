@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C50F0C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FE9C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:09:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FBCE206EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5BFA206EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:09:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SE40P4ic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FBCE206EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GymEHY4L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5BFA206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiIwt-0002Ho-KC
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:08:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51802)
+	id 1iiIy9-0004VO-L0
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:09:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40475)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiIeu-0006nZ-Ov
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:49:37 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iiIgz-0002kV-PA
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:51:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiIet-0006TO-Ix
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:49:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42956
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iiIgx-0004tZ-6g
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:51:45 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46096
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iiIet-0006Qy-CU
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:49:35 -0500
+ id 1iiIgw-0004s7-Ef
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:51:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576849775;
+ s=mimecast20190719; t=1576849900;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O3R47qQwXCqJrWkcxhppveAle9mVn7YI4kgpvwpz38Q=;
- b=SE40P4icgoXNsBcT9RxGJtO61WHESEkoYliW0m1sPXwXh2otSUBBxRkUEqjHF+siatM5Li
- H7ynVesJhbKoZHlJ1ljfKWa5kJR2OCfdDRvgN5sa9H6J33fmDOPnfkvNAjxkQGF7p8xoyE
- BVmy1Lb9LKFrmWo7giDAoU4Z96M4s3E=
+ bh=gm3pPe9kJKXbgbMduC+s+fPdcaSSBqfEaV54R3uzB2s=;
+ b=GymEHY4LzAL6nRU8nefpH47qbNg5qZekDPCzwHd7AHQzg81Oa6Rsh7TH0+EKt3WUyEEIz0
+ 8RzvA9935P0a71rkJ8B6MfsaQ06rs8qF5db6WukOXdQc3u1X3s6HfxuFgcQtRy4E8sWIQn
+ yOLjsGZ4jgCWGZSrUMKPAH/7k6JzpNo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-Fwk9LfuuM-qI4sz5bXKhKA-1; Fri, 20 Dec 2019 08:49:33 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-248-bAeovYU4OLuC_YX4O8ygyw-1; Fri, 20 Dec 2019 08:51:39 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 837C5593A5;
- Fri, 20 Dec 2019 13:49:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7903C800053;
+ Fri, 20 Dec 2019 13:51:38 +0000 (UTC)
 Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DC8FE541FC;
- Fri, 20 Dec 2019 13:49:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5FCFC63BB7;
+ Fri, 20 Dec 2019 13:51:33 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 20/37] mips: use sysbus_mmio_get_region() instead of
- internal fields
-Date: Fri, 20 Dec 2019 17:45:44 +0400
-Message-Id: <20191220134601.571905-21-marcandre.lureau@redhat.com>
+Subject: [PATCH v5 32/37] omap-intc: remove PROP_PTR
+Date: Fri, 20 Dec 2019 17:45:56 +0400
+Message-Id: <20191220134601.571905-33-marcandre.lureau@redhat.com>
 In-Reply-To: <20191220134601.571905-1-marcandre.lureau@redhat.com>
 References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Fwk9LfuuM-qI4sz5bXKhKA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: bAeovYU4OLuC_YX4O8ygyw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,47 +92,139 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Register the memory region with sysbus_init_mmio() and look it up with
-sysbus_mmio_get_region() to avoid accessing internal device fields.
+Since clocks are not QOM objects, replace PROP_PTR of clocks with
+setters methods.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+(in theory there should probably be different methods for omap1 &
+omap2 intc, but this is left as a future improvement)
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/char/serial.c       | 1 +
- hw/mips/mips_mipssim.c | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ hw/arm/omap1.c        |  4 ++--
+ hw/arm/omap2.c        |  4 ++--
+ hw/intc/omap_intc.c   | 17 ++++++++++-------
+ include/hw/arm/omap.h | 14 ++++++++++++++
+ 4 files changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index f0f81b34ec..36f70f16de 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -998,6 +998,7 @@ static void serial_io_realize(DeviceState *dev, Error *=
-*errp)
-     }
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 6ce038a453..1afd1d3d7f 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -3889,7 +3889,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegio=
+n *dram,
 =20
-     memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", 8);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(sio), &s->io);
-     sysbus_init_irq(SYS_BUS_DEVICE(sio), &s->irq);
+     s->ih[0] =3D qdev_create(NULL, "omap-intc");
+     qdev_prop_set_uint32(s->ih[0], "size", 0x100);
+-    qdev_prop_set_ptr(s->ih[0], "clk", omap_findclk(s, "arminth_ck"));
++    omap_intc_set_iclk(OMAP_INTC(s->ih[0]), omap_findclk(s, "arminth_ck"))=
+;
+     qdev_init_nofail(s->ih[0]);
+     busdev =3D SYS_BUS_DEVICE(s->ih[0]);
+     sysbus_connect_irq(busdev, 0,
+@@ -3899,7 +3899,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegio=
+n *dram,
+     sysbus_mmio_map(busdev, 0, 0xfffecb00);
+     s->ih[1] =3D qdev_create(NULL, "omap-intc");
+     qdev_prop_set_uint32(s->ih[1], "size", 0x800);
+-    qdev_prop_set_ptr(s->ih[1], "clk", omap_findclk(s, "arminth_ck"));
++    omap_intc_set_iclk(OMAP_INTC(s->ih[1]), omap_findclk(s, "arminth_ck"))=
+;
+     qdev_init_nofail(s->ih[1]);
+     busdev =3D SYS_BUS_DEVICE(s->ih[1]);
+     sysbus_connect_irq(busdev, 0,
+diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+index 457f152bac..1d7cc435ef 100644
+--- a/hw/arm/omap2.c
++++ b/hw/arm/omap2.c
+@@ -2308,8 +2308,8 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegi=
+on *sdram,
+     /* Actually mapped at any 2K boundary in the ARM11 private-peripheral =
+if */
+     s->ih[0] =3D qdev_create(NULL, "omap2-intc");
+     qdev_prop_set_uint8(s->ih[0], "revision", 0x21);
+-    qdev_prop_set_ptr(s->ih[0], "fclk", omap_findclk(s, "mpu_intc_fclk"));
+-    qdev_prop_set_ptr(s->ih[0], "iclk", omap_findclk(s, "mpu_intc_iclk"));
++    omap_intc_set_fclk(OMAP_INTC(s->ih[0]), omap_findclk(s, "mpu_intc_fclk=
+"));
++    omap_intc_set_iclk(OMAP_INTC(s->ih[0]), omap_findclk(s, "mpu_intc_iclk=
+"));
+     qdev_init_nofail(s->ih[0]);
+     busdev =3D SYS_BUS_DEVICE(s->ih[0]);
+     sysbus_connect_irq(busdev, 0,
+diff --git a/hw/intc/omap_intc.c b/hw/intc/omap_intc.c
+index 854b709ca0..73bb1c2af4 100644
+--- a/hw/intc/omap_intc.c
++++ b/hw/intc/omap_intc.c
+@@ -38,10 +38,6 @@ struct omap_intr_handler_bank_s {
+     unsigned char priority[32];
+ };
+=20
+-#define TYPE_OMAP_INTC "common-omap-intc"
+-#define OMAP_INTC(obj) \
+-    OBJECT_CHECK(struct omap_intr_handler_s, (obj), TYPE_OMAP_INTC)
+-
+ struct omap_intr_handler_s {
+     SysBusDevice parent_obj;
+=20
+@@ -391,9 +387,18 @@ static void omap_intc_realize(DeviceState *dev, Error =
+**errp)
+     }
  }
 =20
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 2c2c7f25b2..84c03dd035 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -227,7 +227,8 @@ mips_mipssim_init(MachineState *machine)
-         qdev_set_legacy_instance_id(dev, 0x3f8, 2);
-         qdev_init_nofail(dev);
-         sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
--        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8, &SERIAL_IO(dev)->serial.=
-io);
-+        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8,
-+                      sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0));
-     }
++void omap_intc_set_iclk(omap_intr_handler *intc, omap_clk clk)
++{
++    intc->iclk =3D clk;
++}
++
++void omap_intc_set_fclk(omap_intr_handler *intc, omap_clk clk)
++{
++    intc->fclk =3D clk;
++}
++
+ static Property omap_intc_properties[] =3D {
+     DEFINE_PROP_UINT32("size", struct omap_intr_handler_s, size, 0x100),
+-    DEFINE_PROP_PTR("clk", struct omap_intr_handler_s, iclk),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 =20
-     if (nd_table[0].used)
+@@ -647,8 +652,6 @@ static void omap2_intc_realize(DeviceState *dev, Error =
+**errp)
+ static Property omap2_intc_properties[] =3D {
+     DEFINE_PROP_UINT8("revision", struct omap_intr_handler_s,
+     revision, 0x21),
+-    DEFINE_PROP_PTR("iclk", struct omap_intr_handler_s, iclk),
+-    DEFINE_PROP_PTR("fclk", struct omap_intr_handler_s, fclk),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+index f3aa670036..bcecf19f89 100644
+--- a/include/hw/arm/omap.h
++++ b/include/hw/arm/omap.h
+@@ -67,6 +67,20 @@ void omap_clk_setrate(omap_clk clk, int divide, int mult=
+iply);
+ int64_t omap_clk_getrate(omap_clk clk);
+ void omap_clk_reparent(omap_clk clk, omap_clk parent);
+=20
++/* omap_intc.c */
++#define TYPE_OMAP_INTC "common-omap-intc"
++#define OMAP_INTC(obj)                                              \
++    OBJECT_CHECK(omap_intr_handler, (obj), TYPE_OMAP_INTC)
++
++typedef struct omap_intr_handler_s omap_intr_handler;
++
++/*
++ * TODO: Ideally we should have a clock framework that
++ * let us wire these clocks up with QOM properties or links.
++ */
++void omap_intc_set_iclk(omap_intr_handler *intc, omap_clk clk);
++void omap_intc_set_fclk(omap_intr_handler *intc, omap_clk clk);
++
+ /* OMAP2 l4 Interconnect */
+ struct omap_l4_s;
+ struct omap_l4_region_s {
 --=20
 2.24.0.308.g228f53135a
 
