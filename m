@@ -2,84 +2,86 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 584F6C3F68F
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5B8C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:06:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD38E20684
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAA182465E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 12:06:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="sbemxHKn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD38E20684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A3RQ9f4+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA182465E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiH0U-0003fh-Es
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:03:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51559)
+	id 1iiH3L-0005yR-Hd
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 07:06:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iiGo4-0002C5-LI
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:51:00 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iiH1R-0004YL-PS
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:04:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iiGnz-0006ZH-PW
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 06:50:56 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:45268)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iiGnz-0006U0-0A; Fri, 20 Dec 2019 06:50:51 -0500
-Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
- [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id E025F96F58;
- Fri, 20 Dec 2019 11:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1576842649;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sma/1XqRHR9jA5vUHDGY8MHOBGJ/bPUaM0ho7sdFhfE=;
- b=sbemxHKnSwNQ2WblX4oTb8Wg9BvENS0sB001SSEJGeXMcIFvIAiIBk+WdJob8YQzVVIVcM
- Lk+0nARN+MzRyltHgtZM3utYNLLizeU+dfYrS+sqlHEAoeArymD2gU2hCq16jLmZCM+zjl
- ujhIUJm+s8JV7VIYfHYq1hkUJJOvrcc=
-From: Damien Hedde <damien.hedde@greensocs.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iiH1P-0007Ho-TB
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:04:45 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:44620)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iiH1P-0007D3-Iy
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 07:04:43 -0500
+Received: by mail-wr1-x432.google.com with SMTP id q10so9168472wrm.11
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 04:04:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=seZxIJJzrC8aUFeIHKs7Llt2Klfs5NAbt8G7XufUqSc=;
+ b=A3RQ9f4+WDMTYxBWQnLzU1VlVY4mLxHrhqqx8v/sr4kCFvpi4kjsJV+ZiUuYGYPSfT
+ Oe3XJCZce1zy8JpupLk7DfBqxJHnsBi3zClsiHCKE5RlZChoyQiuK203jzHC6C/jjh1J
+ UtRyoIV4K7+bMzbQaYCE6/IB0xpuPQW3jlymKkwrJVycxrR7RA5Nf3tTu+ror3/9Hdel
+ wGcPYSRY8q8DLma98V2BnHsBWgxpqkWHcAo2acz7eIV/DOxj6Jgcc7i3Ju4bX/OM7a1D
+ AzsjE4fJV1HzYbXCbVW5PZlNZ62xJBfxFEESp/Z2PWiuTJZix7PmrbKNHejDQ0KqP+HH
+ cRTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=seZxIJJzrC8aUFeIHKs7Llt2Klfs5NAbt8G7XufUqSc=;
+ b=HqmDueWv5IH7lVGm8DIS1EqOg1LN0rHV/hNOwmJ2LnsVg9b12DBl7y5gOhLn7ZmWtU
+ mdERQJQBCsrEAodPgWNSTR4CcEj1wk5Kc5Pmn8Q+xHWm6JKScKDA6HazgYgSdDNa5apQ
+ 2S7frTXObWeq36F311eTfczKlNIQc1YFNaVdAKEP+lDmud23Rhw+hQuE6GHUUm0cnUEy
+ ceJM+3aUdbmHyctWz9HPR3CpRAWgrvCrrZgqnVxKKUOY9+VvojXLf1xIa1W5UV6PQbQR
+ jojyZKFNahXHxSnZyOeFGA61uFqgintuvH5FbN6q7HVw2LksgdYoLyIUR8U7uXfweCH+
+ z6mw==
+X-Gm-Message-State: APjAAAUkUmIhaB+NpV0Q8FsZx3FEGaq+8VAqhBbDFUi8fCf9uF0X5zJi
+ 1lfK9VPXolW4G1TMBQycu6RgQA==
+X-Google-Smtp-Source: APXvYqxdR6zgmqIvREpux2s1AHcUIRprjFUjCi336LKlYzP34FZfv3/gyi13lB4gAFEMVQRwGYme2w==
+X-Received: by 2002:adf:90e1:: with SMTP id i88mr14223975wri.95.1576843482265; 
+ Fri, 20 Dec 2019 04:04:42 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z8sm9597209wrq.22.2019.12.20.04.04.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Dec 2019 04:04:39 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id D0F0E1FF87;
+ Fri, 20 Dec 2019 12:04:38 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 09/11] docs/devel/reset.rst: add doc about Resettable
- interface
-Date: Fri, 20 Dec 2019 12:50:33 +0100
-Message-Id: <20191220115035.709876-10-damien.hedde@greensocs.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191220115035.709876-1-damien.hedde@greensocs.com>
-References: <20191220115035.709876-1-damien.hedde@greensocs.com>
+Subject: [PATCH v4 00/21] gdbstub refactor and SVE support (+check-tcg tweaks)
+Date: Fri, 20 Dec 2019 12:04:17 +0000
+Message-Id: <20191220120438.16114-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1576842649;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sma/1XqRHR9jA5vUHDGY8MHOBGJ/bPUaM0ho7sdFhfE=;
- b=ltu6VFncW71V2ELLP+/v0nLij/BV2DC7feKwgt642x4BlTwxgj7CXq/XK4L3CaT0MF0Za/
- /R6zP/j7bDiaj6oYa59H3J0pVYoS83R7z4n+Z2sZeZGz5nPCGb/E6MNhfQM/GQxOYBlQFx
- pxLRtTwMS8hBOCk6JzG3lQ1SgGghxpg=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576842649; a=rsa-sha256; cv=none;
- b=XUUP0Q3FJzJENsCe+JSuoe6DMFOE+dsCZKRbFOJ8h3Cv0EkTqKEMV83kvpBKckYVWwBQOw
- gcEHnLX3ByIwN7rqv0u8gcgCF+YgBj5VIduN3u255rUJYkO3ELg1URcPR1h4fPaaJrnb7N
- vnv8moa0dY3lO6PPnSCZ7I17SJXbewE=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.135.226.135
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,414 +93,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- berrange@redhat.com, ehabkost@redhat.com, cohuck@redhat.com,
- mark.burton@greensocs.com, qemu-s390x@nongnu.org, edgari@xilinx.com,
- pbonzini@redhat.com, philmd@redhat.com, david@gibson.dropbear.id.au
+Cc: damien.hedde@greensocs.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ luis.machado@linaro.org, alan.hayward@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- docs/devel/index.rst |   1 +
- docs/devel/reset.rst | 289 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 290 insertions(+)
- create mode 100644 docs/devel/reset.rst
+Hi,
 
-diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-index c86a3cdff2..c160c63d33 100644
---- a/docs/devel/index.rst
-+++ b/docs/devel/index.rst
-@@ -23,3 +23,4 @@ Contents:
-    secure-coding-practices
-    tcg
-    tcg-plugins
-+   reset
-diff --git a/docs/devel/reset.rst b/docs/devel/reset.rst
-new file mode 100644
-index 0000000000..abea1102dc
---- /dev/null
-+++ b/docs/devel/reset.rst
-@@ -0,0 +1,289 @@
-+
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+Reset in QEMU: the Resettable interface
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The reset of qemu objects is handled using the resettable interface decl=
-ared
-+in ``include/hw/resettable.h``.
-+
-+This interface allows objects to be grouped (on a tree basis); so that t=
-he
-+whole group can be reset consistently. Each individual member object doe=
-s not
-+have to care about others; in particular, problems of order (which objec=
-t is
-+reset first) are addressed.
-+
-+As of now DeviceClass and BusClass implement this interface.
-+
-+
-+Triggering reset
-+----------------
-+
-+This section documents the APIs which "users" of a resettable object sho=
-uld use
-+to control it. All resettable control functions must be called while hol=
-ding
-+the iothread lock.
-+
-+You can apply a reset to an object using ``resettable_assert_reset()``. =
-You need
-+to call ``resettable_release_reset()`` to release the object from reset.=
- To
-+instantly reset an object, without keeping it in reset state, just call
-+``resettable_reset()``. These functions take two parameters: a pointer t=
-o the
-+object to reset and a reset type.
-+
-+Several types of reset will be supported. For now only cold reset is def=
-ined;
-+others may be added later. The Resettable interface handles reset types =
-with an
-+enum:
-+
-+``RESET_TYPE_COLD``
-+  Cold reset is supported by every resettable object. In QEMU, it means =
-we reset
-+  to the initial state corresponding to the start of QEMU; this might di=
-ffer
-+  from what is a real hardware cold reset. It differs from other resets =
-(like
-+  warm or bus resets) which may keep certain parts untouched.
-+
-+Calling ``resettable_reset()`` is equivalent to calling
-+``resettable_assert_reset()`` then ``resettable_release_reset()``. It is
-+possible to interleave multiple calls to these three functions. There ma=
-y
-+be several reset sources/controllers of a given object. The interface ha=
-ndles
-+everything and the different reset controllers do not need to know anyth=
-ing
-+about each others. The object will leave reset state only when each othe=
-r
-+controllers end their reset operation. This point is handled internally =
-by
-+maintaining a count of in-progress resets; it is crucial to call
-+``resettable_release_reset()`` one time and only one time per
-+``resettable_assert_reset()`` call.
-+
-+For now migration of a device or bus in reset is not supported. Care mus=
-t be
-+taken not to delay ``resettable_release_reset()`` after its
-+``resettable_assert_reset()`` counterpart.
-+
-+Note that, since resettable is an interface, the API takes a simple Obje=
-ct as
-+parameter. Still, it is a programming error to call a resettable functio=
-n on a
-+non-resettable object and it will trigger a run time assert error. Since=
- most
-+calls to resettable interface are done through base class functions, suc=
-h an
-+error is not likely to happen.
-+
-+For Devices and Buses, the following helper functions exist:
-+
-+- ``device_cold_reset()``
-+- ``bus_cold_reset()``
-+
-+These are simple wrappers around resettable_reset() function; they only =
-cast the
-+Device or Bus into an Object and pass the cold reset type. When possible
-+prefer to use these functions instead of ``resettable_reset()``.
-+
-+Device and bus functions co-exist because there can be semantic differen=
-ces
-+between resetting a bus and resetting the controller bridge which owns i=
-t.
-+For example, consider a SCSI controller. Resetting the controller puts a=
-ll
-+its registers back to what reset state was as well as reset everything o=
-n the
-+SCSI bus, whereas resetting just the SCSI bus only resets everything tha=
-t's on
-+it but not the controller.
-+
-+
-+Multi-phase mechanism
-+---------------------
-+
-+This section documents the internals of the resettable interface.
-+
-+The resettable interface uses a multi-phase system to relieve objects an=
-d
-+machines from reset ordering problems. To address this, the reset operat=
-ion
-+of an object is split into three well defined phases.
-+
-+When resetting several objects (for example the whole machine at simulat=
-ion
-+startup), all first phases of all objects are executed, then all second =
-phases
-+and then all third phases.
-+
-+The three phases are:
-+
-+1. The **enter** phase is executed when the object enters reset. It rese=
-ts only
-+   local state of the object; it must not do anything that has a side-ef=
-fect
-+   on other objects, such as raising or lowering a qemu_irq line or read=
-ing or
-+   writing guest memory.
-+
-+2. The **hold** phase is executed for entry into reset, once every objec=
-t in the
-+   group which is being reset has had its *enter* phase executed. At thi=
-s point
-+   devices can do actions that affect other objects.
-+
-+3. The **exit** phase is executed when the object leaves the reset state=
-.
-+   Actions affecting other objects are permitted.
-+
-+As said in previous section, the interface maintains a count of reset. T=
-his
-+count is used to ensure phases are executed only when required. *enter* =
-and
-+*hold* phases are executed only when asserting reset for the first time
-+(if an object is already in reset state when calling
-+``resettable_assert_reset()`` or ``resettable_reset()``, they are not
-+executed).
-+The *exit* phase is executed only when the last reset operation ends. Th=
-erefore
-+the object does not need to care how many of reset controllers it has an=
-d how
-+many of them have started a reset.
-+
-+
-+Handling reset in a resettable object
-+-------------------------------------
-+
-+This section documents the APIs that an implementation of a resettable o=
-bject
-+must provide and what functions it has access to. It is intended for peo=
-ple
-+who want to implement or convert a class which has the resettable interf=
-ace;
-+for example when specializing an existing device or bus.
-+
-+Methods to implement
-+....................
-+
-+Three methods should be defined or left empty. Each method corresponds t=
-o a
-+phase of the reset; they are name ``phases.enter()``, ``phases.hold()`` =
-and
-+``phases.exit()``. They all take the object as parameter. The *enter* me=
-thod
-+also take the reset type as second parameter.
-+
-+When extending an existing class, these methods may need to be extended =
-too.
-+The ``resettable_class_set_parent_phases()`` class function may be used =
-to
-+backup parent class methods.
-+
-+Here follows an example to implement reset for a Device which sets an IO=
- while
-+in reset.
-+
-+::
-+
-+    static void mydev_reset_enter(Object *obj, ResetType type)
-+    {
-+        MyDevClass *myclass =3D MYDEV_GET_CLASS(obj);
-+        MyDevState *mydev =3D MYDEV(obj);
-+        /* call parent class enter phase */
-+        if (myclass->parent_phases.enter) {
-+            myclass->parent_phases.enter(obj, type);
-+        }
-+        /* initialize local state only */
-+        mydev->var =3D 0;
-+    }
-+
-+    static void mydev_reset_hold(Object *obj)
-+    {
-+        MyDevClass *myclass =3D MYDEV_GET_CLASS(obj);
-+        MyDevState *mydev =3D MYDEV(obj);
-+        /* call parent class hold phase */
-+        if (myclass->parent_phases.hold) {
-+            myclass->parent_phases.hold(obj);
-+        }
-+        /* set an IO */
-+        qemu_set_irq(mydev->irq, 1);
-+    }
-+
-+    static void mydev_reset_exit(Object *obj)
-+    {
-+        MyDevClass *myclass =3D MYDEV_GET_CLASS(obj);
-+        MyDevState *mydev =3D MYDEV(obj);
-+        /* call parent class exit phase */
-+        if (myclass->parent_phases.exit) {
-+            myclass->parent_phases.exit(obj);
-+        }
-+        /* clear an IO */
-+        qemu_set_irq(mydev->irq, 0);
-+    }
-+
-+    typedef struct MyDevClass {
-+        MyParentClass parent_class;
-+        /* to store eventual parent reset methods */
-+        ResettablePhases parent_phases;
-+    } MyDevClass;
-+
-+    static void mydev_class_init(ObjectClass *class, void *data)
-+    {
-+        MyDevClass *myclass =3D MYDEV_CLASS(class);
-+        ResettableClass *rc =3D RESETTABLE_CLASS(class);
-+        resettable_class_set_parent_reset_phases(rc,
-+                                                 mydev_reset_enter,
-+                                                 mydev_reset_hold,
-+                                                 mydev_reset_exit,
-+                                                 &myclass->parent_phases=
-);
-+    }
-+
-+In the above example, we override all three phases. It is possible to ov=
-erride
-+only some of them by passing NULL instead of a function pointer to
-+``resettable_class_set_parent_reset_phases()``. For example, the followi=
-ng will
-+only override the *enter* phase and leave *hold* and *exit* untouched::
-+
-+    resettable_class_set_parent_reset_phases(rc, mydev_reset_enter,
-+                                             NULL, NULL,
-+                                             &myclass->parent_phases);
-+
-+This is equivalent to providing a trivial implementation of the hold and=
- exit
-+phases which does nothing but call the parent class's implementation of =
-the
-+phase.
-+
-+Polling the reset state
-+.......................
-+
-+Resettable interface provides the ``resettable_is_in_reset()`` function.
-+This function returns true if the object parameter is currently under re=
-set.
-+
-+An object is under reset from the beginning of the *init* phase to the e=
-nd of
-+the *exit* phase. During all three phases, the function will return that=
- the
-+object is in reset.
-+
-+This function may be used if the object behavior has to be adapted
-+while in reset state. For example if a device has an irq input,
-+it will probably need to ignore it while in reset; then it can for
-+example check the reset state at the beginning of the irq callback.
-+
-+Note that until migration of the reset state is supported, an object
-+should not be left in reset. So apart from being currently executing
-+one of the reset phases, the only cases when this function will return
-+true is if an external interaction (like changing an io) is made during
-+*hold* or *exit* phase of another object in the same reset group.
-+
-+Helpers ``device_is_in_reset()`` and ``bus_is_in_reset()`` are also prov=
-ided
-+for devices and buses and should be preferred.
-+
-+
-+Base class handling of reset
-+----------------------------
-+
-+This section documents parts of the reset mechanism that you only need t=
-o know
-+about if you are extending it to work with a new base class other than
-+DeviceClass or BusClass, or maintaining the existing code in those class=
-es. Most
-+people can ignore it.
-+
-+Methods to implement
-+....................
-+
-+There are two other methods that need to exist in a class implementing t=
-he
-+interface: ``get_state()`` and ``child_foreach()``.
-+
-+``get_state()`` is simple. *resettable* is an interface and, as a conseq=
-uence,
-+does not have any class state structure. But in order to factorize the c=
-ode, we
-+need one. This method must return a pointer to ``ResettableState`` struc=
-ture.
-+The structure must be allocated by the base class; preferably it should =
-be
-+located inside the object instance structure.
-+
-+``child_foreach()`` is more complex. It should execute the given callbac=
-k on
-+every reset child of the given resettable object. All children must be
-+resettable too. Additional parameters (a reset type and an opaque pointe=
-r) must
-+be passed to the callback too.
-+
-+In ``DeviceClass`` and ``BusClass`` the ``ResettableState`` is located
-+``DeviceState`` and ``BusState`` structure. ``child_foreach()`` is imple=
-mented
-+to follow the bus hierarchy; for a bus, it calls the function on every c=
-hild
-+device; for a device, it calls the function on every bus child. When we =
-reset
-+the main system bus, we reset the whole machine bus tree.
-+
-+Changing a resettable parent
-+............................
-+
-+One thing which should be taken care of by the base class is handling re=
-set
-+hierarchy changes.
-+
-+The reset hierarchy is supposed to be static and built during machine cr=
-eation.
-+But there are actually some exceptions. To cope with this, the resettabl=
-e API
-+provides ``resettable_change_parent()``. This function allows to set, up=
-date or
-+remove the parent of a resettable object after machine creation is done.=
- As
-+parameters, it takes the object being moved, the old parent if any and t=
-he new
-+parent if any.
-+
-+This function can be used at any time when not in a reset operation. Dur=
-ing
-+a reset operation it must be used only in *hold* phase. Using it in *ent=
-er* or
-+*exit* phase is an error.
-+Also it should not be used during machine creation, although it is harml=
-ess to
-+do so: the function is a no-op as long as old and new parent are NULL or=
- not
-+in reset.
-+
-+There is currently 2 cases where this function is used:
-+
-+1. *device hotplug*; it means a new device is introduced on a live bus.
-+
-+2. *hot bus change*; it means an existing live device is added, moved or
-+   removed in the bus hierarchy. At the moment, it occurs only in the ra=
-spi
-+   machines for changing the sdbus used by sd card.
---=20
-2.24.0
+This is the current iteration of gdbstub refactoring and SVE support.
+I've fixed a few of the bugs caught up in review and dropped the
+pseudo VG register. You can still read the state of zcr_el1 via the
+existing sysreg support (which doesn't allow writing). I've also
+included a couple of Damian's fixes to the gdbstub which I'll include
+in the final PR.
+
+The following patches need review
+  08 - gdbstub extend GByteArray to read register helper
+  09 - target arm prepare for multiple dynamic XMLs
+  12 - target arm generate xml description of our SVE re
+  13 - tests tcg add a configure compiler check for ARMv
+  15 - tests tcg aarch64 userspace system register test
+  16 - tests guest debug add a simple test runner
+  17 - tests tcg aarch64 add a gdbstub testcase for SVE 
+  18 - tests tcg aarch64 add SVE iotcl test
+  19 - tests tcg aarch64 add test sve ioctl guest debug 
+
+Alex Bennée (19):
+  gdbstub: make GDBState static and have common init function
+  gdbstub: stop passing GDBState * around and use global
+  gdbstub: move str_buf to GDBState and use GString
+  gdbstub: move mem_buf to GDBState and use GByteArray
+  gdbstub: add helper for 128 bit registers
+  target/arm: use gdb_get_reg helpers
+  target/m68k: use gdb_get_reg helpers
+  gdbstub: extend GByteArray to read register helpers
+  target/arm: prepare for multiple dynamic XMLs
+  target/arm: explicitly encode regnum in our XML
+  target/arm: default SVE length to 64 bytes for linux-user
+  target/arm: generate xml description of our SVE registers
+  tests/tcg: add a configure compiler check for ARMv8.1 and SVE
+  target/arm: don't bother with id_aa64pfr0_read for USER_ONLY
+  tests/tcg/aarch64: userspace system register test
+  tests/guest-debug: add a simple test runner
+  tests/tcg/aarch64: add a gdbstub testcase for SVE registers
+  tests/tcg/aarch64: add SVE iotcl test
+  tests/tcg/aarch64: add test-sve-ioctl guest-debug test
+
+Damien Hedde (2):
+  gdbstub: change GDBState.last_packet to GByteArray
+  gdbstub: do not split gdb_monitor_write payload
+
+ include/exec/gdbstub.h                      |  49 +-
+ include/hw/core/cpu.h                       |   2 +-
+ target/alpha/cpu.h                          |   2 +-
+ target/arm/cpu.h                            |  31 +-
+ target/cris/cpu.h                           |   4 +-
+ target/hppa/cpu.h                           |   2 +-
+ target/i386/cpu.h                           |   2 +-
+ target/lm32/cpu.h                           |   2 +-
+ target/m68k/cpu.h                           |   2 +-
+ target/microblaze/cpu.h                     |   2 +-
+ target/mips/internal.h                      |   2 +-
+ target/openrisc/cpu.h                       |   2 +-
+ target/ppc/cpu.h                            |   4 +-
+ target/riscv/cpu.h                          |   2 +-
+ target/s390x/internal.h                     |   2 +-
+ target/sh4/cpu.h                            |   2 +-
+ target/sparc/cpu.h                          |   2 +-
+ target/xtensa/cpu.h                         |   2 +-
+ gdbstub.c                                   | 936 ++++++++++----------
+ hw/core/cpu.c                               |   2 +-
+ target/alpha/gdbstub.c                      |   2 +-
+ target/arm/cpu.c                            |   4 +-
+ target/arm/gdbstub.c                        | 168 +++-
+ target/arm/gdbstub64.c                      |   2 +-
+ target/arm/helper.c                         | 174 +++-
+ target/cris/gdbstub.c                       |   4 +-
+ target/hppa/gdbstub.c                       |   2 +-
+ target/i386/gdbstub.c                       |   2 +-
+ target/lm32/gdbstub.c                       |   2 +-
+ target/m68k/gdbstub.c                       |   2 +-
+ target/m68k/helper.c                        |  33 +-
+ target/microblaze/gdbstub.c                 |   2 +-
+ target/mips/gdbstub.c                       |   2 +-
+ target/nios2/cpu.c                          |   2 +-
+ target/openrisc/gdbstub.c                   |   2 +-
+ target/ppc/gdbstub.c                        |  48 +-
+ target/ppc/translate_init.inc.c             |  54 +-
+ target/riscv/gdbstub.c                      |  18 +-
+ target/s390x/gdbstub.c                      |  30 +-
+ target/sh4/gdbstub.c                        |   2 +-
+ target/sparc/gdbstub.c                      |   2 +-
+ target/xtensa/gdbstub.c                     |   2 +-
+ tests/tcg/aarch64/sve-ioctls.c              |  77 ++
+ tests/tcg/aarch64/sysregs.c                 | 172 ++++
+ tests/.gitignore                            |   1 +
+ tests/guest-debug/run-test.py               |  57 ++
+ tests/tcg/aarch64/Makefile.target           |  10 +
+ tests/tcg/aarch64/gdbstub/test-sve-ioctl.py |  71 ++
+ tests/tcg/aarch64/gdbstub/test-sve.py       |  75 ++
+ tests/tcg/configure.sh                      |  14 +
+ 50 files changed, 1410 insertions(+), 680 deletions(-)
+ create mode 100644 tests/tcg/aarch64/sve-ioctls.c
+ create mode 100644 tests/tcg/aarch64/sysregs.c
+ create mode 100755 tests/guest-debug/run-test.py
+ create mode 100644 tests/tcg/aarch64/gdbstub/test-sve-ioctl.py
+ create mode 100644 tests/tcg/aarch64/gdbstub/test-sve.py
+
+-- 
+2.20.1
 
 
