@@ -1,125 +1,108 @@
 Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLACK autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FBCC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:47:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2FEC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:50:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91E542465E
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD2752465E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 10:50:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="QVkcFqfX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91E542465E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DhlJcbJj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD2752465E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiFof-0007xT-OU
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 05:47:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33364)
+	id 1iiFrO-0001ab-T4
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 05:50:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <felipe@nutanix.com>) id 1iiFnN-0006Z4-VI
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:46:11 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iiFpv-0000MG-Uh
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:48:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <felipe@nutanix.com>) id 1iiFnL-0007dI-Kk
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:46:08 -0500
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:39738)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1iiFnL-0007Yw-7p
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:46:07 -0500
-Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBKAeMa1020121; Fri, 20 Dec 2019 02:46:05 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=B5JUyxzzZF4aLITocszqFAu6Ndb7Nwn69IZrU11ce04=;
- b=QVkcFqfX8SjpK0e2PYtZqHFWq6XoxpimGw/MZKNXibWW6BfeJ0ZDiviHNKA/Bz3/nGtR
- h9q4RxQaKWkNXs65UDRA2pcdLd4iIfn6VRNTm/ifwtoAJSRcGdtfwIAGKVHuY25Toe7I
- 2FNlec7u4S/Q1GrHGbm+vymSJLidKQIu7X5oJqwaWDHo+ww7G6v3taaPZjjv3B4MGSBw
- euVpTKtbKLiF77iOf3f1lP4zUNwr1mJsdytKxWJC0WaXwpP7UjEr/Rm36uG4jUKfZo7Z
- 2z/E/R3DuccdwwLzjGQd8kCH524KELkCIdsNODcc964PfiaU3c42mBQ8h6jBfBK/KE0K tA== 
-Received: from nam02-bl2-obe.outbound.protection.outlook.com
- (mail-bl2nam02lp2052.outbound.protection.outlook.com [104.47.38.52])
- by mx0b-002c1b01.pphosted.com with ESMTP id 2ww056n060-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 20 Dec 2019 02:46:05 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=duMN/PMdLQ0lOZj7lASnzr+ipHJzqpQUTHr7mz1XStCZtgPjwKwjoBmo0LpoSYYyb6Olto4H+EYiQVmrs6t9jUo3eT8Lxl7UTUNCtVQKuXmVlz3fOdinZcdG42Bx4fIW3sIaTcCbpyvJVWwI8w2HVeJXklG2kfQ4Q2K7uv4dSDLDeQ9GyZ12ZygNImfvf3iKJ/yIoD/qixYSfXB7zN25VGXU6nIkGems4nLQ+M8EBAa+YsPGjMHPmn/9wCt9txqLx9UPff1pl5d1MGZQbWFzZM+QRaUoC+rY5daByYK/3X/ZTUTe1odzhSW4o4zNrTjXmY72dNu9SGIGIjMI9XhP2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B5JUyxzzZF4aLITocszqFAu6Ndb7Nwn69IZrU11ce04=;
- b=iikf41ARaKnmt6TIjumiVpu9fchOz7rQWTUhch/PlZSG0LYcfWwTQbCGJ0mBLMS8pDi0Kkg8U7yWWokZnt3KI0qcX9DAAORDskhuc4ZlEuaTqQS1yJG2P6wZQ7awcXHW+hWXBN9IotwT+V7y7nauJ3P0jhClwTIfOQW9dwXd9Sb1goLKjbVgAltJwZxf0Dw8BKM90Xx6Ad//Q/JofDeYbybEbi4s8GUOosJB7Pt3IMoX0PUWXEwt/U4K2Sho9m1eRlL0qFM0YhPMJ5T/QvSu6hz8wGje7Qzp3aLRcugB/Gn59CU6p6ERdPoQOhput06gwp6qo7a/+Yx2qCXkIdEPTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
- MWHPR02MB2685.namprd02.prod.outlook.com (10.175.50.14) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2559.16; Fri, 20 Dec 2019 10:46:03 +0000
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2559.016; Fri, 20 Dec
- 2019 10:46:03 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH v4 0/4] Improve default object property_add uint helpers
-Thread-Topic: [PATCH v4 0/4] Improve default object property_add uint helpers
-Thread-Index: AQHVtpZ6lIuRGF0HJ0OIoqz7XKz+uqfCIrMAgAC1eYA=
-Date: Fri, 20 Dec 2019 10:46:03 +0000
-Message-ID: <834B69F1-93C5-40A6-915F-B0CE91BA2FCC@nutanix.com>
-References: <20191219180205.25191-1-felipe@nutanix.com>
- <c6289c52-aa93-c403-57d0-7cfcfbc99d9b@ozlabs.ru>
-In-Reply-To: <c6289c52-aa93-c403-57d0-7cfcfbc99d9b@ozlabs.ru>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [62.254.189.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5d6dbab8-a7c3-4768-0015-08d78539cf6a
-x-ms-traffictypediagnostic: MWHPR02MB2685:
-x-microsoft-antispam-prvs: <MWHPR02MB26855D1BB349C3B05D34C6D2D72D0@MWHPR02MB2685.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 025796F161
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(136003)(376002)(396003)(39860400002)(366004)(52314003)(40764003)(199004)(189003)(71200400001)(8936002)(66574012)(86362001)(36756003)(66946007)(2616005)(66446008)(64756008)(186003)(66556008)(66476007)(966005)(5660300002)(76116006)(4326008)(91956017)(478600001)(316002)(54906003)(6506007)(53546011)(26005)(6916009)(2906002)(8676002)(6512007)(6486002)(81156014)(81166006)(33656002)(64030200001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2685;
- H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9J4R9uv0MyAw+8HBPF2/wyMW3WjIzPJzVYPVmP49xd7c3H+WqO0PSx9utx5eGJMA8QS3Lx5QRi/Xy/HfxfnCy8jeiu43eHZMO+suaUZMA/L524pquaYqHNTRh+cqKiPNeGB3XHX4vM/ok+oQJJX+0TYR6aYb7auKm46q+nScTlchkpqf1IyIfyFfW6L9+MMqSA46Hp2cOEfyYhqPUY+lQ8BCyfW2VQpRIdSE6mQzp0gO64zzjWS2Y15rQjB1KclKODgFO/d4NrxKm6C/nWOhQhjQtjweEheKbfkQvvENIiEp5bJgTOJKoViuSPCwot5RdJx7LJvg0gDQ9GpYyQqiI6gxnDRjWd4BO2aW69VdgWyydwwVHz+3Rmk3DkRj6XHPGBHb1pVJ1lX+6yLtu3roucO3ODQdGZqav77E6aSvZS4vitF+11Esk+ck7sBHZij0dKCqHYYXBDV59X2VZS2TFuBT9juvZCLTV8Cg8xPdngMc+YMcyprKz8QzqZ4i+p1xqonyiIMrcCh3qELVxjz3TCbRa5qSpHs68A2AHeipYCSozRG3vYS+mNwN+xM2PQEDqIrfyNFzOUlM3rz1VPhizg==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <0ACCC6E341311D49A6F023B7C41A8318@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <mreitz@redhat.com>) id 1iiFps-0005cA-9I
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:48:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44857
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iiFpr-0005Vz-QC
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 05:48:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576838922;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=WMy0Pp71e6O9iKNwmkXWDFm8TwfOUahlM8uOg1Q6w4k=;
+ b=DhlJcbJjRINUjISA57Psqu07vAyQwWU0gWiw3Z+Ekt8SHNZSg/KIcI19Kviu9tLbW65qzr
+ 19P76+iaWcFPyNLRRLRMdyoUP7t2y9nreQqgbJz3tycO72SreZ8uEzJsUV6eU7j0I1pCFs
+ lWfm7avGXe+312Dg7gQbLIAL5wC2vpo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-9sJHsSGROCaqG41St0sD1g-1; Fri, 20 Dec 2019 05:48:41 -0500
+X-MC-Unique: 9sJHsSGROCaqG41St0sD1g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1B54800D50;
+ Fri, 20 Dec 2019 10:48:39 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-205-117.brq.redhat.com
+ [10.40.205.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B709C26FBF;
+ Fri, 20 Dec 2019 10:48:38 +0000 (UTC)
+Subject: Re: [PATCH 02/18] fuse: Allow exporting BDSs via FUSE
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191219143818.1646168-1-mreitz@redhat.com>
+ <20191219143818.1646168-3-mreitz@redhat.com>
+ <20191220102656.GD4019@dhcp-200-226.str.redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1812e968-1197-523e-7039-caf29e3bbc4b@redhat.com>
+Date: Fri, 20 Dec 2019 11:48:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d6dbab8-a7c3-4768-0015-08d78539cf6a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2019 10:46:03.3995 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mEVifQo1/7zkH+TCe73Zua5YELZuiNKR/bWRWHtQDO7pyvNa7tBJE7cox49wHbIPa/aW0j7r47lBQEqvADYPcm5fWrfki2okLrJ7uaKGuDQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2685
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-20_01:2019-12-17,2019-12-20 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.155.12
+In-Reply-To: <20191220102656.GD4019@dhcp-200-226.str.redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="WT0BcDmM7cwV36Kug89wtfF1NPriQrljz"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,112 +114,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>,
- Marc-Andre Lureau <marcandre.lureau@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Phillipe Mathieu-Daude <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WT0BcDmM7cwV36Kug89wtfF1NPriQrljz
+Content-Type: multipart/mixed; boundary="7B8H0dt7gViE52DapiNnFDxshSu08V46V"
 
-> On Dec 19, 2019, at 11:56 PM, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
->=20
->=20
->=20
-> On 20/12/2019 05:02, Felipe Franciosi wrote:
->> This improves the family of object_property_add_uintXX_ptr helpers by en=
-abling
->> a default getter/setter only when desired. To prevent an API behavioural=
- change
->> (from clients that already used these helpers and did not want a setter)=
-, we
->> add a OBJ_PROP_FLAG_READ flag that allow clients to only have a getter. =
-Patch 1
->> enhances the API and modify current users.
->>=20
->> While modifying the clients of the API, a couple of improvement opportun=
-ities
->> were observed in ich9. These were added in separate patches (2 and 3).
->>=20
->> Patch 3 cleans up a lot of existing code by moving various objects to th=
-e
->> enhanced API. Previously, those objects had their own getters/setters th=
-at only
->> updated the values without further checks. Some of them actually lacked =
-a check
->> for setting overflows, which could have resulted in undesired values bei=
-ng set.
->> The new default setters include a check for that, not updating the value=
-s in
->> case of errors (and propagating them). If they did not provide an error
->> pointer, then that behaviour was maintained.
->=20
-> A weird thing happens - when I apply patches from my mailer (thunderbird
-> -> open the source -> cut-n-paste to "git am") - they fail to apply. And
-> the mails themselves look suspicious - too many "MS-Exchange" and
-> "X-Proofpoint" :)
+--7B8H0dt7gViE52DapiNnFDxshSu08V46V
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I apologise for that... as you can see from below, our company's
-"anti-spam" / "anti-virus" mail servers tend to mangle incoming
-e-mails in ways that make it challenging to work with MLs:
+On 20.12.19 11:26, Kevin Wolf wrote:
+> Am 19.12.2019 um 15:38 hat Max Reitz geschrieben:
+>> fuse-export-add allows mounting block graph nodes via FUSE on some
+>> existing regular file.  That file should then appears like a raw disk
+>> image, and accesses to it result in accesses to the exported BDS.
+>>
+>> Right now, we only set up the mount point and tear all mount points down
+>> in bdrv_close_all().  We do not implement any access functions, so
+>> accessing the mount point only results in errors.  This will be
+>> addressed by a followup patch.
+>>
+>> The set of exported nodes is kept in a hash table so we can later add a
+>> fuse-export-remove that allows unmounting.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>=20
+>> diff --git a/qapi/block.json b/qapi/block.json
+>> index 145c268bb6..03f8d1b537 100644
+>> --- a/qapi/block.json
+>> +++ b/qapi/block.json
+>> @@ -317,6 +317,29 @@
+>>  ##
+>>  { 'command': 'nbd-server-stop' }
+>> =20
+>> +##
+>> +# @fuse-export-add:
+>> +#
+>> +# Exports a block graph node on some (file) mountpoint as a raw image.
+>> +#
+>> +# @node-name: Node to be exported
+>> +#
+>> +# @mountpoint: Path on which to export the block device via FUSE.
+>> +#              This must point to an existing regular file.
+>> +#
+>> +# @writable: Whether clients should be able to write to the block
+>> +#            device via the FUSE export. (default: false)
+>> +#
+>> +# Since: 5.0
+>> +##
+>> +{ 'command': 'fuse-export-add',
+>> +  'data': {
+>> +      'node-name': 'str',
+>> +      'mountpoint': 'str',
+>> +      '*writable': 'bool'
+>> +  },
+>> +  'if': 'defined(CONFIG_FUSE)' }
+>=20
+> Can this use a BlockExport union from the start like I'm introducing in
+> the storage daemon series, together with a generic block-export-add?
 
->=20
-> A bundle from
-> https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__patchwork.ozlabs.o=
-rg_project_qemu-2Ddevel_list_-3Fseries-3D149673&d=3DDwICaQ&c=3Ds883GpUCOChK=
-OHiocYtGcg&r=3DCCrJKVC5zGot8PrnI-iYe00MdX4pgdQfMRigp14Ptmk&m=3DTxZxCvPIyfiA=
-MkXeqOwUO_oYhAWFHAG66jA3SeEldzU&s=3DvMLzvHMGCJ9VeW3wSKvJVPrthKmVoud-ACf5eh6=
-w2Rg&e=3D=20
-> applies fine though.
+Hm, you mean still adding a FuseExport structure that would be part of
+BlockExport and then dropping fuse-export-add in favor of a
+block-export-add that we want anyway?
 
-Now I know why both you and Marc-Andre had problems applying my
-patches: apparently our servers also mangle with outgoing e-mails too.
+> It also looks like node-name and writable should be part of the common
+> base of BlockExport.
 
-I heard that pulling the patches from mbox work, but I'll make sure to
-post patches on Github in the future to make things easier for others.
-I've already asked them to look into this and whitelist e-mails on
-various criteria.
+node-name definitely, I=E2=80=99m not so sure about writable.  Or, to be mo=
+re
+precise, I think that if we want writable to be in the base, we also
+want growable to be there: Both are primarily options for the
+BlockBackend that the exports use.
 
-Thanks for your help in making sure these patches work for you despite
-the extra hurdles!
+But both of course also need to be supported by the export
+implementation.  nbd can make its BB growable all it wants, but that
+doesn=E2=80=99t make it work.
 
-F.
+So if we kept writable and growable in the common base, then the schema
+would give no information about what exports actually support them.
 
+On one hand, I don=E2=80=99t know whether it=E2=80=99s important to have th=
+is
+information in a static form, or whether it=E2=80=99s sufficient to learn a=
+t
+runtime.
+
+On the other, I don=E2=80=99t know whether it=E2=80=99s important to have t=
+hose fields
+in the base or not.  Would it make a difference on the wire?
+
+> Unfortunately this would mean that I can't use the
+> same BlockExportNbd for the existing nbd-server-add command any more. I
+> guess I could somehow get a shared base type for both, though.
+
+Hm.  This sounds like you want to make it your problem.  Can I take that
+to mean that you want to implement block-export-add and I can wait with
+v2 until that=E2=80=99s done? :-)
+
+Max
+
+> Markus, any thoughts on these QAPI interfaces?
 >=20
->=20
-> Anyway, this works on powerpc. Thanks,
->=20
->=20
->=20
->>=20
->> Felipe Franciosi (4):
->>  qom/object: enable setter for uint types
->>  ich9: fix getter type for sci_int property
->>  ich9: Simplify ich9_lpc_initfn
->>  qom/object: Use common get/set uint helpers
->>=20
->> hw/acpi/ich9.c       |  99 ++------------------
->> hw/acpi/pcihp.c      |   7 +-
->> hw/acpi/piix4.c      |  12 +--
->> hw/isa/lpc_ich9.c    |  27 ++----
->> hw/misc/edu.c        |  13 +--
->> hw/pci-host/q35.c    |  14 +--
->> hw/ppc/spapr.c       |  18 +---
->> hw/ppc/spapr_drc.c   |   3 +-
->> include/qom/object.h |  44 +++++++--
->> memory.c             |  15 +--
->> qom/object.c         | 216 ++++++++++++++++++++++++++++++++++++++-----
->> target/arm/cpu.c     |  22 +----
->> target/i386/sev.c    | 106 ++-------------------
->> ui/console.c         |   4 +-
->> 14 files changed, 282 insertions(+), 318 deletions(-)
->>=20
->=20
-> --=20
-> Alexey
+> Kevin
+
+
+--7B8H0dt7gViE52DapiNnFDxshSu08V46V--
+
+--WT0BcDmM7cwV36Kug89wtfF1NPriQrljz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl38pwUACgkQ9AfbAGHV
+z0AU1Af+Jkz/mE+cZM0FkD56EEpo0HEn0kv6IvaxrKn8B+uGVnpQxU4yBufkdnh3
+VUO3O7EY44AOhx7gm4EzV6UXjkNlv7Z1qsqAUqppkDM7xp+H/qiqM6MrOtmwY+4R
+c3T/k/C4Qd5ghmWcrxsux6kOlCshz1Bcuw42pEPz7SrkjKEJ6L6F5qRxu2YWWrPY
+hPUBhhfotNEAbF6GyrYP/cIbP/Dbqd18RKBKpNhTls1LPFryjuAdaeUXk5xKomlQ
+AsE4JW46JC9SSNWTueSWk8guEPSeENIA0qQBZQzBt8VxEiEN2Vk61JT8gojG3tQm
++ztWM9tYzFLqn9VJFA0W4wro3+RpbA==
+=ZrJY
+-----END PGP SIGNATURE-----
+
+--WT0BcDmM7cwV36Kug89wtfF1NPriQrljz--
 
 
