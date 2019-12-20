@@ -2,83 +2,107 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3025C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0359C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:19:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8302924679
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E42121D7E
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:19:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=online.net header.i=@online.net header.b="WplczBaH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8302924679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=online.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kLr4ctHY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E42121D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiLuo-0000CQ-JG
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:18:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48842)
+	id 1iiLwR-0001xI-Qi
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:19:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fflorensa@online.net>) id 1iiLtm-0007v5-5D
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:17:11 -0500
+ (envelope-from <john.g.johnson@oracle.com>) id 1iiLug-0000HT-E4
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:18:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fflorensa@online.net>) id 1iiLtj-0000p6-GH
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:17:08 -0500
-Received: from mail.online.net ([62.210.16.11]:46008)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <fflorensa@online.net>)
- id 1iiLti-0000lZ-T4
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:17:07 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.online.net (Postfix) with ESMTP id C0CFDF2B8D49;
- Fri, 20 Dec 2019 18:17:04 +0100 (CET)
-Received: from mail.online.net ([127.0.0.1])
- by localhost (mail.online.net [127.0.0.1]) (amavisd-new, port 10032)
- with ESMTP id CrzPPqzoe8AR; Fri, 20 Dec 2019 18:17:04 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by mail.online.net (Postfix) with ESMTP id 9A4D0F2B8E53;
- Fri, 20 Dec 2019 18:17:04 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.online.net 9A4D0F2B8E53
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.net;
- s=4EC61654-9574-11E8-870F-3D38CA7095BF; t=1576862224;
- bh=zF2MAAx0O3svkEJw/YRXxOrkJrjWtsJISKf1mWOx3DA=;
- h=Date:From:To:Message-ID:MIME-Version;
- b=WplczBaH3vqxLVaUYRZG30Hj4jCX1HDS1bp52schnr2k5z/naax6enl2Lnkr70x0W
- G5foS09Nq768LnHpTqSQZ7y5d/co66KZ1RSN9YFPp9c6HXjLWP41CfWOojnhARF/b/
- 4oHgs6R8ECp1e6ZgZDA4pLdRNJxZuk6sj8zm4QZAKv5+cVK/ljW0TofLf51xmJLp2O
- lLuCKXRpIE+G/yef0mjdqJFpNRY3Fl008Cfj1pqLe9Db0Llt4CUkborarjJ/zmU7WK
- s+I8JqpZGeICbp0S/BUs1XOY14nVGWhm7BqDFUpIS/pUI101gb1ianyTjnl5HVFWwg
- YPpGQied+21HA==
-X-Virus-Scanned: amavisd-new at mail.online.net
-Received: from mail.online.net ([127.0.0.1])
- by localhost (mail.online.net [127.0.0.1]) (amavisd-new, port 10026)
- with ESMTP id yxWJ6v_7i0_U; Fri, 20 Dec 2019 18:17:04 +0100 (CET)
-Received: from localhost (unknown [195.154.229.35])
- by mail.online.net (Postfix) with ESMTPSA id 6EEC1F2B8D49;
- Fri, 20 Dec 2019 18:17:04 +0100 (CET)
-Date: Fri, 20 Dec 2019 18:17:04 +0100
-From: Florian Florensa <fflorensa@online.net>
-To: dillaman@redhat.com
-Subject: Re: [PATCH] block/rbd: Add support for ceph namespaces
-Message-ID: <20191220171704.7qlh6gmulsvj45db@flash.localdomain>
-References: <20191219133416.671431-1-fflorensa@online.net>
- <20191219145125.iwhxhzmt5mow5pea@steredhat>
- <20191220141125.wxlm4eizbwie6522@flash.localdomain>
- <CA+aFP1DuNzvWZo7d8sFX6UEYV175HKm0Wo9PJWyHs91dA_WkHQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="j5dba3slve6pqkyu"
-Content-Disposition: inline
-In-Reply-To: <CA+aFP1DuNzvWZo7d8sFX6UEYV175HKm0Wo9PJWyHs91dA_WkHQ@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 62.210.16.11
+ (envelope-from <john.g.johnson@oracle.com>) id 1iiLuf-00025l-1g
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:18:06 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:55646)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <john.g.johnson@oracle.com>)
+ id 1iiLud-00023X-GC
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:18:04 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBKH9I2V078948;
+ Fri, 20 Dec 2019 17:17:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=kVLC8a4v2EQr3qIDaGe0PANJ3a4LFt8Ni7OvrDOfjOU=;
+ b=kLr4ctHYCETtzITB9+OowlNGjgG7EbBRy4GZY4+qG7C1K71k3mYnqPHIWfIIGggX3xyX
+ NGHN52lS3MM4HFAl7qpiEiQ+988LbOgYJvIc0lkXydzK0U0JtUSvDMwl3ALjqyZgNbmh
+ 5zhhH526C5f8Wi3gveeinGB2FXufUoQzB1mvG6NHkBqCdaG2LH2m8hY+3y1OzmRnt9SC
+ EXmY4LRiqTdvbUvnifGID414J4I7QfSnp3VnVWjLtneLemsnwuDyirEoBMH7TrsK/KS6
+ us/OvQL5v63551jf12b+gVTu4xFxpzXF0TmAXKo0T3+EnO3HpD2sFS3Yq7f5ms7F/IBT IQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 2x0ag170fx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 20 Dec 2019 17:17:47 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBKHEHOV171971;
+ Fri, 20 Dec 2019 17:15:46 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 2x0pcc68qe-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 20 Dec 2019 17:15:45 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xBKHFg7V007522;
+ Fri, 20 Dec 2019 17:15:42 GMT
+Received: from [192.168.10.3] (/24.5.35.151)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Fri, 20 Dec 2019 09:15:42 -0800
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
+ status update
+From: John G Johnson <john.g.johnson@oracle.com>
+In-Reply-To: <20191219133650.GE1624084@stefanha-x1.localdomain>
+Date: Fri, 20 Dec 2019 09:15:40 -0800
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D60846D3-5434-4EF8-B25F-7C70F4FA5367@oracle.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <20191210064716.GA6401@flaka>
+ <20191213104116.GB1180977@stefanha-x1.localdomain>
+ <20191216194655.GA5922@flaka>
+ <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
+ <20191217163316.GB1333385@stefanha-x1.localdomain>
+ <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
+ <4a302c6d-e2c8-0c3e-43d2-946e1fafea5d@redhat.com>
+ <20191219133650.GE1624084@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9477
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912200130
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9477
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912200130
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,112 +114,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ "fam@euphon.net" <fam@euphon.net>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kraxel@redhat.com" <kraxel@redhat.com>,
+ "jag.raman@oracle.com" <jag.raman@oracle.com>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
+ Felipe Franciosi <felipe@nutanix.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "liran.alon@oracle.com" <liran.alon@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
+ "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---j5dba3slve6pqkyu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 20, 2019 at 09:56:51AM -0500, Jason Dillaman wrote:
-> On Fri, Dec 20, 2019 at 9:11 AM Florian Florensa <fflorensa@online.net> w=
-rote:
-> >
-> > Hello Stefano and Jason,
-> >
-> > First of all thanks for the quick reply,
-> > Response inline belowe
-> > > Hi Florian,
-> > >
-> > > I think we need to add (Since: 5.0).
-> >
-> > Are you implying by that (Since: 5.0) that we need to specify its
-> > availability target is qemu 5.0 ?
+> On Dec 19, 2019, at 5:36 AM, Stefan Hajnoczi <stefanha@gmail.com> =
+wrote:
 >=20
-> FWIW, I took this as just a comment to add some documentation that the
-> field is only valid starting w/ qemu v5.
+> On Wed, Dec 18, 2019 at 01:00:55AM +0100, Paolo Bonzini wrote:
+>> On 17/12/19 23:57, Felipe Franciosi wrote:
+>>> Doing it in userspace was the flow we proposed back in last year's =
+KVM
+>>> Forum (Edinburgh), but it got turned down.
+>>=20
+>> I think the time since then has shown that essentially the cat is out =
+of
+>> the bag.  I didn't really like the idea of devices outside QEMU---and =
+I
+>> still don't---but if something like "VFIO over AF_UNIX" turns out to =
+be
+>> the cleanest way to implement multi-process QEMU device models, I am =
+not
+>> going to pull an RMS and block that from happening.  Assuming I could
+>> even do so!
 >=20
-Works for me, will add this in v2.
-> > I guess that maybe a version check would be better ? Like try to do
-> > namespaces stuff only if we have a recent enough librbd in the system ?
-> > Using something like :
-> >
-> > int rbd_major;
-> >
-> > rbd_version(&rbd_major, NULL, NULL);
-> > /*
-> >  * Target only nautilus+ librbd for namespace support
-> > */
-> > if (rbd_major >=3D 14) // tar
-> >  <process namespace>
+> There are a range of approaches that will influence how out-of-process
+> devices can be licensed and distributed.
 >=20
-> Unfortunately, those versions weren't updated in the Mimic nor
-> Nautilus release so it would still return 1/12 (whoops). I think that
-> means you would need to add a probe in "configure" to test for librbd
-> namespace support (e.g. test for the existence of the `rbd_list2`
-> function or the `rbd_linked_image_spec_t` structure). I'll fix this
-> before the forthcoming Octopus release.
-Will see to do this, I originally wanted to do this at runtime so a Qemu
-built against an older librbd would work if the library was updated.
-Else some dlopen + dlsym trickery would work by checking for the
-existence of rbd_list2 in librbd.so, but I guess this might be a bad
-idea, as it would add code that would be useless in sometime
+> A VFIO-over-UNIX domain sockets approach means a stable API so that =
+any
+> license (including proprietary) is possible.
 >=20
-> > > The patch LGTM, but I'd like to use 'namespace' instead of cryptic
-> > > 'nspace'. (as BlockdevOptionsNVMe did)
-> > > What do you think?
-> > >
-> > Yes no worries, I can rename it to 'rbd_namespace' to avoid any possible
-> > confusion, is this Ok for you ?
+> Another approach is a QEMU-centric unstable protocol.  I'll call this
+> the qdev-over-UNIX domain sockets approach.  Maintaining an =
+out-of-tree
+> device is expensive and ugly since the protocol changes between QEMU
+> versions in ways that are incompatible and undetectable.
 >=20
-> We use "pool_namespace" in the rbd CLI if you are trying to avoid the
-> word "namespace".
->=20
-Yes I wanted to avoid namespace because it looks like the qapi generated
-code changes the name to something like q_namespace, will use
-pool_namespace in the v2.
-> > > With those fixed:
-> > >
-> > > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> > >
-> > > Thanks,
-> > > Stefano
-> >
-> > Regards,
-> > Florian
->=20
-> --=20
-> Jason
+> On top of that, the initialization protocol message could include the
+> QEMU version string that the device was compiled against.  If the
+> version string doesn't match then QEMU will refuse to talk to the
+> device.
 >=20
 
-Regards,
-Florian
+	This is very similar to our multi-process QEMU implementation =
+before
+we looked into using muser.  The differences are:
 
---j5dba3slve6pqkyu
-Content-Type: application/pgp-signature; name="signature.asc"
+We use one object per emulated device type in QEMU rather than having a =
+single
+VFIO type that can masquerade as any PCI device.
 
------BEGIN PGP SIGNATURE-----
+We don=E2=80=99t pin guest memory; we pass the QEMU file descriptors =
+used to create
+guest memory to the emulation program, and it mmap()s them itself. (ala
+vhost-user).
 
-iQIzBAEBCAAdFiEENMOcO22p59MYDr5mpFTgAOO+N4gFAl39AgsACgkQpFTgAOO+
-N4jjXhAAgSVYWGfpQBWX/pUFLhpiQHBC+PfW9lJQqjy7ka1P7JIEAUdLh6uPg0s3
-XX6dAU4TgYbaxt/zQlqn1grNk1MZP2HD/20mFTAftXEwHedf4dYrDW8RIsrYKKJ5
-Lk3SWwMeyNtFhDcKc+5sZA6ldN9vDhlpve8gUUf/QEe95cq9ubFjm1k7WuS/mWtP
-YRo+EYSiPc6+r6Iyzo+QSzgqrhJWuAdxOha4AzyivI3GUxyT6o+MdHSfCPKxLcOa
-Pt21B72eOT7NYubNzsqNWM+c0fPLYKGxKMRE/Zbq6MSYp6bMXMbEWG4+c/x+6v91
-sEEclLmpXMO1cN7Xy6Fb20AXm6zr2VS3Z6DW0cU/K78+w+oaRiFi8JjKPL5kOmpc
-n0Ni0wxatNTKPwCK5+L5nMFQNfPz+Yp+y0EiaUYKTksa9tkXdHTfZ6D4xVYHx32p
-sDzpCXqy6pKKl1w2xrnF/HfyzZoukRldUuW0MidIu+xJuZyzs1JsK2uutpUQrHQ5
-AEMudrX5+pqUUgG/e+AMssV0Un6IDlnYpSolymxTZ1BoMHDzPMlJavmQ00+eUvGo
-x9mB0DOZpkpvYiY1kMHsr4+Ge7QM133TtHDHYn9/gUFfy4B6zxHa6nJ5+L2MUKZM
-OR1V6+WXyrDz3mhaJa/Wv8jXA3cjEZNZgBeKi4LQFJkasP6hgxQ=
-=/dox
------END PGP SIGNATURE-----
+								JJ
 
---j5dba3slve6pqkyu--
+
+
+> Distributing a single device executable that works with many QEMUs =
+(e.g.
+> CentOS, Ubuntu) and versions becomes difficult.
+>=20
+> I want to mention that we have the option of doing this if there are
+> strong concerns about out-of-tree devices.  It does have downsides:
+> 1. Inability to share devices with other VMMs.
+> 2. Probably won't replace vhost-user due to the out-of-tree =
+limitations.
+> 3. Can still be circumvented by a motivated device author.
+>=20
+> Stefan
+
 
