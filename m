@@ -2,53 +2,47 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69877C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42C6C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C79C21D7D
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:31:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C79C21D7D
+	by mail.kernel.org (Postfix) with ESMTPS id B824021D7D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 04:32:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B824021D7D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ii9xG-0006w8-8A
-	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:31:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
+	id 1ii9xi-0007kv-SQ
+	for qemu-devel@archiver.kernel.org; Thu, 19 Dec 2019 23:32:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9qM-0004aq-QM
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:24:51 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9nh-0008UX-7Z
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1ii9qL-00059m-JM
- for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:24:50 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34570)
+ (envelope-from <fthain@telegraphics.com.au>) id 1ii9nf-00023M-K8
+ for qemu-devel@nongnu.org; Thu, 19 Dec 2019 23:22:04 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:34454)
  by eggs.gnu.org with esmtp (Exim 4.71)
  (envelope-from <fthain@telegraphics.com.au>)
- id 1ii9qL-00058O-D5; Thu, 19 Dec 2019 23:24:49 -0500
-Received: from localhost (localhost.localdomain [127.0.0.1])
- by kvm5.telegraphics.com.au (Postfix) with ESMTP id 6735A2290B;
- Thu, 19 Dec 2019 23:24:47 -0500 (EST)
-Date: Fri, 20 Dec 2019 15:24:48 +1100 (AEDT)
+ id 1ii9nf-00020y-0p; Thu, 19 Dec 2019 23:22:03 -0500
+Received: by kvm5.telegraphics.com.au (Postfix, from userid 502)
+ id B1EDD28523; Thu, 19 Dec 2019 23:22:02 -0500 (EST)
+To: Jason Wang <jasowang@redhat.com>,
+    qemu-devel@nongnu.org
+Message-Id: <7e4a17ec16270797b1d47042f95263c3dcbeea5a.1576815466.git.fthain@telegraphics.com.au>
+In-Reply-To: <cover.1576815466.git.fthain@telegraphics.com.au>
+References: <cover.1576815466.git.fthain@telegraphics.com.au>
 From: Finn Thain <fthain@telegraphics.com.au>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, 
- =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>
-Subject: Re: [PATCH 00/10] Fixes for DP8393X SONIC device emulation
-In-Reply-To: <CAL1e-=iTBxqCsNCbGpONdewE4uTDG=OAV36fF_Cq9=i6KQhMaA@mail.gmail.com>
-Message-ID: <alpine.LNX.2.21.1.1912200912360.8@nippy.intranet>
-References: <cover.1576286757.git.fthain@telegraphics.com.au>
- <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
- <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
- <CAL1e-=hRs0EMz7ZTt+GXMfyHW8arq-h-m1Dzd3jz+vqP82+zjA@mail.gmail.com>
- <CAL1e-=iTBxqCsNCbGpONdewE4uTDG=OAV36fF_Cq9=i6KQhMaA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: [PATCH v2 09/13] dp8393x: Use long-word-aligned RRA pointers in
+ 32-bit mode
+Date: Fri, 20 Dec 2019 15:17:46 +1100
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
@@ -62,40 +56,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 15 Dec 2019, Aleksandar Markovic wrote:
+Section 3.4.1 of the datasheet says,
 
-> 
-> Herve,
-> 
-> Is there any way for us to come up with an equivalent or at least
-> approximate scenario for Jazz machines?
-> 
-> Regards,
-> Aleksandar
-> 
+    The alignment of the RRA is confined to either word or long word
+    boundaries, depending upon the data width mode. In 16-bit mode,
+    the RRA must be aligned to a word boundary (A0 is always zero)
+    and in 32-bit mode, the RRA is aligned to a long word boundary
+    (A0 and A1 are always zero).
 
-That would be useful in general, but in this case I think it might be 
-better to test NetBSD, since I have already tested Linux. (I had to fix 
-some bugs in the Linux sonic driver.)
+This constraint has been implemented for 16-bit mode; implement it
+for 32-bit mode too.
 
-I tried to boot NetBSD/arc but failed. I got a blue screen when I typed 
-"cd:boot" at the "Run A Program" prompt in the ARC menu.
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+---
+ hw/net/dp8393x.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-$ ln -s NTPROM.RAW mipsel_bios.bin
-$ mips64el-softmmu/qemu-system-mips64el -M magnum -L . 
--drive if=scsi,unit=2,media=cdrom,format=raw,file=NetBSD-8.1-arc.iso 
--global ds1225y.filename=nvram -global ds1225y.size=8200
-qemu-system-mips64el: g364: invalid read at [0000000000102000]
-$ 
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index d722bbe8c1..a3936d3b7b 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -659,12 +659,16 @@ static void dp8393x_write(void *opaque, hwaddr addr, uint64_t data,
+                 qemu_flush_queued_packets(qemu_get_queue(s->nic));
+             }
+             break;
+-        /* Ignore least significant bit */
++        /* The guest is required to store aligned pointers here */
+         case SONIC_RSA:
+         case SONIC_REA:
+         case SONIC_RRP:
+         case SONIC_RWP:
+-            s->regs[reg] = data & 0xfffe;
++            if (s->regs[SONIC_DCR] & SONIC_DCR_DW) {
++                s->regs[reg] = data & 0xfffc;
++            } else {
++                s->regs[reg] = data & 0xfffe;
++            }
+             break;
+         /* Invert written value for some registers */
+         case SONIC_CRCT:
+-- 
+2.23.0
 
-Any help would be appreciated.
 
