@@ -2,79 +2,95 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D95C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF75DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:07:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1F13206EC
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:07:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BADE2206EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 14:07:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8sQNeLN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1F13206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l6IlTDNs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BADE2206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiIwH-0000zA-Ie
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:07:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38976)
+	id 1iiIwK-00011a-Re
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 09:07:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37087)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiIgd-0001vd-5n
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:51:24 -0500
+ (envelope-from <luis.machado@linaro.org>) id 1iiIBL-00062I-Ox
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iiIgb-0004GZ-Lh
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:51:23 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59592
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iiIgb-0004ER-Gt
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:51:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576849881;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PPx08BopiHXZa7B3PA/Z39xri88cttLR72DVl8lC5xQ=;
- b=R8sQNeLNwdO7kDemnFsRDO/x+Qlj9FbJHCGpdbq/E9ooiWGsjazrDhT/I6GbjarxnDjxCv
- iCwAFu9KCw9A9lWj28nSBNo0d60lRS+QidZdP2qSYA3gHQigAKKo+sp7hB9SmikFAnhDy0
- KCvk+a8wlvZIG/w/eaFr4KxqIpczMzs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-ThTFYdbVPSe-3rTVoYCyvw-1; Fri, 20 Dec 2019 08:51:18 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D442800053;
- Fri, 20 Dec 2019 13:51:17 +0000 (UTC)
-Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AEDF06E41F;
- Fri, 20 Dec 2019 13:51:11 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v5 30/37] cris: improve passing PIC interrupt vector to the CPU
-Date: Fri, 20 Dec 2019 17:45:54 +0400
-Message-Id: <20191220134601.571905-31-marcandre.lureau@redhat.com>
-In-Reply-To: <20191220134601.571905-1-marcandre.lureau@redhat.com>
-References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
+ (envelope-from <luis.machado@linaro.org>) id 1iiIBK-0000Ms-7m
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:19:03 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:53839)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <luis.machado@linaro.org>)
+ id 1iiIBJ-0000G2-QE
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:19:02 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id n96so4101255pjc.3
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 05:19:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4aK/ve40XlXyED/AEPJ4m4wmtwjR1LdUmhAHwiSmLJo=;
+ b=l6IlTDNsvGyoB0tXXWQHti/s95zZOjKD7QSM/iiqgWQHlu/BNJKjy77573eoZHiRi1
+ UyU2sc9LkhbSxqBYipLylqXs1qrcfzErjz/wKniNoOZl8UgQKTd6A/VomCu5IOBsM3df
+ lR8pGwT0Np5uEp4ZIwaractOxLEN5EMloX02ENBokjLaT4dN9CpRYcRiMWvyo444hcAA
+ 7PjuDbvkMtY5RhbpJGeZMrMROIS10rmFSKNjldTmt608Q6wOTYS8mbFaAhZFGL8f3mW+
+ NqXtJ7M5S7ld3WmWIOlJYMuYNuyx15LsUqWJei9hloiV5lW+9965EcoOCmzmTDuRkqt+
+ tYVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4aK/ve40XlXyED/AEPJ4m4wmtwjR1LdUmhAHwiSmLJo=;
+ b=cIAdxFnUzyn+mSRJp7Q7w8lrIgbesdrDGinokPqxm570XeBLsGIgHlYGJCCYbri2bV
+ H1UjFl4BH1t6Nw5e7z2vLFmJKPq/IELwLgbmgcLDIJAX7ykYUWv+0SSbq0Hi3vCViluY
+ 4m3+QyESA4mib0QE3y72vXJJHYApvo6uZnsceaG/WbvxaagODt5H8HUD9hfiwD1OTq58
+ WqAjXU9GehM6hF15oGUiRoZdaP5RqABmJc5V2gLfWPpCrDIDaHOooVuOI4RYUJHWspmb
+ CKitWfLoJ/jAfNw4zi0d9If8zj64kCDFCEfZmcnxwbulOMQLEpnwKQaRgM+FH86gS2nA
+ QwQw==
+X-Gm-Message-State: APjAAAV4oKsap4L9wYlc35h2rWRtmzMnjhUw92aX/UNA8dWFMnNBJqb7
+ 8EWh6SJ9kPZQS+bMViXbzf6XQQ==
+X-Google-Smtp-Source: APXvYqyWN9m1C/V/VpQl/BKNVN/sNfLzvNeD66xVzRfevTHKsRReemtDQ6psnbh0PHz+NZi9wIDdyg==
+X-Received: by 2002:a17:90a:8a0e:: with SMTP id
+ w14mr16312526pjn.51.1576847940320; 
+ Fri, 20 Dec 2019 05:19:00 -0800 (PST)
+Received: from ?IPv6:2804:7f0:8282:d06:e0aa:310d:b742:862f?
+ ([2804:7f0:8282:d06:e0aa:310d:b742:862f])
+ by smtp.gmail.com with ESMTPSA id 199sm13643132pfv.81.2019.12.20.05.18.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 20 Dec 2019 05:18:59 -0800 (PST)
+Subject: Re: [PATCH v3 12/20] target/arm: generate xml description of our SVE
+ registers
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20191211170520.7747-1-alex.bennee@linaro.org>
+ <20191211170520.7747-13-alex.bennee@linaro.org>
+ <69e10c48-8bdf-cbe0-3372-815b647f8312@linaro.org> <87k16sdt4d.fsf@linaro.org>
+ <5c6dd0a9-23ba-63ff-5738-8bac11aad810@linaro.org> <87eewzdtqg.fsf@linaro.org>
+From: Luis Machado <luis.machado@linaro.org>
+Message-ID: <81e43d43-29f8-ec56-5270-bb90dd1bc077@linaro.org>
+Date: Fri, 20 Dec 2019 10:18:54 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ThTFYdbVPSe-3rTVoYCyvw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <87eewzdtqg.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1042
+X-Mailman-Approved-At: Fri, 20 Dec 2019 09:01:13 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,154 +102,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: damien.hedde@greensocs.com, Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, alan.hayward@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of accessing cpu interrupt vector directly from PIC, send the
-vector value over the qemu_irq.
+On 12/20/19 10:14 AM, Alex Bennée wrote:
+> 
+> Luis Machado <luis.machado@linaro.org> writes:
+> 
+>> On 12/19/19 4:15 PM, Alex Bennée wrote:
+>>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>>
+>>>> On 12/11/19 9:05 AM, Alex Bennée wrote:
+>>>>> +static struct TypeSize vec_lanes[] = {
+>>>>
+>>>> const.
+>>>>
+>>>>> +    case 51:
+>>>>> +        return gdb_get_reg64(buf, (cpu->env.vfp.zcr_el[1] & 0xf) + 1);
+>>>>
+>>>> You need to use sve_zcr_len_for_el to get the effective vq.
+>>>> Also, I thought vg == 2 * vq.
+>>>>    > +    case 51:
+>>>>> +    {
+>>>>> +        uint64_t val = *(uint64_t *) buf;
+>>>>> +        cpu->env.vfp.zcr_el[1] = (val - 1) & 0xf;
+>>>>
+>>>> You cannot hard-code EL1 without ifdef CONFIG_USER_ONLY.  If the effective vq
+>>>> decreases, you must call aarch64_sve_narrow_vq.  You must call arm_rebuild_hflags.
+>>> I'm just going to drop vg (and therefor the ability to set it) from
+>>> the
+>>> regset. It was only meant to be an indicator and gdb doesn't actually
+>>> look to it to size it's output. The likely dynamic extension will just
+>>> re-transmit the whole XML when a change occurs.
+>>>
+>>
+>> I'd verify with GDB first if vg isn't actually required.
+> 
+> It works with my tests but perhaps we use our own namespaced XML rather
+> than the gdbstub XML.
+> 
+>>  From looking at GDB's code, it does set vg as one of the register
+>> names, and this is regardless of any XML input. It does reference VG
+>> here and there in the code, even though it may not use it to size its
+>> output.
+> 
+> But this is all special casing for feature
+> name="org.gnu.gdb.aarch64.sve" right?
+> 
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/cris/axis_dev88.c  |  4 ----
- hw/intc/etraxfs_pic.c | 26 +-------------------------
- target/cris/cpu.c     |  8 ++++++++
- target/cris/cpu.h     |  1 +
- 4 files changed, 10 insertions(+), 29 deletions(-)
-
-diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-index 940c7dd122..be7760476a 100644
---- a/hw/cris/axis_dev88.c
-+++ b/hw/cris/axis_dev88.c
-@@ -253,7 +253,6 @@ void axisdev88_init(MachineState *machine)
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     CRISCPU *cpu;
--    CPUCRISState *env;
-     DeviceState *dev;
-     SysBusDevice *s;
-     DriveInfo *nand;
-@@ -267,7 +266,6 @@ void axisdev88_init(MachineState *machine)
-=20
-     /* init CPUs */
-     cpu =3D CRIS_CPU(cpu_create(machine->cpu_type));
--    env =3D &cpu->env;
-=20
-     /* allocate RAM */
-     memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram",
-@@ -297,8 +295,6 @@ void axisdev88_init(MachineState *machine)
-=20
-=20
-     dev =3D qdev_create(NULL, "etraxfs,pic");
--    /* FIXME: Is there a proper way to signal vectors to the CPU core?  */
--    qdev_prop_set_ptr(dev, "interrupt_vector", &env->interrupt_vector);
-     qdev_init_nofail(dev);
-     s =3D SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(s, 0, 0x3001c000);
-diff --git a/hw/intc/etraxfs_pic.c b/hw/intc/etraxfs_pic.c
-index 77f652acec..12988c7aa9 100644
---- a/hw/intc/etraxfs_pic.c
-+++ b/hw/intc/etraxfs_pic.c
-@@ -27,8 +27,6 @@
- #include "qemu/module.h"
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
--//#include "pc.h"
--//#include "etraxfs.h"
-=20
- #define D(x)
-=20
-@@ -48,7 +46,6 @@ struct etrax_pic
-     SysBusDevice parent_obj;
-=20
-     MemoryRegion mmio;
--    void *interrupt_vector;
-     qemu_irq parent_irq;
-     qemu_irq parent_nmi;
-     uint32_t regs[R_MAX];
-@@ -79,11 +76,7 @@ static void pic_update(struct etrax_pic *fs)
-         }
-     }
-=20
--    if (fs->interrupt_vector) {
--        /* hack alert: ptr property */
--        *(uint32_t*)(fs->interrupt_vector) =3D vector;
--    }
--    qemu_set_irq(fs->parent_irq, !!vector);
-+    qemu_set_irq(fs->parent_irq, vector);
- }
-=20
- static uint64_t
-@@ -163,28 +156,11 @@ static void etraxfs_pic_init(Object *obj)
-     sysbus_init_mmio(sbd, &s->mmio);
- }
-=20
--static Property etraxfs_pic_properties[] =3D {
--    DEFINE_PROP_PTR("interrupt_vector", struct etrax_pic, interrupt_vector=
-),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void etraxfs_pic_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc =3D DEVICE_CLASS(klass);
--
--    dc->props =3D etraxfs_pic_properties;
--    /*
--     * Note: pointer property "interrupt_vector" may remain null, thus
--     * no need for dc->user_creatable =3D false;
--     */
--}
--
- static const TypeInfo etraxfs_pic_info =3D {
-     .name          =3D TYPE_ETRAX_FS_PIC,
-     .parent        =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(struct etrax_pic),
-     .instance_init =3D etraxfs_pic_init,
--    .class_init    =3D etraxfs_pic_class_init,
- };
-=20
- static void etraxfs_pic_register_types(void)
-diff --git a/target/cris/cpu.c b/target/cris/cpu.c
-index 7adfd6caf4..6a857f548d 100644
---- a/target/cris/cpu.c
-+++ b/target/cris/cpu.c
-@@ -147,6 +147,14 @@ static void cris_cpu_set_irq(void *opaque, int irq, in=
-t level)
-     CPUState *cs =3D CPU(cpu);
-     int type =3D irq =3D=3D CRIS_CPU_IRQ ? CPU_INTERRUPT_HARD : CPU_INTERR=
-UPT_NMI;
-=20
-+    if (irq =3D=3D CRIS_CPU_IRQ) {
-+        /*
-+         * The PIC passes us the vector for the IRQ as the value it sends
-+         * over the qemu_irq line
-+         */
-+        cpu->env.interrupt_vector =3D level;
-+    }
-+
-     if (level) {
-         cpu_interrupt(cs, type);
-     } else {
-diff --git a/target/cris/cpu.h b/target/cris/cpu.h
-index aba0a66474..a7c2a8e15b 100644
---- a/target/cris/cpu.h
-+++ b/target/cris/cpu.h
-@@ -34,6 +34,7 @@
- #define CPU_INTERRUPT_NMI       CPU_INTERRUPT_TGT_EXT_3
-=20
- /* CRUS CPU device objects interrupt lines.  */
-+/* PIC passes the vector for the IRQ as the value of it sends over qemu_ir=
-q */
- #define CRIS_CPU_IRQ 0
- #define CRIS_CPU_NMI 1
-=20
---=20
-2.24.0.308.g228f53135a
-
+Yes, vg is only available if feature org.gnu.gdb.aarch64.sve is available.
 
