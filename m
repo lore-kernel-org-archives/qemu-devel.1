@@ -2,76 +2,75 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB9CC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C8FC2D0D2
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:12:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B424206D3
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:09:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="K3ns4gVM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B424206D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
+	by mail.kernel.org (Postfix) with ESMTPS id 012C621D7D
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 17:12:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 012C621D7D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiLm9-0008Ma-2S
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:09:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52806)
+	id 1iiLpK-0004Cs-4j
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 12:12:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>) id 1iiLh8-0004Do-39
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:04:07 -0500
+ (envelope-from <bounces@canonical.com>) id 1iiLoY-0003FG-NX
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:11:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <svens@stackframe.org>) id 1iiLh6-0002mq-2U
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:04:05 -0500
-Received: from shroom.duncanthrax.net ([2a01:4f8:121:41fa::169]:40571
- helo=smtp.duncanthrax.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <svens@stackframe.org>)
- id 1iiLh3-0002ig-Lf
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:04:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=duncanthrax.net; s=dkim; h=In-Reply-To:Content-Type:MIME-Version:References
- :Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding
- :Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
- Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
- List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=sGp+99S+kUq+lR8QZ830jUWqwgQnW0U0IhXosH4PDj4=; b=K3ns4gVMZayuiWD/wXqid8VB68
- lcREmWGOHYCqz0a5dGFuPGbB59MeXJrCSzzZopLdOoa3R3vAqI+BwqAy/ZAi8HAuDTt4x8uDcGoyY
- QSy21nstNUEEbP1FJllR3uMuhnpklLPTCduOTB1szbchr2wKD1iIm7GDNmK4anFy4vCE=;
-Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
- ([46.5.233.221] helo=t470p.stackframe.org)
- by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>)
- id 1iiLgx-0006zY-9j; Fri, 20 Dec 2019 18:03:55 +0100
-Date: Fri, 20 Dec 2019 18:03:54 +0100
-From: Sven Schnelle <svens@stackframe.org>
-To: Helge Deller <deller@gmx.de>
-Subject: Re: [PATCH v4 5/6] hppa: Add emulation of Artist graphics
-Message-ID: <20191220170354.GA2762@t470p.stackframe.org>
-References: <20191103205607.6590-1-svens@stackframe.org>
- <20191103205607.6590-6-svens@stackframe.org>
- <8a34a5a3-eb8f-c600-b17e-f9b448ea0925@linaro.org>
- <e8efe083-eed1-d7e8-8513-b26d2878bfdd@gmx.de>
- <237c693d-944c-8641-87d9-6bbd52736e5a@gmx.de>
+ (envelope-from <bounces@canonical.com>) id 1iiLoX-0003SK-AM
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:11:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33970)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iiLoX-0003QQ-0a
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 12:11:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iiLoU-0007mk-Nd
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:11:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id ACE092E80CE
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:11:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <237c693d-944c-8641-87d9-6bbd52736e5a@gmx.de>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:121:41fa::169
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 20 Dec 2019 17:02:28 -0000
+From: ecsdn <1856834@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
+X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
+X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
+References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
+Message-Id: <157686134861.27735.4167922142644220101.malone@chaenomeles.canonical.com>
+Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
+ versions
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 0d58c874ea626c549d4eee5ebdbb596155dfbd56
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,82 +79,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Thanks I tried with:
 
-On Fri, Dec 20, 2019 at 05:36:36PM +0100, Helge Deller wrote:
-> On 20.12.19 08:26, Helge Deller wrote:
-> > On 19.12.19 01:28, Richard Henderson wrote:
-> >> On 11/3/19 10:56 AM, Sven Schnelle wrote:
-> >>> This adds emulation of Artist graphics good enough
-> >>> to get a Text console on both Linux and HP-UX. The
-> >>> X11 server from HP-UX also works.
-> >>>
-> >>> Signed-off-by: Sven Schnelle <svens@stackframe.org>
-> >>> ---
-> >>>  hw/display/Kconfig       |    4 +
-> >>>  hw/display/Makefile.objs |    1 +
-> >>>  hw/display/artist.c      | 1449 ++++++++++++++++++++++++++++++++++++++
-> >>>  hw/display/trace-events  |    9 +
-> >>>  hw/hppa/Kconfig          |    1 +
-> >>>  hw/hppa/hppa_hardware.h  |    1 +
-> >>>  hw/hppa/machine.c        |    9 +
-> >>>  7 files changed, 1474 insertions(+)
-> >>>  create mode 100644 hw/display/artist.c
-> >>
-> >> Seems to have some problems rebased upon master:
-> >>
-> >> ...
-> >
-> > Richard, the attached patch (for seabios-hppa) fixes it for me.
-> > Can you test as well?
-> > It fixes the sti text column to go out-of-range and thus outside the framebuffer memory.
-> 
-> The attached patch is even better.
-> It always wraps to the next line (or scrolls the screen if necessary) if
-> the end of the line has been reached.
-> 
-> Helge
+/root/QEMU/qemu-git-4.2.0rc4/qemu/build/ppc-softmmu/qemu-system-ppc -M
+mpc8544ds -nographic -kernel /home/me/boot/uImage-2.6.32 -append
+"root=3D/dev/vda rw" -device virtio-blk-pci,drive=3Ddrive0,disable-
+modern=3Dtrue -drive
+file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
 
-> diff --git a/src/parisc/sti.c b/src/parisc/sti.c
-> index 7935770..61e7002 100644
-> --- a/src/parisc/sti.c
-> +++ b/src/parisc/sti.c
-> @@ -168,5 +168,10 @@ void sti_putc(const char c)
->          }
->          return;
->      }
-> +
-> +    /* wrap to next line or scroll screen if EOL reached */
-> +    if (col >= ((sti_glob_cfg.onscreen_x / font->width) - 1))
-> +	sti_putc('\n');
-> +
->      sti_putchar(rom, row, col++, c);
->  }
+And again it worked with qemu 2.8.1 but failed with the above 4.2.0rc4
+on the same x86_64 host.
 
-Besides this, the root cause is the out-of-bounds check in vram_bit_write():
-This fixes the crash for me. I'll resend an updated version later. Thanks for
-helping debugging this issue!
+On another x86_64 host I confirmed that the below works with qemu 2.8.0
 
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 1d6c7d5d76..13c770e795 100644
---- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -360,7 +360,7 @@ static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_x,
-         return;
-     }
+root@myserver:~# qemu-system-ppc -M mpc8544ds -nographic -kernel
+/home/me/boot/uImage-2.6.32 -append "root=3D/dev/vda rw" -device virtio-
+blk-pci,drive=3Ddrive0,disable-modern=3Dtrue -drive
+file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
 
--    if (posy * width + posx > buf->size) {
-+    if (posy * width + posx >= buf->size) {
-         qemu_log("write outside bounds: wants %dx%d, max size %dx%d\n",
-                 posx, posy, width, height);
-         return;
+But again even on this system 4.2.0 failes with that same command:
+root@myserver:~# /root/QEMU/qemu-4.2.0/build/ppc-softmmu/qemu-system-ppc -M=
+ mpc8544ds -nographic -kernel /home/me/boot/uImage-2.6.32 -append "root=3D/=
+dev/vda rw" -device virtio-blk-pci,drive=3Ddrive0,disable-modern=3Dtrue -dr=
+ive file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
 
-Regards
-Sven
+Fails/freezes at the same vda: location.
+
+Running it from its installed location didn't help, the following still
+failed at vda: also.
+
+root@myserver:/opt/qemu4.2.0/bin# ./qemu-system-ppc -M mpc8544ds
+-nographic -kernel /home/me/boot/uImage-2.6.32 -append "root=3D/dev/vda
+rw" -device virtio-blk-pci,drive=3Ddrive0,disable-modern=3Dtrue -drive
+file=3D/home/me/mmcblk0p2.dd,if=3Dnone,id=3Ddrive0,format=3Draw
+
+Although I didn't think its required for the softmmu qemu "emulation"
+only, ie not "kvm", I even enabled kvm as well as DMAR+IOMMU on the
+kernel and recompiled 4.2.0 but had same vda: failure.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856834
+
+Title:
+  Virtio broken in qemu ppc in 4.2.0 and other versions
+
+Status in QEMU:
+  New
+
+Bug description:
+  The same qemu -M mpc... command that works on qemu-system-ppc version
+  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
+  version 4.2.0release and 4.19dirtygit:
+
+  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
+ccel kvm is set.
+  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
+e (slower).
+
+  ends/freezes at:
+  nbd: registered device at major 43
+  =C2=A0vda:
+
+  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
+  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
+  with 2.8.0 official release from git/github that I compiled/built
+  myself. But both of the newer releases fail on the same exact machine
+  same config.
+
+  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
+ed weren't, ie gave
+  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
+bus=3D0,unit=3D0
+  (but I removed -drive if=3Dmtd since wasn't using it anyway)
+
+  I also tried on windows but I think virtio doesn't work on windows
+  hosts at all? On windows host it fails the same way, even version 2.12
+  as well as 4.1.10...
+
+  used:
+  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
+
+  (basically all steps the same on same exact system same config, yet
+  2.8.0 works fine whether apt-get installed or built from source while
+  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
+
+  In case newer qemu versions act weird on various kernels, I did try with =
+both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
+ compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
+_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
+ich is why I can't use -M ppce500 instead..)
+  tx
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
