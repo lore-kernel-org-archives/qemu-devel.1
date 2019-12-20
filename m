@@ -2,68 +2,89 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7725C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10A01C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:19:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13F9206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:19:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D10E32053B
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 21:19:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="MmrXsBXs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13F9206DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nc4GkIAn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10E32053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiPgI-0006zg-H2
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 16:19:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40086)
+	id 1iiPgL-00084c-PL
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 16:19:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>) id 1iiPcM-00044i-TB
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:15:28 -0500
+ (envelope-from <eblake@redhat.com>) id 1iiPfU-00070l-E6
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:18:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <svens@stackframe.org>) id 1iiPcL-0004US-IU
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:15:26 -0500
-Received: from shroom.duncanthrax.net ([2a01:4f8:121:41fa::169]:32827
- helo=smtp.duncanthrax.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <svens@stackframe.org>)
- id 1iiPcK-0004M0-Tt
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:15:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:MIME-Version:
- References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
- Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=TlOs2J/DOVsKTrU4mZauVdbZC2Ry7+/K8wOK+XSZgS0=; b=MmrXsBXsuJ4sZ5VeoBVpxlzRSg
- EUPE9u6r7CHkWqDmtyzZCf3bcDfRdD/pPl/sfFq862G23Y5IVlnqBq0BBropC6kFpb4YkF9+gZ8TY
- L6vP2rjgFc/i5HzudBchyLS+ynttjYXSThSkg8aJ/B2aRTeTn7jArgBTIHPUaA6yjKBc=;
-Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
- ([46.5.233.221] helo=x280.stackframe.org)
- by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>)
- id 1iiPcI-0000lb-Nt; Fri, 20 Dec 2019 22:15:22 +0100
-From: Sven Schnelle <svens@stackframe.org>
-To: Richard Henderson <rth@twiddle.net>
-Subject: [PATCH v5 3/6] ps2: accept 'Set Key Make and Break' commands
-Date: Fri, 20 Dec 2019 22:15:09 +0100
-Message-Id: <20191220211512.3289-4-svens@stackframe.org>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191220211512.3289-1-svens@stackframe.org>
-References: <20191220211512.3289-1-svens@stackframe.org>
+ (envelope-from <eblake@redhat.com>) id 1iiPfT-0000Gk-Bo
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:18:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34623
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iiPfT-0000Ch-6u
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 16:18:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576876718;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=l4azdl7XUxdhDKK745rFe5LKT/LLcVGMlTEqAMl93CQ=;
+ b=Nc4GkIAnfdG9ttm9Eq+XmWgt+SCATaeC4ENqxC/i5Z7t1w8XPzcTkMYE0aVMn9I/C35OQr
+ qL5RXsclueetQWMVq2LHAr9ZDSdAG/KyRe2jUQVfQln2Be+S0lCuZwb8jaCHR0s5iOj3Xd
+ 7GLrzgmoj5auxxcjE7jeI0FmHIkXwuo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-GesS9bwtORyqx_ZfXwISsQ-1; Fri, 20 Dec 2019 16:18:35 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30DED1883520;
+ Fri, 20 Dec 2019 21:18:34 +0000 (UTC)
+Received: from [10.3.116.246] (ovpn-116-246.phx2.redhat.com [10.3.116.246])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC7DC19C68;
+ Fri, 20 Dec 2019 21:18:33 +0000 (UTC)
+Subject: Re: [PATCH 02/18] fuse: Allow exporting BDSs via FUSE
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20191219143818.1646168-1-mreitz@redhat.com>
+ <20191219143818.1646168-3-mreitz@redhat.com>
+ <20191220102656.GD4019@dhcp-200-226.str.redhat.com>
+ <1812e968-1197-523e-7039-caf29e3bbc4b@redhat.com>
+ <20191220112402.GE4019@dhcp-200-226.str.redhat.com>
+ <87pngjgo2h.fsf@dusky.pond.sub.org>
+ <20191220125839.GG4019@dhcp-200-226.str.redhat.com>
+ <877e2rf7sh.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <931c2067-fe6d-d65d-cc60-d0b20385e84b@redhat.com>
+Date: Fri, 20 Dec 2019 15:18:33 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:121:41fa::169
+In-Reply-To: <877e2rf7sh.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: GesS9bwtORyqx_ZfXwISsQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,64 +96,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-HP-UX sends both the 'Set key make and break (0xfc) and
-'Set all key typematic make and break' (0xfa). QEMU response
-with 'Resend' as it doesn't handle these commands. HP-UX than
-reports an PS/2 max retransmission exceeded error. Add these
-commands and just reply with ACK.
+On 12/20/19 7:25 AM, Markus Armbruster wrote:
 
-Signed-off-by: Sven Schnelle <svens@stackframe.org>
----
- hw/input/ps2.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+>>
+>> I suppose moving a field between a union base and all variants does
+>> still result in different introspection even though the accepted inputs
+>> are the same.
+> 
+> Correct.  A common member (whether it's local or from the base) is in
+> SchemaInfoObject.members[].  Moving it to all the variants moves it to
+> the variant types' .members[].
+> 
+>>                Is this kind of movement still allowed unconditionally or
+>> should we be more careful with something like this?
+> 
+> QMP's backward compatibility promise does not include "introspection
+> value won't change".  Still, such changes can conceivably confuse
+> clients.  Care is advisable.  But it's not a hard "no".
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 67f92f6112..0b671b6339 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -49,6 +49,8 @@
- #define KBD_CMD_RESET_DISABLE	0xF5	/* reset and disable scanning */
- #define KBD_CMD_RESET_ENABLE   	0xF6    /* reset and enable scanning */
- #define KBD_CMD_RESET		0xFF	/* Reset */
-+#define KBD_CMD_SET_MAKE_BREAK  0xFC    /* Set Make and Break mode */
-+#define KBD_CMD_SET_TYPEMATIC   0xFA    /* Set Typematic Make and Break mode */
- 
- /* Keyboard Replies */
- #define KBD_REPLY_POR		0xAA	/* Power on reset */
-@@ -573,6 +575,7 @@ void ps2_write_keyboard(void *opaque, int val)
-         case KBD_CMD_SCANCODE:
-         case KBD_CMD_SET_LEDS:
-         case KBD_CMD_SET_RATE:
-+        case KBD_CMD_SET_MAKE_BREAK:
-             s->common.write_cmd = val;
-             ps2_queue(&s->common, KBD_REPLY_ACK);
-             break;
-@@ -592,11 +595,18 @@ void ps2_write_keyboard(void *opaque, int val)
-                 KBD_REPLY_ACK,
-                 KBD_REPLY_POR);
-             break;
-+        case KBD_CMD_SET_TYPEMATIC:
-+            ps2_queue(&s->common, KBD_REPLY_ACK);
-+            break;
-         default:
-             ps2_queue(&s->common, KBD_REPLY_RESEND);
-             break;
-         }
-         break;
-+    case KBD_CMD_SET_MAKE_BREAK:
-+        ps2_queue(&s->common, KBD_REPLY_ACK);
-+        s->common.write_cmd = -1;
-+        break;
-     case KBD_CMD_SCANCODE:
-         if (val == 0) {
-             if (s->common.queue.count <= PS2_QUEUE_SIZE - 2) {
+And libvirt already correctly handles movements like this (so there are 
+existing clients aware of the potential confusion).
+
 -- 
-2.24.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
