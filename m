@@ -2,86 +2,90 @@ Return-Path: <SRS0=uEni=2K=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99017C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6709C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629D5206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:24:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93FFE206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 20 Dec 2019 13:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bN+mVGYc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629D5206DA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nUE6pb+O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93FFE206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiIGV-00016B-UV
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 08:24:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42597)
+	id 1iiIGY-00018x-A0
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 08:24:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iiIF4-0007SJ-AA
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:55 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iiIF3-0005Ut-3R
+ (envelope-from <alex.bennee@linaro.org>) id 1iiIF2-0007Rv-TB
  for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:54 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38762)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1iiIF1-0005P3-1d
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:52 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38760)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iiIF2-0005R4-Mp
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:52 -0500
-Received: by mail-wm1-x344.google.com with SMTP id u2so9218183wmc.3
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 05:22:52 -0800 (PST)
+ id 1iiIF0-0005Jc-Iy
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 08:22:50 -0500
+Received: by mail-wm1-x342.google.com with SMTP id u2so9218093wmc.3
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 05:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xiAAb76pOFZYS2kb+B4csCpUenDpkD5QkNMd1FaRNGI=;
- b=bN+mVGYcqMSSDTzLyQVDCq3mZen+JsZOqjGVDW2W8PhOGUcQVcbXb12LvTK3+2zSNe
- EgeD7beYvGLd3XOctfv3vzckKhsc2kMpjC4Om1IvQEfC47xiTxYoIETMC1EPmnVOvV4S
- W3O6S/pdE83zsC9CBJ+c1XOVEqx3vVTtMhlY5AlAfGbNpQLGYd9AM0P/hY9Nwzxbz8B7
- a2vnjhOKMyOvKWcQWB9GhtDhzgmVP6e/RA4g+Xo27kkrdr8Xvs/XZVNqpWjFmYyCWxrj
- elc2gLyIJkyfd05kGw0ZChVHG2cRt+iUqQY4gHWk8qBzLLZne5mAz0CsFD36mAtzKrfV
- 3sMQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ovdoYf7CDyOfpwifeooI731QUTwDX4W14EjWn1WUyGo=;
+ b=nUE6pb+O2XFAC6oAOxFwExUDYou7LIo786nSmjUlddRcNzddNEYeFFxianF5IawxwU
+ 9IuUsKaA5o9JPQ64aTV0rR6Ldko71fXr7D/+Wq26rgG9JxhJr6hFScLjRqxPWYJjHavX
+ YlEZkWkK4MGwfroFzlBD/XXxYt85CeZ5/UhSm1JUJthnFDPoosS0drSS72CaOs/tCndz
+ vkUb14CtQ57a+YljskAKWVmgn+6QiNzUSFy1/Gzjk3/KRohoxb7YNrrgvcUa2ZDXWCqR
+ jlqb0HKyBBBoZOC+Km6IIHViLDgHRV1HVY7tzLgnZLgdJGlmoejgt6diU/S/4+PBK/7U
+ OL3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xiAAb76pOFZYS2kb+B4csCpUenDpkD5QkNMd1FaRNGI=;
- b=NvbvvF6fEt6hNseZ4Wc5Q7jVOHOd55RK3pAyQJfBvq+IP1V6dOVVE/K1JzYFDFU89k
- DZ/oMcUv3Wz+tUZH+14UnK7d2RYiLEvQOPm0OIZ/uw2N/lYJ+/0dz/dResTQe4FdmCDv
- PAJG+CfmhrOEkQuPMrR8BMSSTbWwC+1SMlf0yBj7GOhH/iiX1iWKsRXsrH59kzTlHttK
- +6CGf4ZRfLozy6xAlG/pI8f45D8Lx4DEqZEEcDuKNeF+YDB1mONEMOPtD8YvbzeCkH+z
- cMJu2cVXlyNchhJkhX3zsFK3mUnnLG6ka2p5seQo5wCm0J71Thvw5OScd7l4iyhqIvJq
- a46w==
-X-Gm-Message-State: APjAAAUCT8XlVRQo1Z0RZKdHT1hCdqFjmSnjNQ5VqlzpLZz+0nQJG8zL
- ulSHa7CkAL87wwttj+q93rnASw==
-X-Google-Smtp-Source: APXvYqxouc9r3iP7ImYxpgnzr+4Ue6aVU0shUf/MHI1MqbJRbtiGoDot5KE8l9BBSozGoaYwSvb47Q==
-X-Received: by 2002:a1c:f213:: with SMTP id s19mr17427208wmc.42.1576848171425; 
- Fri, 20 Dec 2019 05:22:51 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ovdoYf7CDyOfpwifeooI731QUTwDX4W14EjWn1WUyGo=;
+ b=dWpE28FmJKjI72xWjMaVmMwjhq6Ev/ecTzkKS+fiYayOAGQX8y7yderqLG4WymVjee
+ BNwAuNy1AlkN2Rx5pzsVkcRE1dxPdhujdfyw7WchPb5cTJVhsFHXtqkcKX2lcxT2AFd/
+ 60uv7hdHHMuqlAyub1Wi1sUbqILy35kBns9aCopMEESyztzfbW8GaMHSETn3seVH/Z24
+ Ukc/NU0e3gDvXErGzflzh0cowe+GHD9h2pulmYunNycXrwnKAL4qTXouVzEGiX0iYIkF
+ CwI3m7LLEr3kAYDuSsXlQg9BUFXavFrkzzm20xaaMSo2Y9+MWR542FxcD1oBqKC0n0Ro
+ ccDQ==
+X-Gm-Message-State: APjAAAVNFRJl6XPhhen7N0W9usqJ9FRaI+fPfn7aZFPhuFZDZ3zGtGPh
+ B5q6GL1B/WOyGOsybO2+FXGebQ==
+X-Google-Smtp-Source: APXvYqzgEsLHk7u7rRHF4JlGBj4Qdgiz96dtsKDRxiOtOOz/g6qS2KIFeSl6ZXvWBwXYQ+bJ4Caj7A==
+X-Received: by 2002:a05:600c:1:: with SMTP id
+ g1mr15717810wmc.131.1576848168910; 
+ Fri, 20 Dec 2019 05:22:48 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s65sm9968729wmf.48.2019.12.20.05.22.47
+ by smtp.gmail.com with ESMTPSA id i11sm9852109wrs.10.2019.12.20.05.22.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Fri, 20 Dec 2019 05:22:47 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 96E5F1FF87;
+ by zen.linaroharston (Postfix) with ESMTP id C85C41FF8F;
  Fri, 20 Dec 2019 13:22:46 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 0/5] semihosting read console support
-Date: Fri, 20 Dec 2019 13:22:41 +0000
-Message-Id: <20191220132246.6759-1-alex.bennee@linaro.org>
+Subject: [PATCH v2 2/5] target/arm: only update pc after semihosting completes
+Date: Fri, 20 Dec 2019 13:22:43 +0000
+Message-Id: <20191220132246.6759-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191220132246.6759-1-alex.bennee@linaro.org>
+References: <20191220132246.6759-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,52 +97,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: keithp@keithp.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, keithp@keithp.com,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Before we introduce blocking semihosting calls we need to ensure we
+can restart the system on semi hosting exception. To be able to do
+this the EXCP_SEMIHOST operation should be idempotent until it finally
+completes. Practically this means ensureing we only update the pc
+after the semihosting call has completed.
 
-A quick update to introduce a new "blocking" console read function for
-semihosting. The main change is a new test case for user-mode and
-changing the linux-user implementation to also block on a getchar()
-without any fancy polling. Otherwise I've addresses the review
-comments and re-tested.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Keith Packard <keithp@keithp.com>
+Tested-by: Keith Packard <keithp@keithp.com>
+---
+ linux-user/aarch64/cpu_loop.c | 1 +
+ linux-user/arm/cpu_loop.c     | 1 +
+ target/arm/helper.c           | 2 ++
+ target/arm/m_helper.c         | 1 +
+ target/arm/translate-a64.c    | 2 +-
+ target/arm/translate.c        | 6 +++---
+ 6 files changed, 9 insertions(+), 4 deletions(-)
 
-The following patches need review
-   05 - tests tcg add user version of dumb as bricks semi
-
-Alex Bennée (4):
-  target/arm: remove unused EXCP_SEMIHOST leg
-  target/arm: only update pc after semihosting completes
-  tests/tcg: add a dumb-as-bricks semihosting console test
-  tests/tcg: add user version of dumb-as-bricks semiconsole test
-
-Keith Packard (1):
-  semihosting: add qemu_semihosting_console_inc for SYS_READC
-
- include/hw/semihosting/console.h          | 16 +++++
- include/hw/semihosting/semihost.h         |  4 ++
- hw/semihosting/console.c                  | 79 +++++++++++++++++++++++
- linux-user/aarch64/cpu_loop.c             |  1 +
- linux-user/arm/cpu_loop.c                 |  1 +
- linux-user/arm/semihost.c                 | 27 ++++++++
- stubs/semihost.c                          |  4 ++
- target/arm/arm-semi.c                     |  3 +-
- target/arm/helper.c                       |  8 +--
- target/arm/m_helper.c                     |  1 +
- target/arm/translate-a64.c                |  2 +-
- target/arm/translate.c                    |  6 +-
- tests/tcg/aarch64/system/semiconsole.c    | 38 +++++++++++
- tests/tcg/arm/semiconsole.c               | 47 ++++++++++++++
- vl.c                                      |  3 +
- tests/tcg/aarch64/Makefile.softmmu-target |  9 ++-
- tests/tcg/arm/Makefile.target             |  7 ++
- 17 files changed, 243 insertions(+), 13 deletions(-)
- create mode 100644 tests/tcg/aarch64/system/semiconsole.c
- create mode 100644 tests/tcg/arm/semiconsole.c
-
+diff --git a/linux-user/aarch64/cpu_loop.c b/linux-user/aarch64/cpu_loop.c
+index 31c845a70d4..bbe9fefca81 100644
+--- a/linux-user/aarch64/cpu_loop.c
++++ b/linux-user/aarch64/cpu_loop.c
+@@ -130,6 +130,7 @@ void cpu_loop(CPUARMState *env)
+             break;
+         case EXCP_SEMIHOST:
+             env->xregs[0] = do_arm_semihosting(env);
++            env->pc += 4;
+             break;
+         case EXCP_YIELD:
+             /* nothing to do here for user-mode, just resume guest code */
+diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
+index 7be40717518..1fae90c6dfc 100644
+--- a/linux-user/arm/cpu_loop.c
++++ b/linux-user/arm/cpu_loop.c
+@@ -377,6 +377,7 @@ void cpu_loop(CPUARMState *env)
+             break;
+         case EXCP_SEMIHOST:
+             env->regs[0] = do_arm_semihosting(env);
++            env->regs[15] += env->thumb ? 2 : 4;
+             break;
+         case EXCP_INTERRUPT:
+             /* just indicate that signals should be handled asap */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b4dc2274c8b..088e2693df8 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8602,11 +8602,13 @@ static void handle_semihosting(CPUState *cs)
+                       "...handling as semihosting call 0x%" PRIx64 "\n",
+                       env->xregs[0]);
+         env->xregs[0] = do_arm_semihosting(env);
++        env->pc += 4;
+     } else {
+         qemu_log_mask(CPU_LOG_INT,
+                       "...handling as semihosting call 0x%x\n",
+                       env->regs[0]);
+         env->regs[0] = do_arm_semihosting(env);
++        env->regs[15] += env->thumb ? 2 : 4;
+     }
+ }
+ #endif
+diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
+index 76de317e6af..33d414a684b 100644
+--- a/target/arm/m_helper.c
++++ b/target/arm/m_helper.c
+@@ -2185,6 +2185,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+                       "...handling as semihosting call 0x%x\n",
+                       env->regs[0]);
+         env->regs[0] = do_arm_semihosting(env);
++        env->regs[15] += env->thumb ? 2 : 4;
+         return;
+     case EXCP_BKPT:
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_DEBUG, false);
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index d4bebbe6295..972c28c3c95 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1937,7 +1937,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
+                 break;
+             }
+ #endif
+-            gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
++            gen_exception_internal_insn(s, s->pc_curr, EXCP_SEMIHOST);
+         } else {
+             unsupported_encoding(s, insn);
+         }
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 2b6c1f91bf9..5185e08641b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1124,7 +1124,7 @@ static inline void gen_hlt(DisasContext *s, int imm)
+         s->current_el != 0 &&
+ #endif
+         (imm == (s->thumb ? 0x3c : 0xf000))) {
+-        gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
++        gen_exception_internal_insn(s, s->pc_curr, EXCP_SEMIHOST);
+         return;
+     }
+ 
+@@ -8457,7 +8457,7 @@ static bool trans_BKPT(DisasContext *s, arg_BKPT *a)
+         !IS_USER(s) &&
+ #endif
+         (a->imm == 0xab)) {
+-        gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
++        gen_exception_internal_insn(s, s->pc_curr, EXCP_SEMIHOST);
+     } else {
+         gen_exception_bkpt_insn(s, syn_aa32_bkpt(a->imm, false));
+     }
+@@ -10266,7 +10266,7 @@ static bool trans_SVC(DisasContext *s, arg_SVC *a)
+         !IS_USER(s) &&
+ #endif
+         (a->imm == semihost_imm)) {
+-        gen_exception_internal_insn(s, s->base.pc_next, EXCP_SEMIHOST);
++        gen_exception_internal_insn(s, s->pc_curr, EXCP_SEMIHOST);
+     } else {
+         gen_set_pc_im(s, s->base.pc_next);
+         s->svc_imm = a->imm;
 -- 
 2.20.1
 
