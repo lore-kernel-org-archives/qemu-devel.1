@@ -2,71 +2,92 @@ Return-Path: <SRS0=aHsE=2L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FEC9C43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D92F4C43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:09:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03ACE20716
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:08:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03ACE20716
+	by mail.kernel.org (Postfix) with ESMTPS id A313D20716
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:09:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOilrbL2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A313D20716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiTG0-0003Ya-4U
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 20:08:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43989)
+	id 1iiTGW-0004ay-TG
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 20:09:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iiTCk-00065U-EE
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:05:15 -0500
+ id 1iiTAO-0002Vb-3l
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iiTCi-0008TV-Tx
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:05:14 -0500
-Received: from mail-yw1-f67.google.com ([209.85.161.67]:38403)
+ id 1iiTAN-0006m9-5r
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:02:48 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42456)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1iiTCi-0008Qv-JX
- for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:05:12 -0500
-Received: by mail-yw1-f67.google.com with SMTP id 10so4595242ywv.5
- for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:05:12 -0800 (PST)
+ id 1iiTAM-0006i3-Tr
+ for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:02:47 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q6so11029941wro.9
+ for <qemu-devel@nongnu.org>; Fri, 20 Dec 2019 17:02:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=khfObrraH+OQVE05FoSKKYYMBZ+cKKyCWdxbeBJAw0M=;
+ b=YOilrbL2O+wNeSpvGc88MosSSkbHNltFcklOYqGLle6y8YW/z5qoKNoPxpVHk/VHhh
+ x2EI+v+S52zBnHo/zsK2Sd63ya83PejGmnpBfuGU7ZU/x3hY0raMwHzsSgJLc/cMUx0a
+ TJbhpi86sngngiCO5os1zaZdsSmQcXJOAubkw/J22aEUfshILOEC6sqpYtDn281Ph66+
+ 6oT5zobWvfCGhtmfJA0mzwuZHhal2FXYezPMB557jm+eQLYLwRiSgvfaRMZBhUQ9OHAX
+ SvwX97pfXeoZsJMAoeH+fQ+09tZSVQZVLfMKhc4LO3h+4EwDPiF9dKK9vmlAG9QRxeF6
+ 7ZdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=rfZd3X4kFZ8+r7BcBBI0XVWCOdXjW2lSAaUxJ5cf304=;
- b=OzqCHB2CD2iLylu8W4SRqVYmhDtUfwWOUp3HTjbmXFK9ie0Pd6JuLFS6y4Wpib1JTp
- BGPej6QuWzUYSisK01kq6p/bUAnvOMSGY98cEtUah2S9Ce8JKFrZZDFm5iU2ote5dtxK
- NgWxawdnqafKlHe4ZxQBrLoJcZK5SOtyo+eYsT41IKB+ho+rji4j5hgfrDsk9QtjGjTa
- bATcRIhAbUo/r3afn4B7kFhLtMzB/57T3TcA+Uf1QpIcjYm5dq9S5sPSgm2aNw18sQr2
- 940vGBG++l3kYeaCEJzGOvsrk9cH0V113RUGuTTZ1MfXaC46Vnj+xChOyyFNFFobS4h/
- qVpQ==
-X-Gm-Message-State: APjAAAVskd6C9fvP1HJpd5p4F8Rym+NW9piMFKF2WkA3g9VrJfGnZ4fI
- p5AS4zqhPQye+p93g1w/p3O9v7YgUccBybI4aiPWPlO9
-X-Google-Smtp-Source: APXvYqxnc6mlbFry0Aw2uRItq8HlYIqUsMgzMH4qbS33mEWuA+95x5r3lpdxMJq5VvH02C7GtEDwAfVvTHymwlcOdzY=
-X-Received: by 2002:a0d:d84b:: with SMTP id a72mr12746924ywe.33.1576890311686; 
- Fri, 20 Dec 2019 17:05:11 -0800 (PST)
-MIME-Version: 1.0
-References: <20191221010226.9230-1-f4bug@amsat.org>
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=khfObrraH+OQVE05FoSKKYYMBZ+cKKyCWdxbeBJAw0M=;
+ b=lBYK6uluH/JJe+EBUK7LOD+kVx49xIdk7xSDRH7/JS3VhEwLT5A2f6Yj6y1ls8KAxW
+ jqMqikiZfnnuiNh1z+SEKeyleol3w7RxdLB9bdcAjlmgnVAfLk/Eh4cjP9B/HBdSKarg
+ YLtGv7F3BbsXzXEolEpyN4hAkO+9StvLkNGA/gQL7bIluy1N1WaIiP1/3zw136VP8TYk
+ HwCqGAmwwmU7bQRzZPuCxBX2nhC8UOInicZREh3qmIwkg0y/9cErfcgbhJPo7oF7SJsT
+ s4B2QjD9iTytjXVbIx4g90Llo9M7v0hnIdNnm8Qjel1w11WZ06awMb1xHSamlSWZNKdI
+ oD5w==
+X-Gm-Message-State: APjAAAXXnU/e4BT1iRX4Wonm3G+WJFu13/OUDY7Gu2py7zVp2ji6TR2f
+ 0s4orcyheXkiwAVsfPv3QIBW1tbI
+X-Google-Smtp-Source: APXvYqx7d4klmo+ZIjBhYMkWiTDXx3DchmLli0P/CM+xCdEWtNFFY64PcYQXDmLNmYKp2EWZ4+YUsQ==
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr18335447wrv.358.1576890165717; 
+ Fri, 20 Dec 2019 17:02:45 -0800 (PST)
+Received: from x1w.redhat.com (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id t125sm8449596wmf.17.2019.12.20.17.02.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 20 Dec 2019 17:02:45 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org,
+	Michael Rolnik <mrolnik@gmail.com>
+Subject: [PATCH v2 5/8] tests/boot-serial-test: Test some Arduino boards (AVR
+ based)
+Date: Sat, 21 Dec 2019 02:02:23 +0100
+Message-Id: <20191221010226.9230-6-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191221010226.9230-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 21 Dec 2019 02:05:00 +0100
-Message-ID: <CAAdtpL6nxYySPX77o31iWgTD2tGrigs2KSvA_nVEjM3drxQ7AQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] hw/avr: Introduce the Arduino boards
-To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Michael Rolnik <mrolnik@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.161.67
+References: <20191221010226.9230-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,44 +102,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
  Joaquin de Andres <me@xcancerberox.com.ar>,
  Richard Henderson <richard.henderson@linaro.org>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>, Stefan Hajnoczi <stefanha@redhat.com>,
- Phillip Stevens <phillip.stevens@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>,
  Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Dec 21, 2019 at 2:02 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> Hi,
->
-> This series add the arduino boards, aiming at removing the
-> 'sample' board that doesn't follow any specification.
->
-> Since v1:
-> - Addressed Igor comments
-> - Addressed Aleksandar comments
-> - Fixed UART issue (was due to IRQ shifted by 2 in CPU)
->
-> TODO after merge is:
-> - Extract Timer8 common parts from Timer16
-> - Add GPIOs
-> - Connect LED to GPIO on Arduino
-> - Plug to Scratch (See http://s4a.cat/).
->   (I plan to purpose that as a GSoC idea).
->
-> Thank you for having insisted with this port during so long!
-(This comment is for Michael)
+The Arduino Duemilanove is based on a AVR5 CPU, while the
+Arduino MEGA2560 on a AVR6 CPU.
 
-I forgot to amend this series (including Michael patches) is available here=
-:
-https://gitlab.com/philmd/qemu/commits/arduino-v2
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/boot-serial-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> Regards,
->
-> Phil.
->
-> Based-on: <20191218210329.1960-1-mrolnik@gmail.com>
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg666384.html
+diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
+index e556f09db8..582a497963 100644
+--- a/tests/boot-serial-test.c
++++ b/tests/boot-serial-test.c
+@@ -113,6 +113,8 @@ typedef struct testdef {
+ static testdef_t tests[] = {
+     { "alpha", "clipper", "", "PCI:" },
+     { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
++    { "avr", "arduino-duemilanove", "", "T", sizeof(bios_avr), NULL, bios_avr },
++    { "avr", "arduino-mega-2560-v3", "", "T", sizeof(bios_avr), NULL, bios_avr},
+     { "ppc", "ppce500", "", "U-Boot" },
+     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
+     { "ppc", "g3beige", "", "PowerPC,750" },
+-- 
+2.21.0
+
 
