@@ -2,101 +2,87 @@ Return-Path: <SRS0=aHsE=2L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E70AC2D0C3
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 16:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B77BC2D0C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 17:17:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4408B206EF
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 16:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BB212070B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 17:17:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jG/Ekdnc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4408B206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/bpaDLJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BB212070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iii2v-0007VO-AE
-	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 11:56:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37345)
+	id 1iiiO1-0007Op-4m
+	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 12:17:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36680)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iii27-0006y3-Fd
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 11:55:16 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iiiLv-0006VX-OP
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 12:15:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iii24-0003f9-7Y
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 11:55:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45168
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iii23-0003Uv-OH
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 11:55:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576947310;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oD744Z/8k1aMPJGmwRWlOVEeDulkttJM8pH/DLfCiM8=;
- b=jG/EkdncBwS1Fq9dnhAqk7MqV2KGRpu79NgeTItO7n1Yg9b7JWuHD2nmyusLS1U90dwFIN
- PHliqgA6M5p3lcEsegFSkHnaKEKJtgnk5L+sxqFpDS4ZC0zzneyDJYFw2sikT/SwaevJ4c
- RtHwFCAOgAARS9nRE9zL+T31849rqCI=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-y9YdmKCJMoiR-bnW2px_hw-1; Sat, 21 Dec 2019 11:55:08 -0500
-Received: by mail-wr1-f71.google.com with SMTP id h30so1682819wrh.5
- for <qemu-devel@nongnu.org>; Sat, 21 Dec 2019 08:55:08 -0800 (PST)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iiiLr-0007Cy-Fs
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 12:15:43 -0500
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:38733)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iiiLr-000786-4s
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 12:15:39 -0500
+Received: by mail-ot1-x331.google.com with SMTP id d7so11810075otf.5
+ for <qemu-devel@nongnu.org>; Sat, 21 Dec 2019 09:15:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=u9UCtoiUgKjc93otA3Y1EXU4e/QUw3KxfAWlreuTHPc=;
+ b=J/bpaDLJc+UKdEJf01s7YJGE9Z0cYdxKt+TGO43M/X+kHMtSrlQqN5pqYJFu/h+hG6
+ XLlOdmEr85aULjQq5RyXbI5V7M8BQOE+Yrfnll5LePdCnJDCA+R+8vrITXM/6ul5RJ+9
+ AZmOyuJZNK/eLP+Ofh/s86BVE0pVr5yQzXuh/Q4bS9nYf20NJ9WXguqS4WtEJ8Gln2Hz
+ RAH+21/o3efqEeRFodO9S2Z4mIOL1LTwMPT3Ecn7Y45Iw4XjSHAfUbnRxMbsloovcoEq
+ kdVVMxQk3aMAbj68bApPUArohz1SGHDwiRSMjKLV60LErPy/OiSI2D0udVW0J6gGiiwj
+ DHtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=l5wUHMnXvNAn+4mqLUeGMy+o6IFhf1m1EeiUh9W/Sk0=;
- b=ScVb9RHx0NRp7ov+LYSV4vAn2T4/vu3EF8GMiV13zCEBilLgOcFsPK49d1cxu6a/gJ
- 1tap1O6wyp70KE9u8PSJZd0yZv6yX5XLiHBuEOKuS94xQ7nvgVszVvadMtq0byB7gFRD
- t4PUzSZ/7QQJdrs/BU32c4bpmpVuaYbHm959EbS3wUgR7XOb9+s7sBK5mhD7pzvaPhSG
- 8pS3p+yqBLIXCaoo0I+k/TNlv5l9SR/3KErTXh99S0ydhK22S2J13he1FFi85psARIyL
- ZHGQ6d3TY8zJv9fIq1UYHJyOKWZy/sAefbSj/jtJJ1OU7DBwerh+W29p55P06WZCZ3ma
- G36g==
-X-Gm-Message-State: APjAAAXv2vgisGIYIxi93O/d2oASo4cwBOLQurW2vne6ifde4KtI0wNY
- pzebMtF7LvBQGryod5q6bQd4EnrgF+nRPAZjP8rg969Cp3tiwZ19pguzE7YUJNB2HQX5kFdAkjy
- RE5nyLEpRKvscX8I=
-X-Received: by 2002:a5d:538e:: with SMTP id d14mr21978534wrv.358.1576947307848; 
- Sat, 21 Dec 2019 08:55:07 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz7khAV+/82lvsf3E8JL7Wi9ZNmGdXflyqif2MCeSshLO6L2suLOHVe8GyJErVQLxyLOjvNGg==
-X-Received: by 2002:a5d:538e:: with SMTP id d14mr21978526wrv.358.1576947307664; 
- Sat, 21 Dec 2019 08:55:07 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id t1sm13704169wma.43.2019.12.21.08.55.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 21 Dec 2019 08:55:07 -0800 (PST)
-Subject: Re: [PATCH v27 06/21] target/rx: CPU definition
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>
-References: <20191221144238.127766-1-ysato@users.sourceforge.jp>
- <20191221144238.127766-7-ysato@users.sourceforge.jp>
- <CAL1e-=iFV=PumJ2M=rcpntkJ3NFWT7sqMcroJmiLYhsibwFf4Q@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0f822bed-dfbc-b4d2-c88f-f61bf5f16bfa@redhat.com>
-Date: Sat, 21 Dec 2019 17:55:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=u9UCtoiUgKjc93otA3Y1EXU4e/QUw3KxfAWlreuTHPc=;
+ b=j79qPZTHEjjOzatwfX49NbCRrjJX+vOouIKWtewb10x5jC5Mb9vGNP288TZXlXQDhS
+ 3QO7RBRs4rHRRQJGQDa673SyrPjksA/7VCBbvXy2qtQnSKJfVlzVM2PVrqhAPftzeIbs
+ y0TkFNhYeh+A7EFbymZo7/PyNBBl+64903/nUYw9t8vXxrIuNKWeTYKtbLMssVuIOsLW
+ Al9Yhdd2TYOdwaP/4JBU3BL06HydDEK37Xs9GyhFwhkW0fQBKTklh6aNHHToQJfuv9MG
+ m23VfoOTXd420ceoSxHGZwgQxOTBGd3RZCrfFie9t2Ftlc6zGWa1Or6cM/UkJwkyh5PV
+ ajEw==
+X-Gm-Message-State: APjAAAWUXps82uKrxvAM8N/KI/mPWKOmXJEdFZDLyXK2kbs8EeGgyK6d
+ bA1U/CmUSw2YsazzsGjjNOAQHg5ZETJEll2tTpU=
+X-Google-Smtp-Source: APXvYqxMf3dJ2WZF/vHi5YJZNdI8hHpIrVFbayN2SP1Q7YCLxTOAvBk9PazD2V8qa+Eqgnw9PVZZmT3F2wV5XeyQs2w=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr21971747otp.306.1576948537903; 
+ Sat, 21 Dec 2019 09:15:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=iFV=PumJ2M=rcpntkJ3NFWT7sqMcroJmiLYhsibwFf4Q@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: y9YdmKCJMoiR-bnW2px_hw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Sat, 21 Dec 2019 09:15:37 -0800 (PST)
+In-Reply-To: <CAL1e-=iQ=iBzn9sRDgx9Edi+rO=uP7RqpMyDJQD9RyiB5MwA=A@mail.gmail.com>
+References: <20191218210329.1960-1-mrolnik@gmail.com>
+ <20191218210329.1960-4-mrolnik@gmail.com>
+ <CAL1e-=hB5FhRtuxo1OGBSKA-aw1GW4RgpisKJWaT0TPHKaTVhw@mail.gmail.com>
+ <CAK4993iuuCZzyEzsqodpf_T_3xSSJeF-PP1XLO8PsXy6JwrgfA@mail.gmail.com>
+ <CAL1e-=iQ=iBzn9sRDgx9Edi+rO=uP7RqpMyDJQD9RyiB5MwA=A@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Sat, 21 Dec 2019 18:15:37 +0100
+Message-ID: <CAL1e-=h+ujoRaCcXEkrrMJZ5bX=jWbzDy+GgTzsOJzMybHN96g@mail.gmail.com>
+Subject: Re: [PATCH v39 03/22] target/avr: Add instruction decoding
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="0000000000006e4c1a059a39f1cf"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::331
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,57 +94,708 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
  "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/21/19 5:03 PM, Aleksandar Markovic wrote:
->=20
->=20
-> On Saturday, December 21, 2019, Yoshinori Sato=20
-> <ysato@users.sourceforge.jp <mailto:ysato@users.sourceforge.jp>> wrote:
->=20
->     Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp
->     <mailto:ysato@users.sourceforge.jp>>
->=20
->     Message-Id: <20190616142836.10614-4-ysato@users.sourceforge.jp
->     <mailto:20190616142836.10614-4-ysato@users.sourceforge.jp>>
->     Reviewed-by: Richard Henderson <richard.henderson@linaro.org
->     <mailto:richard.henderson@linaro.org>>
->     Message-Id: <20190607091116.49044-4-ysato@users.sourceforge.jp
->     <mailto:20190607091116.49044-4-ysato@users.sourceforge.jp>>
->=20
->=20
-> Hi, Yoshinori,
->=20
-> I noticed you have a lot of line like this
->=20
-> Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp=20
-> <mailto:20190607091116.49044-9-ysato@users.sourceforge.jp>>
->=20
-> ... sometimes even several in the same message.
->=20
-> May I ask you to delete *all* such lines from commit messages, and=20
-> resend the series?
+--0000000000006e4c1a059a39f1cf
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I expected this series to be ready for merge, and asked Richard if he=20
-could do that to avoid a respin of new version, but apparently Yoshinori=20
-missed my comment:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg664071.html
+On Saturday, December 21, 2019, Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
 
->=20
-> Also, I don't see =C2=A0the documentation update for the new target. Plea=
-se=20
-> provide dome appropriate content in qemu-doc.texi (
-> https://github.com/qemu/qemu/blob/master/qemu-doc.texi ), and include it=
-=20
-> in the next version.
->=20
-> Best regards,
->=20
+>
+>
+> On Saturday, December 21, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+>
+>> Hi Aleksandar.
+>>
+>> please explain.
+>>
+>>>
+>>>
+> Hi, Michael.
+>
+> I wanted to say:
+>
+>
+> 1. Cut the parts of insn.decode that describe coding of arithmetic and
+> logic instructions and include them in the patch:
+>
+> target/avr: Add instruction translation - Arithmetic and Logic Instructio=
+ns
+>
+>
+> Since that would be the first time insn.decode is mentioned in the new
+organization of the series, the license preamble of insn.decode can be
+included in that patch, of course.
+
+Best wishes,
+Aleksandar
+
+
+
+> 2. Cut the parts of insn.decode that describe coding of branch instructio=
+ns and include them in the patch:
+>
+> target/avr: Add instruction translation - Branch Instructions
+>
+> 3. Cut the parts of insn.decode that describe coding of data transfer ins=
+tructions
+> and include them in the patch:
+>
+> target/avr: Add instruction translation - Data Transfer Instructions
+>
+>
+> 4. Cut the parts of insn.decode that describe coding of bit and bit-test
+> instructions and include them in the patch:
+>
+> target/avr: Add instruction translation - Bit and Bit-test Instructions
+>
+>
+> 5. Cut the parts of insn.decode that describe coding of MCU control instr=
+uctions
+> and include them in the patch:
+>
+> target/avr: Add instruction translation - MCU Control Instructions
+>
+>
+> This way, your patches become logicaly-organized rather than file
+> organized. The patch on, let's say, arithmetic and logic instructions wil=
+l
+> contain all elements needed for their implementation, rather than those
+> elements being split between decode and omplementation parts .
+>
+>
+>
+> Regards,
+>
 > Aleksandar
+>
+>
+>
+>> On Sat, Dec 21, 2019 at 1:18 PM Aleksandar Markovic <
+>> aleksandar.m.mail@gmail.com> wrote:
+>>
+>>>
+>>>
+>>> On Wednesday, December 18, 2019, Michael Rolnik <mrolnik@gmail.com>
+>>> wrote:
+>>>
+>>>> This includes:
+>>>> - encoding of all 16 bit instructions
+>>>> - encoding of all 32 bit instructions
+>>>>
+>>>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+>>>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>> ---
+>>>
+>>>
+>>> Michael,
+>>>
+>>> I am very pleased that you rearranged the order to be in sync with the
+>>> documentation.
+>>>
+>>> Now, for the next version, I would ask you to make this patch disappear=
+.
+>>>
+>>> More precisely, "MCU Control Instructions" section of insn.decode file
+>>> move to be a part of "Add MCU Control Instructions" (not sure abiut the
+>>> title, but it is 6 or 7 patches after this one)  patch, and so on, in t=
+he
+>>> same fashion, for all groups of instructions.
+>>>
+>>> Kind regards,
+>>>
+>>> Aleksandar
+>>>
+>>>
+>>>
+>>>  target/avr/insn.decode | 183 +++++++++++++++++++++++++++++++++++++++++
+>>>>  1 file changed, 183 insertions(+)
+>>>>  create mode 100644 target/avr/insn.decode
+>>>>
+>>>> diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+>>>> new file mode 100644
+>>>> index 0000000000..0e4ec9ddf0
+>>>> --- /dev/null
+>>>> +++ b/target/avr/insn.decode
+>>>> @@ -0,0 +1,183 @@
+>>>> +#
+>>>> +# AVR instruction decode definitions.
+>>>> +#
+>>>> +# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
+>>>> +#
+>>>> +# This library is free software; you can redistribute it and/or
+>>>> +# modify it under the terms of the GNU Lesser General Public
+>>>> +# License as published by the Free Software Foundation; either
+>>>> +# version 2.1 of the License, or (at your option) any later version.
+>>>> +#
+>>>> +# This library is distributed in the hope that it will be useful,
+>>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>>> +# Lesser General Public License for more details.
+>>>> +#
+>>>> +# You should have received a copy of the GNU Lesser General Public
+>>>> +# License along with this library; if not, see <
+>>>> http://www.gnu.org/licenses/>.
+>>>> +#
+>>>> +
+>>>> +#
+>>>> +#   regs_16_31_by_one =3D [16 .. 31]
+>>>> +#   regs_16_23_by_one =3D [16 .. 23]
+>>>> +#   regs_24_30_by_two =3D [24, 26, 28, 30]
+>>>> +#   regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]
+>>>> +
+>>>> +%rd             4:5
+>>>> +%rr             9:1 0:4
+>>>> +
+>>>> +%rd_a           4:4
+>>>>  !function=3Dto_regs_16_31_by_one
+>>>> +%rd_b           4:3
+>>>>  !function=3Dto_regs_16_23_by_one
+>>>> +%rd_c           4:2
+>>>>  !function=3Dto_regs_24_30_by_two
+>>>> +%rd_d           4:4
+>>>>  !function=3Dto_regs_00_30_by_two
+>>>> +%rr_a           0:4
+>>>>  !function=3Dto_regs_16_31_by_one
+>>>> +%rr_b           0:3
+>>>>  !function=3Dto_regs_16_23_by_one
+>>>> +%rr_d           0:4
+>>>>  !function=3Dto_regs_00_30_by_two
+>>>> +
+>>>> +%imm6           6:2 0:4
+>>>> +%imm8           8:4 0:4
+>>>> +
+>>>> +%io_imm         9:2 0:4
+>>>> +%ldst_d_imm     13:1 10:2 0:3
+>>>> +
+>>>> +# The 22-bit immediate is partially in the opcode word,
+>>>> +# and partially in the next.  Use append_16 to build the
+>>>> +# complete 22-bit value.
+>>>> +%imm_call       4:5 0:1                     !function=3Dappend_16
+>>>> +
+>>>> +
+>>>> +&rd_rr          rd rr
+>>>> +&rd_imm         rd imm
+>>>> +
+>>>> +@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=3D%rd rr=
+=3D%rr
+>>>> +@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=3D%rd_c
+>>>> imm=3D%imm6
+>>>> +@op_rd_imm8     .... .... .... ....         &rd_imm     rd=3D%rd_a
+>>>> imm=3D%imm8
+>>>> +@op_bit         .... .... . bit:3 ....
+>>>> +@op_bit_imm     .... .. imm:s7 bit:3
+>>>> +@fmul           .... .... . ... . ...       &rd_rr      rd=3D%rd_b
+>>>> rr=3D%rr_b
+>>>> +@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=3D%rd
+>>>> imm=3D%io_imm
+>>>> +@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=3D%ldst_d=
+_imm
+>>>> +
+>>>> +# The 16-bit immediate is completely in the next word.
+>>>> +# Fields cannot be defined with no bits, so we cannot play
+>>>> +# the same trick and append to a zero-bit value.
+>>>> +# Defer reading the immediate until trans_{LDS,STS}.
+>>>> +@ldst_s         .... ... rd:5 ....          imm=3D0
+>>>> +
+>>>> +#
+>>>> +# Arithmetic Instructions
+>>>> +#
+>>>> +ADD             0000 11 . ..... ....        @op_rd_rr
+>>>> +ADC             0001 11 . ..... ....        @op_rd_rr
+>>>> +ADIW            1001 0110 .. .. ....        @op_rd_imm6
+>>>> +SUB             0001 10 . ..... ....        @op_rd_rr
+>>>> +SUBI            0101 .... .... ....         @op_rd_imm8
+>>>> +SBC             0000 10 . ..... ....        @op_rd_rr
+>>>> +SBCI            0100 .... .... ....         @op_rd_imm8
+>>>> +SBIW            1001 0111 .. .. ....        @op_rd_imm6
+>>>> +AND             0010 00 . ..... ....        @op_rd_rr
+>>>> +ANDI            0111 .... .... ....         @op_rd_imm8
+>>>> +OR              0010 10 . ..... ....        @op_rd_rr
+>>>> +ORI             0110 .... .... ....         @op_rd_imm8
+>>>> +EOR             0010 01 . ..... ....        @op_rd_rr
+>>>> +COM             1001 010 rd:5 0000
+>>>> +NEG             1001 010 rd:5 0001
+>>>> +INC             1001 010 rd:5 0011
+>>>> +DEC             1001 010 rd:5 1010
+>>>> +MUL             1001 11 . ..... ....        @op_rd_rr
+>>>> +MULS            0000 0010 .... ....         &rd_rr      rd=3D%rd_a
+>>>> rr=3D%rr_a
+>>>> +MULSU           0000 0011 0 ... 0 ...       @fmul
+>>>> +FMUL            0000 0011 0 ... 1 ...       @fmul
+>>>> +FMULS           0000 0011 1 ... 0 ...       @fmul
+>>>> +FMULSU          0000 0011 1 ... 1 ...       @fmul
+>>>> +DES             1001 0100 imm:4 1011
+>>>> +
+>>>> +#
+>>>> +# Branch Instructions
+>>>> +#
+>>>> +RJMP            1100 imm:s12
+>>>> +IJMP            1001 0100 0000 1001
+>>>> +EIJMP           1001 0100 0001 1001
+>>>> +JMP             1001 010 ..... 110 .        imm=3D%imm_call
+>>>> +RCALL           1101 imm:s12
+>>>> +ICALL           1001 0101 0000 1001
+>>>> +EICALL          1001 0101 0001 1001
+>>>> +CALL            1001 010 ..... 111 .        imm=3D%imm_call
+>>>> +RET             1001 0101 0000 1000
+>>>> +RETI            1001 0101 0001 1000
+>>>> +CPSE            0001 00 . ..... ....        @op_rd_rr
+>>>> +CP              0001 01 . ..... ....        @op_rd_rr
+>>>> +CPC             0000 01 . ..... ....        @op_rd_rr
+>>>> +CPI             0011 .... .... ....         @op_rd_imm8
+>>>> +SBRC            1111 110 rr:5 0 bit:3
+>>>> +SBRS            1111 111 rr:5 0 bit:3
+>>>> +SBIC            1001 1001 reg:5 bit:3
+>>>> +SBIS            1001 1011 reg:5 bit:3
+>>>> +BRBS            1111 00 ....... ...         @op_bit_imm
+>>>> +BRBC            1111 01 ....... ...         @op_bit_imm
+>>>> +
+>>>> +#
+>>>> +# Data Transfer Instructions
+>>>> +#
+>>>> +MOV             0010 11 . ..... ....        @op_rd_rr
+>>>> +MOVW            0000 0001 .... ....         &rd_rr      rd=3D%rd_d
+>>>> rr=3D%rr_d
+>>>> +LDI             1110 .... .... ....         @op_rd_imm8
+>>>> +LDS             1001 000 ..... 0000         @ldst_s
+>>>> +LDX1            1001 000 rd:5 1100
+>>>> +LDX2            1001 000 rd:5 1101
+>>>> +LDX3            1001 000 rd:5 1110
+>>>> +LDY2            1001 000 rd:5 1001
+>>>> +LDY3            1001 000 rd:5 1010
+>>>> +LDZ2            1001 000 rd:5 0001
+>>>> +LDZ3            1001 000 rd:5 0010
+>>>> +LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
+>>>> +LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
+>>>> +STS             1001 001 ..... 0000         @ldst_s
+>>>> +STX1            1001 001 rr:5 1100
+>>>> +STX2            1001 001 rr:5 1101
+>>>> +STX3            1001 001 rr:5 1110
+>>>> +STY2            1001 001 rd:5 1001
+>>>> +STY3            1001 001 rd:5 1010
+>>>> +STZ2            1001 001 rd:5 0001
+>>>> +STZ3            1001 001 rd:5 0010
+>>>> +STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
+>>>> +STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
+>>>> +LPM1            1001 0101 1100 1000
+>>>> +LPM2            1001 000 rd:5 0100
+>>>> +LPMX            1001 000 rd:5 0101
+>>>> +ELPM1           1001 0101 1101 1000
+>>>> +ELPM2           1001 000 rd:5 0110
+>>>> +ELPMX           1001 000 rd:5 0111
+>>>> +SPM             1001 0101 1110 1000
+>>>> +SPMX            1001 0101 1111 1000
+>>>> +IN              1011 0 .. ..... ....        @io_rd_imm
+>>>> +OUT             1011 1 .. ..... ....        @io_rd_imm
+>>>> +PUSH            1001 001 rd:5 1111
+>>>> +POP             1001 000 rd:5 1111
+>>>> +XCH             1001 001 rd:5 0100
+>>>> +LAC             1001 001 rd:5 0110
+>>>> +LAS             1001 001 rd:5 0101
+>>>> +LAT             1001 001 rd:5 0111
+>>>> +
+>>>> +#
+>>>> +# Bit and Bit-test Instructions
+>>>> +#
+>>>> +LSR             1001 010 rd:5 0110
+>>>> +ROR             1001 010 rd:5 0111
+>>>> +ASR             1001 010 rd:5 0101
+>>>> +SWAP            1001 010 rd:5 0010
+>>>> +SBI             1001 1010 reg:5 bit:3
+>>>> +CBI             1001 1000 reg:5 bit:3
+>>>> +BST             1111 101 rd:5 0 bit:3
+>>>> +BLD             1111 100 rd:5 0 bit:3
+>>>> +BSET            1001 0100 0 bit:3 1000
+>>>> +BCLR            1001 0100 1 bit:3 1000
+>>>> +
+>>>> +#
+>>>> +# MCU Control Instructions
+>>>> +#
+>>>> +BREAK           1001 0101 1001 1000
+>>>> +NOP             0000 0000 0000 0000
+>>>> +SLEEP           1001 0101 1000 1000
+>>>> +WDR             1001 0101 1010 1000
+>>>> +
+>>>> --
+>>>> 2.17.2 (Apple Git-113)
+>>>>
+>>>>
+>>
+>> --
+>> Best Regards,
+>> Michael Rolnik
+>>
+>
 
+--0000000000006e4c1a059a39f1cf
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Saturday, December 21, 2019, Aleksandar Markovic &lt;<a href=3D"=
+mailto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wro=
+te:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-=
+left:1px #ccc solid;padding-left:1ex"><br><br>On Saturday, December 21, 201=
+9, Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D"_blank=
+">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div d=
+ir=3D"ltr">Hi Aleksandar.<div><br></div><div>please explain.</div></div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
+ccc solid;padding-left:1ex"><br></blockquote></blockquote><div><br></div><d=
+iv>Hi, Michael.</div><div><br></div><div>I wanted to say:</div><div><br></d=
+iv><div><br></div><div>1. Cut the parts of insn.decode that describe coding=
+ of arithmetic and logic instructions and include them in the patch:</div><=
+div><pre>target/avr: Add instruction <span style=3D"font-family:&#39;Helvet=
+ica Neue&#39;,Helvetica,Arial,sans-serif">translation - Arithmetic and Logi=
+c Instructions</span></pre><pre><span style=3D"font-family:&#39;Helvetica N=
+eue&#39;,Helvetica,Arial,sans-serif"><br></span></pre><pre></pre></div></bl=
+ockquote><div>Since that would be the first time insn.decode is mentioned i=
+n the new organization of the series, the license preamble of insn.decode c=
+an be included in that patch, of course.</div><div><br></div><div>Best wish=
+es,</div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><blockquote c=
+lass=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;=
+padding-left:1ex"><div><pre></pre><pre><div style=3D"font-family:&#39;Helve=
+tica Neue&#39;,Helvetica,Arial,sans-serif;white-space:normal">2. Cut the pa=
+rts of insn.decode that describe coding of branch instructions and include =
+them in the patch:</div><div style=3D"font-family:&#39;Helvetica Neue&#39;,=
+Helvetica,Arial,sans-serif;white-space:normal"></div></pre><pre>target/avr:=
+ Add instruction translation - Branch Instructions
+<br></pre><div>3. Cut the parts of insn.decode that describe coding of d<sp=
+an style=3D"white-space:pre-wrap">ata transfer </span>instructions and incl=
+ude them in the=C2=A0patch:<br></div><div></div><pre><span style=3D"font-fa=
+mily:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif">target/avr: Add i=
+nstruction translation - Data Transfer Instructions</span></pre><pre><span =
+style=3D"font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif"><=
+br></span></pre><div>4. Cut the parts of insn.decode that describe coding o=
+f bit and bit-test instructions and include them in the patch:</div><div></=
+div><pre><span style=3D"font-family:&#39;Helvetica Neue&#39;,Helvetica,Aria=
+l,sans-serif">target/avr: Add instruction translation - Bit and Bit-test In=
+structions</span></pre><pre><span style=3D"font-family:&#39;Helvetica Neue&=
+#39;,Helvetica,Arial,sans-serif"><br></span></pre><div>5. Cut the parts of =
+insn.decode that describe coding of=C2=A0<span style=3D"white-space:pre-wra=
+p">MCU control</span>=C2=A0instructions and include them in=C2=A0the patch:=
+<br></div><div></div><pre><span style=3D"font-family:&#39;Helvetica Neue&#3=
+9;,Helvetica,Arial,sans-serif">target/avr: Add instruction translation - MC=
+U Control Instructions</span><br></pre></div><div><br></div><div>This way, =
+your patches become logicaly-organized rather than file organized. The patc=
+h on, let&#39;s say, arithmetic and logic instructions will contain all ele=
+ments needed for their implementation, rather than those elements being spl=
+it between decode and omplementation parts .</div><div><br></div><div><br><=
+/div><div><br></div><div>Regards,</div><div><br></div><div>Aleksandar</div>=
+<div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"=
+margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sat, Dec 21, 2019=
+ at 1:18 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gma=
+il.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br></d=
+iv><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bord=
+er-left:1px solid rgb(204,204,204);padding-left:1ex"><br><br>On Wednesday, =
+December 18, 2019, Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" =
+target=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"=
+gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
+4,204,204);padding-left:1ex">This includes:<br>
+- encoding of all 16 bit instructions<br>
+- encoding of all 32 bit instructions<br>
+<br>
+Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
+et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
+Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
+com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
+---</blockquote><div><br></div><div>Michael,</div><div><br></div><div>I am =
+very pleased that you rearranged the order to be in sync with the documenta=
+tion.</div><div><br></div><div>Now, for the next version, I would ask you t=
+o make this patch disappear.</div><div><br></div><div>More precisely, &quot=
+;MCU Control Instructions&quot; section of=C2=A0insn.decode file move to be=
+ a part of &quot;Add MCU Control Instructions&quot; (not sure abiut the tit=
+le, but it is 6 or 7 patches after this one) =C2=A0patch, and so on, in the=
+ same fashion, for all groups of instructions.</div><div><br></div><div>Kin=
+d regards,</div><div><br></div><div>Aleksandar</div><div><br></div><div><br=
+></div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+=C2=A0target/avr/insn.decode | 183 ++++++++++++++++++++++++++++++<wbr>+++++=
+++++++<br>
+=C2=A01 file changed, 183 insertions(+)<br>
+=C2=A0create mode 100644 target/avr/insn.decode<br>
+<br>
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode<br>
+new file mode 100644<br>
+index 0000000000..0e4ec9ddf0<br>
+--- /dev/null<br>
++++ b/target/avr/insn.decode<br>
+@@ -0,0 +1,183 @@<br>
++#<br>
++# AVR instruction decode definitions.<br>
++#<br>
++# Copyright (c) 2019 Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.co=
+m" target=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
++#<br>
++# This library is free software; you can redistribute it and/or<br>
++# modify it under the terms of the GNU Lesser General Public<br>
++# License as published by the Free Software Foundation; either<br>
++# version 2.1 of the License, or (at your option) any later version.<br>
++#<br>
++# This library is distributed in the hope that it will be useful,<br>
++# but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<b=
+r>
++# Lesser General Public License for more details.<br>
++#<br>
++# You should have received a copy of the GNU Lesser General Public<br>
++# License along with this library; if not, see &lt;<a href=3D"http://www.g=
+nu.org/licenses/" target=3D"_blank">http://www.gnu.org/licenses/</a>&gt;<wb=
+r>.<br>
++#<br>
++<br>
++#<br>
++#=C2=A0 =C2=A0regs_16_31_by_one =3D [16 .. 31]<br>
++#=C2=A0 =C2=A0regs_16_23_by_one =3D [16 .. 23]<br>
++#=C2=A0 =C2=A0regs_24_30_by_two =3D [24, 26, 28, 30]<br>
++#=C2=A0 =C2=A0regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]<br>
++<br>
++%rd=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:5<br>
++%rr=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A09:1 0:4<br>
++<br>
++%rd_a=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_31_by_on<wbr>e<br>
++%rd_b=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:3=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_23_by_on<wbr>e<br>
++%rd_c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:2=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_24_30_by_tw<wbr>o<br>
++%rd_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_00_30_by_tw<wbr>o<br>
++%rr_a=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_31_by_on<wbr>e<br>
++%rr_b=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:3=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_23_by_on<wbr>e<br>
++%rr_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_00_30_by_tw<wbr>o<br>
++<br>
++%imm6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A06:2 0:4<br>
++%imm8=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A08:4 0:4<br>
++<br>
++%io_imm=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A09:2 0:4<br>
++%ldst_d_imm=C2=A0 =C2=A0 =C2=A013:1 10:2 0:3<br>
++<br>
++# The 22-bit immediate is partially in the opcode word,<br>
++# and partially in the next.=C2=A0 Use append_16 to build the<br>
++# complete 22-bit value.<br>
++%imm_call=C2=A0 =C2=A0 =C2=A0 =C2=A04:5 0:1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=3Dappend_16<br>
++<br>
++<br>
++&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rd rr<br>
++&amp;rd_imm=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rd imm<br>
++<br>
++@op_rd_rr=C2=A0 =C2=A0 =C2=A0 =C2=A0.... .. . ..... ....=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 &amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd rr=3D%rr<br>
++@op_rd_imm6=C2=A0 =C2=A0 =C2=A0.... .... .. .. ....=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 &amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd_c imm=3D%imm6<br>
++@op_rd_imm8=C2=A0 =C2=A0 =C2=A0.... .... .... ....=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0&amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd_a imm=3D%imm8<br>
++@op_bit=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... .... . bit:3 ....<br>
++@op_bit_imm=C2=A0 =C2=A0 =C2=A0.... .. imm:s7 bit:3<br>
++@fmul=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... .... . ... . ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_b rr=3D%rr_b<br=
+>
++@io_rd_imm=C2=A0 =C2=A0 =C2=A0 .... . .. ..... ....=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 &amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd imm=3D%io_imm<br>
++@ldst_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.. . . .. . rd:5=C2=A0 . ...=C2=
+=A0 =C2=A0 =C2=A0&amp;rd_imm=C2=A0 =C2=A0 =C2=A0imm=3D%ldst_d_imm<br>
++<br>
++# The 16-bit immediate is completely in the next word.<br>
++# Fields cannot be defined with no bits, so we cannot play<br>
++# the same trick and append to a zero-bit value.<br>
++# Defer reading the immediate until trans_{LDS,STS}.<br>
++@ldst_s=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... ... rd:5 ....=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 imm=3D0<br>
++<br>
++#<br>
++# Arithmetic Instructions<br>
++#<br>
++ADD=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ADC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00001 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ADIW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0110 .. .. ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 @op_rd_imm6<br>
++SUB=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00001 10 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++SUBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0101 .... .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++SBC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 10 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++SBCI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0100 .... .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++SBIW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0111 .. .. ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 @op_rd_imm6<br>
++AND=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 00 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ANDI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0111 .... .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++OR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0010 10 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ORI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00110 .... .... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++EOR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 01 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++COM=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0000<br>
++NEG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0001<br>
++INC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0011<br>
++DEC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 1010<br>
++MUL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++MULS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0010 .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_a rr=3D%=
+rr_a<br>
++MULSU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0011 0 ... 0 ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0@fmul<br>
++FMUL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0011 0 ... 1 ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0@fmul<br>
++FMULS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0011 1 ... 0 ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0@fmul<br>
++FMULSU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0011 1 ... 1 ...=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0@fmul<br>
++DES=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0100 imm:4 1011<br=
+>
++<br>
++#<br>
++# Branch Instructions<br>
++#<br>
++RJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1100 imm:s12<br>
++IJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 0000 1001<br>
++EIJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0100 0001 1001<br>
++JMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 ..... 110 .=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 imm=3D%imm_call<br>
++RCALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01101 imm:s12<br>
++ICALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 0000 1001<br>
++EICALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 0001 1001<br>
++CALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 010 ..... 111 .=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 imm=3D%imm_call<br>
++RET=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 0000 1000<br>
++RETI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 0001 1000<br>
++CPSE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0001 00 . ..... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++CP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0001 01 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++CPC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 01 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++CPI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00011 .... .... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++SBRC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 110 rr:5 0 bit:3<br>
++SBRS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 111 rr:5 0 bit:3<br>
++SBIC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 1001 reg:5 bit:3<br>
++SBIS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 1011 reg:5 bit:3<br>
++BRBS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 00 ....... ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_bit_imm<br>
++BRBC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 01 ....... ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_bit_imm<br>
++<br>
++#<br>
++# Data Transfer Instructions<br>
++#<br>
++MOV=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++MOVW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0001 .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_d rr=3D%=
+rr_d<br>
++LDI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01110 .... .... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++LDS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 ..... 0000=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@ldst_s<br>
++LDX1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1100<br>
++LDX2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1101<br>
++LDX3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1110<br>
++LDY2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1001<br>
++LDY3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1010<br>
++LDZ2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0001<br>
++LDZ3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0010<br>
++LDDY=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 0 ..... 1 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++LDDZ=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 0 ..... 0 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++STS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 ..... 0000=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@ldst_s<br>
++STX1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1100<br>
++STX2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1101<br>
++STX3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1110<br>
++STY2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1001<br>
++STY3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1010<br>
++STZ2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 0001<br>
++STZ3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 0010<br>
++STDY=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 1 ..... 1 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++STDZ=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 1 ..... 0 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++LPM1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 1100 1000<br>
++LPM2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0100<br>
++LPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0101<br>
++ELPM1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1101 1000<br>
++ELPM2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 0110<br>
++ELPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 0111<br>
++SPM=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1110 1000<br>
++SPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 1111 1000<br>
++IN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1011 0 .. ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @io_rd_imm<br>
++OUT=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01011 1 .. ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @io_rd_imm<br>
++PUSH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1111<br>
++POP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 1111<br>
++XCH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0100<br>
++LAC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0110<br>
++LAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0101<br>
++LAT=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0111<br>
++<br>
++#<br>
++# Bit and Bit-test Instructions<br>
++#<br>
++LSR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0110<br>
++ROR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0111<br>
++ASR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0101<br>
++SWAP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 010 rd:5 0010<br>
++SBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 1010 reg:5 bit:3<b=
+r>
++CBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 1000 reg:5 bit:3<b=
+r>
++BST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01111 101 rd:5 0 bit:3<b=
+r>
++BLD=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01111 100 rd:5 0 bit:3<b=
+r>
++BSET=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 0 bit:3 1000<br>
++BCLR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 1 bit:3 1000<br>
++<br>
++#<br>
++# MCU Control Instructions<br>
++#<br>
++BREAK=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1001 1000<br>
++NOP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0000 0000 0000<br>
++SLEEP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1000 1000<br>
++WDR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1010 1000<br>
++<br>
+-- <br>
+2.17.2 (Apple Git-113)<br>
+<br>
+</blockquote>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote>
+</blockquote>
+
+--0000000000006e4c1a059a39f1cf--
 
