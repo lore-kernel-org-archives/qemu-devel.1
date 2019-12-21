@@ -2,81 +2,81 @@ Return-Path: <SRS0=aHsE=2L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3082FC2D0C3
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 18:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10456C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 18:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFF582070C
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 18:11:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3C16206D8
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 18:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iiao2gsJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF582070C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D0Rki1Pv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C16206D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iijDd-0001pG-2j
-	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 13:11:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60176)
+	id 1iijPm-0004xI-Ky
+	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 13:23:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iijCk-00015V-Tl
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 13:10:20 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iijOv-000449-5u
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 13:22:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iijCj-0005HH-A8
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 13:10:18 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37762)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1iijOt-0005kN-5q
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 13:22:52 -0500
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:40593)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iijCj-0005DQ-0u; Sat, 21 Dec 2019 13:10:17 -0500
-Received: by mail-oi1-x243.google.com with SMTP id h19so5904228oih.4;
- Sat, 21 Dec 2019 10:10:16 -0800 (PST)
+ (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
+ id 1iijOs-0005gh-TC; Sat, 21 Dec 2019 13:22:51 -0500
+Received: by mail-il1-x141.google.com with SMTP id c4so10822963ilo.7;
+ Sat, 21 Dec 2019 10:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=dCkkWWgZCiYfmg2QJJcmgGsbE7ykXCBuzZSq3XwzsXk=;
- b=Iiao2gsJMEgnIvdvhEnse3nA8IFGdXRaDfBjGqC3Uv2sbEs+xRWqRLLRyI/C9Fxsut
- b14CQ3cCwsP5FCEkjXtRcAYF2gxJAC7K+MxhXEJlVSIf0+bq/5bGmHemh9OTDgS4g74E
- aUxnyPg9PhT6rw2Hl5U1z/w86i7LoOqqIaLOxLSzZ5lMAdJXFz799DQt1Qrb3P4IOSJs
- X4glP5qD0lZJ2njwmbfh4ZKRcGy/Z/8EQOS2Vbps8fj9vEAugdgyz4KoINYQxKZBffPk
- qUP4SejT/+Lc6UPgLOSYwlOCBE3j67kKhkjUie4Z9raFPZc4KIilRO+W+5t3Ww4kB1XA
- 1r8w==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZLCFWTYU9xOMO++Bg3cHTj2xEbQKJXfwi0dTYdgU4sw=;
+ b=D0Rki1Pvmo/C3zY+q5P99TxRAfzWtGptRkGD/giuD0wG5JVn+DTXb4HchyYTJgbJ5B
+ iCcGHwrBXrKeXP+Krw/liYEB2qhS1N+zYXCDiqubRp5XT78AhyzA549AA3B2Plc+iSqx
+ t1KZXliCtn/rl+TvGiqwzL3gEo6RhCcprMvQs+RMuJ/zHGLVduub/ff+y2A5RnNelF1t
+ pbXmIaRbUGLcRgG4TeSkice/6AAu+tT4cauleS6tZ8VtNBeUsLivlG7yiMu0YAtCdEvL
+ xg61sld5oLNIMfZ3BDNeLSuVQvLWNped2uLWxrUse+P/lV+YX6CgJeMQ2nXHnIuWdpHt
+ ei1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=dCkkWWgZCiYfmg2QJJcmgGsbE7ykXCBuzZSq3XwzsXk=;
- b=ij9avwxJ+41G4Jf2Zk4bz95rgm7HE41NWYRlpi96fMz1B8ytdWx4OQe0obrq+hHwyH
- RoRpAQRDsH6QS6zsmEXBNC+s067TGGmjG7Rd1PQzwOLrGh2jRaBYzo8yRY3UQqm2gYyI
- xKcaZDDINMDEXUGBmApFji5G5darFGVnWGBjBbtbb2wbYFIPInRh3Cq55dJFy22qMiZ7
- VcoP/OKoLlPhlsH9n7aRzyzEYRlpFcCTb1xs6YODIXYRhuMrYk6kW/mdqNLV9xgzvFJR
- eNEjGm8ltpfBZ96jFPEwPgc2amWzsDCCqbD30rjle/fldfsjNHpWgLpk9O8pA/BAlpIS
- ry5Q==
-X-Gm-Message-State: APjAAAXPeyNpklj6ptQr+D1MKR9rV6Lxs+5us3YTeJquIjOGSNyC7OAw
- B4PlVPfo/zEvCPizqJ3xS9O6SGg0OhSpWMor1Ew=
-X-Google-Smtp-Source: APXvYqxZbPBiVgmC7hN8epfnjvH4deG7idXRd5VjMjncywrKEiwopes56r0Mj4PzfvCJDi3MoiXHhZ+2EICSt+yOMDo=
-X-Received: by 2002:aca:1b08:: with SMTP id b8mr4968718oib.106.1576951815962; 
- Sat, 21 Dec 2019 10:10:15 -0800 (PST)
+ bh=ZLCFWTYU9xOMO++Bg3cHTj2xEbQKJXfwi0dTYdgU4sw=;
+ b=E8x19HAnkFttnXnFm+66wXq3Kj9WcHWU7I1YtMyHc/ckCydt6tO0hGj/z/fahpnHls
+ VbnHufPJ7TcUgM0n+Oi5NSH9HME8cMHNwZ/TUw4GDsfkVVcX1+BYx3Itv3eQ0GJDz5b5
+ IZTnW++AY+Zs/v2a89vredRnMZGT28UXJUcSckaHljaLZBfhvsg+/3OedTe265Z04IZG
+ eu1kHZKD3X6p4B0/lfi/++RC3pYQkvOsod62ECrmWSE73wrSz1bg09mp2CAoMCuBeVsG
+ jkE1/pF+93FMnvyH8+jirP5bSr/cOtpfusTEpOJA/cXjXC/zXd0p+CfSNNfMZd3/3DB4
+ ykMg==
+X-Gm-Message-State: APjAAAVQhEWmfVL1pwoBkuXT6R72cCt2qpW7i4plm/slhOyGTlPiXUaJ
+ j511IxXRnYZF8mMXf/hY1Ld3BI1DaPh5Wv1JZ8w=
+X-Google-Smtp-Source: APXvYqxkpCRbPNm3bZzkc2Tg+zMuqmUEWgCoSt4HtC/1ERDMf3cJB/f3A6hrGQj8aQ9iHcp0/qvvEOYRcK0KZwMqbWQ=
+X-Received: by 2002:a92:af08:: with SMTP id n8mr17618555ili.217.1576952569890; 
+ Sat, 21 Dec 2019 10:22:49 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Sat, 21 Dec 2019 10:10:15 -0800 (PST)
-In-Reply-To: <7c8bc635-96cc-ab3d-01d3-db97013cda3e@redhat.com>
-References: <8736dfdkph.fsf@dusky.pond.sub.org>
- <7c8bc635-96cc-ab3d-01d3-db97013cda3e@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 21 Dec 2019 19:10:15 +0100
-Message-ID: <CAL1e-=iuu9ZAJ_Z4qEvRtydd7-tcXVUzdZDeZPw8VHCP0QYT3A@mail.gmail.com>
-Subject: Re: Can we retire Python 2 now?
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000d18774059a3ab486"
+References: <20191217182730.943-1-f4bug@amsat.org>
+ <20191217182730.943-2-f4bug@amsat.org>
+In-Reply-To: <20191217182730.943-2-f4bug@amsat.org>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
+Date: Sat, 21 Dec 2019 19:22:38 +0100
+Message-ID: <CAPan3Wp2=uRUNsQkZsdfLw7iYs8p6OSJw9ULLggw=2efHg4dpQ@mail.gmail.com>
+Subject: Re: [PATCH 1/5] tests/boot_linux_console: Add a quick test for the
+ OrangePi PC board
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: multipart/alternative; boundary="000000000000c18efa059a3ae11e"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2607:f8b0:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,98 +88,273 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Guenter Roeck <linux@roeck-us.net>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d18774059a3ab486
+--000000000000c18efa059a3ae11e
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Saturday, December 21, 2019, Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi Philippe,
 
-> On 20/12/19 17:29, Markus Armbruster wrote:
-> > Python 2 EOL is only a few days away[*].  We made configure bitch about
-> > it in commit e5abf59eae "Deprecate Python 2 support", 2019-07-01.  Any
-> > objections to retiring it now, i.e. in 5.0?
-> >
-> > Cc'ing everyone who appears to be maintaining something that looks like
-> > a Python script.
-> >
-> > [*] https://pythonclock.org/
+On Tue, Dec 17, 2019 at 7:27 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g>
+wrote:
+
+> This test boots a Linux kernel on a OrangePi PC board and verify
+> the serial output is working.
 >
-> Fortunately Betteridge's law of headlines is not always true.  :)
+> The kernel image and DeviceTree blob are built by the Raspbian
+> project (based on Debian):
+> https://www.raspbian.org/RaspbianImages
+
+
+One minor remark: I noticed here you refer to Raspbian, while the actual
+image
+used is from Armbian :-)
+
+
+>
+> If ARM is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:arm" tags.
+>
+> Alternatively, this test can be run using:
+>
+>   $ make check-venv
+>   $ ./tests/venv/bin/avocado --show=3Dconsole,app run -t machine:orangepi=
+-pc
+> tests/acceptance/boot_linux_console.py
+>   JOB ID     : 2e4d15eceb13c33672af406f08171e6e9de1414a
+>   JOB LOG    : ~/job-results/job-2019-12-17T05.46-2e4d15e/job.log
+>   (1/1)
+> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi=
+:
+>   console: Uncompressing Linux... done, booting the kernel.
+>   console: Booting Linux on physical CPU 0x0
+>   console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version
+> 7.2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET
+> 2019
+>   console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D50c53=
+87d
+>   console: CPU: div instructions available: patching division code
+>   console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing
+> instruction cache
+>   console: OF: fdt: Machine model: Xunlong Orange Pi PC
+>   console: Memory policy: Data cache writealloc
+>   console: OF: reserved mem: failed to allocate memory for node
+> 'cma@4a000000'
+>   console: cma: Failed to reserve 128 MiB
+>   console: psci: probing for conduit method from DT.
+>   console: psci: PSCIv0.2 detected in firmware.
+>   console: psci: Using standard PSCI v0.2 function IDs
+>   console: psci: Trusted OS migration not required
+>   console: random: get_random_bytes called from start_kernel+0x8d/0x3c2
+> with crng_init=3D0
+>   console: percpu: Embedded 18 pages/cpu @(ptrval) s41228 r8192 d24308
+> u73728
+>   console: Built 1 zonelists, mobility grouping on.  Total pages: 32480
+>   console: Kernel command line: printk.time=3D0 console=3DttyS0,115200
+>   PASS (8.59 s)
+>   JOB TIME   : 8.81 s
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py
+> b/tests/acceptance/boot_linux_console.py
+> index 7e41cebd47..820239e439 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -411,6 +411,32 @@ class BootLinuxConsole(Test):
+>          self.wait_for_console_pattern('Boot successful.')
+>          # TODO user command, for now the uart is stuck
+>
+> +    def test_arm_orangepi(self):
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:orangepi-pc
+> +        """
+> +        deb_url =3D ('https://apt.armbian.com/pool/main/l/'
+> +
+>  'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
+> +        deb_hash =3D '1334c29c44d984ffa05ed10de8c3361f33d78315'
+> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+> +        kernel_path =3D self.extract_from_deb(deb_path,
+> +                                            '/boot/vmlinuz-4.20.7-sunxi'=
+)
+> +        dtb_path =3D
+> '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
+> +        dtb_path =3D self.extract_from_deb(deb_path, dtb_path)
+> +
+> +        self.vm.set_machine('orangepi-pc')
+> +        self.vm.set_console()
+> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> +                               'console=3DttyS0,115200n8 '
+> +                               'earlycon=3Duart,mmio32,0x1c28000')
+> +        self.vm.add_args('-kernel', kernel_path,
+> +                         '-dtb', dtb_path,
+> +                         '-append', kernel_command_line)
+> +        self.vm.launch()
+> +        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+> +        self.wait_for_console_pattern(console_pattern)
+> +
+>      def test_s390x_s390_ccw_virtio(self):
+>          """
+>          :avocado: tags=3Darch:s390x
+> --
+> 2.21.0
 >
 >
-Perhaps we can formulate a new law that says:
 
-"Any person who says that he/she is pretty sure he/she is not a maintainer
-of something at all, is, in fact, and for sure, the maintainer of that
-thing."
+--=20
+Niek Linnenbank
 
-:)
-
-Aleksandar
-
-Paolo
->
->
->
-
---000000000000d18774059a3ab486
+--000000000000c18efa059a3ae11e
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Saturday, December 21, 2019, Paolo Bonzini &lt;<a href=3D"mailto=
-:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<br><blockquote cla=
-ss=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pa=
-dding-left:1ex">On 20/12/19 17:29, Markus Armbruster wrote:<br>
-&gt; Python 2 EOL is only a few days away[*].=C2=A0 We made configure bitch=
- about<br>
-&gt; it in commit e5abf59eae &quot;Deprecate Python 2 support&quot;, 2019-0=
-7-01.=C2=A0 Any<br>
-&gt; objections to retiring it now, i.e. in 5.0?<br>
-&gt; <br>
-&gt; Cc&#39;ing everyone who appears to be maintaining something that looks=
- like<br>
-&gt; a Python script.<br>
-&gt; <br>
-&gt; [*] <a href=3D"https://pythonclock.org/" target=3D"_blank">https://pyt=
-honclock.org/</a><br>
+<div dir=3D"ltr"><div>Hi Philippe,<br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Dec 17, 2019 at 7:27 PM Phili=
+ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.o=
+rg</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
+n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
+">This test boots a Linux kernel on a OrangePi PC board and verify<br>
+the serial output is working.<br>
 <br>
-Fortunately Betteridge&#39;s law of headlines is not always true.=C2=A0 :)<=
-br>
-<br></blockquote><div><br></div><div>Perhaps we can formulate a new law tha=
-t says:</div><div><br></div><div>&quot;Any person who says that he/she is p=
-retty sure he/she is not a maintainer of something at all, is, in fact, and=
- for sure, the maintainer of that thing.&quot;</div><div><br></div><div>:)<=
-/div><div><br></div><div>Aleksandar</div><div><br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">
-Paolo<br>
+The kernel image and DeviceTree blob are built by the Raspbian<br>
+project (based on Debian):<br>
+<a href=3D"https://www.raspbian.org/RaspbianImages" rel=3D"noreferrer" targ=
+et=3D"_blank">https://www.raspbian.org/RaspbianImages</a></blockquote><div>=
+<br></div><div>One minor remark: I noticed here you refer to Raspbian, whil=
+e the actual image</div><div>used is from Armbian :-)<br></div><div> <br></=
+div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
+der-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
 <br>
+If ARM is a target being built, &quot;make check-acceptance&quot; will<br>
+automatically include this test by the use of the &quot;arch:arm&quot; tags=
+.<br>
 <br>
-</blockquote>
+Alternatively, this test can be run using:<br>
+<br>
+=C2=A0 $ make check-venv<br>
+=C2=A0 $ ./tests/venv/bin/avocado --show=3Dconsole,app run -t machine:orang=
+epi-pc tests/acceptance/boot_linux_console.py<br>
+=C2=A0 JOB ID=C2=A0 =C2=A0 =C2=A0: 2e4d15eceb13c33672af406f08171e6e9de1414a=
+<br>
+=C2=A0 JOB LOG=C2=A0 =C2=A0 : ~/job-results/job-2019-12-17T05.46-2e4d15e/jo=
+b.log<br>
+=C2=A0 (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_a=
+rm_orangepi:<br>
+=C2=A0 console: Uncompressing Linux... done, booting the kernel.<br>
+=C2=A0 console: Booting Linux on physical CPU 0x0<br>
+=C2=A0 console: Linux version 4.20.7-sunxi (<a href=3D"mailto:root@armbian.=
+com" target=3D"_blank">root@armbian.com</a>) (gcc version 7.2.1 20171011 (L=
+inaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 2019<br>
+=C2=A0 console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=3D50=
+c5387d<br>
+=C2=A0 console: CPU: div instructions available: patching division code<br>
+=C2=A0 console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing inst=
+ruction cache<br>
+=C2=A0 console: OF: fdt: Machine model: Xunlong Orange Pi PC<br>
+=C2=A0 console: Memory policy: Data cache writealloc<br>
+=C2=A0 console: OF: reserved mem: failed to allocate memory for node &#39;c=
+ma@4a000000&#39;<br>
+=C2=A0 console: cma: Failed to reserve 128 MiB<br>
+=C2=A0 console: psci: probing for conduit method from DT.<br>
+=C2=A0 console: psci: PSCIv0.2 detected in firmware.<br>
+=C2=A0 console: psci: Using standard PSCI v0.2 function IDs<br>
+=C2=A0 console: psci: Trusted OS migration not required<br>
+=C2=A0 console: random: get_random_bytes called from start_kernel+0x8d/0x3c=
+2 with crng_init=3D0<br>
+=C2=A0 console: percpu: Embedded 18 pages/cpu @(ptrval) s41228 r8192 d24308=
+ u73728<br>
+=C2=A0 console: Built 1 zonelists, mobility grouping on.=C2=A0 Total pages:=
+ 32480<br>
+=C2=A0 console: Kernel command line: printk.time=3D0 console=3DttyS0,115200=
+<br>
+=C2=A0 PASS (8.59 s)<br>
+=C2=A0 JOB TIME=C2=A0 =C2=A0: 8.81 s<br>
+<br>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsa=
+t.org" target=3D"_blank">f4bug@amsat.org</a>&gt;<br>
+---<br>
+=C2=A0tests/acceptance/boot_linux_console.py | 26 +++++++++++++++++++++++++=
++<br>
+=C2=A01 file changed, 26 insertions(+)<br>
+<br>
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
+_linux_console.py<br>
+index 7e41cebd47..820239e439 100644<br>
+--- a/tests/acceptance/boot_linux_console.py<br>
++++ b/tests/acceptance/boot_linux_console.py<br>
+@@ -411,6 +411,32 @@ class BootLinuxConsole(Test):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.wait_for_console_pattern(&#39;Boot s=
+uccessful.&#39;)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0# TODO user command, for now the uart is =
+stuck<br>
+<br>
++=C2=A0 =C2=A0 def test_arm_orangepi(self):<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;&quot;&quot;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 :avocado: tags=3Darch:arm<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 :avocado: tags=3Dmachine:orangepi-pc<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;&quot;&quot;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 deb_url =3D (&#39;<a href=3D"https://apt.armbi=
+an.com/pool/main/l/" rel=3D"noreferrer" target=3D"_blank">https://apt.armbi=
+an.com/pool/main/l/</a>&#39;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;=
+linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb&#39;)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 deb_hash =3D &#39;1334c29c44d984ffa05ed10de8c3=
+361f33d78315&#39;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 deb_path =3D self.fetch_asset(deb_url, asset_h=
+ash=3Ddeb_hash)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 kernel_path =3D self.extract_from_deb(deb_path=
+,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 &#39;/boot/vmlinuz-4.20.7-sunxi&#39;)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 dtb_path =3D &#39;/usr/lib/linux-image-dev-sun=
+xi/sun8i-h3-orangepi-pc.dtb&#39;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 dtb_path =3D self.extract_from_deb(deb_path, d=
+tb_path)<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.vm.set_machine(&#39;orangepi-pc&#39;)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.vm.set_console()<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 kernel_command_line =3D (self.KERNEL_COMMON_CO=
+MMAND_LINE +<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;console=3DttyS0,115200n8 &#39;<b=
+r>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&#39;earlycon=3Duart,mmio32,0x1c28000=
+&#39;)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.vm.add_args(&#39;-kernel&#39;, kernel_pat=
+h,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0&#39;-dtb&#39;, dtb_path,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0&#39;-append&#39;, kernel_command_line)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.vm.launch()<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 console_pattern =3D &#39;Kernel command line: =
+%s&#39; % kernel_command_line<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 self.wait_for_console_pattern(console_pattern)=
+<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0def test_s390x_s390_ccw_virtio(self):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;&quot;&quot;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0:avocado: tags=3Darch:s390x<br>
+-- <br>
+2.21.0<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
+div></div>
 
---000000000000d18774059a3ab486--
+--000000000000c18efa059a3ae11e--
 
