@@ -2,58 +2,81 @@ Return-Path: <SRS0=aHsE=2L=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CCAC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 14:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C01C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 15:58:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CE272070C
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 14:57:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE272070C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 0DF522072B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 15:58:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdzBcP9q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF522072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iigCM-00081L-El
-	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 09:57:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46507)
+	id 1iih9L-0000m8-6P
+	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 10:58:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43063)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iify2-0005FV-Kw
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:59 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iih8g-0000Ib-Uv
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 10:58:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iifxy-00029h-QY
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:54 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:33414)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iifxy-0001zH-9H
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:50 -0500
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 207E6B1D98;
- Sat, 21 Dec 2019 23:42:48 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 9426524008F;
- Sat, 21 Dec 2019 23:42:47 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v27 06/21] target/rx: CPU definition
-Date: Sat, 21 Dec 2019 23:42:23 +0900
-Message-Id: <20191221144238.127766-7-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191221144238.127766-1-ysato@users.sourceforge.jp>
-References: <20191221144238.127766-1-ysato@users.sourceforge.jp>
+ (envelope-from <mrolnik@gmail.com>) id 1iih8e-0008RK-3B
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 10:57:58 -0500
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:41943)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iih8d-0008LC-Mj
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 10:57:55 -0500
+Received: by mail-qt1-x841.google.com with SMTP id k40so11210226qtk.8
+ for <qemu-devel@nongnu.org>; Sat, 21 Dec 2019 07:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ZsQwcnhHD4NwWetArphb9wl/kfmd1htRtDwK2T1q1DI=;
+ b=TdzBcP9qWiYHa3dXnKnXvQ+SoRhCB0R5pEt0EJHGI+KrFIRv46VNRsv43OhGUsHHn+
+ TNemZp2wR0mz5u4w1mnYDrj6m966mpI9eAZcpihnntPg8tF0uIa2PirdlfR7lX/5Z3DN
+ 7aFKc0d+fOmYmAbpuptHqSLve6h6IebWK/W5xsLnh8UPq+rPPP3zPGeKSXhzjg8ZFWWX
+ eys3rcSMlLjVVe31SGzolnmQaAg5uuCxUXEcXO5rw2iOwulv219doFQRLHVHLosg8iaB
+ gamJzhVu1SYzhEvxXMKYwGgVclZaFqL8uwz+gJgwU+yogTQsKGYMCEfl/0L+qMWC9P7p
+ cbsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ZsQwcnhHD4NwWetArphb9wl/kfmd1htRtDwK2T1q1DI=;
+ b=FzhDwMZCeCtYt+JTrgkhzLjkqitYtBGenGLh1+XNSIP62j2pOdO20v/UwW6kYlwAOs
+ 1Iuqp4qHXQ9QafpYiwBvRFGwSKvD7D525JHSN1mGZctNy6EC5iS7yquk7sXotgkrknnk
+ XCB+u0DXn0WYtE+vf0vpxEWJyW5eiRLdt+OkA6NKVF+ENe7Q0/YEEMNHAkRjCd/qIp7p
+ FaJTnV9F1vRNspKxG48rNcZRhJqV56lEC4THZH0FGQx/reiRq51AWz6LL2nJXmVct831
+ N7F6cpOl84hTaoxbMAGOffsllM6ygyjLknOQXUG83WDClri3u2oPydpibKStgbMd+gmO
+ /I9A==
+X-Gm-Message-State: APjAAAW069fk4AAhNHEytsYdgrYSMTHz6vFRLEmUayiUeOj0vRm4BCPm
+ I07jlENpng+J4wTMtHoVO5TVXu1pJ0DYCBZVDPU=
+X-Google-Smtp-Source: APXvYqw2tY6DtJq6osscjjzSbwS23f+XRUVW/Vdc/Yy0EqqAKWV9S6Ei63TnooNZlOjd9GwiexaYmenZZzLgz1fahQ0=
+X-Received: by 2002:aed:3c52:: with SMTP id u18mr16397105qte.382.1576943874274; 
+ Sat, 21 Dec 2019 07:57:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191218210329.1960-1-mrolnik@gmail.com>
+ <20191218210329.1960-4-mrolnik@gmail.com>
+ <CAL1e-=hB5FhRtuxo1OGBSKA-aw1GW4RgpisKJWaT0TPHKaTVhw@mail.gmail.com>
+In-Reply-To: <CAL1e-=hB5FhRtuxo1OGBSKA-aw1GW4RgpisKJWaT0TPHKaTVhw@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Sat, 21 Dec 2019 17:57:04 +0200
+Message-ID: <CAK4993iuuCZzyEzsqodpf_T_3xSSJeF-PP1XLO8PsXy6JwrgfA@mail.gmail.com>
+Subject: Re: [PATCH v39 03/22] target/avr: Add instruction decoding
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000074faa0059a38db9b"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
+X-Received-From: 2607:f8b0:4864:20::841
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,686 +88,487 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, philmd@redhat.com,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+--00000000000074faa0059a38db9b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Message-Id: <20190616142836.10614-4-ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190607091116.49044-4-ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMD: Use newer QOM style, split cpu-qom.h, restrict access to
- extable array, use rx_cpu_tlb_fill() extracted from patch of
- Yoshinori Sato 'Convert to CPUClass::tlb_fill']
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- target/rx/cpu-param.h   |  31 ++++++
- target/rx/cpu-qom.h     |  42 ++++++++
- target/rx/cpu.h         | 181 +++++++++++++++++++++++++++++++++
- target/rx/cpu.c         | 217 ++++++++++++++++++++++++++++++++++++++++
- target/rx/gdbstub.c     | 112 +++++++++++++++++++++
- target/rx/Makefile.objs |   1 -
- 6 files changed, 583 insertions(+), 1 deletion(-)
- create mode 100644 target/rx/cpu-param.h
- create mode 100644 target/rx/cpu-qom.h
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/cpu.c
- create mode 100644 target/rx/gdbstub.c
+Hi Aleksandar.
 
-diff --git a/target/rx/cpu-param.h b/target/rx/cpu-param.h
-new file mode 100644
-index 0000000000..5da87fbebe
---- /dev/null
-+++ b/target/rx/cpu-param.h
-@@ -0,0 +1,31 @@
-+/*
-+ *  RX cpu parameters
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_PARAM_H
-+#define RX_CPU_PARAM_H
-+
-+#define TARGET_LONG_BITS 32
-+#define TARGET_PAGE_BITS 12
-+
-+#define TARGET_PHYS_ADDR_SPACE_BITS 32
-+#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+
-+#define NB_MMU_MODES 1
-+#define MMU_MODE0_SUFFIX _all
-+
-+#endif
-diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
-new file mode 100644
-index 0000000000..8328900f3f
---- /dev/null
-+++ b/target/rx/cpu-qom.h
-@@ -0,0 +1,42 @@
-+#ifndef QEMU_RX_CPU_QOM_H
-+#define QEMU_RX_CPU_QOM_H
-+
-+#include "hw/core/cpu.h"
-+/*
-+ * RX CPU
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ * SPDX-License-Identifier: LGPL-2.0+
-+ */
-+
-+#define TYPE_RX_CPU "rx-cpu"
-+
-+#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME("rx62n")
-+
-+#define RXCPU_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
-+#define RXCPU(obj) \
-+    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
-+#define RXCPU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
-+
-+/*
-+ * RXCPUClass:
-+ * @parent_realize: The parent class' realize handler.
-+ * @parent_reset: The parent class' reset handler.
-+ *
-+ * A RX CPU model.
-+ */
-+typedef struct RXCPUClass {
-+    /*< private >*/
-+    CPUClass parent_class;
-+    /*< public >*/
-+
-+    DeviceRealize parent_realize;
-+    void (*parent_reset)(CPUState *cpu);
-+
-+} RXCPUClass;
-+
-+#define CPUArchState struct CPURXState
-+
-+#endif
-diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-new file mode 100644
-index 0000000000..2d1eb7665c
---- /dev/null
-+++ b/target/rx/cpu.h
-@@ -0,0 +1,181 @@
-+/*
-+ *  RX emulation definition
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_H
-+#define RX_CPU_H
-+
-+#include "qemu/bitops.h"
-+#include "qemu-common.h"
-+#include "hw/registerfields.h"
-+#include "cpu-qom.h"
-+
-+#include "exec/cpu-defs.h"
-+
-+/* PSW define */
-+REG32(PSW, 0)
-+FIELD(PSW, C, 0, 1)
-+FIELD(PSW, Z, 1, 1)
-+FIELD(PSW, S, 2, 1)
-+FIELD(PSW, O, 3, 1)
-+FIELD(PSW, I, 16, 1)
-+FIELD(PSW, U, 17, 1)
-+FIELD(PSW, PM, 20, 1)
-+FIELD(PSW, IPL, 24, 4)
-+
-+/* FPSW define */
-+REG32(FPSW, 0)
-+FIELD(FPSW, RM, 0, 2)
-+FIELD(FPSW, CV, 2, 1)
-+FIELD(FPSW, CO, 3, 1)
-+FIELD(FPSW, CZ, 4, 1)
-+FIELD(FPSW, CU, 5, 1)
-+FIELD(FPSW, CX, 6, 1)
-+FIELD(FPSW, CE, 7, 1)
-+FIELD(FPSW, CAUSE, 2, 6)
-+FIELD(FPSW, DN, 8, 1)
-+FIELD(FPSW, EV, 10, 1)
-+FIELD(FPSW, EO, 11, 1)
-+FIELD(FPSW, EZ, 12, 1)
-+FIELD(FPSW, EU, 13, 1)
-+FIELD(FPSW, EX, 14, 1)
-+FIELD(FPSW, ENABLE, 10, 5)
-+FIELD(FPSW, FV, 26, 1)
-+FIELD(FPSW, FO, 27, 1)
-+FIELD(FPSW, FZ, 28, 1)
-+FIELD(FPSW, FU, 29, 1)
-+FIELD(FPSW, FX, 30, 1)
-+FIELD(FPSW, FLAGS, 26, 4)
-+FIELD(FPSW, FS, 31, 1)
-+
-+enum {
-+    NUM_REGS =3D 16,
-+};
-+
-+typedef struct CPURXState {
-+    /* CPU registers */
-+    uint32_t regs[NUM_REGS];    /* general registers */
-+    uint32_t psw_o;             /* O bit of status register */
-+    uint32_t psw_s;             /* S bit of status register */
-+    uint32_t psw_z;             /* Z bit of status register */
-+    uint32_t psw_c;             /* C bit of status register */
-+    uint32_t psw_u;
-+    uint32_t psw_i;
-+    uint32_t psw_pm;
-+    uint32_t psw_ipl;
-+    uint32_t bpsw;              /* backup status */
-+    uint32_t bpc;               /* backup pc */
-+    uint32_t isp;               /* global base register */
-+    uint32_t usp;               /* vector base register */
-+    uint32_t pc;                /* program counter */
-+    uint32_t intb;              /* interrupt vector */
-+    uint32_t fintv;
-+    uint32_t fpsw;
-+    uint64_t acc;
-+
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-+    /* Internal use */
-+    uint32_t in_sleep;
-+    uint32_t req_irq;           /* Requested interrupt no (hard) */
-+    uint32_t req_ipl;           /* Requested interrupt level */
-+    uint32_t ack_irq;           /* execute irq */
-+    uint32_t ack_ipl;           /* execute ipl */
-+    float_status fp_status;
-+    qemu_irq ack;               /* Interrupt acknowledge */
-+} CPURXState;
-+
-+/*
-+ * RXCPU:
-+ * @env: #CPURXState
-+ *
-+ * A RX CPU
-+ */
-+struct RXCPU {
-+    /*< private >*/
-+    CPUState parent_obj;
-+    /*< public >*/
-+
-+    CPUNegativeOffsetState neg;
-+    CPURXState env;
-+};
-+
-+typedef struct RXCPU RXCPU;
-+typedef RXCPU ArchCPU;
-+
-+#define ENV_OFFSET offsetof(RXCPU, env)
-+
-+#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
-+#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_RX_CPU
-+
-+extern const char rx_crname[][6];
-+
-+void rx_cpu_do_interrupt(CPUState *cpu);
-+bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
-+void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
-+int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+
-+void rx_translate_init(void);
-+int cpu_rx_signal_handler(int host_signum, void *pinfo,
-+                           void *puc);
-+
-+void rx_cpu_list(void);
-+void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
-+
-+#define cpu_signal_handler cpu_rx_signal_handler
-+#define cpu_list rx_cpu_list
-+
-+#include "exec/cpu-all.h"
-+
-+#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-+#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
-+
-+#define RX_CPU_IRQ 0
-+#define RX_CPU_FIR 1
-+
-+static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *p=
-c,
-+                                        target_ulong *cs_base, uint32_t =
-*flags)
-+{
-+    *pc =3D env->pc;
-+    *cs_base =3D 0;
-+    *flags =3D FIELD_DP32(0, PSW, PM, env->psw_pm);
-+}
-+
-+static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
-+{
-+    return 0;
-+}
-+
-+static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
-+{
-+    uint32_t psw =3D 0;
-+    psw =3D FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-+    psw =3D FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-+    psw =3D FIELD_DP32(psw, PSW, U,   env->psw_u);
-+    psw =3D FIELD_DP32(psw, PSW, I,   env->psw_i);
-+    psw =3D FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-+    psw =3D FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-+    psw =3D FIELD_DP32(psw, PSW, Z,   env->psw_z =3D=3D 0);
-+    psw =3D FIELD_DP32(psw, PSW, C,   env->psw_c);
-+    return psw;
-+}
-+
-+#endif /* RX_CPU_H */
-diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-new file mode 100644
-index 0000000000..ea38639f47
---- /dev/null
-+++ b/target/rx/cpu.c
-@@ -0,0 +1,217 @@
-+/*
-+ * QEMU RX CPU
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
-+#include "qemu-common.h"
-+#include "migration/vmstate.h"
-+#include "exec/exec-all.h"
-+#include "hw/loader.h"
-+#include "fpu/softfloat.h"
-+
-+static void rx_cpu_set_pc(CPUState *cs, vaddr value)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+
-+    cpu->env.pc =3D value;
-+}
-+
-+static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *t=
-b)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+
-+    cpu->env.pc =3D tb->pc;
-+}
-+
-+static bool rx_cpu_has_work(CPUState *cs)
-+{
-+    return cs->interrupt_request &
-+        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
-+}
-+
-+static void rx_cpu_reset(CPUState *s)
-+{
-+    RXCPU *cpu =3D RXCPU(s);
-+    RXCPUClass *rcc =3D RXCPU_GET_CLASS(cpu);
-+    CPURXState *env =3D &cpu->env;
-+    uint32_t *resetvec;
-+
-+    rcc->parent_reset(s);
-+
-+    memset(env, 0, offsetof(CPURXState, end_reset_fields));
-+
-+    resetvec =3D rom_ptr(0xfffffffc, 4);
-+    if (resetvec) {
-+        /* In the case of kernel, it is ignored because it is not set. *=
-/
-+        env->pc =3D ldl_p(resetvec);
-+    }
-+    rx_cpu_unpack_psw(env, 0, 1);
-+    env->regs[0] =3D env->isp =3D env->usp =3D 0;
-+    env->fpsw =3D 0;
-+    set_flush_to_zero(1, &env->fp_status);
-+    set_flush_inputs_to_zero(1, &env->fp_status);
-+}
-+
-+static void rx_cpu_list_entry(gpointer data, gpointer user_data)
-+{
-+    const char *typename =3D object_class_get_name(OBJECT_CLASS(data));
-+
-+    qemu_printf("%s\n", typename);
-+}
-+
-+void rx_cpu_list(void)
-+{
-+    GSList *list;
-+    list =3D object_class_get_list_sorted(TYPE_RX_CPU, false);
-+    g_slist_foreach(list, rx_cpu_list_entry, NULL);
-+    g_slist_free(list);
-+}
-+
-+static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+
-+    oc =3D object_class_by_name(cpu_model);
-+    if (object_class_dynamic_cast(oc, TYPE_RX_CPU) =3D=3D NULL ||
-+        object_class_is_abstract(oc)) {
-+        oc =3D NULL;
-+    }
-+
-+    return oc;
-+}
-+
-+static void rx_cpu_realize(DeviceState *dev, Error **errp)
-+{
-+    CPUState *cs =3D CPU(dev);
-+    RXCPUClass *rcc =3D RXCPU_GET_CLASS(dev);
-+    Error *local_err =3D NULL;
-+
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err !=3D NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    cpu_reset(cs);
-+    qemu_init_vcpu(cs);
-+
-+    rcc->parent_realize(dev, errp);
-+}
-+
-+static void rx_cpu_set_irq(void *opaque, int no, int request)
-+{
-+    RXCPU *cpu =3D opaque;
-+    CPUState *cs =3D CPU(cpu);
-+    int irq =3D request & 0xff;
-+
-+    static const int mask[] =3D {
-+        [RX_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
-+        [RX_CPU_FIR] =3D CPU_INTERRUPT_FIR,
-+    };
-+    if (irq) {
-+        cpu->env.req_irq =3D irq;
-+        cpu->env.req_ipl =3D (request >> 8) & 0x0f;
-+        cpu_interrupt(cs, mask[no]);
-+    } else {
-+        cpu_reset_interrupt(cs, mask[no]);
-+    }
-+}
-+
-+static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-+{
-+    info->mach =3D bfd_mach_rx;
-+    info->print_insn =3D print_insn_rx;
-+}
-+
-+static bool rx_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
-+                            MMUAccessType access_type, int mmu_idx,
-+                            bool probe, uintptr_t retaddr)
-+{
-+    uint32_t address, physical, prot;
-+
-+    /* Linear mapping */
-+    address =3D physical =3D addr & TARGET_PAGE_MASK;
-+    prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-+    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE)=
-;
-+    return true;
-+}
-+
-+static void rx_cpu_init(Object *obj)
-+{
-+    CPUState *cs =3D CPU(obj);
-+    RXCPU *cpu =3D RXCPU(obj);
-+    CPURXState *env =3D &cpu->env;
-+
-+    cpu_set_cpustate_pointers(cpu);
-+    cs->env_ptr =3D env;
-+    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
-+}
-+
-+static void rx_cpu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    CPUClass *cc =3D CPU_CLASS(klass);
-+    RXCPUClass *rcc =3D RXCPU_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, rx_cpu_realize,
-+                                    &rcc->parent_realize);
-+
-+    rcc->parent_reset =3D cc->reset;
-+    cc->reset =3D rx_cpu_reset;
-+
-+    cc->class_by_name =3D rx_cpu_class_by_name;
-+    cc->has_work =3D rx_cpu_has_work;
-+    cc->do_interrupt =3D rx_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt =3D rx_cpu_exec_interrupt;
-+    cc->dump_state =3D rx_cpu_dump_state;
-+    cc->set_pc =3D rx_cpu_set_pc;
-+    cc->synchronize_from_tb =3D rx_cpu_synchronize_from_tb;
-+    cc->gdb_read_register =3D rx_cpu_gdb_read_register;
-+    cc->gdb_write_register =3D rx_cpu_gdb_write_register;
-+    cc->get_phys_page_debug =3D rx_cpu_get_phys_page_debug;
-+    cc->disas_set_info =3D rx_cpu_disas_set_info;
-+    cc->tcg_initialize =3D rx_translate_init;
-+    cc->tlb_fill =3D rx_cpu_tlb_fill;
-+
-+    cc->gdb_num_core_regs =3D 26;
-+}
-+
-+static const TypeInfo rx_cpu_info =3D {
-+    .name =3D TYPE_RX_CPU,
-+    .parent =3D TYPE_CPU,
-+    .instance_size =3D sizeof(RXCPU),
-+    .instance_init =3D rx_cpu_init,
-+    .abstract =3D true,
-+    .class_size =3D sizeof(RXCPUClass),
-+    .class_init =3D rx_cpu_class_init,
-+};
-+
-+static const TypeInfo rx62n_rx_cpu_info =3D {
-+    .name =3D TYPE_RX62N_CPU,
-+    .parent =3D TYPE_RX_CPU,
-+};
-+
-+static void rx_cpu_register_types(void)
-+{
-+    type_register_static(&rx_cpu_info);
-+    type_register_static(&rx62n_rx_cpu_info);
-+}
-+
-+type_init(rx_cpu_register_types)
-diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
-new file mode 100644
-index 0000000000..d76ca52e82
---- /dev/null
-+++ b/target/rx/gdbstub.c
-@@ -0,0 +1,112 @@
-+/*
-+ * RX gdb server stub
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "exec/gdbstub.h"
-+
-+int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+    CPURXState *env =3D &cpu->env;
-+
-+    switch (n) {
-+    case 0 ... 15:
-+        return gdb_get_regl(mem_buf, env->regs[n]);
-+    case 16:
-+        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->=
-usp);
-+    case 17:
-+        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env-=
->isp);
-+    case 18:
-+        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
-+    case 19:
-+        return gdb_get_regl(mem_buf, env->pc);
-+    case 20:
-+        return gdb_get_regl(mem_buf, env->intb);
-+    case 21:
-+        return gdb_get_regl(mem_buf, env->bpsw);
-+    case 22:
-+        return gdb_get_regl(mem_buf, env->bpc);
-+    case 23:
-+        return gdb_get_regl(mem_buf, env->fintv);
-+    case 24:
-+        return gdb_get_regl(mem_buf, env->fpsw);
-+    case 25:
-+        return 0;
-+    }
-+    return 0;
-+}
-+
-+int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu =3D RXCPU(cs);
-+    CPURXState *env =3D &cpu->env;
-+    uint32_t psw;
-+    switch (n) {
-+    case 0 ... 15:
-+        env->regs[n] =3D ldl_p(mem_buf);
-+        if (n =3D=3D 0) {
-+            if (env->psw_u) {
-+                env->usp =3D env->regs[0];
-+            } else {
-+                env->isp =3D env->regs[0];
-+            }
-+        }
-+        break;
-+    case 16:
-+        env->usp =3D ldl_p(mem_buf);
-+        if (env->psw_u) {
-+            env->regs[0] =3D ldl_p(mem_buf);
-+        }
-+        break;
-+    case 17:
-+        env->isp =3D ldl_p(mem_buf);
-+        if (!env->psw_u) {
-+            env->regs[0] =3D ldl_p(mem_buf);
-+        }
-+        break;
-+    case 18:
-+        psw =3D ldl_p(mem_buf);
-+        rx_cpu_unpack_psw(env, psw, 1);
-+        break;
-+    case 19:
-+        env->pc =3D ldl_p(mem_buf);
-+        break;
-+    case 20:
-+        env->intb =3D ldl_p(mem_buf);
-+        break;
-+    case 21:
-+        env->bpsw =3D ldl_p(mem_buf);
-+        break;
-+    case 22:
-+        env->bpc =3D ldl_p(mem_buf);
-+        break;
-+    case 23:
-+        env->fintv =3D ldl_p(mem_buf);
-+        break;
-+    case 24:
-+        env->fpsw =3D ldl_p(mem_buf);
-+        break;
-+    case 25:
-+        return 8;
-+    default:
-+        return 0;
-+    }
-+
-+    return 4;
-+}
-diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
-index aa6f2d2d6c..a0018d5bc5 100644
---- a/target/rx/Makefile.objs
-+++ b/target/rx/Makefile.objs
-@@ -1,5 +1,4 @@
- obj-y +=3D translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
--obj-$(CONFIG_SOFTMMU) +=3D monitor.o
-=20
- DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
-=20
+please explain.
+
+On Sat, Dec 21, 2019 at 1:18 PM Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
+
+>
+>
+> On Wednesday, December 18, 2019, Michael Rolnik <mrolnik@gmail.com> wrote=
+:
+>
+>> This includes:
+>> - encoding of all 16 bit instructions
+>> - encoding of all 32 bit instructions
+>>
+>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>
+>
+> Michael,
+>
+> I am very pleased that you rearranged the order to be in sync with the
+> documentation.
+>
+> Now, for the next version, I would ask you to make this patch disappear.
+>
+> More precisely, "MCU Control Instructions" section of insn.decode file
+> move to be a part of "Add MCU Control Instructions" (not sure abiut the
+> title, but it is 6 or 7 patches after this one)  patch, and so on, in the
+> same fashion, for all groups of instructions.
+>
+> Kind regards,
+>
+> Aleksandar
+>
+>
+>
+>  target/avr/insn.decode | 183 +++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 183 insertions(+)
+>>  create mode 100644 target/avr/insn.decode
+>>
+>> diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+>> new file mode 100644
+>> index 0000000000..0e4ec9ddf0
+>> --- /dev/null
+>> +++ b/target/avr/insn.decode
+>> @@ -0,0 +1,183 @@
+>> +#
+>> +# AVR instruction decode definitions.
+>> +#
+>> +# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
+>> +#
+>> +# This library is free software; you can redistribute it and/or
+>> +# modify it under the terms of the GNU Lesser General Public
+>> +# License as published by the Free Software Foundation; either
+>> +# version 2.1 of the License, or (at your option) any later version.
+>> +#
+>> +# This library is distributed in the hope that it will be useful,
+>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> +# Lesser General Public License for more details.
+>> +#
+>> +# You should have received a copy of the GNU Lesser General Public
+>> +# License along with this library; if not, see <
+>> http://www.gnu.org/licenses/>.
+>> +#
+>> +
+>> +#
+>> +#   regs_16_31_by_one =3D [16 .. 31]
+>> +#   regs_16_23_by_one =3D [16 .. 23]
+>> +#   regs_24_30_by_two =3D [24, 26, 28, 30]
+>> +#   regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]
+>> +
+>> +%rd             4:5
+>> +%rr             9:1 0:4
+>> +
+>> +%rd_a           4:4
+>>  !function=3Dto_regs_16_31_by_one
+>> +%rd_b           4:3
+>>  !function=3Dto_regs_16_23_by_one
+>> +%rd_c           4:2
+>>  !function=3Dto_regs_24_30_by_two
+>> +%rd_d           4:4
+>>  !function=3Dto_regs_00_30_by_two
+>> +%rr_a           0:4
+>>  !function=3Dto_regs_16_31_by_one
+>> +%rr_b           0:3
+>>  !function=3Dto_regs_16_23_by_one
+>> +%rr_d           0:4
+>>  !function=3Dto_regs_00_30_by_two
+>> +
+>> +%imm6           6:2 0:4
+>> +%imm8           8:4 0:4
+>> +
+>> +%io_imm         9:2 0:4
+>> +%ldst_d_imm     13:1 10:2 0:3
+>> +
+>> +# The 22-bit immediate is partially in the opcode word,
+>> +# and partially in the next.  Use append_16 to build the
+>> +# complete 22-bit value.
+>> +%imm_call       4:5 0:1                     !function=3Dappend_16
+>> +
+>> +
+>> +&rd_rr          rd rr
+>> +&rd_imm         rd imm
+>> +
+>> +@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=3D%rd rr=3D%=
+rr
+>> +@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=3D%rd_c
+>> imm=3D%imm6
+>> +@op_rd_imm8     .... .... .... ....         &rd_imm     rd=3D%rd_a
+>> imm=3D%imm8
+>> +@op_bit         .... .... . bit:3 ....
+>> +@op_bit_imm     .... .. imm:s7 bit:3
+>> +@fmul           .... .... . ... . ...       &rd_rr      rd=3D%rd_b rr=
+=3D%rr_b
+>> +@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=3D%rd
+>> imm=3D%io_imm
+>> +@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=3D%ldst_d_i=
+mm
+>> +
+>> +# The 16-bit immediate is completely in the next word.
+>> +# Fields cannot be defined with no bits, so we cannot play
+>> +# the same trick and append to a zero-bit value.
+>> +# Defer reading the immediate until trans_{LDS,STS}.
+>> +@ldst_s         .... ... rd:5 ....          imm=3D0
+>> +
+>> +#
+>> +# Arithmetic Instructions
+>> +#
+>> +ADD             0000 11 . ..... ....        @op_rd_rr
+>> +ADC             0001 11 . ..... ....        @op_rd_rr
+>> +ADIW            1001 0110 .. .. ....        @op_rd_imm6
+>> +SUB             0001 10 . ..... ....        @op_rd_rr
+>> +SUBI            0101 .... .... ....         @op_rd_imm8
+>> +SBC             0000 10 . ..... ....        @op_rd_rr
+>> +SBCI            0100 .... .... ....         @op_rd_imm8
+>> +SBIW            1001 0111 .. .. ....        @op_rd_imm6
+>> +AND             0010 00 . ..... ....        @op_rd_rr
+>> +ANDI            0111 .... .... ....         @op_rd_imm8
+>> +OR              0010 10 . ..... ....        @op_rd_rr
+>> +ORI             0110 .... .... ....         @op_rd_imm8
+>> +EOR             0010 01 . ..... ....        @op_rd_rr
+>> +COM             1001 010 rd:5 0000
+>> +NEG             1001 010 rd:5 0001
+>> +INC             1001 010 rd:5 0011
+>> +DEC             1001 010 rd:5 1010
+>> +MUL             1001 11 . ..... ....        @op_rd_rr
+>> +MULS            0000 0010 .... ....         &rd_rr      rd=3D%rd_a rr=
+=3D%rr_a
+>> +MULSU           0000 0011 0 ... 0 ...       @fmul
+>> +FMUL            0000 0011 0 ... 1 ...       @fmul
+>> +FMULS           0000 0011 1 ... 0 ...       @fmul
+>> +FMULSU          0000 0011 1 ... 1 ...       @fmul
+>> +DES             1001 0100 imm:4 1011
+>> +
+>> +#
+>> +# Branch Instructions
+>> +#
+>> +RJMP            1100 imm:s12
+>> +IJMP            1001 0100 0000 1001
+>> +EIJMP           1001 0100 0001 1001
+>> +JMP             1001 010 ..... 110 .        imm=3D%imm_call
+>> +RCALL           1101 imm:s12
+>> +ICALL           1001 0101 0000 1001
+>> +EICALL          1001 0101 0001 1001
+>> +CALL            1001 010 ..... 111 .        imm=3D%imm_call
+>> +RET             1001 0101 0000 1000
+>> +RETI            1001 0101 0001 1000
+>> +CPSE            0001 00 . ..... ....        @op_rd_rr
+>> +CP              0001 01 . ..... ....        @op_rd_rr
+>> +CPC             0000 01 . ..... ....        @op_rd_rr
+>> +CPI             0011 .... .... ....         @op_rd_imm8
+>> +SBRC            1111 110 rr:5 0 bit:3
+>> +SBRS            1111 111 rr:5 0 bit:3
+>> +SBIC            1001 1001 reg:5 bit:3
+>> +SBIS            1001 1011 reg:5 bit:3
+>> +BRBS            1111 00 ....... ...         @op_bit_imm
+>> +BRBC            1111 01 ....... ...         @op_bit_imm
+>> +
+>> +#
+>> +# Data Transfer Instructions
+>> +#
+>> +MOV             0010 11 . ..... ....        @op_rd_rr
+>> +MOVW            0000 0001 .... ....         &rd_rr      rd=3D%rd_d rr=
+=3D%rr_d
+>> +LDI             1110 .... .... ....         @op_rd_imm8
+>> +LDS             1001 000 ..... 0000         @ldst_s
+>> +LDX1            1001 000 rd:5 1100
+>> +LDX2            1001 000 rd:5 1101
+>> +LDX3            1001 000 rd:5 1110
+>> +LDY2            1001 000 rd:5 1001
+>> +LDY3            1001 000 rd:5 1010
+>> +LDZ2            1001 000 rd:5 0001
+>> +LDZ3            1001 000 rd:5 0010
+>> +LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
+>> +LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
+>> +STS             1001 001 ..... 0000         @ldst_s
+>> +STX1            1001 001 rr:5 1100
+>> +STX2            1001 001 rr:5 1101
+>> +STX3            1001 001 rr:5 1110
+>> +STY2            1001 001 rd:5 1001
+>> +STY3            1001 001 rd:5 1010
+>> +STZ2            1001 001 rd:5 0001
+>> +STZ3            1001 001 rd:5 0010
+>> +STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
+>> +STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
+>> +LPM1            1001 0101 1100 1000
+>> +LPM2            1001 000 rd:5 0100
+>> +LPMX            1001 000 rd:5 0101
+>> +ELPM1           1001 0101 1101 1000
+>> +ELPM2           1001 000 rd:5 0110
+>> +ELPMX           1001 000 rd:5 0111
+>> +SPM             1001 0101 1110 1000
+>> +SPMX            1001 0101 1111 1000
+>> +IN              1011 0 .. ..... ....        @io_rd_imm
+>> +OUT             1011 1 .. ..... ....        @io_rd_imm
+>> +PUSH            1001 001 rd:5 1111
+>> +POP             1001 000 rd:5 1111
+>> +XCH             1001 001 rd:5 0100
+>> +LAC             1001 001 rd:5 0110
+>> +LAS             1001 001 rd:5 0101
+>> +LAT             1001 001 rd:5 0111
+>> +
+>> +#
+>> +# Bit and Bit-test Instructions
+>> +#
+>> +LSR             1001 010 rd:5 0110
+>> +ROR             1001 010 rd:5 0111
+>> +ASR             1001 010 rd:5 0101
+>> +SWAP            1001 010 rd:5 0010
+>> +SBI             1001 1010 reg:5 bit:3
+>> +CBI             1001 1000 reg:5 bit:3
+>> +BST             1111 101 rd:5 0 bit:3
+>> +BLD             1111 100 rd:5 0 bit:3
+>> +BSET            1001 0100 0 bit:3 1000
+>> +BCLR            1001 0100 1 bit:3 1000
+>> +
+>> +#
+>> +# MCU Control Instructions
+>> +#
+>> +BREAK           1001 0101 1001 1000
+>> +NOP             0000 0000 0000 0000
+>> +SLEEP           1001 0101 1000 1000
+>> +WDR             1001 0101 1010 1000
+>> +
+>> --
+>> 2.17.2 (Apple Git-113)
+>>
+>>
+
 --=20
-2.20.1
+Best Regards,
+Michael Rolnik
 
+--00000000000074faa0059a38db9b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+PGRpdiBkaXI9Imx0ciI+SGkgQWxla3NhbmRhci48ZGl2Pjxicj48L2Rpdj48ZGl2PnBsZWFzZSBl
+eHBsYWluLjwvZGl2PjwvZGl2Pjxicj48ZGl2IGNsYXNzPSJnbWFpbF9xdW90ZSI+PGRpdiBkaXI9
+Imx0ciIgY2xhc3M9ImdtYWlsX2F0dHIiPk9uIFNhdCwgRGVjIDIxLCAyMDE5IGF0IDE6MTggUE0g
+QWxla3NhbmRhciBNYXJrb3ZpYyAmbHQ7PGEgaHJlZj0ibWFpbHRvOmFsZWtzYW5kYXIubS5tYWls
+QGdtYWlsLmNvbSI+YWxla3NhbmRhci5tLm1haWxAZ21haWwuY29tPC9hPiZndDsgd3JvdGU6PGJy
+PjwvZGl2PjxibG9ja3F1b3RlIGNsYXNzPSJnbWFpbF9xdW90ZSIgc3R5bGU9Im1hcmdpbjowcHgg
+MHB4IDBweCAwLjhleDtib3JkZXItbGVmdDoxcHggc29saWQgcmdiKDIwNCwyMDQsMjA0KTtwYWRk
+aW5nLWxlZnQ6MWV4Ij48YnI+PGJyPk9uIFdlZG5lc2RheSwgRGVjZW1iZXIgMTgsIDIwMTksIE1p
+Y2hhZWwgUm9sbmlrICZsdDs8YSBocmVmPSJtYWlsdG86bXJvbG5pa0BnbWFpbC5jb20iIHRhcmdl
+dD0iX2JsYW5rIj5tcm9sbmlrQGdtYWlsLmNvbTwvYT4mZ3Q7IHdyb3RlOjxicj48YmxvY2txdW90
+ZSBjbGFzcz0iZ21haWxfcXVvdGUiIHN0eWxlPSJtYXJnaW46MHB4IDBweCAwcHggMC44ZXg7Ym9y
+ZGVyLWxlZnQ6MXB4IHNvbGlkIHJnYigyMDQsMjA0LDIwNCk7cGFkZGluZy1sZWZ0OjFleCI+VGhp
+cyBpbmNsdWRlczo8YnI+DQotIGVuY29kaW5nIG9mIGFsbCAxNiBiaXQgaW5zdHJ1Y3Rpb25zPGJy
+Pg0KLSBlbmNvZGluZyBvZiBhbGwgMzIgYml0IGluc3RydWN0aW9uczxicj4NCjxicj4NClNpZ25l
+ZC1vZmYtYnk6IE1pY2hhZWwgUm9sbmlrICZsdDs8YSBocmVmPSJtYWlsdG86bXJvbG5pa0BnbWFp
+bC5jb20iIHRhcmdldD0iX2JsYW5rIj5tcm9sbmlrQGdtYWlsLmNvbTwvYT4mZ3Q7PGJyPg0KVGVz
+dGVkLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSAmbHQ7PGEgaHJlZj0ibWFpbHRvOnBoaWxt
+ZEByZWRoYXQuY29tIiB0YXJnZXQ9Il9ibGFuayI+cGhpbG1kQHJlZGhhdC5jb208L2E+Jmd0Ozxi
+cj4NCi0tLTwvYmxvY2txdW90ZT48ZGl2Pjxicj48L2Rpdj48ZGl2Pk1pY2hhZWwsPC9kaXY+PGRp
+dj48YnI+PC9kaXY+PGRpdj5JIGFtIHZlcnkgcGxlYXNlZCB0aGF0IHlvdSByZWFycmFuZ2VkIHRo
+ZSBvcmRlciB0byBiZSBpbiBzeW5jIHdpdGggdGhlIGRvY3VtZW50YXRpb24uPC9kaXY+PGRpdj48
+YnI+PC9kaXY+PGRpdj5Ob3csIGZvciB0aGUgbmV4dCB2ZXJzaW9uLCBJIHdvdWxkIGFzayB5b3Ug
+dG8gbWFrZSB0aGlzIHBhdGNoIGRpc2FwcGVhci48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2Pk1v
+cmUgcHJlY2lzZWx5LCAmcXVvdDtNQ1UgQ29udHJvbCBJbnN0cnVjdGlvbnMmcXVvdDsgc2VjdGlv
+biBvZsKgaW5zbi5kZWNvZGUgZmlsZSBtb3ZlIHRvIGJlIGEgcGFydCBvZiAmcXVvdDtBZGQgTUNV
+IENvbnRyb2wgSW5zdHJ1Y3Rpb25zJnF1b3Q7IChub3Qgc3VyZSBhYml1dCB0aGUgdGl0bGUsIGJ1
+dCBpdCBpcyA2IG9yIDcgcGF0Y2hlcyBhZnRlciB0aGlzIG9uZSkgwqBwYXRjaCwgYW5kIHNvIG9u
+LCBpbiB0aGUgc2FtZSBmYXNoaW9uLCBmb3IgYWxsIGdyb3VwcyBvZiBpbnN0cnVjdGlvbnMuPC9k
+aXY+PGRpdj48YnI+PC9kaXY+PGRpdj5LaW5kIHJlZ2FyZHMsPC9kaXY+PGRpdj48YnI+PC9kaXY+
+PGRpdj5BbGVrc2FuZGFyPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj48
+YnI+PC9kaXY+PGJsb2NrcXVvdGUgY2xhc3M9ImdtYWlsX3F1b3RlIiBzdHlsZT0ibWFyZ2luOjBw
+eCAwcHggMHB4IDAuOGV4O2JvcmRlci1sZWZ0OjFweCBzb2xpZCByZ2IoMjA0LDIwNCwyMDQpO3Bh
+ZGRpbmctbGVmdDoxZXgiPg0KwqB0YXJnZXQvYXZyL2luc24uZGVjb2RlIHwgMTgzICsrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrPGJyPg0KwqAxIGZpbGUgY2hhbmdlZCwg
+MTgzIGluc2VydGlvbnMoKyk8YnI+DQrCoGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQvYXZyL2lu
+c24uZGVjb2RlPGJyPg0KPGJyPg0KZGlmZiAtLWdpdCBhL3RhcmdldC9hdnIvaW5zbi5kZWNvZGUg
+Yi90YXJnZXQvYXZyL2luc24uZGVjb2RlPGJyPg0KbmV3IGZpbGUgbW9kZSAxMDA2NDQ8YnI+DQpp
+bmRleCAwMDAwMDAwMDAwLi4wZTRlYzlkZGYwPGJyPg0KLS0tIC9kZXYvbnVsbDxicj4NCisrKyBi
+L3RhcmdldC9hdnIvaW5zbi5kZWNvZGU8YnI+DQpAQCAtMCwwICsxLDE4MyBAQDxicj4NCisjPGJy
+Pg0KKyMgQVZSIGluc3RydWN0aW9uIGRlY29kZSBkZWZpbml0aW9ucy48YnI+DQorIzxicj4NCisj
+IENvcHlyaWdodCAoYykgMjAxOSBNaWNoYWVsIFJvbG5payAmbHQ7PGEgaHJlZj0ibWFpbHRvOm1y
+b2xuaWtAZ21haWwuY29tIiB0YXJnZXQ9Il9ibGFuayI+bXJvbG5pa0BnbWFpbC5jb208L2E+Jmd0
+Ozxicj4NCisjPGJyPg0KKyMgVGhpcyBsaWJyYXJ5IGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4g
+cmVkaXN0cmlidXRlIGl0IGFuZC9vcjxicj4NCisjIG1vZGlmeSBpdCB1bmRlciB0aGUgdGVybXMg
+b2YgdGhlIEdOVSBMZXNzZXIgR2VuZXJhbCBQdWJsaWM8YnI+DQorIyBMaWNlbnNlIGFzIHB1Ymxp
+c2hlZCBieSB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXI8YnI+DQorIyB2ZXJz
+aW9uIDIuMSBvZiB0aGUgTGljZW5zZSwgb3IgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVy
+c2lvbi48YnI+DQorIzxicj4NCisjIFRoaXMgbGlicmFyeSBpcyBkaXN0cmlidXRlZCBpbiB0aGUg
+aG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLDxicj4NCisjIGJ1dCBXSVRIT1VUIEFOWSBXQVJS
+QU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mPGJyPg0KKyMgTUVSQ0hB
+TlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFLsKgIFNlZSB0aGUg
+R05VPGJyPg0KKyMgTGVzc2VyIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgZm9yIG1vcmUgZGV0YWls
+cy48YnI+DQorIzxicj4NCisjIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhl
+IEdOVSBMZXNzZXIgR2VuZXJhbCBQdWJsaWM8YnI+DQorIyBMaWNlbnNlIGFsb25nIHdpdGggdGhp
+cyBsaWJyYXJ5OyBpZiBub3QsIHNlZSAmbHQ7PGEgaHJlZj0iaHR0cDovL3d3dy5nbnUub3JnL2xp
+Y2Vuc2VzLyIgdGFyZ2V0PSJfYmxhbmsiPmh0dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy88L2E+
+Jmd0Oy48YnI+DQorIzxicj4NCis8YnI+DQorIzxicj4NCisjwqAgwqByZWdzXzE2XzMxX2J5X29u
+ZSA9IFsxNiAuLiAzMV08YnI+DQorI8KgIMKgcmVnc18xNl8yM19ieV9vbmUgPSBbMTYgLi4gMjNd
+PGJyPg0KKyPCoCDCoHJlZ3NfMjRfMzBfYnlfdHdvID0gWzI0LCAyNiwgMjgsIDMwXTxicj4NCisj
+wqAgwqByZWdzXzAwXzMwX2J5X3R3byA9IFswLCAyLCA0LCA2LCA4LCAuLiAzMF08YnI+DQorPGJy
+Pg0KKyVyZMKgIMKgIMKgIMKgIMKgIMKgIMKgNDo1PGJyPg0KKyVycsKgIMKgIMKgIMKgIMKgIMKg
+IMKgOToxIDA6NDxicj4NCis8YnI+DQorJXJkX2HCoCDCoCDCoCDCoCDCoCDCoDQ6NMKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIWZ1bmN0aW9uPXRvX3JlZ3NfMTZfMzFfYnlf
+b25lPGJyPg0KKyVyZF9iwqAgwqAgwqAgwqAgwqAgwqA0OjPCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCFmdW5jdGlvbj10b19yZWdzXzE2XzIzX2J5X29uZTxicj4NCislcmRf
+Y8KgIMKgIMKgIMKgIMKgIMKgNDoywqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAhZnVuY3Rpb249dG9fcmVnc18yNF8zMF9ieV90d288YnI+DQorJXJkX2TCoCDCoCDCoCDCoCDC
+oCDCoDQ6NMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIWZ1bmN0aW9uPXRv
+X3JlZ3NfMDBfMzBfYnlfdHdvPGJyPg0KKyVycl9hwqAgwqAgwqAgwqAgwqAgwqAwOjTCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCFmdW5jdGlvbj10b19yZWdzXzE2XzMxX2J5
+X29uZTxicj4NCislcnJfYsKgIMKgIMKgIMKgIMKgIMKgMDozwqAgwqAgwqAgwqAgwqAgwqAgwqAg
+wqAgwqAgwqAgwqAgwqAgwqAhZnVuY3Rpb249dG9fcmVnc18xNl8yM19ieV9vbmU8YnI+DQorJXJy
+X2TCoCDCoCDCoCDCoCDCoCDCoDA6NMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
+IMKgIWZ1bmN0aW9uPXRvX3JlZ3NfMDBfMzBfYnlfdHdvPGJyPg0KKzxicj4NCislaW1tNsKgIMKg
+IMKgIMKgIMKgIMKgNjoyIDA6NDxicj4NCislaW1tOMKgIMKgIMKgIMKgIMKgIMKgODo0IDA6NDxi
+cj4NCis8YnI+DQorJWlvX2ltbcKgIMKgIMKgIMKgIMKgOToyIDA6NDxicj4NCislbGRzdF9kX2lt
+bcKgIMKgIMKgMTM6MSAxMDoyIDA6Mzxicj4NCis8YnI+DQorIyBUaGUgMjItYml0IGltbWVkaWF0
+ZSBpcyBwYXJ0aWFsbHkgaW4gdGhlIG9wY29kZSB3b3JkLDxicj4NCisjIGFuZCBwYXJ0aWFsbHkg
+aW4gdGhlIG5leHQuwqAgVXNlIGFwcGVuZF8xNiB0byBidWlsZCB0aGU8YnI+DQorIyBjb21wbGV0
+ZSAyMi1iaXQgdmFsdWUuPGJyPg0KKyVpbW1fY2FsbMKgIMKgIMKgIMKgNDo1IDA6McKgIMKgIMKg
+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIWZ1bmN0aW9uPWFwcGVuZF8xNjxicj4NCis8YnI+DQor
+PGJyPg0KKyZhbXA7cmRfcnLCoCDCoCDCoCDCoCDCoCByZCBycjxicj4NCismYW1wO3JkX2ltbcKg
+IMKgIMKgIMKgIMKgcmQgaW1tPGJyPg0KKzxicj4NCitAb3BfcmRfcnLCoCDCoCDCoCDCoC4uLi4g
+Li4gLiAuLi4uLiAuLi4uwqAgwqAgwqAgwqAgJmFtcDtyZF9ycsKgIMKgIMKgIHJkPSVyZCBycj0l
+cnI8YnI+DQorQG9wX3JkX2ltbTbCoCDCoCDCoC4uLi4gLi4uLiAuLiAuLiAuLi4uwqAgwqAgwqAg
+wqAgJmFtcDtyZF9pbW3CoCDCoCDCoHJkPSVyZF9jIGltbT0laW1tNjxicj4NCitAb3BfcmRfaW1t
+OMKgIMKgIMKgLi4uLiAuLi4uIC4uLi4gLi4uLsKgIMKgIMKgIMKgIMKgJmFtcDtyZF9pbW3CoCDC
+oCDCoHJkPSVyZF9hIGltbT0laW1tODxicj4NCitAb3BfYml0wqAgwqAgwqAgwqAgwqAuLi4uIC4u
+Li4gLiBiaXQ6MyAuLi4uPGJyPg0KK0BvcF9iaXRfaW1twqAgwqAgwqAuLi4uIC4uIGltbTpzNyBi
+aXQ6Mzxicj4NCitAZm11bMKgIMKgIMKgIMKgIMKgIMKgLi4uLiAuLi4uIC4gLi4uIC4gLi4uwqAg
+wqAgwqAgwqAmYW1wO3JkX3JywqAgwqAgwqAgcmQ9JXJkX2IgcnI9JXJyX2I8YnI+DQorQGlvX3Jk
+X2ltbcKgIMKgIMKgIC4uLi4gLiAuLiAuLi4uLiAuLi4uwqAgwqAgwqAgwqAgJmFtcDtyZF9pbW3C
+oCDCoCDCoHJkPSVyZCBpbW09JWlvX2ltbTxicj4NCitAbGRzdF9kwqAgwqAgwqAgwqAgwqAuLiAu
+IC4gLi4gLiByZDo1wqAgLiAuLi7CoCDCoCDCoCZhbXA7cmRfaW1twqAgwqAgwqBpbW09JWxkc3Rf
+ZF9pbW08YnI+DQorPGJyPg0KKyMgVGhlIDE2LWJpdCBpbW1lZGlhdGUgaXMgY29tcGxldGVseSBp
+biB0aGUgbmV4dCB3b3JkLjxicj4NCisjIEZpZWxkcyBjYW5ub3QgYmUgZGVmaW5lZCB3aXRoIG5v
+IGJpdHMsIHNvIHdlIGNhbm5vdCBwbGF5PGJyPg0KKyMgdGhlIHNhbWUgdHJpY2sgYW5kIGFwcGVu
+ZCB0byBhIHplcm8tYml0IHZhbHVlLjxicj4NCisjIERlZmVyIHJlYWRpbmcgdGhlIGltbWVkaWF0
+ZSB1bnRpbCB0cmFuc197TERTLFNUU30uPGJyPg0KK0BsZHN0X3PCoCDCoCDCoCDCoCDCoC4uLi4g
+Li4uIHJkOjUgLi4uLsKgIMKgIMKgIMKgIMKgIGltbT0wPGJyPg0KKzxicj4NCisjPGJyPg0KKyMg
+QXJpdGhtZXRpYyBJbnN0cnVjdGlvbnM8YnI+DQorIzxicj4NCitBRETCoCDCoCDCoCDCoCDCoCDC
+oCDCoDAwMDAgMTEgLiAuLi4uLiAuLi4uwqAgwqAgwqAgwqAgQG9wX3JkX3JyPGJyPg0KK0FEQ8Kg
+IMKgIMKgIMKgIMKgIMKgIMKgMDAwMSAxMSAuIC4uLi4uIC4uLi7CoCDCoCDCoCDCoCBAb3BfcmRf
+cnI8YnI+DQorQURJV8KgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDExMCAuLiAuLiAuLi4uwqAgwqAg
+wqAgwqAgQG9wX3JkX2ltbTY8YnI+DQorU1VCwqAgwqAgwqAgwqAgwqAgwqAgwqAwMDAxIDEwIC4g
+Li4uLi4gLi4uLsKgIMKgIMKgIMKgIEBvcF9yZF9ycjxicj4NCitTVUJJwqAgwqAgwqAgwqAgwqAg
+wqAgMDEwMSAuLi4uIC4uLi4gLi4uLsKgIMKgIMKgIMKgIMKgQG9wX3JkX2ltbTg8YnI+DQorU0JD
+wqAgwqAgwqAgwqAgwqAgwqAgwqAwMDAwIDEwIC4gLi4uLi4gLi4uLsKgIMKgIMKgIMKgIEBvcF9y
+ZF9ycjxicj4NCitTQkNJwqAgwqAgwqAgwqAgwqAgwqAgMDEwMCAuLi4uIC4uLi4gLi4uLsKgIMKg
+IMKgIMKgIMKgQG9wX3JkX2ltbTg8YnI+DQorU0JJV8KgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDEx
+MSAuLiAuLiAuLi4uwqAgwqAgwqAgwqAgQG9wX3JkX2ltbTY8YnI+DQorQU5EwqAgwqAgwqAgwqAg
+wqAgwqAgwqAwMDEwIDAwIC4gLi4uLi4gLi4uLsKgIMKgIMKgIMKgIEBvcF9yZF9ycjxicj4NCitB
+TkRJwqAgwqAgwqAgwqAgwqAgwqAgMDExMSAuLi4uIC4uLi4gLi4uLsKgIMKgIMKgIMKgIMKgQG9w
+X3JkX2ltbTg8YnI+DQorT1LCoCDCoCDCoCDCoCDCoCDCoCDCoCAwMDEwIDEwIC4gLi4uLi4gLi4u
+LsKgIMKgIMKgIMKgIEBvcF9yZF9ycjxicj4NCitPUknCoCDCoCDCoCDCoCDCoCDCoCDCoDAxMTAg
+Li4uLiAuLi4uIC4uLi7CoCDCoCDCoCDCoCDCoEBvcF9yZF9pbW04PGJyPg0KK0VPUsKgIMKgIMKg
+IMKgIMKgIMKgIMKgMDAxMCAwMSAuIC4uLi4uIC4uLi7CoCDCoCDCoCDCoCBAb3BfcmRfcnI8YnI+
+DQorQ09NwqAgwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMCByZDo1IDAwMDA8YnI+DQorTkVHwqAg
+wqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMCByZDo1IDAwMDE8YnI+DQorSU5DwqAgwqAgwqAgwqAg
+wqAgwqAgwqAxMDAxIDAxMCByZDo1IDAwMTE8YnI+DQorREVDwqAgwqAgwqAgwqAgwqAgwqAgwqAx
+MDAxIDAxMCByZDo1IDEwMTA8YnI+DQorTVVMwqAgwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDExIC4g
+Li4uLi4gLi4uLsKgIMKgIMKgIMKgIEBvcF9yZF9ycjxicj4NCitNVUxTwqAgwqAgwqAgwqAgwqAg
+wqAgMDAwMCAwMDEwIC4uLi4gLi4uLsKgIMKgIMKgIMKgIMKgJmFtcDtyZF9ycsKgIMKgIMKgIHJk
+PSVyZF9hIHJyPSVycl9hPGJyPg0KK01VTFNVwqAgwqAgwqAgwqAgwqAgwqAwMDAwIDAwMTEgMCAu
+Li4gMCAuLi7CoCDCoCDCoCDCoEBmbXVsPGJyPg0KK0ZNVUzCoCDCoCDCoCDCoCDCoCDCoCAwMDAw
+IDAwMTEgMCAuLi4gMSAuLi7CoCDCoCDCoCDCoEBmbXVsPGJyPg0KK0ZNVUxTwqAgwqAgwqAgwqAg
+wqAgwqAwMDAwIDAwMTEgMSAuLi4gMCAuLi7CoCDCoCDCoCDCoEBmbXVsPGJyPg0KK0ZNVUxTVcKg
+IMKgIMKgIMKgIMKgIDAwMDAgMDAxMSAxIC4uLiAxIC4uLsKgIMKgIMKgIMKgQGZtdWw8YnI+DQor
+REVTwqAgwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMDAgaW1tOjQgMTAxMTxicj4NCis8YnI+DQor
+Izxicj4NCisjIEJyYW5jaCBJbnN0cnVjdGlvbnM8YnI+DQorIzxicj4NCitSSk1QwqAgwqAgwqAg
+wqAgwqAgwqAgMTEwMCBpbW06czEyPGJyPg0KK0lKTVDCoCDCoCDCoCDCoCDCoCDCoCAxMDAxIDAx
+MDAgMDAwMCAxMDAxPGJyPg0KK0VJSk1QwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMDAgMDAwMSAx
+MDAxPGJyPg0KK0pNUMKgIMKgIMKgIMKgIMKgIMKgIMKgMTAwMSAwMTAgLi4uLi4gMTEwIC7CoCDC
+oCDCoCDCoCBpbW09JWltbV9jYWxsPGJyPg0KK1JDQUxMwqAgwqAgwqAgwqAgwqAgwqAxMTAxIGlt
+bTpzMTI8YnI+DQorSUNBTEzCoCDCoCDCoCDCoCDCoCDCoDEwMDEgMDEwMSAwMDAwIDEwMDE8YnI+
+DQorRUlDQUxMwqAgwqAgwqAgwqAgwqAgMTAwMSAwMTAxIDAwMDEgMTAwMTxicj4NCitDQUxMwqAg
+wqAgwqAgwqAgwqAgwqAgMTAwMSAwMTAgLi4uLi4gMTExIC7CoCDCoCDCoCDCoCBpbW09JWltbV9j
+YWxsPGJyPg0KK1JFVMKgIMKgIMKgIMKgIMKgIMKgIMKgMTAwMSAwMTAxIDAwMDAgMTAwMDxicj4N
+CitSRVRJwqAgwqAgwqAgwqAgwqAgwqAgMTAwMSAwMTAxIDAwMDEgMTAwMDxicj4NCitDUFNFwqAg
+wqAgwqAgwqAgwqAgwqAgMDAwMSAwMCAuIC4uLi4uIC4uLi7CoCDCoCDCoCDCoCBAb3BfcmRfcnI8
+YnI+DQorQ1DCoCDCoCDCoCDCoCDCoCDCoCDCoCAwMDAxIDAxIC4gLi4uLi4gLi4uLsKgIMKgIMKg
+IMKgIEBvcF9yZF9ycjxicj4NCitDUEPCoCDCoCDCoCDCoCDCoCDCoCDCoDAwMDAgMDEgLiAuLi4u
+LiAuLi4uwqAgwqAgwqAgwqAgQG9wX3JkX3JyPGJyPg0KK0NQScKgIMKgIMKgIMKgIMKgIMKgIMKg
+MDAxMSAuLi4uIC4uLi4gLi4uLsKgIMKgIMKgIMKgIMKgQG9wX3JkX2ltbTg8YnI+DQorU0JSQ8Kg
+IMKgIMKgIMKgIMKgIMKgIDExMTEgMTEwIHJyOjUgMCBiaXQ6Mzxicj4NCitTQlJTwqAgwqAgwqAg
+wqAgwqAgwqAgMTExMSAxMTEgcnI6NSAwIGJpdDozPGJyPg0KK1NCSUPCoCDCoCDCoCDCoCDCoCDC
+oCAxMDAxIDEwMDEgcmVnOjUgYml0OjM8YnI+DQorU0JJU8KgIMKgIMKgIMKgIMKgIMKgIDEwMDEg
+MTAxMSByZWc6NSBiaXQ6Mzxicj4NCitCUkJTwqAgwqAgwqAgwqAgwqAgwqAgMTExMSAwMCAuLi4u
+Li4uIC4uLsKgIMKgIMKgIMKgIMKgQG9wX2JpdF9pbW08YnI+DQorQlJCQ8KgIMKgIMKgIMKgIMKg
+IMKgIDExMTEgMDEgLi4uLi4uLiAuLi7CoCDCoCDCoCDCoCDCoEBvcF9iaXRfaW1tPGJyPg0KKzxi
+cj4NCisjPGJyPg0KKyMgRGF0YSBUcmFuc2ZlciBJbnN0cnVjdGlvbnM8YnI+DQorIzxicj4NCitN
+T1bCoCDCoCDCoCDCoCDCoCDCoCDCoDAwMTAgMTEgLiAuLi4uLiAuLi4uwqAgwqAgwqAgwqAgQG9w
+X3JkX3JyPGJyPg0KK01PVlfCoCDCoCDCoCDCoCDCoCDCoCAwMDAwIDAwMDEgLi4uLiAuLi4uwqAg
+wqAgwqAgwqAgwqAmYW1wO3JkX3JywqAgwqAgwqAgcmQ9JXJkX2QgcnI9JXJyX2Q8YnI+DQorTERJ
+wqAgwqAgwqAgwqAgwqAgwqAgwqAxMTEwIC4uLi4gLi4uLiAuLi4uwqAgwqAgwqAgwqAgwqBAb3Bf
+cmRfaW1tODxicj4NCitMRFPCoCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEgMDAwIC4uLi4uIDAwMDDC
+oCDCoCDCoCDCoCDCoEBsZHN0X3M8YnI+DQorTERYMcKgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDAw
+IHJkOjUgMTEwMDxicj4NCitMRFgywqAgwqAgwqAgwqAgwqAgwqAgMTAwMSAwMDAgcmQ6NSAxMTAx
+PGJyPg0KK0xEWDPCoCDCoCDCoCDCoCDCoCDCoCAxMDAxIDAwMCByZDo1IDExMTA8YnI+DQorTERZ
+MsKgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDAwIHJkOjUgMTAwMTxicj4NCitMRFkzwqAgwqAgwqAg
+wqAgwqAgwqAgMTAwMSAwMDAgcmQ6NSAxMDEwPGJyPg0KK0xEWjLCoCDCoCDCoCDCoCDCoCDCoCAx
+MDAxIDAwMCByZDo1IDAwMDE8YnI+DQorTERaM8KgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDAwIHJk
+OjUgMDAxMDxicj4NCitMRERZwqAgwqAgwqAgwqAgwqAgwqAgMTAgLiAwIC4uIDAgLi4uLi4gMSAu
+Li7CoCDCoCDCoEBsZHN0X2Q8YnI+DQorTEREWsKgIMKgIMKgIMKgIMKgIMKgIDEwIC4gMCAuLiAw
+IC4uLi4uIDAgLi4uwqAgwqAgwqBAbGRzdF9kPGJyPg0KK1NUU8KgIMKgIMKgIMKgIMKgIMKgIMKg
+MTAwMSAwMDEgLi4uLi4gMDAwMMKgIMKgIMKgIMKgIMKgQGxkc3Rfczxicj4NCitTVFgxwqAgwqAg
+wqAgwqAgwqAgwqAgMTAwMSAwMDEgcnI6NSAxMTAwPGJyPg0KK1NUWDLCoCDCoCDCoCDCoCDCoCDC
+oCAxMDAxIDAwMSBycjo1IDExMDE8YnI+DQorU1RYM8KgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDAx
+IHJyOjUgMTExMDxicj4NCitTVFkywqAgwqAgwqAgwqAgwqAgwqAgMTAwMSAwMDEgcmQ6NSAxMDAx
+PGJyPg0KK1NUWTPCoCDCoCDCoCDCoCDCoCDCoCAxMDAxIDAwMSByZDo1IDEwMTA8YnI+DQorU1Ra
+MsKgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDAxIHJkOjUgMDAwMTxicj4NCitTVFozwqAgwqAgwqAg
+wqAgwqAgwqAgMTAwMSAwMDEgcmQ6NSAwMDEwPGJyPg0KK1NURFnCoCDCoCDCoCDCoCDCoCDCoCAx
+MCAuIDAgLi4gMSAuLi4uLiAxIC4uLsKgIMKgIMKgQGxkc3RfZDxicj4NCitTVERawqAgwqAgwqAg
+wqAgwqAgwqAgMTAgLiAwIC4uIDEgLi4uLi4gMCAuLi7CoCDCoCDCoEBsZHN0X2Q8YnI+DQorTFBN
+McKgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDEwMSAxMTAwIDEwMDA8YnI+DQorTFBNMsKgIMKgIMKg
+IMKgIMKgIMKgIDEwMDEgMDAwIHJkOjUgMDEwMDxicj4NCitMUE1YwqAgwqAgwqAgwqAgwqAgwqAg
+MTAwMSAwMDAgcmQ6NSAwMTAxPGJyPg0KK0VMUE0xwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMDEg
+MTEwMSAxMDAwPGJyPg0KK0VMUE0ywqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAwMCByZDo1IDAxMTA8
+YnI+DQorRUxQTVjCoCDCoCDCoCDCoCDCoCDCoDEwMDEgMDAwIHJkOjUgMDExMTxicj4NCitTUE3C
+oCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEgMDEwMSAxMTEwIDEwMDA8YnI+DQorU1BNWMKgIMKgIMKg
+IMKgIMKgIMKgIDEwMDEgMDEwMSAxMTExIDEwMDA8YnI+DQorSU7CoCDCoCDCoCDCoCDCoCDCoCDC
+oCAxMDExIDAgLi4gLi4uLi4gLi4uLsKgIMKgIMKgIMKgIEBpb19yZF9pbW08YnI+DQorT1VUwqAg
+wqAgwqAgwqAgwqAgwqAgwqAxMDExIDEgLi4gLi4uLi4gLi4uLsKgIMKgIMKgIMKgIEBpb19yZF9p
+bW08YnI+DQorUFVTSMKgIMKgIMKgIMKgIMKgIMKgIDEwMDEgMDAxIHJkOjUgMTExMTxicj4NCitQ
+T1DCoCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEgMDAwIHJkOjUgMTExMTxicj4NCitYQ0jCoCDCoCDC
+oCDCoCDCoCDCoCDCoDEwMDEgMDAxIHJkOjUgMDEwMDxicj4NCitMQUPCoCDCoCDCoCDCoCDCoCDC
+oCDCoDEwMDEgMDAxIHJkOjUgMDExMDxicj4NCitMQVPCoCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEg
+MDAxIHJkOjUgMDEwMTxicj4NCitMQVTCoCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEgMDAxIHJkOjUg
+MDExMTxicj4NCis8YnI+DQorIzxicj4NCisjIEJpdCBhbmQgQml0LXRlc3QgSW5zdHJ1Y3Rpb25z
+PGJyPg0KKyM8YnI+DQorTFNSwqAgwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMCByZDo1IDAxMTA8
+YnI+DQorUk9SwqAgwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMCByZDo1IDAxMTE8YnI+DQorQVNS
+wqAgwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMCByZDo1IDAxMDE8YnI+DQorU1dBUMKgIMKgIMKg
+IMKgIMKgIMKgIDEwMDEgMDEwIHJkOjUgMDAxMDxicj4NCitTQknCoCDCoCDCoCDCoCDCoCDCoCDC
+oDEwMDEgMTAxMCByZWc6NSBiaXQ6Mzxicj4NCitDQknCoCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEg
+MTAwMCByZWc6NSBiaXQ6Mzxicj4NCitCU1TCoCDCoCDCoCDCoCDCoCDCoCDCoDExMTEgMTAxIHJk
+OjUgMCBiaXQ6Mzxicj4NCitCTETCoCDCoCDCoCDCoCDCoCDCoCDCoDExMTEgMTAwIHJkOjUgMCBi
+aXQ6Mzxicj4NCitCU0VUwqAgwqAgwqAgwqAgwqAgwqAgMTAwMSAwMTAwIDAgYml0OjMgMTAwMDxi
+cj4NCitCQ0xSwqAgwqAgwqAgwqAgwqAgwqAgMTAwMSAwMTAwIDEgYml0OjMgMTAwMDxicj4NCis8
+YnI+DQorIzxicj4NCisjIE1DVSBDb250cm9sIEluc3RydWN0aW9uczxicj4NCisjPGJyPg0KK0JS
+RUFLwqAgwqAgwqAgwqAgwqAgwqAxMDAxIDAxMDEgMTAwMSAxMDAwPGJyPg0KK05PUMKgIMKgIMKg
+IMKgIMKgIMKgIMKgMDAwMCAwMDAwIDAwMDAgMDAwMDxicj4NCitTTEVFUMKgIMKgIMKgIMKgIMKg
+IMKgMTAwMSAwMTAxIDEwMDAgMTAwMDxicj4NCitXRFLCoCDCoCDCoCDCoCDCoCDCoCDCoDEwMDEg
+MDEwMSAxMDEwIDEwMDA8YnI+DQorPGJyPg0KLS0gPGJyPg0KMi4xNy4yIChBcHBsZSBHaXQtMTEz
+KTxicj4NCjxicj4NCjwvYmxvY2txdW90ZT4NCjwvYmxvY2txdW90ZT48L2Rpdj48YnIgY2xlYXI9
+ImFsbCI+PGRpdj48YnI+PC9kaXY+LS0gPGJyPjxkaXYgZGlyPSJsdHIiIGNsYXNzPSJnbWFpbF9z
+aWduYXR1cmUiPkJlc3QgUmVnYXJkcyw8YnI+TWljaGFlbCBSb2xuaWs8L2Rpdj4NCg==
+--00000000000074faa0059a38db9b--
 
