@@ -6,46 +6,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F40A0C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 14:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28FABC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 14:47:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C755B2072B
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 14:44:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C755B2072B
+	by mail.kernel.org (Postfix) with ESMTPS id F30632072B
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 14:46:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F30632072B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iifzc-00071u-BH
-	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 09:44:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46480)
+	id 1iig1y-0001zB-Im
+	for qemu-devel@archiver.kernel.org; Sat, 21 Dec 2019 09:46:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46352)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iify2-0005FU-B7
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:55 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iify0-0005FI-NJ
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iify0-0002DQ-5b
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:53 -0500
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:35479)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iifxy-0002AA-RS
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:52 -0500
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:53075)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iifxz-0002Ae-Ka
- for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:51 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iifxy-0001to-8U
+ for qemu-devel@nongnu.org; Sat, 21 Dec 2019 09:42:50 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 4CC201BD09;
- Sat, 21 Dec 2019 23:42:50 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 78ACCA7E70;
+ Sat, 21 Dec 2019 23:42:46 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 0903B24008E;
- Sat, 21 Dec 2019 23:42:50 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id EB425240090;
+ Sat, 21 Dec 2019 23:42:45 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v27 13/21] target/rx: Dump bytes for each insn during
- disassembly
-Date: Sat, 21 Dec 2019 23:42:30 +0900
-Message-Id: <20191221144238.127766-14-ysato@users.sourceforge.jp>
+Subject: [PATCH v27 02/21] qemu/bitops.h: Add extract8 and extract16
+Date: Sat, 21 Dec 2019 23:42:19 +0900
+Message-Id: <20191221144238.127766-3-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191221144238.127766-1-ysato@users.sourceforge.jp>
 References: <20191221144238.127766-1-ysato@users.sourceforge.jp>
@@ -54,7 +53,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.13
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,57 +65,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+Cc: richard.henderson@linaro.org, philmd@redhat.com,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-There are so many different forms of each RX instruction
-that it will be very useful to be able to look at the bytes
-to see on which path a bug may lie.
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-24-ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190607091116.49044-10-ysato@users.sourceforge.jp>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ include/qemu/bitops.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 5a32a87534..d73b53db44 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -102,7 +102,21 @@ static int bdsp_s(DisasContext *ctx, int d)
- /* Include the auto-generated decoder.  */
- #include "decode.inc.c"
+diff --git a/include/qemu/bitops.h b/include/qemu/bitops.h
+index 02c1ce6a5d..f55ce8b320 100644
+--- a/include/qemu/bitops.h
++++ b/include/qemu/bitops.h
+@@ -301,6 +301,44 @@ static inline uint32_t extract32(uint32_t value, int=
+ start, int length)
+     return (value >> start) & (~0U >> (32 - length));
+ }
 =20
--#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS_=
-_)
-+static void dump_bytes(DisasContext *ctx)
++/**
++ * extract8:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 8 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 8 bit word. It is valid to request that
++ * all 8 bits are returned (ie @length 8 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline uint8_t extract8(uint8_t value, int start, int length)
 +{
-+    int i, len =3D ctx->len;
-+
-+    for (i =3D 0; i < len; ++i) {
-+        ctx->dis->fprintf_func(ctx->dis->stream, "%02x ", ctx->bytes[i])=
-;
-+    }
-+    ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
++    assert(start >=3D 0 && length > 0 && length <=3D 8 - start);
++    return extract32(value, start, length);
 +}
 +
-+#define prt(...) \
-+    do {                                                        \
-+        dump_bytes(ctx);                                        \
-+        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
-+    } while (0)
-=20
- #define RX_MEMORY_BYTE 0
- #define RX_MEMORY_WORD 1
++/**
++ * extract16:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 16 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 16 bit word. It is valid to request that
++ * all 16 bits are returned (ie @length 16 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline uint16_t extract16(uint16_t value, int start, int length)
++{
++    assert(start >=3D 0 && length > 0 && length <=3D 16 - start);
++    return extract32(value, start, length);
++}
++
+ /**
+  * extract64:
+  * @value: the value to extract the bit field from
 --=20
 2.20.1
 
