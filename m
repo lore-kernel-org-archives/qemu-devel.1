@@ -6,59 +6,57 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC299C43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60241C2D0C8
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88F0F20716
-	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:06:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 303E720716
+	for <qemu-devel@archiver.kernel.org>; Sat, 21 Dec 2019 01:06:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="od8xxc3e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88F0F20716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="U8gspHDy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 303E720716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiTE0-0007Yh-Em
-	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 20:06:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58467)
+	id 1iiTE3-0007dN-0B
+	for qemu-devel@archiver.kernel.org; Fri, 20 Dec 2019 20:06:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iiTAT-0002da-8y
+ (envelope-from <dgibson@ozlabs.org>) id 1iiTAT-0002dg-Ca
  for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:02:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iiTAR-00075r-F8
+ (envelope-from <dgibson@ozlabs.org>) id 1iiTAR-00076T-HC
  for qemu-devel@nongnu.org; Fri, 20 Dec 2019 20:02:52 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38911 helo=ozlabs.org)
+Received: from ozlabs.org ([2401:3900:2:1::2]:58299)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iiTAQ-0006n2-Bi; Fri, 20 Dec 2019 20:02:51 -0500
+ id 1iiTAQ-0006mT-AR; Fri, 20 Dec 2019 20:02:51 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47fnQs6BnDz9sPV; Sat, 21 Dec 2019 12:02:45 +1100 (AEDT)
+ id 47fnQs5Dbgz9sPW; Sat, 21 Dec 2019 12:02:45 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1576890165;
- bh=4vJT99mEOi9sWe7DZk243QBSzR3FSdxB9FjQhdw++1k=;
+ bh=ZMlODfpKIOt63T3fWQzG2RqghsW3+FZEp59QpxFhjFA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=od8xxc3ektkIYK4ZDKRda/TsVOisz42wO5B83iOmsgkxPPvJzTCBXiRqn0wF0ZsnM
- R0Jf6HDvDbU/wrOM6exrWG0PhSlYSLC2UN7futNwlMFXv1PLyHz5HUaZkFX0Fg3J59
- 00XqBCM2Lm7WE/x3QsAX6VYYPKU7oVYrGvkLSX/s=
-Date: Sat, 21 Dec 2019 11:39:06 +1100
+ b=U8gspHDyyWLRp9+r67UNbranb1OH4sjQxlh5/QZNK3u6LO7RsvjyFUt8FNeDfkXrt
+ Rbt7Cixcwe2+6Uoxz9XTlwkGVCIJM59/l/ioBi+6iCvO8F+rMlPDFwvqvOwP6ZUA8J
+ sGvpCzx9HEgqV9hL4XbreP1vOyuCYMr7oM89pqH0=
+Date: Sat, 21 Dec 2019 11:33:43 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 2/2] ppc/pnv: Use the CPU topology to compute the default
- number of chips
-Message-ID: <20191221003906.GC15511@umbus.fritz.box>
-References: <157686069624.97184.12603452056634667288.stgit@bahia.lan>
- <157686070815.97184.16561911770080665569.stgit@bahia.lan>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH v2] mos6522: remove anh register
+Message-ID: <20191221003343.GB15511@umbus.fritz.box>
+References: <20191220214054.76525-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="VywGB/WGlW4DM4P8"
+ protocol="application/pgp-signature"; boundary="dTy3Mrz/UPE2dbVg"
 Content-Disposition: inline
-In-Reply-To: <157686070815.97184.16561911770080665569.stgit@bahia.lan>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <20191220214054.76525-1-laurent@vivier.eu>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,100 +68,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---VywGB/WGlW4DM4P8
+--dTy3Mrz/UPE2dbVg
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 20, 2019 at 05:51:48PM +0100, Greg Kurz wrote:
-> Multi TCG mandates the CPU topology to be dimensioned to the actual
-> number of CPUs, depending on the number of chips the user asked for.
-> That is, '-machine num-chips=3DN' should always have a '-smp' companion
-> with a topology that meats the resulting number of CPUs, typically
-> '-smp sockets=3DN'.
+On Fri, Dec 20, 2019 at 10:40:54PM +0100, Laurent Vivier wrote:
+> Register addr 1 is defined as buffer A with handshake (vBufAH),
+> register addr 15 is also defined as buffer A without handshake (vBufA).
 >=20
-> Simplify the command line for these setups by computing the default
-> number of chips based on the CPU topology, ie. no need to explicitely
-> set "num-chips" anymore. This must be done at machine init because
-> smp_parse() is called after instance init.
+> As both addresses access the same register, remove the definition of
+> 'anh' and use only 'a' (with VIA_REG_ANH and VIA_REG_A).
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Fixes: 51f233ec92cd ("misc: introduce new mos6522 VIA device and enable i=
+t for ppc builds")
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 
-Is there actually any reason to retain num-chips at all?  Or could we
-just set the number of chips equal to the number of sockets, which
-seems to make sense to me.
+Applied to ppc-for-5.0, thanks.
 
 > ---
->  hw/ppc/pnv.c |   23 ++++++++++++++++-------
->  1 file changed, 16 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index f8cf2b6d760f..9b777b7084a0 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -768,6 +768,19 @@ static void pnv_init(MachineState *machine)
->          exit(1);
+> Notes:
+>     v2: update commit message (remove reference to linux)
+>         add LOG_UNIMP for VIA_REG_A access
+>=20
+>  hw/misc/mos6522.c         | 16 ++++++++--------
+>  include/hw/misc/mos6522.h |  1 -
+>  2 files changed, 8 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+> index cecf0be59e..10b85bf751 100644
+> --- a/hw/misc/mos6522.c
+> +++ b/hw/misc/mos6522.c
+> @@ -244,6 +244,9 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsi=
+gned size)
+>          val =3D s->b;
+>          break;
+>      case VIA_REG_A:
+> +       qemu_log_mask(LOG_UNIMP, "Read access to register A with handshak=
+e");
+> +       /* fall through */
+> +    case VIA_REG_ANH:
+>          val =3D s->a;
+>          break;
+>      case VIA_REG_DIRB:
+> @@ -297,9 +300,7 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsi=
+gned size)
+>          val =3D s->ier | 0x80;
+>          break;
+>      default:
+> -    case VIA_REG_ANH:
+> -        val =3D s->anh;
+> -        break;
+> +        g_assert_not_reached();
 >      }
 > =20
-> +    if (!pnv->num_chips) {
-> +        uint32_t num_chips =3D
-> +            machine->smp.max_cpus / (machine->smp.cores * machine->smp.t=
-hreads);
-> +        Error *local_err =3D NULL;
-> +
-> +        object_property_set_uint(OBJECT(pnv), num_chips, "num-chips",
-> +                                 &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            exit(1);
-> +        }
-> +    }
-> +
->      pnv->chips =3D g_new0(PnvChip *, pnv->num_chips);
->      for (i =3D 0; i < pnv->num_chips; i++) {
->          char chip_name[32];
-> @@ -1722,6 +1735,9 @@ static void pnv_set_num_chips(Object *obj, Visitor =
-*v, const char *name,
->       */
->      if (!is_power_of_2(num_chips) || num_chips > 4) {
->          error_setg(errp, "invalid number of chips: '%d'", num_chips);
-> +        error_append_hint(errp,
-> +                          "Set 'num-chips' implicitely with '-smp socket=
-s=3DN'. "
-> +                          "Valid values are : 1, 2 or 4.\n");
->          return;
+>      if (addr !=3D VIA_REG_IFR || val !=3D 0) {
+> @@ -322,6 +323,9 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_=
+t val, unsigned size)
+>          mdc->portB_write(s);
+>          break;
+>      case VIA_REG_A:
+> +       qemu_log_mask(LOG_UNIMP, "Write access to register A with handsha=
+ke");
+> +       /* fall through */
+> +    case VIA_REG_ANH:
+>          s->a =3D (s->a & ~s->dira) | (val & s->dira);
+>          mdc->portA_write(s);
+>          break;
+> @@ -395,9 +399,7 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_=
+t val, unsigned size)
+>                                qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+>          break;
+>      default:
+> -    case VIA_REG_ANH:
+> -        s->anh =3D val;
+> -        break;
+> +        g_assert_not_reached();
 >      }
-> =20
-> @@ -1735,12 +1751,6 @@ static void pnv_set_num_chips(Object *obj, Visitor=
- *v, const char *name,
->      pnv->num_chips =3D num_chips;
 >  }
 > =20
-> -static void pnv_machine_instance_init(Object *obj)
-> -{
-> -    PnvMachineState *pnv =3D PNV_MACHINE(obj);
-> -    pnv->num_chips =3D 1;
-> -}
-> -
->  static void pnv_machine_class_props_init(ObjectClass *oc)
->  {
->      object_class_property_add(oc, "num-chips", "uint32",
-> @@ -1874,7 +1884,6 @@ static const TypeInfo types[] =3D {
->          .parent        =3D TYPE_MACHINE,
->          .abstract       =3D true,
->          .instance_size =3D sizeof(PnvMachineState),
-> -        .instance_init =3D pnv_machine_instance_init,
->          .class_init    =3D pnv_machine_class_init,
->          .class_size    =3D sizeof(PnvMachineClass),
->          .interfaces =3D (InterfaceInfo[]) {
->=20
+> @@ -439,7 +441,6 @@ const VMStateDescription vmstate_mos6522 =3D {
+>          VMSTATE_UINT8(pcr, MOS6522State),
+>          VMSTATE_UINT8(ifr, MOS6522State),
+>          VMSTATE_UINT8(ier, MOS6522State),
+> -        VMSTATE_UINT8(anh, MOS6522State),
+>          VMSTATE_STRUCT_ARRAY(timers, MOS6522State, 2, 0,
+>                               vmstate_mos6522_timer, MOS6522Timer),
+>          VMSTATE_END_OF_LIST()
+> @@ -460,7 +461,6 @@ static void mos6522_reset(DeviceState *dev)
+>      s->ifr =3D 0;
+>      s->ier =3D 0;
+>      /* s->ier =3D T1_INT | SR_INT; */
+> -    s->anh =3D 0;
+> =20
+>      s->timers[0].frequency =3D s->frequency;
+>      s->timers[0].latch =3D 0xffff;
+> diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
+> index 493c907537..97384c6e02 100644
+> --- a/include/hw/misc/mos6522.h
+> +++ b/include/hw/misc/mos6522.h
+> @@ -115,7 +115,6 @@ typedef struct MOS6522State {
+>      uint8_t pcr;
+>      uint8_t ifr;
+>      uint8_t ier;
+> -    uint8_t anh;
+> =20
+>      MOS6522Timer timers[2];
+>      uint64_t frequency;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -171,25 +191,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VywGB/WGlW4DM4P8
+--dTy3Mrz/UPE2dbVg
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl39aaoACgkQbDjKyiDZ
-s5IpKw/+MGOOE5pcsuiV1CSGr6Cx4FFtFJ/R5L7UX6xj+Z+ZJqvJwdoELCuEkpdL
-qbjD5cMBDCulYZtNKZN1BYzyb6x+Qwi8hmLhv8hCxWN1LQe6UdyC24CTbk+uuTDR
-XTa95kFSbaZ1rczpmADBWJxfHdHfJeCyJevZKw94kI8Ir04aO6IHKivlKQvy93HE
-RLOJefs1HOaw1kTimz5VRJ1PuBnmu9ZjFuHIUw9zdzPga4ITC6kZCExObWSCYfWG
-w+s3TKUSwS3qK0WzJppeW2JvOJYD4kIrzWeKGmhuEbpmBQWzGUdVJwepNtr4dE7y
-GVWYtc5pDy6cNoG7MtULJCWaNNbs/93xl5R6DCNCCDE2/cUOpclaITq3t35OSgZ+
-Etd1wbirzFJavhbZaNFuFwK2ybqWYRP89hXuC/7d5l14tvdFc3LqPo5IwY0nfwlz
-eX4peW1arLN+rc+vBDfDmrF+ZB0Z6KGyJUu5ibG9keJL5onw6VeIG0L8AnEbGXYs
-DuTJdvKVlO4wyVzQneTlM8H1KVgMAP8kBMEbPXDLu8ji5KkR2sp/imp08F97YWNX
-TQzwzzRnsALKhTdwqNNhHQGs8Mw9zxqYmvXm72qjcf4mQGPf25Z2dGLv573Ete4I
-pF9KA9PJAtNBzDBNNW5FDhz4xwiFUpSKvY3RhwtQEV24/fZqO14=
-=rqJK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl39aGQACgkQbDjKyiDZ
+s5KF6w//Xf/WTzjQ54gHFF7DsJDPhKeq7fBRJeZcrlBDxr7KQ8BMfYw0adyPXkvI
+uJfzFj8rT7QlCjH7FzTYQrvbYtNVI2AfQsqIvuCdCAgXShgLMGX+cLRqUAP0jlwM
+h35KVrVAk+xn/zb7AvThdKSjWtIi9rLhO8V5o0CCmGGFIU+yWp7E7QBXdO8DFERi
+9qPCNGIu/38rCu/UHXk43Z/iUdu1wd4mstdkxlzHS/3YSInhxGmprcL7Zqu0/qfL
+fZjhvwkZlmiFQHHD+OhS0iDFzu8Ku/0UsUan8365G7hxrFE8RdAfRMY3lA8lF3d0
+BeCRZGannX8qgDZAbzmkUkxJs60HwDeMNxw0Y3PaAKT0j4IDVS4EDpdHWNNJm+do
+f7FWQIsE5D9fMbLqY/YjtiQz5NkNBLPqmHo05BYYOiWQDXESxxIn1DAYXt+AtPnJ
++2Q7H6MmDS7rwh88TeHVOE8X/FZyJO3v83Dzi1YaIKtRebT60xDiUbDZ4+VEn43R
++biOm3ObsccyRfV8lN1UZy5aqnLmm35l+l/qbNdudxX1sN8OBVtSqhPNqwrHdnu+
+A2dCULA+vr38SyIbV3FtTKv9GjLSc7LPHRV8VMHj9JsOlNug9Lprh/x9pSoH8pMr
+Jx1PCRKLTWKL65lHey4hft5MhwFp2UskszVBH+0XvZeHgM3//iQ=
+=0tzF
 -----END PGP SIGNATURE-----
 
---VywGB/WGlW4DM4P8--
+--dTy3Mrz/UPE2dbVg--
 
