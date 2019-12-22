@@ -2,79 +2,80 @@ Return-Path: <SRS0=nsQZ=2M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 252DAC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 12:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C37C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 12:39:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D40F62067C
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 12:34:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1686C20663
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 12:39:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VJdwjdNJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40F62067C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pUsQJj4j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1686C20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ij0R0-0007gf-To
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 07:34:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35239)
+	id 1ij0WF-0000ns-5V
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 07:39:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ij0QK-0007Fo-Fz
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:33:29 -0500
+ id 1ij0Uc-0008Uq-8p
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:37:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ij0QH-0002RX-UM
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:33:28 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43566)
+ id 1ij0Ub-0008IS-35
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:37:54 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35939)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ij0QG-0002Q6-8x
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:33:24 -0500
-Received: by mail-wr1-x441.google.com with SMTP id d16so13780322wre.10
- for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 04:33:23 -0800 (PST)
+ id 1ij0Ua-0008ED-R3
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:37:52 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p17so13587206wma.1
+ for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 04:37:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:autocrypt:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=PKCFxoG9lQRAMqj7N2c/DB0LiRJDNu+D/Cpr80n1gSM=;
- b=VJdwjdNJB/DAXwntNGAQ5B5TA1JPLk7jelnGP3IGrD//CWZwdjSdw6iCWKQOQEQ5Vh
- 7p/YfnSXDFMlmisKHV0gkMaAGiLjkvdu7dEzSclS/QlQ7ztsnnY1DBhkRlTcQmLKIMTc
- DuBAN7/xryLfuLmLIWIGKUvbBdcHfjuBI6nlCXAL+LNrckUE9AMhJiqyZZVBzxhphQMk
- tOaSHdEDg+H7fyxIEd1cQXjFy9twjxBadBgsueo4G7I4tepby3kDKjYy6RXQNNkAj6g4
- 6NVlBlOaIIHIuA9qjYdQdp0onD55AkYZtmmiPWby2A/pWIbg4P79BBCFSZ0Mkpm8/sHI
- NJnQ==
+ bh=eNYo1Ug1kIiutbMCyzGzA07EZ1COuyJ5YIOb1PmMs5I=;
+ b=pUsQJj4jF7RTaSRNtoDUJl/iBH8FNAEvtimhdCdNWUJpdkEuJxB51KpUzudfs0Qisy
+ 9E07ggk1WyDwZkMMv1EvwKZdQ/bK+YeCE5udmhKIYjm/9oKxRJMTf5+DFZNVSXTN74is
+ NZGmnsZnsnq2obitGtDmSh1AIXddYl5nHD+pzu3mzkcr3IusKFJf4V9M1a5foWQOxyvR
+ ABSBijhG09DXrUUkL7e/KmXIOaHrkQ6+Pyzrt2Qucs3OzmGmyQ/Tl1R+5up4omDa6iw/
+ wVWBQnhLhH+keA7ExpC5hdyRVu4eK/ZaNi4a25ElLlbjaUTXrzhZ6iylYVe9DfHeorWp
+ nd0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=PKCFxoG9lQRAMqj7N2c/DB0LiRJDNu+D/Cpr80n1gSM=;
- b=Eu8xtp9b6ODwxEUzGejps2X7O2CE7hzNCb3gTaizICI9xgz8Ry7GK5xiSMBXdI2Sl4
- cjxgp+qo6O/F8Q07zM+X9/ImPnCOvgCYg0Hi9kbroBJx1dFJ+YKjIymC8r6RVmK1DTS7
- BGAip/zjzroyCAQ6b1W4wGqbEJUeO2TiwzLMsAt5YjDWINe0Kdc90yNI/YOsR4vYss30
- ZXUtUCrl1B/gLU4DMvgsDqywfYfCChwzHnc1lUiaRnVxmz8UIuTnPh4pJjfXWJbW7KsF
- H9tYAjk0KvFnQVH48abk1G4+/6+wrieM4sCDFcfLqV5bBh7O7TYfXNz8XpQ8gB6mgIU+
- iZnQ==
-X-Gm-Message-State: APjAAAWSdK0UBYTEaJ1Of8LgMtYlo/V3x1hr+zpk7tyLz/BP5Akdf+Y2
- 8EzUdfQfNcdM+FJypLKiZ72ITXlp1xE=
-X-Google-Smtp-Source: APXvYqy5IXZgQ10Bkt4Eq+zzRz3vvHsmBKsVyy8w0cNrutswQMvd/p9SnAesFfIGNqSCNxgZo3t2qA==
-X-Received: by 2002:adf:fe07:: with SMTP id n7mr25657346wrr.286.1577018002675; 
- Sun, 22 Dec 2019 04:33:22 -0800 (PST)
+ bh=eNYo1Ug1kIiutbMCyzGzA07EZ1COuyJ5YIOb1PmMs5I=;
+ b=TidYz2SEexBvRK4sRTkETohE7xz3ve2JFHMx9K88wYjB3EO/flQH7RMXYIdo2YYDUB
+ 2KfaBKmGYEHkKJtnxAlgR3C21eqiBGNKXeNGfuHy1hFPIR6S1rDJNeTOZVJD+pVoQr8p
+ PItVH3m1BlG2em09YDRHQsfbRQrZa5Htd2RSiFXj4eQ99q0wn320G9gUAQnlUGkZQwfl
+ qTtYiN+Wo77KXCyYt4hWYKIZyqJdd5JxvvvT01L25gNRlSC3D40iw+bB9A+Vkcnp8k7s
+ P0g+UyQS/5AVpdQGAfKERuWWw1p83CCOrivKFTAyOLUj3OJ+eNILJH8IctB4fjpew88c
+ tuSQ==
+X-Gm-Message-State: APjAAAV3ycY/dOktHXsUZl0THEabgYYFkSKL0FKCY8/bLxPTPGJYgpUN
+ vh1kSmwuRQ3UV5MI3uRqkznzGVkBCFQ=
+X-Google-Smtp-Source: APXvYqwGo+hW7Id05J3065h1QMn3vypF8oTbDpZPXev9arG0NZv1N0Nk/Fzkh2yHFP4brBhFFoOI3w==
+X-Received: by 2002:a7b:c759:: with SMTP id w25mr27674903wmk.15.1577018271373; 
+ Sun, 22 Dec 2019 04:37:51 -0800 (PST)
 Received: from [10.0.0.124] ([185.102.219.36])
- by smtp.gmail.com with ESMTPSA id d10sm17275265wrw.64.2019.12.22.04.33.21
+ by smtp.gmail.com with ESMTPSA id a1sm16191172wmj.40.2019.12.22.04.37.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 22 Dec 2019 04:33:21 -0800 (PST)
-Subject: Re: [PATCH v5 6/6] seabios-hppa: update to latest version
+ Sun, 22 Dec 2019 04:37:50 -0800 (PST)
+Subject: Re: [PATCH v5 5/6] hppa: Add emulation of Artist graphics
 To: Sven Schnelle <svens@stackframe.org>, Richard Henderson <rth@twiddle.net>
 References: <20191220211512.3289-1-svens@stackframe.org>
- <20191220211512.3289-7-svens@stackframe.org>
+ <20191220211512.3289-6-svens@stackframe.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Autocrypt: addr=f4bug@amsat.org; keydata=
  mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
@@ -99,18 +100,18 @@ Autocrypt: addr=f4bug@amsat.org; keydata=
  K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
  n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
  CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <98326127-52d1-d03a-3523-6dc902d7a324@amsat.org>
-Date: Sun, 22 Dec 2019 13:33:19 +0100
+Message-ID: <8e0f79d6-46ba-a121-b6cc-8c0a5cc4ea14@amsat.org>
+Date: Sun, 22 Dec 2019 13:37:48 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191220211512.3289-7-svens@stackframe.org>
+In-Reply-To: <20191220211512.3289-6-svens@stackframe.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,41 +129,68 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/20/19 10:15 PM, Sven Schnelle wrote:
-> Helge Deller (13):
->       Add PDC_MEM_MAP and ENTRY_INIT_SRCH_FRST for OSF/MkLinux
->       Return non-existant BTLB for PDC_BLOCK_TLB
->       Add serial, parallel and LAN port support of  LASI chip
->       Implement ENTRY_IO_BBLOCK_IN IODC function
->       Do not print \r on parisc SeaBIOS
->       Fix serial ports and add PDC_MODEL functions for special instructions enablement
->       Implement SeaBIOS returning additional addresses. Fixes HP-UX boot.
->       Fix mod_pgs (number of pages) for graphic cards
->       Merge pull request #3 from svenschnelle/sti
->       Merge pull request #4 from svenschnelle/parisc-qemu-4.1.0
->       parisc: Implement PDC rendenzvous
->       parisc: Improve soft power button emulation
->       parisc: Fix line wrapping in STI console code
-> 
-> Sven Schnelle (7):
->       parisc: fix PDC info for graphics adapter
->       parisc: add missing header guard to hppa.h
->       parisc: add LASI PS/2 emulation.
->       parisc: Add STI support
->       parisc: wire up graphics console
->       parisc: Add support for setting STI screen resolution
->       parisc: support LASI RTC register
-> 
-> Required for STI and LASI support. Also adds a few Bugfixes.
+> This adds emulation of Artist graphics good enough
+> to get a Text console on both Linux and HP-UX. The
+> X11 server from HP-UX also works.
 > 
 > Signed-off-by: Sven Schnelle <svens@stackframe.org>
 > ---
->  pc-bios/hppa-firmware.img | Bin 783724 -> 766136 bytes
->  roms/seabios-hppa         |   2 +-
->  2 files changed, 1 insertion(+), 1 deletion(-)
+>  hw/display/Kconfig       |    4 +
+>  hw/display/Makefile.objs |    1 +
+>  hw/display/artist.c      | 1450 ++++++++++++++++++++++++++++++++++++++
+>  hw/display/trace-events  |    9 +
+>  hw/hppa/Kconfig          |    1 +
+>  hw/hppa/hppa_hardware.h  |    1 +
+>  hw/hppa/machine.c        |    9 +
+>  7 files changed, 1475 insertions(+)
+>  create mode 100644 hw/display/artist.c
+> 
+[...]
+> diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
+> index 507f91e05d..4a2fe2df60 100644
+> --- a/hw/hppa/hppa_hardware.h
+> +++ b/hw/hppa/hppa_hardware.h
+> @@ -22,6 +22,7 @@
+>  #define LASI_PS2KBD_HPA 0xffd08000
+>  #define LASI_PS2MOU_HPA 0xffd08100
+>  #define LASI_GFX_HPA    0xf8000000
+> +#define ARTIST_FB_ADDR  0xf9000000
+>  #define CPU_HPA         0xfffb0000
+>  #define MEMORY_HPA      0xfffbf000
+>  
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index 33e3769d0b..6c67399054 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -75,6 +75,7 @@ static void machine_hppa_init(MachineState *machine)
+>      MemoryRegion *cpu_region;
+>      long i;
+>      unsigned int smp_cpus = machine->smp.cpus;
+> +    SysBusDevice *s;
+>  
+>      ram_size = machine->ram_size;
+>  
+> @@ -127,6 +128,14 @@ static void machine_hppa_init(MachineState *machine)
+>      dev = DEVICE(pci_create_simple(pci_bus, -1, "lsi53c895a"));
+>      lsi53c8xx_handle_legacy_cmdline(dev);
+>  
+> +    if (vga_interface_type != VGA_NONE) {
+> +        dev = qdev_create(NULL, "artist");
+> +        qdev_init_nofail(dev);
+> +        s = SYS_BUS_DEVICE(dev);
+> +        sysbus_mmio_map(s, 0, LASI_GFX_HPA);
+> +        sysbus_mmio_map(s, 1, ARTIST_FB_ADDR);
 
-Odd, MTA from work refused to deliver this patch because it "might
-contains virus" =)
+How is this chipset connected on the board?
+If it is a card you can plug on a bus, you can use a condition.
+If it is soldered or part of another chipset, then it has to be mapped
+unconditionally.
+IOW I think you should drop the 'if (vga_interface_type != VGA_NONE)' check.
 
-Since you share url of repository with content, you can send your series
-with `git-format-patch --no-binary`.
+> +    }
+> +
+>      /* Network setup.  e1000 is good enough, failing Tulip support.  */
+>      for (i = 0; i < nb_nics; i++) {
+>          if (!enable_lasi_lan()) {
+> 
 
