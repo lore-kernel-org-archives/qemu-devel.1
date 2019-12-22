@@ -2,90 +2,65 @@ Return-Path: <SRS0=nsQZ=2M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C4FC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4F4C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53CAA2070A
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:16:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53CAA2070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id D469D20665
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:39:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="a0nK9Uqk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D469D20665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iizDu-00008D-Bl
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 06:16:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37099)
+	id 1iizaM-0004gz-Kk
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 06:39:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iizC6-00077v-3K
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:14:43 -0500
+ (envelope-from <berto@igalia.com>) id 1iizYp-0002nt-22
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iizC4-0008V7-Jt
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:14:41 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:35948
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iizC4-0008Op-B9
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:14:40 -0500
-Received: from host86-191-82-191.range86-191.btcentralplus.com
- ([86.191.82.191] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iizAn-0002Ze-AU; Sun, 22 Dec 2019 11:13:26 +0000
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191218192526.13845-1-philmd@redhat.com>
- <20191218192526.13845-3-philmd@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <089161ef-b68a-0e0a-f77d-c4a0217c6ad7@ilande.co.uk>
-Date: Sun, 22 Dec 2019 11:12:22 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <berto@igalia.com>) id 1iizYn-0005as-Py
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:38:10 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:34961)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iizYn-0004Uh-0l; Sun, 22 Dec 2019 06:38:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
+ bh=3YI9V2tDlLRPz3CdTbTokSYxL9dcWurq4MZPIj1h9PU=; 
+ b=a0nK9UqkTJEEolEtXiguVNDxZOEij7ax0tGwF7S3aj2fVvjc1QJ1Q/gVr25d/MdH8FgygvfBAFudPr9Kk8pZQvlnk4sdj9p2dKdnf7tHVNiClubhgCDN5e6lrCrKacJ3qxXEwTb8DVNVjfH7UKM9MCwodK4E6jJV5kkMTZCD2zJ0oyC+LrEkF8rr2Gvzk/qgmRyipoSUY9FCZ5W+fkyrboik3qaRr5Bq9adoNyzXBchlD5e4epwBd4u/VWQU4bfdKC+v9Z/EwTjsm7Y2NXn4SbZmZ8MxHpTeOU7aQ+axBn+1l8KSorMfjAdD6A0V/71TYOphQeibkn10lQ1EVesvmA==;
+Received: from [80.30.182.172] (helo=perseus.local)
+ by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1iizYU-0005dI-Sk; Sun, 22 Dec 2019 12:37:51 +0100
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1iizXu-0001Vy-NS; Sun, 22 Dec 2019 12:37:14 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v3 16/27] qcow2: Add subcluster support to
+ zero_in_l2_slice()
+Date: Sun, 22 Dec 2019 12:36:57 +0100
+Message-Id: <4ab32f6dfcfeb5a22e119b03e223ea198988538e.1577014346.git.berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1577014346.git.berto@igalia.com>
+References: <cover.1577014346.git.berto@igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20191218192526.13845-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.191.82.191
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 2/6] hw/display/tcx: Add missing fall through comments
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.43.2.167
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,73 +72,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Olivier Danet <odanet@caramail.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/12/2019 19:25, Philippe Mathieu-Daudé wrote:
+Setting the QCOW_OFLAG_ZERO bit of the L2 entry is forbidden if an
+image has subclusters. Instead, the individual 'all zeroes' bits must
+be used.
 
-> When building with GCC9 using CFLAG -Wimplicit-fallthrough=2 we get:
-> 
->   hw/display/tcx.c: In function ‘tcx_dac_writel’:
->   hw/display/tcx.c:453:26: error: this statement may fall through [-Werror=implicit-fallthrough=]
->     453 |             s->dac_index = (s->dac_index + 1) & 0xff; /* Index autoincrement */
->         |             ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
->   hw/display/tcx.c:454:9: note: here
->     454 |         default:
->         |         ^~~~~~~
->   hw/display/tcx.c: In function ‘tcx_dac_readl’:
->   hw/display/tcx.c:412:22: error: this statement may fall through [-Werror=implicit-fallthrough=]
->     412 |         s->dac_index = (s->dac_index + 1) & 0xff; /* Index autoincrement */
->         |         ~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
->   hw/display/tcx.c:413:5: note: here
->     413 |     default:
->         |     ^~~~~~~
->   cc1: all warnings being treated as errors
-> 
-> Give a hint to GCC by adding the missing fall through comments.
-> 
-> Fixes: 55d7bfe22
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-> v2: Reword the description (Aleksandar)
-> 
-> Cc: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-> Cc: Olivier Danet <odanet@caramail.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/display/tcx.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-> index 14e829d3fa..abbeb30284 100644
-> --- a/hw/display/tcx.c
-> +++ b/hw/display/tcx.c
-> @@ -410,6 +410,7 @@ static uint64_t tcx_dac_readl(void *opaque, hwaddr addr,
->      case 2:
->          val = s->b[s->dac_index] << 24;
->          s->dac_index = (s->dac_index + 1) & 0xff; /* Index autoincrement */
-> +        /* fall through */
->      default:
->          s->dac_state = 0;
->          break;
-> @@ -451,6 +452,7 @@ static void tcx_dac_writel(void *opaque, hwaddr addr, uint64_t val,
->              s->b[index] = val >> 24;
->              update_palette_entries(s, index, index + 1);
->              s->dac_index = (s->dac_index + 1) & 0xff; /* Index autoincrement */
-> +            /* fall through */
->          default:
->              s->dac_state = 0;
->              break;
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2-cluster.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index c10601a828..70b0aaa00a 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1870,7 +1870,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+     assert(nb_clusters <= INT_MAX);
+ 
+     for (i = 0; i < nb_clusters; i++) {
+-        uint64_t old_offset;
++        uint64_t old_offset, l2_entry = 0;
+         QCow2ClusterType cluster_type;
+ 
+         old_offset = get_l2_entry(s, l2_slice, l2_index + i);
+@@ -1887,12 +1887,18 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
+ 
+         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
+-            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
+             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
+         } else {
+-            uint64_t entry = get_l2_entry(s, l2_slice, l2_index + i);
+-            set_l2_entry(s, l2_slice, l2_index + i, entry | QCOW_OFLAG_ZERO);
++            l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
+         }
++
++        if (has_subclusters(s)) {
++            set_l2_bitmap(s, l2_slice, l2_index + i, QCOW_L2_BITMAP_ALL_ZEROES);
++        } else {
++            l2_entry |= QCOW_OFLAG_ZERO;
++        }
++
++        set_l2_entry(s, l2_slice, l2_index + i, l2_entry);
+     }
+ 
+     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+-- 
+2.20.1
 
-
-ATB,
-
-Mark.
 
