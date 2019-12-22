@@ -2,99 +2,89 @@ Return-Path: <SRS0=nsQZ=2M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B765C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 10:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFE6C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:11:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FDAE2070A
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 10:32:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TIUI5vHg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FDAE2070A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9FB5A2070A
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:11:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB5A2070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iiyXX-00005F-G3
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 05:32:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41686)
+	id 1iiz9O-0005uy-Mf
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 06:11:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iiyWf-000884-Qz
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 05:31:54 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iiz8f-0005So-AA
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iiyWd-0003ew-0N
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 05:31:51 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22400
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iiyWc-0003XJ-B7
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 05:31:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577010709;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wkmeuOG7A+KZWuw49owg4IEFV/YvO4NNTRrnOnCHQ6s=;
- b=TIUI5vHgrC/grwzJn0cSXWBCpSjCG9aNcPMq9hS+OBqxtJs0zMRSHmSSYgMCkfjtxZKjKQ
- bAkvrEsh0H/QGGcB5DsIg4tu6I25kNlUWyaolCFt97TjpMylnguCrUALGCcxipFu2W6tem
- Msk5RFzcmvyiNNE36Wc32t7u484Tnl4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-7fezw4iJOW67PFnSkbklyQ-1; Sun, 22 Dec 2019 05:31:43 -0500
-Received: by mail-wr1-f72.google.com with SMTP id f10so5510536wro.14
- for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 02:31:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nahE/yIk8qQZGhUo7k8PBb+OrHOzxJo7Z/ELjlA8mnM=;
- b=t+s39z7q/GLqq59AaIHcF2eVB72ckLeVHqUIll8CdmZSatb6Qv79hMqemtffIeJvIX
- KPRV8OhsEbCi3iUQRz46wATgUcW3hReyamMomY0GJoDZBWQ7OJ/Wivv3tjIcIGDhk4gs
- fOydTQMmKHnrtzjZxNDb9Xx/udt0JWonULMtpCObjw2s81wbmzlu9Mc7W8LG9JHPpumJ
- QJp34kQ/jU4faAhw6puFiEZstSAQ5Vonn+3FSjv6GELEOh0kt5y7hDSQOgKN1LYb/3Ce
- 1/HFt6NNHj6uvw+KOsM6O4zlEvWGAs/UB4Bpnob39lpep15DF+ovdV+lWcrUOgbPLjOa
- EOhw==
-X-Gm-Message-State: APjAAAWlbcuyWz9FjLm8eRrxlST3h/hmx1y2U/uHjiE0VMfhosujtQLi
- Tpjo2bwHdhvKhq7yvznQq7yP9DNqQ0VUMXqQZhxv9OidyNgCVrXg8WID2uAvT/Pd4+3X/xudkAz
- VMawUw5ovA0IWfdg=
-X-Received: by 2002:adf:fcc4:: with SMTP id f4mr24796034wrs.247.1577010702045; 
- Sun, 22 Dec 2019 02:31:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzEo1K100Frfq0qKP86XLlMrN91otS8krMrLPYw0W9AC2Ynkb8uawoHV0v7Ap+/5xnVSVQSgw==
-X-Received: by 2002:adf:fcc4:: with SMTP id f4mr24796005wrs.247.1577010701794; 
- Sun, 22 Dec 2019 02:31:41 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:7009:9cf0:6204:f570?
- ([2001:b07:6468:f312:7009:9cf0:6204:f570])
- by smtp.gmail.com with ESMTPSA id u22sm16974908wru.30.2019.12.22.02.31.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 22 Dec 2019 02:31:41 -0800 (PST)
-Subject: Re: [PATCH] hw/i386/x86-iommu: Add missing stubs
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191220154225.25879-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <df27c488-0cf2-1a4d-0de8-9509f442f5fb@redhat.com>
-Date: Sun, 22 Dec 2019 11:31:44 +0100
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iiz8c-0004Ad-QR
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:11:09 -0500
+Received: from mail.ilande.co.uk ([46.43.2.167]:35930
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1iiz8c-0000fm-DS
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:11:06 -0500
+Received: from host86-191-82-191.range86-191.btcentralplus.com
+ ([86.191.82.191] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1iiz6K-0002Wo-NL; Sun, 22 Dec 2019 11:08:51 +0000
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20191219201439.84804-1-laurent@vivier.eu>
+ <20191219201439.84804-2-laurent@vivier.eu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <6d13e84a-5af2-d3ef-579e-b0541e9195f4@ilande.co.uk>
+Date: Sun, 22 Dec 2019 11:07:33 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20191220154225.25879-1-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: 7fezw4iJOW67PFnSkbklyQ-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <20191219201439.84804-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Received-From: 207.211.31.81
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.191.82.191
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 1/2] q800: fix mac_via RTC PRAM commands
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.43.2.167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,51 +96,394 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/12/19 16:42, Philippe Mathieu-Daud=C3=A9 wrote:
-> In commit 6c730e4af9 we introduced a stub to build the MicroVM
-> machine without Intel IOMMU. This stub is incomplete for the
-> other PC machines. Add the missing stubs.
+On 19/12/2019 20:14, Laurent Vivier wrote:
 
-In other words, without this patch you cannot build without Q35 (which
-brings in the IOMMU, at least unless building
---without-default-devices).  Is this correct?
-
-Paolo
-
->=20
-> Fixes: 6c730e4af9
-> Reported-by: Travis-CI
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> The command byte is not decoded correctly.
+> 
+> This patch reworks the RTC/PRAM interface and fixes the problem.
+> It adds a comment before the function to explain how are encoded commands
+> and some trace-events to ease debugging.
+> 
+> Bug: https://bugs.launchpad.net/qemu/+bug/1856549
+> Fixes: 6dca62a000 ("hw/m68k: add VIA support")
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  hw/i386/x86-iommu-stub.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->=20
-> diff --git a/hw/i386/x86-iommu-stub.c b/hw/i386/x86-iommu-stub.c
-> index 03576cdccb..c5ba077f9d 100644
-> --- a/hw/i386/x86-iommu-stub.c
-> +++ b/hw/i386/x86-iommu-stub.c
-> @@ -32,3 +32,12 @@ X86IOMMUState *x86_iommu_get_default(void)
->      return NULL;
+>  hw/misc/mac_via.c    | 274 ++++++++++++++++++++++++++++++-------------
+>  hw/misc/trace-events |  19 +++
+>  2 files changed, 210 insertions(+), 83 deletions(-)
+> 
+> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+> index f3f130ad96..e5658af922 100644
+> --- a/hw/misc/mac_via.c
+> +++ b/hw/misc/mac_via.c
+> @@ -27,7 +27,7 @@
+>  #include "sysemu/runstate.h"
+>  #include "qapi/error.h"
+>  #include "qemu/cutils.h"
+> -
+> +#include "trace.h"
+>  
+>  /*
+>   * VIAs: There are two in every machine,
+> @@ -278,6 +278,21 @@
+>  /* VIA returns time offset from Jan 1, 1904, not 1970 */
+>  #define RTC_OFFSET 2082844800
+>  
+> +enum {
+> +    REG_0,
+> +    REG_1,
+> +    REG_2,
+> +    REG_3,
+> +    REG_TEST,
+> +    REG_WPROTECT,
+> +    REG_PRAM_ADDR,
+> +    REG_PRAM_ADDR_LAST = REG_PRAM_ADDR + 19,
+> +    REG_PRAM_SECT,
+> +    REG_PRAM_SECT_LAST = REG_PRAM_SECT + 7,
+> +    REG_INVALID,
+> +    REG_EMPTY = 0xff,
+> +};
+> +
+>  static void via1_VBL_update(MOS6522Q800VIA1State *v1s)
+>  {
+>      MOS6522State *s = MOS6522(v1s);
+> @@ -360,10 +375,62 @@ static void via2_irq_request(void *opaque, int irq, int level)
+>      mdc->update_irq(s);
 >  }
-> =20
-> +bool x86_iommu_ir_supported(X86IOMMUState *s)
+>  
+> +/*
+> + * RTC Commands
+> + *
+> + * Command byte    Register addressed by the command
+> + *
+> + * z0000001        Seconds register 0 (lowest-order byte)
+> + * z0000101        Seconds register 1
+> + * z0001001        Seconds register 2
+> + * z0001101        Seconds register 3 (highest-order byte)
+> + * 00110001        Test register (write-only)
+> + * 00110101        Write-Protect Register (write-only)
+> + * z010aa01        RAM address 100aa ($10-$13) (first 20 bytes only)
+> + * z1aaaa01        RAM address 0aaaa ($00-$0F) (first 20 bytes only)
+> + * z0111aaa        Extended memory designator and sector number
+> + *
+> + * For a read request, z=1, for a write z=0
+> + * The letter a indicates bits whose value depend on what parameter
+> + * RAM byte you want to address
+> + */
+> +static int via1_rtc_compact_cmd(uint8_t value)
 > +{
-> +    return false;
+> +    uint8_t read = value & 0x80;
+> +
+> +    value &= 0x7f;
+> +
+> +    /* the last 2 bits of a command byte must always be 0b01 ... */
+> +    if ((value & 0x78) == 0x38) {
+> +        /* except for the extended memory designator */
+> +        return read | (REG_PRAM_SECT + (value & 0x07));
+> +    }
+> +    if ((value & 0x03) == 0x01) {
+> +        value >>= 2;
+> +        if ((value & 0x1c) == 0) {
+> +            /* seconds registers */
+> +            return read | (REG_0 + (value & 0x03));
+> +        } else if ((value == 0x0c) && !read) {
+> +            return REG_TEST;
+> +        } else if ((value == 0x0d) && !read) {
+> +            return REG_WPROTECT;
+> +        } else if ((value & 0x1c) == 0x08) {
+> +            /* RAM address 0x10 to 0x13 */
+> +            return read | (REG_PRAM_ADDR + 0x10 + (value & 0x03));
+> +        } else if ((value & 0x43) == 0x41) {
+> +            /* RAM address 0x00 to 0x0f */
+> +            return read | (REG_PRAM_ADDR + (value & 0x0f));
+> +        }
+> +    }
+> +    return REG_INVALID;
 > +}
 > +
-> +IommuType x86_iommu_get_type(void)
-> +{
-> +    abort();
-> +}
->=20
+>  static void via1_rtc_update(MacVIAState *m)
+>  {
+>      MOS6522Q800VIA1State *v1s = &m->mos6522_via1;
+>      MOS6522State *s = MOS6522(v1s);
+> +    int cmd, sector, addr;
+> +    uint32_t time;
+>  
+>      if (s->b & VIA1B_vRTCEnb) {
+>          return;
+> @@ -376,7 +443,9 @@ static void via1_rtc_update(MacVIAState *m)
+>              m->data_out |= s->b & VIA1B_vRTCData;
+>              m->data_out_cnt++;
+>          }
+> +        trace_via1_rtc_update_data_out(m->data_out_cnt, m->data_out);
+>      } else {
+> +        trace_via1_rtc_update_data_in(m->data_in_cnt, m->data_in);
+>          /* receive bits from the RTC */
+>          if ((v1s->last_b & VIA1B_vRTCClk) &&
+>              !(s->b & VIA1B_vRTCClk) &&
+> @@ -386,96 +455,132 @@ static void via1_rtc_update(MacVIAState *m)
+>              m->data_in <<= 1;
+>              m->data_in_cnt--;
+>          }
+> +        return;
+>      }
+>  
+> -    if (m->data_out_cnt == 8) {
+> -        m->data_out_cnt = 0;
+> -
+> -        if (m->cmd == 0) {
+> -            if (m->data_out & 0x80) {
+> -                /* this is a read command */
+> -                uint32_t time = m->tick_offset +
+> -                               (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
+> -                               NANOSECONDS_PER_SECOND);
+> -                if (m->data_out == 0x81) {        /* seconds register 0 */
+> -                    m->data_in = time & 0xff;
+> -                    m->data_in_cnt = 8;
+> -                } else if (m->data_out == 0x85) { /* seconds register 1 */
+> -                    m->data_in = (time >> 8) & 0xff;
+> -                    m->data_in_cnt = 8;
+> -                } else if (m->data_out == 0x89) { /* seconds register 2 */
+> -                    m->data_in = (time >> 16) & 0xff;
+> -                    m->data_in_cnt = 8;
+> -                } else if (m->data_out == 0x8d) { /* seconds register 3 */
+> -                    m->data_in = (time >> 24) & 0xff;
+> -                    m->data_in_cnt = 8;
+> -                } else if ((m->data_out & 0xf3) == 0xa1) {
+> -                    /* PRAM address 0x10 -> 0x13 */
+> -                    int addr = (m->data_out >> 2) & 0x03;
+> -                    m->data_in = v1s->PRAM[addr];
+> -                    m->data_in_cnt = 8;
+> -                } else if ((m->data_out & 0xf3) == 0xa1) {
+> -                    /* PRAM address 0x00 -> 0x0f */
+> -                    int addr = (m->data_out >> 2) & 0x0f;
+> -                    m->data_in = v1s->PRAM[addr];
+> -                    m->data_in_cnt = 8;
+> -                } else if ((m->data_out & 0xf8) == 0xb8) {
+> -                    /* extended memory designator and sector number */
+> -                    m->cmd = m->data_out;
+> -                }
+> -            } else {
+> -                /* this is a write command */
+> -                m->cmd = m->data_out;
+> +    if (m->data_out_cnt != 8) {
+> +        return;
+> +    }
+> +
+> +    m->data_out_cnt = 0;
+> +
+> +    trace_via1_rtc_internal_status(m->cmd, m->alt, m->data_out);
+> +    /* first byte: it's a command */
+> +    if (m->cmd == REG_EMPTY) {
+> +
+> +        cmd = via1_rtc_compact_cmd(m->data_out);
+> +        trace_via1_rtc_internal_cmd(cmd);
+> +
+> +        if (cmd == REG_INVALID) {
+> +            trace_via1_rtc_cmd_invalid(m->data_out);
+> +            return;
+> +        }
+> +
+> +        if (cmd & 0x80) { /* this is a read command */
+> +            switch (cmd & 0x7f) {
+> +            case REG_0...REG_3: /* seconds registers */
+> +                /*
+> +                 * register 0 is lowest-order byte
+> +                 * register 3 is highest-order byte
+> +                 */
+> +
+> +                time = m->tick_offset + (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)
+> +                       / NANOSECONDS_PER_SECOND);
+> +                trace_via1_rtc_internal_time(time);
+> +                m->data_in = (time >> ((cmd & 0x03) << 3)) & 0xff;
+> +                m->data_in_cnt = 8;
+> +                trace_via1_rtc_cmd_seconds_read((cmd & 0x7f) - REG_0,
+> +                                                m->data_in);
+> +                break;
+> +            case REG_PRAM_ADDR...REG_PRAM_ADDR_LAST:
+> +                /* PRAM address 0x00 -> 0x13 */
+> +                m->data_in = v1s->PRAM[(cmd & 0x7f) - REG_PRAM_ADDR];
+> +                m->data_in_cnt = 8;
+> +                trace_via1_rtc_cmd_pram_read((cmd & 0x7f) - REG_PRAM_ADDR,
+> +                                             m->data_in);
+> +                break;
+> +            case REG_PRAM_SECT...REG_PRAM_SECT_LAST:
+> +                /*
+> +                 * extended memory designator and sector number
+> +                 * the only two-byte read command
+> +                 */
+> +                trace_via1_rtc_internal_set_cmd(cmd);
+> +                m->cmd = cmd;
+> +                break;
+> +            default:
+> +                g_assert_not_reached();
+> +                break;
+>              }
+> +            return;
+> +        }
+> +
+> +        /* this is a write command, needs a parameter */
+> +        if (cmd == REG_WPROTECT || !m->wprotect) {
+> +            trace_via1_rtc_internal_set_cmd(cmd);
+> +            m->cmd = cmd;
+>          } else {
+> +            trace_via1_rtc_internal_ignore_cmd(cmd);
+> +        }
+> +        return;
+> +    }
+> +
+> +    /* second byte: it's a parameter */
+> +    if (m->alt == REG_EMPTY) {
+> +        switch (m->cmd & 0x7f) {
+> +        case REG_0...REG_3: /* seconds register */
+> +            /* FIXME */
+> +            trace_via1_rtc_cmd_seconds_write(m->cmd - REG_0, m->data_out);
+> +            m->cmd = REG_EMPTY;
+> +            break;
+> +        case REG_TEST:
+> +            /* device control: nothing to do */
+> +            trace_via1_rtc_cmd_test_write(m->data_out);
+> +            m->cmd = REG_EMPTY;
+> +            break;
+> +        case REG_WPROTECT:
+> +            /* Write Protect register */
+> +            trace_via1_rtc_cmd_wprotect_write(m->data_out);
+> +            m->wprotect = !!(m->data_out & 0x80);
+> +            m->cmd = REG_EMPTY;
+> +            break;
+> +        case REG_PRAM_ADDR...REG_PRAM_ADDR_LAST:
+> +            /* PRAM address 0x00 -> 0x13 */
+> +            trace_via1_rtc_cmd_pram_write(m->cmd - REG_PRAM_ADDR, m->data_out);
+> +            v1s->PRAM[m->cmd - REG_PRAM_ADDR] = m->data_out;
+> +            m->cmd = REG_EMPTY;
+> +            break;
+> +        case REG_PRAM_SECT...REG_PRAM_SECT_LAST:
+> +            addr = (m->data_out >> 2) & 0x1f;
+> +            sector = (m->cmd & 0x7f) - REG_PRAM_SECT;
+>              if (m->cmd & 0x80) {
+> -                if ((m->cmd & 0xf8) == 0xb8) {
+> -                    /* extended memory designator and sector number */
+> -                    int sector = m->cmd & 0x07;
+> -                    int addr = (m->data_out >> 2) & 0x1f;
+> -
+> -                    m->data_in = v1s->PRAM[sector * 8 + addr];
+> -                    m->data_in_cnt = 8;
+> -                }
+> -            } else if (!m->wprotect) {
+> -                /* this is a write command */
+> -                if (m->alt != 0) {
+> -                    /* extended memory designator and sector number */
+> -                    int sector = m->cmd & 0x07;
+> -                    int addr = (m->alt >> 2) & 0x1f;
+> -
+> -                    v1s->PRAM[sector * 8 + addr] = m->data_out;
+> -
+> -                    m->alt = 0;
+> -                } else if (m->cmd == 0x01) { /* seconds register 0 */
+> -                    /* FIXME */
+> -                } else if (m->cmd == 0x05) { /* seconds register 1 */
+> -                    /* FIXME */
+> -                } else if (m->cmd == 0x09) { /* seconds register 2 */
+> -                    /* FIXME */
+> -                } else if (m->cmd == 0x0d) { /* seconds register 3 */
+> -                    /* FIXME */
+> -                } else if (m->cmd == 0x31) {
+> -                    /* Test Register */
+> -                } else if (m->cmd == 0x35) {
+> -                    /* Write Protect register */
+> -                    m->wprotect = m->data_out & 1;
+> -                } else if ((m->cmd & 0xf3) == 0xa1) {
+> -                    /* PRAM address 0x10 -> 0x13 */
+> -                    int addr = (m->cmd >> 2) & 0x03;
+> -                    v1s->PRAM[addr] = m->data_out;
+> -                } else if ((m->cmd & 0xf3) == 0xa1) {
+> -                    /* PRAM address 0x00 -> 0x0f */
+> -                    int addr = (m->cmd >> 2) & 0x0f;
+> -                    v1s->PRAM[addr] = m->data_out;
+> -                } else if ((m->cmd & 0xf8) == 0xb8) {
+> -                    /* extended memory designator and sector number */
+> -                    m->alt = m->cmd;
+> -                }
+> +                /* it's a read */
+> +                m->data_in = v1s->PRAM[sector * 32 + addr];
+> +                m->data_in_cnt = 8;
+> +                trace_via1_rtc_cmd_pram_sect_read(sector, addr,
+> +                                                  sector * 32 + addr,
+> +                                                  m->data_in);
+> +                m->cmd = REG_EMPTY;
+> +            } else {
+> +                /* it's a write, we need one more parameter */
+> +                trace_via1_rtc_internal_set_alt(addr, sector, addr);
+> +                m->alt = addr;
+>              }
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +            break;
+>          }
+> -        m->data_out = 0;
+> +        return;
+>      }
+> +
+> +    /* third byte: it's the data of a REG_PRAM_SECT write */
+> +    g_assert(REG_PRAM_SECT <= m->cmd && m->cmd <= REG_PRAM_SECT_LAST);
+> +    sector = m->cmd - REG_PRAM_SECT;
+> +    v1s->PRAM[sector * 32 + m->alt] = m->data_out;
+> +    trace_via1_rtc_cmd_pram_sect_write(sector, m->alt, sector * 32 + m->alt,
+> +                                       m->data_out);
+> +    m->alt = REG_EMPTY;
+> +    m->cmd = REG_EMPTY;
+>  }
+>  
+>  static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
+> @@ -742,6 +847,9 @@ static void mac_via_reset(DeviceState *dev)
+>      v1s->next_VBL = 0;
+>      timer_del(v1s->one_second_timer);
+>      v1s->next_second = 0;
+> +
+> +    m->cmd = REG_EMPTY;
+> +    m->alt = REG_EMPTY;
+>  }
+>  
+>  static void mac_via_realize(DeviceState *dev, Error **errp)
+> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> index 1deb1d08c1..2e0c820834 100644
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -149,3 +149,22 @@ bcm2835_mbox_write(unsigned int size, uint64_t addr, uint64_t value) "mbox write
+>  bcm2835_mbox_read(unsigned int size, uint64_t addr, uint64_t value) "mbox read sz:%u addr:0x%"PRIx64" data:0x%"PRIx64
+>  bcm2835_mbox_irq(unsigned level) "mbox irq:ARM level:%u"
+>  bcm2835_mbox_property(uint32_t tag, uint32_t bufsize, size_t resplen) "mbox property tag:0x%08x in_sz:%u out_sz:%zu"
+> +
+> +# mac_via.c
+> +via1_rtc_update_data_out(int count, int value) "count=%d value=0x%02x"
+> +via1_rtc_update_data_in(int count, int value) "count=%d value=0x%02x"
+> +via1_rtc_internal_status(int cmd, int alt, int value) "cmd=0x%02x alt=0x%02x value=0x%02x"
+> +via1_rtc_internal_cmd(int cmd) "cmd=0x%02x"
+> +via1_rtc_cmd_invalid(int value) "value=0x%02x"
+> +via1_rtc_internal_time(uint32_t time) "time=0x%08x"
+> +via1_rtc_internal_set_cmd(int cmd) "cmd=0x%02x"
+> +via1_rtc_internal_ignore_cmd(int cmd) "cmd=0x%02x"
+> +via1_rtc_internal_set_alt(int alt, int sector, int offset) "alt=0x%02x sector=%u offset=%u"
+> +via1_rtc_cmd_seconds_read(int reg, int value) "reg=%d value=0x%02x"
+> +via1_rtc_cmd_seconds_write(int reg, int value) "reg=%d value=0x%02x"
+> +via1_rtc_cmd_test_write(int value) "value=0x%02x"
+> +via1_rtc_cmd_wprotect_write(int value) "value=0x%02x"
+> +via1_rtc_cmd_pram_read(int addr, int value) "addr=%u value=0x%02x"
+> +via1_rtc_cmd_pram_write(int addr, int value) "addr=%u value=0x%02x"
+> +via1_rtc_cmd_pram_sect_read(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
+> +via1_rtc_cmd_pram_sect_write(int sector, int offset, int addr, int value) "sector=%u offset=%u addr=%d value=0x%02x"
 
+Seems like a good improvement to me.
+
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+ATB,
+
+Mark.
 
