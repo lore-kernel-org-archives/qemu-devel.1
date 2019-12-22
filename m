@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4F4C2D0C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 521C4C2D0D4
 	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D469D20665
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20D5B20733
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 11:39:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="a0nK9Uqk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D469D20665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XYDaHwDa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D5B20733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iizaM-0004gz-Kk
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 06:39:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41461)
+	id 1iizaN-0004hU-Mz
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 06:39:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41507)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iizYp-0002nt-22
+ (envelope-from <berto@igalia.com>) id 1iizYp-0002nw-EN
  for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iizYn-0005as-Py
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:38:10 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:34961)
+ (envelope-from <berto@igalia.com>) id 1iizYo-0005c7-5y
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 06:38:11 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:34983)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iizYn-0004Uh-0l; Sun, 22 Dec 2019 06:38:09 -0500
+ id 1iizYn-0004V6-DZ; Sun, 22 Dec 2019 06:38:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=3YI9V2tDlLRPz3CdTbTokSYxL9dcWurq4MZPIj1h9PU=; 
- b=a0nK9UqkTJEEolEtXiguVNDxZOEij7ax0tGwF7S3aj2fVvjc1QJ1Q/gVr25d/MdH8FgygvfBAFudPr9Kk8pZQvlnk4sdj9p2dKdnf7tHVNiClubhgCDN5e6lrCrKacJ3qxXEwTb8DVNVjfH7UKM9MCwodK4E6jJV5kkMTZCD2zJ0oyC+LrEkF8rr2Gvzk/qgmRyipoSUY9FCZ5W+fkyrboik3qaRr5Bq9adoNyzXBchlD5e4epwBd4u/VWQU4bfdKC+v9Z/EwTjsm7Y2NXn4SbZmZ8MxHpTeOU7aQ+axBn+1l8KSorMfjAdD6A0V/71TYOphQeibkn10lQ1EVesvmA==;
+ bh=ieXDi5ioqJCItbaztNvJyCyrJUb3lZG7EmUXCdrCtsM=; 
+ b=XYDaHwDagAxK83krAbTO2HObdLEydAnPk+UtYRJLLHBtKDCr3p1sFbN/ngqARcgQkyxlZiquEl1bSG42+37xxBpxHBHa2owHMW/EVlwnMW0Sb4sLnKFkD8/0pqemqKEVctVwiBw2CUCHdqAifH3uRmA1yGqp3dRWDbIKgDduBeSeEhJ0Qf/FuOGp4k17S6COJXlbRVmwAVHFw6Z4Kq/6SVlw7T2tI1UNHvuzuimzdVeluY69wru5rcvsxv2PWxIY7WZweoyYe7QTRlRK360xHCetzM7YSfM2VbZxGubzw02xVvk3TLrARZ1Ru5zsSadz9ydGqGzCTHHmWj4PpHhv5w==;
 Received: from [80.30.182.172] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1iizYU-0005dI-Sk; Sun, 22 Dec 2019 12:37:51 +0100
+ id 1iizYV-0005dQ-25; Sun, 22 Dec 2019 12:37:51 +0100
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1iizXu-0001Vy-NS; Sun, 22 Dec 2019 12:37:14 +0100
+ id 1iizXu-0001WK-Ui; Sun, 22 Dec 2019 12:37:14 +0100
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v3 16/27] qcow2: Add subcluster support to
- zero_in_l2_slice()
-Date: Sun, 22 Dec 2019 12:36:57 +0100
-Message-Id: <4ab32f6dfcfeb5a22e119b03e223ea198988538e.1577014346.git.berto@igalia.com>
+Subject: [RFC PATCH v3 24/27] qcow2: Restrict qcow2_co_pwrite_zeroes() to full
+ clusters only
+Date: Sun, 22 Dec 2019 12:37:05 +0100
+Message-Id: <7a68ff6b42f3d0c7e5118099d17934e08a6bb49f.1577014346.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1577014346.git.berto@igalia.com>
 References: <cover.1577014346.git.berto@igalia.com>
@@ -81,50 +81,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Setting the QCOW_OFLAG_ZERO bit of the L2 entry is forbidden if an
-image has subclusters. Instead, the individual 'all zeroes' bits must
-be used.
+Ideally it should be possible to zero individual subclusters using
+this function, but this is currently not implemented.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/qcow2-cluster.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ block/qcow2.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index c10601a828..70b0aaa00a 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -1870,7 +1870,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
-     assert(nb_clusters <= INT_MAX);
- 
-     for (i = 0; i < nb_clusters; i++) {
--        uint64_t old_offset;
-+        uint64_t old_offset, l2_entry = 0;
-         QCow2ClusterType cluster_type;
- 
-         old_offset = get_l2_entry(s, l2_slice, l2_index + i);
-@@ -1887,12 +1887,18 @@ static int zero_in_l2_slice(BlockDriverState *bs, uint64_t offset,
- 
-         qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
-         if (cluster_type == QCOW2_CLUSTER_COMPRESSED || unmap) {
--            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
-             qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQUEST);
-         } else {
--            uint64_t entry = get_l2_entry(s, l2_slice, l2_index + i);
--            set_l2_entry(s, l2_slice, l2_index + i, entry | QCOW_OFLAG_ZERO);
-+            l2_entry = get_l2_entry(s, l2_slice, l2_index + i);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 242001afa2..0267722065 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3754,6 +3754,12 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+             qemu_co_mutex_unlock(&s->lock);
+             return -ENOTSUP;
          }
-+
-+        if (has_subclusters(s)) {
-+            set_l2_bitmap(s, l2_slice, l2_index + i, QCOW_L2_BITMAP_ALL_ZEROES);
-+        } else {
-+            l2_entry |= QCOW_OFLAG_ZERO;
++        /* TODO: allow zeroing separate subclusters, we only allow
++         * zeroing full clusters at the moment. */
++        if (nr != bytes) {
++            qemu_co_mutex_unlock(&s->lock);
++            return -ENOTSUP;
 +        }
-+
-+        set_l2_entry(s, l2_slice, l2_index + i, l2_entry);
-     }
- 
-     qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+         if (type != QCOW2_SUBCLUSTER_UNALLOCATED_PLAIN &&
+             type != QCOW2_SUBCLUSTER_UNALLOCATED_ALLOC &&
+             type != QCOW2_SUBCLUSTER_ZERO_PLAIN &&
 -- 
 2.20.1
 
