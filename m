@@ -2,73 +2,65 @@ Return-Path: <SRS0=nsQZ=2M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 628C5C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 13:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD85C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 15:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30BFA2067C
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 13:52:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BFA2067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=exploide.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3A2362067C
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 15:35:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A2362067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ij1fE-0004BR-8T
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 08:52:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36535)
+	id 1ij3GA-0006cF-Bs
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 10:35:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iiyLp-0004mW-0Y
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 05:20:42 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1ij3FR-00069s-2S
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 10:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iiyLn-0002IV-KP
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 05:20:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59092)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iiyLn-0002Fv-Dz
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 05:20:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iiyLl-0008M3-H5
- for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 10:20:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7CAFE2E80C0
- for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 10:20:37 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <ysato@users.sourceforge.jp>) id 1ij3FN-00027j-VZ
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 10:34:24 -0500
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:60416)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1ij3FN-0001oy-Da
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 10:34:21 -0500
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id CC84DB20B0;
+ Mon, 23 Dec 2019 00:34:16 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 79C7524008E;
+ Mon, 23 Dec 2019 00:34:15 +0900 (JST)
+Date: Mon, 23 Dec 2019 00:34:11 +0900
+Message-ID: <87v9q8pe6k.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: Re: [PATCH v27 06/21] target/rx: CPU definition
+In-Reply-To: <CAL1e-=iFV=PumJ2M=rcpntkJ3NFWT7sqMcroJmiLYhsibwFf4Q@mail.gmail.com>
+References: <20191221144238.127766-1-ysato@users.sourceforge.jp>
+ <20191221144238.127766-7-ysato@users.sourceforge.jp>
+ <CAL1e-=iFV=PumJ2M=rcpntkJ3NFWT7sqMcroJmiLYhsibwFf4Q@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 22 Dec 2019 10:14:00 -0000
-From: Jannik <me@exploide.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: exploide
-X-Launchpad-Bug-Reporter: Jannik (exploide)
-X-Launchpad-Bug-Modifier: Jannik (exploide)
-Message-Id: <157700964058.28040.6250427039167117245.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1857226] [NEW] 'set_link net0 off' not working with e1000e driver
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8cd09dbb72502cca26d413881ec7a60460a0e320
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Sun, 22 Dec 2019 08:52:11 -0500
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,56 +69,761 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1857226 <1857226@bugs.launchpad.net>
+Cc: "philmd@redhat.com" <philmd@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Sun, 22 Dec 2019 01:03:04 +0900,
+Aleksandar Markovic wrote:
+>=20
+> [1  <text/plain; UTF-8 (quoted-printable)>]
+> [2  <text/html; UTF-8 (quoted-printable)>]
+> On Saturday, December 21, 2019, Yoshinori Sato <ysato@users.sourceforge.j=
+p>
+> wrote:
+>=20
+>     Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+>   =20
+>     Message-Id: <20190616142836.10614-4-ysato@users.sourceforge.jp>
+>     Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>     Message-Id: <20190607091116.49044-4-ysato@users.sourceforge.jp>
+>=20
+> Hi, Yoshinori,
+>=20
+> I noticed you have a lot of line like this
+>=20
+> Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp>
+>=20
+> ... sometimes even several in the same message.
+>=20
+> May I ask you to delete *all* such lines from commit messages, and resend=
+ the
+> series?
+>=20
+> Also, I don't see =A0the documentation update for the new target. Please =
+provide
+> dome appropriate content in qemu-doc.texi (
+> https://github.com/qemu/qemu/blob/master/qemu-doc.texi ), and include it =
+in
+> the next version.
+>=20
+> Best regards,
+>=20
+> Aleksandar
 
-I'm encountering a bug with the e1000e network driver, that appears to
-got previously reported at rhbz. Steps to reproduce are provided in
-detail there:
+OK. I will update.
+Thanks.
+=A0
+>=20
+>     Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>     [PMD: Use newer QOM style, split cpu-qom.h, restrict access to
+>     =A0extable array, use rx_cpu_tlb_fill() extracted from patch of
+>     =A0Yoshinori Sato 'Convert to CPUClass::tlb_fill']
+>     Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>     Acked-by: Igor Mammedov <imammedo@redhat.com>
+>     Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+>     ---
+>     =A0target/rx/cpu-param.h=A0 =A0|=A0 31 ++++++
+>     =A0target/rx/cpu-qom.h=A0 =A0 =A0|=A0 42 ++++++++
+>     =A0target/rx/cpu.h=A0 =A0 =A0 =A0 =A0| 181 ++++++++++++++++++++++++++=
++++++++
+>     =A0target/rx/cpu.c=A0 =A0 =A0 =A0 =A0| 217 ++++++++++++++++++++++++++=
+++++++++++++++
+>     =A0target/rx/gdbstub.c=A0 =A0 =A0| 112 +++++++++++++++++++++
+>     =A0target/rx/Makefile.objs |=A0 =A01 -
+>     =A06 files changed, 583 insertions(+), 1 deletion(-)
+>     =A0create mode 100644 target/rx/cpu-param.h
+>     =A0create mode 100644 target/rx/cpu-qom.h
+>     =A0create mode 100644 target/rx/cpu.h
+>     =A0create mode 100644 target/rx/cpu.c
+>     =A0create mode 100644 target/rx/gdbstub.c
+>   =20
+>     diff --git a/target/rx/cpu-param.h b/target/rx/cpu-param.h
+>     new file mode 100644
+>     index 0000000000..5da87fbebe
+>     --- /dev/null
+>     +++ b/target/rx/cpu-param.h
+>     @@ -0,0 +1,31 @@
+>     +/*
+>     + *=A0 RX cpu parameters
+>     + *
+>     + *=A0 Copyright (c) 2019 Yoshinori Sato
+>     + *
+>     + * This program is free software; you can redistribute it and/or mod=
+ify
+>     it
+>     + * under the terms and conditions of the GNU General Public License,
+>     + * version 2 or later, as published by the Free Software Foundation.
+>     + *
+>     + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+>     + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+>     + * FITNESS FOR A PARTICULAR PURPOSE.=A0 See the GNU General Public L=
+icense
+>     for
+>     + * more details.
+>     + *
+>     + * You should have received a copy of the GNU General Public License
+>     along with
+>     + * this program.=A0 If not, see <http://www.gnu.org/licenses/>.
+>     + */
+>     +
+>     +#ifndef RX_CPU_PARAM_H
+>     +#define RX_CPU_PARAM_H
+>     +
+>     +#define TARGET_LONG_BITS 32
+>     +#define TARGET_PAGE_BITS 12
+>     +
+>     +#define TARGET_PHYS_ADDR_SPACE_BITS 32
+>     +#define TARGET_VIRT_ADDR_SPACE_BITS 32
+>     +
+>     +#define NB_MMU_MODES 1
+>     +#define MMU_MODE0_SUFFIX _all
+>     +
+>     +#endif
+>     diff --git a/target/rx/cpu-qom.h b/target/rx/cpu-qom.h
+>     new file mode 100644
+>     index 0000000000..8328900f3f
+>     --- /dev/null
+>     +++ b/target/rx/cpu-qom.h
+>     @@ -0,0 +1,42 @@
+>     +#ifndef QEMU_RX_CPU_QOM_H
+>     +#define QEMU_RX_CPU_QOM_H
+>     +
+>     +#include "hw/core/cpu.h"
+>     +/*
+>     + * RX CPU
+>     + *
+>     + * Copyright (c) 2019 Yoshinori Sato
+>     + * SPDX-License-Identifier: LGPL-2.0+
+>     + */
+>     +
+>     +#define TYPE_RX_CPU "rx-cpu"
+>     +
+>     +#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME("rx62n")
+>     +
+>     +#define RXCPU_CLASS(klass) \
+>     +=A0 =A0 OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
+>     +#define RXCPU(obj) \
+>     +=A0 =A0 OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
+>     +#define RXCPU_GET_CLASS(obj) \
+>     +=A0 =A0 OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
+>     +
+>     +/*
+>     + * RXCPUClass:
+>     + * @parent_realize: The parent class' realize handler.
+>     + * @parent_reset: The parent class' reset handler.
+>     + *
+>     + * A RX CPU model.
+>     + */
+>     +typedef struct RXCPUClass {
+>     +=A0 =A0 /*< private >*/
+>     +=A0 =A0 CPUClass parent_class;
+>     +=A0 =A0 /*< public >*/
+>     +
+>     +=A0 =A0 DeviceRealize parent_realize;
+>     +=A0 =A0 void (*parent_reset)(CPUState *cpu);
+>     +
+>     +} RXCPUClass;
+>     +
+>     +#define CPUArchState struct CPURXState
+>     +
+>     +#endif
+>     diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+>     new file mode 100644
+>     index 0000000000..2d1eb7665c
+>     --- /dev/null
+>     +++ b/target/rx/cpu.h
+>     @@ -0,0 +1,181 @@
+>     +/*
+>     + *=A0 RX emulation definition
+>     + *
+>     + *=A0 Copyright (c) 2019 Yoshinori Sato
+>     + *
+>     + * This program is free software; you can redistribute it and/or mod=
+ify
+>     it
+>     + * under the terms and conditions of the GNU General Public License,
+>     + * version 2 or later, as published by the Free Software Foundation.
+>     + *
+>     + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+>     + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+>     + * FITNESS FOR A PARTICULAR PURPOSE.=A0 See the GNU General Public L=
+icense
+>     for
+>     + * more details.
+>     + *
+>     + * You should have received a copy of the GNU General Public License
+>     along with
+>     + * this program.=A0 If not, see <http://www.gnu.org/licenses/>.
+>     + */
+>     +
+>     +#ifndef RX_CPU_H
+>     +#define RX_CPU_H
+>     +
+>     +#include "qemu/bitops.h"
+>     +#include "qemu-common.h"
+>     +#include "hw/registerfields.h"
+>     +#include "cpu-qom.h"
+>     +
+>     +#include "exec/cpu-defs.h"
+>     +
+>     +/* PSW define */
+>     +REG32(PSW, 0)
+>     +FIELD(PSW, C, 0, 1)
+>     +FIELD(PSW, Z, 1, 1)
+>     +FIELD(PSW, S, 2, 1)
+>     +FIELD(PSW, O, 3, 1)
+>     +FIELD(PSW, I, 16, 1)
+>     +FIELD(PSW, U, 17, 1)
+>     +FIELD(PSW, PM, 20, 1)
+>     +FIELD(PSW, IPL, 24, 4)
+>     +
+>     +/* FPSW define */
+>     +REG32(FPSW, 0)
+>     +FIELD(FPSW, RM, 0, 2)
+>     +FIELD(FPSW, CV, 2, 1)
+>     +FIELD(FPSW, CO, 3, 1)
+>     +FIELD(FPSW, CZ, 4, 1)
+>     +FIELD(FPSW, CU, 5, 1)
+>     +FIELD(FPSW, CX, 6, 1)
+>     +FIELD(FPSW, CE, 7, 1)
+>     +FIELD(FPSW, CAUSE, 2, 6)
+>     +FIELD(FPSW, DN, 8, 1)
+>     +FIELD(FPSW, EV, 10, 1)
+>     +FIELD(FPSW, EO, 11, 1)
+>     +FIELD(FPSW, EZ, 12, 1)
+>     +FIELD(FPSW, EU, 13, 1)
+>     +FIELD(FPSW, EX, 14, 1)
+>     +FIELD(FPSW, ENABLE, 10, 5)
+>     +FIELD(FPSW, FV, 26, 1)
+>     +FIELD(FPSW, FO, 27, 1)
+>     +FIELD(FPSW, FZ, 28, 1)
+>     +FIELD(FPSW, FU, 29, 1)
+>     +FIELD(FPSW, FX, 30, 1)
+>     +FIELD(FPSW, FLAGS, 26, 4)
+>     +FIELD(FPSW, FS, 31, 1)
+>     +
+>     +enum {
+>     +=A0 =A0 NUM_REGS =3D 16,
+>     +};
+>     +
+>     +typedef struct CPURXState {
+>     +=A0 =A0 /* CPU registers */
+>     +=A0 =A0 uint32_t regs[NUM_REGS];=A0 =A0 /* general registers */
+>     +=A0 =A0 uint32_t psw_o;=A0 =A0 =A0 =A0 =A0 =A0 =A0/* O bit of status=
+ register */
+>     +=A0 =A0 uint32_t psw_s;=A0 =A0 =A0 =A0 =A0 =A0 =A0/* S bit of status=
+ register */
+>     +=A0 =A0 uint32_t psw_z;=A0 =A0 =A0 =A0 =A0 =A0 =A0/* Z bit of status=
+ register */
+>     +=A0 =A0 uint32_t psw_c;=A0 =A0 =A0 =A0 =A0 =A0 =A0/* C bit of status=
+ register */
+>     +=A0 =A0 uint32_t psw_u;
+>     +=A0 =A0 uint32_t psw_i;
+>     +=A0 =A0 uint32_t psw_pm;
+>     +=A0 =A0 uint32_t psw_ipl;
+>     +=A0 =A0 uint32_t bpsw;=A0 =A0 =A0 =A0 =A0 =A0 =A0 /* backup status */
+>     +=A0 =A0 uint32_t bpc;=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* backup pc */
+>     +=A0 =A0 uint32_t isp;=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* global base r=
+egister */
+>     +=A0 =A0 uint32_t usp;=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* vector base r=
+egister */
+>     +=A0 =A0 uint32_t pc;=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 /* program count=
+er */
+>     +=A0 =A0 uint32_t intb;=A0 =A0 =A0 =A0 =A0 =A0 =A0 /* interrupt vecto=
+r */
+>     +=A0 =A0 uint32_t fintv;
+>     +=A0 =A0 uint32_t fpsw;
+>     +=A0 =A0 uint64_t acc;
+>     +
+>     +=A0 =A0 /* Fields up to this point are cleared by a CPU reset */
+>     +=A0 =A0 struct {} end_reset_fields;
+>     +
+>     +=A0 =A0 /* Internal use */
+>     +=A0 =A0 uint32_t in_sleep;
+>     +=A0 =A0 uint32_t req_irq;=A0 =A0 =A0 =A0 =A0 =A0/* Requested interru=
+pt no (hard) */
+>     +=A0 =A0 uint32_t req_ipl;=A0 =A0 =A0 =A0 =A0 =A0/* Requested interru=
+pt level */
+>     +=A0 =A0 uint32_t ack_irq;=A0 =A0 =A0 =A0 =A0 =A0/* execute irq */
+>     +=A0 =A0 uint32_t ack_ipl;=A0 =A0 =A0 =A0 =A0 =A0/* execute ipl */
+>     +=A0 =A0 float_status fp_status;
+>     +=A0 =A0 qemu_irq ack;=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0/* Interrupt ack=
+nowledge */
+>     +} CPURXState;
+>     +
+>     +/*
+>     + * RXCPU:
+>     + * @env: #CPURXState
+>     + *
+>     + * A RX CPU
+>     + */
+>     +struct RXCPU {
+>     +=A0 =A0 /*< private >*/
+>     +=A0 =A0 CPUState parent_obj;
+>     +=A0 =A0 /*< public >*/
+>     +
+>     +=A0 =A0 CPUNegativeOffsetState neg;
+>     +=A0 =A0 CPURXState env;
+>     +};
+>     +
+>     +typedef struct RXCPU RXCPU;
+>     +typedef RXCPU ArchCPU;
+>     +
+>     +#define ENV_OFFSET offsetof(RXCPU, env)
+>     +
+>     +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
+>     +#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
+>     +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
+>     +
+>     +extern const char rx_crname[][6];
+>     +
+>     +void rx_cpu_do_interrupt(CPUState *cpu);
+>     +bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
+>     +void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+>     +int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>     +int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>     +hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+>     +
+>     +void rx_translate_init(void);
+>     +int cpu_rx_signal_handler(int host_signum, void *pinfo,
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0void *puc);
+>     +
+>     +void rx_cpu_list(void);
+>     +void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
+>     +
+>     +#define cpu_signal_handler cpu_rx_signal_handler
+>     +#define cpu_list rx_cpu_list
+>     +
+>     +#include "exec/cpu-all.h"
+>     +
+>     +#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
+>     +#define CPU_INTERRUPT_FIR=A0 CPU_INTERRUPT_TGT_INT_1
+>     +
+>     +#define RX_CPU_IRQ 0
+>     +#define RX_CPU_FIR 1
+>     +
+>     +static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong
+>     *pc,
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 =A0 =A0 target_ulong *cs_base, uint32_t
+>     *flags)
+>     +{
+>     +=A0 =A0 *pc =3D env->pc;
+>     +=A0 =A0 *cs_base =3D 0;
+>     +=A0 =A0 *flags =3D FIELD_DP32(0, PSW, PM, env->psw_pm);
+>     +}
+>     +
+>     +static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
+>     +{
+>     +=A0 =A0 return 0;
+>     +}
+>     +
+>     +static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
+>     +{
+>     +=A0 =A0 uint32_t psw =3D 0;
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, PM,=A0 env->psw_pm);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, U,=A0 =A0env->psw_u);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, I,=A0 =A0env->psw_i);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, O,=A0 =A0env->psw_o >> 31);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, S,=A0 =A0env->psw_s >> 31);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, Z,=A0 =A0env->psw_z =3D=3D 0);
+>     +=A0 =A0 psw =3D FIELD_DP32(psw, PSW, C,=A0 =A0env->psw_c);
+>     +=A0 =A0 return psw;
+>     +}
+>     +
+>     +#endif /* RX_CPU_H */
+>     diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+>     new file mode 100644
+>     index 0000000000..ea38639f47
+>     --- /dev/null
+>     +++ b/target/rx/cpu.c
+>     @@ -0,0 +1,217 @@
+>     +/*
+>     + * QEMU RX CPU
+>     + *
+>     + * Copyright (c) 2019 Yoshinori Sato
+>     + *
+>     + * This program is free software; you can redistribute it and/or mod=
+ify
+>     it
+>     + * under the terms and conditions of the GNU General Public License,
+>     + * version 2 or later, as published by the Free Software Foundation.
+>     + *
+>     + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+>     + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+>     + * FITNESS FOR A PARTICULAR PURPOSE.=A0 See the GNU General Public L=
+icense
+>     for
+>     + * more details.
+>     + *
+>     + * You should have received a copy of the GNU General Public License
+>     along with
+>     + * this program.=A0 If not, see <http://www.gnu.org/licenses/>.
+>     + */
+>     +
+>     +#include "qemu/osdep.h"
+>     +#include "qemu/qemu-print.h"
+>     +#include "qapi/error.h"
+>     +#include "cpu.h"
+>     +#include "qemu-common.h"
+>     +#include "migration/vmstate.h"
+>     +#include "exec/exec-all.h"
+>     +#include "hw/loader.h"
+>     +#include "fpu/softfloat.h"
+>     +
+>     +static void rx_cpu_set_pc(CPUState *cs, vaddr value)
+>     +{
+>     +=A0 =A0 RXCPU *cpu =3D RXCPU(cs);
+>     +
+>     +=A0 =A0 cpu->env.pc =3D value;
+>     +}
+>     +
+>     +static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock
+>     *tb)
+>     +{
+>     +=A0 =A0 RXCPU *cpu =3D RXCPU(cs);
+>     +
+>     +=A0 =A0 cpu->env.pc =3D tb->pc;
+>     +}
+>     +
+>     +static bool rx_cpu_has_work(CPUState *cs)
+>     +{
+>     +=A0 =A0 return cs->interrupt_request &
+>     +=A0 =A0 =A0 =A0 (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
+>     +}
+>     +
+>     +static void rx_cpu_reset(CPUState *s)
+>     +{
+>     +=A0 =A0 RXCPU *cpu =3D RXCPU(s);
+>     +=A0 =A0 RXCPUClass *rcc =3D RXCPU_GET_CLASS(cpu);
+>     +=A0 =A0 CPURXState *env =3D &cpu->env;
+>     +=A0 =A0 uint32_t *resetvec;
+>     +
+>     +=A0 =A0 rcc->parent_reset(s);
+>     +
+>     +=A0 =A0 memset(env, 0, offsetof(CPURXState, end_reset_fields));
+>     +
+>     +=A0 =A0 resetvec =3D rom_ptr(0xfffffffc, 4);
+>     +=A0 =A0 if (resetvec) {
+>     +=A0 =A0 =A0 =A0 /* In the case of kernel, it is ignored because it i=
+s not set. */
+>     +=A0 =A0 =A0 =A0 env->pc =3D ldl_p(resetvec);
+>     +=A0 =A0 }
+>     +=A0 =A0 rx_cpu_unpack_psw(env, 0, 1);
+>     +=A0 =A0 env->regs[0] =3D env->isp =3D env->usp =3D 0;
+>     +=A0 =A0 env->fpsw =3D 0;
+>     +=A0 =A0 set_flush_to_zero(1, &env->fp_status);
+>     +=A0 =A0 set_flush_inputs_to_zero(1, &env->fp_status);
+>     +}
+>     +
+>     +static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+>     +{
+>     +=A0 =A0 const char *typename =3D object_class_get_name(OBJECT_CLASS(=
+data));
+>     +
+>     +=A0 =A0 qemu_printf("%s\n", typename);
+>     +}
+>     +
+>     +void rx_cpu_list(void)
+>     +{
+>     +=A0 =A0 GSList *list;
+>     +=A0 =A0 list =3D object_class_get_list_sorted(TYPE_RX_CPU, false);
+>     +=A0 =A0 g_slist_foreach(list, rx_cpu_list_entry, NULL);
+>     +=A0 =A0 g_slist_free(list);
+>     +}
+>     +
+>     +static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
+>     +{
+>     +=A0 =A0 ObjectClass *oc;
+>     +
+>     +=A0 =A0 oc =3D object_class_by_name(cpu_model);
+>     +=A0 =A0 if (object_class_dynamic_cast(oc, TYPE_RX_CPU) =3D=3D NULL ||
+>     +=A0 =A0 =A0 =A0 object_class_is_abstract(oc)) {
+>     +=A0 =A0 =A0 =A0 oc =3D NULL;
+>     +=A0 =A0 }
+>     +
+>     +=A0 =A0 return oc;
+>     +}
+>     +
+>     +static void rx_cpu_realize(DeviceState *dev, Error **errp)
+>     +{
+>     +=A0 =A0 CPUState *cs =3D CPU(dev);
+>     +=A0 =A0 RXCPUClass *rcc =3D RXCPU_GET_CLASS(dev);
+>     +=A0 =A0 Error *local_err =3D NULL;
+>     +
+>     +=A0 =A0 cpu_exec_realizefn(cs, &local_err);
+>     +=A0 =A0 if (local_err !=3D NULL) {
+>     +=A0 =A0 =A0 =A0 error_propagate(errp, local_err);
+>     +=A0 =A0 =A0 =A0 return;
+>     +=A0 =A0 }
+>     +
+>     +=A0 =A0 cpu_reset(cs);
+>     +=A0 =A0 qemu_init_vcpu(cs);
+>     +
+>     +=A0 =A0 rcc->parent_realize(dev, errp);
+>     +}
+>     +
+>     +static void rx_cpu_set_irq(void *opaque, int no, int request)
+>     +{
+>     +=A0 =A0 RXCPU *cpu =3D opaque;
+>     +=A0 =A0 CPUState *cs =3D CPU(cpu);
+>     +=A0 =A0 int irq =3D request & 0xff;
+>     +
+>     +=A0 =A0 static const int mask[] =3D {
+>     +=A0 =A0 =A0 =A0 [RX_CPU_IRQ] =3D CPU_INTERRUPT_HARD,
+>     +=A0 =A0 =A0 =A0 [RX_CPU_FIR] =3D CPU_INTERRUPT_FIR,
+>     +=A0 =A0 };
+>     +=A0 =A0 if (irq) {
+>     +=A0 =A0 =A0 =A0 cpu->env.req_irq =3D irq;
+>     +=A0 =A0 =A0 =A0 cpu->env.req_ipl =3D (request >> 8) & 0x0f;
+>     +=A0 =A0 =A0 =A0 cpu_interrupt(cs, mask[no]);
+>     +=A0 =A0 } else {
+>     +=A0 =A0 =A0 =A0 cpu_reset_interrupt(cs, mask[no]);
+>     +=A0 =A0 }
+>     +}
+>     +
+>     +static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *i=
+nfo)
+>     +{
+>     +=A0 =A0 info->mach =3D bfd_mach_rx;
+>     +=A0 =A0 info->print_insn =3D print_insn_rx;
+>     +}
+>     +
+>     +static bool rx_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 MMUAccessTyp=
+e access_type, int mmu_idx,
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 bool probe, =
+uintptr_t retaddr)
+>     +{
+>     +=A0 =A0 uint32_t address, physical, prot;
+>     +
+>     +=A0 =A0 /* Linear mapping */
+>     +=A0 =A0 address =3D physical =3D addr & TARGET_PAGE_MASK;
+>     +=A0 =A0 prot =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+>     +=A0 =A0 tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PA=
+GE_SIZE);
+>     +=A0 =A0 return true;
+>     +}
+>     +
+>     +static void rx_cpu_init(Object *obj)
+>     +{
+>     +=A0 =A0 CPUState *cs =3D CPU(obj);
+>     +=A0 =A0 RXCPU *cpu =3D RXCPU(obj);
+>     +=A0 =A0 CPURXState *env =3D &cpu->env;
+>     +
+>     +=A0 =A0 cpu_set_cpustate_pointers(cpu);
+>     +=A0 =A0 cs->env_ptr =3D env;
+>     +=A0 =A0 qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
+>     +}
+>     +
+>     +static void rx_cpu_class_init(ObjectClass *klass, void *data)
+>     +{
+>     +=A0 =A0 DeviceClass *dc =3D DEVICE_CLASS(klass);
+>     +=A0 =A0 CPUClass *cc =3D CPU_CLASS(klass);
+>     +=A0 =A0 RXCPUClass *rcc =3D RXCPU_CLASS(klass);
+>     +
+>     +=A0 =A0 device_class_set_parent_realize(dc, rx_cpu_realize,
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =
+=A0 &rcc->parent_realize);
+>     +
+>     +=A0 =A0 rcc->parent_reset =3D cc->reset;
+>     +=A0 =A0 cc->reset =3D rx_cpu_reset;
+>     +
+>     +=A0 =A0 cc->class_by_name =3D rx_cpu_class_by_name;
+>     +=A0 =A0 cc->has_work =3D rx_cpu_has_work;
+>     +=A0 =A0 cc->do_interrupt =3D rx_cpu_do_interrupt;
+>     +=A0 =A0 cc->cpu_exec_interrupt =3D rx_cpu_exec_interrupt;
+>     +=A0 =A0 cc->dump_state =3D rx_cpu_dump_state;
+>     +=A0 =A0 cc->set_pc =3D rx_cpu_set_pc;
+>     +=A0 =A0 cc->synchronize_from_tb =3D rx_cpu_synchronize_from_tb;
+>     +=A0 =A0 cc->gdb_read_register =3D rx_cpu_gdb_read_register;
+>     +=A0 =A0 cc->gdb_write_register =3D rx_cpu_gdb_write_register;
+>     +=A0 =A0 cc->get_phys_page_debug =3D rx_cpu_get_phys_page_debug;
+>     +=A0 =A0 cc->disas_set_info =3D rx_cpu_disas_set_info;
+>     +=A0 =A0 cc->tcg_initialize =3D rx_translate_init;
+>     +=A0 =A0 cc->tlb_fill =3D rx_cpu_tlb_fill;
+>     +
+>     +=A0 =A0 cc->gdb_num_core_regs =3D 26;
+>     +}
+>     +
+>     +static const TypeInfo rx_cpu_info =3D {
+>     +=A0 =A0 .name =3D TYPE_RX_CPU,
+>     +=A0 =A0 .parent =3D TYPE_CPU,
+>     +=A0 =A0 .instance_size =3D sizeof(RXCPU),
+>     +=A0 =A0 .instance_init =3D rx_cpu_init,
+>     +=A0 =A0 .abstract =3D true,
+>     +=A0 =A0 .class_size =3D sizeof(RXCPUClass),
+>     +=A0 =A0 .class_init =3D rx_cpu_class_init,
+>     +};
+>     +
+>     +static const TypeInfo rx62n_rx_cpu_info =3D {
+>     +=A0 =A0 .name =3D TYPE_RX62N_CPU,
+>     +=A0 =A0 .parent =3D TYPE_RX_CPU,
+>     +};
+>     +
+>     +static void rx_cpu_register_types(void)
+>     +{
+>     +=A0 =A0 type_register_static(&rx_cpu_info);
+>     +=A0 =A0 type_register_static(&rx62n_rx_cpu_info);
+>     +}
+>     +
+>     +type_init(rx_cpu_register_types)
+>     diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
+>     new file mode 100644
+>     index 0000000000..d76ca52e82
+>     --- /dev/null
+>     +++ b/target/rx/gdbstub.c
+>     @@ -0,0 +1,112 @@
+>     +/*
+>     + * RX gdb server stub
+>     + *
+>     + * Copyright (c) 2019 Yoshinori Sato
+>     + *
+>     + * This program is free software; you can redistribute it and/or mod=
+ify
+>     it
+>     + * under the terms and conditions of the GNU General Public License,
+>     + * version 2 or later, as published by the Free Software Foundation.
+>     + *
+>     + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+>     + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+>     + * FITNESS FOR A PARTICULAR PURPOSE.=A0 See the GNU General Public L=
+icense
+>     for
+>     + * more details.
+>     + *
+>     + * You should have received a copy of the GNU General Public License
+>     along with
+>     + * this program.=A0 If not, see <http://www.gnu.org/licenses/>.
+>     + */
+>     +#include "qemu/osdep.h"
+>     +#include "qemu-common.h"
+>     +#include "cpu.h"
+>     +#include "exec/gdbstub.h"
+>     +
+>     +int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+>     +{
+>     +=A0 =A0 RXCPU *cpu =3D RXCPU(cs);
+>     +=A0 =A0 CPURXState *env =3D &cpu->env;
+>     +
+>     +=A0 =A0 switch (n) {
+>     +=A0 =A0 case 0 ... 15:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->regs[n]);
+>     +=A0 =A0 case 16:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, (env->psw_u) ? env->reg=
+s[0] : env->
+>     usp);
+>     +=A0 =A0 case 17:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, (!env->psw_u) ? env->re=
+gs[0] : env->
+>     isp);
+>     +=A0 =A0 case 18:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
+>     +=A0 =A0 case 19:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->pc);
+>     +=A0 =A0 case 20:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->intb);
+>     +=A0 =A0 case 21:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->bpsw);
+>     +=A0 =A0 case 22:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->bpc);
+>     +=A0 =A0 case 23:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->fintv);
+>     +=A0 =A0 case 24:
+>     +=A0 =A0 =A0 =A0 return gdb_get_regl(mem_buf, env->fpsw);
+>     +=A0 =A0 case 25:
+>     +=A0 =A0 =A0 =A0 return 0;
+>     +=A0 =A0 }
+>     +=A0 =A0 return 0;
+>     +}
+>     +
+>     +int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+>     +{
+>     +=A0 =A0 RXCPU *cpu =3D RXCPU(cs);
+>     +=A0 =A0 CPURXState *env =3D &cpu->env;
+>     +=A0 =A0 uint32_t psw;
+>     +=A0 =A0 switch (n) {
+>     +=A0 =A0 case 0 ... 15:
+>     +=A0 =A0 =A0 =A0 env->regs[n] =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 if (n =3D=3D 0) {
+>     +=A0 =A0 =A0 =A0 =A0 =A0 if (env->psw_u) {
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 env->usp =3D env->regs[0];
+>     +=A0 =A0 =A0 =A0 =A0 =A0 } else {
+>     +=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 env->isp =3D env->regs[0];
+>     +=A0 =A0 =A0 =A0 =A0 =A0 }
+>     +=A0 =A0 =A0 =A0 }
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 16:
+>     +=A0 =A0 =A0 =A0 env->usp =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 if (env->psw_u) {
+>     +=A0 =A0 =A0 =A0 =A0 =A0 env->regs[0] =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 }
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 17:
+>     +=A0 =A0 =A0 =A0 env->isp =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 if (!env->psw_u) {
+>     +=A0 =A0 =A0 =A0 =A0 =A0 env->regs[0] =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 }
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 18:
+>     +=A0 =A0 =A0 =A0 psw =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 rx_cpu_unpack_psw(env, psw, 1);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 19:
+>     +=A0 =A0 =A0 =A0 env->pc =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 20:
+>     +=A0 =A0 =A0 =A0 env->intb =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 21:
+>     +=A0 =A0 =A0 =A0 env->bpsw =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 22:
+>     +=A0 =A0 =A0 =A0 env->bpc =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 23:
+>     +=A0 =A0 =A0 =A0 env->fintv =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 24:
+>     +=A0 =A0 =A0 =A0 env->fpsw =3D ldl_p(mem_buf);
+>     +=A0 =A0 =A0 =A0 break;
+>     +=A0 =A0 case 25:
+>     +=A0 =A0 =A0 =A0 return 8;
+>     +=A0 =A0 default:
+>     +=A0 =A0 =A0 =A0 return 0;
+>     +=A0 =A0 }
+>     +
+>     +=A0 =A0 return 4;
+>     +}
+>     diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
+>     index aa6f2d2d6c..a0018d5bc5 100644
+>     --- a/target/rx/Makefile.objs
+>     +++ b/target/rx/Makefile.objs
+>     @@ -1,5 +1,4 @@
+>     =A0obj-y +=3D translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
+>     -obj-$(CONFIG_SOFTMMU) +=3D monitor.o
+>   =20
+>     =A0DECODETREE =3D $(SRC_PATH)/scripts/decodetree.py
+>     =A0
+>     --
+>     2.20.1
+>=20
+>=20
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1707646
-
-It is about switching off network link state (set_link net0 off) having
-no effect when using the e1000e driver.
-
-Version details:
-QEMU emulator version 4.1.1 (qemu-4.1.1-1.fc31)
-Fedora 31
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1857226
-
-Title:
-  'set_link net0 off' not working with e1000e driver
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm encountering a bug with the e1000e network driver, that appears to
-  got previously reported at rhbz. Steps to reproduce are provided in
-  detail there:
-
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1707646
-
-  It is about switching off network link state (set_link net0 off)
-  having no effect when using the e1000e driver.
-
-  Version details:
-  QEMU emulator version 4.1.1 (qemu-4.1.1-1.fc31)
-  Fedora 31
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1857226/+subscriptions
+--=20
+Yosinori Sato
 
