@@ -2,97 +2,95 @@ Return-Path: <SRS0=nsQZ=2M=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57BF4C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 13:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BAF9C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 13:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19FD5206CB
-	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 13:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00C31206CB
+	for <qemu-devel@archiver.kernel.org>; Sun, 22 Dec 2019 13:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IuXyPNVF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19FD5206CB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+l482XG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00C31206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47629 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ij0qI-0004HZ-Oc
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 08:00:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52345)
+	id 1ij0tm-00066o-0n
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 08:03:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ij0pT-0003gg-QI
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:59:29 -0500
+ (envelope-from <mst@redhat.com>) id 1ij0sr-0005Yo-9U
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 08:02:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ij0pQ-0004me-RA
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:59:25 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57095
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1ij0sn-00067Z-0c
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 08:02:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58561
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ij0pQ-0004g5-Gm
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 07:59:24 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ij0sk-00065T-St
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 08:02:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577019563;
+ s=mimecast20190719; t=1577019769;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FnWycme6P9ILUug4JR+gsMKshS/h1cJa3fGlELpm6Sw=;
- b=IuXyPNVFyIUXdJ7qNoG9gIVrFWoys8eBbF9CP+ffi1lsvqrHAd6LdJs08C7jTiSQFfZZTM
- QdiAUN2R4JZs3IlGOTYBm7TDmWmMv0kRNGQT0SkpKhxUA50+fJ/kN8L86D45yormmnX1s2
- 2+bw48xqqyzxEV2k73FciI6NVdr8tYM=
+ bh=EF+cOW1aj50YsyXYYtuJvPS3mzBxL+FrYzYr7AmWXPI=;
+ b=D+l482XGaUlZXeGzat1+0DJ8DDoJrgtc6abv+c5dvRk6EUUYUS+i2WbB6R81NBT0iRp/TS
+ ba80z7Jv3UMTPq5RUwlqnt9ywmbNimEt1koLPGS77Gq3YjXlAAtus2qfD6pPosAVIFifgg
+ OBnYn1GVRt5rITCgwq+eePb88/E5MNE=
 Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
  [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-m4dEGHBqPcmDuzz061wfBQ-1; Sun, 22 Dec 2019 07:59:21 -0500
-Received: by mail-qt1-f198.google.com with SMTP id d18so9417113qtp.16
- for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 04:59:21 -0800 (PST)
+ us-mta-46-jR9Zh94ZMLK0_vnHh2Qyzw-1; Sun, 22 Dec 2019 08:02:47 -0500
+Received: by mail-qt1-f198.google.com with SMTP id k27so9367472qtu.12
+ for <qemu-devel@nongnu.org>; Sun, 22 Dec 2019 05:02:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=3VfY79AaT9OCz9fYtZIxc0pbTybcuktunwaJ6yDMVkY=;
- b=TXYKjzqRHbTnu2Wz0uz6IcvrOZhfxCs6CNbQILhRiugx7CGBcsuwcbFxbr+NkZXQIN
- 71PdUSmbIkXNdwJ04lc8IHhCK45fFDrxxyTDf8JVo9FnBqZT2wUqeFF/WEybE5x8/deG
- /eWQpm8PeBWGhseNp0Yeb0c8Ht/COW8XiOZssYx5tptiwDfTcuw8Y3wg029ZU/d4xXoy
- QG/PKmVr7jZP88OWG6c58D7wkrcaAY9drm1Xc0PAkLQqLl9qLXSxZ5vdEyIPdnlI5OR+
- WYJyzPmZefRWET4IbtlskkVEO8kJ9Ytlku9Yw84isuTl6RxPEX7RPF/TqxjCCf48Jm1/
- Ev2Q==
-X-Gm-Message-State: APjAAAU5HzLkuEF+3IXXnXFCTe/JCJ8tqu8ZUmp9JihJfgjDz9KPJJoj
- 0FR7+lBdGwsDHaLFL0pzyHSGyz9B2ybw2KTQ99DqIqEJYTrrKXNdtXBHjt6YPOq03n0rCQqnjV+
- O+QFIjCEXmxwApxk=
-X-Received: by 2002:a05:6214:162c:: with SMTP id
- e12mr19624909qvw.3.1577019561132; 
- Sun, 22 Dec 2019 04:59:21 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwHttv3+BaW3nJzk9Roqa9ew+PJ+OWrXkOPbUzrYQsRywPsHMNQlr1+SSRtV9E4hsRFWur6Zw==
-X-Received: by 2002:a05:6214:162c:: with SMTP id
- e12mr19624904qvw.3.1577019560933; 
- Sun, 22 Dec 2019 04:59:20 -0800 (PST)
+ bh=iUMpv90PlaAzMPnNvwWcKkD23S9vzhuQNx+pI7uOLio=;
+ b=bHPtn5G8Ce8pyqZ0eUvSZIrtPpvO26MFlXbpIfcaDvFbgHaGf8i5aHA6QSL+vyPXDY
+ RlzZkRPU2hyBadr4FHjLrbESWatsPUEzepciXvfknQ6n/2wjghn5wSrVTgxdoz2M7S3X
+ OAKJPUW//exK+tcT/MtRfffIpYGj8TwFzYyFMDwgrT2fpoW/wQBhHRoiAl8qi4+RYZl9
+ W/rGWrH6w7Qisy8cc+HfH7CVSWtHFnyHnoU2Ne0mvhF/Q/oQbXfAhg6yF0jMa1DwDbK7
+ xP5W7oukK+qTIfiUXR35+m/ltHVm/ijKxqpAfn1OyUsoWMyUXeHQiJYOvWZDxOcBfFIL
+ mHuw==
+X-Gm-Message-State: APjAAAWInLTZdMV5XXmBfAOXpzKy4mLghiU16voOEvPaFR8k8ldkzSiJ
+ MNrJoqaIZ4H3PQ0HJKRPnZK1S1DRM2w+j+0BEelsdNvquW7Ym1n2L7cCzi5b7z+pIxwardT513j
+ SAvKva8DaIIJnNS8=
+X-Received: by 2002:ae9:c205:: with SMTP id j5mr20680933qkg.58.1577019767320; 
+ Sun, 22 Dec 2019 05:02:47 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzdFGjsctw3UskRmkfEulBQoeui/U96h6HA1SQNpIKQ+1m1grddfPxX3FLm6Yic8WyP8DCLSA==
+X-Received: by 2002:ae9:c205:: with SMTP id j5mr20680914qkg.58.1577019767091; 
+ Sun, 22 Dec 2019 05:02:47 -0800 (PST)
 Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id f19sm4773031qkk.69.2019.12.22.04.59.18
+ by smtp.gmail.com with ESMTPSA id j185sm4779167qkc.96.2019.12.22.05.02.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 22 Dec 2019 04:59:19 -0800 (PST)
-Date: Sun, 22 Dec 2019 07:59:15 -0500
+ Sun, 22 Dec 2019 05:02:45 -0800 (PST)
+Date: Sun, 22 Dec 2019 08:02:41 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 Subject: Re: [PULL 00/24] virtio, pci, pc: fixes, features
-Message-ID: <20191222075324-mutt-send-email-mst@kernel.org>
+Message-ID: <20191222080202-mutt-send-email-mst@kernel.org>
 References: <20191219132621.16595-1-mst@redhat.com>
  <CAFEAcA9HVKxVi4vg7F4ELRpjgk=vFtREXRfJySGy5mdjsJuj9A@mail.gmail.com>
 MIME-Version: 1.0
 In-Reply-To: <CAFEAcA9HVKxVi4vg7F4ELRpjgk=vFtREXRfJySGy5mdjsJuj9A@mail.gmail.com>
-X-MC-Unique: m4dEGHBqPcmDuzz061wfBQ-1
+X-MC-Unique: jR9Zh94ZMLK0_vnHh2Qyzw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,36 +160,7 @@ bb4f:
 > -- PMM
 
 
-Could you pls check whether the following fixes it?
-Thanks!
-
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 33fda31a4c..747c9680b0 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -421,7 +421,7 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCa=
-cheOptions *node,
-             ms->numa_state->hmat_cache[node->node_id][node->level - 1]->si=
-ze)) {
-         error_setg(errp, "Invalid size=3D%" PRIu64 ", the size of level=3D=
-%" PRIu8
-                    " should be less than the size(%" PRIu64 ") of "
--                   "level=3D%" PRIu8, node->size, node->level,
-+                   "level=3D%u", node->size, node->level,
-                    ms->numa_state->hmat_cache[node->node_id]
-                                              [node->level - 1]->size,
-                    node->level - 1);
-@@ -434,7 +434,7 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCa=
-cheOptions *node,
-             ms->numa_state->hmat_cache[node->node_id][node->level + 1]->si=
-ze)) {
-         error_setg(errp, "Invalid size=3D%" PRIu64 ", the size of level=3D=
-%" PRIu8
-                    " should be larger than the size(%" PRIu64 ") of "
--                   "level=3D%" PRIu8, node->size, node->level,
-+                   "level=3D%u", node->size, node->level,
-                    ms->numa_state->hmat_cache[node->node_id]
-                                              [node->level + 1]->size,
-                    node->level + 1);
+I think I fixed this up, can you try again with
+new for_upstream at cd8b62554728373e3dcdbc450a3d76a9ce4e7beb please?
 
 
