@@ -2,62 +2,83 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F285C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41896C2D0D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:43:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62EA7206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:26:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62EA7206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11C0A20715
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:43:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GG7t1jzp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C0A20715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijJyw-0006PG-H5
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:26:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54793)
+	id 1ijKFY-0001kf-3G
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:43:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43610)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yang.zhong@intel.com>) id 1ijJy8-0005xY-DM
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:25:42 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ijKEr-0001EY-O1
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yang.zhong@intel.com>) id 1ijJy6-0006d6-0X
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:25:39 -0500
-Received: from mga11.intel.com ([192.55.52.93]:40508)
+ (envelope-from <eric.auger@redhat.com>) id 1ijKEp-0001er-9m
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:42:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59099
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yang.zhong@intel.com>)
- id 1ijJy5-0006EZ-NU
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:25:37 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 23 Dec 2019 01:25:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,347,1571727600"; d="scan'208";a="249429950"
-Received: from yangzhon-virtual.bj.intel.com (HELO localhost) ([10.238.145.50])
- by fmsmga002.fm.intel.com with ESMTP; 23 Dec 2019 01:25:30 -0800
-Date: Mon, 23 Dec 2019 17:18:56 +0800
-From: Yang Zhong <yang.zhong@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] virtio: add the queue number check
-Message-ID: <20191223091856.GA8433@yangzhon-Virtual>
-References: <20191223082813.28930-1-yang.zhong@intel.com>
- <5cb6ace0-dd8e-aa22-e280-1e697c2c4156@redhat.com>
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1ijKEo-0001Uj-UF
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:42:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577094173;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=p5WFdi2YPr6EXHNmft+uuLWxzpFSEFohSYCFOmJOj0M=;
+ b=GG7t1jzpeBHtxecBK7SQzKw9tdNHimfnoq5n/fIT9X4T+uJnVOpx4GomNdcKfh0+Yx8rhX
+ lMFh7MkPN4jT55EiQLX6LxAth1AmDO+3d/cTuXlf+yIAfc9A9ztAbY1NafvWA1ww3Qnm+i
+ TeNcA4dFVEuQeFqd14IklBpfLQPXSTA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-3yZPyScBOgK4c8ouKzDSjw-1; Mon, 23 Dec 2019 04:42:52 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0E6C5184B44D;
+ Mon, 23 Dec 2019 09:42:51 +0000 (UTC)
+Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC49360BF1;
+ Mon, 23 Dec 2019 09:42:39 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v11 07/20] virtio-iommu: Implement map/unmap
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20191122182943.4656-1-eric.auger@redhat.com>
+ <20191122182943.4656-8-eric.auger@redhat.com>
+ <20191210164328.GF277340@myrica>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <aae1cdeb-523e-99d2-e4ad-e2e07359c2bd@redhat.com>
+Date: Mon, 23 Dec 2019 10:42:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5cb6ace0-dd8e-aa22-e280-1e697c2c4156@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
+In-Reply-To: <20191210164328.GF277340@myrica>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 3yZPyScBOgK4c8ouKzDSjw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,211 +90,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ armbru@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ dgilbert@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 23, 2019 at 09:44:46AM +0100, Paolo Bonzini wrote:
-> On 23/12/19 09:28, Yang Zhong wrote:
-> > In the guest kernel driver, like virtio_blk.c and virtio_scsi.c,
-> > there are some definitions like below:
-> > 
-> > num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs)
-> > 
-> > If the queue number is bigger than vcpu number, the VM will be
-> > stuck in the guest driver because the qemu and guest driver have
-> > different queue number. So, this check can avoid this issues.
+Hi jean,
+
+On 12/10/19 5:43 PM, Jean-Philippe Brucker wrote:
+> On Fri, Nov 22, 2019 at 07:29:30PM +0100, Eric Auger wrote:
+>> @@ -238,10 +244,35 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
+>>      uint64_t virt_start = le64_to_cpu(req->virt_start);
+>>      uint64_t virt_end = le64_to_cpu(req->virt_end);
+>>      uint32_t flags = le32_to_cpu(req->flags);
+>> +    viommu_domain *domain;
+>> +    viommu_interval *interval;
+>> +    viommu_mapping *mapping;
 > 
-> Can you explain how the bug happens? This would be an issue in the
-> kernel driver, QEMU shouldn't care about how the kernel driver chooses
-> to steer requests to virtqueues.
+> Additional checks would be good. Most importantly we need to return
+> S_INVAL if we don't recognize a bit in flags (a MUST in the spec). 
+Sure
+
+It
+> might be good to check that addresses are aligned on the page granule as
+> well, and return S_RANGE if they aren't (a SHOULD in the spec), but I
+> don't care as much.
+with KVM accelerated guest I don't have access to the guest page size,
+hence the choice of not checking it.
 > 
-  Paolo, Merry Christmas!
-
-  This issue is easy to reproduce, when i enabled multiple queue with SPDK,
-  and if the num-queues > cpu number in the qemu command, the guest kernel
-  will stuck there and after guest kernel do "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-  , the guest kernel will crash.
-
-  My qemu command:
-  ./qemu-system-x86_64 \
-    -machine q35,accel=kvm \
-    -cpu host -m 1024,maxmem=20G,slots=2 -smp 2 \
-    -chardev socket,id=char0,path=/var/tmp/vhost.1 \
-    -device vhost-user-blk-pci,chardev=char0,num-queues=4,bootindex=2,config-wce=true \
-    ......
-
-  My debug patch as below:
-  diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-  index 7ffd719d89de..b0a2fb503c00 100644
-  --- a/drivers/block/virtio_blk.c
-  +++ b/drivers/block/virtio_blk.c
-  @@ -511,11 +511,12 @@ static int init_vq(struct virtio_blk *vblk)
-          err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
-                                     struct virtio_blk_config, num_queues,
-                                     &num_vqs);
-  +printk("---0------blk_probe and init_vq, the num_queues=%d---\n", num_vqs);
-        if (err)
-                num_vqs = 1;
-  -
-  +printk("---1------blk_probe and init_vq, the num_queues=%d---\n", num_vqs);
-        num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
-  -
-  +printk("---2------blk_probe and init_vq, the num_queues=%d---\n", num_vqs);
-        vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), GFP_KERNEL);
-
-  The debug log:
-  [    0.225780] Linux agpgart interface v0.103
-  [    0.226908] loop: module loaded
-  [    0.227079] ---0------blk_probe and init_vq, the num_queues=4---
-  [    0.227192] ---1------blk_probe and init_vq, the num_queues=4---
-  [    0.227260] ---2------blk_probe and init_vq, the num_queues=2---
-  [    0.227813] virtio_blk virtio1: [vda] 1048576 512-byte logical blocks (537 MB/512 MiB)
-
-  In this time, the queue number in the front-end block driver is 2, but
-  the queue number in qemu side is still 4. So the guest virtio_blk
-  driver will failed to create vq with backend. There is no "set back"
-  mechnism for block driver to inform backend this new queue number.
-  So, i added this check in qemu side.
-
-  Since the current virtio-blk and vhost-user-blk device always
-  defaultly use 1 queue, it's hard to find this issue.
-
-  I checked the guest kernel driver, virtio-scsi and virtio-blk all
-  have same check in their driver probe:
-
-  num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs);
- 
-  It's possible the guest driver has different queue number with qemu
-  side.
-
-  I also want to fix this issue from guest driver side, but currently there 
-  is no better solution to fix this issue.
-
-  By the way, i did not try scsi with this corner case, and only check
-  driver and qemu code to find same issue. thanks! 
-
-  Yang
-
-> Paolo
+>> +
+>> +    interval = g_malloc0(sizeof(*interval));
+>> +
+>> +    interval->low = virt_start;
+>> +    interval->high = virt_end;
+>> +
+>> +    domain = g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
+>> +    if (!domain) {
+>> +        return VIRTIO_IOMMU_S_NOENT;
 > 
-> > Signed-off-by: Yang Zhong <yang.zhong@intel.com>
-> > ---
-> >  hw/block/vhost-user-blk.c | 11 +++++++++++
-> >  hw/block/virtio-blk.c     | 11 ++++++++++-
-> >  hw/scsi/virtio-scsi.c     | 12 ++++++++++++
-> >  3 files changed, 33 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> > index 63da9bb619..250e72abe4 100644
-> > --- a/hw/block/vhost-user-blk.c
-> > +++ b/hw/block/vhost-user-blk.c
-> > @@ -23,6 +23,8 @@
-> >  #include "qom/object.h"
-> >  #include "hw/qdev-core.h"
-> >  #include "hw/qdev-properties.h"
-> > +#include "qemu/option.h"
-> > +#include "qemu/config-file.h"
-> >  #include "hw/virtio/vhost.h"
-> >  #include "hw/virtio/vhost-user-blk.h"
-> >  #include "hw/virtio/virtio.h"
-> > @@ -391,6 +393,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> >      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> >      Error *err = NULL;
-> > +    unsigned cpus;
-> >      int i, ret;
-> >  
-> >      if (!s->chardev.chr) {
-> > @@ -403,6 +406,14 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-> >          return;
-> >      }
-> >  
-> > +    cpus = qemu_opt_get_number(qemu_opts_find(qemu_find_opts("smp-opts"), NULL),
-> > +                               "cpus", 0);
-> > +    if (s->num_queues > cpus ) {
-> > +        error_setg(errp, "vhost-user-blk: the queue number should be equal "
-> > +                "or less than vcpu number");
-> > +        return;
-> > +    }
-> > +
-> >      if (!s->queue_size) {
-> >          error_setg(errp, "vhost-user-blk: queue size must be non-zero");
-> >          return;
-> > diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> > index d62e6377c2..b2f4d01148 100644
-> > --- a/hw/block/virtio-blk.c
-> > +++ b/hw/block/virtio-blk.c
-> > @@ -18,6 +18,8 @@
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/main-loop.h"
-> >  #include "trace.h"
-> > +#include "qemu/option.h"
-> > +#include "qemu/config-file.h"
-> >  #include "hw/block/block.h"
-> >  #include "hw/qdev-properties.h"
-> >  #include "sysemu/blockdev.h"
-> > @@ -1119,7 +1121,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-> >      VirtIOBlock *s = VIRTIO_BLK(dev);
-> >      VirtIOBlkConf *conf = &s->conf;
-> >      Error *err = NULL;
-> > -    unsigned i;
-> > +    unsigned i,cpus;
-> >  
-> >      if (!conf->conf.blk) {
-> >          error_setg(errp, "drive property not set");
-> > @@ -1133,6 +1135,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-> >          error_setg(errp, "num-queues property must be larger than 0");
-> >          return;
-> >      }
-> > +    cpus = qemu_opt_get_number(qemu_opts_find(qemu_find_opts("smp-opts"), NULL),
-> > +                               "cpus", 0);
-> > +    if (conf->num_queues > cpus ) {
-> > +        error_setg(errp, "virtio-blk: the queue number should be equal "
-> > +                "or less than vcpu number");
-> > +        return;
-> > +    }
-> >      if (!is_power_of_2(conf->queue_size) ||
-> >          conf->queue_size > VIRTQUEUE_MAX_SIZE) {
-> >          error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-> > diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> > index e8b2b64d09..8e3e44f6b9 100644
-> > --- a/hw/scsi/virtio-scsi.c
-> > +++ b/hw/scsi/virtio-scsi.c
-> > @@ -21,6 +21,8 @@
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/iov.h"
-> >  #include "qemu/module.h"
-> > +#include "qemu/option.h"
-> > +#include "qemu/config-file.h"
-> >  #include "sysemu/block-backend.h"
-> >  #include "hw/qdev-properties.h"
-> >  #include "hw/scsi/scsi.h"
-> > @@ -880,6 +882,7 @@ void virtio_scsi_common_realize(DeviceState *dev,
-> >  {
-> >      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> >      VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(dev);
-> > +    unsigned cpus;
-> >      int i;
-> >  
-> >      virtio_init(vdev, "virtio-scsi", VIRTIO_ID_SCSI,
-> > @@ -893,6 +896,15 @@ void virtio_scsi_common_realize(DeviceState *dev,
-> >          virtio_cleanup(vdev);
-> >          return;
-> >      }
-> > +
-> > +    cpus = qemu_opt_get_number(qemu_opts_find(qemu_find_opts("smp-opts"), NULL),
-> > +                               "cpus", 0);
-> > +    if (s->conf.num_queues > cpus ) {
-> > +        error_setg(errp, "virtio-scsi: the queue number should be equal "
-> > +                "or less than vcpu number");
-> > +        return;
-> > +    }
-> > +
-> >      s->cmd_vqs = g_new0(VirtQueue *, s->conf.num_queues);
-> >      s->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
-> >      s->cdb_size = VIRTIO_SCSI_CDB_DEFAULT_SIZE;
-> > 
+> Leaks interval, I guess you could allocate it after this block.
+Sure
+
+Thanks!
+
+Eric
+> 
+> Thanks,
+> Jean
+> 
+>> +    }
+>> +
+>> +    mapping = g_tree_lookup(domain->mappings, (gpointer)interval);
+>> +    if (mapping) {
+>> +        g_free(interval);
+>> +        return VIRTIO_IOMMU_S_INVAL;
+>> +    }
+>>  
+>>      trace_virtio_iommu_map(domain_id, virt_start, virt_end, phys_start, flags);
+>>  
+>> -    return VIRTIO_IOMMU_S_UNSUPP;
+>> +    mapping = g_malloc0(sizeof(*mapping));
+>> +    mapping->phys_addr = phys_start;
+>> +    mapping->flags = flags;
+>> +
+>> +    g_tree_insert(domain->mappings, interval, mapping);
+>> +
+>> +    return VIRTIO_IOMMU_S_OK;
+> 
+
 
