@@ -2,86 +2,87 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05EAC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16591C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:12:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC0B3206CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7599206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:12:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=etsukata-com.20150623.gappssmtp.com header.i=@etsukata-com.20150623.gappssmtp.com header.b="1z3/Pq0j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC0B3206CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=etsukata.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eit4hSy9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7599206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijJgf-0007i2-SE
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:07:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49120)
+	id 1ijJlg-0001fZ-V2
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:12:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <devel@etsukata.com>) id 1ijJg4-0007IS-7J
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:07:01 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ijJks-00018J-QP
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:12:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <devel@etsukata.com>) id 1ijJg3-00080n-2h
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:07:00 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34883)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <devel@etsukata.com>) id 1ijJg2-0007sO-KE
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:06:58 -0500
-Received: by mail-pg1-x543.google.com with SMTP id l24so8502404pgk.2
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 01:06:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=etsukata-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=LxG3wd+JkDnvw8rUQlHr+glYrc/y7je8jBeo318Kmpw=;
- b=1z3/Pq0jhs/0Gm59/Bl4pvknRJfRKkoMWr787pFN1u+/459OgyJs4lWFoOHn16+NCr
- P+RjaaB7X1XXAuPNeZVUegOCjIQ4gwYR0gM9QcDtBiqycVV9ZZbGT5oCGNMuWc+EJ0hv
- O/S7PwRrAumkC6wDnmBFpmTPsmvisSMchpVSzwMXhKO9xqJCsWx7an6TX311n91b3Mk5
- xY8DtMtS1nKMYUnkUJvrx7XP9k1PR99GWlKkwUJjIXXGXs03e2NWfK4HKVOnIPBbz2kd
- Lq5qQRXtUctkPAToZxQdzCVz2QqDD+CerUYD7b8kJBc3SMNKmt8KoRj9XwTKTxk++XZK
- Fl8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=LxG3wd+JkDnvw8rUQlHr+glYrc/y7je8jBeo318Kmpw=;
- b=W+l00tOtn9ph8soJarhpPwoF/n+zPVjcDI/veudQK1pcQDaGRj+mbLgmqJfmJYmYEn
- tLdIuGhbAC76TUBByFJ/qeVEw6eOAlYnCYFW4GxKZ9dZGxxXOF3Y3zgPNZkshOOaMoWg
- v8sxdUXKXtZnvmFDf8cTgG0qA5KhCuTTGwahvUdmnUpYB3raIphmlAwhc2RndESgTwTp
- YPyJMnYw0xeGCUsSGM80RIhELnWpKaT84Doi3PtSwTrQAkY40eFuUFBHuCzXDWBvcyd7
- aEtZUWIKcg5Ns/eOvQcksg2yv7sBlwj9jxdUeGpx5CUH6/B9FRnoxSgjuA2LcIL8BxcV
- owWg==
-X-Gm-Message-State: APjAAAUNpHGURV9Ko7gujs2idbUbJogYsyrv3w2V7t1UK0RW6svl+dYo
- hLdEjh773zoO7437v9gR7fB8Ew==
-X-Google-Smtp-Source: APXvYqyOZJ/C4M39HQ8Rps4SWb2kPASSnO+XeiyHJFC6iYI2DiRuzTwaEaXSDB413qwUMCuNG4JdpQ==
-X-Received: by 2002:a63:89c2:: with SMTP id
- v185mr29525920pgd.135.1577092017039; 
- Mon, 23 Dec 2019 01:06:57 -0800 (PST)
-Received: from localhost.localdomain
- (p5307023-ipngn11902marunouchi.tokyo.ocn.ne.jp. [114.166.45.23])
- by smtp.gmail.com with ESMTPSA id r1sm19466242pjp.29.2019.12.23.01.06.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Dec 2019 01:06:56 -0800 (PST)
-From: Eiichi Tsukata <devel@etsukata.com>
-To: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, vsementsov@virtuozzo.com
-Subject: [PATCH] block/backup: fix memory leak in bdrv_backup_top_append()
-Date: Mon, 23 Dec 2019 18:06:32 +0900
-Message-Id: <20191223090632.30653-1-devel@etsukata.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <eric.auger@redhat.com>) id 1ijJkq-0003rX-A3
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:11:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32698
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1ijJkp-0003kP-UK
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:11:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577092314;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f/xlkTrstnlRNO4FHVwyPI1ENajclFfywGWkCwYYhL8=;
+ b=Eit4hSy9tg++TF/RK5CnRU04vqMS9Cqn1XS1nZ8eI91j+zhPDdrB90ng4WXcX9PIYA3Cau
+ ypAi3bPXMCoKAbvK3bbAkcAYhxTg7b1lmHBt23p3s3mTC94k1UboqS4kCDLg73YAFYXzO9
+ NP8+01S8eZs19zaEOvY1WIk7sAopa/E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-msKCyRmkPfiF8ozY0gdOAw-1; Mon, 23 Dec 2019 04:11:53 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA48D189DF40;
+ Mon, 23 Dec 2019 09:11:51 +0000 (UTC)
+Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BCED260BE0;
+ Mon, 23 Dec 2019 09:11:41 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v11 05/20] virtio-iommu: Endpoint and domains
+ structs and helpers
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>
+References: <20191122182943.4656-1-eric.auger@redhat.com>
+ <20191122182943.4656-6-eric.auger@redhat.com>
+ <20191210163716.GD277340@myrica>
+ <28597404-b9ac-8c16-e9e8-ad5793f2f5a3@redhat.com>
+ <20191220170028.GB2626852@myrica>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <fe993994-1b69-cf47-4f9a-88572e275a3e@redhat.com>
+Date: Mon, 23 Dec 2019 10:11:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+In-Reply-To: <20191220170028.GB2626852@myrica>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: msKCyRmkPfiF8ozY0gdOAw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,50 +94,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eiichi Tsukata <devel@etsukata.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ armbru@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ dgilbert@redhat.com, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_open_driver() allocates bs->opaque according to drv->instance_size.
-There is no need to allocate it and overwrite opaque in
-bdrv_backup_top_append().
+Hi Jean,
 
-Reproducer:
+On 12/20/19 6:00 PM, Jean-Philippe Brucker wrote:
+> On Thu, Dec 19, 2019 at 07:31:08PM +0100, Auger Eric wrote:
+>> Hi Jean,
+>>
+>> On 12/10/19 5:37 PM, Jean-Philippe Brucker wrote:
+>>> On Fri, Nov 22, 2019 at 07:29:28PM +0100, Eric Auger wrote:
+>>>> +typedef struct viommu_domain {
+>>>> +    uint32_t id;
+>>>> +    GTree *mappings;
+>>>> +    QLIST_HEAD(, viommu_endpoint) endpoint_list;
+>>>> +} viommu_domain;
+>>>> +
+>>>> +typedef struct viommu_endpoint {
+>>>> +    uint32_t id;
+>>>> +    viommu_domain *domain;
+>>>> +    QLIST_ENTRY(viommu_endpoint) next;
+>>>> +} viommu_endpoint;
+>>>
+>>> There might be a way to merge viommu_endpoint and the IOMMUDevice
+>>> structure introduced in patch 4, since they both represent one endpoint.
+>>> Maybe virtio_iommu_find_add_pci_as() could add the IOMMUDevice to
+>>> s->endpoints, and IOMMUDevice could store the endpoint ID rather than bus
+>>> and devfn.
+>>
+>> On PCI bus enumeration we locally store the PCI bus hierarchy under the
+>> form of GHashTable of IOMMUDevice indexed by iommu_pci_bus pointer.
+>> Those are all the devices attached to the downstream buses. We also use
+>> an array of iommu pci bus pointers indexed by bus number that is lazily
+>> populated due to the fact, at enumeration time we do know the bus number
+>> yet. As you pointed, I haven't used the array of iommu pci bus pointers
+>> indexed by bus number in this series and I should actually. Currently I
+>> am not checking on attach that the sid effectively corresponds to a sid
+>> protected by this iommu. I will add this in my next version. The above
+>> structures are used in intel_iommu and smmu code as well and I think
+>> eventually this may be factorized a common base class..
+>>
+>> on the other hand the gtree of viommu_endpoint - soon renamed in
+>> CamelCase form ;-) - corresponds to the EPs that are actually attached
+>> to any domain. It is indexed by sid and not by bus pointer. This is more
+>> adapted to the virtio-iommu case.
+>>
+>> So, despite your suggestion, I am tempted to keep the different
+>> structures as the first ones are common to all iommu emulation code and
+>> the last is adapted to the virtio-iommu operations.
+>>
+>> Thoughts?
+> 
+> Makes sense, it seems better to keep them separate. I had missed that the
+> PCI bus number is resolved later, and started to move the endpoint ID into
+> IOMMUDevice when adding MMIO support, but I'll need to revisit this.
+> 
+> I'll be off for two weeks, have a nice holiday!
 
-  $ QTEST_QEMU_BINARY=./x86_64-softmmu/qemu-system-x86_64 valgrind -q --leak-check=full tests/test-replication -p /replication/secondary/start
-  ==29792== 24 bytes in 1 blocks are definitely lost in loss record 52 of 226
-  ==29792==    at 0x483AB1A: calloc (vg_replace_malloc.c:762)
-  ==29792==    by 0x4B07CE0: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.6000.7)
-  ==29792==    by 0x12BAB9: bdrv_open_driver (block.c:1289)
-  ==29792==    by 0x12BEA9: bdrv_new_open_driver (block.c:1359)
-  ==29792==    by 0x1D15CB: bdrv_backup_top_append (backup-top.c:190)
-  ==29792==    by 0x1CC11A: backup_job_create (backup.c:439)
-  ==29792==    by 0x1CD542: replication_start (replication.c:544)
-  ==29792==    by 0x1401B9: replication_start_all (replication.c:52)
-  ==29792==    by 0x128B50: test_secondary_start (test-replication.c:427)
-  ...
+Thanks, you too.
 
-Fixes: 7df7868b9640 ("block: introduce backup-top filter driver")
-Signed-off-by: Eiichi Tsukata <devel@etsukata.com>
----
- block/backup-top.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Merry Christmas! :-)
 
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 7cdb1f8eba..617217374d 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -196,7 +196,7 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
-     }
- 
-     top->total_sectors = source->total_sectors;
--    top->opaque = state = g_new0(BDRVBackupTopState, 1);
-+    state = top->opaque;
- 
-     bdrv_ref(target);
-     state->target = bdrv_attach_child(top, target, "target", &child_file, errp);
--- 
-2.21.0
+Eric
+> 
+> Thanks,
+> Jean
+> 
 
 
