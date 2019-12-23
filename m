@@ -2,89 +2,93 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FF3C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A789C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:01:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C29FC20709
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:00:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46CFE20709
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:01:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBMo0dGq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C29FC20709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iw2gaXyM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CFE20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijR4h-0001Uw-E0
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 12:00:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41750)
+	id 1ijR5P-0002dI-Qb
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 12:01:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ijQnX-0005n3-KG
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:43:12 -0500
+ (envelope-from <mst@redhat.com>) id 1ijQn9-00058e-MW
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ijQnW-0005uL-65
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:43:11 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38193
+ (envelope-from <mst@redhat.com>) id 1ijQn8-0005j5-C8
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36834
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQnW-0005uD-23
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:43:10 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQn8-0005is-7q
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577119389;
+ s=mimecast20190719; t=1577119365;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=k9+gzlx294oW9w4JOk3CBVAZ2rl3jEfAGRzU1EfTm6U=;
- b=EBMo0dGqOLBCfEWIbMomAkmnZgm0YTvsuJl991s78czrP+VZ6XvHx02HNRs4iJAedSfPcD
- b2TFtg0i1Bm7mlqRO3Euxg4uuRiJAWD6okzzMjW/xm3Ut7Bua/mVztuxv/K/B/GX9bklMm
- qpZsqOUVpChsFNu7XycLBrU4UMAu+MM=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-VWjQlXQdPcmxfKHeV6Mg6g-1; Mon, 23 Dec 2019 11:43:08 -0500
-Received: by mail-qk1-f198.google.com with SMTP id 143so11436815qkg.12
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:43:08 -0800 (PST)
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=51WDbq+PBwGZb4DLRjFJvXY/baMy4xbXgzhN6b6J6AM=;
+ b=iw2gaXyMG9uHoFlEFY6yRrj3T8X1HcNJDY8YQzW/QJTMjp/KZFm4TsQ3zOD55aEMt/vt3E
+ EPfY4WDHbtZkbLVejzg9mvp7r9KEsTkSytSC9KX/+yLoDummWLsa5g6F21bvi7Zmn0X9GX
+ jsJaphWf2Pa40AKTlrTHCyWdnTSpKuw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-fKOzOR5fP6qnUbRysGFrrQ-1; Mon, 23 Dec 2019 11:42:44 -0500
+Received: by mail-qt1-f197.google.com with SMTP id e1so8290770qto.5
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:42:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:content-transfer-encoding;
- bh=mef0O+8v+v2QwTMkvtiYxZXIRG7/ZbAgvOePkaVbC0s=;
- b=hqvemc4WamAfqS/J0wJU9KzS0UegXktGkdOyWe12fmbkUb205K6G58Kt0dDBZHB64Y
- 4qkFPLooK71RgrNDfKWwmqVs7GaAqlbC0HfxPRAFZRQAd1+wdgzHRjG/rIizds9bam3e
- QUpXypbkxudh+hyiiqPxa3JmOhvC6jP835n46/NgDR6UdB84HcyNf8Zp5bAiuVhPGuqA
- rGMjFvwl+OjoohRjumFpTOiCFAINfIfvgzoRRcFV/LLoQfyJhc90L5gL2sIad4C5Ox/w
- pa+kpehbqSx4qo89eWtH3uIeoX9EBuBbxNKeiwXh3F05G/urmHVITqNyKYv3npxQShE/
- +ddw==
-X-Gm-Message-State: APjAAAU8q6d8ELx9dgJcmcMFlXoQ0iOLrZonXo6lVxKUDccnf0jG2OUB
- cg/w4U8V1y0q195q3AxfBxFR3iEyrPeEvKgrzM+9Om026sVcquJc3PajprUvn1U3GZrOgq1ka52
- DYvFiNn2pO47d2iM=
-X-Received: by 2002:a0c:edc2:: with SMTP id i2mr25438652qvr.62.1577119386478; 
- Mon, 23 Dec 2019 08:43:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyFcNEBNaORtAkh1Cz2IWvCrJjjBlj1H9dLsKfxg6EL4aLTT0MPJglWG/L0CWegTxKYBBDRGw==
-X-Received: by 2002:a0c:edc2:: with SMTP id i2mr25438541qvr.62.1577119384724; 
- Mon, 23 Dec 2019 08:43:04 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=o8odu1UwTWT4bWPiNG9EYA27yURxcpg5mIlh0CMeiVA=;
+ b=o39V5a4uE7vZhZSuQrdI0/7TXrKK3VOChVzrxVp8WorIJsXQSmNEnjkBqIyCYgsDZ/
+ f9mHPgeKSv+167F7HAo8O678S1VOU69YIGkKPbZywfwqqpSAQZFvGjF++z82NxWKAUgi
+ klk7Uk70Flf2MpFpRjf6OCKpBbXRcBOSrMXkrUGcmfqWCalTf7PrFae7XjbXwI5o7fgx
+ PaM/SSCiWB4GVj5SdAmtbjWd5XATmquhpT62Cy0pi2tZgHSozaJn+otS8Pj9Q+pLJudg
+ YoKoxFPt+Nlys8EqPHs87Qpgly6q9Sd+YHpwOOJSdP0ogDjl4lxccxtFx+zqmKduaY7y
+ wqhg==
+X-Gm-Message-State: APjAAAXZAbFhcDiWwXE08eWSxLFWIGqKbFoq43rq4jqrkUClD0pSKFWN
+ eRVrXYXA8r81MbY9yTsvs+aWyNTrb+JaZi3vuZp4TOwMKsrWD8Z/ISSa0ymir2ViZMxDm5P6At7
+ ydfipJLIiAyikCTE=
+X-Received: by 2002:a37:b946:: with SMTP id j67mr25865243qkf.35.1577119363618; 
+ Mon, 23 Dec 2019 08:42:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzdocjm8XB29JnkVa9zMO1WV+qjDM2zdGBCtngrtywtL+CR/24BiLXzwkbf4YV7N0WZZCol5Q==
+X-Received: by 2002:a37:b946:: with SMTP id j67mr25865225qkf.35.1577119363404; 
+ Mon, 23 Dec 2019 08:42:43 -0800 (PST)
 Received: from redhat.com (bzq-109-64-31-13.red.bezeqint.net. [109.64.31.13])
  by smtp.gmail.com with ESMTPSA id
- q5sm5873521qkf.14.2019.12.23.08.43.03
+ k73sm5941000qke.36.2019.12.23.08.42.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Dec 2019 08:43:03 -0800 (PST)
-Date: Mon, 23 Dec 2019 11:43:01 -0500
+ Mon, 23 Dec 2019 08:42:42 -0800 (PST)
+Date: Mon, 23 Dec 2019 11:42:39 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/27] virtio, pci, pc: fixes, features
-Message-ID: <20191223141536.72682-1-mst@redhat.com>
+Subject: [PULL v2 23/27] vhost-user: add VHOST_USER_RESET_DEVICE to reset
+ devices
+Message-ID: <20191223141536.72682-24-mst@redhat.com>
+References: <20191223141536.72682-1-mst@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20191223141536.72682-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: VWjQlXQdPcmxfKHeV6Mg6g-1
+X-MC-Unique: fKOzOR5fP6qnUbRysGFrrQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -101,152 +105,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Vrabel <david.vrabel@nutanix.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit dd5b0f95490883cd8bc7d070db8de70d5c979cbc=
-:
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20191219' into st=
-aging (2019-12-20 16:37:07 +0000)
+Add a VHOST_USER_RESET_DEVICE message which will reset the vhost user
+backend. Disabling all rings, and resetting all internal state, ready
+for the backend to be reinitialized.
 
-are available in the Git repository at:
+A backend has to report it supports this features with the
+VHOST_USER_PROTOCOL_F_RESET_DEVICE protocol feature bit. If it does
+so, the new message is used instead of sending a RESET_OWNER which has
+had inconsistent implementations.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 585c70da17395114e5ec4f6f3f9f5068ae1ff0f3:
-
-  tests: add virtio-scsi and virtio-blk seg_max_adjust test (2019-12-23 09:=
-12:30 -0500)
-
-----------------------------------------------------------------
-virtio, pci, pc: fixes, features
-
-Bugfixes all over the place.
-HMAT support.
-New flags for vhost-user-blk utility.
-Auto-tuning of seg max for virtio storage.
-
+Signed-off-by: David Vrabel <david.vrabel@nutanix.com>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <1572385083-5254-2-git-send-email-raphael.norwitz@nutanix.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/vhost-user.c      |  8 +++++++-
+ docs/interop/vhost-user.rst | 15 +++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
-----------------------------------------------------------------
-
-Changes since v1:
-    - (hopefully) fix build on Mac OSX
-    - fix up 5.0 compat for pc
-    - seg_max auto-config
-
-Denis Plotnikov (3):
-      hw: fix using 4.2 compat in 5.0 machine types for i440fx/q35
-      virtio: make seg_max virtqueue size dependent
-      tests: add virtio-scsi and virtio-blk seg_max_adjust test
-
-Jean-Philippe Brucker (1):
-      virtio-mmio: Clear v2 transport state on soft reset
-
-Liu Jingqi (5):
-      numa: Extend CLI to provide memory latency and bandwidth information
-      numa: Extend CLI to provide memory side cache information
-      hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
-      hmat acpi: Build System Locality Latency and Bandwidth Information St=
-ructure(s)
-      hmat acpi: Build Memory Side Cache Information Structure(s)
-
-Michael Roth (1):
-      virtio-pci: disable vring processing when bus-mastering is disabled
-
-Michael S. Tsirkin (5):
-      virtio: add ability to delete vq through a pointer
-      virtio: make virtio_delete_queue idempotent
-      virtio-input: convert to new virtio_delete_queue
-      virtio: update queue size on guest write
-      ACPI: add expected files for HMAT tests (acpihmat)
-
-Micky Yun Chan (1):
-      Implement backend program convention command for vhost-user-blk
-
-Pan Nengyuan (2):
-      virtio-balloon: fix memory leak while attach virtio-balloon device
-      virtio-serial-bus: fix memory leak while attach virtio-serial-bus
-
-Philippe Mathieu-Daud=C3=A9 (2):
-      hw/pci/pci_host: Remove redundant PCI_DPRINTF()
-      hw/pci/pci_host: Let pci_data_[read/write] use unsigned 'size' argume=
-nt
-
-Raphael Norwitz (2):
-      vhost-user: add VHOST_USER_RESET_DEVICE to reset devices
-      vhost-user-scsi: reset the device if supported
-
-Stefan Hajnoczi (1):
-      virtio: don't enable notifications during polling
-
-Tao Xu (3):
-      numa: Extend CLI to provide initiator information for numa nodes
-      tests/numa: Add case for QMP build HMAT
-      tests/bios-tables-test: add test cases for ACPI HMAT
-
-Yi Sun (1):
-      intel_iommu: fix bug to read DMAR_RTADDR_REG
-
- docs/interop/vhost-user.json              |  31 ++++
- qapi/machine.json                         | 180 +++++++++++++++++-
- hw/acpi/hmat.h                            |  42 +++++
- include/hw/pci/pci_host.h                 |   4 +-
- include/hw/virtio/virtio-blk.h            |   1 +
- include/hw/virtio/virtio-scsi.h           |   1 +
- include/hw/virtio/virtio.h                |  18 ++
- include/sysemu/numa.h                     |  63 +++++++
- contrib/vhost-user-blk/vhost-user-blk.c   | 108 ++++++-----
- hw/acpi/hmat.c                            | 268 ++++++++++++++++++++++++++=
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 02a9b25199..d27a10fcc6 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -58,6 +58,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD =3D 10,
+     VHOST_USER_PROTOCOL_F_HOST_NOTIFIER =3D 11,
+     VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD =3D 12,
++    VHOST_USER_PROTOCOL_F_RESET_DEVICE =3D 13,
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+=20
+@@ -98,6 +99,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
+     VHOST_USER_GPU_SET_SOCKET =3D 33,
++    VHOST_USER_RESET_DEVICE =3D 34,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -890,10 +892,14 @@ static int vhost_user_set_owner(struct vhost_dev *dev=
+)
+ static int vhost_user_reset_device(struct vhost_dev *dev)
+ {
+     VhostUserMsg msg =3D {
+-        .hdr.request =3D VHOST_USER_RESET_OWNER,
+         .hdr.flags =3D VHOST_USER_VERSION,
+     };
+=20
++    msg.hdr.request =3D virtio_has_feature(dev->protocol_features,
++                                         VHOST_USER_PROTOCOL_F_RESET_DEVIC=
+E)
++        ? VHOST_USER_RESET_DEVICE
++        : VHOST_USER_RESET_OWNER;
 +
- hw/block/virtio-blk.c                     |  18 +-
- hw/char/virtio-serial-bus.c               |   8 +
- hw/core/machine.c                         |  68 +++++++
- hw/core/numa.c                            | 297 ++++++++++++++++++++++++++=
-++++
- hw/i386/acpi-build.c                      |   5 +
- hw/i386/intel_iommu.c                     |   7 +-
- hw/i386/pc_piix.c                         |   1 -
- hw/i386/pc_q35.c                          |   1 -
- hw/input/virtio-input.c                   |   5 +-
- hw/pci/pci_host.c                         |  25 +--
- hw/scsi/vhost-scsi.c                      |   2 +
- hw/scsi/vhost-user-scsi.c                 |  24 +++
- hw/scsi/virtio-scsi.c                     |  19 +-
- hw/virtio/vhost-user.c                    |   8 +-
- hw/virtio/virtio-balloon.c                |   7 +
- hw/virtio/virtio-mmio.c                   |  14 ++
- hw/virtio/virtio-pci.c                    |  14 +-
- hw/virtio/virtio.c                        |  63 +++++--
- tests/bios-tables-test.c                  |  44 +++++
- tests/numa-test.c                         | 213 +++++++++++++++++++++
- docs/interop/vhost-user.rst               |  32 ++++
- hw/acpi/Kconfig                           |   7 +-
- hw/acpi/Makefile.objs                     |   1 +
- qemu-options.hx                           |  95 +++++++++-
- tests/acceptance/virtio_seg_max_adjust.py | 134 ++++++++++++++
- tests/data/acpi/pc/APIC.acpihmat          | Bin 0 -> 128 bytes
- tests/data/acpi/pc/DSDT.acpihmat          | Bin 0 -> 6455 bytes
- tests/data/acpi/pc/HMAT.acpihmat          | Bin 0 -> 280 bytes
- tests/data/acpi/pc/SRAT.acpihmat          | Bin 0 -> 280 bytes
- tests/data/acpi/q35/APIC.acpihmat         | Bin 0 -> 128 bytes
- tests/data/acpi/q35/DSDT.acpihmat         | Bin 0 -> 9203 bytes
- tests/data/acpi/q35/HMAT.acpihmat         | Bin 0 -> 280 bytes
- tests/data/acpi/q35/SRAT.acpihmat         | Bin 0 -> 280 bytes
- 43 files changed, 1716 insertions(+), 112 deletions(-)
- create mode 100644 hw/acpi/hmat.h
- create mode 100644 hw/acpi/hmat.c
- create mode 100755 tests/acceptance/virtio_seg_max_adjust.py
- create mode 100644 tests/data/acpi/pc/APIC.acpihmat
- create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
- create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
- create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
- create mode 100644 tests/data/acpi/q35/APIC.acpihmat
- create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
- create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
- create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
+     if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+         return -1;
+     }
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index 015ac08177..5f8b3a456b 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -785,6 +785,7 @@ Protocol features
+   #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+   #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+   #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
++  #define VHOST_USER_PROTOCOL_F_RESET_DEVICE   13
+=20
+ Master message types
+ --------------------
+@@ -1190,6 +1191,20 @@ Master message types
+   ancillary data. The GPU protocol is used to inform the master of
+   rendering state and updates. See vhost-user-gpu.rst for details.
+=20
++``VHOST_USER_RESET_DEVICE``
++  :id: 34
++  :equivalent ioctl: N/A
++  :master payload: N/A
++  :slave payload: N/A
++
++  Ask the vhost user backend to disable all rings and reset all
++  internal device state to the initial state, ready to be
++  reinitialized. The backend retains ownership of the device
++  throughout the reset operation.
++
++  Only valid if the ``VHOST_USER_PROTOCOL_F_RESET_DEVICE`` protocol
++  feature is set by the backend.
++
+ Slave message types
+ -------------------
+=20
+--=20
+MST
 
 
