@@ -2,60 +2,57 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83779C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB15C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:25:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 577C6206CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:22:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577C6206CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56F9F206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:25:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56F9F206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijIyg-00030n-HZ
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:22:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38491)
+	id 1ijJ29-0004NK-EB
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:25:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1ijIxr-00025O-Oq
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:21:21 -0500
+ (envelope-from <yang.zhong@intel.com>) id 1ijJ1F-0003jV-Oo
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:24:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1ijIxp-0006D4-KF
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:21:19 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2227 helo=huawei.com)
+ (envelope-from <yang.zhong@intel.com>) id 1ijJ1D-00047w-Rl
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:24:48 -0500
+Received: from mga03.intel.com ([134.134.136.65]:25328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1ijIxl-0005RB-OP; Mon, 23 Dec 2019 03:21:14 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id E3E14B45958003554A93;
- Mon, 23 Dec 2019 16:21:05 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Mon, 23 Dec 2019
- 16:20:56 +0800
-Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191105091056.9541-1-guoheyi@huawei.com>
- <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <5aece614-4341-35e5-53a6-2f3d788e6e8d@huawei.com>
-Date: Mon, 23 Dec 2019 16:20:55 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+ (Exim 4.71) (envelope-from <yang.zhong@intel.com>)
+ id 1ijJ1D-0003Ul-Hw
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:24:47 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 23 Dec 2019 00:24:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,346,1571727600"; d="scan'208";a="219436161"
+Received: from he.bj.intel.com ([10.238.157.85])
+ by orsmga003.jf.intel.com with ESMTP; 23 Dec 2019 00:24:37 -0800
+From: Yang Zhong <yang.zhong@intel.com>
+To: pbonzini@redhat.com,
+	mst@redhat.com,
+	stefanha@redhat.com
+Subject: [PATCH] virtio: add the queue number check
+Date: Mon, 23 Dec 2019 16:28:13 +0800
+Message-Id: <20191223082813.28930-1-yang.zhong@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,111 +64,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Marc Zyngier <marc.zyngier@arm.com>, Cornelia Huck <cohuck@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, wanghaibin.wang@huawei.com,
- Dave Martin <Dave.Martin@arm.com>
+Cc: yang.zhong@intel.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+In the guest kernel driver, like virtio_blk.c and virtio_scsi.c,
+there are some definitions like below:
 
-Really appreciate your comments.
+num_vqs = min_t(unsigned int, nr_cpu_ids, num_vqs)
 
-For other platforms/boards emulated in qemu, like omap, imx*, etc, are=20
-they just TCG platforms? Can we just enable security and EL3 emulation=20
-for these platforms instead of implementing copies of firmware=20
-interfaces in qemu? Also I think it is possible to optimize the code to=20
-support all KVM enabled virtual boards with one single copy of SDEI=20
-code, so at least the duplication of code inside qemu might be avoided.
+If the queue number is bigger than vcpu number, the VM will be
+stuck in the guest driver because the qemu and guest driver have
+different queue number. So, this check can avoid this issues.
 
-I can understand your concerns; the exsiting SDEI code in ARM Trusted=20
-Firmware also tempted me when I started to writing the code in qemu. I=20
-agree the ideal way is to use the existing firmware directly, but how=20
-can we achieve that? Either I don't think it is good to modify the=20
-firmware code too much, for firmware should be kept simple and reliable.
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+---
+ hw/block/vhost-user-blk.c | 11 +++++++++++
+ hw/block/virtio-blk.c     | 11 ++++++++++-
+ hw/scsi/virtio-scsi.c     | 12 ++++++++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
 
-Does James or Marc have any idea?
-
-Thanks,
-
-Heyi
-
-=E5=9C=A8 2019/12/20 21:44, Peter Maydell =E5=86=99=E9=81=93:
-> On Tue, 5 Nov 2019 at 09:12, Heyi Guo <guoheyi@huawei.com> wrote:
->> SDEI is for ARM "Software Delegated Exception Interface". AS ARM64 doe=
-sn't have
->> native non-maskable interrupt (NMI), we rely on higher privileged (lar=
-ger
->> exception level) software to change the execution flow of lower privil=
-eged
->> (smaller exception level) software when certain events occur, to emula=
-te NMI
->> mechanism, and SDEI is the standard interfaces between the two levels =
-of
->> privileged software. It is based on SMC/HVC calls.
->>
->> The higher privileged software implements an SDEI dispatcher to handle=
- SDEI
->> related SMC/HVC calls and trigger SDEI events; the lower privileged so=
-ftware
->> implements an SDEI client to request SDEI services and handle SDEI eve=
-nts.
-> Hi; I read through these patches last week, but I didn't reply
-> then because although there are some aspects to the design that
-> I don't like, I don't have a clear idea of what a better approach
-> to the problems it's trying to solve would be. However I didn't
-> want to go home for the end of the year without providing at
-> least some response. So I'm going to lay out the parts I have
-> issues with and perhaps somebody else will have a good idea.
->
-> The first part that I dislike here is that this is implementing
-> an entire ABI which in real hardware is provided by firmware. I
-> think that QEMU's design works best when QEMU provides emulation of
-> hardware or hardware-like facilities, which guest code (either
-> in the kernel, or firmware/bios running in the guest) can then
-> make use of. Once we start getting into implementing firmware
-> interfaces directly in QEMU this rapidly becomes a large amount
-> of work and code, and it's unclear where it should stop. Should
-> we implement also the equivalent of firmware for omap boards?
-> For imx* boards? For the raspberry pi? For xilinx boards?
-> Are we going to end up reimplementing more of ARM Trusted Firmware
-> functionality inside QEMU? The code to implement firmware-equivalent
-> ABIs in all these boards would I think quickly become a large part
-> of the codebase.
->
-> My second concern is that to do the things it wants to do,
-> the implementation here does some pretty invasive things:
->   * intercepting interrupt lines which ought to just be
->     emulated hardware signals between devices and the GIC
->   * capturing register values of other CPUs, and arbitrarily
->     stopping those other CPUs and making them run other code
->     at a later point in time
-> I'm really uncomfortable with what's just an 'emulated firmware'
-> interface for one specific board model doing this kind of thing.
->
-> Finally, the stated rationale for the patchset ("we'd like an
-> emulated NMI equivalent") doesn't really feel to me like it's
-> strong enough to counterbalance the amount of code here and
-> the degree to which it's moving us into a swamp I'd prefer
-> it if we could stay out of.
->
-> I'd be much happier with a design where QEMU provides simple
-> facilities to the guest and the guest firmware and kernel
-> deal with making use of them. I appreciate that it's not
-> clear how that would work though, given that in real hardware
-> this works by the firmware running at EL3 and KVM not
-> providing a mechanism that allows guest code that runs at
-> a higher (effective or emulated) privilege level than the
-> guest kernel...
->
-> thanks
-> -- PMM
->
-> .
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 63da9bb619..250e72abe4 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -23,6 +23,8 @@
+ #include "qom/object.h"
+ #include "hw/qdev-core.h"
+ #include "hw/qdev-properties.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
+ #include "hw/virtio/vhost.h"
+ #include "hw/virtio/vhost-user-blk.h"
+ #include "hw/virtio/virtio.h"
+@@ -391,6 +393,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VHostUserBlk *s = VHOST_USER_BLK(vdev);
+     Error *err = NULL;
++    unsigned cpus;
+     int i, ret;
+ 
+     if (!s->chardev.chr) {
+@@ -403,6 +406,14 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++    cpus = qemu_opt_get_number(qemu_opts_find(qemu_find_opts("smp-opts"), NULL),
++                               "cpus", 0);
++    if (s->num_queues > cpus ) {
++        error_setg(errp, "vhost-user-blk: the queue number should be equal "
++                "or less than vcpu number");
++        return;
++    }
++
+     if (!s->queue_size) {
+         error_setg(errp, "vhost-user-blk: queue size must be non-zero");
+         return;
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index d62e6377c2..b2f4d01148 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -18,6 +18,8 @@
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+ #include "trace.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
+ #include "hw/block/block.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/blockdev.h"
+@@ -1119,7 +1121,7 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+     VirtIOBlock *s = VIRTIO_BLK(dev);
+     VirtIOBlkConf *conf = &s->conf;
+     Error *err = NULL;
+-    unsigned i;
++    unsigned i,cpus;
+ 
+     if (!conf->conf.blk) {
+         error_setg(errp, "drive property not set");
+@@ -1133,6 +1135,13 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+         error_setg(errp, "num-queues property must be larger than 0");
+         return;
+     }
++    cpus = qemu_opt_get_number(qemu_opts_find(qemu_find_opts("smp-opts"), NULL),
++                               "cpus", 0);
++    if (conf->num_queues > cpus ) {
++        error_setg(errp, "virtio-blk: the queue number should be equal "
++                "or less than vcpu number");
++        return;
++    }
+     if (!is_power_of_2(conf->queue_size) ||
+         conf->queue_size > VIRTQUEUE_MAX_SIZE) {
+         error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index e8b2b64d09..8e3e44f6b9 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -21,6 +21,8 @@
+ #include "qemu/error-report.h"
+ #include "qemu/iov.h"
+ #include "qemu/module.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/scsi/scsi.h"
+@@ -880,6 +882,7 @@ void virtio_scsi_common_realize(DeviceState *dev,
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(dev);
++    unsigned cpus;
+     int i;
+ 
+     virtio_init(vdev, "virtio-scsi", VIRTIO_ID_SCSI,
+@@ -893,6 +896,15 @@ void virtio_scsi_common_realize(DeviceState *dev,
+         virtio_cleanup(vdev);
+         return;
+     }
++
++    cpus = qemu_opt_get_number(qemu_opts_find(qemu_find_opts("smp-opts"), NULL),
++                               "cpus", 0);
++    if (s->conf.num_queues > cpus ) {
++        error_setg(errp, "virtio-scsi: the queue number should be equal "
++                "or less than vcpu number");
++        return;
++    }
++
+     s->cmd_vqs = g_new0(VirtQueue *, s->conf.num_queues);
+     s->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
+     s->cdb_size = VIRTIO_SCSI_CDB_DEFAULT_SIZE;
+-- 
+2.17.1
 
 
