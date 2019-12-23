@@ -7,94 +7,93 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC1EC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9EBC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:49:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A50ED2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:49:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8DC7206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:49:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbOtevfj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A50ED2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JItGrH1A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8DC7206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijQtZ-00043s-NN
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 11:49:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41416)
+	id 1ijQtn-0004J1-BG
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 11:49:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41534)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ijQlw-0003VL-Nj
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:33 -0500
+ (envelope-from <mst@redhat.com>) id 1ijQma-0004Rf-O0
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ijQlv-0005PZ-N8
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25051
+ (envelope-from <mst@redhat.com>) id 1ijQmY-0005ZW-RC
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22529
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQlv-0005PP-JE
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:31 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQmY-0005ZG-Lx
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577119291;
+ s=mimecast20190719; t=1577119330;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8li2Tk9kJtAQIFMop0/eFLC5J5NJiOvfkc+z767fYRk=;
- b=hbOtevfjTt47U6EzshZVD+ws+knCq4sU7S413fLkXPsNV4Ij0qe5hSGwPoS/lMTnvsvlEp
- rJkkIWGa7cU2ltpedoDT3CHrbR+/7Z+6vo0gLhZBy/fRTJ2bSr0CHAAV1TwSGqsYKNxuil
- PRXSvhhaskYxzlS/ESKjcyp5X3rIlZk=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-SyJrTI7CO660Fn_AfyQ6Ww-1; Mon, 23 Dec 2019 11:41:29 -0500
-Received: by mail-qk1-f198.google.com with SMTP id u30so11537085qke.13
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:41:29 -0800 (PST)
+ bh=FcK7WigJMJDie4qherce/SQbHzZxCxCRnKQYLmv9Zf4=;
+ b=JItGrH1ASJW+ruBcM1wOyhBASCWLcJG3c87I8cBRdxwAwj0B+20IYZFFMSHIkoc7PwH0/L
+ cB0Ef7tByIag+wbFXgtu7ArORAPkF0eYfqVG1/WzJ5Rcfmh+VJAFX+eeRdvbKwAZBR4Kxg
+ 6RAPQrYlW9YJUGxv+6zTTdJO9Kw0lVk=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-j44FNZE8O3yHlGjPsjd_RQ-1; Mon, 23 Dec 2019 11:42:08 -0500
+Received: by mail-qt1-f200.google.com with SMTP id 38so4008127qty.15
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:42:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=8e5zVSr3EGK6wfLcmhM6md/VpcFIAiAuGM2x/CJ8sg4=;
- b=dzNHuWleuMyKEDTXg/ihhuvfZ2ZclBji3R/2xR6PnTOrHS+nDaDurP/mEeEwaIEXRR
- mqyGoNTT3UWDTCQ6x/RSeCIooDcgeMKkRfhypM8awITFpI+L3rHL9oLGN2OHLBv6bGOl
- AzSXV6QfGEyY1qoC19/tVDxPdb8NmsQ0Bv3VeLf+ojJ7+LDw6m98XRH5Uazosz19Kswq
- Z7DQK38K9KGYpeXi0QRvu2HXJs196xC54uq6p/v/w0ypZFIxQuzC0lKGqH/19I+rpCdR
- Ai8gESxiuNjv5hjC6E6+nLp/q1n7j8fFudmWLheG8ap6q5j9AqC8rwI1fFcMQTH+0NyN
- bY1Q==
-X-Gm-Message-State: APjAAAVu9N8hqXE7LqZIKPQoymiDVo/EBTZXkEm3twLuBbDhZ393WlEi
- 5Zd9jX7tJ4RdIqlFUYMfG4k/ktcf7t/NNMv52hBPGP51DFxe3EReB99KNgWbe+uynqo8opPMi1O
- AEgu5nJdXAmrY9Ks=
-X-Received: by 2002:a37:a9d1:: with SMTP id
- s200mr27094368qke.110.1577119288293; 
- Mon, 23 Dec 2019 08:41:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx5sXItuOpvHG6323vHGFR7mDt4BQ+fGfrFmZZkDD6vhMF/HEK/MWepceEoy14qfDI35Rsk6A==
-X-Received: by 2002:a37:a9d1:: with SMTP id
- s200mr27094353qke.110.1577119288091; 
- Mon, 23 Dec 2019 08:41:28 -0800 (PST)
+ bh=OKLjdvfCJDfY6fGqKWe65+lk7+R2Zab8RzeVnW/XRtE=;
+ b=UFxH5z1egCPB5KeygA3VJ6CYxFDkiE1Z6iBS88X72SlBX1XWWRTxHZg3RoOa1UUTor
+ duEOxmdytg0FglykktetsBlRIONxP2TSfzyhQPrG8bmzeSdbTLA8vl/4IXzkfXesav7I
+ xP2BLpHVQR5iJmF04N5e4ZXYcDuRh4Owzp6iPPPc8QxoVEpD7GctYslRjgLDt7fm3v8K
+ SaVjKaLbZKWNa9TD7+MMGiloqk4xHoB/KoymTlnuWHrVTJhtyWOm92RspLYTkK/XaHBs
+ I8st31TColrqYrDz72mF2LH1ZwFice7z4ajPAm3UOYPHeMj2vqmF0RecBtpeeQIWYuWS
+ k8vQ==
+X-Gm-Message-State: APjAAAUqZci8Pb0yRmJLr7sLKQT8Yf878cD4Z4bjPsbriPTwbYvcixZK
+ Rm22xRZsiRG4SS2ctjYhGRMTb43hqvcNRMSSfOVUhVxQiJ+1W3zk6l2BpHZNn5pBSTxfUdNTg54
+ rVC30INDivA8VLjU=
+X-Received: by 2002:a0c:eacb:: with SMTP id y11mr25503246qvp.68.1577119326144; 
+ Mon, 23 Dec 2019 08:42:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyk9qvsOeYUR0TFZ0iPwTetfJ7tiLr4NPW4lNa2ubjcnB0T1buAPPviL+jxo+4iVsRji39PSQ==
+X-Received: by 2002:a0c:eacb:: with SMTP id y11mr25503095qvp.68.1577119324313; 
+ Mon, 23 Dec 2019 08:42:04 -0800 (PST)
 Received: from redhat.com (bzq-109-64-31-13.red.bezeqint.net. [109.64.31.13])
  by smtp.gmail.com with ESMTPSA id
- i6sm5889478qkk.7.2019.12.23.08.41.25
+ 13sm5870349qke.85.2019.12.23.08.42.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Dec 2019 08:41:27 -0800 (PST)
-Date: Mon, 23 Dec 2019 11:41:23 -0500
+ Mon, 23 Dec 2019 08:42:03 -0800 (PST)
+Date: Mon, 23 Dec 2019 11:41:59 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 06/27] intel_iommu: fix bug to read DMAR_RTADDR_REG
-Message-ID: <20191223141536.72682-7-mst@redhat.com>
+Subject: [PULL v2 14/27] hmat acpi: Build Memory Proximity Domain Attributes
+ Structure(s)
+Message-ID: <20191223141536.72682-15-mst@redhat.com>
 References: <20191223141536.72682-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20191223141536.72682-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: SyJrTI7CO660Fn_AfyQ6Ww-1
+X-MC-Unique: j44FNZE8O3yHlGjPsjd_RQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,54 +105,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Liu Jingqi <jingqi.liu@intel.com>,
+ Tao Xu <tao3.xu@intel.com>, Markus Armbruster <armbru@redhat.com>,
+ Daniel Black <daniel@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yi Sun <yi.y.sun@linux.intel.com>
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Should directly read DMAR_RTADDR_REG but not using 's->root'.
-Because 's->root' is modified in 'vtd_root_table_setup()' so
-that the first 12 bits are omitted. This causes the guest
-iommu debugfs cannot show pasid tables.
+HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
+(HMAT). The specification references below link:
+http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
 
-Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-Message-Id: <20191205095439.29114-1-yi.y.sun@linux.intel.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+It describes the memory attributes, such as memory side cache
+attributes and bandwidth and latency details, related to the
+Memory Proximity Domain. The software is
+expected to use this information as hint for optimization.
+
+This structure describes Memory Proximity Domain Attributes by memory
+subsystem and its associativity with processor proximity domain as well as
+hint for memory usage.
+
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables.
+
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Message-Id: <20191213011929.2520-5-tao3.xu@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/intel_iommu.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/acpi/hmat.h        | 42 ++++++++++++++++++
+ hw/acpi/hmat.c        | 99 +++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/acpi-build.c  |  5 +++
+ hw/acpi/Kconfig       |  7 ++-
+ hw/acpi/Makefile.objs |  1 +
+ 5 files changed, 152 insertions(+), 2 deletions(-)
+ create mode 100644 hw/acpi/hmat.h
+ create mode 100644 hw/acpi/hmat.c
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 43c94b993b..ee06993675 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2610,16 +2610,15 @@ static uint64_t vtd_mem_read(void *opaque, hwaddr a=
-ddr, unsigned size)
-     switch (addr) {
-     /* Root Table Address Register, 64-bit */
-     case DMAR_RTADDR_REG:
-+        val =3D vtd_get_quad_raw(s, DMAR_RTADDR_REG);
-         if (size =3D=3D 4) {
--            val =3D s->root & ((1ULL << 32) - 1);
--        } else {
--            val =3D s->root;
-+            val =3D val & ((1ULL << 32) - 1);
+diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+new file mode 100644
+index 0000000000..437dbc6872
+--- /dev/null
++++ b/hw/acpi/hmat.h
+@@ -0,0 +1,42 @@
++/*
++ * HMAT ACPI Implementation Header
++ *
++ * Copyright(C) 2019 Intel Corporation.
++ *
++ * Author:
++ *  Liu jingqi <jingqi.liu@linux.intel.com>
++ *  Tao Xu <tao3.xu@intel.com>
++ *
++ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Tabl=
+e
++ * (HMAT)
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licens=
+es/>
++ */
++
++#ifndef HMAT_H
++#define HMAT_H
++
++#include "hw/acpi/aml-build.h"
++
++/*
++ * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
++ * Table 5-145, Field "flag", Bit [0]: set to 1 to indicate that data in
++ * the Proximity Domain for the Attached Initiator field is valid.
++ * Other bits reserved.
++ */
++#define HMAT_PROXIMITY_INITIATOR_VALID  0x1
++
++void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_st=
+ate);
++
++#endif
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+new file mode 100644
+index 0000000000..9ff79308a4
+--- /dev/null
++++ b/hw/acpi/hmat.c
+@@ -0,0 +1,99 @@
++/*
++ * HMAT ACPI Implementation
++ *
++ * Copyright(C) 2019 Intel Corporation.
++ *
++ * Author:
++ *  Liu jingqi <jingqi.liu@linux.intel.com>
++ *  Tao Xu <tao3.xu@intel.com>
++ *
++ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Tabl=
+e
++ * (HMAT)
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licens=
+es/>
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/numa.h"
++#include "hw/acpi/hmat.h"
++
++/*
++ * ACPI 6.3:
++ * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-145
++ */
++static void build_hmat_mpda(GArray *table_data, uint16_t flags,
++                            uint32_t initiator, uint32_t mem_node)
++{
++
++    /* Memory Proximity Domain Attributes Structure */
++    /* Type */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Length */
++    build_append_int_noprefix(table_data, 40, 4);
++    /* Flags */
++    build_append_int_noprefix(table_data, flags, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Proximity Domain for the Attached Initiator */
++    build_append_int_noprefix(table_data, initiator, 4);
++    /* Proximity Domain for the Memory */
++    build_append_int_noprefix(table_data, mem_node, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
++    /*
++     * Reserved:
++     * Previously defined as the Start Address of the System Physical
++     * Address Range. Deprecated since ACPI Spec 6.3.
++     */
++    build_append_int_noprefix(table_data, 0, 8);
++    /*
++     * Reserved:
++     * Previously defined as the Range Length of the region in bytes.
++     * Deprecated since ACPI Spec 6.3.
++     */
++    build_append_int_noprefix(table_data, 0, 8);
++}
++
++/* Build HMAT sub table structures */
++static void hmat_build_table_structs(GArray *table_data, NumaState *numa_s=
+tate)
++{
++    uint16_t flags;
++    int i;
++
++    for (i =3D 0; i < numa_state->num_nodes; i++) {
++        flags =3D 0;
++
++        if (numa_state->nodes[i].initiator < MAX_NODES) {
++            flags |=3D HMAT_PROXIMITY_INITIATOR_VALID;
++        }
++
++        build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiator,=
+ i);
++    }
++}
++
++void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_st=
+ate)
++{
++    int hmat_start =3D table_data->len;
++
++    /* reserve space for HMAT header  */
++    acpi_data_push(table_data, 40);
++
++    hmat_build_table_structs(table_data, numa_state);
++
++    build_header(linker, table_data,
++                 (void *)(table_data->data + hmat_start),
++                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
++}
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 7b8da62d41..e25df838f0 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -68,6 +68,7 @@
+ #include "hw/i386/intel_iommu.h"
+=20
+ #include "hw/acpi/ipmi.h"
++#include "hw/acpi/hmat.h"
+=20
+ /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
+  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
+@@ -2835,6 +2836,10 @@ void acpi_build(AcpiBuildTables *tables, MachineStat=
+e *machine)
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, machine);
          }
-         break;
++        if (machine->numa_state->hmat_enabled) {
++            acpi_add_table(table_offsets, tables_blob);
++            build_hmat(tables_blob, tables->linker, machine->numa_state);
++        }
+     }
+     if (acpi_get_mcfg(&mcfg)) {
+         acpi_add_table(table_offsets, tables_blob);
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index 12e3f1e86e..54209c6f2f 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -7,6 +7,7 @@ config ACPI_X86
+     select ACPI_NVDIMM
+     select ACPI_CPU_HOTPLUG
+     select ACPI_MEMORY_HOTPLUG
++    select ACPI_HMAT
 =20
-     case DMAR_RTADDR_REG_HI:
-         assert(size =3D=3D 4);
--        val =3D s->root >> 32;
-+        val =3D vtd_get_quad_raw(s, DMAR_RTADDR_REG) >> 32;
-         break;
+ config ACPI_X86_ICH
+     bool
+@@ -23,6 +24,10 @@ config ACPI_NVDIMM
+     bool
+     depends on ACPI
 =20
-     /* Invalidation Queue Address Register, 64-bit */
++config ACPI_HMAT
++    bool
++    depends on ACPI
++
+ config ACPI_PCI
+     bool
+     depends on ACPI && PCI
+@@ -33,5 +38,3 @@ config ACPI_VMGENID
+     depends on PC
+=20
+ config ACPI_HW_REDUCED
+-    bool
+-    depends on ACPI
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 99253057e1..777da07f4d 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -7,6 +7,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
+ common-obj-$(CONFIG_ACPI_HW_REDUCED) +=3D generic_event_device.o
++common-obj-$(CONFIG_ACPI_HMAT) +=3D hmat.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
+ common-obj-$(call lnot,$(CONFIG_PC)) +=3D acpi-x86-stub.o
+=20
 --=20
 MST
 
