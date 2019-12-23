@@ -2,77 +2,158 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA00C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 21:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BC9C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 23:16:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 812EE207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 21:41:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 812EE207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id D0A4820709
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 23:16:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bMxKh0UK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0A4820709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijVSV-00084P-Lr
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 16:41:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45355)
+	id 1ijWvw-0002sD-VZ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 18:16:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ijVRi-0007bh-Kh
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:41:02 -0500
+ (envelope-from <jsnow@redhat.com>) id 1ijWv4-0002Gw-Ec
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 18:15:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ijVRf-0007Nt-4A
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:40:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52632)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ijVRe-0007Mp-QU
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:40:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ijVRd-00028l-9s
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 21:40:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4857D2E8073
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 21:40:53 +0000 (UTC)
+ (envelope-from <jsnow@redhat.com>) id 1ijWv1-0004X7-HE
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 18:15:20 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20210
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ijWv1-0004W7-Ai
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 18:15:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577142918;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=nB0x9x+0PvoOoFYFjd1EJzd3EqGQZmR+rRQTehJII+0=;
+ b=bMxKh0UKEIpOwlUKOjXrA/nPHlx6WhLVtIAU59OKXFJ+ZW6msHy1nXt9e3LBjG+GagGNJW
+ JW+tF1FIgZoED87TLUwFK0/Cqu/RGyZla65MgvRlUKNfGDX3C2aQVRTfgBPKw9IUzSQWMm
+ EhYU7lDr77K0txZ/sVetukuophbmGKw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-i-sglOv_M8uiF4TgpJu21w-1; Mon, 23 Dec 2019 18:15:13 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 214F28024D1;
+ Mon, 23 Dec 2019 23:15:12 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 90D085DA60;
+ Mon, 23 Dec 2019 23:15:11 +0000 (UTC)
+Subject: Re: [PATCH v2] iotests.py: Let wait_migration wait even more
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20191219183617.213637-1-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <811a0234-2805-af1c-9ae5-3d01111f81ff@redhat.com>
+Date: Mon, 23 Dec 2019 18:15:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191219183617.213637-1-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: i-sglOv_M8uiF4TgpJu21w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Dec 2019 21:35:46 -0000
-From: John Snow <1745312@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
- assignee=jsnow@redhat.com; 
-X-Launchpad-Bug-Tags: disk io qemu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: asmqb7 famz jnsnow mario1992 mdasoh stefanha
-X-Launchpad-Bug-Reporter: David Lindsay (asmqb7)
-X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <151686473236.19954.12493487729804470001.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157713694680.3464.6101057575569637664.malone@soybean.canonical.com>
-Subject: [Bug 1745312] Re: Regression report: Disk subsystem I/O
- failures/issues surfacing in DOS/early Windows [two separate issues: one
- bisected, one root-caused]
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 04a458744ddf945355007915d6670dab9c718635
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,879 +162,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1745312 <1745312@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I will try to debug as time permits, but the priority of MS-DOS bugs is
-not ... measurable with casual tools. However, there are a lot of other
-IDE bugs on my plate that are very important! so I am hoping to grab a
-bunch of IDE bugs at once, but no promises here.
 
-Notably, our geometry detection is not very good, it's more than
-possible we are misreporting values and confusing DOS. Our IDE disks are
-also not very consistent about what standard of the spec they are trying
-to emulate, so there are likely other problems there, too.
 
-If you'd like to debug on your own, I'd recommend enabling tracing and
-enabling some of the IDE trace points; some of them can be quite verbose
--- don't enable the data dumping ones. The control flow ones can be
-informational sometimes to guess when the guest OS got confused and then
-walk your way back to a register read that would have picked up some
-error bits, or to detect busy-waits on registers not changing and try to
-guess what it was waiting for.
+On 12/19/19 1:36 PM, Max Reitz wrote:
+> The "migration completed" event may be sent (on the source, to be
+> specific) before the migration is actually completed, so the VM runstate
+> will still be "finish-migrate" instead of "postmigrate".  So ask the
+> users of VM.wait_migration() to specify the final runstate they desire
+> and then poll the VM until it has reached that state.  (This should be
+> over very quickly, so busy polling is fine.)
+>=20
+> Without this patch, I see intermittent failures in the new iotest 280
+> under high system load.  I have not yet seen such failures with other
+> iotests that use VM.wait_migration() and query-status afterwards, but
+> maybe they just occur even more rarely, or it is because they also wait
+> on the destination VM to be running.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+With Kevin's suggestion on the comment touchup or without.
+
+> ---
+> v2:
+> - Stop breaking 234 and 262 [Kevin]
+> ---
+>  tests/qemu-iotests/234        | 8 ++++----
+>  tests/qemu-iotests/262        | 4 ++--
+>  tests/qemu-iotests/280        | 2 +-
+>  tests/qemu-iotests/iotests.py | 6 +++++-
+>  4 files changed, 12 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
+> index 34c818c485..59a7f949ec 100755
+> --- a/tests/qemu-iotests/234
+> +++ b/tests/qemu-iotests/234
+> @@ -69,9 +69,9 @@ with iotests.FilePath('img') as img_path, \
+>      iotests.log(vm_a.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_a)))
+>      with iotests.Timeout(3, 'Migration does not complete'):
+>          # Wait for the source first (which includes setup=3Dsetup)
+> -        vm_a.wait_migration()
+> +        vm_a.wait_migration('postmigrate')
+>          # Wait for the destination second (which does not)
+> -        vm_b.wait_migration()
+> +        vm_b.wait_migration('running')
+> =20
+>      iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+>      iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+> @@ -98,9 +98,9 @@ with iotests.FilePath('img') as img_path, \
+>      iotests.log(vm_b.qmp('migrate', uri=3D'exec:cat >%s' % (fifo_b)))
+>      with iotests.Timeout(3, 'Migration does not complete'):
+>          # Wait for the source first (which includes setup=3Dsetup)
+> -        vm_b.wait_migration()
+> +        vm_b.wait_migration('postmigrate')
+>          # Wait for the destination second (which does not)
+> -        vm_a.wait_migration()
+> +        vm_a.wait_migration('running')
+> =20
+>      iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+>      iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+> diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
+> index 0963daa806..bbcb5260a6 100755
+> --- a/tests/qemu-iotests/262
+> +++ b/tests/qemu-iotests/262
+> @@ -71,9 +71,9 @@ with iotests.FilePath('img') as img_path, \
+>      iotests.log(vm_a.qmp('migrate', uri=3D'exec:cat >%s' % (fifo)))
+>      with iotests.Timeout(3, 'Migration does not complete'):
+>          # Wait for the source first (which includes setup=3Dsetup)
+> -        vm_a.wait_migration()
+> +        vm_a.wait_migration('postmigrate')
+>          # Wait for the destination second (which does not)
+> -        vm_b.wait_migration()
+> +        vm_b.wait_migration('running')
+> =20
+>      iotests.log(vm_a.qmp('query-migrate')['return']['status'])
+>      iotests.log(vm_b.qmp('query-migrate')['return']['status'])
+> diff --git a/tests/qemu-iotests/280 b/tests/qemu-iotests/280
+> index 0b1fa8e1d8..85e9114c5e 100755
+> --- a/tests/qemu-iotests/280
+> +++ b/tests/qemu-iotests/280
+> @@ -45,7 +45,7 @@ with iotests.FilePath('base') as base_path , \
+>      vm.qmp_log('migrate', uri=3D'exec:cat > /dev/null')
+> =20
+>      with iotests.Timeout(3, 'Migration does not complete'):
+> -        vm.wait_migration()
+> +        vm.wait_migration('postmigrate')
+> =20
+>      iotests.log('\nVM is now stopped:')
+>      iotests.log(vm.qmp('query-migrate')['return']['status'])
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+> index 13fd8b5cd2..0b62c42851 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -668,12 +668,16 @@ class VM(qtest.QEMUQtestMachine):
+>              }
+>          ]))
+> =20
+> -    def wait_migration(self):
+> +    def wait_migration(self, expect_runstate):
+>          while True:
+>              event =3D self.event_wait('MIGRATION')
+>              log(event, filters=3D[filter_qmp_event])
+>              if event['data']['status'] =3D=3D 'completed':
+>                  break
+> +        # The event may occur in finish-migrate, so wait for the expecte=
+d
+> +        # post-migration runstate
+> +        while self.qmp('query-status')['return']['status'] !=3D expect_r=
+unstate:
+> +            pass
+> =20
+>      def node_info(self, node_name):
+>          nodes =3D self.qmp('query-named-block-nodes')
+>=20
+
+--=20
+=E2=80=94js
 
-https://github.com/qemu/qemu/blob/master/docs/devel/tracing.txt
-https://github.com/qemu/qemu/blob/master/hw/ide/trace-events
-
-Ignore the AHCI and ATAPI traces, and don't use the ide_data_* traces
-unless you are booting a custom firmware that only performs a strict few
-IO accesses -- otherwise you'll get flooded off the map.
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> John Snow (jnsnow)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1745312
-
-Title:
-  Regression report: Disk subsystem I/O failures/issues surfacing in
-  DOS/early Windows [two separate issues: one bisected, one root-caused]
-
-Status in QEMU:
-  New
-
-Bug description:
-  [Headsup: This report is long-ish due to the amount of detail I've
-  stumbled on along the way that I think is relevant to include. I can't
-  speak as to the complexity of the actual bugs, but the size of this
-  report should not suggest that the reproduction process is
-  particularly headache-inducing.]
-
-  Hi!
-
-  I recently needed to fire up some ancient software for research
-  purposes and got very distracted discovering and playing with old
-  versions of Windows :). In the process I've discovered some glitches
-  with disk I/O.
-
-  I believe I've stumbled on two completely separate issues that
-  coincidentally surfaced at the same time. It's possible that
-  components of this report will be re-filed as more specific new bugs,
-  but I'm not an authority on QEMU internals or how to narrow
-  down/categorize what I've found.
-
-  - The first bug only surfaces when the "isapc" machine type is used.
-  It intermittently produces "General failure {read,writ}ing drive _"
-  under MS-DOS 6.22, and also somehow interferes with early bootstrap of
-  Windows NT 4 (in NTLDR). Enabling or disabling KVM (I'm on Linux)
-  appears to make no difference whatsoever, which may help with
-  debugging.
-
-  - The second issue involves
-    - a WinNT4 disk image
-    - created by running through a bog-standard NT4 install inside QEMU 2.9=
-.0
-    - which will now fail to boot in any version of QEMU - even version 1.0
-      - but which VirtualBox will boot fine
-        - but only if I point VirtualBox at QEMU's raw disk image via a
-          hacked-together VMDK file
-        - if the raw image is converted to VHD(X), VirtualBox will also fail
-          to boot the image with exactly the same error as QEMU
-        - this state of affairs is not affected by image sparseness (which =
-makes
-          sense)
-
-  I'm confident I've bisected the first issue.
-
-  I wasn't able to bisect the second issue (as all tested versions of
-  QEMU behaved identically), but I've figured out a working repro
-  testcase and I believe I've managed to pin down a solid root cause.
-
-
-  =3D=3D #1: Intermittent I/O issues when `-M isapc` is used =3D=3D=3D=3D=
-=3D
-
-  These symptoms sometimes take a small amount of time and fiddling to
-  trigger, but I AM able to consistently surface them on my machine
-  after a short while. (I am very very interested to hear if others
-  cannot reproduce them.)
-
-  So, first of all:
-
-  https://github.com/qemu/qemu/commit/306ec6c3cece7004429c79c1ac93d49919f1f=
-1cc
-    (Jul 30 2013): the last version that works
-
-  https://github.com/qemu/qemu/commit/e689f7c668cbd9d08f330e17c3dd3a059c955=
-3d3
-    (Oct 30 2013): the first version that intermittently fails
-
-  Maybe lift out and build these branches while reading. *shrug*
-  (How to do this can be found at the end of this report - along with a tim=
-e-saving ./configure line, FWIW)
-
-  Here are the changelists between these two revisions:
-
-  https://github.com/qemu/qemu/compare/306ec6c...e689f7c
-  (Compare direction: OLD to NEW) (Commits: 166  Files changed: 192)
-
-  https://github.com/qemu/qemu/compare/e689f7c...306ec6c
-  (Compare direction: NEW to OLD) (Commits: 30   Files changed: 22)
-
-  (Someone else more familiar with Git might know why GitHub returns
-  results for both compare directions, and/or if the 2nd link is useful
-  information. The first link returns a lot more results than the 2nd
-  one, at least. Does comparing new>old return deletions?)
-
-  ---
-
-  Now on to the symptoms. In a moment I'll describe reproduction.
-
-  # MS-DOS 6.22
-
-  The first symptom I discovered was that trivial read and write
-  operations under MS-DOS would sometimes fail:
-
-    C:\>echo test > hi
-
-    General failure writing drive C
-    Abort, Retry, Fail?
-
-  Anything else that exercises the disk behaves similarly:
-
-    C:\>dir /s > nul
-
-    General failure reading drive C
-    Abort, Retry, Fail?
-
-  (Note that the above demonstrates both write and read failures)
-
-  (Also, FWIW, `dir /s` =3D=3D `ls -R`)
-
-  The behavior of the I/O errors is not possible to characterise as it
-  fluctuates so much. For example something as simple as DIR can produce
-  wildly differing results: in one run, poking around with DIR ended
-  with DOS deciding C:\ was empty at one point; at another point in a
-  different run C:\ mysteriously dropped 50% of its contents only to
-  magically gain it all back moments later after some poking around in
-  one of the subdirectories that was still visible.
-
-  The time it takes to trigger these errors is also highly variable.
-  QEMU may fall over as early as hanging forever at "Starting MS-
-  DOS...", or I might get all the way into Windows 3.1 before it
-  triggers (in which case Win3.1 reports vague memory errors - of all
-  things).
-
-  Very occasionally I've seen _SeaBIOS itself_ report "Booting from Hard
-  Disk..." "Boot failed: could not read the boot disk" ... "No bootable
-  device.", and on one occasion I even got "Non-System disk or disk
-  error" "Replace and strike any key when ready"!
-
-  =
-
-  # WinNT 4 Terminal Server
-
-  Most of the time, NTLDR will fire up normally. But every so often...
-
-    SeaBIOS (version rel-1.7.3-117-g31b8b4e-
-  20131206_080705-nilsson.home.kraxel.org)
-
-    Booting from Hard Disk...
-    A disk read error occurred.
-    Insert a system diskette and restart
-    the system.
-
-  (NB. You're seeing the old SeaBIOS version included with e689f7c,
-  which was the first buggy commit.)
-
-  If NT gets past this point without erroring out (ie, it makes it to
-  the boot menu), the rest of the system is 100% fine and there are no
-  other disk I/O issues whatsoever. For example, on QEMU 2.9.0 I was
-  able to enable disk compression, answer "Yes" to "Compress entire disk
-  now?" and have the process fully complete. No hitches.
-
-  This makes me vaguely recall/wonder that perhaps this could be somehow
-  related to LBA and/or Int 13h, or something floating around near that
-  bunch of functionality. (I'm woefully ignorant about such low-level
-  details.) Perhaps DOS/Win3.1 are stuck using a disk mode that QEMU has
-  a buggy implementation of, while NT 4 (once NTOSKRNL is up and
-  running) is able to use a different disk mode or access mechanism.
-
-  I'm really interested to get some understanding of what the root issue
-  is here, when this is fixed. (I wonder if it's a timing thing?)
-
-  I've observed some unusual behavior with repeated restarts. In one
-  case, I attempted to start NT4 multiple times, and QEMU consistently
-  failed with "No bootable device" each time. So, I removed `-M isapc`,
-  promptly got a boot menu, hit ^C, readded `-M isapc` - and continued
-  to get a boot menu. Yep. I'll accept "really really big coincidence"
-  but I do very much wonder if something else is going on here. I've
-  observed many similar incidents. It makes me wonder whether the
-  contents of memory or some other system state is an influence. Very
-  probably not, but still...
-
-
-  -- Reproduction --------------------------------------------
-
-  First of all, there was unfortunately no way for me to avoid having to
-  post entire disk images, but I've managed to compress everything down
-  to 174MB total download size.
-
-  FWIW, WinWorld and many other sites seem to have no operational issues
-  providing clear pointers to CD keys; I consider my distribution of my
-  installed HDD images an extension of the apparent status quo.
-
-  That being said, I've put everything on Google Drive so nobody has to
-  headscratch about Launchpad/Canonical/etc's stance on hosting this
-  data.
-
-  So, this folder contains the disk images:
-  https://drive.google.com/drive/folders/1WdZVBh5Trs9HLC186-nHyKeqaSxfyM2c
-  ("Download all" at the top-right will create a ZIP file, but FWIW
-  downloading the individual files simultaneously would implement a
-  rough form of download acceleration)
-
-  File meta info:
-
-  Compressed
-  |
-  |      Apparent
-  |      |    Actual
-  |      |    |
-  38M -> 200M (103M)  win31.img.xz
-  82M -> 1G   (289M)  wnt4ts-broken.img.xz
-  55M -> 350M (146M)  wnt4ts-intermittent.img.xz
-
-  SHA-256s:
-
-  win31:        8179b8180a2ab40bd472e8a2f3fb89fc331651e56923f94ceb9e52a78ee=
-220d2
-  broken:       a2af5f0bc49a063b75f534b6ffe5b82e32ecc706a64a425b6626feccf6e=
-3fdfa  =
-
-  intermittent: 77ae8c458829ebcdd64c71042012f45d5a2788e6ebd22db9d53de9ef1a5=
-74784
-
-  (Wanted to keep the checksum lines within 80 columns)
-
-  And, since I can't figure out where else in this report to put this,
-  wnt4ts-broken.img's password is "admin" but something seems to have
-  happened to the disk and NT doesn't actually boot properly :(, and
-  wnt4ts-intermittent.img's password is "1234". (These were set up as
-  test images. Now I'm _really_ glad I used simple passwords! :) )
-
-  ---
-
-  =
-
-  I have two testcases: DOS 6.22 (+ Windows 3.1), and Windows NT 4.
-
-  =
-
-  # MS-DOS
-
-  DOS is the simplest. It basically consists of
-
-  $ qemu-system-i386 -drive file=3Dwin31.img,format=3Draw -M isapc -enable-
-  kvm
-
-  And then literally just playing around. Things to try include creating
-  files (`echo blah > file`), repeatedly seeking across the entire FAT
-  (`dir /s > nul` or `dir /s`), and launching Windows (`win`).
-
-  win31.img is not special (as far as I can tell) and merely consists of
-  the result of installing DOS 6.22 and Windows 3.1 from WinWorldPC.
-  I've basically just included the image for convenience.
-
-  Generally no single "run" is immune to starting Win3.1 and then
-  launching File Manager; if that doesn't generate an error, something
-  is definitely up.
-
-  The second best trigger is creating new files. That very very
-  frequently produces "General Failure ...", but not always.
-
-  =
-
-  # WinNT 4
-
-  Windows NT 4 is a bit more complicated. Because this error only occurs
-  at presumably a single small point very early in boot, the window of
-  opportunity for the glitch to surface within is much much narrower and
-  thus often requires a larger number of tries.
-
-  Anecdotally I've had QEMU hit the boot error at the first try/run, and
-  after as many as 63 "successful" boots.
-
-  I made a small test harness that automates the launch process. It
-  consists of two shell scripts and requires tmux (and netcat).
-  (*Potential epilepsy warning*: if you use a light-colored terminal
-  background, the terminal QEMU is repeatedly invoked from will
-  continuously flash rapidly from white to black.)
-
-  One of the scripts is run inside a tmux session in one terminal, while
-  the other script is run in its own terminal (without any tmux).
-
-  =
-
-  I named this one `run-qemu-loop`:
-
-  --8<--------------------------------------------------------
-
-  #!/bin/bash
-
-  # ---
-
-  qemu=3D/path/to/qemu-system-i386
-  #or, alternatively: (I used the following line myself so I
-  #could tab-complete my way to different qemu executables)
-  #qemu=3D"$1"
-
-  disk=3D/path/to/wnt4ts-intermittent.img
-
-  # ---
-
-  port=3D4444
-
-  rm -f STOP itercount
-
-  itercount=3D0
-
-  while :; do
-  	=
-
-  	[ -f STOP ] && break
-  	=
-
-  	((itercount++))
-  	echo $itercount > itercount
-  	=
-
-  	$qemu \
-  		-enable-kvm -vga cirrus -curses -M isapc \
-  		-drive file=3D"$disk",format=3Draw \
-  		-chardev socket,id=3Dmon0,host=3Dlocalhost,port=3D$port,server,nowait \
-  		-mon chardev=3Dmon0,mode=3Dreadline
-  	=
-
-  	#point to an otherwise-unused terminal if you like (see also: `tty`)
-  	#echo "$itercount run(s)" > /dev/pts/__
-  	=
-
-  done
-
-  ------------------------------------------------------------
-
-  Not much logic above; this just repeatedly runs QEMU for as long as
-  the file `STOP` does not exist in the current directory.
-
-  The key "magic" bit is that QEMU is launched in -curses mode.
-
-  The other key bit is that the above script is run inside tmux.
-
-  =
-
-  Here's `tmux-ctl-loop`:
-
-  --8<--------------------------------------------------------
-
-  #!/bin/bash
-
-  port=3D4444
-
-  tmux=3D./tmux
-
-  printf -v l '%0.0s-' {0..25}
-  h1=3D"$l/ buffer dump begin \\$l"
-  h2=3D"$l-\\ buffer dump end /-$l"
-
-  while :; do
-  	=
-
-  	while :; do
-  		echo | nc localhost $port -q0 -w1 > /dev/null && break
-  		echo 'Start qemu!'
-  	done
-  	=
-
-  	buffer=3D"$(tmux -S $tmux capture-pane; tmux -S $tmux save-buffer -)"
-  	=
-
-  	echo "$h1"
-  	[[ "$buffer" ]] && echo "$buffer" || echo '( * Screen buffer is empty * =
-)'
-  	echo "$h2"
-  	=
-
-  	if echo "$buffer" | grep -q 'A disk read error occurred.'; then
-  		=
-
-  		s=3D"<Crashed after $(< itercount) runs.>"
-  		echo "$s"
-  		echo "$s" >> stats
-  		=
-
-  		touch STOP
-  		=
-
-  		#echo q | nc localhost $port -q0 > /dev/null
-  		=
-
-  		exit
-  		=
-
-  	elif echo "$buffer" | grep -q 'OS Loader V4.00'; then
-  			=
-
-  		echo '<Booted successfully, trying again>'
-  		=
-
-  		echo q | nc localhost $port -q0 > /dev/null
-  		=
-
-  	else
-  		=
-
-  		echo '<Waiting for boot>'
-  		=
-
-  	fi
-  			=
-
-  done
-
-  ------------------------------------------------------------
-
-  Nothing particularly amazing going on here either.
-
-  While `qemu-run-loop` is running inside tmux in the first terminal,
-  this is running in the 2nd one.
-
-  The small infinite loop at the top only breaks when it can
-  successfully ping QEMU and it knows it's running.
-
-  Then, a screendump of the contents of the terminal QEMU is in is
-  fetched from tmux, and the buffer's content is analyzed.
-
-  - If NTLDR fails, the script creates `STOP` to halt qemu-run-loop,
-    sends `q` to QEMU through netcat, and then the script exits.
-
-  - If NTLDR loads successfully, the script sends `q` to QEMU and continues
-    looping. (qemu-run-loop will not find the `STOP` file, and so restart q=
-emu.)
-
-  The scripts run very quickly, with 2-3 iterations per second on my i3
-  box.
-
-
-  # Usage
-
-  Save the two scripts above to the same directory as wnt4ts-intermittent.i=
-mg,
-  then:
-
-  - (If port 4444 doesn't work, the value needs to be changed in both
-  scripts.)
-
-  - In the first terminal, run `tmux -S <file>`, where <file> names the soc=
-ket
-    tmux will use. This needs to match "tmux=3D" at the top of `tmux-ctl-lo=
-op`.
-    (with `tmux=3D./tmux`, the command would be `tmux -S tmux`)
-
-  - Still in the first terminal (and now also inside tmux), enter
-    `./qemu-run-loop`, passing the path to qemu if you're using that approa=
-ch
-    (refer to the first few lines of the script). Don't hit enter yet.
-
-  - Now, in the 2nd terminal, type `./tmux-ctl-loop`
-
-  - Hit enter in both terminals.
-   =
-
-
-  Rationale for timing of Enter key:
-
-  - Running qemu-run-loop first will start QEMU, and if NTLDR starts
-    successfully it will immediately begin counting down from 30. If NT act=
-ually
-    starts to boot and is then hard-shut-down this /may/ affect the disk im=
-age
-
-  - tmux-ctl-loop will annoyingly spam a continuous stream of 'Start qemu!'=
- until
-    qemu-run-loop is running.
-
-  - Starting both scripts at "more or less" the same time (no rush) works o=
-ut
-    well.
-
-  =
-
-  Hopefully potential script modifications are obvious; for example
-
-  - changing tmux-ctl-loop to not send 'q' to qemu so you can connect to th=
-e HMP
-    yourself
-    (NB, if `STOP` is not created, when qemu finally exits it will of course
-    promptly be relaunched)
-
-  - pointing run-qemu-loop to a modified qemu binary
-
-
-  =3D=3D #2: QEMU-vs-VirtualBox image issue =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  I was initially completely stumped by this issue, perhaps
-  unsurprisingly so. :)
-
-  wnt4ts-broken.img is a perfectly ordinary NT 4 installation that was
-  created in QEMU 2.9.0. I created a 1GB disk with `truncate`, picked
-  NTFS and installed everything (which took a while).
-
-  NT setup reboots a number of times during the boot process, and IIRC
-  those all went just fine. However, at some point, the image began to
-  consistently bomb out with "A disk read error occurred. ...", and
-  stubbornly refused to boot, regardless of the number of boot attempts
-  I tried.
-
-  QEMU 2.0.0, 1.5.0, and 1.0 (the earliest version I was able to build
-  on my system) all consistently hit "disk read error occurred".
-
-  I tried compiling QEMU 1.0 using clang so I could build for 32-bit on
-  my 64-bit system (GCC 7 died with "Frame pointer required, but
-  reserved"). The resulting qemu completely crashed if I didn't enable
-  KVM (ie, TCG was (understandably) broken); with KVM enabled qemu
-  didn't crash, but NTLDR halted with the same error as on 64-bit qemu.
-  (TL;DR, no difference whatsoever.)
-
-  My initial reaction at this point was to try the image on another
-  virtualization platform. My first pick was VirtualBox.
-
-  So, I followed the official instructions for pointing VirtualBox to
-  physical disk images, except I substituted a /dev/loopN device I'd
-  pointed to the image file via losetup.
-
-  And... VirtualBox picked the image up fine and Just Worked(TM). Yay! -
-  but not yay. What gives?!
-
-  Confused, I then tried to convert the disk image to VHD format.
-  Unfortunately, for some reason, if I try `qemu-image convert ... -O
-  vhdx ...`, VirtualBox chokes on the result:
-
-  -----
-
-  VD: error VERR_NOT_SUPPORTED opening image file
-  '/.../wnt4ts-broken-qemuconv.vhd' (VERR_NOT_SUPPORTED).
-
-  Result Code: NS_ERROR_FAILURE (0x80004005)
-  Component: MediumWrap
-  Interface: IMedium {4afe423b-43e0-e9d0-82e8-ceb307940dda}
-  Callee: IVirtualBox {0169423f-46b4-cde9-91af-1e9d5b6cd945}
-  Callee RC: VBOX_E_OBJECT_NOT_FOUND (0x80BB0001)
-
-  -----
-
-  Welp.
-
-  Well, a bit more digging later, and I found I could do
-
-  $ VBoxManage convertfromraw wnt4ts-broken.img wnt4ts-broken.vhd
-
-  but... as soon as I pointed VirtualBox to this, it too began to choke
-  with "A disk read error occurred".
-
-  And yet, the VMDK->raw image setup worked just fine.
-
-  I found I could even replace the loop device with the path of the .img
-  file itself and that worked just fine too.
-
-  At my wits' end, I followed some online instructions to learn about
-  manual CHS configuration so I could try and get the image working in
-  Bochs. "A disk read error occurred". I wasn't surprised.
-
-  It was at this point I began to give up, but I decided to try One Last
-  Thing(TM) before properly throwing in the towel.
-
-  :)
-
-  I decided to learn a bit more about how `VBoxManage internalcommands
-  createrawvmdk` worked, and try one thing in particular: I can edit the
-  .vmdk file, but can I point `createrawvmdk` at the .img file directly
-  too?
-
-  Turns out, yes you can.
-
-  It also turns out that this promptly caused VirtualBox to bomb out.
-
-  Interesting.
-
-  For reference, here's the VMDK file I initially created (by pointing
-  `createrawvmdk` at /dev/loopN) and then later edited to point straight
-  to the .img file, with both approaches resulting in successful boot.
-
-  --8<--------------------------------------------------------
-
-  # Disk DescriptorFile
-  version=3D1
-  CID=3De35b9a45
-  parentCID=3Dffffffff
-  createType=3D"fullDevice"
-
-  # Extent description
-  RW 1536000 FLAT "/absolute/full/path/to/wnt4ts-broken.img" 0
-
-  # The disk Data Base =
-
-  #DDB
-
-  ddb.virtualHWVersion =3D "4"
-  ddb.adapterType=3D"ide"
-  ddb.geometry.cylinders=3D"1523"
-  ddb.geometry.heads=3D"16"
-  ddb.geometry.sectors=3D"63"
-  ddb.uuid.image=3D"871a6044-c8ca-48ed-b7aa-e6fc49da3db4"
-  ddb.uuid.parent=3D"00000000-0000-0000-0000-000000000000"
-  ddb.uuid.modification=3D"3661715c-3906-4e4a-ab65-486d140e03b8"
-  ddb.uuid.parentmodification=3D"00000000-0000-0000-0000-000000000000"
-  ddb.geometry.biosCylinders=3D"761"
-  ddb.geometry.biosHeads=3D"32"
-  ddb.geometry.biosSectors=3D"63"
-
-  ------------------------------------------------------------
-
-  =
-
-  Here's the _diff_ of what happens if I point `createrawvmdk` at wnt4ts-br=
-oken.img directly:
-
-  --8<--------------------------------------------------------
-
-  ddb.geometry.cylinders=3D"2080"
-  ddb.geometry.heads=3D"16"
-  ddb.geometry.sectors=3D"63"
-
-  ------------------------------------------------------------
-
-  :D
-
-  Naturally,
-
-  $ qemu-system-i386 -drive file=3Dwnt4ts-
-  broken.img,format=3Draw,cyls=3D1523,heads=3D16,secs=3D63 -M isapc -sdl
-
-  will boot happily on 2.9.0 (notwithstanding the occasional "disk read
-  error occurred" documented above).
-
-  It will also boot in 1.6.0.
-
-  (POTENTIAL BUG HEADSUP: 1.0 and 1.5.0 both lock up with a blank
-  640x480 window and use 0% CPU if I specify `-M isapc`.)
-
-  And, of course, using these CHS values in Bochs also results in
-  successful boot as well (after setting the CPU type to pentium).
-
-  Unfortunately, I have no idea what sequence of events caused the
-  creation of the VMDK file above. No invocation of `createrawvmdk` is
-  producing a VMDK file with the CHS settings above.
-
-  I've only just begun to learn about the intricacies of CHS. Am I to
-  understand that these values are stored amongst the first 512 bytes of
-  the disk? If this is the case, then I wonder what changed the data,
-  and why. I was initially only using QEMU 2.9.0, and didn't move the
-  image to different VMs or QEMU versions. Perhaps Windows NT got
-  confused about the disk CHS and rewrote it?
-
-  =
-
-  =3D=3D Sporadic BIOS-level boot failure =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  I have multiple screenshots of SeaBIOS in QEMU 2.9.0 halting with "No
-  bootable device" (et al), even with the above manually-applied CHS
-  settings.
-
-  Commit e689f7c also presents such errors.
-
-  Commit 306ec6c does not suffer from intermittent breakage of any kind:
-
-  - No SeaBIOS flake-outs
-  - No "Non-system disk or disk error"
-  - No "A disk error has occurred"
-  - No "General failure ..."
-
-  While most of my confidence in commit 306ec6c is based on anecdotal
-  evidence, I modified `tmux-ctl-loop` a little to soak-test BIOS-level
-  I/O stability and left this modified version running for a few
-  minutes.
-
-  --8<--------------------------------------------------------
-
-  #!/bin/bash
-
-  port=3D4444
-
-  tmux=3D./tmux
-
-  printf -v l '%0.0s-' {0..25}
-  h1=3D"$l/ buffer dump begin \\$l"
-  h2=3D"$l-\\ buffer dump end /-$l"
-
-  while :; do
-  	=
-
-  	while :; do
-  		echo | nc localhost $port -q0 -w1 > /dev/null && break
-  		echo 'Start qemu!'
-  	done
-  	=
-
-  	buffer=3D"$(tmux -S $tmux capture-pane; tmux -S $tmux save-buffer -)"
-  	=
-
-  	echo "$h1"
-  	[[ "$buffer" ]] && echo "$buffer" || echo '( * Screen buffer is empty * =
-)'
-  	echo "$h2"
-  	=
-
-  	if echo "$buffer" | grep -q 'Non-system disk' || echo "$buffer" | \
-  		grep -q 'No bootable device'
-  	then
-  		=
-
-  		s=3D"<Hit error after $(< itercount) runs.>"
-  		echo "$s"
-  		echo "$s" >> stats
-  		=
-
-  		touch STOP
-  		=
-
-  		#echo q | nc localhost $port -q0 > /dev/null
-  		=
-
-  		exit
-  		=
-
-  	elif echo "$buffer" | grep -q 'OS Loader V4.00' || echo "$buffer" | \
-  		grep -q 'A disk read error'
-  	then
-  	=
-
-  		echo '<Boot did not hang at BIOS, trying again>'
-  		=
-
-  		echo q | nc localhost $port -q0 > /dev/null
-  		=
-
-  	else
-  		=
-
-  		echo '<Waiting for boot>'
-  		=
-
-  	fi
-  			=
-
-  done
-
-  ------------------------------------------------------------
-
-  For the above to work, the top of run-qemu-loop must also be modified
-  to read something along the lines of
-
-  disk=3D/path/to/wnt4ts-broken.img,format=3Draw,cyls=3D1523,heads=3D16,sec=
-s=3D63
-
-  (Suggestion: modify copies of both scripts)
-
-  One small terminal-flicker-headache (and a 57=C2=B0C CPU) later, I was ab=
-le
-  to carefully observe just over 350 successful runs in which QEMU
-  commit 306ec6c only ever produced a boot menu. No other hitches.
-
-  ** Important: **
-
-  However, commit 306ec6c will fail to boot, ever, if the cylinders and
-  geometry are not set to the values VirtualBox "discovered". (Of note
-  is the fact that QEMU (2.9.0) was what initially created this image. I
-  must admit that I don't remember what sequence of QEMU versions I fed
-  the image to - and I maybe, possibly, didn't think to back the file up
-  (sorry), so maybe something mangled something somewhere. But
-  VirtualBox figured it out nonetheless!)
-
-  Furthermore, feeding /dev/loopN to any QEMU version will NOT result in
-  correct CHS discovery (and successful boot).
-
-  This is what leads me to conclude that I've discovered two separate
-  issues.
-
-
-  =3D=3D Appendix: How to build the branches =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  It's very simple.
-
-  First, `git clone https://github.com/qemu/qemu` somewhere if you don't
-  already have a local copy. If you have an old git checkout that's from
-  2014 or later, you can use that old checkout instead. (If you want to
-  test an old checkout you have, the commands below will either work
-  perfectly or completely bomb out with no side effects.)
-
-  A full checkout is a ~183MB download. Sorry.
-
-  Next, create two new directories somewhere. Name them what you like,
-  eg `qemu-working` and `qemu-broken`.
-
-  Now, cd into the checkout directory, and run:
-
-  $ git archive 306ec6c3cece7004429c79c1ac93d49919f1f1cc | tar xC
-  /path/to/qemu-working/
-
-  $ git archive e689f7c668cbd9d08f330e17c3dd3a059c9553d3 | tar xC
-  /path/to/qemu-broken/
-
-  The paths can be relative.
-
-  Now, run this in both of the new directories:
-
-  $ ./configure --python=3Dpython2.7 --disable-libssh2 --disable-seccomp
-  --disable-usb-redir --disable-guest-agent --disable-libiscsi
-  --disable-spice --disable-smartcard-nss --disable-vhost-net --disable-
-  docs --disable-attr --disable-cap-ng --disable-vde --disable-user
-  --disable-bluez --disable-vnc-ws --disable-xen --disable-brlapi
-  --enable-debug --target-list=3Di386-softmmu --disable-fdt
-
-  $ make -j64
-
-  You can open two terminals and configure and build both simultaneously
-  if you like.
-
-  On my decent but very basic (2-core+HT) i3 box, -j64 actually works out -=
- make doesn't actually launch too many gcc processes. You *will* see your s=
-ystem load spike to ~20 though :)
-  (NB. Do. not. use. -j64. with. the. linux. kernel.)
-
-  On my system, a single build with -j64 takes only about 35 seconds. C
-  FTW. (Although this has increased to 1min20sec for more recent
-  builds.)
-
-  Most of the configure arguments remove functionality I'll never use
-  (in this situation) and which will only slow down the build.
-
-  Once QEMU is built, run qemu-system-i386 directly from where it has
-  been built.
-
-  $ /path/to/qemu-working/i386-softmmu/qemu-system-i386 ...
-  $ /path/to/qemu-broken/i386-softmmu/qemu-system-i386 ...
-
-  Again, the paths can be relative.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1745312/+subscriptions
 
