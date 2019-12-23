@@ -2,83 +2,49 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0941C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F0EC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FF082075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:34:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFbMntjc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FF082075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BC537206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:39:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC537206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijLz0-0003Qs-9q
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 06:34:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46328)
+	id 1ijM3H-0004mZ-QD
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 06:39:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48639)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ijLxk-0002yI-7E
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:33:25 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1ijM2Q-0004JL-0P
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ijLxh-0001KD-U8
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:33:24 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20855
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1ijM2N-0007yo-OG
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:38:12 -0500
+Received: from relay.sw.ru ([185.231.240.75]:49100)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ijLxh-0001Ia-Py
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:33:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577100801;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OFoGC+NFlicS/6v9Frf9oi63bi8uWXTYq/qObtEBP0U=;
- b=hFbMntjcMqNRAyyLQTRg4/J7dqAEzw7hcmDVal9g9DjZ5vmH2d8BKgM5jvr30IUpKwkrCM
- UBo2Kz7tIlzBm+kQNLLaWwOvsy/VGywJYPj3xZxULxBgq6op7fvSnS7AUCYtqfyL7oXLZ1
- h9TkfHyHPaESC+hPYlY/3YZ8nlncYgo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-zbEY7o1KMv26_K-AsAmgpw-1; Mon, 23 Dec 2019 06:33:19 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BD60801E6C
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 11:33:18 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DBC6F805FF;
- Mon, 23 Dec 2019 11:33:17 +0000 (UTC)
-Date: Mon, 23 Dec 2019 11:33:15 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Michal =?utf-8?B?UHLDrXZvem7DrWs=?= <mprivozn@redhat.com>
-Subject: Re: [PULL 48/87] x86: move SMM property to X86MachineState
-Message-ID: <20191223113315.GI2529561@redhat.com>
-References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
- <1576670573-48048-49-git-send-email-pbonzini@redhat.com>
- <8e6af403-173f-ff15-11c7-5dad511795a1@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <8e6af403-173f-ff15-11c7-5dad511795a1@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: zbEY7o1KMv26_K-AsAmgpw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1ijM2N-0007v2-Hc
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:38:11 -0500
+Received: from dptest2.qa.sw.ru ([10.94.4.71])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1ijM2H-0002Ur-Ip; Mon, 23 Dec 2019 14:38:05 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1] virtio-pci: store virtqueue size directly to a device
+Date: Mon, 23 Dec 2019 14:37:58 +0300
+Message-Id: <20191223113758.11951-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,72 +56,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: den@virtuozzo.com, rkagan@virtuozzo.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 23, 2019 at 12:28:43PM +0100, Michal Pr=C3=ADvozn=C3=ADk wrote:
-> On 12/18/19 1:02 PM, Paolo Bonzini wrote:
-> > Add it to microvm as well, it is a generic property of the x86
-> > architecture.
-> >=20
-> > Suggested-by: Sergio Lopez <slp@redhat.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  hw/i386/pc.c          | 49 -------------------------------------------=
-------
-> >  hw/i386/pc_piix.c     |  6 +++---
-> >  hw/i386/pc_q35.c      |  2 +-
-> >  hw/i386/x86.c         | 50 +++++++++++++++++++++++++++++++++++++++++++=
-++++++-
-> >  include/hw/i386/pc.h  |  3 ---
-> >  include/hw/i386/x86.h |  5 +++++
-> >  target/i386/kvm.c     |  3 +--
-> >  7 files changed, 59 insertions(+), 59 deletions(-)
-> >=20
->=20
->=20
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index ef63f3a..c7ff67a 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -2173,8 +2173,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-> >      }
-> > =20
-> >      if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
-> > -        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE) &&
-> > -        pc_machine_is_smm_enabled(PC_MACHINE(ms))) {
-> > +        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
-> >          smram_machine_done.notify =3D register_smram_listener;
-> >          qemu_add_machine_init_done_notifier(&smram_machine_done);
-> >      }
-> >=20
->=20
-> Sorry for not catching this earlier, but I don't think this is right.
-> The @ms is not instance of X
->=20
->=20
-> After I refreshed my qemu master I realized that libvirt is unable to
-> fetch capabilities. Libvirt runs the following command:
->=20
->   qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 -S -no-user-config
-> -nodefaults -nographic -machine none,accel=3Dkvm:tcg
+Currenly, the virtqueue size is saved to the proxy on pci writing and
+is read from the device pci reading.
+The virtqueue size is propagated later on form the proxy to the device
+on virqueue enabling stage.
 
-Hmm, it would be good if we can get QEMU CI to launch QEMU  in
-this way, as this isn't the first time some change has broken
-launching of QEMU for probing capabilities.
+This could be a problem, if a guest, on the virtqueue configuration, sets
+the size and then re-read it immediatly before the queue enabling
+in order to check if the desiged size has been set.
 
+This happens in seabios: (sebios snippet)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+vp_find_vq()
+{
+    ...
+    /* check if the queue is available */
+    if (vp->use_modern) {
+        num = vp_read(&vp->common, virtio_pci_common_cfg, queue_size);
+        if (num > MAX_QUEUE_NUM) {
+            vp_write(&vp->common, virtio_pci_common_cfg, queue_size,
+                     MAX_QUEUE_NUM);
+            num = vp_read(&vp->common, virtio_pci_common_cfg, queue_size);
+        }
+    } else {
+        num = vp_read(&vp->legacy, virtio_pci_legacy, queue_num);
+    }
+    if (!num) {
+        dprintf(1, "ERROR: queue size is 0\n");
+        goto fail;
+    }
+    if (num > MAX_QUEUE_NUM) {
+        dprintf(1, "ERROR: queue size %d > %d\n", num, MAX_QUEUE_NUM);
+        goto fail;
+    }
+    ...
+}
+
+If the device queue num is greater then the max queue size supported by seabios,
+seabios tries to reduce the queue size, then re-read it again, I suppose to
+check if the setting actually happens, and then checks the virtqueue size again,
+to deside whether it is satisfied with the vaule.
+In this case, if device's virtqueue size is 512 and seabios max supported queue
+size is 256, seabios tries to set 256 but than read 512 again and can't proceed
+with that vaule, preventing the guest from successful booting.
+The root case was investigated by Roman Kagan <rkagan@virtuozzo.com>
+
+The patch fixes the problem, by propagating the queue size to the device right
+away, so the written value could be read on the next step, if the value was
+ok for the device.
+
+Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
+Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ hw/virtio/virtio-pci.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index c6b47a9c73..e5c759e19e 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1256,6 +1256,8 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
+         break;
+     case VIRTIO_PCI_COMMON_Q_SIZE:
+         proxy->vqs[vdev->queue_sel].num = val;
++        virtio_queue_set_num(vdev, vdev->queue_sel,
++                             proxy->vqs[vdev->queue_sel].num);
+         break;
+     case VIRTIO_PCI_COMMON_Q_MSIX:
+         msix_vector_unuse(&proxy->pci_dev,
+-- 
+2.17.0
 
 
