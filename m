@@ -7,93 +7,92 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE28AC2D0CF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B655C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BBF820709
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E935D20709
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:55:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RDMrBn/S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BBF820709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvKf8mhd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E935D20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijQxI-0000jo-A9
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 11:53:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41541)
+	id 1ijQzT-0002pq-Fr
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 11:55:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41603)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ijQmc-0004To-0a
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:15 -0500
+ (envelope-from <mst@redhat.com>) id 1ijQmx-0004um-Lz
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ijQma-0005a2-Ks
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23415
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1ijQmw-0005fd-F4
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:35 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31952
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQma-0005Zw-GU
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:12 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQmw-0005fW-AE
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:42:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577119332;
+ s=mimecast20190719; t=1577119353;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bLV8rQCbLBZmY0FVDGOQq3AQD9eSmdJYBYmhF7NfsUU=;
- b=RDMrBn/S6gP7MU7Ezs1oNuSKDTU6oEHM8lmQsnB9WwAIB6jU7DhQZnQtOX8SuHNuvd1rmy
- naAUL3TcUUw9c73xnN6Fu41I4abrDT1m5w6zXqlQbxUVuevmSdULwQL/9o2vwHvyk3ui8y
- VUyfSQK3yg+pVEvXKVcenL3KldV0xXE=
+ bh=75DSOPWG53BQMc2DQp8pZrGaf6WLAio2xZatEQc8yH4=;
+ b=MvKf8mhdtAVS1YDci5jzkmolEDoLljx6ImgTYT2W1WWb/us8t8gx7L0+fPcNy1CDW6/N6G
+ IzvwmU31/Ym88Duy7ExaLRj25v4be0TrZ4k5juJEM3olGq3h7+SY85ONUXBWJWPpzdTDJ0
+ jAjdDgJ+VQLUF9oLBZeQkLf4wGl11xs=
 Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
  [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-RmfbOIuFNdOC4sI3hrueeg-1; Mon, 23 Dec 2019 11:42:10 -0500
-Received: by mail-qv1-f72.google.com with SMTP id a14so11684055qvy.23
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:42:10 -0800 (PST)
+ us-mta-55-_H6PHU9xN1O2uiYDMDvANw-1; Mon, 23 Dec 2019 11:42:32 -0500
+Received: by mail-qv1-f72.google.com with SMTP id z9so7330438qvo.10
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:42:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=3qP/C/NttECQ066FqPp6xPe1UgZkrZPuw+r54Uke8BM=;
- b=EZdZnRCyWUbayZAA3RIHpcwxGH8jVggjraSak/nFGy/Utb4TBNd27IdwmqE3XuNeT8
- Tx2NA2oq/Xm4/SC0zeHLi3CCH2gymvvhPWJHcq0nKmhv5H9fXVBg0P0/V1jKOvLBjvRv
- vlhEdDkyVoki9S/u5+zcC1pdk89ITQOhLnvC3tuvJrk371krjPPDmUKrxisyPVf1rQL6
- mj+/IHtyxFL+AveGc2IP85u9bb+nj9pJaMFYE+jSMhv6A4kt4srq4+mh5cd+JNOGJXV5
- DPb3GY9udpsn3TT71Yrleik7p9i+VQja3DPQN7j5q5tbiONX1sy5kMuxxw4F2MGNu/yQ
- pdQw==
-X-Gm-Message-State: APjAAAX6UexxFmgOC0PSoFp8+o+SddSOSRJ/03H/+arxm5UEaJqttXHN
- ypwI81mTd7mjXFbMX0w8rT2S/1D+MMYhS7bxzKgZOpKNmJsSwkIxnZ78x+hG9cYeQ/LoDKY/042
- RYY4EpDVoqEjnv2Y=
-X-Received: by 2002:ac8:7a6c:: with SMTP id w12mr24144487qtt.35.1577119329136; 
- Mon, 23 Dec 2019 08:42:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzIlMbs9ylThfA2g+gzm2+5+irQXSDCk0vUYsSmgdiVThS7Kf+8NPb6DtNDDAqTosszyGz2vw==
-X-Received: by 2002:ac8:7a6c:: with SMTP id w12mr24144463qtt.35.1577119328921; 
- Mon, 23 Dec 2019 08:42:08 -0800 (PST)
+ bh=ilfUa7pwbD2DsrhFhXRw/VkM07xbn4jtSmYjKOWR/YA=;
+ b=IYYKEyDbxuqT/sbb5UtOBlio9PlGnSQNSZzUvgpoDkwLZuW/KlBON7aKFH2S0omveN
+ 7fOSgHB2ZLrGcbnUyJDPKngfrJ9+hxLgkZB1vTHx7/7XmO65TRwPJI7B+8POuKUQT9wW
+ II+HtiFeAi7hhCl3dR8UlsrNcQrvjXC/VgBVBxc+OMWleAZX2CxW7E5hmbLICKic1kDm
+ TzvKrCIMcD+NgusSLqg6w543qumj06OwJxFgv6hmd8iBd0hbyAoubYJwid2FdSaqmzfl
+ Z3sHddaR541gnQmxGHuY9P/2EYRxEXjRm2PlW1aKc0kPTyIm01I3oxCkoL1lRa8kw/vO
+ 6icg==
+X-Gm-Message-State: APjAAAXpvASqtjzFB/ePREJ88VH65PCCaKbM1a7ki2GdZdx4plzGF2jV
+ thgDdrluQdrv5LeY4NcOa/IvckpPhJCBCxOR3kXK9Ktp0/EMpKrJznVlrrShg0QZKJ4K9W6lARW
+ PyXw7lrmTVd4VYok=
+X-Received: by 2002:ac8:328a:: with SMTP id z10mr19131609qta.355.1577119351673; 
+ Mon, 23 Dec 2019 08:42:31 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwgA4gSFsFchqkW35q4m2V42nxLf2JhEV27Fy/v84oc0sCxhBykdm5RPtblKf1utTgjfWIFGQ==
+X-Received: by 2002:ac8:328a:: with SMTP id z10mr19131601qta.355.1577119351494; 
+ Mon, 23 Dec 2019 08:42:31 -0800 (PST)
 Received: from redhat.com (bzq-109-64-31-13.red.bezeqint.net. [109.64.31.13])
  by smtp.gmail.com with ESMTPSA id
- n4sm6333133qti.55.2019.12.23.08.42.06
+ u4sm5838216qkh.59.2019.12.23.08.42.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Dec 2019 08:42:07 -0800 (PST)
-Date: Mon, 23 Dec 2019 11:42:04 -0500
+ Mon, 23 Dec 2019 08:42:30 -0800 (PST)
+Date: Mon, 23 Dec 2019 11:42:27 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 15/27] hmat acpi: Build System Locality Latency and
- Bandwidth Information Structure(s)
-Message-ID: <20191223141536.72682-16-mst@redhat.com>
+Subject: [PULL v2 20/27] virtio-mmio: Clear v2 transport state on soft reset
+Message-ID: <20191223141536.72682-21-mst@redhat.com>
 References: <20191223141536.72682-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20191223141536.72682-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: RmfbOIuFNdOC4sI3hrueeg-1
+X-MC-Unique: _H6PHU9xN1O2uiYDMDvANw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,173 +104,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Igor Mammedov <imammedo@redhat.com>, Tao Xu <tao3.xu@intel.com>,
- Markus Armbruster <armbru@redhat.com>, Liu Jingqi <jingqi.liu@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
-This structure describes the memory access latency and bandwidth
-information from various memory access initiator proximity domains.
-The latency and bandwidth numbers represented in this structure
-correspond to rated latency and bandwidth for the platform.
-The software could use this information as hint for optimization.
+At the moment when the guest writes a status of 0, we only reset the
+virtio core state but not the virtio-mmio state. The virtio-mmio
+specification says (v1.1 cs01, 4.2.2.1 Device Requirements:
+MMIO Device Register Layout):
 
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
-Message-Id: <20191213011929.2520-6-tao3.xu@intel.com>
+    Upon reset, the device MUST clear all bits in InterruptStatus and
+    ready bits in the QueueReady register for all queues in the device.
+
+The core already takes care of InterruptStatus by clearing isr, but we
+still need to clear QueueReady.
+
+It would be tempting to clean all registers, but since the specification
+doesn't say anything more, guests could rely on the registers keeping
+their state across reset. Linux for example, relies on this for
+GuestPageSize in the legacy MMIO tranport.
+
+Fixes: 44e687a4d9ab ("virtio-mmio: implement modern (v2) personality (virti=
+o-1)")
+Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Message-Id: <20191213095410.1516119-1-jean-philippe@linaro.org>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/hmat.c | 104 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 1 deletion(-)
+ hw/virtio/virtio-mmio.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index 9ff79308a4..4635d45dee 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -25,6 +25,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "sysemu/numa.h"
- #include "hw/acpi/hmat.h"
-=20
-@@ -67,11 +68,89 @@ static void build_hmat_mpda(GArray *table_data, uint16_=
-t flags,
-     build_append_int_noprefix(table_data, 0, 8);
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 94d934c44b..ef40b7a9b2 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -65,6 +65,19 @@ static void virtio_mmio_stop_ioeventfd(VirtIOMMIOProxy *=
+proxy)
+     virtio_bus_stop_ioeventfd(&proxy->bus);
  }
 =20
-+/*
-+ * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-+ * Structure: Table 5-146
-+ */
-+static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-+                          uint32_t num_initiator, uint32_t num_target,
-+                          uint32_t *initiator_list)
++static void virtio_mmio_soft_reset(VirtIOMMIOProxy *proxy)
 +{
-+    int i, index;
-+    HMAT_LB_Data *lb_data;
-+    uint16_t *entry_list;
-+    uint32_t base;
-+    /* Length in bytes for entire structure */
-+    uint32_t lb_length
-+        =3D 32 /* Table length upto and including Entry Base Unit */
-+        + 4 * num_initiator /* Initiator Proximity Domain List */
-+        + 4 * num_target /* Target Proximity Domain List */
-+        + 2 * num_initiator * num_target; /* Latency or Bandwidth Entries =
-*/
++    int i;
 +
-+    /* Type */
-+    build_append_int_noprefix(table_data, 1, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, lb_length, 4);
-+    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
-+    assert(!(hmat_lb->hierarchy >> 4));
-+    build_append_int_noprefix(table_data, hmat_lb->hierarchy, 1);
-+    /* Data Type */
-+    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Number of Initiator Proximity Domains (s) */
-+    build_append_int_noprefix(table_data, num_initiator, 4);
-+    /* Number of Target Proximity Domains (t) */
-+    build_append_int_noprefix(table_data, num_target, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+
-+    /* Entry Base Unit */
-+    if (hmat_lb->data_type <=3D HMAT_LB_DATA_WRITE_LATENCY) {
-+        /* Convert latency base from nanoseconds to picosecond */
-+        base =3D hmat_lb->base * 1000;
-+    } else {
-+        /* Convert bandwidth base from Byte to Megabyte */
-+        base =3D hmat_lb->base / MiB;
-+    }
-+    build_append_int_noprefix(table_data, base, 8);
-+
-+    /* Initiator Proximity Domain List */
-+    for (i =3D 0; i < num_initiator; i++) {
-+        build_append_int_noprefix(table_data, initiator_list[i], 4);
++    if (proxy->legacy) {
++        return;
 +    }
 +
-+    /* Target Proximity Domain List */
-+    for (i =3D 0; i < num_target; i++) {
-+        build_append_int_noprefix(table_data, i, 4);
++    for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
++        proxy->vqs[i].enabled =3D 0;
 +    }
-+
-+    /* Latency or Bandwidth Entries */
-+    entry_list =3D g_malloc0(num_initiator * num_target * sizeof(uint16_t)=
-);
-+    for (i =3D 0; i < hmat_lb->list->len; i++) {
-+        lb_data =3D &g_array_index(hmat_lb->list, HMAT_LB_Data, i);
-+        index =3D lb_data->initiator * num_target + lb_data->target;
-+
-+        entry_list[index] =3D (uint16_t)(lb_data->data / hmat_lb->base);
-+    }
-+
-+    for (i =3D 0; i < num_initiator * num_target; i++) {
-+        build_append_int_noprefix(table_data, entry_list[i], 2);
-+    }
-+
-+    g_free(entry_list);
 +}
 +
- /* Build HMAT sub table structures */
- static void hmat_build_table_structs(GArray *table_data, NumaState *numa_s=
-tate)
+ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned siz=
+e)
  {
-     uint16_t flags;
--    int i;
-+    uint32_t num_initiator =3D 0;
-+    uint32_t initiator_list[MAX_NODES];
-+    int i, hierarchy, type;
-+    HMAT_LB_Info *hmat_lb;
+     VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
+@@ -378,6 +391,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offs=
+et, uint64_t value,
 =20
-     for (i =3D 0; i < numa_state->num_nodes; i++) {
-         flags =3D 0;
-@@ -82,6 +161,29 @@ static void hmat_build_table_structs(GArray *table_data=
-, NumaState *numa_state)
-=20
-         build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiator,=
- i);
-     }
-+
-+    for (i =3D 0; i < numa_state->num_nodes; i++) {
-+        if (numa_state->nodes[i].has_cpu) {
-+            initiator_list[num_initiator++] =3D i;
-+        }
-+    }
-+
-+    /*
-+     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Informatio=
-n
-+     * Structure: Table 5-146
-+     */
-+    for (hierarchy =3D HMAT_LB_MEM_MEMORY;
-+         hierarchy <=3D HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
-+        for (type =3D HMAT_LB_DATA_ACCESS_LATENCY;
-+             type <=3D HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-+            hmat_lb =3D numa_state->hmat_lb[hierarchy][type];
-+
-+            if (hmat_lb && hmat_lb->list->len) {
-+                build_hmat_lb(table_data, hmat_lb, num_initiator,
-+                              numa_state->num_nodes, initiator_list);
-+            }
-+        }
-+    }
- }
-=20
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_st=
-ate)
+         if (vdev->status =3D=3D 0) {
+             virtio_reset(vdev);
++            virtio_mmio_soft_reset(proxy);
+         }
+         break;
+     case VIRTIO_MMIO_QUEUE_DESC_LOW:
 --=20
 MST
 
