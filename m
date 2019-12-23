@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BC04C2D0CF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0941C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:34:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF6AE20715
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FF082075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 11:34:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXN760tv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6AE20715
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFbMntjc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FF082075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijLu7-00029d-0k
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 06:29:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44631)
+	id 1ijLz0-0003Qs-9q
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 06:34:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mprivozn@redhat.com>) id 1ijLtV-0001jt-NW
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:29:03 -0500
+ (envelope-from <berrange@redhat.com>) id 1ijLxk-0002yI-7E
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:33:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mprivozn@redhat.com>) id 1ijLtT-0005cZ-Nz
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:29:00 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47397
+ (envelope-from <berrange@redhat.com>) id 1ijLxh-0001KD-U8
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:33:24 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20855
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1ijLtT-0005br-JP
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:28:59 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ijLxh-0001Ia-Py
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 06:33:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577100538;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1577100801;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WENHD1IhJnsaFaLa8s1APUyigw5JkM2nGFpistcENMM=;
- b=ZXN760tvWoSnnFr4yqSPFKo4A6wbTup+4O+bZOab3bxkyHCiHfNUTw0Jc2fuIAdE/s9swo
- i9hN5jfY8GRTgM6Cv8o/RHeSapAmdDAKvrmDKoDAQpnZBB8/ePPg5yHDqUOFRtKY1AJfCA
- eU0k0C7oKi/kInc2U+DFjMV28+9RB6g=
+ bh=OFoGC+NFlicS/6v9Frf9oi63bi8uWXTYq/qObtEBP0U=;
+ b=hFbMntjcMqNRAyyLQTRg4/J7dqAEzw7hcmDVal9g9DjZ5vmH2d8BKgM5jvr30IUpKwkrCM
+ UBo2Kz7tIlzBm+kQNLLaWwOvsy/VGywJYPj3xZxULxBgq6op7fvSnS7AUCYtqfyL7oXLZ1
+ h9TkfHyHPaESC+hPYlY/3YZ8nlncYgo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-kdsgpSnkNGSrEda5VXObXQ-1; Mon, 23 Dec 2019 06:28:47 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-258-zbEY7o1KMv26_K-AsAmgpw-1; Mon, 23 Dec 2019 06:33:19 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35C3DDB20
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 11:28:46 +0000 (UTC)
-Received: from [10.40.204.49] (ovpn-204-49.brq.redhat.com [10.40.204.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A4E8C51;
- Mon, 23 Dec 2019 11:28:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BD60801E6C
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 11:33:18 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DBC6F805FF;
+ Mon, 23 Dec 2019 11:33:17 +0000 (UTC)
+Date: Mon, 23 Dec 2019 11:33:15 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Michal =?utf-8?B?UHLDrXZvem7DrWs=?= <mprivozn@redhat.com>
 Subject: Re: [PULL 48/87] x86: move SMM property to X86MachineState
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <20191223113315.GI2529561@redhat.com>
 References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
  <1576670573-48048-49-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
-Message-ID: <8e6af403-173f-ff15-11c7-5dad511795a1@redhat.com>
-Date: Mon, 23 Dec 2019 12:28:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ <8e6af403-173f-ff15-11c7-5dad511795a1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1576670573-48048-49-git-send-email-pbonzini@redhat.com>
-Content-Language: sk-SK
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: kdsgpSnkNGSrEda5VXObXQ-1
+In-Reply-To: <8e6af403-173f-ff15-11c7-5dad511795a1@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: zbEY7o1KMv26_K-AsAmgpw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -89,100 +90,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/18/19 1:02 PM, Paolo Bonzini wrote:
-> Add it to microvm as well, it is a generic property of the x86
-> architecture.
-> 
-> Suggested-by: Sergio Lopez <slp@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/i386/pc.c          | 49 -------------------------------------------------
->  hw/i386/pc_piix.c     |  6 +++---
->  hw/i386/pc_q35.c      |  2 +-
->  hw/i386/x86.c         | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  include/hw/i386/pc.h  |  3 ---
->  include/hw/i386/x86.h |  5 +++++
->  target/i386/kvm.c     |  3 +--
->  7 files changed, 59 insertions(+), 59 deletions(-)
-> 
+On Mon, Dec 23, 2019 at 12:28:43PM +0100, Michal Pr=C3=ADvozn=C3=ADk wrote:
+> On 12/18/19 1:02 PM, Paolo Bonzini wrote:
+> > Add it to microvm as well, it is a generic property of the x86
+> > architecture.
+> >=20
+> > Suggested-by: Sergio Lopez <slp@redhat.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >  hw/i386/pc.c          | 49 -------------------------------------------=
+------
+> >  hw/i386/pc_piix.c     |  6 +++---
+> >  hw/i386/pc_q35.c      |  2 +-
+> >  hw/i386/x86.c         | 50 +++++++++++++++++++++++++++++++++++++++++++=
+++++++-
+> >  include/hw/i386/pc.h  |  3 ---
+> >  include/hw/i386/x86.h |  5 +++++
+> >  target/i386/kvm.c     |  3 +--
+> >  7 files changed, 59 insertions(+), 59 deletions(-)
+> >=20
+>=20
+>=20
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index ef63f3a..c7ff67a 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -2173,8 +2173,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >      }
+> > =20
+> >      if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
+> > -        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE) &&
+> > -        pc_machine_is_smm_enabled(PC_MACHINE(ms))) {
+> > +        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
+> >          smram_machine_done.notify =3D register_smram_listener;
+> >          qemu_add_machine_init_done_notifier(&smram_machine_done);
+> >      }
+> >=20
+>=20
+> Sorry for not catching this earlier, but I don't think this is right.
+> The @ms is not instance of X
+>=20
+>=20
+> After I refreshed my qemu master I realized that libvirt is unable to
+> fetch capabilities. Libvirt runs the following command:
+>=20
+>   qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 -S -no-user-config
+> -nodefaults -nographic -machine none,accel=3Dkvm:tcg
+
+Hmm, it would be good if we can get QEMU CI to launch QEMU  in
+this way, as this isn't the first time some change has broken
+launching of QEMU for probing capabilities.
 
 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index ef63f3a..c7ff67a 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -2173,8 +2173,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      }
->  
->      if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
-> -        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE) &&
-> -        pc_machine_is_smm_enabled(PC_MACHINE(ms))) {
-> +        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
->          smram_machine_done.notify = register_smram_listener;
->          qemu_add_machine_init_done_notifier(&smram_machine_done);
->      }
-> 
-
-Sorry for not catching this earlier, but I don't think this is right.
-The @ms is not instance of X
-
-
-After I refreshed my qemu master I realized that libvirt is unable to
-fetch capabilities. Libvirt runs the following command:
-
-  qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 -S -no-user-config
--nodefaults -nographic -machine none,accel=kvm:tcg
-
-plus some other (for now) irrelevant args. But qemu fails to initialize:
-
-  qemu.git/target/i386/kvm.c:2176:kvm_arch_init: Object 0x563493f306b0
-is not an instance of type x86-machine
-
-and indeed it is not:
-
-#0  0x00007ffff50acd21 in __GI_raise (sig=sig@entry=6) at
-../sysdeps/unix/sysv/linux/raise.c:50
-#1  0x00007ffff5096535 in __GI_abort () at abort.c:79
-#2  0x0000555555d23275 in object_dynamic_cast_assert
-(obj=0x5555567846b0, typename=0x555555fd42f7 "x86-machine",
-file=0x555555fd3878 "/home/zippy/work/qemu/qemu.git/target/i386/kvm.c",
-line=2176, func=0x555555fd4eb0 <__func__.31258> "kvm_arch_init") at
-qom/object.c:815
-#3  0x0000555555a1c3fb in kvm_arch_init (ms=0x5555567846b0,
-s=0x5555568a8430) at /home/zippy/work/qemu/qemu.git/target/i386/kvm.c:2176
-#4  0x00005555558b4ad7 in kvm_init (ms=0x5555567846b0) at
-/home/zippy/work/qemu/qemu.git/accel/kvm/kvm-all.c:2068
-#5  0x0000555555a44f0a in accel_init_machine (accel=0x5555568a8430,
-ms=0x5555567846b0) at accel/accel.c:55
-#6  0x0000555555a3e28d in do_configure_accelerator
-(opaque=0x7fffffffd6c2, opts=0x5555568a8290, errp=0x5555566f34f0
-<error_fatal>) at vl.c:2737
-#7  0x0000555555e9b773 in qemu_opts_foreach (list=0x55555654ffe0
-<qemu_accel_opts>, func=0x555555a3e1a8 <do_configure_accelerator>,
-opaque=0x7fffffffd6c2, errp=0x5555566f34f0 <error_fatal>) at
-util/qemu-option.c:1170
-#8  0x0000555555a3e4cb in configure_accelerators
-(progname=0x7fffffffdde1
-"/home/zippy/work/qemu/qemu.git/x86_64-softmmu/qemu-system-x86_64") at
-vl.c:2798
-#9  0x0000555555a417a8 in main (argc=7, argv=0x7fffffffda08,
-envp=0x7fffffffda48) at vl.c:4121
-
-
-#2  0x0000555555d23275 in object_dynamic_cast_assert
-(obj=0x5555567846b0, typename=0x555555fd42f7 "x86-machine",
-file=0x555555fd3878 "/home/zippy/work/qemu/qemu.git/target/i386/kvm.c",
-line=2176, func=0x555555fd4eb0 <__func__.31258> "kvm_arch_init") at
-qom/object.c:815
-815             abort();
-object_dynamic_cast_assert 1 $ p obj->class->type->name
-$4 = 0x5555567ad720 "none-machine"
-
-
-Michal
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
