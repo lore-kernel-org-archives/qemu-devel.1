@@ -2,71 +2,78 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D64CC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B46C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:54:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E14BE20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:53:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="pvnp7F/c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E14BE20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2B02F20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:54:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B02F20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijRtr-0007hK-Pg
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 12:53:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37923)
+	id 1ijRuw-0000Y1-71
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 12:54:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>) id 1ijRqR-0005tl-9r
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:50:16 -0500
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1ijRu3-0007uq-1B
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <svens@stackframe.org>) id 1ijRqQ-0005U1-8W
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:50:15 -0500
-Received: from shroom.duncanthrax.net ([2a01:4f8:121:41fa::169]:57633
- helo=smtp.duncanthrax.net)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <svens@stackframe.org>)
- id 1ijRqP-0005Pj-Mh
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:50:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=duncanthrax.net; s=dkim; h=In-Reply-To:Content-Transfer-Encoding:
- Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
- Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=r2K6B4O0r91thNnDh+saPyZAP9VdHJfai9zKiH07b+k=; b=pvnp7F/cUqkYuS2ZVGh+REpGAB
- z0Dv04MTjV5YO+p6cg+2cbkiXT2Mi5QJorUfSTJaV9tGneG523AdGcfxhqxDMEeymvRl+vsddLNhU
- Wm5ujoZwKzEtPuMYC7gudjpjf+6kqD2axiHr3NvbYzBZ81hx6v/xbgyW29a5hQ0qGu/Q=;
-Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
- ([46.5.233.221] helo=t470p.stackframe.org)
- by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
- (envelope-from <svens@stackframe.org>)
- id 1ijRqI-0006T4-Tl; Mon, 23 Dec 2019 18:50:07 +0100
-Date: Mon, 23 Dec 2019 18:50:06 +0100
-From: Sven Schnelle <svens@stackframe.org>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v5 5/6] hppa: Add emulation of Artist graphics
-Message-ID: <20191223175006.GA17323@t470p.stackframe.org>
-References: <20191220211512.3289-1-svens@stackframe.org>
- <20191220211512.3289-6-svens@stackframe.org>
- <8e0f79d6-46ba-a121-b6cc-8c0a5cc4ea14@amsat.org>
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1ijRu2-00019y-3d
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:53:58 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:37964)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
+ id 1ijRtz-00014p-PL; Mon, 23 Dec 2019 12:53:55 -0500
+Received: by mail-lf1-f65.google.com with SMTP id r14so13240826lfm.5;
+ Mon, 23 Dec 2019 09:53:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=70ATbs8bPWzrnp3lDAUDWRJLJrMJ8ecBYWppY5sTlJI=;
+ b=MRIU8WHKC1IdWL6OfphuD8aGN9MA4/5mNLjv9g6qkrcA2XHcTABuwLyJc8XIQDttJo
+ DvznYlzY30qQ50jhw3QjfWmF+1+6X4NCjlKdAdDRabvj2YbRvAdaKV3Hc4bp1HtHzIp4
+ nZPSiZNKZmyvg95vZMPWsKcAOhVl51SMWh6oZ4rRBcA24GwcX3CfNLYMD0mbhdmAOZ++
+ /+J7MwDKzlLK7LCXxhpmOjS3rNIQtJLPha8hv7UEy4ywyrn90FBZN6KnINSVePaJWLOu
+ 9NopDKjqmSDIH1p5XDEc7jr6076cz/aFn2QZunzZR+CboGqAFMSWsvruITDLcZIWXyZe
+ FCYQ==
+X-Gm-Message-State: APjAAAWKLg18xPElErehlhUVREQKzU+HAqtAmoB/wjyIkdlYAqGaz3k9
+ I/EJCWtbdWR+rzxKCewGWV8=
+X-Google-Smtp-Source: APXvYqx3OtIhpfuc/A7KcmdZgOTDmV2kg6+w0dNpUqmWFnA9vyLmxJVcl+kRc6iiKYTL2cbb4mHdtw==
+X-Received: by 2002:a19:f80a:: with SMTP id a10mr18056126lff.107.1577123634254; 
+ Mon, 23 Dec 2019 09:53:54 -0800 (PST)
+Received: from localhost.localdomain ([213.87.155.175])
+ by smtp.gmail.com with ESMTPSA id y14sm8892345ljk.46.2019.12.23.09.53.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Dec 2019 09:53:53 -0800 (PST)
+From: Alexander Popov <alex.popov@linux.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ pmatouse@redhat.com, sstabellini@kernel.org, mdroth@linux.vnet.ibm.com,
+ pjp@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Andrea Arcangeli <aarcange@redhat.com>,
+ Kashyap Chamarthy <kashyap.cv@gmail.com>,
+ Darren Kenny <darren.kenny@oracle.com>, Kevin Wolf <kwolf@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Alexander Popov <alex.popov@linux.com>
+Subject: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add the
+ corresponding unit-test
+Date: Mon, 23 Dec 2019 20:51:15 +0300
+Message-Id: <20191223175117.508990-1-alex.popov@linux.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <8e0f79d6-46ba-a121-b6cc-8c0a5cc4ea14@amsat.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a01:4f8:121:41fa::169
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.167.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,31 +85,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+Fuzzing the Linux kernel with syzkaller allowed to find how to crash qemu
+using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
+ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
 
-On Sun, Dec 22, 2019 at 01:37:48PM +0100, Philippe Mathieu-Daudé wrote:
-> >  
-> > +    if (vga_interface_type != VGA_NONE) {
-> > +        dev = qdev_create(NULL, "artist");
-> > +        qdev_init_nofail(dev);
-> > +        s = SYS_BUS_DEVICE(dev);
-> > +        sysbus_mmio_map(s, 0, LASI_GFX_HPA);
-> > +        sysbus_mmio_map(s, 1, ARTIST_FB_ADDR);
-> 
-> How is this chipset connected on the board?
-> If it is a card you can plug on a bus, you can use a condition.
-> If it is soldered or part of another chipset, then it has to be mapped
-> unconditionally.
+This patch series fixes incorrect handling of some PRDTs in ide_dma_cb()
+and improves the ide-test to cover more PRDT cases (including one
+that causes that particular qemu crash).
 
-Depends on the Model. Hp 9000 712 and 715 had it onboard, for the B160L
-we're emulating and others it was a GSC add-on card.
+Changes from v2 (thanks to Kevin Wolf for the feedback):
+ - the assertion about prepare_buf() return value is improved;
+ - the patch order is reversed to keep the tree bisectable;
+ - the unit-test performance is improved -- now it runs 8 seconds
+   instead of 3 minutes on my laptop.
 
-Regards
-Sven
+Alexander Popov (2):
+  ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
+  tests/ide-test: Create a single unit-test covering more PRDT cases
+
+ hw/ide/core.c    |  30 +++++---
+ tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
+ 2 files changed, 96 insertions(+), 108 deletions(-)
+
+-- 
+2.23.0
+
 
