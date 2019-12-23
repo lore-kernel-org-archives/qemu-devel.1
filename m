@@ -2,75 +2,63 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD80C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83779C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:22:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 658F4207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:21:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 658F4207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 577C6206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:22:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577C6206CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijIyA-00024g-GC
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:21:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36191)
+	id 1ijIyg-00030n-HZ
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:22:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ijIxH-0001Kd-3Q
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:20:44 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1ijIxr-00025O-Oq
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:21:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ijIxF-0003XB-Lw
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:20:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57746)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ijIxF-0003RI-Dn
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:20:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ijIxD-0003fd-Re
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:20:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C0D222E802B
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:20:39 +0000 (UTC)
+ (envelope-from <guoheyi@huawei.com>) id 1ijIxp-0006D4-KF
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:21:19 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2227 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1ijIxl-0005RB-OP; Mon, 23 Dec 2019 03:21:14 -0500
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id E3E14B45958003554A93;
+ Mon, 23 Dec 2019 16:21:05 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Mon, 23 Dec 2019
+ 16:20:56 +0800
+Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <5aece614-4341-35e5-53a6-2f3d788e6e8d@huawei.com>
+Date: Mon, 23 Dec 2019 16:20:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA-+tAbb9h2wZOm56TqUvjQJT0OYFLwTVS-UxKrF5PO3mQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Dec 2019 08:13:33 -0000
-From: =?utf-8?q?N=C4=83stasie_Ion_Octavian?= <1857143@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gschafer noctavian
-X-Launchpad-Bug-Reporter: =?utf-8?q?N=C4=83stasie_Ion_Octavian_=28noctavian?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?N=C4=83stasie_Ion_Octavian_=28noctavian?=
- =?utf-8?q?=29?=
-References: <157685586097.27697.14145668174002417681.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157708881343.5755.13580578910011330665.malone@gac.canonical.com>
-Subject: [Bug 1857143] Re: VMs won't boot from external snapshots on qemu 4.2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 708938a0b50a9238a246f8fd4756a76b7bb6b928
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,60 +67,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1857143 <1857143@bugs.launchpad.net>
+Cc: Mark Rutland <mark.rutland@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, Cornelia Huck <cohuck@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, wanghaibin.wang@huawei.com,
+ Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I've rebased all my snapshots using '-F' and now everything boots
-properly.
+Hi Peter,
 
-Thank you.
+Really appreciate your comments.
 
--- =
+For other platforms/boards emulated in qemu, like omap, imx*, etc, are=20
+they just TCG platforms? Can we just enable security and EL3 emulation=20
+for these platforms instead of implementing copies of firmware=20
+interfaces in qemu? Also I think it is possible to optimize the code to=20
+support all KVM enabled virtual boards with one single copy of SDEI=20
+code, so at least the duplication of code inside qemu might be avoided.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1857143
+I can understand your concerns; the exsiting SDEI code in ARM Trusted=20
+Firmware also tempted me when I started to writing the code in qemu. I=20
+agree the ideal way is to use the existing firmware directly, but how=20
+can we achieve that? Either I don't think it is good to modify the=20
+firmware code too much, for firmware should be kept simple and reliable.
 
-Title:
-  VMs won't boot from external snapshots on qemu 4.2
+Does James or Marc have any idea?
 
-Status in QEMU:
-  New
+Thanks,
 
-Bug description:
-  After upgrading from qemu 4.1.1-1 to 4.2.0-1, VMs that were set to use
-  an external snapshot as their disk failed to boot.
+Heyi
 
-  Depending on the guest OS and other VM settings the boot fails and you
-  get either the "Boot failed: not a bootable drive" message or the grub
-  rescue shell or the EFI shell. Downgrading back to qemu 4.1 allows the
-  VMs to boot from the external snapshots without any problem and the
-  disk images doesn't appear to be corrupted afterwards.
+=E5=9C=A8 2019/12/20 21:44, Peter Maydell =E5=86=99=E9=81=93:
+> On Tue, 5 Nov 2019 at 09:12, Heyi Guo <guoheyi@huawei.com> wrote:
+>> SDEI is for ARM "Software Delegated Exception Interface". AS ARM64 doe=
+sn't have
+>> native non-maskable interrupt (NMI), we rely on higher privileged (lar=
+ger
+>> exception level) software to change the execution flow of lower privil=
+eged
+>> (smaller exception level) software when certain events occur, to emula=
+te NMI
+>> mechanism, and SDEI is the standard interfaces between the two levels =
+of
+>> privileged software. It is based on SMC/HVC calls.
+>>
+>> The higher privileged software implements an SDEI dispatcher to handle=
+ SDEI
+>> related SMC/HVC calls and trigger SDEI events; the lower privileged so=
+ftware
+>> implements an SDEI client to request SDEI services and handle SDEI eve=
+nts.
+> Hi; I read through these patches last week, but I didn't reply
+> then because although there are some aspects to the design that
+> I don't like, I don't have a clear idea of what a better approach
+> to the problems it's trying to solve would be. However I didn't
+> want to go home for the end of the year without providing at
+> least some response. So I'm going to lay out the parts I have
+> issues with and perhaps somebody else will have a good idea.
+>
+> The first part that I dislike here is that this is implementing
+> an entire ABI which in real hardware is provided by firmware. I
+> think that QEMU's design works best when QEMU provides emulation of
+> hardware or hardware-like facilities, which guest code (either
+> in the kernel, or firmware/bios running in the guest) can then
+> make use of. Once we start getting into implementing firmware
+> interfaces directly in QEMU this rapidly becomes a large amount
+> of work and code, and it's unclear where it should stop. Should
+> we implement also the equivalent of firmware for omap boards?
+> For imx* boards? For the raspberry pi? For xilinx boards?
+> Are we going to end up reimplementing more of ARM Trusted Firmware
+> functionality inside QEMU? The code to implement firmware-equivalent
+> ABIs in all these boards would I think quickly become a large part
+> of the codebase.
+>
+> My second concern is that to do the things it wants to do,
+> the implementation here does some pretty invasive things:
+>   * intercepting interrupt lines which ought to just be
+>     emulated hardware signals between devices and the GIC
+>   * capturing register values of other CPUs, and arbitrarily
+>     stopping those other CPUs and making them run other code
+>     at a later point in time
+> I'm really uncomfortable with what's just an 'emulated firmware'
+> interface for one specific board model doing this kind of thing.
+>
+> Finally, the stated rationale for the patchset ("we'd like an
+> emulated NMI equivalent") doesn't really feel to me like it's
+> strong enough to counterbalance the amount of code here and
+> the degree to which it's moving us into a swamp I'd prefer
+> it if we could stay out of.
+>
+> I'd be much happier with a design where QEMU provides simple
+> facilities to the guest and the guest firmware and kernel
+> deal with making use of them. I appreciate that it's not
+> clear how that would work though, given that in real hardware
+> this works by the firmware running at EL3 and KVM not
+> providing a mechanism that allows guest code that runs at
+> a higher (effective or emulated) privilege level than the
+> guest kernel...
+>
+> thanks
+> -- PMM
+>
+> .
 
-  From my testing this bug is easily reproducible. Create a VM, install
-  a guest os, confirm that the VM boots the guest os without problems,
-  shutdown the VM, create an external snapshot of the VM disk, set the
-  VM to boot from the snapshot, try to boot the VM with qemu 4.2 and see
-  it fail, try to boot it with qemu 4.1 and see it succeed.
-
-  In my case, to test that this bug is reproducible, I used virt-manager
-  to install Xubuntu 19.10 on a qcow2 disk image, and then used qemu-img
-  create -f qcow2 -b base_image.qcow2 snapshot_image.qcow2 to create the
-  external snapshot and edited the xml in virt-manager to point the VM's
-  disk to snapshot_image.qcow2. It failed to boot with qemu 4.2, but it
-  was working fine with 4.1.
-
-  I booted this test VM off a live distro using the virtual CDROM and
-  fdisk can't seem to find a partition table on the VM disk when qemu
-  4.2 is used, with 4.1 it can see the partition table just fine.
-
-  Internal snapshots don't seem to have this problem.
-
-  I'm using Archlinux, virt-manager 2.2.1-2, libvirt 5.10.0-1, qemu
-  4.2.0-1.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1857143/+subscriptions
 
