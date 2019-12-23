@@ -2,62 +2,62 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 591B1C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76872C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:31:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DB8D20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 368CA206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:31:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oRMvE/H8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB8D20663
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YuHv98+b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 368CA206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijH2L-0003NK-93
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 01:17:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34370)
+	id 1ijHFu-0005Vj-8a
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 01:31:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ijH1Q-0002p9-UP
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 01:16:54 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ijHF6-000519-CD
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 01:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ijH1P-00046f-Q4
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 01:16:52 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:52781)
+ (envelope-from <dgibson@ozlabs.org>) id 1ijHF3-0003HE-GB
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 01:30:59 -0500
+Received: from ozlabs.org ([203.11.71.1]:59687)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ijH1P-0003nq-DV; Mon, 23 Dec 2019 01:16:51 -0500
+ id 1ijHF2-00034J-CM; Mon, 23 Dec 2019 01:30:57 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47h8JH1hHXz9sP3; Mon, 23 Dec 2019 17:16:47 +1100 (AEDT)
+ id 47h8cX4DnBz9sPV; Mon, 23 Dec 2019 17:30:52 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1577081807;
- bh=NqEHbTfchXCJd/ez5yIWwnDvmcpq9XC4tTXcOQqhgXM=;
+ d=gibson.dropbear.id.au; s=201602; t=1577082652;
+ bh=uCqZznU8mM74T1HTRYwE/ohm/NuZ7euWkOrnjR9vhU4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=oRMvE/H8iuaU2v0Nv7qE9NmlNfczMCunnPguwq7bF1kh7hfwgenWoRtZx/1DzdNZ+
- QbzX4LY0lZkv0QZqmqmCzM91blyf7/a+Pt+/ViQXluKtX3jfeBRW/YO57nwA7U2rBz
- SvJjgtLdp166e1OTOnms4YhxaAh3K9wc/PyMzfWA=
-Date: Mon, 23 Dec 2019 17:16:40 +1100
+ b=YuHv98+bbqBFPZgfOOyRZuYLJkQxdwV2LNfPiXot7eNJNfmroSwastu3QE3B6CLu+
+ 6d1Q4Dd9PHREUMcSZkk2mLY4aDJJnexVvnj1WIy33Srk0oeUri1r7XFDoGqNIgiXdy
+ QcvDvYewVmkpRDU5c4V357bhZ0t26+lBiZB+u/XI=
+Date: Mon, 23 Dec 2019 17:30:43 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2 00/13] ppc/pnv: remove the use of qdev_get_machine()
- and get_system_memory()
-Message-ID: <20191223061640.GG38380@umbus.modem>
-References: <20191219181155.32530-1-clg@kaod.org>
+To: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+Subject: Re: [PATCH] target/ppc: fix memory dump endianness in QEMU monitor
+Message-ID: <20191223063043.GH38380@umbus.modem>
+References: <20191219163854.8945-1-maxiwell@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gvF4niNJ+uBMJnEh"
+ protocol="application/pgp-signature"; boundary="CNfT9TXqV7nd4cfk"
 Content-Disposition: inline
-In-Reply-To: <20191219181155.32530-1-clg@kaod.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20191219163854.8945-1-maxiwell@linux.ibm.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,27 +69,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, farosas@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---gvF4niNJ+uBMJnEh
-Content-Type: text/plain; charset=iso-8859-1
+--CNfT9TXqV7nd4cfk
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 19, 2019 at 07:11:42PM +0100, C=E9dric Le Goater wrote:
-> Hello,
+On Thu, Dec 19, 2019 at 01:38:54PM -0300, Maxiwell S. Garcia wrote:
+> The env->hflags is computed in ppc_cpu_reset(), using the MSR register
+> as input. But at the point ppc_disas_set_info() is called the MSR_LE bit
+> in env->hflags doesn't contain the same information that env->msr.
 >=20
-> The PowerNV and sPAPR machine use qdev_get_machine() and
-> get_system_memory() in some places. This is not a good modeling
-> pratice and it should be avoided. This series replaces the uses of
-> these routines with a set of QOM properties and aliases.
+> Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 
-Remaining patches LGTM, but will need a rebase to account for the
-changes suggested in some of the earlier ones.
+I think the change is ok as far as it goes but,
+
+a) the commit message should expand on what the practical effect of
+this is.  Looking, I think the only thing this affects is DEBUG_DISAS
+output (i.e. very rarely) which is worth noting.
+
+b) AFAICT this is the *only* thing that looks for the LE bit in
+hflags. Given that, and the fact that it would be wrong in most cases,
+we should remove it from hflags entirely along with this change.
+
+> ---
+>  target/ppc/translate_init.inc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index d33d65dff7..a0b384da9e 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10830,7 +10830,7 @@ static void ppc_disas_set_info(CPUState *cs, disa=
+ssemble_info *info)
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      CPUPPCState *env =3D &cpu->env;
+> =20
+> -    if ((env->hflags >> MSR_LE) & 1) {
+> +    if (msr_le) {
+>          info->endian =3D BFD_ENDIAN_LITTLE;
+>      }
+>      info->mach =3D env->bfd_mach;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -97,25 +124,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gvF4niNJ+uBMJnEh
+--CNfT9TXqV7nd4cfk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4AW8cACgkQbDjKyiDZ
-s5K7XhAAv0VYQNVLo5BLN4A/wNXyaj68xzeq5Arm5EPlgguMxwOfgGSje7PF9PMz
-nfdvCtY4osqElXOmgLOvvjVZ+7o0wAD1YS5TKBhYfRwmzJFUsIj13LxfSqPm/3jI
-44PfoI3wwAUWT3PZSgMSW7pxCuwOzjLJT8cnES+INHm10Al7xEH8CGcp2qUmo4rb
-UegeEqnrPJ07cmsbjYFeRhlfl/G3rnrp5BBVxgUNNqHBHk0BUIK07jHXuspJN7oJ
-rSQP6iKYjRx5LaMj+5l8f0nC+PX8/Ht8oTnNau5HKl5I8Rbp9E8YGHEjiJbGvsk5
-ubrXfBOcqyA3Uz4B8wkUtIF8QyoB4UlZHZgyZzWLWhzLmhOUKdkuQ2cC6NsNCPB4
-ttb/4qcFkYnLSoVSkOBSVOdDNMJHuoNp6k0KVZcay5xAQbxnCMzFrX7KluOcmLhA
-2oY3DruT6ZkJNM48L2ShxxYhGBmWXET4hIuc4tZyi/DgZbWvnbbDZrsYCyhEZABR
-not9apITRtPParJsvU60XIHmV4vxa75x6CPHULIg8QwVoDbtnw2D1e9oBbvXWIaj
-KG96xW5qZ2fzhqAKO2rLv5/nB5eWwMfUpPdS307zPPhxiENFsCy85YoeCttb19mE
-gukD6HxMWZJ42jicQ2Gy/rRoxlXMyluzMfo/8iUnq+/pdDNPB2Y=
-=Ew8V
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4AXxAACgkQbDjKyiDZ
+s5KcdxAAznu78UmPI6UogjVnpytErRHeYxK/Fzn0HJvwK7/0Uot8tMSNFAsRHyAk
+EJkLxCmUo46pjQQw9nY+v3cWyCBkSofE/2JaSEOmU6mN0yLX4xb9k8iK7ZIOqoxd
+0j5Hx2+IWZeJgCk9FyIkkuGP0DcO4crb5p7aE2r9Th+WRQvNOcNapc6MqU9RzqyT
+g17TuNUbuGLpxfumY6F7SBoTtEpotxZjEUAhZBmGatknl7EpeBuJWjHgsh5RbJI1
+HrHX4OlJfGu06PIkzx64naq6TrGi8iD3/lG1+Oy+ghAY7semtAtCPH25oNb1VpqT
+gCKhRKIA5pf4M1HrHfUrI0HBMLrL6al6nHdJ5GbYg1wRaV21/zadgS5F6JXeYLyg
+jrMFE94CZhNrOaGv0TIsfAsFzLKPLW+ygJ4Ezkqd7anqNU5jUrHIb2GbERBZjlFz
+ib8JdDcIYeNPJhfubaNYKp84z8ZDTAZ+PZz+Tj8GmcgCCE/e1ub1ecnJki3CWtdY
+JCZBjCwY+q8vnIJPg662xdJpHhgEbFiPs2G5qzDBzgRqe+LUx6RpYtwL9pxkypQr
+251UjB2zMcyf7OYdWthTCQZ+eAjN5dScPMtZ67H8lzp0XY2K3u63W4BRZ7uB+7P8
+wIy4S4FeoDDNWA0MppmrCD2k+sY11NeIeXrcSYVM+ONeMIvS4YI=
+=KOH5
 -----END PGP SIGNATURE-----
 
---gvF4niNJ+uBMJnEh--
+--CNfT9TXqV7nd4cfk--
 
