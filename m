@@ -2,75 +2,65 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFE8C2D0D2
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 04:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C54E1C2D0D2
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 04:33:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5169C206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 04:32:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5169C206D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 85985206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 04:33:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k1bx7h9Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85985206D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijFNw-0004Aw-RE
-	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 23:32:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42332)
+	id 1ijFPO-00068C-NS
+	for qemu-devel@archiver.kernel.org; Sun, 22 Dec 2019 23:33:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ijFM3-0002Nj-7Y
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 23:30:06 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ijFO3-0004rp-SE
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 23:32:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ijFM0-0000ym-Fl
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 23:30:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45524)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ijFLz-0000u8-8D
- for qemu-devel@nongnu.org; Sun, 22 Dec 2019 23:29:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ijFLw-0006ln-TG
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 04:29:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D2EC82E80C3
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 04:29:56 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1ijFO2-0000ft-EV
+ for qemu-devel@nongnu.org; Sun, 22 Dec 2019 23:32:07 -0500
+Received: from ozlabs.org ([203.11.71.1]:47023)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ijFO1-0000N0-0W; Sun, 22 Dec 2019 23:32:06 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47h5zP6JL9z9sR4; Mon, 23 Dec 2019 15:32:01 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1577075521;
+ bh=rWBh9NATchNjgmyVoTHNjlEx4v4QytYxANno8qT3v4A=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=k1bx7h9Y+tdPXMHiZwOOAROG6mdhZwhQHxhNk6TthNMXh9xO3wpBw9sPjUKrsruCI
+ dHxQKBmUWg4AvJqsrYolAs4DGI7MERzX9jU8TJIMACBU4YjSFx1dkV4OIfrFOjv2fI
+ 7A+FzeyNpA8Nu1aZBIyVGC14FazicC9X5doaKs9k=
+Date: Mon, 23 Dec 2019 15:31:40 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Subject: Re: [PATCH v4 1/4] mem: move nvdimm_device_list to utilities
+Message-ID: <20191223043140.GA38380@umbus.modem>
+References: <157657241446.53829.7078678659499762596.stgit@lep8c.aus.stglabs.ibm.com>
+ <157657248567.53829.16210727613973616224.stgit@lep8c.aus.stglabs.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Dec 2019 04:17:31 -0000
-From: Launchpad Bug Tracker <1605506@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: qemu
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor justcaca th-huth
-X-Launchpad-Bug-Reporter: lisiheng (justcaca)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160722071222.4694.55918.malonedeb@wampee.canonical.com>
-Message-Id: <157707465149.29966.6155556800251106417.malone@loganberry.canonical.com>
-Subject: [Bug 1605506] Re: qemu driver_mirror error "Operation not permitted"
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7fd668f2568d64a514929ed950f85495dd129e73
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
+Content-Disposition: inline
+In-Reply-To: <157657248567.53829.16210727613973616224.stgit@lep8c.aus.stglabs.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,226 +69,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1605506 <1605506@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, qemu-ppc@nongnu.org,
+ xiaoguangrong.eric@gmail.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--AhhlLboLdkugWU4S
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Tue, Dec 17, 2019 at 02:48:20AM -0600, Shivaprasad G Bhat wrote:
+> nvdimm_device_list is required for parsing the list for devices
+> in subsequent patches. Move it to common utility area.
+>=20
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1605506
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Title:
-  qemu driver_mirror error "Operation not permitted"
+> ---
+>  hw/acpi/nvdimm.c            |   28 +---------------------------
+>  include/qemu/nvdimm-utils.h |    7 +++++++
+>  util/Makefile.objs          |    1 +
+>  util/nvdimm-utils.c         |   29 +++++++++++++++++++++++++++++
+>  4 files changed, 38 insertions(+), 27 deletions(-)
+>  create mode 100644 include/qemu/nvdimm-utils.h
+>  create mode 100644 util/nvdimm-utils.c
+>=20
+> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> index 9fdad6dc3f..5219dd0e2e 100644
+> --- a/hw/acpi/nvdimm.c
+> +++ b/hw/acpi/nvdimm.c
+> @@ -32,33 +32,7 @@
+>  #include "hw/acpi/bios-linker-loader.h"
+>  #include "hw/nvram/fw_cfg.h"
+>  #include "hw/mem/nvdimm.h"
+> -
+> -static int nvdimm_device_list(Object *obj, void *opaque)
+> -{
+> -    GSList **list =3D opaque;
+> -
+> -    if (object_dynamic_cast(obj, TYPE_NVDIMM)) {
+> -        *list =3D g_slist_append(*list, DEVICE(obj));
+> -    }
+> -
+> -    object_child_foreach(obj, nvdimm_device_list, opaque);
+> -    return 0;
+> -}
+> -
+> -/*
+> - * inquire NVDIMM devices and link them into the list which is
+> - * returned to the caller.
+> - *
+> - * Note: it is the caller's responsibility to free the list to avoid
+> - * memory leak.
+> - */
+> -static GSList *nvdimm_get_device_list(void)
+> -{
+> -    GSList *list =3D NULL;
+> -
+> -    object_child_foreach(qdev_get_machine(), nvdimm_device_list, &list);
+> -    return list;
+> -}
+> +#include "qemu/nvdimm-utils.h"
+> =20
+>  #define NVDIMM_UUID_LE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)         =
+    \
+>     { (a) & 0xff, ((a) >> 8) & 0xff, ((a) >> 16) & 0xff, ((a) >> 24) & 0x=
+ff, \
+> diff --git a/include/qemu/nvdimm-utils.h b/include/qemu/nvdimm-utils.h
+> new file mode 100644
+> index 0000000000..4b8b198ba7
+> --- /dev/null
+> +++ b/include/qemu/nvdimm-utils.h
+> @@ -0,0 +1,7 @@
+> +#ifndef NVDIMM_UTILS_H
+> +#define NVDIMM_UTILS_H
+> +
+> +#include "qemu/osdep.h"
+> +
+> +GSList *nvdimm_get_device_list(void);
+> +#endif
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index df124af1c5..2a096fe190 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -20,6 +20,7 @@ util-obj-y +=3D envlist.o path.o module.o
+>  util-obj-y +=3D host-utils.o
+>  util-obj-y +=3D bitmap.o bitops.o hbitmap.o
+>  util-obj-y +=3D fifo8.o
+> +util-obj-y +=3D nvdimm-utils.o
+>  util-obj-y +=3D cacheinfo.o
+>  util-obj-y +=3D error.o qemu-error.o
+>  util-obj-y +=3D qemu-print.o
+> diff --git a/util/nvdimm-utils.c b/util/nvdimm-utils.c
+> new file mode 100644
+> index 0000000000..5cc768ca47
+> --- /dev/null
+> +++ b/util/nvdimm-utils.c
+> @@ -0,0 +1,29 @@
+> +#include "qemu/nvdimm-utils.h"
+> +#include "hw/mem/nvdimm.h"
+> +
+> +static int nvdimm_device_list(Object *obj, void *opaque)
+> +{
+> +    GSList **list =3D opaque;
+> +
+> +    if (object_dynamic_cast(obj, TYPE_NVDIMM)) {
+> +        *list =3D g_slist_append(*list, DEVICE(obj));
+> +    }
+> +
+> +    object_child_foreach(obj, nvdimm_device_list, opaque);
+> +    return 0;
+> +}
+> +
+> +/*
+> + * inquire NVDIMM devices and link them into the list which is
+> + * returned to the caller.
+> + *
+> + * Note: it is the caller's responsibility to free the list to avoid
+> + * memory leak.
+> + */
+> +GSList *nvdimm_get_device_list(void)
+> +{
+> +    GSList *list =3D NULL;
+> +
+> +    object_child_foreach(qdev_get_machine(), nvdimm_device_list, &list);
+> +    return list;
+> +}
+>=20
 
-Status in QEMU:
-  Expired
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Bug description:
-  I use libvirtd to call qemu drive_mirror return error message "Operation =
-not permitted", But directly run qemu and call drive_mirror is OK;
-  when drive_mirror target is logic device return error message "Operation =
-not permitted",But the file is OK;
+--AhhlLboLdkugWU4S
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  Operating Environment=EF=BC=9A
-  OS:ubuntu 14.04
-  kernel:3.16.0-28-generic
-  libvirt-bin version: 1.2.2-0ubuntu13.1.17
-  qemu:2.5.0 or 2.6.0
-  run vm user: root
-  =EF=BC=88retry in redhat7.2 have the same problem=EF=BC=81=EF=BC=89
+-----BEGIN PGP SIGNATURE-----
 
-  Here is my running process:
-  libvirtd call
-  prepare libvirt xml   libvirt.xml
-  <?xml version=3D"1.0"?><domain type=3D"kvm">
-      <name>i-745F35DC</name>
-      <memory>65536</memory>
-      <vcpu>1</vcpu>
-      <cpu mode=3D"host-model"><model fallback=3D"allow"/><topology sockets=
-=3D"1" threads=3D"1" cores=3D"1"/></cpu>
-      <os><type>hvm</type><boot dev=3D"cdrom"/><boot dev=3D"hd"/></os>
-      <features><acpi/><apic/><pae/></features>
-      <on_poweroff>destroy</on_poweroff>
-      <on_reboot>restart</on_reboot>
-      <on_crash>destroy</on_crash>
-      <devices>
-          <emulator>/usr/local/qemu-2.5.0-20160720/bin/qemu-system-x86_64</=
-emulator>
-          <graphics type=3D"vnc" passwd=3D"" autoport=3D"yes" keymap=3D"en-=
-us" listen=3D"0.0.0.0"/>
-          <disk type=3D"file" device=3D"disk">
-              <driver name=3D"qemu" type=3D"raw" cache=3D"none"/>
-              <source file=3D"/tmp/image.raw"/>
-              <target dev=3D"hda" bus=3D"ide"/>
-              <serial>bc-system</serial>
-          </disk>
-      </devices>
-      <clock offset=3D"localtime"/>
-  </domain>
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4AQywACgkQbDjKyiDZ
+s5Ibxw//VUVJTmAX5nFX5Y3cwRCtiey0ZhH9UTPaPV2/N0O/A3YvyPoA5YjdsCpQ
+3oCVqZTOayNUQj+IeDePulD+EuEzZ7rc/4sSfltJ9BlpPJonVbbHncZVYb8bxYyY
+4hBQZL1qBQYZQHh4KihoPtBnGmgNRFN7tY7OY8ycdcDvFNL5D5qCZmDwTBQmCfIN
+oh8EwQmqGuqpAGyDfWvxy3UypY9gyvxNSld1NrVz4yz4YiNtqUhq4P1geZ/jGRxc
+CmEyv+GDuL6xXJpVlwTx/uN97uferQH31EXkiiE2rrMxnkpFVN8cqyUGNEllxWoH
+tkHx9zw6uhBR3WghJDltk4a5EL28haU1eFwne/0BLcYZW/eXghUx9ZbFaPcZx90Q
+78K0Vv9uoCgtvh3cq/aU4POfMcaXbeVMgh5P0cu/4t/Mg1kPlAVe6/yS6d6N1nQt
+/L2qHYaN0wNMA74sRhHCMd2kKxbCMBi4aSW6u43IE5vHmOSB3g42d2ji4S66LWWi
+Frm9p0vetJIuJ/1HYSth2fIfbltVnqsA4k7leYywsLygZNbPYPyvMjRmSfeEUrl4
+frQu9h408xHb5+8Z9fDv5eZnppKUXMQdaOtg3IjnCW08PQmipkMcPFsTafz444Ua
+I5WBiNEjEnODoBOmb9PuxkNqxgw/nkreHSuO3zSqOZpgFwAUvAA=
+=jIbH
+-----END PGP SIGNATURE-----
 
-  virsh create libvirt.xml
-  root@test:/opt/run/instance/i-745F35DC# virsh list
-   Id    Name                           State
-  ----------------------------------------------------
-   2     i-745F35DC                     running
-  call drive_mirror:
-  virsh qemu-monitor-command --hmp i-745F35DC 'drive_mirror -n -f drive-ide=
-0-0-0 /dev/vg_bc_local/test raw'
-  Could not open '/dev/vg_bc_local/test': Operation not permitted
-
-  directly run qemu and call drive_mirror:
-  /usr/local/qemu-2.5.0-20160720/bin/qemu-system-x86_64 -hda /tmp/image.raw=
- -m 64 --enable-kvm -vnc :51 -monitor stdio
-  QEMU 2.5.0 monitor - type 'help' for more information
-  (qemu) info block
-  ide0-hd0 (#block135): /tmp/image.raw (raw)
-      Cache mode:       writeback
-  (qemu) drive_mirror -n -f ide0-hd0 /dev/vg_bc_local/test raw
-  (qemu) info block-jobs
-  Type mirror, device ide0-hd0: Completed 41126400 of 41126400 bytes, speed=
- limit 0 bytes/s
-  (qemu) block_job_cancel ide0-hd0
-  (qemu) info block-jobs
-  No active jobs
-
-  It is OK!!!
-
-  =
-
-  Here is my debugging process:
-  Recompile qemu-2.5.0 to  enable debug
-  ../configure --prefix=3D/usr/local/qemu-2.5.0-20160720 --enable-trace-bac=
-kend=3Dsimple --enable-werror --disable-xen --disable-virtfs --enable-kvm -=
--enable-seccomp --enable-docs --enable-debug-tcg --enable-vnc-sasl --enable=
--linux-aio --enable-lzo --enable-snappy --enable-usb-redir --enable-vnc-png=
- --disable-vnc-jpeg --enable-uuid --disable-vhost-scsi --enable-rbd --block=
--drv-rw-whitelist=3Dqcow2,raw,file,host_device,blkdebug,nbd,iscsi,rbd,cdp -=
--block-drv-ro-whitelist=3Dvmdk,vhdx,vpc --target-list=3Dx86_64-softmmu CFLA=
-GS=3D-O0
-
-  Use libvirtd to Re-run VM and debug by gdb
-  VM process info:
-  root      7804     1  0 10:45 ?        00:00:10 /usr/local/qemu-2.5.0-201=
-60720/bin/qemu-system-x86_64 -name i-745F35DC -S -machine pc-i440fx-2.5,acc=
-el=3Dkvm,usb=3Doff -cpu Westmere,+invpcid,+erms,+bmi2,+smep,+avx2,+bmi1,+fs=
-gsbase,+abm,+rdtscp,+pdpe1gb,+rdrand,+f16c,+avx,+osxsave,+xsave,+tsc-deadli=
-ne,+movbe,+pcid,+pdcm,+xtpr,+fma,+tm2,+est,+vmx,+ds_cpl,+monitor,+dtes64,+p=
-clmuldq,+pbe,+tm,+ht,+ss,+acpi,+ds,+vme -m 64 -realtime mlock=3Doff -smp 1,=
-sockets=3D1,cores=3D1,threads=3D1 -uuid ef55dfa6-b82e-488d-a7fc-4c882f8091a=
-b -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/=
-lib/libvirt/qemu/i-745F35DC.monitor,server,nowait -mon chardev=3Dcharmonito=
-r,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dlocaltime -no-shutdown -boot stri=
-ct=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive f=
-ile=3D/tmp/image.raw,if=3Dnone,id=3Ddrive-ide0-0-0,format=3Draw,serial=3Dbc=
--system,cache=3Dnone -device ide-hd,bus=3Dide.0,unit=3D0,drive=3Ddrive-ide0=
--0-0,id=3Dide0-0-0,bootindex=3D2 -vnc 0.0.0.0:0,password -k en-us -device c=
-irrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-pci,id=
-=3Dballoon0,bus=3Dpci.0,addr=3D0x3
-
-  gdb -p  7804
-  set breakpoint
-  (gdb) i b
-  Num     Type           Disp Enb Address            What
-  1       breakpoint     keep y   0x00007f51d9e92cb1 in qmp_drive_mirror at=
- /opt/qemu/qemu-2.5.0/blockdev.c:3310
-  2       breakpoint     keep y   0x00007f51da1252f2 in raw_open_common at =
-/opt/qemu/qemu-2.5.0/block/raw-posix.c:457
-  3       breakpoint     keep y   0x00007f51da12500f in raw_parse_flags at =
-/opt/qemu/qemu-2.5.0/block/raw-posix.c:358
-  (gdb)
-
-  call drive_mirror and debug:
-
-  (gdb)
-  raw_open_common (bs=3D0x7f4b27259ab0, options=3D0x7f4b27480290, bdrv_flag=
-s=3D24674, open_flags=3D0, errp=3D0x7fff4a19f548)
-      at /opt/qemu/qemu-2.5.0/block/raw-posix.c:484
-  484        s->fd =3D -1;
-  (gdb) n
-  485        fd =3D qemu_open(filename, s->open_flags, 0644);
-  (gdb) s
-  qemu_open (name=3D0x7f4b2642b5c0 "/dev/vg_bc_local/test", flags=3D2) at /=
-opt/qemu/qemu-2.5.0/util/osdep.c:177
-  177        int mode =3D 0;
-  (gdb) n
-  183        if (strstart(name, "/dev/fdset/", &fdset_id_str)) {
-  (gdb)
-  214        if (flags & O_CREAT) {
-  (gdb)
-  223    char arg[1000] =3D {0};
-  (gdb)
-  227        ret =3D open(name, flags , mode);
-  (gdb) p name
-  $1 =3D 0x7f4b2642b5c0 "/dev/vg_bc_local/test"
-  (gdb) p flags
-  $2 =3D 2
-  (gdb) p mode
-  $3 =3D 0
-  (gdb) n
-  (gdb) p ret
-  $4 =3D -1
-
-  get system erroron is :Operation not permitted  =
-
-  !!!!!!!!!!!!!!
-
-  =
-
-  Re-run VM Directly  and debug by gdb
-  /usr/local/qemu-2.5.0-20160720/bin/qemu-system-x86_64 -hda /tmp/image.raw=
- -m 64 --enable-kvm -vnc :51 -monitor stdio
-  (qemu) info block
-  ide0-hd0 (#block135): /tmp/image.raw (raw)
-      Cache mode:       writeback
-  (qemu) drive_mirror -n -f ide0-hd0 /dev/vg_bc_local/test raw
-
-  gdb debug:
-  (gdb) i b
-  Num     Type           Disp Enb Address            What
-  1       breakpoint     keep y   0x00007f51d9e92cb1 in qmp_drive_mirror at=
- /opt/qemu/qemu-2.5.0/blockdev.c:3310
-  2       breakpoint     keep y   0x00007f51da1252f2 in raw_open_common at =
-/opt/qemu/qemu-2.5.0/block/raw-posix.c:457
-  3       breakpoint     keep y   0x00007f51da12500f in raw_parse_flags at =
-/opt/qemu/qemu-2.5.0/block/raw-posix.c:358
-  (gdb)
-  raw_open_common (bs=3D0x7f51dc15d350, options=3D0x7f51dc083110, bdrv_flag=
-s=3D24642, open_flags=3D0, errp=3D0x7fff5aaa9738)
-      at /opt/qemu/qemu-2.5.0/block/raw-posix.c:484
-  484        s->fd =3D -1;
-  (gdb) n
-  485        fd =3D qemu_open(filename, s->open_flags, 0644);
-  (gdb) s
-  qemu_open (name=3D0x7f51dca09230 "/dev/vg_bc_local/test", flags=3D2) at /=
-opt/qemu/qemu-2.5.0/util/osdep.c:177
-  177        int mode =3D 0;
-  (gdb) n
-  183        if (strstart(name, "/dev/fdset/", &fdset_id_str)) {
-  (gdb)
-  214        if (flags & O_CREAT) {
-  (gdb)
-  223    char arg[1000] =3D {0};
-  (gdb)
-  227        ret =3D open(name, flags , mode);
-  (gdb) p name
-  $1 =3D 0x7f51dca09230 "/dev/vg_bc_local/test"
-  (gdb) p flags
-  $2 =3D 2
-  (gdb) p mode
-  $3 =3D 0
-  (gdb) n
-  (gdb) p ret
-  $4 =3D 16
-  (gdb)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1605506/+subscriptions
+--AhhlLboLdkugWU4S--
 
