@@ -2,83 +2,86 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA64C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05EAC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2D22206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:56:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC0B3206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:07:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1bnk1+Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D22206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=etsukata-com.20150623.gappssmtp.com header.i=@etsukata-com.20150623.gappssmtp.com header.b="1z3/Pq0j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC0B3206CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=etsukata.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijJW7-0004c0-Uc
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:56:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56099)
+	id 1ijJgf-0007i2-SE
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:07:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ijJVU-0004Cb-D5
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:56:05 -0500
+ (envelope-from <devel@etsukata.com>) id 1ijJg4-0007IS-7J
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:07:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ijJVT-0007a4-8i
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:56:04 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40237)
+ (envelope-from <devel@etsukata.com>) id 1ijJg3-00080n-2h
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:07:00 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34883)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ijJVT-0007Wf-1r
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:56:03 -0500
-Received: by mail-ot1-x344.google.com with SMTP id w21so13484971otj.7
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 00:56:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=0pZWmTrzRkYhemir2xCREJGbM7fh5wdv6cE9Kp9V+XM=;
- b=P1bnk1+YGYkWsSHE9lkq6L9SFR0vhOb48pPLL8KVQ/fsXdkPR5iX0Xavl7pfUP/NOK
- sUNiePQtNgyOtrU/kG0Uq9VSEo2AFSBO8aTI3WJdEucCgUqw5R/UBeu0oscHqTySTFUF
- x6sre1W4UtYaDwEAssJbe0sIYOzOT6Vit/87O+koIPVjQ8YSaho7wl2N0gQKX0yaIZx3
- T9jvcDzI/BZk/zIAXt0rHZciwJZmIfUNNoh9m0attqF1BTvzVGXS+L022LETfsypV8HT
- X/b4pkQesijaGLo/G6n7rpa1eOsCpeAXmsT7GKuSxgZGg1kND00AgA3rpXBmVJsc317n
- 790w==
+ (Exim 4.71) (envelope-from <devel@etsukata.com>) id 1ijJg2-0007sO-KE
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:06:58 -0500
+Received: by mail-pg1-x543.google.com with SMTP id l24so8502404pgk.2
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 01:06:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=etsukata-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LxG3wd+JkDnvw8rUQlHr+glYrc/y7je8jBeo318Kmpw=;
+ b=1z3/Pq0jhs/0Gm59/Bl4pvknRJfRKkoMWr787pFN1u+/459OgyJs4lWFoOHn16+NCr
+ P+RjaaB7X1XXAuPNeZVUegOCjIQ4gwYR0gM9QcDtBiqycVV9ZZbGT5oCGNMuWc+EJ0hv
+ O/S7PwRrAumkC6wDnmBFpmTPsmvisSMchpVSzwMXhKO9xqJCsWx7an6TX311n91b3Mk5
+ xY8DtMtS1nKMYUnkUJvrx7XP9k1PR99GWlKkwUJjIXXGXs03e2NWfK4HKVOnIPBbz2kd
+ Lq5qQRXtUctkPAToZxQdzCVz2QqDD+CerUYD7b8kJBc3SMNKmt8KoRj9XwTKTxk++XZK
+ Fl8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=0pZWmTrzRkYhemir2xCREJGbM7fh5wdv6cE9Kp9V+XM=;
- b=LckFvLUb5U9oDLBedZOUhHhayq9IarETzTi1s2ESRLNFTbjeEWlnldhRiVl9o5pRMW
- vkVgJWtR+bfx3CC/g1iMVWpa/JYiHZkwvtowtcJHKTu6I2XbJGf5ej+ofv1K0JGeB1Ue
- lD3mPf3xnIG0N6NrQ6o6+CxZ33yEfljxHUqWGErWptfOorn+RNy4OQA003UlKRTO0dO9
- KflDhoDt/Ej1H3wmFpltMRpHaXAY5B669VL38OTGapZvpzBwIYitX42Yc/r6VsmelJ9i
- 0FGb6CBYOkR2uDCMiZ3h3I4O02p+wNkDqbBzR291HQ5KBEMXekMuOY8Gc5QA82nyrFeq
- gZEQ==
-X-Gm-Message-State: APjAAAVN72VpK07VpXyKoYJbcQzpdqQJ6QW1DQ1LwwjBbg782yTfmspW
- xaqCo6gEt1CyvdIXLtrKkYgwhEnUTFPkjXltysg=
-X-Google-Smtp-Source: APXvYqwsLLBaHYbWKTPr2+Bng0HOG6I6zsqkkNO29w5trUbQXt3na3B1TI0utC8zKm2HyMOUmpVu8uZLrk1qAQ5/7rc=
-X-Received: by 2002:a9d:4c94:: with SMTP id m20mr27265672otf.341.1577091362322; 
- Mon, 23 Dec 2019 00:56:02 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LxG3wd+JkDnvw8rUQlHr+glYrc/y7je8jBeo318Kmpw=;
+ b=W+l00tOtn9ph8soJarhpPwoF/n+zPVjcDI/veudQK1pcQDaGRj+mbLgmqJfmJYmYEn
+ tLdIuGhbAC76TUBByFJ/qeVEw6eOAlYnCYFW4GxKZ9dZGxxXOF3Y3zgPNZkshOOaMoWg
+ v8sxdUXKXtZnvmFDf8cTgG0qA5KhCuTTGwahvUdmnUpYB3raIphmlAwhc2RndESgTwTp
+ YPyJMnYw0xeGCUsSGM80RIhELnWpKaT84Doi3PtSwTrQAkY40eFuUFBHuCzXDWBvcyd7
+ aEtZUWIKcg5Ns/eOvQcksg2yv7sBlwj9jxdUeGpx5CUH6/B9FRnoxSgjuA2LcIL8BxcV
+ owWg==
+X-Gm-Message-State: APjAAAUNpHGURV9Ko7gujs2idbUbJogYsyrv3w2V7t1UK0RW6svl+dYo
+ hLdEjh773zoO7437v9gR7fB8Ew==
+X-Google-Smtp-Source: APXvYqyOZJ/C4M39HQ8Rps4SWb2kPASSnO+XeiyHJFC6iYI2DiRuzTwaEaXSDB413qwUMCuNG4JdpQ==
+X-Received: by 2002:a63:89c2:: with SMTP id
+ v185mr29525920pgd.135.1577092017039; 
+ Mon, 23 Dec 2019 01:06:57 -0800 (PST)
+Received: from localhost.localdomain
+ (p5307023-ipngn11902marunouchi.tokyo.ocn.ne.jp. [114.166.45.23])
+ by smtp.gmail.com with ESMTPSA id r1sm19466242pjp.29.2019.12.23.01.06.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 23 Dec 2019 01:06:56 -0800 (PST)
+From: Eiichi Tsukata <devel@etsukata.com>
+To: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, vsementsov@virtuozzo.com
+Subject: [PATCH] block/backup: fix memory leak in bdrv_backup_top_append()
+Date: Mon, 23 Dec 2019 18:06:32 +0900
+Message-Id: <20191223090632.30653-1-devel@etsukata.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Mon, 23 Dec 2019 00:56:01 -0800 (PST)
-In-Reply-To: <20191218210329.1960-23-mrolnik@gmail.com>
-References: <20191218210329.1960-1-mrolnik@gmail.com>
- <20191218210329.1960-23-mrolnik@gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 23 Dec 2019 09:56:01 +0100
-Message-ID: <CAL1e-=ip9gDy2VjJBAmTfaWixkvMNCzB=wNF53gvxNBxnM+1Mw@mail.gmail.com>
-Subject: Re: [PATCH v39 22/22] target/avr: Update MAINTAINERS file
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000006dfbf3059a5b32a0"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,144 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: Eiichi Tsukata <devel@etsukata.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006dfbf3059a5b32a0
-Content-Type: text/plain; charset="UTF-8"
+bdrv_open_driver() allocates bs->opaque according to drv->instance_size.
+There is no need to allocate it and overwrite opaque in
+bdrv_backup_top_append().
 
-On Wednesday, December 18, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+Reproducer:
 
-> Include AVR maintaners in MAINTAINERS file
->
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> ---
->  MAINTAINERS | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 740401bcbb..9ed886106a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -163,6 +163,27 @@ S: Maintained
->  F: hw/arm/smmu*
->  F: include/hw/arm/smmu*
->
-> +AVR TCG CPUs
-> +M: Michael Rolnik <mrolnik@gmail.com>
-> +R: Sarah Harris <S.E.Harris@kent.ac.uk>
-> +S: Maintained
-> +F: target/avr/
-> +F: tests/acceptance/machine_avr6.py
-> +F: default-configs/avr-softmmu.mak
-> +F: gdb-xml/avr-cpu.xml
-> +
-> +AVR Machines
-> +M: Michael Rolnik <mrolnik@gmail.com>
-> +R: Sarah Harris <S.E.Harris@kent.ac.uk>
-> +S: Maintained
-> +F: hw/avr/
-> +F: hw/char/avr_usart.c
-> +F: include/hw/char/avr_usart.h
-> +F: hw/timer/avr_timer16.c
-> +F: include/hw/timer/avr_timer16.h
-> +F: hw/misc/avr_mask.c
-> +F: include/hw/misc/avr_mask.h
-> +
+  $ QTEST_QEMU_BINARY=./x86_64-softmmu/qemu-system-x86_64 valgrind -q --leak-check=full tests/test-replication -p /replication/secondary/start
+  ==29792== 24 bytes in 1 blocks are definitely lost in loss record 52 of 226
+  ==29792==    at 0x483AB1A: calloc (vg_replace_malloc.c:762)
+  ==29792==    by 0x4B07CE0: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.6000.7)
+  ==29792==    by 0x12BAB9: bdrv_open_driver (block.c:1289)
+  ==29792==    by 0x12BEA9: bdrv_new_open_driver (block.c:1359)
+  ==29792==    by 0x1D15CB: bdrv_backup_top_append (backup-top.c:190)
+  ==29792==    by 0x1CC11A: backup_job_create (backup.c:439)
+  ==29792==    by 0x1CD542: replication_start (replication.c:544)
+  ==29792==    by 0x1401B9: replication_start_all (replication.c:52)
+  ==29792==    by 0x128B50: test_secondary_start (test-replication.c:427)
+  ...
 
+Fixes: 7df7868b9640 ("block: introduce backup-top filter driver")
+Signed-off-by: Eiichi Tsukata <devel@etsukata.com>
+---
+ block/backup-top.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This second section "AVR Machines" is in the wrong place. (Philippe already
-brought this to your attention, but it looks you did not understand his
-point.) Please move this section further down the MAINTAINERS file, after
-"Alpha machines" and "Arm machines". Also, header file and source files are
-in the wrong order in your list. Headrrs should always preceede source files
+diff --git a/block/backup-top.c b/block/backup-top.c
+index 7cdb1f8eba..617217374d 100644
+--- a/block/backup-top.c
++++ b/block/backup-top.c
+@@ -196,7 +196,7 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverState *source,
+     }
+ 
+     top->total_sectors = source->total_sectors;
+-    top->opaque = state = g_new0(BDRVBackupTopState, 1);
++    state = top->opaque;
+ 
+     bdrv_ref(target);
+     state->target = bdrv_attach_child(top, target, "target", &child_file, errp);
+-- 
+2.21.0
 
-Yours,
-Aleksandar
-
-
-
-
->  CRIS TCG CPUs
->  M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->  S: Maintained
-> --
-> 2.17.2 (Apple Git-113)
->
->
-
---0000000000006dfbf3059a5b32a0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Wednesday, December 18, 2019, Michael Rolnik &lt;<a href=3D"mail=
-to:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">Include AVR maintaners in MAINTAINERS file<br>
-<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrol=
-nik@gmail.com</a>&gt;<br>
----<br>
-=C2=A0MAINTAINERS | 21 +++++++++++++++++++++<br>
-=C2=A01 file changed, 21 insertions(+)<br>
-<br>
-diff --git a/MAINTAINERS b/MAINTAINERS<br>
-index 740401bcbb..9ed886106a 100644<br>
---- a/MAINTAINERS<br>
-+++ b/MAINTAINERS<br>
-@@ -163,6 +163,27 @@ S: Maintained<br>
-=C2=A0F: hw/arm/smmu*<br>
-=C2=A0F: include/hw/arm/smmu*<br>
-<br>
-+AVR TCG CPUs<br>
-+M: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrolnik@gmail.c=
-om</a>&gt;<br>
-+R: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk">S.E.Harris@ke=
-nt.ac.uk</a>&gt;<br>
-+S: Maintained<br>
-+F: target/avr/<br>
-+F: tests/acceptance/machine_avr6.<wbr>py<br>
-+F: default-configs/avr-softmmu.<wbr>mak<br>
-+F: gdb-xml/avr-cpu.xml<br>
-+<br>
-+AVR Machines<br>
-+M: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrolnik@gmail.c=
-om</a>&gt;<br>
-+R: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk">S.E.Harris@ke=
-nt.ac.uk</a>&gt;<br>
-+S: Maintained<br>
-+F: hw/avr/<br>
-+F: hw/char/avr_usart.c<br>
-+F: include/hw/char/avr_usart.h<br>
-+F: hw/timer/avr_timer16.c<br>
-+F: include/hw/timer/avr_timer16.h<br>
-+F: hw/misc/avr_mask.c<br>
-+F: include/hw/misc/avr_mask.h<br>
-+</blockquote><div><br></div><div>This second section &quot;AVR Machines&qu=
-ot; is in the wrong place. (Philippe already brought this to your attention=
-, but it looks you did not understand his point.) Please move this section =
-further down the MAINTAINERS file, after &quot;Alpha machines&quot; and &qu=
-ot;Arm machines&quot;. Also, header file and source files are in the wrong =
-order in your list. Headrrs should always preceede source files</div><div><=
-br></div><div>Yours,</div><div>Aleksandar</div><div><br></div><div><br></di=
-v><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
-.8ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0CRIS TCG CPUs<br>
-=C2=A0M: Edgar E. Iglesias &lt;<a href=3D"mailto:edgar.iglesias@gmail.com">=
-edgar.iglesias@gmail.com</a>&gt;<br>
-=C2=A0S: Maintained<br>
--- <br>
-2.17.2 (Apple Git-113)<br>
-<br>
-</blockquote>
-
---0000000000006dfbf3059a5b32a0--
 
