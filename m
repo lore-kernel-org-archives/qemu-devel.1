@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D4FC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1541C2D0D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:13:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C81420663
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E7E320663
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 06:13:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="X+jLcU/0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C81420663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="qNeFmk1w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E7E320663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijGya-0000w8-2f
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 01:13:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54473)
+	id 1ijGyb-0000yU-9w
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 01:13:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54469)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ijGxY-0008AK-7t
+ (envelope-from <dgibson@ozlabs.org>) id 1ijGxY-0008AJ-54
  for qemu-devel@nongnu.org; Mon, 23 Dec 2019 01:12:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ijGxW-0007PM-ES
+ (envelope-from <dgibson@ozlabs.org>) id 1ijGxW-0007PV-Fe
  for qemu-devel@nongnu.org; Mon, 23 Dec 2019 01:12:51 -0500
-Received: from ozlabs.org ([203.11.71.1]:47089)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41855 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ijGxV-00078t-Co; Mon, 23 Dec 2019 01:12:50 -0500
+ id 1ijGxV-000789-Ai; Mon, 23 Dec 2019 01:12:50 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47h8Cd1NWHz9sR4; Mon, 23 Dec 2019 17:12:44 +1100 (AEDT)
+ id 47h8Cc5t77z9sR1; Mon, 23 Dec 2019 17:12:44 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1577081565;
- bh=dpusexBASxYe2sEAZBAzOtRUBdBLdqkf/IRBuC3sRHo=;
+ d=gibson.dropbear.id.au; s=201602; t=1577081564;
+ bh=Le+jgYsHUYmmNbEqSW/dA0TYp4WwPgU3fuWrhCGD7Q8=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=X+jLcU/0jiR88m10TBifYf2RUrXgPn4JftR2n1AYY3r4RbBW7S5+KqtiSBxokAcKd
- e6+IjB8M+su754WM9+Ggz02ZpsDR4mzKKOWq5n4eQqPXq/+ZUfdW7v7LcYRWe8ejni
- NhyU21YmkPhLy2fAJvDZGvoAfEdoKs7ou9Q4MZh8=
-Date: Mon, 23 Dec 2019 17:12:39 +1100
+ b=qNeFmk1wlQMNRpR4BODbFA+tz/QibnskCT3Hv2Fs3GC3S3hNRXg1UhoYqJs6BqP8t
+ z5Jo9+/L7g6bG1AJWT2mxQt4BX++ds9q7lB3ncGaQMoYyxjApU6kGHR+Iqf4CNfQq1
+ Ch05kLettsvs2/HKohij3Exso7DuCZu/tRFQzVZU=
+Date: Mon, 23 Dec 2019 17:10:16 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v2 09/13] ppc/pnv: Add an "nr-threads" property to the
- base chip class
-Message-ID: <20191223061239.GE38380@umbus.modem>
+Subject: Re: [PATCH v2 07/13] spapr, pnv, xive: Add a "xive-fabric" link to
+ the XIVE router
+Message-ID: <20191223061016.GC38380@umbus.modem>
 References: <20191219181155.32530-1-clg@kaod.org>
- <20191219181155.32530-10-clg@kaod.org>
+ <20191219181155.32530-8-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cPi+lWm09sJ+d57q"
+ protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
 Content-Disposition: inline
-In-Reply-To: <20191219181155.32530-10-clg@kaod.org>
+In-Reply-To: <20191219181155.32530-8-clg@kaod.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -76,85 +76,136 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---cPi+lWm09sJ+d57q
+--OBd5C1Lgu00Gd/Tn
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 19, 2019 at 07:11:51PM +0100, C=E9dric Le Goater wrote:
+On Thu, Dec 19, 2019 at 07:11:49PM +0100, C=E9dric Le Goater wrote:
 > From: Greg Kurz <groug@kaod.org>
 >=20
-> Set it at chip creation and forward it to the cores. This allows to drop
-> a call to qdev_get_machine().
+> In order to get rid of qdev_get_machine(), first add a pointer to the
+> XIVE fabric under the XIVE router and make it configurable through a
+> QOM link property.
+>=20
+> Configure it in the spapr and pnv machine. In the case of pnv, the XIVE
+> routers are under the chip, so this is done with a QOM alias property of
+> the POWER9 pnv chip.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-But will need rebase.
+LGTM, but will need rebase.
 
 > ---
->  include/hw/ppc/pnv.h | 1 +
->  hw/ppc/pnv.c         | 8 +++++---
->  2 files changed, 6 insertions(+), 3 deletions(-)
+>  include/hw/ppc/xive.h | 5 +++--
+>  hw/intc/xive.c        | 8 ++++++++
+>  hw/ppc/pnv.c          | 6 ++++++
+>  hw/ppc/spapr_irq.c    | 2 ++
+>  4 files changed, 19 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 8b957dfb5736..4c13d4394a11 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -48,6 +48,7 @@ typedef struct PnvChip {
->      uint64_t     ram_size;
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 1b7b89098f71..1ded82b1cda8 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -324,9 +324,12 @@ typedef struct XiveTCTX {
+>  /*
+>   * XIVE Router
+>   */
+> +typedef struct XiveFabric XiveFabric;
 > =20
->      uint32_t     nr_cores;
-> +    uint32_t     nr_threads;
->      uint64_t     cores_mask;
->      PnvCore      **cores;
+>  typedef struct XiveRouter {
+>      SysBusDevice    parent;
+> +
+> +    XiveFabric *xfb;
+>  } XiveRouter;
 > =20
+>  #define TYPE_XIVE_ROUTER "xive-router"
+> @@ -402,8 +405,6 @@ int xive_presenter_tctx_match(XivePresenter *xptr, Xi=
+veTCTX *tctx,
+>   * XIVE Fabric (Interface between Interrupt Controller and Machine)
+>   */
+> =20
+> -typedef struct XiveFabric XiveFabric;
+> -
+>  #define TYPE_XIVE_FABRIC "xive-fabric"
+>  #define XIVE_FABRIC(obj)                                     \
+>      INTERFACE_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index d4c6e21703b3..6df89b06da38 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -1714,12 +1714,19 @@ void xive_router_notify(XiveNotifier *xn, uint32_=
+t lisn)
+>                             xive_get_field64(EAS_END_DATA,  eas.w));
+>  }
+> =20
+> +static Property xive_router_properties[] =3D {
+> +    DEFINE_PROP_LINK("xive-fabric", XiveRouter, xfb,
+> +                     TYPE_XIVE_FABRIC, XiveFabric *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void xive_router_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>      XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
+> =20
+>      dc->desc    =3D "XIVE Router Engine";
+> +    dc->props   =3D xive_router_properties;
+>      xnc->notify =3D xive_router_notify;
+>  }
+> =20
+> @@ -1727,6 +1734,7 @@ static const TypeInfo xive_router_info =3D {
+>      .name          =3D TYPE_XIVE_ROUTER,
+>      .parent        =3D TYPE_SYS_BUS_DEVICE,
+>      .abstract      =3D true,
+> +    .instance_size =3D sizeof(XiveRouter),
+>      .class_size    =3D sizeof(XiveRouterClass),
+>      .class_init    =3D xive_router_class_init,
+>      .interfaces    =3D (InterfaceInfo[]) {
 > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 915c80a24b3e..e638cdc93091 100644
+> index 2a1b15a69aed..915c80a24b3e 100644
 > --- a/hw/ppc/pnv.c
 > +++ b/hw/ppc/pnv.c
-> @@ -791,6 +791,8 @@ static void pnv_init(MachineState *machine)
->                                  &error_fatal);
->          object_property_set_int(chip, machine->smp.cores,
->                                  "nr-cores", &error_fatal);
-> +        object_property_set_int(chip, machine->smp.threads,
-> +                                "nr-threads", &error_fatal);
->          /*
->           * TODO: Only the MMIO range should be of interest for the
->           * controllers
-> @@ -1529,7 +1531,6 @@ static void pnv_chip_core_sanitize(PnvChip *chip, E=
-rror **errp)
+> @@ -804,6 +804,10 @@ static void pnv_init(MachineState *machine)
+>          if (object_dynamic_cast(OBJECT(pnv), TYPE_XICS_FABRIC)) {
+>              object_property_set_link(chip, OBJECT(pnv), "xics", &error_a=
+bort);
+>          }
+> +        if (object_dynamic_cast(OBJECT(pnv), TYPE_XIVE_FABRIC)) {
+> +            object_property_set_link(chip, OBJECT(pnv), "xive-fabric",
+> +                                     &error_abort);
+> +        }
+>          object_property_set_bool(chip, true, "realized", &error_fatal);
+>      }
+>      g_free(chip_typename);
+> @@ -1224,6 +1228,8 @@ static void pnv_chip_power9_instance_init(Object *o=
+bj)
 > =20
->  static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
->  {
-> -    MachineState *ms =3D MACHINE(qdev_get_machine());
->      Error *error =3D NULL;
->      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
->      const char *typename =3D pnv_chip_core_typename(chip);
-> @@ -1565,8 +1566,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
-ror **errp)
->          object_property_add_child(OBJECT(chip), core_name, OBJECT(pnv_co=
-re),
->                                    &error_abort);
->          chip->cores[i] =3D pnv_core;
-> -        object_property_set_int(OBJECT(pnv_core), ms->smp.threads, "nr-t=
-hreads",
-> -                                &error_fatal);
-> +        object_property_set_int(OBJECT(pnv_core), chip->nr_threads,
-> +                                "nr-threads", &error_fatal);
->          object_property_set_int(OBJECT(pnv_core), core_hwid,
->                                  CPU_CORE_PROP_CORE_ID, &error_fatal);
->          object_property_set_int(OBJECT(pnv_core),
-> @@ -1609,6 +1610,7 @@ static Property pnv_chip_properties[] =3D {
->      DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
->      DEFINE_PROP_LINK("system-memory", PnvChip, system_memory,
->                       TYPE_MEMORY_REGION, MemoryRegion *),
-> +    DEFINE_PROP_UINT32("nr-threads", PnvChip, nr_threads, 1),
->      DEFINE_PROP_END_OF_LIST(),
->  };
+>      object_initialize_child(obj, "xive", &chip9->xive, sizeof(chip9->xiv=
+e),
+>                              TYPE_PNV_XIVE, &error_abort, NULL);
+> +    object_property_add_alias(obj, "xive-fabric", OBJECT(&chip9->xive),
+> +                              "xive-fabric", &error_abort);
 > =20
+>      object_initialize_child(obj, "psi",  &chip9->psi, sizeof(chip9->psi),
+>                              TYPE_PNV9_PSI, &error_abort, NULL);
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 07e08d6544a0..2b656649ad6a 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -340,6 +340,8 @@ void spapr_irq_init(SpaprMachineState *spapr, Error *=
+*errp)
+>           * priority
+>           */
+>          qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+> +        object_property_set_link(OBJECT(dev), OBJECT(spapr), "xive-fabri=
+c",
+> +                                 &error_abort);
+>          qdev_init_nofail(dev);
+> =20
+>          spapr->xive =3D SPAPR_XIVE(dev);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -162,25 +213,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cPi+lWm09sJ+d57q
+--OBd5C1Lgu00Gd/Tn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4AWtYACgkQbDjKyiDZ
-s5I1XhAA5LN92fgiFAREHTDuIdQCqD95d1SjpNBbhLEt2mGFf9slmfSV4ae2W2qJ
-zE1AYjTy3RyXqOEVCYvJC0nDZOC/YJwtEVETfLfx/9QC/8P58AuB286HcLV9xzxD
-cLMNUXe8vHpFvKaCNkBdSuTve/gkUsI7Vv+uYvJVUEn2a0cMmmdixcvVbxjTqJFL
-1HrdDT6fxtWj1E4umcL3NBYMs36sZ0BPuoMe3c6r22wNdu/Tj6b4utKHGr04Pri8
-mX0HYnOKNZuIwWMXydzQqFVIDP2ypPaaOsO9gB1rSv1lDR+u6pODGK1TShg8EfNt
-iVzBrl0uXxuqR+4hO9C4kAKKcxy1G6rYrNvT2ifoIRF+/WXYYnd4kOQQCwXDJnVu
-6qnnhKG787nHdnjKhPBua1ohbDD086jzd3Mr2K+WPaBoK5S9lykQUjDvI8KIdvyY
-QlMIZobW8XSaGO/SB5KLBdUEQ4tkxD7UCQ2pc9mDWwUwhwxnSLxsciJvE+GANBTK
-3yeko1n0aamtqq56zSChAfewpqFLvui6vDYcGUdHGlUwiLG5YyEEkLfexvwQdjWw
-ojKODLJxZ9m1oSxLip3wDvC8M1JovkbHx5yRhy70LUT+/A2te1EoMEHGgh04jf63
-BIp2bKidzq7v0vpcbI3MiOYZyy3hGOl/VdYNlOf/GVun61EZH6k=
-=U18E
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4AWkgACgkQbDjKyiDZ
+s5In5xAAkYD4ANcSsqnyRFx2DWP9vzrTAZ8hbsvKUbBwTGiflToIRkqvepiSqZ4T
+8bnWVlX8Q8fuJ66ffiKFu7iFSYJUdpkgSqkCbCFBZlvtnWi47UNobhSpVDVECqHK
+2fdYCJ8lKpTYEmtJpDdbHLpxSZXrALWYZkK9I4sbw2jRfEkp4WB3c1EKgsPCw/6X
+iu+k9HPs2sWbId4FlirX1ecoAQA6aOX7enFSgAaP4FHO9SBovAi6KYSVzyqW8DeR
+2YuMDFG5w5DoE9vFA1ZImzwJyaf8c1PLyNY9jlEJ5jIM6MN8tb08G0lqqYU8TwFL
+BUwyMD8Cyne9TJ09hUCJ5bEmDffJ23FyEDkn/n8+veBUFy4+LycEeo0/nf9bFqVx
+xWJIurxi+UxEufHRo7rLc9Ej8D+T/l3lGNiXlfd/1dCoMSJtPtfr4HxQ7klGVCKA
+PIZB/zA2RbEcAVnK9siMizFva4ryHWMDUsBDdxdGpMU8+eVQUqixH2T3wsQmt93H
++h8FmLeapAlMN3GRZida4IEZ21D2kE8LHgRLniRvnbN/RNHvRO3ZhAnmn7db2+i7
+a496apcPIxrN57h54x8EYi959XNHKAG2OuhwAn2eVsJfKBMsqnc0XFT1Za7odMQ/
+55yQonvIHaTzeLHbXu1j1rXq4phAxg0QsrQPaPSSRRodTuS1/k0=
+=tadb
 -----END PGP SIGNATURE-----
 
---cPi+lWm09sJ+d57q--
+--OBd5C1Lgu00Gd/Tn--
 
