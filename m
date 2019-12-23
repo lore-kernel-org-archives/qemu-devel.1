@@ -2,58 +2,58 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B46C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4076AC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B02F20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:54:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B02F20663
+	by mail.kernel.org (Postfix) with ESMTPS id 1E1EB20663
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 17:55:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E1EB20663
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijRuw-0000Y1-71
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 12:54:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39259)
+	id 1ijRv1-0000d7-9Q
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 12:54:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1ijRu3-0007uq-1B
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:53:59 -0500
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1ijRu5-0007xe-JZ
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:54:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1ijRu2-00019y-3d
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:53:58 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:37964)
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1ijRu4-0001Ci-CR
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 12:54:01 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39026)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
- id 1ijRtz-00014p-PL; Mon, 23 Dec 2019 12:53:55 -0500
-Received: by mail-lf1-f65.google.com with SMTP id r14so13240826lfm.5;
- Mon, 23 Dec 2019 09:53:55 -0800 (PST)
+ id 1ijRu1-00017h-Fm; Mon, 23 Dec 2019 12:53:57 -0500
+Received: by mail-lj1-f196.google.com with SMTP id l2so18505319lja.6;
+ Mon, 23 Dec 2019 09:53:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=70ATbs8bPWzrnp3lDAUDWRJLJrMJ8ecBYWppY5sTlJI=;
- b=MRIU8WHKC1IdWL6OfphuD8aGN9MA4/5mNLjv9g6qkrcA2XHcTABuwLyJc8XIQDttJo
- DvznYlzY30qQ50jhw3QjfWmF+1+6X4NCjlKdAdDRabvj2YbRvAdaKV3Hc4bp1HtHzIp4
- nZPSiZNKZmyvg95vZMPWsKcAOhVl51SMWh6oZ4rRBcA24GwcX3CfNLYMD0mbhdmAOZ++
- /+J7MwDKzlLK7LCXxhpmOjS3rNIQtJLPha8hv7UEy4ywyrn90FBZN6KnINSVePaJWLOu
- 9NopDKjqmSDIH1p5XDEc7jr6076cz/aFn2QZunzZR+CboGqAFMSWsvruITDLcZIWXyZe
- FCYQ==
-X-Gm-Message-State: APjAAAWKLg18xPElErehlhUVREQKzU+HAqtAmoB/wjyIkdlYAqGaz3k9
- I/EJCWtbdWR+rzxKCewGWV8=
-X-Google-Smtp-Source: APXvYqx3OtIhpfuc/A7KcmdZgOTDmV2kg6+w0dNpUqmWFnA9vyLmxJVcl+kRc6iiKYTL2cbb4mHdtw==
-X-Received: by 2002:a19:f80a:: with SMTP id a10mr18056126lff.107.1577123634254; 
- Mon, 23 Dec 2019 09:53:54 -0800 (PST)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=gjl2jrKVMsz9MrQbtYG/IruMaBFXQ98Mmvqj+RGEwG8=;
+ b=oxNIoI81oVyoARe240eqPJIUBgMgDtkCA4WhTYc84xkwfSo8F01UdrdLDd5hiTT7US
+ 4XTF4kN4lBJwdhhAI2I2YD7b53zL5jA8x5U25w1l3xwU5UvB1vk/X8T87U9NyCADHSkH
+ CrnQSfpuHts4PVhSemqd3nMtMUOgEf2JzvhzH/KcWR4MsMLqGymE/BKr+d8fJ3/Dc6cb
+ hidwJ4qydHftV58EEUXyEBDyAjfFoGnpU3JsuAOpboFW/4RrD7SsGoWx8SoaDDbQ3twD
+ 3clT8VFPv1aLxL/QNE2QAfNv6jIayFQj5DgZ33GSm94ZBbhpkpfYcD1VR7NetG/9BGRP
+ iGbQ==
+X-Gm-Message-State: APjAAAXo45/64dWoQnjWE3YxKq3/hTgy/hAa1Sc8wYSUpy813xrJNFHy
+ YAJKayn/Rl7Mj7lbyksiGQs=
+X-Google-Smtp-Source: APXvYqxe9BF4ZMQSE/OQuC4P7j9BUxtn4etGtMnvwt3t/mYiQTX4ScDzgwCUYnP20kZxjJsxJ5SPmA==
+X-Received: by 2002:a2e:3a13:: with SMTP id h19mr18940411lja.16.1577123636195; 
+ Mon, 23 Dec 2019 09:53:56 -0800 (PST)
 Received: from localhost.localdomain ([213.87.155.175])
- by smtp.gmail.com with ESMTPSA id y14sm8892345ljk.46.2019.12.23.09.53.51
+ by smtp.gmail.com with ESMTPSA id y14sm8892345ljk.46.2019.12.23.09.53.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Dec 2019 09:53:53 -0800 (PST)
+ Mon, 23 Dec 2019 09:53:55 -0800 (PST)
 From: Alexander Popov <alex.popov@linux.com>
 To: "Michael S . Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
  qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org,
@@ -64,16 +64,18 @@ To: "Michael S . Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
  Darren Kenny <darren.kenny@oracle.com>, Kevin Wolf <kwolf@redhat.com>,
  Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
  Alexander Popov <alex.popov@linux.com>
-Subject: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add the
- corresponding unit-test
-Date: Mon, 23 Dec 2019 20:51:15 +0300
-Message-Id: <20191223175117.508990-1-alex.popov@linux.com>
+Subject: [PATCH v3 1/2] ide: Fix incorrect handling of some PRDTs in
+ ide_dma_cb()
+Date: Mon, 23 Dec 2019 20:51:16 +0300
+Message-Id: <20191223175117.508990-2-alex.popov@linux.com>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191223175117.508990-1-alex.popov@linux.com>
+References: <20191223175117.508990-1-alex.popov@linux.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.167.65
+X-Received-From: 209.85.208.196
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,28 +91,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fuzzing the Linux kernel with syzkaller allowed to find how to crash qemu
-using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
-ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
+The commit a718978ed58a from July 2015 introduced the assertion which
+implies that the size of successful DMA transfers handled in ide_dma_cb()
+should be multiple of 512 (the size of a sector). But guest systems can
+initiate DMA transfers that don't fit this requirement.
 
-This patch series fixes incorrect handling of some PRDTs in ide_dma_cb()
-and improves the ide-test to cover more PRDT cases (including one
-that causes that particular qemu crash).
+For fixing that let's check the number of bytes prepared for the transfer
+by the prepare_buf() handler. The code in ide_dma_cb() must behave
+according to the Programming Interface for Bus Master IDE Controller
+(Revision 1.0 5/16/94):
+1. If PRDs specified a smaller size than the IDE transfer
+   size, then the Interrupt and Active bits in the Controller
+   status register are not set (Error Condition).
+2. If the size of the physical memory regions was equal to
+   the IDE device transfer size, the Interrupt bit in the
+   Controller status register is set to 1, Active bit is set to 0.
+3. If PRDs specified a larger size than the IDE transfer size,
+   the Interrupt and Active bits in the Controller status register
+   are both set to 1.
 
-Changes from v2 (thanks to Kevin Wolf for the feedback):
- - the assertion about prepare_buf() return value is improved;
- - the patch order is reversed to keep the tree bisectable;
- - the unit-test performance is improved -- now it runs 8 seconds
-   instead of 3 minutes on my laptop.
+Signed-off-by: Alexander Popov <alex.popov@linux.com>
+---
+ hw/ide/core.c | 30 ++++++++++++++++++++++--------
+ 1 file changed, 22 insertions(+), 8 deletions(-)
 
-Alexander Popov (2):
-  ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
-  tests/ide-test: Create a single unit-test covering more PRDT cases
-
- hw/ide/core.c    |  30 +++++---
- tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
- 2 files changed, 96 insertions(+), 108 deletions(-)
-
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 754ff4dc34..80000eb766 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -849,6 +849,7 @@ static void ide_dma_cb(void *opaque, int ret)
+     int64_t sector_num;
+     uint64_t offset;
+     bool stay_active = false;
++    int32_t prep_size = 0;
+ 
+     if (ret == -EINVAL) {
+         ide_dma_error(s);
+@@ -863,13 +864,15 @@ static void ide_dma_cb(void *opaque, int ret)
+         }
+     }
+ 
+-    n = s->io_buffer_size >> 9;
+-    if (n > s->nsector) {
+-        /* The PRDs were longer than needed for this request. Shorten them so
+-         * we don't get a negative remainder. The Active bit must remain set
+-         * after the request completes. */
++    if (s->io_buffer_size > s->nsector * 512) {
++        /*
++         * The PRDs were longer than needed for this request.
++         * The Active bit must remain set after the request completes.
++         */
+         n = s->nsector;
+         stay_active = true;
++    } else {
++        n = s->io_buffer_size >> 9;
+     }
+ 
+     sector_num = ide_get_sector(s);
+@@ -892,9 +895,20 @@ static void ide_dma_cb(void *opaque, int ret)
+     n = s->nsector;
+     s->io_buffer_index = 0;
+     s->io_buffer_size = n * 512;
+-    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512) {
+-        /* The PRDs were too short. Reset the Active bit, but don't raise an
+-         * interrupt. */
++    prep_size = s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size);
++    /* prepare_buf() must succeed and respect the limit */
++    assert(prep_size >= 0 && prep_size <= n * 512);
++
++    /*
++     * Now prep_size stores the number of bytes in the sglist, and
++     * s->io_buffer_size stores the number of bytes described by the PRDs.
++     */
++
++    if (prep_size < n * 512) {
++        /*
++         * The PRDs are too short for this request. Error condition!
++         * Reset the Active bit and don't raise the interrupt.
++         */
+         s->status = READY_STAT | SEEK_STAT;
+         dma_buf_commit(s, 0);
+         goto eot;
 -- 
 2.23.0
 
