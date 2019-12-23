@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF83C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D119C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:50:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24595206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:49:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24595206D3
+	by mail.kernel.org (Postfix) with ESMTPS id 00EF3206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 09:50:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00EF3206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijKLR-0005l6-Ta
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:49:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45726)
+	id 1ijKLn-000627-Mj
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 04:50:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45333)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1ijKJf-00044a-2t
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:47:56 -0500
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1ijKIk-00034c-Ig
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1ijKJd-00048e-1d
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:47:54 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:50888)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1ijKIj-0006qK-C0
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:46:58 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:50722)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1ijKJc-0003zj-Ib
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:47:52 -0500
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1ijKIi-0006kG-TP
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 04:46:57 -0500
 Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 2BC6354006B;
- Mon, 23 Dec 2019 12:47:47 +0300 (MSK)
-Subject: [for-5.0 PATCH 06/11] replay: introduce breakpoint at the specified
- step
+ by mail.ispras.ru (Postfix) with ESMTPSA id DBC3154006B;
+ Mon, 23 Dec 2019 12:46:38 +0300 (MSK)
+Subject: [for-5.0 PATCH 02/11] qcow2: introduce icount field for snapshots
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 23 Dec 2019 12:47:46 +0300
-Message-ID: <157709446688.12933.7598131292472178158.stgit@pasha-Precision-3630-Tower>
+Date: Mon, 23 Dec 2019 12:46:38 +0300
+Message-ID: <157709439859.12933.3023824005902199560.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
 References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -74,304 +73,85 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch introduces replay_break, replay_delete_break
-qmp and hmp commands.
-These commands allow stopping at the specified instruction.
-It may be useful for debugging when there are some known
-events that should be investigated.
-replay_break command has one argument - number of instructions
-executed since the start of the replay.
-replay_delete_break removes previously set breakpoint.
+This patch introduces the icount field for saving within the snapshot.
+It is required for navigation between the snapshots in record/replay mode.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
 
 --
 
 v2:
- - renamed replay_break qmp command into replay-break
+ - documented format changes in docs/interop/qcow2.txt
    (suggested by Eric Blake)
-v7:
- - introduces replay_delete_break command
-v9:
- - changed 'step' parameter name to 'icount'
- - moved json stuff to replay.json and updated the description
-   (suggested by Markus Armbruster)
 v10:
- - updated descriptions (suggested by Markus Armbruster)
-v11:
- - fixed replay_break rearm bug
+ - updated the documentation
 ---
- hmp-commands.hx           |   34 ++++++++++++++++++
- include/monitor/hmp.h     |    2 +
- qapi/replay.json          |   36 +++++++++++++++++++
- replay/replay-debugging.c |   86 +++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-internal.h  |    4 ++
- replay/replay.c           |   17 +++++++++
- 6 files changed, 179 insertions(+)
+ block/qcow2-snapshot.c |    7 +++++++
+ block/qcow2.h          |    3 +++
+ docs/interop/qcow2.txt |    4 ++++
+ 3 files changed, 14 insertions(+)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index cfcc044ce4..3704294da8 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1930,6 +1930,40 @@ ETEXI
- STEXI
- @item qom-set @var{path} @var{property} @var{value}
- Set QOM property @var{property} of object at location @var{path} to value @var{value}
-+ETEXI
-+
-+    {
-+        .name       = "replay_break",
-+        .args_type  = "icount:i",
-+        .params     = "icount",
-+        .help       = "set breakpoint at the specified instruction count",
-+        .cmd        = hmp_replay_break,
-+    },
-+
-+STEXI
-+@item replay_break @var{icount}
-+@findex replay_break
-+Set replay breakpoint at instruction count @var{icount}.
-+Execution stops when the specified instruction is reached.
-+There can be at most one breakpoint. When breakpoint is set, any prior
-+one is removed.  The breakpoint may be set only in replay mode and only
-+"in the future", i.e. at instruction counts greater than the current one.
-+The current instruction count can be observed with 'info replay'.
-+ETEXI
-+
-+    {
-+        .name       = "replay_delete_break",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "removes replay breakpoint",
-+        .cmd        = hmp_replay_delete_break,
-+    },
-+
-+STEXI
-+@item replay_delete_break
-+@findex replay_delete_break
-+Remove replay breakpoint which was previously set with replay_break.
-+The command is ignored when there are no replay breakpoints.
- ETEXI
- 
-     {
-diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
-index 783784cf10..0fd477aa13 100644
---- a/include/monitor/hmp.h
-+++ b/include/monitor/hmp.h
-@@ -154,5 +154,7 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
- void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
- void hmp_info_sev(Monitor *mon, const QDict *qdict);
- void hmp_info_replay(Monitor *mon, const QDict *qdict);
-+void hmp_replay_break(Monitor *mon, const QDict *qdict);
-+void hmp_replay_delete_break(Monitor *mon, const QDict *qdict);
- 
- #endif
-diff --git a/qapi/replay.json b/qapi/replay.json
-index 67f2d1f859..e3266ef3a9 100644
---- a/qapi/replay.json
-+++ b/qapi/replay.json
-@@ -63,3 +63,39 @@
- ##
- { 'command': 'query-replay',
-   'returns': 'ReplayInfo' }
-+
-+##
-+# @replay-break:
-+#
-+# Set replay breakpoint at instruction count @icount.
-+# Execution stops when the specified instruction is reached.
-+# There can be at most one breakpoint. When breakpoint is set, any prior
-+# one is removed.  The breakpoint may be set only in replay mode and only
-+# "in the future", i.e. at instruction counts greater than the current one.
-+# The current instruction count can be observed with @query-replay.
-+#
-+# @icount: instruction count to stop at
-+#
-+# Since: 5.0
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-break", "data": { "icount": 220414 } }
-+#
-+##
-+{ 'command': 'replay-break', 'data': { 'icount': 'int' } }
-+
-+##
-+# @replay-delete-break:
-+#
-+# Remove replay breakpoint which was set with @replay-break.
-+# The command is ignored when there are no replay breakpoints.
-+#
-+# Since: 5.0
-+#
-+# Example:
-+#
-+# -> { "execute": "replay-delete-break" }
-+#
-+##
-+{ 'command': 'replay-delete-break' }
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index 8cf15ebc11..166ba10d2c 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -12,10 +12,13 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "sysemu/replay.h"
-+#include "sysemu/runstate.h"
- #include "replay-internal.h"
- #include "monitor/hmp.h"
- #include "monitor/monitor.h"
- #include "qapi/qapi-commands-replay.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qemu/timer.h"
- 
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
- {
-@@ -41,3 +44,86 @@ ReplayInfo *qmp_query_replay(Error **errp)
-     retval->icount = replay_get_current_icount();
-     return retval;
- }
-+
-+static void replay_break(uint64_t icount, QEMUTimerCB callback, void *opaque)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    assert(replay_mutex_locked());
-+    assert(replay_break_icount >= replay_get_current_icount());
-+    assert(callback);
-+
-+    replay_break_icount = icount;
-+
-+    if (replay_break_timer) {
-+        timer_del(replay_break_timer);
-+    }
-+    replay_break_timer = timer_new_ns(QEMU_CLOCK_REALTIME,
-+                                      callback, opaque);
-+}
-+
-+static void replay_delete_break(void)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    assert(replay_mutex_locked());
-+
-+    if (replay_break_timer) {
-+        timer_del(replay_break_timer);
-+        timer_free(replay_break_timer);
-+        replay_break_timer = NULL;
-+    }
-+    replay_break_icount = -1ULL;
-+}
-+
-+static void replay_stop_vm(void *opaque)
-+{
-+    vm_stop(RUN_STATE_PAUSED);
-+    replay_delete_break();
-+}
-+
-+void qmp_replay_break(int64_t icount, Error **errp)
-+{
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        if (icount >= replay_get_current_icount()) {
-+            replay_break(icount, replay_stop_vm, NULL);
-+        } else {
-+            error_setg(errp,
-+                "cannot set breakpoint at the instruction in the past");
-+        }
-+    } else {
-+        error_setg(errp, "setting the breakpoint is allowed only in play mode");
-+    }
-+}
-+
-+void hmp_replay_break(Monitor *mon, const QDict *qdict)
-+{
-+    int64_t icount = qdict_get_try_int(qdict, "icount", -1LL);
-+    Error *err = NULL;
-+
-+    qmp_replay_break(icount, &err);
-+    if (err) {
-+        error_report_err(err);
-+        error_free(err);
-+        return;
-+    }
-+}
-+
-+void qmp_replay_delete_break(Error **errp)
-+{
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        replay_delete_break();
-+    } else {
-+        error_setg(errp, "replay breakpoints are allowed only in play mode");
-+    }
-+}
-+
-+void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+
-+    qmp_replay_delete_break(&err);
-+    if (err) {
-+        error_report_err(err);
-+        error_free(err);
-+        return;
-+    }
-+}
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index 33ac551e78..2f6145ec7c 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -94,6 +94,10 @@ extern ReplayState replay_state;
- 
- /* File for replay writing */
- extern FILE *replay_file;
-+/* Instruction count of the replay breakpoint */
-+extern uint64_t replay_break_icount;
-+/* Timer for the replay breakpoint callback */
-+extern QEMUTimer *replay_break_timer;
- 
- void replay_put_byte(uint8_t byte);
- void replay_put_event(uint8_t event);
-diff --git a/replay/replay.c b/replay/replay.c
-index 9ec6ce9996..86b3e943c2 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -34,6 +34,10 @@ static char *replay_filename;
- ReplayState replay_state;
- static GSList *replay_blockers;
- 
-+/* Replay breakpoints */
-+uint64_t replay_break_icount = -1ULL;
-+QEMUTimer *replay_break_timer;
-+
- bool replay_next_event_is(int event)
- {
-     bool res = false;
-@@ -73,6 +77,13 @@ int replay_get_instructions(void)
-     replay_mutex_lock();
-     if (replay_next_event_is(EVENT_INSTRUCTION)) {
-         res = replay_state.instruction_count;
-+        if (replay_break_icount != -1LL) {
-+            uint64_t current = replay_get_current_icount();
-+            assert(replay_break_icount >= current);
-+            if (current + res > replay_break_icount) {
-+                res = replay_break_icount - current;
-+            }
-+        }
-     }
-     replay_mutex_unlock();
-     return res;
-@@ -99,6 +110,12 @@ void replay_account_executed_instructions(void)
-                    will be read from the log. */
-                 qemu_notify_event();
-             }
-+            /* Execution reached the break step */
-+            if (replay_break_icount == replay_state.current_icount) {
-+                /* Cannot make callback directly from the vCPU thread */
-+                timer_mod_ns(replay_break_timer,
-+                    qemu_clock_get_ns(QEMU_CLOCK_REALTIME));
-+            }
+diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+index 5ab64da1ec..b04b3e1634 100644
+--- a/block/qcow2-snapshot.c
++++ b/block/qcow2-snapshot.c
+@@ -163,6 +163,12 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs, bool repair,
+             sn->disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
          }
-     }
- }
+ 
++        if (sn->extra_data_size >= endof(QCowSnapshotExtraData, icount)) {
++            sn->icount = be64_to_cpu(extra.icount);
++        } else {
++            sn->icount = -1ULL;
++        }
++
+         if (sn->extra_data_size > sizeof(extra)) {
+             uint64_t extra_data_end;
+             size_t unknown_extra_data_size;
+@@ -332,6 +338,7 @@ int qcow2_write_snapshots(BlockDriverState *bs)
+         memset(&extra, 0, sizeof(extra));
+         extra.vm_state_size_large = cpu_to_be64(sn->vm_state_size);
+         extra.disk_size = cpu_to_be64(sn->disk_size);
++        extra.icount = cpu_to_be64(sn->icount);
+ 
+         id_str_size = strlen(sn->id_str);
+         name_size = strlen(sn->name);
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 0942126232..f3e0d9aa56 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -171,6 +171,7 @@ typedef struct QEMU_PACKED QCowSnapshotHeader {
+ typedef struct QEMU_PACKED QCowSnapshotExtraData {
+     uint64_t vm_state_size_large;
+     uint64_t disk_size;
++    uint64_t icount;
+ } QCowSnapshotExtraData;
+ 
+ 
+@@ -184,6 +185,8 @@ typedef struct QCowSnapshot {
+     uint32_t date_sec;
+     uint32_t date_nsec;
+     uint64_t vm_clock_nsec;
++    /* icount value for the moment when snapshot was taken */
++    uint64_t icount;
+     /* Size of all extra data, including QCowSnapshotExtraData if available */
+     uint32_t extra_data_size;
+     /* Data beyond QCowSnapshotExtraData, if any */
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index af5711e533..aa9d447cda 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -584,6 +584,10 @@ Snapshot table entry:
+ 
+                     Byte 48 - 55:   Virtual disk size of the snapshot in bytes
+ 
++                    Byte 56 - 63:   icount value which corresponds to
++                                    the record/replay instruction count
++                                    when the snapshot was taken
++
+                     Version 3 images must include extra data at least up to
+                     byte 55.
+ 
 
 
