@@ -2,82 +2,99 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FAEC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D7B0C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E11DD206CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB249206B7
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:40:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="REeQndf0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E11DD206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hP46o934"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB249206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijJ38-0005Hl-2z
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:26:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57195)
+	id 1ijJGV-0007Yv-3C
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:40:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44040)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ijJ2V-0004qX-2w
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:26:08 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ijJFe-0006zK-0W
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:39:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ijJ2T-0008TV-Tv
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:26:06 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41195)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ijJ2T-0008PE-N1
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:26:05 -0500
-Received: by mail-ot1-x344.google.com with SMTP id r27so21139955otc.8
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 00:26:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=MRmUQvhP1Pnnmc+7KZjjGUkKW3/QynPJbZv0u9XwEZY=;
- b=REeQndf0bWxKk9pTETwwvAV0aNp7lTl4Ly0O+N850bYxGID5ZdI4dMfWWGhyipt0lv
- IOStOVtc1rhhrOxLGpDRHpugDNX5oyCKaID+PXIQ0YdKDMmNKklEkI7bX8sGQ9UcL1+K
- iMCZ3rCk2gjEhtzWMeaAfDZ+54eVjm3G7kNhg5AZ+NYfgbegEcB8CDOqmDGieQaDS0Hp
- DsPbuk/jWrE1CDt6iluyYJNJITcU/l9XOKSFf9FbBOLit9RpLQMtnuWImtcefHKRzqYs
- Ai/SHghDWPyFL8qJ3x8fIK3MydwkXpGl2erhBgnpFYD/K3uKCn2r0IEIQHwyKilMaXWc
- +gbw==
+ (envelope-from <pbonzini@redhat.com>) id 1ijJFb-0000l8-Fq
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:39:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51139
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ijJFb-0000dL-B7
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:39:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577090377;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G2rnv9yKhwVaUv3tAS0Tb9fA2sI/sbMHrjOieIL7y5s=;
+ b=hP46o934m4bIhEU+/H5NXF/wEDkTuKVEKgyMWvzYpzkOlkgwTVMlB1RZcu7EFTPLi/NuCl
+ 1UbRDUXHdCDL06+XwaZ5UEyWzyLU4/lV3OsGEejpzmJIl3VjegCaYJuYnJN5urKJlrxJRo
+ 2vKnkiJlo1wetfCS56DZV1T/fsdMpY4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-IYhsdY6HMeuUJtKIBNkUJg-1; Mon, 23 Dec 2019 03:39:36 -0500
+Received: by mail-wm1-f69.google.com with SMTP id p5so2158229wmc.4
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 00:39:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=MRmUQvhP1Pnnmc+7KZjjGUkKW3/QynPJbZv0u9XwEZY=;
- b=fEk38tcGF9gr4QwMdcX966ce6VERa9vMYDoL9TUshnVnHi60gXzN/JmhfUSoY1baW9
- Iu5NwfbK7WjF6fFbYgL+CZNtCrJi/8oqkdeklBLgB+wMAQAVEfMVb7+gDxUPZcV4/fpj
- M90xtZOuurjJ1x+bjbsFeECNmbo9/Mlt7flJs9f4/V4INg8vHUZ/jJ9D2SLpWU2R3Hn/
- pJlW3EjY9b3bhOTw8fulUSrzsBWzn587z0DJEAtOJX0xY62HR6k/cAi+f1ESv1hpBqeV
- rQMBQEMOEj4EuOPXCAYijdt5wdlh7E6y/y9yLvYkf00FCtsTlRqVTLHSr/FBau/Exbpg
- 4Y0w==
-X-Gm-Message-State: APjAAAVWKID64A1guwC6HHiKmCrMDbZLca7ITpSX9F6JOumwXQ55lkWN
- 8Ejp+XQ3Yk5QIcAHygMwvxfuQmfb+8lrNemLN/hz6w==
-X-Google-Smtp-Source: APXvYqzNkKBiljuDMwMCwF1iWu1sBDz+qrvzL6ERHLjZuQ6bKCcPn8vUmNwrCrKVadXA2GJQNOY2DB8PedqG1pSk4b0=
-X-Received: by 2002:a9d:7305:: with SMTP id e5mr29893256otk.64.1577089564491; 
- Mon, 23 Dec 2019 00:26:04 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=G2rnv9yKhwVaUv3tAS0Tb9fA2sI/sbMHrjOieIL7y5s=;
+ b=cWeHppIIysPX4qyLUxqm/4iB2Lf6AgXVdKJakeSmOQugBMneSb5xa0+aHvX+VdpqzD
+ 6m2SZ5lfZvnBa30GUcEcGCLr5qk3WmaUM3PVvXFOoQsmUnY+MGGHdmBuLzACIMUZTpAA
+ MBo70onFQystMUOHvW+o9mBBQEKGfdXw7DGfW6ro+RJ0DyoC0bOBk1HUEheKA02Ljqnv
+ HdN5h8AZTQuT4AsEG/2s/Krv1kkqYwHGypkfj47/Era1czwbB7vy3jBPcL0RiFXUtyHQ
+ +OfNmHxREdmtKtkRWois7gnlYuYp4vDYVwcqm0W/FDNmMoiZ/yM6wdWmXb/I6NKJG7+x
+ RqDw==
+X-Gm-Message-State: APjAAAXf8ni+W7my+Ty9+DWf8K7yWM01yCrfTthC0niqTOL9IfBt40e8
+ lLs554zv9s3Svsbd+DsmkLvOegF9sYyJKYaPiBL6lj2p1THJ//K51dCkPeA+xZwpUw/0RS9w5Vs
+ TikXjSnkASzbHzgo=
+X-Received: by 2002:a7b:c38c:: with SMTP id s12mr29838971wmj.96.1577090375326; 
+ Mon, 23 Dec 2019 00:39:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx7vznAFw8WNXqjo2JJBjpop74SpRR2gEss0uaWcuwVcCrNvWpL3aJd3ojoSp1EYG9VmJUSPA==
+X-Received: by 2002:a7b:c38c:: with SMTP id s12mr29838952wmj.96.1577090375015; 
+ Mon, 23 Dec 2019 00:39:35 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:ac09:bce1:1c26:264c?
+ ([2001:b07:6468:f312:ac09:bce1:1c26:264c])
+ by smtp.gmail.com with ESMTPSA id a1sm19518267wrr.80.2019.12.23.00.39.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Dec 2019 00:39:34 -0800 (PST)
+Subject: Re: [PATCH] iotests: fix usage -machine accel= together with -accel
+ option
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191223074329.21262-1-vsementsov@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8900f0c8-19ce-2475-01c6-150394d516f0@redhat.com>
+Date: Mon, 23 Dec 2019 09:39:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Mon, 23 Dec 2019 00:26:03 -0800 (PST)
-In-Reply-To: <20191222172913.10419-1-hpoussin@reactos.org>
-References: <20191222172913.10419-1-hpoussin@reactos.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 23 Dec 2019 09:26:03 +0100
-Message-ID: <CAL1e-=jXsLpvWe8RjEPSj7yWYqWv7mT4Db+hjBqy71=7SLbUcg@mail.gmail.com>
-Subject: Re: [PATCH] dma/rc4030: correctly reset DMA translation table at reset
-To: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
-Content-Type: multipart/alternative; boundary="000000000000454438059a5ac7fd"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <20191223074329.21262-1-vsementsov@virtuozzo.com>
+Content-Language: en-US
+X-MC-Unique: IYhsdY6HMeuUJtKIBNkUJg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,145 +106,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000454438059a5ac7fd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 23/12/19 08:43, Vladimir Sementsov-Ogievskiy wrote:
+> diff --git a/vl.c b/vl.c
+> index 86474a55c9..9fb859969c 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2779,7 +2779,7 @@ static void configure_accelerators(const char *progname)
+>          for (tmp = accel_list; !accel_initialised && tmp && *tmp; tmp++) {
+>              /*
+>               * Filter invalid accelerators here, to prevent obscenities
+> -             * such as "-machine accel=tcg,,thread=single".
+> +             * such as "-machine accel=tcg,thread=single".
 
-On Sunday, December 22, 2019, Herv=C3=A9 Poussineau <hpoussin@reactos.org> =
-wrote:
+The double comma is intentional.  Without the "if" below, the comma
+would be escaped and parsed as "-accel tcg,thread=single".
 
-> This fixes a freeze at reboot, introduced in c627e7526a902dd5bb1907dbbd5c=
-f9
-> 61679dfa68
->
-> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> ---
->  hw/dma/rc4030.c | 1 +
->  1 file changed, 1 insertion(+)
->
->
-Hi, Herve,
+>               */
+>              if (accel_find(*tmp)) {
+>                  qemu_opts_parse_noisily(qemu_find_opts("accel"), *tmp, true);
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 90970b0549..2890785a10 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -587,13 +587,13 @@ export QEMU_PROG="$(type -p "$QEMU_PROG")"
+>  
+>  case "$QEMU_PROG" in
+>      *qemu-system-arm|*qemu-system-aarch64)
+> -        export QEMU_OPTIONS="-nodefaults -display none -machine virt,accel=qtest"
+> +        export QEMU_OPTIONS="-nodefaults -display none -machine virt -accel qtest"
+>          ;;
+>      *qemu-system-tricore)
+> -        export QEMU_OPTIONS="-nodefaults -display none -machine tricore_testboard,accel=qtest"
+> +        export QEMU_OPTIONS="-nodefaults -display none -machine tricore_testboard -accel qtest"
+>          ;;
+>      *)
+> -        export QEMU_OPTIONS="-nodefaults -display none -machine accel=qtest"
+> +        export QEMU_OPTIONS="-nodefaults -display none -accel qtest"
+>          ;;
+>  esac
+>  
+> 
 
-Very good that you found the fix, but I would really appreciate if you
-provide the details on repro procedure.
+This part is good, but what is the reproducer?
 
-One more thing, does this have anything to do eith the Finn's attempt to
-start Jazz machine with:
+Paolo
 
-Quote:
-
-I tried to boot NetBSD/arc but failed. I got a blue screen when I typed
-"cd:boot" at the "Run A Program" prompt in the ARC menu.
-
-$ ln -s NTPROM.RAW mipsel_bios.bin
-$ mips64el-softmmu/qemu-system-mips64el -M magnum -L .
--drive if=3Dscsi,unit=3D2,media=3Dcdrom,format=3Draw,file=3DNetBSD-8.1-arc.=
-iso
--global ds1225y.filename=3Dnvram -global ds1225y.size=3D8200
-qemu-system-mips64el: g364: invalid read at [0000000000102000]
-$
-
-Best regards,
-Alekssndar
-
-
-diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
-> index c4cf8236f4..76302fe431 100644
-> --- a/hw/dma/rc4030.c
-> +++ b/hw/dma/rc4030.c
-> @@ -534,6 +534,7 @@ static void rc4030_reset(DeviceState *dev)
->
->      memset(s->dma_regs, 0, sizeof(s->dma_regs));
->
-> +    s->dma_tl_base =3D s->dma_tl_limit =3D 0;
->      s->remote_failed_address =3D s->memory_failed_address =3D 0;
->      s->cache_maint =3D 0;
->      s->cache_ptag =3D s->cache_ltag =3D 0;
-> --
-> 2.19.2
->
->
->
-
---000000000000454438059a5ac7fd
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Sunday, December 22, 2019, Herv=C3=A9 Poussineau &lt;<a href=3D"=
-mailto:hpoussin@reactos.org">hpoussin@reactos.org</a>&gt; wrote:<br><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
-solid;padding-left:1ex">This fixes a freeze at reboot, introduced in c627e7=
-526a902dd5bb1907dbbd5cf9<wbr>61679dfa68<br>
-<br>
-Signed-off-by: Herv=C3=A9 Poussineau &lt;<a href=3D"mailto:hpoussin@reactos=
-.org">hpoussin@reactos.org</a>&gt;<br>
----<br>
-=C2=A0hw/dma/rc4030.c | 1 +<br>
-=C2=A01 file changed, 1 insertion(+)<br>
-<br></blockquote><div><br></div><div>Hi, Herve,</div><div><br></div><div>Ve=
-ry good that you found the fix, but I would really appreciate if you provid=
-e the details on repro procedure.</div><div><br></div><div>One more thing, =
-does this have anything to do eith the Finn&#39;s attempt to start Jazz mac=
-hine with:</div><div><br></div><div>Quote:</div><div><br></div><span style=
-=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px">I tr=
-ied to boot NetBSD/arc but failed. I got a blue screen when I typed=C2=A0</=
-span><br style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008=
-392334px"><span style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.=
-1200008392334px">&quot;cd:boot&quot; at the &quot;Run A Program&quot; promp=
-t in the ARC menu.</span><br style=3D"color:rgb(34,34,34);font-size:14px;li=
-ne-height:22.1200008392334px"><br style=3D"color:rgb(34,34,34);font-size:14=
-px;line-height:22.1200008392334px"><span style=3D"color:rgb(34,34,34);font-=
-size:14px;line-height:22.1200008392334px">$ ln -s NTPROM.RAW mipsel_bios.bi=
-n</span><br style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200=
-008392334px"><span style=3D"color:rgb(34,34,34);font-size:14px;line-height:=
-22.1200008392334px">$ mips64el-softmmu/qemu-system-</span><wbr style=3D"col=
-or:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px"><span style=
-=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px">mips=
-64el -M magnum -L .=C2=A0</span><br style=3D"color:rgb(34,34,34);font-size:=
-14px;line-height:22.1200008392334px"><span style=3D"color:rgb(34,34,34);fon=
-t-size:14px;line-height:22.1200008392334px">-drive if=3Dscsi,unit=3D2,media=
-=3Dcdrom,</span><wbr style=3D"color:rgb(34,34,34);font-size:14px;line-heigh=
-t:22.1200008392334px"><span style=3D"color:rgb(34,34,34);font-size:14px;lin=
-e-height:22.1200008392334px">format=3Draw,file=3DNetBSD-8.1-</span><wbr sty=
-le=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px"><s=
-pan style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.120000839233=
-4px">arc.iso=C2=A0</span><br style=3D"color:rgb(34,34,34);font-size:14px;li=
-ne-height:22.1200008392334px"><span style=3D"color:rgb(34,34,34);font-size:=
-14px;line-height:22.1200008392334px">-global ds1225y.filename=3Dnvram -glob=
-al ds1225y.size=3D8200</span><br style=3D"color:rgb(34,34,34);font-size:14p=
-x;line-height:22.1200008392334px"><span style=3D"color:rgb(34,34,34);font-s=
-ize:14px;line-height:22.1200008392334px">qemu-system-mips64el: g364: invali=
-d read at [0000000000102000]</span><br style=3D"color:rgb(34,34,34);font-si=
-ze:14px;line-height:22.1200008392334px"><span style=3D"color:rgb(34,34,34);=
-font-size:14px;line-height:22.1200008392334px">$=C2=A0</span><br style=3D"c=
-olor:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px"><div>=C2=
-=A0<br></div><div>Best regards,</div><div>Alekssndar</div><div><br></div><d=
-iv><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex">
-diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c<br>
-index c4cf8236f4..76302fe431 100644<br>
---- a/hw/dma/rc4030.c<br>
-+++ b/hw/dma/rc4030.c<br>
-@@ -534,6 +534,7 @@ static void rc4030_reset(DeviceState *dev)<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0memset(s-&gt;dma_regs, 0, sizeof(s-&gt;dma_regs));<br>
-<br>
-+=C2=A0 =C2=A0 s-&gt;dma_tl_base =3D s-&gt;dma_tl_limit =3D 0;<br>
-=C2=A0 =C2=A0 =C2=A0s-&gt;remote_failed_address =3D s-&gt;memory_failed_add=
-ress =3D 0;<br>
-=C2=A0 =C2=A0 =C2=A0s-&gt;cache_maint =3D 0;<br>
-=C2=A0 =C2=A0 =C2=A0s-&gt;cache_ptag =3D s-&gt;cache_ltag =3D 0;<br>
--- <br>
-2.19.2<br>
-<br>
-<br>
-</blockquote>
-
---000000000000454438059a5ac7fd--
 
