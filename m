@@ -7,86 +7,85 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF56C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A623BC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA29A2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75DF82073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 16:44:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TONvc7Fd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA29A2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+X489U9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75DF82073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijQnl-0005Su-Av
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 11:43:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41373)
+	id 1ijQog-0006mM-Hl
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 11:44:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41475)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ijQll-0003H7-KY
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:22 -0500
+ (envelope-from <mst@redhat.com>) id 1ijQmE-0003w3-SY
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ijQlk-0005Na-Js
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59213
+ (envelope-from <mst@redhat.com>) id 1ijQmD-0005SY-FD
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58323
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQlk-0005NT-G9
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:20 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ijQmD-0005SM-2W
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 11:41:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577119279;
+ s=mimecast20190719; t=1577119308;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y+1AiFYA4jwJXgwLDoVnwKQ62HQ9au7D6spvhTUBGU8=;
- b=TONvc7Fdi0GlXVuqYaDFe4KasptoH0DBn9v4CJFEy6hhNjiqyH/deX/YoJqvDO1ISXVOyX
- SPQ4Y9myZYJkbajIzCwiuBjcejzY3a3qFM60wBLnbWKIrlhwuDG/dXhQx+6Zb2mbqlYRtd
- TjjTKCIqMAw6UUV7z1oW6YN+07SV8B0=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-L4tBkMXGPBGCJcXFYFma0w-1; Mon, 23 Dec 2019 11:41:16 -0500
-Received: by mail-qv1-f72.google.com with SMTP id d7so11610122qvq.12
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:41:16 -0800 (PST)
+ bh=w1jQK9Yxd2TIknp+M77tR7Mc2wzi2h6Dp27XqCYt2e4=;
+ b=D+X489U9z3Drg4QA1n2pwUd7KGjTnuYSu7KJ8kotz5O4Q16/LMeEJDlqdmwcwMM8zIoLU2
+ R8CinSR/hMhI4rh/HNG94fyeNoZtZIXHwNbeN2KktrturtRyLeT6JeWOG0cyIoCjOxyCvX
+ ipob/sojDCeYRYO6VZv24C/dkW/bi58=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-kLWMxeutPq6c3OlaVD5eVA-1; Mon, 23 Dec 2019 11:41:45 -0500
+Received: by mail-qk1-f200.google.com with SMTP id 11so9269506qkk.11
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 08:41:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=1upHWGgN+kA2iqb9NZ9XxvQ8bHfo9CqfdVL2Jr4HnRY=;
- b=I0tgRYAqzGS+EvlOKmA5h9BWBuqGa/Xx8dlg0Q79E4fb4I9MJJQYkNpm+Zu+QqtcC6
- GqYQDZ0nbZg8PrsRkSnCHGrescL/FVc6nFWHrAnUKfvMYa/yrUliDaK+3IhDsBMys/sf
- p9slRf2j6yLuo2OfrD0NpSHkMOqp7K8tQf7n986ve5lMQL2Vepn9mBURYfGsWo+GD3RR
- haFin0SL6YcO/cMSR2vWgl7xWyXLte0cvGpmZOA3+dBnPBJy90kb1qoYNqS8iFYHdgcL
- cwtlg9UFyuoFdq3ss0BMqYBETK0s+4dfAQ1iJe3ZDvkGTeAGcY4jiMSTZLSIYX2SX9X6
- BSpA==
-X-Gm-Message-State: APjAAAXu1eSZWFxh0ZPLDc5nDOlSDs5PqfmpnpY68jQdk04Jn8iIl/Zt
- qI4OYTTt4QwDhMlgTXGDAhoELlbGkvLtv+x2rUM9bu37Hqa1UcDatR0kHKbU/IqtdhdQ2BVHO3+
- 7ZTvg66397WhX5fQ=
-X-Received: by 2002:ac8:4a85:: with SMTP id l5mr23347946qtq.64.1577119275282; 
- Mon, 23 Dec 2019 08:41:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyWejgYmH9XiIF66Q+SdPhfZFjQScNJOJk7dkqC7QrOTn3UQCjLdTlbwx0oNr691tMIQ2FTOA==
-X-Received: by 2002:ac8:4a85:: with SMTP id l5mr23347936qtq.64.1577119275110; 
- Mon, 23 Dec 2019 08:41:15 -0800 (PST)
+ bh=Ks6shax4mMonha1r8yzWlFliM2SkYmnLxhP6HsmGeGE=;
+ b=t+qSjDxZd29er2IbIvJMeIPIYo/X56X6Pjda4oCqa3bqbSf3U2rouf9ysRR8+LvWZR
+ eLW60t1aq9WNi1uAE8QcfKy/GV0CbCS1fuLVCr2CcwPPA4NGXaTYAThqdicooJUrpfhw
+ TWxbBu/Z8QMzZS4zQ3hwQzLOXKr0XAUlyllTIf64Vj2oalgg/PH/dY80KK6ScFN5KRyo
+ 2PPz7bwPkGHV33trbjYQ+AiY1hjV7ck3M/O89XU+wU5T+0Q6GrKf5YERfurCTLTrDMxB
+ eTnMzwKUzvACVHV1teIhiopRc7oPtU2ShAzCEN2eJq+m4MbpEULgeCviSgeNsSvtrVQx
+ od5Q==
+X-Gm-Message-State: APjAAAWS4/GY0HPglSQMvvbkKZHxwuBUeVSifQlJcqk6J4ZVADEDCwzu
+ BVkGQzGH6bVOAK8wM8vlyzZ/Ev14kPqgeXmPJD0NEEFiPF1ufTmCSixN6Edf/cV8xchWqYcIsbK
+ lx0jo1tTyrVQqnPw=
+X-Received: by 2002:aed:3c7b:: with SMTP id u56mr23568495qte.82.1577119304961; 
+ Mon, 23 Dec 2019 08:41:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzi5Ac4AUvczsxuGqQemAIHvlsRI8sK/I8OT5E5pF5FC+resQU1ixv6HoYFtMcYrsWJ4VMfKA==
+X-Received: by 2002:aed:3c7b:: with SMTP id u56mr23568479qte.82.1577119304753; 
+ Mon, 23 Dec 2019 08:41:44 -0800 (PST)
 Received: from redhat.com (bzq-109-64-31-13.red.bezeqint.net. [109.64.31.13])
  by smtp.gmail.com with ESMTPSA id
- i14sm5878179qkl.133.2019.12.23.08.41.13
+ h32sm6479040qth.2.2019.12.23.08.41.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Dec 2019 08:41:14 -0800 (PST)
-Date: Mon, 23 Dec 2019 11:41:11 -0500
+ Mon, 23 Dec 2019 08:41:44 -0800 (PST)
+Date: Mon, 23 Dec 2019 11:41:40 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 03/27] virtio-balloon: fix memory leak while attach
- virtio-balloon device
-Message-ID: <20191223141536.72682-4-mst@redhat.com>
+Subject: [PULL v2 10/27] virtio: don't enable notifications during polling
+Message-ID: <20191223141536.72682-11-mst@redhat.com>
 References: <20191223141536.72682-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20191223141536.72682-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: L4tBkMXGPBGCJcXFYFma0w-1
+X-MC-Unique: kLWMxeutPq6c3OlaVD5eVA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
@@ -105,59 +104,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
- Euler Robot <euler.robot@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Fam Zheng <fam@euphon.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-ivq/dvq/svq/free_page_vq is forgot to cleanup in
-virtio_balloon_device_unrealize, the memory leak stack is as follow:
+Virtqueue notifications are not necessary during polling, so we disable
+them.  This allows the guest driver to avoid MMIO vmexits.
+Unfortunately the virtio-blk and virtio-scsi handler functions re-enable
+notifications, defeating this optimization.
 
-Direct leak of 14336 byte(s) in 2 object(s) allocated from:
-    #0 0x7f99fd9d8560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
-    #1 0x7f99fcb20015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
-    #2 0x557d90638437 in virtio_add_queue hw/virtio/virtio.c:2327
-    #3 0x557d9064401d in virtio_balloon_device_realize hw/virtio/virtio-bal=
-loon.c:793
-    #4 0x557d906356f7 in virtio_device_realize hw/virtio/virtio.c:3504
-    #5 0x557d9073f081 in device_set_realized hw/core/qdev.c:876
-    #6 0x557d908b1f4d in property_set_bool qom/object.c:2080
-    #7 0x557d908b655e in object_property_set_qobject qom/qom-qobject.c:26
+Fix virtio-blk and virtio-scsi emulation so they leave notifications
+disabled.  The key thing to remember for correctness is that polling
+always checks one last time after ending its loop, therefore it's safe
+to lose the race when re-enabling notifications at the end of polling.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Message-Id: <1575444716-17632-2-git-send-email-pannengyuan@huawei.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+There is a measurable performance improvement of 5-10% with the null-co
+block driver.  Real-life storage configurations will see a smaller
+improvement because the MMIO vmexit overhead contributes less to
+latency.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20191209210957.65087-1-stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/hw/virtio/virtio.h |  1 +
+ hw/block/virtio-blk.c      |  9 +++++++--
+ hw/scsi/virtio-scsi.c      |  9 +++++++--
+ hw/virtio/virtio.c         | 12 ++++++------
+ 4 files changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 40b04f5180..57f3b9f22d 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -831,6 +831,13 @@ static void virtio_balloon_device_unrealize(DeviceStat=
-e *dev, Error **errp)
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 777772475c..b69d517496 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -228,6 +228,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int ve=
+rsion_id);
+=20
+ void virtio_notify_config(VirtIODevice *vdev);
+=20
++bool virtio_queue_get_notification(VirtQueue *vq);
+ void virtio_queue_set_notification(VirtQueue *vq, int enable);
+=20
+ int virtio_queue_ready(VirtQueue *vq);
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index d62e6377c2..b12157b5eb 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -764,13 +764,16 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *=
+vq)
+ {
+     VirtIOBlockReq *req;
+     MultiReqBuffer mrb =3D {};
++    bool suppress_notifications =3D virtio_queue_get_notification(vq);
+     bool progress =3D false;
+=20
+     aio_context_acquire(blk_get_aio_context(s->blk));
+     blk_io_plug(s->blk);
+=20
+     do {
+-        virtio_queue_set_notification(vq, 0);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 0);
++        }
+=20
+         while ((req =3D virtio_blk_get_request(s, vq))) {
+             progress =3D true;
+@@ -781,7 +784,9 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq=
+)
+             }
+         }
+=20
+-        virtio_queue_set_notification(vq, 1);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 1);
++        }
+     } while (!virtio_queue_empty(vq));
+=20
+     if (mrb.num_reqs) {
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index e8b2b64d09..f080545f48 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -597,12 +597,15 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQue=
+ue *vq)
+ {
+     VirtIOSCSIReq *req, *next;
+     int ret =3D 0;
++    bool suppress_notifications =3D virtio_queue_get_notification(vq);
+     bool progress =3D false;
+=20
+     QTAILQ_HEAD(, VirtIOSCSIReq) reqs =3D QTAILQ_HEAD_INITIALIZER(reqs);
+=20
+     do {
+-        virtio_queue_set_notification(vq, 0);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 0);
++        }
+=20
+         while ((req =3D virtio_scsi_pop_req(s, vq))) {
+             progress =3D true;
+@@ -622,7 +625,9 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue=
+ *vq)
+             }
+         }
+=20
+-        virtio_queue_set_notification(vq, 1);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 1);
++        }
+     } while (ret !=3D -EINVAL && !virtio_queue_empty(vq));
+=20
+     QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 7bc6a9455e..95d8ff8508 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -432,6 +432,11 @@ static void virtio_queue_packed_set_notification(VirtQ=
+ueue *vq, int enable)
      }
-     balloon_stats_destroy_timer(s);
-     qemu_remove_balloon_handler(s);
-+
-+    virtio_delete_queue(s->ivq);
-+    virtio_delete_queue(s->dvq);
-+    virtio_delete_queue(s->svq);
-+    if (s->free_page_vq) {
-+        virtio_delete_queue(s->free_page_vq);
-+    }
-     virtio_cleanup(vdev);
  }
 =20
++bool virtio_queue_get_notification(VirtQueue *vq)
++{
++    return vq->notification;
++}
++
+ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+ {
+     vq->notification =3D enable;
+@@ -3410,17 +3415,12 @@ static bool virtio_queue_host_notifier_aio_poll(voi=
+d *opaque)
+ {
+     EventNotifier *n =3D opaque;
+     VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
+-    bool progress;
+=20
+     if (!vq->vring.desc || virtio_queue_empty(vq)) {
+         return false;
+     }
+=20
+-    progress =3D virtio_queue_notify_aio_vq(vq);
+-
+-    /* In case the handler function re-enabled notifications */
+-    virtio_queue_set_notification(vq, 0);
+-    return progress;
++    return virtio_queue_notify_aio_vq(vq);
+ }
+=20
+ static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
 --=20
 MST
 
