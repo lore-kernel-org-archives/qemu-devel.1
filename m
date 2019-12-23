@@ -2,50 +2,72 @@ Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D446EC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 07:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B034C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 07:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A000F206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 07:29:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A000F206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 01261206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 07:39:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nPzzi0kk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01261206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijIA8-0005oa-Lg
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 02:29:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44387)
+	id 1ijIJG-0007uL-3V
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 02:39:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1ijI9Y-0005Pr-Fc
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 02:29:21 -0500
+ (envelope-from <zxq_yx_007@163.com>) id 1ijIIE-0006yE-JQ
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 02:38:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1ijI9X-0001up-7h
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 02:29:20 -0500
-Received: from relay.sw.ru ([185.231.240.75]:40470)
+ (envelope-from <zxq_yx_007@163.com>) id 1ijIIB-0002p3-5v
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 02:38:16 -0500
+Received: from m12-18.163.com ([220.181.12.18]:40465)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1ijI9X-0001hj-00
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 02:29:19 -0500
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1ijI9G-0000hc-VF; Mon, 23 Dec 2019 10:29:03 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <zxq_yx_007@163.com>) id 1ijII9-0002AJ-NZ
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 02:38:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Subject:From:Message-ID:Date:MIME-Version; bh=XWZpj
+ iTYmko2xHdBEd88MpugZUBQAuHCebWl98OLQ/w=; b=nPzzi0kkYt1aU+3/QyhHC
+ yys5B2Avb9v1UCKrZuP3FR5UcPc1+Q2ejglgRdb15DJPh22fU6Dp7Mm98IVR6K3+
+ l5W/6ZQVT+uY9F7aIl27XnpXl5VnHLsqtQb0XG5AqvdhZWsqG0hbTTf149lt79CT
+ AKf3/Xc0SXts0k/LLy5AlU=
+Received: from [10.11.32.153] (unknown [39.155.168.46])
+ by smtp14 (Coremail) with SMTP id EsCowABXZo3abgBe7R7qNQ--.1776S2;
+ Mon, 23 Dec 2019 15:38:02 +0800 (CST)
+Subject: Re: [PATCH v5 07/37] serial: register vmsd with DeviceClass
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1] hw: fix using 4.2 compat in 5.0 machine types for
- i440fx/q35
-Date: Mon, 23 Dec 2019 10:28:56 +0300
-Message-Id: <20191223072856.5369-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
+References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
+ <20191220134601.571905-8-marcandre.lureau@redhat.com>
+From: xiaoqiang zhao <zxq_yx_007@163.com>
+Message-ID: <d68a1865-241c-2f82-5635-285862d723f7@163.com>
+Date: Mon, 23 Dec 2019 15:38:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
+MIME-Version: 1.0
+In-Reply-To: <20191220134601.571905-8-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: EsCowABXZo3abgBe7R7qNQ--.1776S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uw4Uuw4UXr4rWFy3uFW3Wrg_yoW8ZF1Upr
+ 98KFZ8KFy5tr9rWw43uw4YvFy8WF4DK3WUCr43Jw1aqr4Fkr1Syr4xGw1avFyUXFWktF15
+ XF1UurykCFs5trJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j-F4_UUUUU=
+X-Originating-IP: [39.155.168.46]
+X-CM-SenderInfo: 520ts5t0bqili6rwjhhfrp/xtbB0haUxlUMTpd3LgACsN
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-Received-From: 220.181.12.18
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,48 +79,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, cohuck@redhat.com, pbonzini@redhat.com,
- rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-5.0 machine type uses 4.2 compats. This seems to be incorrect, since
-the latests machine type by now is 5.0 and it should use its own
-compat or shouldn't use any relying on the defaults.
-Seems, like this appeared because of some problems on merge/rebase.
-
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- hw/i386/pc_piix.c | 1 -
- hw/i386/pc_q35.c  | 1 -
- 2 files changed, 2 deletions(-)
-
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index ffb30c32ce..846e70bc55 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -431,7 +431,6 @@ static void pc_i440fx_5_0_machine_options(MachineClass *m)
-     m->alias = "pc";
-     m->is_default = 1;
-     pcmc->default_cpu_version = 1;
--    compat_props_add(m->compat_props, hw_compat_4_2, hw_compat_4_2_len);
- }
- 
- DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 7398d7baa2..ddd485d608 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -354,7 +354,6 @@ static void pc_q35_5_0_machine_options(MachineClass *m)
-     pc_q35_machine_options(m);
-     m->alias = "q35";
-     pcmc->default_cpu_version = 1;
--    compat_props_add(m->compat_props, hw_compat_4_2, hw_compat_4_2_len);
- }
- 
- DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
--- 
-2.17.0
+在 2019/12/20 下午9:45, Marc-André Lureau 写道:
+> Migration from old to new code works, however the other way fails for
+> devices that use serial_init/serial_mm_init with "base", used as
+> instance_id previously.
+>
+> (with qdev_set_legacy_instance_id, the alias_id is only used in
+> savevm.c:find_se(), and thus can only be used to match against
+> "legacy" instance id values. On new code, instance_id is generated
+> incrementally from 0 with calculate_new_instance_id(), based on
+> "qdev-path/vmsd-name")
+>
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>   hw/char/serial.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index 233a9e2076..e926845843 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -990,8 +990,7 @@ SerialState *serial_init(int base, qemu_irq irq, int baudbase,
+>       s->baudbase = baudbase;
+>       qemu_chr_fe_init(&s->chr, chr, &error_abort);
+>       serial_realize_core(s, &error_fatal);
+> -
+> -    vmstate_register(NULL, base, &vmstate_serial, s);
+> +    qdev_set_legacy_instance_id(dev, base, 2);
+>       qdev_init_nofail(dev);
+>   
+>       memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", 8);
+> @@ -1006,6 +1005,7 @@ static void serial_class_init(ObjectClass *klass, void *data)
+>   
+>       /* internal device for serialio/serialmm, not user-creatable */
+>       dc->user_creatable = false;
+> +    dc->vmsd = &vmstate_serial;
+>   }
+>   
+>   static const TypeInfo serial_info = {
+> @@ -1069,7 +1069,7 @@ SerialState *serial_mm_init(MemoryRegion *address_space,
+>       qemu_chr_fe_init(&s->chr, chr, &error_abort);
+>   
+>       serial_realize_core(s, &error_fatal);
+> -    vmstate_register(NULL, base, &vmstate_serial, s);
+> +    qdev_set_legacy_instance_id(dev, base, 2);
+>       qdev_init_nofail(dev);
+>   
+>       memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
+Reviewed-by: xiaoqiang zhao <zxq_yx_007@163.com>
 
 
