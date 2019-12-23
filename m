@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F4CC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 21:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B33AC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 21:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 062F5206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 21:21:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062F5206B7
+	by mail.kernel.org (Postfix) with ESMTPS id 69DF620709
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 21:31:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69DF620709
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijV8n-0003AS-2g
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 16:21:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34867)
+	id 1ijVIz-000514-HC
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 16:31:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ijV89-0002j5-Bs
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:20:46 -0500
+ (envelope-from <bounces@canonical.com>) id 1ijVIH-0004cC-L7
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ijV88-0003MH-7d
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:20:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49794)
+ (envelope-from <bounces@canonical.com>) id 1ijVIG-00089L-En
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:31:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52084)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ijV88-0003K7-1x
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:20:44 -0500
+ id 1ijVIG-00088C-9O
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 16:31:12 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ijV86-0008RI-Ak
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 21:20:42 +0000
+ id 1ijVID-0001Nk-Ff
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 21:31:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5059F2E80C0
- for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 21:20:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0B24E2E80D5
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 21:31:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 23 Dec 2019 21:14:30 -0000
-From: John Snow <1816805@bugs.launchpad.net>
+Date: Mon, 23 Dec 2019 21:21:16 -0000
+From: John Snow <1835477@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=jsnow@redhat.com; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ayaurov jnsnow
-X-Launchpad-Bug-Reporter: Andrii Yaurov (ayaurov)
+X-Launchpad-Bug-Commenters: jnsnow moshloop
+X-Launchpad-Bug-Reporter: Moshe Immerman (moshloop)
 X-Launchpad-Bug-Modifier: John Snow (jnsnow)
-References: <155067985595.12116.1229580080440735698.malonedeb@gac.canonical.com>
-Message-Id: <157713567064.14296.608073723478870482.malone@wampee.canonical.com>
-Subject: [Bug 1816805] Re: Cannot create cdrom device with open tray and cache
- option
+X-Launchpad-Bug-Duplicate: 1776920
+References: <156230276883.25246.16130789765520855631.malonedeb@soybean.canonical.com>
+Message-Id: <157713607606.5838.11849703681567954989.malone@gac.canonical.com>
+Subject: [Bug 1835477] Re: Converting qcow2 to vmdk on MacOSX results in a
+ non-bootable image
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f6469e53286f696bd17aaa8a6001561db947fdef
+X-Launchpad-Hash: a2a228691ab01b7c0d06215d0f96ada0a9d510f5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,59 +79,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1816805 <1816805@bugs.launchpad.net>
+Reply-To: Bug 1835477 <1835477@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, versions 2.5 and 2.11 are quite old (though version 2.10 fixed the
-bug mentioned in the Red Hat BZ, so I think this might be a different
-bug.)
+*** This bug is a duplicate of bug 1776920 ***
+    https://bugs.launchpad.net/bugs/1776920
 
+Does the problem happen only when the image is on APFS? when the
+destination is on APFS? Neither? Try to see if it's the filesystem. Use
+OSX to convert images on a non-APFS formatted external drive to see if
+that improves your luck.
 
-It's not clear at what step this is failing or where you are seeing the err=
-or message, so:
+I'm assuming this is a duplicate of 1776920 which is still open because
+we have no OSX developers willing or able to debug this problem.
 
-1. What is your full command line for QEMU?
-2. Do you see this error message when migrating? If so, what does the desti=
-nation QEMU command line look like?
-3. Does the problem reproduce on a currently-supported upstream QEMU? (4.1.=
-1, 4.2.0)
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> John Snow (jnsnow)
+** This bug has been marked a duplicate of bug 1776920
+   qemu-img convert on Mac OSX creates corrupt images
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1816805
+https://bugs.launchpad.net/bugs/1835477
 
 Title:
-  Cannot create cdrom device with open tray and cache option
+  Converting qcow2 to vmdk on MacOSX results in a non-bootable image
 
 Status in QEMU:
-  Incomplete
+  New
 
 Bug description:
-  When trying to create cdrom device with open tray and either of
-  "cache" or "discard" options specified, I get the following error:
+  When using qemu-img convert -O vmdk  with version 3.1.0 or 4.0.0 on
+  OSX (10.14.3) with a qcow2 image  (https://cloud-
+  images.ubuntu.com/bionic/20190703/bionic-server-cloudimg-amd64.img),
+  the resulting image is not bootable.
 
-  qemu-system-x86_64: -drive if=3Dnone,id=3Ddrive-
-  ide0-0-0,readonly=3Don,cache=3Dwriteback,discard=3Dunmap,throttling.iops-
-  total=3D900: Must specify either driver or file
-
-  This bug essentially forbids live migration of VMs with open cdrom
-  trays.
-
-  I was able to find the same bug at RedHat:
-  https://bugzilla.redhat.com/show_bug.cgi?id=3D1338638
-
-  The bug was encountered in versions 2.5 and 2.11.
+  Running the same command on Ubuntu 18.04 results in a bootable image
+  as expected
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1816805/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1835477/+subscriptions
 
