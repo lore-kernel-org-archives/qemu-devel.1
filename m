@@ -6,129 +6,76 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EC6C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F1FC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:52:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 251F3206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE8F3206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 08:52:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="KPqoKVMp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 251F3206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="m72ZjsJ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE8F3206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijJQz-0002bL-92
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:51:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44143)
+	id 1ijJRm-0003TW-T9
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 03:52:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ani.sinha@nutanix.com>) id 1ijJQL-0002AC-TC
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:50:47 -0500
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1ijJR5-0002ml-IK
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ani.sinha@nutanix.com>) id 1ijJQK-0000iT-1p
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:50:45 -0500
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:1750)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ani.sinha@nutanix.com>)
- id 1ijJQJ-0000ey-Pk
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:50:43 -0500
-Received: from pps.filterd (m0127844.ppops.net [127.0.0.1])
- by mx0b-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBN8mTqL027664; Mon, 23 Dec 2019 00:50:42 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version;
- s=proofpoint20171006; bh=6mOaKe5lgOgorUxVZRgDO5GTjPv2bXMwHUAP2wQHGhc=;
- b=KPqoKVMp5JinUfVTHAEVMmAVGAWCLvmefVELQUD0zuI5xj96ajKNLWCRqaNHA1P5bZy9
- WlEkyrzzFhkY3SDlqCrfz2/0HWz8u71bAfclt69sn0TJJoU0xsLe6Y1H69WWm68J0adh
- A7eHkN5tvo8qeFge7jevzhRnEM/eNi4pQAo/WE0PXTc3+Ab4shsqgGxy1QbXY8fz6sZj
- WseBjC5xPETIzAlX8ynvG87JkmFcr52meaJA8rDcDeJK4E8Zdu8oeWsw99rBa8LcSWkb
- hjOoHlHIzXn012UHrpHY4gOHqD/lRhIgPvtYif2N1w67nF/66x9co7jTqpYf6l0Fl0v1 Fw== 
-Received: from nam10-dm6-obe.outbound.protection.outlook.com
- (mail-dm6nam10lp2106.outbound.protection.outlook.com [104.47.58.106])
- by mx0b-002c1b01.pphosted.com with ESMTP id 2x1kt6amca-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 23 Dec 2019 00:50:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xudv/+mRivvRaY/H74OlRk8NNSviVvOvrO9JEurJCxejfXI6eGYJ2o3owcn7HOqVsz8e49dWWey9c77FS1XMNURBuqs5MrwvtR3edBmNBYpl3PKCVQnMXzQd1mEgSk3Lluls1EwE09gXRuPB88LSYzpOl8FxfGzELSMlCC1xIYtdi9SntYK8y+QNklqVI8j+X1ZNVqq3ZwHJLWoC+MLERKwzFaHXJSLi7uWEDXjx+J4T5iPmWpD/guXF4PLlg9xK0U5qXz1dBUmtKtXa85fjZgP1dYJtIo0+EOgOvX86+U4SIEt3WOpTAh5byCcimBpF210lezXjcoPolKcHqC+fvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6mOaKe5lgOgorUxVZRgDO5GTjPv2bXMwHUAP2wQHGhc=;
- b=AGXjTgRuqiIS+4iHuMKoAHuBuZp0ilXqYjy2/mrKqVj2SDNxn/byo2nyVtUoLixeCRFHTRtX4qK7y0c+YoGfvrmwkupO7T5MP640hSqvznG80R57HWBek3kvJl+ZedI9uokbjVENynt/l5/wjd9pfwSBwe4mgvKyrg25XTMFDldJt4bxpih3o/Y2JEOey12e7WCr3t1/IEvdaqca0ZSQZH9HyvKwzuIu0OF6pBTrvePCg/hnRJDSaMfS8YH0uC08Ucgpj8F5UarqwxjaZIKFoevWIc4s2Q74kOr1a+FcQ/y3nBpkb110KF+ZtNq8VMt6kDPaS04ClefpK0Lt5yaccA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MN2PR02MB6303.namprd02.prod.outlook.com (52.132.175.28) by
- MN2PR02MB6640.namprd02.prod.outlook.com (10.255.224.211) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2559.20; Mon, 23 Dec 2019 08:50:40 +0000
-Received: from MN2PR02MB6303.namprd02.prod.outlook.com
- ([fe80::e506:4fa8:c846:e53c]) by MN2PR02MB6303.namprd02.prod.outlook.com
- ([fe80::e506:4fa8:c846:e53c%3]) with mapi id 15.20.2559.017; Mon, 23 Dec 2019
- 08:50:40 +0000
-From: Ani Sinha <ani.sinha@nutanix.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] i386: pass CLZERO to guests with EPYC CPU model on AMD
- ZEN platform
-Thread-Topic: [PATCH] i386: pass CLZERO to guests with EPYC CPU model on AMD
- ZEN platform
-Thread-Index: AQHVtYKm5uylcpuSJ0uEmLmhvuRW56e/yJSAgAYAW4CAAAvdAIABkhyAgAAKKYA=
-Date: Mon, 23 Dec 2019 08:50:40 +0000
-Message-ID: <DC7E39B8-A4F7-4DA0-B93B-C755C0C1D886@nutanix.com>
-References: <1576659933-37123-1-git-send-email-ani.sinha@nutanix.com>
- <2883fd0e-191a-c5a4-be1c-04442c8de1c9@redhat.com>
- <7452FAE9-ACDF-495E-AE5A-8A8ED9488B03@nutanix.com>
- <CABgObfaNtUsDiQ8SrwzsTmJEkqa14RiDyUmxeeAgNwYHUm2F7w@mail.gmail.com>
- <1E885A11-2534-4801-B54E-F8E68A514ACA@nutanix.com>
-In-Reply-To: <1E885A11-2534-4801-B54E-F8E68A514ACA@nutanix.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [115.96.107.217]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 336b905f-d5af-43f1-036a-08d787853018
-x-ms-traffictypediagnostic: MN2PR02MB6640:
-x-microsoft-antispam-prvs: <MN2PR02MB66406DE046E3A571D95F9325F12E0@MN2PR02MB6640.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0260457E99
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(376002)(346002)(136003)(366004)(39860400002)(27584003)(199004)(189003)(66446008)(66556008)(91956017)(64756008)(8936002)(8676002)(81156014)(2616005)(66946007)(66476007)(76116006)(81166006)(186003)(966005)(5660300002)(2906002)(4744005)(26005)(86362001)(33656002)(316002)(6512007)(36756003)(478600001)(53546011)(6506007)(6486002)(54906003)(44832011)(71200400001)(4326008)(6916009)(64030200001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR02MB6640;
- H:MN2PR02MB6303.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: k186acngM6k6NqUeKRTylTQnlm/tcFbLC3eRdkPZ4L0XhXbZxTZ58F/YH9QuaZB5wDZNF1sxQZWex9Bhcxk/4KdhvAhEyWf70WuYNVjY8MT0SDdg5mUrUxN3CpKBPXUaSaWKbruhZBuUZtKaNBhijQWHq09xbQ5hks9Nnfg97A7oftD85BXaGa0kPF/abKupZu5GJTwxQyP9+cvyPvQt5KUcxoiHOSsKBHVPYeddQeXuR5rU8CftWIZvqfHdN7ex8FbuLVDQY9sETCsBbKSUkW8h+Jfyth3xb0QTcB/WHtYZ29dUa5zkbLy7oYikTNxy0c5iSbGbHAUuSKiAInTUvm6WfAZMD9/LlxswUgAMQYT2OGZ4mcOCAkgcbGADKKHDLuvWq/tNIZHumqH7//gVpmhR23vjBAe4szHFbCPjk2/cBRXXyu+opEgvhzbePcDokjeE8TtvMH4oVCRm7vPDpDoZwChte/9F1rZTxLXNuy/VuvzZ/Ot6Dfsc4KvPQClr3i2YSCjIgenbaoG12Hr9Uef0hCUfYbpRib2jEQydiLHiiZG1Ai+RX9Fab9UCcZS8
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <26E9BA921F59D54D9721D9E3AD14EE02@namprd02.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1ijJR1-0003hZ-Q1
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:51:29 -0500
+Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:55164)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1ijJR1-0003Gf-0h
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 03:51:27 -0500
+Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
+ [IPv6:2a02:6b8:0:1402::301])
+ by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id C5EC12E1324;
+ Mon, 23 Dec 2019 11:51:20 +0300 (MSK)
+Received: from localhost (localhost [::1])
+ by mxbackcorp1g.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ 4kgEUdnXyy-pHEOeR6d; Mon, 23 Dec 2019 11:51:20 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1577091080; bh=Rn0jVvlKdWJVHTZwGZ478v0wTYUvQAhBbcIY1Hol8UE=;
+ h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
+ b=m72ZjsJ9qngWHFRbOWF/PyfeeMIJAJ+BB5S8mGu/iMoo9pEIqTFwkNfLClHug9uaC
+ tBOccYqXBvjRYSPZyvHy42Dx9R5x8DNQ0P99eHyoYi4mAPoQZupKXky7YYpRbokPtG
+ m2IbJM00kLAhsD90CZdMekqN/z/5cBohzHYP3HQQ=
+Authentication-Results: mxbackcorp1g.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000071945
+X-Yandex-Avir: 1
+Received: from mxbackcorp1g.mail.yandex.net (localhost [::1])
+ by mxbackcorp1g.mail.yandex.net with LMTP id OVKjRRCKue-ESrhiKUl
+ for <yury-kotov@yandex-team.ru>; Mon, 23 Dec 2019 11:51:07 +0300
+Received: by sas1-eb34c5849710.qloud-c.yandex.net with HTTP;
+ Mon, 23 Dec 2019 11:51:07 +0300
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+In-Reply-To: <20191211111655.GC3875@work-vm>
+References: <20191209074102.5926-1-yury-kotov@yandex-team.ru>
+ <20191211111655.GC3875@work-vm>
+Subject: Re: [RFC PATCH 0/1] Removing RAMBlocks during migration
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 336b905f-d5af-43f1-036a-08d787853018
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Dec 2019 08:50:40.1795 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IUsOmKS0yPnAGpVIYdxGHLNxwTpklGOrBOS/Wxi/jstcgbTWEr46QIxwgDiynUcMdlFkRiqQk8L77OWadRpiww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6640
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-23_03:2019-12-17,2019-12-23 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.155.12
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Mon, 23 Dec 2019 11:51:17 +0300
+Message-Id: <279541577091067@sas1-eb34c5849710.qloud-c.yandex.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a02:6b8:0:1619::183
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -137,25 +84,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Habkost,
- Eduardo" <ehabkost@redhat.com>, rth <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
+ Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gRGVjIDIzLCAyMDE5LCBhdCAxOjQ0IFBNLCBBbmkgU2luaGEgPGFuaS5zaW5oYUBu
-dXRhbml4LmNvbT4gd3JvdGU6DQo+IA0KPiANCj4gDQo+PiBPbiBEZWMgMjIsIDIwMTksIGF0IDE6
-NDUgUE0sIFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+IHdyb3RlOg0KPj4gDQo+
-PiANCj4+IA0KPj4gSWwgZG9tIDIyIGRpYyAyMDE5LCAwODo0OSBBbmkgU2luaGEgPGFuaS5zaW5o
-YUBudXRhbml4LmNvbT4gaGEgc2NyaXR0bzoNCj4+IA0KPj4gUGluZyDigKYNCj4+IA0KPj4gV2h5
-IHBpbmc/IFlvdSBnb3QgcXVlc3Rpb25zIGZyb20gRWR1YXJkbywgc28geW91IG5lZWQgdG8gYW5z
-d2VyIHRoZW0gYW5kL29yIHNlbmQgYSBmaXhlZCB2ZXJzaW9uIG9mIHRoZSBwYXRjaC4NCj4+IA0K
-PiANCj4gDQo+IE1heWJlIGhlIHJlc3BvbmRlZCBwcml2YXRlbHkgYnV0IEkgZGlkIG5vdCBnZXQg
-YW55IHF1ZXN0aW9ucyBmcm9tIEVkdWFyZG8uDQo+IA0KDQpPayBJIHNlZSBoaXMgcmVzcG9uc2Ug
-aW4gdGhlIG1haWxpbmcgbGlzdCBhcmNoaXZlczoNCmh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNo
-aXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE5LTEyL21zZzAzOTI3Lmh0bWwNCg0KSSBnZW5lcmFsbHkg
-ZG8gbm90IHBheSBhdHRlbnRpb24gdG8gZW1haWxzIHNlbnQgdG8gQHFlbXUtZGV2IGFuZCB0aGV5
-IGFycml2ZSBhcyBhIGRpZ2VzdCBhbmQgZ2V0IGZpbHRlcmVkIG91dC4gU28gcGxlYXNlIGRvIHNl
-bmQgdGhlIHJlc3BvbnNlcyB3aXRoIG1lIGluIHRoZSBDQyBvciBUbyBsaXN0LiBUaGF0IHdheSwg
-SSB3b27igJl0IG1pc3MgdGhlbS4NCg0KdGhhbmtzDQphbmkNCiANCg0K
+Hi!
+
+11.12.2019, 14:17, "Dr. David Alan Gilbert" <dgilbert@redhat.com>:
+> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+>> =C2=A0Hi,
+>>
+>> =C2=A0I found that it's possible to remove a RAMBlock during migration=
+.
+>> =C2=A0E.g. device hot-unplugging initiated by a guest (how to reproduc=
+e is below).
+>> =C2=A0And I want to clarify whether RAMBlock removing (or even adding)=
+ during
+>> =C2=A0migration is valid operation or it's a bug.
+>>
+>> =C2=A0Currently, it may cause some race conditions with migration thre=
+ad and
+>> =C2=A0migration may fail because of them. For instance, vmstate_unregi=
+ster_ram
+>> =C2=A0function which is called during PCIe device removing does these:
+>> =C2=A0- Memset idstr -> target may receive unknown/zeroed idstr -> mig=
+ration fail
+>> =C2=A0- Set RAMBlock flags as non-migratable -> migration fail
+>>
+>> =C2=A0RAMBlock removing itself seems safe for migration thread because=
+ of RCU.
+>> =C2=A0But it seems to me there are other possible race conditions (did=
+n't test it):
+>> =C2=A0- qemu_put_buffer_async -> saves pointer to RAMBlock's memory
+>> =C2=A0=C2=A0=C2=A0=C2=A0-> block will be freed out of RCU (between ram=
+ save iterations)
+>> =C2=A0=C2=A0=C2=A0=C2=A0-> qemu_fflush -> access to freed memory.
+>>
+>> =C2=A0So, I have the following questions:
+>> =C2=A01. Is RAMBlock removing/adding OK during migration?
+>
+> I don't think that any hot(un)plug is safe during migration.
+> While it's true we hold RCUs as we walk lists, we can't hold the RCU
+> around the entire migration.
+
+I agree. Currently, it's unsafe to do any hot(un)plug.
+But I thought (and wanted to clarify) it would be nice to make it safe.
+Hold the RCU around the entire migration is not the only way actually.
+For example, we can defer RAMBlock deletion: refcount RAMBlocks before
+migration and unref them after migration.
+
+>
+> There's lots of other problems; for example we call the .save_setup
+> methods on devices at the start of migration, but then call the iterate
+> on those devices later - if the device is added/removed between stages
+> we'll end up either having done a setup and not calling the actual save=
+,
+> or the other way around.
+
+Hm... Yeah, that's a problem, thanks for mentioning it!
+
+>
+> Juan added checks to qdev_device_add/qdev_unplug in b06424d ~2.5 years
+> ago.
+
+I see that hot(un)plug during migration has many issues.
+But generally it has three groups (if I didn't miss something):
+1) RAMBlock add/del
+2) Device add/del
+3) VMState add/del
+
+IIUC, RAMBlocks are not always connected to some devices.
+So, in theory, it might become possible to hot(un)plug a block
+without hot adding/removing a device. It's why I wanted to clarify
+is there a sense to fix separately the problems related to RAMBlocks.
+
+But, if you think there is no sense to fix all related problems
+to let hot(un)plugging during migration be allowed, I think we can add
+an assert(!migrate_is_idle()) in qemu_ram_free.
+
+>> =C2=A02. If yes then what should we do with vmstate_unregister_ram?
+>> =C2=A0=C2=A0=C2=A0=C2=A0- Just remove vmstate_unregister_ram (my RFC p=
+atch)
+>> =C2=A0=C2=A0=C2=A0=C2=A0- Refcount RAMBlock's migratable/non-migratabl=
+e state
+>> =C2=A0=C2=A0=C2=A0=C2=A0- Something else?
+>> =C2=A03. If it mustn't be possible, so may be
+>> =C2=A0=C2=A0=C2=A0=C2=A0assert(migration_is_idle()) in qemu_ram_free?
+>>
+>> =C2=A0P.S.
+>> =C2=A0I'm working on a fix of below problem and trying to choose bette=
+r way:
+>> =C2=A0allow device removing and fix all problem like this or fix a par=
+ticular device.
+>>
+>> =C2=A0--------
+>> =C2=A0How to reproduce device removing during migration:
+>>
+>> =C2=A01. Source QEMU command line (target is similar)
+>> =C2=A0=C2=A0=C2=A0$ x86_64-softmmu/qemu-system-x86_64 \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-nodefaults -no-user-config -m 1024 -M q=
+35 \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-qmp unix:./src.sock,server,nowait \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-drive file=3D./image,format=3Draw,if=3D=
+virtio \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device ioh3420,id=3Dpcie.1 \
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0-device virtio-net,bus=3Dpcie.1
+>> =C2=A02. Start migration with slow speed (to simplify reproducing)
+>> =C2=A03. Power off a device on the hotplug pcie.1 bus:
+>> =C2=A0=C2=A0=C2=A0$ echo 0 > /sys/bus/pci/slots/0/power
+>> =C2=A04. Increase migration speed and wait until fail
+>>
+>> =C2=A0Most likely you will get something like this:
+>> =C2=A0=C2=A0=C2=A0qemu-system-x86_64: get_pci_config_device: Bad confi=
+g data:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0i=3D=
+0xaa read: 0 device: 40 cmask: ff wmask: 0 w1cmask:19
+>> =C2=A0=C2=A0=C2=A0qemu-system-x86_64: Failed to load PCIDevice:config
+>> =C2=A0=C2=A0=C2=A0qemu-system-x86_64: Failed to load
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ioh-=
+3240-express-root-port:parent_obj.parent_obj.parent_obj
+>> =C2=A0=C2=A0=C2=A0qemu-system-x86_64: error while loading state for in=
+stance 0x0 of device
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0'000=
+0:00:03.0/ioh-3240-express-root-port'
+>> =C2=A0=C2=A0=C2=A0qemu-system-x86_64: load of migration failed: Invali=
+d argument
+>>
+>> =C2=A0This error is just an illustration of the removing device possib=
+ility,
+>> =C2=A0but not actually an illustration of the race conditions for remo=
+ving RAMBlock.
+>
+> What path does this actually take - does it end up going via qdev_unplu=
+g
+> or some other way?
+
+1) Guest: writes to slot's pci config
+2) QEMU: pcie_cap_slot_write_config -> pcie_unplug_device
+
+So, it's only guest driven action and qdev_unplug doesn't help here.
+
+>
+> Dave
+>
+>> =C2=A0Regards,
+>> =C2=A0Yury
+>>
+>> =C2=A0Yury Kotov (1):
+>> =C2=A0=C2=A0=C2=A0migration: Remove vmstate_unregister_ram
+>>
+>> =C2=A0=C2=A0hw/block/pflash_cfi01.c | 1 -
+>> =C2=A0=C2=A0hw/block/pflash_cfi02.c | 1 -
+>> =C2=A0=C2=A0hw/mem/pc-dimm.c | 5 -----
+>> =C2=A0=C2=A0hw/misc/ivshmem.c | 2 --
+>> =C2=A0=C2=A0hw/pci/pci.c | 1 -
+>> =C2=A0=C2=A0include/migration/vmstate.h | 1 -
+>> =C2=A0=C2=A0migration/savevm.c | 6 ------
+>> =C2=A0=C2=A07 files changed, 17 deletions(-)
+>>
+>> =C2=A0--
+>> =C2=A02.24.0
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+Regards,
+Yury
 
