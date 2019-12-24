@@ -2,56 +2,62 @@ Return-Path: <SRS0=g5aJ=2O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5332AC2D0C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F95C2D0CF
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 05:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2865C206CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:40:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2865C206CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 22FFD20706
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 05:37:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hmwh6QTD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22FFD20706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijbzj-0003mK-D5
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 23:40:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34516)
+	id 1ijcsw-0002tj-5x
+	for qemu-devel@archiver.kernel.org; Tue, 24 Dec 2019 00:37:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34330)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuH-000688-Mp
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:55 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ijcs2-0001yj-Vu
+ for qemu-devel@nongnu.org; Tue, 24 Dec 2019 00:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuF-0008Bz-L1
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:53 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:58356 helo=mail.rt-rk.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1ijcs1-0003ZQ-BB
+ for qemu-devel@nongnu.org; Tue, 24 Dec 2019 00:36:38 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:37195 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ijbuF-00086J-9c
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:51 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 76C941A1CD0;
- Tue, 24 Dec 2019 05:34:47 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 41A191A1181;
- Tue, 24 Dec 2019 05:34:47 +0100 (CET)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/6] linux-user: mips: Update syscall numbers to kernel 5.5
- rc3 level
-Date: Tue, 24 Dec 2019 05:34:34 +0100
-Message-Id: <1577162078-29048-3-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ijcs0-0003L4-90; Tue, 24 Dec 2019 00:36:37 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47hlML0qt9z9sP6; Tue, 24 Dec 2019 16:36:29 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1577165790;
+ bh=ZvPbNLyyloftXPdG86oAKU+tnwleI7uEMh+7917IPTA=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=hmwh6QTDYgCT1rWTllgIlhYmDzO32Mb5Cgeoqt4pjrIDhwBUf8Zmv/j5Jl1/qpb8W
+ Cla/g58+1D+Sim0wiUd72W4FDPjTbonDA0Jk6mXVaJP7DoPoRPOkh7uqxAMViaAcr5
+ Mb0W4jPHz0CkUD3qAbFJYOrGtxMDz6gZ2XcYWKp4=
+Date: Tue, 24 Dec 2019 16:19:04 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Subject: Re: [PATCH] target/ppc: fix memory dump endianness in QEMU monitor
+Message-ID: <20191224051904.GK38380@umbus.modem>
+References: <20191219163854.8945-1-maxiwell@linux.ibm.com>
+ <20191223063043.GH38380@umbus.modem> <875zi6fwqy.fsf@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="W2ydbIOJmkm74tJ2"
+Content-Disposition: inline
+In-Reply-To: <875zi6fwqy.fsf@linux.ibm.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,183 +69,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Update mips syscall numbers based on Linux kernel tag v5.5-rc3
-(commit 46cf053e).
+--W2ydbIOJmkm74tJ2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/mips/cpu_loop.c     | 69 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/mips/syscall_nr.h   | 45 +++++++++++++++++++++++++++
- linux-user/mips64/syscall_nr.h | 13 ++++++++
- 3 files changed, 127 insertions(+)
+On Mon, Dec 23, 2019 at 08:27:49PM -0300, Fabiano Rosas wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
+>=20
+> > b) AFAICT this is the *only* thing that looks for the LE bit in
+> > hflags. Given that, and the fact that it would be wrong in most cases,
+> > we should remove it from hflags entirely along with this change.
+> >
+>=20
+> I see there is:
+>=20
+> static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState =
+*cs)
+> {
+>     ...
+>     ctx->le_mode =3D !!(env->hflags & (1 << MSR_LE));
+>     ...
+> }
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 39915b3..a9db725 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -390,6 +390,75 @@ static const uint8_t mips_syscall_args[] = {
-         MIPS_SYS(sys_copy_file_range, 6) /* 360 */
-         MIPS_SYS(sys_preadv2, 6)
-         MIPS_SYS(sys_pwritev2, 6)
-+        MIPS_SYS(sys_pkey_mprotect, 4)
-+        MIPS_SYS(sys_pkey_alloc, 2)
-+        MIPS_SYS(sys_pkey_free, 1)                 /* 365 */
-+        MIPS_SYS(sys_statx, 5)
-+        MIPS_SYS(sys_rseq, 4)
-+        MIPS_SYS(sys_io_pgetevents, 6)
-+        0,
-+        0,                                         /* 370 */
-+        0,
-+        0,
-+        0,
-+        0,
-+        0,                                         /* 375 */
-+        0,
-+        0,
-+        0,
-+        0,
-+        0,                                         /* 380 */
-+        0,
-+        0,
-+        0,
-+        0,
-+        0,                                         /* 385 */
-+        0,
-+        0,
-+        0,
-+        0,
-+        0,                                         /* 390 */
-+        0,
-+        0,
-+        MIPS_SYS(sys_semget, 3)
-+        MIPS_SYS(sys_semctl, 4)
-+        MIPS_SYS(sys_shmget, 3)                    /* 395 */
-+        MIPS_SYS(sys_shmctl, 3)
-+        MIPS_SYS(sys_shmat, 3)
-+        MIPS_SYS(sys_shmdt, 1)
-+        MIPS_SYS(sys_msgget, 2)
-+        MIPS_SYS(sys_msgsnd, 4)                    /* 400 */
-+        MIPS_SYS(sys_msgrcv, 5)
-+        MIPS_SYS(sys_msgctl, 3)
-+        MIPS_SYS(sys_timer_gettime64, 2)
-+        MIPS_SYS(sys_timer_settime64, 4)
-+        MIPS_SYS(sys_timerfd_gettime64, 2)         /* 410 */
-+        MIPS_SYS(sys_timerfd_settime64, 4)
-+        MIPS_SYS(sys_utimensat_time64, 4)
-+        MIPS_SYS(sys_pselect6_time64, 6)
-+        MIPS_SYS(sys_ppoll_time64, 5)
-+        0,                                         /* 415 */
-+        MIPS_SYS(sys_io_pgetevents_time64, 6)
-+        MIPS_SYS(sys_recvmmsg_time64, 5)
-+        MIPS_SYS(sys_mq_timedsend_time64, 5)
-+        MIPS_SYS(sys_mq_timedreceive_time64, 5)
-+        MIPS_SYS(sys_semtimedop_time64, 4)         /* 420 */
-+        MIPS_SYS(sys_rt_sigtimedwait_time64, 4)
-+        MIPS_SYS(sys_futex_time64, 6)
-+        MIPS_SYS(sys_sched_rr_get_interval_time64, 2)
-+        MIPS_SYS(sys_pidfd_send_signal, 4)
-+        MIPS_SYS(sys_io_uring_setup, 2)            /* 425 */
-+        MIPS_SYS(sys_io_uring_enter, 6)
-+        MIPS_SYS(sys_io_uring_register, 4)
-+        MIPS_SYS(sys_open_tree, 3)
-+        MIPS_SYS(sys_move_mount, 5)
-+        MIPS_SYS(sys_fsopen, 2)                    /* 430 */
-+        MIPS_SYS(sys_fsconfig, 5)
-+        MIPS_SYS(sys_fsmount, 3)
-+        MIPS_SYS(sys_fspick, 3)
-+        MIPS_SYS(sys_pidfd_open, 2)
-+        MIPS_SYS(sys_clone3, 2)                    /* 435 */
-+
- };
- #  undef MIPS_SYS
- # endif /* O32 */
-diff --git a/linux-user/mips/syscall_nr.h b/linux-user/mips/syscall_nr.h
-index 7fa7fa5..0be3af1 100644
---- a/linux-user/mips/syscall_nr.h
-+++ b/linux-user/mips/syscall_nr.h
-@@ -376,5 +376,50 @@
- #define TARGET_NR_statx                 (TARGET_NR_Linux + 366)
- #define TARGET_NR_rseq                  (TARGET_NR_Linux + 367)
- #define TARGET_NR_io_pgetevents         (TARGET_NR_Linux + 368)
-+/* room for arch specific calls */
-+#define TARGET_NR_semget                (TARGET_NR_Linux + 393)
-+#define TARGET_NR_semctl                (TARGET_NR_Linux + 394)
-+#define TARGET_NR_shmget                (TARGET_NR_Linux + 395)
-+#define TARGET_NR_shmctl                (TARGET_NR_Linux + 396)
-+#define TARGET_NR_shmat                 (TARGET_NR_Linux + 397)
-+#define TARGET_NR_shmdt                 (TARGET_NR_Linux + 398)
-+#define TARGET_NR_msgget                (TARGET_NR_Linux + 399)
-+#define TARGET_NR_msgsnd                (TARGET_NR_Linux + 400)
-+#define TARGET_NR_msgrcv                (TARGET_NR_Linux + 401)
-+#define TARGET_NR_msgctl                (TARGET_NR_Linux + 402)
-+/* 403-423 common for 32-bit archs */
-+#define TARGET_NR_clock_gettime64              (TARGET_NR_Linux + 403)
-+#define TARGET_NR_clock_settime64              (TARGET_NR_Linux + 404)
-+#define TARGET_NR_clock_adjtime64              (TARGET_NR_Linux + 405)
-+#define TARGET_NR_clock_getres_time64          (TARGET_NR_Linux + 406)
-+#define TARGET_NR_clock_nanosleep_time64       (TARGET_NR_Linux + 407)
-+#define TARGET_NR_timer_gettime64              (TARGET_NR_Linux + 408)
-+#define TARGET_NR_timer_settime64              (TARGET_NR_Linux + 409)
-+#define TARGET_NR_timerfd_gettime64            (TARGET_NR_Linux + 410)
-+#define TARGET_NR_timerfd_settime64            (TARGET_NR_Linux + 411)
-+#define TARGET_NR_utimensat_time64             (TARGET_NR_Linux + 412)
-+#define TARGET_NR_pselect6_time64              (TARGET_NR_Linux + 413)
-+#define TARGET_NR_ppoll_time64                 (TARGET_NR_Linux + 414)
-+#define TARGET_NR_io_pgetevents_time64         (TARGET_NR_Linux + 416)
-+#define TARGET_NR_recvmmsg_time64              (TARGET_NR_Linux + 417)
-+#define TARGET_NR_mq_timedsend_time64          (TARGET_NR_Linux + 418)
-+#define TARGET_NR_mq_timedreceive_time64       (TARGET_NR_Linux + 419)
-+#define TARGET_NR_semtimedop_time64            (TARGET_NR_Linux + 420)
-+#define TARGET_NR_rt_sigtimedwait_time64       (TARGET_NR_Linux + 421)
-+#define TARGET_NR_futex_time64                 (TARGET_NR_Linux + 422)
-+#define TARGET_NR_sched_rr_get_interval_time64 (TARGET_NR_Linux + 423)
-+/* 424 onwards common for all archs */
-+#define TARGET_NR_pidfd_send_signal            (TARGET_NR_Linux + 424)
-+#define TARGET_NR_io_uring_setup               (TARGET_NR_Linux + 425)
-+#define TARGET_NR_io_uring_enter               (TARGET_NR_Linux + 426)
-+#define TARGET_NR_io_uring_register            (TARGET_NR_Linux + 427)
-+#define TARGET_NR_open_tree                    (TARGET_NR_Linux + 428)
-+#define TARGET_NR_move_mount                   (TARGET_NR_Linux + 429)
-+#define TARGET_NR_fsopen                       (TARGET_NR_Linux + 430)
-+#define TARGET_NR_fsconfig                     (TARGET_NR_Linux + 431)
-+#define TARGET_NR_fsmount                      (TARGET_NR_Linux + 432)
-+#define TARGET_NR_fspick                       (TARGET_NR_Linux + 433)
-+#define TARGET_NR_pidfd_open                   (TARGET_NR_Linux + 434)
-+#define TARGET_NR_clone3                       (TARGET_NR_Linux + 435)
- 
- #endif
-diff --git a/linux-user/mips64/syscall_nr.h b/linux-user/mips64/syscall_nr.h
-index db40f69..c86943a 100644
---- a/linux-user/mips64/syscall_nr.h
-+++ b/linux-user/mips64/syscall_nr.h
-@@ -674,6 +674,19 @@
- #define TARGET_NR_statx                 (TARGET_NR_Linux + 326)
- #define TARGET_NR_rseq                  (TARGET_NR_Linux + 327)
- #define TARGET_NR_io_pgetevents         (TARGET_NR_Linux + 328)
-+/* 329 through 423 are reserved to sync up with other architectures */
-+#define TARGET_NR_pidfd_send_signal     (TARGET_NR_Linux + 424)
-+#define TARGET_NR_io_uring_setup        (TARGET_NR_Linux + 425)
-+#define TARGET_NR_io_uring_enter        (TARGET_NR_Linux + 426)
-+#define TARGET_NR_io_uring_register     (TARGET_NR_Linux + 427)
-+#define TARGET_NR_open_tree             (TARGET_NR_Linux + 428)
-+#define TARGET_NR_move_mount            (TARGET_NR_Linux + 429)
-+#define TARGET_NR_fsopen                (TARGET_NR_Linux + 430)
-+#define TARGET_NR_fsconfig              (TARGET_NR_Linux + 431)
-+#define TARGET_NR_fsmount               (TARGET_NR_Linux + 432)
-+#define TARGET_NR_fspick                (TARGET_NR_Linux + 433)
-+#define TARGET_NR_pidfd_open            (TARGET_NR_Linux + 434)
-+#define TARGET_NR_clone3                (TARGET_NR_Linux + 435)
- #endif
- 
- #endif
--- 
-2.7.4
+Ah... good point, I missed that one, sorry.  That makes all the
+difference.
 
+My guess is that this bit exists to be a universal flag for endianness
+mode, generalizing across the MSR bit on modern cpus, and the old 601
+which had it in the HID register.  I'm a bit dubious as to whether our
+601 emulation is good enough to warrant bothering with this, but it's
+probably best not to mess with it.
+
+
+> And we call hreg_recompute_hflags in some places:
+
+ITYM hreg_compute_hflags().
+
+> - powerpc_excp (target/ppc/excp_helper.c)
+>   Called from TCG do_interrupt
+>=20
+> - ppc_cpu_reset (target/ppc/translate_init.inc.c)
+>   Called from spapr_machine_reset
+>=20
+> - hreg_store_msr (target/ppc/helper_regs.h)
+>   This is used for migration and for do_rfi, store_msr
+
+Huh... given this, I'm not sure how hflags was getting out of sync
+with the MSR in the first place, which brings the initial patch into
+question.
+
+> - h_cede (hw/ppc/spapr_hcall.c)
+>   QEMU-side H_CEDE hypercall implementation=20
+>=20
+>=20
+> It looks like the hflags MSR_LE is being updated correctly with TCG. But
+> with KVM we only touch it on system_reset
+
+Ah.. right.  I think to fix that we'd want an hreg_compute_hflags() at
+the end of sucking the state out of KVM.
+
+> (and possibly h_cede? I don't
+> know if it is QEMU who handles it).
+
+It's KVM.  If we used the qemu one it would add an awful lot of
+latency to cedes.
+>=20
+> So I would let hflags be.
+>=20
+>=20
+> ... Actually, I don't really know the purpose of hflags. It comes from:
+>=20
+>   commit 3f3373166227b13e762e20d2fb51eadfa6a2d653
+>   Author: Fabrice Bellard <fabrice@bellard.org>
+>   Date:   Wed Aug 20 23:02:09 2003 +0000
+>  =20
+>       pop ss, mov ss, x and sti disable irqs for the next instruction -
+>       began dispatch optimization by adding new x86 cpu 'hidden' flags
+>      =20
+>      =20
+>       git-svn-id: svn://svn.savannah.nongnu.org/qemu/trunk@372 c046a42c-6=
+fe2-441c-8c8c-71466251a162
+>=20
+> Could any one clarify that?
+
+Not really.  It's really, really old, in the cruft bits of TCG I don't
+much understand.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--W2ydbIOJmkm74tJ2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4Bn8gACgkQbDjKyiDZ
+s5JFhhAAhTbLOoCfdmnD+eTrOp81/xphIaKzRyrM0XIqfcPVMyp8Glr0FEbeJ5mU
+hHQ5OwmjaRw2DP47o558Q5iZ6Z/edPAIlk8I5ocPs3/GWRVIMnCFLDM98Pn7OP/V
+9LUgzZl5keePTzjiIB0naZfQ1SduUmYqJ3TnnoQ5jALa4B/S/kdZEACc6ubKskxc
+ok/cK+oOfHc857tH1jEka2a41oowtdrsIJjvlZVal+omsDDpwlLoGSf1Bj//OnDB
+IOjdIh9JldterY7Nkr0eEzejJvehEyVQGnfinqBMxuS1HVqQ1EoktUURjmmCZZln
+wSiHbI4R9ksOgwFOuen5DSO2SfPpKboJXSqQz/d/EWUv1VlWA1K2SjrHP7sjsCnc
+xX0Msu7qGCXrIrU5NWACnYq+VAURU2hrg0Mmtf20ZoEXNiEFqlsik/HIXAE/MzLF
+CMYXQeN6rKMk0ym10UXow6v8D3C7+8V76qFgLml2rRFEXqe9S+FsMTWsQKIiPnVf
+N41KHrLMS58DDxb/RopgNvzuA75+CuoefSIvcea4rDJCiqdENPp+kciGQ//xuF23
+ec/e/R7JCqlIxMQ8+0e3OoB2fAaAA4XKACj9ugVpOLZKfEmuT+El5budz2Y9xwEg
+461eJLkWOSBgzgkV5GigpSCrew00a3mrJ9zEoQzcX2O92If6C00=
+=TaTW
+-----END PGP SIGNATURE-----
+
+--W2ydbIOJmkm74tJ2--
 
