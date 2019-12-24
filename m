@@ -1,156 +1,103 @@
-Return-Path: <SRS0=AgAn=2N=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=g5aJ=2O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6363C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 23:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A793AC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 00:10:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FCD820643
-	for <qemu-devel@archiver.kernel.org>; Mon, 23 Dec 2019 23:48:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F4D3206D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 00:10:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdDS/4uW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FCD820643
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZHLnNhC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F4D3206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijXQx-0002YC-Pc
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 18:48:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34808)
+	id 1ijXmE-0005bo-IH
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 19:10:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ijXQI-00022r-88
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 18:47:39 -0500
+ (envelope-from <philmd@redhat.com>) id 1ijXlN-0005AZ-3O
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 19:09:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ijXQF-0006OR-9h
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 18:47:36 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57701
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ijXlK-00021e-9p
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 19:09:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44112
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ijXQF-0006Ke-1d
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 18:47:35 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ijXlJ-0001zi-Uu
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 19:09:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577144853;
+ s=mimecast20190719; t=1577146161;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=w9TmNhgfaZWHMU1zWqbkypd/QXDp9DDoppz9W2bFhno=;
- b=OdDS/4uWG5RljHKklrc0CZufOWeoxbASQbrT1e4bZtOyNqhejE+YlfgJFff4BifY2h0Ees
- GGSKhyYKw7FN47QNK865XkBCBoJSlTsoHNtnCoGSYOsMy93dGdhydBItnRcg7BRFjcvpuo
- UJ4nNDa0AoaFB5Jhf08hwkP3U0gDE2Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-DxPa8CUSPcerHhMs6BELcw-1; Mon, 23 Dec 2019 18:47:32 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A3DD800D4C;
- Mon, 23 Dec 2019 23:47:31 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE5805C1C3;
- Mon, 23 Dec 2019 23:47:30 +0000 (UTC)
-Subject: Re: [PATCH] iotests/279: Fix for non-qcow2 formats
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191219144243.1763246-1-mreitz@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <571b9178-176d-1123-0c24-763034371614@redhat.com>
-Date: Mon, 23 Dec 2019 18:47:30 -0500
+ in-reply-to:in-reply-to:references:references;
+ bh=Z5Qvz0kjU83nkXZ8Uw4YHn+pcoUe6gYr2aYl45TIask=;
+ b=CZHLnNhCjMcDUTFtyWqQ5CvsKczXXQ+gsBe3xvJbGYJ7zTnAmnMesq0VHwiunPfYEO1aj+
+ vUSzTw19yp+gW3l/BedXz7DQrP7L5UBgSRaqvLmyFG4SoRkRboL8CXDYXZeR27PjzIdwDw
+ dR2FXHaWLDa45d9f5jt+YU34aatQ664=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-8ydVKJanMFeMgI5cooqDyA-1; Mon, 23 Dec 2019 19:09:19 -0500
+Received: by mail-wm1-f69.google.com with SMTP id o24so114524wmh.0
+ for <qemu-devel@nongnu.org>; Mon, 23 Dec 2019 16:09:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1ina/tpP30gacQU4n8XO9E7QzuViRunDHfWEakJYCHE=;
+ b=eUWaEVyCew+sIAwCn9gqIE6VMY68/+WVQYlLnYaOMFbH9Mp25f5tWlD/MoSWY0o/4w
+ JGlhGJoEt+2D4oOLAS6/j7jJceT6SfN5h8yQHtOjNpS/Q7Q8yePtvzQWRG7jAOf9jesG
+ ZVN6yh59xxVsx3PK8KG0nJaR3iQwpVoKCSXo9ApJLGzagKWIjq8jzbN1zqF0jbBCYFMI
+ 8n+BU9+zjPTfLdp2+TMR3pxiExbk9judkqPOAKFD60UWQXe0m25VVnyc6XqTygW5F/be
+ alBx0XFZs+qKYNwjFVDmb6Op3KuIcpltvdRbDSvbLVFzNJzchyLwN1+Cxid3HBO2PKu6
+ MMgA==
+X-Gm-Message-State: APjAAAX9hm6KaFrHL0ZqBNg1NmDbN2knY16frRBJD6fVTNzWsCUstR9I
+ Uzn6F1L8FeVWGamMTpxCV9yJpfOq4an8lJ/H0lK/jY0YlbSLe/r7mDw0raHEoT9SPzvQJmmk8pg
+ P2+ckELd4LAqBxLs=
+X-Received: by 2002:a1c:28d4:: with SMTP id o203mr1073469wmo.123.1577146158251; 
+ Mon, 23 Dec 2019 16:09:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx0yH/YndAAciQ24CPsyWR/LzYkaleo6GVIizN2K5urmqRUAcTNbWYuQtL02ZESorPyd/980A==
+X-Received: by 2002:a1c:28d4:: with SMTP id o203mr1073444wmo.123.1577146158000; 
+ Mon, 23 Dec 2019 16:09:18 -0800 (PST)
+Received: from ?IPv6:2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9?
+ ([2a01:cb1d:8a0a:f500:48c1:8eab:256a:caf9])
+ by smtp.gmail.com with ESMTPSA id e8sm21972918wrt.7.2019.12.23.16.09.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 23 Dec 2019 16:09:17 -0800 (PST)
+Subject: Re: [PATCH v9 14/15] hw/i386: Introduce the microvm machine type
+To: Paolo Bonzini <pbonzini@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191015112346.45554-1-slp@redhat.com>
+ <20191015112346.45554-15-slp@redhat.com>
+ <6276a8e7-2928-6e33-64a1-3ae01a30a718@redhat.com>
+ <a5863b05-4021-df51-d84f-1bb070fa6137@redhat.com>
+ <8eec451f-3ee3-b111-2c03-3c29ade661a6@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <21e2508a-764f-1db9-9c53-dc9eb43d7f68@redhat.com>
+Date: Tue, 24 Dec 2019 01:09:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191219144243.1763246-1-mreitz@redhat.com>
+In-Reply-To: <8eec451f-3ee3-b111-2c03-3c29ade661a6@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: DxPa8CUSPcerHhMs6BELcw-1
+X-MC-Unique: 8ydVKJanMFeMgI5cooqDyA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,61 +109,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, kraxel@redhat.com, imammedo@redhat.com,
+ rth@twiddle.net, lersek@redhat.com, sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Paolo,
 
+On 10/16/19 11:29 AM, Paolo Bonzini wrote:
+> On 16/10/19 11:26, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 10/16/19 9:46 AM, Paolo Bonzini wrote:
+>>>
+>>>> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+>>>> index c5c9d4900e..d399dcba52 100644
+>>>> --- a/hw/i386/Kconfig
+>>>> +++ b/hw/i386/Kconfig
+>>>> @@ -92,6 +92,10 @@ config Q35
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select SMBIOS
+>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 select FW_CFG_DMA
+>>>>  =C2=A0 +config MICROVM
+>>>> +=C2=A0=C2=A0=C2=A0 bool
+>>>
+>>> Missing:
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 select ISA_BUS
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 select APIC
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 select IOAPIC
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 select I8259
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0 select MC146818RTC
+>>
+>> maybe 'select SERIAL_ISA' too?
+>=20
+> Right, but only 'imply'.
 
-On 12/19/19 9:42 AM, Max Reitz wrote:
-> First, driver=qcow2 will not work so well with non-qcow2 formats (and
-> this test claims to support qcow, qed, and vmdk).
-> 
-> Second, vmdk will always report the backing file format to be vmdk.
-> Filter that out so the output looks like for all other formats.
-> 
-> Third, the flat vmdk subformats do not support backing files, so they
-> will not work with this test.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/279 | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/279 b/tests/qemu-iotests/279
-> index 6682376808..30d29b1cb2 100755
-> --- a/tests/qemu-iotests/279
-> +++ b/tests/qemu-iotests/279
-> @@ -38,6 +38,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  _supported_fmt qcow qcow2 vmdk qed
->  _supported_proto file
->  _supported_os Linux
-> +_unsupported_imgopts "subformat=monolithicFlat" \
-> +                     "subformat=twoGbMaxExtentFlat" \
->  
->  TEST_IMG="$TEST_IMG.base" _make_test_img 64M
->  TEST_IMG="$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
-> @@ -45,11 +47,12 @@ _make_test_img -b "$TEST_IMG.mid"
->  
->  echo
->  echo '== qemu-img info --backing-chain =='
-> -_img_info --backing-chain | _filter_img_info
-> +_img_info --backing-chain | _filter_img_info | grep -v 'backing file format'
->  
->  echo
->  echo '== qemu-img info --backing-chain --image-opts =='
-> -TEST_IMG="driver=qcow2,file.driver=file,file.filename=$TEST_IMG" _img_info --backing-chain --image-opts | _filter_img_info
-> +TEST_IMG="driver=$IMGFMT,file.driver=file,file.filename=$TEST_IMG" _img_info --backing-chain --image-opts \
-> +    | _filter_img_info | grep -v 'backing file format'
+Per the documentation, you are correct:
 
-Haha.
+   Boards specify their constituent devices using ``imply`` and ``select``
+   directives.  A device should be listed under ``select`` if the board
+   cannot be started at all without it.  It should be listed under
+   ``imply`` if (depending on the QEMU command line) the board may or
+   may not be started without it.  Boards also default to false; they are
+   enabled by the ``default-configs/*.mak`` for the target they apply to.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+But then the build fails configured with --without-default-devices:
 
->  
->  # success, all done
->  echo "*** done"
-> 
+   LINK    x86_64-softmmu/qemu-system-x86_64
+/usr/bin/ld: hw/i386/microvm.o: in function `microvm_devices_init':
+hw/i386/microvm.c:157: undefined reference to `serial_hds_isa_init'
+collect2: error: ld returned 1 exit status
+make[1]: *** [Makefile:206: qemu-system-x86_64] Error 1
+make: *** [Makefile:483: x86_64-softmmu/all] Error 2
+
+We have:
+
+static void microvm_devices_init(MicrovmMachineState *mms)
+{
+     ...
+     if (mms->isa_serial) {
+         serial_hds_isa_init(isa_bus, 0, 1);
+     }
+     ...
+}
+
+With this diff the link succeed:
+
+-- >8 --
+--- a/hw/i386/Kconfig
++++ b/hw/i386/Kconfig
+@@ -95,7 +95,7 @@ config Q35
+
+  config MICROVM
+      bool
+-    imply SERIAL_ISA
++    select SERIAL_ISA
+      select ISA_BUS
+      select APIC
+      select IOAPIC
+---
+
+I was going to send this as a patch but suddently remembered this=20
+thread. I'm not sure what you want so I prefer ask first :)
+
+We have CONFIG_SERIAL_ISA declared in "config-devices.h" so we could=20
+also use:
+
+-- >8 --
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -153,9 +153,11 @@ static void=20
+microvm_devices_init(MicrovmMachineState *mms)
+          microvm_set_rtc(mms, rtc_state);
+      }
+
++#ifdef CONFIG_SERIAL_ISA
+      if (mms->isa_serial) {
+          serial_hds_isa_init(isa_bus, 0, 1);
+      }
++#endif
+
+      if (bios_name =3D=3D NULL) {
+          bios_name =3D MICROVM_BIOS_FILENAME;
+---
+
+The binary links too, and the difference with the other hunk is now the=20
+device is not listed in 'qemu-system-x86_64 -M microvm -device help'.
+However I guess understand we prefer to avoid that kind of ifdef'ry.
+
+Which way to you prefer?
+
+Thanks,
+
+Phil.
 
 
