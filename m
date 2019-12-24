@@ -2,54 +2,51 @@ Return-Path: <SRS0=g5aJ=2O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 290FDC2D0C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E0CC2D0C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:38:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F41B8206CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:38:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41B8206CB
+	by mail.kernel.org (Postfix) with ESMTPS id DE27C20718
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:38:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE27C20718
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijbxp-0001uc-WE
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 23:38:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34540)
+	id 1ijby0-000201-Ts
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 23:38:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuH-00068J-Rt
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:54 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuG-0008Eh-Ot
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuG-00067B-R5
  for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:53 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:58900 helo=mail.rt-rk.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuF-0008BV-Fv
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:52 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:58319 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ijbuG-0008C5-HI
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:52 -0500
+ id 1ijbuF-00085t-8B
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:51 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 9F9291A1164;
+ by mail.rt-rk.com (Postfix) with ESMTP id 478EE1A1D37;
  Tue, 24 Dec 2019 05:34:47 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 556D31A1D92;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 204C51A0EE6;
  Tue, 24 Dec 2019 05:34:47 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/6] linux-user: Add support for FS_IOC32_<GET|SET>VERSION
- ioctls
-Date: Tue, 24 Dec 2019 05:34:37 +0100
-Message-Id: <1577162078-29048-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v2 0/6] linux-user: Misc patches for 5.0
+Date: Tue, 24 Dec 2019 05:34:32 +0100
+Message-Id: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,43 +67,48 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-These FS_IOC32_<GET|SET>VERSION ioctls are identical to
-FS_IOC_<GET|SET>VERSION ioctls, but without the anomaly of their
-number defined as if their third argument is of type long, while
-it is treated internally in kernel as is of type int.
+This series is a collection of patches I recently accumulated.
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+v1->v2:
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 4fd6939..3affd88 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -142,6 +142,8 @@
-      IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
- 
- #ifdef CONFIG_USBFS
-   /* USB ioctls */
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 964b2b4..a73cc3d 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -922,6 +922,8 @@ struct target_pollfd {
- #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
- #define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
- #define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
-+#define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
-+#define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
- 
- /* usb ioctls */
- #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
+  - fixed a constant in xtensa's termbits.h that was missed in v1
+  - redid syscall numbers for mips o32
+  - minor formatting and wording changes
+
+Aleksandar Markovic (6):
+  linux-user: Fix some constants in termbits.h
+  linux-user: mips: Update syscall numbers to kernel 5.5 rc3 level
+  linux-user: Add support for FS_IOC_<GET|SET>VERSION ioctls
+  linux-user: Add support for FS_IOC32_<GET|SET>FLAGS ioctls
+  linux-user: Add support for FS_IOC32_<GET|SET>VERSION ioctls
+  linux-user: Add support for FS_IOC_FS<GET|SET>XATTR ioctls
+
+ linux-user/aarch64/termbits.h    |   4 +-
+ linux-user/alpha/termbits.h      |  10 +--
+ linux-user/arm/termbits.h        |   4 +-
+ linux-user/cris/termbits.h       |   4 +-
+ linux-user/hppa/termbits.h       |   4 +-
+ linux-user/i386/termbits.h       |   4 +-
+ linux-user/ioctls.h              |  13 ++++
+ linux-user/m68k/termbits.h       |   4 +-
+ linux-user/microblaze/termbits.h |   4 +-
+ linux-user/mips/cpu_loop.c       |  69 +++++++++++++++++
+ linux-user/mips/syscall_nr.h     |  45 +++++++++++
+ linux-user/mips/termbits.h       |   4 +-
+ linux-user/mips64/syscall_nr.h   |  13 ++++
+ linux-user/nios2/termbits.h      |   4 +-
+ linux-user/openrisc/termbits.h   |   6 +-
+ linux-user/ppc/termbits.h        |   4 +-
+ linux-user/riscv/termbits.h      |   4 +-
+ linux-user/s390x/termbits.h      |  26 ++++---
+ linux-user/sh4/termbits.h        |   4 +-
+ linux-user/sparc/termbits.h      |   4 +-
+ linux-user/sparc64/termbits.h    |   4 +-
+ linux-user/syscall_defs.h        |  14 +++-
+ linux-user/x86_64/termbits.h     |   6 +-
+ linux-user/xtensa/termbits.h     | 156 ++++++++++++++++++++++-----------------
+ 24 files changed, 292 insertions(+), 122 deletions(-)
+
 -- 
 2.7.4
 
