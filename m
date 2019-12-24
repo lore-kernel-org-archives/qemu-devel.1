@@ -2,124 +2,58 @@ Return-Path: <SRS0=g5aJ=2O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D76C2C2D0C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F56C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:34:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A38F820706
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:19:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A38F820706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
+	by mail.kernel.org (Postfix) with ESMTPS id A83DB206B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:34:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A83DB206B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijbfM-0003Lk-Mm
-	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 23:19:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56553)
+	id 1ijbtz-0005jL-Qt
+	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 23:34:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1ijbee-0002j1-KS
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:18:45 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1ijbt9-00059s-Ue
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:33:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1ijbed-0008OZ-GX
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:18:44 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:41580)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
- id 1ijbeb-0008Go-DR; Mon, 23 Dec 2019 23:18:41 -0500
-Received: by mail-lj1-f196.google.com with SMTP id h23so19675593ljc.8;
- Mon, 23 Dec 2019 20:18:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:reply-to:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=Xc/L8wQaNZ2cZgOuyzWPtwaXqwnGGTaFsfQKbRFceHI=;
- b=XEjMw3tWvI3BiN8wWUHBvQGcB2U9zxUZHwVUN5dC17UsnGynnhJr6pvxJ37OR0g8NO
- U0Amt85g0V9f4WnFMoanPgJYHRMHsy9a23ahUiDztybaiXbToYFmdlV8cvNvyOhBO+Q+
- zXXYIMeJboR2AIbkLQ+tKrfP8dYGaNBvWNSB/h3w7HlwL6jCDcniWGkWhONUq3GzFVrN
- Bb9lqSKBQdhU52nZHst5Izm70uc9nD+GDVSKawdyANSjR/AxWmZHXHEpHZ+VT9FB2jU3
- DbtupEtKLmE5OiUW1fhVxspaGEce5KD5PU6Q4NVw6g9C09QmchA3LiUvn9mzYeMonj/Y
- Jzkg==
-X-Gm-Message-State: APjAAAUHvYoanXWrCM/oLWmLqQvv1R7XCTKLALr6nQ9+xOYj3BHUNwlB
- 3hBJ3gC+sdRcvs7SQjMznZo=
-X-Google-Smtp-Source: APXvYqyXbYkFudAyijKD2fZdLb/KnrSfWreYMnjkteHD6kEMFwSuPNSoeXVPIjPbrtg6zf+QPVYjBQ==
-X-Received: by 2002:a2e:3a0c:: with SMTP id h12mr12213251lja.200.1577161120043; 
- Mon, 23 Dec 2019 20:18:40 -0800 (PST)
-Received: from [192.168.1.184] (128-68-70-109.broadband.corbina.ru.
- [128.68.70.109])
- by smtp.gmail.com with ESMTPSA id t2sm9248119ljj.11.2019.12.23.20.18.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 23 Dec 2019 20:18:38 -0800 (PST)
-Subject: Re: [PATCH v2 2/2] ide: Fix incorrect handling of some PRDTs in
- ide_dma_cb()
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20191216181405.462292-1-alex.popov@linux.com>
- <20191216181405.462292-2-alex.popov@linux.com>
- <20191219150136.GL5230@linux.fritz.box>
- <2ee972c7-0e0a-5a86-e43f-5cf066b6604d@redhat.com>
-From: Alexander Popov <alex.popov@linux.com>
-Autocrypt: addr=alex.popov@linux.com; prefer-encrypt=mutual; keydata=
- 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
- j3lCqPk=
-Message-ID: <69411934-5e6b-60f0-a774-c964776717af@linux.com>
-Date: Tue, 24 Dec 2019 07:18:37 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <fthain@telegraphics.com.au>) id 1ijbt8-000637-Et
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:33:43 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:59176)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <fthain@telegraphics.com.au>)
+ id 1ijbt8-0005ww-8u; Mon, 23 Dec 2019 23:33:42 -0500
+Received: from localhost (localhost.localdomain [127.0.0.1])
+ by kvm5.telegraphics.com.au (Postfix) with ESMTP id 508B123EE8;
+ Mon, 23 Dec 2019 23:33:35 -0500 (EST)
+Date: Tue, 24 Dec 2019 15:33:40 +1100 (AEDT)
+From: Finn Thain <fthain@telegraphics.com.au>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: NetBSD/arc on MIPS Magnum, was Re: [PATCH 00/10] Fixes for
+ DP8393X SONIC device emulation
+In-Reply-To: <alpine.LNX.2.21.1.1912241016420.42@nippy.intranet>
+Message-ID: <alpine.LNX.2.21.1.1912241504560.11@nippy.intranet>
+References: <cover.1576286757.git.fthain@telegraphics.com.au>
+ <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
+ <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
+ <CAL1e-=hRs0EMz7ZTt+GXMfyHW8arq-h-m1Dzd3jz+vqP82+zjA@mail.gmail.com>
+ <CAL1e-=iTBxqCsNCbGpONdewE4uTDG=OAV36fF_Cq9=i6KQhMaA@mail.gmail.com>
+ <alpine.LNX.2.21.1.1912200912360.8@nippy.intranet>
+ <636043f1-bd84-f00d-55a5-7d58aab6cd57@redhat.com>
+ <alpine.LNX.2.21.1.1912241016420.42@nippy.intranet>
 MIME-Version: 1.0
-In-Reply-To: <2ee972c7-0e0a-5a86-e43f-5cf066b6604d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.208.196
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,36 +65,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: alex.popov@linux.com
-Cc: Andrea Arcangeli <aarcange@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Darren Kenny <darren.kenny@oracle.com>, sstabellini@kernel.org,
- pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
- qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- pjp@redhat.com
+Cc: Jason Wang <jasowang@redhat.com>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.12.2019 03:20, John Snow wrote:
-> On 12/19/19 10:01 AM, Kevin Wolf wrote:
->>
->> John, what do you think?
->>
+On Tue, 24 Dec 2019, Finn Thain wrote:
+
 > 
-> I've been out to lunch for a little while. There are some issues that I
-> recall with IDE, but couldn't find the time to fix prior to 4.2.
+> I know precious little about NetBSD installation and MIPS Magnum. What I 
+> wrote above was guesswork. Hence this could be a NetBSD bug or user 
+> error.
+> 
 
-Hello John.
+It was bugs and user error.
 
-> I'll review all the outstanding IDE problems I am aware of and review
-> these series before the end of the year.
+The user error was not using the serial console. The NetBSD/arc 
+installation guide says that only serial console is supported for MIPS 
+Magnum.
 
-Thanks. It would be nice. I've spent some time on it and want it to be finished.
+The bugs include regressions in NetBSD. (See below.)
 
-Please see the v3 that I sent yesterday.
+The other issue is that the ARC firmware didn't work properly until I 
+defined one or more 'boot selections', even though none of these will ever 
+be selected.
 
-Best regards,
-Alexander
+> Does there exist a known-good combination of NetBSD/arc and 
+> qemu-system-mips64el releases?
+> 
+
+The commit log says that Herv? Poussineau used NetBSD 5.1 with dp8393x in 
+the past, so I tried that.
+
+Here are the steps I used:
+
+./mips64el-softmmu/qemu-system-mips64el -M magnum -L .  
+-drive if=scsi,unit=2,media=cdrom,format=raw,file=arccd-5.1.iso
+-global ds1225y.filename=nvram -global ds1225y.size=8200
+-serial stdio -serial null
+-nic bridge,model=dp83932,mac=00:00:00:02:03:04
+
+-> Run setup -> Initialize system -> Set default configurations
+	800x688
+	3.5 1.44 M
+	No
+	7
+
+-> Set default environment
+	CD-ROM
+	2
+
+-> Set environment variables
+	CONSOLEIN
+	multi()serial(0)term()
+	CONSOLEOUT
+	multi()serial(0)term()
+
+-> Exit
+
+Now restart QEMU. The ARC menu should appear on the tty.
+
+-> Run a program
+
+	scsi(0)cdrom(2)fdisk(0)boot scsi(0)cdrom(2)fdisk(0)netbsd
+
+That doesn't work. Add a boot selection.
+
+-> Run setup -> Manage startup -> Add a boot selection -> Scsi CD-ROM 0
+	\os\nt\osloader.exe
+	Yes
+	\winnt
+	Windows NT
+	No
+
+Somehow, that seems to help. Now restart QEMU.
+
+-> Run a program
+
+        scsi(0)cdrom(2)fdisk(0)boot scsi(0)cdrom(2)fdisk(0)netbsd
+
+NetBSD/arc Bootstrap, Revision 1.1
+(builds@b7.netbsd.org, Sat Nov  6 14:06:36 UTC 2010)
+devopen: scsi(0)cdrom(2)fdisk(0) type disk file netbsd
+5502064+289092=0x5860e0
+Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+    2006, 2007, 2008, 2009, 2010
+    The NetBSD Foundation, Inc.  All rights reserved.
+Copyright (c) 1982, 1986, 1989, 1991, 1993
+    The Regents of the University of California.  All rights reserved.
+
+NetBSD 5.1 (RAMDISK) #0: Sat Nov  6 14:17:36 UTC 2010
+        builds@b7.netbsd.org:/home/builds/ab/netbsd-5-1-RELEASE/arc/201011061943Z-obj/home/builds/ab/netbsd-5-1-RELEASE/src/sys/arch/arc/compile/RAMDISK
+MIPS Magnum
+total memory = 128 MB
+avail memory = 117 MB
+mainbus0 (root)
+cpu0 at mainbus0: MIPS R4000 CPU (0x400) Rev. 0.0 with MIPS R4010 FPC Rev. 0.0
+cpu0: 8KB/16B direct-mapped L1 Instruction cache, 48 TLB entries
+cpu0: 8KB/16B direct-mapped write-back L1 Data cache
+jazzio0 at mainbus0
+timer0 at jazzio0 addr 0xe0000228
+mcclock0 at jazzio0 addr 0xe0004000: mc146818 compatible time-of-day clock
+LPT1 at jazzio0 addr 0xe0008000 intr 0 not configured
+fdc0 at jazzio0 addr 0xe0003000 intr 1
+fd0 at fdc0 drive 1: 1.44MB, 80 cyl, 2 head, 18 sec
+MAGNUM at jazzio0 addr 0xe000c000 intr 2 not configured
+VXL at jazzio0 addr 0xe0800000 intr 3 not configured
+sn0 at jazzio0 addr 0xe0001000 intr 4: SONIC Ethernet
+sonic: write 0x0015 to reg CR
+sonic: write 0x0080 to reg CR
+sonic: write 0x0000 to reg IMR
+sonic: write 0x7fff to reg ISR
+sonic: write 0x0000 to reg CR
+sn0: Ethernet address 00:00:00:00:00:00
+asc0 at jazzio0 addr 0xe0002000 intr 5: NCR53C94, 25MHz, SCSI ID 7
+scsibus0 at asc0: 8 targets, 8 luns per target
+pckbc0 at jazzio0 addr 0xe0005000 intr 6
+pckbd0 at pckbc0 (kbd slot)
+wskbd0 at pckbd0 (mux ignored)
+pms at jazzio0 addr 0xe0005000 intr 7 not configured
+com0 at jazzio0 addr 0xe0006000 intr 8: ns16550a, working fifo
+com0: txfifo disabled
+com0: console
+com1 at jazzio0 addr 0xe0007000 intr 9: ns16550a, working fifo
+com1: txfifo disabled
+jazzisabr0 at mainbus0
+isa0 at jazzisabr0
+isapnp0 at isa0 port 0x279: ISA Plug 'n Play device support
+scsibus0: waiting 2 seconds for devices to settle...
+cd0 at scsibus0 target 2 lun 0: <QEMU, QEMU CD-ROM, 2.5+> cdrom removable
+cd1 at scsibus0 target 4 lun 0: <QEMU, QEMU CD-ROM, 2.5+> cdrom removable
+boot device: <unknown>
+root on md0a dumps on md0b
+root file system type: ffs
+WARNING: preposterous TOD clock time
+WARNING: using filesystem time
+WARNING: CHECK AND RESET THE DATE!
+erase ^H, werase ^W, kill ^U, intr ^C, status ^T
+Terminal type? [vt100] 
+Erase is backspace.                                                     
+(I)nstall, (S)hell or (H)alt ? s
+# ifconfig sn0 10.2.3.4/24
+# ping
+usage: 
+ping [-adDfLnoPqQrRv] [-c count] [-g gateway] [-h host] [-i interval] [-I addr]
+     [-l preload] [-p pattern] [-s size] [-t tos] [-T ttl] [-w maxwait] host
+
+
+My initial testing shows that NetBSD 5.1 doesn't like my v2 patch series. 
+I'll debug that before I send v3.
+
+BTW, there seem to be regressions in NetBSD 8.1 compared to NetBSD 5.1. 
+
+The 'boot' program on the 8.1 ISO just hangs.
+
+If I use the 'boot' program from the 5.1 ISO to load the 'netbsd' 
+binary from the 8.1 ISO, I get a crash:
+
+-> Run a program
+
+	scsi(0)cdrom(2)fdisk(0)boot scsi(0)cdrom(4)fdisk(0)netbsd
+
+NetBSD/arc Bootstrap, Revision 1.1
+(builds@b7.netbsd.org, Sat Nov  6 14:06:36 UTC 2010)
+devopen: scsi(0)cdrom(4)fdisk(0) type disk file netbsd
+7902064|
+Jazz Monitor. Version 174
+Press H for help, Q to quit.
+AdEL exception occurred.
+ at=149f4800 v0=00000000 v1=8003d698 a0=807f3d40 a1=80eff158 a2=00000800
+ a3=80eff188 t0=00000001 t1=00000001 t2=80045400 t3=800232d8 t4=000a4fa4
+ t5=00000000 t6=00746669 t7=00746685 s0=80f0cab8 s1=00000800 s2=80eff1d0
+ s3=80f10000 s4=80f0ee18 s5=80f0ee18 s6=00028eef s7=00000000 t8=00746685
+ t9=c0000000 k0=80041f50 k1=80000194 gp=80f0c540 sp=80eff128 s8=80f0ca30
+ ra=80023310 psr=20000803 epc=8002331c cause=00004010 errorepc=00000000
+ badvaddr=00746689
+>
+
+I haven't tried the latest iso (9.0-rc1).
 
