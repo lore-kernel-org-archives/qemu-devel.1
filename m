@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16665C2D0C3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E623C2D0D2
 	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:36:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E070220718
+	by mail.kernel.org (Postfix) with ESMTPS id E06DB206B7
 	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 04:36:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E070220718
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E06DB206B7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijbvi-0007nr-NC
+	id 1ijbvi-0007oK-TN
 	for qemu-devel@archiver.kernel.org; Mon, 23 Dec 2019 23:36:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34322)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuG-00066v-R6
- for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:54 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuH-00067W-08
+ for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuF-0008BQ-FG
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ijbuF-0008CN-Oo
  for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:52 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:58381 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:58368 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ijbuF-00086e-8S
+ id 1ijbuF-00086P-Gp
  for qemu-devel@nongnu.org; Mon, 23 Dec 2019 23:34:51 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 931E21A0EE6;
+ by mail.rt-rk.com (Postfix) with ESMTP id 8798E1A1158;
  Tue, 24 Dec 2019 05:34:47 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4FDF21A1D40;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4A0C61A1D39;
  Tue, 24 Dec 2019 05:34:47 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/6] linux-user: Add support for FS_IOC32_<GET|SET>FLAGS
+Subject: [PATCH v2 3/6] linux-user: Add support for FS_IOC_<GET|SET>VERSION
  ioctls
-Date: Tue, 24 Dec 2019 05:34:36 +0100
-Message-Id: <1577162078-29048-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 24 Dec 2019 05:34:35 +0100
+Message-Id: <1577162078-29048-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1577162078-29048-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -70,43 +70,53 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-These FS_IOC32_<GET|SET>FLAGS ioctls are identical to
-FS_IOC_<GET|SET>FLAGS ioctls, but without the anomaly of their
-number defined as if their third argument is of type long, while
-it is treated internally in kernel as is of type int.
+A very specific thing for these two ioctls is that their code
+implies that their third argument is of type 'long', but the
+kernel uses that argument as if it is of type 'int'. This anomaly
+is recognized also in commit 6080723 (linux-user: Implement
+FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
  linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/syscall_defs.h | 8 +++++---
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index c44f42e..4fd6939 100644
+index c6b9d6a..c44f42e 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -140,6 +140,8 @@
+@@ -138,6 +138,8 @@
+ 
+      IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
       IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
  
  #ifdef CONFIG_USBFS
    /* USB ioctls */
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index f68a8b6..964b2b4 100644
+index 98c2119..f68a8b6 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -920,6 +920,8 @@ struct target_pollfd {
- #define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
- #define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+@@ -911,12 +911,14 @@ struct target_pollfd {
+ #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
+ #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
+ 
+-/* Note that the ioctl numbers claim type "long" but the actual type
+- * used by the kernel is "int".
++/*
++ * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
++ * claim type "long" but the actual type used by the kernel is "int".
+  */
+ #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
+ #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
+-
++#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
++#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
  #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
-+#define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
-+#define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
  
  /* usb ioctls */
- #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
 -- 
 2.7.4
 
