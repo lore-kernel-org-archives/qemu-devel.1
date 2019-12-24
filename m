@@ -2,62 +2,63 @@ Return-Path: <SRS0=g5aJ=2O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F95C2D0CF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 05:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECAFC2D0D2
+	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 05:37:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22FFD20706
+	by mail.kernel.org (Postfix) with ESMTPS id E1D5920706
 	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 05:37:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hmwh6QTD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22FFD20706
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Qe/72tF0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1D5920706
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijcsw-0002tj-5x
-	for qemu-devel@archiver.kernel.org; Tue, 24 Dec 2019 00:37:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34330)
+	id 1ijcsx-0002uc-1x
+	for qemu-devel@archiver.kernel.org; Tue, 24 Dec 2019 00:37:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ijcs2-0001yj-Vu
+ (envelope-from <dgibson@ozlabs.org>) id 1ijcs2-0001yi-RB
  for qemu-devel@nongnu.org; Tue, 24 Dec 2019 00:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ijcs1-0003ZQ-BB
+ (envelope-from <dgibson@ozlabs.org>) id 1ijcs1-0003ZG-AO
  for qemu-devel@nongnu.org; Tue, 24 Dec 2019 00:36:38 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:37195 helo=ozlabs.org)
+Received: from ozlabs.org ([203.11.71.1]:37587)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ijcs0-0003L4-90; Tue, 24 Dec 2019 00:36:37 -0500
+ id 1ijcs0-0003Km-8R; Tue, 24 Dec 2019 00:36:37 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47hlML0qt9z9sP6; Tue, 24 Dec 2019 16:36:29 +1100 (AEDT)
+ id 47hlMK6x5bz9sPh; Tue, 24 Dec 2019 16:36:29 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1577165790;
- bh=ZvPbNLyyloftXPdG86oAKU+tnwleI7uEMh+7917IPTA=;
+ d=gibson.dropbear.id.au; s=201602; t=1577165789;
+ bh=intfF2AeYZ+3YDeDwDLzDnNODZWxGx0IeRPoMxjrZWc=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hmwh6QTDYgCT1rWTllgIlhYmDzO32Mb5Cgeoqt4pjrIDhwBUf8Zmv/j5Jl1/qpb8W
- Cla/g58+1D+Sim0wiUd72W4FDPjTbonDA0Jk6mXVaJP7DoPoRPOkh7uqxAMViaAcr5
- Mb0W4jPHz0CkUD3qAbFJYOrGtxMDz6gZ2XcYWKp4=
-Date: Tue, 24 Dec 2019 16:19:04 +1100
+ b=Qe/72tF06tTJd6RJDZZLvlsnRO9UZuKCLPRPY4q8HZWB44WdapKErX67hp0PT+p/S
+ FH/mC725j9+bqhBEcddaLAtOk2ShRAUPqTyXgztU3/sZGAAXdNpZupJWBb4kPAGz/p
+ WM+Xr1LD869PII5ROrMo3vNCAOxvozUHbqqfAVJU=
+Date: Tue, 24 Dec 2019 16:10:45 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Fabiano Rosas <farosas@linux.ibm.com>
+To: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
 Subject: Re: [PATCH] target/ppc: fix memory dump endianness in QEMU monitor
-Message-ID: <20191224051904.GK38380@umbus.modem>
+Message-ID: <20191224051045.GJ38380@umbus.modem>
 References: <20191219163854.8945-1-maxiwell@linux.ibm.com>
- <20191223063043.GH38380@umbus.modem> <875zi6fwqy.fsf@linux.ibm.com>
+ <20191223063043.GH38380@umbus.modem>
+ <20191223213530.m4thca35liyjlsln@maxibm>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="W2ydbIOJmkm74tJ2"
+ protocol="application/pgp-signature"; boundary="HcccYpVZDxQ8hzPO"
 Content-Disposition: inline
-In-Reply-To: <875zi6fwqy.fsf@linux.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20191223213530.m4thca35liyjlsln@maxibm>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,99 +70,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, farosas@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---W2ydbIOJmkm74tJ2
+--HcccYpVZDxQ8hzPO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 23, 2019 at 08:27:49PM -0300, Fabiano Rosas wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
+On Mon, Dec 23, 2019 at 06:35:30PM -0300, Maxiwell S. Garcia wrote:
+> On Mon, Dec 23, 2019 at 05:30:43PM +1100, David Gibson wrote:
+> > On Thu, Dec 19, 2019 at 01:38:54PM -0300, Maxiwell S. Garcia wrote:
+> > > The env->hflags is computed in ppc_cpu_reset(), using the MSR register
+> > > as input. But at the point ppc_disas_set_info() is called the MSR_LE =
+bit
+> > > in env->hflags doesn't contain the same information that env->msr.
+> > >=20
+> > > Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
+> > > Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
+> >=20
+> > I think the change is ok as far as it goes but,
+> >=20
+> > a) the commit message should expand on what the practical effect of
+> > this is.  Looking, I think the only thing this affects is DEBUG_DISAS
+> > output (i.e. very rarely) which is worth noting.
 >=20
+> Ok, I will do that. I got this bug using the 'x/i' command on QEMU
+> monitor with a LE guest.
+
+Ok.
+
 > > b) AFAICT this is the *only* thing that looks for the LE bit in
 > > hflags. Given that, and the fact that it would be wrong in most cases,
 > > we should remove it from hflags entirely along with this change.
-> >
+> >=20
 >=20
-> I see there is:
+> I was changing the code to remove this LE bit from hflags and I found the
+> function 'helper_store_hid0_601()' in misc_helper.c, which manipulates the
+> 'hflags'. The commit 056401eae6 says:
 >=20
-> static void ppc_tr_init_disas_context(DisasContextBase *dcbase, CPUState =
-*cs)
-> {
->     ...
->     ctx->le_mode =3D !!(env->hflags & (1 << MSR_LE));
->     ...
-> }
-
-Ah... good point, I missed that one, sorry.  That makes all the
-difference.
-
-My guess is that this bit exists to be a universal flag for endianness
-mode, generalizing across the MSR bit on modern cpus, and the old 601
-which had it in the HID register.  I'm a bit dubious as to whether our
-601 emulation is good enough to warrant bothering with this, but it's
-probably best not to mess with it.
-
-
-> And we call hreg_recompute_hflags in some places:
-
-ITYM hreg_compute_hflags().
-
-> - powerpc_excp (target/ppc/excp_helper.c)
->   Called from TCG do_interrupt
+> "Implement PowerPC 601 HID0 register, needed for little-endian mode suppo=
+rt.
+> As a consequence, we need to merge hflags coming from MSR with other ones.
+> Use little-endian mode from hflags instead of MSR during code translation=
+=2E"
 >=20
-> - ppc_cpu_reset (target/ppc/translate_init.inc.c)
->   Called from spapr_machine_reset
->=20
-> - hreg_store_msr (target/ppc/helper_regs.h)
->   This is used for migration and for do_rfi, store_msr
+> So, is the 'hflags' necessary here? Can we use MSR instead of hflags to
+> change the endianness in this function?
 
-Huh... given this, I'm not sure how hflags was getting out of sync
-with the MSR in the first place, which brings the initial patch into
-question.
+That function alters the LE bit in hflags, but doesn't read it.
+*Nothing* reads it, so none of the places that alter it matter.
 
-> - h_cede (hw/ppc/spapr_hcall.c)
->   QEMU-side H_CEDE hypercall implementation=20
->=20
->=20
-> It looks like the hflags MSR_LE is being updated correctly with TCG. But
-> with KVM we only touch it on system_reset
-
-Ah.. right.  I think to fix that we'd want an hreg_compute_hflags() at
-the end of sucking the state out of KVM.
-
-> (and possibly h_cede? I don't
-> know if it is QEMU who handles it).
-
-It's KVM.  If we used the qemu one it would add an awful lot of
-latency to cedes.
->=20
-> So I would let hflags be.
->=20
->=20
-> ... Actually, I don't really know the purpose of hflags. It comes from:
->=20
->   commit 3f3373166227b13e762e20d2fb51eadfa6a2d653
->   Author: Fabrice Bellard <fabrice@bellard.org>
->   Date:   Wed Aug 20 23:02:09 2003 +0000
->  =20
->       pop ss, mov ss, x and sti disable irqs for the next instruction -
->       began dispatch optimization by adding new x86 cpu 'hidden' flags
->      =20
->      =20
->       git-svn-id: svn://svn.savannah.nongnu.org/qemu/trunk@372 c046a42c-6=
-fe2-441c-8c8c-71466251a162
->=20
-> Could any one clarify that?
-
-Not really.  It's really, really old, in the cruft bits of TCG I don't
-much understand.
+I strongly suspect we won't properly honour the LE bit in the 601 HID
+register, but that's already the case.  I also suspect it's far from
+the only way in which 601 emulation is broken.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -169,25 +134,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---W2ydbIOJmkm74tJ2
+--HcccYpVZDxQ8hzPO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4Bn8gACgkQbDjKyiDZ
-s5JFhhAAhTbLOoCfdmnD+eTrOp81/xphIaKzRyrM0XIqfcPVMyp8Glr0FEbeJ5mU
-hHQ5OwmjaRw2DP47o558Q5iZ6Z/edPAIlk8I5ocPs3/GWRVIMnCFLDM98Pn7OP/V
-9LUgzZl5keePTzjiIB0naZfQ1SduUmYqJ3TnnoQ5jALa4B/S/kdZEACc6ubKskxc
-ok/cK+oOfHc857tH1jEka2a41oowtdrsIJjvlZVal+omsDDpwlLoGSf1Bj//OnDB
-IOjdIh9JldterY7Nkr0eEzejJvehEyVQGnfinqBMxuS1HVqQ1EoktUURjmmCZZln
-wSiHbI4R9ksOgwFOuen5DSO2SfPpKboJXSqQz/d/EWUv1VlWA1K2SjrHP7sjsCnc
-xX0Msu7qGCXrIrU5NWACnYq+VAURU2hrg0Mmtf20ZoEXNiEFqlsik/HIXAE/MzLF
-CMYXQeN6rKMk0ym10UXow6v8D3C7+8V76qFgLml2rRFEXqe9S+FsMTWsQKIiPnVf
-N41KHrLMS58DDxb/RopgNvzuA75+CuoefSIvcea4rDJCiqdENPp+kciGQ//xuF23
-ec/e/R7JCqlIxMQ8+0e3OoB2fAaAA4XKACj9ugVpOLZKfEmuT+El5budz2Y9xwEg
-461eJLkWOSBgzgkV5GigpSCrew00a3mrJ9zEoQzcX2O92If6C00=
-=TaTW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4BndIACgkQbDjKyiDZ
+s5KYig/+Mg2CCs+oD4fiUxbsDeRK6C2WMRZPJopRVaWvn3nLzvE/FVyy99NG+k/v
+hMfJZU0J8ruHKx+VLJny0GqkmU9SR0DU/+LiKseYUtpKKY2rRltVoJb5t1mk1Xzg
+JaL8VJ/FJV+NkuAEQTeYXMKo7rXZBkbfFlJwED1mE+NXTOaAnzJ5fzKr8lVPNlfi
+vIJ9dHqc4eqnjx+l1FwSJ+VIcDFp3zHrvSGAFXqCIXdtUG5lCKZeEqKXNfmluCsI
+fIkPqzhJxv01rZ0P4SstHraAQ2UNA5/3GaHsP2J8oPXWWooEU7l9FHEEIA/Xy/2f
+FFmDfIq6X892viLxljwf7RWjUN1cDyRBVvJDCM/G31wIcbRUbTCjFN2EijjlWP8p
+NNXHzPzE2/mv/a96YE0H6yQdMaejnz+Qh1FlIzLQbBkJH1Db6YhyBvxKRjNbVdqa
+fV+LoIwbR7tkNqtpK5WQWSjaQ8ZtE3rqX+tSZNiN5M2OdPPppuk0maKV8oxvzvJX
+SXr3f17LWdbbTQL9K1m5Uvs8CFPNJMEuau1YZxnMk6IxYLntj6QSjzVQpk24Vz8n
+VRGK6kHp7D20DusyC+UUqAfFbuPn9PgN0NLmibD1SpV0IdaiRY7YfXxUUPLjGa+v
++mZATgTa4VW94mcU3egZVxaIJzETahuCr4l+dApxSsnxaV8i2s0=
+=40nG
 -----END PGP SIGNATURE-----
 
---W2ydbIOJmkm74tJ2--
+--HcccYpVZDxQ8hzPO--
 
