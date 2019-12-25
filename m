@@ -1,4 +1,4 @@
-Return-Path: <SRS0=g5aJ=2O=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=MlkC=2P=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,71 +7,62 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 190B3C2D0CF
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 16:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56FFFC2D0CF
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Dec 2019 06:21:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D27C020643
-	for <qemu-devel@archiver.kernel.org>; Tue, 24 Dec 2019 16:32:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09A1E2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 25 Dec 2019 06:21:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m24eG4mM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27C020643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Um2zmWgC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09A1E2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ijn6q-0007K7-W4
-	for qemu-devel@archiver.kernel.org; Tue, 24 Dec 2019 11:32:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40793)
+	id 1ik02i-0002Ld-3r
+	for qemu-devel@archiver.kernel.org; Wed, 25 Dec 2019 01:21:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <padmashree9107@gmail.com>) id 1ijn67-0006fm-3I
- for qemu-devel@nongnu.org; Tue, 24 Dec 2019 11:31:51 -0500
+ (envelope-from <kvmluck@163.com>) id 1ik01w-0001vm-N5
+ for qemu-devel@nongnu.org; Wed, 25 Dec 2019 01:20:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <padmashree9107@gmail.com>) id 1ijn66-0004DO-1b
- for qemu-devel@nongnu.org; Tue, 24 Dec 2019 11:31:50 -0500
-Received: from mail-yb1-xb2d.google.com ([2607:f8b0:4864:20::b2d]:34037)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <padmashree9107@gmail.com>)
- id 1ijn65-0004D0-Tq
- for qemu-devel@nongnu.org; Tue, 24 Dec 2019 11:31:49 -0500
-Received: by mail-yb1-xb2d.google.com with SMTP id l7so647152ybp.1
- for <qemu-devel@nongnu.org>; Tue, 24 Dec 2019 08:31:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=CFWAb8666CqcEC+0V4kfFmJiQTAo+FfurLxyFbNdbcQ=;
- b=m24eG4mMjIMX6Y0zM4lBO0TrsvGoEPq+wTW+bgQv3h8yDHjIvXrF21ARlnkl+wAA/v
- f2QZ0vc/QGyMmnhOnIyQqA5ZbXktZ2S2ROs1tr9KIo77spxh+08nt/mcV4HWjUpdWYnm
- llG6owvzMjyDPaTi7PETF94/lDQJekw9s5JPNK3DvpAqSIDj6+VzOJtqW0UKtk3Nzquz
- qJSivbzap5aEqhKzCFNopsnu1Dx2TT0GQuW2Yr/vmcMySqR2eH0nOgeVBK+XxMxgpk3o
- ajFwc3sQ/egmaqeS5kvbaN35yl6d/AsW/i6tREFIyag4qH2MYTUvvZYtrlumDJaxLh0N
- xihw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=CFWAb8666CqcEC+0V4kfFmJiQTAo+FfurLxyFbNdbcQ=;
- b=lqYb7opA7NrCvqxnndU47y3ILOmWypMq2bDtrtDY7jtypNovKToRM519p3C5jEYQeW
- iOij9chGGf74Wcc2pWgRPabHOKTvixLqZ5+/rCw+11wn4+qu/VGjkn4BdlWZuLf3gKK6
- 4S+2uTtCtwiCyFoOM7MCNXR4qj+IIHp6deWwZxYgQU+8NjjtxAqVmzjIQwJ8ba37lR/r
- 5gCqb2MPbMJRN9ksbqtESBrvyZJT/9mc4e4Whcu8QbI/oEFlkF7U+AVvZqNOEIKCmR5e
- ATfTuCG5HqIMnBkmMqGen1s3CxcFkbwsaCzh0o7TqnuG5hzpWbHjVnnKijHM06sPZGzf
- ZxPg==
-X-Gm-Message-State: APjAAAUWMe3fWtsHNk8IHDY7ZFiV5brhGWpSywG6MEgDRSdv2LMm8guP
- PviLKutQLuYnlgXczh/z9tpL1TCsK2wIcBdVechhD38o
-X-Google-Smtp-Source: APXvYqxMEUVbS8vDvvKKV4o/Mcu0OXtVc+tlC2y1W7aVi19dysUlYEymmWbGf9JEfKhAaeksHKojOB6EoipCeSiaN4c=
-X-Received: by 2002:a5b:70d:: with SMTP id g13mr24926038ybq.270.1577205108630; 
- Tue, 24 Dec 2019 08:31:48 -0800 (PST)
+ (envelope-from <kvmluck@163.com>) id 1ik01r-0002Be-OU
+ for qemu-devel@nongnu.org; Wed, 25 Dec 2019 01:20:21 -0500
+Received: from m13-82.163.com ([220.181.13.82]:51522)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kvmluck@163.com>) id 1ik01q-00024T-6o
+ for qemu-devel@nongnu.org; Wed, 25 Dec 2019 01:20:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=lq5yv
+ l6hDuOKUe2zlgJNZi/+V6vpxcoGpgpOmin0AcI=; b=Um2zmWgCG0B5VVLNDDkFD
+ 8SS4n7AL6h30OYibY1v7/jxDr/hdxEkT5HE7RUgC3m86tjG/DZXlmTlzxUjxAHz5
+ UIrBoEkJeGMH27bHrD2zvbAyMXHgCOFGeo/kf0uR3A12TT3qF3expgUk18VvSmKv
+ NHKNQnOU2G882T1kglCgaE=
+Received: from kvmluck$163.com ( [111.202.93.98] ) by ajax-webmail-wmsvr82
+ (Coremail) ; Wed, 25 Dec 2019 14:04:41 +0800 (CST)
+X-Originating-IP: [111.202.93.98]
+Date: Wed, 25 Dec 2019 14:04:41 +0800 (CST)
+From: yue <kvmluck@163.com>
+To: qemu-devel <qemu-devel@nongnu.org>, stefanha@redhat.com,
+ jasowang@redhat.com
+Subject: virtio-net  has a sudden high latency when receiving
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
+ Copyright (c) 2002-2019 www.mailtech.cn 163com
+X-CM-CTRLDATA: 3nRFsGZvb3Rlcl9odG09ODc4MDo1Ng==
+Content-Type: multipart/alternative; 
+ boundary="----=_Part_117487_337857067.1577253881492"
 MIME-Version: 1.0
-From: padmashree mandri <padmashree9107@gmail.com>
-Date: Tue, 24 Dec 2019 22:01:37 +0530
-Message-ID: <CANT-jrLcehCiWpau5TaXpReb_B-J6hVN-ycRZek158w1vduRKQ@mail.gmail.com>
-Subject: Audio not working in Qemu-4.2 with pulse audio.
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="0000000000003ce9cf059a75ae7c"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::b2d
+Message-ID: <4e689f95.7930.16f3ba84694.Coremail.kvmluck@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: UsGowAD3uxb5+wJeoYg5Ag--.58648W
+X-CM-SenderInfo: xnypz3lfn6il2tof0z/1tbitBCWiVSIfdL9MgABsG
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 220.181.13.82
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,44 +78,214 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003ce9cf059a75ae7c
-Content-Type: text/plain; charset="UTF-8"
+------=_Part_117487_337857067.1577253881492
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
 
-Hi all,
+SGksIGFsbC4gdmlydGlvLW5ldCAgaGFzIGEgc3VkZGVuIGhpZ2ggbGF0ZW5jeSB3aGVuIHJlY2Vp
+dmluZy4gIGkgdGhpbmsgaXQgaXMgaXJxIHJlbGF0ZWQsIGJ1dCBpIGhhdmUgbm8gaWRlYSB0byBm
+aXggaXQuCgoKMSkgcGljMTogIGluc2lkZSB2bTEoMTkyLjE2OC45MS40KSAsIHBpbmcgMTkyLjE2
+OC45MS41OyAgcGxlYXNlIG5vdGljZSBzZXEgIDIwCgoKClsxNTc3MjUyNDUwLjU5MjQ0MV0gNjQg
+Ynl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2VxPTYgdHRsPTY0IHRpbWU9MC4zMzUgbXMK
+ClsxNTc3MjUyNDUxLjU5MjM3M10gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2Vx
+PTcgdHRsPTY0IHRpbWU9MC4zMDggbXMKClsxNTc3MjUyNDUyLjU5MjQ0OV0gNjQgYnl0ZXMgZnJv
+bSAxOTIuMTY4LjkxLjU6IGljbXBfc2VxPTggdHRsPTY0IHRpbWU9MC4zODEgbXMKClsxNTc3MjUy
+NDUzLjU5NzM1OF0gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2VxPTkgdHRsPTY0
+IHRpbWU9Mi4yMSBtcwoKWzE1NzcyNTI0NTQuNTk2NDE1XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjgu
+OTEuNTogaWNtcF9zZXE9MTAgdHRsPTY0IHRpbWU9MC4zNTMgbXMKClsxNTc3MjUyNDU1LjU5NjQ0
+Nl0gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2VxPTExIHR0bD02NCB0aW1lPTAu
+MzY5IG1zCgpbMTU3NzI1MjQ1Ni42MDA0MjZdIDY0IGJ5dGVzIGZyb20gMTkyLjE2OC45MS41OiBp
+Y21wX3NlcT0xMiB0dGw9NjQgdGltZT0wLjY5MiBtcwoKWzE1NzcyNTI0NTcuNjAwNTE0XSA2NCBi
+eXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTMgdHRsPTY0IHRpbWU9MC40NjIgbXMK
+ClsxNTc3MjUyNDU4LjYwMDU5MF0gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2Vx
+PTE0IHR0bD02NCB0aW1lPTAuMzk2IG1zCgpbMTU3NzI1MjQ1OS42MDA5MjJdIDY0IGJ5dGVzIGZy
+b20gMTkyLjE2OC45MS41OiBpY21wX3NlcT0xNSB0dGw9NjQgdGltZT0wLjg4OCBtcwoKWzE1Nzcy
+NTI0NjAuNjAwNDQ1XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTYgdHRs
+PTY0IHRpbWU9MC4zNTUgbXMKClsxNTc3MjUyNDYxLjYwMTMyOF0gNjQgYnl0ZXMgZnJvbSAxOTIu
+MTY4LjkxLjU6IGljbXBfc2VxPTE3IHR0bD02NCB0aW1lPTAuMzExIG1zCgpbMTU3NzI1MjQ2Mi42
+MDA0NDldIDY0IGJ5dGVzIGZyb20gMTkyLjE2OC45MS41OiBpY21wX3NlcT0xOCB0dGw9NjQgdGlt
+ZT0wLjQyNCBtcwoKWzE1NzcyNTI0NjMuNjAxNzI1XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEu
+NTogaWNtcF9zZXE9MTkgdHRsPTY0IHRpbWU9MC4zMjIgbXMKClsxNTc3MjUyNDY0LjYwNjc1Ml0g
+NjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2VxPTIwIHR0bD02NCB0aW1lPTUuNjUg
+bXMKClsxNTc3MjUyNDY1LjYwMzU2OV0gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBf
+c2VxPTIxIHR0bD02NCB0aW1lPTAuNDM4IG1zCgpbMTU3NzI1MjQ2Ni42MDM2NzldIDY0IGJ5dGVz
+IGZyb20gMTkyLjE2OC45MS41OiBpY21wX3NlcT0yMiB0dGw9NjQgdGltZT0wLjQ5NCBtcwoKWzE1
+NzcyNTI0NjcuNjAzNTQ1XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MjMg
+dHRsPTY0IHRpbWU9MC40MzEgbXMKCgoKdGNwZHVtcCBpbnNpZGUgdm0xIDsgCgoxMzo0MTowNC42
+MDEwMTYgSVAgMTkyLjE2OC45MS40ID4gMTkyLjE2OC45MS41OiBJQ01QIGVjaG8gcmVxdWVzdCwg
+aWQgMTgzNzUsIHNlcSAyMCwgbGVuZ3RoIDY0CgoxMzo0MTowNC42MDY2NDcgSVAgMTkyLjE2OC45
+MS41ID4gMTkyLjE2OC45MS40OiBJQ01QIGVjaG8gcmVwbHksIGlkIDE4Mzc1LCBzZXEgMjAsIGxl
+bmd0aCA2NAoKMikgY2FwdHVyZSBwYWNrZXQgb24gaXRzIGJhY2tlbmQgdGFwIGRldmljZSBvbiBo
+eXBlcnZpc29yIDsgICAgdGNwZHVtcCAtbm4gLWkgdGFwNTgwM2M1NzUtNGEgaWNtcCBhbmQgaG9z
+dCAxOTIuMTY4LjkxLjUgYW5kIGhvc3QgMTkyLjE2OC45MS40CgoxMzo0MTowNC42MDExNjYgSVAg
+MTkyLjE2OC45MS40ID4gMTkyLjE2OC45MS41OiBJQ01QIGVjaG8gcmVxdWVzdCwgaWQgMTgzNzUs
+IHNlcSAyMCwgbGVuZ3RoIDY0CgoxMzo0MTowNC42MDEzNjIgSVAgMTkyLjE2OC45MS41ID4gMTky
+LjE2OC45MS40OiBJQ01QIGVjaG8gcmVwbHksIGlkIDE4Mzc1LCBzZXEgMjAsIGxlbmd0aCA2NAoK
+aXQgc2hvd3MgIHRhcCB0YWtlcyBubyBtdWNoIHRpbWUgYmV0d2VlbiBzZW5kIGFuZCByZWNlaXZl
+LgoKCjYwNjY0NyAtIDYwMTM2MiA9IDUuM21zICwgIHRoaXMgaXMgY29uc3VtZWQgYnkgdmlydGlv
+LW5ldC4KCgpzaW1pbGFybHksIHdoZW4gMTkyLjE2OC45MS41IHJlY2VpdmUgcGFja2V0cyBmcm9t
+IGl0cyBiYWNrZW5kLCBpdCBhbHNvIGhhcyBzdWRkZW4gaGlnaCBsYXRlbmN5LgoKCmRvIHlvdSBh
+bGwgaGF2ZSBhbnkgaWRlYXM/CgoKdGhhbmtzCgoK
+------=_Part_117487_337857067.1577253881492
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: base64
 
-                I tried to run Qemu-4.2  with pulse audio but faced issue
-as there is no audio at all in guest .However it works fine with ALSA. I
-tried the same in Qemu-3.0 with pulseaudio. It was working fine. But facing
-issue after upgrading to Qemu-4.2. Any suggestions?
+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
+Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXY+SGksIGFsbC4mbmJzcDt2aXJ0aW8tbmV0ICZuYnNwO2hh
+cyBhIHN1ZGRlbiBoaWdoIGxhdGVuY3kgd2hlbiByZWNlaXZpbmcuICZuYnNwO2kgdGhpbmsgaXQg
+aXMgaXJxIHJlbGF0ZWQsIGJ1dCBpIGhhdmUgbm8gaWRlYSB0byBmaXggaXQuPC9kaXY+PGRpdj48
+YnI+PC9kaXY+MSkgcGljMTombmJzcDsmbmJzcDtpbnNpZGUmbmJzcDt2bTEoMTkyLjE2OC45MS40
+KSZuYnNwOywmbmJzcDtwaW5nJm5ic3A7MTkyLjE2OC45MS41OyAmbmJzcDtwbGVhc2Ugbm90aWNl
+Jm5ic3A7c2VxJm5ic3A7Jm5ic3A7MjA8ZGl2Pjxicj48L2Rpdj48ZGl2PjxwIHN0eWxlPSJtYXJn
+aW46IDBweDsgZm9udC1zdHJldGNoOiBub3JtYWw7IGZvbnQtc2l6ZTogMTJweDsgbGluZS1oZWln
+aHQ6IG5vcm1hbDsgZm9udC1mYW1pbHk6IE1vbmFjbzsgY29sb3I6IHJnYigyNDIsIDI0MiwgMjQy
+KTsgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAwLCAwLCAwLjg1MDk4KTsiPjxzcGFuIHN0eWxl
+PSJmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBuby1jb21tb24tbGlnYXR1cmVzIj5bMTU3NzI1MjQ1
+MC41OTI0NDFdIDY0IGJ5dGVzIGZyb20gMTkyLjE2OC45MS41OiBpY21wX3NlcT02IHR0bD02NCB0
+aW1lPTAuMzM1IG1zPC9zcGFuPjwvcD4KPHAgc3R5bGU9Im1hcmdpbjogMHB4OyBmb250LXN0cmV0
+Y2g6IG5vcm1hbDsgZm9udC1zaXplOiAxMnB4OyBsaW5lLWhlaWdodDogbm9ybWFsOyBmb250LWZh
+bWlseTogTW9uYWNvOyBjb2xvcjogcmdiKDI0MiwgMjQyLCAyNDIpOyBiYWNrZ3JvdW5kLWNvbG9y
+OiByZ2JhKDAsIDAsIDAsIDAuODUwOTgpOyI+PHNwYW4gc3R5bGU9ImZvbnQtdmFyaWFudC1saWdh
+dHVyZXM6IG5vLWNvbW1vbi1saWdhdHVyZXMiPlsxNTc3MjUyNDUxLjU5MjM3M10gNjQgYnl0ZXMg
+ZnJvbSAxOTIuMTY4LjkxLjU6IGljbXBfc2VxPTcgdHRsPTY0IHRpbWU9MC4zMDggbXM8L3NwYW4+
+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNp
+emU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9y
+OiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44
+NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxp
+Z2F0dXJlcyI+WzE1NzcyNTI0NTIuNTkyNDQ5XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTog
+aWNtcF9zZXE9OCB0dGw9NjQgdGltZT0wLjM4MSBtczwvc3Bhbj48L3A+CjxwIHN0eWxlPSJtYXJn
+aW46IDBweDsgZm9udC1zdHJldGNoOiBub3JtYWw7IGZvbnQtc2l6ZTogMTJweDsgbGluZS1oZWln
+aHQ6IG5vcm1hbDsgZm9udC1mYW1pbHk6IE1vbmFjbzsgY29sb3I6IHJnYigyNDIsIDI0MiwgMjQy
+KTsgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAwLCAwLCAwLjg1MDk4KTsiPjxzcGFuIHN0eWxl
+PSJmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBuby1jb21tb24tbGlnYXR1cmVzIj5bMTU3NzI1MjQ1
+My41OTczNThdIDY0IGJ5dGVzIGZyb20gMTkyLjE2OC45MS41OiBpY21wX3NlcT05IHR0bD02NCB0
+aW1lPTIuMjEgbXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRj
+aDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFt
+aWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6
+IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0
+dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0NTQuNTk2NDE1XSA2NCBieXRlcyBm
+cm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTAgdHRsPTY0IHRpbWU9MC4zNTMgbXM8L3NwYW4+
+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNp
+emU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9y
+OiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44
+NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxp
+Z2F0dXJlcyI+WzE1NzcyNTI0NTUuNTk2NDQ2XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTog
+aWNtcF9zZXE9MTEgdHRsPTY0IHRpbWU9MC4zNjkgbXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFy
+Z2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVp
+Z2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0
+Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHls
+ZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0
+NTYuNjAwNDI2XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTIgdHRsPTY0
+IHRpbWU9MC42OTIgbXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3Ry
+ZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQt
+ZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29s
+b3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxp
+Z2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0NTcuNjAwNTE0XSA2NCBieXRl
+cyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTMgdHRsPTY0IHRpbWU9MC40NjIgbXM8L3Nw
+YW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250
+LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNv
+bG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwg
+MC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9u
+LWxpZ2F0dXJlcyI+WzE1NzcyNTI0NTguNjAwNTkwXSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEu
+NTogaWNtcF9zZXE9MTQgdHRsPTY0IHRpbWU9MC4zOTYgbXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0i
+bWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUt
+aGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIs
+IDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBz
+dHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1Nzcy
+NTI0NTkuNjAwOTIyXSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTUgdHRs
+PTY0IHRpbWU9MC44ODggbXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQt
+c3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZv
+bnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQt
+Y29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50
+LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0NjAuNjAwNDQ1XSA2NCBi
+eXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTYgdHRsPTY0IHRpbWU9MC4zNTUgbXM8
+L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBm
+b250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287
+IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwg
+MCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29t
+bW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0NjEuNjAxMzI4XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjgu
+OTEuNTogaWNtcF9zZXE9MTcgdHRsPTY0IHRpbWU9MC4zMTEgbXM8L3NwYW4+PC9wPgo8cCBzdHls
+ZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxp
+bmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAy
+NDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3Bh
+biBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1
+NzcyNTI0NjIuNjAwNDQ5XSA2NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTgg
+dHRsPTY0IHRpbWU9MC40MjQgbXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZv
+bnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7
+IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91
+bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJp
+YW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0NjMuNjAxNzI1XSA2
+NCBieXRlcyBmcm9tIDE5Mi4xNjguOTEuNTogaWNtcF9zZXE9MTkgdHRsPTY0IHRpbWU9MC4zMjIg
+bXM8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFs
+OyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25h
+Y287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwg
+MCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8t
+Y29tbW9uLWxpZ2F0dXJlcyI+WzE1NzcyNTI0NjQuNjA2NzUyXSA2NCBieXRlcyBmcm9tIDE5Mi4x
+NjguOTEuNTogaWNtcF9zZXE9MjAgdHRsPTY0IHRpbWU9NS42NSBtczwvc3Bhbj48L3A+CjxwIHN0
+eWxlPSJtYXJnaW46IDBweDsgZm9udC1zdHJldGNoOiBub3JtYWw7IGZvbnQtc2l6ZTogMTJweDsg
+bGluZS1oZWlnaHQ6IG5vcm1hbDsgZm9udC1mYW1pbHk6IE1vbmFjbzsgY29sb3I6IHJnYigyNDIs
+IDI0MiwgMjQyKTsgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAwLCAwLCAwLjg1MDk4KTsiPjxz
+cGFuIHN0eWxlPSJmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBuby1jb21tb24tbGlnYXR1cmVzIj5b
+MTU3NzI1MjQ2NS42MDM1NjldIDY0IGJ5dGVzIGZyb20gMTkyLjE2OC45MS41OiBpY21wX3NlcT0y
+MSB0dGw9NjQgdGltZT0wLjQzOCBtczwvc3Bhbj48L3A+CjxwIHN0eWxlPSJtYXJnaW46IDBweDsg
+Zm9udC1zdHJldGNoOiBub3JtYWw7IGZvbnQtc2l6ZTogMTJweDsgbGluZS1oZWlnaHQ6IG5vcm1h
+bDsgZm9udC1mYW1pbHk6IE1vbmFjbzsgY29sb3I6IHJnYigyNDIsIDI0MiwgMjQyKTsgYmFja2dy
+b3VuZC1jb2xvcjogcmdiYSgwLCAwLCAwLCAwLjg1MDk4KTsiPjxzcGFuIHN0eWxlPSJmb250LXZh
+cmlhbnQtbGlnYXR1cmVzOiBuby1jb21tb24tbGlnYXR1cmVzIj5bMTU3NzI1MjQ2Ni42MDM2Nzld
+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC45MS41OiBpY21wX3NlcT0yMiB0dGw9NjQgdGltZT0wLjQ5
+NCBtczwvc3Bhbj48L3A+CjxwIHN0eWxlPSJtYXJnaW46IDBweDsgZm9udC1zdHJldGNoOiBub3Jt
+YWw7IGZvbnQtc2l6ZTogMTJweDsgbGluZS1oZWlnaHQ6IG5vcm1hbDsgZm9udC1mYW1pbHk6IE1v
+bmFjbzsgY29sb3I6IHJnYigyNDIsIDI0MiwgMjQyKTsgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgw
+LCAwLCAwLCAwLjg1MDk4KTsiPjxzcGFuIHN0eWxlPSJmb250LXZhcmlhbnQtbGlnYXR1cmVzOiBu
+by1jb21tb24tbGlnYXR1cmVzIj5bMTU3NzI1MjQ2Ny42MDM1NDVdIDY0IGJ5dGVzIGZyb20gMTky
+LjE2OC45MS41OiBpY21wX3NlcT0yMyB0dGw9NjQgdGltZT0wLjQzMSBtczwvc3Bhbj48L3A+PC9k
+aXY+PGRpdj48YnI+PC9kaXY+PGRpdj50Y3BkdW1wIGluc2lkZSB2bTEgOyZuYnNwOzwvZGl2Pjxk
+aXY+PHAgc3R5bGU9Im1hcmdpbjogMHB4OyBmb250LXN0cmV0Y2g6IG5vcm1hbDsgZm9udC1zaXpl
+OiAxMnB4OyBsaW5lLWhlaWdodDogbm9ybWFsOyBmb250LWZhbWlseTogTW9uYWNvOyBjb2xvcjog
+cmdiKDI0MiwgMjQyLCAyNDIpOyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuODUw
+OTgpOyI+PHNwYW4gc3R5bGU9ImZvbnQtdmFyaWFudC1saWdhdHVyZXM6IG5vLWNvbW1vbi1saWdh
+dHVyZXMiPjEzOjQxOjA0LjYwMTAxNiBJUCAxOTIuMTY4LjkxLjQgJmd0OyAxOTIuMTY4LjkxLjU6
+IElDTVAgZWNobyByZXF1ZXN0LCBpZCAxODM3NSwgc2VxIDIwLCBsZW5ndGggNjQ8L3NwYW4+PC9w
+Pgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZvbnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6
+IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiBy
+Z2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5
+OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJpYW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0
+dXJlcyI+MTM6NDE6MDQuNjA2NjQ3IElQIDE5Mi4xNjguOTEuNSAmZ3Q7IDE5Mi4xNjguOTEuNDog
+SUNNUCBlY2hvIHJlcGx5LCBpZCAxODM3NSwgc2VxIDIwLCBsZW5ndGggNjQ8L3NwYW4+PC9wPjwv
+ZGl2PjxkaXY+MikgY2FwdHVyZSBwYWNrZXQgb24gaXRzIGJhY2tlbmQgdGFwIGRldmljZSBvbiBo
+eXBlcnZpc29yIDsgJm5ic3A7Jm5ic3A7PHNwYW4gc3R5bGU9ImNvbG9yOiByZ2IoMjQyLCAyNDIs
+IDI0Mik7IGZvbnQtZmFtaWx5OiBNb25hY287IGZvbnQtc2l6ZTogMTJweDsgYmFja2dyb3VuZC1j
+b2xvcjogcmdiYSgwLCAwLCAwLCAwLjg1MDk4KTsiPiZuYnNwOzwvc3Bhbj48c3BhbiBzdHlsZT0i
+Y29sb3I6IHJnYigyNDIsIDI0MiwgMjQyKTsgZm9udC1mYW1pbHk6IE1vbmFjbzsgZm9udC1zaXpl
+OiAxMnB4OyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuODUwOTgpOyI+dGNwZHVt
+cCAtbm4gLWkgdGFwNTgwM2M1NzUtNGEgaWNtcCBhbmQgaG9zdCAxOTIuMTY4LjkxLjUgYW5kIGhv
+c3QgMTkyLjE2OC45MS40PC9zcGFuPjwvZGl2PjxkaXY+PHAgc3R5bGU9Im1hcmdpbjogMHB4OyBm
+b250LXN0cmV0Y2g6IG5vcm1hbDsgZm9udC1zaXplOiAxMnB4OyBsaW5lLWhlaWdodDogbm9ybWFs
+OyBmb250LWZhbWlseTogTW9uYWNvOyBjb2xvcjogcmdiKDI0MiwgMjQyLCAyNDIpOyBiYWNrZ3Jv
+dW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuODUwOTgpOyI+PHNwYW4gc3R5bGU9ImZvbnQtdmFy
+aWFudC1saWdhdHVyZXM6IG5vLWNvbW1vbi1saWdhdHVyZXMiPjEzOjQxOjA0LjYwMTE2NiBJUCAx
+OTIuMTY4LjkxLjQgJmd0OyAxOTIuMTY4LjkxLjU6IElDTVAgZWNobyByZXF1ZXN0LCBpZCAxODM3
+NSwgc2VxIDIwLCBsZW5ndGggNjQ8L3NwYW4+PC9wPgo8cCBzdHlsZT0ibWFyZ2luOiAwcHg7IGZv
+bnQtc3RyZXRjaDogbm9ybWFsOyBmb250LXNpemU6IDEycHg7IGxpbmUtaGVpZ2h0OiBub3JtYWw7
+IGZvbnQtZmFtaWx5OiBNb25hY287IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGJhY2tncm91
+bmQtY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44NTA5OCk7Ij48c3BhbiBzdHlsZT0iZm9udC12YXJp
+YW50LWxpZ2F0dXJlczogbm8tY29tbW9uLWxpZ2F0dXJlcyI+MTM6NDE6MDQuNjAxMzYyIElQIDE5
+Mi4xNjguOTEuNSAmZ3Q7IDE5Mi4xNjguOTEuNDogSUNNUCBlY2hvIHJlcGx5LCBpZCAxODM3NSwg
+c2VxIDIwLCBsZW5ndGggNjQ8L3NwYW4+PC9wPjwvZGl2PjxkaXY+aXQgc2hvd3MgJm5ic3A7dGFw
+IHRha2VzIG5vIG11Y2ggdGltZSBiZXR3ZWVuIHNlbmQgYW5kIHJlY2VpdmUuPC9kaXY+PGRpdj48
+YnI+PC9kaXY+PGRpdj48c3BhbiBzdHlsZT0iY2FyZXQtY29sb3I6IHJnYigyNDIsIDI0MiwgMjQy
+KTsgY29sb3I6IHJnYigyNDIsIDI0MiwgMjQyKTsgZm9udC1mYW1pbHk6IE1vbmFjbzsgZm9udC1z
+aXplOiAxMnB4OyBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuODUwOTgpOyI+NjA2
+NjQ3IC0mbmJzcDs8L3NwYW4+PHNwYW4gc3R5bGU9ImNhcmV0LWNvbG9yOiByZ2IoMjQyLCAyNDIs
+IDI0Mik7IGNvbG9yOiByZ2IoMjQyLCAyNDIsIDI0Mik7IGZvbnQtZmFtaWx5OiBNb25hY287IGZv
+bnQtc2l6ZTogMTJweDsgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgwLCAwLCAwLCAwLjg1MDk4KTsi
+PjYwMTM2MiA9IDUuM21zICwgJm5ic3A7dGhpcyBpcyBjb25zdW1lZCBieSB2aXJ0aW8tbmV0Ljwv
+c3Bhbj48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PnNpbWlsYXJseSwgd2hlbiAxOTIuMTY4Ljkx
+LjUgcmVjZWl2ZSBwYWNrZXRzIGZyb20gaXRzIGJhY2tlbmQsIGl0IGFsc28gaGFzIHN1ZGRlbiBo
+aWdoIGxhdGVuY3kuPC9kaXY+PGRpdj48YnI+PC9kaXY+PGRpdj5kbyB5b3UgYWxsIGhhdmUgYW55
+IGlkZWFzPzwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+dGhhbmtzPC9kaXY+PGJyPjxicj48L2Rp
+dj48YnI+PGJyPjxzcGFuIHRpdGxlPSJuZXRlYXNlZm9vdGVyIj48cD4mbmJzcDs8L3A+PC9zcGFu
+Pg==
+------=_Part_117487_337857067.1577253881492--
 
-
-
-Thanks
-
-Padmashree
-
---0000000000003ce9cf059a75ae7c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><p class=3D"MsoNormal" style=3D"margin:0cm 0cm 0.0001pt;fo=
-nt-size:11pt;font-family:Calibri,sans-serif">Hi all,</p>
-
-<p class=3D"MsoNormal" style=3D"margin:0cm 0cm 0.0001pt;font-size:11pt;font=
--family:Calibri,sans-serif">=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 <i>=C2=A0</i>=C2=A0I tried to run Qemu-4.2=C2=A0 with pulse audio but f=
-aced issue as there is no audio at all in guest .However it works fine with=
- ALSA. I tried the same in Qemu-3.0 with pulseaudio. It was working fine. B=
-ut facing issue after upgrading to Qemu-4.2. Any suggestions?</p>
-
-<p class=3D"MsoNormal" style=3D"margin:0cm 0cm 0.0001pt;font-size:11pt;font=
--family:Calibri,sans-serif">=C2=A0</p>
-
-<p class=3D"MsoNormal" style=3D"margin:0cm 0cm 0.0001pt;font-size:11pt;font=
--family:Calibri,sans-serif">Thanks</p>
-
-<p class=3D"MsoNormal" style=3D"margin:0cm 0cm 0.0001pt;font-size:11pt;font=
--family:Calibri,sans-serif">Padmashree</p></div>
-
---0000000000003ce9cf059a75ae7c--
 
