@@ -2,83 +2,87 @@ Return-Path: <SRS0=LSdK=2Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A47BC2D0DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 13:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3ECDC2D0DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0A5F206CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 13:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D2DD20828
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:05:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PlTA/6ue"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0A5F206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yo76YOXi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2DD20828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikT5w-0008PC-45
-	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 08:22:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53682)
+	id 1ikTlq-0005IU-LZ
+	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 09:05:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <xtay.haibin@gmail.com>) id 1ikPdT-0005M9-9X
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 04:40:52 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ikTkx-0004qg-Am
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:04:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <xtay.haibin@gmail.com>) id 1ikPdS-0005UZ-0T
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 04:40:51 -0500
-Received: from mail-io1-xd33.google.com ([2607:f8b0:4864:20::d33]:38798)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <xtay.haibin@gmail.com>)
- id 1ikPdR-0005UL-SR
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 04:40:49 -0500
-Received: by mail-io1-xd33.google.com with SMTP id v3so22841194ioj.5
- for <qemu-devel@nongnu.org>; Thu, 26 Dec 2019 01:40:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=wCLA/PSGT41lqfZjAzBzt7VOUHSCAs3pEfyu9//foac=;
- b=PlTA/6uedB4E86rmMG6HvL/My91PmkdsU2778kXIIeFpvyNVeY5uXVYedrVy2nSqZN
- CN99YHTztJjWo6Ol/TXlyNoRFZ+p71yazf+Z1BjL3nowYkG4m9hTsq1qtyZUINa+Z+8K
- SqukWRQqOw6zdTE6PJZtHGk+CxWkC9W29oKgx9dLpQsnuRpCRnxAzqk0Ivsjq71YrC8V
- P1E0Y50dFk9a3Pv22qIuvMAnI+1NUlcBR4uxILJfz6bmXqvvkZdS5J4W8sxNcoRi9txD
- kv7cnMMsN10mKfXHDHlcbt1h3i7eka1haYEjn/Rwe7QS30ruzw/4pB05/G6vnVM4V0yx
- qsOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wCLA/PSGT41lqfZjAzBzt7VOUHSCAs3pEfyu9//foac=;
- b=CjeIhGa21vhs1yqeq8cYEb4h9iUnn/X0KzIbnRY9XS9IPonQ3minq2axdiIDDf0lHd
- 8EPz47mpbKnbET6oXsGMvP0u/h0c8j0SEU4IaL/yDlDXQaSYpUDVINEqH5ny2JkQyNa6
- 8x/C0FdmsX6/qQUmfEN8Kb+bbmfjhEzMmKLLrogeRp8P4c4Faka+9Sd17Fzb4z49dzSe
- RPimeJAow5SwqeuOO0Do0T5RvMb7epEW2TSlB+qs3k4KmRnB/MZYigR40/4EyUQEgij+
- Frw6tf9LcgE1WULAp88YBA9YYGkFz96kcO/vjubmKY1IKtZr+UDC5xCgZI0Sm29iZKBg
- VXQg==
-X-Gm-Message-State: APjAAAWGG0dyXrjv62LAbHde1M8GGvWX+8jKzy2z6Zk0JLwycQj16ojQ
- CYKyul9gi4rPo2ZK0mau7t0l86NvUlmeCNZhkqG7pQ==
-X-Google-Smtp-Source: APXvYqwLijKVeACBda1sUxVcrEYPMIeR266mkrvS6hDFt1MbQxGIYei2D/6c6603iTPvP9TcUl/WD5b5pb3qoSGPGHo=
-X-Received: by 2002:a5d:9309:: with SMTP id l9mr29990312ion.202.1577353248503; 
- Thu, 26 Dec 2019 01:40:48 -0800 (PST)
+ (envelope-from <wainersm@redhat.com>) id 1ikTku-0002XI-OR
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:04:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56931
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikTku-0002Vl-BR
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:04:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577369082;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8IUPTeGV0tsZkJU3wzdZIMQVHMfn+XgOh4seywZKH1c=;
+ b=Yo76YOXiHSnkrgoYDQj6e+niiNVMDsNR1tL4aZRaKei9JDALN/ZPczLSc4WaoF6HUr8o9E
+ qRM2iC7BnjQjltq+HTAwraUg0ABGriV8ySKGzZ90sW00hMWsiFJUadUb5DSMftMYkDYku0
+ KPh+cYuqDftDgFuYHqBdu3XbuAeQHzc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-Y68DMVhQOnmXiaTN0q04xQ-1; Thu, 26 Dec 2019 09:04:41 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A3DADB20;
+ Thu, 26 Dec 2019 14:04:40 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-71.gru2.redhat.com
+ [10.97.116.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DDDB31C4;
+ Thu, 26 Dec 2019 14:04:34 +0000 (UTC)
+Subject: Re: [PATCH v8 1/4] Acceptance tests: introduce BLD_DIR, SRC_DIR and
+ LNK_DIR
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
+References: <20191218232500.23530-1-crosa@redhat.com>
+ <20191218232500.23530-2-crosa@redhat.com>
+ <3362e435-73be-f5c3-a672-6208f2bacd95@redhat.com>
+ <20191219002539.GA29918@localhost.localdomain>
+ <1d90bf81-7acb-f80c-959f-95ab8fee899b@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <f060662b-f364-e618-c33f-c2d8cbc334e1@redhat.com>
+Date: Thu, 26 Dec 2019 12:04:33 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <CAP0gKjUf4+Jf2GSZy8u5fwQAU2V9bk-viuSBByB5bo78NWHpbQ@mail.gmail.com>
- <20190328170759.GH18536@stefanha-x1.localdomain>
-In-Reply-To: <20190328170759.GH18536@stefanha-x1.localdomain>
-From: =?UTF-8?B?5byg5rW35paM?= <xtay.haibin@gmail.com>
-Date: Thu, 26 Dec 2019 17:40:22 +0800
-Message-ID: <CAP0gKjVqMEKF2gq4Xq8hX=zo-cM3vw2Xw70pajfQOvFj4-wvbA@mail.gmail.com>
-Subject: Re: How to impove downtime of Live-Migration caused bdrv_drain_all()
-To: qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1d90bf81-7acb-f80c-959f-95ab8fee899b@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Y68DMVhQOnmXiaTN0q04xQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d33
-X-Mailman-Approved-At: Thu, 26 Dec 2019 08:21:55 -0500
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,50 +94,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org, Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefan Hajnoczi <stefanha@redhat.com> =E4=BA=8E2019=E5=B9=B43=E6=9C=8829=E6=
-=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=881:08=E5=86=99=E9=81=93=EF=BC=9A
+
+On 12/19/19 9:12 AM, Philippe Mathieu-Daud=E9 wrote:
+> On 12/19/19 1:25 AM, Cleber Rosa wrote:
+>> On Thu, Dec 19, 2019 at 01:02:39AM +0100, Philippe Mathieu-Daud=E9 wrote=
+:
+>>> On 12/19/19 12:24 AM, Cleber Rosa wrote:
+>>>> Some tests may benefit from using resources from a build directory.
+>>>> This introduces three variables that can help tests find resources in
+>>>> those directories.
+>>>>
+>>>> First, a BLD_DIR is assumed to exist, given that the primary form of
+>>>> running the acceptance tests is from a build directory (which may or
+>>>> may not be the same as the source tree, that is, the SRC_DIR).
+>>>
+>>> Can we name this BUILD_DIR?
+>>>
+>>
+>> Yes, of course.
+>>
+>>> This would be more in line with the other buildsys files=20
+>>> (configure/make).
+>>>
+>>
+>> That's a good point.
+>>
+>>>> If the directory containing the acceptance tests happens to be a link
+>>>> to a directory (kept as LNK_DIR), it's assumed to it points to the
+>>>> source tree (SRC_DIR), which is the behavior defined on the QEMU
+>>>> Makefiles.=A0 If the directory containing the acceptance tests is not =
+a
+>>>> link, then a in-tree build is assumed, and the BLD_DIR and SRC_DIR are
+>>>> the same and LNK_DIR is set None.
+>>>
+>>> Similarly, can we name this CURRENT_DIR instead of LNK_DIR?
+>>>
+>>
+>> Yes, or maybe even drop it?=A0 TBH, I can only see use cases for build
 >
-> On Thu, Mar 28, 2019 at 05:53:34PM +0800, =E5=BC=A0=E6=B5=B7=E6=96=8C wro=
-te:
-> > hi, stefan
-> >
-> > I have faced the same problem you wrote in
-> > https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg04025.html
-> >
-> > Reproduce as follow:
-> > 1. Clone qemu code from https://git.qemu.org/git/qemu.git, add some
-> > debug information and compile
-> > 2. Start a new VM
-> > 3. In VM, use fio randwrite to add pressure for disk
-> > 4. Live migrate
-> >
-> > Log show as follow:
-> > [2019-03-28 15:10:40.206] /data/qemu/cpus.c:1086: enter do_vm_stop
-> > [2019-03-28 15:10:40.212] /data/qemu/cpus.c:1097: call bdrv_drain_all
-> > [2019-03-28 15:10:40.989] /data/qemu/cpus.c:1099: call replay_disable_e=
-vents
-> > [2019-03-28 15:10:40.989] /data/qemu/cpus.c:1101: call bdrv_flush_all
-> > [2019-03-28 15:10:41.004] /data/qemu/cpus.c:1104: done do_vm_stop
-> >
-> > Calling bdrv_drain_all() costs 792 mini-seconds.
-> > I just add a bdrv_drain_all() at start of do_vm_stop() before
-> > pause_all_vcpus(), but it doesn't work.
-> > Is there any way to improve live-migration downtime cause by bdrv_drain=
-_all()?
-> >
-> > haibin
+> I haven't checked why you needed to add it, so if we don't need it,=20
+> let's drop it :)
+
+
+1+ for dropping LNK_DIR variable.
+
+Thanks,
+
+Wainer
+
+
 >
-> Thanks for your email.  Please send technical questions to
-> qemu-devel@nongnu.org and CC me.
 >
-> That way the discussion is archived and searchable for the future.  It
-> also allows others in the community to participate and double-check any
-> answers that I give.
+>> and source dirs.=A0 So, I assume you'd propose SRC_DIR would be
+>> SOURCE_DIR?
 >
-> Stefan
+> This one is understandable as it, but SOURCE_DIR is cleaner indeed.
+>
+> Thanks,
+>
+> Phil.
+>
+>
+
 
