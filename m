@@ -2,90 +2,83 @@ Return-Path: <SRS0=LSdK=2Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F061DC2D0DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37752C2D0DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 16:13:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA490206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:59:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA490206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=parsons.com
+	by mail.kernel.org (Postfix) with ESMTPS id E65C7206CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 16:13:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bZZ2nyIv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E65C7206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikUcG-0006CL-Sw
-	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 09:59:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41034)
+	id 1ikVlH-0003wA-1w
+	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 11:13:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=7263172803=alexander.bensch@parsons.com>)
- id 1ikUbc-0005mi-NA
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:59:18 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ikVke-0003SY-2f
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 11:12:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=7263172803=alexander.bensch@parsons.com>)
- id 1ikUbb-0008Dh-17
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:59:16 -0500
-Received: from txdal11mx02.parsons.com ([206.219.199.110]:47604)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <prvs=7263172803=alexander.bensch@parsons.com>)
- id 1ikUbZ-0008DG-GK
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:59:14 -0500
-Received: from pps.filterd (txdal11mx02.parsons.com [127.0.0.1])
- by txdal11mx02.parsons.com (8.16.0.27/8.16.0.27) with SMTP id xBQEdGip007209; 
- Thu, 26 Dec 2019 08:59:10 -0600
-Received: from txdal11exch01.parsons.com (txdal11exch01.parsons.com
- [172.21.212.127])
- by txdal11mx02.parsons.com with ESMTP id 2x4t838uhj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Thu, 26 Dec 2019 08:59:10 -0600
-Received: from ALHUN12EXCH01.Parsons.com (10.62.8.71) by
- TXDAL11EXCH01.Parsons.com (172.21.212.127) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Thu, 26 Dec 2019 08:59:09 -0600
-Received: from ALHUN12EXCH01.Parsons.com (10.62.8.71) by
- ALHUN12EXCH01.Parsons.com (10.62.8.71) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Thu, 26 Dec 2019 08:59:05 -0600
-Received: from ALHUN12EXCH01.Parsons.com ([10.62.8.71]) by
- ALHUN12EXCH01.Parsons.com ([10.62.8.71]) with mapi id 15.00.1473.003; Thu, 26
- Dec 2019 08:59:05 -0600
-From: "Bensch, Alexander" <Alexander.Bensch@parsons.com>
-To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: [EXTERNAL]  Re: MIPS cache bypass on custom board
-Thread-Topic: [EXTERNAL]  Re: MIPS cache bypass on custom board
-Thread-Index: AQHVsh9IRY4kHqmWt0C3EdH2GZKphqe+WPSw
-Date: Thu, 26 Dec 2019 14:59:05 +0000
-Message-ID: <8ff9d62ec2fd43b4b9364fb0debae811@ALHUN12EXCH01.Parsons.com>
-References: <e3c2df7ae90747729a47d5f854e450e5@ALHUN12EXCH02.Parsons.com>
- <9ba23651-746a-5085-eff8-a048385e29ed@redhat.com>
-In-Reply-To: <9ba23651-746a-5085-eff8-a048385e29ed@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Enabled=True;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_SiteId=8d088ff8-7e52-4d0f-8187-dcd9ca37815a;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Owner=Alexander.Bensch@parsons.com;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_SetDate=2019-12-26T14:59:03.8468447Z;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Name=General Business;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Application=Microsoft Azure
- Information Protection;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_ActionId=5b431e79-e506-4be1-b15f-ba5df1682e96;
- MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Extended_MSFT_Method=Manual
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [172.21.212.10]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <wainersm@redhat.com>) id 1ikVkb-00028t-3q
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 11:12:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23226
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikVka-00028G-M2
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 11:12:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577376755;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=DcNxUq7l7GbiSA2uSzV2LEYu5l5jV69nEGxEnan5E3M=;
+ b=bZZ2nyIvs+q2puNybttyGuO9Ii0UTZjwBel9ZlQrKnAAvDKXft35Wi3jZmM6gcCewXq1Lu
+ 61XfT+dV9al2svNXA2B+PLJ9qqADnl3AuoBKWX1IjeaKqbfZhiMMXr2EE1MrP5Mz6czWFh
+ kBUSacbzCXU3tzLDHYNkINayaS8S7+4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-231-kOB5wWX8PeKT2kFFaGNO3Q-1; Thu, 26 Dec 2019 11:12:32 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3A94189DF62;
+ Thu, 26 Dec 2019 16:12:29 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-71.gru2.redhat.com
+ [10.97.116.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4F1D79CA3;
+ Thu, 26 Dec 2019 16:12:24 +0000 (UTC)
+Subject: Re: [PATCH v8 2/4] Acceptance test: add "boot_linux" tests
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20191218232500.23530-1-crosa@redhat.com>
+ <20191218232500.23530-3-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <2bad8edf-97cc-0dcb-4d70-002d78cabffa@redhat.com>
+Date: Thu, 26 Dec 2019 14:12:22 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-12-26_04:, , signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 206.219.199.110
+In-Reply-To: <20191218232500.23530-3-crosa@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: kOB5wWX8PeKT2kFFaGNO3Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,82 +90,288 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Are there any hooks that would allow me to manipulate the MIPS TLB so that =
-I can just split the mappings within the board file? I'm trying to avoid mo=
-difying the CPU source if possible. This type of solution sounds like it wo=
-uld be similar to the last one Peter described in the linked post (which de=
-scribes exactly my problem. Thank you for finding that!)
+Hi Cleber,
 
------Original Message-----
-From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-Sent: Friday, December 13, 2019 8:39 PM
-To: Bensch, Alexander <Alexander.Bensch@parsons.com>; qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>; Richard Henderson <richard.he=
-nderson@linaro.org>
-Subject: [EXTERNAL] Re: MIPS cache bypass on custom board
+just few comments below.
 
-Hi Alexander,
-
-On 12/13/19 7:59 PM, Bensch, Alexander wrote:
-> Hi all,
+On 12/18/19 9:24 PM, Cleber Rosa wrote:
+> This acceptance test, validates that a full blown Linux guest can
+> successfully boot in QEMU.  In this specific case, the guest chosen is
+> Fedora version 31.
 >
-> Currently stuck on a problem in QEMU 4.0.0. I'm trying to implement a
-> custom device using a MIPS 24Kc CPU. The device boots from an SPI
-> flash device that is mapped to 0x9F000000 (physical address
-> 0x1F000000). I got the initial load and execute working by direct
-> loading a flash dump to a MemoryRegion based at 0x1F000000, which
-> worked great until the ROM needed to access the SPI registers that are
-> addressed to 0xBF000000 (/also /physical address 0x1F000000). QEMU
-> cannot differentiate reads and writes to 0xBF000000 from reads and writes=
- to 0x9F000000.
+>   * x86_64, pc and q35 machine types, with and without kvm as an
+>     accelerator
 >
-> Initially I assumed this was a caching problem, as I know that the SPI
-> registers are located in the KSEG1 memory segment which uses uncached
-> writes, while the flash mapping is in KSEG0 with cached writes. I also
-> can see that QEMU has logic to handle caching in a few source files
-> within /targets/mips//. However, when I read from addresses in the
-> KSEG1 region, I still see contents from the KSEG0 region.
+>   * aarch64 and virt machine type, with and without kvm as an
+>     accelerator
 >
-> My question is whether there is any way to configure a MIPS board such
-> that I can correctly bypass the cache for KSEG1 as expressed by the
-> MIPS documentation?
-
-Unfortunately QEMU doesn't model microarchitecture, thus no cache is modell=
-ed, meaning KSEG1 is the same as KSEG0.
-
-Peter Maydell had the similar problem you describe last year:
-https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__www.mail-2Darchive.c=
-om_qemu-2Ddevel-40nongnu.org_msg556999.html&d=3DDwIF-g&c=3DNwf-pp4xtYRe0sCR=
-VM8_LWH54joYF7EKmrYIdfxIq10&r=3Dyw4RN9kr09cGsX2B3Tk1ruaD40EXodGkK9URECIP2Nw=
-&m=3DKF9PMaUnfud9owwwQTKNbzm_MKzEW6eviCXwNADBn9Y&s=3DVlE9yaBuPXyQ0cPdBcLwFJ=
-x2Wl6TrEpI12p3b3BcuDU&e=3D
-
+>   * ppc64 and pseries machine type
 >
-> Apologies if details are lacking. Please request more info if needed.
+>   * s390x and s390-ccw-virtio machine type
 >
-> Thank you,
+> The Avocado vmimage utils library is used to download and cache the
+> Linux guest images, and from those images a snapshot image is created
+> and given to QEMU.  If a qemu-img binary is available in the build
+> directory, it's used to create the snapshot image, so that matching
+> qemu-system-* and qemu-img are used in the same test run.  If qemu-img
+> is not available in the build tree, one is attempted to be found
+> installed system-wide (in the $PATH).  If qemu-img is not found in the
+> build dir or in the $PATH, the test is canceled.
 >
-> *Alex Bensch*
+> The method for checking the successful boot is based on "cloudinit"
+> and its "phone home" feature.  The guest is given an ISO image with
+> the location of the phone home server, and the information to post
+> (the instance ID).  Upon receiving the correct information, from the
+> guest, the test is considered to have PASSed.
+>
+> This test is currently limited to user mode networking only, and
+> instructs the guest to connect to the "router" address that is hard
+> coded in QEMU.
+>
+> To create the cloudinit ISO image that will be used to configure the
+> guest, the pycdlib library is also required and has been added as
+> requirement to the virtual environment created by "check-venv".
+>
+> The console output is read by a separate thread, by means of the
+> Avocado datadrainer utility module.
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   .travis.yml                    |   2 +-
+>   tests/acceptance/boot_linux.py | 180 +++++++++++++++++++++++++++++++++
+>   tests/requirements.txt         |   3 +-
+>   3 files changed, 183 insertions(+), 2 deletions(-)
+>   create mode 100644 tests/acceptance/boot_linux.py
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index 6cb8af6fa5..10c24330fd 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -264,7 +264,7 @@ matrix:
+>   
+>       # Acceptance (Functional) tests
+>       - env:
+> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
+> +        - CONFIG="--python=/usr/bin/python3 --enable-tools --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
+>           - TEST_CMD="make check-acceptance"
+>         after_failure:
+>           - cat tests/results/latest/job.log
+> diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
+> new file mode 100644
+> index 0000000000..495ff2963c
+> --- /dev/null
+> +++ b/tests/acceptance/boot_linux.py
+> @@ -0,0 +1,180 @@
+> +# Functional test that boots a complete Linux system via a cloud image
+> +#
+> +# Copyright (c) 2018-2019 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Cleber Rosa <crosa@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +import os
+> +
+> +from avocado_qemu import Test, BLD_DIR
+> +
+> +from qemu.accel import kvm_available
+> +
+> +from avocado.utils import cloudinit
+> +from avocado.utils import network
+> +from avocado.utils import vmimage
+> +from avocado.utils import datadrainer
+> +
+> +
+> +KVM_NOT_AVAILABLE = "KVM accelerator does not seem to be available"
+> +
+> +
+> +class BootLinux(Test):
+> +    """
+> +    Boots a Linux system, checking for a successful initialization
+> +    """
+> +
+> +    timeout = 900
+> +    chksum = None
+> +
+> +    def setUp(self):
+> +        super(BootLinux, self).setUp()
+> +        self.prepare_boot()
+> +        self.vm.add_args('-smp', '2')
+> +        self.vm.add_args('-m', '2048')
+> +        self.vm.add_args('-drive', 'file=%s' % self.boot.path)
+
+Perhaps move above line to prepare_boot() then following the same logic 
+as in prepare_cloudinit() - which sets the -drive path to the ISO file.
+
+> +        self.prepare_cloudinit()
+> +
+> +    def prepare_boot(self):
+> +        self.log.info('Downloading/preparing boot image')
+> +        # Fedora 31 only provides ppc64le images
+> +        image_arch = self.arch
+> +        if image_arch == 'ppc64':
+> +            image_arch = 'ppc64le'
+> +        # If qemu-img has been built, use it, otherwise the system wide one
+> +        # will be used.  If none is available, the test will cancel.
+> +        qemu_img = os.path.join(BLD_DIR, 'qemu-img')
+> +        if os.path.exists(qemu_img):
+> +            vmimage.QEMU_IMG = qemu_img
+> +        try:
+> +            self.boot = vmimage.get(
+> +                'fedora', arch=image_arch, version='31',
+> +                checksum=self.chksum,
+> +                algorithm='sha256',
+> +                cache_dir=self.cache_dirs[0],
+> +                snapshot_dir=self.workdir)
+> +        except:
+> +            self.cancel('Failed to download/prepare boot image')
+> +
+> +    def prepare_cloudinit(self):
+> +        self.log.info('Preparing cloudinit image')
+> +        try:
+> +            cloudinit_iso = os.path.join(self.workdir, 'cloudinit.iso')
+> +            self.phone_home_port = network.find_free_port()
+> +            cloudinit.iso(cloudinit_iso, self.name,
+> +                          username='root',
+> +                          password='password',
+> +                          # QEMU's hard coded usermode router address
+> +                          phone_home_host='10.0.2.2',
+> +                          phone_home_port=self.phone_home_port)
+> +            self.vm.add_args('-drive', 'file=%s,format=raw' % cloudinit_iso)
+> +        except Exception:
+> +            self.cancel('Failed to prepared cloudinit image')
+> +
+> +    def launch_and_wait(self):
+> +        self.vm.set_console()
+> +        self.vm.launch()
+> +        console_drainer = datadrainer.LineLogger(self.vm.console_socket.fileno(),
+> +                                                 logger=self.log.getChild('console'))
+> +        console_drainer.start()
+> +        self.log.info('VM launched, waiting for boot confirmation from guest')
+> +        cloudinit.wait_for_phone_home(('0.0.0.0', self.phone_home_port), self.name)
+> +
+> +
+> +class BootLinuxX8664(BootLinux):
+> +    """
+> +    :avocado: tags=arch:x86_64
+> +    """
+> +
+> +    chksum = 'e3c1b309d9203604922d6e255c2c5d098a309c2d46215d8fc026954f3c5c27a0'
+> +
+> +    def test_pc(self):
+> +        """
+> +        :avocado: tags=machine:pc
+> +        """
+> +        self.launch_and_wait()
+> +
+> +    def test_kvm_pc(self):
+> +        """
+> +        :avocado: tags=machine:pc
+> +        :avocado: tags=accel:kvm
+> +        """
+> +        if not kvm_available(self.arch, self.qemu_bin):
+> +            self.cancel(KVM_NOT_AVAILABLE)
+> +        self.vm.add_args("-accel", "kvm")
+> +        self.launch_and_wait()
+> +
+> +    def test_q35(self):
+> +        """
+> +        :avocado: tags=machine:q35
+> +        """
+> +        self.launch_and_wait()
+> +
+> +    def test_kvm_q35(self):
+> +        """
+> +        :avocado: tags=machine:q35
+> +        :avocado: tags=accel:kvm
+> +        """
+> +        if not kvm_available(self.arch, self.qemu_bin):
+> +            self.cancel(KVM_NOT_AVAILABLE)
+> +        self.vm.add_args("-accel", "kvm")
 
 
-NOTICE: This email message and all attachments transmitted with it may cont=
-ain privileged and confidential information, and information that is protec=
-ted by, and proprietary to, Parsons Corporation, and is intended solely for=
- the use of the addressee for the specific purpose set forth in this commun=
-ication. If the reader of this message is not the intended recipient, you a=
-re hereby notified that any reading, dissemination, distribution, copying, =
-or other use of this message or its attachments is strictly prohibited, and=
- you should delete this message and all copies and backups thereof. The rec=
-ipient may not further distribute or use any of the information contained h=
-erein without the express written authorization of the sender. If you have =
-received this message in error, or if you have any questions regarding the =
-use of the proprietary information contained therein, please contact the se=
-nder of this message immediately, and the sender will provide you with furt=
-her instructions.
+Following patch will allow to reduce the above boilerplate:
+
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg666239.html
+
+
+> +        self.launch_and_wait()
+> +
+> +
+> +class BootLinuxAarch64(BootLinux):
+> +    """
+> +    :avocado: tags=arch:aarch64
+> +    :avocado: tags=machine:virt
+> +    """
+> +
+> +    chksum = '1e18d9c0cf734940c4b5d5ec592facaed2af0ad0329383d5639c997fdf16fe49'
+> +
+> +    def test_virt(self):
+> +        self.vm.add_args('-cpu', 'cortex-a53')
+> +        self.vm.add_args('-bios',
+> +                         os.path.join(BLD_DIR, 'pc-bios',
+> +                                      'edk2-aarch64-code.fd'))
+> +        self.vm.add_args('-device', 'virtio-rng-pci,rng=rng0')
+> +        self.vm.add_args('-object', 'rng-random,id=rng0,filename=/dev/urandom')
+> +        self.launch_and_wait()
+> +
+> +    def test_kvm_virt(self):
+> +        """
+> +        :avocado: tags=accel:kvm
+> +        """
+> +        if not kvm_available(self.arch, self.qemu_bin):
+> +            self.cancel(KVM_NOT_AVAILABLE)
+> +        self.vm.add_args("-accel", "kvm")
+> +        self.test_virt()
+> +
+> +
+> +class BootLinuxPPC64(BootLinux):
+> +    """
+> +    :avocado: tags=arch:ppc64
+> +    """
+> +
+> +    chksum = '7c3528b85a3df4b2306e892199a9e1e43f991c506f2cc390dc4efa2026ad2f58'
+> +
+> +    def test_pseries(self):
+> +        """
+> +        :avocado: tags=machine:pseries
+> +        """
+> +        self.launch_and_wait()
+> +
+> +
+> +class BootLinuxS390X(BootLinux):
+> +    """
+> +    :avocado: tags=arch:s390x
+> +    """
+> +
+> +    chksum = '4caaab5a434fd4d1079149a072fdc7891e354f834d355069ca982fdcaf5a122d'
+> +
+> +    def test_s390_ccw_virtio(self):
+> +        """
+> +        :avocado: tags=machine:s390-ccw-virtio
+> +        """
+> +        self.launch_and_wait()
+> diff --git a/tests/requirements.txt b/tests/requirements.txt
+> index a2a587223a..0192c352cd 100644
+> --- a/tests/requirements.txt
+> +++ b/tests/requirements.txt
+> @@ -1,4 +1,5 @@
+>   # Add Python module requirements, one per line, to be installed
+>   # in the tests/venv Python virtual environment. For more info,
+>   # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> -avocado-framework==72.0
+> +avocado-framework==73.0
+> +pycdlib==1.8.0
+
 
