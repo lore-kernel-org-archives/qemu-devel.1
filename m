@@ -2,87 +2,90 @@ Return-Path: <SRS0=LSdK=2Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3ECDC2D0DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F061DC2D0DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D2DD20828
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:05:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yo76YOXi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D2DD20828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA490206A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 14:59:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA490206A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=parsons.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikTlq-0005IU-LZ
-	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 09:05:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57510)
+	id 1ikUcG-0006CL-Sw
+	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 09:59:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1ikTkx-0004qg-Am
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:04:52 -0500
+ (envelope-from <prvs=7263172803=alexander.bensch@parsons.com>)
+ id 1ikUbc-0005mi-NA
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:59:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1ikTku-0002XI-OR
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:04:49 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56931
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikTku-0002Vl-BR
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:04:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577369082;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8IUPTeGV0tsZkJU3wzdZIMQVHMfn+XgOh4seywZKH1c=;
- b=Yo76YOXiHSnkrgoYDQj6e+niiNVMDsNR1tL4aZRaKei9JDALN/ZPczLSc4WaoF6HUr8o9E
- qRM2iC7BnjQjltq+HTAwraUg0ABGriV8ySKGzZ90sW00hMWsiFJUadUb5DSMftMYkDYku0
- KPh+cYuqDftDgFuYHqBdu3XbuAeQHzc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-Y68DMVhQOnmXiaTN0q04xQ-1; Thu, 26 Dec 2019 09:04:41 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A3DADB20;
- Thu, 26 Dec 2019 14:04:40 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-71.gru2.redhat.com
- [10.97.116.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDDB31C4;
- Thu, 26 Dec 2019 14:04:34 +0000 (UTC)
-Subject: Re: [PATCH v8 1/4] Acceptance tests: introduce BLD_DIR, SRC_DIR and
- LNK_DIR
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
-References: <20191218232500.23530-1-crosa@redhat.com>
- <20191218232500.23530-2-crosa@redhat.com>
- <3362e435-73be-f5c3-a672-6208f2bacd95@redhat.com>
- <20191219002539.GA29918@localhost.localdomain>
- <1d90bf81-7acb-f80c-959f-95ab8fee899b@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <f060662b-f364-e618-c33f-c2d8cbc334e1@redhat.com>
-Date: Thu, 26 Dec 2019 12:04:33 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <1d90bf81-7acb-f80c-959f-95ab8fee899b@redhat.com>
+ (envelope-from <prvs=7263172803=alexander.bensch@parsons.com>)
+ id 1ikUbb-0008Dh-17
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:59:16 -0500
+Received: from txdal11mx02.parsons.com ([206.219.199.110]:47604)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71)
+ (envelope-from <prvs=7263172803=alexander.bensch@parsons.com>)
+ id 1ikUbZ-0008DG-GK
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 09:59:14 -0500
+Received: from pps.filterd (txdal11mx02.parsons.com [127.0.0.1])
+ by txdal11mx02.parsons.com (8.16.0.27/8.16.0.27) with SMTP id xBQEdGip007209; 
+ Thu, 26 Dec 2019 08:59:10 -0600
+Received: from txdal11exch01.parsons.com (txdal11exch01.parsons.com
+ [172.21.212.127])
+ by txdal11mx02.parsons.com with ESMTP id 2x4t838uhj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+ Thu, 26 Dec 2019 08:59:10 -0600
+Received: from ALHUN12EXCH01.Parsons.com (10.62.8.71) by
+ TXDAL11EXCH01.Parsons.com (172.21.212.127) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 26 Dec 2019 08:59:09 -0600
+Received: from ALHUN12EXCH01.Parsons.com (10.62.8.71) by
+ ALHUN12EXCH01.Parsons.com (10.62.8.71) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Thu, 26 Dec 2019 08:59:05 -0600
+Received: from ALHUN12EXCH01.Parsons.com ([10.62.8.71]) by
+ ALHUN12EXCH01.Parsons.com ([10.62.8.71]) with mapi id 15.00.1473.003; Thu, 26
+ Dec 2019 08:59:05 -0600
+From: "Bensch, Alexander" <Alexander.Bensch@parsons.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: RE: [EXTERNAL]  Re: MIPS cache bypass on custom board
+Thread-Topic: [EXTERNAL]  Re: MIPS cache bypass on custom board
+Thread-Index: AQHVsh9IRY4kHqmWt0C3EdH2GZKphqe+WPSw
+Date: Thu, 26 Dec 2019 14:59:05 +0000
+Message-ID: <8ff9d62ec2fd43b4b9364fb0debae811@ALHUN12EXCH01.Parsons.com>
+References: <e3c2df7ae90747729a47d5f854e450e5@ALHUN12EXCH02.Parsons.com>
+ <9ba23651-746a-5085-eff8-a048385e29ed@redhat.com>
+In-Reply-To: <9ba23651-746a-5085-eff8-a048385e29ed@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Y68DMVhQOnmXiaTN0q04xQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Enabled=True;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_SiteId=8d088ff8-7e52-4d0f-8187-dcd9ca37815a;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Owner=Alexander.Bensch@parsons.com;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_SetDate=2019-12-26T14:59:03.8468447Z;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Name=General Business;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Application=Microsoft Azure
+ Information Protection;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_ActionId=5b431e79-e506-4be1-b15f-ba5df1682e96;
+ MSIP_Label_0008d3e4-f847-4182-a1fb-fb9d345a0f05_Extended_MSFT_Method=Manual
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [172.21.212.10]
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-12-26_04:, , signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 206.219.199.110
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,74 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org, Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Are there any hooks that would allow me to manipulate the MIPS TLB so that =
+I can just split the mappings within the board file? I'm trying to avoid mo=
+difying the CPU source if possible. This type of solution sounds like it wo=
+uld be similar to the last one Peter described in the linked post (which de=
+scribes exactly my problem. Thank you for finding that!)
 
-On 12/19/19 9:12 AM, Philippe Mathieu-Daud=E9 wrote:
-> On 12/19/19 1:25 AM, Cleber Rosa wrote:
->> On Thu, Dec 19, 2019 at 01:02:39AM +0100, Philippe Mathieu-Daud=E9 wrote=
-:
->>> On 12/19/19 12:24 AM, Cleber Rosa wrote:
->>>> Some tests may benefit from using resources from a build directory.
->>>> This introduces three variables that can help tests find resources in
->>>> those directories.
->>>>
->>>> First, a BLD_DIR is assumed to exist, given that the primary form of
->>>> running the acceptance tests is from a build directory (which may or
->>>> may not be the same as the source tree, that is, the SRC_DIR).
->>>
->>> Can we name this BUILD_DIR?
->>>
->>
->> Yes, of course.
->>
->>> This would be more in line with the other buildsys files=20
->>> (configure/make).
->>>
->>
->> That's a good point.
->>
->>>> If the directory containing the acceptance tests happens to be a link
->>>> to a directory (kept as LNK_DIR), it's assumed to it points to the
->>>> source tree (SRC_DIR), which is the behavior defined on the QEMU
->>>> Makefiles.=A0 If the directory containing the acceptance tests is not =
-a
->>>> link, then a in-tree build is assumed, and the BLD_DIR and SRC_DIR are
->>>> the same and LNK_DIR is set None.
->>>
->>> Similarly, can we name this CURRENT_DIR instead of LNK_DIR?
->>>
->>
->> Yes, or maybe even drop it?=A0 TBH, I can only see use cases for build
+-----Original Message-----
+From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Sent: Friday, December 13, 2019 8:39 PM
+To: Bensch, Alexander <Alexander.Bensch@parsons.com>; qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>; Richard Henderson <richard.he=
+nderson@linaro.org>
+Subject: [EXTERNAL] Re: MIPS cache bypass on custom board
+
+Hi Alexander,
+
+On 12/13/19 7:59 PM, Bensch, Alexander wrote:
+> Hi all,
 >
-> I haven't checked why you needed to add it, so if we don't need it,=20
-> let's drop it :)
+> Currently stuck on a problem in QEMU 4.0.0. I'm trying to implement a
+> custom device using a MIPS 24Kc CPU. The device boots from an SPI
+> flash device that is mapped to 0x9F000000 (physical address
+> 0x1F000000). I got the initial load and execute working by direct
+> loading a flash dump to a MemoryRegion based at 0x1F000000, which
+> worked great until the ROM needed to access the SPI registers that are
+> addressed to 0xBF000000 (/also /physical address 0x1F000000). QEMU
+> cannot differentiate reads and writes to 0xBF000000 from reads and writes=
+ to 0x9F000000.
+>
+> Initially I assumed this was a caching problem, as I know that the SPI
+> registers are located in the KSEG1 memory segment which uses uncached
+> writes, while the flash mapping is in KSEG0 with cached writes. I also
+> can see that QEMU has logic to handle caching in a few source files
+> within /targets/mips//. However, when I read from addresses in the
+> KSEG1 region, I still see contents from the KSEG0 region.
+>
+> My question is whether there is any way to configure a MIPS board such
+> that I can correctly bypass the cache for KSEG1 as expressed by the
+> MIPS documentation?
 
+Unfortunately QEMU doesn't model microarchitecture, thus no cache is modell=
+ed, meaning KSEG1 is the same as KSEG0.
 
-1+ for dropping LNK_DIR variable.
-
-Thanks,
-
-Wainer
-
+Peter Maydell had the similar problem you describe last year:
+https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__www.mail-2Darchive.c=
+om_qemu-2Ddevel-40nongnu.org_msg556999.html&d=3DDwIF-g&c=3DNwf-pp4xtYRe0sCR=
+VM8_LWH54joYF7EKmrYIdfxIq10&r=3Dyw4RN9kr09cGsX2B3Tk1ruaD40EXodGkK9URECIP2Nw=
+&m=3DKF9PMaUnfud9owwwQTKNbzm_MKzEW6eviCXwNADBn9Y&s=3DVlE9yaBuPXyQ0cPdBcLwFJ=
+x2Wl6TrEpI12p3b3BcuDU&e=3D
 
 >
+> Apologies if details are lacking. Please request more info if needed.
 >
->> and source dirs.=A0 So, I assume you'd propose SRC_DIR would be
->> SOURCE_DIR?
+> Thank you,
 >
-> This one is understandable as it, but SOURCE_DIR is cleaner indeed.
->
-> Thanks,
->
-> Phil.
->
->
+> *Alex Bensch*
 
+
+NOTICE: This email message and all attachments transmitted with it may cont=
+ain privileged and confidential information, and information that is protec=
+ted by, and proprietary to, Parsons Corporation, and is intended solely for=
+ the use of the addressee for the specific purpose set forth in this commun=
+ication. If the reader of this message is not the intended recipient, you a=
+re hereby notified that any reading, dissemination, distribution, copying, =
+or other use of this message or its attachments is strictly prohibited, and=
+ you should delete this message and all copies and backups thereof. The rec=
+ipient may not further distribute or use any of the information contained h=
+erein without the express written authorization of the sender. If you have =
+received this message in error, or if you have any questions regarding the =
+use of the proprietary information contained therein, please contact the se=
+nder of this message immediately, and the sender will provide you with furt=
+her instructions.
 
