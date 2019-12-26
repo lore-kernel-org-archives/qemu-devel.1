@@ -2,83 +2,83 @@ Return-Path: <SRS0=LSdK=2Q=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B53D2C2D0DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 08:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BB8C2D0DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 09:30:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A75B2075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 08:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EDCD206CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 26 Dec 2019 09:30:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hROpPl3V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A75B2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="YqQepsn7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EDCD206CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikOzJ-00079v-MP
-	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 03:59:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46578)
+	id 1ikPTl-0003y6-HM
+	for qemu-devel@archiver.kernel.org; Thu, 26 Dec 2019 04:30:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1ikOyj-0006jd-VE
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 03:58:47 -0500
+ (envelope-from <yuri.benditovich@daynix.com>) id 1ikPT3-0003PG-R8
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 04:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1ikOyh-0005b4-C0
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 03:58:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30166
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ikOyg-0005aJ-Ly
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 03:58:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577350721;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=fyEldUfl33CC5C5G2OSaiXYYBEtztMOhX7jDRiN/HFM=;
- b=hROpPl3V0/cU4f8lqfg4Ej18vRHKiaEknEe1nodSkQFICpWjWpnRC3hWQ5FBbq2yVJFeeX
- oKvrwuqXaOMVO5ZqGpFshi+EvA1GiyUrUxsBzOAFaXJpoK9fJy4p3/zoFi9Q+BybcoafDl
- X2FPuHyQKZyqWRCmR755MKToHvhqCtM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-e4Ia7I3vOlONDAgMvAEcxA-1; Thu, 26 Dec 2019 03:58:39 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B191A1804162;
- Thu, 26 Dec 2019 08:58:38 +0000 (UTC)
-Received: from [10.72.12.162] (ovpn-12-162.pek2.redhat.com [10.72.12.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5DB1C60BEC;
- Thu, 26 Dec 2019 08:58:23 +0000 (UTC)
-Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
-To: Yuri Benditovich <yuri.benditovich@daynix.com>, mst@redhat.com,
- qemu-devel@nongnu.org
+ (envelope-from <yuri.benditovich@daynix.com>) id 1ikPT2-0001h8-Nq
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 04:30:05 -0500
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:45838)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1ikPT2-0001gt-Cx
+ for qemu-devel@nongnu.org; Thu, 26 Dec 2019 04:30:04 -0500
+Received: by mail-il1-x144.google.com with SMTP id p8so19801560iln.12
+ for <qemu-devel@nongnu.org>; Thu, 26 Dec 2019 01:30:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xUvA+/4EVOCRpGy2oxEekavp8NWeREkrXoXZzG3WwLQ=;
+ b=YqQepsn7l9ntMNckExfwvx2CRHq7LSlAUQvZBXPSQESiAOzyg+cfq6vblvLCCgM3WI
+ z9zLakzu0IpW+F3UwL/8mIG3D1J2msFDAz/BgLWqvoUuw4j0WaSw4Ku6I3TXvJc/xtre
+ LPPiuj7KDBgiVofK1Hl5h/pclXGyOVpQ/XUQHzCNANKHMQo/9BVHv+zxKEjCFRpiHtVb
+ 8I8faSO/A7EjGm4NYty2a5k+ODC0zAPoWjQhJuNJ+ugTakIDs0irsBg0PR4oTmJnN7Jr
+ rWxaiMBpNpGEB3AJiMh61ULq5dyh1X1pMtC6RUzJxR8WntcVCbRBjHashAB8hGDabyNT
+ nVuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xUvA+/4EVOCRpGy2oxEekavp8NWeREkrXoXZzG3WwLQ=;
+ b=KaeoAtGmhS1jIR9GzJvM5f6MseC4upUNFxtsmTP2QBuAWoVMUrajyW9/1J0t9FVZNG
+ WC4TtB58Ai1tLrlfDxvDDZ52Phmz3jnjAAsaWjZNxgq8NUAAEgitBjZuUfYYGajjsTPQ
+ BCa4ljk5NQa8ublN8r2/Yc96OGV+j+vKKeOooL6EaskmX9qpvP4cC5FRvw4oTu4um5rO
+ BIz/RcfzkHJyOUPnIpQU2LypaRNlZWytWD+wH3zQWUcTj1Q8wwazgdg+CTBsGx1PPtnW
+ HJVK7HsmoOr4tHUTOla5K0RUAO9K48ph8t902/KAZ0+RqeFE42CMhhuh8Lm5ZB/mAzkV
+ 5ZSQ==
+X-Gm-Message-State: APjAAAVPIFEk3DxDn4Utv7uSn45T1nXbU9bdS1IM86EJK+XGGIHbiZKj
+ YX1UYc0R0jsbct5ORAHrVr8ipnYQXSIIt0rvjQF1Xg==
+X-Google-Smtp-Source: APXvYqzDf9XFqxgTs/J5pn9vi/55dUyyudVFuSecW796j92lHgv+q/epp9sSb8ZZv6CTNoswv4uMGA6OaVJwnJ77l6A=
+X-Received: by 2002:a92:84dd:: with SMTP id y90mr34454748ilk.99.1577352603538; 
+ Thu, 26 Dec 2019 01:30:03 -0800 (PST)
+MIME-Version: 1.0
 References: <20191226043649.14481-1-yuri.benditovich@daynix.com>
  <20191226043649.14481-2-yuri.benditovich@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
-Date: Thu, 26 Dec 2019 16:58:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191226043649.14481-2-yuri.benditovich@daynix.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: e4Ia7I3vOlONDAgMvAEcxA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
+In-Reply-To: <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Thu, 26 Dec 2019 11:29:50 +0200
+Message-ID: <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
+To: Jason Wang <jasowang@redhat.com>, pbonzini@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,50 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: Yan Vugenfirer <yan@daynix.com>, qemu-devel@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Dec 26, 2019 at 10:58 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditovich wrote:
+> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480
+> > Fix leak of region reference that prevents complete
+> > device deletion on hot unplug.
+>
+>
+> More information is needed here, the bug said only q35 can meet this
+> issue. What makes q35 different here?
+>
 
-On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditovich wrote:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480
-> Fix leak of region reference that prevents complete
-> device deletion on hot unplug.
-
-
-More information is needed here, the bug said only q35 can meet this=20
-issue. What makes q35 different here?
-
+I do not have any ready answer, I did not dig into it too much.
+Probably Michael Tsirkin or Paolo Bonzini can answer without digging.
 
 >
-> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> ---
->   hw/virtio/virtio.c | 5 +++++
->   1 file changed, 5 insertions(+)
+> >
+> > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > ---
+> >   hw/virtio/virtio.c | 5 +++++
+> >   1 file changed, 5 insertions(+)
+> >
+> > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > index 04716b5f6c..baadec8abc 100644
+> > --- a/hw/virtio/virtio.c
+> > +++ b/hw/virtio/virtio.c
+> > @@ -2340,6 +2340,11 @@ void virtio_del_queue(VirtIODevice *vdev, int n)
+> >       vdev->vq[n].vring.num_default =3D 0;
+> >       vdev->vq[n].handle_output =3D NULL;
+> >       vdev->vq[n].handle_aio_output =3D NULL;
+> > +    /*
+> > +     * with vring.num =3D 0 the queue will be ignored
+> > +     * in later loops of region cache reset
+> > +     */
 >
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 04716b5f6c..baadec8abc 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -2340,6 +2340,11 @@ void virtio_del_queue(VirtIODevice *vdev, int n)
->       vdev->vq[n].vring.num_default =3D 0;
->       vdev->vq[n].handle_output =3D NULL;
->       vdev->vq[n].handle_aio_output =3D NULL;
-> +    /*
-> +     * with vring.num =3D 0 the queue will be ignored
-> +     * in later loops of region cache reset
-> +     */
-
-
-I can't get the meaning of this comment.
-
-Thanks
-
-
-> +    virtio_virtqueue_reset_region_cache(&vdev->vq[n]);
->       g_free(vdev->vq[n].used_elems);
->   }
->  =20
-
+>
+> I can't get the meaning of this comment.
+>
+> Thanks
+>
+>
+> > +    virtio_virtqueue_reset_region_cache(&vdev->vq[n]);
+> >       g_free(vdev->vq[n].used_elems);
+> >   }
+> >
+>
 
