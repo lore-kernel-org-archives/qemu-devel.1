@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E3EC2D0C6
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 890B1C2D0C6
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17CE220882
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57F6320882
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BF6owoGX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CE220882
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9LlYsWB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F6320882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikptK-0007wG-MO
-	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 08:42:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58828)
+	id 1ikptM-0007yf-WA
+	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 08:43:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58868)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1ikprb-0006Hh-7n
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:12 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ikpre-0006J0-Ic
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1ikprZ-0002yh-Fi
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:10 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30916
+ (envelope-from <wainersm@redhat.com>) id 1ikprd-00034p-HQ
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:14 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49046
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikprZ-0002yT-CO
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:09 -0500
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikprd-00032D-Dd
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577454068;
+ s=mimecast20190719; t=1577454072;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rsnPAQSkWvtcYpvI7N8qYJnicQPbC05o8HCtvE27HQw=;
- b=BF6owoGXdc8YBo1HWkJ0LiOMMF5KHX8u68s+CE2cARbdnZd8PFzv9a46AQXP3QZRiNtDtw
- SEjeOd2WpYhz7oGDiFDMZpIkbu4g6AiK26VtDqcNynRZYpzsv72WkvBqPAIgFgki+a6hee
- gEmOVxTpKOd5Z/pS06cw5FJ1MIullGc=
+ bh=UDuh+n+0bICDUrGAWdnvNOHlqbxC8cUgCjIl35Pk3/I=;
+ b=J9LlYsWB9IbBIuePmbosoRw6sjX+81YYiDGhl+X25x7+L+RjCsLEd11Nx2D+wpkJ6NBiHS
+ 8AMolSQIup4fLy8Xr4AsLXyEsVuBLRVDwBz49KzEJzw8oj+JsuYTBoXVs+ZF1On4WBbH6C
+ temYaMs3CPKMh7JaZUfddS1eXmGS22o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-71KYVSqFPGW6o9-_KXWFpQ-1; Fri, 27 Dec 2019 08:41:07 -0500
+ us-mta-142-Vaff-dqqNX6FxXurVtQLWQ-1; Fri, 27 Dec 2019 08:41:11 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A48E6801E7A
- for <qemu-devel@nongnu.org>; Fri, 27 Dec 2019 13:41:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA88D180418B
+ for <qemu-devel@nongnu.org>; Fri, 27 Dec 2019 13:41:10 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-24.gru2.redhat.com
  [10.97.116.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4962781765;
- Fri, 27 Dec 2019 13:41:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 30AFC81C11;
+ Fri, 27 Dec 2019 13:41:08 +0000 (UTC)
 From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/5] python/qemu: qmp: Replace socket.error with OSError
-Date: Fri, 27 Dec 2019 10:40:57 -0300
-Message-Id: <20191227134101.244496-2-wainersm@redhat.com>
+Subject: [PATCH 3/5] python/qemu: qmp: Make accept()'s timeout configurable
+Date: Fri, 27 Dec 2019 10:40:59 -0300
+Message-Id: <20191227134101.244496-4-wainersm@redhat.com>
 In-Reply-To: <20191227134101.244496-1-wainersm@redhat.com>
 References: <20191227134101.244496-1-wainersm@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 71KYVSqFPGW6o9-_KXWFpQ-1
+X-MC-Unique: Vaff-dqqNX6FxXurVtQLWQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -91,73 +91,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The socket.error is deprecated from Python 3.3, instead it is
-made a link to OSError. This change replaces the occurences
-of socket.error with OSError.
+Currently the timeout of QEMUMonitorProtocol.accept() is
+hard-coded to 15 seconds. This added the parameter `timeout`
+so the value can be configured by the user.
 
 Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 ---
- python/qemu/qmp.py | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ python/qemu/qmp.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-index 5c8cf6a056..8c6c9847d0 100644
+index f4e04a6683..914b8c6774 100644
 --- a/python/qemu/qmp.py
 +++ b/python/qemu/qmp.py
-@@ -47,7 +47,7 @@ class QEMUMonitorProtocol(object):
-                         or a tuple in the form ( address, port ) for a TCP
-                         connection
-         @param server: server mode listens on the socket (bool)
--        @raise socket.error on socket connection errors
-+        @raise OSError on socket connection errors
-         @note No connection is established, this is done by the connect() =
-or
-               accept() methods
-         """
-@@ -107,8 +107,8 @@ class QEMUMonitorProtocol(object):
-         self.__sock.setblocking(0)
-         try:
-             self.__json_read()
--        except socket.error as err:
--            if err[0] =3D=3D errno.EAGAIN:
-+        except OSError as err:
-+            if err.errno =3D=3D errno.EAGAIN:
-                 # No data available
-                 pass
-         self.__sock.setblocking(1)
-@@ -133,7 +133,7 @@ class QEMUMonitorProtocol(object):
-         Connect to the QMP Monitor and perform capabilities negotiation.
+@@ -154,16 +154,17 @@ class QEMUMonitorProtocol:
+             return self.__negotiate_capabilities()
+         return None
 =20
-         @return QMP greeting dict
--        @raise socket.error on socket connection errors
-+        @raise OSError on socket connection errors
-         @raise QMPConnectError if the greeting is not received
-         @raise QMPCapabilitiesError if fails to negotiate capabilities
+-    def accept(self):
++    def accept(self, timeout=3D15):
          """
-@@ -147,7 +147,7 @@ class QEMUMonitorProtocol(object):
          Await connection from QMP Monitor and perform capabilities negotia=
 tion.
 =20
++        @param timeout (float): timeout in seconds. Default is 15.
          @return QMP greeting dict
--        @raise socket.error on socket connection errors
-+        @raise OSError on socket connection errors
+         @raise OSError on socket connection errors
          @raise QMPConnectError if the greeting is not received
          @raise QMPCapabilitiesError if fails to negotiate capabilities
          """
-@@ -167,10 +167,10 @@ class QEMUMonitorProtocol(object):
-         self.logger.debug(">>> %s", qmp_cmd)
-         try:
-             self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
--        except socket.error as err:
--            if err[0] =3D=3D errno.EPIPE:
-+        except OSError as err:
-+            if err.errno =3D=3D errno.EPIPE:
-                 return
--            raise socket.error(err)
-+            raise err
-         resp =3D self.__json_read()
-         self.logger.debug("<<< %s", resp)
-         return resp
+-        self.__sock.settimeout(15)
++        self.__sock.settimeout(timeout)
+         self.__sock, _ =3D self.__sock.accept()
+         self.__sockfile =3D self.__sock.makefile()
+         return self.__negotiate_capabilities()
 --=20
 2.23.0
 
