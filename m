@@ -2,108 +2,99 @@ Return-Path: <SRS0=GTQb=2R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB94C2D0C6
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 15:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8D9C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 19:08:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19AAA20740
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 15:24:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19AAA20740
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A15A2053B
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 19:08:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSjr0BRV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A15A2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikrTU-0007jL-7M
-	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 10:24:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59156)
+	id 1ikuyc-0000TC-Ay
+	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 14:08:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36545)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mkdolata@us.ibm.com>) id 1ikfZQ-0000Mh-Df
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 21:41:45 -0500
+ (envelope-from <philmd@redhat.com>) id 1ikuxP-0008Uh-5f
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 14:07:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mkdolata@us.ibm.com>) id 1ikfZN-0002SB-JO
- for qemu-devel@nongnu.org; Thu, 26 Dec 2019 21:41:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21578)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mkdolata@us.ibm.com>)
- id 1ikfZN-0002S5-Ay; Thu, 26 Dec 2019 21:41:41 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBR2bTRM077387; Thu, 26 Dec 2019 21:41:39 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2x21r80ent-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 26 Dec 2019 21:41:39 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBR2ecY7082925;
- Thu, 26 Dec 2019 21:41:38 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2x21r80enk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 26 Dec 2019 21:41:38 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBR2eBYr017166;
- Fri, 27 Dec 2019 02:41:37 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma04wdc.us.ibm.com with ESMTP id 2x1b175kqj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 27 Dec 2019 02:41:37 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBR2faid32768380
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 27 Dec 2019 02:41:36 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C93497805E;
- Fri, 27 Dec 2019 02:41:36 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 98F7078064;
- Fri, 27 Dec 2019 02:41:36 +0000 (GMT)
-Received: from mail.gmx.ibm.com (unknown [9.209.252.213])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Fri, 27 Dec 2019 02:41:36 +0000 (GMT)
-Received: from m01ex005.gmx.ibm.com (10.148.53.45) by m01ex010.gmx.ibm.com
- (10.65.151.232) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1779.2; Thu, 26 Dec
- 2019 20:41:35 -0600
-Received: from m01ex005.gmx.ibm.com ([fe80::7d2d:476:2d5a:cb2f]) by
- m01ex005.gmx.ibm.com ([fe80::7d2d:476:2d5a:cb2f%9]) with mapi id
- 15.01.1779.002; Thu, 26 Dec 2019 20:41:29 -0600
-From: "Marek Dolata - mkdolata@us.ibm.com" <mkdolata@us.ibm.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: [PATCH] /target/i386: fix gdbstub k_gs_base issue
-Thread-Topic: [PATCH] /target/i386: fix gdbstub k_gs_base issue
-Thread-Index: AdW8XtoXUETDbpusTL6rHcn7kOLpDw==
-Date: Fri, 27 Dec 2019 02:41:29 +0000
-Message-ID: <f392e1a15634455d8af668b28b88f3b4@us.ibm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [9.16.14.35]
-Content-Type: multipart/alternative;
- boundary="_000_f392e1a15634455d8af668b28b88f3b4usibmcom_"
+ (envelope-from <philmd@redhat.com>) id 1ikuxM-0006Fa-HH
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 14:07:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54111
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ikuxM-00068l-2F
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 14:07:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577473645;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SXjrlhamTtfyvg/D1SArliTdZ6lTrA0Xoo/qczgYVRo=;
+ b=FSjr0BRV3d9kmeBFucz5jriSEHzwNElD9BD9d9RliGtEF2BG/IQhi+gEWxLr8ihqht2ANO
+ TZ/A20PMh2HFQdXX5x2t5N4Uf2W0Wba8KkhgOTCROfaFmd+5/sgWwUK0ATgNoGfkxYyUKH
+ zXVaPM8ZFNHKtDoqgJ1fNtf01v4a35I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-057kCzTKO7KdykXUW1DS0Q-1; Fri, 27 Dec 2019 14:07:22 -0500
+Received: by mail-wm1-f70.google.com with SMTP id q26so1096074wmq.8
+ for <qemu-devel@nongnu.org>; Fri, 27 Dec 2019 11:07:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=X9cXhnEfXjeuZXUX2Qj0A4879k2VqnICTtn7FUljaNU=;
+ b=ki7Ji6O4V2d1KGvC8Dg0ILB1UtQa6cvGaP5dK7+pi/Cz9FyplLGghzSJhEJfcgfQZK
+ tu3KqbPT+wH3Tz17Vr1olnNhdgOLGmfSyf5rqZ/7xbe+o/CnOp7PL0asAD5hUNIuKSzr
+ vkeJhutvzP+k1tKSOj+4P90YIJ6c5qNCW8zfTYzjXVe9KRSfL7eMUdc2p7M3eEVezOBt
+ 1YMQ+42dq6hEVul663vfA3C4byd0TzdLiK5lmOj284tFwomt0F8dMNu2m8FeR7p1X/tJ
+ HGPBpYmVxq+sR7q10pBb5SeAJVBEkBcnPbSJAM38Jh7nvdReZqNHSMiZu3GYO2b3wrb9
+ rwdw==
+X-Gm-Message-State: APjAAAUXH4p/G1oexSk5XDHnDA0/HDOQz6H+umKdysXaOyZ2+Ee2bLez
+ yxI4W+IzNWp1DYE9WsBlCNcpLzQY0dkP7Nsn8xz7WKbEygqeYwRBMQeLX+KOipK/FMLRvwK3KCK
+ S4KRJiINGsnnxaNs=
+X-Received: by 2002:a5d:6551:: with SMTP id z17mr54941580wrv.269.1577473640881; 
+ Fri, 27 Dec 2019 11:07:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwOChvOldgwInKzO6Y2Zj7B2DqwzQgNZbpu4df/5LH9XJnLkATSSANvMvdzZE6hyL9rBehwXg==
+X-Received: by 2002:a5d:6551:: with SMTP id z17mr54941569wrv.269.1577473640693; 
+ Fri, 27 Dec 2019 11:07:20 -0800 (PST)
+Received: from [192.168.1.25] (abayonne-654-1-186-92.w92-134.abo.wanadoo.fr.
+ [92.134.161.92])
+ by smtp.gmail.com with ESMTPSA id l15sm35493367wrv.39.2019.12.27.11.07.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 27 Dec 2019 11:07:19 -0800 (PST)
+Subject: Re: [PATCH 3/5] python/qemu: qmp: Make accept()'s timeout configurable
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20191227134101.244496-1-wainersm@redhat.com>
+ <20191227134101.244496-4-wainersm@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f27657e1-7ef8-e729-604c-29f01894eec3@redhat.com>
+Date: Fri, 27 Dec 2019 20:07:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-26_05:2019-12-24,2019-12-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0 mlxlogscore=787
- clxscore=1011 impostorscore=0 priorityscore=1501 adultscore=0
- suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912270017
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Fri, 27 Dec 2019 10:18:33 -0500
+In-Reply-To: <20191227134101.244496-4-wainersm@redhat.com>
+Content-Language: en-US
+X-MC-Unique: 057kCzTKO7KdykXUW1DS0Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,199 +106,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Doug Gale <doug16k@gmail.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_f392e1a15634455d8af668b28b88f3b4usibmcom_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+On 12/27/19 2:40 PM, Wainer dos Santos Moschetta wrote:
+> Currently the timeout of QEMUMonitorProtocol.accept() is
+> hard-coded to 15 seconds. This added the parameter `timeout`
+> so the value can be configured by the user.
+>=20
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>   python/qemu/qmp.py | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+> index f4e04a6683..914b8c6774 100644
+> --- a/python/qemu/qmp.py
+> +++ b/python/qemu/qmp.py
+> @@ -154,16 +154,17 @@ class QEMUMonitorProtocol:
+>               return self.__negotiate_capabilities()
+>           return None
+>  =20
+> -    def accept(self):
+> +    def accept(self, timeout=3D15):
+>           """
+>           Await connection from QMP Monitor and perform capabilities nego=
+tiation.
+>  =20
+> +        @param timeout (float): timeout in seconds. Default is 15.
 
-Fixes: corrects clobbering of registers appearing after k_gs_base
-Buglink: https://bugs.launchpad.net/qemu/+bug/1857640
+Maybe name with unit: 'timeout_s'.
 
-Signed-off-by: Marek Dolata <mkdolata@us.ibm.com>
----
-target/i386/gdbstub.c | 4 +++-
-1 file changed, 3 insertions(+), 1 deletion(-)
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
-index aef25b70f1..7228d20674 100644
---- a/target/i386/gdbstub.c
-+++ b/target/i386/gdbstub.c
-@@ -350,14 +350,16 @@ int x86_cpu_gdb_write_register(CPUState *cs, uint8_t =
-*mem_buf, int n)
-             env->segs[R_GS].base =3D ldl_p(mem_buf);
-             return 4;
--#ifdef TARGET_X86_64
-         case IDX_SEG_REGS + 8:
-+#ifdef TARGET_X86_64
-             if (env->hflags & HF_CS64_MASK) {
-                 env->kernelgsbase =3D ldq_p(mem_buf);
-                 return 8;
-             }
-             env->kernelgsbase =3D ldl_p(mem_buf);
-             return 4;
-+#else
-+            return 4;
-#endif
-         case IDX_FP_REGS + 8:
---
-2.21.0
-
-
-
---_000_f392e1a15634455d8af668b28b88f3b4usibmcom_
-Content-Type: text/html; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-
-<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
-osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
-xmlns:x=3D"urn:schemas-microsoft-com:office:excel" xmlns:m=3D"http://schema=
-s.microsoft.com/office/2004/12/omml" xmlns=3D"http://www.w3.org/TR/REC-html=
-40">
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
->
-<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
-<style><!--
-/* Font Definitions */
-@font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
-@font-face
-	{font-family:"IBM Plex Sans";
-	panose-1:2 11 5 3 5 2 3 0 2 3;}
-/* Style Definitions */
-p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin:0in;
-	margin-bottom:.0001pt;
-	font-size:11.0pt;
-	font-family:"Calibri",sans-serif;}
-a:link, span.MsoHyperlink
-	{mso-style-priority:99;
-	color:#0563C1;
-	text-decoration:underline;}
-a:visited, span.MsoHyperlinkFollowed
-	{mso-style-priority:99;
-	color:#954F72;
-	text-decoration:underline;}
-span.EmailStyle17
-	{mso-style-type:personal-compose;
-	font-family:"IBM Plex Sans",sans-serif;
-	color:windowtext;}
-.MsoChpDefault
-	{mso-style-type:export-only;
-	font-family:"Calibri",sans-serif;}
-@page WordSection1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;}
-div.WordSection1
-	{page:WordSection1;}
---></style><!--[if gte mso 9]><xml>
-<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
-</xml><![endif]--><!--[if gte mso 9]><xml>
-<o:shapelayout v:ext=3D"edit">
-<o:idmap v:ext=3D"edit" data=3D"1" />
-</o:shapelayout></xml><![endif]-->
-</head>
-<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
-<div class=3D"WordSection1">
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-Fixes: corrects clobbering of registers appearing after k_gs_base<o:p></o:p=
-></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-Buglink: https://bugs.launchpad.net/qemu/&#43;bug/1857640<o:p></o:p></span>=
-</p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-<o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-Signed-off-by: Marek Dolata &lt;mkdolata@us.ibm.com&gt;<o:p></o:p></span></=
-p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
----<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-target/i386/gdbstub.c | 4 &#43;&#43;&#43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-1 file changed, 3 insertions(&#43;), 1 deletion(-)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-<o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c<o:p></o:p></span=
-></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-index aef25b70f1..7228d20674 100644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
---- a/target/i386/gdbstub.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&#43;&#43;&#43; b/target/i386/gdbstub.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-@@ -350,14 &#43;350,16 @@ int x86_cpu_gdb_write_register(CPUState *cs, uint=
-8_t *mem_buf, int n)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; en=
-v-&gt;segs[R_GS].base =3D ldl_p(mem_buf);<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; re=
-turn 4;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
--#ifdef TARGET_X86_64<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case IDX_SEG_REGS &#43; 8:=
-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&#43;#ifdef TARGET_X86_64<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if=
- (env-&gt;hflags &amp; HF_CS64_MASK) {<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;env-&gt;kernelgsbase =3D ldq_p(mem_buf);<o:p></o:p></=
-span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp; return 8;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<=
-o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; en=
-v-&gt;kernelgsbase =3D ldl_p(mem_buf);<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; re=
-turn 4;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&#43;#else<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&#43;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret=
-urn 4;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-#endif<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case IDX_FP_REGS &#43=
-; 8:<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
--- <o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-2.21.0<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-<o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span style=3D"font-family:&quot;Courier New&quot;">=
-<o:p>&nbsp;</o:p></span></p>
-</div>
-</body>
-</html>
-
---_000_f392e1a15634455d8af668b28b88f3b4usibmcom_--
+>           @return QMP greeting dict
+>           @raise OSError on socket connection errors
+>           @raise QMPConnectError if the greeting is not received
+>           @raise QMPCapabilitiesError if fails to negotiate capabilities
+>           """
+> -        self.__sock.settimeout(15)
+> +        self.__sock.settimeout(timeout)
+>           self.__sock, _ =3D self.__sock.accept()
+>           self.__sockfile =3D self.__sock.makefile()
+>           return self.__negotiate_capabilities()
+>=20
 
 
