@@ -2,73 +2,70 @@ Return-Path: <SRS0=GTQb=2R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 890B1C2D0C6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D03EAC2D0DA
 	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57F6320882
+	by mail.kernel.org (Postfix) with ESMTPS id 9F2DD20882
 	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9LlYsWB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F6320882
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFtYnf+n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F2DD20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ikptM-0007yf-WA
+	id 1ikptN-000803-35
 	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 08:43:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58868)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1ikpre-0006J0-Ic
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:15 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ikprb-0006Hg-7c
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1ikprd-00034p-HQ
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:14 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49046
+ (envelope-from <wainersm@redhat.com>) id 1ikprY-0002yP-S0
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:09 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29627
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikprd-00032D-Dd
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:13 -0500
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikprY-0002u4-AV
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577454072;
+ s=mimecast20190719; t=1577454067;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UDuh+n+0bICDUrGAWdnvNOHlqbxC8cUgCjIl35Pk3/I=;
- b=J9LlYsWB9IbBIuePmbosoRw6sjX+81YYiDGhl+X25x7+L+RjCsLEd11Nx2D+wpkJ6NBiHS
- 8AMolSQIup4fLy8Xr4AsLXyEsVuBLRVDwBz49KzEJzw8oj+JsuYTBoXVs+ZF1On4WBbH6C
- temYaMs3CPKMh7JaZUfddS1eXmGS22o=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=z+hHePf5hMQ/6kHC3ZHzL2X6Zrb+WxhoD4CjpOeVki4=;
+ b=SFtYnf+nI/7AP0EuOxZG/IvC1jAtR/iUct3JCHt0EG5KnTA0HPjBWn1VlcyfU6EELutI5A
+ u370uhDGN5PSsW9NfoPs9XoLRBXrqwzYixlnXpsBmjvABQZtCWLYR2FetcGCdnSOJzhqsL
+ HQKkYSJh0bPHsxxFxlPPOzHk+atISSc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-Vaff-dqqNX6FxXurVtQLWQ-1; Fri, 27 Dec 2019 08:41:11 -0500
+ us-mta-188-au-Xu0BNNuCgvNbbnwPZZQ-1; Fri, 27 Dec 2019 08:41:05 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA88D180418B
- for <qemu-devel@nongnu.org>; Fri, 27 Dec 2019 13:41:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97946107ACC4
+ for <qemu-devel@nongnu.org>; Fri, 27 Dec 2019 13:41:04 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-24.gru2.redhat.com
  [10.97.116.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 30AFC81C11;
- Fri, 27 Dec 2019 13:41:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2509981C10;
+ Fri, 27 Dec 2019 13:41:02 +0000 (UTC)
 From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/5] python/qemu: qmp: Make accept()'s timeout configurable
-Date: Fri, 27 Dec 2019 10:40:59 -0300
-Message-Id: <20191227134101.244496-4-wainersm@redhat.com>
-In-Reply-To: <20191227134101.244496-1-wainersm@redhat.com>
-References: <20191227134101.244496-1-wainersm@redhat.com>
+Subject: [PATCH 0/5] python/qemu: qmp: Fix, delint and improvements
+Date: Fri, 27 Dec 2019 10:40:56 -0300
+Message-Id: <20191227134101.244496-1-wainersm@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: Vaff-dqqNX6FxXurVtQLWQ-1
+X-MC-Unique: au-Xu0BNNuCgvNbbnwPZZQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -91,40 +88,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the timeout of QEMUMonitorProtocol.accept() is
-hard-coded to 15 seconds. This added the parameter `timeout`
-so the value can be configured by the user.
+I started fixing an issue on exception handling which in some places
+currently use the deprecated (in Python 3.3) `socket.error`. Then I
+ended up delinting the module code and making some improvements.
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
----
- python/qemu/qmp.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Git:
+- Tree: https://github.com/wainersm/qemu
+- Branch: python_qmp_sockets_error=20
 
-diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-index f4e04a6683..914b8c6774 100644
---- a/python/qemu/qmp.py
-+++ b/python/qemu/qmp.py
-@@ -154,16 +154,17 @@ class QEMUMonitorProtocol:
-             return self.__negotiate_capabilities()
-         return None
-=20
--    def accept(self):
-+    def accept(self, timeout=3D15):
-         """
-         Await connection from QMP Monitor and perform capabilities negotia=
-tion.
-=20
-+        @param timeout (float): timeout in seconds. Default is 15.
-         @return QMP greeting dict
-         @raise OSError on socket connection errors
-         @raise QMPConnectError if the greeting is not received
-         @raise QMPCapabilitiesError if fails to negotiate capabilities
-         """
--        self.__sock.settimeout(15)
-+        self.__sock.settimeout(timeout)
-         self.__sock, _ =3D self.__sock.accept()
-         self.__sockfile =3D self.__sock.makefile()
-         return self.__negotiate_capabilities()
+CI:
+- Travis (FAIL): https://travis-ci.org/wainersm/qemu/builds/629772066
+  Failure not related with this series. Even QEMU master branch is
+  failing to build when `--without-default-devices --disable-user`.
+
+Wainer dos Santos Moschetta (5):
+  python/qemu: qmp: Replace socket.error with OSError
+  python/qemu: Delint the qmp module
+  python/qemu: qmp: Make accept()'s timeout configurable
+  python/qemu: qmp: Make QEMUMonitorProtocol a context manager
+  python/qemu: qmp: Remove unnused attributes
+
+ python/qemu/qmp.py | 91 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 65 insertions(+), 26 deletions(-)
+
 --=20
 2.23.0
 
