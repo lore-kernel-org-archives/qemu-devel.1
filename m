@@ -2,50 +2,79 @@ Return-Path: <SRS0=GTQb=2R=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8452C2D0C6
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 11:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E3EC2D0C6
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC07320828
-	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 11:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC07320828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17CE220882
+	for <qemu-devel@archiver.kernel.org>; Fri, 27 Dec 2019 13:43:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BF6owoGX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17CE220882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iko4j-0001ZY-RS
-	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 06:46:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37125)
+	id 1ikptK-0007wG-MO
+	for qemu-devel@archiver.kernel.org; Fri, 27 Dec 2019 08:42:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iko2X-0007cF-Gq
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 06:44:23 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ikprb-0006Hh-7n
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iko2V-0007Us-5Z
- for qemu-devel@nongnu.org; Fri, 27 Dec 2019 06:44:21 -0500
-Received: from relay.sw.ru ([185.231.240.75]:58022)
+ (envelope-from <wainersm@redhat.com>) id 1ikprZ-0002yh-Fi
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:10 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30916
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iko2P-0007JC-56; Fri, 27 Dec 2019 06:44:13 -0500
-Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iko2C-0001wk-KH; Fri, 27 Dec 2019 14:44:00 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 2/2] qcow2: dump QCOW2 metadata
-Date: Fri, 27 Dec 2019 14:43:59 +0300
-Message-Id: <1577447039-400109-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1577447039-400109-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1577447039-400109-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ikprZ-0002yT-CO
+ for qemu-devel@nongnu.org; Fri, 27 Dec 2019 08:41:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577454068;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rsnPAQSkWvtcYpvI7N8qYJnicQPbC05o8HCtvE27HQw=;
+ b=BF6owoGXdc8YBo1HWkJ0LiOMMF5KHX8u68s+CE2cARbdnZd8PFzv9a46AQXP3QZRiNtDtw
+ SEjeOd2WpYhz7oGDiFDMZpIkbu4g6AiK26VtDqcNynRZYpzsv72WkvBqPAIgFgki+a6hee
+ gEmOVxTpKOd5Z/pS06cw5FJ1MIullGc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-71KYVSqFPGW6o9-_KXWFpQ-1; Fri, 27 Dec 2019 08:41:07 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A48E6801E7A
+ for <qemu-devel@nongnu.org>; Fri, 27 Dec 2019 13:41:06 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-24.gru2.redhat.com
+ [10.97.116.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4962781765;
+ Fri, 27 Dec 2019 13:41:04 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/5] python/qemu: qmp: Replace socket.error with OSError
+Date: Fri, 27 Dec 2019 10:40:57 -0300
+Message-Id: <20191227134101.244496-2-wainersm@redhat.com>
+In-Reply-To: <20191227134101.244496-1-wainersm@redhat.com>
+References: <20191227134101.244496-1-wainersm@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 71KYVSqFPGW6o9-_KXWFpQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -57,536 +86,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
- qemu-devel@nongnu.org, andrey.shinkevich@virtuozzo.com, den@openvz.org,
- mreitz@redhat.com
+Cc: ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let QEMU-IMG CHECK command show QCOW2 structure to inform a user about
-metadata allocations on disk. Introduce '-M'('--dump-meta') key option.
+The socket.error is deprecated from Python 3.3, instead it is
+made a link to OSError. This change replaces the occurences
+of socket.error with OSError.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 ---
- block/qcow2-bitmap.c   | 53 ++++++++++++++++++++++++++++---
- block/qcow2-refcount.c | 84 +++++++++++++++++++++++++++++++++++++++++---------
- block/qcow2.c          | 30 ++++++++++++++++++
- block/qcow2.h          |  6 ++--
- include/block/block.h  |  3 +-
- qemu-img.c             | 29 ++++++++++++++++-
- qemu-img.texi          |  2 +-
- 7 files changed, 183 insertions(+), 24 deletions(-)
+ python/qemu/qmp.py | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index c6c8ebb..4f7b375 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -659,20 +659,29 @@ fail:
- 
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
--                                  int64_t *refcount_table_size)
-+                                  int64_t *refcount_table_size,
-+                                  Qcow2Bitmaps *bitmaps)
- {
-     int ret;
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2BitmapList *bm_list;
-     Qcow2Bitmap *bm;
-+    Qcow2BitmapDirectoryEntryList **pp_dir =
-+        bitmaps ? &bitmaps->bitmap_dir->dir_entries : NULL;
- 
-     if (s->nb_bitmaps == 0) {
-         return 0;
-     }
- 
-+    if (bitmaps) {
-+        bitmaps->nb_bitmaps = s->nb_bitmaps;
-+    }
-+
-     ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
-                                    s->bitmap_directory_offset,
--                                   s->bitmap_directory_size);
-+                                   s->bitmap_directory_size,
-+                                   bitmaps ? bitmaps->bitmap_dir->location
-+                                   : NULL);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -686,12 +695,28 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
- 
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-         uint64_t *bitmap_table = NULL;
-+        Qcow2BitmapTblEntryList **pp_table;
-         int i;
- 
-+        Qcow2BitmapDirectoryEntry *bmde = NULL;
-+        if (bitmaps) {
-+            bmde = g_new0(Qcow2BitmapDirectoryEntry, 1);
-+            bmde->bitmap_name = g_strdup(bm->name);
-+            bmde->bitmap_table = g_new0(Qcow2BitmapTbl, 1);
-+            bmde->bitmap_table->location = g_new0(Qcow2Allocation, 1);
-+            Qcow2BitmapDirectoryEntryList *obj =
-+                g_new0(Qcow2BitmapDirectoryEntryList, 1);
-+            obj->value = bmde;
-+            *pp_dir = obj;
-+            pp_dir = &obj->next;
-+        }
-+
-         ret = qcow2_inc_refcounts_imrt(bs, res,
-                                        refcount_table, refcount_table_size,
-                                        bm->table.offset,
--                                       bm->table.size * sizeof(uint64_t));
-+                                       bm->table.size * sizeof(uint64_t),
-+                                       bmde ? bmde->bitmap_table->location
-+                                       : NULL);
-         if (ret < 0) {
-             goto out;
-         }
-@@ -702,6 +727,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-             goto out;
-         }
- 
-+        pp_table = bmde ? &bmde->bitmap_table->table_entries : NULL;
-+
-         for (i = 0; i < bm->table.size; ++i) {
-             uint64_t entry = bitmap_table[i];
-             uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-@@ -711,13 +738,31 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                 continue;
-             }
- 
-+            Qcow2BitmapTblEntry *bmte = NULL;
-+            if (bmde) {
-+                bmte = g_new0(Qcow2BitmapTblEntry, 1);
-+                bmte->type = offset ? QCOW2_BITMAP_TBL_ENTRY_TYPE_SERIALIZED :
-+                    entry & BME_TABLE_ENTRY_FLAG_ALL_ONES;
-+                if (offset) {
-+                    bmte->cluster = g_new0(Qcow2Allocation, 1);
-+                }
-+                bmte->has_cluster = !!(bmte->cluster);
-+                Qcow2BitmapTblEntryList *elem =
-+                    g_new0(Qcow2BitmapTblEntryList, 1);
-+                elem->value = bmte;
-+                *pp_table = elem;
-+                pp_table = &elem->next;
-+            }
-+
-             if (offset == 0) {
-                 continue;
-             }
- 
-             ret = qcow2_inc_refcounts_imrt(bs, res,
-                                            refcount_table, refcount_table_size,
--                                           offset, s->cluster_size);
-+                                           offset, s->cluster_size,
-+                                           bmte && bmte->cluster ? bmte->cluster
-+                                           : NULL);
-             if (ret < 0) {
-                 g_free(bitmap_table);
-                 goto out;
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index f67ac6b..ac1ae42 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1521,7 +1521,8 @@ static int realloc_refcount_array(BDRVQcow2State *s, void **array,
- int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
-                              void **refcount_table,
-                              int64_t *refcount_table_size,
--                             int64_t offset, int64_t size)
-+                             int64_t offset, int64_t size,
-+                             Qcow2Allocation *qcow2_alloc)
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t start, last, cluster_offset, k, refcount;
-@@ -1550,6 +1551,11 @@ int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
-         return 0;
-     }
- 
-+    if (qcow2_alloc) {
-+        qcow2_alloc->offset = offset;
-+        qcow2_alloc->size = size;
-+    }
-+
-     start = start_of_cluster(s, offset);
-     last = start_of_cluster(s, offset + size - 1);
-     for(cluster_offset = start; cluster_offset <= last;
-@@ -1643,7 +1649,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             ret = qcow2_inc_refcounts_imrt(
-                 bs, res, refcount_table, refcount_table_size,
-                 l2_entry & QCOW2_COMPRESSED_SECTOR_MASK,
--                nb_csectors * QCOW2_COMPRESSED_SECTOR_SIZE);
-+                nb_csectors * QCOW2_COMPRESSED_SECTOR_SIZE, NULL);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -1731,7 +1737,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             if (!has_data_file(bs)) {
-                 ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table,
-                                                refcount_table_size,
--                                               offset, s->cluster_size);
-+                                               offset, s->cluster_size, NULL);
-                 if (ret < 0) {
-                     goto fail;
-                 }
-@@ -1769,17 +1775,20 @@ static int check_refcounts_l1(BlockDriverState *bs,
-                               void **refcount_table,
-                               int64_t *refcount_table_size,
-                               int64_t l1_table_offset, int l1_size,
--                              int flags, BdrvCheckMode fix, bool active)
-+                              int flags, BdrvCheckMode fix, bool active,
-+                              Qcow2L1Table *l1t)
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t *l1_table = NULL, l2_offset, l1_size2;
-+    Qcow2AllocationList **plist = l1t ? &l1t->l2_list : NULL;
-     int i, ret;
- 
-     l1_size2 = l1_size * sizeof(uint64_t);
- 
-     /* Mark L1 table as used */
-     ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
--                                   l1_table_offset, l1_size2);
-+                                   l1_table_offset, l1_size2,
-+                                   l1t ? l1t->location : NULL);
-     if (ret < 0) {
-         goto fail;
-     }
-@@ -1808,9 +1817,19 @@ static int check_refcounts_l1(BlockDriverState *bs,
-         if (l2_offset) {
-             /* Mark L2 table as used */
-             l2_offset &= L1E_OFFSET_MASK;
-+
-+            Qcow2Allocation *l2t = NULL;
-+            if (l1t) {
-+                l2t = g_new0(Qcow2Allocation, 1);
-+                Qcow2AllocationList *obj = g_new0(Qcow2AllocationList, 1);
-+                obj->value = l2t;
-+                *plist = obj;
-+                plist = &obj->next;
-+            }
-+
-             ret = qcow2_inc_refcounts_imrt(bs, res,
-                                            refcount_table, refcount_table_size,
--                                           l2_offset, s->cluster_size);
-+                                           l2_offset, s->cluster_size, l2t);
-             if (ret < 0) {
-                 goto fail;
-             }
-@@ -2047,7 +2066,7 @@ static int check_refblocks(BlockDriverState *bs, BdrvCheckResult *res,
-                 res->corruptions_fixed++;
-                 ret = qcow2_inc_refcounts_imrt(bs, res,
-                                                refcount_table, nb_clusters,
--                                               offset, s->cluster_size);
-+                                               offset, s->cluster_size, NULL);
-                 if (ret < 0) {
-                     return ret;
-                 }
-@@ -2066,7 +2085,7 @@ resize_fail:
- 
-         if (offset != 0) {
-             ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
--                                           offset, s->cluster_size);
-+                                           offset, s->cluster_size, NULL);
-             if (ret < 0) {
-                 return ret;
-             }
-@@ -2093,6 +2112,9 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     BDRVQcow2State *s = bs->opaque;
-     int64_t i;
-     QCowSnapshot *sn;
-+    bool has_snapshots = res->viscera && res->viscera->snapshot_table;
-+    Qcow2L1TableList **plist = has_snapshots ?
-+        &res->viscera->snapshot_table->l1_list : NULL;
-     int ret;
- 
-     if (!*refcount_table) {
-@@ -2106,16 +2128,25 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     }
- 
-     /* header */
-+    if (res->viscera) {
-+        res->viscera->qcow2_header->version = s->qcow_version;
-+    }
-     ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
--                                   0, s->cluster_size);
-+                                   0, s->cluster_size,
-+                                   res->viscera ?
-+                                   res->viscera->qcow2_header->location : NULL);
-     if (ret < 0) {
-         return ret;
-     }
- 
-     /* current L1 table */
-+    if (res->viscera) {
-+        res->viscera->active_l1->name = g_strdup("L1 active table");
-+    }
-     ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
-                              s->l1_table_offset, s->l1_size, CHECK_FRAG_INFO,
--                             fix, true);
-+                             fix, true,
-+                             res->viscera ? res->viscera->active_l1 : NULL);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2143,15 +2174,30 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-             res->corruptions++;
-             continue;
-         }
-+
-+        Qcow2L1Table *l1t = NULL;
-+        if (has_snapshots) {
-+            l1t = g_new0(Qcow2L1Table, 1);
-+            l1t->location = g_new0(Qcow2Allocation, 1);
-+            l1t->name = g_strdup(sn->name);
-+            Qcow2L1TableList *obj = g_new0(Qcow2L1TableList, 1);
-+            obj->value = l1t;
-+            *plist = obj;
-+            plist = &obj->next;
-+        }
-+
-         ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
-                                  sn->l1_table_offset, sn->l1_size, 0, fix,
--                                 false);
-+                                 false, l1t);
-         if (ret < 0) {
-             return ret;
-         }
-     }
-     ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
--                                   s->snapshots_offset, s->snapshots_size);
-+                                   s->snapshots_offset, s->snapshots_size,
-+                                   has_snapshots ?
-+                                   res->viscera->snapshot_table->location
-+                                   : NULL);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2159,7 +2205,10 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     /* refcount data */
-     ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-                                    s->refcount_table_offset,
--                                   s->refcount_table_size * sizeof(uint64_t));
-+                                   s->refcount_table_size * sizeof(uint64_t),
-+                                   res->viscera ?
-+                                   res->viscera->refcount_table->location
-+                                   : NULL);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2168,14 +2217,19 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     if (s->crypto_header.length) {
-         ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, nb_clusters,
-                                        s->crypto_header.offset,
--                                       s->crypto_header.length);
-+                                       s->crypto_header.length,
-+                                       res->viscera ?
-+                                       res->viscera->crypt_header->location
-+                                       : NULL);
-         if (ret < 0) {
-             return ret;
-         }
-     }
- 
-     /* bitmaps */
--    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters);
-+    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters,
-+                                        res->viscera ? res->viscera->bitmaps
-+                                        : NULL);
-     if (ret < 0) {
-         return ret;
-     }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7c18721..39cf918 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -590,6 +590,7 @@ static int coroutine_fn qcow2_co_check_locked(BlockDriverState *bs,
-                                               BdrvCheckResult *result,
-                                               BdrvCheckMode fix)
- {
-+    BDRVQcow2State *s = bs->opaque;
-     BdrvCheckResult snapshot_res = {};
-     BdrvCheckResult refcount_res = {};
-     int ret;
-@@ -602,6 +603,35 @@ static int coroutine_fn qcow2_co_check_locked(BlockDriverState *bs,
-         return ret;
-     }
- 
-+    if (fix & BDRV_DUMP_META) {
-+        result->viscera = g_new0(Qcow2Metadata, 1);
-+        result->viscera->qcow2_header = g_new0(Qcow2Header, 1);
-+        result->viscera->qcow2_header->location = g_new0(Qcow2Allocation, 1);
-+        result->viscera->active_l1 = g_new0(Qcow2L1Table, 1);
-+        result->viscera->active_l1->location = g_new0(Qcow2Allocation, 1);
-+        result->viscera->refcount_table = g_new0(Qcow2RefcountTable, 1);
-+        result->viscera->refcount_table->location = g_new0(Qcow2Allocation, 1);
-+
-+        refcount_res.viscera = result->viscera;
-+
-+        if (s->crypto_header.length) {
-+            result->viscera->crypt_header = g_new0(Qcow2EncryptionHeader, 1);
-+            result->viscera->crypt_header->location =
-+                g_new0(Qcow2Allocation, 1);
-+        }
-+        if (s->nb_bitmaps) {
-+            result->viscera->bitmaps = g_new0(Qcow2Bitmaps, 1);
-+            result->viscera->bitmaps->bitmap_dir = g_new0(Qcow2BitmapDir, 1);
-+            result->viscera->bitmaps->bitmap_dir->location =
-+                g_new0(Qcow2Allocation, 1);
-+        }
-+        if (s->nb_snapshots) {
-+            result->viscera->snapshot_table = g_new0(Qcow2SnapshotsTable, 1);
-+            result->viscera->snapshot_table->location =
-+                g_new0(Qcow2Allocation, 1);
-+        }
-+    }
-+
-     ret = qcow2_check_refcounts(bs, &refcount_res, fix);
-     qcow2_add_check_result(result, &refcount_res, true);
-     if (ret < 0) {
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 0942126..8d615e2 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -662,7 +662,8 @@ int qcow2_pre_write_overlap_check(BlockDriverState *bs, int ign, int64_t offset,
- int qcow2_inc_refcounts_imrt(BlockDriverState *bs, BdrvCheckResult *res,
-                              void **refcount_table,
-                              int64_t *refcount_table_size,
--                             int64_t offset, int64_t size);
-+                             int64_t offset, int64_t size,
-+                             Qcow2Allocation *qcow2_alloc);
- 
- int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
-                                 BlockDriverAmendStatusCB *status_cb,
-@@ -751,7 +752,8 @@ void qcow2_cache_discard(Qcow2Cache *c, void *table);
- /* qcow2-bitmap.c functions */
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
--                                  int64_t *refcount_table_size);
-+                                  int64_t *refcount_table_size,
-+                                  Qcow2Bitmaps *bitmaps);
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-                                                 Error **errp);
-diff --git a/include/block/block.h b/include/block/block.h
-index 1df9848..b1fc275 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -373,7 +373,6 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
-                               Error **errp);
- void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base);
- 
--
- typedef struct BdrvCheckResult {
-     int corruptions;
-     int leaks;
-@@ -382,11 +381,13 @@ typedef struct BdrvCheckResult {
-     int leaks_fixed;
-     int64_t image_end_offset;
-     BlockFragInfo bfi;
-+    Qcow2Metadata *viscera;
- } BdrvCheckResult;
- 
- typedef enum {
-     BDRV_FIX_LEAKS    = 1,
-     BDRV_FIX_ERRORS   = 2,
-+    BDRV_DUMP_META    = 4,
- } BdrvCheckMode;
- 
- int bdrv_check(BlockDriverState *bs, BdrvCheckResult *res, BdrvCheckMode fix);
-diff --git a/qemu-img.c b/qemu-img.c
-index 95a24b9..840eee2 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -173,6 +173,7 @@ static void QEMU_NORETURN help(void)
-            "       '-r leaks' repairs only cluster leaks, whereas '-r all' fixes all\n"
-            "       kinds of errors, with a higher risk of choosing the wrong fix or\n"
-            "       hiding corruption that has already occurred.\n"
-+           "  '-M' Dump QCOW2 metadata to stdout in JSON format.\n"
-            "\n"
-            "Parameters to convert subcommand:\n"
-            "  '-m' specifies how many coroutines work in parallel during the convert\n"
-@@ -659,6 +660,14 @@ static int collect_image_check(BlockDriverState *bs,
-     check->has_fragmented_clusters  = result.bfi.fragmented_clusters != 0;
-     check->compressed_clusters      = result.bfi.compressed_clusters;
-     check->has_compressed_clusters  = result.bfi.compressed_clusters != 0;
-+    check->viscera                  = result.viscera;
-+    check->has_viscera              = !!(result.viscera);
-+
-+    if (check->has_viscera) {
-+        check->viscera->has_crypt_header = !!(check->viscera->crypt_header);
-+        check->viscera->has_bitmaps = !!(check->viscera->bitmaps);
-+        check->viscera->has_snapshot_table = !!(check->viscera->snapshot_table);
-+    }
- 
-     return 0;
- }
-@@ -701,9 +710,10 @@ static int img_check(int argc, char **argv)
-             {"object", required_argument, 0, OPTION_OBJECT},
-             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
-             {"force-share", no_argument, 0, 'U'},
-+            {"dump-meta", no_argument, 0, 'M'},
-             {0, 0, 0, 0}
-         };
--        c = getopt_long(argc, argv, ":hf:r:T:qU",
-+        c = getopt_long(argc, argv, ":hf:r:T:qU:M",
-                         long_options, &option_index);
-         if (c == -1) {
-             break;
-@@ -745,6 +755,9 @@ static int img_check(int argc, char **argv)
-         case 'U':
-             force_share = true;
-             break;
-+        case 'M':
-+            fix |= BDRV_DUMP_META;
-+            break;
-         case OPTION_OBJECT: {
-             QemuOpts *opts;
-             opts = qemu_opts_parse_noisily(&qemu_object_opts,
-@@ -772,6 +785,11 @@ static int img_check(int argc, char **argv)
-         return 1;
-     }
- 
-+    if ((fix & BDRV_DUMP_META) && output_format != OFORMAT_JSON) {
-+        error_report("Metadata output in JSON format only");
-+        return 1;
-+    }
-+
-     if (qemu_opts_foreach(&qemu_object_opts,
-                           user_creatable_add_opts_foreach,
-                           qemu_img_object_print_help, &error_fatal)) {
-@@ -792,6 +810,15 @@ static int img_check(int argc, char **argv)
-     bs = blk_bs(blk);
- 
-     check = g_new0(ImageCheck, 1);
-+
-+    if (fix & BDRV_DUMP_META) {
-+        if (strcmp(bs->drv->format_name, "qcow2")) {
-+            error_report("Metadata output supported for QCOW2 format only");
-+            ret = -ENOTSUP;
-+            goto fail;
-+        }
-+    }
-+
-     ret = collect_image_check(bs, check, filename, fmt, fix);
- 
-     if (ret == -ENOTSUP) {
-diff --git a/qemu-img.texi b/qemu-img.texi
-index b5156d6..873e80a 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -230,7 +230,7 @@ specified as well.
- For write tests, by default a buffer filled with zeros is written. This can be
- overridden with a pattern byte specified by @var{pattern}.
- 
--@item check [--object @var{objectdef}] [--image-opts] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
-+@item check [--object @var{objectdef}] [--image-opts] [-M] [-q] [-f @var{fmt}] [--output=@var{ofmt}] [-r [leaks | all]] [-T @var{src_cache}] [-U] @var{filename}
- 
- Perform a consistency check on the disk image @var{filename}. The command can
- output in the format @var{ofmt} which is either @code{human} or @code{json}.
--- 
-1.8.3.1
+diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
+index 5c8cf6a056..8c6c9847d0 100644
+--- a/python/qemu/qmp.py
++++ b/python/qemu/qmp.py
+@@ -47,7 +47,7 @@ class QEMUMonitorProtocol(object):
+                         or a tuple in the form ( address, port ) for a TCP
+                         connection
+         @param server: server mode listens on the socket (bool)
+-        @raise socket.error on socket connection errors
++        @raise OSError on socket connection errors
+         @note No connection is established, this is done by the connect() =
+or
+               accept() methods
+         """
+@@ -107,8 +107,8 @@ class QEMUMonitorProtocol(object):
+         self.__sock.setblocking(0)
+         try:
+             self.__json_read()
+-        except socket.error as err:
+-            if err[0] =3D=3D errno.EAGAIN:
++        except OSError as err:
++            if err.errno =3D=3D errno.EAGAIN:
+                 # No data available
+                 pass
+         self.__sock.setblocking(1)
+@@ -133,7 +133,7 @@ class QEMUMonitorProtocol(object):
+         Connect to the QMP Monitor and perform capabilities negotiation.
+=20
+         @return QMP greeting dict
+-        @raise socket.error on socket connection errors
++        @raise OSError on socket connection errors
+         @raise QMPConnectError if the greeting is not received
+         @raise QMPCapabilitiesError if fails to negotiate capabilities
+         """
+@@ -147,7 +147,7 @@ class QEMUMonitorProtocol(object):
+         Await connection from QMP Monitor and perform capabilities negotia=
+tion.
+=20
+         @return QMP greeting dict
+-        @raise socket.error on socket connection errors
++        @raise OSError on socket connection errors
+         @raise QMPConnectError if the greeting is not received
+         @raise QMPCapabilitiesError if fails to negotiate capabilities
+         """
+@@ -167,10 +167,10 @@ class QEMUMonitorProtocol(object):
+         self.logger.debug(">>> %s", qmp_cmd)
+         try:
+             self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
+-        except socket.error as err:
+-            if err[0] =3D=3D errno.EPIPE:
++        except OSError as err:
++            if err.errno =3D=3D errno.EPIPE:
+                 return
+-            raise socket.error(err)
++            raise err
+         resp =3D self.__json_read()
+         self.logger.debug("<<< %s", resp)
+         return resp
+--=20
+2.23.0
 
 
