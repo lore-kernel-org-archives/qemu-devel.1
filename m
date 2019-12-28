@@ -2,83 +2,84 @@ Return-Path: <SRS0=DnLG=2S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15236C2D0C8
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 23:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65934C2D0C8
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 23:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0E25207E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 23:41:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3281D207E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 23:48:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kd1kdjji"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E25207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y9jxabQ/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3281D207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilLiE-0001N2-00
-	for qemu-devel@archiver.kernel.org; Sat, 28 Dec 2019 18:41:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38676)
+	id 1ilLoU-0002mF-AC
+	for qemu-devel@archiver.kernel.org; Sat, 28 Dec 2019 18:48:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ilLhd-0000w7-Fw
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 18:41:02 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ilLnk-0002LH-QK
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 18:47:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ilLhc-00081N-Aa
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 18:41:01 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41278)
+ (envelope-from <richard.henderson@linaro.org>) id 1ilLni-00040d-Qv
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 18:47:19 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43927)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ilLhc-0007uT-2r
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 18:41:00 -0500
-Received: by mail-pf1-x444.google.com with SMTP id w62so16550005pfw.8
- for <qemu-devel@nongnu.org>; Sat, 28 Dec 2019 15:40:59 -0800 (PST)
+ id 1ilLnh-0003t9-Vx
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 18:47:18 -0500
+Received: by mail-pf1-x444.google.com with SMTP id x6so15464381pfo.10
+ for <qemu-devel@nongnu.org>; Sat, 28 Dec 2019 15:47:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=oVZu6/SN+5SZK+7c5AowIxQOLLbP2Ox8wv1xHYQdAb4=;
- b=Kd1kdjjiRtB+9k4j6+9ZTTgBsougA1tiqGuRuePV0UrkTP84N7CMcBccOUOEZATDVn
- 4LsZ6eQxS0RE6bAw2bk9LJHeZhSzwogzjNVrN0Irci2CFoRbEx3ah+34QbSQq7V3rOq4
- PnKycHMKaog4Lb7MnGfaRZm5ehlCSTGg6d0w3oo035zbhS6gewzhB/mf6D+EM9f6pcPt
- fh+yN10VGvXoG6vyU2xE47T6SCHP0mAFPB1NrSJhQfOdceWXBNt6Xg4Q0hIMAAeE9THn
- 7B75nm5xh7EVXT3jFqwqvz6pobnUYLM2X8CSY7qRmy7jgb08DDFdXj297eW5SERC9/Sr
- 9LiA==
+ bh=un11ItUGL3UXcuCxg5SKdH17F54/6CzFcVWX6W2yUFE=;
+ b=y9jxabQ/K8RyaN/8QAzbjGi/DBeVhdwDTjpc+7BpagT31fMOthH83dk/J2uHMwOLJ+
+ CGWkL8GaqF/AsUMI9SVENk39EVO1dplrqW1hyoiVDhOCMW5GOQ3WAOPIRmDZ2cQn+dAb
+ UOmdWnJ35MbCcu3QrHYNsWBnNyz3vvPYnWKrepxaTxUwVKh0KsZPGISmsCXgSymnkcvm
+ SnN8twD0C2SjayeEGjpGgDvRlqQMb6JRezH3Ldk6iL8M68SXPnezZ5eKtUNvV/smALg1
+ wGt16EaEi4D1arhi6VfDIjNEME75JrKuJ68T7hT3bH13whXCIiLPE7emRE9toEZVgPwv
+ ybZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=oVZu6/SN+5SZK+7c5AowIxQOLLbP2Ox8wv1xHYQdAb4=;
- b=cv+U14ZXmkl4YfGke5qwjiy+gHf9ZFqqLWPjRc9nK59HP59W8ZP5FVT5n+AYWha7VZ
- y7WE8Q967h+md9gbXM2Vbi9gH/stKelG/tAoe7th1HN1l0htADeFL97V+gEbSarNAF3h
- Fra2+Y4Ig9kHoIwH95Qdx0WjCRTtgn3SZntDit6xyyBvnE0BdP81mO6Y68oWLhU4TALK
- gdA/kqV9bV/i5VOgb/FiVWtTZnEDoOqHYyBL/iJWofiBBjfDE6DLoZ9d113+P+0n66E7
- kuNSKeRa1t5+IzZEoYmbruToS2pfoIsKK0amb/Rk8J+r8afA2o7NF35yuX2LBrUqTJpQ
- 24Eg==
-X-Gm-Message-State: APjAAAVhYb69h+hB3wAaKNcyssZljR+VSXyISRbb+B1UlZ+K+u/9lWMQ
- wZijhwCRxatkjwB9Iapg83iwJQ==
-X-Google-Smtp-Source: APXvYqwa2jI9kowDnmL/rqWB7eSO3IaAAlTxnd2+35mKAMDNB9ECO/FPIUKPC8hU1vHsTTv7xd1BAQ==
-X-Received: by 2002:a65:621a:: with SMTP id d26mr61172846pgv.151.1577576458723; 
- Sat, 28 Dec 2019 15:40:58 -0800 (PST)
+ bh=un11ItUGL3UXcuCxg5SKdH17F54/6CzFcVWX6W2yUFE=;
+ b=XfMCaiKCLL5C39QPgmiXrGQk1+rlmqcWeVngdGEJnFqg+r/YGjg8m7Scz6gq7u1zxE
+ W8CuLUhBeG1KKUfmlRF/V1Nb1uYbD6KfQMGIuwlRJUCLMLm/Bjbn8KaFx/aTifnBobFS
+ rOB3VIE3XKRYP4YUNhhIpojEkvz5fIwCa9icp3d6CiXiPtriKd0fTzwNg5dQe8XTJUg7
+ pkf6uYEAbMYvpqPVFE9ioUt3FGqSOSVLKCHHQp2R9Qm/IPyonNXyHWWsNRMal53EQznq
+ luTO5uj73ZwGE4S44ZpioZ9VV85gO4kN6YgrzahtitAjrhd9D2ygArbx6AwJ6qe73vRP
+ Mf3g==
+X-Gm-Message-State: APjAAAW3cSYB9lDsLAvyH6qdrg9nJ7mtJwBuK/UdAy0Uzra8Z2sQv9hl
+ BNFXZ/hasZzLeI+QFzSaKwoxqg==
+X-Google-Smtp-Source: APXvYqzoZYmnTpEiax9Kpcx9g1eVPBlj5eANv2XrtbTEbDU/4CjMA/MO4S9picWbSnc9dtPCh5hy6A==
+X-Received: by 2002:aa7:93c2:: with SMTP id y2mr64225047pff.140.1577576836688; 
+ Sat, 28 Dec 2019 15:47:16 -0800 (PST)
 Received: from [192.168.1.118] (194-223-58-9.tpgi.com.au. [194.223.58.9])
- by smtp.gmail.com with ESMTPSA id e6sm45589258pfh.32.2019.12.28.15.40.53
+ by smtp.gmail.com with ESMTPSA id 11sm46755210pfz.25.2019.12.28.15.47.11
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 28 Dec 2019 15:40:57 -0800 (PST)
-Subject: Re: [PATCH v6 03/11] hw/core: create Resettable QOM interface
+ Sat, 28 Dec 2019 15:47:16 -0800 (PST)
+Subject: Re: [PATCH v6 05/11] hw/core/resettable: add support for changing
+ parent
 To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
 References: <20191220115035.709876-1-damien.hedde@greensocs.com>
- <20191220115035.709876-4-damien.hedde@greensocs.com>
+ <20191220115035.709876-6-damien.hedde@greensocs.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <40d11096-b1ea-d78c-e7b8-b5d41d450a60@linaro.org>
-Date: Sun, 29 Dec 2019 10:40:50 +1100
+Message-ID: <6ef0f159-0756-ce7e-1374-824186ec4c0d@linaro.org>
+Date: Sun, 29 Dec 2019 10:47:07 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191220115035.709876-4-damien.hedde@greensocs.com>
+In-Reply-To: <20191220115035.709876-6-damien.hedde@greensocs.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -105,50 +106,28 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/20/19 10:50 PM, Damien Hedde wrote:
-> +typedef void (*ResettableEnterPhase)(Object *obj, ResetType type);
-> +typedef void (*ResettableHoldPhase)(Object *obj);
-> +typedef void (*ResettableExitPhase)(Object *obj);
-> +typedef ResettableState * (*ResettableGetState)(Object *obj);
-> +typedef void (*ResettableTrFunction)(Object *obj);
-> +typedef ResettableTrFunction (*ResettableGetTrFunction)(Object *obj);
-> +typedef void (*ResettableChildCallback)(Object *, void *opaque,
-> +                                        ResetType type);
-> +typedef void (*ResettableChildForeach)(Object *obj,
-> +                                       ResettableChildCallback cb,
-> +                                       void *opaque, ResetType type);
-> +typedef struct ResettableClass {
-> +    InterfaceClass parent_class;
-> +
-> +    /* Phase methods */
-> +    struct ResettablePhases {
-> +        ResettableEnterPhase enter;
-> +        ResettableHoldPhase hold;
-> +        ResettableExitPhase exit;
-> +    } phases;
-> +
-> +    /* State access method */
-> +    ResettableGetState get_state;
-> +
-> +    /* Transitional method for legacy reset compatibility */
-> +    ResettableGetTrFunction get_transitional_function;
-> +
-> +    /* Hierarchy handling method */
-> +    ResettableChildForeach child_foreach;
-> +} ResettableClass;
-> +typedef struct ResettablePhases ResettablePhases;
+> Add a function resettable_change_parent() to do the required
+> plumbing when changing the parent a of Resettable object.
+> 
+> We need to make sure that the reset state of the object remains
+> coherent with the reset state of the new parent.
+> 
+> We make the 2 following hypothesis:
+> + when an object is put in a parent under reset, the object goes in
+> reset.
+> + when an object is removed from a parent under reset, the object
+> leaves reset.
+> 
+> The added function avoids any glitch if both old and new parent are
+> already in reset.
+> 
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> ---
+>  include/hw/resettable.h | 16 +++++++++++
+>  hw/core/resettable.c    | 62 +++++++++++++++++++++++++++++++++++++++--
+>  hw/core/trace-events    |  1 +
+>  3 files changed, 77 insertions(+), 2 deletions(-)
 
-Since you use ResettablePhases independently of ResettableClass, I think you
-should un-nest the struct definition and define the typedef as per normal.
-
-Within the ResettableClass definition, just have "ResettablePhases phases;".
-
-
-> +    return (s->count > 0);
-
-IIRC, you should have gotten a checkpatch warning for the parenthesis here.
-They are unnecessary.
-
-Otherwise,
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
