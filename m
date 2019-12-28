@@ -2,128 +2,100 @@ Return-Path: <SRS0=DnLG=2S=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDE2C2D0C6
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 12:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0C2C2D0C6
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 16:59:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F48F207E0
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 12:29:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F48F207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
+	by mail.kernel.org (Postfix) with ESMTPS id 041EA20838
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 16:59:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZWuQG42E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 041EA20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilBE5-0002cm-Rf
-	for qemu-devel@archiver.kernel.org; Sat, 28 Dec 2019 07:29:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57289)
+	id 1ilFR0-0005g1-To
+	for qemu-devel@archiver.kernel.org; Sat, 28 Dec 2019 11:59:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1ilBD5-00020O-Ke
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 07:28:48 -0500
+ (envelope-from <philmd@redhat.com>) id 1ilFPn-0004eR-KO
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 11:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <a13xp0p0v88@gmail.com>) id 1ilBD4-000126-7h
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 07:28:47 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44409)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
- id 1ilBCy-0000oK-Sn; Sat, 28 Dec 2019 07:28:42 -0500
-Received: by mail-wr1-f68.google.com with SMTP id q10so28471786wrm.11;
- Sat, 28 Dec 2019 04:28:39 -0800 (PST)
+ (envelope-from <philmd@redhat.com>) id 1ilFPl-0000CW-5F
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 11:58:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59525
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ilFPk-00005p-SX
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 11:58:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577552287;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZDik/qENimSiOTNyE7E+6Lmlst/8Rr8Dtv2Nv/DAZRk=;
+ b=ZWuQG42EmLHQIS+X1QZe7cXvRefSP1kdj4MxKRSIQSMAi0Nn+m600BNPXVU2zfRw3FizYg
+ rACyRcce7pert3XZB6KUY2e1eWf8TWnmciTNBwkVl/9/dAhyUnHFLFjxcYqQTJbnAZsPGv
+ 7kxg1meheASPXwX+IBWB+jh32VRpP4k=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-105-BlOWC0hlPzm-o8b6c3rvoQ-1; Sat, 28 Dec 2019 11:58:04 -0500
+Received: by mail-wm1-f69.google.com with SMTP id o24so1229984wmh.0
+ for <qemu-devel@nongnu.org>; Sat, 28 Dec 2019 08:58:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:reply-to:subject:to:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=L+T0xKc5q0YzZTCdZ9cNxsGUhTMyrzLqljkK6CPNclw=;
- b=qGnAecg7DcgvIZHyzTqF5u1KA7RwL10qmCBXFKPhulz4mx9msUzCDKnUBZQ5J2Pso3
- 5GyoOs5Qxhqripz0H404IYvKcXV9thaBrxfZwsJNH2c2hAlEWqMbjQb2IW5zoNt+X89t
- 3Mfpc+KJfLhPtahK1Z7+FY2BqPlYUqhB54DgIkyJqh+Jl4XNDrWxI6+jpp7loumPYJ1F
- btRw92T52IOfXO1zBbhNgUvqsMZiqA7LT7x9WXNT/DngrC0+GBhxYzwi4ntQLgcOokdd
- ZWdx/svFfysq/NXlTZpFGLLg62fPHRPsF2T+GBBA3SCmb4S8Wg6RrBFMSCSj9OUzlT4N
- CK4w==
-X-Gm-Message-State: APjAAAWxvawyU9c4f9KD9D73vBlrgRe8Rw4XOTFMM5/syir0y3MLYMtV
- 3cGvRuct6AG8a6n7zNjk+OI=
-X-Google-Smtp-Source: APXvYqzalnMKrqJoTWrwuMEJIAPz/LEdOB0Ne7GG2zoO4CZQO8hpAC1W2doLVp0ZuSNekqTWLIadqw==
-X-Received: by 2002:a05:6000:149:: with SMTP id
- r9mr47339502wrx.147.1577536117138; 
- Sat, 28 Dec 2019 04:28:37 -0800 (PST)
-Received: from [10.9.0.26] ([46.166.128.205])
- by smtp.gmail.com with ESMTPSA id i5sm14174262wml.31.2019.12.28.04.28.34
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eAPYpgunDwkHnTrJpGjelWBSwhOarkRJCG3bFIaFXno=;
+ b=L+l2ZtEpRYPEZ/Gxap0fZIAyQn804SIEnvLoANZkVtF6Vv5N13CJL98PGyfSFeUYxY
+ J2h5BwzIgm8ERbag84sdU8MGJsBN6dxfGW9IEMLJmeYMm+xyOMV2gORq86rwnih6m6H7
+ mH6msDGVkFjTF4ay2T+b687iQtVLJxNBqA5v82Dh9YiaLUwZrjQO0fyqGbJ/Uthd68VE
+ aAtlsqcDx9zCeJJojNbt0wtZw0tWaMzOo4E8eztA1hbUGP9Fsq0JbKX9RZ8ksnw+dn8u
+ J2z2EdUEnsbR0gSo/lrprAE933cTdMjNoVifcsexk9V6g6dAircMw4glKguh89m0/hYt
+ //Iw==
+X-Gm-Message-State: APjAAAUdGv8EQj+h75rOZdZRCg/RleGdk+QnZC2JHUOU/lfIAHDEr2Kn
+ BYT8/4VVSYQgFXsc97djH3R6z/16WAI7vkLuqh78vCepOVbGH2gtZ/zRgGAVSFkQ8bcviepmiXB
+ g1txy0EzlrpAsEc0=
+X-Received: by 2002:a1c:2355:: with SMTP id j82mr25561360wmj.135.1577552282985; 
+ Sat, 28 Dec 2019 08:58:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqybXEVye3NsPFqO6CMDAYzh75QR/hKvBd45IcXBziGwvLYRSDch4KXdpzckKsmYcptrC3F4qw==
+X-Received: by 2002:a1c:2355:: with SMTP id j82mr25561346wmj.135.1577552282748; 
+ Sat, 28 Dec 2019 08:58:02 -0800 (PST)
+Received: from [192.168.1.25] (abayonne-654-1-186-92.w92-134.abo.wanadoo.fr.
+ [92.134.161.92])
+ by smtp.gmail.com with ESMTPSA id f65sm14960078wmf.2.2019.12.28.08.58.01
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 28 Dec 2019 04:28:36 -0800 (PST)
-Subject: Re: [PATCH v3 0/2] ide: Fix incorrect handling of some PRDTs and add
- the corresponding unit-test
-To: "Michael S . Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org,
- pmatouse@redhat.com, sstabellini@kernel.org, mdroth@linux.vnet.ibm.com,
- pjp@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- Andrea Arcangeli <aarcange@redhat.com>,
- Kashyap Chamarthy <kashyap.cv@gmail.com>,
- Darren Kenny <darren.kenny@oracle.com>, Kevin Wolf <kwolf@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
-References: <20191223175117.508990-1-alex.popov@linux.com>
-From: Alexander Popov <alex.popov@linux.com>
-Autocrypt: addr=alex.popov@linux.com; prefer-encrypt=mutual; keydata=
- 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
- j3lCqPk=
-Message-ID: <0d0c9298-9a64-73f5-8107-fc0ff32b101d@linux.com>
-Date: Sat, 28 Dec 2019 15:28:33 +0300
+ Sat, 28 Dec 2019 08:58:02 -0800 (PST)
+Subject: Re: [PATCH V3] target/i386: Fix handling of k_gs_base register in
+ 32-bit mode in gdbstub
+To: "Marek Dolata - mkdolata@us.ibm.com" <mkdolata@us.ibm.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <2cf601fe9f2d4447ba4eec653df634ee@us.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b44c1837-037d-24f4-3ff0-6a36e3fea1e0@redhat.com>
+Date: Sat, 28 Dec 2019 17:57:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191223175117.508990-1-alex.popov@linux.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <2cf601fe9f2d4447ba4eec653df634ee@us.ibm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MC-Unique: BlOWC0hlPzm-o8b6c3rvoQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,42 +107,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: alex.popov@linux.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Doug Gale <doug16k@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.12.2019 20:51, Alexander Popov wrote:
-> Fuzzing the Linux kernel with syzkaller allowed to find how to crash qemu
-> using a special SCSI_IOCTL_SEND_COMMAND. It hits the assertion in
-> ide_dma_cb() introduced in the commit a718978ed58a in July 2015.
-> 
-> This patch series fixes incorrect handling of some PRDTs in ide_dma_cb()
-> and improves the ide-test to cover more PRDT cases (including one
-> that causes that particular qemu crash).
-> 
-> Changes from v2 (thanks to Kevin Wolf for the feedback):
->  - the assertion about prepare_buf() return value is improved;
->  - the patch order is reversed to keep the tree bisectable;
->  - the unit-test performance is improved -- now it runs 8 seconds
->    instead of 3 minutes on my laptop.
-> 
-> Alexander Popov (2):
->   ide: Fix incorrect handling of some PRDTs in ide_dma_cb()
->   tests/ide-test: Create a single unit-test covering more PRDT cases
-> 
->  hw/ide/core.c    |  30 +++++---
->  tests/ide-test.c | 174 ++++++++++++++++++++---------------------------
->  2 files changed, 96 insertions(+), 108 deletions(-)
+On 12/28/19 12:37 AM, Marek Dolata - mkdolata@us.ibm.com wrote:
+> Fixes: corrects clobbering of registers appearing after k_gs_base
+>=20
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1857640
+>=20
+> Signed-off-by: Marek Dolata <mkdolata@us.ibm.com=20
+> <mailto:mkdolata@us.ibm.com>>
+>=20
+> ---
+>=20
+> target/i386/gdbstub.c | 4 ++--
+>=20
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+>=20
+> index aef25b70f1..572ead641c 100644
+>=20
+> --- a/target/i386/gdbstub.c
+>=20
+> +++ b/target/i386/gdbstub.c
+>=20
+> @@ -350,15 +350,15 @@ int x86_cpu_gdb_write_register(CPUState *cs,=20
+> uint8_t *mem_buf, int n)
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 env->segs[R_GS].base =3D ldl_p(mem_=
+buf);
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 4;
+>=20
+> -#ifdef TARGET_X86_64
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0 case IDX_SEG_REGS + 8:
+>=20
+> +#ifdef TARGET_X86_64
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (env->hflags & HF_CS64_MASK) {
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 env->kernelgsbase =3D l=
+dq_p(mem_buf);
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 8;
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 env->kernelgsbase =3D ldl_p(mem_buf=
+);
+>=20
+> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 4;
+>=20
+> #endif
+>=20
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return 4;
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0case IDX_FP_REGS + 8:
+>=20
+>  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 cpu_set_fpuc(env, ldl_p(mem_buf));
+>=20
+> --=20
+>=20
+> 2.24.1
+>=20
 
-Hello!
+Still:
 
-Just a friendly ping.
+$ pwclient git-am 11311411
+Applying patch #11311411 using "git am"
+Description: [V3] target/i386: Fix handling of k_gs_base register in=20
+32-bit mode in gdbstub
+Applying: target/i386: Fix handling of k_gs_base register in 32-bit mode=20
+in gdbstub
+error: corrupt patch at line 25
+Patch failed at 0001 target/i386: Fix handling of k_gs_base register in=20
+32-bit mode in gdbstub
+hint: Use 'git am --show-current-patch' to see the failed patch
+When you have resolved this problem, run "git am --continue".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
+'git am' failed with exit status 128
 
-Could I have the feedback for this patch series?
+I thought this could be due to this recent git change:
+https://github.com/git/git/commit/5983ddc1652
+and would suggest to try with:
 
-Kevin, do you like the changes?
+$ git config sendemail.transferEncoding 8bit
 
-Best regards,
-Alexander
+but you use git 2.24 and this got introduced in 2.25, so I'm not sure=20
+what's wrong. You could still try, in case this helps...
+
 
