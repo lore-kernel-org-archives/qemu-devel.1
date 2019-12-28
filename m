@@ -8,75 +8,78 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F79C2D0C6
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 18:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2BFC2D0C8
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 19:33:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49CFD2173E
-	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 18:54:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 825D7207E0
+	for <qemu-devel@archiver.kernel.org>; Sat, 28 Dec 2019 19:33:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oO6/l7nq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CFD2173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfOqXiq8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825D7207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilHDz-0005UZ-CJ
-	for qemu-devel@archiver.kernel.org; Sat, 28 Dec 2019 13:54:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47467)
+	id 1ilHqB-0000Fv-JV
+	for qemu-devel@archiver.kernel.org; Sat, 28 Dec 2019 14:33:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39859)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1ilHD9-00054p-84
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 13:53:17 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1ilHp7-0008GH-CG
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 14:32:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1ilHD3-0005KK-3y
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 13:53:15 -0500
-Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:42074)
+ (envelope-from <mrolnik@gmail.com>) id 1ilHp4-0007sG-41
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 14:32:29 -0500
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:39514)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ilHD2-0005E0-RP
- for qemu-devel@nongnu.org; Sat, 28 Dec 2019 13:53:09 -0500
-Received: by mail-qv1-xf44.google.com with SMTP id dc14so11105255qvb.9
- for <qemu-devel@nongnu.org>; Sat, 28 Dec 2019 10:53:08 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ilHp3-0007mz-PC
+ for qemu-devel@nongnu.org; Sat, 28 Dec 2019 14:32:26 -0500
+Received: by mail-qt1-x843.google.com with SMTP id e5so27008015qtm.6
+ for <qemu-devel@nongnu.org>; Sat, 28 Dec 2019 11:32:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=rc+X7UKjqYJTwjNsI6AYZoE+FlMkAaBQ0DHmGJI7BVs=;
- b=oO6/l7nqswUUXWe72Id6EAiTM0M7M3sZDkSHsGJdQCa1fE6H4UT5992rDfNCskcnHv
- KmSTmCQshqEJ42ws6w2UzwgM+vSZcMuUA8aZnYVwZyg8xejTXmPDFh95lBfKI9vc3r1M
- BNnV1nvtqvOi9ZYgZg9Ud/zNY5rc/lTovl7/zhw0JY5MlsJ5uIS2ehvOZs+us4GBDIcm
- 6epNCPW829fK1qjReZcBgWquADQ4ZjRRgJeLRCaFtNJGD+42EsqX1fy2BBINgOinm0DD
- 1vei8FQM8YWIYslUBlx1nZ22h+UjjTlZ5PIldNPc+DQE5BS9EEoKAHNWpHw9goQBs7op
- sD6Q==
+ :cc; bh=Rf7s3KHDSIXFhF50nwiYGekNRGS2SZOr7+pA95zVWzg=;
+ b=rfOqXiq8cQmPZ8UoGXpHW9RybDkXDJ4z+T9HW60/ZHJLN6E/VPWtOnP/TasxIVeN9r
+ YdB2ZVKWJkyZI4U33eBeNYXB3I0fSj/SQiDIliTTWliC2Yk8lg/lmAEkXS+4gE7xWwiL
+ pHPGsuaYpYy/0bLXWKghDtGuFI/UR5Cg0ljDxqzfq+UF4YYWKZQ1ZUzjAvquSlch7s7f
+ f4T3ZOIH6/BjVn/wm89KMZY6g6FLAWKWYimNKWOyQhRyeeoHm7bsvPWELMgSDiyfQyQL
+ qb5hIH7j7Ugde5Apjz2rhGHs/ROHQ355uoaaQ1Go6eYvOp6ECiwcYX8MJTNaaDVo4pUn
+ hhVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=rc+X7UKjqYJTwjNsI6AYZoE+FlMkAaBQ0DHmGJI7BVs=;
- b=MBh6AS4sYGgJ1rn+E5dveTpGe18eY3F8xx3e8AFxjhBQs69dXH5top/AKzMmRXyuY9
- BqTBaj9liiNcalpuhDoKJ7Uwp//KUpRDH4IhWMm+puup9HRoohwj2cA7zkC330xlawY2
- AeUH2cGkITpZz5AkmHDLUr92lwEgd2cXXNihObgDqRh9nacAWAbTtE+8K4NvfOah3UOs
- exzQ4a5TnzMUXOIMFfuuS/a59GC+mF9gA7t/GbxPAv9+3jRRzUeIB3hlWOe8HvFhFwKe
- sgg9rSmo4aSUAtNQQkaXg798cWkt5kCrsttnQQQon8X3B5ezZa+Y/YhJ8A3wsXL52kF2
- zDPQ==
-X-Gm-Message-State: APjAAAXO5/yXEIGj5sQhPex1JG8dD6u3xh384sdKnF5jt51x76agRsdj
- ZYq8DEMrLYqHr/Pt114XqPgMf5D76jRivLhHg2E=
-X-Google-Smtp-Source: APXvYqz1tSP+4sjN3X3jPEvhglOU+1BL0UFfCRzMT+monD1c+za9iagQGGLrQO7Yz/4JsRQ61wZSakSrM8sU491VIOQ=
-X-Received: by 2002:a0c:8d0a:: with SMTP id r10mr42711481qvb.7.1577559187750; 
- Sat, 28 Dec 2019 10:53:07 -0800 (PST)
+ bh=Rf7s3KHDSIXFhF50nwiYGekNRGS2SZOr7+pA95zVWzg=;
+ b=rSnkoQWN4MsfgRbf4ZyhlLmeKlhULYFAb0QDEcbssfaNx0kVvohcAccZinc6FeghC7
+ cvGJLYZOwqtvkQqNkWgsvrKMZNv9eqPRV0s270u7FXa1zTY25Npug2Oo//JDeobqcbb1
+ L3qMceHwl+pM57/9tnQMff4iQESw/1LQ9Tl8+sq5RPEyRUnIa02ffXVi/Nk2/eo0/Oyk
+ 69xDTknmC85AAwsYHQxZr6lQpxpimKleR34hYV5u50eKwFLKpN8rgaaWKq1fzWi89P/p
+ SwXUPa64xEQN36l3ZOJygWKrKWtjea7BRA/8/H15f2UWaNHkM5WxaVa1A19JO4TJ0UfJ
+ VnWw==
+X-Gm-Message-State: APjAAAWU6mVTQ/V3hHyHz0qiRwzfPF92Wqjob9hJcvWzzTZaIE9Kq4QU
+ Am7XhJi2YU5O0eu5HPim0qfyvPAUJAjYhDPJ4sI=
+X-Google-Smtp-Source: APXvYqwV3I3YT6fe7O71O8OjJwBNnoso5SzDH3aPN7OEKvjbrV28xLBa9zOjOnihaFJ8tyIJl14yxUHYC0IGrIo8H+M=
+X-Received: by 2002:ac8:4a10:: with SMTP id x16mr42327903qtq.371.1577561544910; 
+ Sat, 28 Dec 2019 11:32:24 -0800 (PST)
 MIME-Version: 1.0
 References: <20191218210329.1960-1-mrolnik@gmail.com>
- <20191218210329.1960-15-mrolnik@gmail.com>
- <CAL1e-=ggk1_RqUSk2M=b9cBjzJA0VBpsH8qAQ9Uvbya2rCNStg@mail.gmail.com>
-In-Reply-To: <CAL1e-=ggk1_RqUSk2M=b9cBjzJA0VBpsH8qAQ9Uvbya2rCNStg@mail.gmail.com>
+ <20191218210329.1960-4-mrolnik@gmail.com>
+ <CAL1e-=hB5FhRtuxo1OGBSKA-aw1GW4RgpisKJWaT0TPHKaTVhw@mail.gmail.com>
+ <CAK4993iuuCZzyEzsqodpf_T_3xSSJeF-PP1XLO8PsXy6JwrgfA@mail.gmail.com>
+ <CAL1e-=iQ=iBzn9sRDgx9Edi+rO=uP7RqpMyDJQD9RyiB5MwA=A@mail.gmail.com>
+ <CAL1e-=h+ujoRaCcXEkrrMJZ5bX=jWbzDy+GgTzsOJzMybHN96g@mail.gmail.com>
+In-Reply-To: <CAL1e-=h+ujoRaCcXEkrrMJZ5bX=jWbzDy+GgTzsOJzMybHN96g@mail.gmail.com>
 From: Michael Rolnik <mrolnik@gmail.com>
-Date: Sat, 28 Dec 2019 20:52:28 +0200
-Message-ID: <CAK4993gw8ju=AQZCeGGL5MobqrKruHVY=p6C-dcM_kAERs14DA@mail.gmail.com>
-Subject: Re: [PATCH v39 14/22] target/avr: Add dummy mask device
+Date: Sat, 28 Dec 2019 21:31:45 +0200
+Message-ID: <CAK4993i0vRtEh=evXyx0=KVziQZWWUsQX9c0JBKjajLv6G-wEw@mail.gmail.com>
+Subject: Re: [PATCH v39 03/22] target/avr: Add instruction decoding
 To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000ff81d6059ac81e45"
+Content-Type: multipart/alternative; boundary="0000000000007eeb3e059ac8ab14"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::f44
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,549 +102,728 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ff81d6059ac81e45
+--0000000000007eeb3e059ac8ab14
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This device is not "Power Reduction" but power reduction registers can be
-implemented with it. All it does, whenever a bit is written the device
-raises an interrupt / IRQ.
-If you have a better name please advise.
+Hi Aleksandar.
 
-On Mon, Dec 23, 2019 at 10:46 AM Aleksandar Markovic <
+This seems less logical to me.
+Then next thing will be to partition disassember part right?
+
+
+
+
+On Sat, Dec 21, 2019 at 7:15 PM Aleksandar Markovic <
 aleksandar.m.mail@gmail.com> wrote:
 
 >
 >
-> On Wednesday, December 18, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+> On Saturday, December 21, 2019, Aleksandar Markovic <
+> aleksandar.m.mail@gmail.com> wrote:
 >
->> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->> ---
+>>
+>>
+>> On Saturday, December 21, 2019, Michael Rolnik <mrolnik@gmail.com> wrote=
+:
+>>
+>>> Hi Aleksandar.
+>>>
+>>> please explain.
+>>>
+>>>>
+>>>>
+>> Hi, Michael.
+>>
+>> I wanted to say:
+>>
+>>
+>> 1. Cut the parts of insn.decode that describe coding of arithmetic and
+>> logic instructions and include them in the patch:
+>>
+>> target/avr: Add instruction translation - Arithmetic and Logic Instructi=
+ons
+>>
+>>
+>> Since that would be the first time insn.decode is mentioned in the new
+> organization of the series, the license preamble of insn.decode can be
+> included in that patch, of course.
 >
->
-> Hi, Michael.
->
-> Please avoid empty commit messages.
->
-> At the very beginning, there is a line:
->
-> + * AVR Power Reduction
->
-> Why is that? There is a power reduction register in the docs, but is it
-> covered in this patch?
->
-> Further, "mask" is too genetic word. Pkease use more specific name bot fir
-> filename and variables within this patch. "interrupt controller",
-> "irq_masq", "IrqMask", "irq" are justsome of ideas.
->
-> Yours,
+> Best wishes,
 > Aleksandar
 >
 >
->>  include/hw/misc/avr_mask.h |  47 ++++++++++++++++
->>  hw/misc/avr_mask.c         | 112 +++++++++++++++++++++++++++++++++++++
->>  hw/misc/Kconfig            |   3 +
->>  hw/misc/Makefile.objs      |   2 +
->>  4 files changed, 164 insertions(+)
->>  create mode 100644 include/hw/misc/avr_mask.h
->>  create mode 100644 hw/misc/avr_mask.c
+>
+>> 2. Cut the parts of insn.decode that describe coding of branch instructi=
+ons and include them in the patch:
 >>
->> diff --git a/include/hw/misc/avr_mask.h b/include/hw/misc/avr_mask.h
->> new file mode 100644
->> index 0000000000..d3e21972d8
->> --- /dev/null
->> +++ b/include/hw/misc/avr_mask.h
->> @@ -0,0 +1,47 @@
->> +/*
->> + * AVR Power Reduction
->> + *
->> + * Copyright (c) 2019 Michael Rolnik
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining
->> a copy
->> + * of this software and associated documentation files (the "Software"),
->> to deal
->> + * in the Software without restriction, including without limitation the
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#ifndef HW_avr_mask_H
->> +#define HW_avr_mask_H
->> +
->> +#include "hw/sysbus.h"
->> +#include "chardev/char-fe.h"
->> +#include "hw/hw.h"
->> +
->> +
->> +#define TYPE_AVR_MASK "avr-mask"
->> +#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)
->> +
->> +typedef struct {
->> +    /* <private> */
->> +    SysBusDevice parent_obj;
->> +
->> +    /* <public> */
->> +    MemoryRegion iomem;
->> +
->> +    uint8_t val;
->> +    qemu_irq irq[8];
->> +} AVRMaskState;
->> +
->> +#endif /* HW_avr_mask_H */
->> diff --git a/hw/misc/avr_mask.c b/hw/misc/avr_mask.c
->> new file mode 100644
->> index 0000000000..3af82ed9c1
->> --- /dev/null
->> +++ b/hw/misc/avr_mask.c
->> @@ -0,0 +1,112 @@
->> +/*
->> + * AVR Power Reduction
->> + *
->> + * Copyright (c) 2019 Michael Rolnik
->> + *
->> + * Permission is hereby granted, free of charge, to any person obtaining
->> a copy
->> + * of this software and associated documentation files (the "Software"),
->> to deal
->> + * in the Software without restriction, including without limitation the
->> rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
->> sell
->> + * copies of the Software, and to permit persons to whom the Software is
->> + * furnished to do so, subject to the following conditions:
->> + *
->> + * The above copyright notice and this permission notice shall be
->> included in
->> + * all copies or substantial portions of the Software.
->> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->> EXPRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->> MERCHANTABILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->> SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
->> OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->> ARISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->> DEALINGS IN
->> + * THE SOFTWARE.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/misc/avr_mask.h"
->> +#include "qemu/log.h"
->> +#include "hw/qdev-properties.h"
->> +#include "hw/irq.h"
->> +
->> +#define DB_PRINT(fmt, args...) /* Nothing */
->> +/*#define DB_PRINT(fmt, args...) printf("%s: " fmt "\n", __func__, ##
->> args)*/
->> +
->> +static void avr_mask_reset(DeviceState *dev)
->> +{
->> +    AVRMaskState *s = AVR_MASK(dev);
->> +
->> +    s->val = 0x00;
->> +
->> +    for (int i = 0; i < 8; i++) {
->> +        qemu_set_irq(s->irq[i], 0);
->> +    }
->> +}
->> +
->> +static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size)
->> +{
->> +    assert(size == 1);
->> +    assert(offset == 0);
->> +    AVRMaskState *s = opaque;
->> +
->> +    return (uint64_t)s->val;
->> +}
->> +
->> +static void avr_mask_write(void *opaque, hwaddr offset,
->> +                              uint64_t val64, unsigned size)
->> +{
->> +    assert(size == 1);
->> +    assert(offset == 0);
->> +    AVRMaskState *s = opaque;
->> +    uint8_t val8 = val64;
->> +
->> +    DB_PRINT("write %d to offset %d", val8, (uint8_t)offset);
->> +
->> +    s->val = val8;
->> +    for (int i = 0; i < 8; i++) {
->> +        qemu_set_irq(s->irq[i], (val8 & (1 << i)) != 0);
->> +    }
->> +}
->> +
->> +static const MemoryRegionOps avr_mask_ops = {
->> +    .read = avr_mask_read,
->> +    .write = avr_mask_write,
->> +    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .impl = {.max_access_size = 1}
->> +};
->> +
->> +static void avr_mask_init(Object *dev)
->> +{
->> +    AVRMaskState *s = AVR_MASK(dev);
->> +    SysBusDevice *busdev = SYS_BUS_DEVICE(dev);
->> +
->> +    memory_region_init_io(&s->iomem, dev, &avr_mask_ops, s,
->> TYPE_AVR_MASK,
->> +            0x01);
->> +    sysbus_init_mmio(busdev, &s->iomem);
->> +
->> +    for (int i = 0; i < 8; i++) {
->> +        sysbus_init_irq(busdev, &s->irq[i]);
->> +    }
->> +    s->val = 0x00;
->> +}
->> +
->> +static void avr_mask_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +
->> +    dc->reset = avr_mask_reset;
->> +}
->> +
->> +static const TypeInfo avr_mask_info = {
->> +    .name          = TYPE_AVR_MASK,
->> +    .parent        = TYPE_SYS_BUS_DEVICE,
->> +    .instance_size = sizeof(AVRMaskState),
->> +    .class_init    = avr_mask_class_init,
->> +    .instance_init = avr_mask_init,
->> +};
->> +
->> +static void avr_mask_register_types(void)
->> +{
->> +    type_register_static(&avr_mask_info);
->> +}
->> +
->> +type_init(avr_mask_register_types)
->> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
->> index 2164646553..e79841e3a4 100644
->> --- a/hw/misc/Kconfig
->> +++ b/hw/misc/Kconfig
->> @@ -125,4 +125,7 @@ config MAC_VIA
->>      select MOS6522
->>      select ADB
+>> target/avr: Add instruction translation - Branch Instructions
 >>
->> +config AVR_MASK
->> +    bool
->> +
->>  source macio/Kconfig
->> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
->> index ba898a5781..3a8093be6a 100644
->> --- a/hw/misc/Makefile.objs
->> +++ b/hw/misc/Makefile.objs
->> @@ -82,3 +82,5 @@ common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
->>  obj-$(CONFIG_MAC_VIA) += mac_via.o
+>> 3. Cut the parts of insn.decode that describe coding of data transfer in=
+structions
+>> and include them in the patch:
 >>
->>  common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
->> +
->> +obj-$(CONFIG_AVR_MASK) += avr_mask.o
->> --
->> 2.17.2 (Apple Git-113)
+>> target/avr: Add instruction translation - Data Transfer Instructions
 >>
+>>
+>> 4. Cut the parts of insn.decode that describe coding of bit and bit-test
+>> instructions and include them in the patch:
+>>
+>> target/avr: Add instruction translation - Bit and Bit-test Instructions
+>>
+>>
+>> 5. Cut the parts of insn.decode that describe coding of MCU control inst=
+ructions
+>> and include them in the patch:
+>>
+>> target/avr: Add instruction translation - MCU Control Instructions
+>>
+>>
+>> This way, your patches become logicaly-organized rather than file
+>> organized. The patch on, let's say, arithmetic and logic instructions wi=
+ll
+>> contain all elements needed for their implementation, rather than those
+>> elements being split between decode and omplementation parts .
+>>
+>>
+>>
+>> Regards,
+>>
+>> Aleksandar
+>>
+>>
+>>
+>>> On Sat, Dec 21, 2019 at 1:18 PM Aleksandar Markovic <
+>>> aleksandar.m.mail@gmail.com> wrote:
+>>>
+>>>>
+>>>>
+>>>> On Wednesday, December 18, 2019, Michael Rolnik <mrolnik@gmail.com>
+>>>> wrote:
+>>>>
+>>>>> This includes:
+>>>>> - encoding of all 16 bit instructions
+>>>>> - encoding of all 32 bit instructions
+>>>>>
+>>>>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+>>>>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>>>> ---
+>>>>
+>>>>
+>>>> Michael,
+>>>>
+>>>> I am very pleased that you rearranged the order to be in sync with the
+>>>> documentation.
+>>>>
+>>>> Now, for the next version, I would ask you to make this patch disappea=
+r.
+>>>>
+>>>> More precisely, "MCU Control Instructions" section of insn.decode file
+>>>> move to be a part of "Add MCU Control Instructions" (not sure abiut th=
+e
+>>>> title, but it is 6 or 7 patches after this one)  patch, and so on, in =
+the
+>>>> same fashion, for all groups of instructions.
+>>>>
+>>>> Kind regards,
+>>>>
+>>>> Aleksandar
+>>>>
+>>>>
+>>>>
+>>>>  target/avr/insn.decode | 183 ++++++++++++++++++++++++++++++++++++++++=
++
+>>>>>  1 file changed, 183 insertions(+)
+>>>>>  create mode 100644 target/avr/insn.decode
+>>>>>
+>>>>> diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+>>>>> new file mode 100644
+>>>>> index 0000000000..0e4ec9ddf0
+>>>>> --- /dev/null
+>>>>> +++ b/target/avr/insn.decode
+>>>>> @@ -0,0 +1,183 @@
+>>>>> +#
+>>>>> +# AVR instruction decode definitions.
+>>>>> +#
+>>>>> +# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
+>>>>> +#
+>>>>> +# This library is free software; you can redistribute it and/or
+>>>>> +# modify it under the terms of the GNU Lesser General Public
+>>>>> +# License as published by the Free Software Foundation; either
+>>>>> +# version 2.1 of the License, or (at your option) any later version.
+>>>>> +#
+>>>>> +# This library is distributed in the hope that it will be useful,
+>>>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>>>> +# Lesser General Public License for more details.
+>>>>> +#
+>>>>> +# You should have received a copy of the GNU Lesser General Public
+>>>>> +# License along with this library; if not, see <
+>>>>> http://www.gnu.org/licenses/>.
+>>>>> +#
+>>>>> +
+>>>>> +#
+>>>>> +#   regs_16_31_by_one =3D [16 .. 31]
+>>>>> +#   regs_16_23_by_one =3D [16 .. 23]
+>>>>> +#   regs_24_30_by_two =3D [24, 26, 28, 30]
+>>>>> +#   regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]
+>>>>> +
+>>>>> +%rd             4:5
+>>>>> +%rr             9:1 0:4
+>>>>> +
+>>>>> +%rd_a           4:4
+>>>>>  !function=3Dto_regs_16_31_by_one
+>>>>> +%rd_b           4:3
+>>>>>  !function=3Dto_regs_16_23_by_one
+>>>>> +%rd_c           4:2
+>>>>>  !function=3Dto_regs_24_30_by_two
+>>>>> +%rd_d           4:4
+>>>>>  !function=3Dto_regs_00_30_by_two
+>>>>> +%rr_a           0:4
+>>>>>  !function=3Dto_regs_16_31_by_one
+>>>>> +%rr_b           0:3
+>>>>>  !function=3Dto_regs_16_23_by_one
+>>>>> +%rr_d           0:4
+>>>>>  !function=3Dto_regs_00_30_by_two
+>>>>> +
+>>>>> +%imm6           6:2 0:4
+>>>>> +%imm8           8:4 0:4
+>>>>> +
+>>>>> +%io_imm         9:2 0:4
+>>>>> +%ldst_d_imm     13:1 10:2 0:3
+>>>>> +
+>>>>> +# The 22-bit immediate is partially in the opcode word,
+>>>>> +# and partially in the next.  Use append_16 to build the
+>>>>> +# complete 22-bit value.
+>>>>> +%imm_call       4:5 0:1                     !function=3Dappend_16
+>>>>> +
+>>>>> +
+>>>>> +&rd_rr          rd rr
+>>>>> +&rd_imm         rd imm
+>>>>> +
+>>>>> +@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=3D%rd rr=
+=3D%rr
+>>>>> +@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=3D%rd_c
+>>>>> imm=3D%imm6
+>>>>> +@op_rd_imm8     .... .... .... ....         &rd_imm     rd=3D%rd_a
+>>>>> imm=3D%imm8
+>>>>> +@op_bit         .... .... . bit:3 ....
+>>>>> +@op_bit_imm     .... .. imm:s7 bit:3
+>>>>> +@fmul           .... .... . ... . ...       &rd_rr      rd=3D%rd_b
+>>>>> rr=3D%rr_b
+>>>>> +@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=3D%rd
+>>>>> imm=3D%io_imm
+>>>>> +@ldst_d         .. . . .. . rd:5  . ...     &rd_imm
+>>>>>  imm=3D%ldst_d_imm
+>>>>> +
+>>>>> +# The 16-bit immediate is completely in the next word.
+>>>>> +# Fields cannot be defined with no bits, so we cannot play
+>>>>> +# the same trick and append to a zero-bit value.
+>>>>> +# Defer reading the immediate until trans_{LDS,STS}.
+>>>>> +@ldst_s         .... ... rd:5 ....          imm=3D0
+>>>>> +
+>>>>> +#
+>>>>> +# Arithmetic Instructions
+>>>>> +#
+>>>>> +ADD             0000 11 . ..... ....        @op_rd_rr
+>>>>> +ADC             0001 11 . ..... ....        @op_rd_rr
+>>>>> +ADIW            1001 0110 .. .. ....        @op_rd_imm6
+>>>>> +SUB             0001 10 . ..... ....        @op_rd_rr
+>>>>> +SUBI            0101 .... .... ....         @op_rd_imm8
+>>>>> +SBC             0000 10 . ..... ....        @op_rd_rr
+>>>>> +SBCI            0100 .... .... ....         @op_rd_imm8
+>>>>> +SBIW            1001 0111 .. .. ....        @op_rd_imm6
+>>>>> +AND             0010 00 . ..... ....        @op_rd_rr
+>>>>> +ANDI            0111 .... .... ....         @op_rd_imm8
+>>>>> +OR              0010 10 . ..... ....        @op_rd_rr
+>>>>> +ORI             0110 .... .... ....         @op_rd_imm8
+>>>>> +EOR             0010 01 . ..... ....        @op_rd_rr
+>>>>> +COM             1001 010 rd:5 0000
+>>>>> +NEG             1001 010 rd:5 0001
+>>>>> +INC             1001 010 rd:5 0011
+>>>>> +DEC             1001 010 rd:5 1010
+>>>>> +MUL             1001 11 . ..... ....        @op_rd_rr
+>>>>> +MULS            0000 0010 .... ....         &rd_rr      rd=3D%rd_a
+>>>>> rr=3D%rr_a
+>>>>> +MULSU           0000 0011 0 ... 0 ...       @fmul
+>>>>> +FMUL            0000 0011 0 ... 1 ...       @fmul
+>>>>> +FMULS           0000 0011 1 ... 0 ...       @fmul
+>>>>> +FMULSU          0000 0011 1 ... 1 ...       @fmul
+>>>>> +DES             1001 0100 imm:4 1011
+>>>>> +
+>>>>> +#
+>>>>> +# Branch Instructions
+>>>>> +#
+>>>>> +RJMP            1100 imm:s12
+>>>>> +IJMP            1001 0100 0000 1001
+>>>>> +EIJMP           1001 0100 0001 1001
+>>>>> +JMP             1001 010 ..... 110 .        imm=3D%imm_call
+>>>>> +RCALL           1101 imm:s12
+>>>>> +ICALL           1001 0101 0000 1001
+>>>>> +EICALL          1001 0101 0001 1001
+>>>>> +CALL            1001 010 ..... 111 .        imm=3D%imm_call
+>>>>> +RET             1001 0101 0000 1000
+>>>>> +RETI            1001 0101 0001 1000
+>>>>> +CPSE            0001 00 . ..... ....        @op_rd_rr
+>>>>> +CP              0001 01 . ..... ....        @op_rd_rr
+>>>>> +CPC             0000 01 . ..... ....        @op_rd_rr
+>>>>> +CPI             0011 .... .... ....         @op_rd_imm8
+>>>>> +SBRC            1111 110 rr:5 0 bit:3
+>>>>> +SBRS            1111 111 rr:5 0 bit:3
+>>>>> +SBIC            1001 1001 reg:5 bit:3
+>>>>> +SBIS            1001 1011 reg:5 bit:3
+>>>>> +BRBS            1111 00 ....... ...         @op_bit_imm
+>>>>> +BRBC            1111 01 ....... ...         @op_bit_imm
+>>>>> +
+>>>>> +#
+>>>>> +# Data Transfer Instructions
+>>>>> +#
+>>>>> +MOV             0010 11 . ..... ....        @op_rd_rr
+>>>>> +MOVW            0000 0001 .... ....         &rd_rr      rd=3D%rd_d
+>>>>> rr=3D%rr_d
+>>>>> +LDI             1110 .... .... ....         @op_rd_imm8
+>>>>> +LDS             1001 000 ..... 0000         @ldst_s
+>>>>> +LDX1            1001 000 rd:5 1100
+>>>>> +LDX2            1001 000 rd:5 1101
+>>>>> +LDX3            1001 000 rd:5 1110
+>>>>> +LDY2            1001 000 rd:5 1001
+>>>>> +LDY3            1001 000 rd:5 1010
+>>>>> +LDZ2            1001 000 rd:5 0001
+>>>>> +LDZ3            1001 000 rd:5 0010
+>>>>> +LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
+>>>>> +LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
+>>>>> +STS             1001 001 ..... 0000         @ldst_s
+>>>>> +STX1            1001 001 rr:5 1100
+>>>>> +STX2            1001 001 rr:5 1101
+>>>>> +STX3            1001 001 rr:5 1110
+>>>>> +STY2            1001 001 rd:5 1001
+>>>>> +STY3            1001 001 rd:5 1010
+>>>>> +STZ2            1001 001 rd:5 0001
+>>>>> +STZ3            1001 001 rd:5 0010
+>>>>> +STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
+>>>>> +STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
+>>>>> +LPM1            1001 0101 1100 1000
+>>>>> +LPM2            1001 000 rd:5 0100
+>>>>> +LPMX            1001 000 rd:5 0101
+>>>>> +ELPM1           1001 0101 1101 1000
+>>>>> +ELPM2           1001 000 rd:5 0110
+>>>>> +ELPMX           1001 000 rd:5 0111
+>>>>> +SPM             1001 0101 1110 1000
+>>>>> +SPMX            1001 0101 1111 1000
+>>>>> +IN              1011 0 .. ..... ....        @io_rd_imm
+>>>>> +OUT             1011 1 .. ..... ....        @io_rd_imm
+>>>>> +PUSH            1001 001 rd:5 1111
+>>>>> +POP             1001 000 rd:5 1111
+>>>>> +XCH             1001 001 rd:5 0100
+>>>>> +LAC             1001 001 rd:5 0110
+>>>>> +LAS             1001 001 rd:5 0101
+>>>>> +LAT             1001 001 rd:5 0111
+>>>>> +
+>>>>> +#
+>>>>> +# Bit and Bit-test Instructions
+>>>>> +#
+>>>>> +LSR             1001 010 rd:5 0110
+>>>>> +ROR             1001 010 rd:5 0111
+>>>>> +ASR             1001 010 rd:5 0101
+>>>>> +SWAP            1001 010 rd:5 0010
+>>>>> +SBI             1001 1010 reg:5 bit:3
+>>>>> +CBI             1001 1000 reg:5 bit:3
+>>>>> +BST             1111 101 rd:5 0 bit:3
+>>>>> +BLD             1111 100 rd:5 0 bit:3
+>>>>> +BSET            1001 0100 0 bit:3 1000
+>>>>> +BCLR            1001 0100 1 bit:3 1000
+>>>>> +
+>>>>> +#
+>>>>> +# MCU Control Instructions
+>>>>> +#
+>>>>> +BREAK           1001 0101 1001 1000
+>>>>> +NOP             0000 0000 0000 0000
+>>>>> +SLEEP           1001 0101 1000 1000
+>>>>> +WDR             1001 0101 1010 1000
+>>>>> +
+>>>>> --
+>>>>> 2.17.2 (Apple Git-113)
+>>>>>
+>>>>>
+>>>
+>>> --
+>>> Best Regards,
+>>> Michael Rolnik
+>>>
 >>
 
--- 
+--=20
 Best Regards,
 Michael Rolnik
 
---000000000000ff81d6059ac81e45
+--0000000000007eeb3e059ac8ab14
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">This device is not &quot;Power Reduction&quot; but power r=
-eduction registers can be implemented with it. All it does, whenever a bit =
-is written the device raises an interrupt / IRQ.=C2=A0<div>If you have a be=
-tter name please advise.</div></div><br><div class=3D"gmail_quote"><div dir=
-=3D"ltr" class=3D"gmail_attr">On Mon, Dec 23, 2019 at 10:46 AM Aleksandar M=
-arkovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com">aleksandar.m.mai=
-l@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex"><br><br>On Wednesday, December 18, 2019, Michael Rolnik &lt;<a h=
-ref=3D"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt=
-; wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
-.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Signed-off-by=
-: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D"_blank"=
->mrolnik@gmail.com</a>&gt;<br>
----</blockquote><div><br></div><div>Hi, Michael.</div><div><br></div><div>P=
-lease avoid empty commit messages.</div><div><br></div><div>At the very beg=
-inning, there is a line:</div><div><br></div><div>+ * AVR Power Reduction<b=
-r></div><div><br></div><div>Why is that? There is a power reduction registe=
-r in the docs, but is it covered in this patch?</div><div><br></div><div>Fu=
-rther, &quot;mask&quot; is too genetic word. Pkease use more specific name =
-bot fir filename and variables within this patch. &quot;interrupt controlle=
-r&quot;, &quot;irq_masq&quot;, &quot;IrqMask&quot;, &quot;irq&quot; are jus=
-tsome of ideas.</div><div><br></div><div>Yours,</div><div>Aleksandar</div><=
-div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0=
-px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-=C2=A0include/hw/misc/avr_mask.h |=C2=A0 47 ++++++++++++++++<br>
-=C2=A0hw/misc/avr_mask.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 112 +++++++++++=
-++++++++++++++++++++++++++<br>
-=C2=A0hw/misc/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
-=A03 +<br>
-=C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A02 +<br>
-=C2=A04 files changed, 164 insertions(+)<br>
-=C2=A0create mode 100644 include/hw/misc/avr_mask.h<br>
-=C2=A0create mode 100644 hw/misc/avr_mask.c<br>
+<div dir=3D"ltr">Hi=C2=A0Aleksandar.<div><br></div><div>This seems less log=
+ical to me.</div><div>Then next thing will be to partition disassember part=
+ right?</div><div><br></div><div><br></div><div><br></div></div><br><div cl=
+ass=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sat, Dec 21, 2=
+019 at 7:15 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@=
+gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br></div><blockquote =
+class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px sol=
+id rgb(204,204,204);padding-left:1ex"><br><br>On Saturday, December 21, 201=
+9, Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com" t=
+arget=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br><blockquote =
+class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px sol=
+id rgb(204,204,204);padding-left:1ex"><br><br>On Saturday, December 21, 201=
+9, Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D"_blank=
+">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddi=
+ng-left:1ex"><div dir=3D"ltr">Hi Aleksandar.<div><br></div><div>please expl=
+ain.</div></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0=
+px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br></blo=
+ckquote></blockquote><div><br></div><div>Hi, Michael.</div><div><br></div><=
+div>I wanted to say:</div><div><br></div><div><br></div><div>1. Cut the par=
+ts of insn.decode that describe coding of arithmetic and logic instructions=
+ and include them in the patch:</div><div><pre>target/avr: Add instruction =
+<span style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-=
+serif">translation - Arithmetic and Logic Instructions</span></pre><pre><sp=
+an style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-ser=
+if"><br></span></pre><pre></pre></div></blockquote><div>Since that would be=
+ the first time insn.decode is mentioned in the new organization of the ser=
+ies, the license preamble of insn.decode can be included in that patch, of =
+course.</div><div><br></div><div>Best wishes,</div><div>Aleksandar</div><di=
+v><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
+ex"><div><pre></pre><pre><div style=3D"font-family:&quot;Helvetica Neue&quo=
+t;,Helvetica,Arial,sans-serif;white-space:normal">2. Cut the parts of insn.=
+decode that describe coding of branch instructions and include them in the =
+patch:</div><div style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetica,=
+Arial,sans-serif;white-space:normal"></div></pre><pre>target/avr: Add instr=
+uction translation - Branch Instructions
+<br></pre><div>3. Cut the parts of insn.decode that describe coding of d<sp=
+an style=3D"white-space:pre-wrap">ata transfer </span>instructions and incl=
+ude them in the=C2=A0patch:<br></div><div></div><pre><span style=3D"font-fa=
+mily:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif">target/avr: Add=
+ instruction translation - Data Transfer Instructions</span></pre><pre><spa=
+n style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-seri=
+f"><br></span></pre><div>4. Cut the parts of insn.decode that describe codi=
+ng of bit and bit-test instructions and include them in the patch:</div><di=
+v></div><pre><span style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetic=
+a,Arial,sans-serif">target/avr: Add instruction translation - Bit and Bit-t=
+est Instructions</span></pre><pre><span style=3D"font-family:&quot;Helvetic=
+a Neue&quot;,Helvetica,Arial,sans-serif"><br></span></pre><div>5. Cut the p=
+arts of insn.decode that describe coding of=C2=A0<span style=3D"white-space=
+:pre-wrap">MCU control</span>=C2=A0instructions and include them in=C2=A0th=
+e patch:<br></div><div></div><pre><span style=3D"font-family:&quot;Helvetic=
+a Neue&quot;,Helvetica,Arial,sans-serif">target/avr: Add instruction transl=
+ation - MCU Control Instructions</span><br></pre></div><div><br></div><div>=
+This way, your patches become logicaly-organized rather than file organized=
+. The patch on, let&#39;s say, arithmetic and logic instructions will conta=
+in all elements needed for their implementation, rather than those elements=
+ being split between decode and omplementation parts .</div><div><br></div>=
+<div><br></div><div><br></div><div>Regards,</div><div><br></div><div>Aleksa=
+ndar</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote"=
+ style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
+adding-left:1ex"><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail=
+_attr">On Sat, Dec 21, 2019 at 1:18 PM Aleksandar Markovic &lt;<a href=3D"m=
+ailto:aleksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmai=
+l.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex"><br><br>On Wednesday, December 18, 2019, Michael Rolnik &lt;<a href=3D=
+"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrot=
+e:<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
+order-left:1px solid rgb(204,204,204);padding-left:1ex">This includes:<br>
+- encoding of all 16 bit instructions<br>
+- encoding of all 32 bit instructions<br>
 <br>
-diff --git a/include/hw/misc/avr_mask.h b/include/hw/misc/avr_mask.h<br>
+Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
+et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
+Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
+com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
+---</blockquote><div><br></div><div>Michael,</div><div><br></div><div>I am =
+very pleased that you rearranged the order to be in sync with the documenta=
+tion.</div><div><br></div><div>Now, for the next version, I would ask you t=
+o make this patch disappear.</div><div><br></div><div>More precisely, &quot=
+;MCU Control Instructions&quot; section of=C2=A0insn.decode file move to be=
+ a part of &quot;Add MCU Control Instructions&quot; (not sure abiut the tit=
+le, but it is 6 or 7 patches after this one) =C2=A0patch, and so on, in the=
+ same fashion, for all groups of instructions.</div><div><br></div><div>Kin=
+d regards,</div><div><br></div><div>Aleksandar</div><div><br></div><div><br=
+></div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+=C2=A0target/avr/insn.decode | 183 ++++++++++++++++++++++++++++++++++++++++=
++<br>
+=C2=A01 file changed, 183 insertions(+)<br>
+=C2=A0create mode 100644 target/avr/insn.decode<br>
+<br>
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode<br>
 new file mode 100644<br>
-index 0000000000..d3e21972d8<br>
+index 0000000000..0e4ec9ddf0<br>
 --- /dev/null<br>
-+++ b/include/hw/misc/avr_mask.h<br>
-@@ -0,0 +1,47 @@<br>
-+/*<br>
-+ * AVR Power Reduction<br>
-+ *<br>
-+ * Copyright (c) 2019 Michael Rolnik<br>
-+ *<br>
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy<br>
-+ * of this software and associated documentation files (the &quot;Software=
-&quot;), to deal<br>
-+ * in the Software without restriction, including without limitation the r=
-ights<br>
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll<br>
-+ * copies of the Software, and to permit persons to whom the Software is<b=
++++ b/target/avr/insn.decode<br>
+@@ -0,0 +1,183 @@<br>
++#<br>
++# AVR instruction decode definitions.<br>
++#<br>
++# Copyright (c) 2019 Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.co=
+m" target=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
++#<br>
++# This library is free software; you can redistribute it and/or<br>
++# modify it under the terms of the GNU Lesser General Public<br>
++# License as published by the Free Software Foundation; either<br>
++# version 2.1 of the License, or (at your option) any later version.<br>
++#<br>
++# This library is distributed in the hope that it will be useful,<br>
++# but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<b=
 r>
-+ * furnished to do so, subject to the following conditions:<br>
-+ *<br>
-+ * The above copyright notice and this permission notice shall be included=
- in<br>
-+ * all copies or substantial portions of the Software.<br>
-+ *<br>
-+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIN=
-D, EXPRESS OR<br>
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,<br>
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL=
-<br>
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER<br>
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,<br>
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN<br>
-+ * THE SOFTWARE.<br>
-+ */<br>
-+<br>
-+#ifndef HW_avr_mask_H<br>
-+#define HW_avr_mask_H<br>
-+<br>
-+#include &quot;hw/sysbus.h&quot;<br>
-+#include &quot;chardev/char-fe.h&quot;<br>
-+#include &quot;hw/hw.h&quot;<br>
-+<br>
-+<br>
-+#define TYPE_AVR_MASK &quot;avr-mask&quot;<br>
-+#define AVR_MASK(obj) OBJECT_CHECK(AVRMaskState, (obj), TYPE_AVR_MASK)<br>
-+<br>
-+typedef struct {<br>
-+=C2=A0 =C2=A0 /* &lt;private&gt; */<br>
-+=C2=A0 =C2=A0 SysBusDevice parent_obj;<br>
-+<br>
-+=C2=A0 =C2=A0 /* &lt;public&gt; */<br>
-+=C2=A0 =C2=A0 MemoryRegion iomem;<br>
-+<br>
-+=C2=A0 =C2=A0 uint8_t val;<br>
-+=C2=A0 =C2=A0 qemu_irq irq[8];<br>
-+} AVRMaskState;<br>
-+<br>
-+#endif /* HW_avr_mask_H */<br>
-diff --git a/hw/misc/avr_mask.c b/hw/misc/avr_mask.c<br>
-new file mode 100644<br>
-index 0000000000..3af82ed9c1<br>
---- /dev/null<br>
-+++ b/hw/misc/avr_mask.c<br>
-@@ -0,0 +1,112 @@<br>
-+/*<br>
-+ * AVR Power Reduction<br>
-+ *<br>
-+ * Copyright (c) 2019 Michael Rolnik<br>
-+ *<br>
-+ * Permission is hereby granted, free of charge, to any person obtaining a=
- copy<br>
-+ * of this software and associated documentation files (the &quot;Software=
-&quot;), to deal<br>
-+ * in the Software without restriction, including without limitation the r=
-ights<br>
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or se=
-ll<br>
-+ * copies of the Software, and to permit persons to whom the Software is<b=
++# Lesser General Public License for more details.<br>
++#<br>
++# You should have received a copy of the GNU Lesser General Public<br>
++# License along with this library; if not, see &lt;<a href=3D"http://www.g=
+nu.org/licenses/" target=3D"_blank">http://www.gnu.org/licenses/</a>&gt;.<b=
 r>
-+ * furnished to do so, subject to the following conditions:<br>
-+ *<br>
-+ * The above copyright notice and this permission notice shall be included=
- in<br>
-+ * all copies or substantial portions of the Software.<br>
-+ *<br>
-+ * THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIN=
-D, EXPRESS OR<br>
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY=
-,<br>
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL=
-<br>
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OT=
-HER<br>
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING=
- FROM,<br>
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS =
-IN<br>
-+ * THE SOFTWARE.<br>
-+ */<br>
++#<br>
 +<br>
-+#include &quot;qemu/osdep.h&quot;<br>
-+#include &quot;hw/misc/avr_mask.h&quot;<br>
-+#include &quot;qemu/log.h&quot;<br>
-+#include &quot;hw/qdev-properties.h&quot;<br>
-+#include &quot;hw/irq.h&quot;<br>
++#<br>
++#=C2=A0 =C2=A0regs_16_31_by_one =3D [16 .. 31]<br>
++#=C2=A0 =C2=A0regs_16_23_by_one =3D [16 .. 23]<br>
++#=C2=A0 =C2=A0regs_24_30_by_two =3D [24, 26, 28, 30]<br>
++#=C2=A0 =C2=A0regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]<br>
 +<br>
-+#define DB_PRINT(fmt, args...) /* Nothing */<br>
-+/*#define DB_PRINT(fmt, args...) printf(&quot;%s: &quot; fmt &quot;\n&quot=
-;, __func__, ## args)*/<br>
++%rd=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:5<br>
++%rr=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A09:1 0:4<br>
 +<br>
-+static void avr_mask_reset(DeviceState *dev)<br>
-+{<br>
-+=C2=A0 =C2=A0 AVRMaskState *s =3D AVR_MASK(dev);<br>
++%rd_a=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_31_by_one<br>
++%rd_b=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:3=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_23_by_one<br>
++%rd_c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:2=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_24_30_by_two<br>
++%rd_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_00_30_by_two<br>
++%rr_a=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_31_by_one<br>
++%rr_b=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:3=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_16_23_by_one<br>
++%rr_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:4=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
+=3Dto_regs_00_30_by_two<br>
 +<br>
-+=C2=A0 =C2=A0 s-&gt;val =3D 0x00;<br>
++%imm6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A06:2 0:4<br>
++%imm8=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A08:4 0:4<br>
 +<br>
-+=C2=A0 =C2=A0 for (int i =3D 0; i &lt; 8; i++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_set_irq(s-&gt;irq[i], 0);<br>
-+=C2=A0 =C2=A0 }<br>
-+}<br>
++%io_imm=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A09:2 0:4<br>
++%ldst_d_imm=C2=A0 =C2=A0 =C2=A013:1 10:2 0:3<br>
 +<br>
-+static uint64_t avr_mask_read(void *opaque, hwaddr offset, unsigned size)<=
-br>
-+{<br>
-+=C2=A0 =C2=A0 assert(size =3D=3D 1);<br>
-+=C2=A0 =C2=A0 assert(offset =3D=3D 0);<br>
-+=C2=A0 =C2=A0 AVRMaskState *s =3D opaque;<br>
++# The 22-bit immediate is partially in the opcode word,<br>
++# and partially in the next.=C2=A0 Use append_16 to build the<br>
++# complete 22-bit value.<br>
++%imm_call=C2=A0 =C2=A0 =C2=A0 =C2=A04:5 0:1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=3Dappend_16<br>
 +<br>
-+=C2=A0 =C2=A0 return (uint64_t)s-&gt;val;<br>
-+}<br>
 +<br>
-+static void avr_mask_write(void *opaque, hwaddr offset,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint64_t val64, unsigned size)<br>
-+{<br>
-+=C2=A0 =C2=A0 assert(size =3D=3D 1);<br>
-+=C2=A0 =C2=A0 assert(offset =3D=3D 0);<br>
-+=C2=A0 =C2=A0 AVRMaskState *s =3D opaque;<br>
-+=C2=A0 =C2=A0 uint8_t val8 =3D val64;<br>
++&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rd rr<br>
++&amp;rd_imm=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rd imm<br>
 +<br>
-+=C2=A0 =C2=A0 DB_PRINT(&quot;write %d to offset %d&quot;, val8, (uint8_t)o=
-ffset);<br>
-+<br>
-+=C2=A0 =C2=A0 s-&gt;val =3D val8;<br>
-+=C2=A0 =C2=A0 for (int i =3D 0; i &lt; 8; i++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_set_irq(s-&gt;irq[i], (val8 &amp; (1 &lt;=
-&lt; i)) !=3D 0);<br>
-+=C2=A0 =C2=A0 }<br>
-+}<br>
-+<br>
-+static const MemoryRegionOps avr_mask_ops =3D {<br>
-+=C2=A0 =C2=A0 .read =3D avr_mask_read,<br>
-+=C2=A0 =C2=A0 .write =3D avr_mask_write,<br>
-+=C2=A0 =C2=A0 .endianness =3D DEVICE_NATIVE_ENDIAN,<br>
-+=C2=A0 =C2=A0 .impl =3D {.max_access_size =3D 1}<br>
-+};<br>
-+<br>
-+static void avr_mask_init(Object *dev)<br>
-+{<br>
-+=C2=A0 =C2=A0 AVRMaskState *s =3D AVR_MASK(dev);<br>
-+=C2=A0 =C2=A0 SysBusDevice *busdev =3D SYS_BUS_DEVICE(dev);<br>
-+<br>
-+=C2=A0 =C2=A0 memory_region_init_io(&amp;s-&gt;iomem, dev, &amp;avr_mask_o=
-ps, s, TYPE_AVR_MASK,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0x01);<br>
-+=C2=A0 =C2=A0 sysbus_init_mmio(busdev, &amp;s-&gt;iomem);<br>
-+<br>
-+=C2=A0 =C2=A0 for (int i =3D 0; i &lt; 8; i++) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_init_irq(busdev, &amp;s-&gt;irq[i]);<br=
++@op_rd_rr=C2=A0 =C2=A0 =C2=A0 =C2=A0.... .. . ..... ....=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 &amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd rr=3D%rr<br>
++@op_rd_imm6=C2=A0 =C2=A0 =C2=A0.... .... .. .. ....=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 &amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd_c imm=3D%imm6<br>
++@op_rd_imm8=C2=A0 =C2=A0 =C2=A0.... .... .... ....=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0&amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd_a imm=3D%imm8<br>
++@op_bit=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... .... . bit:3 ....<br>
++@op_bit_imm=C2=A0 =C2=A0 =C2=A0.... .. imm:s7 bit:3<br>
++@fmul=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... .... . ... . ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_b rr=3D%rr_b<br=
 >
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 s-&gt;val =3D 0x00;<br>
-+}<br>
++@io_rd_imm=C2=A0 =C2=A0 =C2=A0 .... . .. ..... ....=C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 &amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd imm=3D%io_imm<br>
++@ldst_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.. . . .. . rd:5=C2=A0 . ...=C2=
+=A0 =C2=A0 =C2=A0&amp;rd_imm=C2=A0 =C2=A0 =C2=A0imm=3D%ldst_d_imm<br>
 +<br>
-+static void avr_mask_class_init(ObjectClass *klass, void *data)<br>
-+{<br>
-+=C2=A0 =C2=A0 DeviceClass *dc =3D DEVICE_CLASS(klass);<br>
++# The 16-bit immediate is completely in the next word.<br>
++# Fields cannot be defined with no bits, so we cannot play<br>
++# the same trick and append to a zero-bit value.<br>
++# Defer reading the immediate until trans_{LDS,STS}.<br>
++@ldst_s=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... ... rd:5 ....=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 imm=3D0<br>
 +<br>
-+=C2=A0 =C2=A0 dc-&gt;reset =3D avr_mask_reset;<br>
-+}<br>
++#<br>
++# Arithmetic Instructions<br>
++#<br>
++ADD=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ADC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00001 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ADIW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0110 .. .. ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 @op_rd_imm6<br>
++SUB=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00001 10 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++SUBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0101 .... .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++SBC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 10 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++SBCI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0100 .... .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++SBIW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0111 .. .. ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 @op_rd_imm6<br>
++AND=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 00 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ANDI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0111 .... .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++OR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0010 10 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++ORI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00110 .... .... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++EOR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 01 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++COM=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0000<br>
++NEG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0001<br>
++INC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0011<br>
++DEC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 1010<br>
++MUL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++MULS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0010 .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_a rr=3D%=
+rr_a<br>
++MULSU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0011 0 ... 0 ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0@fmul<br>
++FMUL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0011 0 ... 1 ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0@fmul<br>
++FMULS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0011 1 ... 0 ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0@fmul<br>
++FMULSU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0011 1 ... 1 ...=C2=A0 =C2=
+=A0 =C2=A0 =C2=A0@fmul<br>
++DES=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0100 imm:4 1011<br=
+>
 +<br>
-+static const TypeInfo avr_mask_info =3D {<br>
-+=C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_AVR_MASK,<b=
++#<br>
++# Branch Instructions<br>
++#<br>
++RJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1100 imm:s12<br>
++IJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 0000 1001<br>
++EIJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0100 0001 1001<br>
++JMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 ..... 110 .=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 imm=3D%imm_call<br>
++RCALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01101 imm:s12<br>
++ICALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 0000 1001<br>
++EICALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 0001 1001<br>
++CALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 010 ..... 111 .=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 imm=3D%imm_call<br>
++RET=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 0000 1000<br>
++RETI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 0001 1000<br>
++CPSE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0001 00 . ..... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++CP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0001 01 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++CPC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 01 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++CPI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00011 .... .... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++SBRC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 110 rr:5 0 bit:3<br>
++SBRS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 111 rr:5 0 bit:3<br>
++SBIC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 1001 reg:5 bit:3<br>
++SBIS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 1011 reg:5 bit:3<br>
++BRBS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 00 ....... ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_bit_imm<br>
++BRBC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 01 ....... ...=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_bit_imm<br>
++<br>
++#<br>
++# Data Transfer Instructions<br>
++#<br>
++MOV=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 11 . ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
++MOVW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0001 .... ....=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_d rr=3D%=
+rr_d<br>
++LDI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01110 .... .... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
++LDS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 ..... 0000=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@ldst_s<br>
++LDX1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1100<br>
++LDX2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1101<br>
++LDX3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1110<br>
++LDY2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1001<br>
++LDY3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1010<br>
++LDZ2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0001<br>
++LDZ3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0010<br>
++LDDY=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 0 ..... 1 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++LDDZ=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 0 ..... 0 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++STS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 ..... 0000=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@ldst_s<br>
++STX1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1100<br>
++STX2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1101<br>
++STX3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1110<br>
++STY2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1001<br>
++STY3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1010<br>
++STZ2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 0001<br>
++STZ3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 0010<br>
++STDY=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 1 ..... 1 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++STDZ=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 1 ..... 0 ...=C2=
+=A0 =C2=A0 =C2=A0@ldst_d<br>
++LPM1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 1100 1000<br>
++LPM2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0100<br>
++LPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0101<br>
++ELPM1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1101 1000<br>
++ELPM2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 0110<br>
++ELPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 0111<br>
++SPM=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1110 1000<br>
++SPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 1111 1000<br>
++IN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1011 0 .. ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @io_rd_imm<br>
++OUT=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01011 1 .. ..... ....=C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 @io_rd_imm<br>
++PUSH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1111<br>
++POP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 1111<br>
++XCH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0100<br>
++LAC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0110<br>
++LAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0101<br>
++LAT=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0111<br>
++<br>
++#<br>
++# Bit and Bit-test Instructions<br>
++#<br>
++LSR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0110<br>
++ROR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0111<br>
++ASR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0101<br>
++SWAP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 010 rd:5 0010<br>
++SBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 1010 reg:5 bit:3<b=
 r>
-+=C2=A0 =C2=A0 .parent=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_SYS_BUS_DEVICE,<=
-br>
-+=C2=A0 =C2=A0 .instance_size =3D sizeof(AVRMaskState),<br>
-+=C2=A0 =C2=A0 .class_init=C2=A0 =C2=A0 =3D avr_mask_class_init,<br>
-+=C2=A0 =C2=A0 .instance_init =3D avr_mask_init,<br>
-+};<br>
++CBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 1000 reg:5 bit:3<b=
+r>
++BST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01111 101 rd:5 0 bit:3<b=
+r>
++BLD=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01111 100 rd:5 0 bit:3<b=
+r>
++BSET=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 0 bit:3 1000<br>
++BCLR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 1 bit:3 1000<br>
 +<br>
-+static void avr_mask_register_types(void)<br>
-+{<br>
-+=C2=A0 =C2=A0 type_register_static(&amp;avr_mask_info);<br>
-+}<br>
++#<br>
++# MCU Control Instructions<br>
++#<br>
++BREAK=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1001 1000<br>
++NOP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0000 0000 0000<br>
++SLEEP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1000 1000<br>
++WDR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1010 1000<br>
 +<br>
-+type_init(avr_mask_register_types)<br>
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig<br>
-index 2164646553..e79841e3a4 100644<br>
---- a/hw/misc/Kconfig<br>
-+++ b/hw/misc/Kconfig<br>
-@@ -125,4 +125,7 @@ config MAC_VIA<br>
-=C2=A0 =C2=A0 =C2=A0select MOS6522<br>
-=C2=A0 =C2=A0 =C2=A0select ADB<br>
-<br>
-+config AVR_MASK<br>
-+=C2=A0 =C2=A0 bool<br>
-+<br>
-=C2=A0source macio/Kconfig<br>
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs<br>
-index ba898a5781..3a8093be6a 100644<br>
---- a/hw/misc/Makefile.objs<br>
-+++ b/hw/misc/Makefile.objs<br>
-@@ -82,3 +82,5 @@ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o<br>
-=C2=A0obj-$(CONFIG_MAC_VIA) +=3D mac_via.o<br>
-<br>
-=C2=A0common-obj-$(CONFIG_GRLIB) +=3D grlib_ahb_apb_pnp.o<br>
-+<br>
-+obj-$(CONFIG_AVR_MASK) +=3D avr_mask.o<br>
 -- <br>
 2.17.2 (Apple Git-113)<br>
 <br>
 </blockquote>
 </blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote>
+</blockquote>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
  class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
 
---000000000000ff81d6059ac81e45--
+--0000000000007eeb3e059ac8ab14--
 
