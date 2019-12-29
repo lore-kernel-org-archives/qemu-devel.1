@@ -2,89 +2,69 @@ Return-Path: <SRS0=KIBN=2T=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B12C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 22:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E127C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 22:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E9BD207E0
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 22:53:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/Ej2aeA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9BD207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id E6DD8207E0
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 22:58:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6DD8207E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilhRZ-0001uX-AU
-	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 17:53:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53067)
+	id 1ilhWM-0004Id-2Q
+	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 17:58:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ilhJK-0002aF-Qw
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 17:45:24 -0500
+ (envelope-from <no-reply@patchew.org>) id 1ilhVe-0003ff-M7
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 17:58:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ilhJJ-0001yA-Gh
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 17:45:22 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:42836)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ilhJJ-0001wA-9N
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 17:45:21 -0500
-Received: by mail-wr1-x436.google.com with SMTP id q6so31205206wro.9
- for <qemu-devel@nongnu.org>; Sun, 29 Dec 2019 14:45:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Axh3SDMRIAYFo/SxEXYU1q310bgOy7N4rDsJmWBEGVo=;
- b=B/Ej2aeAVCbPxa9uSJzxHxxIoxcDjGLRToXCwDhaoO90oQxYZjeHCxbtdyJ66WFAgc
- I8AjVz/c6WItNCgPI7BA7QLCWXPxsHrxrkb0WV4R6ks5qETiOVp1w+5FGgRYd2FBWzsP
- +3aI7Y/KuzJi6x6g46LYzqHB7Qq0r2K5tTii3JkyrI6Tq3bg5VFVjnUD2xTZxuDc2cmE
- YM5+ScivMdAzj0LtTVywUqTa0/nxku1FHUQuGkCMDPiKr27Rq873zrlCCI7JoHaY2k28
- fIfkVN5GxLdz7t0IsmUTCIFh6dsehxlPpdnumhVjaqlNlgMwuFMuBH69ZnBg558kQ9jP
- oXOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Axh3SDMRIAYFo/SxEXYU1q310bgOy7N4rDsJmWBEGVo=;
- b=DQVH/Q58ZT/08eCmRmi8D+z55quL16ICCfW7EqHNQC4Jv/EY5CMVtA9HIHC5bQ+WhT
- oE0+6kENBICruFsnrG29DHxyIrFqZAzjFd+PCLsfL7cWk5ZWgHBkQDZNY99mKBDGvylk
- pgIeFCMW/M0RCxo/vT35nLQqqxA9ZnRNBbSq27lMlxGUQE5qikGS2DuCpzywcJ2tErX6
- ECU+0u27YY4/iw4Fo8/MVQZqJyW7npdZF1hcr6dZvJ2CCnDF38e7Z8DXc0qleSSavDiv
- K1jrSbMfVJEnfQp7PfNKpuRLw0wnxm/pSX0UCXKSklTUecn1ntoB8oqGXoA7yyCroG9G
- 2vaA==
-X-Gm-Message-State: APjAAAUyLnuG50omz7YSDtUX0WGG29DPSqiopkOYHujVL+84pQUyppqq
- 1K2UNAiCsrFVHsf/Tsss2RaRJZ2fDqs=
-X-Google-Smtp-Source: APXvYqwH5J1B0zwv5D2kUU8Xe0J0aB/JBCsf2T2LFYi3BzMkgNeATlwKWqyMs9DvNUZtfjsbPKeOTA==
-X-Received: by 2002:a5d:620b:: with SMTP id y11mr61655776wru.230.1577659520137; 
- Sun, 29 Dec 2019 14:45:20 -0800 (PST)
-Received: from x1w.home ([2a01:cb18:8372:6b00:691b:aac5:8837:d4da])
- by smtp.gmail.com with ESMTPSA id x1sm42709188wru.50.2019.12.29.14.45.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 29 Dec 2019 14:45:19 -0800 (PST)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 8/8] tests/acceptance: Test the Arduino MEGA2560 board
-Date: Sun, 29 Dec 2019 23:45:05 +0100
-Message-Id: <20191229224505.24466-9-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <no-reply@patchew.org>) id 1ilhVd-00017s-8P
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 17:58:06 -0500
+Resent-Date: Sun, 29 Dec 2019 17:58:06 -0500
+Resent-Message-Id: <E1ilhVd-00017s-8P@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21135)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1ilhVd-00011I-00
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 17:58:05 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1577660270; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Hb0Z0fm0d6kIxq7Bot4yeBTMgZjzkPJRoKkvVofB7hIN7vlMmfz28W2fEs7esfzMWuN6I897b/vOq60dDlod2FOk/uxMzwXr9FaKZt1Ru0VbBvNz/VJj6m61Nxk3Tou8DDSdjMfuIoj9vVbyI1H6J5CToNvB+lAgbWTZ3VMwris=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1577660270;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=NG4OCsHy0NDD+am5O5JOX0Xf52JWiBzZn7VTmmzrKv8=; 
+ b=cN5TkFfmmcx/3EgZVqmUm5WCYTP6ft3/vzdQdWQm8KdbRyj5B9Dqkj20WVrSnG06zVaUyhMyH+AKNsxD2vJ9E5JfH8l3EhKd3kOfDyTTtlzVyIGcSdB9YBZUR7QW5pZZY5qQzaOQX4jMqCz7p3LCCSBPkVtXPdTuJen201QYDA8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1577660262605256.9399520936397;
+ Sun, 29 Dec 2019 14:57:42 -0800 (PST)
 In-Reply-To: <20191229224505.24466-1-f4bug@amsat.org>
-References: <20191229224505.24466-1-f4bug@amsat.org>
+Subject: Re: [PATCH v3 0/8] hw/avr: Introduce the Arduino boards
+Message-ID: <157766026188.19009.2772418918814016586@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: f4bug@amsat.org
+Date: Sun, 29 Dec 2019 14:57:42 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,44 +76,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Sarah Harris <S.E.Harris@kent.ac.uk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Michael Rolnik <mrolnik@gmail.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, thuth@redhat.com, S.E.Harris@kent.ac.uk,
+ qemu-devel@nongnu.org, f4bug@amsat.org, mrolnik@gmail.com, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the path name demonstrates, the FreeRTOS tests target a
-board based on a ATMega2560 MCU. We have one, the Arduino
-MEGA2560.
-
-Complementary documentation:
-
-https://feilipu.me/2012/01/15/ethermega-arduino-mega-2560-and-freertos/
-https://feilipu.me/2015/11/24/arduino_freertos/ (see 'Compatibility')
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- tests/acceptance/machine_avr6.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
-index 94a8004e94..c5ff423e50 100644
---- a/tests/acceptance/machine_avr6.py
-+++ b/tests/acceptance/machine_avr6.py
-@@ -31,7 +31,7 @@ class AVR6Machine(Test):
-     def test_freertos(self):
-         """
-         :avocado: tags=arch:avr
--        :avocado: tags=machine:sample
-+        :avocado: tags=machine:arduino-mega-2560-v3
-         """
-         """
-         https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTIyOTIyNDUwNS4yNDQ2
+Ni0xLWY0YnVnQGFtc2F0Lm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
+ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
+Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMjI5MjI0NTA1LjI0NDY2LTEt
+ZjRidWdAYW1zYXQub3JnL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2Fn
+ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
 
 
