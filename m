@@ -8,82 +8,77 @@ X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D8DC2D0C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 21:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 945AAC2D0C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 22:00:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CAC92071E
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 21:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44BB32071E
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 22:00:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cd78EmIX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CAC92071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3nMAQ4r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44BB32071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilgbA-0007B9-En
-	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 16:59:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33378)
+	id 1ilgcM-00007Z-AR
+	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 17:00:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33789)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1ilgUY-0007GZ-VG
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 16:52:57 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1ilgUr-0007cy-Fn
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 16:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1ilgUW-0002yX-A3
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 16:52:54 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51749)
+ (envelope-from <mrolnik@gmail.com>) id 1ilgUp-0003mo-8H
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 16:53:13 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51753)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ilgUW-0002uu-0T
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 16:52:52 -0500
-Received: by mail-wm1-x341.google.com with SMTP id d73so12639463wmd.1
- for <qemu-devel@nongnu.org>; Sun, 29 Dec 2019 13:52:51 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ilgUp-0003l7-0j
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 16:53:11 -0500
+Received: by mail-wm1-x344.google.com with SMTP id d73so12639833wmd.1
+ for <qemu-devel@nongnu.org>; Sun, 29 Dec 2019 13:53:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=fGEKPDaXPhg0MnHnkiVmEsPf2uycEWZawqW77l6JeFc=;
- b=Cd78EmIXSo+7uEEcATcfQiqMy7IbMacYtdbhD0ZaaxAZPHi2wDKXmc5GwbSaRcCas7
- Z7MvficpEhUf+UEPRuWlyNxUEGGeaN5Q9DMqvHh/57BQ9MeYTGkzfpSxfUoNEP53z7+A
- GTF+wQCUV1FDgSh0SsutGdmnHCQnmIB3j3f2OMWVYhkq5RSQjz/1uxwXODv3sacCEwKf
- sB5cVdTSyTlQZaFOq+oVA1QGWZW3CNqA1DudAVCjRVi/Mqpe9y71gXt3WdYwycbQ61GZ
- dm4ra6BCBzvn7GplRjJkdWh1thkpuLVPck6xj49OnvIMD9v7wibL5YO+9KrJqSJjXhtw
- Jyzw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=fiDJnfw8KuN71OMSUCFWBmBl80J4Xx3JLR0YGBv3k54=;
+ b=k3nMAQ4rUoqvPngcp/iPZ1cegBDDf2tCTlT0PegyXI5Rr/rlASs2VvIsjZpDbCrzA7
+ 4bmQg0NIBAMb5ijnWwYxZtvo50bwyM6SSx3847V+w44LKTa/aVcCGEKCzn3Nd7Pdeimy
+ xZ8IBvcgEsCrO6ywF5koNfQ7IMplW9RbQNMGl8l2LTdyvmOF5E5hpD6FD3gWgMJLiGZD
+ eCMSrDcmWWSSNJhG+hFvvfohFaeMMGqhkf0FjT139LmVTfWFxX2lOEd4UIJwNMnfnY9/
+ zkRE1tdhlhqZvrFWQ8nVCSCWRZ5YG6YWrY7933kMh0Usx84dKJgSeVeLUBoFqIWxFnmQ
+ PQxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=fGEKPDaXPhg0MnHnkiVmEsPf2uycEWZawqW77l6JeFc=;
- b=I4dGfEbTYFcDg9BRJBnv+D/NxDtR1QaBJuk+eZ0+HU8r9fbTDMXOwFx6++VRq4LRd2
- HnFJNT+Ix+b9HYMZ+Yy/uN4zqAAZbD0QrtX2sEyOYhVeLZKeYGaokscKssTlBaDvbB2W
- GqizJXDTsSrF0R/6cW5GwPrXrBGkLE1zA5T3xNm6IieLhkaARCyx6AgUzrofjQ9KNL80
- gqo3iSQUqj820CX4k99Hl0W8b8LdadOFBiEdJwnJKCRMogmuozXBRdaC8dzDN/r4QVvW
- d90SkUVTBBSuFydnDFPPWDKa5cTNcn/0pHEZVk1wShDVqXXtdsbFCgb11HrxJV8JnLXV
- iAmQ==
-X-Gm-Message-State: APjAAAXK6Cd66MCHMZqYX4StPqqVhzYfnTQL6MzxR2vSb0sJGMSQlgIz
- dLxeBacha3qBi5q8O/avmhw6RtUaAJX16A==
-X-Google-Smtp-Source: APXvYqywucHiawV56d4ve7nfq9glrQhjClhSG5HSqvtVsFb7PHmnRyvZleAsButRb+NG8mfV8DTvVg==
-X-Received: by 2002:a7b:c183:: with SMTP id y3mr30137952wmi.45.1577656370563; 
- Sun, 29 Dec 2019 13:52:50 -0800 (PST)
+ :references;
+ bh=fiDJnfw8KuN71OMSUCFWBmBl80J4Xx3JLR0YGBv3k54=;
+ b=pj0ddsFsDcY8XJtSBAgA+tW7Z0RO2sIN6wYtWP1RpQ6dP4K77u7ghdJzmS1kBWJRcL
+ bGoJVI2+5TU/d/qhxJzYsYjOuytyyO0T+Kl3YAWaIgK8ZpQM4Izv67h+meeRekNmcUcS
+ 8T80JbVgHAHJmhzr0JNkJPu1k/zrg+rmIORHgz6YxEMBLsehEDRMVOPJK8FkC/urwSnA
+ k9FGujEaBkQjNAwjGtijYSeewJ0fbRjXATAygD0N+yyeIH9Nfkfv9dGs2mrQQawLunhN
+ gafszaL+nABGQgd8QnJ7SxrGgNCFkNBcGtYcj+zCb5jyibK6FIrY3dI54G/i6AgC82lo
+ UAEA==
+X-Gm-Message-State: APjAAAVi9RyUd7dQdQF3tc2kMTE25AMrk2Dwb6ap8z3fhdxQL0cRytjz
+ 1pXITILpWCZZhJI97FACtn/m0/J4pXDo/w==
+X-Google-Smtp-Source: APXvYqzqeKKeMmtWzZX+j3VWMM69RnZklTEnTLy9E76FDMqHErlKAKYOxwZbJp2gcRI8pZ63KJwd2w==
+X-Received: by 2002:a7b:c00c:: with SMTP id c12mr30549617wmb.174.1577656389696; 
+ Sun, 29 Dec 2019 13:53:09 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-183-93-3.red.bezeqint.net. [79.183.93.3])
- by smtp.gmail.com with ESMTPSA id 25sm18182850wmi.32.2019.12.29.13.52.46
+ by smtp.gmail.com with ESMTPSA id 25sm18182850wmi.32.2019.12.29.13.53.07
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 29 Dec 2019 13:52:50 -0800 (PST)
+ Sun, 29 Dec 2019 13:53:09 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v40 05/21] target/avr: Add instruction translation - Branch
- Instructions
-Date: Sun, 29 Dec 2019 23:51:42 +0200
-Message-Id: <20191229215158.5788-6-mrolnik@gmail.com>
+Subject: [PATCH v40 11/21] hw/avr: Add limited support for USART peripheral
+Date: Sun, 29 Dec 2019 23:51:48 +0200
+Message-Id: <20191229215158.5788-12-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191229215158.5788-1-mrolnik@gmail.com>
 References: <20191229215158.5788-1-mrolnik@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,600 +91,474 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- me@xcancerberox.com.ar, richard.henderson@linaro.org, dovgaluk@ispras.ru,
- imammedo@redhat.com, philmd@redhat.com, aleksandar.m.mail@gmail.com
+ me@xcancerberox.com.ar, richard.henderson@linaro.org,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - RJMP, IJMP, EIJMP, JMP
-    - RCALL, ICALL, EICALL, CALL
-    - RET, RETI
-    - CPSE, CP, CPC, CPI
-    - SBRC, SBRS, SBIC, SBIS
-    - BRBC, BRBS
+These were designed to facilitate testing but should provide enough function to be useful in other contexts.
+Only a subset of the functions of each peripheral is implemented, mainly due to the lack of a standard way to handle electrical connections (like GPIO pins).
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 ---
- target/avr/translate.c | 533 +++++++++++++++++++++++++++++++++++++++++
- target/avr/insn.decode |  24 ++
- 2 files changed, 557 insertions(+)
+ include/hw/char/avr_usart.h |  93 +++++++++++
+ hw/char/avr_usart.c         | 320 ++++++++++++++++++++++++++++++++++++
+ hw/char/Kconfig             |   3 +
+ hw/char/Makefile.objs       |   1 +
+ 4 files changed, 417 insertions(+)
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 hw/char/avr_usart.c
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 2b6411bbed..a80d59464a 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -921,3 +921,536 @@ static bool trans_DES(DisasContext *ctx, arg_DES *a)
+diff --git a/include/hw/char/avr_usart.h b/include/hw/char/avr_usart.h
+new file mode 100644
+index 0000000000..467e97e8c0
+--- /dev/null
++++ b/include/hw/char/avr_usart.h
+@@ -0,0 +1,93 @@
++/*
++ * AVR USART
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#ifndef HW_AVR_USART_H
++#define HW_AVR_USART_H
++
++#include "hw/sysbus.h"
++#include "chardev/char-fe.h"
++#include "hw/hw.h"
++
++/* Offsets of registers. */
++#define USART_DR   0x06
++#define USART_CSRA  0x00
++#define USART_CSRB  0x01
++#define USART_CSRC  0x02
++#define USART_BRRH 0x05
++#define USART_BRRL 0x04
++
++/* Relevant bits in regiters. */
++#define USART_CSRA_RXC    (1 << 7)
++#define USART_CSRA_TXC    (1 << 6)
++#define USART_CSRA_DRE    (1 << 5)
++#define USART_CSRA_MPCM   (1 << 0)
++
++#define USART_CSRB_RXCIE  (1 << 7)
++#define USART_CSRB_TXCIE  (1 << 6)
++#define USART_CSRB_DREIE  (1 << 5)
++#define USART_CSRB_RXEN   (1 << 4)
++#define USART_CSRB_TXEN   (1 << 3)
++#define USART_CSRB_CSZ2   (1 << 2)
++#define USART_CSRB_RXB8   (1 << 1)
++#define USART_CSRB_TXB8   (1 << 0)
++
++#define USART_CSRC_MSEL1  (1 << 7)
++#define USART_CSRC_MSEL0  (1 << 6)
++#define USART_CSRC_PM1    (1 << 5)
++#define USART_CSRC_PM0    (1 << 4)
++#define USART_CSRC_CSZ1   (1 << 2)
++#define USART_CSRC_CSZ0   (1 << 1)
++
++#define TYPE_AVR_USART "avr-usart"
++#define AVR_USART(obj) \
++    OBJECT_CHECK(AVRUsartState, (obj), TYPE_AVR_USART)
++
++typedef struct {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    /* <public> */
++    MemoryRegion mmio;
++
++    CharBackend chr;
++
++    bool enabled;
++
++    uint8_t data;
++    bool data_valid;
++    uint8_t char_mask;
++    /* Control and Status Registers */
++    uint8_t csra;
++    uint8_t csrb;
++    uint8_t csrc;
++    /* Baud Rate Registers (low/high byte) */
++    uint8_t brrh;
++    uint8_t brrl;
++
++    /* Receive Complete */
++    qemu_irq rxc_irq;
++    /* Transmit Complete */
++    qemu_irq txc_irq;
++    /* Data Register Empty */
++    qemu_irq dre_irq;
++} AVRUsartState;
++
++#endif /* HW_AVR_USART_H */
+diff --git a/hw/char/avr_usart.c b/hw/char/avr_usart.c
+new file mode 100644
+index 0000000000..cb307fe23d
+--- /dev/null
++++ b/hw/char/avr_usart.c
+@@ -0,0 +1,320 @@
++/*
++ * AVR USART
++ *
++ * Copyright (c) 2018 University of Kent
++ * Author: Sarah Harris
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
++
++#include "qemu/osdep.h"
++#include "hw/char/avr_usart.h"
++#include "qemu/log.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
++
++static int avr_usart_can_receive(void *opaque)
++{
++    AVRUsartState *usart = opaque;
++
++    if (usart->data_valid || !(usart->csrb & USART_CSRB_RXEN)) {
++        return 0;
++    }
++    return 1;
++}
++
++static void avr_usart_receive(void *opaque, const uint8_t *buffer, int size)
++{
++    AVRUsartState *usart = opaque;
++    assert(size == 1);
++    assert(!usart->data_valid);
++    usart->data = buffer[0];
++    usart->data_valid = true;
++    usart->csra |= USART_CSRA_RXC;
++    if (usart->csrb & USART_CSRB_RXCIE) {
++        qemu_set_irq(usart->rxc_irq, 1);
++    }
++}
++
++static void update_char_mask(AVRUsartState *usart)
++{
++    uint8_t mode = ((usart->csrc & USART_CSRC_CSZ0) ? 1 : 0) |
++        ((usart->csrc & USART_CSRC_CSZ1) ? 2 : 0) |
++        ((usart->csrb & USART_CSRB_CSZ2) ? 4 : 0);
++    switch (mode) {
++    case 0:
++        usart->char_mask = 0b11111;
++        break;
++    case 1:
++        usart->char_mask = 0b111111;
++        break;
++    case 2:
++        usart->char_mask = 0b1111111;
++        break;
++    case 3:
++        usart->char_mask = 0b11111111;
++        break;
++    case 4:
++        /* Fallthrough. */
++    case 5:
++        /* Fallthrough. */
++    case 6:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Reserved character size 0x%x\n",
++            __func__,
++            mode);
++        break;
++    case 7:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Nine bit character size not supported (forcing eight)\n",
++            __func__);
++        usart->char_mask = 0b11111111;
++        break;
++    default:
++        assert(0);
++    }
++}
++
++static void avr_usart_reset(DeviceState *dev)
++{
++    AVRUsartState *usart = AVR_USART(dev);
++    usart->data_valid = false;
++    usart->csra = 0b00100000;
++    usart->csrb = 0b00000000;
++    usart->csrc = 0b00000110;
++    usart->brrl = 0;
++    usart->brrh = 0;
++    update_char_mask(usart);
++    qemu_set_irq(usart->rxc_irq, 0);
++    qemu_set_irq(usart->txc_irq, 0);
++    qemu_set_irq(usart->dre_irq, 0);
++}
++
++static uint64_t avr_usart_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    AVRUsartState *usart = opaque;
++    uint8_t data;
++    assert(size == 1);
++
++    if (!usart->enabled) {
++        return 0;
++    }
++
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_RXEN)) {
++            /* Receiver disabled, ignore. */
++            return 0;
++        }
++        if (usart->data_valid) {
++            data = usart->data & usart->char_mask;
++            usart->data_valid = false;
++        } else {
++            data = 0;
++        }
++        usart->csra &= 0xff ^ USART_CSRA_RXC;
++        qemu_set_irq(usart->rxc_irq, 0);
++        qemu_chr_fe_accept_input(&usart->chr);
++        return data;
++    case USART_CSRA:
++        return usart->csra;
++    case USART_CSRB:
++        return usart->csrb;
++    case USART_CSRC:
++        return usart->csrc;
++    case USART_BRRL:
++        return usart->brrl;
++    case USART_BRRH:
++        return usart->brrh;
++    default:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
++    }
++    return 0;
++}
++
++static void avr_usart_write(void *opaque, hwaddr addr, uint64_t value,
++                                unsigned int size)
++{
++    AVRUsartState *usart = opaque;
++    uint8_t mask;
++    uint8_t data;
++    assert((value & 0xff) == value);
++    assert(size == 1);
++
++    if (!usart->enabled) {
++        return;
++    }
++
++    switch (addr) {
++    case USART_DR:
++        if (!(usart->csrb & USART_CSRB_TXEN)) {
++            /* Transmitter disabled, ignore. */
++            return;
++        }
++        usart->csra |= USART_CSRA_TXC;
++        usart->csra |= USART_CSRA_DRE;
++        if (usart->csrb & USART_CSRB_TXCIE) {
++            qemu_set_irq(usart->txc_irq, 1);
++            usart->csra &= 0xff ^ USART_CSRA_TXC;
++        }
++        if (usart->csrb & USART_CSRB_DREIE) {
++            qemu_set_irq(usart->dre_irq, 1);
++        }
++        data = value;
++        qemu_chr_fe_write_all(&usart->chr, &data, 1);
++        break;
++    case USART_CSRA:
++        mask = 0b01000011;
++        /* Mask read-only bits. */
++        value = (value & mask) | (usart->csra & (0xff ^ mask));
++        usart->csra = value;
++        if (value & USART_CSRA_TXC) {
++            usart->csra ^= USART_CSRA_TXC;
++            qemu_set_irq(usart->txc_irq, 0);
++        }
++        if (value & USART_CSRA_MPCM) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: MPCM not supported by USART\n",
++                __func__);
++        }
++        break;
++    case USART_CSRB:
++        mask = 0b11111101;
++        /* Mask read-only bits. */
++        value = (value & mask) | (usart->csrb & (0xff ^ mask));
++        usart->csrb = value;
++        if (!(value & USART_CSRB_RXEN)) {
++            /* Receiver disabled, flush input buffer. */
++            usart->data_valid = false;
++        }
++        qemu_set_irq(usart->rxc_irq,
++            ((value & USART_CSRB_RXCIE) &&
++            (usart->csra & USART_CSRA_RXC)) ? 1 : 0);
++        qemu_set_irq(usart->txc_irq,
++            ((value & USART_CSRB_TXCIE) &&
++            (usart->csra & USART_CSRA_TXC)) ? 1 : 0);
++        qemu_set_irq(usart->dre_irq,
++            ((value & USART_CSRB_DREIE) &&
++            (usart->csra & USART_CSRA_DRE)) ? 1 : 0);
++        update_char_mask(usart);
++        break;
++    case USART_CSRC:
++        usart->csrc = value;
++        if ((value & USART_CSRC_MSEL1) && (value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: SPI mode not supported by USART\n",
++                __func__);
++        }
++        if ((value & USART_CSRC_MSEL1) && !(value & USART_CSRC_MSEL0)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad USART mode\n", __func__);
++        }
++        if (!(value & USART_CSRC_PM1) && (value & USART_CSRC_PM0)) {
++            qemu_log_mask(
++                LOG_GUEST_ERROR,
++                "%s: Bad USART parity mode\n",
++                __func__);
++        }
++        update_char_mask(usart);
++        break;
++    case USART_BRRL:
++        usart->brrl = value;
++        break;
++    case USART_BRRH:
++        usart->brrh = value & 0b00001111;
++        break;
++    default:
++        qemu_log_mask(
++            LOG_GUEST_ERROR,
++            "%s: Bad offset 0x%"HWADDR_PRIx"\n",
++            __func__,
++            addr);
++    }
++}
++
++static const MemoryRegionOps avr_usart_ops = {
++    .read = avr_usart_read,
++    .write = avr_usart_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {.min_access_size = 1, .max_access_size = 1}
++};
++
++static Property avr_usart_properties[] = {
++    DEFINE_PROP_CHR("chardev", AVRUsartState, chr),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void avr_usart_pr(void *opaque, int irq, int level)
++{
++    AVRUsartState *s = AVR_USART(opaque);
++
++    s->enabled = !level;
++
++    if (!s->enabled) {
++        avr_usart_reset(DEVICE(s));
++    }
++}
++
++static void avr_usart_init(Object *obj)
++{
++    AVRUsartState *s = AVR_USART(obj);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->rxc_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->dre_irq);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->txc_irq);
++    memory_region_init_io(&s->mmio, obj, &avr_usart_ops, s, TYPE_AVR_USART, 8);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++    qdev_init_gpio_in(DEVICE(s), avr_usart_pr, 1);
++    s->enabled = true;
++}
++
++static void avr_usart_realize(DeviceState *dev, Error **errp)
++{
++    AVRUsartState *s = AVR_USART(dev);
++    qemu_chr_fe_set_handlers(&s->chr, avr_usart_can_receive,
++                             avr_usart_receive, NULL, NULL,
++                             s, NULL, true);
++    avr_usart_reset(dev);
++}
++
++static void avr_usart_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = avr_usart_reset;
++    dc->props = avr_usart_properties;
++    dc->realize = avr_usart_realize;
++}
++
++static const TypeInfo avr_usart_info = {
++    .name          = TYPE_AVR_USART,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AVRUsartState),
++    .instance_init = avr_usart_init,
++    .class_init    = avr_usart_class_init,
++};
++
++static void avr_usart_register_types(void)
++{
++    type_register_static(&avr_usart_info);
++}
++
++type_init(avr_usart_register_types)
+diff --git a/hw/char/Kconfig b/hw/char/Kconfig
+index 40e7a8b8bb..331b20983f 100644
+--- a/hw/char/Kconfig
++++ b/hw/char/Kconfig
+@@ -46,3 +46,6 @@ config SCLPCONSOLE
  
-     return true;
- }
-+
-+/*
-+ * Branch Instructions
-+ */
-+static void gen_jmp_ez(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+static void gen_jmp_z(DisasContext *ctx)
-+{
-+    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
-+    ctx->bstate = DISAS_LOOKUP;
-+}
-+
-+static void gen_push_ret(DisasContext *ctx, int ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+
-+        TCGv t0 = tcg_const_i32((ret & 0x0000ff));
-+
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(t0);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+
-+        TCGv t0 = tcg_const_i32((ret & 0x00ffff));
-+
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(t0);
-+
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+
-+        TCGv lo = tcg_const_i32((ret & 0x0000ff));
-+        TCGv hi = tcg_const_i32((ret & 0xffff00) >> 8);
-+
-+        tcg_gen_qemu_st_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_st_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+static void gen_pop_ret(DisasContext *ctx, TCGv ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_UB);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+        TCGv lo = tcg_temp_new_i32();
-+        TCGv hi = tcg_temp_new_i32();
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_ld_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+
-+        tcg_gen_deposit_tl(ret, lo, hi, 8, 16);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+{
-+    TranslationBlock *tb = ctx->tb;
-+
-+    if (ctx->singlestep == 0) {
-+        tcg_gen_goto_tb(n);
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        tcg_gen_exit_tb(tb, n);
-+    } else {
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        gen_helper_debug(cpu_env);
-+        tcg_gen_exit_tb(NULL, 0);
-+    }
-+    ctx->bstate = DISAS_NORETURN;
-+}
-+
-+/*
-+ *  Relative jump to an address within PC - 2K +1 and PC + 2K (words). For
-+ *  AVR microcontrollers with Program memory not exceeding 4K words (8KB) this
-+ *  instruction can address the entire memory from every address location. See
-+ *  also JMP.
-+ */
-+static bool trans_RJMP(DisasContext *ctx, arg_RJMP *a)
-+{
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File. The Z-pointer Register is 16 bits wide and
-+ *  allows jump within the lowest 64K words (128KB) section of Program memory.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_IJMP(DisasContext *ctx, arg_IJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect jumps to the entire 4M (words) Program
-+ *  memory space. See also IJMP.  This instruction is not available in all
-+ *  devices. Refer to the device specific instruction set summary.
-+ */
-+static bool trans_EIJMP(DisasContext *ctx, arg_EIJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+/*
-+ *  Jump to an address within the entire 4M (words) Program memory. See also
-+ *  RJMP.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.0
-+ */
-+static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    gen_goto_tb(ctx, 0, a->imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Relative call to an address within PC - 2K + 1 and PC + 2K (words). The
-+ *  return address (the instruction after the RCALL) is stored onto the Stack.
-+ *  See also CALL. For AVR microcontrollers with Program memory not exceeding 4K
-+ *  words (8KB) this instruction can address the entire memory from every
-+ *  address location. The Stack Pointer uses a post-decrement scheme during
-+ *  RCALL.
-+ */
-+static bool trans_RCALL(DisasContext *ctx, arg_RCALL *a)
-+{
-+    int ret = ctx->npc;
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Calls to a subroutine within the entire 4M (words) Program memory. The
-+ *  return address (to the instruction after the CALL) will be stored onto the
-+ *  Stack. See also RCALL. The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_ICALL(DisasContext *ctx, arg_ICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Indirect call of a subroutine pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect calls to the entire 4M (words) Program
-+ *  memory space. See also ICALL. The Stack Pointer uses a post-decrement scheme
-+ *  during EICALL.  This instruction is not available in all devices. Refer to
-+ *  the device specific instruction set summary.
-+ */
-+static bool trans_EICALL(DisasContext *ctx, arg_EICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+/*
-+ *  Calls to a subroutine within the entire Program memory. The return
-+ *  address (to the instruction after the CALL) will be stored onto the Stack.
-+ *  (See also RCALL). The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_CALL(DisasContext *ctx, arg_CALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    int Imm = a->imm;
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, Imm);
-+
-+    return true;
-+}
-+
-+/*
-+ *  Returns from subroutine. The return address is loaded from the STACK.
-+ *  The Stack Pointer uses a preincrement scheme during RET.
-+ */
-+static bool trans_RET(DisasContext *ctx, arg_RET *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+
-+    ctx->bstate = DISAS_LOOKUP;
-+    return true;
-+}
-+
-+/*
-+ *  Returns from interrupt. The return address is loaded from the STACK and
-+ *  the Global Interrupt Flag is set.  Note that the Status Register is not
-+ *  automatically stored when entering an interrupt routine, and it is not
-+ *  restored when returning from an interrupt routine. This must be handled by
-+ *  the application program. The Stack Pointer uses a pre-increment scheme
-+ *  during RETI.
-+ */
-+static bool trans_RETI(DisasContext *ctx, arg_RETI *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+    tcg_gen_movi_tl(cpu_If, 1);
-+
-+    /* Need to return to main loop to re-evaluate interrupts.  */
-+    ctx->bstate = DISAS_EXIT;
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr, and
-+ *  skips the next instruction if Rd = Rr.
-+ */
-+static bool trans_CPSE(DisasContext *ctx, arg_CPSE *a)
-+{
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = cpu_r[a->rd];
-+    ctx->skip_var1 = cpu_r[a->rr];
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr.
-+ *  None of the registers are changed. All conditional branches can be used
-+ *  after this instruction.
-+ */
-+static bool trans_CP(DisasContext *ctx, arg_CP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    /* update status register */
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr and
-+ *  also takes into account the previous carry. None of the registers are
-+ *  changed. All conditional branches can be used after this instruction.
-+ */
-+static bool trans_CPC(DisasContext *ctx, arg_CPC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv zero = tcg_const_i32(0);
-+
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+    /* update status register */
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
-+
-+    tcg_temp_free_i32(zero);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction performs a compare between register Rd and a constant.
-+ *  The register is not changed. All conditional branches can be used after this
-+ *  instruction.
-+ */
-+static bool trans_CPI(DisasContext *ctx, arg_CPI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = a->imm;
-+    TCGv Rr = tcg_const_i32(Imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+    /* update status register */
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is cleared.
-+ */
-+static bool trans_SBRC(DisasContext *ctx, arg_SBRC *a)
-+{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is set.
-+ */
-+static bool trans_SBRS(DisasContext *ctx, arg_SBRS *a)
-+{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is cleared. This instruction operates on the
-+ *  lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIC(DisasContext *ctx, arg_SBIC *a)
-+{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
-+}
-+
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is set. This instruction operates on the lower
-+ *  32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIS(DisasContext *ctx, arg_SBIS *a)
-+{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
-+}
-+
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is cleared. This instruction branches relatively
-+ *  to PC in either direction (PC - 63 < = destination <= PC + 64). The
-+ *  parameter k is the offset from PC and is represented in two's complement
-+ *  form.
-+ */
-+static bool trans_BRBC(DisasContext *ctx, arg_BRBC *a)
-+{
-+    TCGLabel *not_taken = gen_new_label();
-+
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
-+        break;
-+    case 0x01:
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_gen_brcondi_i32(TCG_COND_NE, var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
-+}
-+
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is set. This instruction branches relatively to
-+ *  PC in either direction (PC - 63 < = destination <= PC + 64). The parameter k
-+ *  is the offset from PC and is represented in two's complement form.
-+ */
-+static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
-+{
-+    TCGLabel *not_taken = gen_new_label();
-+
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
-+        break;
-+    case 0x01:
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_gen_brcondi_i32(TCG_COND_EQ, var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
-+}
-+
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-index 9c71ed6b2f..32034c10d2 100644
---- a/target/avr/insn.decode
-+++ b/target/avr/insn.decode
-@@ -91,3 +91,27 @@ FMUL            0000 0011 0 ... 1 ...       @fmul
- FMULS           0000 0011 1 ... 0 ...       @fmul
- FMULSU          0000 0011 1 ... 1 ...       @fmul
- DES             1001 0100 imm:4 1011
-+
-+#
-+# Branch Instructions
-+#
-+RJMP            1100 imm:s12
-+IJMP            1001 0100 0000 1001
-+EIJMP           1001 0100 0001 1001
-+JMP             1001 010 ..... 110 .        imm=%imm_call
-+RCALL           1101 imm:s12
-+ICALL           1001 0101 0000 1001
-+EICALL          1001 0101 0001 1001
-+CALL            1001 010 ..... 111 .        imm=%imm_call
-+RET             1001 0101 0000 1000
-+RETI            1001 0101 0001 1000
-+CPSE            0001 00 . ..... ....        @op_rd_rr
-+CP              0001 01 . ..... ....        @op_rd_rr
-+CPC             0000 01 . ..... ....        @op_rd_rr
-+CPI             0011 .... .... ....         @op_rd_imm8
-+SBRC            1111 110 rr:5 0 bit:3
-+SBRS            1111 111 rr:5 0 bit:3
-+SBIC            1001 1001 reg:5 bit:3
-+SBIS            1001 1011 reg:5 bit:3
-+BRBS            1111 00 ....... ...         @op_bit_imm
-+BRBC            1111 01 ....... ...         @op_bit_imm
+ config TERMINAL3270
+     bool
++
++config AVR_USART
++    bool
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 02d8a66925..f05c1f5667 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) += spapr_vty.o
+ obj-$(CONFIG_DIGIC) += digic-uart.o
+ obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
+ obj-$(CONFIG_RASPI) += bcm2835_aux.o
++common-obj-$(CONFIG_AVR_USART) += avr_usart.o
+ 
+ common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
+ common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
 -- 
 2.17.2 (Apple Git-113)
 
