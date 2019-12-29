@@ -8,82 +8,79 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BA2C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 14:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47847C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 15:21:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FC61206E4
-	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 14:38:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 012332071E
+	for <qemu-devel@archiver.kernel.org>; Sun, 29 Dec 2019 15:21:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ep9m0oeH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC61206E4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fo5hGigP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 012332071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilZhu-0008AI-JJ
-	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 09:38:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59861)
+	id 1ilaNT-0004zb-1I
+	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 10:21:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ilZhB-0007jd-Uy
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 09:37:32 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ilaMX-0004V8-Pd
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 10:20:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ilZh8-0006p1-GG
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 09:37:29 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39388)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ilaMU-0007B5-6Q
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 10:20:13 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35119)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ilZh8-0006is-50
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 09:37:26 -0500
-Received: by mail-ot1-x344.google.com with SMTP id 77so42940528oty.6
- for <qemu-devel@nongnu.org>; Sun, 29 Dec 2019 06:37:26 -0800 (PST)
+ id 1ilaMT-000764-QJ
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 10:20:10 -0500
+Received: by mail-ot1-x341.google.com with SMTP id k16so38483829otb.2
+ for <qemu-devel@nongnu.org>; Sun, 29 Dec 2019 07:20:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=JJATI8BMxpGbk4GIkVE60B6LGeLKiI/qMwaMnwx0s/E=;
- b=Ep9m0oeHO4mGEAlR30lRJCkMd/ulCQVTX5UmnPBz0sademZ7dhZn125AzVkUEXQbSt
- kYvwEKUKgXZjPTFUQiaY/PYdr++JRjvv9cqoEtsLgJ+vzCx/JPpR0Zma/liAqjTFE8/o
- ebLR5ZSZ3/o3JF/bEzipGpdABj/+WFuXx4DQAQPA5TeFjGi0UHDDN9fNudrVRsOSe8hS
- aZ4ViI67yGFHL9NIVj9um+qYKYG1GPrRmq5PQvG8lyA/XX0Rlvgm1mOA7UhVTwQpZoLs
- kdijeQI5e6QMaqP9/+oAzyi7k8tyjZgMeukdIFt39Pd9pvSH+WpNF6VfNDxUjEYyEeCo
- jxoQ==
+ :cc; bh=SsvcxihDIrQNiNsy0fbrUbqVYY3Rx3Qt26NA1y7JJZc=;
+ b=fo5hGigP/qCygW8+iNMYp40j1P7MUw3Zx90XgwxoFgzvtHVYyydFQgh6KUC/+0jt5M
+ 567Aty/+i9hVheDyrtNjDvk38PkBzwLTiHttmzPeYJpGwW2vJ+sc6Pr0TQtfJIRJP4tF
+ 0jmN9GrP3Ep5Lb6/1qFQRLacZ95hOsxE/AV3wXKfJ8xeYiBhloUSG+6cekCl4t5JZNOP
+ 65jN8azbPNhJ3qneFHfFthid45WAow8Kk7E+vKXri9cVTI/U0yV5kxYVKbVMlVHc5BkT
+ qYCsaeSobR3MKhx3qaMIBDmSriHPVVXCa3x9ksdW+aLQfDTs0CzxJX3xPfvpqbasNH8M
+ uLsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=JJATI8BMxpGbk4GIkVE60B6LGeLKiI/qMwaMnwx0s/E=;
- b=I/wOModg+PPtmgXwK2iD7oWpYfGcwYTsD0zXqHYAU+lEYo9z24D9GDhs72V1xbv5Ki
- f6xkAiOzYjdtKekZET4nUvPhJ0IWDyc/C3MnNMMyUgtFDzWa8xlsMWh1xFjNz/T3cePP
- w3tEyVq8c6O6JcD3XYxTU9YE9Mxvm8ExGRwacSLNHbZGGC2OcLIyIlgraCFPbxcEVtxE
- Whl4o0dFplsXj/WPru2UozmJKf2/+2ipbVQLmVCe5W/SYTrdls2QoKdpp+RIdMkfKij5
- 0heYJNbd9RJvnHMuG3hYkbQYjEplOJ2lTwoyATP88qTYDpNzM/pXiaLIhQ3wwrWmAMoz
- VaTA==
-X-Gm-Message-State: APjAAAXS4YxRFVFZaV8UADa20tl9nVBsu/xwZFZLI9U6SCdoR9RwDopY
- SIPFvUzad8pp8nxUoBUVbmUwBGi0oA8Es7v47Ys=
-X-Google-Smtp-Source: APXvYqy/RKVX5/8hlNzMI//k6o/q+Ks7047kYcoVCcqpbkQO25ejbhaoUZEgLMxCOi/dvu6Bh9ab0lTgV9BId0goH8g=
-X-Received: by 2002:a9d:4c94:: with SMTP id m20mr66551352otf.341.1577630244929; 
- Sun, 29 Dec 2019 06:37:24 -0800 (PST)
+ bh=SsvcxihDIrQNiNsy0fbrUbqVYY3Rx3Qt26NA1y7JJZc=;
+ b=Swn/iCoMXicuXsIVZgAvQ1UN49qc5giPTssRGWOQe5PJtAEJ8MoZ1er5iBxX6N0Raq
+ 3WN52/hrIjHFF6DQ/gU/jPWGgRk62GBJ8ZwHLf5Y9Ggrzvqswiz490hjH1Vk/hsXxXI6
+ 2BVMVAM/HQmfMG/ROysc9XAN2rRwzcMS8aQhYnIrxi+7bHxZQ+2MgGoexIDSVRkytlcx
+ JVsp7A95LZsHVc9bRRXITGs5p8mbTn1qZdjEAvWgrrHgf3U6TmBYhaxDxqj1IoG2BEzh
+ jOrYJ3HNytUDYtYtdbe8o/KGRECPAAQuntZ71yMZDgPAlYW73lwQ3a8zRdFPXLJyijYz
+ GzcQ==
+X-Gm-Message-State: APjAAAXM7LT86dSIxcSrlMBuch6zi8ZsIlmGjx996sG1uqkbBgiYmlSg
+ v2fgpF6wjdTIBZ8ycPmJ7ZU+L2cMLtV2013qJLE=
+X-Google-Smtp-Source: APXvYqyaNZ4C6DIRXRaDa8ELI58QiNN4zorR0G6LZ1GW30lUrq/4exmwLdVqHdUvIOBesGIqdadxVPN8poPvD5Gy8rI=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr69209463otp.306.1577632808845; 
+ Sun, 29 Dec 2019 07:20:08 -0800 (PST)
 MIME-Version: 1.0
 Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Sun, 29 Dec 2019 06:37:24 -0800 (PST)
-In-Reply-To: <CAK4993i0vRtEh=evXyx0=KVziQZWWUsQX9c0JBKjajLv6G-wEw@mail.gmail.com>
-References: <20191218210329.1960-1-mrolnik@gmail.com>
- <20191218210329.1960-4-mrolnik@gmail.com>
- <CAL1e-=hB5FhRtuxo1OGBSKA-aw1GW4RgpisKJWaT0TPHKaTVhw@mail.gmail.com>
- <CAK4993iuuCZzyEzsqodpf_T_3xSSJeF-PP1XLO8PsXy6JwrgfA@mail.gmail.com>
- <CAL1e-=iQ=iBzn9sRDgx9Edi+rO=uP7RqpMyDJQD9RyiB5MwA=A@mail.gmail.com>
- <CAL1e-=h+ujoRaCcXEkrrMJZ5bX=jWbzDy+GgTzsOJzMybHN96g@mail.gmail.com>
- <CAK4993i0vRtEh=evXyx0=KVziQZWWUsQX9c0JBKjajLv6G-wEw@mail.gmail.com>
+ Sun, 29 Dec 2019 07:20:08 -0800 (PST)
+In-Reply-To: <20191228231124.18307-14-richard.henderson@linaro.org>
+References: <20191228231124.18307-1-richard.henderson@linaro.org>
+ <20191228231124.18307-14-richard.henderson@linaro.org>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sun, 29 Dec 2019 15:37:24 +0100
-Message-ID: <CAL1e-=io5JhUP-i50OSk6jpiwxLec-hySVxb59OVVZ0FUkGgxQ@mail.gmail.com>
-Subject: Re: [PATCH v39 03/22] target/avr: Add instruction decoding
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="00000000000056054c059ad8aa72"
+Date: Sun, 29 Dec 2019 16:20:08 +0100
+Message-ID: <CAL1e-=ij8_1GqT-wxLkkfbQ+gKrFXmx5EJxLFDwJjx4F5rYDbg@mail.gmail.com>
+Subject: Re: [PATCH v3 13/29] cputlb: Provide cpu_(ld,
+ st}*_mmuidx_ra for user-only
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000002844ff059ad943c8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,778 +92,883 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000056054c059ad8aa72
+--0000000000002844ff059ad943c8
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Saturday, December 28, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+On Sunday, December 29, 2019, Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-> Hi Aleksandar.
+> This finishes the new interface began with the previous patch.
+> Document the interface and deprecate MMU_MODE<N>_SUFFIX.
 >
-> This seems less logical to me.
-> Then next thing will be to partition disassember part right?
->
->
->
-Please respond inline in future, since inline redponding is standard for
-this mailing list.
-
-What is not logical to you?
-
-I am trying to teach you how to create patches that are logical units easy
-to understand and review.
-
-In my view, yout series doesn't satisfy that basic requirement of being
-organized in proper logical units that are expected from any series to be
-accepted. (The worst part is patch 1)
-
-Regards,
-Aleksandsr
-
-
-
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/exec/cpu_ldst.h     |  80 +++++++++++++-
+>  docs/devel/loads-stores.rst | 211 ++++++++++++++++++++++++++----------
+>  2 files changed, 230 insertions(+), 61 deletions(-)
 >
 >
-> On Sat, Dec 21, 2019 at 7:15 PM Aleksandar Markovic <
-> aleksandar.m.mail@gmail.com> wrote:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+
+
+> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+> index ef59ed61e4..41b98ba801 100644
+> --- a/include/exec/cpu_ldst.h
+> +++ b/include/exec/cpu_ldst.h
+> @@ -25,9 +25,13 @@
+>   *
+>   * The syntax for the accessors is:
+>   *
+> - * load: cpu_ld{sign}{size}_{mmusuffix}(env, ptr)
+> + * load:  cpu_ld{sign}{size}_{mmusuffix}(env, ptr)
+> + *        cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)
+> + *        cpu_ld{sign}{size}_mmuidx_ra(env, ptr, mmu_idx, retaddr)
+>   *
+> - * store: cpu_st{sign}{size}_{mmusuffix}(env, ptr, val)
+> + * store: cpu_st{size}_{mmusuffix}(env, ptr, val)
+> + *        cpu_st{size}_{mmusuffix}_ra(env, ptr, val, retaddr)
+> + *        cpu_st{size}_mmuidx_ra(env, ptr, val, mmu_idx, retaddr)
+>   *
+>   * sign is:
+>   * (empty): for 32 and 64 bit sizes
+> @@ -40,9 +44,10 @@
+>   *   l: 32 bits
+>   *   q: 64 bits
+>   *
+> - * mmusuffix is one of the generic suffixes "data" or "code", or
+> - * (for softmmu configs)  a target-specific MMU mode suffix as defined
+> - * in target cpu.h.
+> + * mmusuffix is one of the generic suffixes "data" or "code", or "mmuidx=
+".
+> + * The "mmuidx" suffix carries an extra mmu_idx argument that specifies
+> + * the index to use; the "data" and "code" suffixes take the index from
+> + * cpu_mmu_index().
+>   */
+>  #ifndef CPU_LDST_H
+>  #define CPU_LDST_H
+> @@ -145,6 +150,71 @@ static inline void clear_helper_retaddr(void)
+>  #undef MEMSUFFIX
+>  #undef CODE_ACCESS
 >
->>
->>
->> On Saturday, December 21, 2019, Aleksandar Markovic <
->> aleksandar.m.mail@gmail.com> wrote:
->>
->>>
->>>
->>> On Saturday, December 21, 2019, Michael Rolnik <mrolnik@gmail.com>
->>> wrote:
->>>
->>>> Hi Aleksandar.
->>>>
->>>> please explain.
->>>>
->>>>>
->>>>>
->>> Hi, Michael.
->>>
->>> I wanted to say:
->>>
->>>
->>> 1. Cut the parts of insn.decode that describe coding of arithmetic and
->>> logic instructions and include them in the patch:
->>>
->>> target/avr: Add instruction translation - Arithmetic and Logic Instruct=
-ions
->>>
->>>
->>> Since that would be the first time insn.decode is mentioned in the new
->> organization of the series, the license preamble of insn.decode can be
->> included in that patch, of course.
->>
->> Best wishes,
->> Aleksandar
->>
->>
->>
->>> 2. Cut the parts of insn.decode that describe coding of branch instruct=
-ions and include them in the patch:
->>>
->>> target/avr: Add instruction translation - Branch Instructions
->>>
->>> 3. Cut the parts of insn.decode that describe coding of data transfer i=
-nstructions
->>> and include them in the patch:
->>>
->>> target/avr: Add instruction translation - Data Transfer Instructions
->>>
->>>
->>> 4. Cut the parts of insn.decode that describe coding of bit and bit-tes=
+> +/*
+> + * Provide the same *_mmuidx_ra interface as for softmmu.
+> + * The mmu_idx argument is ignored.
+> + */
+> +
+> +static inline uint32_t cpu_ldub_mmuidx_ra(CPUArchState *env, abi_ptr
+> addr,
+> +                                          int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldub_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline uint32_t cpu_lduw_mmuidx_ra(CPUArchState *env, abi_ptr
+> addr,
+> +                                          int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_lduw_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline uint32_t cpu_ldl_mmuidx_ra(CPUArchState *env, abi_ptr addr=
+,
+> +                                         int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldl_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline uint64_t cpu_ldq_mmuidx_ra(CPUArchState *env, abi_ptr addr=
+,
+> +                                         int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldq_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline int cpu_ldsb_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldsb_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline int cpu_ldsw_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     int mmu_idx, uintptr_t ra)
+> +{
+> +    return cpu_ldsw_data_ra(env, addr, ra);
+> +}
+> +
+> +static inline void cpu_stb_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint32_t val, int mmu_idx, uintptr_=
 t
->>> instructions and include them in the patch:
->>>
->>> target/avr: Add instruction translation - Bit and Bit-test Instructions
->>>
->>>
->>> 5. Cut the parts of insn.decode that describe coding of MCU control ins=
-tructions
->>> and include them in the patch:
->>>
->>> target/avr: Add instruction translation - MCU Control Instructions
->>>
->>>
->>> This way, your patches become logicaly-organized rather than file
->>> organized. The patch on, let's say, arithmetic and logic instructions w=
-ill
->>> contain all elements needed for their implementation, rather than those
->>> elements being split between decode and omplementation parts .
->>>
->>>
->>>
->>> Regards,
->>>
->>> Aleksandar
->>>
->>>
->>>
->>>> On Sat, Dec 21, 2019 at 1:18 PM Aleksandar Markovic <
->>>> aleksandar.m.mail@gmail.com> wrote:
->>>>
->>>>>
->>>>>
->>>>> On Wednesday, December 18, 2019, Michael Rolnik <mrolnik@gmail.com>
->>>>> wrote:
->>>>>
->>>>>> This includes:
->>>>>> - encoding of all 16 bit instructions
->>>>>> - encoding of all 32 bit instructions
->>>>>>
->>>>>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->>>>>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>>> ---
->>>>>
->>>>>
->>>>> Michael,
->>>>>
->>>>> I am very pleased that you rearranged the order to be in sync with th=
-e
->>>>> documentation.
->>>>>
->>>>> Now, for the next version, I would ask you to make this patch
->>>>> disappear.
->>>>>
->>>>> More precisely, "MCU Control Instructions" section of insn.decode fil=
-e
->>>>> move to be a part of "Add MCU Control Instructions" (not sure abiut t=
-he
->>>>> title, but it is 6 or 7 patches after this one)  patch, and so on, in=
- the
->>>>> same fashion, for all groups of instructions.
->>>>>
->>>>> Kind regards,
->>>>>
->>>>> Aleksandar
->>>>>
->>>>>
->>>>>
->>>>>  target/avr/insn.decode | 183 ++++++++++++++++++++++++++++++
->>>>>> +++++++++++
->>>>>>  1 file changed, 183 insertions(+)
->>>>>>  create mode 100644 target/avr/insn.decode
->>>>>>
->>>>>> diff --git a/target/avr/insn.decode b/target/avr/insn.decode
->>>>>> new file mode 100644
->>>>>> index 0000000000..0e4ec9ddf0
->>>>>> --- /dev/null
->>>>>> +++ b/target/avr/insn.decode
->>>>>> @@ -0,0 +1,183 @@
->>>>>> +#
->>>>>> +# AVR instruction decode definitions.
->>>>>> +#
->>>>>> +# Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
->>>>>> +#
->>>>>> +# This library is free software; you can redistribute it and/or
->>>>>> +# modify it under the terms of the GNU Lesser General Public
->>>>>> +# License as published by the Free Software Foundation; either
->>>>>> +# version 2.1 of the License, or (at your option) any later version=
+> ra)
+> +{
+> +    cpu_stb_data_ra(env, addr, val, ra);
+> +}
+> +
+> +static inline void cpu_stw_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint32_t val, int mmu_idx, uintptr_=
+t
+> ra)
+> +{
+> +    cpu_stw_data_ra(env, addr, val, ra);
+> +}
+> +
+> +static inline void cpu_stl_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint32_t val, int mmu_idx, uintptr_=
+t
+> ra)
+> +{
+> +    cpu_stl_data_ra(env, addr, val, ra);
+> +}
+> +
+> +static inline void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+> +                                     uint64_t val, int mmu_idx, uintptr_=
+t
+> ra)
+> +{
+> +    cpu_stq_data_ra(env, addr, val, ra);
+> +}
+> +
+>  #else
+>
+>  /* Needed for TCG_OVERSIZED_GUEST */
+> diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+> index 8a5bc912a5..03aa9e7ff8 100644
+> --- a/docs/devel/loads-stores.rst
+> +++ b/docs/devel/loads-stores.rst
+> @@ -72,31 +72,34 @@ Regexes for git grep
+>   - ``\<ldn_\([hbl]e\)?_p\>``
+>   - ``\<stn_\([hbl]e\)?_p\>``
+>
+> -``cpu_{ld,st}_*``
+> -~~~~~~~~~~~~~~~~~
+> +``cpu_{ld,st}*_mmuidx_ra``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> -These functions operate on a guest virtual address. Be aware
+> -that these functions may cause a guest CPU exception to be
+> -taken (e.g. for an alignment fault or MMU fault) which will
+> -result in guest CPU state being updated and control longjumping
+> -out of the function call. They should therefore only be used
+> -in code that is implementing emulation of the target CPU.
+> +These functions operate on a guest virtual address plus a context,
+> +known as a "mmu index" or ``mmuidx``, which controls how that virtual
+> +address is translated.  The meaning of the indexes are target specific,
+> +but specifying a particular index might be necessary if, for instance,
+> +the helper requires an "always as non-privileged" access rather that
+> +the default access for the current state of the guest CPU.
+>
+> -These functions may throw an exception (longjmp() back out
+> -to the top level TCG loop). This means they must only be used
+> -from helper functions where the translator has saved all
+> -necessary CPU state before generating the helper function call.
+> -It's usually better to use the ``_ra`` variants described below
+> -from helper functions, but these functions are the right choice
+> -for calls made from hooks like the CPU do_interrupt hook or
+> -when you know for certain that the translator had to save all
+> -the CPU state that ``cpu_restore_state()`` would restore anyway.
+> +These functions may cause a guest CPU exception to be taken
+> +(e.g. for an alignment fault or MMU fault) which will result in
+> +guest CPU state being updated and control longjmp'ing out of the
+> +function call.  They should therefore only be used in code that is
+> +implementing emulation of the guest CPU.
+> +
+> +The ``retaddr`` parameter is used to control unwinding of the
+> +guest CPU state in case of a guest CPU exception.  This is passed
+> +to ``cpu_restore_state()``.  Therefore the value should either be 0,
+> +to indicate that the guest CPU state is already synchronized, or
+> +the result of ``GETPC()`` from the top level ``HELPER(foo)``
+> +function, which is a return address into the generated code.
+>
+>  Function names follow the pattern:
+>
+> -load: ``cpu_ld{sign}{size}_{mmusuffix}(env, ptr)``
+> +load: ``cpu_ld{sign}{size}_mmuidx_ra(env, ptr, mmuidx, retaddr)``
+>
+> -store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
+> +store: ``cpu_st{size}_mmuidx_ra(env, ptr, val, mmuidx, retaddr)``
+>
+>  ``sign``
+>   - (empty) : for 32 or 64 bit sizes
+> @@ -109,56 +112,151 @@ store: ``cpu_st{size}_{mmusuffix}(env, ptr, val)``
+>   - ``l`` : 32 bits
+>   - ``q`` : 64 bits
+>
+> -``mmusuffix`` is one of the generic suffixes ``data`` or ``code``, or
+> -(for softmmu configs) a target-specific MMU mode suffix as defined
+> -in the target's ``cpu.h``.
+> +Regexes for git grep:
+> + - ``\<cpu_ld[us]\?[bwlq]_mmuidx_ra\>``
+> + - ``\<cpu_st[bwlq]_mmuidx_ra\>``
+>
+> -Regexes for git grep
+> - - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+\>``
+> - - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+\>``
+> +``cpu_{ld,st}*_data_ra``
+> +~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> -``cpu_{ld,st}_*_ra``
+> -~~~~~~~~~~~~~~~~~~~~
+> -
+> -These functions work like the ``cpu_{ld,st}_*`` functions except
+> -that they also take a ``retaddr`` argument. This extra argument
+> -allows for correct unwinding of any exception that is taken,
+> -and should generally be the result of GETPC() called directly
+> -from the top level HELPER(foo) function (i.e. the return address
+> -in the generated code).
+> +These functions work like the ``cpu_{ld,st}_mmuidx_ra`` functions
+> +except that the ``mmuidx`` parameter is taken from the current mode
+> +of the guest CPU, as determined by ``cpu_mmu_index(env, false)``.
+>
+>  These are generally the preferred way to do accesses by guest
+> -virtual address from helper functions; see the documentation
+> -of the non-``_ra`` variants for when those would be better.
+> -
+> -Calling these functions with a ``retaddr`` argument of 0 is
+> -equivalent to calling the non-``_ra`` version of the function.
+> +virtual address from helper functions, unless the access should
+> +be performed with a context other than the default.
+>
+>  Function names follow the pattern:
+>
+> -load: ``cpu_ld{sign}{size}_{mmusuffix}_ra(env, ptr, retaddr)``
+> +load: ``cpu_ld{sign}{size}_data_ra(env, ptr, ra)``
+>
+> -store: ``cpu_st{sign}{size}_{mmusuffix}_ra(env, ptr, val, retaddr)``
+> +store: ``cpu_st{size}_data_ra(env, ptr, val, ra)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+> +
+> +Regexes for git grep:
+> + - ``\<cpu_ld[us]\?[bwlq]_data_ra\>``
+> + - ``\<cpu_st[bwlq]_data_ra\>``
+> +
+> +``cpu_{ld,st}*_data``
+> +~~~~~~~~~~~~~~~~~~~~~
+> +
+> +These functions work like the ``cpu_{ld,st}_data_ra`` functions
+> +except that the ``retaddr`` parameter is 0, and thus does not
+> +unwind guest CPU state.
+> +
+> +This means they must only be used from helper functions where the
+> +translator has saved all necessary CPU state.  These functions are
+> +the right choice for calls made from hooks like the CPU ``do_interrupt``
+> +hook or when you know for certain that the translator had to save all
+> +the CPU state anyway.
+> +
+> +Function names follow the pattern:
+> +
+> +load: ``cpu_ld{sign}{size}_data(env, ptr)``
+> +
+> +store: ``cpu_st{size}_data(env, ptr, val)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+>
+>  Regexes for git grep
+> - - ``\<cpu_ld[us]\?[bwlq]_[a-zA-Z0-9]\+_ra\>``
+> - - ``\<cpu_st[bwlq]_[a-zA-Z0-9]\+_ra\>``
+> + - ``\<cpu_ld[us]\?[bwlq]_data\>``
+> + - ``\<cpu_st[bwlq]_data\+\>``
+>
+> -``helper_*_{ld,st}*mmu``
+> -~~~~~~~~~~~~~~~~~~~~~~~~
+> +``cpu_ld*_code``
+> +~~~~~~~~~~~~~~~~
+> +
+> +These functions perform a read for instruction execution.  The ``mmuidx`=
+`
+> +parameter is taken from the current mode of the guest CPU, as determined
+> +by ``cpu_mmu_index(env, true)``.  The ``retaddr`` parameter is 0, and
+> +thus does not unwind guest CPU state, because CPU state is always
+> +synchronized while translating instructions.  Any guest CPU exception
+> +that is raised will indicate an instruction execution fault rather than
+> +a data read fault.
+> +
+> +In general these functions should not be used directly during translatio=
+n.
+> +There are wrapper functions that are to be used which also take care of
+> +plugins for tracing.
+> +
+> +Function names follow the pattern:
+> +
+> +load: ``cpu_ld{sign}{size}_code(env, ptr)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+> +
+> +Regexes for git grep:
+> + - ``\<cpu_ld[us]\?[bwlq]_code\>``
+> +
+> +``translator_ld*``
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +These functions are a wrapper for ``cpu_ld*_code`` which also perform
+> +any actions required by any tracing plugins.  They are only to be
+> +called during the translator callback ``translate_insn``.
+> +
+> +There is a set of functions ending in ``_swap`` which, if the parameter
+> +is true, returns the value in the endianness that is the reverse of
+> +the guest native endianness, as determined by ``TARGET_WORDS_BIGENDIAN``=
 .
->>>>>> +#
->>>>>> +# This library is distributed in the hope that it will be useful,
->>>>>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>>>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>>>>> +# Lesser General Public License for more details.
->>>>>> +#
->>>>>> +# You should have received a copy of the GNU Lesser General Public
->>>>>> +# License along with this library; if not, see <
->>>>>> http://www.gnu.org/licenses/>.
->>>>>> +#
->>>>>> +
->>>>>> +#
->>>>>> +#   regs_16_31_by_one =3D [16 .. 31]
->>>>>> +#   regs_16_23_by_one =3D [16 .. 23]
->>>>>> +#   regs_24_30_by_two =3D [24, 26, 28, 30]
->>>>>> +#   regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]
->>>>>> +
->>>>>> +%rd             4:5
->>>>>> +%rr             9:1 0:4
->>>>>> +
->>>>>> +%rd_a           4:4
->>>>>>  !function=3Dto_regs_16_31_by_one
->>>>>> +%rd_b           4:3
->>>>>>  !function=3Dto_regs_16_23_by_one
->>>>>> +%rd_c           4:2
->>>>>>  !function=3Dto_regs_24_30_by_two
->>>>>> +%rd_d           4:4
->>>>>>  !function=3Dto_regs_00_30_by_two
->>>>>> +%rr_a           0:4
->>>>>>  !function=3Dto_regs_16_31_by_one
->>>>>> +%rr_b           0:3
->>>>>>  !function=3Dto_regs_16_23_by_one
->>>>>> +%rr_d           0:4
->>>>>>  !function=3Dto_regs_00_30_by_two
->>>>>> +
->>>>>> +%imm6           6:2 0:4
->>>>>> +%imm8           8:4 0:4
->>>>>> +
->>>>>> +%io_imm         9:2 0:4
->>>>>> +%ldst_d_imm     13:1 10:2 0:3
->>>>>> +
->>>>>> +# The 22-bit immediate is partially in the opcode word,
->>>>>> +# and partially in the next.  Use append_16 to build the
->>>>>> +# complete 22-bit value.
->>>>>> +%imm_call       4:5 0:1                     !function=3Dappend_16
->>>>>> +
->>>>>> +
->>>>>> +&rd_rr          rd rr
->>>>>> +&rd_imm         rd imm
->>>>>> +
->>>>>> +@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=3D%rd rr=
-=3D%rr
->>>>>> +@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=3D%rd_c
->>>>>> imm=3D%imm6
->>>>>> +@op_rd_imm8     .... .... .... ....         &rd_imm     rd=3D%rd_a
->>>>>> imm=3D%imm8
->>>>>> +@op_bit         .... .... . bit:3 ....
->>>>>> +@op_bit_imm     .... .. imm:s7 bit:3
->>>>>> +@fmul           .... .... . ... . ...       &rd_rr      rd=3D%rd_b
->>>>>> rr=3D%rr_b
->>>>>> +@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=3D%rd
->>>>>> imm=3D%io_imm
->>>>>> +@ldst_d         .. . . .. . rd:5  . ...     &rd_imm
->>>>>>  imm=3D%ldst_d_imm
->>>>>> +
->>>>>> +# The 16-bit immediate is completely in the next word.
->>>>>> +# Fields cannot be defined with no bits, so we cannot play
->>>>>> +# the same trick and append to a zero-bit value.
->>>>>> +# Defer reading the immediate until trans_{LDS,STS}.
->>>>>> +@ldst_s         .... ... rd:5 ....          imm=3D0
->>>>>> +
->>>>>> +#
->>>>>> +# Arithmetic Instructions
->>>>>> +#
->>>>>> +ADD             0000 11 . ..... ....        @op_rd_rr
->>>>>> +ADC             0001 11 . ..... ....        @op_rd_rr
->>>>>> +ADIW            1001 0110 .. .. ....        @op_rd_imm6
->>>>>> +SUB             0001 10 . ..... ....        @op_rd_rr
->>>>>> +SUBI            0101 .... .... ....         @op_rd_imm8
->>>>>> +SBC             0000 10 . ..... ....        @op_rd_rr
->>>>>> +SBCI            0100 .... .... ....         @op_rd_imm8
->>>>>> +SBIW            1001 0111 .. .. ....        @op_rd_imm6
->>>>>> +AND             0010 00 . ..... ....        @op_rd_rr
->>>>>> +ANDI            0111 .... .... ....         @op_rd_imm8
->>>>>> +OR              0010 10 . ..... ....        @op_rd_rr
->>>>>> +ORI             0110 .... .... ....         @op_rd_imm8
->>>>>> +EOR             0010 01 . ..... ....        @op_rd_rr
->>>>>> +COM             1001 010 rd:5 0000
->>>>>> +NEG             1001 010 rd:5 0001
->>>>>> +INC             1001 010 rd:5 0011
->>>>>> +DEC             1001 010 rd:5 1010
->>>>>> +MUL             1001 11 . ..... ....        @op_rd_rr
->>>>>> +MULS            0000 0010 .... ....         &rd_rr      rd=3D%rd_a
->>>>>> rr=3D%rr_a
->>>>>> +MULSU           0000 0011 0 ... 0 ...       @fmul
->>>>>> +FMUL            0000 0011 0 ... 1 ...       @fmul
->>>>>> +FMULS           0000 0011 1 ... 0 ...       @fmul
->>>>>> +FMULSU          0000 0011 1 ... 1 ...       @fmul
->>>>>> +DES             1001 0100 imm:4 1011
->>>>>> +
->>>>>> +#
->>>>>> +# Branch Instructions
->>>>>> +#
->>>>>> +RJMP            1100 imm:s12
->>>>>> +IJMP            1001 0100 0000 1001
->>>>>> +EIJMP           1001 0100 0001 1001
->>>>>> +JMP             1001 010 ..... 110 .        imm=3D%imm_call
->>>>>> +RCALL           1101 imm:s12
->>>>>> +ICALL           1001 0101 0000 1001
->>>>>> +EICALL          1001 0101 0001 1001
->>>>>> +CALL            1001 010 ..... 111 .        imm=3D%imm_call
->>>>>> +RET             1001 0101 0000 1000
->>>>>> +RETI            1001 0101 0001 1000
->>>>>> +CPSE            0001 00 . ..... ....        @op_rd_rr
->>>>>> +CP              0001 01 . ..... ....        @op_rd_rr
->>>>>> +CPC             0000 01 . ..... ....        @op_rd_rr
->>>>>> +CPI             0011 .... .... ....         @op_rd_imm8
->>>>>> +SBRC            1111 110 rr:5 0 bit:3
->>>>>> +SBRS            1111 111 rr:5 0 bit:3
->>>>>> +SBIC            1001 1001 reg:5 bit:3
->>>>>> +SBIS            1001 1011 reg:5 bit:3
->>>>>> +BRBS            1111 00 ....... ...         @op_bit_imm
->>>>>> +BRBC            1111 01 ....... ...         @op_bit_imm
->>>>>> +
->>>>>> +#
->>>>>> +# Data Transfer Instructions
->>>>>> +#
->>>>>> +MOV             0010 11 . ..... ....        @op_rd_rr
->>>>>> +MOVW            0000 0001 .... ....         &rd_rr      rd=3D%rd_d
->>>>>> rr=3D%rr_d
->>>>>> +LDI             1110 .... .... ....         @op_rd_imm8
->>>>>> +LDS             1001 000 ..... 0000         @ldst_s
->>>>>> +LDX1            1001 000 rd:5 1100
->>>>>> +LDX2            1001 000 rd:5 1101
->>>>>> +LDX3            1001 000 rd:5 1110
->>>>>> +LDY2            1001 000 rd:5 1001
->>>>>> +LDY3            1001 000 rd:5 1010
->>>>>> +LDZ2            1001 000 rd:5 0001
->>>>>> +LDZ3            1001 000 rd:5 0010
->>>>>> +LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
->>>>>> +LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
->>>>>> +STS             1001 001 ..... 0000         @ldst_s
->>>>>> +STX1            1001 001 rr:5 1100
->>>>>> +STX2            1001 001 rr:5 1101
->>>>>> +STX3            1001 001 rr:5 1110
->>>>>> +STY2            1001 001 rd:5 1001
->>>>>> +STY3            1001 001 rd:5 1010
->>>>>> +STZ2            1001 001 rd:5 0001
->>>>>> +STZ3            1001 001 rd:5 0010
->>>>>> +STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
->>>>>> +STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
->>>>>> +LPM1            1001 0101 1100 1000
->>>>>> +LPM2            1001 000 rd:5 0100
->>>>>> +LPMX            1001 000 rd:5 0101
->>>>>> +ELPM1           1001 0101 1101 1000
->>>>>> +ELPM2           1001 000 rd:5 0110
->>>>>> +ELPMX           1001 000 rd:5 0111
->>>>>> +SPM             1001 0101 1110 1000
->>>>>> +SPMX            1001 0101 1111 1000
->>>>>> +IN              1011 0 .. ..... ....        @io_rd_imm
->>>>>> +OUT             1011 1 .. ..... ....        @io_rd_imm
->>>>>> +PUSH            1001 001 rd:5 1111
->>>>>> +POP             1001 000 rd:5 1111
->>>>>> +XCH             1001 001 rd:5 0100
->>>>>> +LAC             1001 001 rd:5 0110
->>>>>> +LAS             1001 001 rd:5 0101
->>>>>> +LAT             1001 001 rd:5 0111
->>>>>> +
->>>>>> +#
->>>>>> +# Bit and Bit-test Instructions
->>>>>> +#
->>>>>> +LSR             1001 010 rd:5 0110
->>>>>> +ROR             1001 010 rd:5 0111
->>>>>> +ASR             1001 010 rd:5 0101
->>>>>> +SWAP            1001 010 rd:5 0010
->>>>>> +SBI             1001 1010 reg:5 bit:3
->>>>>> +CBI             1001 1000 reg:5 bit:3
->>>>>> +BST             1111 101 rd:5 0 bit:3
->>>>>> +BLD             1111 100 rd:5 0 bit:3
->>>>>> +BSET            1001 0100 0 bit:3 1000
->>>>>> +BCLR            1001 0100 1 bit:3 1000
->>>>>> +
->>>>>> +#
->>>>>> +# MCU Control Instructions
->>>>>> +#
->>>>>> +BREAK           1001 0101 1001 1000
->>>>>> +NOP             0000 0000 0000 0000
->>>>>> +SLEEP           1001 0101 1000 1000
->>>>>> +WDR             1001 0101 1010 1000
->>>>>> +
->>>>>> --
->>>>>> 2.17.2 (Apple Git-113)
->>>>>>
->>>>>>
->>>>
->>>> --
->>>> Best Regards,
->>>> Michael Rolnik
->>>>
->>>
+> +
+> +Function names follow the pattern:
+> +
+> +load: ``translator_ld{sign}{size}(env, ptr)``
+> +
+> +swap: ``translator_ld{sign}{size}_swap(env, ptr, swap)``
+> +
+> +``sign``
+> + - (empty) : for 32 or 64 bit sizes
+> + - ``u`` : unsigned
+> + - ``s`` : signed
+> +
+> +``size``
+> + - ``b`` : 8 bits
+> + - ``w`` : 16 bits
+> + - ``l`` : 32 bits
+> + - ``q`` : 64 bits
+> +
+> +Regexes for git grep
+> + - ``\<translator_ld[us]\?[bwlq]\(_swap\)\?\>``
+> +
+> +``helper_*_{ld,st}*_mmu``
+> +~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+>  These functions are intended primarily to be called by the code
+>  generated by the TCG backend. They may also be called by target
+> -CPU helper function code. Like the ``cpu_{ld,st}_*_ra`` functions
+> -they perform accesses by guest virtual address; the difference is
+> -that these functions allow you to specify an ``opindex`` parameter
+> -which encodes (among other things) the mmu index to use for the
+> -access. This is necessary if your helper needs to make an access
+> -via a specific mmu index (for instance, an "always as non-privileged"
+> -access) rather than using the default mmu index for the current state
+> -of the guest CPU.
+> +CPU helper function code. Like the ``cpu_{ld,st}_mmuidx_ra`` functions
+> +they perform accesses by guest virtual address, with a given ``mmuidx``.
+>
+> -The ``opindex`` parameter should be created by calling
+> ``make_memop_idx()``.
+> +These functions specify an ``opindex`` parameter which encodes
+> +(among other things) the mmu index to use for the access.  This paramete=
+r
+> +should be created by calling ``make_memop_idx()``.
+>
+>  The ``retaddr`` parameter should be the result of GETPC() called directl=
+y
+>  from the top level HELPER(foo) function (or 0 if no guest CPU state
+> @@ -166,8 +264,9 @@ unwinding is required).
+>
+>  **TODO** The names of these functions are a bit odd for historical
+>  reasons because they were originally expected to be called only from
+> -within generated code. We should rename them to bring them
+> -more in line with the other memory access functions.
+> +within generated code. We should rename them to bring them more in
+> +line with the other memory access functions. The explicit endianness
+> +is the only feature they have beyond ``*_mmuidx_ra``.
+>
+>  load: ``helper_{endian}_ld{sign}{size}_mmu(env, addr, opindex, retaddr)`=
+`
 >
 > --
-> Best Regards,
-> Michael Rolnik
+> 2.20.1
+>
+>
 >
 
---00000000000056054c059ad8aa72
+--0000000000002844ff059ad943c8
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Saturday, December 28, 2019, Michael Rolnik &lt;<a href=3D"mailt=
-o:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=
+<br><br>On Sunday, December 29, 2019, Richard Henderson &lt;<a href=3D"mail=
+to:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; wrote=
+:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-le=
+ft:1px #ccc solid;padding-left:1ex">This finishes the new interface began w=
+ith the previous patch.<br>
+Document the interface and deprecate MMU_MODE&lt;N&gt;_SUFFIX.<br>
+<br>
+Reviewed-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org"=
+>alex.bennee@linaro.org</a>&gt;<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org">richard.henderson@linaro.org</a>&gt;<br>
+---<br>
+=C2=A0include/exec/cpu_ldst.h=C2=A0 =C2=A0 =C2=A0|=C2=A0 80 +++++++++++++-<=
+br>
+=C2=A0docs/devel/loads-stores.rst | 211 ++++++++++++++++++++++++++----<wbr>=
+------<br>
+=C2=A02 files changed, 230 insertions(+), 61 deletions(-)<br>
+<br></blockquote><div><br></div><div><br></div><div><span style=3D"color:rg=
+b(34,34,34);font-size:14px;line-height:22.1200008392334px">Reviewed-by: Ale=
+ksandar Markovic &lt;</span><a href=3D"mailto:amarkovic@wavecomp.com" style=
+=3D"font-size:14px;line-height:22.1200008392334px">amarkovic@wavecomp.com</=
+a><span style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.12000083=
+92334px">&gt;</span></div><div><br></div><div>=C2=A0</div><blockquote class=
 =3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex"><div dir=3D"ltr">Hi=C2=A0Aleksandar.<div><br></div><div>This =
-seems less logical to me.</div><div>Then next thing will be to partition di=
-sassember part right?</div><div><br></div><div><br></div></div></blockquote=
-><div>=C2=A0</div><div>Please respond inline in future, since inline redpon=
-ding is standard for this mailing list.</div><div><br></div><div>What is no=
-t logical to you?</div><div><br></div><div>I am trying to teach you how to =
-create patches that are logical units easy to understand and review.=C2=A0<=
-/div><div><br></div><div>In my view, yout series doesn&#39;t satisfy that b=
-asic requirement of being organized in proper logical units that are expect=
-ed from any series to be accepted. (The worst part is patch 1)</div><div><b=
-r></div><div>Regards,</div><div>Aleksandsr<br></div><div><br></div><div>=C2=
-=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;borde=
-r-left:1px #ccc solid;padding-left:1ex"><div dir=3D"ltr"><div><br></div></d=
-iv><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On =
-Sat, Dec 21, 2019 at 7:15 PM Aleksandar Markovic &lt;<a href=3D"mailto:alek=
-sandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&=
-gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br><=
-br>On Saturday, December 21, 2019, Aleksandar Markovic &lt;<a href=3D"mailt=
-o:aleksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.co=
-m</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br><=
-br>On Saturday, December 21, 2019, Michael Rolnik &lt;<a href=3D"mailto:mro=
-lnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<br><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:=
-1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr">Hi Aleksandar=
-.<div><br></div><div>please explain.</div></div><blockquote class=3D"gmail_=
-quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,=
-204);padding-left:1ex"><br></blockquote></blockquote><div><br></div><div>Hi=
-, Michael.</div><div><br></div><div>I wanted to say:</div><div><br></div><d=
-iv><br></div><div>1. Cut the parts of insn.decode that describe coding of a=
-rithmetic and logic instructions and include them in the patch:</div><div><=
-pre>target/avr: Add instruction <span style=3D"font-family:&quot;Helvetica =
-Neue&quot;,Helvetica,Arial,sans-serif">translation - Arithmetic and Logic I=
-nstructions</span></pre><pre><span style=3D"font-family:&quot;Helvetica Neu=
-e&quot;,Helvetica,Arial,sans-serif"><br></span></pre><pre></pre></div></blo=
-ckquote><div>Since that would be the first time insn.decode is mentioned in=
- the new organization of the series, the license preamble of insn.decode ca=
-n be included in that patch, of course.</div><div><br></div><div>Best wishe=
-s,</div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><blockquote cl=
-ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
- rgb(204,204,204);padding-left:1ex"><div><pre></pre><pre><div style=3D"font=
--family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif;white-space:n=
-ormal">2. Cut the parts of insn.decode that describe coding of branch instr=
-uctions and include them in the patch:</div><div style=3D"font-family:&quot=
-;Helvetica Neue&quot;,Helvetica,Arial,sans-serif;white-space:normal"></div>=
-</pre><pre>target/avr: Add instruction translation - Branch Instructions
-<br></pre><div>3. Cut the parts of insn.decode that describe coding of d<sp=
-an style=3D"white-space:pre-wrap">ata transfer </span>instructions and incl=
-ude them in the=C2=A0patch:<br></div><div></div><pre><span style=3D"font-fa=
-mily:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-serif">target/avr: Add=
- instruction translation - Data Transfer Instructions</span></pre><pre><spa=
-n style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetica,Arial,sans-seri=
-f"><br></span></pre><div>4. Cut the parts of insn.decode that describe codi=
-ng of bit and bit-test instructions and include them in the patch:</div><di=
-v></div><pre><span style=3D"font-family:&quot;Helvetica Neue&quot;,Helvetic=
-a,Arial,sans-serif">target/avr: Add instruction translation - Bit and Bit-t=
-est Instructions</span></pre><pre><span style=3D"font-family:&quot;Helvetic=
-a Neue&quot;,Helvetica,Arial,sans-serif"><br></span></pre><div>5. Cut the p=
-arts of insn.decode that describe coding of=C2=A0<span style=3D"white-space=
-:pre-wrap">MCU control</span>=C2=A0instructions and include them in=C2=A0th=
-e patch:<br></div><div></div><pre><span style=3D"font-family:&quot;Helvetic=
-a Neue&quot;,Helvetica,Arial,sans-serif">target/avr: Add instruction transl=
-ation - MCU Control Instructions</span><br></pre></div><div><br></div><div>=
-This way, your patches become logicaly-organized rather than file organized=
-. The patch on, let&#39;s say, arithmetic and logic instructions will conta=
-in all elements needed for their implementation, rather than those elements=
- being split between decode and omplementation parts .</div><div><br></div>=
-<div><br></div><div><br></div><div>Regards,</div><div><br></div><div>Aleksa=
-ndar</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote"=
- style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
-adding-left:1ex"><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail=
-_attr">On Sat, Dec 21, 2019 at 1:18 PM Aleksandar Markovic &lt;<a href=3D"m=
-ailto:aleksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmai=
-l.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex"><br><br>On Wednesday, December 18, 2019, Michael Rolnik &lt;<a href=3D=
-"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrot=
-e:<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
-order-left:1px solid rgb(204,204,204);padding-left:1ex">This includes:<br>
-- encoding of all 16 bit instructions<br>
-- encoding of all 32 bit instructions<br>
+ing-left:1ex">
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h<br>
+index ef59ed61e4..41b98ba801 100644<br>
+--- a/include/exec/cpu_ldst.h<br>
++++ b/include/exec/cpu_ldst.h<br>
+@@ -25,9 +25,13 @@<br>
+=C2=A0 *<br>
+=C2=A0 * The syntax for the accessors is:<br>
+=C2=A0 *<br>
+- * load: cpu_ld{sign}{size}_{mmusuffix}<wbr>(env, ptr)<br>
++ * load:=C2=A0 cpu_ld{sign}{size}_{mmusuffix}<wbr>(env, ptr)<br>
++ *=C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_ld{sign}{size}_{mmusuffix}<wbr>_ra(env, =
+ptr, retaddr)<br>
++ *=C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_ld{sign}{size}_mmuidx_ra(<wbr>env, ptr, =
+mmu_idx, retaddr)<br>
+=C2=A0 *<br>
+- * store: cpu_st{sign}{size}_{mmusuffix}<wbr>(env, ptr, val)<br>
++ * store: cpu_st{size}_{mmusuffix}(env, ptr, val)<br>
++ *=C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_st{size}_{mmusuffix}_ra(<wbr>env, ptr, v=
+al, retaddr)<br>
++ *=C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_st{size}_mmuidx_ra(env, ptr, val, mmu_id=
+x, retaddr)<br>
+=C2=A0 *<br>
+=C2=A0 * sign is:<br>
+=C2=A0 * (empty): for 32 and 64 bit sizes<br>
+@@ -40,9 +44,10 @@<br>
+=C2=A0 *=C2=A0 =C2=A0l: 32 bits<br>
+=C2=A0 *=C2=A0 =C2=A0q: 64 bits<br>
+=C2=A0 *<br>
+- * mmusuffix is one of the generic suffixes &quot;data&quot; or &quot;code=
+&quot;, or<br>
+- * (for softmmu configs)=C2=A0 a target-specific MMU mode suffix as define=
+d<br>
+- * in target cpu.h.<br>
++ * mmusuffix is one of the generic suffixes &quot;data&quot; or &quot;code=
+&quot;, or &quot;mmuidx&quot;.<br>
++ * The &quot;mmuidx&quot; suffix carries an extra mmu_idx argument that sp=
+ecifies<br>
++ * the index to use; the &quot;data&quot; and &quot;code&quot; suffixes ta=
+ke the index from<br>
++ * cpu_mmu_index().<br>
+=C2=A0 */<br>
+=C2=A0#ifndef CPU_LDST_H<br>
+=C2=A0#define CPU_LDST_H<br>
+@@ -145,6 +150,71 @@ static inline void clear_helper_retaddr(void)<br>
+=C2=A0#undef MEMSUFFIX<br>
+=C2=A0#undef CODE_ACCESS<br>
 <br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
-et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
----</blockquote><div><br></div><div>Michael,</div><div><br></div><div>I am =
-very pleased that you rearranged the order to be in sync with the documenta=
-tion.</div><div><br></div><div>Now, for the next version, I would ask you t=
-o make this patch disappear.</div><div><br></div><div>More precisely, &quot=
-;MCU Control Instructions&quot; section of=C2=A0insn.decode file move to be=
- a part of &quot;Add MCU Control Instructions&quot; (not sure abiut the tit=
-le, but it is 6 or 7 patches after this one) =C2=A0patch, and so on, in the=
- same fashion, for all groups of instructions.</div><div><br></div><div>Kin=
-d regards,</div><div><br></div><div>Aleksandar</div><div><br></div><div><br=
-></div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-=C2=A0target/avr/insn.decode | 183 ++++++++++++++++++++++++++++++<wbr>+++++=
-++++++<br>
-=C2=A01 file changed, 183 insertions(+)<br>
-=C2=A0create mode 100644 target/avr/insn.decode<br>
++/*<br>
++ * Provide the same *_mmuidx_ra interface as for softmmu.<br>
++ * The mmu_idx argument is ignored.<br>
++ */<br>
++<br>
++static inline uint32_t cpu_ldub_mmuidx_ra(<wbr>CPUArchState *env, abi_ptr =
+addr,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 i=
+nt mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 return cpu_ldub_data_ra(env, addr, ra);<br>
++}<br>
++<br>
++static inline uint32_t cpu_lduw_mmuidx_ra(<wbr>CPUArchState *env, abi_ptr =
+addr,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 i=
+nt mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 return cpu_lduw_data_ra(env, addr, ra);<br>
++}<br>
++<br>
++static inline uint32_t cpu_ldl_mmuidx_ra(CPUArchState *env, abi_ptr addr,<=
+br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0in=
+t mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 return cpu_ldl_data_ra(env, addr, ra);<br>
++}<br>
++<br>
++static inline uint64_t cpu_ldq_mmuidx_ra(CPUArchState *env, abi_ptr addr,<=
+br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0in=
+t mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 return cpu_ldq_data_ra(env, addr, ra);<br>
++}<br>
++<br>
++static inline int cpu_ldsb_mmuidx_ra(<wbr>CPUArchState *env, abi_ptr addr,=
 <br>
-diff --git a/target/avr/insn.decode b/target/avr/insn.decode<br>
-new file mode 100644<br>
-index 0000000000..0e4ec9ddf0<br>
---- /dev/null<br>
-+++ b/target/avr/insn.decode<br>
-@@ -0,0 +1,183 @@<br>
-+#<br>
-+# AVR instruction decode definitions.<br>
-+#<br>
-+# Copyright (c) 2019 Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.co=
-m" target=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-+#<br>
-+# This library is free software; you can redistribute it and/or<br>
-+# modify it under the terms of the GNU Lesser General Public<br>
-+# License as published by the Free Software Foundation; either<br>
-+# version 2.1 of the License, or (at your option) any later version.<br>
-+#<br>
-+# This library is distributed in the hope that it will be useful,<br>
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the GNU<b=
-r>
-+# Lesser General Public License for more details.<br>
-+#<br>
-+# You should have received a copy of the GNU Lesser General Public<br>
-+# License along with this library; if not, see &lt;<a href=3D"http://www.g=
-nu.org/licenses/" target=3D"_blank">http://www.gnu.org/licenses/</a>&gt;<wb=
-r>.<br>
-+#<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int mmu_idx, uin=
+tptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 return cpu_ldsb_data_ra(env, addr, ra);<br>
++}<br>
 +<br>
-+#<br>
-+#=C2=A0 =C2=A0regs_16_31_by_one =3D [16 .. 31]<br>
-+#=C2=A0 =C2=A0regs_16_23_by_one =3D [16 .. 23]<br>
-+#=C2=A0 =C2=A0regs_24_30_by_two =3D [24, 26, 28, 30]<br>
-+#=C2=A0 =C2=A0regs_00_30_by_two =3D [0, 2, 4, 6, 8, .. 30]<br>
++static inline int cpu_ldsw_mmuidx_ra(<wbr>CPUArchState *env, abi_ptr addr,=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int mmu_idx, uin=
+tptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 return cpu_ldsw_data_ra(env, addr, ra);<br>
++}<br>
 +<br>
-+%rd=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:5<br>
-+%rr=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A09:1 0:4<br>
++static inline void cpu_stb_mmuidx_ra(CPUArchState *env, abi_ptr addr,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint32_t val, in=
+t mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 cpu_stb_data_ra(env, addr, val, ra);<br>
++}<br>
 +<br>
-+%rd_a=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:4=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_16_31_by_<wbr>one<br>
-+%rd_b=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:3=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_16_23_by_<wbr>one<br>
-+%rd_c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:2=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_24_30_by_<wbr>two<br>
-+%rd_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A04:4=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_00_30_by_<wbr>two<br>
-+%rr_a=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:4=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_16_31_by_<wbr>one<br>
-+%rr_b=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:3=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_16_23_by_<wbr>one<br>
-+%rr_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00:4=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=
-=3Dto_regs_00_30_by_<wbr>two<br>
++static inline void cpu_stw_mmuidx_ra(CPUArchState *env, abi_ptr addr,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint32_t val, in=
+t mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 cpu_stw_data_ra(env, addr, val, ra);<br>
++}<br>
 +<br>
-+%imm6=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A06:2 0:4<br>
-+%imm8=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A08:4 0:4<br>
++static inline void cpu_stl_mmuidx_ra(CPUArchState *env, abi_ptr addr,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint32_t val, in=
+t mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 cpu_stl_data_ra(env, addr, val, ra);<br>
++}<br>
 +<br>
-+%io_imm=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A09:2 0:4<br>
-+%ldst_d_imm=C2=A0 =C2=A0 =C2=A013:1 10:2 0:3<br>
++static inline void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr addr,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0uint64_t val, in=
+t mmu_idx, uintptr_t ra)<br>
++{<br>
++=C2=A0 =C2=A0 cpu_stq_data_ra(env, addr, val, ra);<br>
++}<br>
 +<br>
-+# The 22-bit immediate is partially in the opcode word,<br>
-+# and partially in the next.=C2=A0 Use append_16 to build the<br>
-+# complete 22-bit value.<br>
-+%imm_call=C2=A0 =C2=A0 =C2=A0 =C2=A04:5 0:1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!function=3Dappend_16<br>
-+<br>
-+<br>
-+&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 rd rr<br>
-+&amp;rd_imm=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rd imm<br>
-+<br>
-+@op_rd_rr=C2=A0 =C2=A0 =C2=A0 =C2=A0.... .. . ..... ....=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 &amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd rr=3D%rr<br>
-+@op_rd_imm6=C2=A0 =C2=A0 =C2=A0.... .... .. .. ....=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 &amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd_c imm=3D%imm6<br>
-+@op_rd_imm8=C2=A0 =C2=A0 =C2=A0.... .... .... ....=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0&amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd_a imm=3D%imm8<br>
-+@op_bit=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... .... . bit:3 ....<br>
-+@op_bit_imm=C2=A0 =C2=A0 =C2=A0.... .. imm:s7 bit:3<br>
-+@fmul=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... .... . ... . ...=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_b rr=3D%rr_b<br=
+=C2=A0#else<br>
+<br>
+=C2=A0/* Needed for TCG_OVERSIZED_GUEST */<br>
+diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst<br>
+index 8a5bc912a5..03aa9e7ff8 100644<br>
+--- a/docs/devel/loads-stores.rst<br>
++++ b/docs/devel/loads-stores.rst<br>
+@@ -72,31 +72,34 @@ Regexes for git grep<br>
+=C2=A0 - ``\&lt;ldn_\([hbl]e\)?_p\&gt;``<br>
+=C2=A0 - ``\&lt;stn_\([hbl]e\)?_p\&gt;``<br>
+<br>
+-``cpu_{ld,st}_*``<br>
+-~~~~~~~~~~~~~~~~~<br>
++``cpu_{ld,st}*_mmuidx_ra``<br>
++~~~~~~~~~~~~~~~~~~~~~~~~~~<br>
+<br>
+-These functions operate on a guest virtual address. Be aware<br>
+-that these functions may cause a guest CPU exception to be<br>
+-taken (e.g. for an alignment fault or MMU fault) which will<br>
+-result in guest CPU state being updated and control longjumping<br>
+-out of the function call. They should therefore only be used<br>
+-in code that is implementing emulation of the target CPU.<br>
++These functions operate on a guest virtual address plus a context,<br>
++known as a &quot;mmu index&quot; or ``mmuidx``, which controls how that vi=
+rtual<br>
++address is translated.=C2=A0 The meaning of the indexes are target specifi=
+c,<br>
++but specifying a particular index might be necessary if, for instance,<br>
++the helper requires an &quot;always as non-privileged&quot; access rather =
+that<br>
++the default access for the current state of the guest CPU.<br>
+<br>
+-These functions may throw an exception (longjmp() back out<br>
+-to the top level TCG loop). This means they must only be used<br>
+-from helper functions where the translator has saved all<br>
+-necessary CPU state before generating the helper function call.<br>
+-It&#39;s usually better to use the ``_ra`` variants described below<br>
+-from helper functions, but these functions are the right choice<br>
+-for calls made from hooks like the CPU do_interrupt hook or<br>
+-when you know for certain that the translator had to save all<br>
+-the CPU state that ``cpu_restore_state()`` would restore anyway.<br>
++These functions may cause a guest CPU exception to be taken<br>
++(e.g. for an alignment fault or MMU fault) which will result in<br>
++guest CPU state being updated and control longjmp&#39;ing out of the<br>
++function call.=C2=A0 They should therefore only be used in code that is<br=
 >
-+@io_rd_imm=C2=A0 =C2=A0 =C2=A0 .... . .. ..... ....=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 &amp;rd_imm=C2=A0 =C2=A0 =C2=A0rd=3D%rd imm=3D%io_imm<br>
-+@ldst_d=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.. . . .. . rd:5=C2=A0 . ...=C2=
-=A0 =C2=A0 =C2=A0&amp;rd_imm=C2=A0 =C2=A0 =C2=A0imm=3D%ldst_d_imm<br>
++implementing emulation of the guest CPU.<br>
 +<br>
-+# The 16-bit immediate is completely in the next word.<br>
-+# Fields cannot be defined with no bits, so we cannot play<br>
-+# the same trick and append to a zero-bit value.<br>
-+# Defer reading the immediate until trans_{LDS,STS}.<br>
-+@ldst_s=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.... ... rd:5 ....=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 imm=3D0<br>
++The ``retaddr`` parameter is used to control unwinding of the<br>
++guest CPU state in case of a guest CPU exception.=C2=A0 This is passed<br>
++to ``cpu_restore_state()``.=C2=A0 Therefore the value should either be 0,<=
+br>
++to indicate that the guest CPU state is already synchronized, or<br>
++the result of ``GETPC()`` from the top level ``HELPER(foo)``<br>
++function, which is a return address into the generated code.<br>
+<br>
+=C2=A0Function names follow the pattern:<br>
+<br>
+-load: ``cpu_ld{sign}{size}_{<wbr>mmusuffix}(env, ptr)``<br>
++load: ``cpu_ld{sign}{size}_mmuidx_<wbr>ra(env, ptr, mmuidx, retaddr)``<br>
+<br>
+-store: ``cpu_st{size}_{mmusuffix}(<wbr>env, ptr, val)``<br>
++store: ``cpu_st{size}_mmuidx_ra(env, ptr, val, mmuidx, retaddr)``<br>
+<br>
+=C2=A0``sign``<br>
+=C2=A0 - (empty) : for 32 or 64 bit sizes<br>
+@@ -109,56 +112,151 @@ store: ``cpu_st{size}_{mmusuffix}(<wbr>env, ptr, val=
+)``<br>
+=C2=A0 - ``l`` : 32 bits<br>
+=C2=A0 - ``q`` : 64 bits<br>
+<br>
+-``mmusuffix`` is one of the generic suffixes ``data`` or ``code``, or<br>
+-(for softmmu configs) a target-specific MMU mode suffix as defined<br>
+-in the target&#39;s ``cpu.h``.<br>
++Regexes for git grep:<br>
++ - ``\&lt;cpu_ld[us]\?[bwlq]_mmuidx_<wbr>ra\&gt;``<br>
++ - ``\&lt;cpu_st[bwlq]_mmuidx_ra\&gt;``<br>
+<br>
+-Regexes for git grep<br>
+- - ``\&lt;cpu_ld[us]\?[bwlq]_[a-zA-<wbr>Z0-9]\+\&gt;``<br>
+- - ``\&lt;cpu_st[bwlq]_[a-zA-Z0-9]\+<wbr>\&gt;``<br>
++``cpu_{ld,st}*_data_ra``<br>
++~~~~~~~~~~~~~~~~~~~~~~~~<br>
+<br>
+-``cpu_{ld,st}_*_ra``<br>
+-~~~~~~~~~~~~~~~~~~~~<br>
+-<br>
+-These functions work like the ``cpu_{ld,st}_*`` functions except<br>
+-that they also take a ``retaddr`` argument. This extra argument<br>
+-allows for correct unwinding of any exception that is taken,<br>
+-and should generally be the result of GETPC() called directly<br>
+-from the top level HELPER(foo) function (i.e. the return address<br>
+-in the generated code).<br>
++These functions work like the ``cpu_{ld,st}_mmuidx_ra`` functions<br>
++except that the ``mmuidx`` parameter is taken from the current mode<br>
++of the guest CPU, as determined by ``cpu_mmu_index(env, false)``.<br>
+<br>
+=C2=A0These are generally the preferred way to do accesses by guest<br>
+-virtual address from helper functions; see the documentation<br>
+-of the non-``_ra`` variants for when those would be better.<br>
+-<br>
+-Calling these functions with a ``retaddr`` argument of 0 is<br>
+-equivalent to calling the non-``_ra`` version of the function.<br>
++virtual address from helper functions, unless the access should<br>
++be performed with a context other than the default.<br>
+<br>
+=C2=A0Function names follow the pattern:<br>
+<br>
+-load: ``cpu_ld{sign}{size}_{<wbr>mmusuffix}_ra(env, ptr, retaddr)``<br>
++load: ``cpu_ld{sign}{size}_data_ra(<wbr>env, ptr, ra)``<br>
+<br>
+-store: ``cpu_st{sign}{size}_{<wbr>mmusuffix}_ra(env, ptr, val, retaddr)``<=
+br>
++store: ``cpu_st{size}_data_ra(env, ptr, val, ra)``<br>
 +<br>
-+#<br>
-+# Arithmetic Instructions<br>
-+#<br>
-+ADD=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 11 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+ADC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00001 11 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+ADIW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0110 .. .. ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 @op_rd_imm6<br>
-+SUB=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00001 10 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+SUBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0101 .... .... ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
-+SBC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 10 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+SBCI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0100 .... .... ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
-+SBIW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0111 .. .. ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 @op_rd_imm6<br>
-+AND=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 00 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+ANDI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0111 .... .... ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
-+OR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0010 10 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+ORI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00110 .... .... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
-+EOR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 01 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+COM=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0000<br>
-+NEG=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0001<br>
-+INC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0011<br>
-+DEC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 1010<br>
-+MUL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 11 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+MULS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0010 .... ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_a rr=3D%=
-rr_a<br>
-+MULSU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0011 0 ... 0 ...=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0@fmul<br>
-+FMUL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0011 0 ... 1 ...=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0@fmul<br>
-+FMULS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0011 1 ... 0 ...=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0@fmul<br>
-+FMULSU=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0011 1 ... 1 ...=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0@fmul<br>
-+DES=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0100 imm:4 1011<br=
++``sign``<br>
++ - (empty) : for 32 or 64 bit sizes<br>
++ - ``u`` : unsigned<br>
++ - ``s`` : signed<br>
++<br>
++``size``<br>
++ - ``b`` : 8 bits<br>
++ - ``w`` : 16 bits<br>
++ - ``l`` : 32 bits<br>
++ - ``q`` : 64 bits<br>
++<br>
++Regexes for git grep:<br>
++ - ``\&lt;cpu_ld[us]\?[bwlq]_data_<wbr>ra\&gt;``<br>
++ - ``\&lt;cpu_st[bwlq]_data_ra\&gt;``<br>
++<br>
++``cpu_{ld,st}*_data``<br>
++~~~~~~~~~~~~~~~~~~~~~<br>
++<br>
++These functions work like the ``cpu_{ld,st}_data_ra`` functions<br>
++except that the ``retaddr`` parameter is 0, and thus does not<br>
++unwind guest CPU state.<br>
++<br>
++This means they must only be used from helper functions where the<br>
++translator has saved all necessary CPU state.=C2=A0 These functions are<br=
 >
-+<br>
-+#<br>
-+# Branch Instructions<br>
-+#<br>
-+RJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1100 imm:s12<br>
-+IJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 0000 1001<br>
-+EIJMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0100 0001 1001<br>
-+JMP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 ..... 110 .=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 imm=3D%imm_call<br>
-+RCALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01101 imm:s12<br>
-+ICALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 0000 1001<br>
-+EICALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 0001 1001<br>
-+CALL=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 010 ..... 111 .=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 imm=3D%imm_call<br>
-+RET=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 0000 1000<br>
-+RETI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 0001 1000<br>
-+CPSE=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0001 00 . ..... ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+CP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0001 01 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+CPC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 01 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+CPI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00011 .... .... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
-+SBRC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 110 rr:5 0 bit:3<br>
-+SBRS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 111 rr:5 0 bit:3<br>
-+SBIC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 1001 reg:5 bit:3<br>
-+SBIS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 1011 reg:5 bit:3<br>
-+BRBS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 00 ....... ...=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_bit_imm<br>
-+BRBC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1111 01 ....... ...=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0@op_bit_imm<br>
-+<br>
-+#<br>
-+# Data Transfer Instructions<br>
-+#<br>
-+MOV=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00010 11 . ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @op_rd_rr<br>
-+MOVW=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0000 0001 .... ....=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;rd_rr=C2=A0 =C2=A0 =C2=A0 rd=3D%rd_d rr=3D%=
-rr_d<br>
-+LDI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01110 .... .... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@op_rd_imm8<br>
-+LDS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 ..... 0000=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@ldst_s<br>
-+LDX1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1100<br>
-+LDX2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1101<br>
-+LDX3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1110<br>
-+LDY2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1001<br>
-+LDY3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 1010<br>
-+LDZ2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0001<br>
-+LDZ3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0010<br>
-+LDDY=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 0 ..... 1 ...=C2=
-=A0 =C2=A0 =C2=A0@ldst_d<br>
-+LDDZ=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 0 ..... 0 ...=C2=
-=A0 =C2=A0 =C2=A0@ldst_d<br>
-+STS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 ..... 0000=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0@ldst_s<br>
-+STX1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1100<br>
-+STX2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1101<br>
-+STX3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rr:5 1110<br>
-+STY2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1001<br>
-+STY3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1010<br>
-+STZ2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 0001<br>
-+STZ3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 0010<br>
-+STDY=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 1 ..... 1 ...=C2=
-=A0 =C2=A0 =C2=A0@ldst_d<br>
-+STDZ=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 10 . 0 .. 1 ..... 0 ...=C2=
-=A0 =C2=A0 =C2=A0@ldst_d<br>
-+LPM1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 1100 1000<br>
-+LPM2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0100<br>
-+LPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 000 rd:5 0101<br>
-+ELPM1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1101 1000<br>
-+ELPM2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 0110<br>
-+ELPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 0111<br>
-+SPM=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1110 1000<br>
-+SPMX=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0101 1111 1000<br>
-+IN=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1011 0 .. ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @io_rd_imm<br>
-+OUT=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01011 1 .. ..... ....=C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 @io_rd_imm<br>
-+PUSH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 001 rd:5 1111<br>
-+POP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 000 rd:5 1111<br>
-+XCH=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0100<br>
-+LAC=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0110<br>
-+LAS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0101<br>
-+LAT=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 001 rd:5 0111<br>
-+<br>
-+#<br>
-+# Bit and Bit-test Instructions<br>
-+#<br>
-+LSR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0110<br>
-+ROR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0111<br>
-+ASR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 010 rd:5 0101<br>
-+SWAP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 010 rd:5 0010<br>
-+SBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 1010 reg:5 bit:3<b=
++the right choice for calls made from hooks like the CPU ``do_interrupt``<b=
 r>
-+CBI=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 1000 reg:5 bit:3<b=
-r>
-+BST=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01111 101 rd:5 0 bit:3<b=
-r>
-+BLD=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01111 100 rd:5 0 bit:3<b=
-r>
-+BSET=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 0 bit:3 1000<br>
-+BCLR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1001 0100 1 bit:3 1000<br>
++hook or when you know for certain that the translator had to save all<br>
++the CPU state anyway.<br>
 +<br>
-+#<br>
-+# MCU Control Instructions<br>
-+#<br>
-+BREAK=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1001 1000<br>
-+NOP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00000 0000 0000 0000<br>
-+SLEEP=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1000 1000<br>
-+WDR=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A01001 0101 1010 1000<br>
++Function names follow the pattern:<br>
 +<br>
++load: ``cpu_ld{sign}{size}_data(env, ptr)``<br>
++<br>
++store: ``cpu_st{size}_data(env, ptr, val)``<br>
++<br>
++``sign``<br>
++ - (empty) : for 32 or 64 bit sizes<br>
++ - ``u`` : unsigned<br>
++ - ``s`` : signed<br>
++<br>
++``size``<br>
++ - ``b`` : 8 bits<br>
++ - ``w`` : 16 bits<br>
++ - ``l`` : 32 bits<br>
++ - ``q`` : 64 bits<br>
+<br>
+=C2=A0Regexes for git grep<br>
+- - ``\&lt;cpu_ld[us]\?[bwlq]_[a-zA-<wbr>Z0-9]\+_ra\&gt;``<br>
+- - ``\&lt;cpu_st[bwlq]_[a-zA-Z0-9]\+<wbr>_ra\&gt;``<br>
++ - ``\&lt;cpu_ld[us]\?[bwlq]_data\&gt;`<wbr>`<br>
++ - ``\&lt;cpu_st[bwlq]_data\+\&gt;``<br>
+<br>
+-``helper_*_{ld,st}*mmu``<br>
+-~~~~~~~~~~~~~~~~~~~~~~~~<br>
++``cpu_ld*_code``<br>
++~~~~~~~~~~~~~~~~<br>
++<br>
++These functions perform a read for instruction execution.=C2=A0 The ``mmui=
+dx``<br>
++parameter is taken from the current mode of the guest CPU, as determined<b=
+r>
++by ``cpu_mmu_index(env, true)``.=C2=A0 The ``retaddr`` parameter is 0, and=
+<br>
++thus does not unwind guest CPU state, because CPU state is always<br>
++synchronized while translating instructions.=C2=A0 Any guest CPU exception=
+<br>
++that is raised will indicate an instruction execution fault rather than<br=
+>
++a data read fault.<br>
++<br>
++In general these functions should not be used directly during translation.=
+<br>
++There are wrapper functions that are to be used which also take care of<br=
+>
++plugins for tracing.<br>
++<br>
++Function names follow the pattern:<br>
++<br>
++load: ``cpu_ld{sign}{size}_code(env, ptr)``<br>
++<br>
++``sign``<br>
++ - (empty) : for 32 or 64 bit sizes<br>
++ - ``u`` : unsigned<br>
++ - ``s`` : signed<br>
++<br>
++``size``<br>
++ - ``b`` : 8 bits<br>
++ - ``w`` : 16 bits<br>
++ - ``l`` : 32 bits<br>
++ - ``q`` : 64 bits<br>
++<br>
++Regexes for git grep:<br>
++ - ``\&lt;cpu_ld[us]\?[bwlq]_code\&gt;`<wbr>`<br>
++<br>
++``translator_ld*``<br>
++~~~~~~~~~~~~~~~~~~<br>
++<br>
++These functions are a wrapper for ``cpu_ld*_code`` which also perform<br>
++any actions required by any tracing plugins.=C2=A0 They are only to be<br>
++called during the translator callback ``translate_insn``.<br>
++<br>
++There is a set of functions ending in ``_swap`` which, if the parameter<br=
+>
++is true, returns the value in the endianness that is the reverse of<br>
++the guest native endianness, as determined by ``TARGET_WORDS_BIGENDIAN``.<=
+br>
++<br>
++Function names follow the pattern:<br>
++<br>
++load: ``translator_ld{sign}{size}(<wbr>env, ptr)``<br>
++<br>
++swap: ``translator_ld{sign}{size}_<wbr>swap(env, ptr, swap)``<br>
++<br>
++``sign``<br>
++ - (empty) : for 32 or 64 bit sizes<br>
++ - ``u`` : unsigned<br>
++ - ``s`` : signed<br>
++<br>
++``size``<br>
++ - ``b`` : 8 bits<br>
++ - ``w`` : 16 bits<br>
++ - ``l`` : 32 bits<br>
++ - ``q`` : 64 bits<br>
++<br>
++Regexes for git grep<br>
++ - ``\&lt;translator_ld[us]\?[bwlq]\<wbr>(_swap\)\?\&gt;``<br>
++<br>
++``helper_*_{ld,st}*_mmu``<br>
++~~~~~~~~~~~~~~~~~~~~~~~~~<br>
+<br>
+=C2=A0These functions are intended primarily to be called by the code<br>
+=C2=A0generated by the TCG backend. They may also be called by target<br>
+-CPU helper function code. Like the ``cpu_{ld,st}_*_ra`` functions<br>
+-they perform accesses by guest virtual address; the difference is<br>
+-that these functions allow you to specify an ``opindex`` parameter<br>
+-which encodes (among other things) the mmu index to use for the<br>
+-access. This is necessary if your helper needs to make an access<br>
+-via a specific mmu index (for instance, an &quot;always as non-privileged&=
+quot;<br>
+-access) rather than using the default mmu index for the current state<br>
+-of the guest CPU.<br>
++CPU helper function code. Like the ``cpu_{ld,st}_mmuidx_ra`` functions<br>
++they perform accesses by guest virtual address, with a given ``mmuidx``.<b=
+r>
+<br>
+-The ``opindex`` parameter should be created by calling ``make_memop_idx()`=
+`.<br>
++These functions specify an ``opindex`` parameter which encodes<br>
++(among other things) the mmu index to use for the access.=C2=A0 This param=
+eter<br>
++should be created by calling ``make_memop_idx()``.<br>
+<br>
+=C2=A0The ``retaddr`` parameter should be the result of GETPC() called dire=
+ctly<br>
+=C2=A0from the top level HELPER(foo) function (or 0 if no guest CPU state<b=
+r>
+@@ -166,8 +264,9 @@ unwinding is required).<br>
+<br>
+=C2=A0**TODO** The names of these functions are a bit odd for historical<br=
+>
+=C2=A0reasons because they were originally expected to be called only from<=
+br>
+-within generated code. We should rename them to bring them<br>
+-more in line with the other memory access functions.<br>
++within generated code. We should rename them to bring them more in<br>
++line with the other memory access functions. The explicit endianness<br>
++is the only feature they have beyond ``*_mmuidx_ra``.<br>
+<br>
+=C2=A0load: ``helper_{endian}_ld{sign}{<wbr>size}_mmu(env, addr, opindex, r=
+etaddr)``<br>
+=C2=A0<br>
 -- <br>
-2.17.2 (Apple Git-113)<br>
+2.20.1<br>
 <br>
-</blockquote>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
-</blockquote>
-</blockquote>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
+<br>
 </blockquote>
 
---00000000000056054c059ad8aa72--
+--0000000000002844ff059ad943c8--
 
