@@ -7,74 +7,72 @@ X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C841C2D0D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E38C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:11:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A42520718
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:06:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E72D20409
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:11:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+LVjlR9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A42520718
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHu/QICP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E72D20409
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1im1J3-0005z0-76
-	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 15:06:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52939)
+	id 1im1Ny-0007eT-Qf
+	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 15:11:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1im1ID-0005Rz-NQ
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:05:35 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1im1NJ-000779-Lr
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:10:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1im1IC-0004C2-11
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:05:33 -0500
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:37929)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1im1NH-0001WK-RY
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:10:49 -0500
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:42987)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1im1IB-00049i-P6; Mon, 30 Dec 2019 15:05:31 -0500
-Received: by mail-il1-x143.google.com with SMTP id f5so28671443ilq.5;
- Mon, 30 Dec 2019 12:05:31 -0800 (PST)
+ id 1im1NH-0001Vi-GB; Mon, 30 Dec 2019 15:10:47 -0500
+Received: by mail-il1-x143.google.com with SMTP id t2so13339140ilq.9;
+ Mon, 30 Dec 2019 12:10:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=g9X2mXf5DKOk0UjALzlwCxcS5bofOS+FPHTLLKTZLb0=;
- b=U+LVjlR9VUfWJd8YR/HXe5XyBRM3BY0WeDDqFP/xXyqFIOaLMggKICSb4FJtrNmNb+
- XLJ1sLfJWIKBC7IFYDR9H2+gBs6OSnDIRESmYqlTXtEeuSCy5wBS6lU7U9+E1wfW1kRN
- uZMmAoWvIl17c8w3wcd70L+T7q2D9DprlV6wXOqSWO9JkavImyoZW1Fjtajj3UGFT1uc
- p60OVoYId8kXY8ufspNBto0VPjatO7lg6K862otGeWaMaIv+rZP3Ypd2Abt2Ek+7e88v
- 4WeKeZJPyogrr6MGQcQ+ZVYYpujpTzC8nIL6FJfiXcZpoQbrfV/sWkSnvGKdw9vW22Td
- aB6A==
+ :cc; bh=c5Otgqe1JRl3ZBdsNri3GHgmpT8tEdVyUo3kmz6/T+E=;
+ b=nHu/QICPy38pKXiJytNHC3k9WAaRmuFm03T2mS1YS6hjm0tceRB8a+VfPZ0wd2liRF
+ jjLQLaXbagB/Az4DRNX7Zak7YLuseHIrUmkA2kk5hXHncZckWilFoK8mAjWYkQnsZH8u
+ v6TZnybijrVOFe8l7cM7lzihSmrTp9C9xS52hzR5OC4MoFVr3dXST933W0INdPOREiK/
+ zwS7lXLFVNcG/q2dDCMKYLLf0xU4cH6jvjaS7ZvesxJj3jqxcUxiANcN38Ufv8oA/L49
+ cnlW4Sq0BzpN0S0KR8+5HiwPLpRGPD2bCl6ZQuLs9flBlPPeN4GKYx4DblJ+cMbaObsl
+ l87Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=g9X2mXf5DKOk0UjALzlwCxcS5bofOS+FPHTLLKTZLb0=;
- b=smKj+FUoByU9bYFdTqAW0pBwwzfwZHfUPnIkrgCRAdEKWVA7wWr4AEOHOls5C5SHqV
- tXjnh0d+3al3p2ys3Xka7oWWuhRYSwZ8Xx5TVm4uYB3yOGLyyyItp5ryyl53j+1eeRpI
- pv8+tdIwcM0hx9YoJd3cxNS/AvWwGX0qQr7SUlcjl3W3NFd0rXoK2yVBKbh+aQpkPMA0
- 0MUXRZsmCRdBeoDQG0jNXfgFYBVJbxfB+yAh7nkPC7KPOyAPkmeYa2H7X5+/ro6QH82s
- CiWjafBnJQQ/qrTUpyb82BVQNr314zZKsJ+nh0evGkEnTb/oBJh+rgC9Gqdz5MGoSSF2
- ZgZg==
-X-Gm-Message-State: APjAAAVTMXy+bihx8Zf+k6vvoJIs5ip3V16zujnG6SRhvVmgx8zByBSw
- kh6dvxQ0jUpqDl5tZQr0Fyxw7gRKpbSO+/rukWo=
-X-Google-Smtp-Source: APXvYqzXxSC2IBjbjyYZY8uFgCDT+5fcS0Xoe+yivePI9lnNAckDpedhw8/Xx0DzpnG8ArDj0EaNR9vXval00uoz+Xs=
-X-Received: by 2002:a92:d5cf:: with SMTP id d15mr56490425ilq.306.1577736330877; 
- Mon, 30 Dec 2019 12:05:30 -0800 (PST)
+ bh=c5Otgqe1JRl3ZBdsNri3GHgmpT8tEdVyUo3kmz6/T+E=;
+ b=OUwg/yJxvtDuf/0dtcTSRg6Jeypw2bZcdti6JZybh5qHoFV76CR4Jm7jdaAHdqZUcv
+ INwiiEua2V355Uod6bR4WnaZ+5Qab70+OXM+kEnY9QUgQspC7MhiHlw8/4s7KBICzqNQ
+ rNKmqckWYKJM81FR8lFll6FYIqqE5X7CjuKqcSGhi0qCD3/QWfSIuTszULAUjqMrpACW
+ XtY4qd6TGmudFM3qDa+vclJyiGbltRAadYdaJg31RUPwyVEVIdcIrmiMELbOIzopwb4Q
+ 36jg5HK+mDw1r/NdF5sBoXw68yVev38Hpi7hlu6w9oLBnMWS9/E+pKMZj0p4vfEu32b2
+ 6KEA==
+X-Gm-Message-State: APjAAAUZFlrAzo55hDFSJUwwr9d6s+aNTf8Wvf7rxFhomSUEI4zH0TTh
+ 5ptwyI2j5KUIKjTDpQ/GSEM8q7v4wov2k2Ma/zs=
+X-Google-Smtp-Source: APXvYqwWNYypmvf2xieWXZJPHdbhwYTQ0eFkR4W4S510235nkZJPeatnJa21ZYeFHrDZsW7NW2cN2NXdebWeMU7kHSw=
+X-Received: by 2002:a92:7509:: with SMTP id q9mr36693120ilc.67.1577736646489; 
+ Mon, 30 Dec 2019 12:10:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20191230110953.25496-1-f4bug@amsat.org>
- <20191230110953.25496-7-f4bug@amsat.org>
- <CAPan3WrBN77rcczzQ1knMEKCaCUSCb6RtdhSMiDWE9Ah7jvgjg@mail.gmail.com>
- <9cdbe625-fe29-cb91-2ed4-1231953b3148@redhat.com>
-In-Reply-To: <9cdbe625-fe29-cb91-2ed4-1231953b3148@redhat.com>
+References: <20191216233519.29030-1-nieklinnenbank@gmail.com>
+ <CAPan3WpDbWb_cBMJPgokSLKAJndMQLvRdOav6CPpDbFv+ChN0g@mail.gmail.com>
+ <9756419b-55bf-23a9-556a-d5bc5fb29331@redhat.com>
+In-Reply-To: <9756419b-55bf-23a9-556a-d5bc5fb29331@redhat.com>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Mon, 30 Dec 2019 21:05:19 +0100
-Message-ID: <CAPan3Wre4wsx+-CUBrkkDK_nwCkA-52OT0W3wS8-eM3bs7DaDQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 6/6] hw/arm/cubieboard: Disable unsupported M-USB in
- device tree blob
+Date: Mon, 30 Dec 2019 21:10:35 +0100
+Message-ID: <CAPan3WrYAK+PFtFM7ZDCVsKLc_ksGxZeHEcwB9_FK=4v5p8h=w@mail.gmail.com>
+Subject: Re: [PATCH v2 00/10] Add Allwinner H3 SoC and Orange Pi PC Machine
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000008d2163059af15d66"
+Content-Type: multipart/alternative; boundary="0000000000005cfd1c059af17074"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::143
@@ -89,125 +87,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008d2163059af15d66
+--0000000000005cfd1c059af17074
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hey Philippe,
-
-I took a second look at this and, it seems my previous suggestion was only
-partly valid.
-The kernel error you reported came from the driver in
-drivers/usb/musb/sunxi.c. Apparently, this
-is an Allwinner specific driver for M-USB. And I don't see it documented in
-the A10 user manual.
-
-On the other hand, the USB host interfaces EHCI/OHCI do apply for the A10
-SoC and this board.
-Linux has them defined in the DTB in arch/arm/boot/dts/sun4i-a10.dtsi
-(ehci0/1, ohci0/1).
-But probably that is for another patch/commit.
-
-Regards,
-Niek
-
-On Mon, Dec 30, 2019 at 2:56 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
+On Mon, Dec 30, 2019 at 3:56 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
 com>
 wrote:
 
-> On 12/30/19 12:33 PM, Niek Linnenbank wrote:
-> > Hello Philippe,
+> On 12/30/19 12:28 PM, Niek Linnenbank wrote:
+> > Hi,
 > >
-> > I have a suggestion: probably you can apply (almost) the same patch to
-> > get USB
-> > working for A10 as I did in the Allwinner H3, in patch #4 "add USB host
-> > controller" [1]
-> > That way you can avoid the DTB modifications and with low effort get US=
-B
-> > working as well for this board.
-> > As far as I can see, in Section 21.1 in the A10 user manual [2] has the
-> > same description
-> > as for the H3. It basically has the standard EHCI and OHCI interfaces.
+> > Here a short status report of this patch series.
 >
-> Oh good news. I guess in the long term we want a AllwinnerSoc parent
-> class where all common blocks are mapped, and A10/H3 children with the
-> differences. But we'll worry about that after your H3 series get merged.
+> Good idea!
 >
-> > [1] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg03266.html
-> > [2] https://linux-sunxi.org/File:Allwinner_A10_User_manual_V1.5.pdf
 > >
-> > Regards,
-> > Niek
+> > For V3 update I already prepared the following:
+> >   - reworked all review comments from Philippe, except:
+> >     - patch#8: question for the SID, whether command-line override is
+> > required (and how is the best way for machine-specific cli arg?) [1]
+>
+> Answered recently.
+>
+Thanks!
+
+>
+> > - added BootROM support, allows booting with only specifying -sd <IMG>
+> > - added SDRAM controller driver, for U-Boot SPL
+> > - added Allwinner generic RTC driver (for both Cubieboard and OrangePi
+> > PC, supports sun4i, sun6i, sun7i)
+> > - small fixes for EMAC
+> >
+> > My current TODO:
+> >   - integrate Philips acceptance tests in the series
+>
+> You can queue them in your series, adding your Signed-off-by tag after
+> mine. See:
+>
+> https://www.kernel.org/doc/html/latest/process/submitting-patches.html#si=
+gn-your-work-the-developer-s-certificate-of-origin
+>
+>    The sign-off is a simple line at the end of the explanation for the
+> patch, which certifies that you wrote it or otherwise have the right to
+> pass it on as an open-source patch.
+>
+> See point (c).
+>
+> Ah that certainly helps. I'll read that page.
+
+
+> >   - integrate Philips work for generalizing the Allwinner timer, and
+> > finish it
+>
+> We can also do that later, and get your work merged first.
+>
+
+Ok that sounds very good! Agreed, lets do the timer work later.
+
+
+>
+> >   - test and fix BSD targets (NetBSD, FreeBSD) [2, 3]
+> >   - further generalize the series to cover very similar SoCs: H2+, H5
+> >
+> > Does anyone have more comments/requests for the V3 update?
+> >
+> > [1] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04049.html
+> > [2] https://wiki.netbsd.org/ports/evbarm/allwinner/
+> > [3]
+> >
+> https://wiki.freebsd.org/action/show/arm/Allwinner?action=3Dshow&redirect=
+=3DFreeBSD%2Farm%2FAllwinner
 >
 >
 
 --=20
 Niek Linnenbank
 
---0000000000008d2163059af15d66
+--0000000000005cfd1c059af17074
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hey Philippe,<br></div><div><br></div><di=
-v>I took a second look at this and, it seems my previous suggestion was onl=
-y partly valid.</div><div> The kernel error you reported came from the driv=
-er in drivers/usb/musb/sunxi.c. Apparently, this</div><div>is an Allwinner =
-specific driver for M-USB. And I don&#39;t see it documented in the A10 use=
-r manual.</div><div><br></div><div>On the other hand, the USB host interfac=
-es EHCI/OHCI do apply for the A10 SoC and this board.</div><div>Linux has t=
-hem defined in the DTB in arch/arm/boot/dts/sun4i-a10.dtsi (ehci0/1, ohci0/=
-1).</div><div>But probably that is for another patch/commit.</div><div><br>=
-</div><div>Regards,</div><div>Niek<br></div><div><br></div><div class=3D"gm=
-ail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Dec 30, 2019 at 2:=
-56 PM Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">=
-philmd@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote"=
- style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
-adding-left:1ex">On 12/30/19 12:33 PM, Niek Linnenbank wrote:<br>
-&gt; Hello Philippe,<br>
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Dec 30, 2019 at 3:56 PM Phili=
+ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redh=
+at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On 12/30/19 12:28 PM, Niek Linnenbank wrote:<br>
+&gt; Hi,<br>
 &gt; <br>
-&gt; I have a suggestion: probably you can apply (almost) the same patch to=
+&gt; Here a short status report of this patch series.<br>
+<br>
+Good idea!<br>
+<br>
+&gt; <br>
+&gt; For V3 update I already prepared the following:<br>
+&gt;=C2=A0 =C2=A0- reworked all review comments from Philippe, except:<br>
+&gt;=C2=A0 =C2=A0=C2=A0 - patch#8: question for the SID, whether command-li=
+ne override is <br>
+&gt; required (and how is the best way for machine-specific cli arg?) [1]<b=
+r>
+<br>
+Answered recently.<br></blockquote><div>Thanks! <br></div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
+b(204,204,204);padding-left:1ex">
+<br>
+&gt; - added BootROM support, allows booting with only specifying -sd &lt;I=
+MG&gt;<br>
+&gt; - added SDRAM controller driver, for U-Boot SPL<br>
+&gt; - added Allwinner generic RTC driver (for both Cubieboard and OrangePi=
  <br>
-&gt; get USB<br>
-&gt; working for A10 as I did in the Allwinner H3, in patch #4 &quot;add US=
-B host <br>
-&gt; controller&quot; [1]<br>
-&gt; That way you can avoid the DTB modifications and with low effort get U=
-SB <br>
-&gt; working as well for this board.<br>
-&gt; As far as I can see, in Section 21.1 in the A10 user manual [2] has th=
-e <br>
-&gt; same description<br>
-&gt; as for the H3. It basically has the standard EHCI and OHCI interfaces.=
-<br>
-<br>
-Oh good news. I guess in the long term we want a AllwinnerSoc parent <br>
-class where all common blocks are mapped, and A10/H3 children with the <br>
-differences. But we&#39;ll worry about that after your H3 series get merged=
-.<br>
-<br>
-&gt; [1] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/m=
-sg03266.html" rel=3D"noreferrer" target=3D"_blank">https://lists.gnu.org/ar=
-chive/html/qemu-devel/2019-12/msg03266.html</a><br>
-&gt; [2] <a href=3D"https://linux-sunxi.org/File:Allwinner_A10_User_manual_=
-V1.5.pdf" rel=3D"noreferrer" target=3D"_blank">https://linux-sunxi.org/File=
-:Allwinner_A10_User_manual_V1.5.pdf</a><br>
+&gt; PC, supports sun4i, sun6i, sun7i)<br>
+&gt; - small fixes for EMAC<br>
 &gt; <br>
-&gt; Regards,<br>
-&gt; Niek<br>
+&gt; My current TODO:<br>
+&gt;=C2=A0 =C2=A0- integrate Philips acceptance tests in the series<br>
+<br>
+You can queue them in your series, adding your Signed-off-by tag after <br>
+mine. See:<br>
+<a href=3D"https://www.kernel.org/doc/html/latest/process/submitting-patche=
+s.html#sign-your-work-the-developer-s-certificate-of-origin" rel=3D"norefer=
+rer" target=3D"_blank">https://www.kernel.org/doc/html/latest/process/submi=
+tting-patches.html#sign-your-work-the-developer-s-certificate-of-origin</a>=
+<br>
+<br>
+=C2=A0 =C2=A0The sign-off is a simple line at the end of the explanation fo=
+r the <br>
+patch, which certifies that you wrote it or otherwise have the right to <br=
+>
+pass it on as an open-source patch.<br>
+<br>
+See point (c).<br>
+<br></blockquote><div>Ah that certainly helps. I&#39;ll read that page.<br>=
+</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+&gt;=C2=A0 =C2=A0- integrate Philips work for generalizing the Allwinner ti=
+mer, and <br>
+&gt; finish it<br>
+<br>
+We can also do that later, and get your work merged first.<br></blockquote>=
+<div><br></div><div>Ok that sounds very good! Agreed, lets do the timer wor=
+k later.<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">
+<br>
+&gt;=C2=A0 =C2=A0- test and fix BSD targets (NetBSD, FreeBSD) [2, 3]<br>
+&gt;=C2=A0 =C2=A0- further generalize the series to cover very similar SoCs=
+: H2+, H5<br>
+&gt; <br>
+&gt; Does anyone have more comments/requests for the V3 update?<br>
+&gt; <br>
+&gt; [1] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/m=
+sg04049.html" rel=3D"noreferrer" target=3D"_blank">https://lists.gnu.org/ar=
+chive/html/qemu-devel/2019-12/msg04049.html</a><br>
+&gt; [2] <a href=3D"https://wiki.netbsd.org/ports/evbarm/allwinner/" rel=3D=
+"noreferrer" target=3D"_blank">https://wiki.netbsd.org/ports/evbarm/allwinn=
+er/</a><br>
+&gt; [3] <br>
+&gt; <a href=3D"https://wiki.freebsd.org/action/show/arm/Allwinner?action=
+=3Dshow&amp;redirect=3DFreeBSD%2Farm%2FAllwinner" rel=3D"noreferrer" target=
+=3D"_blank">https://wiki.freebsd.org/action/show/arm/Allwinner?action=3Dsho=
+w&amp;redirect=3DFreeBSD%2Farm%2FAllwinner</a><br>
 <br>
 </blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
 mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
 div></div>
 
---0000000000008d2163059af15d66--
+--0000000000005cfd1c059af17074--
 
