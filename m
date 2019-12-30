@@ -2,76 +2,102 @@ Return-Path: <SRS0=s40H=2U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F143EC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 22:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 609DFC2D0C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 23:00:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9B52206DB
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 22:03:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B52206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 238F9206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 23:00:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HHFHqBk4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238F9206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1im38P-0007UN-HJ
-	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 17:03:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52845)
+	id 1im41f-0008Cb-58
+	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 18:00:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ilyFf-0003wZ-9z
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 11:50:44 -0500
+ (envelope-from <philmd@redhat.com>) id 1im40b-0007ip-97
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 17:59:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ilyFe-0008Ge-2H
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 11:50:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56428)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ilyFd-0008GW-T1
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 11:50:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ilyFb-00035m-Kt
- for <qemu-devel@nongnu.org>; Mon, 30 Dec 2019 16:50:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9C66E2E80C0
- for <qemu-devel@nongnu.org>; Mon, 30 Dec 2019 16:50:39 +0000 (UTC)
+ (envelope-from <philmd@redhat.com>) id 1im40Y-0000P3-8j
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 17:59:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38674
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1im40Y-0000IF-2N
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 17:59:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577746768;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pOBSoYSqiWQjBrUtAcV/qem+ibiygU+Pte2uOxw+L1c=;
+ b=HHFHqBk4MaqWt07UlBnvgrjXy+Xj4FwxGzOc2Uu3aOsMpjRUE045XYb5wNomEoyyJzmxCl
+ YeyTH3mnvfyT6qUQmv+gPKrP9Yjj4BTi8UdRXByEtjE3/PL+DnfBuOkuBmcFkVsWAgSx+H
+ vHwyev7hbZcB21L5KB7ZYTRV5ennaxM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179-ouVrUqxqPU-QwM1yfk7shA-1; Mon, 30 Dec 2019 17:59:23 -0500
+Received: by mail-wr1-f71.google.com with SMTP id k18so17277821wrw.9
+ for <qemu-devel@nongnu.org>; Mon, 30 Dec 2019 14:59:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pOBSoYSqiWQjBrUtAcV/qem+ibiygU+Pte2uOxw+L1c=;
+ b=reDZXj9FxKOFDi6AQjNNQtLs/WZ7mUCwYT3nfNi/ALI4Or5oV9RD7MHHmMNuxUrqJ9
+ Enr4qM3HnWuoZGtbsPhtAFaolVr+42bwd1FGEZF38LbeQyXUbBv2idgRDANnvxUvMmMM
+ ofDNHScP5itpd2fs7/DRErPl7eQjw+LAlBkxIUUV1lZTP9dDezX7aLX7zUBBdt3ALGBH
+ f16Ms1kNDMUrgRassrF3w6mze1nmkepkAHoUTZWvO+d5PnReEVtD02ALHSvXY0B4dKhm
+ UOgw/qLijRH3ENlvqilFtde7+pn51hdFCK9muKTQ2Toq0QMv2dlzyivlgomCE17jVKJ6
+ x9Uw==
+X-Gm-Message-State: APjAAAV8ReGgvftYiorPevzmMexEyh8CV2BNpFoDeehvU2Qnzxl8exKZ
+ 8uERE6ShQiE+YfHHBYcaxl+cFqnPBfRQu4pvjo5rBdT6BxKzLm/yczVYyRQV7Nu4Jm4Bu8dl3m5
+ FnWUQjJg625scm+Y=
+X-Received: by 2002:a5d:404b:: with SMTP id w11mr71920011wrp.171.1577746762506; 
+ Mon, 30 Dec 2019 14:59:22 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxHoDjfiWd983ESjr+aYkxq5u0glUtsj1zuAb8fDxXS2Cv7mri1y/O7CpCbjwMX4q9BBhhboA==
+X-Received: by 2002:a5d:404b:: with SMTP id w11mr71920001wrp.171.1577746762238; 
+ Mon, 30 Dec 2019 14:59:22 -0800 (PST)
+Received: from ?IPv6:2a01:cb18:8372:6b00:691b:aac5:8837:d4da?
+ ([2a01:cb18:8372:6b00:691b:aac5:8837:d4da])
+ by smtp.gmail.com with ESMTPSA id w8sm812099wmm.0.2019.12.30.14.59.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 30 Dec 2019 14:59:21 -0800 (PST)
+Subject: Re: [PATCH] display/gtk: get proper refreshrate
+To: Nikola Pavlica <pavlica.nikola@gmail.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
+References: <8531e41f28df7f4bebe4db257ff95e92f5145afc.camel@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <dc998ea3-4fbe-8ecb-65f5-0af59ddd0d6f@redhat.com>
+Date: Mon, 30 Dec 2019 23:59:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Dec 2019 16:41:45 -0000
-From: Alex Fliker <alexandru.barbovschi@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: crash hvf macos
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bwibking cuser2 fliker09 kisg roolebo
-X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
-X-Launchpad-Bug-Modifier: Alex Fliker (fliker09)
-References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157772410599.5239.8975502245585267506.malone@gac.canonical.com>
-Subject: [Bug 1818937] Re: Crash with HV_ERROR on macOS host
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 76ff33dc01b0c05deb9c7d163622eac9784f3ca1
+In-Reply-To: <8531e41f28df7f4bebe4db257ff95e92f5145afc.camel@gmail.com>
+Content-Language: en-US
+X-MC-Unique: ouVrUqxqPU-QwM1yfk7shA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Mon, 30 Dec 2019 17:01:56 -0500
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,87 +106,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Are there any updates? Trying to run the IE11 image from Microsoft
-(based on Windows 8.1) and it is crashing with this error sporadically
-:-\
+Hi Nikola,
 
--- =
+Thanks for your patch!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818937
+On 12/30/19 6:28 PM, Nikola Pavlica wrote:
+>  From 70c95b18fa056b2dd0ecc202ab517bc775b986da Mon Sep 17 00:00:00 2001
+> From: Nikola Pavlica <pavlica.nikola@gmail.com>
+> Date: Mon, 30 Dec 2019 18:17:35 +0100
+> Subject: [PATCH] display/gtk: get proper refreshrate
 
-Title:
-  Crash with HV_ERROR on macOS host
+Can you describe here the problem you encountered, and how your patch 
+fixes it?
 
-Status in QEMU:
-  New
+> 
+> Signed-off-by: Nikola Pavlica <pavlica.nikola@gmail.com>
+> ---
+>   ui/gtk.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index 692ccc7bbb..7a041457f2 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -2259,6 +2259,11 @@ static void gtk_display_init(DisplayState *ds,
+> DisplayOptions *opts)
+>           opts->u.gtk.grab_on_hover) {
+>           gtk_menu_item_activate(GTK_MENU_ITEM(s->grab_on_hover_item));
+>       }
+> +
+> +    GdkDisplay *display = gdk_display_get_default();
 
-Bug description:
-  On macOS host running Windows 10 guest, qemu crashed with error
-  message: Error: HV_ERROR.
+Can we use window_display declared earlier instead?
 
-  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
- 4278U.
-  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
-  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
-rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
+     window_display = gtk_widget_get_display(s->window);
 
-  thread list
-  Process 56054 stopped
-    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
-nar16 + 970, queue =3D 'com.apple.main-thread'
-    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
-__select + 10
-    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
-__sigwait + 10
-  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
-__pthread_kill + 10, stop reason =3D signal SIGABRT
-    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
-`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
-    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #32: tid =3D 0x300c17, 0x0000000000000000
-    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
-`__psynch_cvwait + 10
+If you look at the CODING_STYLE.rst file referenced here:
+https://wiki.qemu.org/Contribute/SubmitAPatch#Use_the_QEMU_coding_style
+It states:
 
-  =
+   Declarations
+   ============
 
-  Crashed thread:
+   Mixed declarations (interleaving statements and declarations
+   within blocks) are generally not allowed; declarations should
+   be at the beginning of blocks.
 
-  * thread #6, stop reason =3D signal SIGABRT
-    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
-10
-      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
-85
-      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
-      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
-unavailable>) at hvf.c:106 [opt]
-      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
-x00007f8e5283de00) at hvf.c:681 [opt]
-      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
-n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
-      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
-s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
-      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
-126
-      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
- 70
-      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
+So you should move the declaration of both display/monitor variables 
+earlier, around line 2192.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
+> +    GdkMonitor *monitor = gdk_display_get_primary_monitor(display);
+> +    vc->gfx.dcl.update_interval = 1000000 /
+> +        gdk_monitor_get_refresh_rate(monitor);
+
+Now looking at this line, I think this should be done in the 
+gd_vc_gfx_init() function (line 2029, before the 
+register_displaychangelistener() call).
+
+>   }
+>   
+>   static void early_gtk_display_init(DisplayOptions *opts)
+> 
+
+As suggested on IRC, your patch have more chances to get reviewed if you 
+Cc its maintainers. See this help here:
+https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer
+
+In this case we get:
+
+$ ./scripts/get_maintainer.pl -f ui/gtk.c
+Gerd Hoffmann <kraxel@redhat.com> (odd fixer:Graphics)
+qemu-devel@nongnu.org (open list:All patches CC here)
+
+I'm Cc'ing Gerd for you.
+
+Regards,
+
+Phil.
+
 
