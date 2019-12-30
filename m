@@ -2,113 +2,102 @@ Return-Path: <SRS0=s40H=2U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E59C2D0CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 09:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5187DC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 10:00:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 652062071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 09:53:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 652062071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 14A802071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 10:00:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LJYC2y7w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14A802071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilrkE-0000e1-Iz
-	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 04:53:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53421)
+	id 1ilrqk-000295-55
+	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 05:00:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sw@weilnetz.de>) id 1ilrjZ-0008SQ-1D
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 04:53:09 -0500
+ (envelope-from <philmd@redhat.com>) id 1ilrq0-0001VS-FJ
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 04:59:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1ilrjY-0002Sk-2e
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 04:53:08 -0500
-Received: from mail.weilnetz.de ([37.120.169.71]:37452
- helo=v2201612906741603.powersrv.de)
+ (envelope-from <philmd@redhat.com>) id 1ilrpy-0006PD-Sk
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 04:59:47 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42670
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>)
- id 1ilrjV-0002Px-Kg; Mon, 30 Dec 2019 04:53:05 -0500
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id DEE60DB9A6A;
- Mon, 30 Dec 2019 10:53:02 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id FIlKc108VSlr; Mon, 30 Dec 2019 10:53:01 +0100 (CET)
-Received: from edv-macbook-pro.fritz.box (pD9EC3B33.dip0.t-ipconnect.de
- [217.236.59.51])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 0D0CFDA0376;
- Mon, 30 Dec 2019 10:53:01 +0100 (CET)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ilrpy-0006ON-Oo
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 04:59:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577699986;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gqFk+x0X9D60pam+u0Foq5BjemwZC+N+k+hZLjLiTVE=;
+ b=LJYC2y7wItLSGB24HW8x8iAxOOeOLQNf3C2lmL8/Ke/VyvMyV3vxqD9ly/jTzRPHlC+0na
+ clcafZUXw9woZ+tQdVBKH5Ys+9Zbu/gMjk3UKTZCiRP130n3wwde3WJAvlptT6DbWjkc81
+ ejVi2VgecVvHWaJghOg9+X8ZK/edPAw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-DqbMEHdkNLaDRiAmax4bhg-1; Mon, 30 Dec 2019 04:59:44 -0500
+Received: by mail-wm1-f72.google.com with SMTP id m133so1457037wmf.2
+ for <qemu-devel@nongnu.org>; Mon, 30 Dec 2019 01:59:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nHtO6Vsw0hLQyKeVXTvkdGim74QMEL7005MktoQeb/g=;
+ b=tSEPmPui8vc1CZo+3hSkDiVWbzzXc8/i03qFoaeXZa0OMDalvvm5CaNIkDdX53rrI7
+ IIWUvlQ26A5/qZ7r/5eph9RIPcHyFPHfAmPKj91TKF6mxdS/aOoRuOYuVNUJnVJjsRwd
+ 82jffxeNSr2t9XVG55/BuQB9hW74CL4zKTEVciUeZ5Xb90GzHSGAOuNLeUdWhNwa3CgY
+ Z1Y50T5DsRs+Nmoapk727da3ZLcNPxp6dx7D2czp22gai2VQvP2TxM/FAeUVDCoxl1ko
+ xXdayHO5UjewDrLb5ndWJ+61p9fDEcqWWhCrnj4ogKE4fnM/CiQS0l3tjoKJyxsKOYp6
+ mdCw==
+X-Gm-Message-State: APjAAAWxHjBQJ3zIzp484b64q326rk+SWahck1EIo8hGchfuH+CRU9JQ
+ 54g5hhl2QeNZhqY338/tQG/JgploJFQ7mvho4JOBxnjgiekBEkefzwhTB/vKohSo9a6sexQD3ZJ
+ S6Nz7kqQiFtPRKiE=
+X-Received: by 2002:a1c:4454:: with SMTP id r81mr33061268wma.117.1577699983544; 
+ Mon, 30 Dec 2019 01:59:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzQJMPuSs+59lxAJOKH6KCCABboI19InCFscJ7xeEBu6XQWYAjfD10FKvWAF/jvDgOikM0V3Q==
+X-Received: by 2002:a1c:4454:: with SMTP id r81mr33061234wma.117.1577699983295; 
+ Mon, 30 Dec 2019 01:59:43 -0800 (PST)
+Received: from ?IPv6:2a01:cb18:8372:6b00:691b:aac5:8837:d4da?
+ ([2a01:cb18:8372:6b00:691b:aac5:8837:d4da])
+ by smtp.gmail.com with ESMTPSA id i16sm20447753wmb.36.2019.12.30.01.59.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 30 Dec 2019 01:59:42 -0800 (PST)
 Subject: Re: [PATCH 1/2] tcg: Search includes from the project root source
  directory
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>
 References: <20191230090900.446-1-philmd@redhat.com>
  <20191230090900.446-2-philmd@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <273bf2e5-1223-3d01-f930-394195c037e4@weilnetz.de>
-Date: Mon, 30 Dec 2019 10:53:00 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.3.1
+ <273bf2e5-1223-3d01-f930-394195c037e4@weilnetz.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <64c2434d-3b2b-1a3e-5358-e4b5acfbe8e8@redhat.com>
+Date: Mon, 30 Dec 2019 10:59:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191230090900.446-2-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <273bf2e5-1223-3d01-f930-394195c037e4@weilnetz.de>
+Content-Language: en-US
+X-MC-Unique: DqbMEHdkNLaDRiAmax4bhg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 37.120.169.71
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -142,32 +131,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 30.12.19 um 10:08 schrieb Philippe Mathieu-Daud=C3=A9:
+Hi Stefan,
 
-[...]
+On 12/30/19 10:53 AM, Stefan Weil wrote:
+> Am 30.12.19 um 10:08 schrieb Philippe Mathieu-Daud=C3=A9:
+>=20
+> [...]
+>=20
+>>   tcg/tcg-op.h                  | 2 +-
+>>   tcg/tcg.h                     | 4 ++--
+>>   tcg/tcg-common.c              | 2 +-
+>>   tcg/tcg-op-gvec.c             | 8 ++++----
+>>   tcg/tcg-op-vec.c              | 6 +++---
+>>   tcg/tcg-op.c                  | 6 +++---
+>>   tcg/tcg.c                     | 2 +-
+>>   tcg/tci.c                     | 2 +-
+>=20
+>=20
+> Source files in the tcg directory should not need any change because
+> they find include files in the same directory without searching.
+>=20
+> If we add a tcg/ include file prefix for them as well, that has the
+> advantage that it might look prettier and more uniform, but it has the
+> disadvantage of requiring a search by the preprocessor.
 
->  tcg/tcg-op.h                  | 2 +-
->  tcg/tcg.h                     | 4 ++--
->  tcg/tcg-common.c              | 2 +-
->  tcg/tcg-op-gvec.c             | 8 ++++----
->  tcg/tcg-op-vec.c              | 6 +++---
->  tcg/tcg-op.c                  | 6 +++---
->  tcg/tcg.c                     | 2 +-
->  tcg/tci.c                     | 2 +-
+Yeah, I was not sure about these specific files. My first attempt was=20
+without modifying them, but then I thought it would be better to keep=20
+the codebase uniform, as you said.
 
+>=20
+> I'd prefer not changing those files.
 
-Source files in the tcg directory should not need any change because
-they find include files in the same directory without searching.
+OK, I'll wait to see what Richard/Markus prefer.
 
-If we add a tcg/ include file prefix for them as well, that has the
-advantage that it might look prettier and more uniform, but it has the
-disadvantage of requiring a search by the preprocessor.
+> Regards and best wished for 2020
 
-I'd prefer not changing those files.
-
-Regards and best wished for 2020
-Stefan
-
-
+Thanks ;)
 
 
