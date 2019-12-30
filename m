@@ -2,77 +2,60 @@ Return-Path: <SRS0=s40H=2U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB58C2D0C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 00:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55432C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 02:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E088B20748
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 00:21:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E088B20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 249C020718
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 02:24:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249C020718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ilio5-0002Vo-0P
-	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 19:21:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46584)
+	id 1ilkja-0007xN-6t
+	for qemu-devel@archiver.kernel.org; Sun, 29 Dec 2019 21:24:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ilinT-00025s-Jv
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 19:20:36 -0500
+ (envelope-from <wangyan122@huawei.com>) id 1ilkiz-0007Qg-98
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 21:24:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ilinS-0001Zb-DT
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 19:20:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57340)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ilinS-0001ZD-8I
- for qemu-devel@nongnu.org; Sun, 29 Dec 2019 19:20:34 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ilinQ-0001GC-Ny
- for <qemu-devel@nongnu.org>; Mon, 30 Dec 2019 00:20:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9C5002E805B
- for <qemu-devel@nongnu.org>; Mon, 30 Dec 2019 00:20:32 +0000 (UTC)
+ (envelope-from <wangyan122@huawei.com>) id 1ilkiy-0004aq-2k
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 21:24:05 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:56602 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wangyan122@huawei.com>)
+ id 1ilkix-0004W5-OT
+ for qemu-devel@nongnu.org; Sun, 29 Dec 2019 21:24:04 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id E36EF160F3E1806C38A6;
+ Mon, 30 Dec 2019 10:23:54 +0800 (CST)
+Received: from HGHY4W004241041.china.huawei.com (10.133.208.128) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 30 Dec 2019 10:23:48 +0800
+From: Yan Wang <wangyan122@huawei.com>
+To: <groug@kaod.org>
+Subject: [PATCH] 9p: local: fix memory leak
+Date: Mon, 30 Dec 2019 10:23:47 +0800
+Message-ID: <20191230022347.36932-1-wangyan122@huawei.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
+X-Originating-IP: [10.133.208.128]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 30 Dec 2019 00:13:36 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1857449@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cirosantilli philmd
-X-Launchpad-Bug-Reporter: =?utf-8?b?Q2lybyBTYW50aWxsaSDlha3lm5vkuovku7Yg?=
- =?utf-8?b?5rOV6L2u5YqfIChjaXJvc2FudGlsbGkp?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <157719032956.5393.6667899255989227451.malonedeb@gac.canonical.com>
-Message-Id: <157766481703.27484.8151704558958836012.malone@chaenomeles.canonical.com>
-Subject: [Bug 1857449] Re: QEMU x86_64 -nographic full system breaks host Bash
- terminal line wrapping state after simulation ends,
- requires reset or "tput smam" to fix it
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 90b0bbf7055c0c48b522a8b9a5c2fa58dbf11891
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 45.249.212.35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,65 +64,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1857449 <1857449@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Apparently the code you run (BIOS?) is sending the DECRST control sequence =
-to the terminal, which disable the auto-wrap mode flag.
-Looking at the detailed explanations on https://github.com/mattiase/wraptes=
-t I'm not sure how QEMU can save/restore this flag.
+Signed-off-by: Yan Wang <wangyan122@huawei.com>
+---
+ hw/9pfs/9p-local.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
--- =
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index ca641390fb..d0592c3b45 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -947,7 +947,7 @@ static int local_link(FsContext *ctx, V9fsPath *oldpa=
+th,
+     if (ctx->export_flags & V9FS_SM_MAPPED_FILE &&
+         local_is_mapped_file_metadata(ctx, name)) {
+         errno =3D EINVAL;
+-        return -1;
++        goto out;
+     }
+=20
+     odirfd =3D local_opendir_nofollow(ctx, odirpath);
+--=20
+2.19.1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1857449
 
-Title:
-  QEMU x86_64 -nographic full system breaks host Bash terminal line
-  wrapping state after simulation ends, requires reset or "tput smam" to
-  fix it
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU 4.2.0 compiled from source, Ubuntu 19.10, open a fresh new gnome
-  terminal.
-
-  If you print 1000 =3D chars on the host terminal, then they do wrap
-  around the end of the terminal:
-
-  printf "=3D%.0s" {0..1000}
-
-  However, if you first run QEMU:
-
-  x86_64-softmmu/qemu-system-x86_64 -nographic
-
-  and then quit it in any way, e.g. with Ctrl + A, and then re-run on
-  the host terminal:
-
-  printf "=3D%.0s" {0..1000}
-
-  then the signs don't wrap around anymore, they just go "off the
-  terminal to the right".
-
-  This can be fixed with either:
-
-  reset
-  tpam smam
-
-  but unfortunately those don't work in tmux for some reason:
-  https://github.com/tmux/tmux/issues/969
-
-  I consider this buggy behavior, QEMU should restore the original
-  terminal state if possible.
-
-  Related: https://github.com/cirosantilli/linux-kernel-module-
-  cheat/issues/110
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1857449/+subscriptions
 
