@@ -2,80 +2,85 @@ Return-Path: <SRS0=s40H=2U=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E38C2D0C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814BFC2D0C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:53:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E72D20409
-	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:11:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4418E20658
+	for <qemu-devel@archiver.kernel.org>; Mon, 30 Dec 2019 20:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nHu/QICP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E72D20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R8X1ijzz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4418E20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1im1Ny-0007eT-Qf
-	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 15:11:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
+	id 1im22R-0004Z0-Fg
+	for qemu-devel@archiver.kernel.org; Mon, 30 Dec 2019 15:53:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1im1NJ-000779-Lr
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:10:51 -0500
+ (envelope-from <wainersm@redhat.com>) id 1im21f-00043N-2S
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1im1NH-0001WK-RY
- for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:10:49 -0500
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:42987)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1im1NH-0001Vi-GB; Mon, 30 Dec 2019 15:10:47 -0500
-Received: by mail-il1-x143.google.com with SMTP id t2so13339140ilq.9;
- Mon, 30 Dec 2019 12:10:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=c5Otgqe1JRl3ZBdsNri3GHgmpT8tEdVyUo3kmz6/T+E=;
- b=nHu/QICPy38pKXiJytNHC3k9WAaRmuFm03T2mS1YS6hjm0tceRB8a+VfPZ0wd2liRF
- jjLQLaXbagB/Az4DRNX7Zak7YLuseHIrUmkA2kk5hXHncZckWilFoK8mAjWYkQnsZH8u
- v6TZnybijrVOFe8l7cM7lzihSmrTp9C9xS52hzR5OC4MoFVr3dXST933W0INdPOREiK/
- zwS7lXLFVNcG/q2dDCMKYLLf0xU4cH6jvjaS7ZvesxJj3jqxcUxiANcN38Ufv8oA/L49
- cnlW4Sq0BzpN0S0KR8+5HiwPLpRGPD2bCl6ZQuLs9flBlPPeN4GKYx4DblJ+cMbaObsl
- l87Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=c5Otgqe1JRl3ZBdsNri3GHgmpT8tEdVyUo3kmz6/T+E=;
- b=OUwg/yJxvtDuf/0dtcTSRg6Jeypw2bZcdti6JZybh5qHoFV76CR4Jm7jdaAHdqZUcv
- INwiiEua2V355Uod6bR4WnaZ+5Qab70+OXM+kEnY9QUgQspC7MhiHlw8/4s7KBICzqNQ
- rNKmqckWYKJM81FR8lFll6FYIqqE5X7CjuKqcSGhi0qCD3/QWfSIuTszULAUjqMrpACW
- XtY4qd6TGmudFM3qDa+vclJyiGbltRAadYdaJg31RUPwyVEVIdcIrmiMELbOIzopwb4Q
- 36jg5HK+mDw1r/NdF5sBoXw68yVev38Hpi7hlu6w9oLBnMWS9/E+pKMZj0p4vfEu32b2
- 6KEA==
-X-Gm-Message-State: APjAAAUZFlrAzo55hDFSJUwwr9d6s+aNTf8Wvf7rxFhomSUEI4zH0TTh
- 5ptwyI2j5KUIKjTDpQ/GSEM8q7v4wov2k2Ma/zs=
-X-Google-Smtp-Source: APXvYqwWNYypmvf2xieWXZJPHdbhwYTQ0eFkR4W4S510235nkZJPeatnJa21ZYeFHrDZsW7NW2cN2NXdebWeMU7kHSw=
-X-Received: by 2002:a92:7509:: with SMTP id q9mr36693120ilc.67.1577736646489; 
- Mon, 30 Dec 2019 12:10:46 -0800 (PST)
+ (envelope-from <wainersm@redhat.com>) id 1im21c-0000Hn-1S
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:52:29 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22707
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1im21b-0000G2-JE
+ for qemu-devel@nongnu.org; Mon, 30 Dec 2019 15:52:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577739146;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Zc0FTPmlN/eRAhViCLUrPsRLUXsok9bOT2zdMSbRLgQ=;
+ b=R8X1ijzzwhP2BLHQXQe7+C7Ec4lqGlZV+KePHM+EzWmQ+aRsmT1+jbEn43b0dVmGog84bW
+ gBr5li2m2Z+o5WwlKbuuVU7lN+iDB8m7ZbKwfI/pTrJulTj2M6w//qzELlyvnlznhvtA31
+ Qh3j1sm7cjWWhsWQQ9+23Xmyab7h9lQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-NjHmOij-PCKjhle4dijyog-1; Mon, 30 Dec 2019 15:52:21 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 797B2107ACC5;
+ Mon, 30 Dec 2019 20:52:19 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-92.gru2.redhat.com
+ [10.97.116.92])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C0BF778E81;
+ Mon, 30 Dec 2019 20:52:15 +0000 (UTC)
+Subject: Re: [PATCH 1/6] tests/boot_linux_console: Add initrd test for the
+ CubieBoard
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20191230110953.25496-1-f4bug@amsat.org>
+ <20191230110953.25496-2-f4bug@amsat.org>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <31147d48-2f31-9fce-b8a4-1a270f114a45@redhat.com>
+Date: Mon, 30 Dec 2019 18:52:13 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20191216233519.29030-1-nieklinnenbank@gmail.com>
- <CAPan3WpDbWb_cBMJPgokSLKAJndMQLvRdOav6CPpDbFv+ChN0g@mail.gmail.com>
- <9756419b-55bf-23a9-556a-d5bc5fb29331@redhat.com>
-In-Reply-To: <9756419b-55bf-23a9-556a-d5bc5fb29331@redhat.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Mon, 30 Dec 2019 21:10:35 +0100
-Message-ID: <CAPan3WrYAK+PFtFM7ZDCVsKLc_ksGxZeHEcwB9_FK=4v5p8h=w@mail.gmail.com>
-Subject: Re: [PATCH v2 00/10] Add Allwinner H3 SoC and Orange Pi PC Machine
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000005cfd1c059af17074"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::143
+In-Reply-To: <20191230110953.25496-2-f4bug@amsat.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: NjHmOij-PCKjhle4dijyog-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,177 +92,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005cfd1c059af17074
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 30, 2019 at 3:56 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
+On 12/30/19 9:09 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> This test boots a Linux kernel on a CubieBoard and verify
+> the serial output is working.
+>
+> The kernel image and DeviceTree blob are built by the Armbian
+> project (based on Debian):
+> https://docs.armbian.com/Developer-Guide_Build-Preparation/
+>
+> The cpio image used comes from the linux-build-test project:
+> https://github.com/groeck/linux-build-test
+>
+> If ARM is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:arm" tags.
+>
+> Alternatively, this test can be run using:
+>
+>    $ avocado --show=3Dconsole run -t machine:cubieboard tests/acceptance/=
+boot_linux_console.py
+>    console: Uncompressing Linux... done, booting the kernel.
+>    console: Booting Linux on physical CPU 0x0
+>    console: Linux version 4.20.7-sunxi (root@armbian.com) (gcc version 7.=
+2.1 20171011 (Linaro GCC 7.2-2017.11)) #5.75 SMP Fri Feb 8 09:02:10 CET 201=
+9
+>    console: CPU: ARMv7 Processor [410fc080] revision 0 (ARMv7), cr=3D50c5=
+387d
+>    console: CPU: PIPT / VIPT nonaliasing data cache, VIPT nonaliasing ins=
+truction cache
+>    console: OF: fdt: Machine model: Cubietech Cubieboard
+>    [...]
+>    console: Boot successful.
+>    console: cat /proc/cpuinfo
+>    console: / # cat /proc/cpuinfo
+>    console: processor      : 0
+>    console: model name     : ARMv7 Processor rev 0 (v7l)
+>    console: BogoMIPS       : 832.51
+>    [...]
+>    console: Hardware       : Allwinner sun4i/sun5i Families
+>    console: Revision       : 0000
+>    console: Serial         : 0000000000000000
+>    console: cat /proc/iomem
+>    console: / # cat /proc/iomem
+>    console: 01c00000-01c0002f : system-control@1c00000
+>    console: 01c02000-01c02fff : dma-controller@1c02000
+>    console: 01c05000-01c05fff : spi@1c05000
+>    console: 01c0b080-01c0b093 : mdio@1c0b080
+>    console: 01c0c000-01c0cfff : lcd-controller@1c0c000
+>    console: 01c0d000-01c0dfff : lcd-controller@1c0d000
+>    console: 01c0f000-01c0ffff : mmc@1c0f000
+>    [...]
+>    PASS (54.35 s)
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>   tests/acceptance/boot_linux_console.py | 41 ++++++++++++++++++++++++++
+>   1 file changed, 41 insertions(+)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index 9c6aa2040a..4643f60e37 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -400,6 +400,47 @@ class BootLinuxConsole(Test):
+>           self.wait_for_console_pattern('Boot successful.')
+>           # TODO user command, for now the uart is stuck
+>  =20
+> +    def test_arm_cubieboard_initrd(self):
 
-> On 12/30/19 12:28 PM, Niek Linnenbank wrote:
-> > Hi,
-> >
-> > Here a short status report of this patch series.
->
-> Good idea!
->
-> >
-> > For V3 update I already prepared the following:
-> >   - reworked all review comments from Philippe, except:
-> >     - patch#8: question for the SID, whether command-line override is
-> > required (and how is the best way for machine-specific cli arg?) [1]
->
-> Answered recently.
->
-Thanks!
+Unless you have two tests, one with and without initrd (not the case=20
+though) the suffix '_initrd' is useless. So I suggest to remove it.
 
->
-> > - added BootROM support, allows booting with only specifying -sd <IMG>
-> > - added SDRAM controller driver, for U-Boot SPL
-> > - added Allwinner generic RTC driver (for both Cubieboard and OrangePi
-> > PC, supports sun4i, sun6i, sun7i)
-> > - small fixes for EMAC
-> >
-> > My current TODO:
-> >   - integrate Philips acceptance tests in the series
->
-> You can queue them in your series, adding your Signed-off-by tag after
-> mine. See:
->
-> https://www.kernel.org/doc/html/latest/process/submitting-patches.html#si=
-gn-your-work-the-developer-s-certificate-of-origin
->
->    The sign-off is a simple line at the end of the explanation for the
-> patch, which certifies that you wrote it or otherwise have the right to
-> pass it on as an open-source patch.
->
-> See point (c).
->
-> Ah that certainly helps. I'll read that page.
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:cubieboard
+> +        """
+> +        deb_url =3D ('https://apt.armbian.com/pool/main/l/'
+> +                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.=
+deb')
+> +        deb_hash =3D '1334c29c44d984ffa05ed10de8c3361f33d78315'
+> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+> +        kernel_path =3D self.extract_from_deb(deb_path,
+> +                                            '/boot/vmlinuz-4.20.7-sunxi'=
+)
+> +        dtb_path =3D '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboar=
+d.dtb'
+> +        dtb_path =3D self.extract_from_deb(deb_path, dtb_path)
+> +        initrd_url =3D ('https://github.com/groeck/linux-build-test/raw/=
+'
+> +                      '2eb0a73b5d5a28df3170c546ddaaa9757e1e0848/rootfs/'
+> +                      'arm/rootfs-armv5.cpio.gz')
+> +        initrd_hash =3D '2b50f1873e113523967806f4da2afe385462ff9b'
+> +        initrd_path_gz =3D self.fetch_asset(initrd_url, asset_hash=3Dini=
+trd_hash)
+> +        initrd_path =3D os.path.join(self.workdir, 'rootfs.cpio')
+> +        archive.gzip_uncompress(initrd_path_gz, initrd_path)
+> +
+> +        self.vm.set_console()
+> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+> +                               'console=3DttyS0,115200 '
+> +                               'usbcore.nousb '
+> +                               'panic=3D-1 noreboot')
+> +        self.vm.add_args('-kernel', kernel_path,
+> +                         '-dtb', dtb_path,
+> +                         '-initrd', initrd_path,
+> +                         '-append', kernel_command_line,
+> +                         '-no-reboot')
+> +        self.vm.launch()
+> +        self.wait_for_console_pattern('Boot successful.')
+> +
+> +        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
+> +                                                'Allwinner sun4i/sun5i')
+> +        exec_command_and_wait_for_pattern(self, 'cat /proc/iomem',
+> +                                                'system-control@1c00000'=
+)
+> +        exec_command_and_wait_for_pattern(self, 'reboot',
+> +                                                'reboot: Restarting syst=
+em')
 
 
-> >   - integrate Philips work for generalizing the Allwinner timer, and
-> > finish it
->
-> We can also do that later, and get your work merged first.
->
+I ran this test case with success, so:
 
-Ok that sounds very good! Agreed, lets do the timer work later.
+Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+
+With the comment regarding the _initrd suffix:
+
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
 
->
-> >   - test and fix BSD targets (NetBSD, FreeBSD) [2, 3]
-> >   - further generalize the series to cover very similar SoCs: H2+, H5
-> >
-> > Does anyone have more comments/requests for the V3 update?
-> >
-> > [1] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04049.html
-> > [2] https://wiki.netbsd.org/ports/evbarm/allwinner/
-> > [3]
-> >
-> https://wiki.freebsd.org/action/show/arm/Allwinner?action=3Dshow&redirect=
-=3DFreeBSD%2Farm%2FAllwinner
->
->
+> +
+>       def test_s390x_s390_ccw_virtio(self):
+>           """
+>           :avocado: tags=3Darch:s390x
 
---=20
-Niek Linnenbank
-
---0000000000005cfd1c059af17074
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Dec 30, 2019 at 3:56 PM Phili=
-ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redh=
-at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
-:1ex">On 12/30/19 12:28 PM, Niek Linnenbank wrote:<br>
-&gt; Hi,<br>
-&gt; <br>
-&gt; Here a short status report of this patch series.<br>
-<br>
-Good idea!<br>
-<br>
-&gt; <br>
-&gt; For V3 update I already prepared the following:<br>
-&gt;=C2=A0 =C2=A0- reworked all review comments from Philippe, except:<br>
-&gt;=C2=A0 =C2=A0=C2=A0 - patch#8: question for the SID, whether command-li=
-ne override is <br>
-&gt; required (and how is the best way for machine-specific cli arg?) [1]<b=
-r>
-<br>
-Answered recently.<br></blockquote><div>Thanks! <br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">
-<br>
-&gt; - added BootROM support, allows booting with only specifying -sd &lt;I=
-MG&gt;<br>
-&gt; - added SDRAM controller driver, for U-Boot SPL<br>
-&gt; - added Allwinner generic RTC driver (for both Cubieboard and OrangePi=
- <br>
-&gt; PC, supports sun4i, sun6i, sun7i)<br>
-&gt; - small fixes for EMAC<br>
-&gt; <br>
-&gt; My current TODO:<br>
-&gt;=C2=A0 =C2=A0- integrate Philips acceptance tests in the series<br>
-<br>
-You can queue them in your series, adding your Signed-off-by tag after <br>
-mine. See:<br>
-<a href=3D"https://www.kernel.org/doc/html/latest/process/submitting-patche=
-s.html#sign-your-work-the-developer-s-certificate-of-origin" rel=3D"norefer=
-rer" target=3D"_blank">https://www.kernel.org/doc/html/latest/process/submi=
-tting-patches.html#sign-your-work-the-developer-s-certificate-of-origin</a>=
-<br>
-<br>
-=C2=A0 =C2=A0The sign-off is a simple line at the end of the explanation fo=
-r the <br>
-patch, which certifies that you wrote it or otherwise have the right to <br=
->
-pass it on as an open-source patch.<br>
-<br>
-See point (c).<br>
-<br></blockquote><div>Ah that certainly helps. I&#39;ll read that page.<br>=
-</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-&gt;=C2=A0 =C2=A0- integrate Philips work for generalizing the Allwinner ti=
-mer, and <br>
-&gt; finish it<br>
-<br>
-We can also do that later, and get your work merged first.<br></blockquote>=
-<div><br></div><div>Ok that sounds very good! Agreed, lets do the timer wor=
-k later.<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">
-<br>
-&gt;=C2=A0 =C2=A0- test and fix BSD targets (NetBSD, FreeBSD) [2, 3]<br>
-&gt;=C2=A0 =C2=A0- further generalize the series to cover very similar SoCs=
-: H2+, H5<br>
-&gt; <br>
-&gt; Does anyone have more comments/requests for the V3 update?<br>
-&gt; <br>
-&gt; [1] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/m=
-sg04049.html" rel=3D"noreferrer" target=3D"_blank">https://lists.gnu.org/ar=
-chive/html/qemu-devel/2019-12/msg04049.html</a><br>
-&gt; [2] <a href=3D"https://wiki.netbsd.org/ports/evbarm/allwinner/" rel=3D=
-"noreferrer" target=3D"_blank">https://wiki.netbsd.org/ports/evbarm/allwinn=
-er/</a><br>
-&gt; [3] <br>
-&gt; <a href=3D"https://wiki.freebsd.org/action/show/arm/Allwinner?action=
-=3Dshow&amp;redirect=3DFreeBSD%2Farm%2FAllwinner" rel=3D"noreferrer" target=
-=3D"_blank">https://wiki.freebsd.org/action/show/arm/Allwinner?action=3Dsho=
-w&amp;redirect=3DFreeBSD%2Farm%2FAllwinner</a><br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
-
---0000000000005cfd1c059af17074--
 
