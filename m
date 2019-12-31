@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21307C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14F2C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:38:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E02F0206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:37:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB5B8206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:38:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNShPplM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E02F0206DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+cHaJII"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB5B8206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHhz-0004zn-HK
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:37:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56416)
+	id 1imHjQ-0007JN-Ey
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:38:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHCJ-0005jc-V6
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:33 -0500
+ (envelope-from <imammedo@redhat.com>) id 1imHCX-0005rd-2y
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHCE-0003z9-PQ
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55311
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1imHCS-0004HL-12
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49010
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCE-0003wV-IY
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:26 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCQ-0004F1-Ma
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797466;
+ s=mimecast20190719; t=1577797478;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B1bQJCYl+M/Ne+UhybFCL4M7d/tlSaEX26IlcWHZjhc=;
- b=XNShPplMH8BzuvW/Ae6GKWzpQZPNCTC3AO/GeU5Mdox/nSBVu5S4dMjFr0rbJOuPPdgMaF
- fIP+XVpSfBHWdiuL5onO0xULchMBKP1U0ZvtbUfGkth1HH+t58Zxq7bxuqC5BUXue64C0j
- rLa0k3byK/hUtpfOqbuLhA9usyy6wZc=
+ bh=wLuo5naVQqI5MzQmvnq/Z/TlQR0qIfPl9fITLLXC2GQ=;
+ b=H+cHaJII6TSR4Ow1UtgXfQOL8qX6aVOgdunmO7kNPrC6rpZjoGoLLFqtSYhtvcsSmQSI6N
+ UslfFnOXM2IlbWW6k6H0W6OHcdSxZ/bMED5j6NRuqIMucC5Z88PNe4aRWiWQnNVTAX4laX
+ zj/GwjzIepAMZ4YKcgPymfHRmeyGQcs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-7ZOfKySzO0m9RU6IgG9EKg-1; Tue, 31 Dec 2019 08:04:24 -0500
+ us-mta-30-_Lbi_ZlrO0CLtSn0Ma6-og-1; Tue, 31 Dec 2019 08:04:35 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDAAA1005510
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB84718031DA
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:34 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 54C25620A6
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 72D94620A6
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:34 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 42/86] cris:axis_dev88: use memdev for RAM
-Date: Tue, 31 Dec 2019 14:03:26 +0100
-Message-Id: <1577797450-88458-43-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 56/86] mips:mips_malta: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:40 +0100
+Message-Id: <1577797450-88458-57-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 7ZOfKySzO0m9RU6IgG9EKg-1
+X-MC-Unique: _Lbi_ZlrO0CLtSn0Ma6-og-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,49 +99,55 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/cris/axis_dev88.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/mips/mips_malta.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-index 940c7dd..82e9bcb 100644
---- a/hw/cris/axis_dev88.c
-+++ b/hw/cris/axis_dev88.c
-@@ -249,7 +249,6 @@ static struct cris_load_info li;
- static
- void axisdev88_init(MachineState *machine)
- {
--    ram_addr_t ram_size =3D machine->ram_size;
-     const char *kernel_filename =3D machine->kernel_filename;
-     const char *kernel_cmdline =3D machine->kernel_cmdline;
-     CRISCPU *cpu;
-@@ -262,17 +261,13 @@ void axisdev88_init(MachineState *machine)
-     struct etraxfs_dma_client *dma_eth;
-     int i;
-     MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *phys_ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *phys_intmem =3D g_new(MemoryRegion, 1);
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 783cd99..adffa3a 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -1223,7 +1223,6 @@ void mips_malta_init(MachineState *machine)
+     char *filename;
+     PFlashCFI01 *fl;
+     MemoryRegion *system_memory =3D get_system_memory();
+-    MemoryRegion *ram_high =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ram_low_preio =3D g_new(MemoryRegion, 1);
+     MemoryRegion *ram_low_postio;
+     MemoryRegion *bios, *bios_copy =3D g_new(MemoryRegion, 1);
+@@ -1261,13 +1260,11 @@ void mips_malta_init(MachineState *machine)
+     }
 =20
-     /* init CPUs */
-     cpu =3D CRIS_CPU(cpu_create(machine->cpu_type));
-     env =3D &cpu->env;
-=20
--    /* allocate RAM */
--    memory_region_allocate_system_memory(phys_ram, NULL, "axisdev88.ram",
+     /* register RAM at high address where it is undisturbed by IO */
+-    memory_region_allocate_system_memory(ram_high, NULL, "mips_malta.ram",
 -                                         ram_size);
--    memory_region_add_subregion(address_space_mem, 0x40000000, phys_ram);
-+    memory_region_add_subregion(address_space_mem, 0x40000000, machine->ra=
-m);
+-    memory_region_add_subregion(system_memory, 0x80000000, ram_high);
++    memory_region_add_subregion(system_memory, 0x80000000, machine->ram);
 =20
-     /* The ETRAX-FS has 128Kb on chip ram, the docs refer to it as the=20
-        internal memory.  */
-@@ -355,6 +350,7 @@ static void axisdev88_machine_init(MachineClass *mc)
-     mc->init =3D axisdev88_init;
-     mc->is_default =3D 1;
-     mc->default_cpu_type =3D CRIS_CPU_TYPE_NAME("crisv32");
-+    mc->default_ram_id =3D "axisdev88.ram";
+     /* alias for pre IO hole access */
+     memory_region_init_alias(ram_low_preio, NULL, "mips_malta_low_preio.ra=
+m",
+-                             ram_high, 0, MIN(ram_size, 256 * MiB));
++                             machine->ram, 0, MIN(ram_size, 256 * MiB));
+     memory_region_add_subregion(system_memory, 0, ram_low_preio);
+=20
+     /* alias for post IO hole access, if there is enough RAM */
+@@ -1275,7 +1272,7 @@ void mips_malta_init(MachineState *machine)
+         ram_low_postio =3D g_new(MemoryRegion, 1);
+         memory_region_init_alias(ram_low_postio, NULL,
+                                  "mips_malta_low_postio.ram",
+-                                 ram_high, 512 * MiB,
++                                 machine->ram, 512 * MiB,
+                                  ram_size - 512 * MiB);
+         memory_region_add_subregion(system_memory, 512 * MiB,
+                                     ram_low_postio);
+@@ -1447,6 +1444,7 @@ static void mips_malta_machine_init(MachineClass *mc)
+ #else
+     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
+ #endif
++    mc->default_ram_id =3D "mips_malta.ram";
  }
 =20
- DEFINE_MACHINE("axis-dev88", axisdev88_machine_init)
+ DEFINE_MACHINE("malta", mips_malta_machine_init)
 --=20
 2.7.4
 
