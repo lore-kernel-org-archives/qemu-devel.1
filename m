@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8AEEC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA3A3C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 769FE206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FB2C206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:23:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MjadgHUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769FE206DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WF2bGOKo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FB2C206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHUG-0003Rv-3c
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:23:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56151)
+	id 1imHUj-0004AI-3c
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:23:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHCC-0005eP-RK
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:25 -0500
+ (envelope-from <imammedo@redhat.com>) id 1imHC4-0005R7-NU
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHCB-0003j3-Fq
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:24 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45675
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1imHC2-000365-LH
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57538
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCB-0003h1-AN
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:23 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHC2-00032f-ED
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797462;
+ s=mimecast20190719; t=1577797453;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=m19fOxX7h2bliNC0m68qr2ip1wTDRq6lTo+RgGFC5Y0=;
- b=MjadgHUBFooUYlj1bj2yD52R2uehy2ofjW9VqlmPaO4dwTydzF/SyXl1R8HC2IlS1xBXQo
- 8L+oGQFFA63Sd8y42HchTye/xMkFJjrPicK0ypg1J9dYX7G0nfgpYfYJa+hMY0TZF2rGWN
- J1Qx1qHx+qK5ijqDKk0FEXgDQZGeedA=
+ bh=/jqgnA5+T9FFDJPObgtt6mzGOQfLsBDRBNj8Dp4fv1o=;
+ b=WF2bGOKoIi1yLCppTDRLbn9rLLZ0QZ6CaAHCDx7FpV9TB6h4J4qaqmX1Ilh3BGZzUMhUdk
+ dgDdXkvQM3AzHi7H3Zv5XyZLWT1uExrr5antqeyFKWQHT5ayl2Dl5+hFQOAr0DFoG0c9NO
+ 75YKMAZo4Bi2wxNPcJkCO7J7G/5zYgc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-73HpvNgRMkmp3M0Xa--Bzw-1; Tue, 31 Dec 2019 08:04:20 -0500
+ us-mta-46-42gZM8XGNz6Jj4a5L-aflA-1; Tue, 31 Dec 2019 08:04:09 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D486518031CD
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF89018031CD
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:08 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AF65620A6
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 35D81620A6
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:08 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 37/86] arm:xilinx_zynq: use memdev for RAM
-Date: Tue, 31 Dec 2019 14:03:21 +0100
-Message-Id: <1577797450-88458-38-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 23/86] arm:mcimx7d-sabre: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:07 +0100
+Message-Id: <1577797450-88458-24-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 73HpvNgRMkmp3M0Xa--Bzw-1
+X-MC-Unique: 42gZM8XGNz6Jj4a5L-aflA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,42 +97,84 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
+PS:
+ remove no longer needed MCIMX7Sabre
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/arm/xilinx_zynq.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/arm/mcimx7d-sabre.c | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
 
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index df950fc..0ef9688 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -160,7 +160,6 @@ static void zynq_init(MachineState *machine)
+diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
+index 0d1f62d..de1e264 100644
+--- a/hw/arm/mcimx7d-sabre.c
++++ b/hw/arm/mcimx7d-sabre.c
+@@ -21,15 +21,10 @@
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+=20
+-typedef struct {
+-    FslIMX7State soc;
+-    MemoryRegion ram;
+-} MCIMX7Sabre;
+-
+ static void mcimx7d_sabre_init(MachineState *machine)
  {
-     ARMCPU *cpu;
-     MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *ext_ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *ocm_ram =3D g_new(MemoryRegion, 1);
-     DeviceState *dev;
-     SysBusDevice *busdev;
-@@ -190,9 +189,7 @@ static void zynq_init(MachineState *machine)
-     object_property_set_bool(OBJECT(cpu), true, "realized", &error_fatal);
+     static struct arm_boot_info boot_info;
+-    MCIMX7Sabre *s =3D g_new0(MCIMX7Sabre, 1);
++    FslIMX7State *s;
+     int i;
 =20
-     /* DDR remapped to address zero.  */
--    memory_region_allocate_system_memory(ext_ram, NULL, "zynq.ext_ram",
+     if (machine->ram_size > FSL_IMX7_MMDC_SIZE) {
+@@ -45,15 +40,12 @@ static void mcimx7d_sabre_init(MachineState *machine)
+         .nb_cpus =3D machine->smp.cpus,
+     };
+=20
+-    object_initialize_child(OBJECT(machine), "soc",
+-                            &s->soc, sizeof(s->soc),
+-                            TYPE_FSL_IMX7, &error_fatal, NULL);
+-    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fat=
+al);
++    s =3D FSL_IMX7(object_new(TYPE_FSL_IMX7));
++    object_property_add_child(OBJECT(machine), "soc", OBJECT(s), &error_fa=
+tal);
++    object_property_set_bool(OBJECT(s), true, "realized", &error_fatal);
+=20
+-    memory_region_allocate_system_memory(&s->ram, NULL, "mcimx7d-sabre.ram=
+",
 -                                         machine->ram_size);
--    memory_region_add_subregion(address_space_mem, 0, ext_ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
+-    memory_region_add_subregion(get_system_memory(),
+-                                FSL_IMX7_MMDC_ADDR, &s->ram);
++    memory_region_add_subregion(get_system_memory(), FSL_IMX7_MMDC_ADDR,
++                                machine->ram);
 =20
-     /* 256K of on-chip memory */
-     memory_region_init_ram(ocm_ram, NULL, "zynq.ocm_ram", 256 * KiB,
-@@ -318,6 +315,7 @@ static void zynq_machine_init(MachineClass *mc)
-     mc->no_sdcard =3D 1;
-     mc->ignore_memory_transaction_failures =3D true;
-     mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a9");
-+    mc->default_ram_id =3D "zynq.ext_ram";
+     for (i =3D 0; i < FSL_IMX7_NUM_USDHCS; i++) {
+         BusState *bus;
+@@ -63,7 +55,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
+=20
+         di =3D drive_get_next(IF_SD);
+         blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
+-        bus =3D qdev_get_child_bus(DEVICE(&s->soc.usdhc[i]), "sd-bus");
++        bus =3D qdev_get_child_bus(DEVICE(&s->usdhc[i]), "sd-bus");
+         carddev =3D qdev_create(bus, TYPE_SD_CARD);
+         qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
+         object_property_set_bool(OBJECT(carddev), true,
+@@ -71,7 +63,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
+     }
+=20
+     if (!qtest_enabled()) {
+-        arm_load_kernel(&s->soc.cpu[0], machine, &boot_info);
++        arm_load_kernel(&s->cpu[0], machine, &boot_info);
+     }
  }
 =20
- DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+@@ -80,5 +72,6 @@ static void mcimx7d_sabre_machine_init(MachineClass *mc)
+     mc->desc =3D "Freescale i.MX7 DUAL SABRE (Cortex A7)";
+     mc->init =3D mcimx7d_sabre_init;
+     mc->max_cpus =3D FSL_IMX7_NUM_CPUS;
++    mc->default_ram_id =3D "mcimx7d-sabre.ram";
+ }
+ DEFINE_MACHINE("mcimx7d-sabre", mcimx7d_sabre_machine_init)
 --=20
 2.7.4
 
