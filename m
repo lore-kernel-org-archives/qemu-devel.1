@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3794FC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BDBC3F68F
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:42:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03C43206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03A1C206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:42:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gLnWHUB5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03C43206DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eHtDv2lL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03A1C206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHm6-0002vT-Cg
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:41:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56721)
+	id 1imHmd-0003TI-UY
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:42:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56613)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHCX-0005re-1Y
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:46 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHCS-0004Ie-Id
+ (envelope-from <imammedo@redhat.com>) id 1imHCS-0005pG-4R
  for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27841
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <imammedo@redhat.com>) id 1imHCM-00048D-OY
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:39 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60722
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCR-0004GC-Uo
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:40 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCL-00045T-0p
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797479;
+ s=mimecast20190719; t=1577797471;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hFQ4xBmnEBht7XvkseDuNIY2IDkul95ZAGH47gI0iJY=;
- b=gLnWHUB5xO9jLG+hBvCm3AulfW3M/Bx+0CpLxdQybfecSoS65200X8La4TCFYmSo3irIbM
- JH1w6FL532L2755zgpbyhSlUKh5H2532aV4ImYA0Jn/Tl2rzXsNWokp13Jw0iWm6fvksub
- e4FgTWOQZXBuhetlcXn9rwR5JYJ8fyU=
+ bh=wrL8I1SkCsSDFF30iuDDx8C/6wBz5QBq+/mFshQ7As4=;
+ b=eHtDv2lLHEF5eTN+xb9t8Pccse8cr6haPxmsYJAHRDoUj6ZKGJcQ/NZjlFls+MHrRd17i3
+ dzdeLePR8U6CbexPUq6TD9GV4I7/YceV7Yx9Unl1/gnE0OQf68lpbdrnjIke7DAln4KKlw
+ YBM8SMyBE1f0wVSMHiyR1jQDRJd9sVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-D9nzNTQpOJuPqEwSUUVERg-1; Tue, 31 Dec 2019 08:04:37 -0500
+ us-mta-284-oVfP028pP12WOQa0u1ZnLA-1; Tue, 31 Dec 2019 08:04:29 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87C66477
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 944F41005502
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:28 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F844620A6
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1B48F620A6
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:27 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 58/86] mips:mips_r4k: use memdev for RAM
-Date: Tue, 31 Dec 2019 14:03:42 +0100
-Message-Id: <1577797450-88458-59-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 48/86] lm32:milkymist: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:32 +0100
+Message-Id: <1577797450-88458-49-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: D9nzNTQpOJuPqEwSUUVERg-1
+X-MC-Unique: oVfP028pP12WOQa0u1ZnLA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -97,65 +97,90 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
+PS:
+ while at it add check for user supplied RAM size and error
+ out if it mismatches board expected value.
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/mips/mips_r4k.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ hw/lm32/milkymist.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index fd926a3..69b6549 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -171,13 +171,11 @@ static const int sector_len =3D 32 * KiB;
- static
- void mips_r4k_init(MachineState *machine)
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index 460d322..cc9db7d 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -82,6 +82,7 @@ static void main_cpu_reset(void *opaque)
+ static void
+ milkymist_init(MachineState *machine)
  {
--    ram_addr_t ram_size =3D machine->ram_size;
++    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
      const char *kernel_filename =3D machine->kernel_filename;
      const char *kernel_cmdline =3D machine->kernel_cmdline;
      const char *initrd_filename =3D machine->initrd_filename;
-     char *filename;
+@@ -90,22 +91,26 @@ milkymist_init(MachineState *machine)
+     int kernel_size;
+     DriveInfo *dinfo;
      MemoryRegion *address_space_mem =3D get_system_memory();
--    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-     MemoryRegion *bios;
-     MemoryRegion *iomem =3D g_new(MemoryRegion, 1);
-     MemoryRegion *isa_io =3D g_new(MemoryRegion, 1);
-@@ -203,14 +201,12 @@ void mips_r4k_init(MachineState *machine)
-     qemu_register_reset(main_cpu_reset, reset_info);
+-    MemoryRegion *phys_sdram =3D g_new(MemoryRegion, 1);
+     qemu_irq irq[32];
+     int i;
+     char *bios_filename;
+     ResetInfo *reset_info;
 =20
-     /* allocate RAM */
--    if (ram_size > 256 * MiB) {
-+    if (machine->ram_size > 256 * MiB) {
-         error_report("Too much memory for this machine: %" PRId64 "MB,"
-                      " maximum 256MB", ram_size / MiB);
-         exit(1);
-     }
--    memory_region_allocate_system_memory(ram, NULL, "mips_r4k.ram", ram_si=
-ze);
--
--    memory_region_add_subregion(address_space_mem, 0, ram);
-+    memory_region_add_subregion(address_space_mem, 0, machine->ram);
++    if (machine->ram_size !=3D mc->default_ram_size) {
++        error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
++                     mc->default_ram_size);
++        exit(EXIT_FAILURE);
++    }
++
+     /* memory map */
+     hwaddr flash_base   =3D 0x00000000;
+     size_t flash_sector_size        =3D 128 * KiB;
+     size_t flash_size               =3D 32 * MiB;
+     hwaddr sdram_base   =3D 0x40000000;
+-    size_t sdram_size               =3D 128 * MiB;
 =20
-     memory_region_init_io(iomem, NULL, &mips_qemu_ops,
-                           NULL, "mips-qemu", 0x10000);
-@@ -261,7 +257,7 @@ void mips_r4k_init(MachineState *machine)
-     g_free(filename);
+     hwaddr initrd_base  =3D sdram_base + 0x1002000;
+     hwaddr cmdline_base =3D sdram_base + 0x1000000;
+-    size_t initrd_max =3D sdram_size - 0x1002000;
++    size_t initrd_max =3D machine->ram_size - 0x1002000;
 =20
-     if (kernel_filename) {
--        loaderparams.ram_size =3D ram_size;
-+        loaderparams.ram_size =3D machine->ram_size;
-         loaderparams.kernel_filename =3D kernel_filename;
-         loaderparams.kernel_cmdline =3D kernel_cmdline;
-         loaderparams.initrd_filename =3D initrd_filename;
-@@ -316,7 +312,7 @@ static void mips_machine_init(MachineClass *mc)
- #else
-     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
- #endif
--
-+    mc->default_ram_id =3D "mips_r4k.ram";
+     reset_info =3D g_malloc0(sizeof(ResetInfo));
+=20
+@@ -116,9 +121,7 @@ milkymist_init(MachineState *machine)
+=20
+     cpu_lm32_set_phys_msb_ignore(env, 1);
+=20
+-    memory_region_allocate_system_memory(phys_sdram, NULL, "milkymist.sdra=
+m",
+-                                         sdram_size);
+-    memory_region_add_subregion(address_space_mem, sdram_base, phys_sdram)=
+;
++    memory_region_add_subregion(address_space_mem, sdram_base, machine->ra=
+m);
+=20
+     dinfo =3D drive_get(IF_PFLASH, 0, 0);
+     /* Numonyx JS28F256J3F105 */
+@@ -183,7 +186,7 @@ milkymist_init(MachineState *machine)
+=20
+         if (kernel_size < 0) {
+             kernel_size =3D load_image_targphys(kernel_filename, sdram_bas=
+e,
+-                                              sdram_size);
++                                              machine->ram_size);
+             reset_info->bootstrap_pc =3D sdram_base;
+         }
+=20
+@@ -216,6 +219,8 @@ static void milkymist_machine_init(MachineClass *mc)
+     mc->init =3D milkymist_init;
+     mc->is_default =3D 0;
+     mc->default_cpu_type =3D LM32_CPU_TYPE_NAME("lm32-full");
++    mc->default_ram_size =3D 128 * MiB;
++    mc->default_ram_id =3D "milkymist.sdram";
  }
 =20
- DEFINE_MACHINE("mips", mips_machine_init)
+ DEFINE_MACHINE("milkymist", milkymist_machine_init)
 --=20
 2.7.4
 
