@@ -2,78 +2,78 @@ Return-Path: <SRS0=eTrL=2V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AB1C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CEBC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:44:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF1CA206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:44:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A4D9206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:44:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8B6Fhpe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1CA206DB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DB6wOWC7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4D9206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHoc-0006VK-MR
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:44:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56716)
+	id 1imHow-0006yf-V6
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:44:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56723)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHCW-0005ra-VE
+ (envelope-from <imammedo@redhat.com>) id 1imHCX-0005rf-2G
  for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHCT-0004KY-0y
+ (envelope-from <imammedo@redhat.com>) id 1imHCS-0004IZ-IV
  for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:44 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28344
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31573
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCS-0004Hw-LV
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCR-0004GE-Vx
  for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797480;
+ s=mimecast20190719; t=1577797479;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jF8uPId+5fqxcR5sLbjqM5UR26DFj2imdkGk9o4x/9c=;
- b=L8B6FhpeO8gEAkPHVzq1JZtnnwntAtTNlAV8qmreXQok9dfEsEvJKNQhuReRfJMpXSNomi
- w4Q+8mLgSLdlU10BF27wzClyrb00QFXNqhQ9oVG8h/67x0CaMZd5C0kMkgpX0uL1t7XpY1
- TAyjymFVQpJZ/01WjWvk+Bk4LW/w2tg=
+ bh=MDNwLJ044g+O+8GeTRaa6og2q+g/2cxff7E/mWFvIGU=;
+ b=DB6wOWC7P0ssFRyC4vylG4MRIHiGP9B/QUlowjeML+5ZqldHGTyovCFj546Nh9SBsvCAQU
+ QqQqXTs6Vn8VJdUBYo4Bt5W/IQSSMpGvfKsuNbv2nOIDW49VTdECj21vIgd0OOxQ1oWnG0
+ e8Mm0S1+Qd6BJIC4AbARx3u+yF1aElY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-szK-C8QMPrGykTn4E63slg-1; Tue, 31 Dec 2019 08:04:38 -0500
+ us-mta-277-odexrSEtP1awIlLN7cg4Ew-1; Tue, 31 Dec 2019 08:04:36 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5607D107ACC5
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAB4C107ACC4
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:35 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D15C978E96
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40D09620A6
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:35 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 59/86] ppc:e500: drop RAM size fixup
-Date: Tue, 31 Dec 2019 14:03:43 +0100
-Message-Id: <1577797450-88458-60-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 57/86] mips:mips_mipssim: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:41 +0100
+Message-Id: <1577797450-88458-58-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: szK-C8QMPrGykTn4E63slg-1
+X-MC-Unique: odexrSEtP1awIlLN7cg4Ew-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,75 +89,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If user provided non-sense RAM size, board will complain and
-continue running with max RAM size supported.
-Also RAM is going to be allocated by generic code, so it won't be
-possible for board to fix things up for user.
-
-Make it error message and exit to force user fix CLI,
-instead of accepting non-sense CLI values.
-
-While at it, replace usage of global ram_size with
-machine->ram_size
+memory_region_allocate_system_memory() API is going away, so
+replace it with memdev allocated MemoryRegion. The later is
+initialized by generic code, so board only needs to opt in
+to memdev scheme by providing
+  MachineClass::default_ram_id
+and using MachineState::ram instead of manually initializing
+RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/ppc/e500.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ hw/mips/mips_mipssim.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 12b6a5b..aac4aba 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -906,12 +906,14 @@ void ppce500_init(MachineState *machine)
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+index 282bbec..be3972f 100644
+--- a/hw/mips/mips_mipssim.c
++++ b/hw/mips/mips_mipssim.c
+@@ -142,14 +142,12 @@ static void mipsnet_init(int base, qemu_irq irq, NICI=
+nfo *nd)
+ static void
+ mips_mipssim_init(MachineState *machine)
+ {
+-    ram_addr_t ram_size =3D machine->ram_size;
+     const char *kernel_filename =3D machine->kernel_filename;
+     const char *kernel_cmdline =3D machine->kernel_cmdline;
+     const char *initrd_filename =3D machine->initrd_filename;
+     char *filename;
+     MemoryRegion *address_space_mem =3D get_system_memory();
+     MemoryRegion *isa =3D g_new(MemoryRegion, 1);
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     MemoryRegion *bios =3D g_new(MemoryRegion, 1);
+     MIPSCPU *cpu;
+     CPUMIPSState *env;
+@@ -166,13 +164,11 @@ mips_mipssim_init(MachineState *machine)
+     qemu_register_reset(main_cpu_reset, reset_info);
 =20
-     env =3D firstenv;
+     /* Allocate RAM. */
+-    memory_region_allocate_system_memory(ram, NULL, "mips_mipssim.ram",
+-                                         ram_size);
+     memory_region_init_ram(bios, NULL, "mips_mipssim.bios", BIOS_SIZE,
+                            &error_fatal);
+     memory_region_set_readonly(bios, true);
 =20
--    /* Fixup Memory size on a alignment boundary */
--    ram_size &=3D ~(RAM_SIZES_ALIGN - 1);
--    machine->ram_size =3D ram_size;
-+    if (!QEMU_IS_ALIGNED(machine->ram_size, RAM_SIZES_ALIGN)) {
-+        error_report("RAM size must be multiple of %ld", RAM_SIZES_ALIGN);
-+        exit(EXIT_FAILURE);
-+    }
+-    memory_region_add_subregion(address_space_mem, 0, ram);
++    memory_region_add_subregion(address_space_mem, 0, machine->ram);
 =20
-     /* Register Memory */
--    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram", ram_s=
-ize);
-+    memory_region_allocate_system_memory(ram, NULL, "mpc8544ds.ram",
-+                                         machine->ram_size);
-     memory_region_add_subregion(address_space_mem, 0, ram);
-=20
-     dev =3D qdev_create(NULL, "e500-ccsr");
-@@ -1083,7 +1085,7 @@ void ppce500_init(MachineState *machine)
-         kernel_base =3D cur_base;
-         kernel_size =3D load_image_targphys(machine->kernel_filename,
-                                           cur_base,
--                                          ram_size - cur_base);
-+                                          machine->ram_size - cur_base);
-         if (kernel_size < 0) {
-             error_report("could not load kernel '%s'",
-                          machine->kernel_filename);
-@@ -1097,7 +1099,7 @@ void ppce500_init(MachineState *machine)
-     if (machine->initrd_filename) {
-         initrd_base =3D (cur_base + INITRD_LOAD_PAD) & ~INITRD_PAD_MASK;
-         initrd_size =3D load_image_targphys(machine->initrd_filename, init=
-rd_base,
--                                          ram_size - initrd_base);
-+                                          machine->ram_size - initrd_base)=
-;
-=20
-         if (initrd_size < 0) {
-             error_report("could not load initial ram disk '%s'",
-@@ -1115,7 +1117,7 @@ void ppce500_init(MachineState *machine)
-      * ensures enough space between kernel and initrd.
-      */
-     dt_base =3D (loadaddr + payload_size + DTC_LOAD_PAD) & ~DTC_PAD_MASK;
--    if (dt_base + DTB_MAX_SIZE > ram_size) {
-+    if (dt_base + DTB_MAX_SIZE > machine->ram_size) {
-             error_report("not enough memory for device tree");
-             exit(1);
+     /* Map the BIOS / boot exception handler. */
+     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+@@ -199,7 +195,7 @@ mips_mipssim_init(MachineState *machine)
      }
+=20
+     if (kernel_filename) {
+-        loaderparams.ram_size =3D ram_size;
++        loaderparams.ram_size =3D machine->ram_size;
+         loaderparams.kernel_filename =3D kernel_filename;
+         loaderparams.kernel_cmdline =3D kernel_cmdline;
+         loaderparams.initrd_filename =3D initrd_filename;
+@@ -237,6 +233,7 @@ static void mips_mipssim_machine_init(MachineClass *mc)
+ #else
+     mc->default_cpu_type =3D MIPS_CPU_TYPE_NAME("24Kf");
+ #endif
++    mc->default_ram_id =3D "mips_mipssim.ram";
+ }
+=20
+ DEFINE_MACHINE("mipssim", mips_mipssim_machine_init)
 --=20
 2.7.4
 
