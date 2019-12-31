@@ -2,99 +2,78 @@ Return-Path: <SRS0=eTrL=2V=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A053FC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 16:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE636C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 16:23:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B458205ED
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 16:12:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F8B9206D9
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 16:23:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+aUOb+m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B458205ED
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3cOjWq6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F8B9206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imK8O-0005l5-Jw
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 11:12:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51431)
+	id 1imKJ3-0000Jd-P6
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 11:23:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1imK7c-0005LK-1T
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 11:11:53 -0500
+ (envelope-from <imammedo@redhat.com>) id 1imKID-00088Y-5d
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 11:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1imK7a-0006FM-QS
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 11:11:51 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59545
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1imKI9-0003fH-F6
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 11:22:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38510
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1imK7a-0006Cu-MI
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 11:11:50 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imKI9-0003cM-AK
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 11:22:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577808710;
+ s=mimecast20190719; t=1577809364;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=71RkQy8imLfUAbo+vbrwGLjoMIo/DXHu6WN3MOu0rH8=;
- b=i+aUOb+mUuPJPEtsBDJIiKpjjBAFfnlwxLR6N7vei5aK20QMsmB9WZ91pjFctm+EwsQmvZ
- A5pL0576q3qPL5ZFAKHap0/CQ5DPT9Gamx3WPo4P812IPwM42A0q5l7SuUtNSExcNBsRyr
- WrW6zQVVByie4L5f2DkDkrPS9pGaV3M=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-ZJUUfF_2MlydeGVp9XinyA-1; Tue, 31 Dec 2019 11:11:46 -0500
-Received: by mail-wr1-f72.google.com with SMTP id f10so10958323wro.14
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 08:11:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=CqtVprdIShq+l0n6lj+m14h0IxqgwUjTwFy9K+/x5A0=;
- b=BCYiCW/bzxh+mGNbVHMWpf9yKQh5uChjEWDulYiKEUCOx08LcnbDUBud3/Q55ktwub
- tPSUH1h79By3opjBzDPZ2Ni2+2RLQGM7wX1/8q1t0bAWbtXs4j6/vVCYD9iKbYV0w6UL
- Bj1alGuGbApgrg/CNOMrtYQcebyePuiz+1pFtz0u7SVEL8LRpB4uzSDdMZ/hzXNosEEJ
- JmUi06pN5+IZnpXy9/3zdWHFNVfykIVsDBmd6gd+9Z+AJ3JreH+FboCttb2VUznC1u01
- RScAkEre/Aka2zJBxl4J+5SSkpI2lcdJhwWRg0DaSDVmHtZjUC21x+IfKMDiBh48Ieaw
- nB7A==
-X-Gm-Message-State: APjAAAUdCvxpguUrozcqJ+KJ5fJ+JG5fg8n3fSbmf2jNRvVIPlGHACxU
- GOqX/8hMdXbrTa02nTKdTLsVbrDK5Y3x0HkNPJ8q0SpsTTFjCLfvoIv7tP60UnrQha6eM+UiyZ1
- 4BzAtIQvptXzxhrE=
-X-Received: by 2002:adf:8b4f:: with SMTP id v15mr44265477wra.231.1577808705439; 
- Tue, 31 Dec 2019 08:11:45 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyNeUDh5+KutEgs6EEj7FHGXJw44XTl/qCbUl0ZiYZsNffobCJMRCqJ3ppPd8Pyni8aKwZAJw==
-X-Received: by 2002:adf:8b4f:: with SMTP id v15mr44265465wra.231.1577808705252; 
- Tue, 31 Dec 2019 08:11:45 -0800 (PST)
-Received: from ?IPv6:2a01:cb18:8372:6b00:691b:aac5:8837:d4da?
- ([2a01:cb18:8372:6b00:691b:aac5:8837:d4da])
- by smtp.gmail.com with ESMTPSA id b15sm2873227wmj.13.2019.12.31.08.11.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 31 Dec 2019 08:11:44 -0800 (PST)
-Subject: Re: [PATCH 08/86] alpha:dp264: use memdev for RAM
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+ bh=EmwxasvGW/gphYw+pddLpzWTq4h7H1GtDelQEdNvYeQ=;
+ b=J3cOjWq6jFhxc3QA21STpFX5bmdAM0QMD7fIi/TooR7n82oyY3WHITclD9YxcKfXQRWlWj
+ 3Yl8Q2eWepBwLIKepYbx4j4QXJg3ayEZtLGQ4biekAMJp0Egj4HwhkFralN1tjEisk4z+Z
+ h6U1jnoDXMxHxcK48iyx9KdOJ4eB73I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-ouJEvRpIN4KJ8tva3vU2CQ-1; Tue, 31 Dec 2019 11:22:43 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0862410054E3
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 16:22:42 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-204-66.brq.redhat.com [10.40.204.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D6D41001DD7;
+ Tue, 31 Dec 2019 16:22:38 +0000 (UTC)
+Date: Tue, 31 Dec 2019 17:22:35 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 00/86] refactor main RAM allocation to use hostmem backend
+Message-ID: <20191231172235.682553d0@Igors-MacBook-Pro>
+In-Reply-To: <c2d1f51d-a204-ec82-1b0a-bf91161b819f@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
- <1577797450-88458-9-git-send-email-imammedo@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <5ec72d69-32e6-3867-4320-65b3891a283b@redhat.com>
-Date: Tue, 31 Dec 2019 17:11:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ <c2d1f51d-a204-ec82-1b0a-bf91161b819f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1577797450-88458-9-git-send-email-imammedo@redhat.com>
-Content-Language: en-US
-X-MC-Unique: ZJUUfF_2MlydeGVp9XinyA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: ouJEvRpIN4KJ8tva3vU2CQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,102 +85,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/31/19 2:02 PM, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->    MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Tue, 31 Dec 2019 16:58:10 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-> ---
->   hw/alpha/alpha_sys.h | 2 +-
->   hw/alpha/dp264.c     | 3 ++-
->   hw/alpha/typhoon.c   | 8 ++------
->   3 files changed, 5 insertions(+), 8 deletions(-)
+> Hi Igor,
 >=20
-> diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-> index 95033d7..bc0a286 100644
-> --- a/hw/alpha/alpha_sys.h
-> +++ b/hw/alpha/alpha_sys.h
-> @@ -11,7 +11,7 @@
->   #include "hw/intc/i8259.h"
->  =20
->  =20
-> -PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
-> +PCIBus *typhoon_init(MemoryRegion *, ISABus **, qemu_irq *, AlphaCPU *[4=
-],
->                        pci_map_irq_fn);
->  =20
->   /* alpha_pci.c.  */
-> diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-> index f2026fd..29439c7 100644
-> --- a/hw/alpha/dp264.c
-> +++ b/hw/alpha/dp264.c
-> @@ -75,7 +75,7 @@ static void clipper_init(MachineState *machine)
->       cpus[0]->env.trap_arg2 =3D smp_cpus;
->  =20
->       /* Init the chipset.  */
-> -    pci_bus =3D typhoon_init(ram_size, &isa_bus, &rtc_irq, cpus,
-> +    pci_bus =3D typhoon_init(machine->ram, &isa_bus, &rtc_irq, cpus,
->                              clipper_pci_map_irq);
->  =20
->       /* Since we have an SRM-compatible PALcode, use the SRM epoch.  */
-> @@ -183,6 +183,7 @@ static void clipper_machine_init(MachineClass *mc)
->       mc->max_cpus =3D 4;
->       mc->is_default =3D 1;
->       mc->default_cpu_type =3D ALPHA_CPU_TYPE_NAME("ev67");
-> +    mc->default_ram_id =3D "ram";
->   }
->  =20
->   DEFINE_MACHINE("clipper", clipper_machine_init)
-> diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-> index 179e1f7..1795e2f 100644
-> --- a/hw/alpha/typhoon.c
-> +++ b/hw/alpha/typhoon.c
-> @@ -58,7 +58,6 @@ typedef struct TyphoonState {
->       TyphoonCchip cchip;
->       TyphoonPchip pchip;
->       MemoryRegion dchip_region;
-> -    MemoryRegion ram_region;
->   } TyphoonState;
->  =20
->   /* Called when one of DRIR or DIM changes.  */
-> @@ -817,8 +816,7 @@ static void typhoon_alarm_timer(void *opaque)
->       cpu_interrupt(CPU(s->cchip.cpu[cpu]), CPU_INTERRUPT_TIMER);
->   }
->  =20
-> -PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
-> -                     qemu_irq *p_rtc_irq,
-> +PCIBus *typhoon_init(MemoryRegion *ram, ISABus **isa_bus, qemu_irq *p_rt=
-c_irq,
->                        AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
->   {
->       MemoryRegion *addr_space =3D get_system_memory();
-> @@ -851,9 +849,7 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **is=
-a_bus,
->  =20
->       /* Main memory region, 0x00.0000.0000.  Real hardware supports 32GB=
-,
->          but the address space hole reserved at this point is 8TB.  */
-> -    memory_region_allocate_system_memory(&s->ram_region, OBJECT(s), "ram=
-",
-> -                                         ram_size);
-> -    memory_region_add_subregion(addr_space, 0, &s->ram_region);
-> +    memory_region_add_subregion(addr_space, 0, ram);
->  =20
->       /* TIGbus, 0x801.0000.0000, 1GB.  */
->       /* ??? The TIGbus is used for delivering interrupts, and access to
+> On 12/31/19 2:02 PM, Igor Mammedov wrote:
+> > Series removes ad hoc RAM allocation API (memory_region_allocate_system=
+_memory)
+> > and consolidates it around hostmem backend. It allows to
+> >   * resolve conflicts between global -mem-prealloc and hostmem's "polic=
+y" option
+> >     fixing premature allocation before binding policy is applied
+> >   * simplify complicated memory allocation routines which had to deal w=
+ith 2 ways
+> >     to allocate RAM.
+> >   * it allows to reuse hostmem backends of a choice for main RAM withou=
+t adding
+> >     extra CLI options to duplicate hostmem features.
+> >     Recent case was -mem-shared, to enable vhost-user on targets that d=
+on't
+> >     support hostmem backends [1] (ex: s390)
+> >   * move RAM allocation from individual boards into generic machine cod=
+e and
+> >     provide them with prepared MemoryRegion.
+> >   * clean up deprecated NUMA features which were tied to the old API (s=
+ee patches)
+> >      - "numa: remove deprecated -mem-path fallback to anonymous RAM"
+> >      - "numa: remove deprecated implicit RAM distribution between nodes=
+"
+> >      - "forbid '-numa node,mem' for 5.0 and newer machine types"
+> >=20
+> > Conversion introduces a new machine.ram-memdev property and wrapper cod=
+e that
+> > aliases global -mem-path and -mem-alloc into automatically created host=
+mem
+> > backend properties (provided ram-memdev was not set explicitly by user)=
+.
+> > And then follows bulk of trivial patches that incrementally convert ind=
+ividual
+> > boards to using machine.ram-memdev provided MemoryRegion.
+> >=20
+> > Board conversion typically involves:
+> >   * providing MachineClass::default_ram_size and MachineClass::default_=
+ram_id
+> >     so generic code could create default backend if user didn't explici=
+tly provide
+> >     ram-memdev or -m options
+> >   * dropping memory_region_allocate_system_memory() call
+> >   * using covinience MachineState::ram MemoryRegion, which points to Me=
+moryRegion
+> >     allocated by ram-memdev
+> > On top of that for some boards:
+> >   * added missing ram_size checks (typically it were boards with fixed =
+ram size)
+> >   * ram_size fixups were replaced by checks and hard errors, forcing us=
+er to
+> >     provide correct "-m" values instead of ignoring it and continuing r=
+unning.
+> >    =20
+> > After all boards are converted the old API is removed and memory alloca=
+tion
+> > routines are cleaned up.
+>=20
+> I'm replying to the cover because multiple patches are concerned.
+>=20
+> Compiling arm/lm32/mips64el/ppc on 32-bit host I get:
+Thanks for spotting it.
+I was thinking that travis-ci did 32-bit builds (I was wrong).
+I'll dig up 32-bit machine and try to fix build issues.
+
+>=20
+>    CC      hw/arm/digic_boards.o
+> hw/arm/digic_boards.c: In function 'digic4_board_init':
+> hw/arm/digic_boards.c:57:22: error: format '%lli' expects argument of=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/digic_boards.o' failed
+> make: *** [hw/arm/digic_boards.o] Error 1
+>    CC      hw/arm/musicpal.o
+> hw/arm/musicpal.c: In function 'musicpal_init':
+> hw/arm/musicpal.c:1598:22: error: format '%lli' expects argument of type=
+=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/musicpal.o' failed
+> make: *** [hw/arm/musicpal.o] Error 1
+>    CC      hw/arm/nseries.o
+> hw/arm/nseries.c: In function 'n8x0_init':
+> hw/arm/nseries.c:1316:22: error: format '%lli' expects argument of type=
+=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/nseries.o' failed
+> make: *** [hw/arm/nseries.o] Error 1
+>    CC      hw/arm/omap_sx1.o
+> hw/arm/omap_sx1.c: In function 'sx1_init':
+> hw/arm/omap_sx1.c:119:22: error: format '%lli' expects argument of type=
+=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/omap_sx1.o' failed
+> make: *** [hw/arm/omap_sx1.o] Error 1
+>    CC      hw/arm/palm.o
+> hw/arm/palm.c: In function 'palmte_init':
+> hw/arm/palm.c:202:22: error: format '%lli' expects argument of type=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/palm.o' failed
+> make: *** [hw/arm/palm.o] Error 1
+>    CC      hw/arm/collie.o
+> hw/arm/collie.c: In function 'collie_init':
+> hw/arm/collie.c:32:22: error: format '%lli' expects argument of type=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/collie.o' failed
+> make: *** [hw/arm/collie.o] Error 1
+>    CC      hw/arm/mps2.o
+> hw/arm/mps2.c: In function 'mps2_common_init':
+> hw/arm/mps2.c:121:22: error: format '%lli' expects argument of type=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/mps2.o' failed
+> make: *** [hw/arm/mps2.o] Error 1
+>    CC      hw/arm/mps2-tz.o
+> hw/arm/mps2-tz.c: In function 'mps2tz_common_init':
+> hw/arm/mps2-tz.c:391:22: error: format '%lli' expects argument of type=20
+> 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned int}'=
+=20
+> [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/arm/mps2-tz.o' failed
+> make: *** [hw/arm/mps2-tz.o] Error 1
+>    CC      hw/lm32/lm32_boards.o
+> hw/lm32/lm32_boards.c: In function 'lm32_evr_init':
+> hw/lm32/lm32_boards.c:89:22: error: format '%lli' expects argument of=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> hw/lm32/lm32_boards.c: In function 'lm32_uclinux_init':
+> hw/lm32/lm32_boards.c:179:22: error: format '%lli' expects argument of=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/lm32/lm32_boards.o' failed
+> make: *** [hw/lm32/lm32_boards.o] Error 1
+>    CC      hw/lm32/milkymist.o
+> hw/lm32/milkymist.c: In function 'milkymist_init':
+> hw/lm32/milkymist.c:100:22: error: format '%lli' expects argument of=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+>    CC      hw/mips/mips_fulong2e.o
+> hw/mips/mips_fulong2e.c: In function 'mips_fulong2e_init':
+> hw/mips/mips_fulong2e.c:317:22: error: format '%ld' expects argument of=
+=20
+> type 'long int', but argument 2 has type 'long long int' [-Werror=3Dforma=
+t=3D]
+>           error_report("Invalid RAM size, should be %ld", 256 * MiB);
+>                        ^
+> cc1: all warnings being treated as errors
+>    CC      hw/ppc/ppc405_boards.o
+> hw/ppc/ppc405_boards.c: In function 'ref405ep_init':
+> hw/ppc/ppc405_boards.c:165:22: error: format '%lli' expects argument of=
+=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> hw/ppc/ppc405_boards.c: In function 'taihu_405ep_init':
+> hw/ppc/ppc405_boards.c:435:22: error: format '%lli' expects argument of=
+=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, should be %" PRIi64 " Bytes",
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/ppc/ppc405_boards.o' failed
+> make: *** [hw/ppc/ppc405_boards.o] Error 1
+>    CC      hw/ppc/ppc4xx_devs.o
+> hw/ppc/ppc4xx_devs.c: In function 'ppc4xx_sdram_adjust':
+> hw/ppc/ppc4xx_devs.c:704:39: error: format '%lli' expects argument of=20
+> type 'long long int', but argument 3 has type 'ram_addr_t {aka const=20
+> unsigned int}' [-Werror=3Dformat=3D]
+>               char *t =3D g_strdup_printf("%s%" PRIi64 "%s", s,=20
+> sdram_bank_sizes[i],
+>                                         ^
+> hw/ppc/ppc4xx_devs.c:709:22: error: format '%lli' expects argument of=20
+> type 'long long int', but argument 2 has type 'ram_addr_t {aka unsigned=
+=20
+> int}' [-Werror=3Dformat=3D]
+>           error_report("Invalid RAM size, unable to fit all RAM into RAM=
+=20
+> banks"
+>                        ^
+> cc1: all warnings being treated as errors
+> rules.mak:69: recipe for target 'hw/ppc/ppc4xx_devs.o' failed
+> make: *** [hw/ppc/ppc4xx_devs.o] Error 1
+>    CC      hw/ppc/e500.o
+> hw/ppc/e500.c: In function 'ppce500_init':
+> hw/ppc/e500.c:909:22: error: format '%ld' expects argument of type 'long=
+=20
+> int', but argument 2 has type 'long long int' [-Werror=3Dformat=3D]
+>           error_report("RAM size must be multiple of %ld", RAM_SIZES_ALIG=
+N);
+>                        ^
+> cc1: all warnings being treated as errors
 >=20
 
 
