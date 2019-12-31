@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2519BC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:34:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A0EC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:34:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E39E7206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:34:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B634206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:34:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJLv4YPN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39E7206DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/q6+U1k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B634206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHf8-0000nj-E7
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:34:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56606)
+	id 1imHfc-0001VC-Jd
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:34:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHCS-0005p0-3x
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:44 -0500
+ (envelope-from <imammedo@redhat.com>) id 1imHCE-0005hA-Jm
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHCM-00048x-Sg
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44581
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1imHCD-0003ru-Ab
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:26 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54319
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCL-000452-TC
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:34 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCD-0003pc-64
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797469;
+ s=mimecast20190719; t=1577797464;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=28UayHgN+n+bvnj6lYVtrYqru20kTF+ZD4V5VbbMohM=;
- b=SJLv4YPNyEvBDp+8kzmlzWRS5Wy+2/P2jEXjOz6OBQaysVeocHvJO2Dvh+IkJ0b043B5Tq
- FgyTAalLltNsFFpGBlceJJXwjCJNbO3n00lkOcaCmZ5sgztjQiNuKT2TGoGyaVzgVLj8+v
- 8x+mljZErxFjVuxers1s1GNliOOklso=
+ bh=QthNdiSaB3zyJQ7GDULbAQ5mvEHYwqQPwBVC+cEqJr8=;
+ b=B/q6+U1knB9Rk+E0dW8eeNrmJYmFaWJxeKiUwAs704ewZpajoVYnAE1Yqus/H7f0KvoOJa
+ FcH/jV25hUYb+m7Q+f32GAiXNHEQQUUfmQ7eiKJ9ApbWmPx6NiNSPu9dRUpQaMaPeHhO8r
+ OkXS44MLEP8ocKrE+5H7c2HD9jA+XSc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-C1pZP0H7OEm5Uns6t2T9nw-1; Tue, 31 Dec 2019 08:04:27 -0500
+ us-mta-115-h4eq0nnzO-CYOP0IpjE_uQ-1; Tue, 31 Dec 2019 08:04:23 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03A2F800D41
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DE1EDB61
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:22 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7F165620A6
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B9C54620A6
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:21 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 46/86] x86:pc: use memdev for RAM
-Date: Tue, 31 Dec 2019 14:03:30 +0100
-Message-Id: <1577797450-88458-47-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 40/86] s390x:s390-virtio-ccw: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:24 +0100
+Message-Id: <1577797450-88458-41-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: C1pZP0H7OEm5Uns6t2T9nw-1
+X-MC-Unique: h4eq0nnzO-CYOP0IpjE_uQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,64 +99,47 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/pc.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 42014b0..aa956aa 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -935,7 +935,7 @@ void pc_memory_init(PCMachineState *pcms,
-                     MemoryRegion **ram_memory)
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index e0e2813..cbdd4ba 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -154,14 +154,12 @@ static void virtio_ccw_register_hcalls(void)
+                                    virtio_ccw_hcall_early_printk);
+ }
+=20
+-static void s390_memory_init(ram_addr_t mem_size)
++static void s390_memory_init(MemoryRegion *ram)
  {
-     int linux_boot, i;
--    MemoryRegion *ram, *option_rom_mr;
-+    MemoryRegion *option_rom_mr;
-     MemoryRegion *ram_below_4g, *ram_above_4g;
-     FWCfgState *fw_cfg;
-     MachineState *machine =3D MACHINE(pcms);
-@@ -948,22 +948,20 @@ void pc_memory_init(PCMachineState *pcms,
+     MemoryRegion *sysmem =3D get_system_memory();
+-    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+     Error *local_err =3D NULL;
 =20
-     linux_boot =3D (machine->kernel_filename !=3D NULL);
+     /* allocate RAM for core */
+-    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
+     memory_region_add_subregion(sysmem, 0, ram);
 =20
--    /* Allocate RAM.  We allocate it as a single memory region and use
--     * aliases to address portions of it, mostly for backwards compatibili=
-ty
--     * with older qemus that used qemu_ram_alloc().
-+    /*
-+     * Split single memory region and use aliases to address portions of i=
-t,
-+     * done for backwards compatibility with older qemus.
-      */
--    ram =3D g_malloc(sizeof(*ram));
--    memory_region_allocate_system_memory(ram, NULL, "pc.ram",
--                                         machine->ram_size);
--    *ram_memory =3D ram;
-+    *ram_memory =3D machine->ram;
-     ram_below_4g =3D g_malloc(sizeof(*ram_below_4g));
--    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", ram,
-+    memory_region_init_alias(ram_below_4g, NULL, "ram-below-4g", machine->=
-ram,
-                              0, x86ms->below_4g_mem_size);
-     memory_region_add_subregion(system_memory, 0, ram_below_4g);
-     e820_add_entry(0, x86ms->below_4g_mem_size, E820_RAM);
-     if (x86ms->above_4g_mem_size > 0) {
-         ram_above_4g =3D g_malloc(sizeof(*ram_above_4g));
--        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g", ram,
-+        memory_region_init_alias(ram_above_4g, NULL, "ram-above-4g",
-+                                 machine->ram,
-                                  x86ms->below_4g_mem_size,
-                                  x86ms->above_4g_mem_size);
-         memory_region_add_subregion(system_memory, 0x100000000ULL,
-@@ -1951,6 +1949,7 @@ static void pc_machine_class_init(ObjectClass *oc, vo=
-id *data)
-     mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported =3D true;
-     mc->numa_mem_supported =3D true;
-+    mc->default_ram_id =3D "pc.ram";
+     /*
+@@ -245,7 +243,7 @@ static void ccw_init(MachineState *machine)
 =20
-     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
+     s390_sclp_init();
+     /* init memory + setup max page size. Required for the CPU model */
+-    s390_memory_init(machine->ram_size);
++    s390_memory_init(machine->ram);
+=20
+     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+     s390_init_cpus(machine);
+@@ -471,6 +469,7 @@ static void ccw_machine_class_init(ObjectClass *oc, voi=
+d *data)
+     hc->plug =3D s390_machine_device_plug;
+     hc->unplug_request =3D s390_machine_device_unplug_request;
+     nc->nmi_monitor_handler =3D s390_nmi;
++    mc->default_ram_id =3D "s390.ram";
+ }
+=20
+ static inline bool machine_get_aes_key_wrap(Object *obj, Error **errp)
 --=20
 2.7.4
 
