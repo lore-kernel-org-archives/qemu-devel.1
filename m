@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA59CC2D0DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0156C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:25:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9407206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:25:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F6DC206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:25:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AfgV9dr0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9407206DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b116QOuI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F6DC206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHWa-0006no-9M
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:25:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55812)
+	id 1imHWc-0006qt-3C
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:25:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHC7-0005Vx-5m
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:21 -0500
+ (envelope-from <imammedo@redhat.com>) id 1imHCD-0005g5-Vz
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHC5-0003Je-J9
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51386
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1imHCC-0003oe-Oh
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:25 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32879
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHC5-0003HN-Co
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:17 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCC-0003mQ-IN
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797457;
+ s=mimecast20190719; t=1577797464;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pNT9rUS3ODM08KqZ7EJF4TqTiHE+uGic/50HJmk5w9g=;
- b=AfgV9dr0ckdKms0x1EBOegaX6sjC5sDtxwNbHJila1XvO7ASZPtlay81z+tJZtRezVwDU7
- nNhQ/zmutmCa7wICtY7cFrok4goyKDyhWTEnMM8tdtmW2TOBUZsan06wtte/8SSOQZOJyV
- R5ypM6N8oFSGw7tO78rTiehQo1h/XS0=
+ bh=+ZKgmU1TMZJTYv++FRog4sBWhFmevXlgLx2sqgYEh5E=;
+ b=b116QOuIz5CklNJcXn3TJCj77MxuGhBF+CcQtpCf5NChMGs65qh9KtIY3j7OZqdePq9UYs
+ BJFtLwiYsJM1i1ok/sBRdz8B7QZ85hrVxSCEJkSoIur5D1rrCdFk8CGaGAkYmQAFfKtAt2
+ Pk9u3m93ZLk3vV3roKgiCHY+VQTxd9g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-Ai9e_DbdPHyFYMkEp5mhNw-1; Tue, 31 Dec 2019 08:04:15 -0500
+ us-mta-352-Yo8BOmqpOyOJ_nj-EFMimA-1; Tue, 31 Dec 2019 08:04:22 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49746107ACC9
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74275DB60
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:21 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C27E2620A6
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB1E3620A6
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:20 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 30/86] arm:raspi: use memdev for RAM
-Date: Tue, 31 Dec 2019 14:03:14 +0100
-Message-Id: <1577797450-88458-31-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 39/86] arm:xlnx-zcu102: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:23 +0100
+Message-Id: <1577797450-88458-40-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Ai9e_DbdPHyFYMkEp5mhNw-1
+X-MC-Unique: Yo8BOmqpOyOJ_nj-EFMimA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,117 +97,48 @@ to memdev scheme by providing
 and using MachineState::ram instead of manually initializing
 RAM memory region.
 
-PS:
- remove no longer needed RasPiState
-
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/arm/raspi.c | 34 +++++++++++++---------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
+ hw/arm/xlnx-zcu102.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 6a510aa..33ace66 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -32,11 +32,6 @@
- /* Table of Linux board IDs for different Pi versions */
- static const int raspi_boardid[] =3D {[1] =3D 0xc42, [2] =3D 0xc43, [3] =
-=3D 0xc44};
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index 53cfe7c..bd645ad 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -28,7 +28,6 @@ typedef struct XlnxZCU102 {
+     MachineState parent_obj;
 =20
--typedef struct RasPiState {
--    BCM283XState soc;
--    MemoryRegion ram;
--} RasPiState;
--
- static void write_smpboot(ARMCPU *cpu, const struct arm_boot_info *info)
- {
-     static const uint32_t smpboot[] =3D {
-@@ -166,7 +161,7 @@ static void setup_boot(MachineState *machine, int versi=
-on, size_t ram_size)
+     XlnxZynqMPState soc;
+-    MemoryRegion ddr_ram;
 =20
- static void raspi_init(MachineState *machine, int version)
- {
--    RasPiState *s =3D g_new0(RasPiState, 1);
-+    Object *soc;
-     uint32_t vcram_size;
-     DriveInfo *di;
-     BlockBackend *blk;
-@@ -179,30 +174,26 @@ static void raspi_init(MachineState *machine, int ver=
-sion)
-         exit(1);
+     bool secure;
+     bool virt;
+@@ -87,13 +86,10 @@ static void xlnx_zcu102_init(MachineState *machine)
+                  ram_size);
      }
 =20
--    object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc=
+-    memory_region_allocate_system_memory(&s->ddr_ram, NULL, "ddr-ram",
+-                                         ram_size);
+-
+     object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->soc=
 ),
--                            version =3D=3D 3 ? TYPE_BCM2837 : TYPE_BCM2836=
-,
--                            &error_abort, NULL);
-+    soc =3D object_new(version =3D=3D 3 ? TYPE_BCM2837 : TYPE_BCM2836);
-+    object_property_add_child(OBJECT(machine), "soc", soc, &error_fatal);
+                             TYPE_XLNX_ZYNQMP, &error_abort, NULL);
 =20
--    /* Allocate and map RAM */
--    memory_region_allocate_system_memory(&s->ram, OBJECT(machine), "ram",
--                                         machine->ram_size);
-     /* FIXME: Remove when we have custom CPU address space support */
--    memory_region_add_subregion_overlap(get_system_memory(), 0, &s->ram, 0=
-);
-+    memory_region_add_subregion_overlap(get_system_memory(), 0,
-+                                        machine->ram, 0);
-=20
-     /* Setup the SOC */
--    object_property_add_const_link(OBJECT(&s->soc), "ram", OBJECT(&s->ram)=
-,
-+    object_property_add_const_link(soc, "ram", OBJECT(machine->ram),
-                                    &error_abort);
--    object_property_set_int(OBJECT(&s->soc), machine->smp.cpus, "enabled-c=
-pus",
-+    object_property_set_int(soc, machine->smp.cpus, "enabled-cpus",
-                             &error_abort);
-     int board_rev =3D version =3D=3D 3 ? 0xa02082 : 0xa21041;
--    object_property_set_int(OBJECT(&s->soc), board_rev, "board-rev",
--                            &error_abort);
--    object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_abo=
-rt);
-+    object_property_set_int(soc, board_rev, "board-rev", &error_abort);
-+    object_property_set_bool(soc, true, "realized", &error_abort);
-=20
-     /* Create and plug in the SD cards */
-     di =3D drive_get_next(IF_SD);
-     blk =3D di ? blk_by_legacy_dinfo(di) : NULL;
--    bus =3D qdev_get_child_bus(DEVICE(&s->soc), "sd-bus");
-+    bus =3D qdev_get_child_bus(DEVICE(soc), "sd-bus");
-     if (bus =3D=3D NULL) {
-         error_report("No SD bus found in SOC object");
-         exit(1);
-@@ -211,8 +202,7 @@ static void raspi_init(MachineState *machine, int versi=
-on)
-     qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
-     object_property_set_bool(OBJECT(carddev), true, "realized", &error_fat=
-al);
-=20
--    vcram_size =3D object_property_get_uint(OBJECT(&s->soc), "vcram-size",
--                                          &error_abort);
-+    vcram_size =3D object_property_get_uint(soc, "vcram-size", &error_abor=
-t);
-     setup_boot(machine, version, machine->ram_size - vcram_size);
- }
-=20
-@@ -233,6 +223,7 @@ static void raspi2_machine_init(MachineClass *mc)
-     mc->min_cpus =3D BCM283X_NCPUS;
-     mc->default_cpus =3D BCM283X_NCPUS;
-     mc->default_ram_size =3D 1 * GiB;
-+    mc->default_ram_id =3D "ram";
+-    object_property_set_link(OBJECT(&s->soc), OBJECT(&s->ddr_ram),
++    object_property_set_link(OBJECT(&s->soc), OBJECT(machine->ram),
+                          "ddr-ram", &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), s->secure, "secure",
+                              &error_fatal);
+@@ -211,6 +207,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass =
+*oc, void *data)
      mc->ignore_memory_transaction_failures =3D true;
- };
- DEFINE_MACHINE("raspi2", raspi2_machine_init)
-@@ -255,6 +246,7 @@ static void raspi3_machine_init(MachineClass *mc)
-     mc->min_cpus =3D BCM283X_NCPUS;
-     mc->default_cpus =3D BCM283X_NCPUS;
-     mc->default_ram_size =3D 1 * GiB;
-+    mc->default_ram_id =3D "ram";
+     mc->max_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+     mc->default_cpus =3D XLNX_ZYNQMP_NUM_APU_CPUS;
++    mc->default_ram_id =3D "ddr-ram";
  }
- DEFINE_MACHINE("raspi3", raspi3_machine_init)
- #endif
+=20
+ static const TypeInfo xlnx_zcu102_machine_init_typeinfo =3D {
 --=20
 2.7.4
 
