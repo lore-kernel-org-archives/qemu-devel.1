@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6116EC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6626DC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:47:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CE9B206D9
-	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3222C206DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 31 Dec 2019 13:47:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ws/Yn6Fc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CE9B206D9
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUroSu09"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3222C206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imHpJ-0007Ve-Kf
-	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:44:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56615)
+	id 1imHrY-0001hY-Ok
+	for qemu-devel@archiver.kernel.org; Tue, 31 Dec 2019 08:47:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1imHCS-0005pH-3l
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:44 -0500
+ (envelope-from <imammedo@redhat.com>) id 1imHCb-0005zX-2c
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1imHCM-00048Q-PY
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59063
+ (envelope-from <imammedo@redhat.com>) id 1imHCZ-0004Z0-8S
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47044
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCL-00044S-0E
- for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:33 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1imHCY-0004Vd-VP
+ for qemu-devel@nongnu.org; Tue, 31 Dec 2019 08:04:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577797467;
+ s=mimecast20190719; t=1577797486;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O2eelqXaC3pUz3GeVceDZ8mL4XweDBc6wJNeqRDorwA=;
- b=Ws/Yn6FcJEZ6JsrDEWtpo2VqQM1deC7DiuYvX1YgX/L6WIFQMyoWffXCRULWA/qi+tFv1q
- 87Y0kjHfUUp4Yd4Mjxygc7yekQJe0IS69YZG+Pi0TLkXN61FDFU+YTfn6U8zfFk/lZM5oM
- +fBMGQAbRp4ER4HZUPkplzNszflQ9+Y=
+ bh=g+h+u9gYsFlLicKSN4chMEr82/G6v49q6m4/6FD8tfI=;
+ b=bUroSu09AYP9+eWsOxiYFHZAEscg7p3/o0FmKaiZG42r/CXrS2OfSrCxE80M4/Tdx3BtkW
+ zGrSqnoOqaqN3umu+nrlCtugOefOoHzg8v3CsyxZ4JOMNPSYEIAgJQktPLiQg1Ke50Nwsb
+ HSkEgZqTKLDFWuaH5RlUXxBYkyipG50=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-KRUOG5qPOJKMERconQhozQ-1; Tue, 31 Dec 2019 08:04:26 -0500
+ us-mta-245-NbmfB515PSarxNM-E3RmmA-1; Tue, 31 Dec 2019 08:04:44 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 684B618031DE
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADDC4DB62
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:43 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E3897620A6
- for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3382C78E99
+ for <qemu-devel@nongnu.org>; Tue, 31 Dec 2019 13:04:43 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 44/86] hppa: use memdev for RAM
-Date: Tue, 31 Dec 2019 14:03:28 +0100
-Message-Id: <1577797450-88458-45-git-send-email-imammedo@redhat.com>
+Subject: [PATCH 67/86] ppc:ppc440_bamboo/sam460ex: use memdev for RAM
+Date: Tue, 31 Dec 2019 14:03:51 +0100
+Message-Id: <1577797450-88458-68-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: KRUOG5qPOJKMERconQhozQ-1
+X-MC-Unique: NbmfB515PSarxNM-E3RmmA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -99,42 +99,102 @@ RAM memory region.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/hppa/machine.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ include/hw/ppc/ppc4xx.h | 2 +-
+ hw/ppc/ppc440_bamboo.c  | 3 ++-
+ hw/ppc/ppc4xx_devs.c    | 6 ++----
+ hw/ppc/sam460ex.c       | 3 ++-
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 25f5afc..b2f7bc5 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -70,7 +70,6 @@ static void machine_hppa_init(MachineState *machine)
-     uint64_t kernel_entry =3D 0, kernel_low, kernel_high;
-     MemoryRegion *addr_space =3D get_system_memory();
-     MemoryRegion *rom_region;
--    MemoryRegion *ram_region;
-     MemoryRegion *cpu_region;
-     long i;
-     unsigned int smp_cpus =3D machine->smp.cpus;
-@@ -96,11 +95,7 @@ static void machine_hppa_init(MachineState *machine)
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index 1a28127..896b1b1 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -42,7 +42,7 @@ enum {
+ qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
+                        uint32_t dcr_base, int has_ssr, int has_vr);
+=20
+-void ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
++void ppc4xx_sdram_adjust(MemoryRegion *ram, int nr_banks,
+                          MemoryRegion ram_memories[],
+                          hwaddr ram_bases[], hwaddr ram_sizes[],
+                          const ram_addr_t sdram_bank_sizes[]);
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 66dee89..73e5b23 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -206,7 +206,7 @@ static void bamboo_init(MachineState *machine)
+     /* SDRAM controller */
+     memset(ram_bases, 0, sizeof(ram_bases));
+     memset(ram_sizes, 0, sizeof(ram_sizes));
+-    ppc4xx_sdram_adjust(ram_size, PPC440EP_SDRAM_NR_BANKS, ram_memories,
++    ppc4xx_sdram_adjust(machine->ram, PPC440EP_SDRAM_NR_BANKS, ram_memorie=
+s,
+                         ram_bases, ram_sizes, ppc440ep_sdram_bank_sizes);
+     /* XXX 440EP's ECC interrupts are on UIC1, but we've only created UIC0=
+. */
+     ppc4xx_sdram_init(env, pic[14], PPC440EP_SDRAM_NR_BANKS, ram_memories,
+@@ -293,6 +293,7 @@ static void bamboo_machine_init(MachineClass *mc)
+     mc->desc =3D "bamboo";
+     mc->init =3D bamboo_init;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("440epb");
++    mc->default_ram_id =3D "ppc4xx.sdram";
+ }
+=20
+ DEFINE_MACHINE("bamboo", bamboo_machine_init)
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index 54af296..515e462 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -673,12 +673,12 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq ir=
+q, int nbanks,
+  * The 4xx SDRAM controller supports a small number of banks, and each ban=
+k
+  * must be one of a small set of sizes. The number of banks and the suppor=
+ted
+  * sizes varies by SoC. */
+-void ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
++void ppc4xx_sdram_adjust(MemoryRegion *ram, int nr_banks,
+                          MemoryRegion ram_memories[],
+                          hwaddr ram_bases[], hwaddr ram_sizes[],
+                          const ram_addr_t sdram_bank_sizes[])
+ {
+-    MemoryRegion *ram =3D g_malloc0(sizeof(*ram));
++    ram_addr_t ram_size =3D memory_region_size(ram);
+     ram_addr_t size_left =3D ram_size;
+     ram_addr_t base =3D 0;
+     ram_addr_t bank_size;
+@@ -713,8 +713,6 @@ void ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_ba=
+nks,
          exit(EXIT_FAILURE);
      }
 =20
--    /* Main memory region. */
--    ram_region =3D g_new(MemoryRegion, 1);
--    memory_region_allocate_system_memory(ram_region, OBJECT(machine),
--                                         "ram", ram_size);
--    memory_region_add_subregion(addr_space, 0, ram_region);
-+    memory_region_add_subregion(addr_space, 0, machine->ram);
+-    memory_region_allocate_system_memory(ram, NULL, "ppc4xx.sdram", ram_si=
+ze);
+-
+     size_left =3D ram_size;
+     for (i =3D 0; i < nr_banks && size_left; i++) {
+         for (j =3D 0; sdram_bank_sizes[j] !=3D 0; j++) {
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index f592816..2d75719 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -324,7 +324,7 @@ static void sam460ex_init(MachineState *machine)
+     /* SDRAM controller */
+     /* put all RAM on first bank because board has one slot
+      * and firmware only checks that */
+-    ppc4xx_sdram_adjust(machine->ram_size, 1, ram_memories, ram_bases,
++    ppc4xx_sdram_adjust(machine->ram, 1, ram_memories, ram_bases,
+                         ram_sizes, ppc460ex_sdram_bank_sizes);
 =20
-     /* Init Dino (PCI host bus chip).  */
-     pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
-@@ -284,6 +279,7 @@ static void machine_hppa_machine_init(MachineClass *mc)
-     mc->is_default =3D 1;
+     /* FIXME: does 460EX have ECC interrupts? */
+@@ -483,6 +483,7 @@ static void sam460ex_machine_init(MachineClass *mc)
+     mc->init =3D sam460ex_init;
+     mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("460exb");
      mc->default_ram_size =3D 512 * MiB;
-     mc->default_boot_order =3D "cd";
-+    mc->default_ram_id =3D "ram";
++    mc->default_ram_id =3D "ppc4xx.sdram";
  }
 =20
- DEFINE_MACHINE("hppa", machine_hppa_machine_init)
+ DEFINE_MACHINE("sam460ex", sam460ex_machine_init)
 --=20
 2.7.4
 
