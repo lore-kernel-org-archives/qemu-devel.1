@@ -6,91 +6,95 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88192C2D0DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 23:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8AB6C2D0DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 23:51:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D68120722
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 23:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 694FE20848
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 23:51:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7TEZi08"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D68120722
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faJMLYZi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694FE20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imnfK-0004o5-B9
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jan 2020 18:44:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58263)
+	id 1imnlb-0007ZQ-II
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jan 2020 18:51:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58843)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1imneg-0004P0-SR
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 18:44:00 -0500
+ (envelope-from <mst@redhat.com>) id 1imnky-000751-28
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 18:50:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1imnee-0001HK-6e
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 18:43:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35140
+ (envelope-from <mst@redhat.com>) id 1imnkw-0006PQ-GY
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 18:50:27 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33190
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1imned-0001DP-Rs
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 18:43:56 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1imnkw-0006Oe-Be
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 18:50:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577922234;
+ s=mimecast20190719; t=1577922625;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=G/5tuwMscxP1GV6aVSN3u9jCI6bMeFI6luevqafuacA=;
- b=e7TEZi08uWJFlR8kHe6q+VvG20O2gzAlwG5a/c4AnAoE9O9AhUYvUHQxwBd/UgdWOw9lO2
- lpKY/tdYPfx2Xni1SCNR6tbeTOjiRoxCQr2t5xFTFQHQ9LEuBBuC+p12kjE6ZQcMiDwQi6
- fTUxQFZqB+NOkFOdf/4sT5f9At5rfMA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-_k2uwXE-NvSH-tGltudsIw-1; Wed, 01 Jan 2020 18:43:52 -0500
-Received: by mail-wr1-f72.google.com with SMTP id c17so14712333wrp.10
- for <qemu-devel@nongnu.org>; Wed, 01 Jan 2020 15:43:52 -0800 (PST)
+ bh=IdyatWB78Kdni7U2XhcZbG26fqRy+jGSBrd6UDRmbys=;
+ b=faJMLYZi9+FLZxTNi2h7BXCIR8dc917GZEexU0IR+7mBj8IkxWDOokxJ/brc/nUEgiWMwK
+ pTyOvbxcwwoZSbr1Or/+bA4qlvGuA9YtIIdahpdjGWi5lHYP2C53xtpFlUzG59wCuoXVSS
+ +ztCjub7d+iEKfsAbZAQ28I1pRbZ5A0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-PLvdt3xvO926cvUbXx_Qpw-1; Wed, 01 Jan 2020 18:50:23 -0500
+Received: by mail-wr1-f70.google.com with SMTP id v17so19280048wrm.17
+ for <qemu-devel@nongnu.org>; Wed, 01 Jan 2020 15:50:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=CiXFn+iZBeRp0P9E9p0aFCnuW/O3DRy5jdc/3JHhR9w=;
- b=eYgDAmEOoFJ/yTOryfFTeR5yQ+dEyX4gaf9BwxGzqzUwrXUgBUS3ML0+Ul+xFowK0o
- 9AuCnsO0UfqyMhfdx3GyERc+4l5KnpE/HJb86L9JpMcGS3TZqPkbgnS7e/Uhkshzno9h
- nIsBIl0SQSahhz/Kw0sje7LjvzjegbWdH+uv2eA7bf9NAz7VwhYPmpdCu63bOKcjUjA8
- 2eQI/rzcP1syjXMbzl6TKo5tWnOkZQBC82iMm4ygVf2UdLy6l1eCduxsob+MAf8hleZ5
- NFbhhQNFM5kfJTT+rNz/NdkU+wp5/DkinhwrWrdoUu3SW47FyoLoN0rHWLlA0ZxNODy3
- Irqw==
-X-Gm-Message-State: APjAAAXXw42DlXdpRIkOny10f0bw8M7HjRZ4mLmU7wIvL9RBN10So7Gf
- r/O4l32NiQuteWCeUBcIQUTB/M0tJdOW2EoEiyQT8ITwScwMvnaIDXTTJhwGvWRHeMVGFAYDCJb
- alD3u1+6w1wdxv7A=
-X-Received: by 2002:a5d:4b88:: with SMTP id b8mr31526458wrt.343.1577922231691; 
- Wed, 01 Jan 2020 15:43:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwmm0cP7JZ+D/Gcy1zzx/K+JFm0ydIpaWOmJnhjugG6WkbJPofegVE/BHKU+Xgq4pTo2XeLvw==
-X-Received: by 2002:a5d:4b88:: with SMTP id b8mr31526447wrt.343.1577922231491; 
- Wed, 01 Jan 2020 15:43:51 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=I1CC66Ikw4YBtxWMbzBs/HTQQUwVWR0X5qsu0kq4BJE=;
+ b=tcUBC8CmE+I0/dru06AlcbQzkhCEfDhvW+eMyR6c0wvvzOBJsVZfD4b8VTW5GmgIYr
+ 8RlEjg1B1XpnYhCgjnrfCDeQcIy6F/KX/S4mFRpMFR6m8kQKRzwhFj733Ru8mnpEvao3
+ FbPm1PoFgVaSf3UjGT4Zkrhnru2sS4ve8bUzAyWntWEt7iMZts81UaXE4G7yl7OGTEMO
+ +EjBXzeL9ubNfKgTgu5tCFFoCe4AFrJNrjtOSk+mGgeF2LYfXLVXGUosj2AHvoFBa8LE
+ bQQDvJrkYuwlci2Ov3jTC9koURmSa7wm8bubumKvPZJaWLwiBGBcB++wNUNKeoTcSq8b
+ U1sQ==
+X-Gm-Message-State: APjAAAVvEDSpg3Sws2BLVUvWqmGt5cdwGv/lzhbV0cuzw01ubxQqTRDj
+ D3SkVp1vlqDye27lTlKWlLNCD/n7X68TL33PPY5KoBEt806Js0ya5FAV4Ou/a6wjDH2BJpfCbj5
+ aCVMB/R1x2rNQOAo=
+X-Received: by 2002:a05:600c:2298:: with SMTP id
+ 24mr11581234wmf.65.1577922622673; 
+ Wed, 01 Jan 2020 15:50:22 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyiSTZm7L1CcJrPK/yGCgnDNgM1/5VYWXFZkHNx6hPUwPY1/e1ca5jUkdfZNJK1RdSTJx8tgw==
+X-Received: by 2002:a05:600c:2298:: with SMTP id
+ 24mr11581217wmf.65.1577922622483; 
+ Wed, 01 Jan 2020 15:50:22 -0800 (PST)
 Received: from redhat.com (89.20.181.189.static.ef-service.nl. [89.20.181.189])
- by smtp.gmail.com with ESMTPSA id r5sm53381842wrt.43.2020.01.01.15.43.50
+ by smtp.gmail.com with ESMTPSA id b137sm7028722wme.26.2020.01.01.15.50.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Jan 2020 15:43:50 -0800 (PST)
-Date: Wed, 1 Jan 2020 18:43:49 -0500
+ Wed, 01 Jan 2020 15:50:21 -0800 (PST)
+Date: Wed, 1 Jan 2020 18:50:20 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Subject: Re: [PATCH 2/2] virtio-net: delete also control queue when TX/RX
- deleted
-Message-ID: <20200101184128-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
+Message-ID: <20200101184425-mutt-send-email-mst@kernel.org>
 References: <20191226043649.14481-1-yuri.benditovich@daynix.com>
- <20191226043649.14481-3-yuri.benditovich@daynix.com>
+ <20191226043649.14481-2-yuri.benditovich@daynix.com>
+ <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
+ <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191226043649.14481-3-yuri.benditovich@daynix.com>
-X-MC-Unique: _k2uwXE-NvSH-tGltudsIw-1
+In-Reply-To: <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
+X-MC-Unique: PLvdt3xvO926cvUbXx_Qpw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,41 +106,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com, jasowang@redhat.com, qemu-devel@nongnu.org
+Cc: Yan Vugenfirer <yan@daynix.com>, pbonzini@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 26, 2019 at 06:36:49AM +0200, Yuri Benditovich wrote:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480
-> If the control queue is not deleted together with TX/RX, it
-> later will be ignored in freeing cache resources and hot
-> unplug will not be completed.
+On Thu, Dec 26, 2019 at 11:29:50AM +0200, Yuri Benditovich wrote:
+> On Thu, Dec 26, 2019 at 10:58 AM Jason Wang <jasowang@redhat.com> wrote:
+> >
+> >
+> > On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditovich wrote:
+> > > https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480
+> > > Fix leak of region reference that prevents complete
+> > > device deletion on hot unplug.
+> >
+> >
+> > More information is needed here, the bug said only q35 can meet this
+> > issue. What makes q35 different here?
+> >
 >=20
-> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> ---
->  hw/net/virtio-net.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index db3d7c38e6..f325440d01 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -3101,7 +3101,8 @@ static void virtio_net_device_unrealize(DeviceState=
- *dev, Error **errp)
->      for (i =3D 0; i < max_queues; i++) {
->          virtio_net_del_queue(n, i);
->      }
-> -
-> +    /* delete also control vq */
-> +    virtio_del_queue(vdev, max_queues * 2);
->      qemu_announce_timer_del(&n->announce_timer, false);
->      g_free(n->vqs);
->      qemu_del_nic(n->nic);
+> I do not have any ready answer, I did not dig into it too much.
+> Probably Michael Tsirkin or Paolo Bonzini can answer without digging.
 
-Do we need to limit this to when ctrl vq exists?
 
-> --=20
-> 2.17.1
+
+> >
+> > >
+> > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
+> > > ---
+> > >   hw/virtio/virtio.c | 5 +++++
+> > >   1 file changed, 5 insertions(+)
+> > >
+> > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > index 04716b5f6c..baadec8abc 100644
+> > > --- a/hw/virtio/virtio.c
+> > > +++ b/hw/virtio/virtio.c
+> > > @@ -2340,6 +2340,11 @@ void virtio_del_queue(VirtIODevice *vdev, int =
+n)
+> > >       vdev->vq[n].vring.num_default =3D 0;
+> > >       vdev->vq[n].handle_output =3D NULL;
+> > >       vdev->vq[n].handle_aio_output =3D NULL;
+> > > +    /*
+> > > +     * with vring.num =3D 0 the queue will be ignored
+> > > +     * in later loops of region cache reset
+> > > +     */
+> >
+> >
+> > I can't get the meaning of this comment.
+> >
+> > Thanks
+> >
+> >
+> > > +    virtio_virtqueue_reset_region_cache(&vdev->vq[n]);
+
+
+Do we need to drop this from virtio_device_free_virtqueues then?
+
+> > >       g_free(vdev->vq[n].used_elems);
+> > >   }
+> > >
+> >
 
 
