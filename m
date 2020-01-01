@@ -2,99 +2,92 @@ Return-Path: <SRS0=kzat=2W=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF92C2D0DC
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 15:39:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F80C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 16:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DF452072C
-	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 15:39:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A77C2080A
+	for <qemu-devel@archiver.kernel.org>; Wed,  1 Jan 2020 16:16:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFdmtxZ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF452072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="FfqedtF8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A77C2080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1img5k-0006Ap-FP
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jan 2020 10:39:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60361)
+	id 1imgg4-00030Z-6y
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jan 2020 11:16:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1img56-0005kJ-Qa
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 10:38:45 -0500
+ (envelope-from <cminyard@mvista.com>) id 1imgfG-0002V6-78
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 11:16:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1img55-00061R-NX
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 10:38:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22964
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1img55-00060S-JD
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 10:38:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577893123;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WwAL+bDZctfWAe7b+yuTRpzau5C5PrjwC5uXwQlg3Fk=;
- b=hFdmtxZ3vJjwOWg1V7yxZiFWedAwist80YDIf0qbomavS+sRVD125TPlg+g95T+/h4Vsbj
- VEfNSLln7MB/5NBfWLBcjLD5Wvkz/I8EB3wTO57H9+nb68/YEMwR65x0sSz5moVbYwiEKp
- T0hdyQX3EdCQyUBPV7+EHkvhrED4A3M=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-zE_IDWK0Md-AmHWpAh3-7w-1; Wed, 01 Jan 2020 10:38:42 -0500
-Received: by mail-wm1-f70.google.com with SMTP id t4so424525wmf.2
- for <qemu-devel@nongnu.org>; Wed, 01 Jan 2020 07:38:41 -0800 (PST)
+ (envelope-from <cminyard@mvista.com>) id 1imgfE-0003OS-G6
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 11:16:05 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36664)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1imgfE-0003CI-1E
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 11:16:04 -0500
+Received: by mail-oi1-x241.google.com with SMTP id c16so12531417oic.3
+ for <qemu-devel@nongnu.org>; Wed, 01 Jan 2020 08:16:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=farSUXxp88oWk1zRhqa1mqTL/SABerU4X6E3hdyAXZU=;
+ b=FfqedtF8+6jMFF+00JTOeLu7ZZgOtAlFSjmUqbBVJe3gBeQPTFG1BYwQkDQWxATQiF
+ YwfHwiLJxBrQwT71yHICOMW5LdqROyqBb47fyh802lAIXdG7wckPzY65VZ3aJNepk3+O
+ xtdYZV7IidkxvHBSJDe6krpfVrVy62ygkx3EaJAOixn5EZVhGnqnNo+Ilq26kHPhWhE/
+ fXmaO9+KHpK2Sg72KbOdy7Hwz5V8l1yPvEz7oCDiNzgBaFhjvLkiICFOhGYSrfb+KBsS
+ 7snxAqFdId93UbRf20VcvqiqKegMocO8e9xMBEZasqb+NAE8WVEkRB8jv7Wi47WHs9F6
+ bl+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=u4HAX1gX8l4PUfsHDBmpqYR5eMRseEXfpvBMjnzD4WM=;
- b=RkwtvbzTE6ogldUsWMwFEhlxqpk/49H24pR1lb6Ser/B1EysYbiJaktFEz9Zs7ZAWk
- Z0lh6eQHpMLfWWFiMb//xW5K9BmmMIyQ0/sFYRoDu938/67EnINrRUQYGJaZT2kGgjxf
- FgNc9ol/F1zL6kuBsfJ6e7GjwplHFaTPQgLhwRfL36Itwa62XnacrupOyNE6y72zcT4R
- DqYYQzC3FQr+kGMbFYxQVdEeoEBzpg/Rogw2PfKn31v/lVY9Ek+eLM9aoVzh1OZEioiL
- eIHt6RzIMiL+8WaScEDyvCgxA0Edu+6Nb4JxBV8SnkwydWviC7ugKJRqXl9jrfTlsVzr
- ZP5A==
-X-Gm-Message-State: APjAAAVGgH1dqi7R8SSEk6lcTw9+PkJDOP+RIhG+0p5OBVqtbEVbzd+l
- AhDdjz+uvggKl6DrPtet7ul3voax6InOEzBypOgpx8igWtmZDRioVFYtkg5pWDMSJgJc82FegGu
- EF+KoZMToWJqN//Q=
-X-Received: by 2002:a1c:6588:: with SMTP id z130mr10066689wmb.0.1577893120789; 
- Wed, 01 Jan 2020 07:38:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz2xRGdXUNrH9tCowVliRx+cPkluT1kG6tFotoUnlAlcQNIb9+QypGg+Vv0H9P8qWchAbFJRw==
-X-Received: by 2002:a1c:6588:: with SMTP id z130mr10066671wmb.0.1577893120514; 
- Wed, 01 Jan 2020 07:38:40 -0800 (PST)
-Received: from [10.30.42.123] ([62.102.229.57])
- by smtp.gmail.com with ESMTPSA id s19sm5737982wmj.33.2020.01.01.07.38.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 01 Jan 2020 07:38:39 -0800 (PST)
-Subject: Re: [PATCH 66/86] ppc:ppc440_bamboo/sam460ex: drop RAM size fixup
-To: BALATON Zoltan <balaton@eik.bme.hu>, Igor Mammedov <imammedo@redhat.com>
-References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
- <1577797450-88458-67-git-send-email-imammedo@redhat.com>
- <alpine.BSF.2.21.99999.352.2001011235410.5612@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2d440542-7a32-4e1d-6635-201d4535f91a@redhat.com>
-Date: Wed, 1 Jan 2020 16:39:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition
+ :content-transfer-encoding:in-reply-to:user-agent;
+ bh=farSUXxp88oWk1zRhqa1mqTL/SABerU4X6E3hdyAXZU=;
+ b=EJ2HmbQdOPpkpkMtoF9SNRypktCoGpSgov8Ckk8NyzWc0khZf/Atip6q5c/n/7xzFO
+ ctfQhpqWSCJ9AOjb5FpIbb2y602nhsupQQnxspLYk7oxoFDt3JDR1LRKeAxnrH66JXVt
+ zq+gkuWURct2i4Zc++FU8gezm5cxSgmMk8mcoEg+ajrmkEoGkRm2EnaIvEuRtZqHhfjo
+ LunAlWEFhyLLWOeTYvAbRM9wst+jO6Ks6x6ZbUinFGh1xwibsZlqvqGNgVfIJJWMvN0K
+ KxiVjf3VHosh0QrjtWJszByPJR2MhBIqpDYcwum5gY4yu+Go7lOHAa6wnbpwtDFuiJwN
+ LkRA==
+X-Gm-Message-State: APjAAAX8M7SHajthdCa/NZyO56nIHXHnS5IA6UxwLpkhVtCafnz7AP5I
+ GvE0B8oDwq9nev6XBKab4rUyyg==
+X-Google-Smtp-Source: APXvYqwSp69gkdG/GLj2Z3SA26h1ZLKNqvqh8LXHcZy256LAKTh2eU2qFHUJxsUC5g7DR7npgn0M0Q==
+X-Received: by 2002:a05:6808:4cc:: with SMTP id
+ a12mr1974625oie.115.1577895360974; 
+ Wed, 01 Jan 2020 08:16:00 -0800 (PST)
+Received: from minyard.net ([2001:470:b8f6:1b:d193:7acb:1243:c644])
+ by smtp.gmail.com with ESMTPSA id e6sm18247823otl.12.2020.01.01.08.15.59
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Wed, 01 Jan 2020 08:16:00 -0800 (PST)
+Date: Wed, 1 Jan 2020 10:15:58 -0600
+From: Corey Minyard <cminyard@mvista.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 05/14] hw/i2c/Kconfig: Add an entry for the SMBus
+Message-ID: <20200101161558.GC6454@minyard.net>
+References: <20191231183216.6781-1-philmd@redhat.com>
+ <20191231183216.6781-6-philmd@redhat.com>
+ <20191231191600.GB6497@minyard.net>
+ <89c243b7-bbd0-78cc-67ba-34e0fb19e1bd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.99999.352.2001011235410.5612@zero.eik.bme.hu>
-Content-Language: en-US
-X-MC-Unique: zE_IDWK0Md-AmHWpAh3-7w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <89c243b7-bbd0-78cc-67ba-34e0fb19e1bd@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,62 +99,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: cminyard@mvista.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-ppc@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/1/20 12:54 PM, BALATON Zoltan wrote:
-> On Tue, 31 Dec 2019, Igor Mammedov wrote:
->> If user provided non-sense RAM size, board will complain and
->> continue running with max RAM size supported.
->> Also RAM is going to be allocated by generic code, so it won't be
->> possible for board to fix things up for user.
->>
->> Make it error message and exit to force user fix CLI,
->> instead of accepting non-sense CLI values.
->>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->> include/hw/ppc/ppc4xx.h |=A0 9 ++++-----
->> hw/ppc/ppc440_bamboo.c=A0 | 11 ++++-------
->> hw/ppc/ppc4xx_devs.c=A0=A0=A0 | 26 ++++++++++++++++----------
->> hw/ppc/sam460ex.c=A0=A0=A0=A0=A0=A0 |=A0 5 ++---
->> 4 files changed, 26 insertions(+), 25 deletions(-)
->>
->> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
->> index 7d82259..1a28127 100644
->> --- a/include/hw/ppc/ppc4xx.h
->> +++ b/include/hw/ppc/ppc4xx.h
->> @@ -42,11 +42,10 @@ enum {
->> qemu_irq *ppcuic_init (CPUPPCState *env, qemu_irq *irqs,
->> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 uint3=
-2_t dcr_base, int has_ssr, int has_vr);
->>
->> -ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
->> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0 MemoryRegion ram_memories[],
->> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0 hwaddr ram_bases[],
->> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0 hwaddr ram_sizes[],
->> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0 const ram_addr_t sdram_bank_sizes[]);
->> +void ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 MemoryRegion ram_memories[],
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 hwaddr ram_bases[], hwaddr ram_sizes[],
->> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 const ram_addr_t sdram_bank_sizes[]);
->=20
-> With this change this function does not adjust ram size any more so it=20
-> may need to be renamed, e.g. ppc4xx_sdram_banks or something else.
->=20
-> A better patch title may be
->=20
-> ppc/{ppc440_bamboo,sam460x}: drop RAM size fixup
+On Wed, Jan 01, 2020 at 11:25:42AM +0100, Philippe Mathieu-Daudé wrote:
+> On 12/31/19 8:16 PM, Corey Minyard wrote:
+> > On Tue, Dec 31, 2019 at 07:32:07PM +0100, Philippe Mathieu-Daudé wrote:
+> > > The System Management Bus is more or less a derivative of the I2C
+> > > bus, thus the Kconfig entry depends of I2C.
+> > > Not all boards providing an I2C bus support SMBus.
+> > > Use two different Kconfig entries to be able to select I2C without
+> > > selecting SMBus.
+> > > 
+> > > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> > > ---
+> > > Cc: Corey Minyard <cminyard@mvista.com>
+> > > ---
+> > >   default-configs/mips-softmmu-common.mak | 1 +
+> > >   hw/i2c/Kconfig                          | 8 ++++++--
+> > >   hw/i2c/Makefile.objs                    | 3 ++-
+> > >   3 files changed, 9 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+> > > index da29c6c0b2..ac76d944b8 100644
+> > > --- a/default-configs/mips-softmmu-common.mak
+> > > +++ b/default-configs/mips-softmmu-common.mak
+> > > @@ -37,6 +37,7 @@ CONFIG_R4K=y
+> > >   CONFIG_MALTA=y
+> > >   CONFIG_PCNET_PCI=y
+> > >   CONFIG_MIPSSIM=y
+> > > +CONFIG_SMBUS=y
+> > 
+> > Why is the above necessary?  Wouldn't CONFIG_ACPI_SMBUS=y below cause
+> > this to be done?
+> 
+> Yes you are correct!
+> 
+> > 
+> > >   CONFIG_ACPI_SMBUS=y
+> > >   CONFIG_SMBUS_EEPROM=y
+> > >   CONFIG_TEST_DEVICES=y
+> > > diff --git a/hw/i2c/Kconfig b/hw/i2c/Kconfig
+> > > index 2bbd395813..09642a6dcb 100644
+> > > --- a/hw/i2c/Kconfig
+> > > +++ b/hw/i2c/Kconfig
+> > > @@ -1,9 +1,13 @@
+> > >   config I2C
+> > >       bool
+> > > +config SMBUS
+> > > +    bool
+> > > +    select I2C
+> > > +
+> > >   config SMBUS_EEPROM
+> > >       bool
+> > > -    depends on I2C
+> > > +    select SMBUS
+> > >   config VERSATILE_I2C
+> > >       bool
+> > > @@ -11,7 +15,7 @@ config VERSATILE_I2C
+> > >   config ACPI_SMBUS
+> > >       bool
+> > > -    select I2C
+> > > +    select SMBUS
+> > >   config BITBANG_I2C
+> > >       bool
+> > > diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+> > > index d7073a401f..cbbc8507a3 100644
+> > > --- a/hw/i2c/Makefile.objs
+> > > +++ b/hw/i2c/Makefile.objs
+> > > @@ -1,4 +1,5 @@
+> > > -common-obj-$(CONFIG_I2C) += core.o smbus_slave.o smbus_master.o
+> > > +common-obj-$(CONFIG_I2C) += core.o
+> > > +common-obj-$(CONFIG_SMBUS) += smbus_slave.o smbus_master.o
+> > >   common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
+> > >   common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
+> > >   common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
+> > 
+> > There is some messiness with ICH, but it appears that everything will
+> > work correctly there and this patch is not the right place to fix it.
+> 
+> I did some cleaning with the ICH9 chipset last year, I need to find some
+> time to refresh it.
+> 
+> > This looks fine and avoids including smbus code when it is not
+> > necessary.  With the MIPS config item removed (assuming it is not
+> > necessary):
+> > 
+> > Reviewed-by: Corey Minyard <cminyard@mvista.com>
+> 
+> Thanks!
+> 
+> > 
+> > I can take it into my tree if you like.
+> 
+> Sure, do you mind cleaning default-configs/mips-softmmu-common.mak or you
+> prefer a respin of this single patch?
 
-Or split in 2 patches.
+I removed that piece and have it queued.
 
+Thanks,
+
+-corey
+
+> 
+> > 
+> > Thanks,
+> > 
+> > -corey
+> > 
+> > > -- 
+> > > 2.21.0
+> > > 
+> > 
+> 
 
