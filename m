@@ -2,83 +2,69 @@ Return-Path: <SRS0=Q/S9=2X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D379C2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:48:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E587C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:56:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7841215A4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:48:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED45E2072C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:56:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FC8XJYA9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7841215A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="T4W+Klir"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED45E2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=zx2c4.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1in1mK-0003dg-T2
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 09:48:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42232)
+	id 1in1tQ-0007E1-36
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 09:56:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1in1lM-0002nk-OS
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:47:50 -0500
+ (envelope-from <Jason@zx2c4.com>) id 1in1sk-0006me-Px
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:55:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1in1lL-0004d0-Hz
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:47:48 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30380
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <Jason@zx2c4.com>) id 1in1sj-0007HV-Oz
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:55:26 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:47975)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1in1lL-0004bt-Df
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:47:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577976466;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oERDlXY0wp808zSy+S2S6agc1WjSlm03s58t2QHS10M=;
- b=FC8XJYA9WirhPcF1MrPFZ4kD5PMJMzNJ49s80Y1jobqKsLqaczhDXVvRe5EyHRSkf3PyYr
- aH8eJkvBKOKRoz3pOhZzBv6GLX8Z2jiT09+LS5M1fVRC+W57mQZAePDIfCIoNfI0RaAD82
- 8AZkoLSfiABBYQvFu94oSfL4lquMIaA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-KYW7zn5IO1uOPVAcQdls3g-1; Thu, 02 Jan 2020 09:47:45 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B814B107B790;
- Thu,  2 Jan 2020 14:47:44 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6EAAF5C545;
- Thu,  2 Jan 2020 14:47:41 +0000 (UTC)
-Date: Thu, 2 Jan 2020 15:47:39 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Helge Deller <deller@gmx.de>
-Subject: Re: [PATCH 43/86] hppa: drop RAM size fixup
-Message-ID: <20200102154739.5fd87c2f@redhat.com>
-In-Reply-To: <c6362789-579a-29ee-6947-7597eeda6515@gmx.de>
-References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
- <1577797450-88458-44-git-send-email-imammedo@redhat.com>
- <bc7bac60-0d20-d0e3-b9ac-2c9ff62c2c15@redhat.com>
- <8cb7bd0f-7841-7e60-8de6-708515b81b00@gmx.de>
- <7cc361d0-300f-a8a1-3650-9358e815c070@redhat.com>
- <c6362789-579a-29ee-6947-7597eeda6515@gmx.de>
+ (Exim 4.71) (envelope-from <Jason@zx2c4.com>) id 1in1sj-0007HB-Ih
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:55:25 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 29babb62
+ for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 13:56:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+ :from:date:message-id:subject:to:cc:content-type; s=mail; bh=dyO
+ 6Xh/IVGP9540dVMxI8zwbkGs=; b=T4W+Klir5BBaGMD3meXAJfmfmL6HVkgPfBS
+ 3hfloqcaChRn5yeXO0HlOIwQRpLmvmIYHMuoCauOCpgWxTqvEQB7vnzfYNFt0S7Q
+ XQwCPcIlOm7zawkZlxsRsVLYJn3WkxrHO+3CassCl9DBBIH31N0ob0OQeMUOB2Ix
+ 051SKWO+VBF84wfUC2QMkvEKj9S07mtgftxovp1yaxdLQld1U6FWJcDxuNLjqYUz
+ N+a7nXfG2uM+6i5yKwF4u/HgPWyZpC6WDBHoMEUmBDOHeQseK+xG61/J4Xqi5ik9
+ 9PwOL1v4NK90zh/y5yEwPTra83+eKNyEtQCDPfMyPd5ifOFZFnQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c07c68dd
+ (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+ for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 13:56:53 +0000 (UTC)
+Received: by mail-ot1-f50.google.com with SMTP id w21so49600345otj.7
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 06:55:23 -0800 (PST)
+X-Gm-Message-State: APjAAAX2gBSmjL/+IdIscPCUzVxs1+X1Suzrh+cF3q8I4inQ34gcfTuT
+ D4mM8s++j3guphxISUY05o0fxF9vq7NraIaRuxc=
+X-Google-Smtp-Source: APXvYqx/owVFPOL0hY+m2rThLQaWTX1MS5wQ0/IUnbpb00rakcIY12BtuRlYnVeGjm61MevtcwZw0hkWTJgYEE4dLic=
+X-Received: by 2002:a9d:1e88:: with SMTP id n8mr94460910otn.369.1577976922693; 
+ Thu, 02 Jan 2020 06:55:22 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: KYW7zn5IO1uOPVAcQdls3g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Thu, 2 Jan 2020 15:55:11 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pBFvcm7F=-Sxc5apU6JuE=1X=Omza_eMKL5qyuisTJ3g@mail.gmail.com>
+Message-ID: <CAHmME9pBFvcm7F=-Sxc5apU6JuE=1X=Omza_eMKL5qyuisTJ3g@mail.gmail.com>
+Subject: CONFIG_JUMP_LABEL=y on 32-bit x86 leads to intermittent qemu crashes
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 192.95.5.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,96 +76,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: LKML <linux-kernel@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2 Jan 2020 14:02:01 +0100
-Helge Deller <deller@gmx.de> wrote:
+Hi,
 
-> On 02.01.20 13:06, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 1/2/20 12:31 PM, Helge Deller wrote: =20
-> >> On 31.12.19 16:44, Philippe Mathieu-Daud=C3=A9 wrote: =20
-> >>> On 12/31/19 2:03 PM, Igor Mammedov wrote: =20
-> >>>> If user provided non-sense RAM size, board will complain and
-> >>>> continue running with max RAM size supported.
-> >>>> Also RAM is going to be allocated by generic code, so it won't be
-> >>>> possible for board to fix things up for user.
-> >>>>
-> >>>> Make it error message and exit to force user fix CLI,
-> >>>> instead of accepting non-sense CLI values.
-> >>>>
-> >>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >>>> ---
-> >>>> =C2=A0=C2=A0 hw/hppa/machine.c | 3 ++-
-> >>>> =C2=A0=C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> >>>> index 5d0de26..25f5afc 100644
-> >>>> --- a/hw/hppa/machine.c
-> >>>> +++ b/hw/hppa/machine.c
-> >>>> @@ -92,7 +92,8 @@ static void machine_hppa_init(MachineState *machin=
-e)
-> >>>> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Limit main memory. */
-> >>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ram_size > FIRMWARE_START) =
-{
-> >>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine->ram_size =3D ra=
-m_size =3D FIRMWARE_START;
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("RAM size m=
-ore than %d is not supported", FIRMWARE_START);
-> >>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(EXIT_FAILURE); =20
-> >>>
-> >>> $ qemu-system-hppa -m 3841m
-> >>> qemu-system-hppa: invalid accelerator kvm
-> >>> qemu-system-hppa: falling back to tcg
-> >>> qemu-system-hppa: RAM size more than -268435456 is not supported
-> >>>
-> >>> Instead of using qemu_strtosz_MiB on FIRMWARE_START or unsigned forma=
-t, we can simply use "RAM size more than 3840m is not supported". Is that O=
-K with you? =20
-> >>
-> >> I don't really like that change.
-> >>
-> >> We currently only emulate a 32-bit system, and for those 4GB is the ma=
-ximum.
-> >> So, if I start my machine with "qemu-system-hppa -m 4G", the current c=
-ode
-> >> then automatically uses the maximum possible of 3841MB (which is limit=
-ed by
-> >> firmware start address).
-> >> I don't expect users to know the excact 3841MB number.
-> >> Even on a phyiscal machine you can only add DIMMs of sizes 2GB, 3GB or=
- 4GB,
-> >> but not "3841MB". =20
-> >
-> > Thanks for the explanation. This deserves a comment in the source
-> > file IMHO (and displaying a warning to the user that the behavior is
-> > changed). =20
->=20
-> If you put 4GB physically in the box, you wouldn't get a warning either..=
-.
-> It will simply use just 3841MB.
->=20
-> > I understand the CPU can't access this DRAM area because the ROM is
-> > mapped there. What about other devices, can they do DMA access to
-> > it? =20
->=20
-> Yes, I think so.
+Here's an interesting crash I've seen pop up since enabling CONFIG_JUMP_LABEL=y:
 
-Question is if is it supported/used in current impl?
+[    4.716238] EIP: secure_tcp_seq+0x1e/0xa0^M
+[    4.716238] Code: c1 e8 46 90 fb ff eb a2 8d 74 26 00 55 89 e5 83
+ec 18 89 75 f8 89 c6 0f b7 45 08 89 5d f4 0f b7 d9 89 7d fc 89 d7 89
+45 ec 3e <8d> 74 26 00 8b 4d
+ec c1 e3 10 89 fa c7 04 24 d0 e3 36 c1 89 f0 09^M
+[    4.716238] EAX: 000090bc EBX: 00005114 ECX: 00005114 EDX: 01f1a8c0^M
+[    4.716238] ESI: 02f1a8c0 EDI: 01f1a8c0 EBP: c010bb88 ESP: c010bb70^M
+[    4.716238] DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00000282^M
+[    4.716238] CR0: 80050033 CR2: bfcd7fb0 CR3: 00380000 CR4: 00000690^M
+[    4.716238] Call Trace:^M
+[    4.716238]  <SOFTIRQ>^M
+[    4.716238]  tcp_v4_init_seq+0x3d/0x50^M
+[    4.716238]  tcp_conn_request+0x35d/0x926^M
+[    4.716238]  ? fib6_table_lookup+0xb5/0x210^M
+[    4.716238]  ? ip_route_input_slow+0x864/0x900^M
+...
 
-If it's not then lets keep a hard error providing the exact max value,
-instead of complicating code for unclear benefit.
+It looks like this is:
+secure_tcp_seq ->
+  net_secret_init->
+    net_get_random_once(&net_secret, sizeof(net_secret))
+        get_random_once(&net_secret, sizeof(net_secret))
+          DO_ONCE(get_random_bytes(&net_secret, sizeof(net_secret)))
 
->=20
-> > Igor: If this complicates your series too much, I think we can
-> > directly allocate up-to 4GiB and not worry about the 256MiB lost. =20
->=20
-> Sounds like the best solution.
->=20
-> Helge
->=20
+Which then expands to the usual static_key logic.
 
+I was only able to reproduce this when the host system running
+`qemu-system-i386 -m 256M -smp 4 -cpu coreduo -machine q35` is under
+considerable load.
+
+Is there a TCG issue with how it handles the dynamic patching debug
+instructions?
+
+Jason
 
