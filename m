@@ -2,107 +2,86 @@ Return-Path: <SRS0=Q/S9=2X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEEBC2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 16:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CC3C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 16:51:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F06F217F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 16:03:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D64B206E6
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 16:51:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JFeqXZwq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F06F217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jVDRp792"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D64B206E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1in2wJ-0000Tw-K0
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 11:03:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55051)
+	id 1in3gr-0000rJ-8p
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 11:51:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1in2vA-00080v-M5
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 11:02:01 -0500
+ (envelope-from <imammedo@redhat.com>) id 1in3g9-0000GV-4H
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 11:50:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elena.ufimtseva@oracle.com>) id 1in2v9-0005Er-2J
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 11:02:00 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:51934)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1in2v8-0005E5-Oc
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 11:01:59 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 002Fsd7S191640;
- Thu, 2 Jan 2020 16:01:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- content-transfer-encoding : in-reply-to; s=corp-2019-08-05;
- bh=jm1IyxFjLz23l0JulfRLNuNY85eqw+O2zSkv77giojM=;
- b=JFeqXZwqUXCjuD2NHPc/ijeQYY/XI2Bnk17xpDGTb8P7QWAzaFyY8VgTBYA7rOD9R3Ha
- oLx+VZH1u1JX5lVk/lk1eDzaCsN57+axdrtAlNxLfWLEpwpRVJUn3SiZvuDhoSXGdS+1
- YSL0pg4i4YZovPGBJ+EPLDv0grYqfOqJp/Bue1qRiKvnUN+CmgYx4T9C2BwGK04Pn/ke
- Y5wvlk5ztf4f0L1XQUKzOBjhx3+QHf9rtm3HeHOTulubl+885jG2MTTFEVwpV3n3AuIr
- Nxh5fSmkrRC+O/E5NLGDhcQ+PmI4Uj5ZEc6QINu25gpI/931bqm9hrK2fNuXMEC0q8vf hw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 2x5y0pr1ss-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 02 Jan 2020 16:01:44 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 002FsmTG084229;
- Thu, 2 Jan 2020 16:01:43 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 2x8gurqf3h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 02 Jan 2020 16:01:43 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 002G1eZL021919;
- Thu, 2 Jan 2020 16:01:40 GMT
-Received: from heatpipe (/67.180.143.163)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 02 Jan 2020 08:01:39 -0800
-Date: Thu, 2 Jan 2020 08:01:36 -0800
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
- status update
-Message-ID: <20200102160136.GA20919@heatpipe>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <20191210064716.GA6401@flaka>
- <20191213104116.GB1180977@stefanha-x1.localdomain>
- <20191216194655.GA5922@flaka>
- <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
- <20191217163316.GB1333385@stefanha-x1.localdomain>
+ (envelope-from <imammedo@redhat.com>) id 1in3g6-00043D-9R
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 11:50:31 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36329
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1in3g6-00042r-5K
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 11:50:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1577983829;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eaxXXG45O6TV6xYWx3tukk+HSHOpfRPfCe+GPctdrM0=;
+ b=jVDRp792GCEM8PTYWMyyTnZwck/ZzTzLcF8bW4RLNwi+QoaLJUyqRW35OrjbhPwMbpWLeI
+ n9FQTcSgqurmYKMSl9axQ2ZGGsMuDA5KKZ7A+8xD1bN0jg05naiP0XNgaaqQ31Y51mlrZf
+ kfRk7K8+EFFcarVedFLH3Y6XuTIlcFY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-1T5KEUrCOC2iWSOBC9xOAw-1; Thu, 02 Jan 2020 11:50:28 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E28D7800A02;
+ Thu,  2 Jan 2020 16:50:26 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA7515DA32;
+ Thu,  2 Jan 2020 16:50:23 +0000 (UTC)
+Date: Thu, 2 Jan 2020 17:50:21 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH 43/86] hppa: drop RAM size fixup
+Message-ID: <20200102175021.35b07b0d@redhat.com>
+In-Reply-To: <f073e703-5caf-e63c-ef1b-04fa7ab51716@redhat.com>
+References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
+ <1577797450-88458-44-git-send-email-imammedo@redhat.com>
+ <bc7bac60-0d20-d0e3-b9ac-2c9ff62c2c15@redhat.com>
+ <8cb7bd0f-7841-7e60-8de6-708515b81b00@gmx.de>
+ <7cc361d0-300f-a8a1-3650-9358e815c070@redhat.com>
+ <20200102151223.73e1448b@redhat.com>
+ <a3017f38-b32b-de32-9896-b287253d0fa2@redhat.com>
+ <20200102160827.790b8ed2@redhat.com>
+ <f073e703-5caf-e63c-ef1b-04fa7ab51716@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191217163316.GB1333385@stefanha-x1.localdomain>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9488
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001020140
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9488
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001020140
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 1T5KEUrCOC2iWSOBC9xOAw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by aserp2120.oracle.com id
- 002Fsd7S191640
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,93 +93,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>, "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
- Felipe Franciosi <felipe@nutanix.com>, "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "liran.alon@oracle.com" <liran.alon@oracle.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
- "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 17, 2019 at 04:33:16PM +0000, Stefan Hajnoczi wrote:
-> On Mon, Dec 16, 2019 at 07:57:32PM +0000, Felipe Franciosi wrote:
-> > > On 16 Dec 2019, at 20:47, Elena Ufimtseva <elena.ufimtseva@oracle.c=
-om> wrote:
-> > > =EF=BB=BFOn Fri, Dec 13, 2019 at 10:41:16AM +0000, Stefan Hajnoczi =
-wrote:
-> > >> Is there a work-in-progress muser patch series you can post to sta=
-rt the
-> > >> discussion early?  That way we can avoid reviewers like myself ask=
-ing
-> > >> you to make changes after you have invested a lot of time.
-> > >>=20
-> > >=20
-> > > Absolutely, that is our plan. At the moment we do not have the patc=
-hes
-> > > ready for the review. We have setup internally a milestone and will=
- be
-> > > sending that early version as a tarball after we have it completed.
-> > > Would be also a meeting something that could help us to stay on the=
- same
-> > > page?
+On Thu, 2 Jan 2020 16:49:00 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+
+> On 1/2/20 4:08 PM, Igor Mammedov wrote:
+> > On Thu, 2 Jan 2020 15:17:14 +0100
+> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> >  =20
+> >> On 1/2/20 3:12 PM, Igor Mammedov wrote: =20
+> >>> On Thu, 2 Jan 2020 13:06:33 +0100
+> >>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+> >>>     =20
+> >>>> On 1/2/20 12:31 PM, Helge Deller wrote: =20
+> >>>>> On 31.12.19 16:44, Philippe Mathieu-Daud=C3=A9 wrote: =20
+> >>>>>> On 12/31/19 2:03 PM, Igor Mammedov wrote: =20
+> >>>>>>> If user provided non-sense RAM size, board will complain and
+> >>>>>>> continue running with max RAM size supported.
+> >>>>>>> Also RAM is going to be allocated by generic code, so it won't be
+> >>>>>>> possible for board to fix things up for user.
+> >>>>>>>
+> >>>>>>> Make it error message and exit to force user fix CLI,
+> >>>>>>> instead of accepting non-sense CLI values.
+> >>>>>>>
+> >>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >>>>>>> ---
+> >>>>>>>    =C2=A0 hw/hppa/machine.c | 3 ++-
+> >>>>>>>    =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)
+> >>>>>>>
+> >>>>>>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> >>>>>>> index 5d0de26..25f5afc 100644
+> >>>>>>> --- a/hw/hppa/machine.c
+> >>>>>>> +++ b/hw/hppa/machine.c
+> >>>>>>> @@ -92,7 +92,8 @@ static void machine_hppa_init(MachineState *mac=
+hine)
+> >>>>>>>    =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Limit main memory. */
+> >>>>>>>    =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ram_size > FIRMWARE_START) =
+{
+> >>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine->ram_size =3D=
+ ram_size =3D FIRMWARE_START;
+> >>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("RAM siz=
+e more than %d is not supported", FIRMWARE_START);
+> >>>>>>> +        exit(EXIT_FAILURE); =20
+> >>>>>>
+> >>>>>> $ qemu-system-hppa -m 3841m
+> >>>>>> qemu-system-hppa: invalid accelerator kvm
+> >>>>>> qemu-system-hppa: falling back to tcg
+> >>>>>> qemu-system-hppa: RAM size more than -268435456 is not supported
+> >>>>>>
+> >>>>>> Instead of using qemu_strtosz_MiB on FIRMWARE_START or unsigned fo=
+rmat, we can simply use "RAM size more than 3840m is not supported". Is tha=
+t OK with you? =20
+> >>>>>
+> >>>>> I don't really like that change.
+> >>>>>
+> >>>>> We currently only emulate a 32-bit system, and for those 4GB is the=
+ maximum.
+> >>>>> So, if I start my machine with "qemu-system-hppa -m 4G", the curren=
+t code
+> >>>>> then automatically uses the maximum possible of 3841MB (which is li=
+mited by
+> >>>>> firmware start address).
+> >>>>> I don't expect users to know the excact 3841MB number.
+> >>>>> Even on a phyiscal machine you can only add DIMMs of sizes 2GB, 3GB=
+ or 4GB,
+> >>>>> but not "3841MB". =20
+> >>>>
+> >>>> Thanks for the explanation. This deserves a comment in the source fi=
+le
+> >>>> IMHO (and displaying a warning to the user that the behavior is chan=
+ged).
+> >>>>
+> >>>> I understand the CPU can't access this DRAM area because the ROM is
+> >>>> mapped there. What about other devices, can they do DMA access to it=
+?
+> >>>>
+> >>>> Igor: If this complicates your series too much, I think we can direc=
+tly
+> >>>> allocate up-to 4GiB and not worry about the 256MiB lost. =20
+> >>>
+> >>> Do you mean
+> >>> s/"RAM size more than %d is not supported"/"RAM size more than 4Gb is=
+ not supported"/ =20
+> >>
+> >> Works for me! You can keep my R-b with this change, thanks. =20
 > >=20
-> > Please loop us in if you so set up a meeting.
->
-
-Hi Stefan
-
-And happy New Year to everyone!
-
-> There is a bi-weekly KVM Community Call that we can use for phone
-> discussions:
+> > Well, it's not that simple.
+> > Do we map whole 4G in address space, if yes then we have to "unbreak"
+> > firmware mapping and use overlap mapping or do we map only portion of i=
+t?
+> > Both would make code more confusing and all for the sake of user conven=
+ience
+> > so they won't have to change their CLI? =20
 >=20
->   https://calendar.google.com/calendar/embed?src=3DdG9iMXRqcXAzN3Y4ZXZw=
-NzRoMHE4a3BqcXNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
->
+> I was thinking about this patch:
+it probably should be a bit more complicated.
 
-Our team would like to join the call on Jan 14 and maybe talk over few th=
-ings.
-Felipe, will you and your team be joining as well?
-
-> Or we can schedule a one-off call at any time :).
->
-
-Awesome! Thank you, we will use for sure this opportunity.
-
-Elena
-
-> Questions I've seen when discussing muser with people have been:
 >=20
-> 1. Can unprivileged containers create muser devices?  If not, this is a
->    blocker for use cases that want to avoid root privileges entirely.
+> -- >8 -- =20
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index 5d0de26140..fa0b6a9536 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -91,15 +91,16 @@ static void machine_hppa_init(MachineState *machine)
+>       }
 >=20
-> 2. Does muser need to be in the kernel (e.g. slower to develop/ship,
->    security reasons)?  A similar library could be implemented in
->    userspace along the lines of the vhost-user protocol.  Although VMMs
->    would then need to use a new libmuser-client library instead of
->    reusing their VFIO code to access the device.
+>       /* Limit main memory. */
+> -    if (ram_size > FIRMWARE_START) {
+> -        machine->ram_size =3D ram_size =3D FIRMWARE_START;
+> +    if (ram_size > 4 * GiB) {
+> +        error_report("Can not model more than 4GB of RAM");
+> +        exit(EXIT_FAILURE);
+>       }
 >=20
-> 3. Should this feature be Linux-only?  vhost-user can be implemented on
->    non-Linux OSes...
+>       /* Main memory region. */
+>       ram_region =3D g_new(MemoryRegion, 1);
+>       memory_region_allocate_system_memory(ram_region, OBJECT(machine),
+>                                            "ram", ram_size);
+> -    memory_region_add_subregion(addr_space, 0, ram_region);
+> +    memory_region_add_subregion_overlap(addr_space, 0, ram_region, -1);
 >=20
-> Stefan
+>       /* Init Dino (PCI host bus chip).  */
+>       pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
 
+Ok, I give up on trying to convince you to avoid relaxing error check
+but I'd make it an extra patch on top of "[PATCH 43/86] hppa: drop RAM size=
+ fixup"
+as it's a separate change.
+
+> ---
+>=20
+> $ hppa-softmmu/qemu-system-hppa -m 3840m -S -monitor stdio
+> QEMU 4.2.50 monitor - type 'help' for more information
+> (qemu) info mtree
+> address-space: memory
+>    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+>      0000000000000000-00000000efffffff (prio -1, ram): ram
+>      00000000f0000000-00000000f07fffff (prio 0, ram): firmware
+>      00000000f9000000-00000000f90007ff (prio 0, i/o): isa-io
+>        00000000f9000020-00000000f9000021 (prio 0, i/o): pic
+>        00000000f9000070-00000000f9000071 (prio 0, i/o): rtc
+>          00000000f9000070-00000000f9000070 (prio 0, i/o): rtc-index
+>        00000000f90000a0-00000000f90000a1 (prio 0, i/o): pic
+>        00000000f90004d0-00000000f90004d0 (prio 0, i/o): elcr
+>        00000000f90004d1-00000000f90004d1 (prio 0, i/o): elcr
+>      00000000fff80000-00000000fff80fff (prio 0, i/o): dino
+>        00000000fff80064-00000000fff80067 (prio 0, i/o): pci-conf-idx
+>        00000000fff80068-00000000fff8006b (prio 0, i/o): pci-conf-data
+>      00000000fff83800-00000000fff83807 (prio 0, i/o): serial
+>      00000000fffb0000-00000000fffb0003 (prio 0, i/o): cpu0-io-eir
+>=20
 
 
