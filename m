@@ -2,72 +2,69 @@ Return-Path: <SRS0=Q/S9=2X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9887C2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 232B7C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93A2F21655
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:39:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kPgdSIVV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A2F21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=zx2c4.com
+	by mail.kernel.org (Postfix) with ESMTPS id D897021655
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:43:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D897021655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imxtP-00057B-N7
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 05:39:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38779)
+	id 1imxww-0006VJ-M5
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 05:43:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Jason@zx2c4.com>) id 1imxsq-0004hS-Hk
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:39:17 -0500
+ (envelope-from <no-reply@patchew.org>) id 1imxwG-00062w-Ka
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:42:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Jason@zx2c4.com>) id 1imxsp-0001GW-LD
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:39:16 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:40571)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Jason@zx2c4.com>) id 1imxsp-0001G9-Fz
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:39:15 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id cb6bc442
- for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 09:40:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
- :references:in-reply-to:from:date:message-id:subject:to
- :content-type; s=mail; bh=S7D1zVMReq8bZ3EKWj74lmVjmno=; b=kPgdSI
- VV/W72SwFm+m/uSIBdQ30oOxfqG/xLwtbMrpcAejS6w2OEsa8gPFv+1YHSx+iffL
- 39imbwiBaBSoCHZWgcA0hJl0NQ0fS9NmXlRERY51P7B8kq7AxHknJIA+L7VioBBO
- ZTuHT3VOgjhlQXNpOco3yHu3JTFeSMLRjB0wf311052qv/Q9U4C97LNd4wtuCd1H
- u5dgnDIr642rHqkqlYuN2XMUuoEQMloJGl0YFlymASAPn+rO4aHZdPSRrxtpdNsf
- /UOeohQ5YBt2zVooMK5Qjy0aP5XWU6SbKwn+mHURsdS7hjvnzrPtm442DORO90s7
- wEEGKrerW76YbrNw==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7e57df83
- (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
- for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 09:40:44 +0000 (UTC)
-Received: by mail-ot1-f49.google.com with SMTP id 19so44017858otz.3
- for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 02:39:13 -0800 (PST)
-X-Gm-Message-State: APjAAAUzWIpXf4Ih/wOPsA8S5Yf5+cQDWIWY8vIme0cCTJfbjioAbJ+3
- GDCo2qO2xGNaESN64e9hIy9/gIrSG4p/U4U70PA=
-X-Google-Smtp-Source: APXvYqz7j/zxE8sQZTzfJU5SfMs7NLi2mqcjtqrl7niLT3bf3TGGe9LqJVgumK12296C0zRySup2iBX5/IBI3Acv78w=
-X-Received: by 2002:a9d:674f:: with SMTP id w15mr93232724otm.243.1577961553051; 
- Thu, 02 Jan 2020 02:39:13 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1imxwB-0004mJ-B6
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:42:48 -0500
+Resent-Date: Thu, 02 Jan 2020 05:42:48 -0500
+Resent-Message-Id: <E1imxwB-0004mJ-B6@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21139)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1imxwB-0004gw-3k
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:42:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1577961753; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=fB9vZYMuYklL9EB1pK2XYcdrAc2XOByCo7PkvMpfCSqNtqIZ9wwB3t2eudOKhsji5QOmjRlRwl+uAKQZP/zdC2rlO8ClbVEoPm7b6eQ8ho48JNYLkU46PcNIqjbSZrNUJU3YIILOCSu4v50m7k2t/XhXXKyI8ACymSrFZ+eHsd4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1577961753;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=2xvNy49yfPxTBs05/x+C/0UAqdIGkhy79yALwfvvEZE=; 
+ b=F5SSQ57U7EvY+xs9OWDx76lc7SXAicffc5GKWuESzHuUEj22zt5ylOAG37vtVOqVZ3rL80qYRwXLAf/P3AzcuVXa3aJ2RcmgbiEuRQAWrLmeVDWNN+fJHk4K8y8xqcF8UoeAse8QhO+cxYorOoqjaM/S0rfAQoEeLZZDuC1E5Os=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1577961749318880.8891725887723;
+ Thu, 2 Jan 2020 02:42:29 -0800 (PST)
+In-Reply-To: <20200102103644.233370-1-Jason@zx2c4.com>
+Subject: Re: [PATCH] q800: implement mac rom reset function for BIOS-less mode
+Message-ID: <157796174882.32423.8893531591101882639@37313f22b938>
 MIME-Version: 1.0
-References: <20200101215905.121298-1-Jason@zx2c4.com>
-In-Reply-To: <20200101215905.121298-1-Jason@zx2c4.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 2 Jan 2020 11:39:01 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qBRFAr1webkpL=C0OwiRikQJbCgbeePnJcwJWbWK9OLA@mail.gmail.com>
-Message-ID: <CAHmME9qBRFAr1webkpL=C0OwiRikQJbCgbeePnJcwJWbWK9OLA@mail.gmail.com>
-Subject: Re: [PATCH] q800: map reset function to poweroff of some random kernel
-To: laurent@vivier.eu, QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: Jason@zx2c4.com
+Date: Thu, 2 Jan 2020 02:42:29 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 192.95.5.64
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,10 +76,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: Jason@zx2c4.com, laurent@vivier.eu, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Superseded by https://lore.kernel.org/qemu-devel/20200102103644.233370-1-Jason@zx2c4.com
-, thankfully.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEwMjEwMzY0NC4yMzMz
+NzAtMS1KYXNvbkB6eDJjNC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
+YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDEwMjEwMzY0NC4yMzMzNzAt
+MS1KYXNvbkB6eDJjNC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
+
 
