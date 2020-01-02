@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B423EC2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 13:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C273C3276C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 13:36:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87D9221734
+	by mail.kernel.org (Postfix) with ESMTPS id E0F6F20863
 	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 13:36:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87D9221734
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F6F20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1in0eH-0001mo-Jl
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 08:36:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57691)
+	id 1in0eI-0001nw-1V
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 08:36:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1in0dS-0000z7-Ks
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 08:35:35 -0500
+ (envelope-from <bounces@canonical.com>) id 1in0dS-0000z8-OA
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 08:35:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1in0dR-0008LB-F7
+ (envelope-from <bounces@canonical.com>) id 1in0dR-0008LH-Hd
  for qemu-devel@nongnu.org; Thu, 02 Jan 2020 08:35:34 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46062)
+Received: from indium.canonical.com ([91.189.90.7]:46046)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1in0dR-0008Jx-9x
+ id 1in0dR-0008JB-CH
  for qemu-devel@nongnu.org; Thu, 02 Jan 2020 08:35:33 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1in0dQ-0006DF-7Z
- for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 13:35:32 +0000
+ id 1in0dP-0006DF-On
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 13:35:31 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 358832E8074
- for <qemu-devel@nongnu.org>; Thu,  2 Jan 2020 13:35:32 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B94A32E80CB
+ for <qemu-devel@nongnu.org>; Thu,  2 Jan 2020 13:35:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jan 2020 13:28:52 -0000
+Date: Thu, 02 Jan 2020 13:28:08 -0000
 From: crocket <crockabiscuit@gmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -56,7 +56,7 @@ X-Launchpad-Bug-Commenters: crockabiscuit laurent-vivier
 X-Launchpad-Bug-Reporter: crocket (crockabiscuit)
 X-Launchpad-Bug-Modifier: crocket (crockabiscuit)
 References: <155806778498.21734.945063058665872727.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157797173209.14768.15569330814177560407.malone@wampee.canonical.com>
+Message-Id: <157797168886.5882.6380213761362019230.malone@gac.canonical.com>
 Subject: [Bug 1829459] Re: qemu seems to lack support for pid namespace.
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -64,7 +64,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9f3960d31aa1397318936c84bd00c55f4c94a2e2
+X-Launchpad-Hash: 950ea71d0b0f3b11835710cff7b30a8203321923
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -83,8 +83,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to `man unshare`, --keep-caps seems to apply only to user
-namespace.
+In a native chroot, `sudo unshare --pid -- echo hello world` works
+without a problem.
+
+In a qemu-aarch64 chroot, `sudo unshare --keep-caps --pid -- echo hello
+world` fails with the same error described in this issue.
+
+`qemu: qemu_thread_create: Invalid argument`
 
 -- =
 
