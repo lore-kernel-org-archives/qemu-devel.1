@@ -2,61 +2,85 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4117CC32771
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D70C32771
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10C13207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:18:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C13207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9B24B2072C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:31:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSIsktJK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B24B2072C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioOWa-0007Oh-85
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 04:18:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52777)
+	id 1ioOji-0003SB-3M
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 04:31:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ioOVu-0006pF-NT
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:17:31 -0500
+ (envelope-from <stefanha@gmail.com>) id 1ioOiy-0002uE-O3
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ioOVt-00089E-FH
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:17:30 -0500
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:59140)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ioOVt-00088U-8q
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:17:29 -0500
-Received: from player792.ha.ovh.net (unknown [10.108.42.142])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id DB36E1BE29B
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 10:17:26 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player792.ha.ovh.net (Postfix) with ESMTPSA id 82EE3DECCEB6;
- Mon,  6 Jan 2020 09:17:19 +0000 (UTC)
-Date: Mon, 6 Jan 2020 10:17:18 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH] vfio/pci: Don't remove irqchip notifier if not registered
-Message-ID: <20200106101718.79499f12@bahia.lan>
-In-Reply-To: <20191231133915.115363-1-peterx@redhat.com>
-References: <20191231133915.115363-1-peterx@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <stefanha@gmail.com>) id 1ioOix-0000G9-Ry
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:31:00 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:33327)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ioOix-0000FA-LY
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:30:59 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id d139so11558937wmd.0
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 01:30:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=j/ZCK4+3Vy63nCApeZumgHcR1+F3GN/9XUwx5seBaQ4=;
+ b=FSIsktJK6M5OQz+V4lYNzSyzF+GGAjr+iPVfz0Ywn0sZOPOMqC19RzUue7r65UA/Z7
+ DCnFUHMd1KSA0/K3UTTqKaqgmQDbR3PiWNk0UcADMIKzH9fLfZrGz1K7CrADzqJ0+FO0
+ 1rQu4C03QSD9ZGO12UxuPDmBtU6H00+fceQxHrJsCW1T5Ry6eb4/DydzfEMl4iBQg9L/
+ B4nHqMaePnZPZ3aw2XjdXSjNed6qw2BBvZ2unQ16iIruJWJaLPi39W6+C6fa/4T9KZa3
+ TN3WCWa7nFq5P+497xnA6BKNZcP/UOAgjwNl//VQyjjBv6q9UQxddnyugVLz0+GyjVB4
+ aD4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=j/ZCK4+3Vy63nCApeZumgHcR1+F3GN/9XUwx5seBaQ4=;
+ b=CI+e8UyYEO5emfLydUKrRifltNagK2ky88s84spxPsPfet76eTHcVi28PpVhmp5IpY
+ TXW/PaEBvc+gTxcboD4rHS6pEuFOAnG68+KfsVXGqRtE7K1s1sDg7BoVMQraP6eo2TfI
+ 4B5kpn4hKnDPMQ2Fs27VKz9cUDIvJhYQZd6qMzEkR9teRug4xlZxbeJp1R1CJFDj2OVf
+ NeFcpCwSBvlh0s1Hzpq+EN8XQNmk9eO53bMM2TYs8kXfH0S15ehvbUgdtJMhmxkE+jTU
+ 88OBRmj45AaQsmO8sSIzOfCzOUxRs4xg0Fhz3ewzwcaf29pxIYBwsR7R+MTFpLb3JPQx
+ lSAQ==
+X-Gm-Message-State: APjAAAVkFN3nd7ct8czQEeO0JalUrT+CFr0v7Gqk9ic+y9CHJIgdEeem
+ 52vbx+XhYPwwSzfZDcQAFq4=
+X-Google-Smtp-Source: APXvYqzJKi9VzI3R7hIKrJxWHym/AEqTGoqzfC7HNh+VurRykbSXVscczWR/n73INiq1uC4F92miTg==
+X-Received: by 2002:a1c:9c4c:: with SMTP id f73mr35108071wme.125.1578303057963; 
+ Mon, 06 Jan 2020 01:30:57 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id 25sm21623454wmi.32.2020.01.06.01.30.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Jan 2020 01:30:56 -0800 (PST)
+Date: Thu, 2 Jan 2020 14:58:45 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: padmashree mandri <padmashree9107@gmail.com>
+Subject: Re: Audio not working in Qemu-4.2 with pulse audio.
+Message-ID: <20200102145845.GN121208@stefanha-x1.localdomain>
+References: <CANT-jrLcehCiWpau5TaXpReb_B-J6hVN-ycRZek158w1vduRKQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 18097152156012550525
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehrvgguhhgrthdrtghomhenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejledvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.58.226
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lBqJz4CGKwlWe7/k"
+Content-Disposition: inline
+In-Reply-To: <CANT-jrLcehCiWpau5TaXpReb_B-J6hVN-ycRZek158w1vduRKQ@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,54 +92,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
- yanghliu@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ dirty.ice.hu@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 31 Dec 2019 08:39:15 -0500
-Peter Xu <peterx@redhat.com> wrote:
 
-> The kvm irqchip notifier is only registered if the device supports
-> INTx, however it's unconditionally removed.  If the assigned device
-> does not support INTx, this will cause QEMU to crash when unplugging
-> the device from the system.  Change it to conditionally remove the
-> notifier only if the notify hook is setup.
-> 
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: David Gibson <david@gibson.dropbear.id.au>
-> CC: Alex Williamson <alex.williamson@redhat.com>
-> Reported-by: yanghliu@redhat.com
-> Fixes: c5478fea27 ("vfio/pci: Respond to KVM irqchip change notifier", 2019-11-26)
-> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1782678
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
+--lBqJz4CGKwlWe7/k
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Good catch... sorry for missing this during review :-\
+On Tue, Dec 24, 2019 at 10:01:37PM +0530, padmashree mandri wrote:
+>                 I tried to run Qemu-4.2  with pulse audio but faced issue
+> as there is no audio at all in guest .However it works fine with ALSA. I
+> tried the same in Qemu-3.0 with pulseaudio. It was working fine. But faci=
+ng
+> issue after upgrading to Qemu-4.2. Any suggestions?
 
-Cc'ing stable since we certainly want this fix in 4.2.1 as well.
+Hi Padmashree,
+Please post your QEMU command-line.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+I have CCed Gerd Hoffmann and Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3 who work on=
+ the audio
+subsystem.
 
->  hw/vfio/pci.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 2d40b396f2..337a173ce7 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3076,7 +3076,9 @@ static void vfio_exitfn(PCIDevice *pdev)
->      vfio_unregister_req_notifier(vdev);
->      vfio_unregister_err_notifier(vdev);
->      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> -    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-> +    if (vdev->irqchip_change_notifier.notify) {
-> +        kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-> +    }
->      vfio_disable_interrupts(vdev);
->      if (vdev->intx.mmap_timer) {
->          timer_free(vdev->intx.mmap_timer);
+Stefan
 
+--lBqJz4CGKwlWe7/k
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4OBSQACgkQnKSrs4Gr
+c8j+pAgApkRrATfhD6+cFVpk/FOqG0f6N0Rcu27Do7YD+KMeLAATTZdslXqB9JGV
+2hiA7WaXKB/Ay64hst7yS9fTh69FJPrGCm8T9ADTfXh6XjON0nP6+/D0FCu1UdkY
+Xe0+CP9nxLcziPWM2vWN8UCranJ3kqac5txJLmgmjfRiZxek2ROZjxWBfQVDyNK/
+2wA40AOjH3eFqUgXBG45YP4HrhZAzDowEFqiI8UW+Zs9ahgY0mUvZ/77t0T9FKyi
+MTnz7bkCOI51V22sGG2tsYZEkQ1VB/TIP6Ci/yfYZ+H3L9pj9YdVXVi60AcBCRHl
+STKXiRq9wkaAwoJ2IQPJHXTSQIoIyw==
+=YY2l
+-----END PGP SIGNATURE-----
+
+--lBqJz4CGKwlWe7/k--
 
