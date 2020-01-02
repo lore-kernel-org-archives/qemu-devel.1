@@ -6,88 +6,86 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E670C2D0DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 07:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10197C2D0DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 07:57:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 638AB20866
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 07:56:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 638AB20866
+	by mail.kernel.org (Postfix) with ESMTPS id D989020866
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 07:57:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D989020866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imvL5-00081n-9c
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 02:56:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36937)
+	id 1imvMb-0001rC-1s
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 02:57:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1imvH8-0003Bk-Aq
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 02:52:11 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1imvGy-0002vz-M1
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 02:52:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1imvH7-0005Pw-21
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 02:52:10 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:19202
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1imvGx-0005Mn-2k
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 02:52:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:6896)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1imvH6-0005Pk-Tg
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 02:52:09 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0027mEZN039652
- for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 02:52:08 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2x88jjn47w-1
+ id 1imvGw-0005Mc-Rc
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 02:51:59 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0027mF2W105324
+ for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 02:51:58 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2x88jvp36w-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 02:52:08 -0500
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 02:51:57 -0500
 Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Thu, 2 Jan 2020 07:52:06 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Thu, 2 Jan 2020 07:51:55 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 2 Jan 2020 07:52:03 -0000
+ Thu, 2 Jan 2020 07:51:52 -0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
  [9.149.105.232])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0027q2CI46858434
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0027pqwX50462894
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 2 Jan 2020 07:52:02 GMT
+ Thu, 2 Jan 2020 07:51:52 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 252EC5204F;
- Thu,  2 Jan 2020 07:52:02 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id DE73E52067;
+ Thu,  2 Jan 2020 07:51:51 +0000 (GMT)
 Received: from localhost.localdomain.com (unknown [9.199.45.4])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9FD785204E;
- Thu,  2 Jan 2020 07:51:59 +0000 (GMT)
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C55185204E;
+ Thu,  2 Jan 2020 07:51:49 +0000 (GMT)
 From: Ganesh Goudar <ganeshgr@linux.ibm.com>
 To: aik@ozlabs.ru, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
  david@gibson.dropbear.id.au
-Subject: [PATCH v18 5/7] ppc: spapr: Handle "ibm, nmi-register" and "ibm,
- nmi-interlock" RTAS calls
-Date: Thu,  2 Jan 2020 13:21:09 +0530
+Subject: [PATCH v18 3/7] target/ppc: Handle NMI guest exit
+Date: Thu,  2 Jan 2020 13:21:07 +0530
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
 References: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 20010207-0016-0000-0000-000002D9D243
+x-cbid: 20010207-0020-0000-0000-0000039D2C0D
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010207-0017-0000-0000-0000333C3B11
-Message-Id: <20200102075111.25308-6-ganeshgr@linux.ibm.com>
+x-cbparentid: 20010207-0021-0000-0000-000021F47984
+Message-Id: <20200102075111.25308-4-ganeshgr@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2020-01-02_01:2019-12-30,2020-01-02 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- priorityscore=1501 bulkscore=0 clxscore=1015 impostorscore=0 phishscore=0
- mlxscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=999
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxlogscore=999 mlxscore=0
+ impostorscore=0 clxscore=1015 bulkscore=0 adultscore=0 spamscore=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-2001020072
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,163 +97,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: paulus@ozlabs.org, Ganesh Goudar <ganeshgr@linux.ibm.com>,
- Aravinda Prasad <arawinda.p@gmail.com>, groug@kaod.org
+Cc: paulus@ozlabs.org, Aravinda Prasad <arawinda.p@gmail.com>, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Aravinda Prasad <arawinda.p@gmail.com>
 
-This patch adds support in QEMU to handle "ibm,nmi-register"
-and "ibm,nmi-interlock" RTAS calls.
+Memory error such as bit flips that cannot be corrected
+by hardware are passed on to the kernel for handling.
+If the memory address in error belongs to guest then
+the guest kernel is responsible for taking suitable action.
+Patch [1] enhances KVM to exit guest with exit reason
+set to KVM_EXIT_NMI in such cases. This patch handles
+KVM_EXIT_NMI exit.
 
-The machine check notification address is saved when the
-OS issues "ibm,nmi-register" RTAS call.
+[1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
+    (e20bbd3d and related commits)
 
-This patch also handles the case when multiple processors
-experience machine check at or about the same time by
-handling "ibm,nmi-interlock" call. In such cases, as per
-PAPR, subsequent processors serialize waiting for the first
-processor to issue the "ibm,nmi-interlock" call. The second
-processor that also received a machine check error waits
-till the first processor is done reading the error log.
-The first processor issues "ibm,nmi-interlock" call
-when the error log is consumed.
-
-[Move fwnmi registration to .apply hook]
-Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
 Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_caps.c    |  6 +++++
- hw/ppc/spapr_rtas.c    | 58 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  7 ++++-
- 3 files changed, 70 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c          |  8 ++++++++
+ hw/ppc/spapr_events.c   | 37 +++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h  | 10 ++++++++++
+ target/ppc/kvm.c        | 14 ++++++++++++++
+ target/ppc/kvm_ppc.h    |  2 ++
+ target/ppc/trace-events |  1 +
+ 6 files changed, 72 insertions(+)
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 3001098601..e922419cfb 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -502,6 +502,12 @@ static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
-     if (!val) {
-         return; /* Disabled by default */
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c91e64aad0..975d7da734 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1679,6 +1679,12 @@ static void spapr_machine_reset(MachineState *machine)
+     first_ppc_cpu->env.gpr[5] = 0;
+ 
+     spapr->cas_reboot = false;
++
++    spapr->mc_status = -1;
++    spapr->guest_machine_check_addr = -1;
++
++    /* Signal all vCPUs waiting on this condition */
++    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+ }
+ 
+ static void spapr_create_nvram(SpaprMachineState *spapr)
+@@ -2973,6 +2979,8 @@ static void spapr_machine_init(MachineState *machine)
+ 
+         kvmppc_spapr_enable_inkernel_multitce();
      }
 +
-+    if (!spapr->fwnmi_calls_registered && !kvmppc_set_fwnmi()) {
-+        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
-+        spapr_fwnmi_register();
-+        spapr->fwnmi_calls_registered = true;
-+    }
++    qemu_cond_init(&spapr->mc_delivery_cond);
  }
  
- SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 2c066a372d..54b142f35b 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -400,6 +400,56 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
-     rtas_st(rets, 1, 100);
+ static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index e355e000d0..dfc0de840a 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -40,6 +40,7 @@
+ #include "hw/ppc/spapr_drc.h"
+ #include "qemu/help_option.h"
+ #include "qemu/bcd.h"
++#include "qemu/main-loop.h"
+ #include "hw/ppc/spapr_ovec.h"
+ #include <libfdt.h>
+ 
+@@ -622,6 +623,42 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
+                             RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
  }
  
-+static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-+                                  SpaprMachineState *spapr,
-+                                  uint32_t token, uint32_t nargs,
-+                                  target_ulong args,
-+                                  uint32_t nret, target_ulong rets)
++void spapr_mce_req_event(PowerPCCPU *cpu)
 +{
-+    hwaddr rtas_addr;
++    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++    CPUState *cs = CPU(cpu);
 +
-+    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
-+        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-+        return;
-+    }
-+
-+    rtas_addr = spapr_get_rtas_addr();
-+    if (!rtas_addr) {
-+        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-+        return;
-+    }
-+
-+    spapr->guest_machine_check_addr = rtas_ld(args, 1);
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-+}
-+
-+static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-+                                   SpaprMachineState *spapr,
-+                                   uint32_t token, uint32_t nargs,
-+                                   target_ulong args,
-+                                   uint32_t nret, target_ulong rets)
-+{
 +    if (spapr->guest_machine_check_addr == -1) {
-+        /* NMI register not called */
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
++        /*
++         * This implies that we have hit a machine check either when the
++         * guest has not registered FWNMI (i.e., "ibm,nmi-register" not
++         * called) or between system reset and "ibm,nmi-register".
++         * Fall back to the old machine check behavior in such cases.
++         */
++        cs->exception_index = POWERPC_EXCP_MCHECK;
++        ppc_cpu_do_interrupt(cs);
 +        return;
 +    }
 +
-+    if (spapr->mc_status != cpu->vcpu_id) {
-+        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock" */
-+        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-+        return;
++    while (spapr->mc_status != -1) {
++        /*
++         * Check whether the same CPU got machine check error
++         * while still handling the mc error (i.e., before
++         * that CPU called "ibm,nmi-interlock")
++         */
++        if (spapr->mc_status == cpu->vcpu_id) {
++            qemu_system_guest_panicked(NULL);
++            return;
++        }
++        qemu_cond_wait_iothread(&spapr->mc_delivery_cond);
++        /* Meanwhile if the system is reset, then just return */
++        if (spapr->guest_machine_check_addr == -1) {
++            return;
++        }
 +    }
-+
-+    /*
-+     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
-+     * hence unset mc_status.
-+     */
-+    spapr->mc_status = -1;
-+    qemu_cond_signal(&spapr->mc_delivery_cond);
-+    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
++    spapr->mc_status = cpu->vcpu_id;
 +}
 +
- static struct rtas_call {
-     const char *name;
-     spapr_rtas_fn fn;
-@@ -503,6 +553,14 @@ hwaddr spapr_get_rtas_addr(void)
-     return (hwaddr)fdt32_to_cpu(*rtas_data);
- }
- 
-+void spapr_fwnmi_register(void)
-+{
-+    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
-+                        rtas_ibm_nmi_register);
-+    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
-+                        rtas_ibm_nmi_interlock);
-+}
-+
- static void core_rtas_register_types(void)
- {
-     spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+ static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
+                             uint32_t token, uint32_t nargs,
+                             target_ulong args,
 diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 652a5514e8..a90e677cc3 100644
+index 7bc5fc3a9e..909d3976f9 100644
 --- a/include/hw/ppc/spapr.h
 +++ b/include/hw/ppc/spapr.h
-@@ -218,6 +218,8 @@ struct SpaprMachineState {
+@@ -191,6 +191,15 @@ struct SpaprMachineState {
+      * occurs during the unplug process. */
+     QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
  
-     unsigned gpu_numa_id;
-     SpaprTpmProxy *tpm_proxy;
++    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
++    target_ulong guest_machine_check_addr;
++    /*
++     * mc_status is set to -1 if mc is not in progress, else is set to the CPU
++     * handling the mc.
++     */
++    int mc_status;
++    QemuCond mc_delivery_cond;
 +
-+    bool fwnmi_calls_registered;
- };
+     /*< public >*/
+     char *kvm_type;
+     char *host_model;
+@@ -804,6 +813,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
+ int spapr_max_server_number(SpaprMachineState *spapr);
+ void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+                       uint64_t pte0, uint64_t pte1);
++void spapr_mce_req_event(PowerPCCPU *cpu);
  
- #define H_SUCCESS         0
-@@ -656,8 +658,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
- #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
- #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
- #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
-+#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
-+#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
+ /* DRC callbacks. */
+ void spapr_core_release(DeviceState *dev);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 518de7e4b7..2aebb44e2f 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -1708,6 +1708,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+         ret = 0;
+         break;
  
--#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
-+#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
++    case KVM_EXIT_NMI:
++        trace_kvm_handle_nmi_exception();
++        ret = kvm_handle_nmi(cpu, run);
++        break;
++
+     default:
+         fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
+         ret = -1;
+@@ -2803,6 +2808,15 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+     return data & 0xffff;
+ }
  
- /* RTAS ibm,get-system-parameter token values */
- #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
-@@ -908,4 +912,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
++int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
++{
++    cpu_synchronize_state(CPU(cpu));
++
++    spapr_mce_req_event(cpu);
++
++    return 0;
++}
++
+ int kvmppc_enable_hwrng(void)
+ {
+     if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index eedb15d48e..bd2a0edf43 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -83,6 +83,8 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
+ void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
+ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset);
  
- void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
- hwaddr spapr_get_rtas_addr(void);
-+void spapr_fwnmi_register(void);
- #endif /* HW_SPAPR_H */
++int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
++
+ #else
+ 
+ static inline uint32_t kvmppc_get_tbfreq(void)
+diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+index 3dc6740706..6d15aa90b4 100644
+--- a/target/ppc/trace-events
++++ b/target/ppc/trace-events
+@@ -28,3 +28,4 @@ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
+ kvm_handle_epr(void) "handle epr"
+ kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
+ kvm_handle_debug_exception(void) "handle debug exception"
++kvm_handle_nmi_exception(void) "handle NMI exception"
 -- 
 2.17.2
 
