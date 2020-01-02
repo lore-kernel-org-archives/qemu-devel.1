@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36961C2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43240C3276C
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04D81215A4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:01:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04D81215A4
+	by mail.kernel.org (Postfix) with ESMTPS id 17795215A4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:06:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17795215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1in12f-0003Tl-4e
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 09:01:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60665)
+	id 1in17K-0004zF-4F
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 09:06:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33267)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1in11r-000342-3e
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:00:48 -0500
+ (envelope-from <bounces@canonical.com>) id 1in16f-0004ZA-00
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:05:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1in11p-0002W2-S1
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:00:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48160)
+ (envelope-from <bounces@canonical.com>) id 1in16d-0004E5-TS
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:05:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48356)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1in11p-0002Vl-Ly
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:00:45 -0500
+ id 1in16d-0004Du-OI
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:05:43 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1in11o-00085G-9m
- for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 14:00:44 +0000
+ id 1in16c-0008Gg-Tu
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 14:05:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 448C32E8058
- for <qemu-devel@nongnu.org>; Thu,  2 Jan 2020 14:00:44 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id DA09F2E80C3
+ for <qemu-devel@nongnu.org>; Thu,  2 Jan 2020 14:05:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 02 Jan 2020 13:51:41 -0000
+Date: Thu, 02 Jan 2020 13:55:52 -0000
 From: crocket <crockabiscuit@gmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,17 +55,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: crockabiscuit laurent-vivier
 X-Launchpad-Bug-Reporter: crocket (crockabiscuit)
 X-Launchpad-Bug-Modifier: crocket (crockabiscuit)
-References: <157762661516.5433.16221584605990009162.malonedeb@gac.canonical.com>
-Message-Id: <157797310148.27288.4438830735380164482.malone@chaenomeles.canonical.com>
-Subject: [Bug 1857811] Re: qemu user static binary seems to lack support for
- network namespace.
+References: <155806778498.21734.945063058665872727.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157797335254.22264.15021375374773981431.malone@wampee.canonical.com>
+Subject: [Bug 1829459] Re: qemu seems to lack support for pid namespace.
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 62843be7e9b773edbb5a8c1ce705911fbbdebce7
+X-Launchpad-Hash: 0e5dc3d61974729580f8a9b8b0e2f423cc1ee9e4
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,38 +78,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1857811 <1857811@bugs.launchpad.net>
+Reply-To: Bug 1829459 <1829459@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I executed "emerge" with QEMU_LOG=3Dunimp and QEMU_STRACE=3D"".
+I think you should investigate
 
-** Attachment added: "emerge.log"
-   https://bugs.launchpad.net/qemu/+bug/1857811/+attachment/5317106/+files/=
-emerge.log
+`qemu: qemu_thread_create: Invalid argument`
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1857811
+https://bugs.launchpad.net/bugs/1829459
 
 Title:
-  qemu user static binary seems to lack support for network namespace.
+  qemu seems to lack support for pid namespace.
 
 Status in QEMU:
   New
 
 Bug description:
-  Whenever I execute emerge in gentoo linux in qemu-aarch64 chroot, I
-  see the following error message.
+  # Version
 
-  Unable to configure loopback interface: Operation not supported
+  qemu-4.0.0
+  glibc-2.28
 
-  If I disable emerge's network-sandbox which utilizes network
-  namespace, the error disappears.
+  # commands used to launch qemu-aarch64 in user mode.
+
+  : ${QEMU_BINFMT_FLAGS:=3DOC}
+
+  printf '%s\n' ':qemu-
+  aarch64:M::\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x0=
+0\xb7\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\=
+xfe\xff\xff\xff:/usr/bin
+  /qemu-aarch64:'"${QEMU_BINFMT_FLAGS}"
+  >/proc/sys/fs/binfmt_misc/register
+
+  > sudo cp /usr/bin/qemu-aarch64 $RPI/usr/bin
+  > sudo chroot $RPI /bin/ksh -l
+
+  # host
+
+  Gentoo Linux amd64
+
+  # Guest
+
+  Gentoo Linux aarch64
+
+  # The problem that I have
+
+  "emerge" program fails due to the error, "qemu: qemu_thread_create: Inval=
+id argument".
+  "emerge" is Gentoo's package manager that compiles and installs packages.
+
+  # Workaround
+
+  Disable pid-sandbox in emerge.
+
+  # How to reproduce the issue
+
+  Execute
+
+  unshare --pid -- echo hello world
+
+  or
+
+  python -c "import portage.process; portage.process.spawn(['echo',
+  'hello', 'world'], unshare_pid=3DTrue)"
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1857811/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1829459/+subscriptions
 
