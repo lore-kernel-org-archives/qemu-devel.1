@@ -6,59 +6,57 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B88AC2D0DE
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 02:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EF1C2D0DE
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 02:26:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69A5A215A4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 02:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D498320866
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 02:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LMfLQe4+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69A5A215A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TBg+TDRU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D498320866
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imq9z-00047W-5V
-	for qemu-devel@archiver.kernel.org; Wed, 01 Jan 2020 21:24:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42573)
+	id 1imqBb-0006XX-05
+	for qemu-devel@archiver.kernel.org; Wed, 01 Jan 2020 21:26:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42644)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1imq6k-0008MN-9i
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 21:21:07 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1imq6m-0008Mu-HN
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 21:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1imq6i-0005Sq-RS
- for qemu-devel@nongnu.org; Wed, 01 Jan 2020 21:21:05 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:39307 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1imq6l-0005Un-BN
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 21:21:08 -0500
+Received: from ozlabs.org ([203.11.71.1]:56359)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1imq6i-0005R6-Fm; Wed, 01 Jan 2020 21:21:04 -0500
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1imq6k-0005TM-Vf
+ for qemu-devel@nongnu.org; Wed, 01 Jan 2020 21:21:07 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47pBbb3lNrz9sPK; Thu,  2 Jan 2020 13:20:59 +1100 (AEDT)
+ id 47pBbc31wnz9sRp; Thu,  2 Jan 2020 13:21:00 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1577931659;
- bh=zzCsEZFC21PJNnTZTKM+zrONrqVJimGayr78SWVC6Bc=;
+ d=gibson.dropbear.id.au; s=201602; t=1577931660;
+ bh=lcckO8Br3mxw9lPZDlRNQSACAfzbUFAgMI0QmlGurfo=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=LMfLQe4+PAlWPCfbb7VcZaf0SmXA+chVOhV6GD5eSuK+DekwPiFXbx3vb6/aTA7Pp
- oOF9BRfyqnKtoIqeFTjdcfNMLgcbptWUe8spPJsDBFdqtGUFYxsmL5+mprBLL6mRNx
- su26XWRJUP0NOo3mt0tHLpW3pVdtjTn+tjGk5C98=
-Date: Thu, 2 Jan 2020 13:03:40 +1100
+ b=TBg+TDRUo+v578O0jmFG+gh8SA63Lkp2ntX2WHwESoKfQUhsPI1t7PqokZ7Ny2eFR
+ LCNbgKAFTDaPmbodmPIvxsMVuZ/rDIi6XmOGPhbioFmJLr43JT0sDgxvKbzyo1sEwx
+ 4lRJ0sYebEZSn0THj9LhdeLmfOYg5rhNvp7e54Z8=
+Date: Thu, 2 Jan 2020 13:19:55 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 07/14] hw/ppc/Kconfig: Let the Sam460ex board use the
- PowerPC 405 devices
-Message-ID: <20200102020340.GD2098@umbus>
-References: <20191231183216.6781-1-philmd@redhat.com>
- <20191231183216.6781-8-philmd@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH] vfio/pci: Don't remove irqchip notifier if not registered
+Message-ID: <20200102021955.GJ2098@umbus>
+References: <20191231133915.115363-1-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="hoZxPH4CaxYzWscb"
+ protocol="application/pgp-signature"; boundary="bgQAstJ9X1Eg13Dy"
 Content-Disposition: inline
-In-Reply-To: <20191231183216.6781-8-philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20191231133915.115363-1-peterx@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,57 +68,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-ppc@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: yanghliu@redhat.com, Alex Williamson <alex.williamson@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---hoZxPH4CaxYzWscb
-Content-Type: text/plain; charset=iso-8859-1
+--bgQAstJ9X1Eg13Dy
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 31, 2019 at 07:32:09PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> When configured with --without-default-devices, the build fails:
+On Tue, Dec 31, 2019 at 08:39:15AM -0500, Peter Xu wrote:
+> The kvm irqchip notifier is only registered if the device supports
+> INTx, however it's unconditionally removed.  If the assigned device
+> does not support INTx, this will cause QEMU to crash when unplugging
+> the device from the system.  Change it to conditionally remove the
+> notifier only if the notify hook is setup.
 >=20
->     LINK    ppc-softmmu/qemu-system-ppc
->   /usr/bin/ld: hw/ppc/sam460ex.o: in function `sam460ex_init':
->   hw/ppc/sam460ex.c:313: undefined reference to `ppc4xx_plb_init'
->   /usr/bin/ld: hw/ppc/sam460ex.c:353: undefined reference to `ppc405_ebc_=
-init'
->   collect2: error: ld returned 1 exit status
->   make[1]: *** [Makefile:206: qemu-system-ppc] Error 1
->=20
-> Fix by selecting the PPC405 config.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> CC: David Gibson <david@gibson.dropbear.id.au>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> Reported-by: yanghliu@redhat.com
+> Fixes: c5478fea27 ("vfio/pci: Respond to KVM irqchip change notifier", 20=
+19-11-26)
+> Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=3D1782678
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+Mea culpa.
 
 > ---
->  hw/ppc/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+>  hw/vfio/pci.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
-> index 0cd8d4053e..004b7d5ad5 100644
-> --- a/hw/ppc/Kconfig
-> +++ b/hw/ppc/Kconfig
-> @@ -50,6 +50,7 @@ config PPC4XX
-> =20
->  config SAM460EX
->      bool
-> +    select PPC405
->      select PFLASH_CFI01
->      select IDE_SII3112
->      select M41T80
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 2d40b396f2..337a173ce7 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -3076,7 +3076,9 @@ static void vfio_exitfn(PCIDevice *pdev)
+>      vfio_unregister_req_notifier(vdev);
+>      vfio_unregister_err_notifier(vdev);
+>      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> -    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+> +    if (vdev->irqchip_change_notifier.notify) {
+> +        kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifie=
+r);
+> +    }
+>      vfio_disable_interrupts(vdev);
+>      if (vdev->intx.mmap_timer) {
+>          timer_free(vdev->intx.mmap_timer);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -128,25 +127,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hoZxPH4CaxYzWscb
+--bgQAstJ9X1Eg13Dy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4NT3wACgkQbDjKyiDZ
-s5KY7w//SVKQ4v5x4L4eF0eJEkXtTVSGVIiQWtn1oVHu3qhTWc1UOnk9XjIagtqJ
-n4/p8z3KcnsugxU/TvfFHlRNfbnA7WJUdg/t2JGQPTDmvPLP2cumMAMHnd4LzduC
-D1BPnpZsT5bq4L0YDhpjaw9IQ86m+RIUoty+GMVB7O4Fg8eqc85Iy8/Ch6JpYZP2
-smuKvZjXtJ3v3luIrnkqmvE22KTG2+jmg4wynIcKF6XqkLIdY2X+BsSRX/y1e3nz
-17HnAlzrFiMKtAq6K/ucLpQXEOepY1GWEj6QXZuDgixRLMc4iOptKeirhf7NtrUj
-R2q2i4MIAvjer6R9AOzBcjVqrqaJG+ubnN/5e8QacQsqVJzWvtgB+Dkp2yl05uHm
-yZ0usEoV2qtWf7ilw45lLdWE9A5ZuBCD7dY1jAFqO6PLY9Ri2nnAsK80XzPjRtRc
-Xz57StVbO0356ABDjrkWzhj/ZlWNkY0AQ1IjdOVvfVhUvQ/BS/mppZO1coVdwVNZ
-qaSZt8WkhVV/krWX840kq4fJG98sVpO6U2MIT2oNRyvz1CIP0te4svgcimkPtgus
-SdlenbW30kvGbaoVsdVCSbSnI986HTzXvsibgVceznnEyBeQ4qdP1Yvg3sMIlJeY
-qkOAgBsBMHf9N5Ux5+k+CJSpfJgM1hGHPH8TkqlNq0pPz2NUez0=
-=918o
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4NU0kACgkQbDjKyiDZ
+s5L8vg/9Fk8vxtqyn/Up4u050Ne0DH2XMgCKVQGHP67qPkMY5Ij2L9XXMJ+UUwX6
+6kSQOB/9su4k9hBcr9/LW/gtDUU7H5xGlq+NONtWMFJozNAFTqCFTjEf/6NAT0zH
+V4w3NnqOTojpccJsnT5x0b0+R5XGTeklyo41YBEHh0fiY/eHbAmcGNBbnGrOdYRo
+REmhIKbmk9/y+VfSmHn+E/KJUpPQNqCXt45Cp6yMh4aW+RI1mlyBa8ggPU9qhVdi
+yOS/8ft4bmq8IN/mZZTmZNa7RTDADrf8BbV2xOlyvd4OaXbeXSclSeQIR7nb9g/d
+gGXaT67vKXSxGyeVbQ8ll9I6U5BlTjQJr1pFPPcULj8seexPSeRZeT7z4VRpJwW3
+197LPOlb1Bi2AboOnTd3rPCedKf7cxKiUHA7AZEALUqw7YGQxpLvUx204wDamPHt
+xxbvJpX9GX490pDV4j8WMv6GG349X5a9lL5U52pb1rMz2xJQ1qSyaodFEGRkt38r
+yDfyIlq9Z1MVpw4hAOsogpn+shXv0YDh9vCioYT+Z0hcTRlqLqi+nicwCdL+297k
+NRKRj1uCCMIS5z/yE0vxlFhR9ul5g6jAy32Mmn3SZQapxDJpyTcKS5ZeIJRZi+JQ
+RjwYEruYkzzXUKpLV0UQdhiZLMVQnuMqW8HXay+x1DDlvkXbj2g=
+=zylT
 -----END PGP SIGNATURE-----
 
---hoZxPH4CaxYzWscb--
+--bgQAstJ9X1Eg13Dy--
 
