@@ -2,61 +2,69 @@ Return-Path: <SRS0=Q/S9=2X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D14CDC2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9887C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AB9121655
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:37:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93A2F21655
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:39:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RDW6g+3/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AB9121655
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kPgdSIVV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A2F21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=zx2c4.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imxrB-0003rM-Nz
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 05:37:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38592)
+	id 1imxtP-00057B-N7
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 05:39:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38779)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Jason@zx2c4.com>) id 1imxqZ-0003Qp-7M
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:36:56 -0500
+ (envelope-from <Jason@zx2c4.com>) id 1imxsq-0004hS-Hk
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Jason@zx2c4.com>) id 1imxqY-0007pU-20
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:36:55 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:56857)
+ (envelope-from <Jason@zx2c4.com>) id 1imxsp-0001GW-LD
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:39:16 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:40571)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Jason@zx2c4.com>) id 1imxqX-0007nO-R0
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:36:54 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id a438101f;
- Thu, 2 Jan 2020 09:38:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
- :subject:date:message-id:mime-version:content-transfer-encoding;
- s=mail; bh=iJFCMwYx1+oOy184iBhg9viKFeM=; b=RDW6g+3/lxx5bqaHZ+Ds
- RJ4UWKN/Z7wHcBUvdLP59lSb8r+MhI2UK5k/hfGkht5LqF3tzxzyHpisEYDLJEit
- smpAxWjJRcmLpwYWDpIXAQzbRvuy3m6u4qh/Oyw3/3YcI1gK3P9BdHU5+yCcpEq3
- u5NAUFJwv79pozUJNRSR9Kb5LZorNtshplnrOp9gsQbwkHq3s4EQxDd7e2ocexlK
- 4TPVdFzmXl/VO8/4aWWxl/q4SHESCYG9lrnwF6ijQKQEUQZd+7PpDu90RxoSvrCF
- 0xtPJ5I0g/GnN5xkm61ql9hmXl46x68PgTvSEbyYRmr9dXoYe8DBzmvJ8NCyVvOp
- 6w==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0e683f42
- (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO); 
- Thu, 2 Jan 2020 09:38:23 +0000 (UTC)
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: laurent@vivier.eu,
-	qemu-devel@nongnu.org
-Subject: [PATCH] q800: implement mac rom reset function for BIOS-less mode
-Date: Thu,  2 Jan 2020 11:36:44 +0100
-Message-Id: <20200102103644.233370-1-Jason@zx2c4.com>
+ (Exim 4.71) (envelope-from <Jason@zx2c4.com>) id 1imxsp-0001G9-Fz
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:39:15 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id cb6bc442
+ for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 09:40:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+ :references:in-reply-to:from:date:message-id:subject:to
+ :content-type; s=mail; bh=S7D1zVMReq8bZ3EKWj74lmVjmno=; b=kPgdSI
+ VV/W72SwFm+m/uSIBdQ30oOxfqG/xLwtbMrpcAejS6w2OEsa8gPFv+1YHSx+iffL
+ 39imbwiBaBSoCHZWgcA0hJl0NQ0fS9NmXlRERY51P7B8kq7AxHknJIA+L7VioBBO
+ ZTuHT3VOgjhlQXNpOco3yHu3JTFeSMLRjB0wf311052qv/Q9U4C97LNd4wtuCd1H
+ u5dgnDIr642rHqkqlYuN2XMUuoEQMloJGl0YFlymASAPn+rO4aHZdPSRrxtpdNsf
+ /UOeohQ5YBt2zVooMK5Qjy0aP5XWU6SbKwn+mHURsdS7hjvnzrPtm442DORO90s7
+ wEEGKrerW76YbrNw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7e57df83
+ (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+ for <qemu-devel@nongnu.org>; Thu, 2 Jan 2020 09:40:44 +0000 (UTC)
+Received: by mail-ot1-f49.google.com with SMTP id 19so44017858otz.3
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 02:39:13 -0800 (PST)
+X-Gm-Message-State: APjAAAUzWIpXf4Ih/wOPsA8S5Yf5+cQDWIWY8vIme0cCTJfbjioAbJ+3
+ GDCo2qO2xGNaESN64e9hIy9/gIrSG4p/U4U70PA=
+X-Google-Smtp-Source: APXvYqz7j/zxE8sQZTzfJU5SfMs7NLi2mqcjtqrl7niLT3bf3TGGe9LqJVgumK12296C0zRySup2iBX5/IBI3Acv78w=
+X-Received: by 2002:a9d:674f:: with SMTP id w15mr93232724otm.243.1577961553051; 
+ Thu, 02 Jan 2020 02:39:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200101215905.121298-1-Jason@zx2c4.com>
+In-Reply-To: <20200101215905.121298-1-Jason@zx2c4.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Thu, 2 Jan 2020 11:39:01 +0100
+X-Gmail-Original-Message-ID: <CAHmME9qBRFAr1webkpL=C0OwiRikQJbCgbeePnJcwJWbWK9OLA@mail.gmail.com>
+Message-ID: <CAHmME9qBRFAr1webkpL=C0OwiRikQJbCgbeePnJcwJWbWK9OLA@mail.gmail.com>
+Subject: Re: [PATCH] q800: map reset function to poweroff of some random kernel
+To: laurent@vivier.eu, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 192.95.5.64
@@ -71,64 +79,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Linux, calling `reboot(RB_AUTOBOOT);` will result in
-arch/m68k/mac/misc.c's mac_reset function being called. That in turn
-looks at the rombase (or uses 0x40800000 is there's no rombase), adds
-0xa, and jumps to that address. At the moment, there's nothing there, so
-the kernel just crashes when trying to reboot. So, this commit adds a
-very simple implementation at that location, which just writes to via2
-to power down.
-
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- hw/m68k/q800.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-index 4ca8678007..491ba11200 100644
---- a/hw/m68k/q800.c
-+++ b/hw/m68k/q800.c
-@@ -128,6 +128,20 @@ static void main_cpu_reset(void *opaque)
-     cpu->env.pc = ldl_phys(cs->as, 4);
- }
- 
-+static uint8_t fake_mac_rom[] = {
-+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-+    /* offset: 0xa - mac_reset */
-+    0x20, 0x7C, 0x50, 0xF0, 0x24, 0x00,	/* moveal #1357915136,%a0 */
-+    0x10, 0x10,				/* moveb %a0@,%d0 */
-+    0x00, 0x00, 0x00, 0x04,		/* orib #4,%d0 */
-+    0x10, 0x80,				/* moveb %d0,%a0@ */
-+    0x20, 0x7C, 0x50, 0xF0, 0x20, 0x00,	/* moveal #1357914112,%a0 */
-+    0x10, 0x10,				/* moveb %a0@,%d0 */
-+    0x02, 0x00, 0xFF, 0xFB,		/* andib #-5,%d0 */
-+    0x10, 0x80,				/* moveb %d0,%a0@ */
-+    0x60, 0xFE				/* bras [self] */
-+};
-+
- static void q800_init(MachineState *machine)
- {
-     M68kCPU *cpu = NULL;
-@@ -339,6 +353,13 @@ static void q800_init(MachineState *machine)
-         BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
-                   (graphic_width * graphic_depth + 7) / 8);
-         BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_ROMBASE, MACROM_ADDR);
-+
-+        rom = g_malloc(sizeof(*rom));
-+        memory_region_init_ram_ptr(rom, NULL, "m68k_fake_mac.rom",
-+                                   sizeof(fake_mac_rom), fake_mac_rom);
-+        memory_region_set_readonly(rom, true);
-+        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
- 
-         if (kernel_cmdline) {
-             BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
--- 
-2.24.1
-
+Superseded by https://lore.kernel.org/qemu-devel/20200102103644.233370-1-Jason@zx2c4.com
+, thankfully.
 
