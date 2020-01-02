@@ -7,57 +7,49 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC80C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 20:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB31C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 20:26:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9395921655
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 20:14:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 470BF20866
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 20:26:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Z1pdMMMX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9395921655
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="OshAv3Pw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470BF20866
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1in6rL-0007Y3-DV
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 15:14:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55996)
+	id 1in735-0002Kf-4a
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 15:26:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1in6nE-0006Dk-Gu
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 15:10:06 -0500
+ (envelope-from <deller@gmx.de>) id 1in6z6-0001O3-Ql
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 15:22:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1in6nC-00088I-Os
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 15:10:04 -0500
-Received: from mout.gmx.net ([212.227.15.19]:60115)
+ (envelope-from <deller@gmx.de>) id 1in6z5-000097-Bl
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 15:22:20 -0500
+Received: from mout.gmx.net ([212.227.15.18]:33335)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <deller@gmx.de>) id 1in6nC-00087X-BG
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 15:10:02 -0500
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1in6z5-00006K-1y
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 15:22:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1577995784;
- bh=e9/BKcjvA0EEoiSKwVr7QOOLHFqlBFsnAI04RQy1w3I=;
+ s=badeba3b8450; t=1577996533;
+ bh=T+JeQqdnB2RuMtWhGmk4nXTWNBLpesKJ5UD07VvHDy4=;
  h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=Z1pdMMMXBtlDIqEksHrss6u+vQ8UQBcZVWrcGhG9cQPt+Cit43ymxbrEgyRBz4T6U
- iFxou8Ciza8BNTf9pN3RXK4xKPeA3yxUt5Ufhb9R4KHQUPrwj0Gj26Jc++FRHEMDsj
- hHyJ5cWK+snZZPO9IYGaR3VNCe6r9o+FixxxOQc8=
+ b=OshAv3PwXro2aYg+pZ2KGdtaeguZxw6nOJ7HHPRlgOE44WcfksGZV+ZoiKu4muZqE
+ V8T1s0cH2YpHf3d6Y7j4+ZGlI4MUGqbkUlSwNMBtR0MZ1oY0V8T6MknrR9+2Sg8G3m
+ hZVQZTWA1J5CezOeQ4yXQU5oTstVKsarIMpq0H94=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from [192.168.20.60] ([92.116.183.77]) by mail.gmx.com (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MsHs0-1jbDKv3Ucs-00tj0N; Thu, 02
- Jan 2020 21:09:43 +0100
-Subject: Re: [PATCH 43/86] hppa: drop RAM size fixup
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>
-References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
- <1577797450-88458-44-git-send-email-imammedo@redhat.com>
- <bc7bac60-0d20-d0e3-b9ac-2c9ff62c2c15@redhat.com>
- <8cb7bd0f-7841-7e60-8de6-708515b81b00@gmx.de>
- <7cc361d0-300f-a8a1-3650-9358e815c070@redhat.com>
- <20200102151223.73e1448b@redhat.com>
- <a3017f38-b32b-de32-9896-b287253d0fa2@redhat.com>
- <20200102160827.790b8ed2@redhat.com>
- <f073e703-5caf-e63c-ef1b-04fa7ab51716@redhat.com>
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MFsUv-1iwlkQ1L83-00HPWK; Thu, 02
+ Jan 2020 21:22:13 +0100
+Subject: Re: [PATCH v2] hppa: allow max ram size upto 4Gb
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <27c3e31d-82ae-e62f-caba-a0a3fbd55e7c@redhat.com>
+ <1577987162-150529-1-git-send-email-imammedo@redhat.com>
 From: Helge Deller <deller@gmx.de>
 Autocrypt: addr=deller@gmx.de; keydata=
  mQINBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
@@ -116,41 +108,41 @@ Autocrypt: addr=deller@gmx.de; keydata=
  XzCscCr+pggvqX7kI33AQsxo1DT19sNYLU5dJ5Qxz1+zdNkB9kK9CcTVFXMYehKueBkk5MaU
  ou0ZH9LCDjtnOKxPuUWstxTXWzsinSpLDIpkP//4fN6asmPo2cSXMXE0iA5WsWAXcK8uZ4jD
  c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <aa4d2f06-6931-b3f5-3a20-6c7633514a73@gmx.de>
-Date: Thu, 2 Jan 2020 21:09:41 +0100
+Message-ID: <2f226aa4-5f61-6e6d-d6b9-a98685a79e8c@gmx.de>
+Date: Thu, 2 Jan 2020 21:22:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <f073e703-5caf-e63c-ef1b-04fa7ab51716@redhat.com>
+In-Reply-To: <1577987162-150529-1-git-send-email-imammedo@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:tcZl5s0svCcf9aFS8x+/Lb4LAQ12IpBmxlA3PhWpxkbzEt/Dcrv
- ClH2sYnq5qrJ57e8ehXRCcqEGQe+D8adOufzpti4t9T6SVpC7dn3LkFOyq9oLDJUUvwYNIa
- 4wpZZVchX6USbb1PJmOur337mLTHQ4wQkqtDa3nqCy6jgK5Y09uGVJwpmlIHPRCdLOhk3fb
- oPsr1C6Fbv9ac5ESw7CNw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cGOn1h0xZuM=:ZhknxiMugdBCn1ISC7ByAo
- /G4a8oVHpXm1CFytq2QV5tStZ991ocmPZdOioXit3oFU/CSZMOY1fj56sgT0+8pJyLUfdsiHe
- s3gSf0ZiG3Xol0dVCNw0qDWM7d3diHHaouseL8CWczBwzOs0VpFfYvG4lKI+QSNyZsAP0j5/f
- rA8xXmzzHQeJ/KBmBRaWMsgRs9PonlOkx59eIoZtpzlBkkNs9usgv6SmkFwnYjyN2dXsmJeJJ
- XzvnVf7gpG0fvaXQO+zJlRs7nO2CN/XnwYAxjhu4GUUB4FtD3pv6K2Fc/IHzDKuGbZcAQAEQT
- osvivgaMZG9AvmeumEOIWBCuJroXJYONPwpYrAsEAgfz7BaVwrba2XX4aRgc/fIkB07/BsAcc
- qXwiT8Bl2QDQgxQ5ObBSqB8FxMH2uuEgIN8GemqIp1ZJAZa7KwMCmZlNkDO3dS6EDmm1rB3pX
- aRj0IyAS523KzRRRSLEV01BPxEE8CzmYTMdHNZVmYJdfW2Xuo9rEMsh49YDpoQnAyvPMaHtjp
- v4J7ef3M2JuQQbGzEEexyD4v32ZueVDADfy7Cb2j6JXdbPLlm9+oyXJFSF3Sbq495LtQYFl3w
- Hoq0AzH/qba2Mx2nqNk0BEElZrMWCHXyfCltE3sERak0WIY3/U6pzj0aT6Rmz4Tbj2PUA7J/P
- wrvQT9hdVEVXjpvUz5CeoP7eKo+Kd810jAaNTzsYw7fbWanhctPMdTW6VG6ByP3ADF4TAqTUl
- Ge8NiZqWfoKbd7RPnKhlCQB+o6T//xLb78XLGEjdI8Bdk5wtXR2c1oNLvID81akDg/3BtJybH
- DGSSjNuCwCCVMOrvquMKBqzSKmIVs7Ik/qgaCsY9seoy3Kkp7gqch0QdkAMKR5HqMEr2K/SXp
- ntQd4dOX8sxEGr9LQDrhhbNe9geqi6twM0PzY1ukyVtjrapHwd5v91ZtQQA6ES26GN6MoBEH0
- WPosGu9yFouICvyHVZdfNcN3tMiaxrgs8i8e5zKEHCIgIdsZRFMld9RkeBe0mmKFIWDE2Boah
- I27I2ObKL9l7hdPyxF7BfO2yXPqWKANQg5MWanL+TF1kh2whgJ1o08Hol2YQHSbYI6xNawkIf
- pNNPjveWnG3Xv6aF2M+TXA5xtAEN81YcMrQx6jMRy+4DhcOShTOMBuilgF6WvVrq6iBujihIS
- EBRCzGH2l1OXyubMDa+wgQ19luHOv+iIVy9FuDIa4AKwfC9jDOqyQujGJY/nKFliQBZhxJohc
- N1RPJ0+GOdXW2vIAhIcoImRRctQ7mXW8SICKtlQ==
+X-Provags-ID: V03:K1:OvlBDMr0YBImvfihtYHNc78ei/oBUFqIvlEHbBg+37p/whFHNZn
+ Q8aHbf6NAICBb1vdkbDdkZrFXKKm0GiJ5rLsHJiXQYKR+/pwejR78nCkQk2O//j26w3yiEy
+ B4e9U0eKU1UlfBUJ8tjWFsD+MRHa/0mmzrf6AkIkZBxBw6Fet3OVxBgKfYW5R8KivfCy9IB
+ 8BM3VcTfsQW6cJH+gDemg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:aisv5GslM5s=:fgdqq2vOUBkskFLzUK4HbK
+ mdYaBqtyzBy5eomyTBJSSVuIA1S50aIhrpfX9/gPchivsZiKRuQL0FiScPfL1q6CulLZc+I+d
+ jAgGCw+bby+1uDM9JtijQzPEmGNc5hOMgzkpJsPivHM/idCEeL/vDHlgir1zmp6floMhLIY13
+ 8CQVEMYyLItR93xNNDVDWo+8B7EVnPuQyfHtCFpvgyFW5tQaDXFyQHpvKQNqIBRCWyzJs1RNl
+ aXIEXzMG3ENa8ABAmc84D0Fl5x0xq02+WuXfMqHaZcR6+s9vL/xDAfE0rVkuOhnLeg+xwS1pV
+ Magg3Dm6wnP9NYIvJZRwgTqEhx+uxeDl2+8fE8StLT3waI+qf9xX90m1npzGuffzaoQYmRVWG
+ y2b0b6xnbo1MAso1ThoyWM870/sYErCKC3SGVpyYC4QyVqd7dpnBlDxWoIzOX5CGZHl+kbw0q
+ fTJiu2WEwKrcBCPRGoTe1IwiGL8dpGs15ry2tLKiRCVzX4wnPmloohjI3MkQZBQNd4BUQmlPF
+ 6Gd+jty8s1xplsJx64+FsRKCzrcr4dYNSIe2/L3mI7Gbd2uZ5AmK1+lNJw5abpqq141dDNBeV
+ +YSXOzpBmtY0W8d7ugbh8yAbQx0lwZOEe9m8s4wkBI2uVB7SPLT4vYS3PCtZ6IrXa6Qdl3CPo
+ MEGlSX1EPBOpztQmyAkCi1yeNIhZmH2zYqOSg/yS5KQYB2ok/gWeNvuT9z5MWjYXT0RSZPTko
+ npH8dH8kEEOrVGJ00QK5iSufVKVljmlTrD3dARxExYqtTFfbW0PG11YeCxfXl9iD0MYT4RV+N
+ /ZSk1CpuCw24Be+Ao3sJ6dRCrKUAHk0KvaJVzJD40qWt/aBySgHcmEG0Ixo7qmF0cT2tGlelj
+ ucKoiK9DdY6O+eUGBt7wy6yL4aWwtJjFfP/p5acMc7AxTObR5jUVzam5oDiaAPrMQs8k4b3R4
+ uXzf62o4XNr3lINd6KU1VQUhiWQAzDU+dk2fbVQsZk5v25/Eo13L/EKwje62ftgRg/4RrfxHy
+ wP9fNQL4QdpW2Qbo/CLSFoA5i/aVGiZCLzIZX3YM2GjIP9A2HLdbyKkjrrDMWZiyNbP2ujPbr
+ HMgi3r/SVrVvV0kPY8+aAv5XrfGtmn13G6NIrEc3codXTMazluT11qNDc0quoWmLbbxSlCsqA
+ 3ee7xMMgELD8+d3av9Lm1pc5msF/CIn9aqUZi9hxBPxAc2rOIcUNoi3UNMRLkqqUykg7aTrFh
+ itJQW6wj1uyBKN7uWZaxeG0gECyxOjjo9H8XRRg==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.15.19
+X-Received-From: 212.227.15.18
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,179 +154,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02.01.20 16:49, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/2/20 4:08 PM, Igor Mammedov wrote:
->> On Thu, 2 Jan 2020 15:17:14 +0100
->> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->>
->>> On 1/2/20 3:12 PM, Igor Mammedov wrote:
->>>> On Thu, 2 Jan 2020 13:06:33 +0100
->>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->>>> =C2=A0=C2=A0
->>>>> On 1/2/20 12:31 PM, Helge Deller wrote:
->>>>>> On 31.12.19 16:44, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>>>> On 12/31/19 2:03 PM, Igor Mammedov wrote:
->>>>>>>> If user provided non-sense RAM size, board will complain and
->>>>>>>> continue running with max RAM size supported.
->>>>>>>> Also RAM is going to be allocated by generic code, so it won't be
->>>>>>>> possible for board to fix things up for user.
->>>>>>>>
->>>>>>>> Make it error message and exit to force user fix CLI,
->>>>>>>> instead of accepting non-sense CLI values.
->>>>>>>>
->>>>>>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>>>>>> ---
->>>>>>>> =C2=A0=C2=A0 =C2=A0 hw/hppa/machine.c | 3 ++-
->>>>>>>> =C2=A0=C2=A0 =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-=
-)
->>>>>>>>
->>>>>>>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
->>>>>>>> index 5d0de26..25f5afc 100644
->>>>>>>> --- a/hw/hppa/machine.c
->>>>>>>> +++ b/hw/hppa/machine.c
->>>>>>>> @@ -92,7 +92,8 @@ static void machine_hppa_init(MachineState *mac=
-hine)
->>>>>>>> =C2=A0=C2=A0 =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Limit main =
-memory. */
->>>>>>>> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ram_size > FIRMWA=
-RE_START) {
->>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine->ram_size =3D=
- ram_size =3D FIRMWARE_START;
->>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("RAM siz=
-e more than %d is not supported", FIRMWARE_START);
->>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(EXIT_FAILURE);
->>>>>>>
->>>>>>> $ qemu-system-hppa -m 3841m
->>>>>>> qemu-system-hppa: invalid accelerator kvm
->>>>>>> qemu-system-hppa: falling back to tcg
->>>>>>> qemu-system-hppa: RAM size more than -268435456 is not supported
->>>>>>>
->>>>>>> Instead of using qemu_strtosz_MiB on FIRMWARE_START or unsigned fo=
-rmat, we can simply use "RAM size more than 3840m is not supported". Is th=
-at OK with you?
->>>>>>
->>>>>> I don't really like that change.
->>>>>>
->>>>>> We currently only emulate a 32-bit system, and for those 4GB is the=
- maximum.
->>>>>> So, if I start my machine with "qemu-system-hppa -m 4G", the curren=
-t code
->>>>>> then automatically uses the maximum possible of 3841MB (which is li=
-mited by
->>>>>> firmware start address).
->>>>>> I don't expect users to know the excact 3841MB number.
->>>>>> Even on a phyiscal machine you can only add DIMMs of sizes 2GB, 3GB=
- or 4GB,
->>>>>> but not "3841MB".
->>>>>
->>>>> Thanks for the explanation. This deserves a comment in the source fi=
-le
->>>>> IMHO (and displaying a warning to the user that the behavior is chan=
-ged).
->>>>>
->>>>> I understand the CPU can't access this DRAM area because the ROM is
->>>>> mapped there. What about other devices, can they do DMA access to it=
-?
->>>>>
->>>>> Igor: If this complicates your series too much, I think we can direc=
-tly
->>>>> allocate up-to 4GiB and not worry about the 256MiB lost.
->>>>
->>>> Do you mean
->>>> s/"RAM size more than %d is not supported"/"RAM size more than 4Gb is=
- not supported"/
->>>
->>> Works for me! You can keep my R-b with this change, thanks.
->>
->> Well, it's not that simple.
->> Do we map whole 4G in address space, if yes then we have to "unbreak"
->> firmware mapping and use overlap mapping or do we map only portion of i=
-t?
->> Both would make code more confusing and all for the sake of user conven=
-ience
->> so they won't have to change their CLI?
+On 02.01.20 18:46, Igor Mammedov wrote:
+> Previous patch drops silent ram_size fixup and makes
+> QEMU error out with:
 >
-> I was thinking about this patch:
+>  "RAM size more than 3840m is not supported"
 >
-> -- >8 --
-> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index 5d0de26140..fa0b6a9536 100644
-> --- a/hw/hppa/machine.c
-> +++ b/hw/hppa/machine.c
-> @@ -91,15 +91,16 @@ static void machine_hppa_init(MachineState *machine)
-> =C2=A0=C2=A0=C2=A0=C2=A0 }
+> when user specified -m X more than supported value.
 >
-> =C2=A0=C2=A0=C2=A0=C2=A0 /* Limit main memory. */
-> -=C2=A0=C2=A0=C2=A0 if (ram_size > FIRMWARE_START) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine->ram_size =3D ram_si=
-ze =3D FIRMWARE_START;
-> +=C2=A0=C2=A0=C2=A0 if (ram_size > 4 * GiB) {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Can not model =
-more than 4GB of RAM");
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exit(EXIT_FAILURE);
-> =C2=A0=C2=A0=C2=A0=C2=A0 }
+> User shouldn't be bothered with starting QEMU with valid CLI,
+> so for the sake of user convenience allow using -m 4G vs -m 3840M.
 >
-> =C2=A0=C2=A0=C2=A0=C2=A0 /* Main memory region. */
-> =C2=A0=C2=A0=C2=A0=C2=A0 ram_region =3D g_new(MemoryRegion, 1);
-> =C2=A0=C2=A0=C2=A0=C2=A0 memory_region_allocate_system_memory(ram_region=
-, OBJECT(machine),
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "ram", ram_size);
-> -=C2=A0=C2=A0=C2=A0 memory_region_add_subregion(addr_space, 0, ram_regio=
-n);
-> +=C2=A0=C2=A0=C2=A0 memory_region_add_subregion_overlap(addr_space, 0, r=
-am_region, -1);
+> Requested-by: Helge Deller <deller@gmx.de>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v2:
+>   - make main ram -1 prio, so it wouldn't conflict with other regions
+>     starting from 0xf9000000
 >
-> =C2=A0=C2=A0=C2=A0=C2=A0 /* Init Dino (PCI host bus chip).=C2=A0 */
-> =C2=A0=C2=A0=C2=A0=C2=A0 pci_bus =3D dino_init(addr_space, &rtc_irq, &se=
-rial_irq);
+> I dislike it but if you feel it's really necessary feel free to ack it.
+>
+> should be applied on top of:
+>   "hppa: drop RAM size fixup"
 
+Hello Igor,
+I appreciate that you are trying to make it more cleaner.
+But, can't you merge both of your patches to one patch?
+Right now you have one patch "hppa: drop RAM size fixup", which is
+what I think is wrong. Then you add another one which somehow
+fixes it up again and adds other stuff.
+Having everything in one single patch makes your full change more
+understandable.
 
-I haven't tested this patch, but that one seems good.
+Is it necessary to introduce clamped_ram_size and not continue with
+ram_size (even if you would add it as static local variable)?
 
 Helge
 
 
 > ---
+>  hw/hppa/machine.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
 >
-> $ hppa-softmmu/qemu-system-hppa -m 3840m -S -monitor stdio
-> QEMU 4.2.50 monitor - type 'help' for more information
-> (qemu) info mtree
-> address-space: memory
-> =C2=A0 0000000000000000-ffffffffffffffff (prio 0, i/o): system
-> =C2=A0=C2=A0=C2=A0 0000000000000000-00000000efffffff (prio -1, ram): ram
-> =C2=A0=C2=A0=C2=A0 00000000f0000000-00000000f07fffff (prio 0, ram): firm=
-ware
-> =C2=A0=C2=A0=C2=A0 00000000f9000000-00000000f90007ff (prio 0, i/o): isa-=
-io
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000f9000020-00000000f9000021 (prio 0=
-, i/o): pic
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000f9000070-00000000f9000071 (prio 0=
-, i/o): rtc
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000f9000070-00000000f900=
-0070 (prio 0, i/o): rtc-index
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000f90000a0-00000000f90000a1 (prio 0=
-, i/o): pic
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000f90004d0-00000000f90004d0 (prio 0=
-, i/o): elcr
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000f90004d1-00000000f90004d1 (prio 0=
-, i/o): elcr
-> =C2=A0=C2=A0=C2=A0 00000000fff80000-00000000fff80fff (prio 0, i/o): dino
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000fff80064-00000000fff80067 (prio 0=
-, i/o): pci-conf-idx
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 00000000fff80068-00000000fff8006b (prio 0=
-, i/o): pci-conf-data
-> =C2=A0=C2=A0=C2=A0 00000000fff83800-00000000fff83807 (prio 0, i/o): seri=
-al
-> =C2=A0=C2=A0=C2=A0 00000000fffb0000-00000000fffb0003 (prio 0, i/o): cpu0=
--io-eir
+> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> index ebbf44f..0302983 100644
+> --- a/hw/hppa/machine.c
+> +++ b/hw/hppa/machine.c
+> @@ -54,6 +54,7 @@ static uint64_t cpu_hppa_to_phys(void *opaque, uint64_=
+t addr)
+>
+>  static HPPACPU *cpu[HPPA_MAX_CPUS];
+>  static uint64_t firmware_entry;
+> +static ram_addr_t clamped_ram_size;
+>
+>  static void machine_hppa_init(MachineState *machine)
+>  {
+> @@ -74,8 +75,6 @@ static void machine_hppa_init(MachineState *machine)
+>      long i;
+>      unsigned int smp_cpus =3D machine->smp.cpus;
+>
+> -    ram_size =3D machine->ram_size;
+> -
+>      /* Create CPUs.  */
+>      for (i =3D 0; i < smp_cpus; i++) {
+>          char *name =3D g_strdup_printf("cpu%ld-io-eir", i);
+> @@ -90,12 +89,14 @@ static void machine_hppa_init(MachineState *machine)
+>      }
+>
+>      /* Limit main memory. */
+> -    if (ram_size > FIRMWARE_START) {
+> -        error_report("RAM size more than %d is not supported", FIRMWARE=
+_START);
+> +    if (machine->ram_size > 4 * GiB) {
+> +        error_report("RAM size more than 4Gb is not supported");
+>          exit(EXIT_FAILURE);
+>      }
+> +    clamped_ram_size =3D machine->ram_size > FIRMWARE_START ?
+> +        FIRMWARE_START : machine->ram_size;
+>
+> -    memory_region_add_subregion(addr_space, 0, machine->ram);
+> +    memory_region_add_subregion_overlap(addr_space, 0, machine->ram, -1=
+);
+>
+>      /* Init Dino (PCI host bus chip).  */
+>      pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
+> @@ -151,7 +152,7 @@ static void machine_hppa_init(MachineState *machine)
+>      qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
+>                    "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
+>                    firmware_low, firmware_high, firmware_entry);
+> -    if (firmware_low < ram_size || firmware_high >=3D FIRMWARE_END) {
+> +    if (firmware_low < clamped_ram_size || firmware_high >=3D FIRMWARE_=
+END) {
+>          error_report("Firmware overlaps with memory or IO space");
+>          exit(1);
+>      }
+> @@ -204,7 +205,7 @@ static void machine_hppa_init(MachineState *machine)
+>                 (1) Due to sign-extension problems and PDC,
+>                 put the initrd no higher than 1G.
+>                 (2) Reserve 64k for stack.  */
+> -            initrd_base =3D MIN(ram_size, 1 * GiB);
+> +            initrd_base =3D MIN(clamped_ram_size, 1 * GiB);
+>              initrd_base =3D initrd_base - 64 * KiB;
+>              initrd_base =3D (initrd_base - initrd_size) & TARGET_PAGE_M=
+ASK;
+>
+> @@ -232,7 +233,7 @@ static void machine_hppa_init(MachineState *machine)
+>       * various parameters in registers. After firmware initialization,
+>       * firmware will start the Linux kernel with ramdisk and cmdline.
+>       */
+> -    cpu[0]->env.gr[26] =3D ram_size;
+> +    cpu[0]->env.gr[26] =3D clamped_ram_size;
+>      cpu[0]->env.gr[25] =3D kernel_entry;
+>
+>      /* tell firmware how many SMP CPUs to present in inventory table */
+> @@ -255,11 +256,11 @@ static void hppa_machine_reset(MachineState *ms)
+>      }
+>
+>      /* already initialized by machine_hppa_init()? */
+> -    if (cpu[0]->env.gr[26] =3D=3D ram_size) {
+> +    if (cpu[0]->env.gr[26] =3D=3D clamped_ram_size) {
+>          return;
+>      }
+>
+> -    cpu[0]->env.gr[26] =3D ram_size;
+> +    cpu[0]->env.gr[26] =3D clamped_ram_size;
+>      cpu[0]->env.gr[25] =3D 0; /* no firmware boot menu */
+>      cpu[0]->env.gr[24] =3D 'c';
+>      /* gr22/gr23 unused, no initrd while reboot. */
 >
 
 
