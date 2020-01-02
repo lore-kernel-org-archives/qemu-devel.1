@@ -2,102 +2,87 @@ Return-Path: <SRS0=Q/S9=2X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ED89C2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7B0C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:48:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B5F8215A4
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:47:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7A61215A4
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 14:48:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btEH6FDa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5F8215A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOMxL7Sg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A61215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1in1ka-00022O-C4
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 09:47:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41781)
+	id 1in1lu-00034E-Tv
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 09:48:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42139)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1in1jd-0001SE-UA
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:46:03 -0500
+ (envelope-from <stefanha@gmail.com>) id 1in1l1-0002Tn-HS
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:47:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1in1jc-0003sO-MW
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:46:01 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26062
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1in1jc-0003rs-J5
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:46:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1577976359;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Yls47jQK8SpQOvybOv9drIVcdElwSa1+Bi5RpxnZXAs=;
- b=btEH6FDaLFwBi1dZOGnOh5jOXNSvgraocK/LvvLf6Z/kF8rpBGczsKK+FFBaHqStDkYSWa
- nCFmoEkH99wRDWkYyo3f50j0PA0CbHLFD9ZzJf4k/jx3FQ8QVeo+VWUid6OxNHZ6P7O973
- lxubrFjBoIy2uLnu7T34F+umKYWgMSw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-I60EGi04Oe2JiIcJp9eXfw-1; Thu, 02 Jan 2020 09:45:58 -0500
-Received: by mail-wm1-f72.google.com with SMTP id h130so820544wme.7
- for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 06:45:57 -0800 (PST)
+ (envelope-from <stefanha@gmail.com>) id 1in1l0-0004XT-5W
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:47:27 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:35463)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1in1kz-0004XE-Sd
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 09:47:26 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id p17so5868663wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 06:47:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=HFWandZ948+NYHiu+wRtaAleKYJy+O19h5qYbdqXyUk=;
+ b=FOMxL7Sg1y9trnbBFHojHif4+uNBo/foviXSPzi1GMLsLkQ5NBE9HToDRcw6Da+/l9
+ OpA0CNs4+yU29GNH7zQChvAD5tUq0+XKIJNNgx+y0QVItjeIkRRdEOmTjLoDvTnmtSNo
+ VzfA0YfnvcFscBpZMLY3BZxUTheEnAOGdtTFLdkzK0dgVfOqKqYi9fwehuqFUwq4zNIW
+ IEcO2opSknNrZM+27mewV/56Yy1ZBSkSkE06CE5sni/kQNmslG6QJ5NRbCbyECHyLAZ1
+ S4noA/lms42Ir7/Q/ZaDLEGRq/tdtAX+0M32GIge9Z7den+nbRXIlES8jGfuG17JG0wR
+ Q74g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mA7dgI6yltfpBR/sYgtBdnSobk2/vz2JLBcyQqsoHVQ=;
- b=GSnmF3pfjpVeeIih1q13XdyQq4RfvQ6HwnDjg+zYEPCg/K1FaNI3igYnI+gi9/QJQA
- 3/Hnr05PYmgrRo6m4ZaTGJofLuOdGZ8+tzClDvuvx8o1hnIstcI5K/jPVV5Ec7uPP5Nr
- luwnqa7ATTyTyaiR8CsVlhOBkansavKte8ZiTo2GrLxm6BqIPIvLNSVDUjCDRIwG+UFk
- OeXFXawdVdiK7pUBX0Z8CfUXRdTx8iz6lp+EujVQeFQJ8+5ua2BiEHrA0doEcg9nUvpz
- qlJTOW+lM5gtMekFyLgSAJOqOSUSZeJzVbNzgDPGWLNz6fBTEEI96Spc2Q0zmqZyGM97
- a+EA==
-X-Gm-Message-State: APjAAAWM6ilzHeJiCvOMQOyfWqDyi3oziOB5WoHaycmP5dEzL/tJCCif
- Im07Jrs8UCJ0l47QS7yl4SjC09OrMxa5EhjnXxrL6DXx26G9QAQ9v3VayvAeBc/GeUUBoNPQwGk
- Jd5FWUT3FA7+/PM0=
-X-Received: by 2002:adf:fd87:: with SMTP id d7mr82779090wrr.226.1577976357035; 
- Thu, 02 Jan 2020 06:45:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqydjN9uFWjDzY/dmO7+ji9YB8BWY8sTT0c/9P6bIlOD0xLW+PVho5gtcH8vFywrmsEMJnkQaw==
-X-Received: by 2002:adf:fd87:: with SMTP id d7mr82779080wrr.226.1577976356795; 
- Thu, 02 Jan 2020 06:45:56 -0800 (PST)
-Received: from [192.168.50.32] (243.red-88-26-246.staticip.rima-tde.net.
- [88.26.246.243])
- by smtp.gmail.com with ESMTPSA id g23sm8688291wmk.14.2020.01.02.06.45.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Jan 2020 06:45:56 -0800 (PST)
-Subject: Re: [PATCH 43/86] hppa: drop RAM size fixup
-To: Igor Mammedov <imammedo@redhat.com>, Helge Deller <deller@gmx.de>
-References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
- <1577797450-88458-44-git-send-email-imammedo@redhat.com>
- <bc7bac60-0d20-d0e3-b9ac-2c9ff62c2c15@redhat.com>
- <8cb7bd0f-7841-7e60-8de6-708515b81b00@gmx.de>
- <20200102154158.460b2da6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2953de56-4544-1727-3454-18dc1c19821b@redhat.com>
-Date: Thu, 2 Jan 2020 15:45:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=HFWandZ948+NYHiu+wRtaAleKYJy+O19h5qYbdqXyUk=;
+ b=VM3YltUSGeUZAhS0Mu6Z7ERaVJJaQsyZmsaxB10BR7KvAMyPTsK3wDm+Pktkr7s2OO
+ 3Jay2NnN3L3IY//u3fX8+33GNLfrQHL0Ax6quVICkkWnSxNRvg41JzU3lbTbHXtTD2P3
+ Wna/pBK7svN1oQ7BWReSmVcIvj8t7GLnUVc0bNBmH9AcaJAYP4/KQxs6Cu3DfxrIlagk
+ 3msPKTKXM+84kAtc7kti85q/W0J13AjzmkL/aCs+5BtXGnt0aEGozpL93jSsi+YtGMRw
+ Yd1nWlqCV0LlRqPtTX2RNISMEPCSIQIP1TFbMfQPnMNmY2V3zM+c9sSLzZoGZ0zByer1
+ mFNA==
+X-Gm-Message-State: APjAAAVSQ4dnPrxLXjPmrPHVuJQSOXX1wkFOhCZ/buKJk7nmlmkdzTy4
+ h33B6gT5Yz7RLVH7wNRtHV0=
+X-Google-Smtp-Source: APXvYqwgv83coufRw+pWXKG+aRVxFBziD4nnTxeqkP+nSucCYKVmQNVT9Fb+f5GNyUKaR3kTc/BQkg==
+X-Received: by 2002:a1c:9acf:: with SMTP id
+ c198mr14190161wme.175.1577976444403; 
+ Thu, 02 Jan 2020 06:47:24 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id p17sm57096505wrx.20.2020.01.02.06.47.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 02 Jan 2020 06:47:23 -0800 (PST)
+Date: Thu, 2 Jan 2020 14:47:22 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200102144722.GL121208@stefanha-x1.localdomain>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <87h81unja8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20200102154158.460b2da6@redhat.com>
-Content-Language: en-US
-X-MC-Unique: I60EGi04Oe2JiIcJp9eXfw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+278g007AL/ykmV8"
+Content-Disposition: inline
+In-Reply-To: <87h81unja8.fsf@dusky.pond.sub.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,82 +94,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/2/20 3:41 PM, Igor Mammedov wrote:
-> On Thu, 2 Jan 2020 12:31:58 +0100
-> Helge Deller <deller@gmx.de> wrote:
->=20
->> On 31.12.19 16:44, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 12/31/19 2:03 PM, Igor Mammedov wrote:
->>>> If user provided non-sense RAM size, board will complain and
->>>> continue running with max RAM size supported.
->>>> Also RAM is going to be allocated by generic code, so it won't be
->>>> possible for board to fix things up for user.
->>>>
->>>> Make it error message and exit to force user fix CLI,
->>>> instead of accepting non-sense CLI values.
->>>>
->>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>> ---
->>>>  =C2=A0 hw/hppa/machine.c | 3 ++-
->>>>  =C2=A0 1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
->>>> index 5d0de26..25f5afc 100644
->>>> --- a/hw/hppa/machine.c
->>>> +++ b/hw/hppa/machine.c
->>>> @@ -92,7 +92,8 @@ static void machine_hppa_init(MachineState *machine)
->>>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Limit main memory. */
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ram_size > FIRMWARE_START) {
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine->ram_size =3D ram_=
-size =3D FIRMWARE_START;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("RAM size mor=
-e than %d is not supported", FIRMWARE_START);
->>>> +        exit(EXIT_FAILURE);
->>>
->>> $ qemu-system-hppa -m 3841m
->>> qemu-system-hppa: invalid accelerator kvm
->>> qemu-system-hppa: falling back to tcg
->>> qemu-system-hppa: RAM size more than -268435456 is not supported
->>>
->>> Instead of using qemu_strtosz_MiB on FIRMWARE_START or unsigned format,=
- we can simply use "RAM size more than 3840m is not supported". Is that OK =
-with you?
->>
->> I don't really like that change.
->>
->> We currently only emulate a 32-bit system, and for those 4GB is the maxi=
-mum.
->> So, if I start my machine with "qemu-system-hppa -m 4G", the current cod=
-e
->> then automatically uses the maximum possible of 3841MB (which is limited=
- by
->> firmware start address).
->> I don't expect users to know the excact 3841MB number.
-> It's annoying to see a error where it used to work before
-> with no matter what -m value user have used.
->=20
-> But error message tells exact max size one could use,
-> so user doesn't have to know max, just fix CLI with provided value.
->=20
->> Even on a phyiscal machine you can only add DIMMs of sizes 2GB, 3GB or 4=
-GB,
->> but not "3841MB".
->>
->> So, I think that patch is - although it's more correct - not a
->> benefit for the end user.
-> Sure thing that users dislike when we do breaking changes (removing legac=
-y CLI
-> options, fixups or adding error checks that weren't there before).
-> But I'd choose correctness (and consistent codebase) vs convenience.
-> (it's no like we are hiding max from user)
 
-Going from 3841MB to 4GB is not a breaking change, and 4GB is correct I=20
-think. The Raspberry Pi machines do the same (allocate more RAM than the=20
-CPU is able to access, and DMA is able to use this extra RAM).
+--+278g007AL/ykmV8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Dec 21, 2019 at 10:02:23AM +0100, Markus Armbruster wrote:
+> Stefan Hajnoczi <stefanha@gmail.com> writes:
+>=20
+> > Hi,
+> > QEMU presents a command-line interface and QMP monitor for
+> > applications to interact with.  Applications actually need API
+> > bindings in their programming language.  Bindings avoid reimplementing
+> > code to spawn a QEMU process and interact with QMP.  QEMU is kind of
+> > lazy and de facto relies on libvirt for API bindings.
+> >
+> > Is it time for better QEMU APIs?
+> >
+> > 1. We have qapi-schema.json.  Let's render to HTML and publish
+> > versioned documentation online.
+>=20
+> Make can build docs/interop/qemu-qmp-ref.{7,html,info,pdf,txt}.  Grab
+> the .html and go for it.  There's also qmp-ga-ref.
+
+The missing step here is to integrate doc generation and upload into the
+release process so the documentation is published.
+
+Once my recent documentation publishing patches have been merged I'll
+see if Mike Roth wants to extend the release scripts.
+
+> > 2. scripts/qmp/ contains command-line tools for QMP communication.
+> > They could use some polish and then be shipped.
+>=20
+> MAINTAINERS blames them on me, but they're effectively unmaintained.
+> Prerequisite for shipping: having a maintainer who actually gives a
+> damn.
+=2E..
+> * scripts/qmp/qmp-shell
+>=20
+>   Half-hearted attempt at a human-friendly wrapper around the JSON
+>   syntax.  I have no use for this myself.
+
+I think this one is used by people.  John Snow comes to mind.
+
+> > 3. python/qemu/ contains Python modules for managing a QEMU process
+> > and QMP communication.  This should be packaged in distros and
+> > available on PyPI.
+>=20
+> Currently maintained by Eduardo and Cleber (cc'ed) under "Python
+> scripts".
+>=20
+> > 4. Go and Rust bindings would also be useful.  There is
+> > https://github.com/intel/govmm but I think it makes sense to keep it
+> > in qemu.git and provide an interface similar to our Python modules.
+>=20
+> Mapping QAPI/QMP commands and events to function signatures isn't hard
+> (the QAPI code generator does).  Two problems (at least):
+>=20
+> 1. Leads to some pretty ridiculous functions.  Here's one:
+>=20
+>     void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+>                              const char *device,
+>                              const char *target,
+>                              bool has_replaces, const char *replaces,
+>                              MirrorSyncMode sync,
+>                              bool has_speed, int64_t speed,
+>                              bool has_granularity, uint32_t granularity,
+>                              bool has_buf_size, int64_t buf_size,
+>                              bool has_on_source_error,
+>                              BlockdevOnError on_source_error,
+>                              bool has_on_target_error, BlockdevOnError on=
+_target_error,
+>                              bool has_filter_node_name, const char *filte=
+r_node_name,
+>                              bool has_copy_mode, MirrorCopyMode copy_mode=
+,=20
+>                              bool has_auto_finalize, bool auto_finalize,
+>                              bool has_auto_dismiss, bool auto_dismiss,
+>                              Error **errp);
+>=20
+>   We commonly use 'boxed': true for such beasts, which results in
+>   functions like this one:
+>=20
+>     void qmp_blockdev_add(BlockdevOptions *arg, Error **errp);
+>=20
+> 2. Many schema changes that are nicely backward compatible in QMP are
+>    anything but in such an "obvious" C API.  Adding optional arguments,
+>    for instance, or changing integer type width.  The former is less of
+>    an issue with 'boxed': true.
+>=20
+> Perhaps less of an issue with dynamic languages.
+>=20
+> I figure a static language would need much more expressive oomph than C
+> to be a good target.  No idea how well Go or Rust bindings can work.
+
+Most of what govmm does is build QEMU command-lines, not wrap QMP APIs.
+
+Native QMP API bindings are harder and we'd need to see who really needs
+this.  Languages with a built-in dict type like Python make working with
+JSON-level QMP feasible.  In C it's painful though and native API
+bindings are desirable.
+
+--+278g007AL/ykmV8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4OAnkACgkQnKSrs4Gr
+c8gaoQf/dVcjER4HurjzBGW25WV9OsxxsKfC0lJ32DsedLrGezZEhXQUhdfkjMuk
++Esu52/ZePFplPiA/01Y3rPKVPEDUEi8eJvA3mnBTaF7W/qv8UACHzVT5t0Kx/Vh
+c6oE38DJlYz3j3KmyjdRvPkievqDupgmeqNo9aiQyYH0IeG8mKm3B26urSuuoP27
+pZMM+IkAdPoOPzQT9l5zpQLsYh9smdIgL+vgTCjEZ7fZytZJlvI64HIqcbT/x3ZW
+56OpuuRuDJtrzB9XDGy7838t2zVx3Ej8/PPhNdQnlo3rfHUByRyoeDzYZ+wkjQK0
+Q8i5BlqpMs3PdFA+UY+dLeTVl8i+Jg==
+=s6Ci
+-----END PGP SIGNATURE-----
+
+--+278g007AL/ykmV8--
 
