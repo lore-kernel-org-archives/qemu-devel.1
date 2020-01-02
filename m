@@ -2,77 +2,77 @@ Return-Path: <SRS0=Q/S9=2X=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807BBC2D0DC
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED93C2D0DC
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AB8821655
-	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BA8D21655
+	for <qemu-devel@archiver.kernel.org>; Thu,  2 Jan 2020 10:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y5MurfWr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AB8821655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XkG1gm8w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA8D21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1imxIp-0004q5-CT
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 05:02:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34260)
+	id 1imxLy-0006QS-65
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 05:05:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34647)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1imxHt-00047f-Mq
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:01:06 -0500
+ (envelope-from <stefanha@gmail.com>) id 1imxLM-00060Z-B3
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:04:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1imxHs-00083c-Iz
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:01:05 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35107)
+ (envelope-from <stefanha@gmail.com>) id 1imxLL-0001eS-7R
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:04:40 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46378)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1imxHs-00082H-Bx
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:01:04 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p17so5169130wmb.0
- for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 02:01:03 -0800 (PST)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1imxLL-0001dx-0l
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 05:04:39 -0500
+Received: by mail-wr1-x442.google.com with SMTP id z7so38620273wrl.13
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 02:04:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=nlGFmFXCeeyouI9K+jx8ZyRb1E4SG7cNAhsATuXNtLM=;
- b=Y5MurfWrH6BTZzdWXaeNdsxCI7GHn7ipgM14H4l7PYVcP3TlV4YtdQnkKcCvCek5EV
- qEKf64/zlXRfa7X4Gxtn47SctWsBYJnzQ0RpjKFpb2BXgBZimJrHzHKUj3zt63p/TjMl
- rSJGIAiokHcgGTIWJrCvnjYdCdeRpl+ZDtFkm13greR0IQo3xL5EynY6g9B+A1Dpw7vn
- MB06/L+5v6NOK2kk43iCZ12fflRMLgi7Oz6nJcX7u0aj5nXhW7CcCipXCjJyV2wG/1Zp
- sMXIiIsr554nmB2gqOtGMPkl18kSC5S6NDYomb4v3mlDjCwLR/c8Uk/oHpzCjLICLLsN
- tosA==
+ bh=BATLscc48mfHUpWif2MffqTYB0WOvlMP8x34gDnT0f4=;
+ b=XkG1gm8wF9lRdaqt2O5JEkYUggUSsSkbq2f19Dfk/wYIZsxgDMuVe3mOwY0fZjFI5Z
+ 4huKU/4fwyGvh8esYRerCssaopOO0R00KwjnOdFumFYBgJfk2kqofhKFp4SAUeGFxKyf
+ xyIIa4Vmfov9GUfXFVfaUL1X9c3wqmqWQXkojBkPdv7uFzi5YCeduQqwuQU6M9Ve8r5U
+ JHgusUjEGNgXjq32hSh63R31gBzpFA1MLJpz5Fe+TicVVHfrO7c7yWdkyp7HZzsJnolb
+ Gd1DhxotKIWUxYzP3o6vHo11oU2RoZ8l1uxc7f/E3IFMNxXyIXPrMLU4t+68kESvEiwe
+ CTAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=nlGFmFXCeeyouI9K+jx8ZyRb1E4SG7cNAhsATuXNtLM=;
- b=ByvuN/zVhrEb2kwwrjYY7+9yyysnjEMwsbnmXxx/ftfjqDJHr6tZ7bDlUro8NW7AGx
- bnzL6UdElILX0rriJkHmJNg4PvyKjTJypW8p9JYUFVbQz4KwFdRKHij43g3o34iQFG0s
- OuEJXuZ+vkDzYFwAA6hMN/SLSENo/8GBXcZl6xPGXSDpHfdYXdvl+D1cT9DFGEkCIzlw
- xcTpX98JhpVTl5A2eJmqh2QRTRX2Oy3+ZeDiEYBEPUAAUNlQCCs5irJWCL4nH8Ajw+ft
- n3VIffjXdWlLiK1bDYexvG3jmQEBWzOdjO/ebIzObOvfmKYUSgaurWzh23+FBPhfChOY
- CyYA==
-X-Gm-Message-State: APjAAAWIMmrYpIG/raRewwvg6daygrenvE7u8oqJ0WurWPTwvMy2nJuW
- +wEw+DJ9F1AAxnDjntdseOM=
-X-Google-Smtp-Source: APXvYqwoJZJVj3fzc1zHDfZOVP5colMKJ1CXrguGopS5eBbHSeVDpicKeh5llPtxZGhSQgmNjCqkhQ==
-X-Received: by 2002:a7b:cbcd:: with SMTP id n13mr13514288wmi.104.1577959262765; 
- Thu, 02 Jan 2020 02:01:02 -0800 (PST)
+ bh=BATLscc48mfHUpWif2MffqTYB0WOvlMP8x34gDnT0f4=;
+ b=MY4aIQgrY5bXl/e4vkrbDkVzNrGoHnz9TUshlhGKEWLGPk/OE/xJAO0ugian6c0AzX
+ cZ9LtpszeZXX/GAr41XsK0QXnlfHq2+nuYkURLBcKLaz+OUSeQ611dmW6vx9FfSwIbJR
+ +FCjpbHGwAZn/Sz0BtQb290Ygvdv+5t+gB0/yhi5TyS3Y8bfgQu/839JqemhHbfl8JAp
+ iqMUOU/ya3JO0VyRYlhzRBuZ9MK8WSP8vt1iWjMFUtNXMK4VSGWjutOqBuTreY0PWau0
+ cZOY1+rGIQgQFYhA7U5gz9udBZtWNwrb/mAi9O1uYNjaAIG6YrVcbTib+fsHslBu3xss
+ yo5g==
+X-Gm-Message-State: APjAAAWVcWBD0Gi4HarqSoeMS1Dm3nx1h+YaiLT75cRZUQIqMlWxaZGC
+ BZM8QZOBgh/12PqWi/uOkNU=
+X-Google-Smtp-Source: APXvYqwusked7iws9NCc6COOQgk2t3y/GJofo1F6t8PaQu9FGW9Chv0dSTVFJFCOU74DMAN8k2JTJA==
+X-Received: by 2002:a5d:4602:: with SMTP id t2mr80033857wrq.37.1577959477994; 
+ Thu, 02 Jan 2020 02:04:37 -0800 (PST)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id d14sm57308705wru.9.2020.01.02.02.01.00
+ by smtp.gmail.com with ESMTPSA id g18sm7974324wmh.48.2020.01.02.02.04.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Jan 2020 02:01:01 -0800 (PST)
-Date: Thu, 2 Jan 2020 10:00:59 +0000
+ Thu, 02 Jan 2020 02:04:37 -0800 (PST)
+Date: Thu, 2 Jan 2020 10:04:35 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
 To: John G Johnson <john.g.johnson@oracle.com>
 Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
  status update
-Message-ID: <20200102100059.GD121208@stefanha-x1.localdomain>
+Message-ID: <20200102100435.GE121208@stefanha-x1.localdomain>
 References: <cover.1571905346.git.jag.raman@oracle.com>
  <20191210064716.GA6401@flaka>
  <20191213104116.GB1180977@stefanha-x1.localdomain>
@@ -85,12 +85,12 @@ References: <cover.1571905346.git.jag.raman@oracle.com>
  <D60846D3-5434-4EF8-B25F-7C70F4FA5367@oracle.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IDYEmSnFhs3mNXr+"
+ protocol="application/pgp-signature"; boundary="XuV1QlJbYrcVoo+x"
 Content-Disposition: inline
 In-Reply-To: <D60846D3-5434-4EF8-B25F-7C70F4FA5367@oracle.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,7 +129,7 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---IDYEmSnFhs3mNXr+
+--XuV1QlJbYrcVoo+x
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -143,25 +143,26 @@ On Fri, Dec 20, 2019 at 09:15:40AM -0800, John G Johnson wrote:
 > guest memory to the emulation program, and it mmap()s them itself. (ala
 > vhost-user).
 
-Does muser really require pinning?  If yes, then it seems like a
-limitation that can be removed in the future.
+Please ignore my reply.  I just saw pinning was discussed in another
+sub-thread.  Felipe posted this URL for tracking the issue:
+https://github.com/nutanix/muser/issues/28
 
 Stefan
 
---IDYEmSnFhs3mNXr+
+--XuV1QlJbYrcVoo+x
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4Nv1sACgkQnKSrs4Gr
-c8iD3Af9Ec9LZ8BtMbSlbljxRWrdCaLLTtvLgZ6i72hj2Hg3vi5PMPvaaTa1giPE
-938UZozFz/mEPFu6U92TM9vuPmFky+7IMM5ZyGD/VHpgI3wskli04QH6Iz7gzbFt
-a/nSrdK4TymtKvsdLrgDqqdb8JlIqUWwFF9mI8K8tU3VDqCUyKQv5M5P80agYyiv
-S3a2zjQFdKokmb2FNMrfKQf4OdPMqoAX2h/OhU8Xy8RtRhiD2ORv8y3uv4dbDmje
-YFXhBms45IsbGr0t4Ss2QxeeVXy+A1UVJxpCTiFYBQl91Phlo17JzLoV1xNX+o7c
-ntXfLaBSP1AdnzzuWWc3ABLSZDrBzA==
-=3Qlq
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4NwDMACgkQnKSrs4Gr
+c8gH3AgApQpzTmHr9426jMnxTyasd+LSridNEX4kL6LO8gyBNmT9HS/a9IEusPO4
+z+ULjNP91WwNlEW1449+XrUyvWCP0/Mtmtanzzng+xvEhfK0S7Mpi/vXLu+YGWc0
+/EoQGttI81rtjwo5AfCEiX1mj+kPep8U8BQ9oXFRLm0a4MI1P4p07K0jNgsDhjv3
+9RZhoHfMw1DJDEIbjPqhpNHLoSBvenm5Kqq72pCmwFVN7zsIbbWjGaag4DUxR7X1
+LuzVArj7MjmDNgJN/k55PIawByd+ScNvRxMaKUs1Zh/an1xM5R70UaTpLx50m51D
+kYiYlx82KWwnacWaiHHMo5mg0Re6nw==
+=02Ib
 -----END PGP SIGNATURE-----
 
---IDYEmSnFhs3mNXr+--
+--XuV1QlJbYrcVoo+x--
 
