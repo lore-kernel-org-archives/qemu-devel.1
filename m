@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FADC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 15:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BEFC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 15:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC38E21734
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 15:37:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE61A21734
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 15:41:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AoShyfqG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC38E21734
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="inMsBFbC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE61A21734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inP1H-00048k-Pp
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 10:37:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44572)
+	id 1inP5G-00062Z-Ra
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 10:41:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53062)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1inP0a-0003Qy-Um
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:37:06 -0500
+ (envelope-from <berrange@redhat.com>) id 1inP4f-0005cl-7d
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:41:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1inP0Z-00008J-R1
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:37:04 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49451
+ (envelope-from <berrange@redhat.com>) id 1inP4e-0002nw-6c
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:41:17 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28827
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1inP0S-00005K-Kx
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:37:03 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1inP4e-0002kw-0F
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:41:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578065815;
+ s=mimecast20190719; t=1578066075;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zvi4sVQyrTKVR9ceyFBFySdwA4bl/Wmt5dp1F9NouyI=;
- b=AoShyfqGFZ3D4gbBwVjTF+dHPGCC1Oe5b/UkJ1EIcqF3ZLBicK5QX495AZVn5JcPrSUi14
- 44jQSGpPCW4VBccEKI0+5/EZzArPwjZVdNDjIX2CUb7bHDUoyEHTlFTOYconuwE786ii0U
- xxgOKeUlYoHYtpCxD/ZGViuksFO0yqY=
+ bh=eVYI+y7q1RXAH43Wa58MH8psjqOKC1qHBVeuiKGzfQY=;
+ b=inMsBFbCoFo4H6KqmZhOhtumHi3/9ml7NLtQeA7V5re51+8vWBSRMZc8HQQh3OGo1gPmkE
+ 2oXgCLh0WyrZo0x5FMJyNYYmzqlRmHROI7Cwe9+cpaRndTwOu5DtguQo5T0fml8ys3rwIX
+ Qza27EIyFlcTO/q/ePlqzpdpetedblk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-bHQIZC4-N3GWw2zb0BaSEQ-1; Fri, 03 Jan 2020 10:36:54 -0500
+ us-mta-246-Q_TPWy_kPFeNZBX6Nd0DRw-1; Fri, 03 Jan 2020 10:41:14 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DCB2477
- for <qemu-devel@nongnu.org>; Fri,  3 Jan 2020 15:36:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 316108A20A2
+ for <qemu-devel@nongnu.org>; Fri,  3 Jan 2020 15:41:13 +0000 (UTC)
 Received: from redhat.com (ovpn-112-41.ams2.redhat.com [10.36.112.41])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CE2E85C28F;
- Fri,  3 Jan 2020 15:36:49 +0000 (UTC)
-Date: Fri, 3 Jan 2020 15:36:46 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E3945C548;
+ Fri,  3 Jan 2020 15:41:08 +0000 (UTC)
+Date: Fri, 3 Jan 2020 15:41:05 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 023/104] virtiofsd: Send replies to messages
-Message-ID: <20200103153646.GQ2753983@redhat.com>
+Subject: Re: [PATCH 024/104] virtiofsd: Keep track of replies
+Message-ID: <20200103154105.GR2753983@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-24-dgilbert@redhat.com>
+ <20191212163904.159893-25-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-24-dgilbert@redhat.com>
+In-Reply-To: <20191212163904.159893-25-dgilbert@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: bHQIZC4-N3GWw2zb0BaSEQ-1
+X-MC-Unique: Q_TPWy_kPFeNZBX6Nd0DRw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -95,19 +95,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:37:43PM +0000, Dr. David Alan Gilbert (git) wrot=
+On Thu, Dec 12, 2019 at 04:37:44PM +0000, Dr. David Alan Gilbert (git) wrot=
 e:
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >=20
-> Route fuse out messages back through the same queue elements
-> that had the command that triggered the request.
+> Keep track of whether we sent a reply to a request; this is a bit
+> paranoid but it means:
+>   a) We should always recycle an element even if there was an error
+>      in the request
+>   b) Never try and send two replies on one queue element
 >=20
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  tools/virtiofsd/fuse_lowlevel.c |   4 ++
->  tools/virtiofsd/fuse_virtio.c   | 107 ++++++++++++++++++++++++++++++--
->  tools/virtiofsd/fuse_virtio.h   |   4 ++
->  3 files changed, 111 insertions(+), 4 deletions(-)
+>  tools/virtiofsd/fuse_virtio.c | 23 ++++++++++++++++++++---
+>  1 file changed, 20 insertions(+), 3 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
