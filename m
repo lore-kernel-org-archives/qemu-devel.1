@@ -2,82 +2,81 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14570C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2107AC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D413A20848
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:05:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFD7820848
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:06:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SPs+5s1p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D413A20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xzLQhi82"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD7820848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inLhc-0007v5-1y
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 07:05:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41447)
+	id 1inLiQ-0000SV-1x
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 07:06:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45800)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1inLgt-0007Ki-Hx
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:04:32 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1inLhj-0008GW-8l
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:05:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1inLgr-0000D3-0V
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:04:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58584
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1inLgq-00009H-PZ
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:04:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578053068;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SIhqbFjZJ01b4yzuronp1xBl1VANvp5tWkW4eu66PFs=;
- b=SPs+5s1pHwbhRSJkGPkLrm9O1+HgL6X6zbUiDSHot8BL+7/eCtUH9/g0ZaxHbyzZxrzGvv
- LN8w04Dy9zhwOKASZpqb3hP+SFoHBgkl8v/smPgBKPYJRejfyrpI0ZKiJjNTcp8rlKaziS
- GZ3xksilmq311yXVEF6pzn1Rf7twoHw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-sageCbhxMYui709XdWDmaQ-1; Fri, 03 Jan 2020 07:04:26 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F0F3477
- for <qemu-devel@nongnu.org>; Fri,  3 Jan 2020 12:04:25 +0000 (UTC)
-Received: from redhat.com (ovpn-112-41.ams2.redhat.com [10.36.112.41])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E25E84666;
- Fri,  3 Jan 2020 12:04:20 +0000 (UTC)
-Date: Fri, 3 Jan 2020 12:04:17 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 007/104] virtiofsd: Format imported files to qemu style
-Message-ID: <20200103120417.GM2753983@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-8-dgilbert@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1inLhh-0004Ec-Tf
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:05:23 -0500
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:33316)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1inLhh-00048N-Im
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:05:21 -0500
+Received: by mail-oi1-x22d.google.com with SMTP id v140so14142849oie.0
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 04:05:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=SpyBTMyj0svKRO+0dlhe4l8qHXDJqvarVDOn1TRqPOo=;
+ b=xzLQhi82E0dJ3XFvdHGcln5XykOvpV5LSjQWEN7X48RxCjynkomhKnoFn/pOzGMuMi
+ S71lUf8Bs0a9Uf12nifRrN6o2zcqtrG+aAd4QrBhfQ2zjiOLKJg6hffXhi7EP9WUdMDW
+ bjTtGEOkh+6BynKtIbgEJMzmhBl7lwnkNSnxun8hEsuIn6dcP/TSbJ3zAuEjfxXTpO23
+ 7FkghNOtZ55sLpreKRrIaudk+8MzCvtySXUGTmhFlNR0D1bznvPaEkz4p8KQq/2SL5hx
+ L10+8Z6OAEA35++2qY4eTzE7wna/u8m6Es93EN98kF3HiJvYtHfKItIWrasrhAirrFhQ
+ ucNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=SpyBTMyj0svKRO+0dlhe4l8qHXDJqvarVDOn1TRqPOo=;
+ b=GuBgXVSASTFSZlcjI16Or7Ezz+YF3+S6Lz/g8s+6hAuLcfJuVCxQ8nub9psMuCLBLk
+ XQAYwaXUt37yUe1DU2ILd4dba4Tp0H30vx6yfg3rvmyGs42Sn0nf/5elCtGe75ZZvvad
+ 1vnQz8k5TcjwmYMMk2POD95VPu0Q0/lyXCSpxg3tnl2BRKZzGTvjX1lrjtY5JrvZH36A
+ c2VNybE2n+aOS8G81xpanm0+WBHy3VpZwkuOEgROtNMsk2hb6ppngarP3sgF6x9LFqmY
+ FUCb7uvNhXvkT608NS+7JS8RS0qdfkVPcm7B3JbOvV/QAqeThfOGoamOShRIMzro1ygz
+ az3Q==
+X-Gm-Message-State: APjAAAWK5jAuUUCqAaxLxtLIeyY5/AGu0m5Vr9LW5gouL3GkCLdgR590
+ EBzRPBXltMs4uUxiT2c2sv7zGPgOgPJC64jVhfXdgQ==
+X-Google-Smtp-Source: APXvYqwqDIAuElnFPKmja7ppMg0UJZKFu8bY7H8swqBd20jSGOCCOoGb/JP0y93ZH5+h3T9wVytSSsRetHHJBD9Ic/I=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr3960824oid.98.1578053120317;
+ Fri, 03 Jan 2020 04:05:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-8-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: sageCbhxMYui709XdWDmaQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+References: <20191214094526.8698-1-cohuck@redhat.com>
+ <20191214094526.8698-17-cohuck@redhat.com>
+In-Reply-To: <20191214094526.8698-17-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jan 2020 12:05:08 +0000
+Message-ID: <CAFEAcA-0q006spm3Jya8MxxrpWTQB6=u5kspuZHzn3XURvefLA@mail.gmail.com>
+Subject: Re: [PULL v2 16/16] qga: fence guest-set-time if hwclock not available
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,151 +88,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:37:27PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Mostly using a set like:
->=20
-> indent -nut -i 4 -nlp -br -cs -ce --no-space-after-function-call-names fi=
-le
-> clang-format -style=3Dfile -i -- file
-> clang-tidy -fix-errors -checks=3Dreadability-braces-around-statements fil=
-e
-> clang-format -style=3Dfile -i -- file
->=20
-> With manual cleanups.
->=20
-> The .clang-format used is below.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
-> Language:        Cpp
-> AlignAfterOpenBracket: Align
-> AlignConsecutiveAssignments: false # although we like it, it creates chur=
-n
-> AlignConsecutiveDeclarations: false
-> AlignEscapedNewlinesLeft: true
-> AlignOperands:   true
-> AlignTrailingComments: false # churn
-> AllowAllParametersOfDeclarationOnNextLine: true
-> AllowShortBlocksOnASingleLine: false
-> AllowShortCaseLabelsOnASingleLine: false
-> AllowShortFunctionsOnASingleLine: None
-> AllowShortIfStatementsOnASingleLine: false
-> AllowShortLoopsOnASingleLine: false
-> AlwaysBreakAfterReturnType: None # AlwaysBreakAfterDefinitionReturnType i=
-s taken into account
-> AlwaysBreakBeforeMultilineStrings: false
-> BinPackArguments: true
-> BinPackParameters: true
-> BraceWrapping:
->   AfterControlStatement: false
->   AfterEnum:       false
->   AfterFunction:   true
->   AfterStruct:     false
->   AfterUnion:      false
->   BeforeElse:      false
->   IndentBraces:    false
-> BreakBeforeBinaryOperators: None
-> BreakBeforeBraces: Custom
-> BreakBeforeTernaryOperators: false
-> BreakStringLiterals: true
-> ColumnLimit:     80
-> ContinuationIndentWidth: 4
-> Cpp11BracedListStyle: false
-> DerivePointerAlignment: false
-> DisableFormat:   false
-> ForEachMacros:   [
->   'CPU_FOREACH',
->   'CPU_FOREACH_REVERSE',
->   'CPU_FOREACH_SAFE',
->   'IOMMU_NOTIFIER_FOREACH',
->   'QLIST_FOREACH',
->   'QLIST_FOREACH_ENTRY',
->   'QLIST_FOREACH_RCU',
->   'QLIST_FOREACH_SAFE',
->   'QLIST_FOREACH_SAFE_RCU',
->   'QSIMPLEQ_FOREACH',
->   'QSIMPLEQ_FOREACH_SAFE',
->   'QSLIST_FOREACH',
->   'QSLIST_FOREACH_SAFE',
->   'QTAILQ_FOREACH',
->   'QTAILQ_FOREACH_REVERSE',
->   'QTAILQ_FOREACH_SAFE',
->   'QTAILQ_RAW_FOREACH',
->   'RAMBLOCK_FOREACH'
-> ]
-> IncludeCategories:
->   - Regex:           '^"qemu/osdep.h'
->     Priority:        -3
->   - Regex:           '^"(block|chardev|crypto|disas|exec|fpu|hw|io|libdec=
-number|migration|monitor|net|qapi|qemu|qom|standard-headers|sysemu|ui)/'
->     Priority:        -2
->   - Regex:           '^"(elf.h|qemu-common.h|glib-compat.h|qemu-io.h|trac=
-e-tcg.h)'
->     Priority:        -1
->   - Regex:           '.*'
->     Priority:        1
-> IncludeIsMainRegex: '$'
-> IndentCaseLabels: false
-> IndentWidth:     4
-> IndentWrappedFunctionNames: false
-> KeepEmptyLinesAtTheStartOfBlocks: false
-> MacroBlockBegin: '.*_BEGIN$' # only PREC_BEGIN ?
-> MacroBlockEnd:   '.*_END$'
-> MaxEmptyLinesToKeep: 2
-> PointerAlignment: Right
-> ReflowComments:  true
-> SortIncludes:    true
-> SpaceAfterCStyleCast: false
-> SpaceBeforeAssignmentOperators: true
-> SpaceBeforeParens: ControlStatements
-> SpaceInEmptyParentheses: false
-> SpacesBeforeTrailingComments: 1
-> SpacesInContainerLiterals: true
-> SpacesInParentheses: false
-> SpacesInSquareBrackets: false
-> Standard:        Auto
-> UseTab:          Never
-> ...
+On Sat, 14 Dec 2019 at 09:46, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The Posix implementation of guest-set-time invokes hwclock to
+> set/retrieve the time to/from the hardware clock. If hwclock
+> is not available, the user is currently informed that "hwclock
+> failed to set hardware clock to system time", which is quite
+> misleading. This may happen e.g. on s390x, which has a different
+> timekeeping concept anyway.
+>
+> Let's check for the availability of the hwclock command and
+> return QERR_UNSUPPORTED for guest-set-time if it is not available.
+>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Message-Id: <20191205115350.18713-1-cohuck@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 > ---
->  tools/virtiofsd/buffer.c              |  550 ++--
->  tools/virtiofsd/fuse.h                | 1572 +++++------
->  tools/virtiofsd/fuse_common.h         |  764 ++---
->  tools/virtiofsd/fuse_i.h              |  127 +-
->  tools/virtiofsd/fuse_log.c            |   38 +-
->  tools/virtiofsd/fuse_log.h            |   32 +-
->  tools/virtiofsd/fuse_loop_mt.c        |   66 +-
->  tools/virtiofsd/fuse_lowlevel.c       | 3678 +++++++++++++------------
->  tools/virtiofsd/fuse_lowlevel.h       | 2401 ++++++++--------
->  tools/virtiofsd/fuse_misc.h           |   30 +-
->  tools/virtiofsd/fuse_opt.c            |  659 ++---
->  tools/virtiofsd/fuse_opt.h            |   79 +-
->  tools/virtiofsd/fuse_signals.c        |  118 +-
->  tools/virtiofsd/helper.c              |  517 ++--
->  tools/virtiofsd/passthrough_helpers.h |   33 +-
->  tools/virtiofsd/passthrough_ll.c      | 2063 +++++++-------
->  16 files changed, 6530 insertions(+), 6197 deletions(-)
+>  qga/commands-posix.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 1c1a165daed8..0be301a4ea77 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -156,6 +156,17 @@ void qmp_guest_set_time(bool has_time, int64_t time_=
+ns, Error **errp)
+>      pid_t pid;
+>      Error *local_err =3D NULL;
+>      struct timeval tv;
+> +    static const char hwclock_path[] =3D "/sbin/hwclock";
+> +    static int hwclock_available =3D -1;
+> +
+> +    if (hwclock_available < 0) {
+> +        hwclock_available =3D (access(hwclock_path, X_OK) =3D=3D 0);
+> +    }
+> +
+> +    if (!hwclock_available) {
+> +        error_setg(errp, QERR_UNSUPPORTED);
+> +        return;
+> +    }
+>
+>      /* If user has passed a time, validate and set it. */
+>      if (has_time) {
+> @@ -195,7 +206,7 @@ void qmp_guest_set_time(bool has_time, int64_t time_n=
+s, Error **errp)
+>
+>          /* Use '/sbin/hwclock -w' to set RTC from the system time,
+>           * or '/sbin/hwclock -s' to set the system time from RTC. */
+> -        execle("/sbin/hwclock", "hwclock", has_time ? "-w" : "-s",
+> +        execle(hwclock_path, "hwclock", has_time ? "-w" : "-s",
+>                 NULL, environ);
+>          _exit(EXIT_FAILURE);
+>      } else if (pid < 0) {
+> --
 
+FWIW, Coverity thought this might be a time-of-check-time-of-use
+bug based on our doing an access() check and then later doing
+an execle(). This seems like a false positive to me, so I've
+marked it as such (CID 1411029).
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+thanks
+-- PMM
 
