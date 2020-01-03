@@ -2,98 +2,86 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C447FC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 19:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC48C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 19:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B1E620866
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 19:38:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02C6E20866
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 19:46:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SQvBM5Ze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B1E620866
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDRN8tf9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C6E20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inSlt-0006yX-KO
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 14:38:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50851)
+	id 1inStW-0001o4-31
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 14:46:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1inSkd-00067B-Sr
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:36:55 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1inSsQ-00017h-PT
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:44:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1inSka-0004Y2-IO
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:36:50 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29010
+ (envelope-from <dgilbert@redhat.com>) id 1inSsO-0002lN-7j
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:44:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35811
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1inSka-0004Rp-4T
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:36:48 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1inSsN-0002iE-W7
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:44:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578080206;
+ s=mimecast20190719; t=1578080691;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cShQfQXu90uxLCw1PPex7aGCURKPjSBACR+xtDvYlZk=;
- b=SQvBM5Zeta+YrN6QC4vOE6H0DYTpiU0CLss/AG4oda+lntShh/dtKeHNyPJLSoZi1cczIr
- sFrZuTotWOnOqF8tlf8mWZkpsD1azIp6DdwzK5DqIhogxrBw98/gXGt/PmKIQbVyfJIkPh
- hexU/yuAvzJwust3deIwKtvvFkGLbFY=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-ZN1ODQy5MVWUGy08-L4MTA-1; Fri, 03 Jan 2020 14:36:43 -0500
-Received: by mail-qk1-f200.google.com with SMTP id l7so11466616qke.8
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 11:36:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=X/X1Qmanw8CICMN3evGP3+ifZr/jGld29lY2tUdSQVc=;
- b=qSoubsN4AWsw4Pw2Qy01520EqP0I44uJSm4rSPCXyDF0+un/WV3aB17grUr4ugM6Dy
- ZVXHg8X2E77/F80+1n/bqTL1MvA13CQzUyTcVZe7cGOKtx+oGMcmwUqjgGVNaqtxVjvC
- rcC6pS2CIC6PY0jbJ1Xned89SDQPB5zpyw9Qm07g0Ch3Hn+BofqZswKHIW048ZpxfrgK
- mWc/Tc6mG6sYG5nHSM2+otn4j05tSOvC1GGzwe+dC6/elYG1M5bUMVS2esnzpO719AaE
- p77xVwnL6C6iu+mW718+HySMSldxuxio5b2tGOt2HsP5+klEAmKpxi9t90G+BP2IgM+5
- IuHw==
-X-Gm-Message-State: APjAAAVluYOemBegoNfxYjhuB6EdNJctpFBZmjuIR6P/rQbT7hDF4btb
- 87LjbFCzEcF8FxFTi1pXPxmf+ijwzeNCMqAsQQKNm9ezm6jTJsoaOjeAFprlyUpy7LumjOIBjGV
- WBHKgG+I+TnzGu84=
-X-Received: by 2002:a05:620a:1116:: with SMTP id
- o22mr74074372qkk.190.1578080203069; 
- Fri, 03 Jan 2020 11:36:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxuKpK5MKco0LteK2ZDBqytRPfrzgW+JiwQ+amJbOPqfyk0BR3t1L9A+8dhT1twQQgOrFtXoQ==
-X-Received: by 2002:a05:620a:1116:: with SMTP id
- o22mr74074349qkk.190.1578080202772; 
- Fri, 03 Jan 2020 11:36:42 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
- by smtp.gmail.com with ESMTPSA id k73sm16931927qke.36.2020.01.03.11.36.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jan 2020 11:36:41 -0800 (PST)
-Date: Fri, 3 Jan 2020 14:36:40 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 0/2] Speed up QMP stream reading
-Message-ID: <20200103193640.GF157597@xz-x1>
-References: <20191219160756.22389-1-yury-kotov@yandex-team.ru>
- <87a77ndlms.fsf@dusky.pond.sub.org>
- <549941577104857@iva4-9c479177d279.qloud-c.yandex.net>
- <20200103110731.GC3804@work-vm> <20200103190627.GE157597@xz-x1>
+ bh=DI4YbcUxsETNrZgdLi6Uj/cUW7aqXTGGYTZfzozbiwM=;
+ b=EDRN8tf95QWDwe5t369Wbe4rxDi8RNoGYjdoWmsfO3B/46pDQByOQTQVSleqDWOZ5S0c/g
+ Qt3SMPdOlYrtUTgrx46NMl5pKzDW3utm/N4Sp9hVt0RqN7+Tp1VXf8qiTz0jsViPyrnpzX
+ njvJgGVrqlL7OXYEBbAFP28qz8tlVU4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-omuQXVJvMdOIfR5BA0srPA-1; Fri, 03 Jan 2020 14:44:47 -0500
+X-MC-Unique: omuQXVJvMdOIfR5BA0srPA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51A6B18552D1;
+ Fri,  3 Jan 2020 19:44:45 +0000 (UTC)
+Received: from work-vm (ovpn-117-78.ams2.redhat.com [10.36.117.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CD447D964;
+ Fri,  3 Jan 2020 19:44:36 +0000 (UTC)
+Date: Fri, 3 Jan 2020 19:44:34 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20200103194434.GT3804@work-vm>
+References: <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
+ <20191217051513.GE21868@joy-OptiPlex-7040>
+ <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
+ <20191217095110.GH21868@joy-OptiPlex-7040>
+ <0d9604d9-3bb2-6944-9858-983366f332bb@nvidia.com>
+ <20191218010451.GI21868@joy-OptiPlex-7040>
+ <20191218200552.GX3707@work-vm>
+ <20191219005749.GJ21868@joy-OptiPlex-7040>
+ <75c4f23b-b668-6edb-2f4e-191b253cede9@nvidia.com>
+ <20191220005836.GK21868@joy-OptiPlex-7040>
 MIME-Version: 1.0
-In-Reply-To: <20200103190627.GE157597@xz-x1>
-X-MC-Unique: ZN1ODQy5MVWUGy08-L4MTA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20191220005836.GK21868@joy-OptiPlex-7040>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,127 +93,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Yury Kotov <yury-kotov@yandex-team.ru>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- "Denis V. Lunev" <den@openvz.org>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 03, 2020 at 02:06:27PM -0500, Peter Xu wrote:
-> On Fri, Jan 03, 2020 at 11:07:31AM +0000, Dr. David Alan Gilbert wrote:
-> > * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> > > Hi!
-> > >=20
-> > > 20.12.2019, 19:09, "Markus Armbruster" <armbru@redhat.com>:
-> > > > Yury Kotov <yury-kotov@yandex-team.ru> writes:
-> > > >
-> > > >>  Hi,
-> > > >>
-> > > >>  This series is continuation of another one:
-> > > >>  [PATCH] monitor: Fix slow reading
-> > > >>  https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg03722.ht=
-ml
-> > > >>
-> > > >>  Which also tried to read more than one byte from a stream at a ti=
-me,
-> > > >>  but had some problems with OOB and HMP:
-> > > >>  https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg05018.ht=
-ml
-> > > >>
-> > > >>  This series is an attempt to fix problems described.
-> > > >
-> > > > Two problems: (1) breaks HMP migrate -d, and (2) need to think thro=
-ugh
-> > > > how this affects reading of QMP input, in particular OOB.
-> > > >
-> > > > This series refrains from changing HMP, thus avoids (1). Good.
-> > > >
-> > > > What about (2)? I'm feeling denser than usual today... Can you expl=
-ain
-> > > > real slow how QMP input works? PATCH 2 appears to splice in a ring
-> > > > buffer. Why is that needed?
-> > >=20
-> > > Yes, the second patch introduced the input ring buffer to store remai=
-ning
-> > > bytes while monitor is suspended.
-> > >=20
-> > > QMP input scheme:
-> > > 1. monitor_qmp_can_read returns a number of bytes, which it's ready t=
-o receive.
-> > >    Currently it returns 0 (if suspended) or 1 otherwise.
-> > >    In my patch: monitor_qmp_can_read returns a free size of the intro=
-duced
-> > >    ring buffer.
-> > >=20
-> > > 2. monitor_qmp_read receives and handles input bytes
-> > >    Currently it just puts received bytes into a json lexer.
-> > >    If monitor is suspended this function won't be called and thus it =
-won't
-> > >    process new command until monitor resume.
-> > >    In my patch: monitor_qmp_read stores input bytes into the buffer a=
-nd then
-> > >    handles bytes in the buffer one by one while monitor is not suspen=
-ded.
-> > >    So, it allows to be sure that the original logic is preserved and
-> > >    we won't handle new commands while monitor is suspended.
-> > >=20
-> > > 3. monitor_resume schedules monitor_accept_input which calls
-> > >    monitor_qmp_handle_inbuf which tries to handle remaining bytes
-> > >    in the buffer. monitor_accept_input is a BH scheduled by monitor_r=
-esume
-> > >    on monitor's aio context. It is needed to be sure, that we access
-> > >    the input buffer only in monitor's context.
-> > >=20
-> > > Example:
-> > > 1. QMP read 100 bytes
-> > > 2. Handle some command in the first 60 bytes
-> > > 3. For some reason, monitor becomes suspended after the first command
-> > > 4. 40 bytes are remaining
-> > > 5. After a while, something calls monitor_resume which handles
-> > >    the remaining bytes in the buffer (implicitly: resume -> sched bh =
--> buf)
-> > >=20
-> > > Actually, QMP continues to receive data even though the monitor is su=
-spended
-> > > until the buffer is full. But it doesn't process received data.
-> >=20
-> > I *think* that's OK for OOB; my reading is that prior to this set of
-> > patches, if you filled the queue (even with oob enabled) you could
-> > suspend the monitor and block - but you're just not supposed to be
-> > throwing commands quickly at an OOB monitor; but I'm cc'ing in Peter.
->=20
-> I read this first:
->=20
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg00472.html
->=20
-> Which makes sense to me.  From OOB POV, IMHO it's fine, because as
-> Markus pointed out that we only call emit() after the json
-> parser/streamer, so IIUC it should not be affected on how much we read
-> from the chardev frontend each time.
->=20
-> But from my understanding what Markus suggested has nothing to do with
-> the currently introduced ring buffer.  Also, from what I read above I
-> still didn't find anywhere that explained on why we need a ring buffer
-> (or I must have missed it).
+* Yan Zhao (yan.y.zhao@intel.com) wrote:
+> On Fri, Dec 20, 2019 at 12:21:45AM +0800, Kirti Wankhede wrote:
+> > 
+> > 
+> > On 12/19/2019 6:27 AM, Yan Zhao wrote:
+> > > On Thu, Dec 19, 2019 at 04:05:52AM +0800, Dr. David Alan Gilbert wrote:
+> > >> * Yan Zhao (yan.y.zhao@intel.com) wrote:
+> > >>> On Tue, Dec 17, 2019 at 07:47:05PM +0800, Kirti Wankhede wrote:
+> > >>>>
+> > >>>>
+> > >>>> On 12/17/2019 3:21 PM, Yan Zhao wrote:
+> > >>>>> On Tue, Dec 17, 2019 at 05:24:14PM +0800, Kirti Wankhede wrote:
+> > >>>>>>>>     
+> > >>>>>>>>     		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+> > >>>>>>>>     			-EFAULT : 0;
+> > >>>>>>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+> > >>>>>>>> +		struct vfio_iommu_type1_dirty_bitmap range;
+> > >>>>>>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+> > >>>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
+> > >>>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
+> > >>>>>>>> +		int ret;
+> > >>>>>>>> +
+> > >>>>>>>> +		if (!iommu->v2)
+> > >>>>>>>> +			return -EACCES;
+> > >>>>>>>> +
+> > >>>>>>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
+> > >>>>>>>> +				    bitmap);
+> > >>>>>>>> +
+> > >>>>>>>> +		if (copy_from_user(&range, (void __user *)arg, minsz))
+> > >>>>>>>> +			return -EFAULT;
+> > >>>>>>>> +
+> > >>>>>>>> +		if (range.argsz < minsz || range.flags & ~mask)
+> > >>>>>>>> +			return -EINVAL;
+> > >>>>>>>> +
+> > >>>>>>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> > >>>>>>>> +			iommu->dirty_page_tracking = true;
+> > >>>>>>>> +			return 0;
+> > >>>>>>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> > >>>>>>>> +			iommu->dirty_page_tracking = false;
+> > >>>>>>>> +
+> > >>>>>>>> +			mutex_lock(&iommu->lock);
+> > >>>>>>>> +			vfio_remove_unpinned_from_dma_list(iommu);
+> > >>>>>>>> +			mutex_unlock(&iommu->lock);
+> > >>>>>>>> +			return 0;
+> > >>>>>>>> +
+> > >>>>>>>> +		} else if (range.flags &
+> > >>>>>>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> > >>>>>>>> +			uint64_t iommu_pgmask;
+> > >>>>>>>> +			unsigned long pgshift = __ffs(range.pgsize);
+> > >>>>>>>> +			unsigned long *bitmap;
+> > >>>>>>>> +			long bsize;
+> > >>>>>>>> +
+> > >>>>>>>> +			iommu_pgmask =
+> > >>>>>>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> > >>>>>>>> +
+> > >>>>>>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> > >>>>>>>> +			    (range.pgsize - 1))
+> > >>>>>>>> +				return -EINVAL;
+> > >>>>>>>> +
+> > >>>>>>>> +			if (range.iova & iommu_pgmask)
+> > >>>>>>>> +				return -EINVAL;
+> > >>>>>>>> +			if (!range.size || range.size > SIZE_MAX)
+> > >>>>>>>> +				return -EINVAL;
+> > >>>>>>>> +			if (range.iova + range.size < range.iova)
+> > >>>>>>>> +				return -EINVAL;
+> > >>>>>>>> +
+> > >>>>>>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> > >>>>>>>> +						   range.bitmap_size);
+> > >>>>>>>> +			if (bsize)
+> > >>>>>>>> +				return ret;
+> > >>>>>>>> +
+> > >>>>>>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+> > >>>>>>>> +			if (!bitmap)
+> > >>>>>>>> +				return -ENOMEM;
+> > >>>>>>>> +
+> > >>>>>>>> +			ret = copy_from_user(bitmap,
+> > >>>>>>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+> > >>>>>>>> +			if (ret)
+> > >>>>>>>> +				goto bitmap_exit;
+> > >>>>>>>> +
+> > >>>>>>>> +			iommu->dirty_page_tracking = false;
+> > >>>>>>> why iommu->dirty_page_tracking is false here?
+> > >>>>>>> suppose this ioctl can be called several times.
+> > >>>>>>>
+> > >>>>>>
+> > >>>>>> This ioctl can be called several times, but once this ioctl is called
+> > >>>>>> that means vCPUs are stopped and VFIO devices are stopped (i.e. in
+> > >>>>>> stop-and-copy phase) and dirty pages bitmap are being queried by user.
+> > >>>>>>
+> > >>>>> can't agree that VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP can only be
+> > >>>>> called in stop-and-copy phase.
+> > >>>>> As stated in last version, this will cause QEMU to get a wrong expectation
+> > >>>>> of VM downtime and this is also the reason for previously pinned pages
+> > >>>>> before log_sync cannot be treated as dirty. If this get bitmap ioctl can
+> > >>>>> be called early in save_setup phase, then it's no problem even all ram
+> > >>>>> is dirty.
+> > >>>>>
+> > >>>>
+> > >>>> Device can also write to pages which are pinned, and then there is no
+> > >>>> way to know pages dirtied by device during pre-copy phase.
+> > >>>> If user ask dirty bitmap in per-copy phase, even then user will have to
+> > >>>> query dirty bitmap in stop-and-copy phase where this will be superset
+> > >>>> including all pages reported during pre-copy. Then instead of copying
+> > >>>> all pages twice, its better to do it once during stop-and-copy phase.
+> > >>>>
+> > >>> I think the flow should be like this:
+> > >>> 1. save_setup --> GET_BITMAP ioctl --> return bitmap for currently + previously
+> > >>> pinned pages and clean all previously pinned pages
+> > >>>
+> > >>> 2. save_pending --> GET_BITMAP ioctl  --> return bitmap of (currently
+> > >>> pinned pages + previously pinned pages since last clean) and clean all
+> > >>> previously pinned pages
+> > >>>
+> > >>> 3. save_complete_precopy --> GET_BITMAP ioctl --> return bitmap of (currently
+> > >>> pinned pages + previously pinned pages since last clean) and clean all
+> > >>> previously pinned pages
+> > >>>
+> > >>>
+> > >>> Copying pinned pages multiple times is unavoidable because those pinned pages
+> > >>> are always treated as dirty. That's per vendor's implementation.
+> > >>> But if the pinned pages are not reported as dirty before stop-and-copy phase,
+> > >>> QEMU would think dirty pages has converged
+> > >>> and enter blackout phase, making downtime_limit severely incorrect.
+> > >>
+> > >> I'm not sure it's any worse.
+> > >> I *think* we do a last sync after we've decided to go to stop-and-copy;
+> > >> wont that then mark all those pages as dirty again, so it'll have the
+> > >> same behaviour?
+> > > No. something will be different.
+> > > currently, in kirti's implementation, if GET_BITMAP ioctl is called only
+> > > once in stop-and-copy phase, then before that phase, QEMU does not know those
+> > > pages are dirty.
+> > > If we can report those dirty pages earlier before stop-and-copy phase,
+> > > QEMU can at least copy other pages to reduce dirty pages to below threshold.
+> > > 
+> > > Take a example, let's assume those vfio dirty pages is 1Gb, and network speed is
+> > > also 1Gb. Expected vm downtime is 1s.
+> > > If before stop-and-copy phase, dirty pages produced by other pages is
+> > > also 1Gb. To meet the expected vm downtime, QEMU should copy pages to
+> > > let dirty pages be less than 1Gb, otherwise, it should not complete live
+> > > migration.
+> > > If vfio does not report this 1Gb dirty pages, QEMU would think there's
+> > > only 1Gb and stop the vm. It would then find out there's actually 2Gb and vm
+> > > downtime is 2s.
+> > > Though the expected vm downtime is always not exactly the same as the
+> > > true vm downtime, it should be caused by rapid dirty page rate, which is
+> > > not predictable.
+> > > Right?
+> > > 
+> > 
+> > If you report vfio dirty pages 1Gb before stop-and-copy phase (i.e. in 
+> > pre-copy phase), enter into stop-and-copy phase, how will you know which 
+> > and how many pages are dirtied by device from the time when pages copied 
+> > in pre-copy phase to that time where device is stopped? You don't have a 
+> > way to know which pages are dirtied by device. So ideally device can 
+> > write to all pages which are pinned. Then we have to mark all those 
+> > pinned pages dirty in stop-and-copy phase, 1Gb, and copy to destination. 
+> > Now you had copied same pages twice. Shouldn't we try not to copy pages 
+> > twice?
+> >
+> For mdevs who reply on treating all pinned pages as dirty pages, as above
+> mentioned condition, repeated page copying can be avoided by
+> (1) adding an ioctl to get size of dirty pages and report it to QEMU through
+> vfio_save_pending() interface
+> (2) in this GET_BITMAP ioctl, empty bitmap is returned until stop-and-copy phase.
+> 
+> But for devices who know fine-grained dirty pages, (e.g. devices have ditry page
+> tracking in hardware), GET_BITMAP ioctl has to return incremental dirty
+> bitmaps in each iteration and step (1) should return 0 to avoid 2*size
+> of dirty page reported.
 
-Oh I think I see the point now...  So what matters is not the general
-OOB messages, but actually when OOB is disabled or when OOB queue is
-full.  In other words, json_message_parser_feed() can call
-monitor_suspend() itself, so we must make sure
-json_message_parser_feed() is still called with size=3D=3D1 always,
-otherwise we can't suspend monitors properly.
+I think you're right that something is needed; but it's starting to get
+a bit complex.
 
-I see that patch 2 did this right on checking against suspend_cnt
-before each call of json_message_parser_feed(size=3D=3D1), so it seems
-good..  And yes in that case the ring buffer is needed to achieve this.
+As well as the size, you need the addresses to know which areas to avoid
+- it's not just a simple size, because I think you only care about areas
+that the guest has registered/pinned to the device; so it would have to
+be a list somehow.  So then if you got that list you'd add the size
+to the amount you knew was pending, and avoid sending that area until
+stop-and-copy.
 
---=20
-Peter Xu
+However, if it is only areas that the guest has registered, then what
+happens if the guest (de)registers an area during the migration process?
+That says the list itself has to be refreshed.  So it's getting messy.
+
+Dave
+
+> Thanks
+> Yan
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
