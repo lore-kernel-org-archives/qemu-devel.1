@@ -2,86 +2,94 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC48C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 19:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E52C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 21:19:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02C6E20866
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 19:46:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF3BA206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 21:19:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDRN8tf9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C6E20866
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GKtrdST2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF3BA206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inStW-0001o4-31
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 14:46:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
+	id 1inUMQ-0003Xf-2A
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 16:19:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56936)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1inSsQ-00017h-PT
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:44:56 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1inULo-00036m-VW
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:19:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1inSsO-0002lN-7j
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:44:53 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35811
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1inULm-0008KY-7F
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:19:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47259
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1inSsN-0002iE-W7
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 14:44:52 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1inULl-0008FO-Sa
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:19:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578080691;
+ s=mimecast20190719; t=1578086356;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=DI4YbcUxsETNrZgdLi6Uj/cUW7aqXTGGYTZfzozbiwM=;
- b=EDRN8tf95QWDwe5t369Wbe4rxDi8RNoGYjdoWmsfO3B/46pDQByOQTQVSleqDWOZ5S0c/g
- Qt3SMPdOlYrtUTgrx46NMl5pKzDW3utm/N4Sp9hVt0RqN7+Tp1VXf8qiTz0jsViPyrnpzX
- njvJgGVrqlL7OXYEBbAFP28qz8tlVU4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-omuQXVJvMdOIfR5BA0srPA-1; Fri, 03 Jan 2020 14:44:47 -0500
-X-MC-Unique: omuQXVJvMdOIfR5BA0srPA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51A6B18552D1;
- Fri,  3 Jan 2020 19:44:45 +0000 (UTC)
-Received: from work-vm (ovpn-117-78.ams2.redhat.com [10.36.117.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CD447D964;
- Fri,  3 Jan 2020 19:44:36 +0000 (UTC)
-Date: Fri, 3 Jan 2020 19:44:34 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v10 Kernel 4/5] vfio iommu: Implementation of ioctl to
- for dirty pages tracking.
-Message-ID: <20200103194434.GT3804@work-vm>
-References: <1576527700-21805-5-git-send-email-kwankhede@nvidia.com>
- <20191217051513.GE21868@joy-OptiPlex-7040>
- <17ac4c3b-5f7c-0e52-2c2b-d847d4d4e3b1@nvidia.com>
- <20191217095110.GH21868@joy-OptiPlex-7040>
- <0d9604d9-3bb2-6944-9858-983366f332bb@nvidia.com>
- <20191218010451.GI21868@joy-OptiPlex-7040>
- <20191218200552.GX3707@work-vm>
- <20191219005749.GJ21868@joy-OptiPlex-7040>
- <75c4f23b-b668-6edb-2f4e-191b253cede9@nvidia.com>
- <20191220005836.GK21868@joy-OptiPlex-7040>
+ bh=F+tgdWfjhUuWbIC4aYa2sI2tJO9KBcoynCGaF2Cjqvw=;
+ b=GKtrdST2b4eph6F6UoF7ScniKVWMPTwF+V3e/vPyloykelYv0NEjkWNbWZQp8ajdzevPan
+ YNUu3429ngxgUMayrk8SUZUvjk6j9iIlCySlmqjeiIoSjzzJomhtYlAGV3H78ZCRPmVGn1
+ RulbiJQDJBSQkBSCzTvgqgQfeqeNiAE=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-KHmnmpmQPLOSn_BBEUWitA-1; Fri, 03 Jan 2020 16:19:11 -0500
+Received: by mail-ed1-f70.google.com with SMTP id v11so23423464edw.11
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 13:19:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7JbF2WXT/IQZJypA7NehdC4XcRnCjKx5BcmwH9wGSLo=;
+ b=IltJMuwfCrDBTmzKCDfRUhgnPXSQMxC6xG7SIfc/fA3JCiYS264USZhYR/0HlD6S0c
+ 7jvpcozYhCpua68aL5hfG2lXH9v2fq0A3iqfSy2WM73EVjtycgMbhl6JDXeTpDQt2g5a
+ vrl/pTctKa4ZIWiaOiZwZjozSisBkDGIIKByci7337JiOfSGzdM1wTrcb0s5dQAix6TE
+ XtjTVWrIsfUDQJS/edeBEho6d5yIn9uSpFwCj9Wmqxb8U9KuMt4/u+iiGnXAKwJF4bMM
+ mYvHaMn0reTQmocYYxsSH4uM7PaghxVTeEux3jXDouYUlJYGWkf7IWSy0FoGNeWNUp8z
+ NaHA==
+X-Gm-Message-State: APjAAAUF2mXZ2HnU4Nio9C+8fWOfzEBny3WB5SoObZSdu2Th3GJHjGz9
+ xgbUk6/Uk78Ng88toBHwztEh0MohaxXSA7XySQAtdIYrHSjl/bf64Upm7PA98SysDMRNdMae+tc
+ AwXNqIow0Dm6zwzGDL7ixmBuv+zVI5oU=
+X-Received: by 2002:a17:906:560e:: with SMTP id
+ f14mr95124509ejq.300.1578086350764; 
+ Fri, 03 Jan 2020 13:19:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw+UIz3hbDOwpnaqtfSTwNiQ/5+wklmBw1zBFQ4MqnFr3BfXGXTOCQxIZMt6cSO/T8uT4h109wzQ1h2siaEeCM=
+X-Received: by 2002:a17:906:560e:: with SMTP id
+ f14mr95124498ejq.300.1578086350567; 
+ Fri, 03 Jan 2020 13:19:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191220005836.GK21868@joy-OptiPlex-7040>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20191223082813.28930-1-yang.zhong@intel.com>
+ <5cb6ace0-dd8e-aa22-e280-1e697c2c4156@redhat.com>
+ <20191223091856.GA8433@yangzhon-Virtual>
+ <e13a5fcc-b861-1847-58a8-e3d6445f84b0@redhat.com>
+ <20191223092508-mutt-send-email-mst@kernel.org>
+ <187f02d9-1677-d232-a44a-ed7b1e5f6ee5@redhat.com>
+ <20200103150145.GA24552@yangzhon-Virtual>
+In-Reply-To: <20200103150145.GA24552@yangzhon-Virtual>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 3 Jan 2020 22:18:58 +0100
+Message-ID: <CABgObfZWq_d-R_j456yxipPnbcLzCOJwd=9mCBMiwHDOckaXYg@mail.gmail.com>
+Subject: Re: [PATCH] virtio: add the queue number check
+To: Yang Zhong <yang.zhong@intel.com>
+X-MC-Unique: KHmnmpmQPLOSn_BBEUWitA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/alternative; boundary="00000000000059d0d6059b42dccb"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,216 +101,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yan Zhao (yan.y.zhao@intel.com) wrote:
-> On Fri, Dec 20, 2019 at 12:21:45AM +0800, Kirti Wankhede wrote:
-> > 
-> > 
-> > On 12/19/2019 6:27 AM, Yan Zhao wrote:
-> > > On Thu, Dec 19, 2019 at 04:05:52AM +0800, Dr. David Alan Gilbert wrote:
-> > >> * Yan Zhao (yan.y.zhao@intel.com) wrote:
-> > >>> On Tue, Dec 17, 2019 at 07:47:05PM +0800, Kirti Wankhede wrote:
-> > >>>>
-> > >>>>
-> > >>>> On 12/17/2019 3:21 PM, Yan Zhao wrote:
-> > >>>>> On Tue, Dec 17, 2019 at 05:24:14PM +0800, Kirti Wankhede wrote:
-> > >>>>>>>>     
-> > >>>>>>>>     		return copy_to_user((void __user *)arg, &unmap, minsz) ?
-> > >>>>>>>>     			-EFAULT : 0;
-> > >>>>>>>> +	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
-> > >>>>>>>> +		struct vfio_iommu_type1_dirty_bitmap range;
-> > >>>>>>>> +		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
-> > >>>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP |
-> > >>>>>>>> +				VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP;
-> > >>>>>>>> +		int ret;
-> > >>>>>>>> +
-> > >>>>>>>> +		if (!iommu->v2)
-> > >>>>>>>> +			return -EACCES;
-> > >>>>>>>> +
-> > >>>>>>>> +		minsz = offsetofend(struct vfio_iommu_type1_dirty_bitmap,
-> > >>>>>>>> +				    bitmap);
-> > >>>>>>>> +
-> > >>>>>>>> +		if (copy_from_user(&range, (void __user *)arg, minsz))
-> > >>>>>>>> +			return -EFAULT;
-> > >>>>>>>> +
-> > >>>>>>>> +		if (range.argsz < minsz || range.flags & ~mask)
-> > >>>>>>>> +			return -EINVAL;
-> > >>>>>>>> +
-> > >>>>>>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
-> > >>>>>>>> +			iommu->dirty_page_tracking = true;
-> > >>>>>>>> +			return 0;
-> > >>>>>>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
-> > >>>>>>>> +			iommu->dirty_page_tracking = false;
-> > >>>>>>>> +
-> > >>>>>>>> +			mutex_lock(&iommu->lock);
-> > >>>>>>>> +			vfio_remove_unpinned_from_dma_list(iommu);
-> > >>>>>>>> +			mutex_unlock(&iommu->lock);
-> > >>>>>>>> +			return 0;
-> > >>>>>>>> +
-> > >>>>>>>> +		} else if (range.flags &
-> > >>>>>>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
-> > >>>>>>>> +			uint64_t iommu_pgmask;
-> > >>>>>>>> +			unsigned long pgshift = __ffs(range.pgsize);
-> > >>>>>>>> +			unsigned long *bitmap;
-> > >>>>>>>> +			long bsize;
-> > >>>>>>>> +
-> > >>>>>>>> +			iommu_pgmask =
-> > >>>>>>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-> > >>>>>>>> +
-> > >>>>>>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
-> > >>>>>>>> +			    (range.pgsize - 1))
-> > >>>>>>>> +				return -EINVAL;
-> > >>>>>>>> +
-> > >>>>>>>> +			if (range.iova & iommu_pgmask)
-> > >>>>>>>> +				return -EINVAL;
-> > >>>>>>>> +			if (!range.size || range.size > SIZE_MAX)
-> > >>>>>>>> +				return -EINVAL;
-> > >>>>>>>> +			if (range.iova + range.size < range.iova)
-> > >>>>>>>> +				return -EINVAL;
-> > >>>>>>>> +
-> > >>>>>>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
-> > >>>>>>>> +						   range.bitmap_size);
-> > >>>>>>>> +			if (bsize)
-> > >>>>>>>> +				return ret;
-> > >>>>>>>> +
-> > >>>>>>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
-> > >>>>>>>> +			if (!bitmap)
-> > >>>>>>>> +				return -ENOMEM;
-> > >>>>>>>> +
-> > >>>>>>>> +			ret = copy_from_user(bitmap,
-> > >>>>>>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
-> > >>>>>>>> +			if (ret)
-> > >>>>>>>> +				goto bitmap_exit;
-> > >>>>>>>> +
-> > >>>>>>>> +			iommu->dirty_page_tracking = false;
-> > >>>>>>> why iommu->dirty_page_tracking is false here?
-> > >>>>>>> suppose this ioctl can be called several times.
-> > >>>>>>>
-> > >>>>>>
-> > >>>>>> This ioctl can be called several times, but once this ioctl is called
-> > >>>>>> that means vCPUs are stopped and VFIO devices are stopped (i.e. in
-> > >>>>>> stop-and-copy phase) and dirty pages bitmap are being queried by user.
-> > >>>>>>
-> > >>>>> can't agree that VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP can only be
-> > >>>>> called in stop-and-copy phase.
-> > >>>>> As stated in last version, this will cause QEMU to get a wrong expectation
-> > >>>>> of VM downtime and this is also the reason for previously pinned pages
-> > >>>>> before log_sync cannot be treated as dirty. If this get bitmap ioctl can
-> > >>>>> be called early in save_setup phase, then it's no problem even all ram
-> > >>>>> is dirty.
-> > >>>>>
-> > >>>>
-> > >>>> Device can also write to pages which are pinned, and then there is no
-> > >>>> way to know pages dirtied by device during pre-copy phase.
-> > >>>> If user ask dirty bitmap in per-copy phase, even then user will have to
-> > >>>> query dirty bitmap in stop-and-copy phase where this will be superset
-> > >>>> including all pages reported during pre-copy. Then instead of copying
-> > >>>> all pages twice, its better to do it once during stop-and-copy phase.
-> > >>>>
-> > >>> I think the flow should be like this:
-> > >>> 1. save_setup --> GET_BITMAP ioctl --> return bitmap for currently + previously
-> > >>> pinned pages and clean all previously pinned pages
-> > >>>
-> > >>> 2. save_pending --> GET_BITMAP ioctl  --> return bitmap of (currently
-> > >>> pinned pages + previously pinned pages since last clean) and clean all
-> > >>> previously pinned pages
-> > >>>
-> > >>> 3. save_complete_precopy --> GET_BITMAP ioctl --> return bitmap of (currently
-> > >>> pinned pages + previously pinned pages since last clean) and clean all
-> > >>> previously pinned pages
-> > >>>
-> > >>>
-> > >>> Copying pinned pages multiple times is unavoidable because those pinned pages
-> > >>> are always treated as dirty. That's per vendor's implementation.
-> > >>> But if the pinned pages are not reported as dirty before stop-and-copy phase,
-> > >>> QEMU would think dirty pages has converged
-> > >>> and enter blackout phase, making downtime_limit severely incorrect.
-> > >>
-> > >> I'm not sure it's any worse.
-> > >> I *think* we do a last sync after we've decided to go to stop-and-copy;
-> > >> wont that then mark all those pages as dirty again, so it'll have the
-> > >> same behaviour?
-> > > No. something will be different.
-> > > currently, in kirti's implementation, if GET_BITMAP ioctl is called only
-> > > once in stop-and-copy phase, then before that phase, QEMU does not know those
-> > > pages are dirty.
-> > > If we can report those dirty pages earlier before stop-and-copy phase,
-> > > QEMU can at least copy other pages to reduce dirty pages to below threshold.
-> > > 
-> > > Take a example, let's assume those vfio dirty pages is 1Gb, and network speed is
-> > > also 1Gb. Expected vm downtime is 1s.
-> > > If before stop-and-copy phase, dirty pages produced by other pages is
-> > > also 1Gb. To meet the expected vm downtime, QEMU should copy pages to
-> > > let dirty pages be less than 1Gb, otherwise, it should not complete live
-> > > migration.
-> > > If vfio does not report this 1Gb dirty pages, QEMU would think there's
-> > > only 1Gb and stop the vm. It would then find out there's actually 2Gb and vm
-> > > downtime is 2s.
-> > > Though the expected vm downtime is always not exactly the same as the
-> > > true vm downtime, it should be caused by rapid dirty page rate, which is
-> > > not predictable.
-> > > Right?
-> > > 
-> > 
-> > If you report vfio dirty pages 1Gb before stop-and-copy phase (i.e. in 
-> > pre-copy phase), enter into stop-and-copy phase, how will you know which 
-> > and how many pages are dirtied by device from the time when pages copied 
-> > in pre-copy phase to that time where device is stopped? You don't have a 
-> > way to know which pages are dirtied by device. So ideally device can 
-> > write to all pages which are pinned. Then we have to mark all those 
-> > pinned pages dirty in stop-and-copy phase, 1Gb, and copy to destination. 
-> > Now you had copied same pages twice. Shouldn't we try not to copy pages 
-> > twice?
-> >
-> For mdevs who reply on treating all pinned pages as dirty pages, as above
-> mentioned condition, repeated page copying can be avoided by
-> (1) adding an ioctl to get size of dirty pages and report it to QEMU through
-> vfio_save_pending() interface
-> (2) in this GET_BITMAP ioctl, empty bitmap is returned until stop-and-copy phase.
-> 
-> But for devices who know fine-grained dirty pages, (e.g. devices have ditry page
-> tracking in hardware), GET_BITMAP ioctl has to return incremental dirty
-> bitmaps in each iteration and step (1) should return 0 to avoid 2*size
-> of dirty page reported.
+--00000000000059d0d6059b42dccb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I think you're right that something is needed; but it's starting to get
-a bit complex.
+Il ven 3 gen 2020, 16:08 Yang Zhong <yang.zhong@intel.com> ha scritto:
 
-As well as the size, you need the addresses to know which areas to avoid
-- it's not just a simple size, because I think you only care about areas
-that the guest has registered/pinned to the device; so it would have to
-be a list somehow.  So then if you got that list you'd add the size
-to the amount you knew was pending, and avoid sending that area until
-stop-and-copy.
+>   I also tried virtio-blk device like below:
+>   https://patchwork.kernel.org/cover/10873193/
+>
+>   The virtio-blk can work with this changes, but vhost-user-blk device
+>   failed with this kernel patch.
+>
+>   in vhost_virtqueue_start() function, below operation to check if the
+>   desc addr set by guest kernel. This will ignore the extra vqs.
+>     a =3D virtio_queue_get_desc_addr(vdev, idx);
+>     if (a =3D=3D 0) {
+>         /* Queue might not be ready for start */
+>         return 0;
+>     }
+>
+>   If guest kernel add min(cpu,num_vqs), do we need add same check in
+>   realize function of vhost-user-blk device?
+>
 
-However, if it is only areas that the guest has registered, then what
-happens if the guest (de)registers an area during the migration process?
-That says the list itself has to be refreshed.  So it's getting messy.
+No. If virtio-blk works, the bug is in vhost-user-blk; if virtio-blk needs
+no check in cpu count, vhost-user-blk also doesn't.
 
-Dave
+You need to check first if the bug is in QEMU or the vhost-user-blk server.
 
-> Thanks
-> Yan
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
+
+--00000000000059d0d6059b42dccb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il ven 3 gen 2020, 16:08 Yang Zhong &lt;<a href=3D"mai=
+lto:yang.zhong@intel.com">yang.zhong@intel.com</a>&gt; ha scritto:<br></div=
+><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
+px #ccc solid;padding-left:1ex">=C2=A0 I also tried virtio-blk device like =
+below:<br>
+=C2=A0 <a href=3D"https://patchwork.kernel.org/cover/10873193/" rel=3D"nore=
+ferrer noreferrer" target=3D"_blank">https://patchwork.kernel.org/cover/108=
+73193/</a><br>
+<br>
+=C2=A0 The virtio-blk can work with this changes, but vhost-user-blk device=
+<br>
+=C2=A0 failed with this kernel patch.<br>
+<br>
+=C2=A0 in vhost_virtqueue_start() function, below operation to check if the=
+<br>
+=C2=A0 desc addr set by guest kernel. This will ignore the extra vqs.<br>
+=C2=A0 =C2=A0 a =3D virtio_queue_get_desc_addr(vdev, idx);<br>
+=C2=A0 =C2=A0 if (a =3D=3D 0) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Queue might not be ready for start */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+=C2=A0 =C2=A0 }<br>
+<br>
+=C2=A0 If guest kernel add min(cpu,num_vqs), do we need add same check in<b=
+r>
+=C2=A0 realize function of vhost-user-blk device?<br></blockquote></div></d=
+iv><div dir=3D"auto"><br></div><div dir=3D"auto">No. If virtio-blk works, t=
+he bug is in vhost-user-blk; if virtio-blk needs no check in cpu count, vho=
+st-user-blk also doesn&#39;t.</div><div dir=3D"auto"><br></div><div dir=3D"=
+auto">You need to check first if the bug is in QEMU or the vhost-user-blk s=
+erver.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div></div>
+
+--00000000000059d0d6059b42dccb--
 
 
