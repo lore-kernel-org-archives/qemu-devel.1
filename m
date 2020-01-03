@@ -7,95 +7,94 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12770C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 10:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 784EBC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 10:52:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D18D82253D
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 10:49:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4451C206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 10:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TkFcpaaJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D18D82253D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxLe5W9f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4451C206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inKVx-00019x-C9
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 05:49:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40205)
+	id 1inKZN-0002oE-7K
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 05:52:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54357)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1inKVE-0000iS-Ld
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 05:48:25 -0500
+ (envelope-from <philmd@redhat.com>) id 1inKYV-0002BY-Im
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 05:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1inKVC-0003nv-AM
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 05:48:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40843
+ (envelope-from <philmd@redhat.com>) id 1inKYU-0004rs-A9
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 05:51:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31532
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inKVB-0003hv-Vq
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 05:48:22 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inKYU-0004oA-59
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 05:51:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578048500;
+ s=mimecast20190719; t=1578048705;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XhzGI4C37/Ef0AsVJaaO0k0ikydgbDK0HKwZBh3bNSs=;
- b=TkFcpaaJxzCRPvYhw7vgRfrDAkWjUO/o4j7SWmjC+7EyCfbP8S+u2ayx/FA1PTbNQAh6+0
- pOceYcJDCx21FCN+b6sCWE+IOsGV2FX4Jej0ME1DI1au5QKnh/JFcSAocI0OjH2t460aZi
- MT4HFZcexfZszo08TUP+oDm9BwlNB+U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-acZ3pHM1P02igsw9A5Hpgg-1; Fri, 03 Jan 2020 05:48:15 -0500
-Received: by mail-wr1-f71.google.com with SMTP id v17so21294166wrm.17
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 02:48:15 -0800 (PST)
+ bh=8uRvO3wfYz59Vw1XJCh9pE26o21dJKdFS2reE4ffWa0=;
+ b=IxLe5W9fvAUjuUkpko3QBHpLlD2ExsStrwilUA8nBTUgMaogCZoC+jTtZsANLGvPtFv6e0
+ IQ1Rv6Z3DITEL7Q33uR5DxCpcpP0HsXO0vP2PjL334n9oTzB+rck133jHOZoAY+Hx640QZ
+ ge3sQxaGhAM46T8jCkwSD0XrxbaZyG4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-_2coT_cNM7OsNBSMKhwIBQ-1; Fri, 03 Jan 2020 05:51:43 -0500
+Received: by mail-wr1-f69.google.com with SMTP id z10so18699011wrt.21
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 02:51:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=J3pN62T46n1mzvCm0p/WcivZWD10DPDcRZJ2oCidIO8=;
- b=N0fnZxpp1CWNmuIHx6L2inwDiT3kTEJLuhsHdi5dNJhWQFsPQJwrLg2sdemusQiXmp
- m4hrfAZHssL5A3MqXAO8uyisEP4fUF4ahoF+Y9ouznBCqAE6KmH7fPGWN4+Vz730Eh08
- 5HjDfedkiPnDadUfsewFVKIkjFpQHhXOY7bnDQtlq/iIi4JAIA0ypSN4ROUEwu/Ik34n
- V/GLpNLite2Kq/XXKNhAbPYtUwBgLzuQzOUeH85gKg5RnE73LKxc165SwsZVoSTKe8pt
- +p/aWqv3zj+MvuqpkQbWsUtRDccLxKvT8nHdER+/JGA5+17H6F58tXHAshA44oETTmXp
- jR1g==
-X-Gm-Message-State: APjAAAUHMKTR+55yZmPKMGiyLFjID+BEocIVoyrq5Mk0HDSMPtfCBGce
- 2Sz6clpY24KyJBVPgZutZ68RCANdYc6I1fVdDCefCNMouR8ANdEhquHS3YXzw4wXko/wKC4zhe0
- XVKCe/erNFXsiP6Y=
-X-Received: by 2002:a7b:cd11:: with SMTP id f17mr19436246wmj.48.1578048494627; 
- Fri, 03 Jan 2020 02:48:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwRM108Iu4nwl8jqx7cYwHeu+u1OUmVGkUg41Q6Bw5GPMFMhgxxbddYGSyTFyCaitjtcRXKcQ==
-X-Received: by 2002:a7b:cd11:: with SMTP id f17mr19436233wmj.48.1578048494410; 
- Fri, 03 Jan 2020 02:48:14 -0800 (PST)
+ bh=w5D3hNithGllU5+ym6ld2VlzHg/aYEyKm00Sx8Qka74=;
+ b=BpbENEj8pcj+rzZdIxw3bhR5kXHqQ7RlRaq8ZWzKFXDJVp8d0DBn5Qlo+tF3iu9Nun
+ Axb4+4HdIBBtY1KfzQ0wr0U49XOLRmVatOBk4HqJ33VMEd7tf7oziwONiKQD28knqopQ
+ HkBbIShl6nTs4q9GEccIWhWgLc6YdWCpjRNCFVpZCieVsxHQXz7qFhIKj/UugrJYJw2D
+ J77DvfnO8iXr11sdQyvGYRGR6upLo3VOmfBSMx49J+NhjMkaPEhUcFHr15O1arw5mjh/
+ eGGr1HARFzrR2vBfAcKkVGfu2HZ8MVC/FwdqxnWj7/UcrAANbGbvDkbCmvx50X88Pl80
+ QGdg==
+X-Gm-Message-State: APjAAAV6TxiqMq8c48RoyDSpzJdEdvCFTchw4iZJKcM10KWGMgeFiYPQ
+ 1+ajPiN88bPMglePXdy6GrIxIgsNMUD4BUxHRXmZTbYWjQnf1VSB8ArUOX+7Tik8xfvin6zESXW
+ MzirB3K8+gkNv52o=
+X-Received: by 2002:a5d:4a84:: with SMTP id o4mr86181746wrq.396.1578048702840; 
+ Fri, 03 Jan 2020 02:51:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw+pfHXH6LTv2YCCFye+/YhXcchcRCQKVZCtGtp+1fir3BSfeZ0BtVoRysENLmCM8GSfzONvw==
+X-Received: by 2002:a5d:4a84:: with SMTP id o4mr86181721wrq.396.1578048702611; 
+ Fri, 03 Jan 2020 02:51:42 -0800 (PST)
 Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id z187sm11618374wme.16.2020.01.03.02.48.12
+ by smtp.gmail.com with ESMTPSA id t5sm58685738wrr.35.2020.01.03.02.51.41
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jan 2020 02:48:13 -0800 (PST)
-Subject: Re: [PATCH 032/132] meson: uncompress edk2 bios
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+ Fri, 03 Jan 2020 02:51:42 -0800 (PST)
+Subject: Re: [PATCH 121/132] meson: install edk2
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
- <1576155176-2464-33-git-send-email-pbonzini@redhat.com>
+ <1576758232-12439-30-git-send-email-pbonzini@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <15178264-c74b-6531-7faa-2edfaa755416@redhat.com>
-Date: Fri, 3 Jan 2020 11:48:12 +0100
+Message-ID: <e7923ebc-2196-1bba-7c37-0d136bf35852@redhat.com>
+Date: Fri, 3 Jan 2020 11:51:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1576155176-2464-33-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1576758232-12439-30-git-send-email-pbonzini@redhat.com>
 Content-Language: en-US
-X-MC-Unique: acZ3pHM1P02igsw9A5Hpgg-1
+X-MC-Unique: _2coT_cNM7OsNBSMKhwIBQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,95 +106,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/19 1:51 PM, Paolo Bonzini wrote:
+On 12/19/19 1:23 PM, Paolo Bonzini wrote:
 > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >=20
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
 > ---
->   Makefile            |  4 ----
->   meson.build         |  2 ++
->   pc-bios/meson.build | 21 +++++++++++++++++++++
->   3 files changed, 23 insertions(+), 4 deletions(-)
->   create mode 100644 pc-bios/meson.build
+>   Makefile            | 7 -------
+>   pc-bios/meson.build | 8 ++++++--
+>   2 files changed, 6 insertions(+), 9 deletions(-)
 >=20
 > diff --git a/Makefile b/Makefile
-> index 0a6615c..b880265 100644
+> index d64e481..e961286 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -103,9 +103,6 @@ generated-files-y +=3D module_block.h
+> @@ -99,7 +99,6 @@ generated-files-y =3D config-host.h
+>  =20
 >   generated-files-y +=3D .git-submodule-status
 >  =20
->   edk2-decompressed =3D $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
-> -pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
-> -=09$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
-> -
+> -edk2-decompressed =3D $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
 >   # Don't try to regenerate Makefile or configure
 >   # We don't generate any of them
 >   Makefile: ;
-> @@ -226,7 +223,6 @@ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
->   $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
->   $(SOFTMMU_ALL_RULES): $(io-obj-y)
->   $(SOFTMMU_ALL_RULES): config-all-devices.mak
-> -$(SOFTMMU_ALL_RULES): $(edk2-decompressed)
+> @@ -267,7 +266,6 @@ endif
+>   ICON_SIZES=3D16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
 >  =20
->   .PHONY: $(TARGET_DIRS_RULES)
->   # The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
-> diff --git a/meson.build b/meson.build
-> index de5a26e..00c0767 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -312,3 +312,5 @@ if have_tools
->       subdir('contrib/ivshmem-server')
->     endif
+>   install: all install-datadir install-localstatedir \
+> -=09$(if $(INSTALL_BLOBS),$(edk2-decompressed)) \
+>   =09recurse-install
+>   ifneq ($(vhost-user-json-y),)
+>   =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/vhost-user/"
+> @@ -280,11 +278,6 @@ ifneq ($(BLOBS),)
+>   =09=09$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir=
+)"; \
+>   =09done
 >   endif
-> +
-> +subdir('pc-bios')
+> -ifdef INSTALL_BLOBS
+> -=09set -e; for x in $(edk2-decompressed); do \
+> -=09=09$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)"; \
+> -=09done
+> -endif
+>   ifneq ($(DESCS),)
+>   =09$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/firmware"
+>   =09set -e; tmpf=3D$$(mktemp); trap 'rm -f -- "$$tmpf"' EXIT; \
 > diff --git a/pc-bios/meson.build b/pc-bios/meson.build
-> new file mode 100644
-> index 0000000..5524b95
-> --- /dev/null
+> index 5524b95..18201b0 100644
+> --- a/pc-bios/meson.build
 > +++ b/pc-bios/meson.build
-> @@ -0,0 +1,21 @@
-> +bzip2 =3D find_program('bzip2')
+> @@ -11,11 +11,15 @@ fds =3D [
+>     'edk2-x86_64-secure-code.fd',
+>   ]
+>  =20
+> -foreach f : fds
+> +install_blobs =3D 'INSTALL_BLOBS' in config_host
 > +
-> +fds =3D [
-> +  'edk2-aarch64-code.fd',
-> +  'edk2-arm-code.fd',
-> +  'edk2-arm-vars.fd',
-
-Can we split this in 2 arrays ...
-
-> +  'edk2-i386-code.fd',
-> +  'edk2-i386-secure-code.fd',
-> +  'edk2-i386-vars.fd',
-> +  'edk2-x86_64-code.fd',
-> +  'edk2-x86_64-secure-code.fd',
-> +]
-> +
-
-... then for each array ...
-
-> +foreach f : fds
-> +  custom_target(f,
-> +                output: f,
-> +                input: '@0@.bz2'.format(f),
-> +                capture: true,
-> +                build_by_default: true,
-
-... use:
-
-   build_by_default: if 'i386' in target_arch
-                     or if 'x86_64' in target_arch,
-
-Ah, different that this patch intent, so for later.
-
-> +                command: [ bzip2, '-dc', '@INPUT0@' ])
-> +endforeach
+> +foreach f: fds
+>     custom_target(f,
+>                   output: f,
+>                   input: '@0@.bz2'.format(f),
+>                   capture: true,
+>                   build_by_default: true,
+> -                command: [ bzip2, '-dc', '@INPUT0@' ])
+> +                command: [ bzip2, '-dc', '@INPUT0@' ],
+> +                install: install_blobs,
+> +                install_dir: config_host['qemu_datadir'])
+>   endforeach
 >=20
 
 
