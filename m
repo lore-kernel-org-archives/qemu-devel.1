@@ -7,92 +7,74 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CC3C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA53C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:48:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD4052072C
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:46:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8977F2085B
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:48:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSnasFY4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD4052072C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EvsZxFE1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8977F2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inQ64-0001Gp-6r
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 11:46:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42062)
+	id 1inQ7l-0002sx-Ky
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 11:48:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1inQ4W-0000T7-4Z
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:45:13 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1inQ67-00020Y-RD
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:46:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1inQ4T-0000Fp-0v
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:45:10 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35123
+ (envelope-from <dgilbert@redhat.com>) id 1inQ66-0007IQ-NY
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:46:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24475
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inQ4S-00007G-Cg
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:45:08 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1inQ66-0007FY-GS
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:46:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578069907;
+ s=mimecast20190719; t=1578070010;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GACDei65r7g0qCAfrtjPPyCiW3Ljoiaoqq4YLvOcNrA=;
- b=QSnasFY4ggvR61mb65TDnU6twgXNiTgyIkGpnGN6hhqgNNWAB9l2bWqbzUTyfxwJCh0YjT
- Y0wPywh83O6hZ2juxRkTM+cbsltKoqpphkr103nkIDBIGjXia6X2riTgOsdwQPD4nLqUdX
- KS47m4cdruHq6HX2LETJ96OJi3JSLBY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-IEtPupRyNBeHXlsLolfRww-1; Fri, 03 Jan 2020 11:45:06 -0500
-Received: by mail-wm1-f72.google.com with SMTP id t4so1577189wmf.2
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 08:45:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=GACDei65r7g0qCAfrtjPPyCiW3Ljoiaoqq4YLvOcNrA=;
- b=BMvTFMds6wKBAaUsrUrUDeSRQqnzaNMqv62hsZFkLNdfwZdT8Ip3DSjQ43YY5RLEFw
- sdZ0PYmn+WxYBgyhTesHwctbLZeYuEvjgC+yEcVb8iNDWwtZ0ex7fu0jJiPf6RBFusFn
- 9wrEIWSwQiMXiuy0DHZyWgOy3qnSFgXVbS/pc7t/dHZ0IhR7OOOr6tEfYq7f1rjCaPGV
- /1S2Pa12qm0EXQKN19Dl1imKprd+P4MYGpPUcYOQaPH6niQHqC/kbZqeDWhagTd0C0yW
- FatDfrkYh6QM1EmAgSDGhDjhIZg+kfvr1/yEV8EgBik9J98Foq4/H7rG2XTOcQqP9g9u
- AsVg==
-X-Gm-Message-State: APjAAAURpbhQz3JF9/JXwPyaLjMhwSk8P/UboBDi4bjuJWvPManCWsn3
- MTTwEjVcGczL2tnabSWvnM39AMTGwhWO7cZhMh+3GWOn4fYa1EM9v6TtFzvJ3qB2IrT4LcsZE4w
- SqVOAhkyrJqko19M=
-X-Received: by 2002:adf:e6c6:: with SMTP id y6mr89319081wrm.284.1578069904986; 
- Fri, 03 Jan 2020 08:45:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwWkfhLsyEI65C8XhlP7JOt8kEs4xlP366iyAbGua//omxiKsxRJ4aMmJ2v1MSL+X84IYNfhw==
-X-Received: by 2002:adf:e6c6:: with SMTP id y6mr89319061wrm.284.1578069904798; 
- Fri, 03 Jan 2020 08:45:04 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id q6sm64989394wrx.72.2020.01.03.08.45.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jan 2020 08:45:04 -0800 (PST)
-Subject: Re: [PATCH v6 11/21] libqtest: make bufwrite rely on the TransportOps
-To: "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191129213424.6290-1-alxndr@bu.edu>
- <20191129213424.6290-12-alxndr@bu.edu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3745422f-0b12-d1ba-4c7c-b51ddf734012@redhat.com>
-Date: Fri, 3 Jan 2020 17:45:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=gmY+vPdr9fnVNNfAQSSdAjUQOV4bYdxs6a6SwHGB8kE=;
+ b=EvsZxFE1uzTobg1VbJikFOm7STHEor7VPoTRzVtzm+fL5ofaTJdCRdEnx9FYJOLLdQ2jok
+ BskLoefg6KCMtjPYpclRsaPlL8OK+4e0Es8S948pbpOX7Oaz18fzRstpMC/z9RojI7AFm4
+ n6qhuZ0yC9sRCFx2AX5L881+Hh99lX8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-79-t0vmnHxGNViuNZobrjxSlQ-1; Fri, 03 Jan 2020 11:46:49 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EA6B18B642C
+ for <qemu-devel@nongnu.org>; Fri,  3 Jan 2020 16:46:48 +0000 (UTC)
+Received: from work-vm (ovpn-117-78.ams2.redhat.com [10.36.117.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F8665C28C;
+ Fri,  3 Jan 2020 16:46:45 +0000 (UTC)
+Date: Fri, 3 Jan 2020 16:46:43 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v2 04/10] migration: Make multifd_save_setup() get an
+ Error parameter
+Message-ID: <20200103164643.GL3804@work-vm>
+References: <20191218020119.3776-1-quintela@redhat.com>
+ <20191218020119.3776-5-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191129213424.6290-12-alxndr@bu.edu>
-Content-Language: en-US
-X-MC-Unique: IEtPupRyNBeHXlsLolfRww-1
+In-Reply-To: <20191218020119.3776-5-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: t0vmnHxGNViuNZobrjxSlQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -107,68 +89,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/29/19 10:34 PM, Oleinik, Alexander wrote:
-> When using qtest "in-process" communication, qtest_sendf directly calls
-> a function in the server (qtest.c). Previously, bufwrite used
-> socket_send, which bypasses the TransportOps enabling the call into
-> qtest.c. This change replaces the socket_send calls with ops->send,
-> maintaining the benefits of the direct socket_send call, while adding
-> support for in-process qtest calls.
-> 
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+* Juan Quintela (quintela@redhat.com) wrote:
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->   tests/libqtest.c | 4 ++--
->   tests/libqtest.h | 3 +++
->   2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index ac4b6ab5f0..a7df92319a 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -1080,8 +1080,8 @@ void qtest_bufwrite(QTestState *s, uint64_t addr, const void *data, size_t size)
->   
->       bdata = g_base64_encode(data, size);
->       qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx ", addr, size);
-> -    socket_send(s->fd, bdata, strlen(bdata));
-> -    socket_send(s->fd, "\n", 1);
-> +    s->ops.send(s, bdata);
-> +    s->ops.send(s, "\n");
+>  migration/migration.c | 2 +-
+>  migration/ram.c       | 2 +-
+>  migration/ram.h       | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index e7f707e033..5a56bd0c91 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -3400,7 +3400,7 @@ void migrate_fd_connect(MigrationState *s, Error *e=
+rror_in)
+>          return;
+>      }
+> =20
+> -    if (multifd_save_setup() !=3D 0) {
+> +    if (multifd_save_setup(&error_in) !=3D 0) {
 
-Ah, is this the send_line() from patch #5?
+I'm not sure that's right.  I think the *error passed into
+migration_channel_connect, and then onto migrate_fd_connect is an
+indication that an error has happened, not a place you can put
+an error pointer.   Note how migration_channel_connect
+frees it after the migrate_fd_connect call, it doesn't report it.
 
-Now it makes sense to move the send("\n") there and call it send_line().
+Dave
 
-Moving the send(\n) we get this in patch #5:
-
-  static void qtest_client_socket_send_line(QTestState *s,
-                                            const char *bufline)
-  {
-      socket_send(s->fd, bufline, strlen(bufline));
-      socket_send(s->fd, "\n", 1);
-  }
-
->       qtest_rsp(s, 0);
->       g_free(bdata);
->   }
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index c9e21e05b3..0e9b8908ef 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -729,4 +729,7 @@ bool qtest_probe_child(QTestState *s);
->    */
->   void qtest_set_expected_status(QTestState *s, int status);
->   
-> +QTestState *qtest_inproc_init(bool log, const char* arch,
-> +                    void (*send)(void*, const char*));
-> +void qtest_client_inproc_recv(void *opaque, const char *str);
->   #endif
-> 
+>          migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+>                            MIGRATION_STATUS_FAILED);
+>          migrate_fd_cleanup(s);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 38070f1bb2..1f364cc23d 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1208,7 +1208,7 @@ static void multifd_new_send_channel_async(QIOTask =
+*task, gpointer opaque)
+>      }
+>  }
+> =20
+> -int multifd_save_setup(void)
+> +int multifd_save_setup(Error **errp)
+>  {
+>      int thread_count;
+>      uint32_t page_count =3D MULTIFD_PACKET_SIZE / qemu_target_page_size(=
+);
+> diff --git a/migration/ram.h b/migration/ram.h
+> index bd0eee79b6..da22a417ea 100644
+> --- a/migration/ram.h
+> +++ b/migration/ram.h
+> @@ -41,7 +41,7 @@ int xbzrle_cache_resize(int64_t new_size, Error **errp)=
+;
+>  uint64_t ram_bytes_remaining(void);
+>  uint64_t ram_bytes_total(void);
+> =20
+> -int multifd_save_setup(void);
+> +int multifd_save_setup(Error **errp);
+>  void multifd_save_cleanup(void);
+>  int multifd_load_setup(void);
+>  int multifd_load_cleanup(Error **errp);
+> --=20
+> 2.23.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
