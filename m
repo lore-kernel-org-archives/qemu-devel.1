@@ -2,84 +2,79 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B22BCC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE23DC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82D872085B
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98FCB206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 12:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFmH1pSp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82D872085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kwewixb6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98FCB206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inM9P-00044f-LP
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 07:33:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41756)
+	id 1inMWN-0002mF-I6
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 07:57:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1inM8l-0003dE-3H
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:33:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1inMVa-00023d-48
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:56:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1inM8i-0001dQ-SS
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:33:18 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46109
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1inM8i-0001YC-N9
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:33:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578054795;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=weGexod5tBMg0CDwzyojDlqkirYzOv55fsNqEq0GBTk=;
- b=SFmH1pSp9ohdltTQXYbDvKuXX8zHlK6Y0x94k2j+8NiHDiYfOnj/QUD5FjhhPCwXOjwpVi
- QawpWbFKXLIl+0Uxrz0qHKYZNzT9KAAIN3F84N6yGR3gKOKPwFfekeh4HKS8KmLH0BVNqi
- KUVpVK1ZVtpS+9b8GiyqqR1hseijZVA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-xPa4XVp3ObafoVd54yl1qg-1; Fri, 03 Jan 2020 07:33:11 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A360A800D41
- for <qemu-devel@nongnu.org>; Fri,  3 Jan 2020 12:33:10 +0000 (UTC)
-Received: from redhat.com (ovpn-112-41.ams2.redhat.com [10.36.112.41])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 69D44385;
- Fri,  3 Jan 2020 12:33:06 +0000 (UTC)
-Date: Fri, 3 Jan 2020 12:33:03 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 005/104] virtiofsd: Add passthrough_ll
-Message-ID: <20200103123303.GS2753983@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-6-dgilbert@redhat.com>
- <20200103120109.GK2753983@redhat.com>
- <20200103121535.GE3804@work-vm>
+ (envelope-from <peter.maydell@linaro.org>) id 1inMVY-0001as-PQ
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:56:53 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37982)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1inMVY-0001WK-DI
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 07:56:52 -0500
+Received: by mail-ot1-x344.google.com with SMTP id d7so56644032otf.5
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 04:56:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YuHS3kDBcRl5hERJRpUhJ30ZFxh6O5E6c4KqlgN4B2g=;
+ b=Kwewixb6yEjv8RbdpYDnbXQ2MbukQT3B2C+v8U14TO+3xl4bYUcqNlxTuZqiFQG3yg
+ 06EqJ63r4D9TgMyKlfqNtqvReeijP8jNNHzRd1hSJhI0OeIOkPyJ0Q89h8b6HE3FbAm0
+ LEI3mmzcIRAooJPM7/4zIRyOg0Pe4xkCg5AvZroVYouW2y1m+SJk1xZM3wYYW6N+b3yu
+ umfOBXFMDMq2BmNreU5X+6+Z9mzmoQnyUG+dNbdNr0lo+dAY/e9k3APJffDqSuc42lVI
+ RWi/qR37tNWNyBMeb+PJIwXfQwk23ABdQYDBKlenYD8vheFX1S40inL0AsVF8WaIjjUl
+ d7Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YuHS3kDBcRl5hERJRpUhJ30ZFxh6O5E6c4KqlgN4B2g=;
+ b=JYRriVKLbZ1qqjHTkR7ybQozw4mreQeASWd9zkM+HlzJX6OyjjcqxOp2X0oZnlfWZN
+ i01IAR3BVqoKt3Qywtd9k2KTW4sExXHfy40A9ugRmIWhX4uzrKC0nd4Eje/L77eLVbzl
+ /AvRGnf2MKUvg6pMiJFCdGYqSUhIguY0kmDuU1TzL98H9xGX5cqYN+GkQILmK794s1vj
+ MoVZcisWIJHfspBUIUxnfMrsJn6uacCWnC/KR0d3rYG3oMpYR/TmeVx4/TZnKxi3sTD+
+ nH6MrVnk3tBCElC6cVKnvTtfFU5pPL2slGz2yEkt+J+Ct7tUCJL2wLl9u+US5aOA6Db0
+ 1+Qg==
+X-Gm-Message-State: APjAAAVS/sU2T7wbf/U3vEbgl1FEPFD9+yaiAAe4n5WW9cyiDU5ql13i
+ 8dg7QstdxYbMeZVpWjDLbCqh4A9ZZSsij1C3YASERA==
+X-Google-Smtp-Source: APXvYqwY9GpLb4YhUB+egdO7ugg5Yn/kQg6XThSsE5lI7R1GcYgpsLifF5QeUgtPSPS0SmaE3cSd73eUr1WVr/tsNpE=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr89886527otq.135.1578056211554; 
+ Fri, 03 Jan 2020 04:56:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200103121535.GE3804@work-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: xPa4XVp3ObafoVd54yl1qg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191219185609.16748-1-richard.henderson@linaro.org>
+In-Reply-To: <20191219185609.16748-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jan 2020 12:56:40 +0000
+Message-ID: <CAFEAcA-WBtXM=K+n1gNxLAFzttWZDwapYpXX_Sfk_Cws7tg=9g@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: Set ISSIs16Bit in make_issinfo
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,86 +86,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Jeff Kubascik <jeff.kubascik@dornerworks.com>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 03, 2020 at 12:15:35PM +0000, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Thu, Dec 12, 2019 at 04:37:25PM +0000, Dr. David Alan Gilbert (git) =
-wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > >=20
-> > > passthrough_ll is one of the examples in the upstream fuse project
-> > > and is the main part of our daemon here.  It passes through requests
-> > > from fuse to the underlying filesystem, using syscalls as directly
-> > > as possible.
-> > >=20
-> > > From libfuse fuse-3.8.0
-> > >=20
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  tools/virtiofsd/passthrough_ll.c | 1338 ++++++++++++++++++++++++++++=
-++
-> > >  1 file changed, 1338 insertions(+)
-> > >  create mode 100644 tools/virtiofsd/passthrough_ll.c
-> > >=20
-> > > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passt=
-hrough_ll.c
-> > > new file mode 100644
-> > > index 0000000000..5372d02934
-> > > --- /dev/null
-> > > +++ b/tools/virtiofsd/passthrough_ll.c
-> > > @@ -0,0 +1,1338 @@
-> > > +/*
-> > > +  FUSE: Filesystem in Userspace
-> > > +  Copyright (C) 2001-2007  Miklos Szeredi <miklos@szeredi.hu>
-> > > +
-> > > +  This program can be distributed under the terms of the GNU GPL.
-> >=20
-> > I presume this mistake exists in upstream fuse GIT - missing GPL versio=
-n
-> > number info here.
->=20
-> Yes it is, see:
-> https://github.com/libfuse/libfuse/blob/d735af94fa54a5555ce725f1d4e6b97b8=
-12b6603/example/passthrough_ll.c
->=20
-> And at the time that was added their COPYING file was GPL v2.
->=20
-> although they've since renamed COPYING to GPL2.txt but not updated
-> the comments; but they added a LICENSE file.
-> https://github.com/libfuse/libfuse/commit/e8bcd8461ce7dfdc7366f44bad8d855=
-696e73c3b
->=20
-> > This is important to correct since we're moving code
-> > from another repo and thus the COPYING file it is referring to on the
-> > next line is ambiguous to the casual reader.
-> >=20
-> > > +  See the file COPYING.
-> > > +*/
-> >=20
-> > With the GPL version info added:
->=20
-> So just change 'GNU GPL' to 'GNU GPL version 2' during the import?
+On Thu, 19 Dec 2019 at 18:56, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> During the conversion to decodetree, the setting of
+> ISSIs16Bit got lost.  This causes the guest os to
+> incorrectly adjust trapping memory operations.
+>
+> Fixes: 46beb58efbb8a2a32
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Jeff Kubascik <jeff.kubascik@dornerworks.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 2b6c1f91bf..9f0afbdb75 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -8556,6 +8556,9 @@ static ISSInfo make_issinfo(DisasContext *s, int rd, bool p, bool w)
+>      /* ISS not valid if writeback */
+>      if (p && !w) {
+>          ret = rd;
+> +        if (s->base.pc_next - s->pc_curr == 2) {
+> +            ret |= ISSIs16Bit;
+> +        }
+>      } else {
+>          ret = ISSInvalid;
+>      }
+> --
+> 2.20.1
 
-Yes, or just  "GPLv2" is fine too. Ideally submit a patch to libfuse
-upstream & then just copy the result.
+This is correct, and fixes the regression vs 46beb58efbb8a,
+but I agree with Jeff that it's not sufficient (and in fact
+we've always been reporting wrong ISS info as a result)
+because of the wrong sense of the bool argument to
+syn_data_abort_with_iss() in merge_syn_data_abort().
 
->=20
-> >   Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+thanks
+-- PMM
 
