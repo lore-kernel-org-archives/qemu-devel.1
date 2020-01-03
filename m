@@ -2,84 +2,79 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B38C32767
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 18:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A47C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 18:51:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E439222C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 18:26:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA495215A4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 18:51:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRIo+/Pj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E439222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dkHsEzbp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA495215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inReB-0003BE-8O
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 13:26:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59333)
+	id 1inS2S-00029T-VQ
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 13:51:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1inRdO-0002d9-UO
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 13:25:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1inS1m-0001NQ-JO
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 13:50:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1inRdN-0006qW-9R
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 13:25:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59559
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1inRdN-0006jM-3e
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 13:25:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578075915;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Io05Il7tShveRA1C28MAX44M/J/nguwT9QqCFEw2Pgk=;
- b=VRIo+/PjQ9XE1QWoYvD/BdMw0Pl0vqzE5thl+BISUb0NP2rhfQScTs6psHfjRzJ3Frb+Gh
- tqDZH4t4R1+QJgDXMKZw9fSajImeQPR055hwnwhY1qlBFQhg1m4P4cabZjFIBfg0pllAFY
- llplMpodjsrZbS19VySTzxOONMKkydQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-5vwxHz6aMUSjxsqjucMT4A-1; Fri, 03 Jan 2020 13:25:13 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04735113784E
- for <qemu-devel@nongnu.org>; Fri,  3 Jan 2020 18:25:13 +0000 (UTC)
-Received: from redhat.com (ovpn-116-61.ams2.redhat.com [10.36.116.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A69A5C548;
- Fri,  3 Jan 2020 18:25:12 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH v2 01/10] migration: Increase default number of multifd
- channels to 16
-In-Reply-To: <20200103165832.GU2753983@redhat.com> ("Daniel P. =?utf-8?Q?B?=
- =?utf-8?Q?errang=C3=A9=22's?=
- message of "Fri, 3 Jan 2020 16:58:32 +0000")
-References: <20191218020119.3776-1-quintela@redhat.com>
- <20191218020119.3776-2-quintela@redhat.com>
- <20200103165832.GU2753983@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Fri, 03 Jan 2020 19:25:08 +0100
-Message-ID: <87mub4xurf.fsf@trasno.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1inS1l-00052i-2B
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 13:50:30 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:37777)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1inS1k-0004y0-Qw
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 13:50:28 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id k14so62252591otn.4
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 10:50:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=BtdziEX1a5/ByrHx79DDm2iYiQK+ndf19aKHFR/b/ts=;
+ b=dkHsEzbpo8lQUs23D283AWyZjnQuqStZ4W6LUpom5ED7wNGS+Ow2G2c2GAySevbkkw
+ y0MwFiZa3zURbIzipf1guYZLWzawFUEi2gyFDMHLhHHfPu/aqj7wN5X5oFBFEk54ZXgn
+ O5ZOqibOUrkTNtUGgpgHRrlLsHYjzDSdYUlMaBDLPAYNsKErgwvaMC547Aq2N6xwSpVa
+ DV2GDaGVAsfnUPofZowO0t3EDmpsG/px9eub1pWoRTPLyhMmheEOJuWiR+xrmZ9fPZny
+ DsizxvS5SD7mjcYwqX21dc/mZtvL4RK4ZLn6o4U4wz/ANISpxt7Zly9A5j+42pDR+o6O
+ tBBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=BtdziEX1a5/ByrHx79DDm2iYiQK+ndf19aKHFR/b/ts=;
+ b=gOYYns+jE3UlINC9UXeQMk6lNmV1WmnTpygrQU41R8shXIj4dipm6AhBOZXsLY9tcp
+ bFrfJbQbFyF6eBKls+YWK9UgLPK7Av9O9iA+CJb6xT1T2LQ+ANvTx5+Hayvlt9AJSUcU
+ uFma+4AqVUxnGSGYetbZYSUY9vkd5STCu6OOATzYhrpopQk12GKlWnrkCqkBvv4Ib2k1
+ r7JPKBCUq0drr2erfVi9NCo+k51gxl2NKUQtqbGR6HgUy3Mn2UsZ02Z24Hzvk+M4lQWW
+ t308ZxnN69JI3DkdYYYR1+vPmrILcG/TWbbaLJJkdBrVxHAT9a7WkTlFzL7EGE1LTm7A
+ chbw==
+X-Gm-Message-State: APjAAAXNGEUTbaAGwMy1HaAmLhFMFBdZ3KobxE0dVWi3BzeRYSYQ61Tt
+ ONjFsqF8SOhyLMBFavuISZUMDYRBzPGe/cNErJYwoQ==
+X-Google-Smtp-Source: APXvYqznBIWdo62PJ01WOGCFzyY4M9vmm9IKwHagw2HjG0KRWCp377o6QPJsnvdMIalNjGxMTROZej8llbu3HCzSpF0=
+X-Received: by 2002:a9d:8cb:: with SMTP id 69mr81602304otf.221.1578077427881; 
+ Fri, 03 Jan 2020 10:50:27 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 5vwxHz6aMUSjxsqjucMT4A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191220102520.1637190-1-stefanha@redhat.com>
+In-Reply-To: <20191220102520.1637190-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jan 2020 18:50:17 +0000
+Message-ID: <CAFEAcA-=4NTz9nXJ7LRjsGOBENviXLMxYRF9u+SR8EYbs=K=UQ@mail.gmail.com>
+Subject: Re: [PULL 0/3] Block patches
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,70 +86,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> On Wed, Dec 18, 2019 at 03:01:10AM +0100, Juan Quintela wrote:
->> We can scale much better with 16, so we can scale to higher numbers.
+On Fri, 20 Dec 2019 at 10:25, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> What was the test scenario showing such scaling ?
-
-On my test hardware, with 2 channels we can saturate around 8Gigabit max,
-more than that, and the migration thread is not fast enough to fill the
-network bandwidth.
-
-With 8 that is enough to fill whatever we can find.
-We used to have a bug where we were getting trouble with more channels
-than cores.  That was the initial reason why the default was so low.
-
-So, pros/cons are:
-- have low value (2).  We are backwards compatible, but we are not using
-  all  bandwith.  Notice that we will dectect the error before 5.0 is
-  out and print a good error message.
-
-- have high value (I tested 8 and 16).  Found no performance loss when
-  moving to lower bandwidth limits, and clearly we were able to saturate
-  the higher speeds (I tested on localhost, so I had big enough bandwidth)
+> The following changes since commit aceeaa69d28e6f08a24395d0aa6915b687d0a681:
+>
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-12-17' into staging (2019-12-17 15:55:20 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 725fe5d10dbd4259b1853b7d253cef83a3c0d22a:
+>
+>   virtio-blk: fix out-of-bounds access to bitmap in notify_guest_bh (2019-12-19 16:20:25 +0000)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+> ----------------------------------------------------------------
 
 
-> In the real world I'm sceptical that virt hosts will have
-> 16 otherwise idle CPU cores available that are permissible
-> to use for migration, or indeed whether they'll have network
-> bandwidth available to allow 16 cores to saturate the link.
+Applied, thanks.
 
-The problem here is that if you have such a host, and you want to have
-high speed migration, you need to configure it.  My measumermets are
-that high number of channels don't affect performance with low
-bandwidth, but low number of channels affect performance with high
-bandwidth speed.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-So, if we want to have something that works "automatically" everywhere,
-we need to put it to at least 8.  Or we can trust that management app
-will do the right thing.
-
-If you are using a low value of bandwidth, the only difference with 16
-channels is that you are using a bit more memory (just the space for the
-stacks) and that you are having less contention for the locks (but with
-low bandwidth you are not having contention anyways).
-
-So,  I think that the question is:
-- What does libvirt prefferes
-- What does ovirt/openstack preffer
-- Do we really want that the user "have" to configure that value
-
-I don't really care one way or another.
-
-Thanks, Juan.
-
-PD.  On next patch submission I will make it be 2 for old machine types,
-     it is not difficult and makes the backward compatibility problem go
-     away.
-
+-- PMM
 
