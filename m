@@ -2,88 +2,69 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A36C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 21:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A98C00523
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 21:35:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13F121835
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 21:27:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d4cxdSXa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13F121835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 12A3B21835
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 21:35:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12A3B21835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inUTw-0000Z7-RD
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 16:27:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45551)
+	id 1inUb9-0002fz-5K
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 16:35:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1inURV-0005Yz-PK
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:25:14 -0500
+ (envelope-from <no-reply@patchew.org>) id 1inUaV-0002Eu-CR
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1inURU-0004L8-Oi
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:25:13 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:37550)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1inURU-0004HY-Hw
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:25:12 -0500
-Received: by mail-pl1-x644.google.com with SMTP id c23so19466600plz.4
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 13:25:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=v5KPKRZAR7txzi3dtQ0M2sC1CnUsf9tIOlY4B9oV1g8=;
- b=d4cxdSXakwl8gu5aoAbEDrQslebPkBRfyvScF7etxqt5M/IC5EUgjF2F7lpgOJc0fe
- rali1GqndHWZoAEcQnd7gXAzFsT3ccp8baeGn14IdcYZIw4QM27roUZCwl4NL1xeZ8Y5
- aVqybggqawR9dc5F9OFGm+jnaTXFjNjGNXDF2ZzJOQxxCoCN/mbk4APSllW1H2TmxM1s
- L1yWMGlTk3esva8lWwn/68eyqMS2KTfU3vFLKeF+Ws7x3qb3JM3TXabEFLJZFDhHCeAj
- kCybrmQmHwDF8kv2ExAC10SHiQOucfGp0U1aG/Ur2hvX9y8vFYi7oIs2s2SmGss8lzh3
- ivWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=v5KPKRZAR7txzi3dtQ0M2sC1CnUsf9tIOlY4B9oV1g8=;
- b=R+EI80qtdnEakDLxfqipiX1bGXVFW+AKtYpIZ5Hdpw0T5IcAx+0+H1MTDHrd5D43KV
- BAN5LqjZZU+37wq0b7ZshEWjtRhm1KQpBPLacNLyIceODjN0llVnobh8PJ5jq2FcP5nI
- MbUVEokokich+qr/ARPkgSZbe0fYy7sWevgFos2+I/UB9plSd11S84CkLtTD6OSL1bVn
- hUu3XelK6u2l8Gorg2zcgQhcaMs5ffwy5JbJfHPxDah7HsaxvndRZ3lNtw8ydBWBLHXp
- Cc8DBbGcLfzvle1+rHhQAaA9IkJNC6xFOPR30DRgnsNPmXiujHjtdhV6yJdKpVExPVZ6
- b7sw==
-X-Gm-Message-State: APjAAAUx21NDNTf063E8euvmkM1QWanVcOBOVKN2/OtWeXyVkB56RY5a
- axR8hVIDj0yaatZG5UhDqWupNWLpu159sg==
-X-Google-Smtp-Source: APXvYqwjsTJ8GVGsHrIfxCsM+4DW1Bt7FbPyfTmdo2GcTV042L/Dnj+xRgQQIKs7rxAHPFrUmeg4Og==
-X-Received: by 2002:a17:902:934a:: with SMTP id
- g10mr69132583plp.99.1578086711266; 
- Fri, 03 Jan 2020 13:25:11 -0800 (PST)
-Received: from localhost.localdomain
- (59-100-211-22.bri.static-ipl.aapt.com.au. [59.100.211.22])
- by smtp.gmail.com with ESMTPSA id c15sm16668907pja.30.2020.01.03.13.25.09
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jan 2020 13:25:10 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/3] capstone: Enable disassembly for s390x
-Date: Sat,  4 Jan 2020 07:24:59 +1000
-Message-Id: <20200103212500.14384-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <no-reply@patchew.org>) id 1inUaT-0001i8-Qg
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:34:31 -0500
+Resent-Date: Fri, 03 Jan 2020 16:34:30 -0500
+Resent-Message-Id: <E1inUaT-0001i8-Qg@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21170)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1inUaT-0001Zf-IT
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 16:34:29 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1578087262; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=jR6N7YobUKwVVb0U5F7KWjmgy4dtLbhPnJRusVV5rt3nE1HiYETytQl4DUdF7ur0Kc57Sr+EDPOdnqU5o8R7AIZeWhglo0woBOjurmvBdRxZrUoRjgO3fELfPo4BgZnBVv6CmLjMa3+v3IHIlh4G5vu/pVjZRKFh9M3B+EqijNY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1578087262;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=swjRjVFRP9b5OvYJ9ap8Z6WotD9MRSD6a7e2f+pzTvY=; 
+ b=X1rcHy4qkR5gLHGILI/aocZ+vmsX64LIYIIGS8bm6OsRfTyXe1/vTn1psAxwF3D6GNieLqJtZ/YDGoKw2FbPy0rPWfAOB7SbxLcZoW6K9hdvzaAZ3WsjcVkKhxSEDtQeps7dZ00T30l2F8zHujKOvLOR8dsJdkm95+LNy15TJek=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1578087260334742.3143895506244;
+ Fri, 3 Jan 2020 13:34:20 -0800 (PST)
 In-Reply-To: <20200103212500.14384-1-richard.henderson@linaro.org>
-References: <20200103212500.14384-1-richard.henderson@linaro.org>
+Subject: Re: [PATCH 0/3] capstone: update to next
+Message-ID: <157808725991.18970.6654200309304888295@37313f22b938>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Fri, 3 Jan 2020 13:34:20 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,69 +76,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable s390x, aka SYSZ, in the git submodule build.
-Set the capstone parameters for both s390x host and guest.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- Makefile           | 1 +
- disas.c            | 3 +++
- target/s390x/cpu.c | 4 ++++
- 3 files changed, 8 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 12e129ac9d..df1c692ccd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -504,6 +504,7 @@ CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
- CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
-+CAP_CFLAGS += -DCAPSTONE_HAS_SYSZ
- CAP_CFLAGS += -DCAPSTONE_HAS_X86
- 
- .PHONY: capstone/all
-diff --git a/disas.c b/disas.c
-index 3937da6157..845c40fca8 100644
---- a/disas.c
-+++ b/disas.c
-@@ -660,6 +660,9 @@ void disas(FILE *out, void *code, unsigned long size)
-     print_insn = print_insn_m68k;
- #elif defined(__s390__)
-     print_insn = print_insn_s390;
-+    s.info.cap_arch = CS_ARCH_SYSZ;
-+    s.info.cap_insn_unit = 2;
-+    s.info.cap_insn_split = 6;
- #elif defined(__hppa__)
-     print_insn = print_insn_hppa;
- #endif
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 625daeedd1..1734ad9c3a 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -43,6 +43,7 @@
- #include "sysemu/tcg.h"
- #endif
- #include "fpu/softfloat-helpers.h"
-+#include "disas/capstone.h"
- 
- #define CR0_RESET       0xE0UL
- #define CR14_RESET      0xC2000000UL;
-@@ -162,6 +163,9 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
- {
-     info->mach = bfd_mach_s390_64;
-     info->print_insn = print_insn_s390;
-+    info->cap_arch = CS_ARCH_SYSZ;
-+    info->cap_insn_unit = 2;
-+    info->cap_insn_split = 6;
- }
- 
- static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEwMzIxMjUwMC4xNDM4
+NC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzNdIGNhcHN0b25lOiB1cGRh
+dGUgdG8gbmV4dApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDAxMDMyMTI1MDAuMTQzODQt
+MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKZmF0YWw6IHVuYWJsZSB0byB3cml0ZSBuZXcgaW5kZXggZmlsZQp3YXJuaW5n
+OiBDbG9uZSBzdWNjZWVkZWQsIGJ1dCBjaGVja291dCBmYWlsZWQuCllvdSBjYW4gaW5zcGVjdCB3
+aGF0IHdhcyBjaGVja2VkIG91dCB3aXRoICdnaXQgc3RhdHVzJwphbmQgcmV0cnkgdGhlIGNoZWNr
+b3V0IHdpdGggJ2dpdCBjaGVja291dCAtZiBIRUFEJwoKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBj
+YWxsIGxhc3QpOgogIEZpbGUgInBhdGNoZXctdGVzdGVyMi9zcmMvcGF0Y2hldy1jbGkiLCBsaW5l
+IDUzMSwgaW4gdGVzdF9vbmUKICAgIGdpdF9jbG9uZV9yZXBvKGNsb25lLCByWyJyZXBvIl0sIHJb
+ImhlYWQiXSwgbG9nZiwgVHJ1ZSkKICBGaWxlICJwYXRjaGV3LXRlc3RlcjIvc3JjL3BhdGNoZXct
+Y2xpIiwgbGluZSA2MiwgaW4gZ2l0X2Nsb25lX3JlcG8KICAgIHN1YnByb2Nlc3MuY2hlY2tfY2Fs
+bChjbG9uZV9jbWQsIHN0ZGVycj1sb2dmLCBzdGRvdXQ9bG9nZikKICBGaWxlICIvb3B0L3JoL3Jo
+LXB5dGhvbjM2L3Jvb3QvdXNyL2xpYjY0L3B5dGhvbjMuNi9zdWJwcm9jZXNzLnB5IiwgbGluZSAy
+OTEsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBj
+bWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ2dpdCcsICdjbG9u
+ZScsICctcScsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcGF0Y2hldy1naXQtY2FjaGUvaHR0cHNn
+aXRodWJjb21wYXRjaGV3cHJvamVjdHFlbXUtM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NCcsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMXlhXzNyMngvc3JjJ10n
+IHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEyOC4KCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
+YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDEwMzIxMjUwMC4xNDM4NC0x
+LXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1l
+c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
 
 
