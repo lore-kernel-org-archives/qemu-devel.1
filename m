@@ -2,59 +2,100 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBEAC2D0CE
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 03:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F01C2D0CE
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 05:07:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85A4221582
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 03:37:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85A4221582
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id B427821734
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 05:07:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQIaGh71"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B427821734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inDmC-000133-Mj
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 22:37:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43774)
+	id 1inFB0-000761-Ra
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 00:07:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1inDj0-00050O-AL
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 22:34:11 -0500
+ (envelope-from <philmd@redhat.com>) id 1inFAK-0006cv-1Q
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 00:06:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1inDiy-00036x-Oy
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 22:34:10 -0500
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:56205)
+ (envelope-from <philmd@redhat.com>) id 1inFAH-0002Er-Gy
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 00:06:26 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55758
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1inDiy-0002wU-6i
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 22:34:08 -0500
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436282|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.637094-0.00976433-0.353142;
- DS=CONTINUE|ham_system_inform|0.275118-0.000104362-0.724777;
- FP=0|0|0|0|0|-1|-1|-1; HT=e01a16378; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=9; SR=0; TI=SMTPD_---.GV9YvOJ_1578022440; 
-Received: from L-PF1D6DP4-1208.hz.ali.com(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GV9YvOJ_1578022440)
- by smtp.aliyun-inc.com(10.147.42.16); Fri, 03 Jan 2020 11:34:02 +0800
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-To: alistair23@gmail.com, richard.henderson@linaro.org,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-Subject: [PATCH v3 3/4] RISC-V: support vector extension csr
-Date: Fri,  3 Jan 2020 11:33:46 +0800
-Message-Id: <20200103033347.20909-4-zhiwei_liu@c-sky.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200103033347.20909-1-zhiwei_liu@c-sky.com>
-References: <20200103033347.20909-1-zhiwei_liu@c-sky.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inFAH-00029U-1w
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 00:06:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578027983;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0e7IM6FFYqaY0OqhGuJX3oIso53CmeO603gpv21Dd3A=;
+ b=MQIaGh71FA4+oxfShy4DtdWghfPRlueuI+K2mTBSqBNl5scyKyWo78zYEXgmFGEi8zWLG6
+ TQSel4LM5lVVkcENO0DVxsXSo7+5e5sHXpCnS0VbcYzI4gkG2iy60d82GiXr1hzL6yTU+p
+ sBtQQjHS+kMen7sbMvZsLVWwSw+Bgvw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-azEJeDE_M2mvWejzZ4vL-Q-1; Fri, 03 Jan 2020 00:06:21 -0500
+Received: by mail-wr1-f72.google.com with SMTP id 90so22490590wrq.6
+ for <qemu-devel@nongnu.org>; Thu, 02 Jan 2020 21:06:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1znOzGs2JxGB7GNeic5dKzBKrJwcITpNgFNCw8yiKAE=;
+ b=OYfIiouKS4qs1VsfKrfiCTIXtOEsdVDrDHafBVWH1A4XZkqSYBSj9m+k0h3OcoD7wN
+ /yrQB3UL/vs5TO3f66nLJ85DYgkHXg4WY1Sm1MzzB8jaGckMGpPd+OXOY8rwuSqNuSnZ
+ Wi2KFpcxg9dL40DMUYqoys57m0RI9sKXJNVno2CfUFpaaO6GNWBt9aeJ+gxJW1zEEMPm
+ 5Rm9b5yaPr62KrdpgVXpAe70h5FWXckIS5CMZANfc1/Q2KwVdRY6faEOiquWDaNrrn4r
+ 0k7mM/tsjhZEMDk1RBPMiEelcPhkjkfYAjJs3OvznlAbV8QKrorFS5uZny05BbVb2JKL
+ 2lGg==
+X-Gm-Message-State: APjAAAUzvxkeSiboU/ogyCOgQeeXHGwetYxq16FGC4KnFfJLI4d0VgkE
+ hs28aoTx7Q5uct16dIaLdZfeq6F2jtTUYJVYuorHvoJuJbwBtNjE3vjAM4ta+Ra4OwxBlle7tn2
+ UVE+7sJ9a1cueQ6U=
+X-Received: by 2002:adf:9c8a:: with SMTP id d10mr84660656wre.156.1578027980590; 
+ Thu, 02 Jan 2020 21:06:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzDoTm/wTLQ8olEfgVeaElo+4rYJVzNptfe47SHw7bJkDFYwjH2EjA6JGtxY23VyunqsPv8Fg==
+X-Received: by 2002:adf:9c8a:: with SMTP id d10mr84660629wre.156.1578027980351; 
+ Thu, 02 Jan 2020 21:06:20 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id a1sm58314712wrr.80.2020.01.02.21.06.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 02 Jan 2020 21:06:19 -0800 (PST)
+Subject: Re: [PATCH 1/2] RFC: savevm: check RAM is page_size aligned
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200102210149.926077-1-marcandre.lureau@redhat.com>
+ <20200102210149.926077-2-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <926dcf48-e309-55a5-cfcd-bd1343c17f27@redhat.com>
+Date: Fri, 3 Jan 2020 06:06:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+In-Reply-To: <20200102210149.926077-2-marcandre.lureau@redhat.com>
+Content-Language: en-US
+X-MC-Unique: azEJeDE_M2mvWejzZ4vL-Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,213 +107,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Until v0.7.1 specification, vector status is still not defined for
-mstatus.
+Hi Marc-Andr=C3=A9,
 
-Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
----
- target/riscv/cpu_bits.h | 15 +++++++
- target/riscv/csr.c      | 92 +++++++++++++++++++++++++++++------------
- 2 files changed, 80 insertions(+), 27 deletions(-)
+On 1/2/20 10:01 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Check the host pointer is correctly aligned, otherwise we may fail
+> during migration in ram_block_discard_range().
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>   migration/savevm.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+>=20
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index a71b930b91..ab6e02011f 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2910,6 +2910,11 @@ err_drain:
+>  =20
+>   void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
+>   {
+> +    RAMBlock *rb =3D mr->ram_block;
+> +    uintptr_t hostaddr =3D (uintptr_t)qemu_ram_get_host_addr(rb);
+> +
+> +    assert((hostaddr & (qemu_ram_pagesize(rb) - 1)) =3D=3D 0);
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 11f971ad5d..9eb43ecc1e 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -29,6 +29,14 @@
- #define FSR_NXA             (FPEXC_NX << FSR_AEXC_SHIFT)
- #define FSR_AEXC            (FSR_NVA | FSR_OFA | FSR_UFA | FSR_DZA | FSR_NXA)
- 
-+/* Vector Fixed-Point round model */
-+#define FSR_VXRM_SHIFT      9
-+#define FSR_VXRM            (0x3 << FSR_VXRM_SHIFT)
-+
-+/* Vector Fixed-Point saturation flag */
-+#define FSR_VXSAT_SHIFT     8
-+#define FSR_VXSAT           (0x1 << FSR_VXSAT_SHIFT)
-+
- /* Control and Status Registers */
- 
- /* User Trap Setup */
-@@ -48,6 +56,13 @@
- #define CSR_FRM             0x002
- #define CSR_FCSR            0x003
- 
-+/* User Vector CSRs */
-+#define CSR_VSTART          0x008
-+#define CSR_VXSAT           0x009
-+#define CSR_VXRM            0x00a
-+#define CSR_VL              0xc20
-+#define CSR_VTYPE           0xc21
-+
- /* User Timers and Counters */
- #define CSR_CYCLE           0xc00
- #define CSR_TIME            0xc01
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index e0d4586760..506ad7b590 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -53,6 +53,11 @@ static int fs(CPURISCVState *env, int csrno)
-     return 0;
- }
- 
-+static int vs(CPURISCVState *env, int csrno)
-+{
-+    return 0;
-+}
-+
- static int ctr(CPURISCVState *env, int csrno)
- {
- #if !defined(CONFIG_USER_ONLY)
-@@ -107,11 +112,6 @@ static int pmp(CPURISCVState *env, int csrno)
- /* User Floating-Point CSRs */
- static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
- {
--#if !defined(CONFIG_USER_ONLY)
--    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
--        return -1;
--    }
--#endif
-     *val = riscv_cpu_get_fflags(env);
-     return 0;
- }
-@@ -119,9 +119,6 @@ static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
- static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
- {
- #if !defined(CONFIG_USER_ONLY)
--    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
--        return -1;
--    }
-     env->mstatus |= MSTATUS_FS;
- #endif
-     riscv_cpu_set_fflags(env, val & (FSR_AEXC >> FSR_AEXC_SHIFT));
-@@ -130,11 +127,6 @@ static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
- 
- static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
- {
--#if !defined(CONFIG_USER_ONLY)
--    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
--        return -1;
--    }
--#endif
-     *val = env->frm;
-     return 0;
- }
-@@ -142,9 +134,6 @@ static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
- static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
- {
- #if !defined(CONFIG_USER_ONLY)
--    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
--        return -1;
--    }
-     env->mstatus |= MSTATUS_FS;
- #endif
-     env->frm = val & (FSR_RD >> FSR_RD_SHIFT);
-@@ -153,29 +142,73 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
- 
- static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
- {
--#if !defined(CONFIG_USER_ONLY)
--    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
--        return -1;
--    }
--#endif
--    *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
--        | (env->frm << FSR_RD_SHIFT);
-+    *val = (env->vext.vxrm << FSR_VXRM_SHIFT)
-+            | (env->vext.vxsat << FSR_VXSAT_SHIFT)
-+            | (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
-+            | (env->frm << FSR_RD_SHIFT);
-     return 0;
- }
- 
- static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
- {
- #if !defined(CONFIG_USER_ONLY)
--    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
--        return -1;
--    }
-     env->mstatus |= MSTATUS_FS;
- #endif
-     env->frm = (val & FSR_RD) >> FSR_RD_SHIFT;
-+    env->vext.vxrm = (val & FSR_VXRM) >> FSR_VXRM_SHIFT;
-+    env->vext.vxsat = (val & FSR_VXSAT) >> FSR_VXSAT_SHIFT;
-     riscv_cpu_set_fflags(env, (val & FSR_AEXC) >> FSR_AEXC_SHIFT);
-     return 0;
- }
- 
-+static int read_vtype(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vext.vtype;
-+    return 0;
-+}
-+
-+static int read_vl(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vext.vl;
-+    return 0;
-+}
-+
-+static int read_vxrm(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vext.vxrm;
-+    return 0;
-+}
-+
-+static int read_vxsat(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vext.vxsat;
-+    return 0;
-+}
-+
-+static int read_vstart(CPURISCVState *env, int csrno, target_ulong *val)
-+{
-+    *val = env->vext.vstart;
-+    return 0;
-+}
-+
-+static int write_vxrm(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vext.vxrm = val;
-+    return 0;
-+}
-+
-+static int write_vxsat(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vext.vxsat = val;
-+    return 0;
-+}
-+
-+static int write_vstart(CPURISCVState *env, int csrno, target_ulong val)
-+{
-+    env->vext.vstart = val;
-+    return 0;
-+}
-+
- /* User Timers and Counters */
- static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
- {
-@@ -873,7 +906,12 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_FFLAGS] =              { fs,   read_fflags,      write_fflags      },
-     [CSR_FRM] =                 { fs,   read_frm,         write_frm         },
-     [CSR_FCSR] =                { fs,   read_fcsr,        write_fcsr        },
--
-+    /* Vector CSRs */
-+    [CSR_VSTART] =              { vs,   read_vstart,      write_vstart      },
-+    [CSR_VXSAT] =               { vs,   read_vxsat,       write_vxsat       },
-+    [CSR_VXRM] =                { vs,   read_vxrm,        write_vxrm        },
-+    [CSR_VL] =                  { vs,   read_vl                             },
-+    [CSR_VTYPE] =               { vs,   read_vtype                          },
-     /* User Timers and Counters */
-     [CSR_CYCLE] =               { ctr,  read_instret                        },
-     [CSR_INSTRET] =             { ctr,  read_instret                        },
--- 
-2.23.0
+Can we use the QEMU_PTR_IS_ALIGNED() macro instead?
+
+        assert(QEMU_PTR_IS_ALIGNED(qemu_ram_get_host_addr(rb),
+                                   qemu_ram_pagesize(rb)));
+
+>       qemu_ram_set_idstr(mr->ram_block,
+>                          memory_region_name(mr), dev);
+>       qemu_ram_set_migratable(mr->ram_block);
+>=20
 
 
