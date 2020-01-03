@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F090C3276E
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 02:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B48BC3276F
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 02:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C440217F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 02:43:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24EE4217F4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 02:44:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ceiMdCCF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C440217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sf2Lzd2h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24EE4217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inCw8-0003Ev-ES
-	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 21:43:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48038)
+	id 1inCxB-0004ki-Bg
+	for qemu-devel@archiver.kernel.org; Thu, 02 Jan 2020 21:44:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52506)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1inCv8-00026O-IQ
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 21:42:39 -0500
+ (envelope-from <alistair23@gmail.com>) id 1inCvb-0002qO-P8
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 21:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1inCv7-000409-6l
- for qemu-devel@nongnu.org; Thu, 02 Jan 2020 21:42:38 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34390)
+ (envelope-from <alistair23@gmail.com>) id 1inCva-0004xQ-Mi
+ for qemu-devel@nongnu.org; Thu, 02 Jan 2020 21:43:07 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34394)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1inCv6-0003xf-UN; Thu, 02 Jan 2020 21:42:37 -0500
-Received: by mail-lj1-x242.google.com with SMTP id z22so37752328ljg.1;
- Thu, 02 Jan 2020 18:42:36 -0800 (PST)
+ id 1inCva-0004ve-Ex; Thu, 02 Jan 2020 21:43:06 -0500
+Received: by mail-lj1-x242.google.com with SMTP id z22so37753000ljg.1;
+ Thu, 02 Jan 2020 18:43:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=uE7iq03z6c6M4Osq9S5c6hdyiQ+NoJTxkaCnPW5cj6U=;
- b=ceiMdCCF8ANz5LvlKA51hDTEK+H7IT4uVVy96PojnOXHMyV65AQuUYZqlu0Gi/ZC2y
- HCk6J9tIyGTRxHliYsyPh8ZVEXdTq/pPMAPNr47zo/nUl8YL5Ef9lKvOszkX6LnwPi1X
- OEyPhWnozMyyNTRMyVzcpUhIWrX2w0LG7UFjPxPdcFlKi3jPVBrTx+OHCdc2hTnlQ/s8
- ZtpYreIAO2zY5lDc2FMkRwMtpmSqNOwcOvMcl5T4wIpGwRbKN8CW/rJ1KEAXwd6ZolpD
- gY5yylh5KQBDDxgQ8A/6G984DuOCw2VMtyle9b/9yJi0BOy5SbpCNolM7aXgCvNE2Rov
- KeXg==
+ bh=+7cA0d0Hyi5444bKwVYHxmPS0oGCkXfU/S2Nefqv/E4=;
+ b=sf2Lzd2hOuHlbhMGyxYZNV5Cvzh+3KLU8lTMbdmKHMjHNh0igsRrL4XjCAk4yRP8vf
+ s/OjWrR6da7a2LVtU5DeediGnZbXeF4F/Dp76/g8PuMr8i2mtdYPg7S9M+ZZeqxXx30p
+ eUi2GAw68sH8XnxlQNcJj5TJ7E1NyzlKLM6xa91OJqT7SYkm84GvPH23zQggZ2daCl0a
+ rjrQ+GkiLEecFyt2uN+r94Qft6M0goUgtbv3NLqccuBOLRS4kibs2CdOTPxFJghJ69Xw
+ DyrwAnU6vA74NzWNMy9eMT/YARCg2dl7x2Qryev3G/6DA+nfrE7iGijvPqyBDAPm6NKl
+ XeyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=uE7iq03z6c6M4Osq9S5c6hdyiQ+NoJTxkaCnPW5cj6U=;
- b=Ct81ADNW9iTwJqKyIA1AUDsOaGI5ZFwjacbYH+/C4FhCJmmXD+ttYfkhwNz2rvXSw+
- 4toVZzjloGFmi5JdC0YlttsRU0WkwIODVtjfLYgBFPSqhyzbfgllgmRMHxiGshP2u8oR
- G49lIK4i6/9MI4atW+DqREwoYWYIrolRiYjqE6a521V0MnC2qXM5snjIKcFzUMry0IrR
- gLnK+fz7MV0vnZ+SBgnKuvVktiwqsIBY4Nk5YTSVa3ZvZeBzrwm+l7T2cTO2Xdq2aWam
- W3EbaMHv3h2H7ZclYMbmiRUIjBfAkhwkEzwXaouYUUIgIZv9Giz4vHhBxf0vsKL5agLk
- izbQ==
-X-Gm-Message-State: APjAAAUZQdHk+ucjWn7qCJ4y7Qz65ZrANh8MURsjwWGz8eq+nVx1sA4m
- yHQSZT81akVWDaOWBwPE/vxzV0vI8EiDmrpgjF4=
-X-Google-Smtp-Source: APXvYqwE0wKi4dKpd627Rjjbhzykm0Vj+gJiWG0nDWDP0FQa1tIeWdNxBqyKqdCIaEJxNEcwtUP79zGCSQW6X3PA24Y=
-X-Received: by 2002:a2e:3608:: with SMTP id d8mr49686247lja.152.1578019355649; 
- Thu, 02 Jan 2020 18:42:35 -0800 (PST)
+ bh=+7cA0d0Hyi5444bKwVYHxmPS0oGCkXfU/S2Nefqv/E4=;
+ b=e3W2egTjOhGsXM1pUhCn5zHC0G8DFn+aDLT8iYgW37ho0kjebaqPIORQYh4n2H/9Qt
+ UjVGzpcCqMZ0wCBhItWvSyEOlovucNKb9+Dr3XnOA0TUI3hmWjQK+tYn/WoazkgFaKv9
+ 4F3NWm6E71Tn88Y0x6oNwn3C3Zxj7IO7cL7Xnf0ID2znRcpRtb7PUvGYrO4BT8NzWGY+
+ JEuPJmTQhGEx2F20sBSkreyvvcVB1BRg6FTnxB2WUtsCcsJEpJMmfeqP1cm6bpn8EXQt
+ oGFCoDR6DailBtZq8GMlzwat4XsSs95093XKALiTyrK5FI27uQXTIgnZ9SVEvB1wZdFi
+ dinA==
+X-Gm-Message-State: APjAAAWIpQUv51hk5TuVNyNqdpPVJJsJNRj+xCsD6OJyXwIYNzj4k2zX
+ D4dOnvPesJIVaFvjIDOr5M8xF/ptCbn8mIAJiVQ=
+X-Google-Smtp-Source: APXvYqyJxH2lgoAOxeOFfTY00+cTVDLIOj+633dJyMoRWo0yvp9dCGNnnSHzqXFAwBHgUhI2yRIUMyNLZY/V6IVminE=
+X-Received: by 2002:a2e:96c6:: with SMTP id d6mr20605277ljj.4.1578019385388;
+ Thu, 02 Jan 2020 18:43:05 -0800 (PST)
 MIME-Version: 1.0
 References: <20200101112303.20724-1-philmd@redhat.com>
- <20200101112303.20724-4-philmd@redhat.com>
-In-Reply-To: <20200101112303.20724-4-philmd@redhat.com>
+ <20200101112303.20724-5-philmd@redhat.com>
+In-Reply-To: <20200101112303.20724-5-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 2 Jan 2020 18:42:08 -0800
-Message-ID: <CAKmqyKPvVOWw1_YzhButrc+_DD2mJoAszEE7mWkqs37SGutHvg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] tcg: Move TCG headers to include/tcg/
+Date: Thu, 2 Jan 2020 18:42:38 -0800
+Message-ID: <CAKmqyKPGWZh1a6vQk2TF=crN2yK7ZxpAvre55wx_-cuOMLrp9w@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] configure: Remove tcg/ from the preprocessor
+ include search list
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -114,8 +115,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 1, 2020 at 3:27 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+On Wed, Jan 1, 2020 at 3:25 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
 om> wrote:
+>
+> All tcg includes are relative to the repository root directory,
+> we can safely remove the tcg/ directory from the include search
+> path list.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -124,57 +129,22 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  {tcg =3D> include/tcg}/tcg-gvec-desc.h | 0
->  {tcg =3D> include/tcg}/tcg-mo.h        | 0
->  {tcg =3D> include/tcg}/tcg-op-gvec.h   | 0
->  {tcg =3D> include/tcg}/tcg-op.h        | 0
->  {tcg =3D> include/tcg}/tcg-opc.h       | 0
->  {tcg =3D> include/tcg}/tcg.h           | 0
->  MAINTAINERS                          | 1 +
->  7 files changed, 1 insertion(+)
->  rename {tcg =3D> include/tcg}/tcg-gvec-desc.h (100%)
->  rename {tcg =3D> include/tcg}/tcg-mo.h (100%)
->  rename {tcg =3D> include/tcg}/tcg-op-gvec.h (100%)
->  rename {tcg =3D> include/tcg}/tcg-op.h (100%)
->  rename {tcg =3D> include/tcg}/tcg-opc.h (100%)
->  rename {tcg =3D> include/tcg}/tcg.h (100%)
+>  configure | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/tcg/tcg-gvec-desc.h b/include/tcg/tcg-gvec-desc.h
-> similarity index 100%
-> rename from tcg/tcg-gvec-desc.h
-> rename to include/tcg/tcg-gvec-desc.h
-> diff --git a/tcg/tcg-mo.h b/include/tcg/tcg-mo.h
-> similarity index 100%
-> rename from tcg/tcg-mo.h
-> rename to include/tcg/tcg-mo.h
-> diff --git a/tcg/tcg-op-gvec.h b/include/tcg/tcg-op-gvec.h
-> similarity index 100%
-> rename from tcg/tcg-op-gvec.h
-> rename to include/tcg/tcg-op-gvec.h
-> diff --git a/tcg/tcg-op.h b/include/tcg/tcg-op.h
-> similarity index 100%
-> rename from tcg/tcg-op.h
-> rename to include/tcg/tcg-op.h
-> diff --git a/tcg/tcg-opc.h b/include/tcg/tcg-opc.h
-> similarity index 100%
-> rename from tcg/tcg-opc.h
-> rename to include/tcg/tcg-opc.h
-> diff --git a/tcg/tcg.h b/include/tcg/tcg.h
-> similarity index 100%
-> rename from tcg/tcg.h
-> rename to include/tcg/tcg.h
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 387879aebc..02e1490895 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2374,6 +2374,7 @@ Common TCG code
->  M: Richard Henderson <rth@twiddle.net>
->  S: Maintained
->  F: tcg/
-> +F: include/tcg/
+> diff --git a/configure b/configure
+> index 940bf9e87a..74dad08580 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7436,7 +7436,6 @@ elif test "$ARCH" =3D "riscv32" || test "$ARCH" =3D=
+ "riscv64" ; then
+>  else
+>    QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
+>  fi
+> -QEMU_INCLUDES=3D"-iquote \$(SRC_PATH)/tcg $QEMU_INCLUDES"
 >
->  TCG Plugins
->  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>  echo "TOOLS=3D$tools" >> $config_host_mak
+>  echo "ROMS=3D$roms" >> $config_host_mak
 > --
 > 2.21.0
 >
