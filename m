@@ -2,78 +2,80 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 067B7C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 14:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDEAC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 14:31:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C69E7206DA
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 14:23:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 696BE215A4
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 14:31:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dk6pbeG7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69E7206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QprWBQ16"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 696BE215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inNrc-0000a4-Rr
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 09:23:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34694)
+	id 1inNyd-0005Zx-I4
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 09:30:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1inNqv-00008J-0L
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 09:23:05 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1inNxN-0004DI-Qw
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 09:29:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1inNqu-0002I9-19
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 09:23:00 -0500
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:39962)
+ (envelope-from <peter.maydell@linaro.org>) id 1inNxM-0006O7-Br
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 09:29:41 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46620)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1inNqt-0002ES-Rp; Fri, 03 Jan 2020 09:22:59 -0500
-Received: by mail-yw1-xc41.google.com with SMTP id i126so18558150ywe.7;
- Fri, 03 Jan 2020 06:22:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1inNxM-0006KN-4G
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 09:29:40 -0500
+Received: by mail-ot1-x341.google.com with SMTP id k8so44195828otl.13
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 06:29:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=t/9tzaHSOw4Etp7svWNKYnXFNtq34ho3I41bW1D5osI=;
- b=dk6pbeG7AUH8bfzp+WhT9SYHFtfhCibFqgTwcNiCjben8Pxymvv9VdJktJtvTEdtIr
- 8srB/Rz0eFpi6Bk9dV7FCu5EavlxMKbuclVvJ/pob5EOWbRWVi5BVe7WtZMGy5Seeb+w
- uttgqPsZUzdRJts150iJAjgi1jY7oTwDUckyCk3ngS9p1ZASE5jNmT614djWrUkAAKMK
- puHU76Il3sQvkLWp071XgweeYCwuRB0uTAVAyaMk+IV8vuuJ1hieXVDK4zZl8kXSCNZR
- 34cUgdf6gIAS2/NKJws4aI9Cx/D2H3GLy9mEcuBIAbIBclC/wf2cJRsN6mLljYoV+Ij0
- FU5g==
+ :cc; bh=UIapnTfcT6EWiT0i8ZWVwyA9XLv7MTGS6f6qT/tTUVo=;
+ b=QprWBQ16odgxFxaQe+m8CLYyHIZJ1AavXCh/8OUGxaBMdkDgZ75udGhgr558fpT35f
+ 43SIQlvQNz+TBOedBOULJ3w9w1WHY6ADiN58L3F0I0QWasJRrJ8wdBKxk5Bh9h2yywxP
+ ZjSidZ1Dwe29PT9XhuSr+HECPiev6/1Lp4AploBKUm/Usv9VKpw4ZcZrLiX6vqofv+WG
+ zdaa7LYT+Ex0+g1ja9A64sDAeXRT5wPljgXcj6UAULgdGmWlGOLTR3M84rhxDC1+yxho
+ CdfcZ7QulVmBot3FvSLXujxHji36zq6OAdv3A6GrETVZ+nU+kPbC/X9y5YyDB0MSDEy5
+ GMWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=t/9tzaHSOw4Etp7svWNKYnXFNtq34ho3I41bW1D5osI=;
- b=rKQSj5ccdLJgsR4aaniLqnz/k2Xb1Q5HvzeI+VGiJZauQCUsRAeixqjD6kjTgSnMpb
- hn9EQw+LHLczs5Jd9M+c6EeU8Psf1DU1tr2CVkzu4ZbFzAUwL3X0+EcRDH8a95L5G0+Q
- bcWIGj9QuFGBEdxrJnjDB82p82wfj9IcSwYMFFlWuAqhty8GGXhXoPg+3UAlfH5uwkb/
- jZTZq6q7pqRJl3GC8E0xBidFaKHQ+/UkHxrwkunGY/2F/84mli5sB8S5xoK2usbXq95e
- wA2Bg9dpEz6C0yMZF3vOtK8W08pCWW2vV5Jt/dfCmeEzZ7YS8CKL9yqv9j8f5dh0FGCj
- lh9w==
-X-Gm-Message-State: APjAAAVU0wZe77XlKIA3QGT1ju4WA9+LmMxV9wZVQOEG/PKoU1uy397T
- LuYtkzxSg1eB1XbUn6ITILRVC9pUbygDrmcpw9A=
-X-Google-Smtp-Source: APXvYqwB31lYh0qxre9PwNjvlspHDl5I/84mN1oVe+8lhSSxCsY8901NQfWZBuE0+WXpk0QEKTjJAKedCNHKUpdI5U8=
-X-Received: by 2002:a81:7841:: with SMTP id t62mr66924993ywc.140.1578061378986; 
- Fri, 03 Jan 2020 06:22:58 -0800 (PST)
+ bh=UIapnTfcT6EWiT0i8ZWVwyA9XLv7MTGS6f6qT/tTUVo=;
+ b=RRnKrQ6pW5vdLyLM3BXSwTAisBosDBFXkrVEqdolLIRyBYJaf3KgduHERpefAasR5T
+ 1gw0tfdXSBxDZGw1tbzFlsUlnqPAf6pGCLC5n5u762W1z/zX/g50y0hMw1UyjKbZB/FV
+ tod5HeuEsYXm8GDXU6zAEVRE1PwUy6O4KpcMerCNvFzNNey8JngzsKzL9nTgmccXS/NF
+ KUOls+eJN3gtzGOftsbh3SXRKYcK8IkDcIr3gkx5J6qDv9YsaUZnlF/evKfyiFc07N7V
+ Re+A4AdkxjpJkzdjyzfGoQ5K9XLvwdH3jo1em49yWr5kcjvIJ0sC/TWv2TlY21wUsUpb
+ 7jvg==
+X-Gm-Message-State: APjAAAUI+PKIZ3+1m/akAAZsS7BkuDgEpnKysfd137JBhMgsMN/OhGJV
+ w4pYpAke3RAibsYVVRRlFPdMqC8oNSv2+pVXhkXHxA==
+X-Google-Smtp-Source: APXvYqyorFaonW1ZtewCxlC1zS5zxoNh9X8+TItPz/okFUZYm+iTdugPmvQP2m7R2E0mDfpsd8OzpubBD4Trh11ifcM=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr82121978ota.232.1578061779375; 
+ Fri, 03 Jan 2020 06:29:39 -0800 (PST)
 MIME-Version: 1.0
-References: <1578023622-49180-1-git-send-email-yiting.wang@windriver.com>
-In-Reply-To: <1578023622-49180-1-git-send-email-yiting.wang@windriver.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 3 Jan 2020 22:22:48 +0800
-Message-ID: <CAEUhbmWVBAK2EUCiTOFpY4c1k=Tcva4iYP-jBsDPJ-uEfGNSYg@mail.gmail.com>
-Subject: Re: [PATCH] riscv: Set xPIE to 1 after xRET
-To: Yiting Wang <yiting.wang@windriver.com>
+References: <20191219172441.7289-1-kwolf@redhat.com>
+In-Reply-To: <20191219172441.7289-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 3 Jan 2020 14:29:28 +0000
+Message-ID: <CAFEAcA9-vT2Grs2MP3AUkjzKu5Bw8_40HcPse3r8O7DZNaLUwA@mail.gmail.com>
+Subject: Re: [PULL 00/30] Block layer patches
+To: Kevin Wolf <kwolf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,28 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 3, 2020 at 4:03 PM Yiting Wang <yiting.wang@windriver.com> wrote:
+On Thu, 19 Dec 2019 at 17:24, Kevin Wolf <kwolf@redhat.com> wrote:
 >
-> When executing an xRET instruction, supposing xPP holds the
-> value y, xIE is set to xPIE; the privilege mode is changed to y;
-> xPIE is set to 1. But QEMU sets xPIE to 0 incorrectly.
+> The following changes since commit aceeaa69d28e6f08a24395d0aa6915b687d0a681:
 >
-> Signed-off-by: Yiting Wang <yiting.wang@windriver.com>
-> ---
->  target/riscv/op_helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2019-12-17' into staging (2019-12-17 15:55:20 +0000)
 >
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to f62f08ab7a9d902da70078992248ec5c98f652ad:
+>
+>   iotests: Test external snapshot with VM state (2019-12-19 18:04:25 +0100)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - qemu-img: fix info --backing-chain --image-opts
+> - Error out on image creation with conflicting size options
+> - Fix external snapshot with VM state
+> - hmp: Allow using qdev ID for qemu-io command
+> - Misc code cleanup
+> - Many iotests improvements
 
-Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
-Tested-by: Bin Meng <bmeng.cn@gmail.com>
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
