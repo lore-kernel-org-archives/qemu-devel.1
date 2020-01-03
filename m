@@ -2,101 +2,81 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F5FC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 11:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB01C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 11:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E194E222C4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 11:02:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62E6D206DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 11:08:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaXL+2PR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E194E222C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjVKyYqX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62E6D206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inKjJ-00086L-Ok
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 06:02:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44662)
+	id 1inKoc-0002tN-G4
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 06:08:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41451)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1inKiI-0007WG-No
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 06:01:55 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1inKnz-0002Tj-BC
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 06:07:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1inKiG-0000wb-4L
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 06:01:53 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47754
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1inKnx-0007A5-Fi
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 06:07:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40876
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inKiF-0000oX-B0
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 06:01:51 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1inKnx-00075N-8r
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 06:07:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578049310;
+ s=mimecast20190719; t=1578049664;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f4kKn1kJ1qGKPJJyyyhi9yKBCm2EaNRNuKV2y68VO/g=;
- b=CaXL+2PRTrZbHvgu+RySCgCs5WKDyafuKd1Iybx176aWARPOg3QVCaK8/il+n4f447TphE
- AWCBesY/ItgR2FwXsEToEKZDiuEOIzuUjtWz8RxAqsrJm/EB2wPphCHRRJKKMLUb4WG0Ck
- 1B/C1GHCp7FRsZU5dgVxOV1oQDf7XrY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-pyTIMlOhN1uLAK4w3UBSaQ-1; Fri, 03 Jan 2020 06:01:48 -0500
-Received: by mail-wr1-f72.google.com with SMTP id z14so23073052wrs.4
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 03:01:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cKdvHPgQvCFIBE4mBv+GvczUV/D4daQEO3nB2sZG1CI=;
- b=MbF/Jm2+YRMBb+7T0Dpa/6OAxdxrfKE14+v9zdFC4djBnIf4TTixEZVfaDcIdaR0Pw
- uLuFPEVqLrHRhOj1vtK220+axQp8xkCjx68T3p6O2O2MAz/QfzvMSJa1gmgsx3/jf1YK
- s6zoDWVGpbEqgoCXZj0I+9v9xMvLMFFQddqW4+iHVcilxnn7Q2HOeYY8H9haz4mkKRVv
- Hc4xlEHTyEzaCsk20l73a20oI1+jvWISlvp0UqtEpOZ2eLm8HcvIBF5RmCHGZHgXi7Bl
- MrYCVqtkiZujxWr4GQrC4zMscCGRmXbfbmwWZ6lyedl/GPoKNgIaY5LiPisAdB726tU5
- 91Ow==
-X-Gm-Message-State: APjAAAUFSAZ8bArDW6/MCvdU/B4AhtYnPq0CelFBU36nE7pqYDpzWOzC
- LGz9YE5LkOJDhR6hVBksWEv2cX3w+yG29FRzYSWbt+3GXVDPHyefkf4JTouLj0Th5h9B822bfjT
- fjcH5ZazYphlP33E=
-X-Received: by 2002:a1c:200a:: with SMTP id g10mr19340400wmg.77.1578049307678; 
- Fri, 03 Jan 2020 03:01:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzhgzSeaGONkVki79PBDUOi1LuTIpwDEMBuXnUcVYvAKc9Frv+XL+0xb/xwwOrkpbyHVEKYQQ==
-X-Received: by 2002:a1c:200a:: with SMTP id g10mr19340358wmg.77.1578049307473; 
- Fri, 03 Jan 2020 03:01:47 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id e16sm58779539wrs.73.2020.01.03.03.01.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jan 2020 03:01:46 -0800 (PST)
-Subject: Re: [PATCH v6 02/21] libqos: Rename i2c_send and i2c_recv
-To: Thomas Huth <thuth@redhat.com>, "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191129213424.6290-1-alxndr@bu.edu>
- <20191129213424.6290-3-alxndr@bu.edu>
- <8a74a941-b646-3708-c6cc-5dcb0fb1fbca@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dcd102bf-e390-b8df-c0c7-f2459132790f@redhat.com>
-Date: Fri, 3 Jan 2020 12:01:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=HaBHUlmO+DWXK6aoiC4wvOmxfEkD/AmjlbJ6VB4Hm98=;
+ b=SjVKyYqXoe7WXxrLYCJqpQmntuLWJ7URiHNf93d6sWjvu/soZcLku25JiPqq9vg5mGphwh
+ 1nN3yA7yG3ua+/6y5aM+jR9QEEukMKoewzncYAemcpbLxioi0cBcEO8h0uufNRKKUKccko
+ Y+DcGjl7XZuJyg2brJ9YMhsdpw2eV3E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-304-CCn88dkiN1uevMOjr-4wzg-1; Fri, 03 Jan 2020 06:07:43 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5CC4107ACC4;
+ Fri,  3 Jan 2020 11:07:41 +0000 (UTC)
+Received: from work-vm (ovpn-117-78.ams2.redhat.com [10.36.117.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 899675D9C9;
+ Fri,  3 Jan 2020 11:07:34 +0000 (UTC)
+Date: Fri, 3 Jan 2020 11:07:31 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>, peterx@redhat.com
+Subject: Re: [PATCH 0/2] Speed up QMP stream reading
+Message-ID: <20200103110731.GC3804@work-vm>
+References: <20191219160756.22389-1-yury-kotov@yandex-team.ru>
+ <87a77ndlms.fsf@dusky.pond.sub.org>
+ <549941577104857@iva4-9c479177d279.qloud-c.yandex.net>
 MIME-Version: 1.0
-In-Reply-To: <8a74a941-b646-3708-c6cc-5dcb0fb1fbca@redhat.com>
-Content-Language: en-US
-X-MC-Unique: pyTIMlOhN1uLAK4w3UBSaQ-1
+In-Reply-To: <549941577104857@iva4-9c479177d279.qloud-c.yandex.net>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: CCn88dkiN1uevMOjr-4wzg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,55 +88,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "bsd@redhat.com" <bsd@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
+ "Denis V. Lunev" <den@openvz.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/9/19 1:02 PM, Thomas Huth wrote:
-> On 29/11/2019 22.34, Oleinik, Alexander wrote:
->> The names i2c_send and i2c_recv collide with functions defined in
->> hw/i2c/core.c. This causes an error when linking against libqos and
->> softmmu simultaneously (for example when using qtest inproc). Rename the
->> libqos functions to avoid this.
->>
->> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
->> ---
->>   tests/libqos/i2c.c   | 10 +++++-----
->>   tests/libqos/i2c.h   |  4 ++--
->>   tests/pca9552-test.c | 10 +++++-----
->>   3 files changed, 12 insertions(+), 12 deletions(-)
->>
->> diff --git a/tests/libqos/i2c.c b/tests/libqos/i2c.c
->> index 156114e745..38f800dbab 100644
->> --- a/tests/libqos/i2c.c
->> +++ b/tests/libqos/i2c.c
->> @@ -10,12 +10,12 @@
->>   #include "libqos/i2c.h"
->>   #include "libqtest.h"
->>  =20
->> -void i2c_send(QI2CDevice *i2cdev, const uint8_t *buf, uint16_t len)
->> +void qi2c_send(QI2CDevice *i2cdev, const uint8_t *buf, uint16_t len)
->>   {
->>       i2cdev->bus->send(i2cdev->bus, i2cdev->addr, buf, len);
->>   }
->>  =20
->> -void i2c_recv(QI2CDevice *i2cdev, uint8_t *buf, uint16_t len)
->> +void qi2c_recv(QI2CDevice *i2cdev, uint8_t *buf, uint16_t len)
->>   {
->>       i2cdev->bus->recv(i2cdev->bus, i2cdev->addr, buf, len);
->>   }
+* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
+> Hi!
 >=20
-> I'd prefer qos_i2c_send and qos_i2c_recv instead ... but that's just a
-> matter of taste.
+> 20.12.2019, 19:09, "Markus Armbruster" <armbru@redhat.com>:
+> > Yury Kotov <yury-kotov@yandex-team.ru> writes:
+> >
+> >>  Hi,
+> >>
+> >>  This series is continuation of another one:
+> >>  [PATCH] monitor: Fix slow reading
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg03722.html
+> >>
+> >>  Which also tried to read more than one byte from a stream at a time,
+> >>  but had some problems with OOB and HMP:
+> >>  https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg05018.html
+> >>
+> >>  This series is an attempt to fix problems described.
+> >
+> > Two problems: (1) breaks HMP migrate -d, and (2) need to think through
+> > how this affects reading of QMP input, in particular OOB.
+> >
+> > This series refrains from changing HMP, thus avoids (1). Good.
+> >
+> > What about (2)? I'm feeling denser than usual today... Can you explain
+> > real slow how QMP input works? PATCH 2 appears to splice in a ring
+> > buffer. Why is that needed?
 >=20
-> Acked-by: Thomas Huth <thuth@redhat.com>
+> Yes, the second patch introduced the input ring buffer to store remaining
+> bytes while monitor is suspended.
+>=20
+> QMP input scheme:
+> 1. monitor_qmp_can_read returns a number of bytes, which it's ready to re=
+ceive.
+>    Currently it returns 0 (if suspended) or 1 otherwise.
+>    In my patch: monitor_qmp_can_read returns a free size of the introduce=
+d
+>    ring buffer.
+>=20
+> 2. monitor_qmp_read receives and handles input bytes
+>    Currently it just puts received bytes into a json lexer.
+>    If monitor is suspended this function won't be called and thus it won'=
+t
+>    process new command until monitor resume.
+>    In my patch: monitor_qmp_read stores input bytes into the buffer and t=
+hen
+>    handles bytes in the buffer one by one while monitor is not suspended.
+>    So, it allows to be sure that the original logic is preserved and
+>    we won't handle new commands while monitor is suspended.
+>=20
+> 3. monitor_resume schedules monitor_accept_input which calls
+>    monitor_qmp_handle_inbuf which tries to handle remaining bytes
+>    in the buffer. monitor_accept_input is a BH scheduled by monitor_resum=
+e
+>    on monitor's aio context. It is needed to be sure, that we access
+>    the input buffer only in monitor's context.
+>=20
+> Example:
+> 1. QMP read 100 bytes
+> 2. Handle some command in the first 60 bytes
+> 3. For some reason, monitor becomes suspended after the first command
+> 4. 40 bytes are remaining
+> 5. After a while, something calls monitor_resume which handles
+>    the remaining bytes in the buffer (implicitly: resume -> sched bh -> b=
+uf)
+>=20
+> Actually, QMP continues to receive data even though the monitor is suspen=
+ded
+> until the buffer is full. But it doesn't process received data.
 
-Agreed.
+I *think* that's OK for OOB; my reading is that prior to this set of
+patches, if you filled the queue (even with oob enabled) you could
+suspend the monitor and block - but you're just not supposed to be
+throwing commands quickly at an OOB monitor; but I'm cc'ing in Peter.
 
-Renamed qos_*:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Dave
+
+> Regards,
+> Yury
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
