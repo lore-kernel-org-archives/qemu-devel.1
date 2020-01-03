@@ -2,95 +2,102 @@ Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD48FC2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE87C2D0C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:30:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9074217F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE2DC22314
+	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 16:30:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JgPmNtjL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9074217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TX1IhXaG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2DC22314
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inPN1-0005Zm-Og
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 11:00:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47227)
+	id 1inPqQ-0007d4-Hh
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 11:30:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1inPME-0004lL-Rk
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:59:28 -0500
+ (envelope-from <philmd@redhat.com>) id 1inPpJ-00075U-0j
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:29:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1inPMD-0007dR-CQ
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:59:26 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52131)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1inPMD-0007bH-2M
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 10:59:25 -0500
-Received: by mail-wm1-x344.google.com with SMTP id d73so8790705wmd.1
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 07:59:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=wA6EK79giMER1Ca0PtrxyLb7P77jiivLi1XYR7Sb1ks=;
- b=JgPmNtjL5tnV3s4vDkuQ6NVuK0IRfbolIb7rAQ50cC/8H+Yb6QVbcxs3p/isvse3q7
- SXrQJY7nx6vpYtFjCFnYxDPJZ2H+zsQZViyBBxYjLl1w27vH/IJNc9XTmgXJ9f02qdKs
- jkH5oVGoisUecPeBNjhX/NCaWNpeSNAFhh77M6wtKKJ5iXjd4yYxpR6/oyYxhmlXcpq6
- q8QYGCceEmzARr6KdAwdoaBg13e4rS/I9sqMKciyuhAPiegC+61LRbmz5k9kVpoASFnQ
- rSqRcW5l8mt8hIIwTfUojNHVtfUzn9oxjmf16Bbf0oAiyduHn2XZBQ3cxC2pZMgllpxi
- SIGg==
+ (envelope-from <philmd@redhat.com>) id 1inPpF-00005v-Qk
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:29:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36712
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inPpF-0008RI-Ap
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 11:29:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578068964;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MzgAdmVIAQMO3bFr6OwSSau80q0n4VX4/RF7jUWdbo8=;
+ b=TX1IhXaG0utSIMEyn2ySx4Cg6RCzvAYrdo3ijsb0L0kl71IamXwLvgbW03ugU1oUodl1Qx
+ Skn+SncXVQzjjkfN4W8NNN7t8w8crIxAG1CFEL2lj1FDHzdvNQlqcY2SUN4p2NSRgOlkho
+ FA3J+dWzmhBRJDqVixv8yPJer9ilGa0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-4pk6GWb7MdaVPjtX73qcUA-1; Fri, 03 Jan 2020 11:29:21 -0500
+Received: by mail-wm1-f72.google.com with SMTP id b131so1559724wmd.9
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 08:29:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=wA6EK79giMER1Ca0PtrxyLb7P77jiivLi1XYR7Sb1ks=;
- b=G95pVwRWZe1cBqYVOqsPfnvvlzrFJiqHlkPA8Xq+HyCNbni3sV2KcBLG9ED4fcQba+
- 5Sj2Y3dDkId3W8nZLvBJLUGNS7v2VaArtcTQjG0kfyP3g76ug5xOya6hvxAB2UQIZXlK
- X8BM9iRqCb3JvrWygaB0mYaijMeiGMRWokWmeN8AS+J9YBc1IppSVIYfFP1asK37Qqo0
- b3TfkawEVDR+NlLz2rV+hphPy6N9SjHYzr9T0Afdlipr9EskqeUJzKjINk9O1C0mvzYR
- NTpsiMh8k92sNAUhnOI8yvhH/ZSmRfFM52FQdNjZlld1qwljnQRi/SGI3RO8mEWj/GwE
- a2iA==
-X-Gm-Message-State: APjAAAXtCSuKe+HYulgIGsvnI+rFJMuqIMcKrUjA7OhE2jDDXJrItusb
- iNLM6hvYN196bWdJijAItG0=
-X-Google-Smtp-Source: APXvYqzo3kWdKXjvfiSRoEs/9/gq2i9Mikmj7qoRWEyRbd3lkIiAQwf9uWydLCS74/SO3HFBGK3edQ==
-X-Received: by 2002:a7b:ce8b:: with SMTP id q11mr20079691wmj.100.1578067163485; 
- Fri, 03 Jan 2020 07:59:23 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id c4sm12404407wml.7.2020.01.03.07.59.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Jan 2020 07:59:22 -0800 (PST)
-Date: Fri, 3 Jan 2020 15:59:20 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Felipe Franciosi <felipe@nutanix.com>
-Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
- status update
-Message-ID: <20200103155920.GB281236@stefanha-x1.localdomain>
-References: <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
- <20191217163316.GB1333385@stefanha-x1.localdomain>
- <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
- <20191219115545.GD1624084@stefanha-x1.localdomain>
- <772D9CF3-D15D-42D1-B9CF-1279619D7C20@nutanix.com>
- <20191219125504.GI1190276@redhat.com>
- <20191220094712.GA1635864@stefanha-x1.localdomain>
- <20191220102237.GA1699760@redhat.com>
- <20200102104255.GF121208@stefanha-x1.localdomain>
- <C4F6A4B0-607A-4BEE-B722-8F5447F1ADB7@nutanix.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MzgAdmVIAQMO3bFr6OwSSau80q0n4VX4/RF7jUWdbo8=;
+ b=BKXsYR94TOk/A2Xw1QoZBLkuj2d7V0+Jy4fFsNg95KY2EchLzCGLXmXuaJ9t+s6tqw
+ p4QnSxGbCCw+CkpumeW4CKCeAJu45167+funB+1/D4iaL0SyPADAl2xItuRDtem9Ys1V
+ oL78EP92Umnyoa39gqjRThVrYTH+hbMYhQbMDZNqb+DP0cDSEpVUFEJbLus21JZSxDLj
+ NxuiYWmHz33msgseq80WjftBFLpLCs4odoSDKyeeOwZFMxf6q/aobS1eyVDfZ9DBJ1On
+ zD2GWs2EI+U7l1+s5np7VYjSLhVSOvZKZ6kB8FFQZ/vy2KUDv1XqncJXS0FiKKbI+bqp
+ ixAQ==
+X-Gm-Message-State: APjAAAWKSGayFiXqVR6CL4bD64IV+RKd4ForD5gMDMi82OCwPvpmWCaG
+ dVwcafQbbExsNJatO2VqQezlYV9jxX4qrVg08Owoz+KZDZQJSbfgpaniBOL+H056gEOBOoRIwKh
+ FSpIt1EFRqYfWItM=
+X-Received: by 2002:a1c:20d3:: with SMTP id
+ g202mr20891723wmg.169.1578068960185; 
+ Fri, 03 Jan 2020 08:29:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx3qnWmFDxh+W76sX9Q0ZQQnxr8HWrdg4ImCoelyFpNkV3uvdjdsDCa51RmwkI+pshS4uoEKw==
+X-Received: by 2002:a1c:20d3:: with SMTP id
+ g202mr20891701wmg.169.1578068959923; 
+ Fri, 03 Jan 2020 08:29:19 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id h17sm63867001wrs.18.2020.01.03.08.29.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 03 Jan 2020 08:29:19 -0800 (PST)
+Subject: Re: [PATCH v6 05/21] libqtest: Add a layer of abstraciton to send/recv
+To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191129213424.6290-1-alxndr@bu.edu>
+ <20191129213424.6290-6-alxndr@bu.edu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f82b43de-bead-a1d6-8ae7-83ab14ac1ef6@redhat.com>
+Date: Fri, 3 Jan 2020 17:29:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dc+cDN39EJAMEtIO"
-Content-Disposition: inline
-In-Reply-To: <C4F6A4B0-607A-4BEE-B722-8F5447F1ADB7@nutanix.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <20191129213424.6290-6-alxndr@bu.edu>
+Content-Language: en-US
+X-MC-Unique: 4pk6GWb7MdaVPjtX73qcUA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,151 +109,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- "fam@euphon.net" <fam@euphon.net>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Walker,
- Benjamin" <benjamin.walker@intel.com>, "kraxel@redhat.com" <kraxel@redhat.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>, "Harris,
- James R" <james.r.harris@intel.com>,
- "quintela@redhat.com" <quintela@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "liran.alon@oracle.com" <liran.alon@oracle.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
- "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Aleksander,
 
---dc+cDN39EJAMEtIO
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Typo in patch subject: "abstraction"
 
-On Thu, Jan 02, 2020 at 11:03:22AM +0000, Felipe Franciosi wrote:
-> > On Jan 2, 2020, at 10:42 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > On Fri, Dec 20, 2019 at 10:22:37AM +0000, Daniel P. Berrang=C3=A9 wrote:
-> >> On Fri, Dec 20, 2019 at 09:47:12AM +0000, Stefan Hajnoczi wrote:
-> >>> On Thu, Dec 19, 2019 at 12:55:04PM +0000, Daniel P. Berrang=C3=A9 wro=
-te:
-> >>>> On Thu, Dec 19, 2019 at 12:33:15PM +0000, Felipe Franciosi wrote:
-> >>>>>> On Dec 19, 2019, at 11:55 AM, Stefan Hajnoczi <stefanha@gmail.com>=
- wrote:
-> >>>>>> On Tue, Dec 17, 2019 at 10:57:17PM +0000, Felipe Franciosi wrote:
-> >>>>>>>> On Dec 17, 2019, at 5:33 PM, Stefan Hajnoczi <stefanha@redhat.co=
-m> wrote:
-> >>>>>>>> On Mon, Dec 16, 2019 at 07:57:32PM +0000, Felipe Franciosi wrote:
-> >>>>>>>>>> On 16 Dec 2019, at 20:47, Elena Ufimtseva <elena.ufimtseva@ora=
-cle.com> wrote:
-> >>>>>>>>>> =EF=BB=BFOn Fri, Dec 13, 2019 at 10:41:16AM +0000, Stefan Hajn=
-oczi wrote:
-> >>>>> To be clear: I'm very happy to have a userspace-only option for thi=
-s,
-> >>>>> I just don't want to ditch the kernel module (yet, anyway). :)
-> >>>>=20
-> >>>> If it doesn't create too large of a burden to support both, then I t=
-hink
-> >>>> it is very desirable. IIUC, this is saying a kernel based solution a=
-s the
-> >>>> optimized/optimal solution, and userspace UNIX socket based option a=
-s the
-> >>>> generic "works everywhere" fallback solution.
-> >>>=20
-> >>> I'm slightly in favor of the kernel implementation because it keeps us
-> >>> better aligned with VFIO.  That means solving problems in one place o=
-nly
-> >>> and less reinventing the wheel.
-> >>>=20
-> >>> Knowing that a userspace implementation is possible is a plus though.
-> >>> Maybe that option will become attractive in the future and someone wi=
-ll
-> >>> develop it.  In fact, a userspace implementation may be a cool Google
-> >>> Summer of Code project idea that I'd like to co-mentor.
-> >>=20
-> >> If it is technically viable as an approach, then I think  we should be
-> >> treating a fully unprivileged muser-over-UNIX socket as a higher prior=
-ity
-> >> than just "maybe a GSoC student will want todo it".
-> >>=20
-> >> Libvirt is getting strong message from KubeVirt project that they want=
- to
-> >> be running both libvirtd and QEMU fully unprivileged. This allows their
-> >> containers to be unprivileged. Anything that requires privileges requi=
-res
-> >> jumping through extra hoops writing custom code in KubeVirt to do thin=
-gs
-> >> outside libvirt in side loaded privileged containers and this limits h=
-ow
-> >> where those features can be used.
-> >=20
-> > Okay this makes sense.
-> >=20
-> > There needs to be a consensus on whether to go with a qdev-over-socket
-> > approach that is QEMU-specific and strongly discourages third-party
-> > device distribution or a muser-over-socket approach that offers a stable
-> > API for VMM interoperability and third-party device distribution.
->=20
-> The reason I dislike yet another offloading protocol (ie. there is
-> vhost, there is vfio, and then there would be qdev-over-socket) is
-> that we keep reinventing the wheel. I very much prefer picking
-> something solid (eg. VFIO) and keep investing on it.
+On 11/29/19 10:34 PM, Oleinik, Alexander wrote:
+> This makes it simple to swap the transport functions for qtest commands
+> to and from the qtest client. For example, now it is possible to
+> directly pass qtest commands to a server handler that exists within the
+> same process, without the standard way of writing to a file descriptor.
+> 
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> ---
+>   tests/libqtest.c | 50 +++++++++++++++++++++++++++++++++++++++---------
+>   1 file changed, 41 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 91e9cb220c..ac4b6ab5f0 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -35,6 +35,17 @@
+>   #define SOCKET_TIMEOUT 50
+>   #define SOCKET_MAX_FDS 16
+>   
+> +
+> +typedef void (*QTestSendFn)(QTestState *s, const char *buf);
+> +typedef void (*ExternalSendFn)(void *s, const char *buf);
+> +typedef GString* (*QTestRecvFn)(QTestState *);
+> +
+> +typedef struct QTestClientTransportOps {
+> +    QTestSendFn     send;
 
-I like the idea of sticking close to VFIO too.  The first step is
-figuring out whether VFIO can be mapped to a UNIX domain socket protocol
-and many non-VFIO protocol messages are required.  Hopefully that extra
-non-VFIO stuff isn't too large.
+We use strlen() so we also send a send a string. Maybe rename it send_line?
 
-If implementations can use the kernel uapi vfio header files then we're
-on track for compatibility with VFIO.
+Please add a comment here about what does each function handler in this 
+structure.
 
-> > This is just a more elaborate explanation for the "the cat is out of the
-> > bag" comments that have already been made on licensing.  Does anyone
-> > still disagree or want to discuss further?
-> >=20
-> > If there is agreement that a stable API is okay then I think the
-> > practical way to do this is to first merge a cleaned-up version of
-> > multi-process QEMU as an unstable experimental API.  Once it's being
-> > tested and used we can write a protocol specification and publish it as
-> > a stable interface when the spec has addressed most use cases.
-> >=20
-> > Does this sound good?
->=20
-> In that case, wouldn't it be preferable to revive our proposal from
-> Edinburgh (KVM Forum 2018)? Our prototypes moved more of the Qemu VFIO
-> code to "common" and added a "user" backend underneath it, similar to
-> how vhost-user-scsi moved some of vhost-scsi to vhost-scsi-common and
-> added vhost-user-scsi. It was centric on PCI, but it doesn't have to
-> be. The other side can be implemented in libmuser for facilitating things.
+> +    ExternalSendFn  external_send;
 
-That sounds good.
+Is external_send used? Apparently in patch #12. Can you add it there, 
+where it is used? I don't understand why we a "type-safe wrapper" is 
+called 'external'.
 
-Stefan
+> +    QTestRecvFn     recv_line;
+> +} QTestTransportOps;
+> +
+>   struct QTestState
+>   {
+>       int fd;
+> @@ -45,6 +56,7 @@ struct QTestState
+>       bool big_endian;
+>       bool irq_level[MAX_IRQ];
+>       GString *rx;
+> +    QTestTransportOps ops;
+>   };
+>   
+>   static GHookList abrt_hooks;
+> @@ -52,6 +64,14 @@ static struct sigaction sigact_old;
+>   
+>   static int qtest_query_target_endianness(QTestState *s);
+>   
+> +static void qtest_client_socket_send(QTestState*, const char *buf);
+> +static void socket_send(int fd, const char *buf, size_t size);
+> +
+> +static GString *qtest_client_socket_recv_line(QTestState *);
+> +
+> +static void qtest_client_set_tx_handler(QTestState *s, QTestSendFn send);
+> +static void qtest_client_set_rx_handler(QTestState *s, QTestRecvFn recv);
+> +
+>   static int init_socket(const char *socket_path)
+>   {
+>       struct sockaddr_un addr;
+> @@ -234,6 +254,9 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+>       sock = init_socket(socket_path);
+>       qmpsock = init_socket(qmp_socket_path);
+>   
+> +    qtest_client_set_rx_handler(s, qtest_client_socket_recv_line);
+> +    qtest_client_set_tx_handler(s, qtest_client_socket_send);
+> +
+>       qtest_add_abrt_handler(kill_qemu_hook_func, s);
+>   
+>       command = g_strdup_printf("exec %s "
+> @@ -379,13 +402,9 @@ static void socket_send(int fd, const char *buf, size_t size)
+>       }
+>   }
+>   
+> -static void socket_sendf(int fd, const char *fmt, va_list ap)
+> +static void qtest_client_socket_send(QTestState *s, const char *buf)
+>   {
+> -    gchar *str = g_strdup_vprintf(fmt, ap);
+> -    size_t size = strlen(str);
+> -
+> -    socket_send(fd, str, size);
+> -    g_free(str);
+> +    socket_send(s->fd, buf, strlen(buf));
+>   }
+>   
+>   static void GCC_FMT_ATTR(2, 3) qtest_sendf(QTestState *s, const char *fmt, ...)
+> @@ -393,8 +412,11 @@ static void GCC_FMT_ATTR(2, 3) qtest_sendf(QTestState *s, const char *fmt, ...)
+>       va_list ap;
+>   
+>       va_start(ap, fmt);
+> -    socket_sendf(s->fd, fmt, ap);
+> +    gchar *str = g_strdup_vprintf(fmt, ap);
+>       va_end(ap);
+> +
+> +    s->ops.send(s, str);
+> +    g_free(str);
+>   }
+>   
+>   /* Sends a message and file descriptors to the socket.
+> @@ -431,7 +453,7 @@ static void socket_send_fds(int socket_fd, int *fds, size_t fds_num,
+>       g_assert_cmpint(ret, >, 0);
+>   }
+>   
+> -static GString *qtest_recv_line(QTestState *s)
+> +static GString *qtest_client_socket_recv_line(QTestState *s)
+>   {
+>       GString *line;
+>       size_t offset;
+> @@ -468,7 +490,7 @@ static gchar **qtest_rsp(QTestState *s, int expected_args)
+>       int i;
+>   
+>   redo:
+> -    line = qtest_recv_line(s);
+> +    line = s->ops.recv_line(s);
+>       words = g_strsplit(line->str, " ", 0);
+>       g_string_free(line, TRUE);
+>   
+> @@ -1337,3 +1359,13 @@ void qmp_assert_error_class(QDict *rsp, const char *class)
+>   
+>       qobject_unref(rsp);
+>   }
+> +
+> +static void qtest_client_set_tx_handler(QTestState *s,
+> +                    QTestSendFn send)
+> +{
+> +    s->ops.send = send;
+> +}
+> +static void qtest_client_set_rx_handler(QTestState *s, QTestRecvFn recv)
+> +{
+> +    s->ops.recv_line = recv;
+> +}
+> 
 
---dc+cDN39EJAMEtIO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4PZNgACgkQnKSrs4Gr
-c8gKCwf+MJ7jrbS90Jexw3wPcOJUvaTFGaw5LO0GBvc63GjV1o3VWW7vByPtvorb
-f1CjBg67tXO/InLB8QF2GHEPQpHjZFmPZMRR5rL9/SAv7//5rgYnTpMc0kVzCFMf
-iMq36uC36xV7YzDhh/lNBY2R3WYSLx4fhlZJ2F+Ud2bZscE7PN2OrjTtzoAGz8Fc
-A9a3bOXZo/f58EFqXIlsanvSXs8cqZSd3K5Pllay7bf9KO1JEpDRVPLkJMYJRAzy
-e4NO6N+GiPZraZhxyug1Z5/ZArXEpHc0upH7QUv/Zq1ldjf0xRxbcVwU+Y6j7x1Q
-CtWBk3bY8UElkvo81fm8otwpZx0mSQ==
-=wCd+
------END PGP SIGNATURE-----
-
---dc+cDN39EJAMEtIO--
 
