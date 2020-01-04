@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A1F1C32767
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 09:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B566BC32767
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 09:14:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E377B215A4
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 09:13:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E377B215A4
+	by mail.kernel.org (Postfix) with ESMTPS id 8AEF2215A4
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 09:14:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AEF2215A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1infVM-0004lq-2y
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jan 2020 04:13:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33911)
+	id 1infWA-0005rB-Kp
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jan 2020 04:14:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <volker.ruemelin@t-online.de>) id 1infT1-0001dx-2R
- for qemu-devel@nongnu.org; Sat, 04 Jan 2020 04:11:32 -0500
+ (envelope-from <volker.ruemelin@t-online.de>) id 1infT4-0001fu-5i
+ for qemu-devel@nongnu.org; Sat, 04 Jan 2020 04:11:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <volker.ruemelin@t-online.de>) id 1infSz-0006eg-V6
- for qemu-devel@nongnu.org; Sat, 04 Jan 2020 04:11:31 -0500
-Received: from mailout06.t-online.de ([194.25.134.19]:33414)
+ (envelope-from <volker.ruemelin@t-online.de>) id 1infT3-0006tL-5q
+ for qemu-devel@nongnu.org; Sat, 04 Jan 2020 04:11:34 -0500
+Received: from mailout09.t-online.de ([194.25.134.84]:50330)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <volker.ruemelin@t-online.de>)
- id 1infSz-0006XP-OV
- for qemu-devel@nongnu.org; Sat, 04 Jan 2020 04:11:29 -0500
-Received: from fwd16.aul.t-online.de (fwd16.aul.t-online.de [172.20.26.243])
- by mailout06.t-online.de (Postfix) with SMTP id B3A4E41657D5;
- Sat,  4 Jan 2020 10:11:27 +0100 (CET)
+ id 1infT2-0006oY-VJ
+ for qemu-devel@nongnu.org; Sat, 04 Jan 2020 04:11:33 -0500
+Received: from fwd24.aul.t-online.de (fwd24.aul.t-online.de [172.20.26.129])
+ by mailout09.t-online.de (Postfix) with SMTP id C935D42B0144;
+ Sat,  4 Jan 2020 10:11:31 +0100 (CET)
 Received: from linpower.localnet
- (GQTK2EZXrhlnmiexBFeuF+mabf9XMAlavyrrRvkacjs49ed+hGEgecOY+zv+ghbZgF@[46.86.52.107])
- by fwd16.t-online.de
+ (Vsp7dwZE8hpwRej46NpLTFiWFvj2SK016rerHX+lsK5vuuPi5AfAJTyyhjou9r7Qhm@[46.86.52.107])
+ by fwd24.t-online.de
  with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1infSx-1UhxJI0; Sat, 4 Jan 2020 10:11:27 +0100
+ esmtp id 1infSv-3aVadM0; Sat, 4 Jan 2020 10:11:25 +0100
 Received: by linpower.localnet (Postfix, from userid 1000)
- id 22F0F20278F; Sat,  4 Jan 2020 10:11:22 +0100 (CET)
+ id 2155220278E; Sat,  4 Jan 2020 10:11:22 +0100 (CET)
 From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
 To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: [PATCH v2 3/5] paaudio: drop recording stream in qpa_fini_in
-Date: Sat,  4 Jan 2020 10:11:20 +0100
-Message-Id: <20200104091122.13971-3-vr_qemu@t-online.de>
+Subject: [PATCH v2 2/5] hda-codec: fix recording rate control
+Date: Sat,  4 Jan 2020 10:11:19 +0100
+Message-Id: <20200104091122.13971-2-vr_qemu@t-online.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <07d61da6-51fb-8599-ea27-dae828fbdb3c@t-online.de>
 References: <07d61da6-51fb-8599-ea27-dae828fbdb3c@t-online.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-ID: GQTK2EZXrhlnmiexBFeuF+mabf9XMAlavyrrRvkacjs49ed+hGEgecOY+zv+ghbZgF
-X-TOI-MSGID: 7468035e-a24f-4e18-8a4b-0f3a9eb2e8aa
+X-ID: Vsp7dwZE8hpwRej46NpLTFiWFvj2SK016rerHX+lsK5vuuPi5AfAJTyyhjou9r7Qhm
+X-TOI-MSGID: e3c19cee-8fcb-4b34-a0a0-7925696ff78a
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 194.25.134.19
+X-Received-From: 194.25.134.84
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,87 +77,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Every call to pa_stream_peek which returns a data length > 0
-should have a corresponding pa_stream_drop. A call to qpa_read
-does not necessarily call pa_stream_drop immediately after a
-call to pa_stream_peek. Test in qpa_fini_in if a last
-pa_stream_drop is needed.
-
-This prevents following messages in the libvirt log file after
-a recording stream gets closed and a new one opened.
-
-pulseaudio: pa_stream_drop failed
-pulseaudio: Reason: Bad state
-pulseaudio: pa_stream_drop failed
-pulseaudio: Reason: Bad state
-
-To reproduce start qemu with
--audiodev pa,id=3Daudio0,in.mixing-engine=3Doff
-and in the guest start and stop Audacity several times.
+Apply previous commit to hda_audio_input_cb for the same
+reasons.
 
 Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
 ---
- audio/paaudio.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+ hw/audio/hda-codec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 55a91f8980..7db1dc15f0 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -536,7 +536,6 @@ static void qpa_simple_disconnect(PAConnection *c, pa=
-_stream *stream)
- {
-     int err;
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index 768ba31e79..e711a99a41 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -265,8 +265,6 @@ static void hda_audio_input_cb(void *opaque, int avai=
+l)
 =20
--    pa_threaded_mainloop_lock(c->mainloop);
-     /*
-      * wait until actually connects. workaround pa bug #247
-      * https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/247
-@@ -550,7 +549,6 @@ static void qpa_simple_disconnect(PAConnection *c, pa=
-_stream *stream)
-         dolog("Failed to disconnect! err=3D%d\n", err);
+     int64_t to_transfer =3D MIN(B_SIZE - (wpos - rpos), avail);
+=20
+-    hda_timer_sync_adjust(st, -((wpos - rpos) + to_transfer - (B_SIZE >>=
+ 1)));
+-
+     while (to_transfer) {
+         uint32_t start =3D (uint32_t) (wpos & B_MASK);
+         uint32_t chunk =3D (uint32_t) MIN(B_SIZE - start, to_transfer);
+@@ -278,6 +276,8 @@ static void hda_audio_input_cb(void *opaque, int avai=
+l)
+             break;
+         }
      }
-     pa_stream_unref(stream);
--    pa_threaded_mainloop_unlock(c->mainloop);
- }
-=20
- static void qpa_fini_out (HWVoiceOut *hw)
-@@ -558,8 +556,12 @@ static void qpa_fini_out (HWVoiceOut *hw)
-     PAVoiceOut *pa =3D (PAVoiceOut *) hw;
-=20
-     if (pa->stream) {
--        qpa_simple_disconnect(pa->g->conn, pa->stream);
-+        PAConnection *c =3D pa->g->conn;
 +
-+        pa_threaded_mainloop_lock(c->mainloop);
-+        qpa_simple_disconnect(c, pa->stream);
-         pa->stream =3D NULL;
-+        pa_threaded_mainloop_unlock(c->mainloop);
-     }
++    hda_timer_sync_adjust(st, -((wpos - rpos) - (B_SIZE >> 1)));
  }
 =20
-@@ -568,8 +570,20 @@ static void qpa_fini_in (HWVoiceIn *hw)
-     PAVoiceIn *pa =3D (PAVoiceIn *) hw;
-=20
-     if (pa->stream) {
--        qpa_simple_disconnect(pa->g->conn, pa->stream);
-+        PAConnection *c =3D pa->g->conn;
-+
-+        pa_threaded_mainloop_lock(c->mainloop);
-+        if (pa->read_length) {
-+            int r =3D pa_stream_drop(pa->stream);
-+            if (r) {
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "pa_stream_drop failed\n");
-+            }
-+            pa->read_length =3D 0;
-+        }
-+        qpa_simple_disconnect(c, pa->stream);
-         pa->stream =3D NULL;
-+        pa_threaded_mainloop_unlock(c->mainloop);
-     }
- }
-=20
+ static void hda_audio_output_timer(void *opaque)
 --=20
 2.16.4
 
