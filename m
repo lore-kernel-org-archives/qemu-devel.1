@@ -2,101 +2,79 @@ Return-Path: <SRS0=YGca=2Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C823C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 15:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65ECC2D0C2
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 16:08:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 599A322B48
-	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 15:01:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69BB522B48
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 16:08:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KindEMs5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 599A322B48
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihjY2Lun"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BB522B48
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inkvb-0004qk-Ei
-	for qemu-devel@archiver.kernel.org; Sat, 04 Jan 2020 10:01:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55695)
+	id 1inly3-0005y4-I5
+	for qemu-devel@archiver.kernel.org; Sat, 04 Jan 2020 11:07:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1inkul-0004Lz-AM
- for qemu-devel@nongnu.org; Sat, 04 Jan 2020 10:00:33 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1inlx4-0005X5-6p
+ for qemu-devel@nongnu.org; Sat, 04 Jan 2020 11:07:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1inkug-0003Hh-HT
- for qemu-devel@nongnu.org; Sat, 04 Jan 2020 10:00:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52899
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1inkug-0003D6-94
- for qemu-devel@nongnu.org; Sat, 04 Jan 2020 10:00:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578150024;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4AZtwPz7YvV30zG88KGatoMWXyvUGPvR2HtAljezWjM=;
- b=KindEMs5cGvbq8ks+6G5Bu4Zw3+cEFOI/sR5NoLsHRpoMktkEI1TEYiGi9UPgJVAkFWUZZ
- u8B1kyVdl+J1lvhwutCBf1y6SXsOdOgFP8ol3W0D3nJvYoD0JQzQgO8Tzw5JY7DzQXQoDJ
- 7mX+CE0wgvmxtnoP2PMNq25FytOHodc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-tgTQ3HV7M56zjjLAydCmNw-1; Sat, 04 Jan 2020 10:00:23 -0500
-Received: by mail-wr1-f71.google.com with SMTP id h30so15811078wrh.5
- for <qemu-devel@nongnu.org>; Sat, 04 Jan 2020 07:00:22 -0800 (PST)
+ (envelope-from <coiby.xu@gmail.com>) id 1inlx2-00041J-5p
+ for qemu-devel@nongnu.org; Sat, 04 Jan 2020 11:06:58 -0500
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45932)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1inlx1-0003qQ-Mv
+ for qemu-devel@nongnu.org; Sat, 04 Jan 2020 11:06:56 -0500
+Received: by mail-lf1-x141.google.com with SMTP id 203so33706209lfa.12
+ for <qemu-devel@nongnu.org>; Sat, 04 Jan 2020 08:06:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7juJ6rZsgkjfs81ZCuChXzAC1xQUNM28ZPfu4d9Z0w0=;
+ b=ihjY2LunROYUxl3GpSibcvuAMAsUD9TzSlxqaILvZIIpwQvoOeSZB5ln1ZUGVm5UQ+
+ H8OatxLnp561Akhn8GylX8WtCvjBvNJjFqeUF7LFZ4t5+/7NL+DJtHF2sfJOgDsevEXr
+ a4cNSU8V9eLeG+1fxUTAVEoPJFKDquyzJPSisoD5QQFmrobpX7aQU3W24H6tidK4croF
+ GC2go3FxxQF2tGPx13vFbnDSVKdRJK57v7yV9vgXYf6Tgo7B3WOvhYTvjJqaUjfttiYq
+ ezlS95X18E/man15VCyiJnCy2m1hPuBLrG5k4hJhyEU8UpU2RLGdlmoZrir9EoXei6+3
+ 4mSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4AZtwPz7YvV30zG88KGatoMWXyvUGPvR2HtAljezWjM=;
- b=S13plqvf10NLZciWrU22ia9v1dk25J39stcOC01I83Ol30gRlG0zOOUJw6MWHgvaJg
- a90hRNCWtC6ZfeRfKMQaLdmEEd9EKG8IKMmmXNd08W6ncOB2V1plHwIRi28E8EyRNVfe
- X5jPVTL1AwhM7tbAwB5x+W1gxKPAzBSZpZ/GjDccw/zrYTSo3lIsHronL5MO3YSuPrAT
- fm5o5c3dpnllpba2PogXcCjKfXREwcW52e6HfeXBmdTiNFbNMSZnVY+GSfceobn4huTE
- Wf5SI+TdVzc75vDXn+ihLYbWVSDzsLWCKq/ixmZ7tL5rG1PfMT+vadpgb7hel0a+XbsK
- w0ew==
-X-Gm-Message-State: APjAAAUli4HpHLHMV2RhR0Syq9j9g0fPUfAIrR2MczeYuNNPVarBa7VN
- wA5URMx3VFCqhDcI3yMk0bdjPda5FMnbDltp+70drhrPVjfmTW4ReZtTIjPTmAtKNM03HAA2paL
- sDxGO0FVAz3FUHOs=
-X-Received: by 2002:a5d:65c5:: with SMTP id e5mr93423710wrw.311.1578150021344; 
- Sat, 04 Jan 2020 07:00:21 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxq5G7nAcsGSSUAWY/5q4rW5BiGQ6IoKNZqVi108JeJmbT0yZ4jX0YtG/SOnAkwpF1poZzeHg==
-X-Received: by 2002:a5d:65c5:: with SMTP id e5mr93423692wrw.311.1578150021058; 
- Sat, 04 Jan 2020 07:00:21 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id x10sm64463816wrp.58.2020.01.04.07.00.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 04 Jan 2020 07:00:20 -0800 (PST)
-Subject: Re: [PATCH v2] hppa: allow max ram size upto 4Gb
-To: Igor Mammedov <imammedo@redhat.com>, Helge Deller <deller@gmx.de>
-References: <27c3e31d-82ae-e62f-caba-a0a3fbd55e7c@redhat.com>
- <1577987162-150529-1-git-send-email-imammedo@redhat.com>
- <2f226aa4-5f61-6e6d-d6b9-a98685a79e8c@gmx.de>
- <20200103105434.050d28ea@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6fa7bcd3-ee67-cc84-fd4e-d3677e3ae51a@redhat.com>
-Date: Sat, 4 Jan 2020 16:00:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7juJ6rZsgkjfs81ZCuChXzAC1xQUNM28ZPfu4d9Z0w0=;
+ b=PM9ERHRfmoHkzd3p95Cii4h9CwD3fD0S7KxCAuT/QFbL/lSAqIfq8+BQvmamYBhryr
+ 1VYm6SYiWl3M0259ekiq77j5e+MAYzM3pcl2P7f7gDv7ydsSkGToULK3eGaQKAjK6qoa
+ bsazXl0rZaRKt0pdYPqbJXAI3cxqlrW0KYi4L6GPUYoVf2XLlxpDvWhfxHECQ5IdIzPF
+ 1LKKbGVRWZZGtJbX7j+3FCMNTDRzKmGL5E1dtWGNTzZ9nMLp2gfS7kZGQopOCQ6UUmFr
+ 2L0lEnSTViVtgZM0OTan5MsvstKDZwVcxYHzxIdti5JPoNvBG+tnK9rrzyqLErAx1qMv
+ XQ8Q==
+X-Gm-Message-State: APjAAAUMqbSipnps8KygHdqgRPYFcfmbLkdjCk+HJUYxhCIicg5ARLm0
+ AdVVKrzejiBfFH5B0GQqzaATi3OZJGi48vLNi1w=
+X-Google-Smtp-Source: APXvYqzEDXRQui62dp/tR9B92H5A4vpq3e2IrXy7r0GRCK8dmKjQDFRxZd9hAqganPspdpvTCbQp2m1iG5u4cE3hIUE=
+X-Received: by 2002:ac2:4884:: with SMTP id x4mr51165421lfc.92.1578154013815; 
+ Sat, 04 Jan 2020 08:06:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200103105434.050d28ea@redhat.com>
-Content-Language: en-US
-X-MC-Unique: tgTQ3HV7M56zjjLAydCmNw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <CAJAkqrWm28qXtsFmaENAcsDNQV7gE=sd+YyA5ADmm2Vo9DKrUQ@mail.gmail.com>
+ <20191219143141.GF1624084@stefanha-x1.localdomain>
+In-Reply-To: <20191219143141.GF1624084@stefanha-x1.localdomain>
+From: Coiby Xu <coiby.xu@gmail.com>
+Date: Sun, 5 Jan 2020 00:06:17 +0800
+Message-ID: <CAJAkqrXKnwPhQMAT6dhvxDgs+7t3o89QSBPPDeP8AxQmwMi2Xw@mail.gmail.com>
+Subject: Re: [RFC] Implementing vhost-user-blk device backend
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000064f92a059b529d24"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,161 +86,335 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sven Schnelle <svens@stackframe.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Bharat Singh <bharatlkmlkvm@gmail.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/3/20 10:54 AM, Igor Mammedov wrote:
-> On Thu, 2 Jan 2020 21:22:12 +0100
-> Helge Deller <deller@gmx.de> wrote:
-> 
->> On 02.01.20 18:46, Igor Mammedov wrote:
->>> Previous patch drops silent ram_size fixup and makes
->>> QEMU error out with:
->>>
->>>   "RAM size more than 3840m is not supported"
->>>
->>> when user specified -m X more than supported value.
->>>
->>> User shouldn't be bothered with starting QEMU with valid CLI,
->>> so for the sake of user convenience allow using -m 4G vs -m 3840M.
->>>
->>> Requested-by: Helge Deller <deller@gmx.de>
->>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>> ---
->>> v2:
->>>    - make main ram -1 prio, so it wouldn't conflict with other regions
->>>      starting from 0xf9000000
->>>
->>> I dislike it but if you feel it's really necessary feel free to ack it.
+--00000000000064f92a059b529d24
+Content-Type: text/plain; charset="UTF-8"
 
-Hard to find the v2 buried in the other series with my email client.
+Hi Stefan,
 
->>>
->>> should be applied on top of:
->>>    "hppa: drop RAM size fixup"
->>
->> Hello Igor,
->> I appreciate that you are trying to make it more cleaner.
->> But, can't you merge both of your patches to one patch?
->> Right now you have one patch "hppa: drop RAM size fixup", which is
->> what I think is wrong. Then you add another one which somehow
->> fixes it up again and adds other stuff.
-> 1st patch bring it in line with other boards adding
-> proper error check but without changing RAM size.
-> While 2nd is changing device model (mapped RAM size) and
-> clearly documents that it's a hack for user convenience,
-> Hence I'd prefer to keep both separated.
-> 
->> Having everything in one single patch makes your full change more
->> understandable.
->>
->> Is it necessary to introduce clamped_ram_size and not continue with
->> ram_size (even if you would add it as static local variable)?
-> it's necessary since ram_size is global which should be kept == MachineState::ram_size.
-> Later on I plan to remove the former altogether and maybe
-> MachineState::ram_size aa well, since it could be read with
-> memory_region_size(MachineState::ram).
+Thank you for reviewing my work! All the improvements have been
+applied except for a small issue regarding object_add.
 
-Why insist on clamping the ram? We recommend to model what the hardware 
-does, and the hardware uses a full DIMM of DRAM, so 4GB, not less.
+>  (qemu) object_add vhost-user-server,id=ID,chardev=CHARDEV,writable=on|off
 
-What are the new problem introduced by using 4GB? I only see advantages 
-doing so. This doesn't break your series. This doesn't break the CLI.
-Am I missing something?
+Currently I implement object_add feature in the following syntax which use
+unix_socket directly instead of chardev,
 
->>> ---
->>>   hw/hppa/machine.c | 21 +++++++++++----------
->>>   1 file changed, 11 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
->>> index ebbf44f..0302983 100644
->>> --- a/hw/hppa/machine.c
->>> +++ b/hw/hppa/machine.c
->>> @@ -54,6 +54,7 @@ static uint64_t cpu_hppa_to_phys(void *opaque, uint64_t addr)
->>>
->>>   static HPPACPU *cpu[HPPA_MAX_CPUS];
->>>   static uint64_t firmware_entry;
->>> +static ram_addr_t clamped_ram_size;
->>>
->>>   static void machine_hppa_init(MachineState *machine)
->>>   {
->>> @@ -74,8 +75,6 @@ static void machine_hppa_init(MachineState *machine)
->>>       long i;
->>>       unsigned int smp_cpus = machine->smp.cpus;
->>>
->>> -    ram_size = machine->ram_size;
->>> -
->>>       /* Create CPUs.  */
->>>       for (i = 0; i < smp_cpus; i++) {
->>>           char *name = g_strdup_printf("cpu%ld-io-eir", i);
->>> @@ -90,12 +89,14 @@ static void machine_hppa_init(MachineState *machine)
->>>       }
->>>
->>>       /* Limit main memory. */
->>> -    if (ram_size > FIRMWARE_START) {
->>> -        error_report("RAM size more than %d is not supported", FIRMWARE_START);
->>> +    if (machine->ram_size > 4 * GiB) {
->>> +        error_report("RAM size more than 4Gb is not supported");
->>>           exit(EXIT_FAILURE);
->>>       }
->>> +    clamped_ram_size = machine->ram_size > FIRMWARE_START ?
->>> +        FIRMWARE_START : machine->ram_size;
->>>
->>> -    memory_region_add_subregion(addr_space, 0, machine->ram);
->>> +    memory_region_add_subregion_overlap(addr_space, 0, machine->ram, -1);
->>>
->>>       /* Init Dino (PCI host bus chip).  */
->>>       pci_bus = dino_init(addr_space, &rtc_irq, &serial_irq);
->>> @@ -151,7 +152,7 @@ static void machine_hppa_init(MachineState *machine)
->>>       qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
->>>                     "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
->>>                     firmware_low, firmware_high, firmware_entry);
->>> -    if (firmware_low < ram_size || firmware_high >= FIRMWARE_END) {
->>> +    if (firmware_low < clamped_ram_size || firmware_high >= FIRMWARE_END) {
->>>           error_report("Firmware overlaps with memory or IO space");
->>>           exit(1);
->>>       }
->>> @@ -204,7 +205,7 @@ static void machine_hppa_init(MachineState *machine)
->>>                  (1) Due to sign-extension problems and PDC,
->>>                  put the initrd no higher than 1G.
->>>                  (2) Reserve 64k for stack.  */
->>> -            initrd_base = MIN(ram_size, 1 * GiB);
->>> +            initrd_base = MIN(clamped_ram_size, 1 * GiB);
->>>               initrd_base = initrd_base - 64 * KiB;
->>>               initrd_base = (initrd_base - initrd_size) & TARGET_PAGE_MASK;
->>>
->>> @@ -232,7 +233,7 @@ static void machine_hppa_init(MachineState *machine)
->>>        * various parameters in registers. After firmware initialization,
->>>        * firmware will start the Linux kernel with ramdisk and cmdline.
->>>        */
->>> -    cpu[0]->env.gr[26] = ram_size;
->>> +    cpu[0]->env.gr[26] = clamped_ram_size;
+  (qemu) object_add
+vhost-user-server,id=id=disk,unix_socket=/tmp/vhost-user-blk_vhost.socket,name=disk,writable=off
 
-Helge, is this the code using this register?
+I know in QEMU we can create a socket server using chardev-add,
+  (qemu) chardev-add socket,id=char1,path=/tmp/vhost-user-blk_vhost.socket
 
-https://github.com/hdeller/seabios-hppa/blob/parisc-qemu-5.0/src/parisc/head.S#L139
+But it seems it's a bit cumbersome to utilize chardev. Take QMP over socket
+as an example,
 
->>>       cpu[0]->env.gr[25] = kernel_entry;
->>>
->>>       /* tell firmware how many SMP CPUs to present in inventory table */
->>> @@ -255,11 +256,11 @@ static void hppa_machine_reset(MachineState *ms)
->>>       }
->>>
->>>       /* already initialized by machine_hppa_init()? */
->>> -    if (cpu[0]->env.gr[26] == ram_size) {
->>> +    if (cpu[0]->env.gr[26] == clamped_ram_size) {
->>>           return;
->>>       }
->>>
->>> -    cpu[0]->env.gr[26] = ram_size;
->>> +    cpu[0]->env.gr[26] = clamped_ram_size;
->>>       cpu[0]->env.gr[25] = 0; /* no firmware boot menu */
->>>       cpu[0]->env.gr[24] = 'c';
->>>       /* gr22/gr23 unused, no initrd while reboot. */
->>>   
->>
-> 
+  $ x86_64-softmmu/qemu-system-x86_64 -drive
+file=dpdk.img,format=raw,if=none,id=disk -device
+ide-hd,drive=disk,bootindex=0 -m 128 -enable-kvm -chardev
+socket,id=mon1,path=/tmp/mon.sock,server,nowait -mon
+chardev=mon1,mode=control,pretty=on
 
+It doesn't support multiple concurrent client connections because of the
+limitation of chardev/char-socket.c.
+
+On Thu, Dec 19, 2019 at 10:31 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+
+> On Mon, Nov 18, 2019 at 10:27:28PM +0800, Coiby Xu wrote:
+> > Hi all,
+> >
+> > This is an implementation of vhost-user-blk device backend by
+> > following
+> https://wiki.qemu.org/Google_Summer_of_Code_2019#vhost-user-blk_device_backend
+> .
+> > raw/qcow2 disk images can now be shared via vhost user protocol. In
+> > this way, it could provide better performance than QEMU's existing NBD
+> > support.
+>
+> Thank you for working on this feature!
+>
+> > +static size_t vub_iov_to_buf(const struct iovec *iov,
+> > +                             const unsigned int iov_cnt, void *buf)
+>
+> Please take a look at utils/iov.c.  iov_to_buf_full() can be used
+> instead of defining this function.
+>
+> > +{
+> > +    size_t len;
+> > +    unsigned int i;
+> > +
+> > +    len = 0;
+> > +    for (i = 0; i < iov_cnt; i++) {
+> > +        memcpy(buf + len,  iov[i].iov_base, iov[i].iov_len);
+> > +        len += iov[i].iov_len;
+> > +    }
+> > +    return len;
+> > +}
+> > +
+> > +static  VubDev *vub_device;
+>
+> If you switch to -object (see below) then this global pointer will go
+> away so I won't comment on it throughout this patch.
+>
+> > +static void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
+> > +                       gpointer opaque)
+> > +{
+> > +    /* only one connection */
+> > +    if (vub_device->sioc) {
+> > +        return;
+> > +    }
+> > +
+> > +    vub_device->sioc = sioc;
+> > +    vub_device->listener = listener;
+> > +    /*
+> > +     * increase the object reference, so cioc will not freeed by
+> > +     * qio_net_listener_channel_func which will call
+> object_unref(OBJECT(sioc))
+> > +     */
+> > +    object_ref(OBJECT(sioc));
+> > +
+> > +    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-server");
+> > +    if (!vug_init(&vub_device->parent, VHOST_USER_BLK_MAX_QUEUES,
+> sioc->fd,
+> > +                  vub_panic_cb, &vub_iface)) {
+> > +        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+> > +    }
+>
+> vug_init() uses the default GMainContext, which is bad for performance
+> when there are many devices because it cannot take advantage of
+> multi-core CPUs.  vhost-user-server should support IOThread so that
+> devices can be run in dedicated threads.
+>
+> The nbd/server.c:NBDExport->ctx field serves this purpose in the NBD
+> server.  It's a little trickier with libvhost-user-glib because the API
+> currently doesn't allow passing in a GMainContext and will need to be
+> extended.
+>
+> > diff --git a/hmp-commands.hx b/hmp-commands.hx
+> > index cfcc044ce4..d8de179747 100644
+> > --- a/hmp-commands.hx
+> > +++ b/hmp-commands.hx
+> > @@ -1614,6 +1614,33 @@ STEXI
+> >  @findex acl_reset
+> >  Remove all matches from the access control list, and set the default
+> >  policy back to @code{deny}.
+> > +ETEXI
+> > +
+> > +    {
+> > +        .name       = "vhost_user_server_stop",
+> > +        .args_type  = "",
+> > +        .params     = "vhost_user_server_stop",
+> > +        .help       = "stop vhost-user-blk device backend",
+> > +        .cmd        = hmp_vhost_user_server_stop,
+> > +    },
+> > +STEXI
+> > +@item vhost_user_server_stop
+> > +@findex vhost_user_server_stop
+> > +Stop the QEMU embedded vhost-user-blk device backend server.
+> > +ETEXI
+>
+> The NBD server supports multiple client connections and exports
+> (drives).  A vhost-user socket only supports one connection and one
+> device.  I think it will be necessary to assign a unique identifier to
+> every vhost-user server.
+>
+> By the way, I think the server should be a UserCreatable Object so the
+> following syntax works:
+>
+>   $ qemu -object vhost-user-server,id=ID,chardev=CHARDEV,writable=on|off
+>
+> And existing HMP/QMP commands can be used:
+>
+>   (qemu) object_add vhost-user-server,id=ID,chardev=CHARDEV,writable=on|off
+>   (qemu) object_del ID
+>
+> This way we don't need to define new HMP/QMP/command-line syntax for
+> vhost-user-server.
+>
+> If you grep for UserCreatable you'll find examples like "iothread",
+> "secret", "throttle-group", etc.
+>
+
+
+-- 
+*Best regards,*
+*Coiby*
+
+--00000000000064f92a059b529d24
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi Stefan,<div><br></div><div>Thank you for reviewing my w=
+ork! All the improvements have been applied=C2=A0except for a small issue=
+=C2=A0regarding object_add.</div><div><br></div><div>&gt;=C2=A0 (qemu) obje=
+ct_add vhost-user-server,id=3DID,chardev=3DCHARDEV,writable=3Don|off<br></d=
+iv><div><br></div><div>Currently I implement=C2=A0object_add feature in the=
+ following syntax which use unix_socket directly instead of chardev,</div><=
+div><br></div><div>=C2=A0 (qemu) object_add vhost-user-server,id=3Did=3Ddis=
+k,unix_socket=3D/tmp/vhost-user-blk_vhost.socket,name=3Ddisk,writable=3Doff=
+<br></div><div><br></div><div>I know in QEMU we can create a socket server =
+using chardev-add,</div><div>=C2=A0 (qemu) chardev-add socket,id=3Dchar1,pa=
+th=3D/tmp/vhost-user-blk_vhost.socket</div><div><br></div><div>But it seems=
+ it&#39;s a bit cumbersome to utilize chardev. Take QMP over socket as an e=
+xample,=C2=A0</div><div><br></div><div>=C2=A0 $=C2=A0x86_64-softmmu/qemu-sy=
+stem-x86_64 -drive file=3Ddpdk.img,format=3Draw,if=3Dnone,id=3Ddisk -device=
+ ide-hd,drive=3Ddisk,bootindex=3D0 -m 128 -enable-kvm -chardev socket,id=3D=
+mon1,path=3D/tmp/mon.sock,server,nowait -mon chardev=3Dmon1,mode=3Dcontrol,=
+pretty=3Don</div><div><br></div><div>It doesn&#39;t support multiple concur=
+rent client connections because of the limitation of chardev/char-socket.c.=
+=C2=A0</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"=
+gmail_attr">On Thu, Dec 19, 2019 at 10:31 PM Stefan Hajnoczi &lt;<a href=3D=
+"mailto:stefanha@gmail.com" target=3D"_blank">stefanha@gmail.com</a>&gt; wr=
+ote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
+ 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Mon, Nov=
+ 18, 2019 at 10:27:28PM +0800, Coiby Xu wrote:<br>
+&gt; Hi all,<br>
+&gt; <br>
+&gt; This is an implementation of vhost-user-blk device backend by<br>
+&gt; following <a href=3D"https://wiki.qemu.org/Google_Summer_of_Code_2019#=
+vhost-user-blk_device_backend" rel=3D"noreferrer" target=3D"_blank">https:/=
+/wiki.qemu.org/Google_Summer_of_Code_2019#vhost-user-blk_device_backend</a>=
+.<br>
+&gt; raw/qcow2 disk images can now be shared via vhost user protocol. In<br=
+>
+&gt; this way, it could provide better performance than QEMU&#39;s existing=
+ NBD<br>
+&gt; support.<br>
+<br>
+Thank you for working on this feature!<br>
+<br>
+&gt; +static size_t vub_iov_to_buf(const struct iovec *iov,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0const unsigned int iov_cnt, void *buf)<b=
+r>
+<br>
+Please take a look at utils/iov.c.=C2=A0 iov_to_buf_full() can be used<br>
+instead of defining this function.<br>
+<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 size_t len;<br>
+&gt; +=C2=A0 =C2=A0 unsigned int i;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 len =3D 0;<br>
+&gt; +=C2=A0 =C2=A0 for (i =3D 0; i &lt; iov_cnt; i++) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 memcpy(buf + len,=C2=A0 iov[i].iov_base, =
+iov[i].iov_len);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 len +=3D iov[i].iov_len;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +=C2=A0 =C2=A0 return len;<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +static=C2=A0 VubDev *vub_device;<br>
+<br>
+If you switch to -object (see below) then this global pointer will go<br>
+away so I won&#39;t comment on it throughout this patch.<br>
+<br>
+&gt; +static void vub_accept(QIONetListener *listener, QIOChannelSocket *si=
+oc,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0gpointer opaque)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 /* only one connection */<br>
+&gt; +=C2=A0 =C2=A0 if (vub_device-&gt;sioc) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;sioc =3D sioc;<br>
+&gt; +=C2=A0 =C2=A0 vub_device-&gt;listener =3D listener;<br>
+&gt; +=C2=A0 =C2=A0 /*<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* increase the object reference, so cioc will not=
+ freeed by<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0* qio_net_listener_channel_func which will call o=
+bject_unref(OBJECT(sioc))<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt; +=C2=A0 =C2=A0 object_ref(OBJECT(sioc));<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 qio_channel_set_name(QIO_CHANNEL(sioc), &quot;vhost-ser=
+ver&quot;);<br>
+&gt; +=C2=A0 =C2=A0 if (!vug_init(&amp;vub_device-&gt;parent, VHOST_USER_BL=
+K_MAX_QUEUES, sioc-&gt;fd,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 vub_pa=
+nic_cb, &amp;vub_iface)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Failed to initializ=
+ed libvhost-user-glib\n&quot;);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+<br>
+vug_init() uses the default GMainContext, which is bad for performance<br>
+when there are many devices because it cannot take advantage of<br>
+multi-core CPUs.=C2=A0 vhost-user-server should support IOThread so that<br=
+>
+devices can be run in dedicated threads.<br>
+<br>
+The nbd/server.c:NBDExport-&gt;ctx field serves this purpose in the NBD<br>
+server.=C2=A0 It&#39;s a little trickier with libvhost-user-glib because th=
+e API<br>
+currently doesn&#39;t allow passing in a GMainContext and will need to be<b=
+r>
+extended.<br>
+<br>
+&gt; diff --git a/hmp-commands.hx b/hmp-commands.hx<br>
+&gt; index cfcc044ce4..d8de179747 100644<br>
+&gt; --- a/hmp-commands.hx<br>
+&gt; +++ b/hmp-commands.hx<br>
+&gt; @@ -1614,6 +1614,33 @@ STEXI<br>
+&gt;=C2=A0 @findex acl_reset<br>
+&gt;=C2=A0 Remove all matches from the access control list, and set the def=
+ault<br>
+&gt;=C2=A0 policy back to @code{deny}.<br>
+&gt; +ETEXI<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D &quot=
+;vhost_user_server_stop&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .args_type=C2=A0 =3D &quot;&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .params=C2=A0 =C2=A0 =C2=A0=3D &quot;vhos=
+t_user_server_stop&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .help=C2=A0 =C2=A0 =C2=A0 =C2=A0=3D &quot=
+;stop vhost-user-blk device backend&quot;,<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 .cmd=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D hmp_v=
+host_user_server_stop,<br>
+&gt; +=C2=A0 =C2=A0 },<br>
+&gt; +STEXI<br>
+&gt; +@item vhost_user_server_stop<br>
+&gt; +@findex vhost_user_server_stop<br>
+&gt; +Stop the QEMU embedded vhost-user-blk device backend server.<br>
+&gt; +ETEXI<br>
+<br>
+The NBD server supports multiple client connections and exports<br>
+(drives).=C2=A0 A vhost-user socket only supports one connection and one<br=
+>
+device.=C2=A0 I think it will be necessary to assign a unique identifier to=
+<br>
+every vhost-user server.<br>
+<br>
+By the way, I think the server should be a UserCreatable Object so the<br>
+following syntax works:<br>
+<br>
+=C2=A0 $ qemu -object vhost-user-server,id=3DID,chardev=3DCHARDEV,writable=
+=3Don|off<br>
+<br>
+And existing HMP/QMP commands can be used:<br>
+<br>
+=C2=A0 (qemu) object_add vhost-user-server,id=3DID,chardev=3DCHARDEV,writab=
+le=3Don|off<br>
+=C2=A0 (qemu) object_del ID<br>
+<br>
+This way we don&#39;t need to define new HMP/QMP/command-line syntax for<br=
+>
+vhost-user-server.<br>
+<br>
+If you grep for UserCreatable you&#39;ll find examples like &quot;iothread&=
+quot;,<br>
+&quot;secret&quot;, &quot;throttle-group&quot;, etc.<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+><div dir=3D"ltr"><div><div dir=3D"ltr"><div><i>Best regards,</i></div><fon=
+t color=3D"#00cccc"><i>Coiby</i></font><div><font color=3D"#00cccc"><br></f=
+ont></div></div></div></div></div>
+
+--00000000000064f92a059b529d24--
 
