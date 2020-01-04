@@ -1,95 +1,83 @@
-Return-Path: <SRS0=dCqM=2Y=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=YGca=2Z=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F5CC00523
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 23:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C464C00523
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 00:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62F1E21835
-	for <qemu-devel@archiver.kernel.org>; Fri,  3 Jan 2020 23:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E085621835
+	for <qemu-devel@archiver.kernel.org>; Sat,  4 Jan 2020 00:22:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MMPXUzHc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F1E21835
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gRnVfA7F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E085621835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1inWZo-0001WW-Gv
-	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 18:41:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48268)
+	id 1inXD5-0006CX-0X
+	for qemu-devel@archiver.kernel.org; Fri, 03 Jan 2020 19:22:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46352)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1inWZA-0000zZ-Hw
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 18:41:17 -0500
+ (envelope-from <linus.walleij@linaro.org>) id 1inXCI-0005mm-NC
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 19:21:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1inWZ8-00089B-Sl
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 18:41:16 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35250)
+ (envelope-from <linus.walleij@linaro.org>) id 1inXCH-0001o8-A5
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 19:21:42 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:44355)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1inWZ8-00086q-KE
- for qemu-devel@nongnu.org; Fri, 03 Jan 2020 18:41:14 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id s7so5287230pjc.0
- for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 15:41:14 -0800 (PST)
+ (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
+ id 1inXCH-0001gG-0x
+ for qemu-devel@nongnu.org; Fri, 03 Jan 2020 19:21:41 -0500
+Received: by mail-lj1-x244.google.com with SMTP id u71so45390525lje.11
+ for <qemu-devel@nongnu.org>; Fri, 03 Jan 2020 16:21:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ckqU1DFkeXaBLh1Z/pUX3jG28tYO74vwqFpUuM0oUPI=;
- b=MMPXUzHcV4YqKt4NsyowW2cxQapjVsNi3+ENUK4kbWqN8OcdKKT9tgj8LTl/8epkNA
- XcNtYdUxJQ1BWGZbFgmGTGBbqI0miIEGPZ9k0MRHjZqZJVM9t+kdEW0GVEI7Ut6RUpEG
- vSB6rQ0JSJB5+RysNISpaq44pLC9ZyaiZd+F8zzBSVbNL7r6sbn6zTKBnjmhSSiJQU5x
- sezIyY3Ha4kY0SMJo2pafbZww+HD7UM/fVAYZbh+JlADXLB+xJQGxez5JJujmwmvJNu9
- b3Gys0HLRvOYFd7Q25F8VwGZpg4x3LJ9ZlhxQdCJoSP/6GjS984HxpCqrALzecWuTOLO
- eSXw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=a25MTBnzC/TY/vt8zz8+qKKJTGhY6mCF1CmPfY1tykI=;
+ b=gRnVfA7FDAgs73jNy22XumTxemh0aYDjK9B1YAV7aDhmr0DazAVJiMp4WVw1bkv31/
+ bcATx1sRwYkcsu4O0LQVmlmjSHW5VtsN8kArTfZitHm7x//5M6K3YcSNLlNrU4k2nXBM
+ yt6DH6rszExsqnVul0yZCOGTl1phucIVvqvK/Gcklh4kjZC6VQ1xu9ZmRNx0Ik5oj39W
+ PUCHY1sxyw3q0Pr498xt9akwnDTU17FpPWdhZ0+b30zgWzvbnxDXRO1SyZ+eSC73LL7M
+ 4bTSAi5L7Qao6/+sTppkChYPciZ16A05vGdttDOmIm7Rn2KAj85O40F9gtCbP1HMl69m
+ XGZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ckqU1DFkeXaBLh1Z/pUX3jG28tYO74vwqFpUuM0oUPI=;
- b=rqlO5tBfjYZoKjV1A2FFuzzQZhbZWZi2NwLVCdPWLHIpmY9k1FUCq5hLYzOWhWFr8p
- 5o/Fopx9vt7lwOJO6BYE+kZgp8Bv4PWuG5nJgmUETXZN/k1mlG3LU/u4OIzloH3W1cLG
- HDNZ8aHyOWWINQ7EIITHIMpKcyL4ZnVRTHrVVR3qlSxZo9lXZy5t/0/EUMchuQwjYybv
- bWQcL1EwSSyj+FrIcBXyUNXCQyb8uK8hRTdqKQQob86jVy5ewIBsmY/jPhcDPhX4XuRE
- Q/hsQBrfpqkkPa4dNGBfRILr/fRDzDSxY+ZxIDilb+pF26mFLvY2uDxNki57GfEErwtd
- QtfQ==
-X-Gm-Message-State: APjAAAXgyFw2gQnKakZal0mAQYXjYmU5dRsvWgStIIvwKOF3aDprUEEH
- rr/I8veBI2+F09gKEWF3/zE3+A==
-X-Google-Smtp-Source: APXvYqyjlymtJEtLE3BCFifMnkpdfnxDrbWi0mz0ldwBRhKTrfCpQ/j913/3jVANshTmHoKd/2kfsA==
-X-Received: by 2002:a17:90b:147:: with SMTP id
- em7mr30029432pjb.49.1578094873207; 
- Fri, 03 Jan 2020 15:41:13 -0800 (PST)
-Received: from [10.103.5.8] (59-100-211-22.bri.static-ipl.aapt.com.au.
- [59.100.211.22])
- by smtp.gmail.com with ESMTPSA id i2sm62440210pgi.94.2020.01.03.15.41.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Jan 2020 15:41:12 -0800 (PST)
-Subject: Re: [PATCH v3 4/4] RISC-V: add vector extension configure instruction
-To: LIU Zhiwei <zhiwei_liu@c-sky.com>, alistair23@gmail.com,
- chihmin.chao@sifive.com, palmer@dabbelt.com
-References: <20200103033347.20909-1-zhiwei_liu@c-sky.com>
- <20200103033347.20909-5-zhiwei_liu@c-sky.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-X-Enigmail-Draft-Status: N11100
-Message-ID: <94fd7ef0-3ee7-d836-3feb-00a8b93ab585@linaro.org>
-Date: Sat, 4 Jan 2020 10:41:04 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=a25MTBnzC/TY/vt8zz8+qKKJTGhY6mCF1CmPfY1tykI=;
+ b=Msm9jXUPz0Qwq9LNp7XKNnQsJqd8w2fquNwhk1W/PZl+DQ6oWmcI1UirAv0hTlNjsI
+ dMQcdThV3SOF10gZ7uaC3QRDI0Fdvo65f/pz0IxX1Z2X7NG8k8oT3EqRwLUN9n0vB5Go
+ 4vLTvEcLyf8fQpKToJNPQOn0Cvfj3iN6Y1eDslLTtFqorkd9BJouvCcew9aBlHMunh2D
+ zDi3WUTE4EvggmkPwKzSr3u7f/5hhRsg2UtbcNd7KhqAfujQYRpedGcBXshE1AMUfHUe
+ 08E2iajQdbz6yTlbrbHkIXCKOsiyYysJJpLy/wYau9UIaBd8zWajA7JM0I2KeYHI0xR3
+ G05w==
+X-Gm-Message-State: APjAAAXTHaZWAmBw/DEcJJpd9GJmJMJQJ0UtP2bUXDZkQxg8/xuej2nU
+ IYQJsShiCSgjpnjQdvrseNBMoNBf/O5ZCwt1AcSLLQ==
+X-Google-Smtp-Source: APXvYqxHT5NBcGXP7l31r/rUzGwxDXqF6xPcQ35bsC0BAshJRd7O7pJFod6OutyDNvKjGim9p9LsFYX1ulkLOKLmCGs=
+X-Received: by 2002:a2e:85cd:: with SMTP id h13mr51946653ljj.191.1578097298469; 
+ Fri, 03 Jan 2020 16:21:38 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200103033347.20909-5-zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-7-geert+renesas@glider.be>
+ <CACRpkdb1XZAeSThxWmJtnm80T4aPufXV2UvJdVdgnw-TJe3trg@mail.gmail.com>
+ <CAMuHMdV+Ww5Y9G7+bS-SyHtm4dC89V37yuaYvrS3kYW=PRTkFA@mail.gmail.com>
+In-Reply-To: <CAMuHMdV+Ww5Y9G7+bS-SyHtm4dC89V37yuaYvrS3kYW=PRTkFA@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 4 Jan 2020 01:21:27 +0100
+Message-ID: <CACRpkdZwos9Dtt9E3OkxWf4rqMALNTge5NGduzGm-7MhQyLZuQ@mail.gmail.com>
+Subject: Re: [PATCH v3 6/7] docs: gpio: Add GPIO Aggregator/Repeater
+ documentation
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,176 +89,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang@c-sky.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- wxy194768@alibaba-inc.com
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/3/20 2:33 PM, LIU Zhiwei wrote:
-> vsetvl and vsetvli are two configure instructions for vl, vtype. TB flags
-> should update after configure instructions. The (ill, lmul, sew ) of vtype
-> and the bit of (VSTART == 0 && VL == VLMAX) will be placed within tb_flags.
-> 
-> Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-> ---
->  target/riscv/Makefile.objs              |  2 +-
->  target/riscv/cpu.c                      |  1 +
->  target/riscv/cpu.h                      | 55 ++++++++++++++++++++-----
->  target/riscv/helper.h                   |  2 +
->  target/riscv/insn32.decode              |  5 +++
->  target/riscv/insn_trans/trans_rvv.inc.c | 52 +++++++++++++++++++++++
->  target/riscv/translate.c                | 17 +++++++-
->  target/riscv/vector_helper.c            | 51 +++++++++++++++++++++++
->  8 files changed, 172 insertions(+), 13 deletions(-)
->  create mode 100644 target/riscv/insn_trans/trans_rvv.inc.c
->  create mode 100644 target/riscv/vector_helper.c
-> 
-> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-> index b1c79bc1d1..d577cef9e0 100644
-> --- a/target/riscv/Makefile.objs
-> +++ b/target/riscv/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o pmp.o
-> +obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o vector_helper.o gdbstub.o pmp.o
->  
->  DECODETREE = $(SRC_PATH)/scripts/decodetree.py
->  
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index c2370a0a57..3ff7b50bff 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -347,6 +347,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->          }
->      }
->      if (cpu->cfg.vext_spec) {
-> +        env->vext.vtype = ~((target_ulong)-1 >> 1);
+On Thu, Dec 12, 2019 at 3:48 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> On Thu, Dec 12, 2019 at 3:42 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> > On Wed, Nov 27, 2019 at 9:43 AM Geert Uytterhoeven
+> > <geert+renesas@glider.be> wrote:
+> > > +The GPIO Aggregator allows access control for individual GPIOs, by aggregating
+> > > +them into a new gpio_chip, which can be assigned to a group or user using
+> > > +standard UNIX file ownership and permissions.  Furthermore, this simplifies and
+> > > +hardens exporting GPIOs to a virtual machine, as the VM can just grab the full
+> > > +GPIO controller, and no longer needs to care about which GPIOs to grab and
+> > > +which not, reducing the attack surface.
+> > > +
+> > > +Aggregated GPIO controllers are instantiated and destroyed by writing to
+> > > +write-only attribute files in sysfs.
+> >
+> > I suppose virtual machines will have a lengthy config file where
+> > they specify which GPIO lines to pick and use for their GPIO
+> > aggregator, and that will all be fine, the VM starts and the aggregator
+> > is there and we can start executing.
+> >
+> > I would perhaps point out a weakness as with all sysfs and with the current
+> > gpio sysfs: if a process creates an aggregator device, and then that
+> > process crashes, what happens when you try to restart the process and
+> > run e.g. your VM again?
+> >
+> > Time for a hard reboot? Or should we add some design guidelines for
+> > these machines so that they can cleanly tear down aggregators
+> > previously created by the crashed VM?
+>
+> No, the VM does not create the aggregator.
+>
+> The idea is for the user to create one or more aggregators, set up
+> permissions on /dev/gpiochipX, and launch the VM, passing the aggregated
+> /dev/gpiochipX as parameters.
+> If the VM crashes, just launch it again.
+>
+> Destroying the aggregators is a manual and independent process, after
+> the VM has exited.
 
-Better as FIELD_DP64(0, VTYPE, VILL, 1),
+I'm thinking about someone making some industrial application for some
+control of a machinery say a robotic arm.
 
+And do make sure this VM is only controlling these GPIOs related to
+this robotic arm, they create a GPIO aggregator. And we care about
+cases like that since we provide this security argument.
 
-> +struct VTYPE {
-> +#ifdef HOST_WORDS_BIGENDIAN
-> +    target_ulong vill:1;
-> +    target_ulong reserved:sizeof(target_ulong) * 8 - 7;
-> +    target_ulong sew:3;
-> +    target_ulong lmul:2;
-> +#else
-> +    target_ulong lmul:2;
-> +    target_ulong sew:3;
-> +    target_ulong reserved:sizeof(target_ulong) * 8 - 7;
-> +    target_ulong vill:1;
-> +#endif
-> +};
+Surely that machine will be rebooted.
 
-Do not use bit fields to describe target register layout.
-Use FIELD().
+Surely they don't have a printed paper with all the commands lying
+at the console, and asking whoever powers it back on to manually
+type it all in again. That feels a bit 1981.
 
-> -#define TB_FLAGS_MMU_MASK   3
-> -#define TB_FLAGS_MSTATUS_FS MSTATUS_FS
-> +typedef CPURISCVState CPUArchState;
-> +typedef RISCVCPU ArchCPU;
-> +#include "exec/cpu-all.h"
-> +
-> +FIELD(TB_FLAGS, MMU, 0, 2)
-> +FIELD(TB_FLAGS, FS, 13, 2)
+So they will have a script for this I suppose. Possibly in some
+initscript so it is set up on boot. And this script echos stuff
+all over the place to set up the aggregator.
 
-The change to use FIELD for MMU and FS should be made separately from adding
-the vector state.
+Is this the use case you're thinking of?
 
-> +FIELD(TB_FLAGS, VL_EQ_VLMAX, 16, 1)
-> +FIELD(TB_FLAGS, LMUL, 17, 2)
-> +FIELD(TB_FLAGS, SEW, 19, 3)
-> +FIELD(TB_FLAGS, VILL, 22, 1)
+I just like to have the whole picture here.
 
-Why are you leaving holes in TB_FLAGS?  I know why the original hole was there,
-since it corresponded to simple masks on other registers.
-
-> +    vlmax = (1 << vtype->lmul) * cpu->cfg.vlen / (8 * (1 << vtype->sew));
-
-Wow, this can be simplified a lot.
-
-   (1 << LMUL) * VLEN / (8 * (1 << SEW))
- = (VLEN << LMUL) / (8 << SEW)
- = (VLEN << LMUL) >> (SEW + 3)
- = VLEN >> (SEW + 3 - LMUL)
-
-
-> +    vl_eq_vlmax = (env->vext.vstart == 0) && (vlmax == env->vext.vl);
-> +
-> +    flags = FIELD_DP32(flags, TB_FLAGS, VILL, vtype->vill);
-> +    flags = FIELD_DP32(flags, TB_FLAGS, SEW, vtype->sew);
-> +    flags = FIELD_DP32(flags, TB_FLAGS, LMUL, vtype->lmul);
-> +    flags = FIELD_DP32(flags, TB_FLAGS, VL_EQ_VLMAX, vl_eq_vlmax);
-
-I wonder if perhaps this all ought to be nested under
-
-  if (env->misa & RVV) {
-      ...
-  } else {
-      flag = FIELD_DP32(flags, TB_FLAGS, VILL, 1);
-  }
-
-so that, for the normal case when RVV is disabled, we don't bother computing
-all of those bits.
-
-> +static bool trans_vsetvl(DisasContext *ctx, arg_vsetvl * a)
-> +{
-> +    TCGv s1, s2, d;
-> +    d = tcg_temp_new();
-> +    s1 = tcg_temp_new();
-> +    s2 = tcg_temp_new();
-> +    gen_get_gpr(s1, a->rs1);
-> +    gen_get_gpr(s2, a->rs2);
-> +    gen_helper_vector_vsetvli(d, cpu_env, s1, s2);
-> +    tcg_gen_st_tl(d, cpu_env, offsetof(CPURISCVState, vext.vl));
-
-Why are you performing the store to vl inline, as opposed to within the helper
-funtion?
-
-> +    exit_tb(ctx);
-
-A normal exit is correct for vsetvl, because the new state is variable.
-
-> +static bool trans_vsetvli(DisasContext *ctx, arg_vsetvli * a)
-> +{
-> +    TCGv s1, s2, d;
-> +    d = tcg_temp_new();
-> +    s1 = tcg_temp_new();
-> +    s2 = tcg_const_tl(a->zimm);
-> +    gen_get_gpr(s1, a->rs1);
-> +    gen_helper_vector_vsetvli(d, cpu_env, s1, s2);
-> +    tcg_gen_st_tl(d, cpu_env, offsetof(CPURISCVState, vext.vl));
-> +    exit_tb(ctx);
-
-You could use
-
-  gen_goto_tb(ctx, 0, ctx->base.pc_next)
-
-here, because the new state is unknown but constant.  It will be the same every
-time the instruction is executed, and thus can compute the new state only once,
-saving that computation in the link to the next tb.
-
-> +target_ulong VECTOR_HELPER(vsetvli)(CPURISCVState *env, target_ulong s1,
-> +    target_ulong s2)
-> +{
-> +    int vlmax, vl;
-> +    RISCVCPU *cpu = env_archcpu(env);
-> +    struct VTYPE *vtype = (struct VTYPE *)&s2;
-
-FIELD_EX64 for all uses of VTYPE.
-
-> +
-> +    if (vtype->sew > cpu->cfg.elen) { /* only set vill bit. */
-> +        env->vext.vtype = ~((target_ulong)-1 >> 1);
-
-FIELD_DP64.
-
-> +    vlmax = (1 << vtype->lmul) * cpu->cfg.vlen / (8 * (1 << vtype->sew));
-
-Same simplification as before.  Perhaps extract this to an inline function for
-clarity, documenting the algebraic simplification only once.
-
-
-r~
+Yours,
+Linus Walleij
 
