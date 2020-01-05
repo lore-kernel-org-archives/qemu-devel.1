@@ -7,94 +7,94 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEA1C33C8C
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57FC7C33C8C
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:18:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9818207FD
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:17:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1327A207FD
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:18:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VOtSxsZp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9818207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K741qEQI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1327A207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1io5n4-0008V8-Iy
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 08:17:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58737)
+	id 1io5ny-0001f8-9H
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 08:18:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1io5Vx-00042w-NM
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 08:00:19 -0500
+ (envelope-from <mst@redhat.com>) id 1io5UI-0001xV-7k
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:58:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1io5Vw-0005TY-5m
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 08:00:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51030
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1io5UG-0004N9-2O
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:58:34 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42664
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5Vw-0005TM-11
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 08:00:16 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5UF-0004Lr-Su
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:58:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578229215;
+ s=mimecast20190719; t=1578229111;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VvaA+Bcc2Gxeb7XmQhJgoMxxUrIKTcdYM4rBXSKaGgM=;
- b=VOtSxsZpO1BoD5HEBi3+gueKbrW20FWxrgY7vzlNOeGHK2/7kmB7GC4Qkgo0ZSZf3dN9q1
- 1UOXgVGx5WWv8VSrrs/4lhR5iSOyfB6R0H7vt35PDG+ZJxp2nWbpWdN9JJ/mLn0fPMWf4u
- YToD4sn7I7K18LyI8nvoK5X4w7d6IEY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-BJ3nyWm0NYO_dGScZqZQYQ-1; Sun, 05 Jan 2020 08:00:12 -0500
-Received: by mail-qv1-f71.google.com with SMTP id v5so32900480qvn.21
- for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 05:00:12 -0800 (PST)
+ bh=gA+pwh7nEEbohLHaQ73B+nUfWUkuIF1GGYQVjzNVnqg=;
+ b=K741qEQImAeXm11twPZNjPR/A90oYDB5uwCqG0RIC51/i4RytwZ1JQfPBcneB15L3ZpPEt
+ aI5nOUL6kLjKiZqVyz8SzYBl8b/xtasGrJ0OdxRjEuQma3hcqxF5Z7tnqFoLdzgx9Lflmo
+ ix1R3fC7qpwM18FkPeCgLgSHZOpPQUE=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-ODXVqlLSNwWC2YxQrfDW-w-1; Sun, 05 Jan 2020 07:58:30 -0500
+Received: by mail-qt1-f200.google.com with SMTP id d18so15702147qtp.16
+ for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:58:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=aNLKl1oKPF+kDyM8hwhwxdKmZvFLTYfwlNBJlJeT2zg=;
- b=UqqEX3AR2K9ROaiJYNFhXo49ef6hGNrDa9ygWNjVVlWKFgpJXWnc9dajZRBTnYcn25
- og7MByccklhn2TruuDCsaSQeTZX7o2MFByVur3W6yWG8HZZDaLt/VE/fk7M/WtEEaYUo
- Y0HavswsBPdPf/DqQpMhv+tUlTYWV/OlqCrcX7QISBlN+Jmn3JjBTd4Z5SVO4HTfF8o1
- DFmA+0YwxVipW7FYnrE60f6viTmJ/GSDwFq68uDpIGD1zhgR/NVwPWgBwEQNlcz7b3ox
- x3FES+JZSAth115DwFIh6nhBl29XKG3RjHv413yrVna1L5RLOlAH3jsoPhbAlkce06iu
- LqLA==
-X-Gm-Message-State: APjAAAUkXIpC4D0LGZ1/ghojBfrszPE2p6vf/IiSe4//N+qYuCydWUs/
- 00Un32aUfy8KkoGY4EflgcdJzcMotIIhrjPaK0HPMjNHlmTonZD6IPOBpNpW6RxZN84C6wxyPQs
- 1mBcbIy0Gt3Mvm2w=
-X-Received: by 2002:a05:6214:1772:: with SMTP id
- et18mr39343901qvb.154.1578229211856; 
- Sun, 05 Jan 2020 05:00:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwMKh8VtuZnkWcWHJLEF8OmGmsU0HxtpqN5DQIXpP8bDy+Hffc5juG13QqEpIkYS1AsMLQBUw==
-X-Received: by 2002:a05:6214:1772:: with SMTP id
- et18mr39343872qvb.154.1578229211561; 
- Sun, 05 Jan 2020 05:00:11 -0800 (PST)
+ bh=bjxdhZe8lLxQ+Az28/cWVrxvfjQRU8bK06t3mInr1NE=;
+ b=eD31xLE6uclE3g1gBBTF0f8X4Vln1+MzQ4ufmlx2t/owZWvGm19W0S1EoegK3IjoB1
+ ch2oin5IaZDW6Oi1n5Y5qVVKGMtV/SfpqWn/UMg0U3H4iQYvZaw71vAJ3aT4M1aWQY8N
+ mUIJky2cr1gKrKZVwlw0fgIbuusqwR/SuEvKTwcGvHfHifdY818YcVO0+hBsgWZHKoHH
+ nUgcoNbgcztMEZKUM7yoOcU+r7Vd5fxShyLBvejLNDUst0hg0afYe3gm726Xy2vshdOC
+ 6n4kZ+b/j45KUASS84LY/502Fr1XK8dTXzDlFXuezMSzgV2VXHny/m8oeN2vlQDz2+C3
+ 7M3A==
+X-Gm-Message-State: APjAAAWb659dXIgCqBXH9tkllfep+WXJb5sgbNvLV/T55tMY+dtpu3KA
+ xKpWPOEiSIgrzXmU3t+YSHZucGMr/ksK6hAPhtRxgvhjXfO9UV92FAYA2uBfKRyKG2Apok0Ye6I
+ ub6xhJItBNWm/gN0=
+X-Received: by 2002:a05:620a:13e7:: with SMTP id
+ h7mr80328292qkl.235.1578229109136; 
+ Sun, 05 Jan 2020 04:58:29 -0800 (PST)
+X-Google-Smtp-Source: APXvYqycIzJdKmm49Tdfu7vCsO3wdGwDQu8gqUTRwG3V8HUieebFn/Syo/IB0lWz8WYpwvC8vkDLdw==
+X-Received: by 2002:a05:620a:13e7:: with SMTP id
+ h7mr80328277qkl.235.1578229108645; 
+ Sun, 05 Jan 2020 04:58:28 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id q25sm19415327qkq.88.2020.01.05.05.00.07
+ by smtp.gmail.com with ESMTPSA id c24sm19425257qtk.40.2020.01.05.04.58.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jan 2020 05:00:10 -0800 (PST)
-Date: Sun, 5 Jan 2020 08:00:05 -0500
+ Sun, 05 Jan 2020 04:58:27 -0800 (PST)
+Date: Sun, 5 Jan 2020 07:58:23 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 32/32] intel_iommu: add present bit check for pasid table
- entries
-Message-ID: <20200105125622.27231-33-mst@redhat.com>
+Subject: [PULL v3 13/32] numa: Extend CLI to provide memory side cache
+ information
+Message-ID: <20200105125622.27231-14-mst@redhat.com>
 References: <20200105125622.27231-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200105125622.27231-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: BJ3nyWm0NYO_dGScZqZQYQ-1
+X-MC-Unique: ODXVqlLSNwWC2YxQrfDW-w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,211 +106,365 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Tian <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-stable@nongnu.org,
- Peter Xu <peterx@redhat.com>, Liu Yi L <yi.l.liu@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Liu Jingqi <jingqi.liu@intel.com>,
+ Tao Xu <tao3.xu@intel.com>, Markus Armbruster <armbru@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Yi L <yi.l.liu@intel.com>
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-The present bit check for pasid entry (pe) and pasid directory
-entry (pdire) were missed in previous commits as fpd bit check
-doesn't require present bit as "Set". This patch adds the present
-bit check for callers which wants to get a valid pe/pdire.
+Add -numa hmat-cache option to provide Memory Side Cache Information.
+These memory attributes help to build Memory Side Cache Information
+Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
+Before using hmat-cache option, enable HMAT with -machine hmat=3Don.
 
-Cc: qemu-stable@nongnu.org
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Message-Id: <1578058086-4288-3-git-send-email-yi.l.liu@intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Message-Id: <20191213011929.2520-4-tao3.xu@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/i386/intel_iommu_internal.h |  1 +
- hw/i386/intel_iommu.c          | 92 +++++++++++++++++++++++++++-------
- 2 files changed, 74 insertions(+), 19 deletions(-)
+ qapi/machine.json     | 81 +++++++++++++++++++++++++++++++++++++++++--
+ include/sysemu/numa.h |  5 +++
+ hw/core/numa.c        | 80 ++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx       | 17 +++++++--
+ 4 files changed, 179 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.=
-h
-index edcf9fc9bb..862033ebe6 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -479,6 +479,7 @@ typedef struct VTDRootEntry VTDRootEntry;
- #define VTD_PASID_ENTRY_FPD           (1ULL << 1) /* Fault Processing Disa=
-ble */
+diff --git a/qapi/machine.json b/qapi/machine.json
+index cf8faf5a2a..b3d30bc816 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -428,10 +428,12 @@
+ #
+ # @hmat-lb: memory latency and bandwidth information (Since: 5.0)
+ #
++# @hmat-cache: memory side cache information (Since: 5.0)
++#
+ # Since: 2.1
+ ##
+ { 'enum': 'NumaOptionsType',
+-  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
++  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
 =20
- /* PASID Granular Translation Type Mask */
-+#define VTD_PASID_ENTRY_P              1ULL
- #define VTD_SM_PASID_ENTRY_PGTT        (7ULL << 6)
- #define VTD_SM_PASID_ENTRY_FLT         (1ULL << 6)
- #define VTD_SM_PASID_ENTRY_SLT         (2ULL << 6)
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 609b80750a..a523ef0e65 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -686,9 +686,18 @@ static inline bool vtd_pe_type_check(X86IOMMUState *x8=
-6_iommu,
-     return true;
+ ##
+ # @NumaOptions:
+@@ -447,7 +449,8 @@
+     'node': 'NumaNodeOptions',
+     'dist': 'NumaDistOptions',
+     'cpu': 'NumaCpuOptions',
+-    'hmat-lb': 'NumaHmatLBOptions' }}
++    'hmat-lb': 'NumaHmatLBOptions',
++    'hmat-cache': 'NumaHmatCacheOptions' }}
+=20
+ ##
+ # @NumaNodeOptions:
+@@ -646,6 +649,80 @@
+     '*latency': 'uint64',
+     '*bandwidth': 'size' }}
+=20
++##
++# @HmatCacheAssociativity:
++#
++# Cache associativity in the Memory Side Cache Information Structure
++# of HMAT
++#
++# For more information of @HmatCacheAssociativity, see chapter
++# 5.2.27.5: Table 5-147 of ACPI 6.3 spec.
++#
++# @none: None (no memory side cache in this proximity domain,
++#              or cache associativity unknown)
++#
++# @direct: Direct Mapped
++#
++# @complex: Complex Cache Indexing (implementation specific)
++#
++# Since: 5.0
++##
++{ 'enum': 'HmatCacheAssociativity',
++  'data': [ 'none', 'direct', 'complex' ] }
++
++##
++# @HmatCacheWritePolicy:
++#
++# Cache write policy in the Memory Side Cache Information Structure
++# of HMAT
++#
++# For more information of @HmatCacheWritePolicy, see chapter
++# 5.2.27.5: Table 5-147: Field "Cache Attributes" of ACPI 6.3 spec.
++#
++# @none: None (no memory side cache in this proximity domain,
++#              or cache write policy unknown)
++#
++# @write-back: Write Back (WB)
++#
++# @write-through: Write Through (WT)
++#
++# Since: 5.0
++##
++{ 'enum': 'HmatCacheWritePolicy',
++  'data': [ 'none', 'write-back', 'write-through' ] }
++
++##
++# @NumaHmatCacheOptions:
++#
++# Set the memory side cache information for a given memory domain.
++#
++# For more information of @NumaHmatCacheOptions, see chapter
++# 5.2.27.5: Table 5-147: Field "Cache Attributes" of ACPI 6.3 spec.
++#
++# @node-id: the memory proximity domain to which the memory belongs.
++#
++# @size: the size of memory side cache in bytes.
++#
++# @level: the cache level described in this structure.
++#
++# @associativity: the cache associativity,
++#         none/direct-mapped/complex(complex cache indexing).
++#
++# @policy: the write policy, none/write-back/write-through.
++#
++# @line: the cache Line size in bytes.
++#
++# Since: 5.0
++##
++{ 'struct': 'NumaHmatCacheOptions',
++  'data': {
++   'node-id': 'uint32',
++   'size': 'size',
++   'level': 'uint8',
++   'associativity': 'HmatCacheAssociativity',
++   'policy': 'HmatCacheWritePolicy',
++   'line': 'uint16' }}
++
+ ##
+ # @HostMemPolicy:
+ #
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 70f93c83d7..ba693cc80b 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -91,6 +91,9 @@ struct NumaState {
+=20
+     /* NUMA nodes HMAT Locality Latency and Bandwidth Information */
+     HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
++
++    /* Memory Side Cache Information Structure */
++    NumaHmatCacheOptions *hmat_cache[MAX_NODES][HMAT_LB_LEVELS];
+ };
+ typedef struct NumaState NumaState;
+=20
+@@ -98,6 +101,8 @@ void set_numa_options(MachineState *ms, NumaOptions *obj=
+ect, Error **errp);
+ void parse_numa_opts(MachineState *ms);
+ void parse_numa_hmat_lb(NumaState *numa_state, NumaHmatLBOptions *node,
+                         Error **errp);
++void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
++                           Error **errp);
+ void numa_complete_configuration(MachineState *ms);
+ void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
+ extern QemuOptsList qemu_numa_opts;
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 34eb413f5d..747c9680b0 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -379,6 +379,73 @@ void parse_numa_hmat_lb(NumaState *numa_state, NumaHma=
+tLBOptions *node,
+     g_array_append_val(hmat_lb->list, lb_data);
  }
 =20
--static int vtd_get_pasid_dire(dma_addr_t pasid_dir_base,
--                              uint32_t pasid,
--                              VTDPASIDDirEntry *pdire)
-+static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
++void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
++                           Error **errp)
 +{
-+    return pdire->val & 1;
-+}
++    int nb_numa_nodes =3D ms->numa_state->num_nodes;
++    NodeInfo *numa_info =3D ms->numa_state->nodes;
++    NumaHmatCacheOptions *hmat_cache =3D NULL;
 +
-+/**
-+ * Caller of this function should check present bit if wants
-+ * to use pdir entry for futher usage except for fpd bit check.
-+ */
-+static int vtd_get_pdire_from_pdir_table(dma_addr_t pasid_dir_base,
-+                                         uint32_t pasid,
-+                                         VTDPASIDDirEntry *pdire)
- {
-     uint32_t index;
-     dma_addr_t addr, entry_size;
-@@ -703,18 +712,22 @@ static int vtd_get_pasid_dire(dma_addr_t pasid_dir_ba=
-se,
-     return 0;
- }
-=20
--static int vtd_get_pasid_entry(IntelIOMMUState *s,
--                               uint32_t pasid,
--                               VTDPASIDDirEntry *pdire,
--                               VTDPASIDEntry *pe)
-+static inline bool vtd_pe_present(VTDPASIDEntry *pe)
-+{
-+    return pe->val[0] & VTD_PASID_ENTRY_P;
-+}
-+
-+static int vtd_get_pe_in_pasid_leaf_table(IntelIOMMUState *s,
-+                                          uint32_t pasid,
-+                                          dma_addr_t addr,
-+                                          VTDPASIDEntry *pe)
- {
-     uint32_t index;
--    dma_addr_t addr, entry_size;
-+    dma_addr_t entry_size;
-     X86IOMMUState *x86_iommu =3D X86_IOMMU_DEVICE(s);
-=20
-     index =3D VTD_PASID_TABLE_INDEX(pasid);
-     entry_size =3D VTD_PASID_ENTRY_SIZE;
--    addr =3D pdire->val & VTD_PASID_TABLE_BASE_ADDR_MASK;
-     addr =3D addr + index * entry_size;
-     if (dma_memory_read(&address_space_memory, addr, pe, entry_size)) {
-         return -VTD_FR_PASID_TABLE_INV;
-@@ -732,25 +745,54 @@ static int vtd_get_pasid_entry(IntelIOMMUState *s,
-     return 0;
- }
-=20
--static int vtd_get_pasid_entry_from_pasid(IntelIOMMUState *s,
--                                          dma_addr_t pasid_dir_base,
--                                          uint32_t pasid,
--                                          VTDPASIDEntry *pe)
-+/**
-+ * Caller of this function should check present bit if wants
-+ * to use pasid entry for futher usage except for fpd bit check.
-+ */
-+static int vtd_get_pe_from_pdire(IntelIOMMUState *s,
-+                                 uint32_t pasid,
-+                                 VTDPASIDDirEntry *pdire,
-+                                 VTDPASIDEntry *pe)
-+{
-+    dma_addr_t addr =3D pdire->val & VTD_PASID_TABLE_BASE_ADDR_MASK;
-+
-+    return vtd_get_pe_in_pasid_leaf_table(s, pasid, addr, pe);
-+}
-+
-+/**
-+ * This function gets a pasid entry from a specified pasid
-+ * table (includes dir and leaf table) with a specified pasid.
-+ * Sanity check should be done to ensure return a present
-+ * pasid entry to caller.
-+ */
-+static int vtd_get_pe_from_pasid_table(IntelIOMMUState *s,
-+                                       dma_addr_t pasid_dir_base,
-+                                       uint32_t pasid,
-+                                       VTDPASIDEntry *pe)
- {
-     int ret;
-     VTDPASIDDirEntry pdire;
-=20
--    ret =3D vtd_get_pasid_dire(pasid_dir_base, pasid, &pdire);
-+    ret =3D vtd_get_pdire_from_pdir_table(pasid_dir_base,
-+                                        pasid, &pdire);
-     if (ret) {
-         return ret;
-     }
-=20
--    ret =3D vtd_get_pasid_entry(s, pasid, &pdire, pe);
-+    if (!vtd_pdire_present(&pdire)) {
-+        return -VTD_FR_PASID_TABLE_INV;
++    if (node->node_id >=3D nb_numa_nodes) {
++        error_setg(errp, "Invalid node-id=3D%" PRIu32 ", it should be less=
+ "
++                   "than %d", node->node_id, nb_numa_nodes);
++        return;
 +    }
 +
-+    ret =3D vtd_get_pe_from_pdire(s, pasid, &pdire, pe);
-     if (ret) {
-         return ret;
-     }
-=20
--    return ret;
-+    if (!vtd_pe_present(pe)) {
-+        return -VTD_FR_PASID_TABLE_INV;
++    if (numa_info[node->node_id].lb_info_provided !=3D (BIT(0) | BIT(1))) =
+{
++        error_setg(errp, "The latency and bandwidth information of "
++                   "node-id=3D%" PRIu32 " should be provided before memory=
+ side "
++                   "cache attributes", node->node_id);
++        return;
 +    }
 +
-+    return 0;
- }
-=20
- static int vtd_ce_get_rid2pasid_entry(IntelIOMMUState *s,
-@@ -763,7 +805,7 @@ static int vtd_ce_get_rid2pasid_entry(IntelIOMMUState *=
-s,
-=20
-     pasid =3D VTD_CE_GET_RID2PASID(ce);
-     pasid_dir_base =3D VTD_CE_GET_PASID_DIR_TABLE(ce);
--    ret =3D vtd_get_pasid_entry_from_pasid(s, pasid_dir_base, pasid, pe);
-+    ret =3D vtd_get_pe_from_pasid_table(s, pasid_dir_base, pasid, pe);
-=20
-     return ret;
- }
-@@ -781,7 +823,11 @@ static int vtd_ce_get_pasid_fpd(IntelIOMMUState *s,
-     pasid =3D VTD_CE_GET_RID2PASID(ce);
-     pasid_dir_base =3D VTD_CE_GET_PASID_DIR_TABLE(ce);
-=20
--    ret =3D vtd_get_pasid_dire(pasid_dir_base, pasid, &pdire);
-+    /*
-+     * No present bit check since fpd is meaningful even
-+     * if the present bit is clear.
-+     */
-+    ret =3D vtd_get_pdire_from_pdir_table(pasid_dir_base, pasid, &pdire);
-     if (ret) {
-         return ret;
-     }
-@@ -791,7 +837,15 @@ static int vtd_ce_get_pasid_fpd(IntelIOMMUState *s,
-         return 0;
-     }
-=20
--    ret =3D vtd_get_pasid_entry(s, pasid, &pdire, &pe);
-+    if (!vtd_pdire_present(&pdire)) {
-+        return -VTD_FR_PASID_TABLE_INV;
++    if (node->level < 1 || node->level >=3D HMAT_LB_LEVELS) {
++        error_setg(errp, "Invalid level=3D%" PRIu8 ", it should be larger =
+than 0 "
++                   "and less than or equal to %d", node->level,
++                   HMAT_LB_LEVELS - 1);
++        return;
 +    }
 +
-+    /*
-+     * No present bit check since fpd is meaningful even
-+     * if the present bit is clear.
-+     */
-+    ret =3D vtd_get_pe_from_pdire(s, pasid, &pdire, &pe);
-     if (ret) {
-         return ret;
++    assert(node->associativity < HMAT_CACHE_ASSOCIATIVITY__MAX);
++    assert(node->policy < HMAT_CACHE_WRITE_POLICY__MAX);
++    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
++        error_setg(errp, "Duplicate configuration of the side cache for "
++                   "node-id=3D%" PRIu32 " and level=3D%" PRIu8,
++                   node->node_id, node->level);
++        return;
++    }
++
++    if ((node->level > 1) &&
++        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
++        (node->size >=3D
++            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->si=
+ze)) {
++        error_setg(errp, "Invalid size=3D%" PRIu64 ", the size of level=3D=
+%" PRIu8
++                   " should be less than the size(%" PRIu64 ") of "
++                   "level=3D%u", node->size, node->level,
++                   ms->numa_state->hmat_cache[node->node_id]
++                                             [node->level - 1]->size,
++                   node->level - 1);
++        return;
++    }
++
++    if ((node->level < HMAT_LB_LEVELS - 1) &&
++        ms->numa_state->hmat_cache[node->node_id][node->level + 1] &&
++        (node->size <=3D
++            ms->numa_state->hmat_cache[node->node_id][node->level + 1]->si=
+ze)) {
++        error_setg(errp, "Invalid size=3D%" PRIu64 ", the size of level=3D=
+%" PRIu8
++                   " should be larger than the size(%" PRIu64 ") of "
++                   "level=3D%u", node->size, node->level,
++                   ms->numa_state->hmat_cache[node->node_id]
++                                             [node->level + 1]->size,
++                   node->level + 1);
++        return;
++    }
++
++    hmat_cache =3D g_malloc0(sizeof(*hmat_cache));
++    memcpy(hmat_cache, node, sizeof(*hmat_cache));
++    ms->numa_state->hmat_cache[node->node_id][node->level] =3D hmat_cache;
++}
++
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+ {
+     Error *err =3D NULL;
+@@ -430,6 +497,19 @@ void set_numa_options(MachineState *ms, NumaOptions *o=
+bject, Error **errp)
+             goto end;
+         }
+         break;
++    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
++        if (!ms->numa_state->hmat_enabled) {
++            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
++                       "(HMAT) is disabled, enable it with -machine hmat=
+=3Don "
++                       "before using any of hmat specific options");
++            return;
++        }
++
++        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
++        if (err) {
++            goto end;
++        }
++        break;
+     default:
+         abort();
      }
+diff --git a/qemu-options.hx b/qemu-options.hx
+index a0c0bbb7cf..d4b73ef60c 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -176,7 +176,8 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+     "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][=
+,initiator=3Dnode]\n"
+     "-numa dist,src=3Dsource,dst=3Ddestination,val=3Ddistance\n"
+     "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=3Dz=
+]\n"
+-    "-numa hmat-lb,initiator=3Dnode,target=3Dnode,hierarchy=3Dmemory|first=
+-level|second-level|third-level,data-type=3Daccess-latency|read-latency|wri=
+te-latency[,latency=3Dlat][,bandwidth=3Dbw]\n",
++    "-numa hmat-lb,initiator=3Dnode,target=3Dnode,hierarchy=3Dmemory|first=
+-level|second-level|third-level,data-type=3Daccess-latency|read-latency|wri=
+te-latency[,latency=3Dlat][,bandwidth=3Dbw]\n"
++    "-numa hmat-cache,node-id=3Dnode,size=3Dsize,level=3Dlevel[,associativ=
+ity=3Dnone|direct|complex][,policy=3Dnone|write-back|write-through][,line=
+=3Dsize]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu}]=
+][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
+@@ -184,6 +185,7 @@ STEXI
+ @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@var{di=
+stance}
+ @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=3D@va=
+r{y}][,thread-id=3D@var{z}]
+ @itemx -numa hmat-lb,initiator=3D@var{node},target=3D@var{node},hierarchy=
+=3D@var{hierarchy},data-type=3D@var{tpye}[,latency=3D@var{lat}][,bandwidth=
+=3D@var{bw}]
++@itemx -numa hmat-cache,node-id=3D@var{node},size=3D@var{size},level=3D@va=
+r{level}[,associativity=3D@var{str}][,policy=3D@var{str}][,line=3D@var{size=
+}]
+ @findex -numa
+ Define a NUMA node and assign RAM and VCPUs to it.
+ Set the NUMA distance from a source node to a destination node.
+@@ -287,11 +289,20 @@ NUM byte per second (or MB/s, GB/s or TB/s depending =
+on used suffix).
+ Note that if latency or bandwidth value is 0, means the corresponding late=
+ncy or
+ bandwidth information is not provided.
+=20
++In @samp{hmat-cache} option, @var{node-id} is the NUMA-id of the memory be=
+longs.
++@var{size} is the size of memory side cache in bytes. @var{level} is the c=
+ache
++level described in this structure, note that the cache level 0 should not =
+be used
++with @samp{hmat-cache} option. @var{associativity} is the cache associativ=
+ity,
++the possible value is 'none/direct(direct-mapped)/complex(complex cache in=
+dexing)'.
++@var{policy} is the write policy. @var{line} is the cache Line size in byt=
+es.
++
+ For example, the following options describe 2 NUMA nodes. Node 0 has 2 cpu=
+s and
+ a ram, node 1 has only a ram. The processors in node 0 access memory in no=
+de
+ 0 with access-latency 5 nanoseconds, access-bandwidth is 200 MB/s;
+ The processors in NUMA node 0 access memory in NUMA node 1 with access-lat=
+ency 10
+ nanoseconds, access-bandwidth is 100 MB/s.
++And for memory side cache information, NUMA node 0 and 1 both have 1 level=
+ memory
++cache, size is 10KB, policy is write-back, the cache Line size is 8 bytes:
+ @example
+ -machine hmat=3Don \
+ -m 2G \
+@@ -305,7 +316,9 @@ nanoseconds, access-bandwidth is 100 MB/s.
+ -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacce=
+ss-latency,latency=3D5 \
+ -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dmemory,data-type=3Dacce=
+ss-bandwidth,bandwidth=3D200M \
+ -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacce=
+ss-latency,latency=3D10 \
+--numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacce=
+ss-bandwidth,bandwidth=3D100M
++-numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dmemory,data-type=3Dacce=
+ss-bandwidth,bandwidth=3D100M \
++-numa hmat-cache,node-id=3D0,size=3D10K,level=3D1,associativity=3Ddirect,p=
+olicy=3Dwrite-back,line=3D8 \
++-numa hmat-cache,node-id=3D1,size=3D10K,level=3D1,associativity=3Ddirect,p=
+olicy=3Dwrite-back,line=3D8
+ @end example
+=20
+ ETEXI
 --=20
 MST
 
