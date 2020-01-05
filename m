@@ -2,75 +2,66 @@ Return-Path: <SRS0=Lm/k=22=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7E9C00523
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 10:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0937C33C8C
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 11:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A52F121582
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 10:18:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A52F121582
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B614C21582
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 11:00:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B614C21582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1io2zo-0006XB-KH
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 05:18:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41729)
+	id 1io3du-0001T7-T4
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 06:00:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46122)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1io2wx-0004mo-IM
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 05:16:00 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1io3dD-00012g-Ij
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 05:59:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1io2wq-0001Ui-JK
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 05:15:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41344)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1io2wm-0001P4-70
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 05:15:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1io2wj-0003Pc-7L
- for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 10:15:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 31B912E80CD
- for <qemu-devel@nongnu.org>; Sun,  5 Jan 2020 10:15:45 +0000 (UTC)
+ (envelope-from <balaton@eik.bme.hu>) id 1io3dB-0001al-Kg
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 05:59:38 -0500
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:27099)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1io3dB-0001TJ-ER
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 05:59:37 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 69E22748DCB;
+ Sun,  5 Jan 2020 11:59:25 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 442CE748DCA; Sun,  5 Jan 2020 11:59:25 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 41D437482CA;
+ Sun,  5 Jan 2020 11:59:25 +0100 (CET)
+Date: Sun, 5 Jan 2020 11:59:25 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [Qemu-devel] What should a virtual board emulate?
+In-Reply-To: <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
+Message-ID: <alpine.BSF.2.21.99999.352.2001051138080.92636@zero.eik.bme.hu>
+References: <20190319144013.26584-1-pbonzini@redhat.com>
+ <alpine.BSF.2.21.9999.1903192350550.11467@zero.eik.bme.hu>
+ <87imwe847x.fsf_-_@dusky.pond.sub.org>
+ <CAAdtpL5Z1OXqZ_zzA0RLq9soydNtTFt2oCOEfui1rq19bLKUgA@mail.gmail.com>
+ <d9d5ac96-c0f5-dd83-d305-10e20c745dd1@redhat.com>
+ <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
+User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 05 Jan 2020 10:07:35 -0000
-From: Idar Lund <1839060@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: windows
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gnif idarlund spheenik
-X-Launchpad-Bug-Reporter: Martin Schrodt (spheenik)
-X-Launchpad-Bug-Modifier: Idar Lund (idarlund)
-References: <156507518934.25260.15982229597694445610.malonedeb@soybean.canonical.com>
-Message-Id: <157821885573.2454.6097116337997869141.malone@soybean.canonical.com>
-Subject: [Bug 1839060] Re: HDA device non functional in Windows 10 1903
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5d3c7a0835ecb7e00267a490a3d6b12c60df3ccb
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Type: multipart/mixed;
+ boundary="3866299591-1407236395-1578221965=:92636"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,49 +70,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1839060 <1839060@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Microsoft has fixed their hda driver
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+--3866299591-1407236395-1578221965=:92636
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Sat, 4 Jan 2020, Philippe Mathieu-Daud=C3=A9 wrote:
+> I insist this patch is incorrect for the particular case of the Fuloong=
+2e=20
+> board. I plan to revert it when I post the test.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1839060
+I can only repeat my comment from when it last came up:
 
-Title:
-  HDA device non functional in Windows 10 1903
+On Wed, 20 Mar 2019, BALATON Zoltan wrote:
+> Thanks, I did not know about this variable. Although the real hardware=20
+> has the GPU soldered on the mainboard it makes sense to allow it to be=20
+> disabled in QEMU especially at this stage when Linux kernel has some=20
+> problem with it so this is a good idea.
 
-Status in QEMU:
-  Fix Released
+I think the option is useful to boot Linux now until we improve rv100=20
+emulation enough to work with the Linux DRM driver so either way you'll=20
+have a problem: with -vga none not disabling soldered chip you can't boot=
+=20
+normal Linux CDs without patching them, with -vga none obeyed you can't=20
+use PMON. But since PMON is not bundled in QEMU (we don't have the source=
+=20
+of the actual board firmware, only a binary) it may be less of a problem=20
+than Linux install CDs not working. After install you could change Linux=20
+to use radeon framebuffer driver which probably works better. (Although=20
+I'm not sure if anyone actually tried to do that.)
 
-Bug description:
-  I made the update to 1903, and the HDA device stopped working.
+But I don't really mind either way, go with what you prefer. I only care=20
+about the chip emulations used by this board not going away as I plan to=20
+use them for pegasos2 emulation but not the fulong board itself apart fro=
+m=20
+using it for cross checking changes. I know about one problem with the=20
+via-ide part that I could reproduce with both:
 
-  The driver says the device is working correctly, but it does not.
-  When I try to open the Windows sound configuration, the dialog hangs and =
-never shows it's content.
+https://osdn.net/projects/qmiga/ticket/38949
 
-  Several people reported this back in May:
+but I'm still not sure it's not missing irq emulation in my Marvel=20
+Discovery II emulation that's causing problem on pegasos2.
 
-  https://windowsreport.com/windows-10-v1903-ich6-ich9-virtio/
+> Reviewed-by: BALATON Zoltan <balaton@eik.bme.hu>
+>=20
+> When changing it you could also replace the -1 in pci_create with=20
+> PCI_DEVFN(FULONG2E_ATI_SLOT, 0) to match the address the board has or=20
+> should that be a separate patch?
 
-  I can confirm I have exactly the same problem.
+Looks like this above comment was not considered last time, maybe if you=20
+change it now this could be fixed as well.
 
-  Host is Arch Linux, current (5.2.5) kernel, QEMU 4.0.
-
-  I enabled HDA debug output and compared an older, working Windows
-  version to 1903, but could not see the difference. The driver seems to
-  issue the same verbs.
-
-  I am happy to provide additional information if needed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1839060/+subscriptions
+Regards,
+BALATON Zoltan
+--3866299591-1407236395-1578221965=:92636--
 
