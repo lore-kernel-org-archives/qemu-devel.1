@@ -7,92 +7,91 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0250C33C8C
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90459C33C99
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:03:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D4572085B
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FFD62085B
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:03:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QW6PXgNR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D4572085B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Om2D03T8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FFD62085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1io5Ya-00062F-K1
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 08:03:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58082)
+	id 1io5Ya-00064E-MR
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 08:03:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58119)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1io5TQ-0000bi-V3
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:57:41 -0500
+ (envelope-from <mst@redhat.com>) id 1io5Tg-0000vN-2A
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:57:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1io5TP-0003gw-RJ
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:57:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32276
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1io5Te-0003n4-Tw
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:57:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53606
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5TP-0003gj-NO
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:57:39 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5Te-0003mt-QN
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:57:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578229059;
+ s=mimecast20190719; t=1578229074;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y+1AiFYA4jwJXgwLDoVnwKQ62HQ9au7D6spvhTUBGU8=;
- b=QW6PXgNR4OcExaJan+jtbRrBhrZGgoc9r5slZkHMpUKVqoa26v1km+cZ0BY+Un9wfKcwTJ
- nS+p1zqoMtfP4rZduLNolSOqAZUmGL+2x7fGbeGDz8sPJEA0Go7DxIs2vkLLiqz6slODYM
- IYxuA35MZbQtp8OHmDXCqPxnxqmmr7Q=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-__2DBuQJN66emddeKSeiCw-1; Sun, 05 Jan 2020 07:57:35 -0500
-Received: by mail-qt1-f200.google.com with SMTP id x8so8875175qtq.14
- for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:57:35 -0800 (PST)
+ bh=8li2Tk9kJtAQIFMop0/eFLC5J5NJiOvfkc+z767fYRk=;
+ b=Om2D03T8LZDHmmCrynVffr7ZrDYlJx7JIOeya99IZaQlVmBXBc2cxU6RM+nQ6mbrxu9N6T
+ XN+jBS9DLzNIbBQk73FVxZRkphwJpZrab0ozWbJLVAmdAK3vCCjXrgqQ/OgL1ghlf72k+V
+ Mh5KcJJpfg+LRhFj8/RZjwrXzsDfNjU=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-155-fvuyiLjwO3ukQdOfKlzBgw-1; Sun, 05 Jan 2020 07:57:50 -0500
+Received: by mail-qv1-f69.google.com with SMTP id e10so1733926qvq.18
+ for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:57:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=1upHWGgN+kA2iqb9NZ9XxvQ8bHfo9CqfdVL2Jr4HnRY=;
- b=YKd5N5kvVAeWXAOeMTK/yn/rqdMro0ZY9MmZO/bQlcGV0rA47pdRNZrVYasZZvQ5qF
- cVqZja2TpBZWI8H61yd65sWyEJIaqAQAfghUW7FmA+zwLVvjEiOkgoyLBAYolGv+VzNG
- NdW8tj4Sxq5EVvgH/07lzFTND9R85uebrji90lY47JiBGdm/unszEuDxiQoCF1qM0OEI
- w6wMHEzCJEDDAM/ezE71hJJxUeuDY4A12Hv87W70mNtfVBteWSZmIuCtUssa/G9bxWv7
- hfOwTbJnBsMDZ8KStFIy0XOzK4i53tiMiVYCkd/W1SbC2jjg6JZn17SZfO5D+t+c7PLU
- Gx+g==
-X-Gm-Message-State: APjAAAXEBnD8TGdwcl8vva0YQbKx70ma1qCMH0/0+omChOQaQQwUi19x
- cvk7JiKoYwy6IdSQrDmaezx+8KqJbynyTqwvv038ZiVZNLo9fESR6mXOHOwNDVFORNaVnxwdtXv
- bK/ja+tiR6nddtuY=
-X-Received: by 2002:a0c:a563:: with SMTP id y90mr62740223qvy.78.1578229054854; 
- Sun, 05 Jan 2020 04:57:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqybwO2O4OgIabEdTzA+/hkr4g5j7ZfdylmRWEBTa5snlbEE0KQ98qXVnFIjsp2am1CWe6RAZQ==
-X-Received: by 2002:a0c:a563:: with SMTP id y90mr62740212qvy.78.1578229054639; 
- Sun, 05 Jan 2020 04:57:34 -0800 (PST)
+ bh=8e5zVSr3EGK6wfLcmhM6md/VpcFIAiAuGM2x/CJ8sg4=;
+ b=S47lKfQ360j7i6+SUWLxhCkrvaKXhCRN9W+lcEr4rgJR/Yn5G2PzlkF0Jt0cgfyoP2
+ 5f8ELtn/eX7ZxxLfNA6zXdoV3DCH+9Biq+W5t5vIVqd2QMdhGy0ichSt93QRADWBAxa8
+ uFWKSLTfM8tSBXCjsWIqYIB1p+brmkwlW3wETKjGbcWsBPHfx7OhHm3Frg9StdaMs8HL
+ rebucqI71hf8JGrcU2S0iGAVDUdyE9r+H07EbQGH5NJaNU94KAT2TWcqCl1axj5wlId2
+ xmxMdbg3ZmeeHi+KnGVG3bgNvHWEA+n7Ei+5gBJwVuzI2ptygkrN71TvhuxOKY6Vpq8N
+ NeUg==
+X-Gm-Message-State: APjAAAU6qFhT18jCaJML0H1mfI02GAcKGPt3rLpnC8Q/CrTWf05giWbN
+ 34X8ScfjoFzSOCLW9j2D6Eu/MLunO+IySad3hNemU3j4/kBT10iyG94Aa/yl1LNOa7b1RZemEl6
+ RCrbqFFhHMsi1uOY=
+X-Received: by 2002:ac8:64a:: with SMTP id e10mr70464921qth.292.1578229070065; 
+ Sun, 05 Jan 2020 04:57:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwMIga4L4/YEt0EtoelaucL7ilPDrNP7l7eXbJhX7lAbGrrA2Pza82yF6eidBq2Ke2DosDoww==
+X-Received: by 2002:ac8:64a:: with SMTP id e10mr70464911qth.292.1578229069917; 
+ Sun, 05 Jan 2020 04:57:49 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id g52sm19046718qta.58.2020.01.05.04.57.32
+ by smtp.gmail.com with ESMTPSA id r80sm19325029qke.134.2020.01.05.04.57.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jan 2020 04:57:33 -0800 (PST)
-Date: Sun, 5 Jan 2020 07:57:30 -0500
+ Sun, 05 Jan 2020 04:57:49 -0800 (PST)
+Date: Sun, 5 Jan 2020 07:57:45 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 03/32] virtio-balloon: fix memory leak while attach
- virtio-balloon device
-Message-ID: <20200105125622.27231-4-mst@redhat.com>
+Subject: [PULL v3 06/32] intel_iommu: fix bug to read DMAR_RTADDR_REG
+Message-ID: <20200105125622.27231-7-mst@redhat.com>
 References: <20200105125622.27231-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200105125622.27231-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: __2DBuQJN66emddeKSeiCw-1
+X-MC-Unique: fvuyiLjwO3ukQdOfKlzBgw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,59 +103,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
- Euler Robot <euler.robot@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yi Sun <yi.y.sun@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+From: Yi Sun <yi.y.sun@linux.intel.com>
 
-ivq/dvq/svq/free_page_vq is forgot to cleanup in
-virtio_balloon_device_unrealize, the memory leak stack is as follow:
+Should directly read DMAR_RTADDR_REG but not using 's->root'.
+Because 's->root' is modified in 'vtd_root_table_setup()' so
+that the first 12 bits are omitted. This causes the guest
+iommu debugfs cannot show pasid tables.
 
-Direct leak of 14336 byte(s) in 2 object(s) allocated from:
-    #0 0x7f99fd9d8560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
-    #1 0x7f99fcb20015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
-    #2 0x557d90638437 in virtio_add_queue hw/virtio/virtio.c:2327
-    #3 0x557d9064401d in virtio_balloon_device_realize hw/virtio/virtio-bal=
-loon.c:793
-    #4 0x557d906356f7 in virtio_device_realize hw/virtio/virtio.c:3504
-    #5 0x557d9073f081 in device_set_realized hw/core/qdev.c:876
-    #6 0x557d908b1f4d in property_set_bool qom/object.c:2080
-    #7 0x557d908b655e in object_property_set_qobject qom/qom-qobject.c:26
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-Message-Id: <1575444716-17632-2-git-send-email-pannengyuan@huawei.com>
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+Message-Id: <20191205095439.29114-1-yi.y.sun@linux.intel.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/virtio-balloon.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/i386/intel_iommu.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 40b04f5180..57f3b9f22d 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -831,6 +831,13 @@ static void virtio_balloon_device_unrealize(DeviceStat=
-e *dev, Error **errp)
-     }
-     balloon_stats_destroy_timer(s);
-     qemu_remove_balloon_handler(s);
-+
-+    virtio_delete_queue(s->ivq);
-+    virtio_delete_queue(s->dvq);
-+    virtio_delete_queue(s->svq);
-+    if (s->free_page_vq) {
-+        virtio_delete_queue(s->free_page_vq);
-+    }
-     virtio_cleanup(vdev);
- }
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 43c94b993b..ee06993675 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2610,16 +2610,15 @@ static uint64_t vtd_mem_read(void *opaque, hwaddr a=
+ddr, unsigned size)
+     switch (addr) {
+     /* Root Table Address Register, 64-bit */
+     case DMAR_RTADDR_REG:
++        val =3D vtd_get_quad_raw(s, DMAR_RTADDR_REG);
+         if (size =3D=3D 4) {
+-            val =3D s->root & ((1ULL << 32) - 1);
+-        } else {
+-            val =3D s->root;
++            val =3D val & ((1ULL << 32) - 1);
+         }
+         break;
 =20
+     case DMAR_RTADDR_REG_HI:
+         assert(size =3D=3D 4);
+-        val =3D s->root >> 32;
++        val =3D vtd_get_quad_raw(s, DMAR_RTADDR_REG) >> 32;
+         break;
+=20
+     /* Invalidation Queue Address Register, 64-bit */
 --=20
 MST
 
