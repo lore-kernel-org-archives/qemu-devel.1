@@ -6,91 +6,93 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1C74C33C8C
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 12:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C18C33C8C
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 12:55:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C29E21582
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 12:34:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D0CE20866
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 12:55:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L6/PngZr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C29E21582
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eOS1ylfL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D0CE20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1io57P-000424-JU
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 07:34:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55618)
+	id 1io5R5-00083r-EA
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 07:55:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1io56b-0003In-65
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:34:06 -0500
+ (envelope-from <mst@redhat.com>) id 1io5Px-0007Ho-3y
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:54:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1io56Z-00077X-Nd
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:34:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51618
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1io5Pv-0007Dg-2c
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:54:04 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58346
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io56Z-00076q-J6
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:34:03 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5Pu-0007AW-U3
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:54:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578227642;
+ s=mimecast20190719; t=1578228842;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f8Prri9WaGRO65yjl09PcbeCr+ZCjA9X+9asGScE0xU=;
- b=L6/PngZrUzhqNWJhhMlFqmad+xHmwwaXB97Vg57/Etqw6zaxgvhdDv8AUmCHbLvTB9BfM7
- oTMNcPMq+Kw/k6WsjFXa7yo90rw7TEacfucGKl7HW2O0iHj3Dk3vpv9ZOoeKDDlarqs6fj
- uTwW3ANOPU0EqqhxyQYO45FgjiKrBmI=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-0pyR4CuWOae9roh14E0G_g-1; Sun, 05 Jan 2020 07:34:01 -0500
-Received: by mail-qv1-f70.google.com with SMTP id di5so16606268qvb.3
- for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:34:01 -0800 (PST)
+ bh=ofOgKIJGQmYYlJvJEtar4z1ANhqjstHJaxxlbxxFsR0=;
+ b=eOS1ylfL/cesZvI4Xfak0tDAWuyxMqTllwTo6zYJS/MyS9UUyDZP1/V8DO8HZAkRw2RznM
+ bYqu9syBsLLS0e09NPzzvur6xVLgXOEx9MyNcociEWuubGZNbG7hZ6woFWZbB6+DFjmUh5
+ 1cXlZAQv7iqsNed64lxcwz9qrKid0WE=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-wOooEyusMfapj_f5OHbMMw-1; Sun, 05 Jan 2020 07:54:00 -0500
+Received: by mail-qt1-f200.google.com with SMTP id l56so32598265qtk.11
+ for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:54:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TR3cstnnK+QyGLvRLq/RdvlbvZb4gYytD8iSV5sXewE=;
- b=dFn+sQLTeDv7loeb2sZ11CnZ3EiO7g3yw/NQizQtYptI5rW6LFdkbDJ9LlZgBhybnu
- /OuPjkClRYcHPfU4rZHfvHeLqVv/7r1iqrAgFeJNtW3nFV9WDKIhOluUluohvlkHrXr0
- 28URtbW07wRNmrw/IsColZYAG0DPGZ69/qGftjHyQ/Su8cBN+bbQefoBN+b4s1IJeFOP
- AkSzqGXxij8CjNvDJanEcf+Z0UOxpi7vRNwZRgMp4d1ubHvLo4hw5JB5/OdQq3d/BLE8
- jmw7XLcruePn01lNc2oJBt9neX3bqfYm7n0tfBbXCyTJT00UCVm+DFstAxjwoMW3o2yv
- C6FQ==
-X-Gm-Message-State: APjAAAWAL+640HaQKiev0F3XWF/CjdY/9eXXdCoyJF/L7HdrE0paDSV7
- Cz8JFLATfGvloGGIl5hwqR6Dujgrhgt4B3Jhl33s9iOogvYNO2x9cDbaB7W8RSo7/W5zRIMqlC1
- SgSRrF8BuHF7Lkys=
-X-Received: by 2002:a37:9245:: with SMTP id u66mr80446287qkd.102.1578227641148; 
- Sun, 05 Jan 2020 04:34:01 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwdUsdYh/bUtV2CzvAF3l16jKUb3caYUthYOiNiE+doW1wVtBHwYFkR1tknHHak0dOQ/XOUCw==
-X-Received: by 2002:a37:9245:: with SMTP id u66mr80446274qkd.102.1578227640900; 
- Sun, 05 Jan 2020 04:34:00 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=Vxo46B2oj+YCTfA3i4ixkh8kVV8Fpgnabmgxa9H/c0M=;
+ b=ACKq497bTKk19JjF95mJlNvkE1uuKR2f78mWhN9HoNY+tJeQTL6EmXfzu6wIU7qH8S
+ xbD6Jv4g9EH2FZVr1WU1SoFJJtyxQqOFQv59JQdLqS6aoH2P0H2e/1byX1tdvlEJzWM2
+ z/P5OOoD9PUgDvzWBupibNbomlIYHlxiHxYtLoOjOKJpuAXMwAYT9sMAaWHcdAxrVX33
+ zGFnwk5M+JxytzDEeQdqiMtx3YRUUp7iaYkcicKXXH6b2hfHXYTvTE9eACGnKgku39ML
+ dqSwdd7R4/fUZR4MJcGWUq0FEl9MNCC/m1aYxu4ZkzyUMaNV3uvwG95qB0X50C0nuVoA
+ XdbA==
+X-Gm-Message-State: APjAAAVJD9wW0q/rp8IJKsxP5Q7p1h6DA3CjIZouR+ApJpIr5jUWIONj
+ p9gJ7joNKla1X+FgpWGoKA23G00k/SphRa4IDBc05fVSEj/axHX9A8eHMDsWGlSTURaua5w537P
+ YcZuxwOylZVJ48vQ=
+X-Received: by 2002:ae9:e10e:: with SMTP id g14mr80913294qkm.430.1578228840251; 
+ Sun, 05 Jan 2020 04:54:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxnZg6RPg6VO6daf7utzCy42WOLd+7iXP9oNyDG2nShDNA9AlZSBFccJyj+axm8nnNgY756mw==
+X-Received: by 2002:ae9:e10e:: with SMTP id g14mr80913276qkm.430.1578228839798; 
+ Sun, 05 Jan 2020 04:53:59 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id j194sm19260957qke.83.2020.01.05.04.33.57
+ by smtp.gmail.com with ESMTPSA id t3sm21769324qtc.8.2020.01.05.04.53.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jan 2020 04:34:00 -0800 (PST)
-Date: Sun, 5 Jan 2020 07:33:55 -0500
+ Sun, 05 Jan 2020 04:53:59 -0800 (PST)
+Date: Sun, 5 Jan 2020 07:53:53 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Heyi Guo <guoheyi@huawei.com>
 Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified
  by _HID
-Message-ID: <20200105072504-mutt-send-email-mst@kernel.org>
+Message-ID: <20200105074308-mutt-send-email-mst@kernel.org>
 References: <20191219064759.35053-1-guoheyi@huawei.com>
  <20191219064759.35053-3-guoheyi@huawei.com>
+ <20200105072504-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20191219064759.35053-3-guoheyi@huawei.com>
-X-MC-Unique: 0pyR4CuWOae9roh14E0G_g-1
+In-Reply-To: <20200105072504-mutt-send-email-mst@kernel.org>
+X-MC-Unique: wOooEyusMfapj_f5OHbMMw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,89 +112,131 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 19, 2019 at 02:47:59PM +0800, Heyi Guo wrote:
-> According to ACPI spec, _ADR should be used for device which is on a
-> bus that has a standard enumeration algorithm. It does not make sense
-> to have a _ADR object for devices which already have _HID and will be
-> enumerated by OSPM.
+On Sun, Jan 05, 2020 at 07:34:01AM -0500, Michael S. Tsirkin wrote:
+> On Thu, Dec 19, 2019 at 02:47:59PM +0800, Heyi Guo wrote:
+> > According to ACPI spec, _ADR should be used for device which is on a
+> > bus that has a standard enumeration algorithm. It does not make sense
+> > to have a _ADR object for devices which already have _HID and will be
+> > enumerated by OSPM.
+> >=20
+> > Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 >=20
-> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Are you sure? I would think this depends on the ID and the device
+> really. E.g. PCI devices all are expected to have _ADR and some of them
+> have a _HID.
 
-Are you sure? I would think this depends on the ID and the device
-really. E.g. PCI devices all are expected to have _ADR and some of them
-have a _HID.
 
-CC Corey who added a device with both HID and ADR to x86 recenly.
+To clarify I am not commenting on patches.
+The spec says this:
+=096.1.5 _HID (Hardware ID)
 
-Apropos Corey, why was HID APP0005 chosen?
+=09This object is used to supply OSPM with the device=E2=80=99s PNP ID or A=
+CPI ID. 1
 
-> ---
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: qemu-arm@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/arm/virt-acpi-build.c          |   8 --------
->  tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
->  tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
->  tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
->  4 files changed, 8 deletions(-)
+=09When describing a platform, use of any _HID objects is optional. However=
+, a _HID object must be
+
+=09used to describe any device that will be enumerated by OSPM. OSPM only e=
+numerates a device
+
+=09when no bus enumerator can detect the device ID. For example, devices on=
+ an ISA bus are
+
+=09enumerated by OSPM. Use the _ADR object to describe devices enumerated b=
+y bus enumerators
+
+=09other than OSPM.
+
+
+Note: "detect the device ID" not "enumerate the device" which I think
+means there's a driver matching this vendor/device ID.
+
+So it seems fine to have _ADR so device is enumerated, and still have
+_HID e.g. so ACPI driver can be loaded as fallback if there's
+no bus driver.
+
+
+Note I am not saying the patch itself is not correct.
+Maybe these devices are not on any standard bus and that
+is why they should not have _ADR? I have not looked.
+
+I am just saying that spec does not seem to imply _HID and _ADR
+can't coexist.
+
+
+> CC Corey who added a device with both HID and ADR to x86 recenly.
 >=20
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 9f4c7d1889..be752c0ad8 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMa=
-pEntry *uart_memmap,
->                               AML_EXCLUSIVE, &uart_irq, 1));
->      aml_append(dev, aml_name_decl("_CRS", crs));
-> =20
-> -    /* The _ADR entry is used to link this device to the UART described
-> -     * in the SPCR table, i.e. SPCR.base_address.address =3D=3D _ADR.
-> -     */
-> -    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)));
-> -
->      aml_append(scope, dev);
->  }
-> =20
-> @@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMa=
-pEntry *memmap,
->      aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
->      aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
->      aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
-> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->      aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
->      aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")))=
+> Apropos Corey, why was HID APP0005 chosen?
+>=20
+> > ---
+> > Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> > Cc: Peter Maydell <peter.maydell@linaro.org>
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Igor Mammedov <imammedo@redhat.com>
+> > Cc: qemu-arm@nongnu.org
+> > Cc: qemu-devel@nongnu.org
+> > ---
+> >  hw/arm/virt-acpi-build.c          |   8 --------
+> >  tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
+> >  tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
+> >  tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
+> >  4 files changed, 8 deletions(-)
+> >=20
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index 9f4c7d1889..be752c0ad8 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const Mem=
+MapEntry *uart_memmap,
+> >                               AML_EXCLUSIVE, &uart_irq, 1));
+> >      aml_append(dev, aml_name_decl("_CRS", crs));
+> > =20
+> > -    /* The _ADR entry is used to link this device to the UART describe=
+d
+> > -     * in the SPCR table, i.e. SPCR.base_address.address =3D=3D _ADR.
+> > -     */
+> > -    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)))=
 ;
->      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-> @@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemM=
-apEntry *gpio_memmap,
->  {
->      Aml *dev =3D aml_device("GPO0");
->      aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
-> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-> =20
->      Aml *crs =3D aml_resource_template();
-> @@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
->  {
->      Aml *dev =3D aml_device(ACPI_POWER_BUTTON_DEVICE);
->      aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
-> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->      aml_append(scope, dev);
->  }
-> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-
-
-Please do not include binary changes in acpi patches.
-
-See comment at the top of tests/bios-tables-test.c for documentation
-on how to update these.
-
---=20
-MST
+> > -
+> >      aml_append(scope, dev);
+> >  }
+> > =20
+> > @@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const Mem=
+MapEntry *memmap,
+> >      aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+> >      aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+> >      aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+> > -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+> >      aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
+> >      aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")=
+));
+> >      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+> > @@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const Me=
+mMapEntry *gpio_memmap,
+> >  {
+> >      Aml *dev =3D aml_device("GPO0");
+> >      aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
+> > -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+> >      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+> > =20
+> >      Aml *crs =3D aml_resource_template();
+> > @@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+> >  {
+> >      Aml *dev =3D aml_device(ACPI_POWER_BUTTON_DEVICE);
+> >      aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
+> > -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+> >      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+> >      aml_append(scope, dev);
+> >  }
+> > diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
+>=20
+>=20
+> Please do not include binary changes in acpi patches.
+>=20
+> See comment at the top of tests/bios-tables-test.c for documentation
+> on how to update these.
+>=20
+> --=20
+> MST
 
 
