@@ -2,97 +2,98 @@ Return-Path: <SRS0=Lm/k=22=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 438B0C33C8C
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A5F4C33C8C
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CCF3207FD
-	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:09:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8CD2207FD
+	for <qemu-devel@archiver.kernel.org>; Sun,  5 Jan 2020 13:10:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KmMVf0Lm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CCF3207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S7EW6eFz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8CD2207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41969 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1io5f9-00073X-Li
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 08:09:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58171)
+	id 1io5g1-0008Pp-HK
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 08:10:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1io5Tu-0001IT-B5
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:58:11 -0500
+ (envelope-from <mst@redhat.com>) id 1io5V4-00032m-48
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:59:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1io5Ts-0003ux-Mh
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:58:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44341
+ (envelope-from <mst@redhat.com>) id 1io5V2-0004xC-Vn
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:59:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34133
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5Ts-0003ua-HZ
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:58:08 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1io5V2-0004wp-RV
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 07:59:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578229088;
+ s=mimecast20190719; t=1578229160;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2mjtemMUgB27JpLi8+N3bxzl1+0IVjBnBvvjPKdiAjc=;
- b=KmMVf0LmN/oVXH091eC4JGKwertJbv4OPghaE+QqIREIJ7IfXF04+yfOa564rEdia4X8gm
- 9XRPZMOfpgu84tHYLbNSxyuzPlyTQitrTvJYYHrUaen82B3taT3LSGoQKISx0vzIO/lAiQ
- mjfyayFMMXRBbVxfna7zbET9p98I1lo=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-6iiKViAOMFmiMLZBz9K61Q-1; Sun, 05 Jan 2020 07:58:06 -0500
-Received: by mail-qv1-f69.google.com with SMTP id p3so6444222qvt.9
- for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:58:06 -0800 (PST)
+ bh=mD5CnKaHCqEnDtYsfaWuvKKdqaTymxgk4zlUTmpGAA8=;
+ b=S7EW6eFzeabOJsimzcFvugXWdUZJbWwa0RN27fkF9x7N1fiJq9iV2VIy9lWqaeMzCiDdAh
+ zRMty6mcfUPDvld6fbD/QGcebQWbcg4B916DF0maKGnbkIoX1eZfUqkQACVCsugDeT2TDY
+ DHrH18BzQevl/aIYFoRHDqPqVIShJSo=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-fCsge2F-PGqIu3qZiBaeEQ-1; Sun, 05 Jan 2020 07:59:18 -0500
+Received: by mail-qv1-f71.google.com with SMTP id p3so6445846qvt.9
+ for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 04:59:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=P6B2QZEV+S1MRINFAeh/u30RoNzW+dHtR0xLU33u1wE=;
- b=GXhhoOKeiTLSrA5nHNZEz3EUHbTqZH16XaY5zyn+sA5hN+mgJVOJF5yMSF6s/npXiH
- HgAZc7cH8vkbmP3NZpz0VtwuoayYOyIBOWIu5rQm75C8YBwQ53qXb6/Dth3jNTcOMfO5
- opToRviTkFyunF6/Km+ITWI4vCbEYMFfCFP7bBuTZCaCeGArEeibeM77TLbgNddR2vxB
- 63v/kTercTbKZEkJXJ/HkS0Sx2YcUqu0+qW1rrWtWGe6Uxtf49dYh7qlY7+21ErZZb/f
- DfJ67HdYagMjMzKQC583vx+UcfT3P/FOC7ggc8Ik2X+m436OPXQy9Fui086lQq4KyhhO
- njXQ==
-X-Gm-Message-State: APjAAAUKKPswiTTYavOc2FODbRWLb/pp3fYzf0Ufp2pMI9odjRdfG1Mi
- TZ7IohgI+JeWJXjq+Dbdv+hxwWW6wKDCNx9r21qjAeEb8FSJSiekxGiC0TOrOIw4DmjKJhwsd4P
- vr7yIlqZReg8KUnI=
-X-Received: by 2002:ae9:c104:: with SMTP id z4mr77457075qki.418.1578229085625; 
- Sun, 05 Jan 2020 04:58:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwR8SP+i99dEbE241wuu8Zc6Zi34dKH+cZAjlYPGS30lKJfYoAF+jZtvmYmYah1flMaSJF2cw==
-X-Received: by 2002:ae9:c104:: with SMTP id z4mr77457062qki.418.1578229085267; 
- Sun, 05 Jan 2020 04:58:05 -0800 (PST)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=zrcV6NduOW424RfDjQAFC57USpEMc62nbflawLr92Qk=;
+ b=ujjOgt9aNRUcf+0LotGmuVHslMtHYXVJtg3xN1L71Q1hHqY226MgtpCbasPjghayry
+ cdOXuBvGQJLsJwe8U2bzQzSgrRLwz9jUeGuiI+IQPlnY+p9R7/8KAHsmmJQfJQfcz4mJ
+ jhoi4cGGNcHwpsxWpo+TrIIPrpktei3LLAgb7dY1FQePLXR3oTmQZTWWu75+lllWBjWh
+ bVO03FVQZU/bC8Wp2L4rsQxJGm9kMlRFAvnIMOKPjqtcEj4jwi9wfvxDVp5QDg9LfuBT
+ XDebw/HY3B1n4ax4nYIlNF9ptJ6w4xs8qA4+NNcdq6qoowCo3Xr50vpWFFqaR4pvhIy9
+ R2zw==
+X-Gm-Message-State: APjAAAVOg93HKc177MiHQ+KOl8Wt3P2RagImmmz22aZwGPtUv3mwMTDS
+ vwfRmFSm5cORJmcZ8pda8jBZTxBIBZ0s+ti09Rmm8dwEc4mlLa9XSGpkyMd2KV1nu2qGqh8mIqB
+ Gv3ofab3U6QvfT18=
+X-Received: by 2002:ac8:31f0:: with SMTP id i45mr71927446qte.327.1578229157404; 
+ Sun, 05 Jan 2020 04:59:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyWMcYFeCQL+hxuvjqX/2J5hH6/mtPZrR5nM8FCmZmwzrzWsGxrmi1aGhdpm4DL6F0LXtcWaw==
+X-Received: by 2002:ac8:31f0:: with SMTP id i45mr71927442qte.327.1578229157239; 
+ Sun, 05 Jan 2020 04:59:17 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id 184sm19225653qke.73.2020.01.05.04.58.03
+ by smtp.gmail.com with ESMTPSA id f4sm19082258qka.89.2020.01.05.04.59.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 05 Jan 2020 04:58:04 -0800 (PST)
-Date: Sun, 5 Jan 2020 07:58:01 -0500
+ Sun, 05 Jan 2020 04:59:16 -0800 (PST)
+Date: Sun, 5 Jan 2020 07:59:13 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 09/32] Implement backend program convention command for
- vhost-user-blk
-Message-ID: <20200105125622.27231-10-mst@redhat.com>
+Subject: [PULL v3 22/32] hw/pci/pci_host: Let pci_data_[read/write] use
+ unsigned 'size' argument
+Message-ID: <20200105125622.27231-23-mst@redhat.com>
 References: <20200105125622.27231-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200105125622.27231-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: 6iiKViAOMFmiMLZBz9K61Q-1
+X-MC-Unique: fCsge2F-PGqIu3qZiBaeEQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,245 +106,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Micky Yun Chan <chanmickyyun@gmail.com>
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Micky Yun Chan <chanmickyyun@gmail.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This patch is to add standard commands defined in docs/interop/vhost-user.r=
-st
-For vhost-user-* program
+Both functions are called by MemoryRegionOps.[read/write] handlers
+with unsigned 'size' argument. Both functions call
+pci_host_config_[read/write]_common() which expect a uint32_t 'len'
+parameter (also unsigned).
+Since it is pointless (and confuse) to use a signed value, use a
+unsigned type.
 
-Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
-Message-Id: <20191209015331.5455-1-chanmickyyun@gmail.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20191216002134.18279-3-philmd@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/interop/vhost-user.json            |  31 +++++++
- contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
- docs/interop/vhost-user.rst             |  17 ++++
- 3 files changed, 112 insertions(+), 44 deletions(-)
+ include/hw/pci/pci_host.h | 4 ++--
+ hw/pci/pci_host.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-index da6aaf51c8..ce0ef74db5 100644
---- a/docs/interop/vhost-user.json
-+++ b/docs/interop/vhost-user.json
-@@ -54,6 +54,37 @@
-   ]
+diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+index ba31595fc7..9ce088bd13 100644
+--- a/include/hw/pci/pci_host.h
++++ b/include/hw/pci/pci_host.h
+@@ -62,8 +62,8 @@ void pci_host_config_write_common(PCIDevice *pci_dev, uin=
+t32_t addr,
+ uint32_t pci_host_config_read_common(PCIDevice *pci_dev, uint32_t addr,
+                                      uint32_t limit, uint32_t len);
+=20
+-void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len);
+-uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len);
++void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, unsigned len);
++uint32_t pci_data_read(PCIBus *s, uint32_t addr, unsigned len);
+=20
+ extern const MemoryRegionOps pci_host_conf_le_ops;
+ extern const MemoryRegionOps pci_host_conf_be_ops;
+diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+index 0958d157de..ce7bcdb1d5 100644
+--- a/hw/pci/pci_host.c
++++ b/hw/pci/pci_host.c
+@@ -106,7 +106,7 @@ uint32_t pci_host_config_read_common(PCIDevice *pci_dev=
+, uint32_t addr,
+     return ret;
  }
 =20
-+##
-+# @VHostUserBackendBlockFeature:
-+#
-+# List of vhost user "block" features.
-+#
-+# @read-only: The --read-only command line option is supported.
-+# @blk-file: The --blk-file command line option is supported.
-+#
-+# Since: 5.0
-+##
-+{
-+  'enum': 'VHostUserBackendBlockFeature',
-+  'data': [ 'read-only', 'blk-file' ]
-+}
-+
-+##
-+# @VHostUserBackendCapabilitiesBlock:
-+#
-+# Capabilities reported by vhost user "block" backends
-+#
-+# @features: list of supported features.
-+#
-+# Since: 5.0
-+##
-+{
-+  'struct': 'VHostUserBackendCapabilitiesBlock',
-+  'data': {
-+    'features': [ 'VHostUserBackendBlockFeature' ]
-+  }
-+}
-+
- ##
- # @VHostUserBackendInputFeature:
- #
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-b=
-lk/vhost-user-blk.c
-index ae61034656..6fd91c7e99 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -576,70 +576,90 @@ vub_new(char *blk_file)
-     return vdev_blk;
- }
-=20
-+static int opt_fdnum =3D -1;
-+static char *opt_socket_path;
-+static char *opt_blk_file;
-+static gboolean opt_print_caps;
-+static gboolean opt_read_only;
-+
-+static GOptionEntry entries[] =3D {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-+     "block device or file path", "PATH"},
-+    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-+      "Enable read-only", NULL }
-+};
-+
- int main(int argc, char **argv)
+-void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len)
++void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, unsigned len)
  {
--    int opt;
--    char *unix_socket =3D NULL;
--    char *blk_file =3D NULL;
--    bool enable_ro =3D false;
-     int lsock =3D -1, csock =3D -1;
-     VubDev *vdev_blk =3D NULL;
-+    GError *error =3D NULL;
-+    GOptionContext *context;
-=20
--    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
--        switch (opt) {
--        case 'b':
--            blk_file =3D g_strdup(optarg);
--            break;
--        case 's':
--            unix_socket =3D g_strdup(optarg);
--            break;
--        case 'r':
--            enable_ro =3D true;
--            break;
--        case 'h':
--        default:
--            printf("Usage: %s [ -b block device or file, -s UNIX domain so=
-cket"
--                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--            return 0;
-+    context =3D g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"block\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"read-only\",\n");
-+        g_print("    \"blk-file\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
-+
-+    if (!opt_blk_file) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (opt_socket_path) {
-+        lsock =3D unix_sock_new(opt_socket_path);
-+        if (lsock < 0) {
-+            exit(EXIT_FAILURE);
-         }
-+    } else if (opt_fdnum < 0) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    } else {
-+        lsock =3D opt_fdnum;
-     }
-=20
--    if (!unix_socket || !blk_file) {
--        printf("Usage: %s [ -b block device or file, -s UNIX domain socket=
-"
--               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--        return -1;
--    }
--
--    lsock =3D unix_sock_new(unix_socket);
--    if (lsock < 0) {
--        goto err;
--    }
--
--    csock =3D accept(lsock, (void *)0, (void *)0);
-+    csock =3D accept(lsock, NULL, NULL);
-     if (csock < 0) {
--        fprintf(stderr, "Accept error %s\n", strerror(errno));
--        goto err;
-+        g_printerr("Accept error %s\n", strerror(errno));
-+        exit(EXIT_FAILURE);
-     }
-=20
--    vdev_blk =3D vub_new(blk_file);
-+    vdev_blk =3D vub_new(opt_blk_file);
-     if (!vdev_blk) {
--        goto err;
-+        exit(EXIT_FAILURE);
-     }
--    if (enable_ro) {
-+    if (opt_read_only) {
-         vdev_blk->enable_ro =3D true;
-     }
-=20
-     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
-                   vub_panic_cb, &vub_iface)) {
--        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
--        goto err;
-+        g_printerr("Failed to initialize libvhost-user-glib\n");
-+        exit(EXIT_FAILURE);
-     }
-=20
-     g_main_loop_run(vdev_blk->loop);
--
-+    g_main_loop_unref(vdev_blk->loop);
-+    g_option_context_free(context);
-     vug_deinit(&vdev_blk->parent);
--
--err:
-     vub_free(vdev_blk);
-     if (csock >=3D 0) {
-         close(csock);
-@@ -647,8 +667,8 @@ err:
-     if (lsock >=3D 0) {
-         close(lsock);
-     }
--    g_free(unix_socket);
--    g_free(blk_file);
-+    g_free(opt_socket_path);
-+    g_free(opt_blk_file);
-=20
-     return 0;
+     PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+     uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
+@@ -119,7 +119,7 @@ void pci_data_write(PCIBus *s, uint32_t addr, uint32_t =
+val, int len)
+                                  val, len);
  }
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 7827b710aa..015ac08177 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -1376,3 +1376,20 @@ Command line options:
-   Enable virgl rendering support.
 =20
-   (optional)
-+
-+vhost-user-blk
-+--------------
-+
-+Command line options:
-+
-+--blk-file=3DPATH
-+
-+  Specify block device or file path.
-+
-+  (optional)
-+
-+--read-only
-+
-+  Enable read-only.
-+
-+  (optional)
+-uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len)
++uint32_t pci_data_read(PCIBus *s, uint32_t addr, unsigned len)
+ {
+     PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+     uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
 --=20
 MST
 
