@@ -2,63 +2,90 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FBEC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E3AC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:51:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D25C72146E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:50:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25C72146E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 79D7320715
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:51:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cXE7GDhR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D7320715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioWVt-0008RO-1v
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:50:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35087)
+	id 1ioWXd-0001nY-JR
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:51:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ioWVF-0007zQ-Cl
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:49:23 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1ioWX0-0001HQ-Ky
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ioWVD-0000hA-GA
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:49:21 -0500
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:36691)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ioWVD-0000eB-7o
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:49:19 -0500
-Received: from player731.ha.ovh.net (unknown [10.108.57.183])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id A582F12B3DF
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 18:49:16 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player731.ha.ovh.net (Postfix) with ESMTPSA id B2051DB5D51F;
- Mon,  6 Jan 2020 17:49:11 +0000 (UTC)
-Date: Mon, 6 Jan 2020 18:49:10 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 2/9] 9pfs: validate count sent by client with T_readdir
-Message-ID: <20200106184852.4f035e53@bahia.lan>
-In-Reply-To: <6289486.8nMSniMWIK@silver>
-References: <cover.1576678644.git.qemu_oss@crudebyte.com>
- <4866c87cb19f3191b977fc7fbe2857abf1da80b6.1576678644.git.qemu_oss@crudebyte.com>
- <20200106133024.2ce31324@bahia.lan> <6289486.8nMSniMWIK@silver>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 8294504614993107264
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -51
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepghhithhhuhgsrdhiohdpghhnuhdrohhrghenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.34.1
+ (envelope-from <palmerdabbelt@google.com>) id 1ioWWz-0002Eb-GS
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:51:10 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38672)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1ioWWz-0002C1-8y
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:51:09 -0500
+Received: by mail-pf1-x442.google.com with SMTP id x185so27287468pfc.5
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 09:51:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:subject:cc:to:in-reply-to:references:message-id
+ :mime-version:content-transfer-encoding;
+ bh=oC2sr88t+bxCA7MEstlJC7JQToE8IQv/b76cf7Wna2s=;
+ b=cXE7GDhRYxyCS5UcqQktkwZTC5TNkE58ZArey/CN5QP2s+uR7kle2b91f711++6jnp
+ R7cBZ8PT/Xz722+sPkopoYF9f8+F5perkLq6zZ9WrfsPvx48N5bt3sJh30+FrrX238U/
+ J6bYt7RwOGsQz6XPAAUqjbnQyQ3KW6wAjYfK/kxrVdvFBAA1b6hD7RsUPBCFd/MjUurh
+ +Ri6H201ZuvmiY7mhHqUKFT+8rLB1lts9axl3IgSvSVjXMO6Rizu0L4jQyAoTHlEY3rA
+ QTi5WnzvGWyEhZ5jecxmW+MwaR2qqhYVtsb74YP2VlEIdHaBmBSXMm9GrFD6ZBAN4QYh
+ +xhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
+ :message-id:mime-version:content-transfer-encoding;
+ bh=oC2sr88t+bxCA7MEstlJC7JQToE8IQv/b76cf7Wna2s=;
+ b=J0l9sRwfeVGEJC6dkk7EeRjBnrhyzFFq/4JuMomUEqaVzNaYuPJuEf9m+JoUMwOUX5
+ 4vsJdMm2120okQwexd6Pf29kmyIwwDegQ0EUTOLAoRsaYvkYP9vGHeZiU8jji54PQVzj
+ vjqm/pvmnku461+jfMM5rdSgU68ToL5TQftyeaK27/PgpS4o7SEz2bT7SYZNkCk2YTQZ
+ dZrzZE3UoK/2j+iJsk7f6fYgBDv5+lk2KkftOujkON2wwGwzL02exn9YaIy57uQ782FK
+ ZtV7j3M1Xc/xHYcTLsshixjzvVAy7RKrBB958upNKWY1cQgkSTLa5dAsd4kUSgVvk62i
+ G/0g==
+X-Gm-Message-State: APjAAAVYX/zpd5ClXDIsvhpFZ+YGL3FM8z3UIRrGATbcMyp3ijR2Vnd8
+ zRJDCzfY38DarddEy9CPM+Ah6uhHPJE=
+X-Google-Smtp-Source: APXvYqzxTcU5mYeZFCkstumU+j3dHQ9cMO3ynAufjcUQ6jrPxPyMMcxR9BN9Pw124oJLI2OreGAStQ==
+X-Received: by 2002:a63:fe50:: with SMTP id x16mr93610332pgj.31.1578333065423; 
+ Mon, 06 Jan 2020 09:51:05 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
+ by smtp.gmail.com with ESMTPSA id 68sm72969594pge.14.2020.01.06.09.51.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Jan 2020 09:51:05 -0800 (PST)
+Date: Mon, 06 Jan 2020 09:51:05 -0800 (PST)
+X-Google-Original-Date: Mon, 06 Jan 2020 09:50:25 PST (-0800)
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject: Re: [PATCH v1 02/36] target/riscv: Don't set write permissions on
+ dirty PTEs
+CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+To: Alistair Francis <Alistair.Francis@wdc.com>
+In-Reply-To: <6a38e1a02e9a3d38fc311809772a152f0d99fd7a.1575914822.git.alistair.francis@wdc.com>
+References: <6a38e1a02e9a3d38fc311809772a152f0d99fd7a.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
+Message-ID: <mhng-23785a15-6ae5-4a3a-8474-9bff5d0c2109@palmerdabbelt-glaptop>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,178 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: anthony.perard@citrix.com, Stefano Stabellini <sstabellini@kernel.org>,
- qemu-devel@nongnu.org, Stefano Stabellini <stefano.stabellini@xilinx.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 06 Jan 2020 16:10:28 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+On Mon, 09 Dec 2019 10:10:45 PST (-0800), Alistair Francis wrote:
+> Setting write permission on dirty PTEs results in userspace inside a
+> Hypervisor guest (VU) becoming corrupted. This appears to be because it
+> ends up with write permission in the second stage translation in cases
+> where we aren't doing a store.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+> ---
+>  target/riscv/cpu_helper.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 767c8762ac..0de3a468eb 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -344,10 +344,8 @@ restart:
+>              if ((pte & PTE_X)) {
+>                  *prot |= PAGE_EXEC;
+>              }
+> -            /* add write permission on stores or if the page is already dirty,
+> -               so that we TLB miss on later writes to update the dirty bit */
+> -            if ((pte & PTE_W) &&
+> -                    (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
+> +            /* add write permission on stores */
+> +            if ((pte & PTE_W) && (access_type == MMU_DATA_STORE)) {
+>                  *prot |= PAGE_WRITE;
+>              }
+>              return TRANSLATE_SUCCESS;
 
-> On Montag, 6. Januar 2020 13:30:24 CET Greg Kurz wrote:
-> > On Wed, 18 Dec 2019 14:17:59 +0100
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > A good 9p client sends T_readdir with "count" parameter that's
-> > > sufficiently smaller than client's initially negotiated msize
-> > > (maximum message size). We perform a check for that though to
-> > > avoid the server to be interrupted with a "Failed to encode
-> > > VirtFS reply type 41" error message by bad clients.
-> > 
-> > Hmm... doesn't v9fs_do_readdir() already take care of that ?
-> 
-> No, unfortunately it doesn't. It just looks at the "count" parameter 
-> transmitted with client's T_readdir request, but not at session's msize.
+This is at least the second time I've spent a day or two trying to figure out
+what the right thing to do here is, and once again I'm lost.  I think what's
+really getting me is the original comment: why would this cause us to TLB miss,
+wouldn't it cause us to not TLB miss?
 
-Indeed.
-
-> So a bad client could send a T_readdir request with a "count" parameter that's 
-> substantially higher than session's msize, which would lead to that mentioned 
-> transport error ATM. Hence I suggested this patch here to address it.
-> 
-> You can easily reproduce this issue:
-> 
-> 1. Omit this patch 2 (since it would fix it).
-> 
-> 2. Apply patch 3 and patch 4 of this patch set, which assemble a T_readdir
->    test case combined, then stop patches here (i.e. don't apply subsequent 
->    patches of this patch set, since e.g. patch 6 would increase test client's 
->    msize).
-> 
-> 3. Set QTEST_V9FS_SYNTH_READDIR_NFILES in hw/9pfs/9p-synth.h to a high number
->    (e.g. several thousands).
-> 
-> 4. Run the T_readdir test case:
-> 
->    cd build
->    make && make tests/qos-test
->    export QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
->    tests/qos-test -p $(tests/qos-test -l | grep readdir/basic)
-> 
-> Result: Since the test client's msize is quite small at this point (4kB), test 
-> client would transmit a very large "count" parameter with T_readdir request to 
-> retrieve all QTEST_V9FS_SYNTH_READDIR_NFILES files, and you'll end up getting 
-> the quoted transport error message on server (see precise error message 
-> above).
-> 
-
-I don't observe this behavior with:
-
--#define QTEST_V9FS_SYNTH_READDIR_NFILES 100
-+#define QTEST_V9FS_SYNTH_READDIR_NFILES 20000
-
-/x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-9p-tests/fs/readdir/basic: **
-ERROR:/home/greg/Work/qemu/qemu-9p/tests/virtio-9p-test.c:597:fs_readdir: assertion failed (nentries == QTEST_V9FS_SYNTH_READDIR_NFILES + 2): (101 == 20002)
-
-The server didn't hit the transport error...
-
-> > > Note: we should probably also check for a minimum size of
-> > > msize during T_version to avoid issues and/or too complicated
-> > > count/size checks later on in other requests of that client.
-> > > T_version should submit an msize that's at least as large as
-> > > the largest request's header size.
-> > 
-> > Do you mean that the server should expose such an msize in the
-> > R_version response ? The 9p spec only says that the server must
-> > return an msize <= to the one proposed by the client [1]. Not
-> > sure we can do more than to emit a warning and/or interrupt the
-> > server if the client sends a silly size.
-> > 
-> > [1] https://9fans.github.io/plan9port/man/man9/version.html
-> 
-> My idea was to "handle it as an error" immediately when server receives a 
-> T_version request with a "msize" argument transmitted by client that would be 
-> way too small for anything.
-> 
-> Because if client sends T_version with msize < P9_IOHDRSZ then it is obvious 
-> that this msize would be way too small for handling any subsequent 9p request 
-> at all.
-> 
-> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > ---
-> > > 
-> > >  hw/9pfs/9p.c | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > > 
-> > > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > > index 520177f40c..30e33b6573 100644
-> > > --- a/hw/9pfs/9p.c
-> > > +++ b/hw/9pfs/9p.c
-> > > @@ -2414,6 +2414,7 @@ static void coroutine_fn v9fs_readdir(void *opaque)
-> > > 
-> > >      int32_t count;
-> > >      uint32_t max_count;
-> > >      V9fsPDU *pdu = opaque;
-> > > 
-> > > +    V9fsState *s = pdu->s;
-> > > 
-> > >      retval = pdu_unmarshal(pdu, offset, "dqd", &fid,
-> > >      
-> > >                             &initial_offset, &max_count);
-> > > 
-> > > @@ -2422,6 +2423,13 @@ static void coroutine_fn v9fs_readdir(void *opaque)
-> > > 
-> > >      }
-> > >      trace_v9fs_readdir(pdu->tag, pdu->id, fid, initial_offset,
-> > >      max_count);
-> > > 
-> > > +    if (max_count > s->msize - P9_IOHDRSZ) {
-> > > +        max_count = s->msize - P9_IOHDRSZ;
-> > 
-> > What if s->msize < P9_IOHDRSZ ?
-> 
-> Exactly, that's why I added that comment to the commit log of this patch for 
-> now to make this circumstance clear as yet TODO.
-> 
-> This issue with T_version and msize needs to be addressed anyway, because it 
-> will popup again and again with various other request types and also with 
-> transport aspects like previously discussed on a transport buffer size issue 
-> (submitters of that transport patch on CC here for that reason):
-> https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04701.html
-> 
-> The required patch to address this overall minimum msize issue would be very 
-> small: just comparing client's transmitted "msize" parameter of client's 
-> T_version request and if that transmitted msize is smaller than a certain 
-> absolute minimum msize then raise an error immediately to prevent the session 
-> to start.
-> 
-> But there are some decisions to be made, that's why I haven't provided a patch 
-> for this min. msize issue in this patch series yet:
-> 
-> 1. What is the minimum msize to be allowed with T_version?
-> 
->    P9_IOHDRSZ would be IMO too small, because P9_IOHDRSZ is the size of the 
->    common header portion of all IO requests. So it would rather make sense IMO
->    reviewing the protocol and pick the largest header size among all possible 
->    requests supported by 9pfs server ATM. The advantage of this approach would 
->    be that overall code would be easier too maintain, since we don't have to 
->    add minimum msize checks in any (or even all) individual request type 
->    handlers. T_version handler of server would already enforce a minimum msize 
->    and prevent the session if msize too small, and that's it.
-> 
-> 2. How to handle that error with T_version exactly?
-> 
->    As far as I can see it, it was originally not considered that T_version 
->    might react with an error response at all. The specs are ambiguous about 
->    this topic. All you can find is that if the transmitted protocol version
->    is not supported by server, then server should respond with "unknown" with 
->    its R_version response, but should not respond with R_error in that case.
-> 
->    The specs do not prohibit R_error for T_version in general, but I could 
->    imagine that some clients might not expect if we would send R_error. On the 
->    other hand responding with R_version "unknown" would not be appropriate for 
->    this msize error either, because that would mean to the client that the 
->    protocol version was not supported, which is not the case. So it would 
->    leave client uninformed about the actual reason/cause of the error.
-> 
-> 3. Are there any undocumented special msizes, e.g. msize=0 for "don't care" ?
-> 
->    Probably not, but you might have seen more client implementations than me.
-> 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
-
+Assuming that's the case, it seems to me more like there's some missing fence
+in whatever program is blowing up due to this -- maybe it's just reading from
+the page before marking it as read-only, then relying on writes to trap without
+doing the requisite fence.
 
