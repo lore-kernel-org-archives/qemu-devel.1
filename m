@@ -2,99 +2,96 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FCCC32771
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A2BC2D0D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:00:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39615207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4CE22072E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:00:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqAF2O+F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39615207FD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dHKtrO23"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4CE22072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioP9q-0006pR-AI
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 04:58:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59965)
+	id 1ioPBg-00081s-1u
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 05:00:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ioP9E-00067x-Hj
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:58:10 -0500
+ (envelope-from <philmd@redhat.com>) id 1ioPAt-0007LG-AX
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:59:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ioP9B-0004i7-Fw
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:58:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58047
+ (envelope-from <philmd@redhat.com>) id 1ioPAs-0005he-2I
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:59:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20413
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ioP9B-0004gx-BQ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:58:05 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioPAr-0005gh-V7
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:59:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578304684;
+ s=mimecast20190719; t=1578304788;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LNlCJBWJPATvWPsS82+/NWD0HbofVteiRNygFg343+U=;
- b=cqAF2O+F8M4rGSGXeqLllhKTlIOL98cVYXv9cXkDtS7vcgX3RogzRvXBZpwEmz1JF5sMC7
- uwo4sevtGvVsOTc3GFHNfOl4vYakGkFZZ+FqwTQxTz77Pw0JMyom0S3XoZLmK5ojoxMrni
- RK2J4dZxZpUfC3lg7q8ac6hN2VHVOhY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-183-Hwf8ThAIN82GcfkepWvwYg-1; Mon, 06 Jan 2020 04:58:00 -0500
-Received: by mail-qk1-f198.google.com with SMTP id x127so29071676qkb.0
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 01:58:00 -0800 (PST)
+ bh=jTe2S/qKyy6usxHbnOSlZI6zVERzDLKtbGzepRnHNso=;
+ b=dHKtrO23KcVs3oQzKmE+TPW7hvbSwEQBHdaPZ7SCyrCzH/izF0U9XU6alpYIu8gonDMdzt
+ utUSNPN5ilW/9wv+OPHReQ4232PdHgWk3WuYbdmstkHXLpYETqcbz/zk/fHj2a3evkwaeu
+ L4KVs5ew1Ds0Z6KDGGXcM/8FCEK3E18=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-LRQusaexNJGkax7dtZrEHA-1; Mon, 06 Jan 2020 04:59:47 -0500
+Received: by mail-wr1-f70.google.com with SMTP id c17so1848391wrp.10
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 01:59:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=td1ZYZa3KyvUVU0VaAQ+9Hf9EcjjZqMSwFwwiTXYdgk=;
- b=Wzs6wSJ+neO+31AL6HIM0yQdhF5/xu6rBQ6b5EUYlxfm/94frDcLC8X/eKEWh69hZl
- JCT4wT4XIJlQqFvXuTlz581qnmgMMevNDUytMXKOIMlrxCIAaJoBhdlxRceN2TkzjEO5
- H6lmgt0NSz230t2uaWQ9SnR20c+rV3UcnS6BJa4aAWfNTLk2M4etSEbAEZAyjHwKbi+2
- CrTxbnSuIWbRko1bN+oLpggY6/MzYti9C9EmdxaXDn7RriOgkrkCEf0R5W6lSr97lCSP
- r+h7uAgLgn/Ab4U9JDTvDo+EvvxOJZdVEbzflDNFoU9gPwfYtrMDuVvCpZ7u4fKLbqqE
- FO4g==
-X-Gm-Message-State: APjAAAXUZ4OA7YdkNlkWK9fxyxD1USheRanosCbabBHlD+1ZSX72HruL
- Wu2dBmHhky2l08nMpLFtAxn0fUpeZzP8vpSXMWs439SfQiAnBemK4K8oKlUYTvimdY1vfHLiucm
- ols08ANFKOVoK6D8=
-X-Received: by 2002:ad4:51cc:: with SMTP id p12mr76653954qvq.113.1578304680428; 
- Mon, 06 Jan 2020 01:58:00 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyEVGyY5zJfYKnykZwYNKicJs6dZw/pTcGvD0regnFwcpuODKgNLdj/QfbAQ4Jr/EU5ROj4Jw==
-X-Received: by 2002:ad4:51cc:: with SMTP id p12mr76653936qvq.113.1578304680132; 
- Mon, 06 Jan 2020 01:58:00 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id 17sm47230qkl.106.2020.01.06.01.57.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 01:57:59 -0800 (PST)
-Date: Mon, 6 Jan 2020 04:57:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
-Message-ID: <20200106044351-mutt-send-email-mst@kernel.org>
-References: <20191226043649.14481-1-yuri.benditovich@daynix.com>
- <20191226043649.14481-2-yuri.benditovich@daynix.com>
- <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
- <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
- <20200101184425-mutt-send-email-mst@kernel.org>
- <CAOEp5Oefmj5dM5auk1QpQ3F+CeJXQy+0aXJC1VNmUOj1KHp8aw@mail.gmail.com>
- <20200105063518-mutt-send-email-mst@kernel.org>
- <CAOEp5Of0PYiCu9kPyi7W84ToHrGzTHFkPFBGd0A7AVFkwzVZOg@mail.gmail.com>
- <CAOEp5Oec3x71vPVKDcTBWT4TkgrbSbUZmyDkd2bGF84sXEHUyQ@mail.gmail.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=toeKQXHi8c85WI9A7K/0KFPyElcbcdM7Z+eyv09AMos=;
+ b=aog5W7WA879TActF6QpqrP47DM9hMDGJ09ZY95VmWUumkRRhb/W+bh9DhQxrzqoIxD
+ 5DcXIOvv7HFj4StaF6LLnWhjMWmAgw/FysiV/LxxKo75MVWt2JhF9lIITrmbBOJO7WW7
+ gLeq8xQqlq9cpzi2uoXhGpIpl2x+yokgNmdT7TbKEcnZ+pNY88RO8qEhEMWHt2VVFtKJ
+ 7m0cxjzbQyjckyD2o+qFiCaJfYvwYQnfxhjl0jqlQnAqtQimHV7Fbz8JwR4vdTTqLb/S
+ e879/UX+comCjVrdtV0KL08WLw7/Hv72rqzP2jxKp+FX9FtsvZKbWduFaSChilUqzbJa
+ oL8w==
+X-Gm-Message-State: APjAAAW599bS8G51G/rWmp0YKpwcgIy0oTygN0hDEe5ly8RFSMpGz5RB
+ hmFSGHYPG3H/4bEgJEld5hIMBYEoTS0BwZEe3Fahadi4XWIACmYrSw/6yQzrNykW6F8RRgpTt5L
+ l1fTfo3vEDPoXns8=
+X-Received: by 2002:adf:82f3:: with SMTP id 106mr105200899wrc.69.1578304786035; 
+ Mon, 06 Jan 2020 01:59:46 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzd5z47fiYRlYCJH1pipBY4S3zhQhJTWl/h57Pvf/HpBTvieRUt8BthhJLjRpM6NGdzztAQUQ==
+X-Received: by 2002:adf:82f3:: with SMTP id 106mr105200869wrc.69.1578304785755; 
+ Mon, 06 Jan 2020 01:59:45 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id z21sm22907261wml.5.2020.01.06.01.59.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jan 2020 01:59:45 -0800 (PST)
+Subject: Re: [PATCH v2] ui: Print available display backends with '-display
+ help'
+To: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org
+References: <20200106093313.17081-1-huth@tuxfamily.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3a9700da-5d9b-6dfd-c0dd-a0871392fadf@redhat.com>
+Date: Mon, 6 Jan 2020 10:59:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAOEp5Oec3x71vPVKDcTBWT4TkgrbSbUZmyDkd2bGF84sXEHUyQ@mail.gmail.com>
-X-MC-Unique: Hwf8ThAIN82GcfkepWvwYg-1
+In-Reply-To: <20200106093313.17081-1-huth@tuxfamily.org>
+Content-Language: en-US
+X-MC-Unique: LRQusaexNJGkax7dtZrEHA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -109,169 +106,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, pbonzini@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I guess it somehow has to do with the following:
+On 1/6/20 10:33 AM, Thomas Huth wrote:
+> We already print availabled devices with "-device help", or available
+> backends with "-netdev help" or "-chardev help". Let's provide a way
+> for the users to query the available display backends, too.
+>=20
+> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+> ---
+>   v2: Now it should work with modules, too
+>=20
+>   include/ui/console.h |  1 +
+>   ui/console.c         | 15 +++++++++++++++
+>   vl.c                 |  5 +++++
+>   3 files changed, 21 insertions(+)
+>=20
+> diff --git a/include/ui/console.h b/include/ui/console.h
+> index f981696848..b7e1a8e6c0 100644
+> --- a/include/ui/console.h
+> +++ b/include/ui/console.h
+> @@ -440,6 +440,7 @@ void qemu_display_register(QemuDisplay *ui);
+>   bool qemu_display_find_default(DisplayOptions *opts);
+>   void qemu_display_early_init(DisplayOptions *opts);
+>   void qemu_display_init(DisplayState *ds, DisplayOptions *opts);
+> +void qemu_display_help(void);
+>  =20
+>   /* vnc.c */
+>   void vnc_display_init(const char *id, Error **errp);
+> diff --git a/ui/console.c b/ui/console.c
+> index 82d1ddac9c..9556b5d8dd 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -2330,6 +2330,21 @@ void qemu_display_init(DisplayState *ds, DisplayOp=
+tions *opts)
+>       dpys[opts->type]->init(ds, opts);
+>   }
+>  =20
+> +void qemu_display_help(void)
+> +{
+> +    int idx;
+> +
+> +    printf("Available display backend types:\n");
+> +    for (idx =3D DISPLAY_TYPE_NONE; idx < DISPLAY_TYPE__MAX; idx++) {
+> +        if (!dpys[idx]) {
+> +            ui_module_load_one(DisplayType_str(idx));
+> +        }
+> +        if (dpys[idx]) {
+> +            printf("%s\n",  DisplayType_str(dpys[idx]->type));
+> +        }
+> +    }
+> +}
+> +
+>   void qemu_chr_parse_vc(QemuOpts *opts, ChardevBackend *backend, Error *=
+*errp)
+>   {
+>       int val;
+> diff --git a/vl.c b/vl.c
+> index 86474a55c9..ee15055ba2 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1869,6 +1869,11 @@ static void parse_display(const char *p)
+>   {
+>       const char *opts;
+>  =20
+> +    if (is_help_option(p)) {
+> +        qemu_display_help();
+> +        exit(0);
+> +    }
+> +
+>       if (strstart(p, "sdl", &opts)) {
+>           /*
+>            * sdl DisplayType needs hand-crafted parser instead of
+>=20
 
-    if (proxy->disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {
-        proxy->disable_legacy =3D pcie_port ? ON_OFF_AUTO_ON : ON_OFF_AUTO_=
-OFF;
-    }
+Consider updating the manpage too:
 
-so by default device on an express port does not have a legacy interface.
+-- >8 --
+diff --git a/qemu-options.hx b/qemu-options.hx
+index e9d6231438..d86ec0332a 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -1585,8 +1585,9 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
+  STEXI
+  @item -display @var{type}
+  @findex -display
+-Select type of display to use. This option is a replacement for the
+-old style -sdl/-curses/... options. Valid values for @var{type} are
++Select type of display to use. Use @code{-display help} to list
++available displays. This option is a replacement for the old style
++-sdl/-curses/... options. Valid values for @var{type} are
+  @table @option
+  @item sdl
+  Display video output via SDL (usually in a separate graphics
+---
 
-Somehow having a legacy interface fixes things?
-Does enabling legacy on q35 without this patch fix things?
-And does disabling legacy on PIIX without this patch break thing?
-
-How can having a legacy interface fix things if it's not
-even active? I don't know. Is there a chance windows drivers use the
-legacy interface on a transitional device by mistake?
-
-
-On Mon, Jan 06, 2020 at 11:10:18AM +0200, Yuri Benditovich wrote:
-> Michael,
-> Can you please comment on Jason's question: why we have a problem only wi=
-th q35
-> and not with legacy pc?
-> If you have a simple answer, it will help us in further work with other h=
-ot
-> plug/unplug problems.
->=20
-> Thanks,
-> Yuri Benditovich
->=20
-> On Sun, Jan 5, 2020 at 6:21 PM Yuri Benditovich <yuri.benditovich@daynix.=
-com>
-> wrote:
->=20
->=20
->=20
->     On Sun, Jan 5, 2020 at 1:39 PM Michael S. Tsirkin <mst@redhat.com> wr=
-ote:
->=20
->         On Thu, Jan 02, 2020 at 09:09:04AM +0200, Yuri Benditovich wrote:
->         >
->         >
->         > On Thu, Jan 2, 2020 at 1:50 AM Michael S. Tsirkin <mst@redhat.c=
-om>
->         wrote:
->         >
->         >=C2=A0 =C2=A0 =C2=A0On Thu, Dec 26, 2019 at 11:29:50AM +0200, Yu=
-ri Benditovich wrote:
->         >=C2=A0 =C2=A0 =C2=A0> On Thu, Dec 26, 2019 at 10:58 AM Jason Wan=
-g <
->         jasowang@redhat.com> wrote:
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> > On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Y=
-uri Benditovich wrote:
->         >=C2=A0 =C2=A0 =C2=A0> > > https://bugzilla.redhat.com/show_bug.c=
-gi?id=3D1708480
->         >=C2=A0 =C2=A0 =C2=A0> > > Fix leak of region reference that prev=
-ents complete
->         >=C2=A0 =C2=A0 =C2=A0> > > device deletion on hot unplug.
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> > More information is needed here, the bug=
- said only q35 can
->         meet this
->         >=C2=A0 =C2=A0 =C2=A0> > issue. What makes q35 different here?
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0>
->         >=C2=A0 =C2=A0 =C2=A0> I do not have any ready answer, I did not =
-dig into it too much.
->         >=C2=A0 =C2=A0 =C2=A0> Probably Michael Tsirkin or Paolo Bonzini =
-can answer without
->         digging.
->         >
->         >
->         >
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> > >
->         >=C2=A0 =C2=A0 =C2=A0> > > Signed-off-by: Yuri Benditovich <
->         yuri.benditovich@daynix.com>
->         >=C2=A0 =C2=A0 =C2=A0> > > ---
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0hw/virtio/virtio.c | 5 +++=
-++
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A01 file changed, 5 insertio=
-ns(+)
->         >=C2=A0 =C2=A0 =C2=A0> > >
->         >=C2=A0 =C2=A0 =C2=A0> > > diff --git a/hw/virtio/virtio.c b/hw/v=
-irtio/virtio.c
->         >=C2=A0 =C2=A0 =C2=A0> > > index 04716b5f6c..baadec8abc 100644
->         >=C2=A0 =C2=A0 =C2=A0> > > --- a/hw/virtio/virtio.c
->         >=C2=A0 =C2=A0 =C2=A0> > > +++ b/hw/virtio/virtio.c
->         >=C2=A0 =C2=A0 =C2=A0> > > @@ -2340,6 +2340,11 @@ void virtio_del=
-_queue(VirtIODevice
->         *vdev, int
->         >=C2=A0 =C2=A0 =C2=A0n)
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev->vq[n].=
-vring.num_default =3D 0;
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev->vq[n].=
-handle_output =3D NULL;
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev->vq[n].=
-handle_aio_output =3D NULL;
->         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 /*
->         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 =C2=A0* with vring.num =
-=3D 0 the queue will be ignored
->         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 =C2=A0* in later loops =
-of region cache reset
->         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 =C2=A0*/
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> > I can't get the meaning of this comment.
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> > Thanks
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 virtio_virtqueue_reset_=
-region_cache(&vdev->vq[n]);
->         >
->         >
->         >=C2=A0 =C2=A0 =C2=A0Do we need to drop this from virtio_device_f=
-ree_virtqueues then?
->         >
->         >
->         >
->         > Not mandatory. Repetitive=C2=A0 virtio_virtqueue_reset_region_c=
-ache=C2=A0does
->         not do
->         > anything bad.
->         > Some of virtio devices do not do 'virtio_del_queue' at all.
->         Currently=C2=A0
->         > virtio_device_free_virtqueues resets region cache for them.
->         > IMO, not calling 'virtio_del_queue' is a bug, but not in the sc=
-ope of
->         current
->         > series, I'll take care of that later.
->=20
->         Maybe we should just del all queues in virtio_device_unrealize?
->         Will allow us to drop some logic tracking which vqs were created.
->=20
->=20
->=20
->     Yes, this is also possible with some rework of
->     virtio_device_free_virtqueues.
->     virtio-net has some additional operations around queue deletion, it d=
-eletes
->     queues when switches from single queue to multiple.
->     =C2=A0
->=20
->=20
->         >
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0g_free(vdev-=
->vq[n].used_elems);
->         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0}
->         >=C2=A0 =C2=A0 =C2=A0> > >
->         >=C2=A0 =C2=A0 =C2=A0> >
->         >
->         >
->=20
->=20
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
