@@ -2,91 +2,77 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EAAEC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AF3C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A7F12071A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C4372071A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="ojVjjgaV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A7F12071A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fcptzwCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4372071A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioS7I-0002RU-BZ
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 08:08:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36614)
+	id 1ioS9q-00042J-Ij
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 08:10:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cminyard@mvista.com>) id 1ioS6Z-0001uj-Lz
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:07:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1ioS94-00036Z-Hp
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cminyard@mvista.com>) id 1ioS6W-0005s6-6d
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:07:35 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33883)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1ioS6V-0005qx-Sr
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:07:32 -0500
-Received: by mail-oi1-x241.google.com with SMTP id l136so15822156oig.1
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 05:07:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mvista-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=djuTjSz97I65e9Rdhz0iVYkKZcol8tp8cxJmmTQmsow=;
- b=ojVjjgaVktB6L4hwatHWW51Aq8aJUGwXU3j4mdXUglwDsTyP51fJOEq8XhMmaRUFX4
- RgCgV0Egn020XKoo5Ehx7Md4yaq7w137GfcBC8QAlNMhRflqSRyrIOBa+xgGWshfmH9W
- TAs9pe6J5elc4gPfg8W1nkmsCaNzSLYxnU9H7x6shG0QroE2UTL1md8ARDQyvCscwZsz
- 7gzg2QUDYsCm4RkklJ9HOvSUiVFb50Gh+t31C7p+PEDNGqsyrGxPhL/XfAM2hBaMiODc
- yNPdv9yepRJ1pf9QaaDw+UFK2vuMypeG5Q1cTvWhfB01rF9HipsA2JfVeXU47pgbu675
- HLSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=djuTjSz97I65e9Rdhz0iVYkKZcol8tp8cxJmmTQmsow=;
- b=tf3q84nazkFGHr7Wzi8rUdQ9a4m/ns+6ADRi+9IAx1KplZawYyPCMV8JzNi+fc6cgJ
- qDsJms4WScQj+pptvWe9Dq038bOaFEQbVhvnx83yRKlRCLuyvIhs0hCgaTxrZdNaZjRF
- KEUH3ZMUg+l+/r+imgfnsfdEfAA4FCa5b0sUHzUmpB210WE5m0LBFFuOGdEiGxx5OPO1
- twUahIKtoB2ZtrCF/fXDZEVUSshy0Ptc+1Fy+GHgWUYgJ4imXH7IfMKpbWMwEoQ4HjDZ
- +2YN+cyPIGM9Qy0zadSe4WOZT7EipDz4s6rlFlDZvhll44Hmf8htYww5E14jAMsUKdOS
- /2TQ==
-X-Gm-Message-State: APjAAAWZAxW7DMgopTnB35iFzUyiKPYUn29aiaTHWCrU+iILJPIR7aVL
- Vn5NT/IpERhC+wxlsMQxXZsqPg==
-X-Google-Smtp-Source: APXvYqwdms4GxGO+9C7JXMJBgCtlLK/Sry5YrMwSV1l9unfN3WQth6+W9iFFV19clG9YQpmkKMtK0g==
-X-Received: by 2002:aca:6744:: with SMTP id b4mr321855oiy.99.1578316050628;
- Mon, 06 Jan 2020 05:07:30 -0800 (PST)
-Received: from minyard.net ([2001:470:b8f6:1b:adc3:7c20:81:d62b])
- by smtp.gmail.com with ESMTPSA id n7sm21185655oij.14.2020.01.06.05.07.29
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 06 Jan 2020 05:07:29 -0800 (PST)
-Date: Mon, 6 Jan 2020 07:07:27 -0600
-From: Corey Minyard <cminyard@mvista.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified
- by _HID
-Message-ID: <20200106130727.GA2886@minyard.net>
-References: <20191219064759.35053-1-guoheyi@huawei.com>
- <20191219064759.35053-3-guoheyi@huawei.com>
- <20200105072504-mutt-send-email-mst@kernel.org>
- <20200105225420.GJ6497@minyard.net>
- <20200106043916-mutt-send-email-mst@kernel.org>
+ (envelope-from <philmd@redhat.com>) id 1ioS91-0007l4-2j
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:10:08 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44164
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioS90-0007jE-Ox
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:10:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578316205;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=EBJo5O2O6f9hi2tJc2mLTcCl2pbwneP09KgrZui8rzk=;
+ b=fcptzwCB0/OGBfLF4l4VEqoRZSFgdy8We+H9K6foyxxKbVwSg9uYHAVjhwes2zD47y8aDF
+ M6E+z/a5iT0hUkFChiz3/jvDGT1V+0nqQSi9Dg2Bn/mGAmjqrAA1oFPPIfYAfTQONQqnD8
+ +OnON40K+HilAvNInuBRn/zWY62eJ74=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-ME8v3rAtMKyzE-EUKCmp1A-1; Mon, 06 Jan 2020 08:10:03 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD06E800D41;
+ Mon,  6 Jan 2020 13:10:02 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-53.brq.redhat.com [10.40.204.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 847C81C4;
+ Mon,  6 Jan 2020 13:09:54 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] tests/qemu-iotests: Update tests to recent desugarized -accel
+ option
+Date: Mon,  6 Jan 2020 14:09:51 +0100
+Message-Id: <20200106130951.29873-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200106043916-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: ME8v3rAtMKyzE-EUKCmp1A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,120 +84,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: cminyard@mvista.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Heyi Guo <guoheyi@huawei.com>,
- wanghaibin.wang@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-block@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 06, 2020 at 04:39:51AM -0500, Michael S. Tsirkin wrote:
-> On Sun, Jan 05, 2020 at 04:54:20PM -0600, Corey Minyard wrote:
-> > On Sun, Jan 05, 2020 at 07:33:55AM -0500, Michael S. Tsirkin wrote:
-> > > On Thu, Dec 19, 2019 at 02:47:59PM +0800, Heyi Guo wrote:
-> > > > According to ACPI spec, _ADR should be used for device which is on a
-> > > > bus that has a standard enumeration algorithm. It does not make sense
-> > > > to have a _ADR object for devices which already have _HID and will be
-> > > > enumerated by OSPM.
-> > > > 
-> > > > Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-> > > 
-> > > Are you sure? I would think this depends on the ID and the device
-> > > really. E.g. PCI devices all are expected to have _ADR and some of them
-> > > have a _HID.
-> > 
-> > That's my understanding, too.
-> > 
-> > > 
-> > > CC Corey who added a device with both HID and ADR to x86 recenly.
-> > > 
-> > > Apropos Corey, why was HID APP0005 chosen?
-> > 
-> > I don't remember.  I thought I had looked it up someplace, but I didn't
-> > document it.
-> > 
-> > >From reading the spec, I believe you could safely delete the _HID and it
-> > would be fine.  However, I don't see anything that says it can't be
-> > there, either.  But it is extraneous.
-> > 
-> > Searching on the web a bit, I see that the APP0005 has confused windows.
-> 
-> Could you post the link you found pls?
+Commit 6f6e1698a6 desugarized "-machine accel=3D" to a list
+of "-accel" options. Since now "-machine accel" and "-accel"
+became incompatible, update the iotests to the new format.
 
-https://bugs.launchpad.net/qemu/+bug/1856724
+Error reported here:
+https://gitlab.com/qemu-project/qemu/-/jobs/385801004#L3400
 
-> 
-> > It does look to be wrong.  Maybe deleting it would be a good idea.
-> > 
-> > -corey
-> > 
-> > > 
-> > > > ---
-> > > > Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> > > > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > Cc: Igor Mammedov <imammedo@redhat.com>
-> > > > Cc: qemu-arm@nongnu.org
-> > > > Cc: qemu-devel@nongnu.org
-> > > > ---
-> > > >  hw/arm/virt-acpi-build.c          |   8 --------
-> > > >  tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
-> > > >  tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
-> > > >  tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
-> > > >  4 files changed, 8 deletions(-)
-> > > > 
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index 9f4c7d1889..be752c0ad8 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
-> > > >                               AML_EXCLUSIVE, &uart_irq, 1));
-> > > >      aml_append(dev, aml_name_decl("_CRS", crs));
-> > > >  
-> > > > -    /* The _ADR entry is used to link this device to the UART described
-> > > > -     * in the SPCR table, i.e. SPCR.base_address.address == _ADR.
-> > > > -     */
-> > > > -    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)));
-> > > > -
-> > > >      aml_append(scope, dev);
-> > > >  }
-> > > >  
-> > > > @@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> > > >      aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
-> > > >      aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-> > > >      aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
-> > > > -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-> > > >      aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
-> > > >      aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
-> > > >      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
-> > > > @@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
-> > > >  {
-> > > >      Aml *dev = aml_device("GPO0");
-> > > >      aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
-> > > > -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-> > > >      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-> > > >  
-> > > >      Aml *crs = aml_resource_template();
-> > > > @@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
-> > > >  {
-> > > >      Aml *dev = aml_device(ACPI_POWER_BUTTON_DEVICE);
-> > > >      aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
-> > > > -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
-> > > >      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-> > > >      aml_append(scope, dev);
-> > > >  }
-> > > > diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-> > > 
-> > > 
-> > > Please do not include binary changes in acpi patches.
-> > > 
-> > > See comment at the top of tests/bios-tables-test.c for documentation
-> > > on how to update these.
-> > > 
-> > > -- 
-> > > MST
-> > > 
-> 
+Reported-by: GitLab CI
+Fixes: 6f6e1698a6 (vl: configure accelerators from -accel options)
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/qemu-iotests/235   | 2 +-
+ tests/qemu-iotests/check | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
+index fedd111fd4..3d7533980d 100755
+--- a/tests/qemu-iotests/235
++++ b/tests/qemu-iotests/235
+@@ -49,7 +49,7 @@ qemu_img_create('-f', iotests.imgfmt, '-o', 'preallocatio=
+n=3Dmetadata', disk,
+                 str(size))
+=20
+ vm =3D QEMUMachine(iotests.qemu_prog)
+-vm.add_args('-machine', 'accel=3Dkvm:tcg')
++vm.add_args('-accel', 'kvm', '-accel', 'tcg')
+ if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+         vm.add_args('-no-shutdown')
+ vm.add_args('-drive', 'id=3Dsrc,file=3D' + disk)
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 90970b0549..2890785a10 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -587,13 +587,13 @@ export QEMU_PROG=3D"$(type -p "$QEMU_PROG")"
+=20
+ case "$QEMU_PROG" in
+     *qemu-system-arm|*qemu-system-aarch64)
+-        export QEMU_OPTIONS=3D"-nodefaults -display none -machine virt,acc=
+el=3Dqtest"
++        export QEMU_OPTIONS=3D"-nodefaults -display none -machine virt -ac=
+cel qtest"
+         ;;
+     *qemu-system-tricore)
+-        export QEMU_OPTIONS=3D"-nodefaults -display none -machine tricore_=
+testboard,accel=3Dqtest"
++        export QEMU_OPTIONS=3D"-nodefaults -display none -machine tricore_=
+testboard -accel qtest"
+         ;;
+     *)
+-        export QEMU_OPTIONS=3D"-nodefaults -display none -machine accel=3D=
+qtest"
++        export QEMU_OPTIONS=3D"-nodefaults -display none -accel qtest"
+         ;;
+ esac
+=20
+--=20
+2.21.1
+
 
