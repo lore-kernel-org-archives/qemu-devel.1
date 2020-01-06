@@ -6,70 +6,71 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC24FC32771
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 07:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 884DEC32771
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 08:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1D05215A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 07:46:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D05215A4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 55F7220848
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 08:07:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55F7220848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioN5n-0008Ga-Sy
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 02:46:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36101)
+	id 1ioNQP-0004GX-Ew
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 03:07:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ioN56-0007qJ-Aa
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 02:45:45 -0500
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1ioNPo-0003qQ-2m
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 03:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ioN54-0005yq-S3
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 02:45:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56388)
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1ioNPm-0004M4-Rs
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 03:07:08 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:46488)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ioN54-0005xy-MZ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 02:45:42 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ioN53-0003Y3-5G
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 07:45:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 16D802E80C8
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 07:45:41 +0000 (UTC)
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1ioNPm-0004LU-NV
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 03:07:06 -0500
+Received: by mail-ot1-f67.google.com with SMTP id q3so2070086otr.13
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 00:07:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DW1SIti7NHYB1AbqgFvyF14dNMwa3qPTzBW09JetqYs=;
+ b=TDfvFiBVrno6poF1zmmxn3/auQ47lTLWOjBuU/UbB9UvBYf3MiJtAGsZobAM48ndmy
+ b37nf6prTmZaEB4XIQFyNZpSVPi4JhLs2Tor1vDP+R7XoQKGBcROlcGB5wMct6GhxTSZ
+ qh5LsV7Ol2lgVyI1RHNBcOmGXBRRVugiOVzR1I0Hx7Hz5ALL4HnIbQrvhNz67rOjuGWW
+ P1k7wAp9aSmS+PN2RTpdiHc6UAks7LZmUZUImmgUO2M6dJu+RKY6Kx8ul392Xfsal2Qo
+ iHkIakHQda1DJjxHnJEVansxp+CN4sPh5VwZc8tIYI6quXH8dtz/JedDk1D7jHVOYch4
+ TvAw==
+X-Gm-Message-State: APjAAAU7sPS0Xd7k9Y/4vQit2ILHX79Hd59kEjF0xpk2vBEAUDWSPWsw
+ sHlEPtSllaY+QmYG0ANd2DvfU/0vpZLzIGuYtBo=
+X-Google-Smtp-Source: APXvYqxAKJhctUL3mn7UzaLw+sqHKf++PDfXB8dUrOnMMXR6h0t2N8/KpR/0X7vcb8CRnhjsdWQ+ZW4+Y5nwyAvTH3w=
+X-Received: by 2002:a9d:dc1:: with SMTP id 59mr15235457ots.250.1578298025342; 
+ Mon, 06 Jan 2020 00:07:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 06 Jan 2020 07:39:45 -0000
-From: Fabian Godehardt <1856837@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gcc9.2 segfault
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fgodeh pmaydell
-X-Launchpad-Bug-Reporter: Fabian Godehardt (fgodeh)
-X-Launchpad-Bug-Modifier: Fabian Godehardt (fgodeh)
-References: <157666594314.15384.3778802807711797985.malonedeb@wampee.canonical.com>
-Message-Id: <157829638549.28004.14832998592685884564.malone@chaenomeles.canonical.com>
-Subject: [Bug 1856837] Re: qemu 4.2.0 arm  segmentation fault with gcc 9.2
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 88b6b6f469a104b7d359e7bc3a9627fb15bd02b9
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-7-geert+renesas@glider.be>
+ <CACRpkdb1XZAeSThxWmJtnm80T4aPufXV2UvJdVdgnw-TJe3trg@mail.gmail.com>
+ <CAMuHMdV+Ww5Y9G7+bS-SyHtm4dC89V37yuaYvrS3kYW=PRTkFA@mail.gmail.com>
+ <CACRpkdZwos9Dtt9E3OkxWf4rqMALNTge5NGduzGm-7MhQyLZuQ@mail.gmail.com>
+In-Reply-To: <CACRpkdZwos9Dtt9E3OkxWf4rqMALNTge5NGduzGm-7MhQyLZuQ@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 6 Jan 2020 09:06:53 +0100
+Message-ID: <CAMuHMdWZ7Wh9rq7SGt7edgCXL1e5UwtSUfxLc0exHa-TEB=W5w@mail.gmail.com>
+Subject: Re: [PATCH v3 6/7] docs: gpio: Add GPIO Aggregator/Repeater
+ documentation
+To: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 209.85.210.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,102 +79,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856837 <1856837@bugs.launchpad.net>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry for the delay. I added the sysroot, the binary and the files causing =
-the segfault.
-Please let me know if there is something missing.
+Hi Linus,
 
-I used the following commands to let it run:
+On Sat, Jan 4, 2020 at 1:21 AM Linus Walleij <linus.walleij@linaro.org> wrote:
+> On Thu, Dec 12, 2019 at 3:48 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > On Thu, Dec 12, 2019 at 3:42 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> > > On Wed, Nov 27, 2019 at 9:43 AM Geert Uytterhoeven
+> > > <geert+renesas@glider.be> wrote:
+> > > > +The GPIO Aggregator allows access control for individual GPIOs, by aggregating
+> > > > +them into a new gpio_chip, which can be assigned to a group or user using
+> > > > +standard UNIX file ownership and permissions.  Furthermore, this simplifies and
+> > > > +hardens exporting GPIOs to a virtual machine, as the VM can just grab the full
+> > > > +GPIO controller, and no longer needs to care about which GPIOs to grab and
+> > > > +which not, reducing the attack surface.
+> > > > +
+> > > > +Aggregated GPIO controllers are instantiated and destroyed by writing to
+> > > > +write-only attribute files in sysfs.
+> > >
+> > > I suppose virtual machines will have a lengthy config file where
+> > > they specify which GPIO lines to pick and use for their GPIO
+> > > aggregator, and that will all be fine, the VM starts and the aggregator
+> > > is there and we can start executing.
+> > >
+> > > I would perhaps point out a weakness as with all sysfs and with the current
+> > > gpio sysfs: if a process creates an aggregator device, and then that
+> > > process crashes, what happens when you try to restart the process and
+> > > run e.g. your VM again?
+> > >
+> > > Time for a hard reboot? Or should we add some design guidelines for
+> > > these machines so that they can cleanly tear down aggregators
+> > > previously created by the crashed VM?
+> >
+> > No, the VM does not create the aggregator.
+> >
+> > The idea is for the user to create one or more aggregators, set up
+> > permissions on /dev/gpiochipX, and launch the VM, passing the aggregated
+> > /dev/gpiochipX as parameters.
+> > If the VM crashes, just launch it again.
+> >
+> > Destroying the aggregators is a manual and independent process, after
+> > the VM has exited.
+>
+> I'm thinking about someone making some industrial application for some
+> control of a machinery say a robotic arm.
+>
+> And do make sure this VM is only controlling these GPIOs related to
+> this robotic arm, they create a GPIO aggregator. And we care about
+> cases like that since we provide this security argument.
+>
+> Surely that machine will be rebooted.
+>
+> Surely they don't have a printed paper with all the commands lying
+> at the console, and asking whoever powers it back on to manually
+> type it all in again. That feels a bit 1981.
+>
+> So they will have a script for this I suppose. Possibly in some
+> initscript so it is set up on boot. And this script echos stuff
+> all over the place to set up the aggregator.
+>
+> Is this the use case you're thinking of?
 
-export LD_LIBRARY_PATH=3D/opt/qemu-test/test1/lib
-/opt/qemu-test/test1/bin/qemu-arm "/opt/qemu-test/test1/files/mksnapshot.ar=
-m" --log-snapshot-positions --logfile "/tmp/snapshot.log" --random-seed 314=
-159265 "/tmp/snapshot.cc"
+Exactly.
 
+And they can configure that by echoing the GPIO specifiers to
+/sys/bus/platform/drivers/gpio-aggregator/new_device.
 
-Thanks again!
-Fabian
+If their system has DT, another option is to describe the device in DT,
+and add its compatible value to gpio_aggregator_dt_ids[], cfr. the
+frobnicator example.
 
-** Attachment added: "Tarball containing sysroot, qemu binary and files"
-   https://bugs.launchpad.net/qemu/+bug/1856837/+attachment/5317851/+files/=
-qemu-segfault-v8.tar.xz
+> I just like to have the whole picture here.
 
--- =
+Sure. If anything is still unclear, please let me know!
+Thanks!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856837
+Gr{oetje,eeting}s,
 
-Title:
-  qemu 4.2.0 arm  segmentation fault with gcc 9.2
+                        Geert
 
-Status in QEMU:
-  New
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-Bug description:
-  As discussed with f4bug yesterday on IRC here comes the bug
-  description.
-
-  I'm building/configured qemu-4.2.0 on an x86_64 (gcc (Debian
-  6.3.0-18+deb9u1) 6.3.0 20170516) with target-list "arm-softmmu,arm-
-  linux-user" and debug enabled. I use the arm-linux-user variant,
-  "qemu-arm".
-
-  Then i'm trying to cross-compile (arm gcc) an old version of googles
-  v8 (as i need this version of the lib for binary compatibility) which
-  uses qemu during build.
-
-  It worked with gcc 5.4.0 but not with 9.2.0. I also tried with 6.5.0,
-  7.4.0 and 8.3.0 but those are also causing the same segmentation
-  fault.
-
-  The executed command wich breaks qemu is:
-
-   qemu-arm /tmp/build/out/arm.release/mksnapshot.arm --log-snapshot-
-  positions --logfile
-  /tmp/build/out/arm.release/obj.host/v8_snapshot/geni/snapshot.log
-  --random-seed 314159265 /tmp/build/out/arm.release/obj.host/v8_snap
-
-  The printed error message is:
-
-  ARMv7=3D1 VFP3=3D1 VFP32DREGS=3D1 NEON=3D0 SUDIV=3D0 UNALIGNED_ACCESSES=
-=3D1 MOVW_MOVT_IMMEDIATE_LOADS=3D0 USE_EABI_HARDFLOAT=3D1
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-
-  Calling qemu with gdb gives the following information:
-
-   Thread 1 "qemu-arm" received signal SIGSEGV, Segmentation fault.
-   0x0000555555d63d11 in static_code_gen_buffer ()
-
-  and
-
-   (gdb) bt
-   #0  0x0000555555d63d11 in static_code_gen_buffer ()
-   #1  0x0000555555628d58 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D0x55=
-5557c33930) at =
-
-   /tmp/build/qemu/accel/tcg/cpu-exec.c:172
-   #2  cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, last_tb=3D<syntheti=
-c pointer>, tb=3D<optimized out>, =
-
-   cpu=3D0x555557c33930) at /tmp/build/qemu/accel/tcg/cpu-exec.c:618
-   #3  cpu_exec (cpu=3Dcpu@entry=3D0x555557c2b660) at /tmp/build/qemu/accel=
-/tcg/cpu-exec.c:731
-   #4  0x0000555555661578 in cpu_loop (env=3D0x555557c33930) at /tmp/build/=
-qemu/linux-user/arm/cpu_loop.c:219
-  #5  0x00005555555d6d76 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>, envp=3D<optimized out>) at /tmp/build/qemu/linux-user/main.c:865
-
-  Calling qemu-arm with debug switch "-d in_asm,int,op_opt" shows the
-  log in the attached file.
-
-  Thanks for any hints!
-  Fabian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856837/+subscriptions
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
