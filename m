@@ -2,81 +2,74 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F84CC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16065C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5929B20715
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:19:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D66DA20715
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:20:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RAAZh8L5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5929B20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJlrdArt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D66DA20715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioW2B-0003fh-Gl
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:19:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50380)
+	id 1ioW35-0004h7-2w
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:20:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51659)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ioVzy-0001wy-MT
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:17:03 -0500
+ (envelope-from <philmd@redhat.com>) id 1ioW2L-000416-FD
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:19:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ioVzx-00015f-ED
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:17:02 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41420)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ioVzx-000157-9M
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:17:01 -0500
-Received: by mail-ot1-x342.google.com with SMTP id r27so72527101otc.8
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 09:17:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Edq6LBKbuEUkVplSckBaeEYD1hTN6Nww1y6Fk9AWehs=;
- b=RAAZh8L5Od1ka1ePbvXBRgxvggFYE7qtpxJnGVuMAFhZVER8ZTeBNk95YjhViQiktw
- 0ZDzg8Q+QxWKyqBma+/z4QD4XVLHOcVDcu8+/YkOmd6dlMnY2ggXZ8C5stvycl8dboeE
- 12AseeCCgmwMqZpFZRvbsgElnvdVR+wqBb/HSpV1MaYYVq/Y88VirhFAUNPdW3o7KRzF
- R2XWDDnanOeX9XQFlLIJoGdlgr6+Yaq0tEND2vUbplKDT/ACmaVN5xdHb68i/jx3Zb6z
- 3w/hwmedevxmxJqaCrKEyw6rXd9tpn0S5TxL2o1FbFohgjVGPiSUkGVJ1YMIZf3Oqz4+
- EzSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Edq6LBKbuEUkVplSckBaeEYD1hTN6Nww1y6Fk9AWehs=;
- b=GJEjkQ0hSKabGpbjhZ5IiNWv6GZr9FDHTM50qADGo0JLnRtq+pGeMEOFBtJlZCGRfJ
- vp3fE3Qmz8V+yVOzu+ID9kFPegBRO6nHdsOOozxO4gBifFslFuUBfuk6mQJD61Wia7k5
- 8l/SSDJbef/VTgJJ+fARrXGxsaC424RLmOorNd/ThllkvtqKQn8al3C0k4TGj0l/IyNV
- Lfz5IN2tBoXIB45PaqSSyC6afuZfc+GuMvSl6U9zCUdLvQ+c2dlyGDcB72vsB8UU8YVP
- AsrpEGsnPoxhSM6hf4k2rh7YsezqLwEcwtrLTHCtNKU6SoEgLa3mp3iCAfltLtAWEz+j
- 2BFg==
-X-Gm-Message-State: APjAAAXZbsASKJcx0udldfkYkxGftBJFJa945BAmeME2JvKIGDKuFgnZ
- xnA+Jdmtl9JDW273nqANW7hArUDkI4KY0g78FeCrRg==
-X-Google-Smtp-Source: APXvYqyObqvOd/9WVOL2n9YMwrkhQUk9Gw81gZt+lI3doEyFi7Q164hnfb3WAQ1qnTuj3n4HGL+b8Xc3O1CHOcuEMHk=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr117794451otd.91.1578331020524; 
- Mon, 06 Jan 2020 09:17:00 -0800 (PST)
+ (envelope-from <philmd@redhat.com>) id 1ioW2K-0003LG-6v
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:19:29 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38106
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioW2K-0003KP-31
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:19:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578331166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=WdE/mMa5DL4tuKPiXYMZvaAFUILQ4E3aQN8rlBxNvVk=;
+ b=jJlrdArtVsJf0YxiajsjFcossYAdSns1hRryqjY0ieZtVGAge+d7K5x18LjlyILG7SBt8N
+ 9RwgcqtumxWvTDrMrsA6KPkj2YabPDlJdFCMCCiQpIWBnJNFiUc7SmxvfKY/HODiS3nOzD
+ TFVqfaGQoHTPx//Ht/Las30ousy0O8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-c4Vtb6tRMPGTvbPjRmO7zA-1; Mon, 06 Jan 2020 12:19:23 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C8C4800D54
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 17:19:22 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-53.brq.redhat.com [10.40.204.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 03049858B2;
+ Mon,  6 Jan 2020 17:19:15 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/timer/Kconfig: Intel 8254 PIT depends of ISA bus
+Date: Mon,  6 Jan 2020 18:19:12 +0100
+Message-Id: <20200106171912.16523-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <cover.1576658572.git.alistair@alistair23.me>
- <dad8d8d47f7625913e35e27a1c00f603a6b08f9a.1576658572.git.alistair@alistair23.me>
- <20200106175650.0ddc9bf2@redhat.com>
-In-Reply-To: <20200106175650.0ddc9bf2@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Jan 2020 17:16:49 +0000
-Message-ID: <CAFEAcA_VmuxuCWydF-ryi9dAF9_kGFYM2Co1fvMRosdDzTSXOA@mail.gmail.com>
-Subject: Re: [PATCH v7 4/4] hw/arm: Add the Netduino Plus 2
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: c4Vtb6tRMPGTvbPjRmO7zA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,33 +81,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Jan 2020 at 16:56, Igor Mammedov <imammedo@redhat.com> wrote:
-> I wonder if we should make user provided '-m' a hard error
-> for boards that have fixed RAM size. And make '-m' or forthcoming
-> "-machine memdev" optin feature for boards that explicitly ask for it?
+Since i8254_common.c calls isa_register_ioport() from "hw/isa/isa.h"
+we can not select it when ISA_BUS is disabled. Add a 'depends on'
+clause.
 
-Maybe. I bet that there are users out there explicitly
-specifying the ram size anyway, though...
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/timer/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
->
-> PS:
-> (I suspect that the most boards with fixed RAM size do not really
-> care about numa, mempath/prealloc and other features memdev provides)
+diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
+index a990f9fe35..59b3f44d69 100644
+--- a/hw/timer/Kconfig
++++ b/hw/timer/Kconfig
+@@ -15,6 +15,7 @@ config HPET
+=20
+ config I8254
+     bool
++    depends on ISA_BUS
+=20
+ config ALTERA_TIMER
+     bool
+--=20
+2.21.1
 
-Yes, almost nothing cares about NUMA and all that stuff,
-whether it has a fixed RAM size or not. Ideally that
-would be opt-in stuff so the 99% of board models which
-aren't x86 PC or arm virt could ignore it :-)
-
-thanks
--- PMM
 
