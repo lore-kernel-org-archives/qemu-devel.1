@@ -2,82 +2,82 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EAEC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C357BC33C9E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:41:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A56A2075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 921EC2146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:41:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SrAP8wv9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A56A2075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdfrxoBj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921EC2146E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioUTS-0006t3-Nj
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:39:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36761)
+	id 1ioUVB-0001PG-Pv
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:41:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tcminyard@gmail.com>) id 1ioUHp-0006cF-Ie
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:27:23 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ioUDJ-0007cV-9O
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:22:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1ioUHm-000810-6c
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:27:21 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43016)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ioUDI-0003xc-0Z
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:22:41 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55119)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ioUHm-000802-22
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:27:18 -0500
-Received: by mail-ot1-x341.google.com with SMTP id p8so35711823oth.10
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 07:27:17 -0800 (PST)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1ioUDH-0003uQ-QO
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:22:39 -0500
+Received: by mail-wm1-x342.google.com with SMTP id b19so15309147wmj.4
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 07:22:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=RALcAVMrFgZq7I9MBPW6YNVoQ1qjsckt124hKks9wk4=;
- b=SrAP8wv92ItJK/zTkHiXJ17CcFOI0JnJSorhRxvx3KW4Yaq1m0w0uICyy8CU85ANF3
- oV2QczP+04Duyy9N2JDHs4Ot2hQsg5Fs+jauN8fp3at9mEaES0iD5wL0dYVix6jMKuKO
- cqS5AJ9pIxtfpQlsh/cMPSAGHu9JJ87wrz1KHfQ+Z1XTLy6igsKnYFtp0PIqDvb9ULrN
- 3qY/sobDjT6VHJkRv4xtFh4vvjKDNA4OrgjTYF11j4hwj05LIPTU8F9mHsGoRJReC9DN
- K9T1duha0tXAPeT5WapO1AVxQNcNxizsqfGfdeXmczfzLAEI61PDij3eIGLPkJ2XLNFW
- G6zQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=LShIjmc7MPKNcJQC0b7I/MFUevn2g2qSUoYMEt41DTg=;
+ b=KdfrxoBj27XeMPo+opeMRQJUtyY9NxfBqqU2OimW6EgdIRvQ4LU9nd4BN0W1M0uEoo
+ EEqvwNBVStpqh+FDp++mZeSqHpcXcWOsftXCBGGorevYJf6PpsRbY+9Vp8vLfykUxo14
+ YoTafOtOdyU2X/c2OzCM3zC7q4/eaPfQE3VKapUqrYUCYJjbGgd4jwiniHfjHrPSKJqm
+ 0SxqrfanPg6BGC0uHW2TaLuKovp6RYvhKb7+OtQjX0pXrrj0yU7hEqSBI4B6xJlaK1tJ
+ iSUC7dxpr8OiXALvDExLeZFGQNnvwI8Aeh+okc9GJ5QzdL2u4OjP62vtr3ZSPonLF5Bx
+ q2eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=RALcAVMrFgZq7I9MBPW6YNVoQ1qjsckt124hKks9wk4=;
- b=EkA94BOorTGIEt02aYYy4TWqlkGq/DTZjgjT1ELgh9jLl4kiWPzIbIE2Upuvz4Pys6
- my9EZWY/I4hRbvLjAITMOZSgFq7Hsw87QeWMqwR/aV2wlfKmyNrZzopd7Ml5Y9YF7xvx
- COLYN8F5Lh8ZBueS5Gi42VvEExNaWaa6r3GxjPKADoEMyS8R8Sf872yM4Z8Iscz66Pfr
- tod93vZEIP0o6Rg4z5mtm78go+kDugjG1e5arDX1uQgcPjapKQG0VX2jm3IIV+5Ok+17
- jqIDhLWFvm2MdGHcYpv0nRgYc5ydJr+AygunAuMuDPKwuIKDriMsTBe+BOkSHt+RiK8v
- Tnfw==
-X-Gm-Message-State: APjAAAXu2e/U7gK+swQSaLByhvBbGaJcKNysMoOS1QzFFY0bmhHt+b7V
- 9Y756zxuDj7dl89IiMqxUw==
-X-Google-Smtp-Source: APXvYqxEbniKz152PhZQ33JLNRkyrjRQiyDHQsXhJG4B4TQM72cbaKmGbJWzt9R+IdHxmWTo792msw==
-X-Received: by 2002:a9d:3a65:: with SMTP id j92mr117482186otc.37.1578324436612; 
- Mon, 06 Jan 2020 07:27:16 -0800 (PST)
-Received: from serve.minyard.net (serve.minyard.net. [2001:470:b8f6:1b::1])
- by smtp.gmail.com with ESMTPSA id 17sm24243378oty.48.2020.01.06.07.27.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 07:27:16 -0800 (PST)
-Received: from t560.minyard.net (unknown
- [IPv6:2001:470:b8f6:1b:adc3:7c20:81:d62b])
- by serve.minyard.net (Postfix) with ESMTPA id 6DB1D180050;
- Mon,  6 Jan 2020 15:27:15 +0000 (UTC)
-From: minyard@acm.org
-To: qemu-devel@nongnu.org
-Subject: [PATCH] i386:acpi: Remove _HID from the SMBus ACPI entry
-Date: Mon,  6 Jan 2020 09:27:05 -0600
-Message-Id: <20200106152705.8258-1-minyard@acm.org>
-X-Mailer: git-send-email 2.17.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=LShIjmc7MPKNcJQC0b7I/MFUevn2g2qSUoYMEt41DTg=;
+ b=d0UtqWB1IabK3B+HXs59mt/33VOPc2whH7PWCBkSwRihD6ATvxjKjWUx4nWffopf7z
+ vmDQUPkCsCPFW3QjbVRRMXm0bNo2TciPEt1vBCsKCevMPwwNcwBfFEBZ7v+Sb5FRQr3E
+ b/5sW6bLpQyxdd3GPxA6QPzst++9XCuXKnamuBXekVCQEJLjXW054vxKlTsmz+4bduyt
+ ZUdR1IcEGkH5X+8yCoOmxIPPns4AcKMW5WcXbFVzbue4SUkN24yy0ZKRMD00wdqZYEqF
+ UyeYgnHgbssSLYHc1wuqLp3JQgVz4Lr+yvUnY2hRMYdnEOzHjid2mLjC7aQwHzcF5hwH
+ t3uA==
+X-Gm-Message-State: APjAAAVWKIedL0OzwD/wBbgC1GeEu93qgHmv9vLC5iJr8btE63/T+dGo
+ o5IJqvfbKC0xpEboICUyIGKCRQh4QwuZdMyMo8s=
+X-Google-Smtp-Source: APXvYqwBo7+IDOjta5MmpBIWV5eIJPOe+3FLooG9pwI1yc5wunIVwIvfL3vN6om4Q5GqxxXf3r4/GYHVPiDKLiVVEQM=
+X-Received: by 2002:a7b:c407:: with SMTP id k7mr35801878wmi.46.1578324156699; 
+ Mon, 06 Jan 2020 07:22:36 -0800 (PST)
+MIME-Version: 1.0
+References: <20200106144552.7205-1-peter.maydell@linaro.org>
+In-Reply-To: <20200106144552.7205-1-peter.maydell@linaro.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 6 Jan 2020 19:22:23 +0400
+Message-ID: <CAJ+F1C+PcER4eQhJwwE6Q-xrfn4+rTr=z+otyg2O=ZQA+sD4FQ@mail.gmail.com>
+Subject: Re: [PATCH] tests/iothread: Always connect iothread GSource to a
+ GMainContext
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,41 +89,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, wanghaibin.wang@huawei.com,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+Hi
 
-Per the ACPI spec (version 6.1, section 6.1.5 _HID) it is not required
-on enumerated buses (like PCI in this case), _ADR is required (and is
-already there).  And the _HID value is wrong.  Linux appears to ignore
-the _HID entry, but it confuses Windows.
+On Mon, Jan 6, 2020 at 7:03 PM Peter Maydell <peter.maydell@linaro.org> wro=
+te:
+>
+> On older versions of glib (anything prior to glib commit 0f056ebe
+> from May 2019), the implementation of g_source_ref() and
+> g_source_unref() is not threadsafe for a GSource which is not
+> attached to a GMainContext.
+>
+> QEMU's real iothread.c implementation always attaches its
+> iothread->ctx's GSource to a GMainContext created for that iothread,
+> so it is OK, but the simple test framework implementation in
+> tests/iothread.c was not doing this.  This was causing intermittent
+> assertion failures in the test-aio-multithread subtest
+> "/aio/multi/mutex/contended" test on the BSD hosts.  (It's unclear
+> why only BSD seems to have been affected -- perhaps a combination of
+> the specific glib version being used in the VMs and their happening
+> to run on a host with a lot of CPUs).
+>
+> Borrow the iothread_init_gcontext() from the real iothread.c
+> and add the corresponding cleanup code and the calls to
+> g_main_context_push/pop_thread_default() so we actually use
+> the GMainContext we create.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I don't really have a good understanding of the glib APIs here,
+> so I'm mostly just cribbing code from the real iothread.c;
+> review by people who do know the glib/iothread stuff better
+> welcomed. It does seem to fix the intermittent test failure
+> on NetBSD, at least, where we were running into an assertion
+> failure because a g_source_unref() incorrectly thought it
+> had decremented the refcount to 0 and should delete a context
+> that was actually still in use.
+>
+>  tests/iothread.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+>
+> diff --git a/tests/iothread.c b/tests/iothread.c
+> index 13c9fdcd8df..d3a2ee9a014 100644
+> --- a/tests/iothread.c
+> +++ b/tests/iothread.c
+> @@ -21,6 +21,8 @@
+>
+>  struct IOThread {
+>      AioContext *ctx;
+> +    GMainContext *worker_context;
+> +    GMainLoop *main_loop;
+>
+>      QemuThread thread;
+>      QemuMutex init_done_lock;
+> @@ -35,6 +37,17 @@ AioContext *qemu_get_current_aio_context(void)
+>      return my_iothread ? my_iothread->ctx : qemu_get_aio_context();
+>  }
+>
+> +static void iothread_init_gcontext(IOThread *iothread)
+> +{
+> +    GSource *source;
+> +
+> +    iothread->worker_context =3D g_main_context_new();
+> +    source =3D aio_get_g_source(iothread_get_aio_context(iothread));
+> +    g_source_attach(source, iothread->worker_context);
+> +    g_source_unref(source);
+> +    iothread->main_loop =3D g_main_loop_new(iothread->worker_context, TR=
+UE);
+> +}
+> +
+>  static void *iothread_run(void *opaque)
+>  {
+>      IOThread *iothread =3D opaque;
+> @@ -44,6 +57,20 @@ static void *iothread_run(void *opaque)
+>      my_iothread =3D iothread;
+>      qemu_mutex_lock(&iothread->init_done_lock);
+>      iothread->ctx =3D aio_context_new(&error_abort);
+> +
+> +    /*
+> +     * We must connect the ctx to a GMainContext, because in older versi=
+ons
+> +     * of glib the g_source_ref()/unref() functions are not threadsafe
+> +     * on sources without a context.
+> +     */
+> +    iothread_init_gcontext(iothread);
+> +
+> +    /*
+> +     * g_main_context_push_thread_default() must be called before anythi=
+ng
+> +     * in this new thread uses glib.
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/acpi-build.c | 1 -
- 1 file changed, 1 deletion(-)
+in/if, I suppose
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7b8da62d41..ab73a8f4c8 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1815,7 +1815,6 @@ static void build_smb0(Aml *table, I2CBus *smbus, int devnr, int func)
-     Aml *scope = aml_scope("_SB.PCI0");
-     Aml *dev = aml_device("SMB0");
- 
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("APP0005")));
-     aml_append(dev, aml_name_decl("_ADR", aml_int(devnr << 16 | func)));
-     build_acpi_ipmi_devices(dev, BUS(smbus), "\\_SB.PCI0.SMB0");
-     aml_append(scope, dev);
--- 
-2.17.1
+> +     */
+> +    g_main_context_push_thread_default(iothread->worker_context);
+> +
+>      qemu_cond_signal(&iothread->init_done_cond);
+>      qemu_mutex_unlock(&iothread->init_done_lock);
+>
+> @@ -51,6 +78,7 @@ static void *iothread_run(void *opaque)
+>          aio_poll(iothread->ctx, true);
+>      }
+>
+> +    g_main_context_pop_thread_default(iothread->worker_context);
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+> @@ -66,6 +94,8 @@ void iothread_join(IOThread *iothread)
+>  {
+>      aio_bh_schedule_oneshot(iothread->ctx, iothread_stop_bh, iothread);
+>      qemu_thread_join(&iothread->thread);
+> +    g_main_context_unref(iothread->worker_context);
+> +    g_main_loop_unref(iothread->main_loop);
+>      qemu_cond_destroy(&iothread->init_done_cond);
+>      qemu_mutex_destroy(&iothread->init_done_lock);
+>      aio_context_unref(iothread->ctx);
+> --
+> 2.20.1
+>
+>
 
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
