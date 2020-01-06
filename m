@@ -2,107 +2,100 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CBB9C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C84AAC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:20:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1615A2071A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 914882071A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 13:20:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BI4H9YaV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1615A2071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WHdRZyZ/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 914882071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioSGo-0006El-5m
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 08:18:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39540)
+	id 1ioSIl-0007Zg-Lc
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 08:20:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39983)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ioSFk-0005gq-Ah
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:17:05 -0500
+ (envelope-from <philmd@redhat.com>) id 1ioSHp-00076n-2F
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:19:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ioSFi-0003f8-PK
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:17:03 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59648
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ioSHo-0004ow-3B
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:19:12 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48836
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioSFi-0003ef-KA
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:17:02 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioSHn-0004oW-Vu
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 08:19:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578316621;
+ s=mimecast20190719; t=1578316751;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hy4EsRQeNe3lbCWpy1ZHQS1K1+X5fHfhsRgSCB1OaWw=;
- b=BI4H9YaVZtzbn/7KsDDmDsKE0Po+OWToCDqgxwUj/XwSkaRD9FX/dcO4z9N27aFZFPaVOT
- EfNzGuO2mc8WyPtMiSbK6c84otqb1yWLtYrSEODBSS6wE2K5edxFe+IS/tGkPuM2re7TVn
- qCegi2TPGAVnMfpUJx1RPdMoWzDpRZE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-ljoHkUBYP2GGVMxPST8M4w-1; Mon, 06 Jan 2020 08:16:54 -0500
-X-MC-Unique: ljoHkUBYP2GGVMxPST8M4w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64AEF8024DE;
- Mon,  6 Jan 2020 13:16:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-91.ams2.redhat.com
- [10.36.117.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A19611C4;
- Mon,  6 Jan 2020 13:16:46 +0000 (UTC)
-Subject: Re: [PATCH] tests/qemu-iotests: Update tests to recent desugarized
- -accel option
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200106130951.29873-1-philmd@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <453b637c-64d5-d693-09d8-a77c5a62c6c6@redhat.com>
-Date: Mon, 6 Jan 2020 14:16:44 +0100
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EP9twcUXIne18d+yPPDMHkEUN4T7j9IGvSCed5uazYE=;
+ b=WHdRZyZ/SiBt0l/mi7I5YIYfW0E3HzDeewaEETyUzvwD9QwtqeTkuw1YdyAl5L2cjfCjBR
+ 2bYT1FxDak5s8Qu/Qsm2KuufMwJVpsndQtSyrrGa+vpKdh1SIRa/DrCSjpAwzwuwbkCxx3
+ rmHgNW9D63G+NQ3VlyC4rr0lSp8cXxc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-CMFAtjyYNWuuk8z1o5YPoA-1; Mon, 06 Jan 2020 08:19:10 -0500
+Received: by mail-wm1-f71.google.com with SMTP id p2so2838043wma.3
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 05:19:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aQqXr+QfpG4ruVihzftt0wK2hav0V1YGvF3AybQH8mE=;
+ b=f1CO3hKkLEd6aYnfuypwzPU0ms/nIMjmS0TtnP7CPgu95z9Ox0DNH3a+5k2eih7+dn
+ n4U4T9+Oa4yQsSRA7pG1AqgUQyeaI/j6mJga+XVaGKqKlQ7wE2VpfGfX2+9FkkC1IbSa
+ vA0rnwSrYtPX/PBHOIGtt1gQkaCGWe6MnnCUyEEp1R7WbSts7JeLHZuZzGhRoTKHXuXP
+ ZRDKUrQ44P+sPLTMhc/+3iEppQCk7bzTqk2WPdpzVDEpA14ES9eXcy4pTyyNF1UBkb0o
+ BFK031r+wCjE/V1PefR4oOWWblyLjqAYgifIyFIr766/Y031DoBkzGxpArVDn2YuuIrV
+ KztQ==
+X-Gm-Message-State: APjAAAX+3C/KFQhG2x9MY9e/pTWGSzNKlzZqCXCvN1pwxEwsay6XbTwU
+ 3uhZ/eAqfOLJAA9AxZmxgcCuzjtMjFrQUSaimpwcuHvUQ2r2vpiyM/eSmpzpZs+GUHUmKC3TFFZ
+ FBPaTbQI+Lhdo3SY=
+X-Received: by 2002:a1c:bbc3:: with SMTP id
+ l186mr34650678wmf.101.1578316749072; 
+ Mon, 06 Jan 2020 05:19:09 -0800 (PST)
+X-Google-Smtp-Source: APXvYqznDOTZsYxLhp09ngpoZf5pO1vQc5a5X5pONUq3CE6BuAXvb+xH42n2IyG5GVvuChsA6sorSQ==
+X-Received: by 2002:a1c:bbc3:: with SMTP id
+ l186mr34650665wmf.101.1578316748894; 
+ Mon, 06 Jan 2020 05:19:08 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id y6sm70903811wrl.17.2020.01.06.05.19.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jan 2020 05:19:08 -0800 (PST)
+Subject: Re: [PATCH] freebsd: use python37
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200106123746.18201-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bb1948f0-e9df-f250-cad4-825c985b3141@redhat.com>
+Date: Mon, 6 Jan 2020 14:19:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200106130951.29873-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200106123746.18201-1-kraxel@redhat.com>
+Content-Language: en-US
+X-MC-Unique: CMFAtjyYNWuuk8z1o5YPoA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="UmbFsUB8N6q3cTFfIqaX9UqLwKAG7fcgg"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,63 +107,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-block@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UmbFsUB8N6q3cTFfIqaX9UqLwKAG7fcgg
-Content-Type: multipart/mixed; boundary="zaW87QApZnbtaqq16wW5WMDi1BaknUvTA"
-
---zaW87QApZnbtaqq16wW5WMDi1BaknUvTA
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 06.01.20 14:09, Philippe Mathieu-Daud=C3=A9 wrote:
-> Commit 6f6e1698a6 desugarized "-machine accel=3D" to a list
-> of "-accel" options. Since now "-machine accel" and "-accel"
-> became incompatible, update the iotests to the new format.
+On 1/6/20 1:37 PM, Gerd Hoffmann wrote:
+> FreeBSD seems to use python37 by default now, which breaks the build
+> script.  Add python to the package list, to explicitly pick the version,
+> and also adapt the configure command line.
 >=20
-> Error reported here:
-> https://gitlab.com/qemu-project/qemu/-/jobs/385801004#L3400
->=20
-> Reported-by: GitLab CI
-> Fixes: 6f6e1698a6 (vl: configure accelerators from -accel options)
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  tests/qemu-iotests/235   | 2 +-
->  tests/qemu-iotests/check | 6 +++---
->  2 files changed, 4 insertions(+), 4 deletions(-)
+>   tests/vm/freebsd | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> index 1825cc58218b..33a736298a9a 100755
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -32,6 +32,7 @@ class FreeBSDVM(basevm.BaseVM):
+>           "git",
+>           "pkgconf",
+>           "bzip2",
+> +        "python37",
+>  =20
+>           # gnu tools
+>           "bash",
+> @@ -63,7 +64,7 @@ class FreeBSDVM(basevm.BaseVM):
+>           mkdir src build; cd src;
+>           tar -xf /dev/vtbd1;
+>           cd ../build
+> -        ../src/configure --python=3Dpython3.6 {configure_opts};
+> +        ../src/configure --python=3Dpython3.7 {configure_opts};
+>           gmake --output-sync -j{jobs} {target} {verbose};
+>       """
+>  =20
+>=20
 
-Thanks, applied to my block branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-Max
-
-
---zaW87QApZnbtaqq16wW5WMDi1BaknUvTA--
-
---UmbFsUB8N6q3cTFfIqaX9UqLwKAG7fcgg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4TMzwACgkQ9AfbAGHV
-z0D2xwf/enxqt8+5L7m4z1RZq6I2q1yCFz2tIKMRh+Xi6zQJiuYqCFQ8cBJ/YZ0D
-QNPCbW8ALlOdGVmL8etFGtEo4N7GY8LT7n41xAX1VZJ+G3wclX5mrcxorPuTsffp
-4u0kf7YUEe8aI4H3B7Ssy0GtvFUv0SP0p3MfloSTieJXZsh52+u6ldVahzRdSMKd
-B1PUALpBfl4tpkUKHYhe0a51djS1v4pMd84KgmpkV7WCgkGwihlTjX7DyGuWh9sx
-64VvLtnc5tYRCkYTRkdusnfWjShpvJB+Ei4wHH9pGdjqT1CZ/hyooPbiVDoMc5yz
-CziHa7cs1xWoo26rgaNrmBLhqKyE6g==
-=U0oj
------END PGP SIGNATURE-----
-
---UmbFsUB8N6q3cTFfIqaX9UqLwKAG7fcgg--
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
