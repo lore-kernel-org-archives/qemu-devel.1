@@ -2,82 +2,62 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2885C33C9E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 416A6C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:28:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 714B4207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:28:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTp0mGkd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 714B4207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 14C08207FD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:28:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14C08207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioUJ2-0007v5-4r
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:28:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50680)
+	id 1ioUJE-0008I2-N4
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:28:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ioTqU-000325-2I
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:59:07 -0500
+ (envelope-from <clg@kaod.org>) id 1ioTpG-0001BN-TI
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:57:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ioTqS-00020m-Qz
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:59:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55480
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ioTpF-0001Dd-PD
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:57:50 -0500
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:46115)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ioTqS-00020L-MV
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:59:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578322744;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dyziwDBtUmhzsWzUQk9h9h0sDUUwiGayNnObVtsSPsQ=;
- b=cTp0mGkd2UhxfHB9q/QRswqDbtd6UUTlOysgl4toF4QSbHkvgeTUmfARv8K2fRd/uQB81K
- dD++3zwFRILQZumBO7vJV17gN5TKHyjeveLGGSy3dKSuofpZB+2xgo8DlxsfO60bwCWv8Q
- /ugEbBO8nGDBoWdfWiyElJl6dFyhS0A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-KKO5c3YgNvmqyDJjD3VroQ-1; Mon, 06 Jan 2020 09:59:02 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EACB11005502
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 14:59:01 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 80BC077FFD;
- Mon,  6 Jan 2020 14:58:58 +0000 (UTC)
-Date: Mon, 6 Jan 2020 14:58:58 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 052/104] virtiofsd: cap-ng helpers
-Message-ID: <20200106145858.GQ2930416@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-53-dgilbert@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ioTpF-0001Cp-JB
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:57:49 -0500
+Received: from player731.ha.ovh.net (unknown [10.108.57.141])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id EFBA511D0EA
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 15:57:47 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player731.ha.ovh.net (Postfix) with ESMTPSA id EEC18DB3A82C;
+ Mon,  6 Jan 2020 14:57:41 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v3 09/12] spapr/xive: Deduce the SpaprXive pointer from
+ XiveTCTX::xptr
+Date: Mon,  6 Jan 2020 15:56:42 +0100
+Message-Id: <20200106145645.4539-10-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200106145645.4539-1-clg@kaod.org>
+References: <20200106145645.4539-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-53-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: KKO5c3YgNvmqyDJjD3VroQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 5398408578433190886
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddgjeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeeh
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.51.249
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,37 +69,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:12PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> libcap-ng reads /proc during capng_get_caps_process, and virtiofsd's
-> sandboxing doesn't have /proc mounted; thus we have to do the
-> caps read before we sandbox it and save/restore the state.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  Makefile                         |  2 +
->  tools/virtiofsd/passthrough_ll.c | 72 ++++++++++++++++++++++++++++++++
->  2 files changed, 74 insertions(+)
+From: Greg Kurz <groug@kaod.org>
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+And use it instead of reaching out to the machine. This allows to get rid
+of a call to qdev_get_machine() and to reduce the scope of another one so
+that it is only used within the argument list of error_append_hint(). Thi=
+s
+is an acceptable tradeoff compared to all it would require to know about
+the maximum number of CPUs here without calling qdev_get_machine().
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/spapr_xive_kvm.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Regards,
-Daniel
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 32b2809210a0..edb7ee0e74f1 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -75,7 +75,7 @@ static void kvm_cpu_disable_all(void)
+=20
+ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+ {
+-    SpaprXive *xive =3D SPAPR_MACHINE(qdev_get_machine())->xive;
++    SpaprXive *xive =3D SPAPR_XIVE(tctx->xptr);
+     uint64_t state[2];
+     int ret;
+=20
+@@ -97,7 +97,7 @@ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **=
+errp)
+=20
+ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
+ {
+-    SpaprXive *xive =3D SPAPR_MACHINE(qdev_get_machine())->xive;
++    SpaprXive *xive =3D SPAPR_XIVE(tctx->xptr);
+     uint64_t state[2] =3D { 0 };
+     int ret;
+=20
+@@ -152,8 +152,7 @@ void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx=
+, Error **errp)
+=20
+ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+ {
+-    MachineState *ms =3D MACHINE(qdev_get_machine());
+-    SpaprXive *xive =3D SPAPR_MACHINE(ms)->xive;
++    SpaprXive *xive =3D SPAPR_XIVE(tctx->xptr);
+     unsigned long vcpu_id;
+     int ret;
+=20
+@@ -179,7 +178,7 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **=
+errp)
+                    vcpu_id, strerror(errno));
+         if (errno =3D=3D ENOSPC) {
+             error_append_hint(&local_err, "Try -smp maxcpus=3DN with N <=
+ %u\n",
+-                              ms->smp.max_cpus);
++                              MACHINE(qdev_get_machine())->smp.max_cpus)=
+;
+         }
+         error_propagate(errp, local_err);
+         return;
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+2.21.1
 
 
