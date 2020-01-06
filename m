@@ -2,68 +2,83 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD32C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 339C9C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:11:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 022C1206DB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:09:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 022C1206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id F28A8206DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:11:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUip0jUS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F28A8206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioVt8-0002qZ-73
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:09:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46155)
+	id 1ioVud-0004fV-5z
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:11:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ioVsW-0002LJ-8C
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:09:21 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ioVoi-0006wf-Ng
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ioVsV-000364-5H
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:09:20 -0500
-Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:37583)
+ (envelope-from <dgilbert@redhat.com>) id 1ioVof-0007hq-SL
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:05:23 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27419
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ioVsU-00034H-VB
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:09:19 -0500
-Received: from player738.ha.ovh.net (unknown [10.108.1.191])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id F239A11CDDD
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 18:09:16 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player738.ha.ovh.net (Postfix) with ESMTPSA id 98F17E03FC2A;
- Mon,  6 Jan 2020 17:09:11 +0000 (UTC)
-Subject: Re: [PATCH qemu v2] spapr: Kill SLOF
-To: Alexey Kardashevskiy <aik@ozlabs.ru>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20200105234242.78897-1-aik@ozlabs.ru>
- <20200106041940.GV2098@umbus>
- <80157816-7859-3450-6a2c-ab151be5ee94@ozlabs.ru>
- <20200106085042.GW2098@umbus>
- <741e9b5e-6a7d-66a4-451d-e37c30697b2b@ozlabs.ru>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <b0587d24-c7f6-ff1f-9527-ee389bd25b1f@kaod.org>
-Date: Mon, 6 Jan 2020 18:09:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ioVof-0007em-7L
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:05:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578330320;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gV8JUI+Cmd8JgdTBVK7Cut4Q9MQRkogNpLPSNJ8sMhk=;
+ b=VUip0jUSj8LDkqi3XlYeg7ByEYN7HhrrITjU/RaMfr5UWf75MGJThslGAfyz9h/4RhatLY
+ nshhnpeuboYCXs4hoYTxTeSmPaoiqqyCGsjgMk3P172RalotHR8hw8JSmPl6gV8UusMC1w
+ FaKvXvDVesnxRN+U+/Sk1dQn8D5XWGo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-Qb2HqUEyPvy0b8FTXw4RVA-1; Mon, 06 Jan 2020 12:05:18 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A5611800D4E
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 17:05:17 +0000 (UTC)
+Received: from work-vm (ovpn-117-53.ams2.redhat.com [10.36.117.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B94345C1B0;
+ Mon,  6 Jan 2020 17:05:13 +0000 (UTC)
+Date: Mon, 6 Jan 2020 17:05:11 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 058/104] virtiofsd: print log only when priority is high
+ enough
+Message-ID: <20200106170511.GI2798@work-vm>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-59-dgilbert@redhat.com>
+ <20200106151048.GV2930416@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <741e9b5e-6a7d-66a4-451d-e37c30697b2b@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 7618964673147603776
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddgleeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+In-Reply-To: <20200106151048.GV2930416@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: Qb2HqUEyPvy0b8FTXw4RVA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.51.249
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,97 +90,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->>>>> index e62c89b3dd40..1c97534a0aea 100644
->>>>> --- a/hw/ppc/spapr.c
->>>>> +++ b/hw/ppc/spapr.c
->>>>> @@ -896,6 +896,51 @@ out:
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->>>>> =C2=A0 }
->>>>> =C2=A0 +/*
->>>>> + * Below is a compiled version of RTAS blob and OF client interfac=
-e entry point.
->>>>> + *
->>>>> + * gcc -nostdlib=C2=A0 -mbig -o spapr-rtas.img spapr-rtas.S
->>>>> + * objcopy=C2=A0 -O binary -j .text=C2=A0 spapr-rtas.img spapr-rta=
-s.bin
->>>>> + *
->>>>> + *=C2=A0=C2=A0 .globl=C2=A0 _start
->>>>> + *=C2=A0=C2=A0 _start:
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mr=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 4,3
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lis=
-=C2=A0=C2=A0=C2=A0=C2=A0 3,KVMPPC_H_RTAS@h
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ori=
-=C2=A0=C2=A0=C2=A0=C2=A0 3,3,KVMPPC_H_RTAS@l
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sc=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 1
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blr
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mr=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 4,3
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lis=
-=C2=A0=C2=A0=C2=A0=C2=A0 3,KVMPPC_H_CLIENT@h
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ori=
-=C2=A0=C2=A0=C2=A0=C2=A0 3,3,KVMPPC_H_CLIENT@l
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sc=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 1
->>>>> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blr
->>>>> + */
->>>>> +static struct {
->>>>> +=C2=A0=C2=A0=C2=A0 uint8_t rtas[20], client[20];
->>>>> +} QEMU_PACKED rtas_client_blob =3D {
->>>>> +=C2=A0=C2=A0=C2=A0 .rtas =3D {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x7c, 0x64, 0x1b, 0x78,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x3c, 0x60, 0x00, 0x00,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x60, 0x63, 0xf0, 0x00,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x44, 0x00, 0x00, 0x22,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x4e, 0x80, 0x00, 0x20
->>>>> +=C2=A0=C2=A0=C2=A0 },
->>>>> +=C2=A0=C2=A0=C2=A0 .client =3D {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x7c, 0x64, 0x1b, 0x78,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x3c, 0x60, 0x00, 0x00,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x60, 0x63, 0xf0, 0x05,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x44, 0x00, 0x00, 0x22,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0x4e, 0x80, 0x00, 0x20
->>>>> +=C2=A0=C2=A0=C2=A0 }
->>>>> +};
->>>>
->>>> I'd really prefer to read this in from a file (or files) which we
->>>> assemble (as with the existing spapr-rtas.img), rather than having a
->>>> magic array in qemu.
->>>
->>> Two considerations here:
->>> 1. This blob is not going to change (at least often)
->>
->> True, but I'd still prefer to build it from a .S rather than have the
->> binary written out.=C2=A0 We already had this until recently (when we =
-moved
->> the RTAS image into SLOF), and it's really not too hard to manage.
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Thu, Dec 12, 2019 at 04:38:18PM +0000, Dr. David Alan Gilbert (git) wr=
+ote:
+> > From: Eryu Guan <eguan@linux.alibaba.com>
+> >=20
+> > Introduce "-o log_level=3D" command line option to specify current log
+> > level (priority), valid values are "debug info warn err", e.g.
+> >=20
+> >     ./virtiofsd -o log_level=3Ddebug ...
+> >=20
+> > So only log priority higher than "debug" will be printed to
+> > stderr/syslog. And the default level is info.
+> >=20
+> > The "-o debug"/"-d" options are kept, and imply debug log level.
+> >=20
+> > Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
+> > dgilbert: Reworked for libfuse's log_func
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  tools/virtiofsd/fuse_log.c       |   4 ++
+> >  tools/virtiofsd/fuse_lowlevel.c  |  75 ++++++++------------
+> >  tools/virtiofsd/fuse_lowlevel.h  |   1 +
+> >  tools/virtiofsd/helper.c         |  10 ++-
+> >  tools/virtiofsd/passthrough_ll.c | 118 +++++++++++++------------------
+> >  5 files changed, 92 insertions(+), 116 deletions(-)
 >=20
+> > diff --git a/tools/virtiofsd/fuse_log.c b/tools/virtiofsd/fuse_log.c
+> > index 11345f9ec8..79a18a7aaa 100644
+> > --- a/tools/virtiofsd/fuse_log.c
+> > +++ b/tools/virtiofsd/fuse_log.c
+> > @@ -8,6 +8,10 @@
+> >   * See the file COPYING.LIB
+> >   */
+> > =20
+> > +#include <stdbool.h>
+> > +#include <stdio.h>
+> > +#include <stdarg.h>
+> > +#include <syslog.h>
+> >  #include "fuse_log.h"
+> > =20
+> >  #include <stdarg.h>
 >=20
-> But what is exactly the benefit? It is not going to change. I can look =
-into making it a .S, compile it to a binary an include this binary into q=
-emu-system-ppc64 as a byte array, just need to refresh my gcc/ldd memorie=
-s but a separate file is too much for this imho.
+> Why do we need to add these headers if there are no code changes in this
+> file ?
 
-ARM bootloaders are also embedded in QEMU's code. See hw/arm/boot.c.
-You could improve a bit the definition though.
+Thanks, those are left overs from an earlier version; I've deleted them now=
+.
 
-C.
+> > diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_low=
+level.c
+> > index f3c8bdf7cb..0abb369b3d 100644
+> > --- a/tools/virtiofsd/fuse_lowlevel.c
+> > +++ b/tools/virtiofsd/fuse_lowlevel.c
+> > @@ -158,19 +158,17 @@ static int fuse_send_msg(struct fuse_session *se,=
+ struct fuse_chan *ch,
+> >      struct fuse_out_header *out =3D iov[0].iov_base;
+> > =20
+> >      out->len =3D iov_length(iov, count);
+> > -    if (se->debug) {
+> > -        if (out->unique =3D=3D 0) {
+> > -            fuse_log(FUSE_LOG_DEBUG, "NOTIFY: code=3D%d length=3D%u\n"=
+, out->error,
+> > -                     out->len);
+> > -        } else if (out->error) {
+> > -            fuse_log(FUSE_LOG_DEBUG,
+> > -                     "   unique: %llu, error: %i (%s), outsize: %i\n",
+> > -                     (unsigned long long)out->unique, out->error,
+> > -                     strerror(-out->error), out->len);
+> > -        } else {
+> > -            fuse_log(FUSE_LOG_DEBUG, "   unique: %llu, success, outsiz=
+e: %i\n",
+> > -                     (unsigned long long)out->unique, out->len);
+> > -        }
+> > +    if (out->unique =3D=3D 0) {
+> > +        fuse_log(FUSE_LOG_DEBUG, "NOTIFY: code=3D%d length=3D%u\n", ou=
+t->error,
+> > +                 out->len);
+> > +    } else if (out->error) {
+> > +        fuse_log(FUSE_LOG_DEBUG,
+> > +                 "   unique: %llu, error: %i (%s), outsize: %i\n",
+> > +                 (unsigned long long)out->unique, out->error,
+> > +                 strerror(-out->error), out->len);
+> > +    } else {
+> > +        fuse_log(FUSE_LOG_DEBUG, "   unique: %llu, success, outsize: %=
+i\n",
+> > +                 (unsigned long long)out->unique, out->len);
+> >      }
+>=20
+> Removing all the 'if (se->debug)' checks means that we take the
+> performance hit of calling many logging functions in the common
+> case where debug is disabled. Hopefully 'fuse_log' is smart
+> enough to avoid printf formatting of the msg + args unless
+> it is actually goiing to output the message
+
+It is; we go through fuse_log (fuse_log.c an imported file) that just
+does the va_start and then calls the log_func that was set later in this
+patch and the first thing it does is check the level and exit.
+
+Dave
 
 >=20
->>> 2. A new file which needs to be packaged/signed/copied.
->>
->> Eh, again, we had this for RTAS until very recently and it really
->> wasn't that much hassle.
 >=20
->=20
-> I keep secure VMs in mind. And SLOF is a separate package, why was not =
-RTAS?
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
