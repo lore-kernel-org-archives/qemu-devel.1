@@ -2,82 +2,70 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C357BC33C9E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4720C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 921EC2146E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:41:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DCA320731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:42:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdfrxoBj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921EC2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="WlS0tY7l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DCA320731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioUVB-0001PG-Pv
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:41:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34521)
+	id 1ioUWA-0002Iq-Ou
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:42:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ioUDJ-0007cV-9O
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:22:42 -0500
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ioUEx-0001n7-KL
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:24:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ioUDI-0003xc-0Z
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:22:41 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55119)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1ioUDH-0003uQ-QO
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:22:39 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b19so15309147wmj.4
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 07:22:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=LShIjmc7MPKNcJQC0b7I/MFUevn2g2qSUoYMEt41DTg=;
- b=KdfrxoBj27XeMPo+opeMRQJUtyY9NxfBqqU2OimW6EgdIRvQ4LU9nd4BN0W1M0uEoo
- EEqvwNBVStpqh+FDp++mZeSqHpcXcWOsftXCBGGorevYJf6PpsRbY+9Vp8vLfykUxo14
- YoTafOtOdyU2X/c2OzCM3zC7q4/eaPfQE3VKapUqrYUCYJjbGgd4jwiniHfjHrPSKJqm
- 0SxqrfanPg6BGC0uHW2TaLuKovp6RYvhKb7+OtQjX0pXrrj0yU7hEqSBI4B6xJlaK1tJ
- iSUC7dxpr8OiXALvDExLeZFGQNnvwI8Aeh+okc9GJ5QzdL2u4OjP62vtr3ZSPonLF5Bx
- q2eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=LShIjmc7MPKNcJQC0b7I/MFUevn2g2qSUoYMEt41DTg=;
- b=d0UtqWB1IabK3B+HXs59mt/33VOPc2whH7PWCBkSwRihD6ATvxjKjWUx4nWffopf7z
- vmDQUPkCsCPFW3QjbVRRMXm0bNo2TciPEt1vBCsKCevMPwwNcwBfFEBZ7v+Sb5FRQr3E
- b/5sW6bLpQyxdd3GPxA6QPzst++9XCuXKnamuBXekVCQEJLjXW054vxKlTsmz+4bduyt
- ZUdR1IcEGkH5X+8yCoOmxIPPns4AcKMW5WcXbFVzbue4SUkN24yy0ZKRMD00wdqZYEqF
- UyeYgnHgbssSLYHc1wuqLp3JQgVz4Lr+yvUnY2hRMYdnEOzHjid2mLjC7aQwHzcF5hwH
- t3uA==
-X-Gm-Message-State: APjAAAVWKIedL0OzwD/wBbgC1GeEu93qgHmv9vLC5iJr8btE63/T+dGo
- o5IJqvfbKC0xpEboICUyIGKCRQh4QwuZdMyMo8s=
-X-Google-Smtp-Source: APXvYqwBo7+IDOjta5MmpBIWV5eIJPOe+3FLooG9pwI1yc5wunIVwIvfL3vN6om4Q5GqxxXf3r4/GYHVPiDKLiVVEQM=
-X-Received: by 2002:a7b:c407:: with SMTP id k7mr35801878wmi.46.1578324156699; 
- Mon, 06 Jan 2020 07:22:36 -0800 (PST)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ioUEw-0005A3-BZ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:24:23 -0500
+Received: from kylie.crudebyte.com ([5.189.157.229]:40921)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1ioUEv-00058f-TZ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:24:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=jChDevm7+FSSnpvZooTOApF3ckawxX62n9bXQo0ypqw=; b=WlS0tY7lhZB/XkcM8Nb6BraZru
+ Y1w1iMZcufQ7BdbUExR4lC7A+vi8/r8sw1eXxwVhoGTCZO09oBfS0C2/T9URLSWz4bTa5UPsPrcXE
+ c2OU+oqMUlBGYwk7UqszQOgUjIJ9YuVRaaND9fhuveFGCok6Vpi1OSrFc+QP3ku9y5LpLen1+3KVe
+ quf+RFB1J3liRl7sCfE+5Zg0Hnu+WA/ckh+Gq3kMq1fvC7xT1+bx0S6o6zz7S9pz6fxmkNaaWBkFN
+ HQdyL6inG7LkXXQVw1pXdaMWDCyj7RQhdBviVmCaVizbyh7iYlmgTldBgg6uEZCwIMHqAUKVt/PuA
+ NDn+rDTkF7IusQ5gAFWIOFaK+SELfQhyaKB9m7FtbLUjH6athhvkdKWauYCOFJzpxbqCP1r3kTa2b
+ rTqkQL23Jn/UCTdlG2CWxVyoXKJjcfL1INCEiqN/bp4i5oybcwQ7gQnyGjpwfG3Mx4l5xnCHzWbDg
+ z49Kwr8i9JTGSKHnBD9my0LFVnrRn+qmxeS6eu+amOSN4eCiSTHYuV1dZwGP9dHb/8D3zbWfcGV08
+ Sv5AOeiwx7Kz2TQYtiNZ9th9zGPD6VGUzDT/yNXXdOy93dpWKRQSIwE+bc1HyAnMoxl3m69Vu/Moa
+ 5i+KWE2Pe0Bp7VTpAjCy7WsU3muPvq7jUOuruYK1Y=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>,
+ anthony.perard@citrix.com, Stefano Stabellini <stefano.stabellini@xilinx.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH] 9p: init_in_iov_from_pdu can truncate the size
+Date: Mon, 06 Jan 2020 16:24:18 +0100
+Message-ID: <2163433.xPYm55Bgvh@silver>
+In-Reply-To: <20200106144254.79920ae7@bahia.lan>
+References: <20191219004251.23763-1-sstabellini@kernel.org>
+ <20200106144254.79920ae7@bahia.lan>
 MIME-Version: 1.0
-References: <20200106144552.7205-1-peter.maydell@linaro.org>
-In-Reply-To: <20200106144552.7205-1-peter.maydell@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 6 Jan 2020 19:22:23 +0400
-Message-ID: <CAJ+F1C+PcER4eQhJwwE6Q-xrfn4+rTr=z+otyg2O=ZQA+sD4FQ@mail.gmail.com>
-Subject: Re: [PATCH] tests/iothread: Always connect iothread GSource to a
- GMainContext
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,134 +77,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On Montag, 6. Januar 2020 14:42:54 CET Greg Kurz wrote:
+> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> > index 775e8ff766..68873c3f5f 100644
+> > --- a/hw/9pfs/virtio-9p-device.c
+> > +++ b/hw/9pfs/virtio-9p-device.c
+> > @@ -145,19 +145,15 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu,
+> > size_t offset,> 
+> >  }
+> >  
+> >  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec
+> >  **piov,
+> > 
+> > -                                        unsigned int *pniov, size_t size)
+> > +                                        unsigned int *pniov, size_t
+> > *size)
+> > 
+> >  {
+> >  
+> >      V9fsState *s = pdu->s;
+> >      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+> >      VirtQueueElement *elem = v->elems[pdu->idx];
+> >      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
+> > 
+> > -    if (buf_size < size) {
+> > -        VirtIODevice *vdev = VIRTIO_DEVICE(v);
+> > -
+> > -        virtio_error(vdev,
+> > -                     "VirtFS reply type %d needs %zu bytes, buffer has
+> > %zu", -                     pdu->id + 1, size, buf_size);
+> > +    if (buf_size < *size) {
+> > +        *size = buf_size;
+> > 
+> >      }
+> 
+> As suggested by Christian in some other mail, it could still make sense to
+> raise the error if there isn't even enough space to pack a 9p message
+> header.
 
-On Mon, Jan 6, 2020 at 7:03 PM Peter Maydell <peter.maydell@linaro.org> wro=
-te:
->
-> On older versions of glib (anything prior to glib commit 0f056ebe
-> from May 2019), the implementation of g_source_ref() and
-> g_source_unref() is not threadsafe for a GSource which is not
-> attached to a GMainContext.
->
-> QEMU's real iothread.c implementation always attaches its
-> iothread->ctx's GSource to a GMainContext created for that iothread,
-> so it is OK, but the simple test framework implementation in
-> tests/iothread.c was not doing this.  This was causing intermittent
-> assertion failures in the test-aio-multithread subtest
-> "/aio/multi/mutex/contended" test on the BSD hosts.  (It's unclear
-> why only BSD seems to have been affected -- perhaps a combination of
-> the specific glib version being used in the VMs and their happening
-> to run on a host with a lot of CPUs).
->
-> Borrow the iothread_init_gcontext() from the real iothread.c
-> and add the corresponding cleanup code and the calls to
-> g_main_context_push/pop_thread_default() so we actually use
-> the GMainContext we create.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> I don't really have a good understanding of the glib APIs here,
-> so I'm mostly just cribbing code from the real iothread.c;
-> review by people who do know the glib/iothread stuff better
-> welcomed. It does seem to fix the intermittent test failure
-> on NetBSD, at least, where we were running into an assertion
-> failure because a g_source_unref() incorrectly thought it
-> had decremented the refcount to 0 and should delete a context
-> that was actually still in use.
->
->  tests/iothread.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
->
-> diff --git a/tests/iothread.c b/tests/iothread.c
-> index 13c9fdcd8df..d3a2ee9a014 100644
-> --- a/tests/iothread.c
-> +++ b/tests/iothread.c
-> @@ -21,6 +21,8 @@
->
->  struct IOThread {
->      AioContext *ctx;
-> +    GMainContext *worker_context;
-> +    GMainLoop *main_loop;
->
->      QemuThread thread;
->      QemuMutex init_done_lock;
-> @@ -35,6 +37,17 @@ AioContext *qemu_get_current_aio_context(void)
->      return my_iothread ? my_iothread->ctx : qemu_get_aio_context();
->  }
->
-> +static void iothread_init_gcontext(IOThread *iothread)
-> +{
-> +    GSource *source;
-> +
-> +    iothread->worker_context =3D g_main_context_new();
-> +    source =3D aio_get_g_source(iothread_get_aio_context(iothread));
-> +    g_source_attach(source, iothread->worker_context);
-> +    g_source_unref(source);
-> +    iothread->main_loop =3D g_main_loop_new(iothread->worker_context, TR=
-UE);
-> +}
-> +
->  static void *iothread_run(void *opaque)
->  {
->      IOThread *iothread =3D opaque;
-> @@ -44,6 +57,20 @@ static void *iothread_run(void *opaque)
->      my_iothread =3D iothread;
->      qemu_mutex_lock(&iothread->init_done_lock);
->      iothread->ctx =3D aio_context_new(&error_abort);
-> +
-> +    /*
-> +     * We must connect the ctx to a GMainContext, because in older versi=
-ons
-> +     * of glib the g_source_ref()/unref() functions are not threadsafe
-> +     * on sources without a context.
-> +     */
-> +    iothread_init_gcontext(iothread);
-> +
-> +    /*
-> +     * g_main_context_push_thread_default() must be called before anythi=
-ng
-> +     * in this new thread uses glib.
+Another option: Instead of handling this as a hard error (which they probably 
+try to avoid in their use case): putting the handler asleep for a while by 
+calling qemu_co_sleep_ns_wakeable() in this case. Then a bit later transport 
+would eventually have the required buffer size and handler could continue the 
+request without an error.
 
-in/if, I suppose
+But this would require more care. For instance subsequent request handlers 
+would need to check if there was already an event handler asleep, and if so it 
+would either need to wake it up or put itself asleep as well to prevent the 
+request order being processed by server being messed up.
 
-> +     */
-> +    g_main_context_push_thread_default(iothread->worker_context);
-> +
->      qemu_cond_signal(&iothread->init_done_cond);
->      qemu_mutex_unlock(&iothread->init_done_lock);
->
-> @@ -51,6 +78,7 @@ static void *iothread_run(void *opaque)
->          aio_poll(iothread->ctx, true);
->      }
->
-> +    g_main_context_pop_thread_default(iothread->worker_context);
->      rcu_unregister_thread();
->      return NULL;
->  }
-> @@ -66,6 +94,8 @@ void iothread_join(IOThread *iothread)
->  {
->      aio_bh_schedule_oneshot(iothread->ctx, iothread_stop_bh, iothread);
->      qemu_thread_join(&iothread->thread);
-> +    g_main_context_unref(iothread->worker_context);
-> +    g_main_loop_unref(iothread->main_loop);
->      qemu_cond_destroy(&iothread->init_done_cond);
->      qemu_mutex_destroy(&iothread->init_done_lock);
->      aio_context_unref(iothread->ctx);
-> --
-> 2.20.1
->
->
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Best regards,
+Christian Schoenebeck
 
 
---=20
-Marc-Andr=C3=A9 Lureau
 
