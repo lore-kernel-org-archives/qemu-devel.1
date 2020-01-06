@@ -2,83 +2,72 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E76C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 182F9C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:38:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E8A42075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:37:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D54AF2075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:38:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+X3zXNE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8A42075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="XTjdOyUP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D54AF2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioURz-0004YK-HF
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:37:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32833)
+	id 1ioUSt-000610-Uh
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:38:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58303)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ioU9G-0001Ik-0l
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:18:31 -0500
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ioU1a-0008EB-PD
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:10:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ioU9E-00013b-1z
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:18:29 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59458
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ioU9D-00013I-Ud
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:18:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578323907;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=J7nilBbIsUZFieXeFgHe8O6C0oQfwQWIAQAZkO/kr6A=;
- b=b+X3zXNETxvCJNZmgaX9YLrrw/lCgxMJnepzXeQcZP2ECIjLf3DkVtbn0dk5jqdXhdIepP
- qWnlCwzrPTX5Vzi/7Uo1TB27HlLBf/sN/uZGfiTnBF/QH8OSFQYNX9mno6InH/OObexw2x
- hPIxjjXzZF8GyF3ioLdW+et77OiMkG4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-cBVytmopNqGdw08JRxR_jQ-1; Mon, 06 Jan 2020 10:18:25 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBA2F8026A9
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 15:18:24 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B9475C3F8;
- Mon,  6 Jan 2020 15:18:18 +0000 (UTC)
-Date: Mon, 6 Jan 2020 15:18:19 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 059/104] virtiofsd: Add ID to the log with FUSE_LOG_DEBUG
- level
-Message-ID: <20200106151819.GW2930416@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-60-dgilbert@redhat.com>
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ioU1Y-0004iz-TP
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:10:34 -0500
+Received: from kylie.crudebyte.com ([5.189.157.229]:49699)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1ioU1Y-0004i0-Bu
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:10:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=yb2suF/OENmaPwybHdvuGFCLAgQc3CdKMbNFMNk5UBM=; b=XTjdOyUPuGd2pq0rYfDCRPTn/U
+ uFfGaWZCaqOctN4doLIicsDrL3n69YV9qbs5SraK0YTLLY24ID/Ep3KR434RDYaDYbJyjGFgTqvWq
+ wm4pQ8KrBVe/pBw+8Qo6vJcp59+DTh91h3TwsYQFKhh3xq10yJJtJcwuNsMajz8gxzRGDwq1XdWUD
+ AUR3JLcFSpy2fLTdFy2mhxgPISORJTCdkhU7qfgV6+yMEeJeAWz7oLr8RxaESPE1H4HBA8LdjupIG
+ 6eAOO4/Ccjdw1e3yd8kBGtR1V0/HwBTrYGe0vVIzCBiRkeqQ+cQX0KmxWPi6YPtITU2ETGOjYzm7f
+ 691U0FeAuIyqpsgUMsFfGnEycnb5MCRreIoDD8lacqZspH/F0DbmJnYG5QWTXvxH8/RkGqzfFXehH
+ ZDYHe0ZOIoXGNhWda2NqHqLwfV14QSOlt5Te7fnDcFoYOpZxFDqXKHCvJL5K3zUKql0kxd/gpb21C
+ ZS+YBFXUoDFUe+2Uxe6wn2DHI1Z5Vvu4ESg0ngfdNaqYDZjhh4in1pZgYAEuhYPU5xRpLVhmp6TeU
+ 4zjILgnWi8ZXCp5uMuKh6vIJvfSutfT+6BRl5A6IWNmhVJcOSgzf1ZDqruTKQNrzL3jYPdZ3JjNJb
+ x3VBy+FQkExmzlRJtVFjD/jj+cB+FgVzlJ2ymOG30=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, anthony.perard@citrix.com,
+ Stefano Stabellini <stefano.stabellini@xilinx.com>
+Subject: Re: [PATCH v2 2/9] 9pfs: validate count sent by client with T_readdir
+Date: Mon, 06 Jan 2020 16:10:28 +0100
+Message-ID: <6289486.8nMSniMWIK@silver>
+In-Reply-To: <20200106133024.2ce31324@bahia.lan>
+References: <cover.1576678644.git.qemu_oss@crudebyte.com>
+ <4866c87cb19f3191b977fc7fbe2857abf1da80b6.1576678644.git.qemu_oss@crudebyte.com>
+ <20200106133024.2ce31324@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-60-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: cBVytmopNqGdw08JRxR_jQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,118 +79,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:19PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
->=20
-> virtiofsd has some threads, so we see a lot of logs with debug option.
-> It would be useful for debugging if we can identify the specific thread
-> from the log.
->=20
-> Add ID, which is got by gettid(), to the log with FUSE_LOG_DEBUG level
-> so that we can grep the specific thread.
->=20
-> The log is like as:
->=20
->   ]# ./virtiofsd -d -o vhost_user_socket=3D/tmp/vhostqemu0 -o source=3D/t=
-mp/share0 -o cache=3Dauto
->   ...
->   [ID: 00000097]    unique: 12696, success, outsize: 120
->   [ID: 00000097] virtio_send_msg: elem 18: with 2 in desc of length 120
->   [ID: 00000003] fv_queue_thread: Got queue event on Queue 1
->   [ID: 00000003] fv_queue_thread: Queue 1 gave evalue: 1 available: in: 6=
-5552 out: 80
->   [ID: 00000003] fv_queue_thread: Waiting for Queue 1 event
->   [ID: 00000071] fv_queue_worker: elem 33: with 2 out desc of length 80 b=
-ad_in_num=3D0 bad_out_num=3D0
->   [ID: 00000071] unique: 12694, opcode: READ (15), nodeid: 2, insize: 80,=
- pid: 2014
->   [ID: 00000071] lo_read(ino=3D2, size=3D65536, off=3D131072)
->=20
-> Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-> ---
->  tools/virtiofsd/passthrough_ll.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+On Montag, 6. Januar 2020 13:30:24 CET Greg Kurz wrote:
+> On Wed, 18 Dec 2019 14:17:59 +0100
+> 
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > A good 9p client sends T_readdir with "count" parameter that's
+> > sufficiently smaller than client's initially negotiated msize
+> > (maximum message size). We perform a check for that though to
+> > avoid the server to be interrupted with a "Failed to encode
+> > VirtFS reply type 41" error message by bad clients.
+> 
+> Hmm... doesn't v9fs_do_readdir() already take care of that ?
 
->=20
-> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrou=
-gh_ll.c
-> index 6f398a7ff2..8e00a90e6f 100644
-> --- a/tools/virtiofsd/passthrough_ll.c
-> +++ b/tools/virtiofsd/passthrough_ll.c
-> @@ -42,6 +42,7 @@
->  #include <cap-ng.h>
->  #include <dirent.h>
->  #include <errno.h>
-> +#include <glib.h>
->  #include <inttypes.h>
->  #include <limits.h>
->  #include <pthread.h>
-> @@ -2248,12 +2249,18 @@ static void setup_nofile_rlimit(void)
->      }
->  }
-> =20
-> -static void log_func(enum fuse_log_level level, const char *fmt, va_list=
- ap)
-> +static void log_func(enum fuse_log_level level, const char *_fmt, va_lis=
-t ap)
->  {
-> +    char *fmt =3D (char *)_fmt;
+No, unfortunately it doesn't. It just looks at the "count" parameter 
+transmitted with client's T_readdir request, but not at session's msize.
+So a bad client could send a T_readdir request with a "count" parameter that's 
+substantially higher than session's msize, which would lead to that mentioned 
+transport error ATM. Hence I suggested this patch here to address it.
 
-Reusing a variable for data that may be const from stack or
-non-const from heap is really gross & asking for trouble.
+You can easily reproduce this issue:
 
-If instead it does:
+1. Omit this patch 2 (since it would fix it).
 
-    g_autofree *localfmt =3D NULL;
+2. Apply patch 3 and patch 4 of this patch set, which assemble a T_readdir
+   test case combined, then stop patches here (i.e. don't apply subsequent 
+   patches of this patch set, since e.g. patch 6 would increase test client's 
+   msize).
 
-> +
->      if (current_log_level < level) {
->          return;
->      }
-> =20
-> +    if (current_log_level =3D=3D FUSE_LOG_DEBUG) {
-> +        fmt =3D g_strdup_printf("[ID: %08ld] %s", syscall(__NR_gettid), =
-_fmt);
+3. Set QTEST_V9FS_SYNTH_READDIR_NFILES in hw/9pfs/9p-synth.h to a high number
+   (e.g. several thousands).
 
-Then:
+4. Run the T_readdir test case:
 
-           localfmt =3D g_strdup_printf(....)
-=09   fmt =3D localfmt;
+   cd build
+   make && make tests/qos-test
+   export QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
+   tests/qos-test -p $(tests/qos-test -l | grep readdir/basic)
 
-> +    }
-> +
->      if (use_syslog) {
->          int priority =3D LOG_ERR;
->          switch (level) {
-> @@ -2286,6 +2293,10 @@ static void log_func(enum fuse_log_level level, co=
-nst char *fmt, va_list ap)
->      } else {
->          vfprintf(stderr, fmt, ap);
->      }
-> +
-> +    if (current_log_level =3D=3D FUSE_LOG_DEBUG) {
-> +        g_free(fmt);
-> +    }
+Result: Since the test client's msize is quite small at this point (4kB), test 
+client would transmit a very large "count" parameter with T_readdir request to 
+retrieve all QTEST_V9FS_SYNTH_READDIR_NFILES files, and you'll end up getting 
+the quoted transport error message on server (see precise error message 
+above).
 
-This can then be deleted.
+> > Note: we should probably also check for a minimum size of
+> > msize during T_version to avoid issues and/or too complicated
+> > count/size checks later on in other requests of that client.
+> > T_version should submit an msize that's at least as large as
+> > the largest request's header size.
+> 
+> Do you mean that the server should expose such an msize in the
+> R_version response ? The 9p spec only says that the server must
+> return an msize <= to the one proposed by the client [1]. Not
+> sure we can do more than to emit a warning and/or interrupt the
+> server if the client sends a silly size.
+> 
+> [1] https://9fans.github.io/plan9port/man/man9/version.html
 
->  }
+My idea was to "handle it as an error" immediately when server receives a 
+T_version request with a "msize" argument transmitted by client that would be 
+way too small for anything.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Because if client sends T_version with msize < P9_IOHDRSZ then it is obvious 
+that this msize would be way too small for handling any subsequent 9p request 
+at all.
+
+> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > ---
+> > 
+> >  hw/9pfs/9p.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> > 
+> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> > index 520177f40c..30e33b6573 100644
+> > --- a/hw/9pfs/9p.c
+> > +++ b/hw/9pfs/9p.c
+> > @@ -2414,6 +2414,7 @@ static void coroutine_fn v9fs_readdir(void *opaque)
+> > 
+> >      int32_t count;
+> >      uint32_t max_count;
+> >      V9fsPDU *pdu = opaque;
+> > 
+> > +    V9fsState *s = pdu->s;
+> > 
+> >      retval = pdu_unmarshal(pdu, offset, "dqd", &fid,
+> >      
+> >                             &initial_offset, &max_count);
+> > 
+> > @@ -2422,6 +2423,13 @@ static void coroutine_fn v9fs_readdir(void *opaque)
+> > 
+> >      }
+> >      trace_v9fs_readdir(pdu->tag, pdu->id, fid, initial_offset,
+> >      max_count);
+> > 
+> > +    if (max_count > s->msize - P9_IOHDRSZ) {
+> > +        max_count = s->msize - P9_IOHDRSZ;
+> 
+> What if s->msize < P9_IOHDRSZ ?
+
+Exactly, that's why I added that comment to the commit log of this patch for 
+now to make this circumstance clear as yet TODO.
+
+This issue with T_version and msize needs to be addressed anyway, because it 
+will popup again and again with various other request types and also with 
+transport aspects like previously discussed on a transport buffer size issue 
+(submitters of that transport patch on CC here for that reason):
+https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg04701.html
+
+The required patch to address this overall minimum msize issue would be very 
+small: just comparing client's transmitted "msize" parameter of client's 
+T_version request and if that transmitted msize is smaller than a certain 
+absolute minimum msize then raise an error immediately to prevent the session 
+to start.
+
+But there are some decisions to be made, that's why I haven't provided a patch 
+for this min. msize issue in this patch series yet:
+
+1. What is the minimum msize to be allowed with T_version?
+
+   P9_IOHDRSZ would be IMO too small, because P9_IOHDRSZ is the size of the 
+   common header portion of all IO requests. So it would rather make sense IMO
+   reviewing the protocol and pick the largest header size among all possible 
+   requests supported by 9pfs server ATM. The advantage of this approach would 
+   be that overall code would be easier too maintain, since we don't have to 
+   add minimum msize checks in any (or even all) individual request type 
+   handlers. T_version handler of server would already enforce a minimum msize 
+   and prevent the session if msize too small, and that's it.
+
+2. How to handle that error with T_version exactly?
+
+   As far as I can see it, it was originally not considered that T_version 
+   might react with an error response at all. The specs are ambiguous about 
+   this topic. All you can find is that if the transmitted protocol version
+   is not supported by server, then server should respond with "unknown" with 
+   its R_version response, but should not respond with R_error in that case.
+
+   The specs do not prohibit R_error for T_version in general, but I could 
+   imagine that some clients might not expect if we would send R_error. On the 
+   other hand responding with R_version "unknown" would not be appropriate for 
+   this msize error either, because that would mean to the client that the 
+   protocol version was not supported, which is not the case. So it would 
+   leave client uninformed about the actual reason/cause of the error.
+
+3. Are there any undocumented special msizes, e.g. msize=0 for "don't care" ?
+
+   Probably not, but you might have seen more client implementations than me.
+
+Best regards,
+Christian Schoenebeck
+
 
 
