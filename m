@@ -2,90 +2,110 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B83FC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 20:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72AD0C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 21:05:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9AE920731
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 20:36:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pVh9nrB7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9AE920731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 45F062072C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 21:05:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45F062072C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioZ7R-0006EI-3k
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 15:36:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50353)
+	id 1ioZYa-0008RK-Bo
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 16:05:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39760)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ioZ6T-0005bw-Il
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 15:35:58 -0500
+ (envelope-from <sw@weilnetz.de>) id 1ioZXs-0007ne-3j
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 16:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ioZ6S-0000TX-IU
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 15:35:57 -0500
-Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:45210)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ioZ6Q-0000RN-4w; Mon, 06 Jan 2020 15:35:54 -0500
-Received: by mail-qv1-xf43.google.com with SMTP id l14so19594236qvu.12;
- Mon, 06 Jan 2020 12:35:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZncD7zhSxxbabOsOGW71JUJwtsupPDeAceN9FfhoZgI=;
- b=pVh9nrB7tGk9kD/gd7ljzbrj66ytZyWvie+YujhPTWH9GaEgriMrRPfIFWXeGFrXs2
- oHF2+cBX7B4kKt9NHgMvDJHo1SyfgPsrODB3S7MDjpoUQFM7wywK4CyBff0VI3mIrEAA
- 2hflGS1hEci0MMAuQmZdK/0JBhEtV/OMCsxnWK/uCKoYeUG9oGaDon3s3mJ3OjD2xnrw
- FM6GWzeOOZAjpaa4Vs5tI7pK7Ynf1YeLjETSMDethONDpiJGMSt461bAav1JLW54IEO2
- AtZbuRbRv1+PBfbefBP4WiyYQB53mfpem8FSilvWVDpF2A4HoCE1z8EeOoBaL+AxGjeT
- FCAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZncD7zhSxxbabOsOGW71JUJwtsupPDeAceN9FfhoZgI=;
- b=iUC+Ae8jI9gDc9is5CFA6cRiSyppl06YLxO/CT5nIi0DSc4QjYhN9Dxr3WPNwpfky+
- IiASktz/o9iZznJQY42Gd7gCgu5iD7vQjg1KXVzaecYwLcFGUCiPBaaxgWbrQtnyaU/x
- vmZQvfi86UbAqO1a4mg1yMjCFxQis+ItafGqlxPDXkJaUUQzmv9/JK90vOJgw7/I42I0
- nBDZEibCVKH8fC1B9SG64jJaicTMl5R0qsMLvR8Fqx6ZlRJuJLAi7tkcPlD8hyKqJ3Xg
- wZS+XqDIsaggObpIVfyNd6NPjzOHAJP/el4DXjn5/quxEDo3O0YYcA3yVIbvSWG1n2Ge
- VmnQ==
-X-Gm-Message-State: APjAAAUqBFMd4nQ4bLm0qVL0yk4z+1EG+i3YIMGP5kZR+eoTDGfhrGzv
- JYtCKHrLuyCMS2aHKTKQmPsNf2DB
-X-Google-Smtp-Source: APXvYqz3yRyxDM1/foc5ViV7uD7SAfEvpNEsojh3Xh4xXO68CL3cC5XX+iLQ6gsGfL1Zvlo5NfJBDQ==
-X-Received: by 2002:ad4:518d:: with SMTP id b13mr80295621qvp.141.1578342953193; 
- Mon, 06 Jan 2020 12:35:53 -0800 (PST)
-Received: from ?IPv6:2804:431:c7c6:655b:9e1c:e865:3705:e1df?
- ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id t2sm23749571qtn.22.2020.01.06.12.35.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 06 Jan 2020 12:35:52 -0800 (PST)
-Subject: Re: [PATCH v1 00/59] trivial unneeded labels cleanup
-To: minyard@acm.org
+ (envelope-from <sw@weilnetz.de>) id 1ioZXq-0003Ry-NN
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 16:04:16 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:47270
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>)
+ id 1ioZXm-0003G9-Ei; Mon, 06 Jan 2020 16:04:10 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id 32F51DBAA99;
+ Mon,  6 Jan 2020 22:04:08 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id YVMNpFMezDdY; Mon,  6 Jan 2020 22:04:06 +0100 (CET)
+Received: from edv-macbook-pro.fritz.box (pD9EC3B33.dip0.t-ipconnect.de
+ [217.236.59.51])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits))
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id C0E6ADBAA94;
+ Mon,  6 Jan 2020 22:04:06 +0100 (CET)
+Subject: Re: [PATCH v1 13/59] block/vdi.c: remove 'fail' label in vdi_open()
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
 References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106195457.GE2886@minyard.net>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <f71eb524-571b-54d1-1a99-95d2896f6586@gmail.com>
-Date: Mon, 6 Jan 2020 17:35:49 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ <20200106182425.20312-14-danielhb413@gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ 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
+Message-ID: <06475279-d456-7160-1927-0120460b6864@weilnetz.de>
+Date: Mon, 6 Jan 2020 22:04:06 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200106195457.GE2886@minyard.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f43
+In-Reply-To: <20200106182425.20312-14-danielhb413@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 37.120.169.71
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,54 +117,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 06.01.20 um 19:23 schrieb Daniel Henrique Barboza:
+
+> The 'fail' label can be replaced by 'return ret' or by
+> a 'return' with the error code that was being set right
+> before the 'goto' call.
+>
+> CC: Stefan Weil <sw@weilnetz.de>
+> CC: qemu-block@nongnu.org
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> ---
+>  block/vdi.c | 40 +++++++++++++---------------------------
+>  1 file changed, 13 insertions(+), 27 deletions(-)
+>
+> diff --git a/block/vdi.c b/block/vdi.c
+> index 0142da7233..6d486ffed9 100644
+> --- a/block/vdi.c
+> +++ b/block/vdi.c
+> @@ -388,7 +388,7 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+> =20
+>      ret =3D bdrv_pread(bs->file, 0, &header, sizeof(header));
+>      if (ret < 0) {
+> -        goto fail;
+> +        return ret;
+>      }
+> =20
+>      vdi_header_to_cpu(&header);
+> @@ -400,8 +400,7 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+>          error_setg(errp, "Unsupported VDI image size (size is 0x%" PRI=
+x64
+>                            ", max supported is 0x%" PRIx64 ")",
+>                            header.disk_size, VDI_DISK_SIZE_MAX);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      }
+> =20
+>      uuid_link =3D header.uuid_link;
+> @@ -418,58 +417,48 @@ static int vdi_open(BlockDriverState *bs, QDict *=
+options, int flags,
+>      if (header.signature !=3D VDI_SIGNATURE) {
+>          error_setg(errp, "Image not in VDI format (bad signature %08" =
+PRIx32
+>                     ")", header.signature);
+> -        ret =3D -EINVAL;
+> -        goto fail;
+> +        return -EINVAL;
+>      } else if (header.version !=3D VDI_VERSION_1_1) {
+>          error_setg(errp, "unsupported VDI image (version %" PRIu32 ".%=
+" PRIu32
+>                     ")", header.version >> 16, header.version & 0xffff)=
+;
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (header.offset_bmap % SECTOR_SIZE !=3D 0) {
+>          /* We only support block maps which start on a sector boundary=
+=2E */
+>          error_setg(errp, "unsupported VDI image (unaligned block map o=
+ffset "
+>                     "0x%" PRIx32 ")", header.offset_bmap);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (header.offset_data % SECTOR_SIZE !=3D 0) {
+>          /* We only support data blocks which start on a sector boundar=
+y. */
+>          error_setg(errp, "unsupported VDI image (unaligned data offset=
+ 0x%"
+>                     PRIx32 ")", header.offset_data);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (header.sector_size !=3D SECTOR_SIZE) {
+>          error_setg(errp, "unsupported VDI image (sector size %" PRIu32=
+
+>                     " is not %u)", header.sector_size, SECTOR_SIZE);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (header.block_size !=3D DEFAULT_CLUSTER_SIZE) {
+>          error_setg(errp, "unsupported VDI image (block size %" PRIu32
+>                           " is not %" PRIu32 ")",
+>                     header.block_size, DEFAULT_CLUSTER_SIZE);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (header.disk_size >
+>                 (uint64_t)header.blocks_in_image * header.block_size) {=
+
+>          error_setg(errp, "unsupported VDI image (disk size %" PRIu64 "=
+, "
+>                     "image bitmap has room for %" PRIu64 ")",
+>                     header.disk_size,
+>                     (uint64_t)header.blocks_in_image * header.block_siz=
+e);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (!qemu_uuid_is_null(&uuid_link)) {
+>          error_setg(errp, "unsupported VDI image (non-NULL link UUID)")=
+;
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (!qemu_uuid_is_null(&uuid_parent)) {
+>          error_setg(errp, "unsupported VDI image (non-NULL parent UUID)=
+");
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      } else if (header.blocks_in_image > VDI_BLOCKS_IN_IMAGE_MAX) {
+>          error_setg(errp, "unsupported VDI image "
+>                           "(too many blocks %u, max is %u)",
+>                            header.blocks_in_image, VDI_BLOCKS_IN_IMAGE_=
+MAX);
+> -        ret =3D -ENOTSUP;
+> -        goto fail;
+> +        return -ENOTSUP;
+>      }
+> =20
+>      bs->total_sectors =3D header.disk_size / SECTOR_SIZE;
+> @@ -482,8 +471,7 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+>      bmap_size =3D DIV_ROUND_UP(bmap_size, SECTOR_SIZE);
+>      s->bmap =3D qemu_try_blockalign(bs->file->bs, bmap_size * SECTOR_S=
+IZE);
+>      if (s->bmap =3D=3D NULL) {
+> -        ret =3D -ENOMEM;
+> -        goto fail;
+> +        return -ENOMEM;
+>      }
+> =20
+>      ret =3D bdrv_pread(bs->file, header.offset_bmap, s->bmap,
+> @@ -509,8 +497,6 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+> =20
+>   fail_free_bmap:
+>      qemu_vfree(s->bmap);
+> -
+> - fail:
+>      return ret;
+>  }
+> =20
 
 
-On 1/6/20 4:54 PM, Corey Minyard wrote:
-> On Mon, Jan 06, 2020 at 03:23:26PM -0300, Daniel Henrique Barboza wrote:
->> Hello,
-[...]
->>
->> Which is cleaner and requires less brain cycles to wonder
->> whether the 'cleanup' label does anything special, such
->> as a heap memory cleanup.
-> 
-> I would disagree with this analysis.  To me, I often wonder
-> when I have to add cleanup code to a routine whether there is
-> some hidden return in the middle of the function.  That's a lot
-> harder to spot than just looking for the cleanup label at the
-> end of the function to see what it does.  For non-trivial
-> functions I prefer to have one point of return at the end
-> (and maybe some minor checks with returns right at the beginning).
-> I'm not adamant about this, just my opinion.
+Technically these changes are fine. Personally I prefer functions having
+a single return statement, even if that requires a goto statement. But
+if there is a consense to change the code, that can be done of course.
 
-I agree that what I'm doing here isn't a one rule fits all situation. This
-is why I didn't purge all the 'unused' labels I found. The criteria used to
-remove/spare labels will differ from person to person (although I believe that
-cases such as patch 15 isn't too much of a debate), thus I'd rather leave to
-each maintainer to accept/deny the changes based on the context of the code.
-
-And for this same reason I don't think that a checkpatch rule is necessary.
-The review process can take care of these situations and allow 'good unneeded
-labels' to be in the code.
-
-
-Thanks,
-
-
-DHB
+Regards,
+Stefan Weil
 
 
 
-> 
-> But if we are going to fix things like this, it might be best to add
-> them to the coding style document and checkpatch script.  Otherwise
-> these sorts of things will just continue.
-> 
-> -corey
-> 
 
