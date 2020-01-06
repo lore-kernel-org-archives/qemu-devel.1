@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 240C1C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92E0C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E240120731
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 712A72072E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:22:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bn3nQnh8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E240120731
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gJ1PhFIQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712A72072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioTFi-0002EA-W2
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:21:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34155)
+	id 1ioTGh-0003TV-Eg
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:22:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ioTEq-0001SS-Jt
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:20:13 -0500
+ (envelope-from <berrange@redhat.com>) id 1ioTFg-0002Lh-Gu
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:21:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ioTEm-0003pW-18
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:20:12 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30110
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1ioTFf-0004Z4-BV
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:21:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20786
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ioTEl-0003pB-Sx
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:20:07 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ioTFe-0004Wd-QQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:21:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578320407;
+ s=mimecast20190719; t=1578320461;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CqSqEckoI3VOkPxXctQd3vS2VD1/OEaP9LRcI4sDHUU=;
- b=bn3nQnh8ZFvOtM2dBsi0k0ARvBO04OkDA1PmnELOZe4Y7yBNLytk47HK6okSfQ9yq3agvn
- I7HE2zLxGXaU4civBKYTVsNVrFh+7O1aAmNXLBDn+E8JASEtpzg7qarn8O+ZlFmMVVSJoa
- 3f+NPgYawU8xjuXwHTqwYI/kK3HKa+g=
+ bh=Y1uypd3ryHU6zPfO1OsFbxlV9kiFwXuI3sQGwhMemuo=;
+ b=gJ1PhFIQYd4qGMPwc2kM5xtsX/1vZ4dUUOW+29VrX4sgdBt6rijaG9NvTKA+p5uRpATFEu
+ 8Kl82sZ1pd8g34adlRUqDS92bUxvhSMZcNNoIPdcRfA/U1hPVzaqnU6h9PdkikWVxb9UUR
+ w43uww9ESDkf51fSZhPt7bnIMCccKXQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-e-X0QsfsPhOvndGSfKr_yQ-1; Mon, 06 Jan 2020 09:20:04 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-13-37u1pFqVPVWzb5m2iv_atA-1; Mon, 06 Jan 2020 09:20:40 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E06CD8F0406
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 14:20:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8C8D8026BD
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 14:20:39 +0000 (UTC)
 Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BCC85E1AD;
- Mon,  6 Jan 2020 14:19:57 +0000 (UTC)
-Date: Mon, 6 Jan 2020 14:19:58 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B5363858B9;
+ Mon,  6 Jan 2020 14:20:31 +0000 (UTC)
+Date: Mon, 6 Jan 2020 14:20:31 +0000
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 029/104] virtiofsd: add vhost-user.json file
-Message-ID: <20200106141958.GH2930416@redhat.com>
+Subject: Re: [PATCH 030/104] virtiofsd: add --print-capabilities option
+Message-ID: <20200106142031.GI2930416@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-30-dgilbert@redhat.com>
+ <20191212163904.159893-31-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-30-dgilbert@redhat.com>
+In-Reply-To: <20191212163904.159893-31-dgilbert@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: e-X0QsfsPhOvndGSfKr_yQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 37u1pFqVPVWzb5m2iv_atA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,24 +95,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:37:49PM +0000, Dr. David Alan Gilbert (git) wrot=
+On Thu, Dec 12, 2019 at 04:37:50PM +0000, Dr. David Alan Gilbert (git) wrot=
 e:
 > From: Stefan Hajnoczi <stefanha@redhat.com>
 >=20
-> Install a vhost-user.json file describing virtiofsd.  This allows
-> libvirt and other management tools to enumerate vhost-user backend
-> programs.
+> Add the --print-capabilities option as per vhost-user.rst "Backend
+> programs conventions".  Currently there are no advertised features.
 >=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  .gitignore                                | 1 +
->  Makefile                                  | 1 +
->  tools/virtiofsd/50-qemu-virtiofsd.json.in | 5 +++++
->  3 files changed, 7 insertions(+)
->  create mode 100644 tools/virtiofsd/50-qemu-virtiofsd.json.in
+>  docs/interop/vhost-user.json     |  4 +++-
+>  tools/virtiofsd/fuse_lowlevel.h  |  1 +
+>  tools/virtiofsd/helper.c         |  2 ++
+>  tools/virtiofsd/passthrough_ll.c | 12 ++++++++++++
+>  4 files changed, 18 insertions(+), 1 deletion(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-=20
+
 
 Regards,
 Daniel
