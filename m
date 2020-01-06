@@ -8,73 +8,72 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BE4C33C9E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3E3C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:18:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 838872072E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:16:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 015E02072E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:18:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfk3Gxix"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 838872072E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtGRoI1E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 015E02072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioXrN-0003eW-E3
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:16:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46377)
+	id 1ioXt0-0005b0-W5
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:17:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ioX53-0003bn-Mg
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:26:22 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ioX5G-0003zz-61
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:26:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ioX52-00059A-Kv
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:26:21 -0500
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:41166)
+ (envelope-from <danielhb413@gmail.com>) id 1ioX5E-0005JP-VF
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:26:34 -0500
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:44709)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ioX52-00058q-HE; Mon, 06 Jan 2020 13:26:20 -0500
-Received: by mail-qk1-x742.google.com with SMTP id x129so40279646qke.8;
- Mon, 06 Jan 2020 10:26:20 -0800 (PST)
+ id 1ioX5E-0005J5-RL; Mon, 06 Jan 2020 13:26:32 -0500
+Received: by mail-qv1-xf42.google.com with SMTP id n8so19408495qvg.11;
+ Mon, 06 Jan 2020 10:26:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fAxjxUHh9JaiR6VmZW01ZkN0LXgZJSoQuf5vn+XIRdw=;
- b=rfk3GxixlysDr45BPkf2u2KqFAkKa0GmFiVAVKpJUP4Zr8BnRwQLCwkXm0c0y///bt
- mBMNXqNMOLIo1T8xLwqHx6GiexrLw7h+v+9OKOhPSEsZXzRt0xWxajGjyY1HgCohi6Yv
- 4xBnd4pcnK5rrg9tuEyFoOD6zSmBuE8YCn6CgXYcYIeQbs04UB89nVeg4cpIV2N3+YmR
- HQMjfPdl4KxMPKMjXi9MWFCJhBcRp7pBorZOlSke4orsAG1l7ztNlHJ4Mj2NklPwBA33
- IrdcbWT17kPDvYy0kt//+pGymVrEOdkQZs/mQf8TZzmQvnnjI9Dz6XK2LBw5hvrsCNgn
- fCfQ==
+ bh=8epzYC9Hx96nC8wKq8nl8igdorRt4UtCgIwD3AuQIS8=;
+ b=CtGRoI1EAaFcZ6XoR5d+63MLor+iAEqD2yM88p5EaGJXkcPA9LKw3LiViNE5nDNejI
+ ABgUNaD6xhvfr1VYxHN+POKVOR40TVf6QUGvzZCiZJ4xztny9YCi67AyIYgo7pwPwIAD
+ CuR/1wIM0q/H/1p+His7K4QoYglHO7cKAJ/HF825HXbChXuByO/OC0ztG4npOytSl2HF
+ v7HYadn8fhnmUYifDQ/GAt34Ec23R0aX5h8BGPziaU5JTrsj+BA/wHwo2MdQoXOY9XZB
+ 2QTp4yefkn51kwf1LkTr+jQRQpiVaAAG2kwg7t4sunaCf32ZidCRVOtFa8JWk4UOVwAH
+ EXUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fAxjxUHh9JaiR6VmZW01ZkN0LXgZJSoQuf5vn+XIRdw=;
- b=SkHXXHOxRdescD8MmAsCXMQYd130AXc8S64fevrve2SkKf/bZ658vUzhnjVMB1Um3z
- 6NjUF3MVtvS8DvRNcllWgblKtAeM3ItcUN++LjffUW/xqZ5WQHjZri+uoJomyco0/jZY
- AFpg8dMTH55Z6UO2lCYZVDHkpyrPnxURAe/uNv+n9iXymXmJECI59rG2ecNLql768ual
- sxZ0btppyBCjEO5YOfG8Th1YNUAZWayySnZUyBAaqKYmhhQo3lubrs8jSPSFDZ3tiTFp
- 8pq04GfYM+B998MQpG5wCDr38wxe4j0HT8AgAVTgWSW9L0s1pZQp92HO4pZDlONkuWPp
- 9Q3w==
-X-Gm-Message-State: APjAAAW0OhQPASEb6/OXrnDVXCzMCGP/bNtOH9I7Ntb2efuqrZvSicDY
- rg2jsZoPSRcyf6D0KAqXpcOIjpMN
-X-Google-Smtp-Source: APXvYqw/aCh3zfgRbSaEj6maI+tanxesOlhxR/XyK5a1KtVEXQzovhATZA+9ouabFCdOpv4Gm3edbQ==
-X-Received: by 2002:a05:620a:139b:: with SMTP id
- k27mr83022316qki.112.1578335179982; 
- Mon, 06 Jan 2020 10:26:19 -0800 (PST)
+ bh=8epzYC9Hx96nC8wKq8nl8igdorRt4UtCgIwD3AuQIS8=;
+ b=cCbz6RrrVbDa6dhTQqfhupqKQfjuF8DFpFjR6+TTDPHm79UkW+KDBz8cTGoO8Yafz4
+ +r62rNH3S7CURSLC2dzIJRuDf5QsHnmG/5+DQ/B5+PYr5hyRZvxMll4gi1AKjgjGYuHU
+ gTlAqf6iSOo/TcW9Hd7tf75mTcRlww98ncv6B58eYBqYGZZXDeXBxJQTNFXVRlar3897
+ s5mWmWfaGw4Vh76SPNgSzO52IZ0Pgfr3A5cgjKo4jlaT/j9CFuAytXv3Gd1S1XsmdhZm
+ GvGYVP/V9qKMRZbWe0t3NEMJcO2LpeJ0VdDLvsnFVLvsiBbZZJO16vlIBzMUGGBLTQaR
+ PGqA==
+X-Gm-Message-State: APjAAAWJop3wiGWg/ajholh2qo/0bKT2kQGGssS+wtq5VKrkWSQXOjKH
+ fvM18vpjjLhKxGIrciBvJsSC0jjI
+X-Google-Smtp-Source: APXvYqxtyRMbmiEujs6q/5zgBBL/E9J99OUADg6ZgH+EC79ejwTz2kcu9nJQQyNjSHyiW7bCWWSW7Q==
+X-Received: by 2002:a0c:a145:: with SMTP id d63mr82830123qva.120.1578335192274; 
+ Mon, 06 Jan 2020 10:26:32 -0800 (PST)
 Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.26.18
+ by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.26.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 10:26:19 -0800 (PST)
+ Mon, 06 Jan 2020 10:26:31 -0800 (PST)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 49/59] rdma/rdma_rm.c: remove unneeded label in
- rdma_rm_alloc_pd()
-Date: Mon,  6 Jan 2020 15:24:15 -0300
-Message-Id: <20200106182425.20312-50-danielhb413@gmail.com>
+Subject: [PATCH v1 56/59] linux-user/signal.c: remove unneeded label in
+ do_sigaltstack()
+Date: Mon,  6 Jan 2020 15:24:22 -0300
+Message-Id: <20200106182425.20312-57-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200106182425.20312-1-danielhb413@gmail.com>
 References: <20200106182425.20312-1-danielhb413@gmail.com>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+X-Received-From: 2607:f8b0:4864:20::f42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,65 +93,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>,
- Yuval Shaia <yuval.shaia@oracle.com>
+Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'out' label can be replaced by 'return ret'. Since 'ret' will
-be set to -ENOMEM in 'goto' time, we can replace it to
-'return -ENOMEM'.
+'out' can be replaced by 'return ret'. Since 'ret' is used
+just to set the return value, drop the 'ret' variable and
+use 'return' with the appropriate value instead.
 
-After this change, the 'ret' var is used to store the
-result of rdma_backend_create_pd(), see if it's not zero,
-then 'ret' is set to -EIO before the jump to out_tbl_dealloc.
--EIO is the only error being thrown by out_tbl_dealloc too.
-This means we can go a step further in the code simplification
-by also removing the 'ret' variable and making out_tbl_dealloc
-return -EIO directly.
-
-CC: Yuval Shaia <yuval.shaia@oracle.com>
-CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+CC: Riku Voipio <riku.voipio@iki.fi>
+CC: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- hw/rdma/rdma_rm.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ linux-user/signal.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-diff --git a/hw/rdma/rdma_rm.c b/hw/rdma/rdma_rm.c
-index 1524dfaeaa..f049fda38a 100644
---- a/hw/rdma/rdma_rm.c
-+++ b/hw/rdma/rdma_rm.c
-@@ -161,16 +161,13 @@ int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
-                      uint32_t *pd_handle, uint32_t ctx_handle)
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 5ca6d62b15..5efb1b79d9 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -708,7 +708,6 @@ static void host_signal_handler(int host_signum, siginfo_t *info,
+ /* compare linux/kernel/signal.c:do_sigaltstack() */
+ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
  {
-     RdmaRmPD *pd;
--    int ret = -ENOMEM;
+-    int ret;
+     struct target_sigaltstack oss;
+     TaskState *ts = (TaskState *)thread_cpu->opaque;
  
-     pd = rdma_res_tbl_alloc(&dev_res->pd_tbl, pd_handle);
-     if (!pd) {
--        goto out;
-+        return -ENOMEM;
+@@ -734,32 +733,28 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
+         }
+ #endif
+ 
+-        ret = -TARGET_EFAULT;
+         if (!lock_user_struct(VERIFY_READ, uss, uss_addr, 1)) {
+-            goto out;
++            return -TARGET_EFAULT;
+         }
+         __get_user(ss.ss_sp, &uss->ss_sp);
+         __get_user(ss.ss_size, &uss->ss_size);
+         __get_user(ss.ss_flags, &uss->ss_flags);
+         unlock_user_struct(uss, uss_addr, 0);
+ 
+-        ret = -TARGET_EPERM;
+         if (on_sig_stack(sp))
+-            goto out;
++            return -TARGET_EPERM;
+ 
+-        ret = -TARGET_EINVAL;
+         if (ss.ss_flags != TARGET_SS_DISABLE
+             && ss.ss_flags != TARGET_SS_ONSTACK
+             && ss.ss_flags != 0)
+-            goto out;
++            return -TARGET_EINVAL;
+ 
+         if (ss.ss_flags == TARGET_SS_DISABLE) {
+             ss.ss_size = 0;
+             ss.ss_sp = 0;
+         } else {
+-            ret = -TARGET_ENOMEM;
+             if (ss.ss_size < minstacksize) {
+-                goto out;
++                return -TARGET_ENOMEM;
+             }
+         }
+ 
+@@ -768,14 +763,11 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
      }
  
--    ret = rdma_backend_create_pd(backend_dev, &pd->backend_pd);
--    if (ret) {
--        ret = -EIO;
-+    if (rdma_backend_create_pd(backend_dev, &pd->backend_pd)) {
-         goto out_tbl_dealloc;
+     if (uoss_addr) {
+-        ret = -TARGET_EFAULT;
+         if (copy_to_user(uoss_addr, &oss, sizeof(oss)))
+-            goto out;
++            return -TARGET_EFAULT;
      }
  
-@@ -180,9 +177,7 @@ int rdma_rm_alloc_pd(RdmaDeviceResources *dev_res, RdmaBackendDev *backend_dev,
- 
- out_tbl_dealloc:
-     rdma_res_tbl_dealloc(&dev_res->pd_tbl, *pd_handle);
--
+-    ret = 0;
 -out:
 -    return ret;
-+    return -EIO;
++    return 0;
  }
  
- RdmaRmPD *rdma_rm_get_pd(RdmaDeviceResources *dev_res, uint32_t pd_handle)
+ /* do_sigaction() return target values and host errnos */
 -- 
 2.24.1
 
