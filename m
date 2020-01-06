@@ -8,71 +8,72 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3359EC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88543C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:26:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F09E224676
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:26:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50E0624676
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:26:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JWJv08rP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09E224676
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NYbCZL8k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E0624676
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioX5P-0003YB-Oy
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 13:26:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44926)
+	id 1ioX5V-0003hh-O0
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 13:26:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44949)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ioX3f-0001Mm-Tv
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:24:56 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ioX3h-0001OH-B3
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:24:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ioX3e-0003dR-Q6
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:24:55 -0500
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:39310)
+ (envelope-from <danielhb413@gmail.com>) id 1ioX3g-0003el-Ao
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:24:57 -0500
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:43278)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ioX3e-0003d3-KO; Mon, 06 Jan 2020 13:24:54 -0500
-Received: by mail-qk1-x744.google.com with SMTP id c16so40275737qko.6;
- Mon, 06 Jan 2020 10:24:54 -0800 (PST)
+ id 1ioX3g-0003eZ-77; Mon, 06 Jan 2020 13:24:56 -0500
+Received: by mail-qt1-x843.google.com with SMTP id d18so40492830qtj.10;
+ Mon, 06 Jan 2020 10:24:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BPtzP3vwdKJDYfiK+1V5sLIQfxo+hk+yi1CNnAf7kDI=;
- b=JWJv08rPQVD7dn31fA27RO0L1TkNs1eZ9KXvmtdm0n7e2b3V2eAIbZttqeAX1H5Rte
- Avc+0JE3rvoP7GzJvhfOJ5ewaz3VJA8JSAMPIEbsKh1adEh4g1QXbfSEVxbQjoFqikk4
- BtI1GUO3uQlj9ymIAnA6TsItIgbn3CABvoQb5Qd3aeGUH+/2fAjRGSSclE99FWzTI1zS
- D7IiLxILsyuC3+Yfx5T6a7s8n1INXpR9QVEZWm2K2cnvrQQtTrSACyBoKJzs8nYrD7Ja
- Tqfhpqa1OHtwL+kO1m+RmsjjWV5ViP3i7YswqofiguV26EAZYI6iOFXTk7q94UMJcUpy
- g37w==
+ bh=9UmeSQEs5rob9wrTq2qmb04fnkLXv4NpiQ8wHgmBhdQ=;
+ b=NYbCZL8kRRwem5Io6W0Rv8fJs/luyPrKXDV1i3FI2TMztdEE2dMIcwM/vU9maVNhMr
+ 3t/FqCrKWy4GHh/Eg5tg83YQSid3KvIYEt8oVX4BgLS31EPmbiAUw8D1N6od7AN6EWgJ
+ +gC9gaEX5EMeVvc1Yi/7276dYGW2YURBRGmzphfT2dY1/+vDAcKaXMgx43iNa8rbcgP4
+ xM+UQIbFsd9WrLaQR+WgCTNlPOW2AM+BfM/04WqOozqXaqChsE8o1y9RxXaHQ1iC3h5m
+ h9s5IJyzmh8oFC9Ec9/VrAaPyUn7a4fJH66QHNm75vUZCcIGWd0C2cZA7bVwMgjLkRnt
+ 7sGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BPtzP3vwdKJDYfiK+1V5sLIQfxo+hk+yi1CNnAf7kDI=;
- b=LNkij0JqX25hjDF3zASaW8heATGHWZGBMDFdsMaoyIm1NBkd/A5N4WywYMPNv+J2Ev
- aYEniwLzUayM7S/280bJvCFSUwT5CCV6ZevYjcRmC54xKwUwGRLOv/ovJUBligb9R5rZ
- QU5nVvJm7iRuUFGugxetpo/V2qZ2Mdl9EIVI4zXrLFgOUisBeO+8oepvdPS8NbNYpdg+
- hSXDpJAy+hJizn+xaHMXfsY2zNXjuTIz2itK7q1w+nOv3FLMnj2kzS9ZzdgO4J5fa+SY
- dBoM9aBu9glhNtiggpj6swbu9fmUKRzKB7YoBTKveDP2L9Ggi/b/01nsREaUs0WvN8yV
- /1vA==
-X-Gm-Message-State: APjAAAUqb+GePkxdx7yVyxDQ1ZikRp4kdbiAeCW28pUjsW3kWChCX+05
- gBFi1C91RC8wiiPRaRRLQi4Qt76s
-X-Google-Smtp-Source: APXvYqzSvXtub0j4T5AEHx49CbNdWuauWRDEVcXL7gZSK9eZLojO15sNyMdKc7IVkJTQgyCJfdjIaw==
-X-Received: by 2002:a37:48f:: with SMTP id 137mr83913337qke.25.1578335093972; 
- Mon, 06 Jan 2020 10:24:53 -0800 (PST)
+ bh=9UmeSQEs5rob9wrTq2qmb04fnkLXv4NpiQ8wHgmBhdQ=;
+ b=uSMNsWNDtZAxifOBhv6UdFoU77ISvgEyW4xfG/QQBUdP0vLxGtUMQFjR1H/4yLKkci
+ 8a9g81aQ8cQ26DDg4pE2zCvAPQCBLY1Mv8xgmEEWG8/FiDtbbIfJwjbVt6DsHGlyAhIb
+ yZt2fl9qdANBlWTLe8DU4TC1STGYneY8P1EFp+VfHas/q+7uJWEgyOkiYDy0rab1Z8cy
+ UpTA6eGVjCfwod9yncj70h63KC3gAifHzDyjzhiWcT0Lz/C3+f+a8f0bvrnwps4XWKJe
+ J6IROnXqwGMqmIsoJOZ0cPbRqjz1YDXtk+1grvpVWbdJ0S64qM9IzTprZHClvm8zp/Kw
+ AfFQ==
+X-Gm-Message-State: APjAAAWLusAsaR/Ob/rKS7V9luK8O6NmyLkydjNtjry/y8jiEK+eomRr
+ 3jklzHwDz9jAPl9Nm73vnwbac4vM
+X-Google-Smtp-Source: APXvYqysG9Euycb7WM82W/Td0I147yU5XTejtd+bqGoAlGKBmm3Qvmlpmn7SqAtCcQzqSKytc+nEPw==
+X-Received: by 2002:ac8:59:: with SMTP id i25mr76889454qtg.110.1578335095624; 
+ Mon, 06 Jan 2020 10:24:55 -0800 (PST)
 Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.24.52
+ by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.24.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 10:24:53 -0800 (PST)
+ Mon, 06 Jan 2020 10:24:55 -0800 (PST)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 01/59] spapr.c: remove 'out' label in spapr_dt_cas_updates()
-Date: Mon,  6 Jan 2020 15:23:27 -0300
-Message-Id: <20200106182425.20312-2-danielhb413@gmail.com>
+Subject: [PATCH v1 02/59] ppc440_bamboo.c: remove label from
+ bamboo_load_device_tree()
+Date: Mon,  6 Jan 2020 15:23:28 -0300
+Message-Id: <20200106182425.20312-3-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200106182425.20312-1-danielhb413@gmail.com>
 References: <20200106182425.20312-1-danielhb413@gmail.com>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::744
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,43 +99,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'out' can be replaced by 'return' with the appropriate
-return value.
+'out' label can be replaced by 'return -1' in all cases.
 
 CC: David Gibson <david@gibson.dropbear.id.au>
 CC: qemu-ppc@nongnu.org
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- hw/ppc/spapr.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ hw/ppc/ppc440_bamboo.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f11422fc41..1bfe47337c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -878,7 +878,7 @@ static int spapr_dt_cas_updates(SpaprMachineState *spapr, void *fdt,
-         g_assert(smc->dr_lmb_enabled);
-         ret = spapr_populate_drconf_memory(spapr, fdt);
-         if (ret) {
--            goto out;
-+            return ret;
-         }
+diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
+index 4d95c0f8a8..b782641b23 100644
+--- a/hw/ppc/ppc440_bamboo.c
++++ b/hw/ppc/ppc440_bamboo.c
+@@ -71,12 +71,12 @@ static int bamboo_load_device_tree(hwaddr addr,
+ 
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
+     if (!filename) {
+-        goto out;
++        return -1;
+     }
+     fdt = load_device_tree(filename, &fdt_size);
+     g_free(filename);
+     if (fdt == NULL) {
+-        goto out;
++        return -1;
      }
  
-@@ -889,11 +889,8 @@ static int spapr_dt_cas_updates(SpaprMachineState *spapr, void *fdt,
-             return offset;
-         }
-     }
--    ret = spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
--                                 "ibm,architecture-vec-5");
+     /* Manipulate device tree in memory. */
+@@ -117,10 +117,6 @@ static int bamboo_load_device_tree(hwaddr addr,
+     rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
+     g_free(fdt);
+     return 0;
 -
 -out:
+-
 -    return ret;
-+    return spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
-+                                  "ibm,architecture-vec-5");
  }
  
- static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+ /* Create reset TLB entries for BookE, spanning the 32bit addr space.  */
 -- 
 2.24.1
 
