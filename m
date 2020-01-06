@@ -2,62 +2,80 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B453AC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2D8C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:25:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B014207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:25:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B014207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3618D207FD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:25:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWr1quaK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3618D207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioUFt-0002hC-AW
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:25:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49871)
+	id 1ioUG1-0002rS-Ii
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:25:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ioTpB-00017V-VP
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:57:48 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioTf9-0003XZ-KJ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:47:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ioTpA-00018Z-4p
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:57:45 -0500
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:45380)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioTf4-00037o-46
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:47:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22423
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ioTp9-00017K-QN
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:57:43 -0500
-Received: from player731.ha.ovh.net (unknown [10.109.146.137])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id DCF98155A6E
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 15:57:41 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player731.ha.ovh.net (Postfix) with ESMTPSA id 324B7DB3A7FE;
- Mon,  6 Jan 2020 14:57:36 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v3 08/12] xive: Add a "presenter" link property to the TCTX
- object
-Date: Mon,  6 Jan 2020 15:56:41 +0100
-Message-Id: <20200106145645.4539-9-clg@kaod.org>
-X-Mailer: git-send-email 2.21.1
-In-Reply-To: <20200106145645.4539-1-clg@kaod.org>
-References: <20200106145645.4539-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1ioTf4-00037Z-03
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:47:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578322037;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lnggqyY7jXoYcxTAVAI6egAZmyRwKbX+QeATdxe7/Nc=;
+ b=KWr1quaKTt4+KjNYWaaJsn23OOwkXQLxF9Iyps8Nl11H59I15WiKlhYTlDuxkVIX4fPZ/Z
+ rbh2jY+6OWerXIeW8sw5DeqLIQIsy3TZ+le64KuAynnjE/bo5rAhdLnMTlKiYBmISKUDjH
+ 5Asc+n4VATYax2pVvK2h13OtJ1DgNzI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-3_MHpCf7OI6U3ub0qjYc9w-1; Mon, 06 Jan 2020 09:47:14 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53CCE805850;
+ Mon,  6 Jan 2020 14:47:13 +0000 (UTC)
+Received: from localhost (ovpn-112-48.ams2.redhat.com [10.36.112.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4C4FD101F942;
+ Mon,  6 Jan 2020 14:47:08 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: peter.maydell@linaro.org,
+	qemu-devel@nongnu.org
+Subject: [PULL v2 4/9] util: add dbus helper unit
+Date: Mon,  6 Jan 2020 18:46:17 +0400
+Message-Id: <20200106144622.1520994-5-marcandre.lureau@redhat.com>
+In-Reply-To: <20200106144622.1520994-1-marcandre.lureau@redhat.com>
+References: <20200106144622.1520994-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 3_MHpCf7OI6U3ub0qjYc9w-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 5396719732748028902
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddgjedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.79.203
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,143 +87,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will be used in subsequent patches to access the XIVE associated to
-a TCTX without reaching out to the machine through qdev_get_machine().
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-[ groug: - split patch
-         - write subject and changelog ]
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- include/hw/ppc/xive.h | 8 +++++---
- hw/intc/spapr_xive.c  | 2 +-
- hw/intc/xive.c        | 6 +++++-
- hw/ppc/pnv.c          | 3 ++-
- 4 files changed, 13 insertions(+), 6 deletions(-)
+ include/qemu/dbus.h | 19 +++++++++++++++
+ util/dbus.c         | 57 +++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS         |  2 ++
+ util/Makefile.objs  |  3 +++
+ 4 files changed, 81 insertions(+)
+ create mode 100644 include/qemu/dbus.h
+ create mode 100644 util/dbus.c
 
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 1ded82b1cda8..705cf48176fc 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -311,6 +311,8 @@ void xive_source_set_irq(void *opaque, int srcno, int=
- val);
- #define XIVE_TM_RING_COUNT      4
- #define XIVE_TM_RING_SIZE       0x10
-=20
-+typedef struct XivePresenter XivePresenter;
+diff --git a/include/qemu/dbus.h b/include/qemu/dbus.h
+new file mode 100644
+index 0000000000..9d591f9ee4
+--- /dev/null
++++ b/include/qemu/dbus.h
+@@ -0,0 +1,19 @@
++/*
++ * Helpers for using D-Bus
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
 +
- typedef struct XiveTCTX {
-     DeviceState parent_obj;
-=20
-@@ -319,6 +321,8 @@ typedef struct XiveTCTX {
-     qemu_irq    os_output;
-=20
-     uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
++#ifndef DBUS_H
++#define DBUS_H
 +
-+    XivePresenter *xptr;
- } XiveTCTX;
++#include <gio/gio.h>
++
++GStrv qemu_dbus_get_queued_owners(GDBusConnection *connection,
++                                  const char *name,
++                                  Error **errp);
++
++#endif /* DBUS_H */
+diff --git a/util/dbus.c b/util/dbus.c
+new file mode 100644
+index 0000000000..9099dc5b4b
+--- /dev/null
++++ b/util/dbus.c
+@@ -0,0 +1,57 @@
++/*
++ * Helpers for using D-Bus
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/dbus.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++
++/*
++ * qemu_dbus_get_queued_owners() - return the list of queued unique names
++ * @connection: A GDBusConnection
++ * @name: a service name
++ *
++ * Return: a GStrv of unique names, or NULL on failure.
++ */
++GStrv
++qemu_dbus_get_queued_owners(GDBusConnection *connection, const char *name,
++                            Error **errp)
++{
++    g_autoptr(GDBusProxy) proxy =3D NULL;
++    g_autoptr(GVariant) result =3D NULL;
++    g_autoptr(GVariant) child =3D NULL;
++    g_autoptr(GError) err =3D NULL;
++
++    proxy =3D g_dbus_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE, N=
+ULL,
++                                  "org.freedesktop.DBus",
++                                  "/org/freedesktop/DBus",
++                                  "org.freedesktop.DBus",
++                                  NULL, &err);
++    if (!proxy) {
++        error_setg(errp, "Failed to create DBus proxy: %s", err->message);
++        return NULL;
++    }
++
++    result =3D g_dbus_proxy_call_sync(proxy, "ListQueuedOwners",
++                                    g_variant_new("(s)", name),
++                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
++                                    -1, NULL, &err);
++    if (!result) {
++        if (g_error_matches(err,
++                            G_DBUS_ERROR,
++                            G_DBUS_ERROR_NAME_HAS_NO_OWNER)) {
++            return g_new0(char *, 1);
++        }
++        error_setg(errp, "Failed to call ListQueuedOwners: %s", err->messa=
+ge);
++        return NULL;
++    }
++
++    child =3D g_variant_get_child_value(result, 0);
++    return g_variant_dup_strv(child, NULL);
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 72b253a5bd..e2e879e733 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2209,6 +2209,8 @@ F: qapi/migration.json
+ D-Bus
+ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+ S: Maintained
++F: util/dbus.c
++F: include/qemu/dbus.h
+ F: docs/interop/dbus.rst
 =20
- /*
-@@ -378,8 +382,6 @@ typedef struct XiveTCTXMatch {
-     uint8_t ring;
- } XiveTCTXMatch;
-=20
--typedef struct XivePresenter XivePresenter;
--
- #define TYPE_XIVE_PRESENTER "xive-presenter"
- #define XIVE_PRESENTER(obj)                                     \
-     INTERFACE_CHECK(XivePresenter, (obj), TYPE_XIVE_PRESENTER)
-@@ -467,7 +469,7 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveT=
-CTX *tctx, hwaddr offset,
-                            unsigned size);
-=20
- void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
--Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-+Object *xive_tctx_create(Object *cpu, XivePresenter *xptr, Error **errp)=
-;
- void xive_tctx_reset(XiveTCTX *tctx);
- void xive_tctx_destroy(XiveTCTX *tctx);
- void xive_tctx_ipb_update(XiveTCTX *tctx, uint8_t ring, uint8_t ipb);
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 32322470a8b8..76631238783e 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -601,7 +601,7 @@ static int spapr_xive_cpu_intc_create(SpaprInterruptC=
-ontroller *intc,
-     Object *obj;
-     SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-=20
--    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(xive), errp);
-+    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_PRESENTER(xive), errp);
-     if (!obj) {
-         return -1;
-     }
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 12a362b681a6..bc8019c4c973 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -654,6 +654,7 @@ static void xive_tctx_realize(DeviceState *dev, Error=
- **errp)
-     Error *local_err =3D NULL;
-=20
-     assert(tctx->cs);
-+    assert(tctx->xptr);
-=20
-     cpu =3D POWERPC_CPU(tctx->cs);
-     env =3D &cpu->env;
-@@ -727,6 +728,8 @@ static const VMStateDescription vmstate_xive_tctx =3D=
- {
-=20
- static Property xive_tctx_properties[] =3D {
-     DEFINE_PROP_LINK("cpu", XiveTCTX, cs, TYPE_CPU, CPUState *),
-+    DEFINE_PROP_LINK("presenter", XiveTCTX, xptr, TYPE_XIVE_PRESENTER,
-+                     XivePresenter *),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
-@@ -752,7 +755,7 @@ static const TypeInfo xive_tctx_info =3D {
-     .class_init    =3D xive_tctx_class_init,
- };
-=20
--Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
-+Object *xive_tctx_create(Object *cpu, XivePresenter *xptr, Error **errp)
- {
-     Error *local_err =3D NULL;
-     Object *obj;
-@@ -761,6 +764,7 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xrt=
-r, Error **errp)
-     object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
-     object_unref(obj);
-     object_property_set_link(obj, cpu, "cpu", &error_abort);
-+    object_property_set_link(obj, OBJECT(xptr), "presenter", &error_abor=
-t);
-     object_property_set_bool(obj, true, "realized", &local_err);
-     if (local_err) {
-         goto error;
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index b2e3d11ad000..de44c7ddb304 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -913,7 +913,8 @@ static void pnv_chip_power9_intc_create(PnvChip *chip=
-, PowerPCCPU *cpu,
-      * controller object is initialized afterwards. Hopefully, it's
-      * only used at runtime.
-      */
--    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_ROUTER(&chip9->xive), &lo=
-cal_err);
-+    obj =3D xive_tctx_create(OBJECT(cpu), XIVE_PRESENTER(&chip9->xive),
-+                           &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
+ Seccomp
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 63599d62aa..11262aafaf 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -56,3 +56,6 @@ util-obj-$(call lnot,$(CONFIG_INOTIFY1)) +=3D filemonitor=
+-stub.o
+ util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
+ util-obj-$(CONFIG_POSIX) +=3D drm.o
+ util-obj-y +=3D guest-random.o
++util-obj-$(CONFIG_GIO) +=3D dbus.o
++dbus.o-cflags =3D $(GIO_CFLAGS)
++dbus.o-libs =3D $(GIO_LIBS)
 --=20
-2.21.1
+2.25.0.rc1.1.gb0343b22ed
 
 
