@@ -2,79 +2,82 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E595C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50262C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:12:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A47720731
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:08:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CC0020731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:12:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PabWmIWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A47720731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EL5hBp4w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC0020731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioT3s-0003qX-Cx
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:08:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57414)
+	id 1ioT7m-0005XX-8w
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:12:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ioT35-0003OJ-4p
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:08:04 -0500
+ (envelope-from <berrange@redhat.com>) id 1ioT7A-000570-Cs
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:12:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ioT33-0007PX-Pk
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:08:02 -0500
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:37900)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ioT33-0007Ow-KX
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:08:01 -0500
-Received: by mail-oi1-x233.google.com with SMTP id l9so13192986oii.5
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 06:08:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TS5z4xVQUZrVQ+v6+agx5Uw8rcl7kqEIJvTkIHd7n0A=;
- b=PabWmIWPsl6iv/pFOTQ5tqwesjnR4S9CzBQbGLOUcZAuiuX0WTzS/ypsqmL/b6oITP
- qjpLc5W1SH8ERRwZdU3gfsp2Chi/h7yZd6pjVVAlNmtwcnVLHkJKc+Hj8GNh79bNWGNd
- Rq1ZNxU/RuTrUKSR5odlLj0y9p0EsPLJ/MbbshbDDvrppeCqBapzc74oMu9DJ+FUMj7c
- P5/+S8Wmc7QyB+lupbNrtKJiiaK76ROUD5C6IVVza3tlOWEasFkB4wZBBf2C1doM8MVa
- ZQiw4uWquAx6fvcGYpGiaa6EjhC9meiDcNCEiZFsbJb0eQH0+bxT8OXnaAA5p7Wac/hX
- 7Gwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TS5z4xVQUZrVQ+v6+agx5Uw8rcl7kqEIJvTkIHd7n0A=;
- b=lkUoeqOir//CbR5+qiIxnndKYUkrNNfCZYzRtZzdbGVu4rM2eMXgEF+Xruoeh9DvY7
- tUnJrxfBWp7lfvrKyljbGcfZZvSOoYQlOtvSXsZpR/+uiCOnL0LVjQVCaFOs+ZAz/rEe
- R1niPDBkQ5QcNdtA8miFfBo6QdlMKgnViRGeMupezBA4GfQcGn428Kl0/y2eaXvSZFiP
- RK8Dk+B76KlugOi00cnR/7ycQr4DJnhGtoEIjI8vUV24GUfAoLhUwyutXG4QKNxpQgRl
- MwXX5TSs54Hrzw86ap0ACkLpCSlAMohSpWMZ48iwZ/NM6MBaiYXv9m0DiZG0kUhcG1+p
- z37w==
-X-Gm-Message-State: APjAAAUnMwN6p38FPAe8hGJR150Ifs3o/EGYPNw2M/PKa2HzpV5hlJ+3
- 0BvP0NlCLCI3ET5/cWaD0QnSQCBcpFcEe02eDgmxIA==
-X-Google-Smtp-Source: APXvYqxL+bU2d+xn6yPORiDZn6mXgSnV1D4RUa3sv7cUsnGt8rReBnGBZlbSTU/PkCFgIVx3QXAU4wYXvomWtY7HVHg=
-X-Received: by 2002:aca:3182:: with SMTP id x124mr5671813oix.170.1578319680229; 
- Mon, 06 Jan 2020 06:08:00 -0800 (PST)
+ (envelope-from <berrange@redhat.com>) id 1ioT78-0001ak-1W
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:12:15 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21357
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ioT77-0001aS-Tw
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:12:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578319932;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aJ2QlWkCjBFgXoxe1Ln6pdqJ6mxYPwpV11WBmiw8Jec=;
+ b=EL5hBp4wrTEgXkSOOppFgMAp9t9Ei5Im/we7Jhsj/iRaj3zOFgW+Pr7x2GtaszusIvHqKr
+ CSfwa19xOcbQ4gis6eHWMIo4l8DLwvy061uFI/S5u/PK12gzsFreARbiPRoHMuX3098dcZ
+ 0vlHmj5Y83q/E1cWBZ0gES4+5r6mC5U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-lsTwglWnNXS64sv0ufgFAg-1; Mon, 06 Jan 2020 09:12:10 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66521801E6C
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 14:12:09 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 211EA858B1;
+ Mon,  6 Jan 2020 14:12:06 +0000 (UTC)
+Date: Mon, 6 Jan 2020 14:12:06 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 027/104] virtiofsd: add --fd=FDNUM fd passing option
+Message-ID: <20200106141206.GD2930416@redhat.com>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-28-dgilbert@redhat.com>
 MIME-Version: 1.0
-References: <20191220165141.2207058-1-ehabkost@redhat.com>
-In-Reply-To: <20191220165141.2207058-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 6 Jan 2020 14:07:49 +0000
-Message-ID: <CAFEAcA_5D76r+n5Eg6t9d3KNGJw60iF20QPgp3Fkc5fGgM5e-Q@mail.gmail.com>
-Subject: Re: [PULL 0/2] Require Python >= 3.5 to build QEMU
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::233
+In-Reply-To: <20191212163904.159893-28-dgilbert@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: lsTwglWnNXS64sv0ufgFAg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,50 +89,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Juan Quintela <quintela@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Markus Armbruster <armbru@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 20 Dec 2019 at 16:51, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> Differences from the previous Python 3.5 pull request
-> that was rejected:
->
-> * Now tests/vm/netbsd was fixed
-> * .travis.yml is being updated to replace Python 3.4 job with 3.5
->
-> The following changes since commit f59b31e6d0c69792b5d817c5aa0a6ed64fba42e0:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-tesing-and-misc-191219-1' into staging (2019-12-20 14:00:49 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to ddf90699631db53c981b6a5a63d31c08e0eaeec7:
->
->   configure: Require Python >= 3.5 (2019-12-20 13:45:59 -0300)
->
-> ----------------------------------------------------------------
-> Require Python >= 3.5 to build QEMU
->
-> Python 2 EOL is 11 days away, we will stop supporting
-> it in QEMU 5.0.
->
-> ---------------------------------------------------------------
+On Thu, Dec 12, 2019 at 04:37:47PM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Although --socket-path=3DPATH is useful for manual invocations, managemen=
+t
+> tools typically create the UNIX domain socket themselves and pass it to
+> the vhost-user device backend.  This way QEMU can be launched
+> immediately with a valid socket.  No waiting for the vhost-user device
+> backend is required when fd passing is used.
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tools/virtiofsd/fuse_i.h        |  1 +
+>  tools/virtiofsd/fuse_lowlevel.c | 14 +++++++++---
+>  tools/virtiofsd/fuse_virtio.c   | 39 ++++++++++++++++++++++++---------
+>  3 files changed, 41 insertions(+), 13 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
-
--- PMM
 
