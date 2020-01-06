@@ -8,73 +8,72 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A4D3C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:34:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930E5C33C9B
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65BE42072E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:34:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 618B22072E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:34:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwihmafX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65BE42072E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="szZ/2NDm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 618B22072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioXD0-0004rj-TJ
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 13:34:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45499)
+	id 1ioXD1-0004uU-Qx
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 13:34:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ioX4D-00029p-Vk
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:31 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ioX3x-0001oU-GT
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ioX4C-0004FY-RJ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:29 -0500
-Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:42441)
+ (envelope-from <danielhb413@gmail.com>) id 1ioX3w-0003y9-6Z
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:13 -0500
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:38153)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ioX4C-0004FG-NL; Mon, 06 Jan 2020 13:25:28 -0500
-Received: by mail-qv1-xf41.google.com with SMTP id dc14so19417436qvb.9;
- Mon, 06 Jan 2020 10:25:28 -0800 (PST)
+ id 1ioX3w-0003wo-1v; Mon, 06 Jan 2020 13:25:12 -0500
+Received: by mail-qt1-x844.google.com with SMTP id n15so43210630qtp.5;
+ Mon, 06 Jan 2020 10:25:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bPEopA2rGPiKlnwe7NwEEW5/buNpX4bBB0w0wRuIyWo=;
- b=VwihmafXyrVYQKAP1pZJKtR4hfs73lmSlCTxATzLXkFHVkupvup1ZQLLLiplJDqsQq
- bczTVaeiaZ4fDnBYDC8azWkuwM4uEx6INZLK3pkookVwygZbBOteZgBd5nFDXEG0BWaW
- o1S77n7u3WX2kZnhr/LV8l5clxTwAKoh8rVd711zrk5rono1U5aZjP+H1H5/+rPB0K5U
- dw8gWHKa1d6qlfDUZYM6aEQkZEo3eqSH/V8H6fL7i9Rg4RaRb+JBOAopejZ19h43YXe0
- WA7h+D+gqR602cf0FMGl8ykZf+3Cjh3/G4HDEEXLmPKtF1lFtC/hNNnFMbxLh8F6VOgT
- ytZw==
+ bh=wNyN4G4tLR9E8OrgeCl2UNMlP8h56Iu2NzeloDyPJKs=;
+ b=szZ/2NDmZZkk416Jl30SXuRfce1Lb8bCbcwl4bonG515oQAqjm11G3slp7ZGoLzXi4
+ S+RofwQUkJkF9Qn99lzClL2uuBU4b0B2VKmQZMiquGMH4R4vAZ+54mSlroGK58IRr/8I
+ vwVo43hVJ0ZuS8B2muoHUtiyKAWif044J3PN4tmCTYbL7fRYzYwZCyDwPOwiNuTEx4EP
+ BroIUibWDoEnficSgeOgmkDOvAqZjqdYgTxy9ES3UXDoOxw+a1Ld5MPtB20wEJE6nsID
+ erN6HGy2/Q6PdjQnS+N9pNcgcaF8lUyRwFHsOShIRfE1BA97gS+R4T7KXclRg6XqIoFC
+ 1Juw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bPEopA2rGPiKlnwe7NwEEW5/buNpX4bBB0w0wRuIyWo=;
- b=hZC+UXSMN/waHCpoNVPYUK8lspLBXVYx/pepyVHwuYcYOPbbcdpc10qMh9E2NCehxx
- Qk6xyyWOhbzR0Ly2Dh1ZfY7tNuHleTxcdM8YLh0EQpXp9SVsrb5Q7z5LY4+KCb2hUjyy
- t855hOmZy58G5lE8huWGwJHvCeN8XRK2GQR2B2JF5H3h1E/Bu0SlAdyU9MLIs9H0BYe9
- c3VCb5ASNvgPmop9hwhi8yzdTtcrMuRJP+VcFZ0vPexmJO60/mnMsOpPpl+Tld3WR4BB
- DpyaRpHzKlpbtEc5qP9zkrYhu7CXuOJyq+0KrkSIZutHTZ6rHfMQa0nmtV7OnejF+ODV
- eWUQ==
-X-Gm-Message-State: APjAAAWnsj1MgOdil44OtfA9qcz7d0oA5MRYOxLJ1c27Zv4nzSC0eqnv
- aO8Z5RtJ/B2NSLs39VsfOwm77rZ0
-X-Google-Smtp-Source: APXvYqzciuoVbabwwxlGIl13Ksj3vtokHbUWMVSjvO9RGjZcKpW4zNQZ5T9o2tbs6M1UcRLDoSfAdQ==
-X-Received: by 2002:a05:6214:1272:: with SMTP id
- r18mr51710568qvv.208.1578335128135; 
- Mon, 06 Jan 2020 10:25:28 -0800 (PST)
+ bh=wNyN4G4tLR9E8OrgeCl2UNMlP8h56Iu2NzeloDyPJKs=;
+ b=FOAsoopdMOPPgGWtlgaaXLWtPHQCOg6WXh1lEQ9AGN8onkjQiI7Pmv3y8fCArrVr32
+ zxBs5VFX9l7S6PNQAzrkehnu1OwbPYC2HTFYNaVROLcVJXJgcUCWo0AVa5pVnPJt3U1/
+ crhl1J+jRAQo1v2BkiXpf9hKMRsHausWVrKFn8lX9BFDQblS8KgGATisqXZcI7pGEOTW
+ 0DMV6Okzm3gtmA9xAVepBLffyAcjta7pdSdUDIyEKK8EiC5HSoptj7CB8yC0GZJja3j8
+ 6EhSm2B/uGQ+xnalkL0/g5BGj/MG3zTx5+4usvCIC3GQVXFuTkkgSTUIhUu3NDFf/Mqc
+ XJAw==
+X-Gm-Message-State: APjAAAWVSbOrtMfs+yskP1HFUxW2GKCQKLBweCrYrh1hVHsM07/qCgXz
+ iZevWxoTv7m20uo7Q/FuHvQx25kz
+X-Google-Smtp-Source: APXvYqzLWtQJ+bUN46xBQKxQOfytbUMLBQTKH1xJ3o+iwnVg7mgodRy5RhKkkopvjs4bbqJqnnnRew==
+X-Received: by 2002:ac8:4289:: with SMTP id o9mr76710977qtl.277.1578335111312; 
+ Mon, 06 Jan 2020 10:25:11 -0800 (PST)
 Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.25.26
+ by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.25.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 10:25:27 -0800 (PST)
+ Mon, 06 Jan 2020 10:25:10 -0800 (PST)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 20/59] block/vpc.c: remove unneeded 'fail' label in
- create_dynamic_disk()
-Date: Mon,  6 Jan 2020 15:23:46 -0300
-Message-Id: <20200106182425.20312-21-danielhb413@gmail.com>
+Subject: [PATCH v1 11/59] exec.c: remove 'err' label in
+ ram_block_discard_range()
+Date: Mon,  6 Jan 2020 15:23:37 -0300
+Message-Id: <20200106182425.20312-12-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200106182425.20312-1-danielhb413@gmail.com>
 References: <20200106182425.20312-1-danielhb413@gmail.com>
@@ -82,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::f41
+X-Received-From: 2607:f8b0:4864:20::844
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,66 +93,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-block@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'fail' label can be replaced by 'return ret' on error and
-'return 0' in the end of the function.
+'err' is a label that just executes 'return ret'. We can remove
+the label and simply 'return ret' on error.
 
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: qemu-block@nongnu.org
+CC: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- block/vpc.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ exec.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/block/vpc.c b/block/vpc.c
-index a65550298e..2678b48dfd 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -839,13 +839,13 @@ static int create_dynamic_disk(BlockBackend *blk, uint8_t *buf,
- 
-     ret = blk_pwrite(blk, offset, buf, HEADER_SIZE, 0);
-     if (ret < 0) {
--        goto fail;
+diff --git a/exec.c b/exec.c
+index d4b769d0d4..7cfd80826e 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3898,7 +3898,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+     if ((uintptr_t)host_startaddr & (rb->page_size - 1)) {
+         error_report("ram_block_discard_range: Unaligned start address: %p",
+                      host_startaddr);
+-        goto err;
 +        return ret;
      }
  
-     offset = 1536 + ((num_bat_entries * 4 + 511) & ~511);
-     ret = blk_pwrite(blk, offset, buf, HEADER_SIZE, 0);
-     if (ret < 0) {
--        goto fail;
-+        return ret;
-     }
- 
-     /* Write the initial BAT */
-@@ -855,7 +855,7 @@ static int create_dynamic_disk(BlockBackend *blk, uint8_t *buf,
-     for (i = 0; i < DIV_ROUND_UP(num_bat_entries * 4, 512); i++) {
-         ret = blk_pwrite(blk, offset, buf, 512, 0);
-         if (ret < 0) {
--            goto fail;
+     if ((start + length) <= rb->used_length) {
+@@ -3906,7 +3906,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+         if (length & (rb->page_size - 1)) {
+             error_report("ram_block_discard_range: Unaligned length: %zx",
+                          length);
+-            goto err;
 +            return ret;
          }
-         offset += 512;
-     }
-@@ -882,12 +882,10 @@ static int create_dynamic_disk(BlockBackend *blk, uint8_t *buf,
  
-     ret = blk_pwrite(blk, offset, buf, 1024, 0);
-     if (ret < 0) {
--        goto fail;
-+        return ret;
+         errno = ENOTSUP; /* If we are missing MADVISE etc */
+@@ -3930,14 +3930,14 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+                 error_report("ram_block_discard_range: Failed to fallocate "
+                              "%s:%" PRIx64 " +%zx (%d)",
+                              rb->idstr, start, length, ret);
+-                goto err;
++                return ret;
+             }
+ #else
+             ret = -ENOSYS;
+             error_report("ram_block_discard_range: fallocate not available/file"
+                          "%s:%" PRIx64 " +%zx (%d)",
+                          rb->idstr, start, length, ret);
+-            goto err;
++            return ret;
+ #endif
+         }
+         if (need_madvise) {
+@@ -3953,14 +3953,14 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+                 error_report("ram_block_discard_range: Failed to discard range "
+                              "%s:%" PRIx64 " +%zx (%d)",
+                              rb->idstr, start, length, ret);
+-                goto err;
++                return ret;
+             }
+ #else
+             ret = -ENOSYS;
+             error_report("ram_block_discard_range: MADVISE not available"
+                          "%s:%" PRIx64 " +%zx (%d)",
+                          rb->idstr, start, length, ret);
+-            goto err;
++            return ret;
+ #endif
+         }
+         trace_ram_block_discard_range(rb->idstr, host_startaddr, length,
+@@ -3971,7 +3971,6 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+                      rb->idstr, start, length, rb->used_length);
      }
  
--    ret = 0;
-- fail:
--    return ret;
-+    return 0;
+-err:
+     return ret;
  }
  
- static int create_fixed_disk(BlockBackend *blk, uint8_t *buf,
 -- 
 2.24.1
 
