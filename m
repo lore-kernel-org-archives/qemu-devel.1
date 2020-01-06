@@ -2,63 +2,85 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 833B2C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DFBBC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58274207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:23:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58274207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CFC4620731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:26:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CIFvaJDg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC4620731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioW6L-0007U6-C2
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:23:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53481)
+	id 1ioW9M-0000Tq-UU
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:26:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55331)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ioW5j-0006zW-IY
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:23:00 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ioW83-0008BM-NQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:25:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ioW5h-0006cg-TV
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:22:59 -0500
-Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:59441)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ioW5h-0006aw-Mk
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:22:57 -0500
-Received: from player779.ha.ovh.net (unknown [10.108.57.44])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 556B915499A
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 18:22:55 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player779.ha.ovh.net (Postfix) with ESMTPSA id 866E6DE03DA5;
- Mon,  6 Jan 2020 17:22:53 +0000 (UTC)
-Date: Mon, 6 Jan 2020 18:22:52 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 4/9] tests/virtio-9p: added readdir test
-Message-ID: <20200106182252.58dd6712@bahia.lan>
-In-Reply-To: <a8d6dab2625554d425bd44a4d54d84459f083b18.1576678644.git.qemu_oss@crudebyte.com>
-References: <cover.1576678644.git.qemu_oss@crudebyte.com>
- <a8d6dab2625554d425bd44a4d54d84459f083b18.1576678644.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <peter.maydell@linaro.org>) id 1ioW82-0000ri-Hx
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:25:23 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43805)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ioW82-0000qk-Co
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:25:22 -0500
+Received: by mail-ot1-x343.google.com with SMTP id p8so36131711oth.10
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 09:25:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=79nzsff85wB3e13TUvSqzK3wGM7lE7VNcNli7I7WCR4=;
+ b=CIFvaJDgL2hEqGnW+cHBNBSUQG+XBXWDdLTglOqHcZ1rKtT/IUyJXH1UplVcMALpTd
+ frkxVsTaL1AZKJN5HK8SetvWyWD/zsE4r9e/L7jG7xQqRH3Qj9r63RRKSEQShzN0Lo6N
+ fgsSCObG68qeEkjaX8qDaJ3xSafhPXWCQM1jb+o51QUbUMYNCnFc2V5wzk5cBZcwvUth
+ 2vdif1s1OJVoEmmoOFBeO+6RHeXSjIz3vWy4sDN9vZZAGpsJ+mwJhtNw3SHCvBjcb6yL
+ XmA5Sntyv9ifDSkfCMfKGqyZbkL3+ncXaHhkaBxJkxoZdiqVK8SE+UyAfbzFO+HY/vT4
+ F4Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=79nzsff85wB3e13TUvSqzK3wGM7lE7VNcNli7I7WCR4=;
+ b=f/Cq3F/pO7Z/PRoYd4ngnuXhZ5Ls7IuDFNVAePp0fnd8NQ1MuJy+NoM6199DastsPE
+ RUT+M05dFvy0B1AgLvjbvku86ay8CR3W7XGIfhRHf9vfZuumbrdDzAzIQ7Zs8mNKyWPc
+ 5E5651D+pmhqjg0cd1JGA+WXZeuHw/M4xm8XDnkPqwZ7qAqb3kN9XAq8bTDTMl4k+wqn
+ KZyk+a+UgHvj2mr5INeie3VCJ63P71cpNrMiotyk+sS7iveBrRqLe4Wq9MDWDT0s/PLk
+ nYNrobl+F8493KQOaz4prASainMd6jGGbppv5NnxPf4lR8Zt+JdTOFMq9o3H9N3hLBaE
+ EXkg==
+X-Gm-Message-State: APjAAAWKxc4QznF+PEx55JXcuygGlEi+ruG/VUAxfyaL9mhCq41iqNy4
+ VS0WySeBZcx3QMKqoSE6GfCXg+ANEGInRLoOV13yaw==
+X-Google-Smtp-Source: APXvYqwAebEj6mFylf7mE8tYz/l4W8yzrk327pr9i9GMhR2JfdboUaozZHkhTqwCIIuYmLCnVbkNV6z/q6L1DUnsf4Q=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr108557360otq.135.1578331521414; 
+ Mon, 06 Jan 2020 09:25:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 7849211201066735936
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddguddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.111.220
+References: <20200105234242.78897-1-aik@ozlabs.ru>
+ <20200106041940.GV2098@umbus>
+ <80157816-7859-3450-6a2c-ab151be5ee94@ozlabs.ru> <20200106085042.GW2098@umbus>
+ <741e9b5e-6a7d-66a4-451d-e37c30697b2b@ozlabs.ru>
+ <b0587d24-c7f6-ff1f-9527-ee389bd25b1f@kaod.org>
+In-Reply-To: <b0587d24-c7f6-ff1f-9527-ee389bd25b1f@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Jan 2020 17:25:10 +0000
+Message-ID: <CAFEAcA9ZrTgPBxBq1rBo0u4z2SB=YHpWx_WUuycXK6pahARuXg@mail.gmail.com>
+Subject: Re: [PATCH qemu v2] spapr: Kill SLOF
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,206 +92,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc <qemu-ppc@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Dec 2019 14:30:43 +0100
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+On Mon, 6 Jan 2020 at 17:09, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> ARM bootloaders are also embedded in QEMU's code. See hw/arm/boot.c.
+> You could improve a bit the definition though.
 
-> This first readdir test simply checks the amount of directory
-> entries returned by 9pfs server, according to the created amount
-> of virtual files on 9pfs synth driver side.
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
->  tests/virtio-9p-test.c | 124 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 124 insertions(+)
-> 
-> diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-> index 06263edb53..48c0eca292 100644
-> --- a/tests/virtio-9p-test.c
-> +++ b/tests/virtio-9p-test.c
-> @@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t len)
->      req->r_off += len;
->  }
->  
-> +static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-> +{
-> +    v9fs_memread(req, val, 1);
-> +}
-> +
->  static void v9fs_uint16_write(P9Req *req, uint16_t val)
->  {
->      uint16_t le_val = cpu_to_le16(val);
-> @@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t *val)
->      le32_to_cpus(val);
->  }
->  
-> +static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-> +{
-> +    v9fs_memread(req, val, 8);
-> +    le64_to_cpus(val);
-> +}
-> +
->  /* len[2] string[len] */
->  static uint16_t v9fs_string_size(const char *string)
->  {
-> @@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
->          id == P9_RLOPEN ? "RLOPEN" :
->          id == P9_RWRITE ? "RWRITE" :
->          id == P9_RFLUSH ? "RFLUSH" :
-> +        id == P9_RREADDIR ? "READDIR" :
->          "<unknown>";
->  }
->  
-> @@ -348,6 +360,79 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid, v9fs_qid **wqid)
->      v9fs_req_free(req);
->  }
->  
-> +/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-> +static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t offset,
-> +                            uint32_t count, uint16_t tag)
-> +{
-> +    P9Req *req;
-> +
-> +    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-> +    v9fs_uint32_write(req, fid);
-> +    v9fs_uint64_write(req, offset);
-> +    v9fs_uint32_write(req, count);
-> +    v9fs_req_send(req);
-> +    return req;
-> +}
-> +
-> +struct v9fs_dirent {
+Given an opportunity to restart from scratch I don't know
+that I'd do things the way hw/arm/boot.c does. The initial
+idea was really simple and straightforward: 3 or 4 insns
+which just set some registers and jumped to the kernel.
+Fast-forward a decade or two, and the complexity has
+significantly increased as we added extra tweaks to deal
+with SMP systems, the GIC interrupt controller, boards
+which need to do some extra odd stuff, CPUs which start
+in Secure state, 64-bit CPUs, mangling the DTB, booting
+multiple flavours of image file format, implementing
+various 'firmware' functionality and APIs, and so on and on.
+Insisting from the start that QEMU emulates what bare metal
+hardware does, and doesn't get into the business of faking
+up the behaviour of firmware would have been a neater
+separation of concerns in the long run.
 
-The QEMU coding style calls for a CamelCase typedef,
+To the narrower concern, yeah, on the arm side we
+just embed hand-assembled hex values in the C file;
+this is mostly to avoid needing a cross-compiler setup at
+QEMU build time, but it also lets us hand-patch the
+binary blob at runtime to fill in addresses and so on.
 
-ie.
-
-typedef struct V9fsDirent V9fsDirent;
-
-> +    v9fs_qid qid;
-
-Yeah... I should have done the same when I introduced this type ;-)
-
-> +    uint64_t offset;
-> +    uint8_t type;
-> +    char *name;
-> +    struct v9fs_dirent *next;
-> +};
-> +
-> +/* size[4] Rreaddir tag[2] count[4] data[count] */
-> +static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t *nentries,
-> +                          struct v9fs_dirent **entries)
-> +{
-> +    uint32_t sz;
-> +    struct v9fs_dirent *e = NULL;
-> +    uint16_t slen;
-> +    uint32_t n = 0;
-> +
-> +    v9fs_req_recv(req, P9_RREADDIR);
-> +    v9fs_uint32_read(req, &sz);
-> +
-> +    if (count) {
-> +        *count = sz;
-> +    }
-> +
-> +    for (int32_t togo = (int32_t)sz;
-> +         togo >= 13 + 8 + 1 + 2;
-> +         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-> +    {
-> +        if (!e) {
-> +            e = g_malloc(sizeof(struct v9fs_dirent));
-> +            if (entries)
-> +                *entries = e;
-> +        } else {
-> +            e = e->next = g_malloc(sizeof(struct v9fs_dirent));
-> +        }
-> +        e->next = NULL;
-> +        /* qid[13] offset[8] type[1] name[s] */
-> +        v9fs_memread(req, &e->qid, 13);
-> +        v9fs_uint64_read(req, &e->offset);
-> +        v9fs_uint8_read(req, &e->type);
-> +        v9fs_string_read(req, &slen, &e->name);
-> +    }
-> +
-> +    if (nentries) {
-> +        *nentries = n;
-> +    }
-> +}
-> +
-> +static void v9fs_free_dirents(struct v9fs_dirent *e)
-> +{
-> +    struct v9fs_dirent *next = NULL;
-> +
-> +    for (; e; e = next) {
-> +        next = e->next;
-> +        g_free(e->name);
-> +        g_free(e);
-> +    }
-> +}
-> +
->  /* size[4] Tlopen tag[2] fid[4] flags[4] */
->  static P9Req *v9fs_tlopen(QVirtio9P *v9p, uint32_t fid, uint32_t flags,
->                            uint16_t tag)
-> @@ -480,6 +565,44 @@ static void fs_walk(void *obj, void *data, QGuestAllocator *t_alloc)
->      g_free(wqid);
->  }
->  
-> +static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-> +{
-> +    QVirtio9P *v9p = obj;
-> +    alloc = t_alloc;
-> +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-> +    uint16_t nqid;
-> +    v9fs_qid qid;
-> +    uint32_t count, nentries;
-> +    struct v9fs_dirent *entries = NULL;
-> +    P9Req *req;
-> +
-> +    fs_attach(v9p, NULL, t_alloc);
-> +    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rwalk(req, &nqid, NULL);
-> +    g_assert_cmpint(nqid, ==, 1);
-> +
-> +    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rlopen(req, &qid, NULL);
-> +
-> +    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - P9_IOHDRSZ, 0);
-> +    v9fs_req_wait_for_reply(req, NULL);
-> +    v9fs_rreaddir(req, &count, &nentries, &entries);
-> +
-> +    /*
-> +     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve all
-> +     * dir entries with only one readdir request.
-> +     */
-> +    g_assert_cmpint(
-> +        nentries, ==,
-> +        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-> +    );
-
-What about coming up with a version of this test that loops until
-it could read all the entries instead of this assumption ?
-
-> +
-> +    v9fs_free_dirents(entries);
-> +    g_free(wnames[0]);
-> +}
-> +
->  static void fs_walk_no_slash(void *obj, void *data, QGuestAllocator *t_alloc)
->  {
->      QVirtio9P *v9p = obj;
-> @@ -658,6 +781,7 @@ static void register_virtio_9p_test(void)
->                   NULL);
->      qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
->                   NULL);
-> +    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
->  }
->  
->  libqos_init(register_virtio_9p_test);
-
+thanks
+-- PMM
 
