@@ -2,75 +2,78 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F80C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC39C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:25:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD374207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:24:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B7AF207FD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:25:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="adiP0ZcT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD374207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxV/sMUD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7AF207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioXz7-0004TO-I7
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:24:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52961)
+	id 1ioY0X-00060R-Bc
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:25:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ioXOW-0004lY-UC
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:46:30 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ioXYt-0001zA-TS
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ioXOU-0003ES-Ik
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:46:28 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26563
+ (envelope-from <dgilbert@redhat.com>) id 1ioXYs-0003oV-Jv
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:57:11 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54458
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioXOU-0003EC-FL
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:46:26 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ioXYs-0003o6-Fs
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:57:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578336386;
+ s=mimecast20190719; t=1578337030;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+x7G4JCLQje2QXs8EZmf9Rkm8tTIk53p9vFvwGwU7HI=;
- b=adiP0ZcTRmfJBjMjfS1rWJmbDin9i8Zg1laGqgrFgmszPR9qX9eiO9obzYB0x3O2p89c2w
- ai4i7/QwCQV/mWFas6wSuThPndAOsyqcPdtM4uzDwtTw9QLlHsREl+mt2OGN/s/2JCoscj
- kJL1eiDQXCb8W47W/ZqonAWjI0ZcDmQ=
+ bh=Yw+PxDAygc39+OT5Uw/VZinsoASgcc3XbKbTThXogJ4=;
+ b=OxV/sMUDI63dBN78wg2nRVm27hz02ctD9j2nT3KfUFs3AJa489x0HBx62LVmQ+BQeotKLx
+ GVolsoSx18YkN/MIZKGiuWPl2MUsZjTSk14elk1zyn1L4ts3jlVjM2gBthZi+186DNv+1R
+ vNHbVfVDq7CG1Wkr7urYlS+kPk+HIog=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-QQTE08bBPZ21ibRs4Mq5tA-1; Mon, 06 Jan 2020 13:46:22 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-47-hYrkj7rEMTmGrRTMQTLb7w-1; Mon, 06 Jan 2020 13:57:07 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C9FC100551A;
- Mon,  6 Jan 2020 18:46:21 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-53.brq.redhat.com [10.40.204.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AAAA761076;
- Mon,  6 Jan 2020 18:46:16 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH 2/3] gitlab-ci.yml: Add a job to build EDK2 firmware binaries
-Date: Mon,  6 Jan 2020 19:46:00 +0100
-Message-Id: <20200106184601.25453-3-philmd@redhat.com>
-In-Reply-To: <20200106184601.25453-1-philmd@redhat.com>
-References: <20200106184601.25453-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6BBB802C82;
+ Mon,  6 Jan 2020 18:57:05 +0000 (UTC)
+Received: from work-vm (ovpn-117-53.ams2.redhat.com [10.36.117.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CF6F55C290;
+ Mon,  6 Jan 2020 18:57:04 +0000 (UTC)
+Date: Mon, 6 Jan 2020 18:57:02 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v1 05/59] ram.c: remove unneeded labels
+Message-ID: <20200106185702.GN2798@work-vm>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-6-danielhb413@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: QQTE08bBPZ21ibRs4Mq5tA-1
+In-Reply-To: <20200106182425.20312-6-danielhb413@gmail.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: hYrkj7rEMTmGrRTMQTLb7w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -85,112 +88,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a GitLab job to build the EDK2 firmware binaries.
-This job is only built when the roms/edk2/ submodule is updated,
-when a git-ref starts with 'edk2' or when the last commit contains
-'EDK2'.
+* Daniel Henrique Barboza (danielhb413@gmail.com) wrote:
+> ram_save_queue_pages() has an 'err' label that can be replaced by
+> 'return -1' instead.
+>=20
+> Same thing with ram_discard_range(), and in this case we can also
+> get rid of the 'ret' variable and return either '-1' on error
+> or the result of ram_block_discard_range().
+>=20
+> CC: Juan Quintela <quintela@redhat.com>
+> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-GitLab CI generates an artifacts.zip file containing the firmware
-binaries.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-With edk2-stable201905, the job took 40 minutes 26 seconds,
-the artifacts.zip takes 10MiB.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- .gitlab-ci-edk2.yml | 37 +++++++++++++++++++++++++++++++++++++
- .gitlab-ci.yml      |  3 +++
- MAINTAINERS         |  3 ++-
- 3 files changed, 42 insertions(+), 1 deletion(-)
- create mode 100644 .gitlab-ci-edk2.yml
-
-diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci-edk2.yml
-new file mode 100644
-index 0000000000..abfaf52874
---- /dev/null
-+++ b/.gitlab-ci-edk2.yml
-@@ -0,0 +1,37 @@
-+build-edk2:
-+ rules: # Only run this job when ...
-+ - changes: # ... roms/edk2/ is modified (submodule updated)
-+   - roms/edk2/*
-+   when: always
-+ - if: '$CI_COMMIT_REF_NAME =3D~ /^edk2/' # ... the branch/tag starts with=
- 'edk2'
-+   when: always
-+ - if: '$CI_COMMIT_MESSAGE =3D~ /edk2/i' # last commit description contain=
-s 'EDK2'
-+   when: always
-+ artifacts:
-+   paths: # 'artifacts.zip' will contains the following files:
-+   - pc-bios/edk2*bz2
-+   - pc-bios/edk2-licenses.txt
-+   - edk2-stdout.log
-+   - edk2-stderr.log
-+ image: ubuntu:16.04 # Use Ubuntu Xenial
-+ before_script: # Install packages requiered to build EDK2
-+ - apt-get update --quiet --quiet
-+ - DEBIAN_FRONTEND=3Dnoninteractive
-+   apt-get install --assume-yes --no-install-recommends --quiet --quiet
-+     build-essential
-+     ca-certificates
-+     dos2unix
-+     gcc-aarch64-linux-gnu
-+     gcc-arm-linux-gnueabi
-+     git
-+     iasl
-+     make
-+     nasm
-+     python
-+     uuid-dev
-+ script: # Clone the required submodules and build EDK2
-+ - git submodule update --init roms/edk2
-+ - git -C roms/edk2 submodule update --init
-+ - export JOBS=3D$(($(getconf _NPROCESSORS_ONLN) + 1))
-+ - echo "=3D=3D=3D Using ${JOBS} simultaneous jobs =3D=3D=3D"
-+ - make -j${JOBS} -C roms efi 1>edk2-stdout.log 2> >(tee -a edk2-stderr.lo=
-g >&2)
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ebcef0ebe9..f799246047 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -1,3 +1,6 @@
-+include:
-+  - local: '/.gitlab-ci-edk2.yml'
-+
- before_script:
-  - apt-get update -qq
-  - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev geniso=
-image
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8571327881..22a1fd5824 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2346,6 +2346,7 @@ F: roms/edk2
- F: roms/edk2-*
- F: tests/data/uefi-boot-images/
- F: tests/uefi-test-tools/
-+F: .gitlab-ci-edk2.yml
-=20
- Usermode Emulation
- ------------------
-@@ -2689,7 +2690,7 @@ W: https://cirrus-ci.com/github/qemu/qemu
- GitLab Continuous Integration
- M: Thomas Huth <thuth@redhat.com>
- S: Maintained
--F: .gitlab-ci.yml
-+F: .gitlab-ci*.yml
-=20
- Guest Test Compilation Support
- M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
---=20
-2.21.1
+> ---
+>  migration/ram.c | 18 +++++-------------
+>  1 file changed, 5 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 96feb4062c..980cc644d7 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -2434,7 +2434,7 @@ int ram_save_queue_pages(const char *rbname, ram_ad=
+dr_t start, ram_addr_t len)
+>               * it's the 1st request.
+>               */
+>              error_report("ram_save_queue_pages no previous block");
+> -            goto err;
+> +            return -1;
+>          }
+>      } else {
+>          ramblock =3D qemu_ram_block_by_name(rbname);
+> @@ -2442,7 +2442,7 @@ int ram_save_queue_pages(const char *rbname, ram_ad=
+dr_t start, ram_addr_t len)
+>          if (!ramblock) {
+>              /* We shouldn't be asked for a non-existent RAMBlock */
+>              error_report("ram_save_queue_pages no block '%s'", rbname);
+> -            goto err;
+> +            return -1;
+>          }
+>          rs->last_req_rb =3D ramblock;
+>      }
+> @@ -2451,7 +2451,7 @@ int ram_save_queue_pages(const char *rbname, ram_ad=
+dr_t start, ram_addr_t len)
+>          error_report("%s request overrun start=3D" RAM_ADDR_FMT " len=3D=
+"
+>                       RAM_ADDR_FMT " blocklen=3D" RAM_ADDR_FMT,
+>                       __func__, start, len, ramblock->used_length);
+> -        goto err;
+> +        return -1;
+>      }
+> =20
+>      struct RAMSrcPageRequest *new_entry =3D
+> @@ -2467,9 +2467,6 @@ int ram_save_queue_pages(const char *rbname, ram_ad=
+dr_t start, ram_addr_t len)
+>      qemu_mutex_unlock(&rs->src_page_req_mutex);
+> =20
+>      return 0;
+> -
+> -err:
+> -    return -1;
+>  }
+> =20
+>  static bool save_page_use_compression(RAMState *rs)
+> @@ -3072,8 +3069,6 @@ int ram_postcopy_send_discard_bitmap(MigrationState=
+ *ms)
+>   */
+>  int ram_discard_range(const char *rbname, uint64_t start, size_t length)
+>  {
+> -    int ret =3D -1;
+> -
+>      trace_ram_discard_range(rbname, start, length);
+> =20
+>      RCU_READ_LOCK_GUARD();
+> @@ -3081,7 +3076,7 @@ int ram_discard_range(const char *rbname, uint64_t =
+start, size_t length)
+> =20
+>      if (!rb) {
+>          error_report("ram_discard_range: Failed to find block '%s'", rbn=
+ame);
+> -        goto err;
+> +        return -1;
+>      }
+> =20
+>      /*
+> @@ -3093,10 +3088,7 @@ int ram_discard_range(const char *rbname, uint64_t=
+ start, size_t length)
+>                       length >> qemu_target_page_bits());
+>      }
+> =20
+> -    ret =3D ram_block_discard_range(rb, start, length);
+> -
+> -err:
+> -    return ret;
+> +    return ram_block_discard_range(rb, start, length);
+>  }
+> =20
+>  /*
+> --=20
+> 2.24.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
