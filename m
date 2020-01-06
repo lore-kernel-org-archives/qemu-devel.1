@@ -2,62 +2,102 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C932FC32771
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FCCC32771
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:58:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BA1F20848
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:46:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BA1F20848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 39615207FD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 09:58:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqAF2O+F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39615207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioOy4-0002GI-Oy
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 04:46:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57542)
+	id 1ioP9q-0006pR-AI
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 04:58:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ioOxK-0001fh-3x
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:45:51 -0500
+ (envelope-from <mst@redhat.com>) id 1ioP9E-00067x-Hj
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:58:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ioOxI-000502-AE
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:45:49 -0500
-Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:35583)
+ (envelope-from <mst@redhat.com>) id 1ioP9B-0004i7-Fw
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:58:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58047
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ioOxI-0004yb-3j
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:45:48 -0500
-Received: from player799.ha.ovh.net (unknown [10.108.42.184])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id E43748AD81
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 10:45:44 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player799.ha.ovh.net (Postfix) with ESMTPSA id 84B8DDE65821;
- Mon,  6 Jan 2020 09:45:35 +0000 (UTC)
-Date: Mon, 6 Jan 2020 10:45:33 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Ganesh Goudar <ganeshgr@linux.ibm.com>
-Subject: Re: [PATCH v18 3/7] target/ppc: Handle NMI guest exit
-Message-ID: <20200106104533.28569d42@bahia.lan>
-In-Reply-To: <20200102075111.25308-4-ganeshgr@linux.ibm.com>
-References: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
- <20200102075111.25308-4-ganeshgr@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ioP9B-0004gx-BQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 04:58:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578304684;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LNlCJBWJPATvWPsS82+/NWD0HbofVteiRNygFg343+U=;
+ b=cqAF2O+F8M4rGSGXeqLllhKTlIOL98cVYXv9cXkDtS7vcgX3RogzRvXBZpwEmz1JF5sMC7
+ uwo4sevtGvVsOTc3GFHNfOl4vYakGkFZZ+FqwTQxTz77Pw0JMyom0S3XoZLmK5ojoxMrni
+ RK2J4dZxZpUfC3lg7q8ac6hN2VHVOhY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-Hwf8ThAIN82GcfkepWvwYg-1; Mon, 06 Jan 2020 04:58:00 -0500
+Received: by mail-qk1-f198.google.com with SMTP id x127so29071676qkb.0
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 01:58:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=td1ZYZa3KyvUVU0VaAQ+9Hf9EcjjZqMSwFwwiTXYdgk=;
+ b=Wzs6wSJ+neO+31AL6HIM0yQdhF5/xu6rBQ6b5EUYlxfm/94frDcLC8X/eKEWh69hZl
+ JCT4wT4XIJlQqFvXuTlz581qnmgMMevNDUytMXKOIMlrxCIAaJoBhdlxRceN2TkzjEO5
+ H6lmgt0NSz230t2uaWQ9SnR20c+rV3UcnS6BJa4aAWfNTLk2M4etSEbAEZAyjHwKbi+2
+ CrTxbnSuIWbRko1bN+oLpggY6/MzYti9C9EmdxaXDn7RriOgkrkCEf0R5W6lSr97lCSP
+ r+h7uAgLgn/Ab4U9JDTvDo+EvvxOJZdVEbzflDNFoU9gPwfYtrMDuVvCpZ7u4fKLbqqE
+ FO4g==
+X-Gm-Message-State: APjAAAXUZ4OA7YdkNlkWK9fxyxD1USheRanosCbabBHlD+1ZSX72HruL
+ Wu2dBmHhky2l08nMpLFtAxn0fUpeZzP8vpSXMWs439SfQiAnBemK4K8oKlUYTvimdY1vfHLiucm
+ ols08ANFKOVoK6D8=
+X-Received: by 2002:ad4:51cc:: with SMTP id p12mr76653954qvq.113.1578304680428; 
+ Mon, 06 Jan 2020 01:58:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyEVGyY5zJfYKnykZwYNKicJs6dZw/pTcGvD0regnFwcpuODKgNLdj/QfbAQ4Jr/EU5ROj4Jw==
+X-Received: by 2002:ad4:51cc:: with SMTP id p12mr76653936qvq.113.1578304680132; 
+ Mon, 06 Jan 2020 01:58:00 -0800 (PST)
+Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
+ by smtp.gmail.com with ESMTPSA id 17sm47230qkl.106.2020.01.06.01.57.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Jan 2020 01:57:59 -0800 (PST)
+Date: Mon, 6 Jan 2020 04:57:54 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
+Message-ID: <20200106044351-mutt-send-email-mst@kernel.org>
+References: <20191226043649.14481-1-yuri.benditovich@daynix.com>
+ <20191226043649.14481-2-yuri.benditovich@daynix.com>
+ <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
+ <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
+ <20200101184425-mutt-send-email-mst@kernel.org>
+ <CAOEp5Oefmj5dM5auk1QpQ3F+CeJXQy+0aXJC1VNmUOj1KHp8aw@mail.gmail.com>
+ <20200105063518-mutt-send-email-mst@kernel.org>
+ <CAOEp5Of0PYiCu9kPyi7W84ToHrGzTHFkPFBGd0A7AVFkwzVZOg@mail.gmail.com>
+ <CAOEp5Oec3x71vPVKDcTBWT4TkgrbSbUZmyDkd2bGF84sXEHUyQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 128352591561857298
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddgtdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepshhpihhnihgtshdrnhgvthenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+In-Reply-To: <CAOEp5Oec3x71vPVKDcTBWT4TkgrbSbUZmyDkd2bGF84sXEHUyQ@mail.gmail.com>
+X-MC-Unique: Hwf8ThAIN82GcfkepWvwYg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.58.91
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,206 +109,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: Yan Vugenfirer <yan@daynix.com>, pbonzini@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  2 Jan 2020 13:21:07 +0530
-Ganesh Goudar <ganeshgr@linux.ibm.com> wrote:
+I guess it somehow has to do with the following:
 
-> From: Aravinda Prasad <arawinda.p@gmail.com>
-> 
-> Memory error such as bit flips that cannot be corrected
-> by hardware are passed on to the kernel for handling.
-> If the memory address in error belongs to guest then
-> the guest kernel is responsible for taking suitable action.
-> Patch [1] enhances KVM to exit guest with exit reason
-> set to KVM_EXIT_NMI in such cases. This patch handles
-> KVM_EXIT_NMI exit.
-> 
-> [1] https://www.spinics.net/lists/kvm-ppc/msg12637.html
->     (e20bbd3d and related commits)
-> 
-> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
+    if (proxy->disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {
+        proxy->disable_legacy =3D pcie_port ? ON_OFF_AUTO_ON : ON_OFF_AUTO_=
+OFF;
+    }
 
-Missing S-o-b.
+so by default device on an express port does not have a legacy interface.
 
->  hw/ppc/spapr.c          |  8 ++++++++
->  hw/ppc/spapr_events.c   | 37 +++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr.h  | 10 ++++++++++
->  target/ppc/kvm.c        | 14 ++++++++++++++
->  target/ppc/kvm_ppc.h    |  2 ++
->  target/ppc/trace-events |  1 +
->  6 files changed, 72 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index c91e64aad0..975d7da734 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1679,6 +1679,12 @@ static void spapr_machine_reset(MachineState *machine)
->      first_ppc_cpu->env.gpr[5] = 0;
->  
->      spapr->cas_reboot = false;
-> +
-> +    spapr->mc_status = -1;
-> +    spapr->guest_machine_check_addr = -1;
-> +
-> +    /* Signal all vCPUs waiting on this condition */
-> +    qemu_cond_broadcast(&spapr->mc_delivery_cond);
->  }
->  
->  static void spapr_create_nvram(SpaprMachineState *spapr)
-> @@ -2973,6 +2979,8 @@ static void spapr_machine_init(MachineState *machine)
->  
->          kvmppc_spapr_enable_inkernel_multitce();
->      }
-> +
-> +    qemu_cond_init(&spapr->mc_delivery_cond);
->  }
->  
->  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index e355e000d0..dfc0de840a 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -40,6 +40,7 @@
->  #include "hw/ppc/spapr_drc.h"
->  #include "qemu/help_option.h"
->  #include "qemu/bcd.h"
-> +#include "qemu/main-loop.h"
->  #include "hw/ppc/spapr_ovec.h"
->  #include <libfdt.h>
->  
-> @@ -622,6 +623,42 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
->                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
->  }
->  
-> +void spapr_mce_req_event(PowerPCCPU *cpu)
-> +{
-> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> +    CPUState *cs = CPU(cpu);
-> +
-> +    if (spapr->guest_machine_check_addr == -1) {
-> +        /*
-> +         * This implies that we have hit a machine check either when the
-> +         * guest has not registered FWNMI (i.e., "ibm,nmi-register" not
-> +         * called) or between system reset and "ibm,nmi-register".
-> +         * Fall back to the old machine check behavior in such cases.
-> +         */
-> +        cs->exception_index = POWERPC_EXCP_MCHECK;
-> +        ppc_cpu_do_interrupt(cs);
-> +        return;
-> +    }
-> +
-> +    while (spapr->mc_status != -1) {
-> +        /*
-> +         * Check whether the same CPU got machine check error
-> +         * while still handling the mc error (i.e., before
-> +         * that CPU called "ibm,nmi-interlock")
-> +         */
-> +        if (spapr->mc_status == cpu->vcpu_id) {
-> +            qemu_system_guest_panicked(NULL);
-> +            return;
-> +        }
-> +        qemu_cond_wait_iothread(&spapr->mc_delivery_cond);
-> +        /* Meanwhile if the system is reset, then just return */
-> +        if (spapr->guest_machine_check_addr == -1) {
-> +            return;
-> +        }
-> +    }
-> +    spapr->mc_status = cpu->vcpu_id;
-> +}
-> +
->  static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
->                              uint32_t token, uint32_t nargs,
->                              target_ulong args,
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 7bc5fc3a9e..909d3976f9 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -191,6 +191,15 @@ struct SpaprMachineState {
->       * occurs during the unplug process. */
->      QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
->  
-> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
-> +    target_ulong guest_machine_check_addr;
-> +    /*
-> +     * mc_status is set to -1 if mc is not in progress, else is set to the CPU
-> +     * handling the mc.
-> +     */
-> +    int mc_status;
-> +    QemuCond mc_delivery_cond;
-> +
->      /*< public >*/
->      char *kvm_type;
->      char *host_model;
-> @@ -804,6 +813,7 @@ void spapr_clear_pending_events(SpaprMachineState *spapr);
->  int spapr_max_server_number(SpaprMachineState *spapr);
->  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
->                        uint64_t pte0, uint64_t pte1);
-> +void spapr_mce_req_event(PowerPCCPU *cpu);
->  
->  /* DRC callbacks. */
->  void spapr_core_release(DeviceState *dev);
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 518de7e4b7..2aebb44e2f 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -1708,6 +1708,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
->          ret = 0;
->          break;
->  
-> +    case KVM_EXIT_NMI:
-> +        trace_kvm_handle_nmi_exception();
-> +        ret = kvm_handle_nmi(cpu, run);
-> +        break;
-> +
->      default:
->          fprintf(stderr, "KVM: unknown exit reason %d\n", run->exit_reason);
->          ret = -1;
-> @@ -2803,6 +2808,15 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
->      return data & 0xffff;
->  }
->  
-> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run)
-> +{
-> +    cpu_synchronize_state(CPU(cpu));
-> +
-> +    spapr_mce_req_event(cpu);
-> +
-> +    return 0;
-> +}
-> +
->  int kvmppc_enable_hwrng(void)
->  {
->      if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_PPC_HWRNG)) {
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index eedb15d48e..bd2a0edf43 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -83,6 +83,8 @@ void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
->  void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu, unsigned int online);
->  void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset);
->  
-> +int kvm_handle_nmi(PowerPCCPU *cpu, struct kvm_run *run);
-> +
->  #else
->  
->  static inline uint32_t kvmppc_get_tbfreq(void)
-> diff --git a/target/ppc/trace-events b/target/ppc/trace-events
-> index 3dc6740706..6d15aa90b4 100644
-> --- a/target/ppc/trace-events
-> +++ b/target/ppc/trace-events
-> @@ -28,3 +28,4 @@ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
->  kvm_handle_epr(void) "handle epr"
->  kvm_handle_watchdog_expiry(void) "handle watchdog expiry"
->  kvm_handle_debug_exception(void) "handle debug exception"
-> +kvm_handle_nmi_exception(void) "handle NMI exception"
+Somehow having a legacy interface fixes things?
+Does enabling legacy on q35 without this patch fix things?
+And does disabling legacy on PIIX without this patch break thing?
+
+How can having a legacy interface fix things if it's not
+even active? I don't know. Is there a chance windows drivers use the
+legacy interface on a transitional device by mistake?
+
+
+On Mon, Jan 06, 2020 at 11:10:18AM +0200, Yuri Benditovich wrote:
+> Michael,
+> Can you please comment on Jason's question: why we have a problem only wi=
+th q35
+> and not with legacy pc?
+> If you have a simple answer, it will help us in further work with other h=
+ot
+> plug/unplug problems.
+>=20
+> Thanks,
+> Yuri Benditovich
+>=20
+> On Sun, Jan 5, 2020 at 6:21 PM Yuri Benditovich <yuri.benditovich@daynix.=
+com>
+> wrote:
+>=20
+>=20
+>=20
+>     On Sun, Jan 5, 2020 at 1:39 PM Michael S. Tsirkin <mst@redhat.com> wr=
+ote:
+>=20
+>         On Thu, Jan 02, 2020 at 09:09:04AM +0200, Yuri Benditovich wrote:
+>         >
+>         >
+>         > On Thu, Jan 2, 2020 at 1:50 AM Michael S. Tsirkin <mst@redhat.c=
+om>
+>         wrote:
+>         >
+>         >=C2=A0 =C2=A0 =C2=A0On Thu, Dec 26, 2019 at 11:29:50AM +0200, Yu=
+ri Benditovich wrote:
+>         >=C2=A0 =C2=A0 =C2=A0> On Thu, Dec 26, 2019 at 10:58 AM Jason Wan=
+g <
+>         jasowang@redhat.com> wrote:
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> > On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Y=
+uri Benditovich wrote:
+>         >=C2=A0 =C2=A0 =C2=A0> > > https://bugzilla.redhat.com/show_bug.c=
+gi?id=3D1708480
+>         >=C2=A0 =C2=A0 =C2=A0> > > Fix leak of region reference that prev=
+ents complete
+>         >=C2=A0 =C2=A0 =C2=A0> > > device deletion on hot unplug.
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> > More information is needed here, the bug=
+ said only q35 can
+>         meet this
+>         >=C2=A0 =C2=A0 =C2=A0> > issue. What makes q35 different here?
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0>
+>         >=C2=A0 =C2=A0 =C2=A0> I do not have any ready answer, I did not =
+dig into it too much.
+>         >=C2=A0 =C2=A0 =C2=A0> Probably Michael Tsirkin or Paolo Bonzini =
+can answer without
+>         digging.
+>         >
+>         >
+>         >
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> > >
+>         >=C2=A0 =C2=A0 =C2=A0> > > Signed-off-by: Yuri Benditovich <
+>         yuri.benditovich@daynix.com>
+>         >=C2=A0 =C2=A0 =C2=A0> > > ---
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0hw/virtio/virtio.c | 5 +++=
+++
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A01 file changed, 5 insertio=
+ns(+)
+>         >=C2=A0 =C2=A0 =C2=A0> > >
+>         >=C2=A0 =C2=A0 =C2=A0> > > diff --git a/hw/virtio/virtio.c b/hw/v=
+irtio/virtio.c
+>         >=C2=A0 =C2=A0 =C2=A0> > > index 04716b5f6c..baadec8abc 100644
+>         >=C2=A0 =C2=A0 =C2=A0> > > --- a/hw/virtio/virtio.c
+>         >=C2=A0 =C2=A0 =C2=A0> > > +++ b/hw/virtio/virtio.c
+>         >=C2=A0 =C2=A0 =C2=A0> > > @@ -2340,6 +2340,11 @@ void virtio_del=
+_queue(VirtIODevice
+>         *vdev, int
+>         >=C2=A0 =C2=A0 =C2=A0n)
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev->vq[n].=
+vring.num_default =3D 0;
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev->vq[n].=
+handle_output =3D NULL;
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev->vq[n].=
+handle_aio_output =3D NULL;
+>         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 /*
+>         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 =C2=A0* with vring.num =
+=3D 0 the queue will be ignored
+>         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 =C2=A0* in later loops =
+of region cache reset
+>         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 =C2=A0*/
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> > I can't get the meaning of this comment.
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> > Thanks
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >=C2=A0 =C2=A0 =C2=A0> > > +=C2=A0 =C2=A0 virtio_virtqueue_reset_=
+region_cache(&vdev->vq[n]);
+>         >
+>         >
+>         >=C2=A0 =C2=A0 =C2=A0Do we need to drop this from virtio_device_f=
+ree_virtqueues then?
+>         >
+>         >
+>         >
+>         > Not mandatory. Repetitive=C2=A0 virtio_virtqueue_reset_region_c=
+ache=C2=A0does
+>         not do
+>         > anything bad.
+>         > Some of virtio devices do not do 'virtio_del_queue' at all.
+>         Currently=C2=A0
+>         > virtio_device_free_virtqueues resets region cache for them.
+>         > IMO, not calling 'virtio_del_queue' is a bug, but not in the sc=
+ope of
+>         current
+>         > series, I'll take care of that later.
+>=20
+>         Maybe we should just del all queues in virtio_device_unrealize?
+>         Will allow us to drop some logic tracking which vqs were created.
+>=20
+>=20
+>=20
+>     Yes, this is also possible with some rework of
+>     virtio_device_free_virtqueues.
+>     virtio-net has some additional operations around queue deletion, it d=
+eletes
+>     queues when switches from single queue to multiple.
+>     =C2=A0
+>=20
+>=20
+>         >
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0 =C2=A0 =C2=A0g_free(vdev-=
+>vq[n].used_elems);
+>         >=C2=A0 =C2=A0 =C2=A0> > >=C2=A0 =C2=A0}
+>         >=C2=A0 =C2=A0 =C2=A0> > >
+>         >=C2=A0 =C2=A0 =C2=A0> >
+>         >
+>         >
+>=20
+>=20
 
 
