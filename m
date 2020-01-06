@@ -2,70 +2,82 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4720C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF6FC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DCA320731
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:42:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6A0020731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:43:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="WlS0tY7l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DCA320731
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ou1icnTe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A0020731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioUWA-0002Iq-Ou
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:42:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35449)
+	id 1ioUXB-0003sE-Ur
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:43:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ioUEx-0001n7-KL
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:24:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ioULm-00043a-HJ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:31:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ioUEw-0005A3-BZ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:24:23 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:40921)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1ioUEv-00058f-TZ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:24:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=jChDevm7+FSSnpvZooTOApF3ckawxX62n9bXQo0ypqw=; b=WlS0tY7lhZB/XkcM8Nb6BraZru
- Y1w1iMZcufQ7BdbUExR4lC7A+vi8/r8sw1eXxwVhoGTCZO09oBfS0C2/T9URLSWz4bTa5UPsPrcXE
- c2OU+oqMUlBGYwk7UqszQOgUjIJ9YuVRaaND9fhuveFGCok6Vpi1OSrFc+QP3ku9y5LpLen1+3KVe
- quf+RFB1J3liRl7sCfE+5Zg0Hnu+WA/ckh+Gq3kMq1fvC7xT1+bx0S6o6zz7S9pz6fxmkNaaWBkFN
- HQdyL6inG7LkXXQVw1pXdaMWDCyj7RQhdBviVmCaVizbyh7iYlmgTldBgg6uEZCwIMHqAUKVt/PuA
- NDn+rDTkF7IusQ5gAFWIOFaK+SELfQhyaKB9m7FtbLUjH6athhvkdKWauYCOFJzpxbqCP1r3kTa2b
- rTqkQL23Jn/UCTdlG2CWxVyoXKJjcfL1INCEiqN/bp4i5oybcwQ7gQnyGjpwfG3Mx4l5xnCHzWbDg
- z49Kwr8i9JTGSKHnBD9my0LFVnrRn+qmxeS6eu+amOSN4eCiSTHYuV1dZwGP9dHb/8D3zbWfcGV08
- Sv5AOeiwx7Kz2TQYtiNZ9th9zGPD6VGUzDT/yNXXdOy93dpWKRQSIwE+bc1HyAnMoxl3m69Vu/Moa
- 5i+KWE2Pe0Bp7VTpAjCy7WsU3muPvq7jUOuruYK1Y=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Stefano Stabellini <sstabellini@kernel.org>,
- anthony.perard@citrix.com, Stefano Stabellini <stefano.stabellini@xilinx.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH] 9p: init_in_iov_from_pdu can truncate the size
-Date: Mon, 06 Jan 2020 16:24:18 +0100
-Message-ID: <2163433.xPYm55Bgvh@silver>
-In-Reply-To: <20200106144254.79920ae7@bahia.lan>
-References: <20191219004251.23763-1-sstabellini@kernel.org>
- <20200106144254.79920ae7@bahia.lan>
+ (envelope-from <peter.maydell@linaro.org>) id 1ioULl-0004HF-Ac
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:31:26 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37144)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ioULl-0004Fc-4Y
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:31:25 -0500
+Received: by mail-oi1-x243.google.com with SMTP id z64so9827999oia.4
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 07:31:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PSt786zdUr+RZhsCyf9cMWSNjSK1NSrxJJSQuMhHSrk=;
+ b=ou1icnTeP8B1y+qcAeVqUWa6Sy+efIFjlCk8aWDdWclflqS5NoEHkcyM4avEykyg0N
+ 4U0PAIHkadwD0XJ0C68kKZxro/yUmapo/LtSwD2yF3UgyJGUUpvvPqJ2g39chqmINwja
+ xS0PZ9hJru5P+1Nhsn3o36uZXlYZ0LFJNUlDuZnbgiCdHV9bGzDcCJdEgCPGW8JWjiGp
+ DkEy/zQPoMisJI9bF5tcHPWTw8HMCXM+j8H3F2Znjy1O5V9LrpQeAZWM81pdG0kqQSRN
+ wqjV2WrNX3kcP77v62Y7re88Z5kRXy5QMrOINOCT4TrxWyLT1/WG27O7Niq2mlyNvWGR
+ 5LSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PSt786zdUr+RZhsCyf9cMWSNjSK1NSrxJJSQuMhHSrk=;
+ b=PZyyihPLihuTtQ7RFrBnLwoqn54ra4AG+6WBQuYac1M2seLxztaClL5afaKaSzOXNb
+ PYUVL4rpZhb864Sxw2ZZrpPXP7skbNuLvgRdso7vrLmUYSkb18a+PW2LS3kbuN+f5APv
+ qnfXjyFB1Jat/sqYZjH5ZmjOG7fRAQVgPnM++bpg9m8I/+gS2Dmo/tiQ13YCPIGuVchu
+ 1PpCriZuYtSQbnqa98S/oi17Hv9jtsspNq5JG2jY6b5frGTGjSLw1fo20drzEhlt0xJ8
+ Brj9ehiyEhR620kSTRXZCO3G1lPNKaNvcnQMHew1+ZyePJ9eJxUvAnrCCbqhLojHxD6d
+ LsDg==
+X-Gm-Message-State: APjAAAUhCwPKn9K1+Isa8NaCUD795RH+/LNkhtx+kV+IPR6vkG6ymxBo
+ IFXYaigr8FEM3a/teQfOyv6eBU7DQcLwzNFE2DfMHA==
+X-Google-Smtp-Source: APXvYqxVl73SBr6Fa9s27kaQkLGP/JyDV7CJct/dOP5ups20G/k4QCMk5l1DQqa94BhIML/f11czyvG6dK3AKHM5OmM=
+X-Received: by 2002:aca:f484:: with SMTP id s126mr5253711oih.48.1578324683886; 
+ Mon, 06 Jan 2020 07:31:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.189.157.229
+References: <20200106144552.7205-1-peter.maydell@linaro.org>
+ <CAJ+F1C+PcER4eQhJwwE6Q-xrfn4+rTr=z+otyg2O=ZQA+sD4FQ@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+PcER4eQhJwwE6Q-xrfn4+rTr=z+otyg2O=ZQA+sD4FQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Jan 2020 15:31:12 +0000
+Message-ID: <CAFEAcA8-_vT3dX9aT5UZVmsnS3qkohZk8LrgTQRymsitAFNAZg@mail.gmail.com>
+Subject: Re: [PATCH] tests/iothread: Always connect iothread GSource to a
+ GMainContext
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,61 +89,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Montag, 6. Januar 2020 14:42:54 CET Greg Kurz wrote:
-> > diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> > index 775e8ff766..68873c3f5f 100644
-> > --- a/hw/9pfs/virtio-9p-device.c
-> > +++ b/hw/9pfs/virtio-9p-device.c
-> > @@ -145,19 +145,15 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu,
-> > size_t offset,> 
-> >  }
-> >  
-> >  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec
-> >  **piov,
-> > 
-> > -                                        unsigned int *pniov, size_t size)
-> > +                                        unsigned int *pniov, size_t
-> > *size)
-> > 
+On Mon, 6 Jan 2020 at 15:22, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Mon, Jan 6, 2020 at 7:03 PM Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+> >
+> > On older versions of glib (anything prior to glib commit 0f056ebe
+> > from May 2019), the implementation of g_source_ref() and
+> > g_source_unref() is not threadsafe for a GSource which is not
+> > attached to a GMainContext.
+> >
+> > QEMU's real iothread.c implementation always attaches its
+> > iothread->ctx's GSource to a GMainContext created for that iothread,
+> > so it is OK, but the simple test framework implementation in
+> > tests/iothread.c was not doing this.  This was causing intermittent
+> > assertion failures in the test-aio-multithread subtest
+> > "/aio/multi/mutex/contended" test on the BSD hosts.  (It's unclear
+> > why only BSD seems to have been affected -- perhaps a combination of
+> > the specific glib version being used in the VMs and their happening
+> > to run on a host with a lot of CPUs).
+
+> >  static void *iothread_run(void *opaque)
 > >  {
-> >  
-> >      V9fsState *s = pdu->s;
-> >      V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
-> >      VirtQueueElement *elem = v->elems[pdu->idx];
-> >      size_t buf_size = iov_size(elem->in_sg, elem->in_num);
-> > 
-> > -    if (buf_size < size) {
-> > -        VirtIODevice *vdev = VIRTIO_DEVICE(v);
-> > -
-> > -        virtio_error(vdev,
-> > -                     "VirtFS reply type %d needs %zu bytes, buffer has
-> > %zu", -                     pdu->id + 1, size, buf_size);
-> > +    if (buf_size < *size) {
-> > +        *size = buf_size;
-> > 
-> >      }
-> 
-> As suggested by Christian in some other mail, it could still make sense to
-> raise the error if there isn't even enough space to pack a 9p message
-> header.
+> >      IOThread *iothread =3D opaque;
+> > @@ -44,6 +57,20 @@ static void *iothread_run(void *opaque)
+> >      my_iothread =3D iothread;
+> >      qemu_mutex_lock(&iothread->init_done_lock);
+> >      iothread->ctx =3D aio_context_new(&error_abort);
+> > +
+> > +    /*
+> > +     * We must connect the ctx to a GMainContext, because in older ver=
+sions
+> > +     * of glib the g_source_ref()/unref() functions are not threadsafe
+> > +     * on sources without a context.
+> > +     */
+> > +    iothread_init_gcontext(iothread);
+> > +
+> > +    /*
+> > +     * g_main_context_push_thread_default() must be called before anyt=
+hing
+> > +     * in this new thread uses glib.
+>
+> in/if, I suppose
 
-Another option: Instead of handling this as a hard error (which they probably 
-try to avoid in their use case): putting the handler asleep for a while by 
-calling qemu_co_sleep_ns_wakeable() in this case. Then a bit later transport 
-would eventually have the required buffer size and handler could continue the 
-request without an error.
+No; it means "before anything in this new thread specifically" as
+opposed to "before anything in the whole process". (This comment is
+verbatim copied from the main iothread.c, incidentally).
 
-But this would require more care. For instance subsequent request handlers 
-would need to check if there was already an event handler asleep, and if so it 
-would either need to wake it up or put itself asleep as well to prevent the 
-request order being processed by server being messed up.
+Thanks for the review.
 
-Best regards,
-Christian Schoenebeck
-
-
+-- PMM
 
