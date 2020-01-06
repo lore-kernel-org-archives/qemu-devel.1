@@ -2,63 +2,91 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03812C00523
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 02:11:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F94EC00523
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 02:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE0E0215A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 02:11:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE0E0215A4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 135B1215A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 02:16:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L+5ViJE/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 135B1215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioHrm-0002V2-Vx
-	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 21:11:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43778)
+	id 1ioHwc-0004M2-8z
+	for qemu-devel@archiver.kernel.org; Sun, 05 Jan 2020 21:16:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1ioHqv-0001ux-FM
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 21:10:46 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ioHvY-0003g8-JJ
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 21:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1ioHqu-0008CJ-2c
- for qemu-devel@nongnu.org; Sun, 05 Jan 2020 21:10:45 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2285 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1ioHqq-0007zr-T7; Sun, 05 Jan 2020 21:10:41 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 41DC94A0B0DEFCBBC6AC;
- Mon,  6 Jan 2020 10:10:34 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Mon, 6 Jan 2020
- 10:10:25 +0800
-Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified by
- _HID
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20191219064759.35053-1-guoheyi@huawei.com>
- <20191219064759.35053-3-guoheyi@huawei.com>
- <20200105072504-mutt-send-email-mst@kernel.org>
- <20200105074308-mutt-send-email-mst@kernel.org>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <ede9a938-32a3-70e0-d884-325505afb345@huawei.com>
-Date: Mon, 6 Jan 2020 10:10:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ (envelope-from <richard.henderson@linaro.org>) id 1ioHvX-00042w-8O
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 21:15:32 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34262)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ioHvW-0003y6-WB
+ for qemu-devel@nongnu.org; Sun, 05 Jan 2020 21:15:31 -0500
+Received: by mail-pf1-x443.google.com with SMTP id i6so19385353pfc.1
+ for <qemu-devel@nongnu.org>; Sun, 05 Jan 2020 18:15:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=XP2hNmKzUX3IBbM3eIgKOH1z6Rf1aNz0lhFQuUULG28=;
+ b=L+5ViJE/plrN7/Mb02cYU3on+MSMjvXFum9iBNLG4cSZVc98RsAx+t0+giOH/7vxnY
+ Io2ZFBtPuUSXbxkjuzrZRNncANRyBvpp0mVHnu4duv2JSIelA1qhLc/4WnbJf87Krq06
+ s3iXcDm4nLInqAbd3ZK24/2jVdeYpr5X//LrhliNCvurrUr4FMiAbRpBBoCWF30uknZn
+ +i4HoE7zTRx0CEUX8RmzjV7obcpImGDRiYSJp/mDh/vSnl3DOKbF9cCOn+0SS61LgUmP
+ bpcuNHcNv3yLIitYkqU3BSa+ssgQSbyH7E0M9y294F9n2sJ0ONmKfTnDXXg5a42tsymM
+ 5DZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XP2hNmKzUX3IBbM3eIgKOH1z6Rf1aNz0lhFQuUULG28=;
+ b=nxsIv6kwNhZ1soUdlK8hvHqt+xlsLkb/d2Co+33OQsdewULGzk8HtWNZSPdK8jIY5x
+ bc0YfwGyFidI5g/SxOWedycE/qzo781D/zk8ebAMsU3XzYHItJ0utdXUTiqqP8IlHbsi
+ 7v68/WndBEz90ww2Z543g52lW+zf3yfx6EN8cE04Zs5NloJXx9wQmqDaQ0PWKYzNVr/U
+ tz6/k/cKoV8jlwhjA5qeTDlQrn4znGNUdBXt/9OLOWb3+0CtmWwROmi5fizjL+llAjTf
+ gphy4/KJyOp9HqP5A7Z76ijD0IzD23dC65QTHoMud/KDGPiWC2Sqf0TAktbyl7Tjfn9S
+ w4gA==
+X-Gm-Message-State: APjAAAV/aTL5yWKPE+WpVA45zuCwjIf9cEF5bL31COkn7UKU3CY/U9Jz
+ MeKCJeRbVziZ+zrxYWc/TAvRcg==
+X-Google-Smtp-Source: APXvYqzm/I8hj2u5w/XYgHGzZIr6n8dwIqvbWjJ4C8k8SWV87E9RhpMQLnIDrk/G2Bdkz5g2p6hTFw==
+X-Received: by 2002:a63:5b59:: with SMTP id
+ l25mr110928350pgm.382.1578276929620; 
+ Sun, 05 Jan 2020 18:15:29 -0800 (PST)
+Received: from ?IPv6:2001:44b8:2176:c800:f1c3:9f9c:2e9f:1ebd?
+ (2001-44b8-2176-c800-f1c3-9f9c-2e9f-1ebd.static.ipv6.internode.on.net.
+ [2001:44b8:2176:c800:f1c3:9f9c:2e9f:1ebd])
+ by smtp.gmail.com with ESMTPSA id z6sm60618257pfa.155.2020.01.05.18.15.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 05 Jan 2020 18:15:28 -0800 (PST)
+Subject: Re: [PATCH] arm/translate-a64: fix uninitialized variable warning
+To: pannengyuan@huawei.com, peter.maydell@linaro.org
+References: <20200106015700.52992-1-pannengyuan@huawei.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <69ee9eb1-84bf-5bcc-738c-c75dd520cbf2@linaro.org>
+Date: Mon, 6 Jan 2020 12:15:22 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200105074308-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+In-Reply-To: <20200106015700.52992-1-pannengyuan@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,151 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, wanghaibin.wang@huawei.com
+Cc: qemu-trivial@nongnu.org, Euler Robot <euler.robot@huawei.com>,
+ qemu-arm@nongnu.org, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 1/6/20 11:57 AM, pannengyuan@huawei.com wrote:
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+> 
+> Fixes:
+> target/arm/translate-a64.c: In function 'disas_crypto_three_reg_sha512':
+> target/arm/translate-a64.c:13625:9: error: 'genfn' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>     genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr);
+>     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> qemu/target/arm/translate-a64.c:13609:8: error: 'feature' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>     if (!feature) {
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org> 
 
-=E5=9C=A8 2020/1/5 20:53, Michael S. Tsirkin =E5=86=99=E9=81=93:
-> On Sun, Jan 05, 2020 at 07:34:01AM -0500, Michael S. Tsirkin wrote:
->> On Thu, Dec 19, 2019 at 02:47:59PM +0800, Heyi Guo wrote:
->>> According to ACPI spec, _ADR should be used for device which is on a
->>> bus that has a standard enumeration algorithm. It does not make sense
->>> to have a _ADR object for devices which already have _HID and will be
->>> enumerated by OSPM.
->>>
->>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->> Are you sure? I would think this depends on the ID and the device
->> really. E.g. PCI devices all are expected to have _ADR and some of the=
-m
->> have a _HID.
->
-> To clarify I am not commenting on patches.
-> The spec says this:
-> 	6.1.5 _HID (Hardware ID)
->
-> 	This object is used to supply OSPM with the device=E2=80=99s PNP ID or=
- ACPI ID. 1
->
-> 	When describing a platform, use of any _HID objects is optional. Howev=
-er, a _HID object must be
->
-> 	used to describe any device that will be enumerated by OSPM. OSPM only=
- enumerates a device
->
-> 	when no bus enumerator can detect the device ID. For example, devices =
-on an ISA bus are
->
-> 	enumerated by OSPM. Use the _ADR object to describe devices enumerated=
- by bus enumerators
->
-> 	other than OSPM.
->
->
-> Note: "detect the device ID" not "enumerate the device" which I think
-> means there's a driver matching this vendor/device ID.
->
-> So it seems fine to have _ADR so device is enumerated, and still have
-> _HID e.g. so ACPI driver can be loaded as fallback if there's
-> no bus driver.
->
->
-> Note I am not saying the patch itself is not correct.
-> Maybe these devices are not on any standard bus and that
-> is why they should not have _ADR? I have not looked.
->
-> I am just saying that spec does not seem to imply _HID and _ADR
-> can't coexist.
+Are you compiling with reduced optimization?  The compiler should be able to
+prove that these variables are initialized.  It certainly does with -O2, on all
+known gcc versions.
 
-That's true; I did't find such statement either. Maybe what we can say=20
-is that the _ADR is senseless here.
+Perhaps a better fix is to add a
 
-Thanks,
+    default:
+        g_assert_not_reached();
 
-Heyi
+entry to the o == 0 switch.  Though of course opcode must be in [0-3], based on
+the extraction mask, so a default label isn't actually reachable.  But that's
+the only path I can see for which incomplete optimization would fail to prove
+initialization.
 
->
->
->> CC Corey who added a device with both HID and ADR to x86 recenly.
->>
->> Apropos Corey, why was HID APP0005 chosen?
->>
->>> ---
->>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
->>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>> Cc: Igor Mammedov <imammedo@redhat.com>
->>> Cc: qemu-arm@nongnu.org
->>> Cc: qemu-devel@nongnu.org
->>> ---
->>>   hw/arm/virt-acpi-build.c          |   8 --------
->>>   tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
->>>   tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
->>>   tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
->>>   4 files changed, 8 deletions(-)
->>>
->>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>> index 9f4c7d1889..be752c0ad8 100644
->>> --- a/hw/arm/virt-acpi-build.c
->>> +++ b/hw/arm/virt-acpi-build.c
->>> @@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const M=
-emMapEntry *uart_memmap,
->>>                                AML_EXCLUSIVE, &uart_irq, 1));
->>>       aml_append(dev, aml_name_decl("_CRS", crs));
->>>  =20
->>> -    /* The _ADR entry is used to link this device to the UART descri=
-bed
->>> -     * in the SPCR table, i.e. SPCR.base_address.address =3D=3D _ADR=
-.
->>> -     */
->>> -    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)=
-));
->>> -
->>>       aml_append(scope, dev);
->>>   }
->>>  =20
->>> @@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const M=
-emMapEntry *memmap,
->>>       aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
->>>       aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
->>>       aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
->>> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->>>       aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
->>>       aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Devic=
-e")));
->>>       aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
->>> @@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const =
-MemMapEntry *gpio_memmap,
->>>   {
->>>       Aml *dev =3D aml_device("GPO0");
->>>       aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
->>> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->>>       aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->>>  =20
->>>       Aml *crs =3D aml_resource_template();
->>> @@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope=
-)
->>>   {
->>>       Aml *dev =3D aml_device(ACPI_POWER_BUTTON_DEVICE);
->>>       aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
->>> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
->>>       aml_append(dev, aml_name_decl("_UID", aml_int(0)));
->>>       aml_append(scope, dev);
->>>   }
->>> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
->>
->> Please do not include binary changes in acpi patches.
->>
->> See comment at the top of tests/bios-tables-test.c for documentation
->> on how to update these.
->>
->> --=20
->> MST
->
-> .
 
+r~
 
