@@ -2,82 +2,62 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2116AC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 367FDC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:34:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0A482081E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:33:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BK5bGLEI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0A482081E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C12D207FD
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 15:34:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C12D207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioUNy-0006WU-8O
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:33:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55037)
+	id 1ioUOK-00072v-7N
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 10:34:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ioTwP-00011y-46
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:05:15 -0500
+ (envelope-from <clg@kaod.org>) id 1ioTpb-0001cH-QI
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ioTwN-00007E-Ta
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:05:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45046
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ioTpa-0001UY-GL
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:58:11 -0500
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:59412)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ioTwM-0008WI-RD
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 10:05:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578323110;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=S5gI5+HKCZngJGsD2h9ZdORMAS15f1OiqFoglQKYm3Q=;
- b=BK5bGLEIExGxedAUwrZkwPkU7Ajfv831KfeyZR/jps1zPVE7Sfs3acIgs4HIkRKkHHDkcv
- 1iXz19SbCw+7qwjVydAyCXJ6i18yzYA+Eq4q6Fg6gOBogBDWSYfSwSKVf0zdsJTy+6LAIy
- ESCnW+em/gB1c+Xr9nFjTTrQPUDfbtA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-toNXLA4pOYSmJPX5PQBQRg-1; Mon, 06 Jan 2020 10:05:09 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65738801E7A
- for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 15:05:08 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 06E08858BE;
- Mon,  6 Jan 2020 15:05:04 +0000 (UTC)
-Date: Mon, 6 Jan 2020 15:05:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 057/104] virtiofsd: add --syslog command-line option
-Message-ID: <20200106150505.GU2930416@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-58-dgilbert@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ioTpa-0001Sl-A1
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:58:10 -0500
+Received: from player731.ha.ovh.net (unknown [10.108.42.145])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id CE3C0155AAE
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 15:58:07 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player731.ha.ovh.net (Postfix) with ESMTPSA id 35281DB3A926;
+ Mon,  6 Jan 2020 14:58:00 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH v3 12/12] pnv/psi: Consolidate some duplicated code in
+ pnv_psi_realize()
+Date: Mon,  6 Jan 2020 15:56:45 +0100
+Message-Id: <20200106145645.4539-13-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200106145645.4539-1-clg@kaod.org>
+References: <20200106145645.4539-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-58-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: toNXLA4pOYSmJPX5PQBQRg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 5404038079288347622
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehtddgjedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeef
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.59.63
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,42 +69,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:17PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: Stefan Hajnoczi <stefanha@redhat.com>
->=20
-> Sometimes collecting output from stderr is inconvenient or does not fit
-> within the overall logging architecture.  Add syslog(3) support for
-> cases where stderr cannot be used.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> dgilbert: Reworked as a logging function
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  tools/virtiofsd/fuse_lowlevel.h  |  1 +
->  tools/virtiofsd/helper.c         |  2 ++
->  tools/virtiofsd/passthrough_ll.c | 50 ++++++++++++++++++++++++++++++--
->  tools/virtiofsd/seccomp.c        | 32 ++++++++++++++------
->  tools/virtiofsd/seccomp.h        |  4 ++-
->  5 files changed, 76 insertions(+), 13 deletions(-)
+From: Greg Kurz <groug@kaod.org>
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+The proper way to do that would be to use device_class_set_parent_realize=
+(),
+but defining a Pnv8PsiClass and a Pnv9PsiClass types with a parent_realiz=
+e
+pointer adds a fair amount of code. Calling pnv_psi_realize() explicitely
+is fine for now.
 
+This should probably be achieved with a device realize hook in the
+PSI base class and device_class_set_parent_realize() in the children
+classes.
 
-Regards,
-Daniel
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/pnv_psi.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index cf21e42d93b7..ce7717ccb151 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -471,6 +471,16 @@ static void pnv_psi_reset_handler(void *dev)
+     dc->reset(DEVICE(dev));
+ }
+=20
++static void pnv_psi_realize(DeviceState *dev, Error **errp)
++{
++    PnvPsi *psi =3D PNV_PSI(dev);
++
++    /* Default BAR for MMIO region */
++    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
++
++    qemu_register_reset(pnv_psi_reset_handler, dev);
++}
++
+ static void pnv_psi_power8_instance_init(Object *obj)
+ {
+     Pnv8Psi *psi8 =3D PNV8_PSI(obj);
+@@ -523,9 +533,6 @@ static void pnv_psi_power8_realize(DeviceState *dev, =
+Error **errp)
+     memory_region_init_io(&psi->regs_mr, OBJECT(dev), &psi_mmio_ops, psi=
+,
+                           "psihb", PNV_PSIHB_SIZE);
+=20
+-    /* Default BAR for MMIO region */
+-    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+-
+     /* Default sources in XIVR */
+     for (i =3D 0; i < PSI_NUM_INTERRUPTS; i++) {
+         uint8_t xivr =3D irq_to_xivr[i];
+@@ -533,7 +540,7 @@ static void pnv_psi_power8_realize(DeviceState *dev, =
+Error **errp)
+             ((uint64_t) i << PSIHB_XIVR_SRC_SH);
+     }
+=20
+-    qemu_register_reset(pnv_psi_reset_handler, dev);
++    pnv_psi_realize(dev, errp);
+ }
+=20
+ static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+@@ -868,9 +875,7 @@ static void pnv_psi_power9_realize(DeviceState *dev, =
+Error **errp)
+     memory_region_init_io(&psi->regs_mr, OBJECT(dev), &pnv_psi_p9_mmio_o=
+ps, psi,
+                           "psihb", PNV9_PSIHB_SIZE);
+=20
+-    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+-
+-    qemu_register_reset(pnv_psi_reset_handler, dev);
++    pnv_psi_realize(dev, errp);
+ }
+=20
+ static void pnv_psi_power9_class_init(ObjectClass *klass, void *data)
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+2.21.1
 
 
