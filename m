@@ -2,89 +2,77 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB0D5C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22BAC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:28:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79650207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:19:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MjRYTqty"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79650207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7756B2072E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:28:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7756B2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iobf6-0003Ug-GW
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 18:19:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60048)
+	id 1iobnc-0001y5-9w
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 18:28:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iobeK-0002kC-A9
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:19:05 -0500
+ (envelope-from <bounces@canonical.com>) id 1ioY9z-000350-7V
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 14:35:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iobeH-0003GS-41
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:19:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57473
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iobeG-0003Ea-Oh
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:19:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578352739;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+M955kzUI0mRQtNhhPkI/Adz6orgOVBkd1rxCP/IcqQ=;
- b=MjRYTqtyIPOJmJobjf/JRCsQc8tBt/QOv16azqIL6kMfNRZOTEg2mL393Lt8dUasn0ruiR
- Ms1YY+JLpwy9bio6kUayofGxbCAdMX02btSaoJ9VRYUw661LtZA5IpxiWDo6dMS0bz8FqI
- lpQ7Sxlt934An/qla/Cry7E71cOSAWg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-ingXIQSeOiiwQlc6mhfIJQ-1; Mon, 06 Jan 2020 18:18:56 -0500
-X-MC-Unique: ingXIQSeOiiwQlc6mhfIJQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96AC4800D48;
- Mon,  6 Jan 2020 23:18:53 +0000 (UTC)
-Received: from w520.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 844341036D1B;
- Mon,  6 Jan 2020 23:18:51 +0000 (UTC)
-Date: Mon, 6 Jan 2020 16:18:51 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20200106161851.07871e28@w520.home>
-In-Reply-To: <20200102182537.GK2927@work-vm>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
- <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
- <20191216154406.023f912b@x1.home>
- <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
- <20191217114357.6496f748@x1.home>
- <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
- <20191219102706.0a316707@x1.home>
- <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
- <20191219140929.09fa24da@x1.home> <20200102182537.GK2927@work-vm>
+ (envelope-from <bounces@canonical.com>) id 1ioY9x-0000kZ-VE
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 14:35:31 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45562)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ioY9x-0000jh-PQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 14:35:29 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ioY9w-0004QT-Ra
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 19:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CF5B52E80C3
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 19:35:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Jan 2020 19:26:48 -0000
+From: David Miller <zezuspam@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: audio dos games gus sb16 timed timer
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: zezuspam
+X-Launchpad-Bug-Reporter: David Miller (zezuspam)
+X-Launchpad-Bug-Modifier: David Miller (zezuspam)
+References: <157833854539.28173.10729724748625497755.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157833880848.3062.6630996346887021056.malone@soybean.canonical.com>
+Subject: [Bug 1858488] Re: qemu git && 4.2:  timed audio issues with sb16,
+ gus not working?
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4059a55347c6390ff9cc4c74fecaa9a598f4c4c5
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Mon, 06 Jan 2020 18:26:20 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,83 +81,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- cohuck@redhat.com, shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org,
- zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Reply-To: Bug 1858488 <1858488@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2 Jan 2020 18:25:37 +0000
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+./qemu is a symlink to qemu/build/i386-softmmu/qemu-system-i386
 
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Fri, 20 Dec 2019 01:40:35 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> > > On 12/19/2019 10:57 PM, Alex Williamson wrote:
-> > > 
-> > > <Snip>
-> > >   
-> 
-> <snip>
-> 
-> > > 
-> > > If device state it at pre-copy state (011b).
-> > > Transition, i.e., write to device state as stop-and-copy state (010b) 
-> > > failed, then by previous state I meant device should return pre-copy 
-> > > state(011b), i.e. previous state which was successfully set, or as you 
-> > > said current state which was successfully set.  
-> > 
-> > Yes, the point I'm trying to make is that this version of the spec
-> > tries to tell the user what they should do upon error according to our
-> > current interpretation of the QEMU migration protocol.  We're not
-> > defining the QEMU migration protocol, we're defining something that can
-> > be used in a way to support that protocol.  So I think we should be
-> > concerned with defining our spec, for example my proposal would be: "If
-> > a state transition fails the user can read device_state to determine the
-> > current state of the device.  This should be the previous state of the
-> > device unless the vendor driver has encountered an internal error, in
-> > which case the device may report the invalid device_state 110b.  The
-> > user must use the device reset ioctl in order to recover the device
-> > from this state.  If the device is indicated in a valid device state
-> > via reading device_state, the user may attempt to transition the device
-> > to any valid state reachable from the current state."  
-> 
-> We might want to be able to distinguish between:
->   a) The device has failed and needs a reset
->   b) The migration has failed
+-- =
 
-I think the above provides this.  For Kirti's example above of
-transitioning from pre-copy to stop-and-copy, the device could refuse
-to transition to stop-and-copy, generating an error on the write() of
-device_state.  The user re-reading device_state would allow them to
-determine the current device state, still in pre-copy or failed.  Only
-the latter would require a device reset.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1858488
 
-> If some part of the devices mechanics for migration fail, but the device
-> is otherwise operational then we should be able to decide to fail the
-> migration without taking the device down, which might be very bad for
-> the VM.
-> Losing a VM during migration due to a problem with migration really
-> annoys users; it's one thing the migration failing, but taking the VM
-> out as well really gets to them.
-> 
-> Having the device automatically transition back to the 'running' state
-> seems a bad idea to me; much better to tell the hypervisor and provide
-> it with a way to clean up; for example, imagine a system with multiple
-> devices that are being migrated, most of them have happily transitioned
-> to stop-and-copy, but then the last device decides to fail - so now
-> someone is going to have to take all of them back to running.
+Title:
+  qemu git && 4.2:  timed audio issues with sb16,  gus not working?
 
-Right, unless I'm missing one, it seems invalid->running is the only
-self transition the device should make, though still by way of user
-interaction via the reset ioctl.  Thanks,
+Status in QEMU:
+  New
 
-Alex
+Bug description:
+  =
 
+  I have built [both] current git, and 4.2.0, there are issues with audio/s=
+oundhw for both.
+
+  Specifics:
+
+  Linux nullrig 5.3.0-24-generic #26-Ubuntu SMP Thu Nov 14 01:33:18 UTC
+  2019 x86_64 x86_64 x86_64 GNU/Linux
+
+  Out of source build, successful for both:
+
+  ../configure --prefix=3D/opt/qemu --target-list=3Di386-softmmu,mips64el-
+  softmmu ---enable-sdl --enable-sdl-image --enable-lzo --enable-bzip2
+  --enable-avx2 --enable-kvm --enable-membarrier --enable-plugin
+
+  Call:
+
+  ./qemu -machine pc,accel=3Dkvm,usb=3Doff -cpu pentium -m 64 -rtc
+  base=3Dlocaltime -parallel none -soundhw sb16,adlib,pcspk -device
+  cirrus-vga,bus=3Dpci.0 -drive
+  id=3Ddisk1,file=3Ddoom.cow,format=3Dqcow2,if=3Dvirtio -audiodev pa,id=3Dpa
+
+  Audio for sb16 sounds ok,  however if i switch to a timer based audio:
+  -audiodev wav
+
+  The output is wrong..  I had assumed it was all timer based audio,
+  however it seems to be limited to sb16.
+
+  So I then tried the next popular/compatible audio device for dos
+  games:  gravis ultrasound [gus].
+
+  I get no output at all for it.
+  I have tried more than one piece of software,  DOOM shareware is any easy=
+ example.
+
+  I realize there are better solutions for playing DOS games, however I
+  am interested in snapshot support which many of them lack.
+
+  I am willing to put the work into fixing it myself if need be,
+  however i'm not very familiar with the audio backend.   Specifically,
+  it is already mixed into a single buffer,  if 'adlib' driver is
+  already working: (audio_pcm_ops.write() output is correct on timer
+  based output) I failed to see how it affects emulation of the sound
+  blaster.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1858488/+subscriptions
 
