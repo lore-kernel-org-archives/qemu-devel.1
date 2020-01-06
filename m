@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F34C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A0BDC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:51:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 155E020731
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14BCF20731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:51:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alG9N8e9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 155E020731
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPcKP9Vm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14BCF20731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioTib-0006pN-IU
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:50:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43174)
+	id 1ioTil-0006zP-MB
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:51:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43313)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ioTaT-0005Yx-5y
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:34 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ioTae-0005vi-LQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ioTaR-0008Kk-Il
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52919
+ (envelope-from <mreitz@redhat.com>) id 1ioTad-0008SJ-HR
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39227
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioTaR-0008Jv-Eb
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:31 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioTad-0008Rg-E3
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578321751;
+ s=mimecast20190719; t=1578321762;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=p9tpAQdINwsC2qxcq9bQXk8UJ95ABgg+qf/HxpPai1I=;
- b=alG9N8e9skJAMuWTfedGPZy43mc4zq/EubbyaerVPk3A2nVl0/4exc7EafYv8X3X7v/dE2
- dDBnB11dTdSn127KrcU8ihYoNYiBkwtTLc8YbSWnJnMp0q94he5RMON6ZXGLk/td2ZNTFw
- E5ACl0fOrWiJFQEkmxLWt0TqJl/oD3Q=
+ bh=HcR8kdZVNr6+Xmm97ZoQXx/mtvvqp3phSsQ3QlqYEE8=;
+ b=GPcKP9VmlVcBzcV++eCEoeQLfTtM4BorLGlqciRF/vzEtlsPEBdTQ8yf00YWU1JPVt2Yal
+ 2uvCMw7Fz85UUHGsCpMWeZPTe0H/JYczJnWsoUprNJ6SThEh1kozxZYmnHaE00qR9pVlLM
+ iKadDg4QTLkcyV1bFBja5W6u3wC9OO4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-yN6O0pjCPbWvhexxuZVeTw-1; Mon, 06 Jan 2020 09:42:27 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-18-PGKEBlKJPtyFb-0gutoewA-1; Mon, 06 Jan 2020 09:42:39 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53ED61083E88;
- Mon,  6 Jan 2020 14:42:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 281C585B6FE;
+ Mon,  6 Jan 2020 14:42:38 +0000 (UTC)
 Received: from localhost (ovpn-117-91.ams2.redhat.com [10.36.117.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B698E7C00A;
- Mon,  6 Jan 2020 14:42:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8499B29342;
+ Mon,  6 Jan 2020 14:42:37 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 03/34] blkdebug: Allow taking/unsharing permissions
-Date: Mon,  6 Jan 2020 15:41:35 +0100
-Message-Id: <20200106144206.698920-4-mreitz@redhat.com>
+Subject: [PULL 06/34] throttle-groups: fix memory leak in
+ throttle_group_set_limit:
+Date: Mon,  6 Jan 2020 15:41:38 +0100
+Message-Id: <20200106144206.698920-7-mreitz@redhat.com>
 In-Reply-To: <20200106144206.698920-1-mreitz@redhat.com>
 References: <20200106144206.698920-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: yN6O0pjCPbWvhexxuZVeTw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: PGKEBlKJPtyFb-0gutoewA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -90,204 +91,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sometimes it is useful to be able to add a node to the block graph that
-takes or unshare a certain set of permissions for debugging purposes.
-This patch adds this capability to blkdebug.
+From: PanNengyuan <pannengyuan@huawei.com>
 
-(Note that you cannot make blkdebug release or share permissions that it
-needs to take or cannot share, because this might result in assertion
-failures in the block layer.  But if the blkdebug node has no parents,
-it will not take any permissions and share everything by default, so you
-can then freely choose what permissions to take and share.)
+This avoid a memory leak when qom-set is called to set throttle_group
+limits, here is an easy way to reproduce:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20191108123455.39445-4-mreitz@redhat.com
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+1. run qemu-iotests as follow and check the result with asan:
+       ./check -qcow2 184
+
+Following is the asan output backtrack:
+Direct leak of 912 byte(s) in 3 object(s) allocated from:
+    #0 0xffff8d7ab3c3 in __interceptor_calloc   (/lib64/libasan.so.4+0xd33c=
+3)
+    #1 0xffff8d4c31cb in g_malloc0   (/lib64/libglib-2.0.so.0+0x571cb)
+    #2 0x190c857 in qobject_input_start_struct  /mnt/sdc/qemu-master/qemu-4=
+.2.0-rc0/qapi/qobject-input-visitor.c:295
+    #3 0x19070df in visit_start_struct   /mnt/sdc/qemu-master/qemu-4.2.0-rc=
+0/qapi/qapi-visit-core.c:49
+    #4 0x1948b87 in visit_type_ThrottleLimits   qapi/qapi-visit-block-core.=
+c:3759
+    #5 0x17e4aa3 in throttle_group_set_limits   /mnt/sdc/qemu-master/qemu-4=
+.2.0-rc0/block/throttle-groups.c:900
+    #6 0x1650eff in object_property_set     /mnt/sdc/qemu-master/qemu-4.2.0=
+-rc0/qom/object.c:1272
+    #7 0x1658517 in object_property_set_qobject   /mnt/sdc/qemu-master/qemu=
+-4.2.0-rc0/qom/qom-qobject.c:26
+    #8 0x15880bb in qmp_qom_set  /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qom/qo=
+m-qmp-cmds.c:74
+    #9 0x157e3e3 in qmp_marshal_qom_set  qapi/qapi-commands-qom.c:154
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+Message-id: 1574835614-42028-1-git-send-email-pannengyuan@huawei.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/blkdebug.c     | 93 +++++++++++++++++++++++++++++++++++++++++++-
- qapi/block-core.json | 14 ++++++-
- 2 files changed, 105 insertions(+), 2 deletions(-)
+ block/throttle-groups.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 5ae96c52b0..af44aa973f 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -28,10 +28,14 @@
- #include "qemu/cutils.h"
- #include "qemu/config-file.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-+#include "qapi/qapi-visit-block-core.h"
- #include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/qobject-input-visitor.h"
- #include "sysemu/qtest.h"
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 77014c741b..37695b0cd7 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -893,8 +893,7 @@ static void throttle_group_set_limits(Object *obj, Visi=
+tor *v,
+ {
+     ThrottleGroup *tg =3D THROTTLE_GROUP(obj);
+     ThrottleConfig cfg;
+-    ThrottleLimits arg =3D { 0 };
+-    ThrottleLimits *argp =3D &arg;
++    ThrottleLimits *argp;
+     Error *local_err =3D NULL;
 =20
- typedef struct BDRVBlkdebugState {
-@@ -44,6 +48,9 @@ typedef struct BDRVBlkdebugState {
-     uint64_t opt_discard;
-     uint64_t max_discard;
-=20
-+    uint64_t take_child_perms;
-+    uint64_t unshare_child_perms;
-+
-     /* For blkdebug_refresh_filename() */
-     char *config_file;
-=20
-@@ -344,6 +351,69 @@ static void blkdebug_parse_filename(const char *filena=
-me, QDict *options,
-     qdict_put_str(options, "x-image", filename);
+     visit_type_ThrottleLimits(v, name, &argp, &local_err);
+@@ -912,6 +911,7 @@ static void throttle_group_set_limits(Object *obj, Visi=
+tor *v,
+ unlock:
+     qemu_mutex_unlock(&tg->lock);
+ ret:
++    qapi_free_ThrottleLimits(argp);
+     error_propagate(errp, local_err);
+     return;
  }
-=20
-+static int blkdebug_parse_perm_list(uint64_t *dest, QDict *options,
-+                                    const char *prefix, Error **errp)
-+{
-+    int ret =3D 0;
-+    QDict *subqdict =3D NULL;
-+    QObject *crumpled_subqdict =3D NULL;
-+    Visitor *v =3D NULL;
-+    BlockPermissionList *perm_list =3D NULL, *element;
-+    Error *local_err =3D NULL;
-+
-+    *dest =3D 0;
-+
-+    qdict_extract_subqdict(options, &subqdict, prefix);
-+    if (!qdict_size(subqdict)) {
-+        goto out;
-+    }
-+
-+    crumpled_subqdict =3D qdict_crumple(subqdict, errp);
-+    if (!crumpled_subqdict) {
-+        ret =3D -EINVAL;
-+        goto out;
-+    }
-+
-+    v =3D qobject_input_visitor_new(crumpled_subqdict);
-+    visit_type_BlockPermissionList(v, NULL, &perm_list, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret =3D -EINVAL;
-+        goto out;
-+    }
-+
-+    for (element =3D perm_list; element; element =3D element->next) {
-+        *dest |=3D bdrv_qapi_perm_to_blk_perm(element->value);
-+    }
-+
-+out:
-+    qapi_free_BlockPermissionList(perm_list);
-+    visit_free(v);
-+    qobject_unref(subqdict);
-+    qobject_unref(crumpled_subqdict);
-+    return ret;
-+}
-+
-+static int blkdebug_parse_perms(BDRVBlkdebugState *s, QDict *options,
-+                                Error **errp)
-+{
-+    int ret;
-+
-+    ret =3D blkdebug_parse_perm_list(&s->take_child_perms, options,
-+                                   "take-child-perms.", errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    ret =3D blkdebug_parse_perm_list(&s->unshare_child_perms, options,
-+                                   "unshare-child-perms.", errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    return 0;
-+}
-+
- static QemuOptsList runtime_opts =3D {
-     .name =3D "blkdebug",
-     .head =3D QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-@@ -419,6 +489,12 @@ static int blkdebug_open(BlockDriverState *bs, QDict *=
-options, int flags,
-     /* Set initial state */
-     s->state =3D 1;
-=20
-+    /* Parse permissions modifiers before opening the image file */
-+    ret =3D blkdebug_parse_perms(s, options, errp);
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-     /* Open the image file */
-     bs->file =3D bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "=
-image",
-                                bs, &child_file, false, &local_err);
-@@ -916,6 +992,21 @@ static int blkdebug_reopen_prepare(BDRVReopenState *re=
-open_state,
-     return 0;
- }
-=20
-+static void blkdebug_child_perm(BlockDriverState *bs, BdrvChild *c,
-+                                const BdrvChildRole *role,
-+                                BlockReopenQueue *reopen_queue,
-+                                uint64_t perm, uint64_t shared,
-+                                uint64_t *nperm, uint64_t *nshared)
-+{
-+    BDRVBlkdebugState *s =3D bs->opaque;
-+
-+    bdrv_filter_default_perms(bs, c, role, reopen_queue, perm, shared,
-+                              nperm, nshared);
-+
-+    *nperm |=3D s->take_child_perms;
-+    *nshared &=3D ~s->unshare_child_perms;
-+}
-+
- static const char *const blkdebug_strong_runtime_opts[] =3D {
-     "config",
-     "inject-error.",
-@@ -940,7 +1031,7 @@ static BlockDriver bdrv_blkdebug =3D {
-     .bdrv_file_open         =3D blkdebug_open,
-     .bdrv_close             =3D blkdebug_close,
-     .bdrv_reopen_prepare    =3D blkdebug_reopen_prepare,
--    .bdrv_child_perm        =3D bdrv_filter_default_perms,
-+    .bdrv_child_perm        =3D blkdebug_child_perm,
-=20
-     .bdrv_getlength         =3D blkdebug_getlength,
-     .bdrv_refresh_filename  =3D blkdebug_refresh_filename,
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index fcb52ec24f..839b10b3f0 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3454,6 +3454,16 @@
- #
- # @set-state:       array of state-change descriptions
- #
-+# @take-child-perms: Permissions to take on @image in addition to what
-+#                    is necessary anyway (which depends on how the
-+#                    blkdebug node is used).  Defaults to none.
-+#                    (since 5.0)
-+#
-+# @unshare-child-perms: Permissions not to share on @image in addition
-+#                       to what cannot be shared anyway (which depends
-+#                       on how the blkdebug node is used).  Defaults
-+#                       to none.  (since 5.0)
-+#
- # Since: 2.9
- ##
- { 'struct': 'BlockdevOptionsBlkdebug',
-@@ -3463,7 +3473,9 @@
-             '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
-             '*opt-discard': 'int32', '*max-discard': 'int32',
-             '*inject-error': ['BlkdebugInjectErrorOptions'],
--            '*set-state': ['BlkdebugSetStateOptions'] } }
-+            '*set-state': ['BlkdebugSetStateOptions'],
-+            '*take-child-perms': ['BlockPermission'],
-+            '*unshare-child-perms': ['BlockPermission'] } }
-=20
- ##
- # @BlockdevOptionsBlklogwrites:
 --=20
 2.24.1
 
