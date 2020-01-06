@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D58D9C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78850C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F3CC2075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:53:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 426D32075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:53:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WDsU6oZo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F3CC2075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/N3SMOs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 426D32075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioTkt-0001wD-9F
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:53:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43286)
+	id 1ioTl9-0002Ox-LD
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:53:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ioTab-0005td-Uv
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:43 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ioTar-0006A4-0q
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ioTaa-0008QP-O6
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34670
+ (envelope-from <mreitz@redhat.com>) id 1ioTap-00009d-R4
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27730
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioTaa-0008Pv-Ko
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:40 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioTap-00008u-N1
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578321760;
+ s=mimecast20190719; t=1578321775;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QSBQdOnL72EHKVqrlm6ZtVcGCAI/LeO2wRMWAF3DQec=;
- b=WDsU6oZoYH1DeN2301/fbrBT362XvPKnv3dMQcmHCcGtXVDvkaf8x+fq5rLejL1k/EET93
- de/lvkna/KXQyS8ke4bRuQtCKAXuex3TF4/Nj4oSccB6fDXUah/eWr9XbHFVWW8Kn87dSG
- YKlPNYGIHA+mVB2X1cNDZas3U6zWIMA=
+ bh=5fV0o92wv3EQ/Iwazcvp/NxjEvMeO/Tonk+nyxiGGRc=;
+ b=h/N3SMOsS4ntPCkCkh/IO1GfJ8Unv9OOkT4Nhas1gDVh8IFLWlY9aQvlhayTGygafnOfTU
+ lCjOOTVcTxDn5kHUVFC+QA98PhldaDokUvM77pwrFgdWDWfyQqzsRCe4iKu1eqTHiQ1h1I
+ bATYEBdbdgBog3ybbMYLJ+rkuDvpfZk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-ydecRgtTPmirzHBA_0eAGw-1; Mon, 06 Jan 2020 09:42:36 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-6-2xJ6fo-HOjqEL_z47pfVjA-1; Mon, 06 Jan 2020 09:42:52 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90BEF107AD3E;
- Mon,  6 Jan 2020 14:42:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01C5618B9F54;
+ Mon,  6 Jan 2020 14:42:51 +0000 (UTC)
 Received: from localhost (ovpn-117-91.ams2.redhat.com [10.36.117.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 179B510840F1;
- Mon,  6 Jan 2020 14:42:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8087687ECB;
+ Mon,  6 Jan 2020 14:42:50 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 05/34] iotests: Add test for failing mirror complete
-Date: Mon,  6 Jan 2020 15:41:37 +0100
-Message-Id: <20200106144206.698920-6-mreitz@redhat.com>
+Subject: [PULL 11/34] iotests: Add _filter_json_filename
+Date: Mon,  6 Jan 2020 15:41:43 +0100
+Message-Id: <20200106144206.698920-12-mreitz@redhat.com>
 In-Reply-To: <20200106144206.698920-1-mreitz@redhat.com>
 References: <20200106144206.698920-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: ydecRgtTPmirzHBA_0eAGw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 2xJ6fo-HOjqEL_z47pfVjA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -91,87 +91,48 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20191108123455.39445-6-mreitz@redhat.com
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Message-id: 20191107163708.833192-5-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/041     | 44 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/041.out |  4 ++--
- 2 files changed, 46 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/common.filter | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 8568426311..d7be30b62b 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -1121,6 +1121,50 @@ class TestOrphanedSource(iotests.QMPTestCase):
-                              target=3D'dest-ro')
-         self.assert_qmp(result, 'error/class', 'GenericError')
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.f=
+ilter
+index 5367deea39..116cc8a840 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -232,5 +232,29 @@ _filter_qmp_empty_return()
+     grep -v '{"return": {}}'
+ }
 =20
-+    def test_failing_permission_in_complete(self):
-+        self.assert_no_active_block_jobs()
++_filter_json_filename()
++{
++    $PYTHON -c 'import sys
++result, *fnames =3D sys.stdin.read().split("json:{")
++depth =3D 0
++for fname in fnames:
++    depth +=3D 1 # For the opening brace in the split separator
++    for chr_i, chr in enumerate(fname):
++        if chr =3D=3D "{":
++            depth +=3D 1
++        elif chr =3D=3D "}":
++            depth -=3D 1
++            if depth =3D=3D 0:
++                break
 +
-+        # Unshare consistent-read on the target
-+        # (The mirror job does not care)
-+        result =3D self.vm.qmp('blockdev-add',
-+                             driver=3D'blkdebug',
-+                             node_name=3D'dest-perm',
-+                             image=3D'dest',
-+                             unshare_child_perms=3D['consistent-read'])
-+        self.assert_qmp(result, 'return', {})
++    # json:{} filenames may be nested; filter out everything from
++    # inside the outermost one
++    if depth =3D=3D 0:
++        chr_i +=3D 1 # First character past the filename
++        result +=3D "json:{ /* filtered */ }" + fname[chr_i:]
 +
-+        result =3D self.vm.qmp('blockdev-mirror', job_id=3D'job', device=
-=3D'src',
-+                             sync=3D'full', target=3D'dest',
-+                             filter_node_name=3D'mirror-filter')
-+        self.assert_qmp(result, 'return', {})
++sys.stdout.write(result)'
++}
 +
-+        # Require consistent-read on the source
-+        # (We can only add this node once the job has started, or it
-+        # will complain that it does not want to run on non-root nodes)
-+        result =3D self.vm.qmp('blockdev-add',
-+                             driver=3D'blkdebug',
-+                             node_name=3D'src-perm',
-+                             image=3D'src',
-+                             take_child_perms=3D['consistent-read'])
-+        self.assert_qmp(result, 'return', {})
-+
-+        # While completing, mirror will attempt to replace src by
-+        # dest, which must fail because src-perm requires
-+        # consistent-read but dest-perm does not share it; thus
-+        # aborting the job when it is supposed to complete
-+        self.complete_and_wait('job',
-+                               completion_error=3D'Operation not permitted=
-')
-+
-+        # Assert that all of our nodes are still there (except for the
-+        # mirror filter, which should be gone despite the failure)
-+        nodes =3D self.vm.qmp('query-named-block-nodes')['return']
-+        nodes =3D [node['node-name'] for node in nodes]
-+
-+        for expect in ('src', 'src-perm', 'dest', 'dest-perm'):
-+            self.assertTrue(expect in nodes, '%s disappeared' % expect)
-+        self.assertFalse('mirror-filter' in nodes,
-+                         'Mirror filter node did not disappear')
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2', 'qed'],
-                  supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index 2c448b4239..f496be9197 100644
---- a/tests/qemu-iotests/041.out
-+++ b/tests/qemu-iotests/041.out
-@@ -1,5 +1,5 @@
--..........................................................................=
-................
-+..........................................................................=
-.................
- ----------------------------------------------------------------------
--Ran 90 tests
-+Ran 91 tests
-=20
- OK
+ # make sure this script returns success
+ true
 --=20
 2.24.1
 
