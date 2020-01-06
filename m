@@ -8,72 +8,73 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8916AC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8156C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53631208C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 769512146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 18:44:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PnwIgj7M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53631208C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THZ+VBYY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769512146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioXM4-0001hQ-RX
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 13:43:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45349)
+	id 1ioXMP-00023B-B6
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 13:44:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ioX44-0001zH-P6
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:21 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ioX4X-0002ff-Lu
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ioX43-00046c-Mm
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:20 -0500
-Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:45614)
+ (envelope-from <danielhb413@gmail.com>) id 1ioX4W-0004aM-N1
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:49 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:34262)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ioX43-00046G-Ih; Mon, 06 Jan 2020 13:25:19 -0500
-Received: by mail-qv1-xf41.google.com with SMTP id l14so19415266qvu.12;
- Mon, 06 Jan 2020 10:25:19 -0800 (PST)
+ id 1ioX4W-0004a8-JT; Mon, 06 Jan 2020 13:25:48 -0500
+Received: by mail-qk1-x744.google.com with SMTP id j9so40690522qkk.1;
+ Mon, 06 Jan 2020 10:25:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hSgP8NRncEIEX6pPa78Nm0OrXSlmyhM+fq2uskBfwUQ=;
- b=PnwIgj7Mss+7c3FRHg/gxnuuuKT8VRVeMsMvCbh1H4EGvXB3DM2fzXTh5jB0Rkh2Nn
- JCW4h8jtc19hRCb2cAOxvhCJC05xHS92i2Zm+j5y/OZJwI+goDz5791lDCJwzm5ERSeH
- WyEgduHpVUIVR6CNKpZSeLfVr8/wH9iGgMwLxf7nhDIEiTcm2Wxk0kgicREh0VB+jcE3
- /wsN8ac/2tnyy0LXicEg4VGn+YEY9hzwjeI1TBRwY7YeDZm2TgQLxbuwAVScuhpewABw
- MdJWkCG0Rn0e1e7Z310As33vFUSeFS0x4GdRDnDesE1Yn78gGk2VZMB5VhNk0wq8/8nl
- 3ZVw==
+ bh=CkaRW9GkcqQi8J8yq9bVtroJ/RDDzEhUPcZDuYcLtVI=;
+ b=THZ+VBYYtFliiVYANai24SLT6IuIr98gBcUYXtT44BxIf9LmqYCPtB+2Z7xsj1vLrp
+ C8EdITVO5MbvcLZJqlsQFMm09UdSZL+MlnrCmfGyun1SbdBQpsiK7EC8Zid51x2kH6xP
+ ooPpOlHPNt+vsQKIkffhiO7qORT+csTUw4eFo/MT4EsfBCqpMj9zlkotHadecCiKW1JI
+ 6Vkac2vshedLgJP9lEU1ABl4L6nR4s2KI0KQWjtD1RNr4DBUrilbRDqAon8BeztN3kKV
+ 7qurbXz+bygD/ok5+fnqitSdFtktz4GkPWoub89oxyX+2e34VyEAmmLpB0cldlkK0pnh
+ knMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=hSgP8NRncEIEX6pPa78Nm0OrXSlmyhM+fq2uskBfwUQ=;
- b=DGuWTI4uDeeyoIWwxJ7jx6Y5Nquo7EUUV1bUzWQmoQEELbv6gIfvzOFwJ/+W8kpoDF
- v7gm7/3Zs0QDU+5NePMSz/U+LrygWULskNSKjI8p2bzJO9U0gNKz/fUiZhY/axUwwi0p
- 3hrQ+xPZESr2hlXcCy8JW4lvB8Qr4eZUHAGG5RYvv3aD3abII59iCBdLBgbT1yRvzpCt
- 8UPd51Tli28FwjroUTXXr45a8xsJmSENZEv94/mpzMzG3XT9lH+TPjZ4B4ypX3t+4Ub2
- x+Xybzzl5sRO1O2TQvJ3pK37AbOEDUQMCJRz+IJe8QIs297XiRlZYpPc6sv/jqBDlDAB
- RtOA==
-X-Gm-Message-State: APjAAAUPkRzRp7jf65vPj0r9qql3eFHPcyx+g3CiOR98yzPcf2Iyx4Y3
- TS6c81Gzui2WyfhNmOpTgCwYiq6l
-X-Google-Smtp-Source: APXvYqxX16Cv1Akxg3pbiFk+LwU7ID3SXP4GXRzIaaySsTIEkjSILzEueIMKSMxhXeNKoZzSZuNfdA==
-X-Received: by 2002:a0c:8bd2:: with SMTP id a18mr53137941qvc.38.1578335118942; 
- Mon, 06 Jan 2020 10:25:18 -0800 (PST)
+ bh=CkaRW9GkcqQi8J8yq9bVtroJ/RDDzEhUPcZDuYcLtVI=;
+ b=H021zkB8N3jwijj+lQqDZ1olfm1yue9AMRKdz8BmaHeoQXsIKqeKYVBsO97YPhhVxB
+ QjJAmkbQcjE8PZDhSf8Dc8iTxp0RAMUDXSLAPMTMWDq+QqqBVmFCK11jEzVg7OVVw/OB
+ iTszSjpMtd45HpIK6EYgo70E3njOBPgz6dlWajhTGy2v2CPCF6rCEW+7vOv4B9gkcNrU
+ vtygPB5uoXPxUdAlmc2We+varI54UJ5P2VQteCGo0nYbUowFw596BWeeQ2FZiTT/PW3O
+ 9apqN2YVpHX3L9WdkoqjBzKn6teyYr15S10twKXkv3oLg25fmHVR69NG/inr2G643g6C
+ 5rIQ==
+X-Gm-Message-State: APjAAAXxRHKUSxFOhA6ymUDolQkjaHDgFWUvAi2QIgeUr/t0t6abGtRF
+ zzvR0qZDe+BgRUUoFtWyrBESgvPY
+X-Google-Smtp-Source: APXvYqwn+VqbjFcIZj2wWG/ZmvQIU2j6SovxRbLRfHDACElrSjqiPVjK7h8ipfumIYTJ68eww7+OXA==
+X-Received: by 2002:a05:620a:6b8:: with SMTP id
+ i24mr86401008qkh.9.1578335148022; 
+ Mon, 06 Jan 2020 10:25:48 -0800 (PST)
 Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.25.17
+ by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.25.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 10:25:18 -0800 (PST)
+ Mon, 06 Jan 2020 10:25:47 -0800 (PST)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 15/59] block/blkreplay.c: remove unneeded 'fail' label in
- blkreplay_open()
-Date: Mon,  6 Jan 2020 15:23:41 -0300
-Message-Id: <20200106182425.20312-16-danielhb413@gmail.com>
+Subject: [PATCH v1 31/59] util/aio-posix.c: remove unneeded 'out' label in
+ aio_epoll
+Date: Mon,  6 Jan 2020 15:23:57 -0300
+Message-Id: <20200106182425.20312-32-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200106182425.20312-1-danielhb413@gmail.com>
 References: <20200106182425.20312-1-danielhb413@gmail.com>
@@ -81,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::f41
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,53 +95,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+ Daniel Henrique Barboza <danielhb413@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both the 'fail' label and the 'ret' variable can be removed.
-Use 'return -EINVAL' in the error condition and 'return 0' in
-the end of the function.
+'out' can be replaced by 'return ret'.
 
-CC: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 CC: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- block/blkreplay.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ util/aio-posix.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index c96ac8f4bc..d8c4c311f3 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -24,23 +24,19 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp)
- {
-     Error *local_err = NULL;
--    int ret;
- 
-     /* Open the image file */
-     bs->file = bdrv_open_child(NULL, options, "image",
-                                bs, &child_file, false, &local_err);
-     if (local_err) {
--        ret = -EINVAL;
-         error_propagate(errp, local_err);
--        goto fail;
-+        return -EINVAL;
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index a4977f538e..7c4cfea8ce 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -121,7 +121,7 @@ static int aio_epoll(AioContext *ctx, GPollFD *pfds,
+                          ARRAY_SIZE(events),
+                          timeout);
+         if (ret <= 0) {
+-            goto out;
++            return ret;
+         }
+         for (i = 0; i < ret; i++) {
+             int ev = events[i].events;
+@@ -132,7 +132,6 @@ static int aio_epoll(AioContext *ctx, GPollFD *pfds,
+                 (ev & EPOLLERR ? G_IO_ERR : 0);
+         }
      }
- 
-     bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED;
-     bs->supported_zero_flags = BDRV_REQ_WRITE_UNCHANGED;
- 
--    ret = 0;
--fail:
--    return ret;
-+    return 0;
+-out:
+     return ret;
  }
  
- static int64_t blkreplay_getlength(BlockDriverState *bs)
 -- 
 2.24.1
 
