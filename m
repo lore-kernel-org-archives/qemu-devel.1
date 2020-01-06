@@ -2,84 +2,73 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C262C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF1DBC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:42:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56E152072A
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:40:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BxWmy4hi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56E152072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9FCC72072A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 23:42:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FCC72072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iobzO-0007MW-88
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 18:40:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51977)
+	id 1ioc0e-0000im-Tv
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 18:42:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iobxB-0005Rz-1D
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:38:34 -0500
+ (envelope-from <bounces@canonical.com>) id 1iobzM-0007qV-66
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:40:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iobx8-0006G3-HD
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:38:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37015
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iobx8-0006FH-D2
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:38:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578353909;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vOyTcMLr9WzrXoxI0/cmErtAO80sAJQrm+KZusxm4dw=;
- b=BxWmy4hiVcq9lN7lhnELID9ZgtG6Npf3TyPV5A6n8J5LhlpATPzVfHZMaXPup4rJAS6qbe
- pVMbVyGDF0H69RTX+ULRHFznaNVtTbclVBWFzxtIbt/TRC2cq4M4Qvcfm6z9Pbl5c9c3bz
- /tFIwFRTS/VLtNiSfSJX3HoTg7jf7yU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-Wd5YEv4HMBCP6QgXnIEGcA-1; Mon, 06 Jan 2020 18:38:27 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 901BE107ACC5;
- Mon,  6 Jan 2020 23:38:26 +0000 (UTC)
-Received: from redhat.com (ovpn-116-57.ams2.redhat.com [10.36.116.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C1A9387;
- Mon,  6 Jan 2020 23:38:25 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v1 05/59] ram.c: remove unneeded labels
-In-Reply-To: <20200106182425.20312-6-danielhb413@gmail.com> (Daniel Henrique
- Barboza's message of "Mon, 6 Jan 2020 15:23:31 -0300")
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-6-danielhb413@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 07 Jan 2020 00:38:23 +0100
-Message-ID: <87blrgxij4.fsf@trasno.org>
+ (envelope-from <bounces@canonical.com>) id 1iobzK-0000Y8-NH
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:40:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51208)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iobzK-0000Vt-FO
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 18:40:46 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iobzI-0001iu-Ui
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:40:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CB1AF2E80C8
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 23:40:44 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Wd5YEv4HMBCP6QgXnIEGcA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 06 Jan 2020 23:32:39 -0000
+From: puchuu <1858461@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: aladjev-andrew
+X-Launchpad-Bug-Reporter: puchuu (aladjev-andrew)
+X-Launchpad-Bug-Modifier: puchuu (aladjev-andrew)
+References: <157833123209.15024.12557979334447840996.malonedeb@wampee.canonical.com>
+Message-Id: <157835355989.5838.7830680062358364120.malone@gac.canonical.com>
+Subject: [Bug 1858461] Re: Please refactor linux-user/mips/cpu_loop.c
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a586f344cc47b9c505674638cc3b15eeb4088a5a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,25 +77,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1858461 <1858461@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
-> ram_save_queue_pages() has an 'err' label that can be replaced by
-> 'return -1' instead.
->
-> Same thing with ram_discard_range(), and in this case we can also
-> get rid of the 'ret' variable and return either '-1' on error
-> or the result of ram_block_discard_range().
->
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Please do not use previous workaround in prod, it is bad, just proof of
+concept.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+It looks like nobody is maintaining syscall list. It is not possible to
+trust it.
 
+We have "arch/mips/kernel/syscalls/syscall_o32.tbl", we need to create
+generator. Generator should provide maximum possible number of arguments
+for syscall. For example:
+
+> sync_file_range  sys_sync_file_range  sys32_sync_file_range
+
+"sys_sync_file_range" has 4 arguments, "sys32_sync_file_range" - 7
+arguments. Maximum value - 7 should be stored inside our table.
+
+The problem is that some syscalls in kernel code is prefixed by
+SYSCALL_DEFINE{N} or COMPAT_SYSCALL_DEFINE{N}. but some (like
+"sys_sync_file_range" and "sys32_sync_file_range") are not prefixed.
+
+So I think we may have a generator that provides "WAT?" if it don't know
+the arguments count and require to update value manualy.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1858461
+
+Title:
+  Please refactor linux-user/mips/cpu_loop.c
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello. I am working with qemu on test images. I've added a new syscall
+  (436) to qemu but received ENOSYS from mips application.
+
+  Please open "linux-user/mips/cpu_loop.c". I've added at the end of
+  "mips_syscall_args" the following:
+
+  ```
+  MIPS_SYS(sys_getdents64_x32, 3)
+  ```
+
+  But
+
+  ```
+  syscall_num =3D env->active_tc.gpr[2] - 4000;
+  if (syscall_num >=3D sizeof(mips_syscall_args)) {
+    ret =3D -TARGET_ENOSYS;
+  ```
+
+  returns -TARGET_ENOSYS
+
+  We can see that "linux-user/mips/cpu_loop.c" differs a lot from
+  "linux-user/arm/cpu_loop.c". Arm has it's own "ARM_NR_BASE" and etc.
+
+  Can you please refactor mips cpu loop in the same way as arm? Thank
+  you.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1858461/+subscriptions
 
