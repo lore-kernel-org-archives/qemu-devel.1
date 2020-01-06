@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F28C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F34C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:50:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C537020731
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:49:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 155E020731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 14:50:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hREzr7g8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C537020731
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alG9N8e9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 155E020731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioTgy-0004wd-7P
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:49:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43841)
+	id 1ioTib-0006pN-IU
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 09:50:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ioTbE-0006jT-52
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:43:21 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ioTaT-0005Yx-5y
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ioTbD-0000U6-0b
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:43:19 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40901
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1ioTaR-0008Kk-Il
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52919
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioTbC-0000Tp-Sl
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:43:18 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ioTaR-0008Jv-Eb
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 09:42:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578321798;
+ s=mimecast20190719; t=1578321751;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bLiYj6BXkPYmDRDPIGzY1HHWOR+4yjYppQp72ysdNJc=;
- b=hREzr7g8YRtA36wgPaJqJadIadogcjQhRUW8gSPeYmiBXYG7lYe4JQD77pVZKFooTnZqvY
- cy8648csVktpVlA5bDsX9wDLGVSktwzo4YwylSvl4+ScvC8EX9mX72SeIXvlWOkDil2xis
- j8Szj5o5IX1DZkR8yji8gIsUiejm3z8=
+ bh=p9tpAQdINwsC2qxcq9bQXk8UJ95ABgg+qf/HxpPai1I=;
+ b=alG9N8e9skJAMuWTfedGPZy43mc4zq/EubbyaerVPk3A2nVl0/4exc7EafYv8X3X7v/dE2
+ dDBnB11dTdSn127KrcU8ihYoNYiBkwtTLc8YbSWnJnMp0q94he5RMON6ZXGLk/td2ZNTFw
+ E5ACl0fOrWiJFQEkmxLWt0TqJl/oD3Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-Xss0MI4xOBKUcOEtrf1LtA-1; Mon, 06 Jan 2020 09:43:17 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-14-yN6O0pjCPbWvhexxuZVeTw-1; Mon, 06 Jan 2020 09:42:27 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06BF55B37C;
- Mon,  6 Jan 2020 14:43:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53ED61083E88;
+ Mon,  6 Jan 2020 14:42:26 +0000 (UTC)
 Received: from localhost (ovpn-117-91.ams2.redhat.com [10.36.117.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A067210840F1;
- Mon,  6 Jan 2020 14:43:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B698E7C00A;
+ Mon,  6 Jan 2020 14:42:24 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 20/34] iotests: Drop IMGOPTS use in 267
-Date: Mon,  6 Jan 2020 15:41:52 +0100
-Message-Id: <20200106144206.698920-21-mreitz@redhat.com>
+Subject: [PULL 03/34] blkdebug: Allow taking/unsharing permissions
+Date: Mon,  6 Jan 2020 15:41:35 +0100
+Message-Id: <20200106144206.698920-4-mreitz@redhat.com>
 In-Reply-To: <20200106144206.698920-1-mreitz@redhat.com>
 References: <20200106144206.698920-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: Xss0MI4xOBKUcOEtrf1LtA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: yN6O0pjCPbWvhexxuZVeTw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,64 +90,204 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Overwriting IMGOPTS means ignoring all user-supplied options, which is
-not what we want.  Replace the current IMGOPTS use by a new BACKING_FILE
-variable.
+Sometimes it is useful to be able to add a node to the block graph that
+takes or unshare a certain set of permissions for debugging purposes.
+This patch adds this capability to blkdebug.
+
+(Note that you cannot make blkdebug release or share permissions that it
+needs to take or cannot share, because this might result in assertion
+failures in the block layer.  But if the blkdebug node has no parents,
+it will not take any permissions and share everything by default, so you
+can then freely choose what permissions to take and share.)
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Message-id: 20191107163708.833192-14-mreitz@redhat.com
+Message-id: 20191108123455.39445-4-mreitz@redhat.com
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/267 | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ block/blkdebug.c     | 93 +++++++++++++++++++++++++++++++++++++++++++-
+ qapi/block-core.json | 14 ++++++-
+ 2 files changed, 105 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
-index b823668e29..bd9a5c5524 100755
---- a/tests/qemu-iotests/267
-+++ b/tests/qemu-iotests/267
-@@ -69,7 +69,11 @@ size=3D128M
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index 5ae96c52b0..af44aa973f 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -28,10 +28,14 @@
+ #include "qemu/cutils.h"
+ #include "qemu/config-file.h"
+ #include "block/block_int.h"
++#include "block/qdict.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
++#include "qapi/qapi-visit-block-core.h"
+ #include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/qobject-input-visitor.h"
+ #include "sysemu/qtest.h"
 =20
- run_test()
- {
--    _make_test_img $size
-+    if [ -n "$BACKING_FILE" ]; then
-+        _make_test_img -b "$BACKING_FILE" $size
-+    else
-+        _make_test_img $size
-+    fi
-     printf "savevm snap0\ninfo snapshots\nloadvm snap0\n" | run_qemu "$@" =
-| _filter_date
+ typedef struct BDRVBlkdebugState {
+@@ -44,6 +48,9 @@ typedef struct BDRVBlkdebugState {
+     uint64_t opt_discard;
+     uint64_t max_discard;
+=20
++    uint64_t take_child_perms;
++    uint64_t unshare_child_perms;
++
+     /* For blkdebug_refresh_filename() */
+     char *config_file;
+=20
+@@ -344,6 +351,69 @@ static void blkdebug_parse_filename(const char *filena=
+me, QDict *options,
+     qdict_put_str(options, "x-image", filename);
  }
 =20
-@@ -120,12 +124,12 @@ echo
++static int blkdebug_parse_perm_list(uint64_t *dest, QDict *options,
++                                    const char *prefix, Error **errp)
++{
++    int ret =3D 0;
++    QDict *subqdict =3D NULL;
++    QObject *crumpled_subqdict =3D NULL;
++    Visitor *v =3D NULL;
++    BlockPermissionList *perm_list =3D NULL, *element;
++    Error *local_err =3D NULL;
++
++    *dest =3D 0;
++
++    qdict_extract_subqdict(options, &subqdict, prefix);
++    if (!qdict_size(subqdict)) {
++        goto out;
++    }
++
++    crumpled_subqdict =3D qdict_crumple(subqdict, errp);
++    if (!crumpled_subqdict) {
++        ret =3D -EINVAL;
++        goto out;
++    }
++
++    v =3D qobject_input_visitor_new(crumpled_subqdict);
++    visit_type_BlockPermissionList(v, NULL, &perm_list, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret =3D -EINVAL;
++        goto out;
++    }
++
++    for (element =3D perm_list; element; element =3D element->next) {
++        *dest |=3D bdrv_qapi_perm_to_blk_perm(element->value);
++    }
++
++out:
++    qapi_free_BlockPermissionList(perm_list);
++    visit_free(v);
++    qobject_unref(subqdict);
++    qobject_unref(crumpled_subqdict);
++    return ret;
++}
++
++static int blkdebug_parse_perms(BDRVBlkdebugState *s, QDict *options,
++                                Error **errp)
++{
++    int ret;
++
++    ret =3D blkdebug_parse_perm_list(&s->take_child_perms, options,
++                                   "take-child-perms.", errp);
++    if (ret < 0) {
++        return ret;
++    }
++
++    ret =3D blkdebug_parse_perm_list(&s->unshare_child_perms, options,
++                                   "unshare-child-perms.", errp);
++    if (ret < 0) {
++        return ret;
++    }
++
++    return 0;
++}
++
+ static QemuOptsList runtime_opts =3D {
+     .name =3D "blkdebug",
+     .head =3D QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+@@ -419,6 +489,12 @@ static int blkdebug_open(BlockDriverState *bs, QDict *=
+options, int flags,
+     /* Set initial state */
+     s->state =3D 1;
 =20
- TEST_IMG=3D"$TEST_IMG.base" _make_test_img $size
++    /* Parse permissions modifiers before opening the image file */
++    ret =3D blkdebug_parse_perms(s, options, errp);
++    if (ret < 0) {
++        goto out;
++    }
++
+     /* Open the image file */
+     bs->file =3D bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "=
+image",
+                                bs, &child_file, false, &local_err);
+@@ -916,6 +992,21 @@ static int blkdebug_reopen_prepare(BDRVReopenState *re=
+open_state,
+     return 0;
+ }
 =20
--IMGOPTS=3D"backing_file=3D$TEST_IMG.base" \
-+BACKING_FILE=3D"$TEST_IMG.base" \
- run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG.base",node-name=3Db=
-acking-file \
-          -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile \
-          -blockdev driver=3D$IMGFMT,file=3Dfile,backing=3Dbacking-file,nod=
-e-name=3Dfmt
++static void blkdebug_child_perm(BlockDriverState *bs, BdrvChild *c,
++                                const BdrvChildRole *role,
++                                BlockReopenQueue *reopen_queue,
++                                uint64_t perm, uint64_t shared,
++                                uint64_t *nperm, uint64_t *nshared)
++{
++    BDRVBlkdebugState *s =3D bs->opaque;
++
++    bdrv_filter_default_perms(bs, c, role, reopen_queue, perm, shared,
++                              nperm, nshared);
++
++    *nperm |=3D s->take_child_perms;
++    *nshared &=3D ~s->unshare_child_perms;
++}
++
+ static const char *const blkdebug_strong_runtime_opts[] =3D {
+     "config",
+     "inject-error.",
+@@ -940,7 +1031,7 @@ static BlockDriver bdrv_blkdebug =3D {
+     .bdrv_file_open         =3D blkdebug_open,
+     .bdrv_close             =3D blkdebug_close,
+     .bdrv_reopen_prepare    =3D blkdebug_reopen_prepare,
+-    .bdrv_child_perm        =3D bdrv_filter_default_perms,
++    .bdrv_child_perm        =3D blkdebug_child_perm,
 =20
--IMGOPTS=3D"backing_file=3D$TEST_IMG.base" \
-+BACKING_FILE=3D"$TEST_IMG.base" \
- run_test -blockdev driver=3Dfile,filename=3D"$TEST_IMG.base",node-name=3Db=
-acking-file \
-          -blockdev driver=3D$IMGFMT,file=3Dbacking-file,node-name=3Dbackin=
-g-fmt \
-          -blockdev driver=3Dfile,filename=3D"$TEST_IMG",node-name=3Dfile \
-@@ -142,7 +146,7 @@ echo
- echo "=3D=3D=3D -blockdev with NBD server on the backing file =3D=3D=3D"
- echo
+     .bdrv_getlength         =3D blkdebug_getlength,
+     .bdrv_refresh_filename  =3D blkdebug_refresh_filename,
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index fcb52ec24f..839b10b3f0 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3454,6 +3454,16 @@
+ #
+ # @set-state:       array of state-change descriptions
+ #
++# @take-child-perms: Permissions to take on @image in addition to what
++#                    is necessary anyway (which depends on how the
++#                    blkdebug node is used).  Defaults to none.
++#                    (since 5.0)
++#
++# @unshare-child-perms: Permissions not to share on @image in addition
++#                       to what cannot be shared anyway (which depends
++#                       on how the blkdebug node is used).  Defaults
++#                       to none.  (since 5.0)
++#
+ # Since: 2.9
+ ##
+ { 'struct': 'BlockdevOptionsBlkdebug',
+@@ -3463,7 +3473,9 @@
+             '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
+             '*opt-discard': 'int32', '*max-discard': 'int32',
+             '*inject-error': ['BlkdebugInjectErrorOptions'],
+-            '*set-state': ['BlkdebugSetStateOptions'] } }
++            '*set-state': ['BlkdebugSetStateOptions'],
++            '*take-child-perms': ['BlockPermission'],
++            '*unshare-child-perms': ['BlockPermission'] } }
 =20
--IMGOPTS=3D"backing_file=3D$TEST_IMG.base" _make_test_img $size
-+_make_test_img -b "$TEST_IMG.base" $size
- cat <<EOF |
- nbd_server_start unix:$SOCK_DIR/nbd
- nbd_server_add -w backing-fmt
+ ##
+ # @BlockdevOptionsBlklogwrites:
 --=20
 2.24.1
 
