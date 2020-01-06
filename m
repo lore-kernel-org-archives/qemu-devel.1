@@ -2,89 +2,82 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 281E9C2D0D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D2FC32771
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:49:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D32F62072E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D16F2075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:49:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="PK0ohHlk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D32F62072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VfcHxrLJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D16F2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioPmA-0006Fl-2u
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 05:38:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44132)
+	id 1ioPwu-0002AA-MR
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 05:49:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48447)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1ioPlS-0005pH-AX
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:37:40 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ioPwB-0001IZ-Oe
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:48:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1ioPlQ-0000U3-Gk
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:37:38 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43367)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1ioPlQ-0000T6-2r
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:37:36 -0500
-Received: by mail-io1-xd41.google.com with SMTP id n21so46536891ioo.10
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 02:37:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kioC//NqP9XNmF4R0cNN0EdcSnlckdmgMPs0Vb2JKSo=;
- b=PK0ohHlk6G5wqJAzYsp5Db3dsMjuVLpjTGvIGlKogGKVl74CW37pW1RPhpxnROnFFN
- isECpZwu642TdvmZiGPsPEuFBmItLppIIcucPm/FfB7AzKieu+2k5BEu0pNurnJsLJeH
- WF4KjCUzN87JdPphEh5llqQ3KzJsxby6SM4QjS52ozDGhrC7/wG0hXBw1pBUChafHpoS
- PKbzDcwjbTbbRvMfFgW157UtLVc+nwIPL3zeerRxtwIkhN4+Cs8LsN9g4F0p8AdBa4Cy
- HmQXAe7yHjpq8YaID6znUl27/UVT4WVjcn/Tw7GcnSv+0zP5y4G98WD7MbZkH5x9MXST
- MHgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=kioC//NqP9XNmF4R0cNN0EdcSnlckdmgMPs0Vb2JKSo=;
- b=Hw4Mu5RfmqCdHE5fyh02ZaGpLq86eY63fV7g1e0oI6c9xFa5dtrIKqcQNCMid6WwBP
- 6PWoJV1PZHZEN+5cLr4ZvzdTRKscewHjygNNNLJff+wmdyZzJCYqki2dr6tVDPKV55WH
- uoJJz/sDexCAjaHH/8hnjUqG+UL8rBXisQm4IC+1BFrsyBVgXEx1+IpTU9gUZVPO27nl
- 3X48aK9XigzZxxLO2rybNyeAfjRSiPqkK1SUGKzr5LJ4dalJCclI+pKSBpFA3zq110i+
- dXsBfT8FMvVx7pBZ/BGiCuTtvbtkUSLbodxVnH8FxRrQR4+eCnw+TTQyLoT6BaftzzdI
- EazA==
-X-Gm-Message-State: APjAAAUjKW9muDxNQzPezlCenc82vvxtJEpDTxYeqSxJSpSBLV8E7kI0
- XXjdPfKgvujEdJcUh000+/g24VYASa5Id7G9+/sb6w==
-X-Google-Smtp-Source: APXvYqwxCM5+YXGZ4Qt80gWfInCNKtpyqxcej1Ov9dpsnA1AhFz/joj1Dy1sEZdodJtdL3mwVmVkScjwvBprQTjvvtg=
-X-Received: by 2002:a6b:7119:: with SMTP id q25mr63294938iog.148.1578307055126; 
- Mon, 06 Jan 2020 02:37:35 -0800 (PST)
+ (envelope-from <imammedo@redhat.com>) id 1ioPw8-0001xh-Kd
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:48:42 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60974
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ioPw8-0001wR-DP
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:48:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578307719;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=X3cFuAYWDnHliTwjFBqfl5kZcZIolp4XEdv9h91BVk0=;
+ b=VfcHxrLJUKDUOytrMAGINKc750s4k9y5E+RC2vcuXz38zPoVl7TMvAu/Y8iw1TSh2UUusA
+ aoUgpFa3NZphxbVoi9I2qlncr63dZC5HyZaVN/Ry5Wv50s2YVW/Z0k5oF/tDZFqvJPe7Zb
+ xxx1x4oF5X16aHYejb3m5fNMOWjYZog=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-ZD_Fp-gCNpWFViOX23XPXA-1; Mon, 06 Jan 2020 05:48:35 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0242107ACC5;
+ Mon,  6 Jan 2020 10:48:34 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 380217BA49;
+ Mon,  6 Jan 2020 10:48:30 +0000 (UTC)
+Date: Mon, 6 Jan 2020 11:48:28 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH v2] hppa: allow max ram size upto 4Gb
+Message-ID: <20200106114828.6bc96b23@redhat.com>
+In-Reply-To: <6fa7bcd3-ee67-cc84-fd4e-d3677e3ae51a@redhat.com>
+References: <27c3e31d-82ae-e62f-caba-a0a3fbd55e7c@redhat.com>
+ <1577987162-150529-1-git-send-email-imammedo@redhat.com>
+ <2f226aa4-5f61-6e6d-d6b9-a98685a79e8c@gmx.de>
+ <20200103105434.050d28ea@redhat.com>
+ <6fa7bcd3-ee67-cc84-fd4e-d3677e3ae51a@redhat.com>
 MIME-Version: 1.0
-References: <20191226043649.14481-1-yuri.benditovich@daynix.com>
- <20191226043649.14481-2-yuri.benditovich@daynix.com>
- <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
- <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
- <20200101184425-mutt-send-email-mst@kernel.org>
- <CAOEp5Oefmj5dM5auk1QpQ3F+CeJXQy+0aXJC1VNmUOj1KHp8aw@mail.gmail.com>
- <20200105063518-mutt-send-email-mst@kernel.org>
- <CAOEp5Of0PYiCu9kPyi7W84ToHrGzTHFkPFBGd0A7AVFkwzVZOg@mail.gmail.com>
- <CAOEp5Oec3x71vPVKDcTBWT4TkgrbSbUZmyDkd2bGF84sXEHUyQ@mail.gmail.com>
- <20200106044351-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20200106044351-mutt-send-email-mst@kernel.org>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Mon, 6 Jan 2020 12:37:21 +0200
-Message-ID: <CAOEp5OfrGDAnpj_8W2GSZV95yzuJ=p3aK5a8qVVV-O6QL6EAQQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000005e1ce7059b763f7a"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ZD_Fp-gCNpWFViOX23XPXA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,409 +89,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yan Vugenfirer <yan@daynix.com>, pbonzini@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005e1ce7059b763f7a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Sat, 4 Jan 2020 16:00:19 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-On Mon, Jan 6, 2020 at 11:58 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-
-> I guess it somehow has to do with the following:
->
->     if (proxy->disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {
->         proxy->disable_legacy =3D pcie_port ? ON_OFF_AUTO_ON :
-> ON_OFF_AUTO_OFF;
->     }
->
-> so by default device on an express port does not have a legacy interface.
->
-> Somehow having a legacy interface fixes things?
->
-
-I'll check it.
-
-
-> Does enabling legacy on q35 without this patch fix things?
->
-
-I'll check it also.
-
-
-> And does disabling legacy on PIIX without this patch break thing?
->
-
-I'll check it also.
-
-
->
-> How can having a legacy interface fix things if it's not
-> even active? I don't know. Is there a chance windows drivers use the
-> legacy interface on a transitional device by mistake?
->
->
-I'll recheck it. I do not think we use legacy interface on modern device
-even if it has one.
-
-
->
-> On Mon, Jan 06, 2020 at 11:10:18AM +0200, Yuri Benditovich wrote:
-> > Michael,
-> > Can you please comment on Jason's question: why we have a problem only
-> with q35
-> > and not with legacy pc?
-> > If you have a simple answer, it will help us in further work with other
-> hot
-> > plug/unplug problems.
-> >
-> > Thanks,
-> > Yuri Benditovich
-> >
-> > On Sun, Jan 5, 2020 at 6:21 PM Yuri Benditovich <
-> yuri.benditovich@daynix.com>
-> > wrote:
-> >
-> >
-> >
-> >     On Sun, Jan 5, 2020 at 1:39 PM Michael S. Tsirkin <mst@redhat.com>
-> wrote:
-> >
-> >         On Thu, Jan 02, 2020 at 09:09:04AM +0200, Yuri Benditovich wrot=
-e:
-> >         >
-> >         >
-> >         > On Thu, Jan 2, 2020 at 1:50 AM Michael S. Tsirkin <
-> mst@redhat.com>
-> >         wrote:
-> >         >
-> >         >     On Thu, Dec 26, 2019 at 11:29:50AM +0200, Yuri Benditovic=
-h
-> wrote:
-> >         >     > On Thu, Dec 26, 2019 at 10:58 AM Jason Wang <
-> >         jasowang@redhat.com> wrote:
-> >         >     > >
-> >         >     > >
-> >         >     > > On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditovi=
-ch wrote:
-> >         >     > > > https://bugzilla.redhat.com/show_bug.cgi?id=3D17084=
-80
-> >         >     > > > Fix leak of region reference that prevents complete
-> >         >     > > > device deletion on hot unplug.
-> >         >     > >
-> >         >     > >
-> >         >     > > More information is needed here, the bug said only q3=
-5
-> can
-> >         meet this
-> >         >     > > issue. What makes q35 different here?
-> >         >     > >
-> >         >     >
-> >         >     > I do not have any ready answer, I did not dig into it
-> too much.
-> >         >     > Probably Michael Tsirkin or Paolo Bonzini can answer
-> without
-> >         digging.
-> >         >
-> >         >
-> >         >
-> >         >     > >
-> >         >     > > >
-> >         >     > > > Signed-off-by: Yuri Benditovich <
-> >         yuri.benditovich@daynix.com>
-> >         >     > > > ---
-> >         >     > > >   hw/virtio/virtio.c | 5 +++++
-> >         >     > > >   1 file changed, 5 insertions(+)
-> >         >     > > >
-> >         >     > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.=
-c
-> >         >     > > > index 04716b5f6c..baadec8abc 100644
-> >         >     > > > --- a/hw/virtio/virtio.c
-> >         >     > > > +++ b/hw/virtio/virtio.c
-> >         >     > > > @@ -2340,6 +2340,11 @@ void
-> virtio_del_queue(VirtIODevice
-> >         *vdev, int
-> >         >     n)
-> >         >     > > >       vdev->vq[n].vring.num_default =3D 0;
-> >         >     > > >       vdev->vq[n].handle_output =3D NULL;
-> >         >     > > >       vdev->vq[n].handle_aio_output =3D NULL;
-> >         >     > > > +    /*
-> >         >     > > > +     * with vring.num =3D 0 the queue will be igno=
-red
-> >         >     > > > +     * in later loops of region cache reset
-> >         >     > > > +     */
-> >         >     > >
-> >         >     > >
-> >         >     > > I can't get the meaning of this comment.
-> >         >     > >
-> >         >     > > Thanks
-> >         >     > >
-> >         >     > >
-> >         >     > > > +
-> virtio_virtqueue_reset_region_cache(&vdev->vq[n]);
-> >         >
-> >         >
-> >         >     Do we need to drop this from virtio_device_free_virtqueue=
+> On 1/3/20 10:54 AM, Igor Mammedov wrote:
+> > On Thu, 2 Jan 2020 21:22:12 +0100
+> > Helge Deller <deller@gmx.de> wrote:
+> >  =20
+> >> On 02.01.20 18:46, Igor Mammedov wrote: =20
+> >>> Previous patch drops silent ram_size fixup and makes
+> >>> QEMU error out with:
+> >>>
+> >>>   "RAM size more than 3840m is not supported"
+> >>>
+> >>> when user specified -m X more than supported value.
+> >>>
+> >>> User shouldn't be bothered with starting QEMU with valid CLI,
+> >>> so for the sake of user convenience allow using -m 4G vs -m 3840M.
+> >>>
+> >>> Requested-by: Helge Deller <deller@gmx.de>
+> >>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >>> ---
+> >>> v2:
+> >>>    - make main ram -1 prio, so it wouldn't conflict with other region=
 s
-> then?
-> >         >
-> >         >
-> >         >
-> >         > Not mandatory. Repetitive
-> virtio_virtqueue_reset_region_cache does
-> >         not do
-> >         > anything bad.
-> >         > Some of virtio devices do not do 'virtio_del_queue' at all.
-> >         Currently
-> >         > virtio_device_free_virtqueues resets region cache for them.
-> >         > IMO, not calling 'virtio_del_queue' is a bug, but not in the
-> scope of
-> >         current
-> >         > series, I'll take care of that later.
-> >
-> >         Maybe we should just del all queues in virtio_device_unrealize?
-> >         Will allow us to drop some logic tracking which vqs were create=
-d.
-> >
-> >
-> >
-> >     Yes, this is also possible with some rework of
-> >     virtio_device_free_virtqueues.
-> >     virtio-net has some additional operations around queue deletion, it
-> deletes
-> >     queues when switches from single queue to multiple.
-> >
-> >
-> >
-> >         >
-> >         >     > > >       g_free(vdev->vq[n].used_elems);
-> >         >     > > >   }
-> >         >     > > >
-> >         >     > >
-> >         >
-> >         >
-> >
-> >
->
->
+> >>>      starting from 0xf9000000
+> >>>
+> >>> I dislike it but if you feel it's really necessary feel free to ack i=
+t. =20
+>=20
+> Hard to find the v2 buried in the other series with my email client.
+>=20
+> >>>
+> >>> should be applied on top of:
+> >>>    "hppa: drop RAM size fixup" =20
+> >>
+> >> Hello Igor,
+> >> I appreciate that you are trying to make it more cleaner.
+> >> But, can't you merge both of your patches to one patch?
+> >> Right now you have one patch "hppa: drop RAM size fixup", which is
+> >> what I think is wrong. Then you add another one which somehow
+> >> fixes it up again and adds other stuff. =20
+> > 1st patch bring it in line with other boards adding
+> > proper error check but without changing RAM size.
+> > While 2nd is changing device model (mapped RAM size) and
+> > clearly documents that it's a hack for user convenience,
+> > Hence I'd prefer to keep both separated.
+> >  =20
+> >> Having everything in one single patch makes your full change more
+> >> understandable.
+> >>
+> >> Is it necessary to introduce clamped_ram_size and not continue with
+> >> ram_size (even if you would add it as static local variable)? =20
+> > it's necessary since ram_size is global which should be kept =3D=3D Mac=
+hineState::ram_size.
+> > Later on I plan to remove the former altogether and maybe
+> > MachineState::ram_size aa well, since it could be read with
+> > memory_region_size(MachineState::ram). =20
+>=20
+> Why insist on clamping the ram? We recommend to model what the hardware=
+=20
+> does, and the hardware uses a full DIMM of DRAM, so 4GB, not less.
+I'm not adding 4Gb support here (it's out of scope of this series),
+all this patch does is making pre-existing global ram_size fixup,
+this board only business and naming it clamped_ram_size to match
+its current usage (along with explicitly documenting the deviation from
+other boards why it was requested to keep fixup 'for user convenience'
+instead of going for correct and simpler error message telling
+how much RAM user could specify on CLI).
 
---0000000000005e1ce7059b763f7a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> What are the new problem introduced by using 4GB? I only see advantages=
+=20
+> doing so. This doesn't break your series. This doesn't break the CLI.
+> Am I missing something?
 
-<div dir=3D"ltr"><div dir=3D"ltr"></div><br><div class=3D"gmail_quote"><div=
- dir=3D"ltr" class=3D"gmail_attr">On Mon, Jan 6, 2020 at 11:58 AM Michael S=
-. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com">mst@redhat.com</a>&gt; wrot=
-e:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
-.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">I guess it so=
-mehow has to do with the following:<br>
-<br>
-=C2=A0 =C2=A0 if (proxy-&gt;disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 proxy-&gt;disable_legacy =3D pcie_port ? ON_OFF=
-_AUTO_ON : ON_OFF_AUTO_OFF;<br>
-=C2=A0 =C2=A0 }<br>
-<br>
-so by default device on an express port does not have a legacy interface.<b=
-r>
-<br>
-Somehow having a legacy interface fixes things?<br></blockquote><div><br></=
-div><div>I&#39;ll check it.</div><div>=C2=A0</div><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,20=
-4,204);padding-left:1ex">
-Does enabling legacy on q35 without this patch fix things?<br></blockquote>=
-<div><br></div><div>I&#39;ll check it also.</div><div></div><div>=C2=A0</di=
-v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
-r-left:1px solid rgb(204,204,204);padding-left:1ex">
-And does disabling legacy on PIIX without this patch break thing?<br></bloc=
-kquote><div><br></div><div><div>I&#39;ll check it also.</div><div></div></d=
-iv><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-How can having a legacy interface fix things if it&#39;s not<br>
-even active? I don&#39;t know. Is there a chance windows drivers use the<br=
->
-legacy interface on a transitional device by mistake?<br>
-<br></blockquote><div><br></div><div><div>I&#39;ll recheck it. I do not thi=
-nk we use legacy interface on modern device even if it has one.</div><div><=
-/div></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"marg=
-in:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1e=
-x">
-<br>
-On Mon, Jan 06, 2020 at 11:10:18AM +0200, Yuri Benditovich wrote:<br>
-&gt; Michael,<br>
-&gt; Can you please comment on Jason&#39;s question: why we have a problem =
-only with q35<br>
-&gt; and not with legacy pc?<br>
-&gt; If you have a simple answer, it will help us in further work with othe=
-r hot<br>
-&gt; plug/unplug problems.<br>
-&gt; <br>
-&gt; Thanks,<br>
-&gt; Yuri Benditovich<br>
-&gt; <br>
-&gt; On Sun, Jan 5, 2020 at 6:21 PM Yuri Benditovich &lt;<a href=3D"mailto:=
-yuri.benditovich@daynix.com" target=3D"_blank">yuri.benditovich@daynix.com<=
-/a>&gt;<br>
-&gt; wrote:<br>
-&gt; <br>
-&gt; <br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0On Sun, Jan 5, 2020 at 1:39 PM Michael S. Tsirkin &=
-lt;<a href=3D"mailto:mst@redhat.com" target=3D"_blank">mst@redhat.com</a>&g=
-t; wrote:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0On Thu, Jan 02, 2020 at 09:09:04AM +0=
-200, Yuri Benditovich wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; On Thu, Jan 2, 2020 at 1:50 AM M=
-ichael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" target=3D"_blank">m=
-st@redhat.com</a>&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0On Thu, Dec 2=
-6, 2019 at 11:29:50AM +0200, Yuri Benditovich wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; On Thu, =
-Dec 26, 2019 at 10:58 AM Jason Wang &lt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"mailto:jasowang@redhat.com=
-" target=3D"_blank">jasowang@redhat.com</a>&gt; wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; On =
-2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditovich wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480" rel=3D"=
-noreferrer" target=3D"_blank">https://bugzilla.redhat.com/show_bug.cgi?id=
-=3D1708480</a><br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; Fix leak of region reference that prevents complete<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; device deletion on hot unplug.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; Mor=
-e information is needed here, the bug said only q35 can<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0meet this<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; iss=
-ue. What makes q35 different here?<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; I do not=
- have any ready answer, I did not dig into it too much.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; Probably=
- Michael Tsirkin or Paolo Bonzini can answer without<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0digging.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; Signed-off-by: Yuri Benditovich &lt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"mailto:yuri.benditovich@da=
-ynix.com" target=3D"_blank">yuri.benditovich@daynix.com</a>&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; ---<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A0hw/virtio/virtio.c | 5 +++++<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A01 file changed, 5 insertions(+)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; index 04716b5f6c..baadec8abc 100644<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; --- a/hw/virtio/virtio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; +++ b/hw/virtio/virtio.c<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; @@ -2340,6 +2340,11 @@ void virtio_del_queue(VirtIODevice<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*vdev, int<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0n)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev-&gt;vq[n].vring.num_default =3D 0;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev-&gt;vq[n].handle_output =3D NULL;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev-&gt;vq[n].handle_aio_output =3D NULL;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; +=C2=A0 =C2=A0 /*<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; +=C2=A0 =C2=A0 =C2=A0* with vring.num =3D 0 the queue will be ignored<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; +=C2=A0 =C2=A0 =C2=A0* in later loops of region cache reset<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; +=C2=A0 =C2=A0 =C2=A0*/<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; I c=
-an&#39;t get the meaning of this comment.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; Tha=
-nks<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-; +=C2=A0 =C2=A0 virtio_virtqueue_reset_region_cache(&amp;vdev-&gt;vq[n]);<=
-br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0Do we need to=
- drop this from virtio_device_free_virtqueues then?<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; Not mandatory. Repetitive=C2=A0 =
-virtio_virtqueue_reset_region_cache=C2=A0does<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0not do<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; anything bad.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; Some of virtio devices do not do=
- &#39;virtio_del_queue&#39; at all.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Currently=C2=A0<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; virtio_device_free_virtqueues re=
-sets region cache for them.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; IMO, not calling &#39;virtio_del=
-_queue&#39; is a bug, but not in the scope of<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0current<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; series, I&#39;ll take care of th=
-at later.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Maybe we should just del all queues i=
-n virtio_device_unrealize?<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Will allow us to drop some logic trac=
-king which vqs were created.<br>
-&gt; <br>
-&gt; <br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Yes, this is also possible with some rework of<br>
-&gt;=C2=A0 =C2=A0 =C2=A0virtio_device_free_virtqueues.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0virtio-net has some additional operations around qu=
-eue deletion, it deletes<br>
-&gt;=C2=A0 =C2=A0 =C2=A0queues when switches from single queue to multiple.=
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0<br>
-&gt; <br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A0 =C2=A0 =C2=A0g_free(vdev-&gt;vq[n].used_elems);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;=C2=A0 =C2=A0}<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
-;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt; <br>
-&gt; <br>
-<br>
-</blockquote></div></div>
+Well, board was fixing up global ram_size and then used it to
+ - pass clamped value to guest via register
+ - pass it to load load_image_targphys()
+ - perform various checks
+ - affects reset sequence
 
---0000000000005e1ce7059b763f7a--
+This patch keeps all of that in the same state
+(I'd suspect changing above points, would break guest)
+
+If you have an alternative patch that enables to use full 4Gb,
+I'd include on respin as far as it doesn't change user supplied
+global ram_size && ms->ram_size && uses generic ms->ram &&
+preferably on top of
+ "[PATCH 44/86] hppa: use memdev for RAM"
+so it would be easier to drop it if there would opposition to it
+without affecting series.
+
+> >>> ---
+> >>>   hw/hppa/machine.c | 21 +++++++++++----------
+> >>>   1 file changed, 11 insertions(+), 10 deletions(-)
+> >>>
+> >>> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> >>> index ebbf44f..0302983 100644
+> >>> --- a/hw/hppa/machine.c
+> >>> +++ b/hw/hppa/machine.c
+> >>> @@ -54,6 +54,7 @@ static uint64_t cpu_hppa_to_phys(void *opaque, uint=
+64_t addr)
+> >>>
+> >>>   static HPPACPU *cpu[HPPA_MAX_CPUS];
+> >>>   static uint64_t firmware_entry;
+> >>> +static ram_addr_t clamped_ram_size;
+> >>>
+> >>>   static void machine_hppa_init(MachineState *machine)
+> >>>   {
+> >>> @@ -74,8 +75,6 @@ static void machine_hppa_init(MachineState *machine=
+)
+> >>>       long i;
+> >>>       unsigned int smp_cpus =3D machine->smp.cpus;
+> >>>
+> >>> -    ram_size =3D machine->ram_size;
+> >>> -
+> >>>       /* Create CPUs.  */
+> >>>       for (i =3D 0; i < smp_cpus; i++) {
+> >>>           char *name =3D g_strdup_printf("cpu%ld-io-eir", i);
+> >>> @@ -90,12 +89,14 @@ static void machine_hppa_init(MachineState *machi=
+ne)
+> >>>       }
+> >>>
+> >>>       /* Limit main memory. */
+> >>> -    if (ram_size > FIRMWARE_START) {
+> >>> -        error_report("RAM size more than %d is not supported", FIRMW=
+ARE_START);
+> >>> +    if (machine->ram_size > 4 * GiB) {
+> >>> +        error_report("RAM size more than 4Gb is not supported");
+> >>>           exit(EXIT_FAILURE);
+> >>>       }
+> >>> +    clamped_ram_size =3D machine->ram_size > FIRMWARE_START ?
+> >>> +        FIRMWARE_START : machine->ram_size;
+> >>>
+> >>> -    memory_region_add_subregion(addr_space, 0, machine->ram);
+> >>> +    memory_region_add_subregion_overlap(addr_space, 0, machine->ram,=
+ -1);
+> >>>
+> >>>       /* Init Dino (PCI host bus chip).  */
+> >>>       pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
+> >>> @@ -151,7 +152,7 @@ static void machine_hppa_init(MachineState *machi=
+ne)
+> >>>       qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
+> >>>                     "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
+> >>>                     firmware_low, firmware_high, firmware_entry);
+> >>> -    if (firmware_low < ram_size || firmware_high >=3D FIRMWARE_END) =
+{
+> >>> +    if (firmware_low < clamped_ram_size || firmware_high >=3D FIRMWA=
+RE_END) {
+> >>>           error_report("Firmware overlaps with memory or IO space");
+> >>>           exit(1);
+> >>>       }
+> >>> @@ -204,7 +205,7 @@ static void machine_hppa_init(MachineState *machi=
+ne)
+> >>>                  (1) Due to sign-extension problems and PDC,
+> >>>                  put the initrd no higher than 1G.
+> >>>                  (2) Reserve 64k for stack.  */
+> >>> -            initrd_base =3D MIN(ram_size, 1 * GiB);
+> >>> +            initrd_base =3D MIN(clamped_ram_size, 1 * GiB);
+> >>>               initrd_base =3D initrd_base - 64 * KiB;
+> >>>               initrd_base =3D (initrd_base - initrd_size) & TARGET_PA=
+GE_MASK;
+> >>>
+> >>> @@ -232,7 +233,7 @@ static void machine_hppa_init(MachineState *machi=
+ne)
+> >>>        * various parameters in registers. After firmware initializati=
+on,
+> >>>        * firmware will start the Linux kernel with ramdisk and cmdlin=
+e.
+> >>>        */
+> >>> -    cpu[0]->env.gr[26] =3D ram_size;
+> >>> +    cpu[0]->env.gr[26] =3D clamped_ram_size; =20
+>=20
+> Helge, is this the code using this register?
+>=20
+> https://github.com/hdeller/seabios-hppa/blob/parisc-qemu-5.0/src/parisc/h=
+ead.S#L139
+>=20
+> >>>       cpu[0]->env.gr[25] =3D kernel_entry;
+> >>>
+> >>>       /* tell firmware how many SMP CPUs to present in inventory tabl=
+e */
+> >>> @@ -255,11 +256,11 @@ static void hppa_machine_reset(MachineState *ms=
+)
+> >>>       }
+> >>>
+> >>>       /* already initialized by machine_hppa_init()? */
+> >>> -    if (cpu[0]->env.gr[26] =3D=3D ram_size) {
+> >>> +    if (cpu[0]->env.gr[26] =3D=3D clamped_ram_size) {
+> >>>           return;
+> >>>       }
+> >>>
+> >>> -    cpu[0]->env.gr[26] =3D ram_size;
+> >>> +    cpu[0]->env.gr[26] =3D clamped_ram_size;
+> >>>       cpu[0]->env.gr[25] =3D 0; /* no firmware boot menu */
+> >>>       cpu[0]->env.gr[24] =3D 'c';
+> >>>       /* gr22/gr23 unused, no initrd while reboot. */
+> >>>    =20
+> >> =20
+> >  =20
+>=20
+
 
