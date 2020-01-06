@@ -2,92 +2,80 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BAEEC33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B22A7C33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:17:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14BC8206DB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:12:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A84620715
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:17:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pcbrkjEd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14BC8206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k81n14Nw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A84620715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioVvb-0005ht-32
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:12:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44272)
+	id 1ioW01-0001ad-7p
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:17:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jean-philippe@linaro.org>) id 1ioVq3-00086l-SK
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:06:49 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ioVy9-0008K9-4s
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:15:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jean-philippe@linaro.org>) id 1ioVq2-0000o5-C9
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:06:47 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38371)
+ (envelope-from <peter.maydell@linaro.org>) id 1ioVy7-0007dq-8s
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:15:09 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44829)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jean-philippe@linaro.org>)
- id 1ioVpy-0000jo-Ff
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:06:46 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y17so50499114wrh.5
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 09:06:41 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ioVy6-0007an-Sd
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:15:07 -0500
+Received: by mail-ot1-x344.google.com with SMTP id h9so69915388otj.11
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 09:15:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=QwtBdC5pI1sgKCXH6j8cPBwozyzvDybZ4woNY7xn/Cg=;
- b=pcbrkjEd8PM/cmseu4JciD9/I7TRvwC47RtdpnoBoECQA8mNGU45dtKmFlGdMQ/I88
- HF8eS3sTnxw8ljtJREjRcfSfxte4Wn6N8YH0mzjMmAlrXR/1kWLS0LJheMnA/DhnlVcj
- Go5pPutKhtIuu4xJ7hslC7Pb9xF5muHxuqxfxr/FlJp64jDDfjYs5UQhFal4+SlDCnwl
- 3jBlGbIUTeUB9sm9QTvdur8Hw7PtHip3zYb2SJPCuxTqOcOfJ7IXDSWOpmFK73qNIN3Z
- LLIHSW1/TIkQG6LEtY34/LhPNJgqNtXBc6oos0bG+z4UPpFAg9JVokP2vdquCJaOoc9T
- raUA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=LQxidMh1ompo67sH9IV7Q3/gPnh7WO+DzKCNJVGFP7o=;
+ b=k81n14NwPPVPYVV1VrArC4mklYxXlDkp9N7qgNTs1of1EVbbK9rdktSkfO0WyNepiy
+ FOR2fjKE/z1MCYorKBFypoAAEwUNEMn/cXEczHZYfhYYMPdxTO7QyFq4rj0/Qu7KzmBZ
+ sNLQhaAlR0uKT+g+rGX/VamAxHCb4KY+Hr/A03qXCJxRQmn8saikgAKimrhItAj/OTw0
+ afUe+62y7uZBi7rfScNLHPQ1Rrn5DI/1nyAWYFiCemfSXvkoWiOMDkln4Btl0uWesPoL
+ BqVwIiqmjyRRwQWxRbZ8TUDofs4RQCoaQ61qIH2afba94P/9Bj/8APSMiI0QLfCXXqWf
+ ERog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=QwtBdC5pI1sgKCXH6j8cPBwozyzvDybZ4woNY7xn/Cg=;
- b=fkjvejVsRLxGB80l1Vk2cDfJ52llIjHe6l+Biyw/oLr4o06MUlFHAZy3sUAHrOJN6i
- YUSxuVdtN/mExNKTILKFuaKpJLuDdQyUCbiaryX44sYk+qRQTx+2U6u/1UrxI7JYVAdg
- 8kJk6wE7e/wFFsuqEtjdGooHBatgKx/7xQriwQ9rrYHQmQYLQ7d3iZFDuKobXQazCCAC
- Vtpf0BkonJLkTa9S3oaSQrDQSfBl57CkBFTIaeLq6d6/YIdq/HTBwj8qHfMSU0wiqTOz
- Wrl0U+JQlU8uBU9/reiCNxBRJditt82q9dltubW4ODHixCkL36wICVkmQjYLpaZQApWP
- vQlA==
-X-Gm-Message-State: APjAAAU6kvsnLM3lin+jhWZR5LZSzOuprnU4fXcU0c16l4Dh3RD+2F/F
- XJ6OYtEhqDWRPz3nl6NsRdrwyQ==
-X-Google-Smtp-Source: APXvYqwIm5Atl15tx1r8r9EFH+KPKAp94qgWgdQrh1zTWM3Ue3tPtJI6g1URL1Ye+BQSX7y+Qor0KQ==
-X-Received: by 2002:adf:bc87:: with SMTP id g7mr108873928wrh.121.1578330400372; 
- Mon, 06 Jan 2020 09:06:40 -0800 (PST)
-Received: from myrica (adsl-84-227-176-239.adslplus.ch. [84.227.176.239])
- by smtp.gmail.com with ESMTPSA id 2sm75044495wrq.31.2020.01.06.09.06.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 09:06:39 -0800 (PST)
-Date: Mon, 6 Jan 2020 18:06:34 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH for-5.0 v11 08/20] virtio-iommu: Implement translate
-Message-ID: <20200106170634.GF2062@myrica>
-References: <20191122182943.4656-1-eric.auger@redhat.com>
- <20191122182943.4656-9-eric.auger@redhat.com>
- <20191210193342.GJ3352@xz-x1>
- <44c0041d-68ad-796f-16cc-4bab7ba0f164@redhat.com>
- <20191219133308.GA4246@xz-x1>
- <9d58b293-ada0-353e-bba2-ad1f538dfc62@redhat.com>
- <20191219144936.GB50561@xz-x1>
- <9ec9d0d5-062b-f96b-c72c-4d15865ff9a1@redhat.com>
- <20191220162642.GA2626852@myrica> <20191220165100.GA3780@xz-x1>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=LQxidMh1ompo67sH9IV7Q3/gPnh7WO+DzKCNJVGFP7o=;
+ b=D8HzkAaXuYzbgSdScqHxhS1J3mhPCnmFKi2WNNN58ooS7SDnjpMSpSpd836RMZk3uc
+ ArzmMc39NLyIzmIuJDPt0svKO/nd7BWhTmEs9PBzUc/lbdyLsi+cq3OdpjLWj1v21Yn6
+ JzGXCoU3dt0Q9OZFczM5XfNFJyVR+tJHY+SfnT8cBDV6tocLHx7XaiUYSCRkifppLKqm
+ IAmjzT2IFO6JXYLrb7ZGqehjIi5QNdE2UMHcacHfmxdQSeosmay/17is6qK618r/tML5
+ ufm6GiMMPLA3P5r0n+2zfiO3Y0uNkBWmHO/jDe4x6tIpS84drIScZ5KV3JlQXzIQj+9i
+ Mxnw==
+X-Gm-Message-State: APjAAAXWL8vxTYDW91se+Cp/Cf1AZWfZETjCR1lEupyWBdZBOMHB3CPp
+ /Xr+h8qs26T/o28cYdrrtVGO7ellmzglrIt8sSkKWQ==
+X-Google-Smtp-Source: APXvYqwqxtRluDBEbFx9iMttfES9Gc722FgKx7f+yJzGProOWK4IuiPt2ajeHpPpeFO6CN4FNktGJ5SQFW5YmsiMZ2E=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr100401197ota.232.1578330904812; 
+ Mon, 06 Jan 2020 09:15:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191220165100.GA3780@xz-x1>
+References: <20191220202707.30641-1-beata.michalska@linaro.org>
+ <20191220202707.30641-2-beata.michalska@linaro.org>
+In-Reply-To: <20191220202707.30641-2-beata.michalska@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Jan 2020 17:14:53 +0000
+Message-ID: <CAFEAcA-N=Xsnb3522mm7tT-7TOxBtJ6S_cE23XHw-4vXVVA7Xw@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] target/arm: kvm: Handle DABT with no valid ISS
+To: Beata Michalska <beata.michalska@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,84 +87,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
- quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- Auger Eric <eric.auger@redhat.com>, bharatb.linux@gmail.com,
- qemu-arm@nongnu.org, dgilbert@redhat.com, eric.auger.pro@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Christoffer Dall <Christoffer.Dall@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 20, 2019 at 11:51:00AM -0500, Peter Xu wrote:
-> On Fri, Dec 20, 2019 at 05:26:42PM +0100, Jean-Philippe Brucker wrote:
-> > There is at the virtio transport level: the driver sets status to
-> > FEATURES_OK once it accepted the feature bits, and to DRIVER_OK once its
-> > fully operational. The virtio-iommu spec says:
-> > 
-> >   If the driver does not accept the VIRTIO_IOMMU_F_BYPASS feature, the
-> >   device SHOULD NOT let endpoints access the guest-physical address space.
-> > 
-> > So before features negotiation, there is no access. Afterwards it depends
-> > if the VIRTIO_IOMMU_F_BYPASS has been accepted by the driver.
-> 
-> Before enabling virtio-iommu device, should we still let the devices
-> to access the whole system address space?  I believe that's at least
-> what Intel IOMMUs are doing.  From code-wise, its:
-> 
->     if (likely(s->dmar_enabled)) {
->         success = vtd_do_iommu_translate(vtd_as, vtd_as->bus, vtd_as->devfn,
->                                          addr, flag & IOMMU_WO, &iotlb);
->     } else {
->         /* DMAR disabled, passthrough, use 4k-page*/
->         iotlb.iova = addr & VTD_PAGE_MASK_4K;
->         iotlb.translated_addr = addr & VTD_PAGE_MASK_4K;
->         iotlb.addr_mask = ~VTD_PAGE_MASK_4K;
->         iotlb.perm = IOMMU_RW;
->         success = true;
->     }
-> 
-> From hardware-wise, an IOMMU should be close to transparent if you
-> never enable it, imho.
+On Fri, 20 Dec 2019 at 20:27, Beata Michalska
+<beata.michalska@linaro.org> wrote:
+>
+> On ARMv7 & ARMv8 some load/store instructions might trigger a data abort
+> exception with no valid ISS info to be decoded. The lack of decode info
+> makes it at least tricky to emulate those instruction which is one of the
+> (many) reasons why KVM will not even try to do so.
+>
+> Add suport for handling those by requesting KVM to inject external
+> dabt into the quest.
+>
+> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
+> ---
+>  accel/kvm/kvm-all.c    | 15 +++++++
+>  accel/stubs/kvm-stub.c |  4 ++
+>  include/sysemu/kvm.h   |  1 +
+>  target/arm/cpu.h       |  3 +-
+>  target/arm/kvm.c       | 95 ++++++++++++++++++++++++++++++++++++++++++
+>  target/arm/kvm32.c     |  3 ++
+>  target/arm/kvm64.c     |  3 ++
+>  target/arm/kvm_arm.h   | 19 +++++++++
+>  8 files changed, 142 insertions(+), 1 deletion(-)
+>
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index ca00daa2f5..a3ee038142 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2174,6 +2174,14 @@ static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
+>      }
+>  }
+>
+> +static void do_kvm_cpu_synchronize_state_force(CPUState *cpu,
+> +                                               run_on_cpu_data arg)
+> +{
+> +    kvm_arch_get_registers(cpu);
+> +    cpu->vcpu_dirty = true;
+> +}
 
-For hardware that's not necessarily the best choice. As cited in my
-previous reply it has been shown to introduce vulnerabilities since
-malicious devices can DMA during boot, before the OS takes control of the
-IOMMU. The Arm SMMU allows an implementation to adopt a deny policy by
-default.
+Why is this functionality special such that it needs a non-standard
+way of synchronizing state with KVM that nothing else does ?
 
-> Otherwise I'm confused on how a guest (with virtio-iommu) could boot
-> with a normal BIOS that does not contain a virtio-iommu driver.  For
-> example, what if the BIOS needs to read some block sectors (as you
-> mentioned)?
+> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+> index 9fe233b9bf..0cacc61d8a 100644
+> --- a/include/sysemu/kvm.h
+> +++ b/include/sysemu/kvm.h
+> @@ -483,6 +483,7 @@ void kvm_cpu_synchronize_state(CPUState *cpu);
+>  void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+>  void kvm_cpu_synchronize_post_init(CPUState *cpu);
+>  void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
+> +void kvm_cpu_synchronize_state_force(CPUState *cpu);
+>
+>  void kvm_init_cpu_signals(CPUState *cpu);
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 5f70e9e043..e11b5e7438 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -558,7 +558,8 @@ typedef struct CPUARMState {
+>          uint8_t has_esr;
+>          uint64_t esr;
+>      } serror;
+> -
+> +    /* Status field for pending extarnal dabt */
 
-Ideally we should aim at supporting the device in both the BIOS and the
-OS. Failing that, there should at least be a way to instantiate a
-virtio-iommu device that is blocking by default, that cannot be bypassed
-unless the controlling software decides to allow it. Could the bypass
-policy be a command-line option to the virtio-iommu device?
+"external" (I think you have the same typo later in the patch too)
 
-[...]
-> > Yes bypass mode assumes that devices and drivers aren't malicious, and the
-> > IOMMU is only used for things like assigning devices to guest userspace,
-> > or having large contiguous DMA buffers.
-> 
-> Yes I agree.  However again when the BYPASS flag was introduced, have
-> you thought of introducing that flag per-device?  IMHO that could be
-> better because you have a finer granularity on controlling all these,
-> so you'll be able to reject malicious devices but at the meantime
-> grant permission to trusted devices.
+> +    uint8_t ext_dabt_pending;
+>      /* State of our input IRQ/FIQ/VIRQ/VFIQ lines */
+>      uint32_t irq_line_state;
 
-At the moment that per-device behavior can be emulated by sending an
-ATTACH request followed by identity MAP. It could be a little more
-efficient to add a "bypass" flag to the ATTACH request and avoid setting
-up the identity mapping manually, since the device then wouldn't need to
-look up the mapping on translation, but I don't know how much it would
-improve performance. The device could also cache the fact that the address
-space is identity-mapped, for the same result. The domain lookup has to
-happen in any case, so you can never get the full iommu-free performance
-with these mechanisms.
 
-Thanks,
-Jean
+> @@ -701,6 +719,11 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+>              ret = EXCP_DEBUG;
+>          } /* otherwise return to guest */
+>          break;
+> +    case KVM_EXIT_ARM_NISV:
+> +        /* External DAB with no valid iss to decode */
+
+"DABT"
+
+> +        ret = kvm_arm_handle_dabt_nisv(cs, run->arm_nisv.esr_iss,
+> +                                 run->arm_nisv.fault_ipa);
+
+(indentation looks odd here?)
+
+> +        break;
+>      default:
+>          qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
+>                        __func__, run->exit_reason);
+> @@ -835,3 +858,75 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
+>  {
+>      return (data - 32) & 0xffff;
+>  }
+> +
+> +int kvm_arm_handle_dabt_nisv(CPUState *cs, uint64_t esr_iss,
+> +                              uint64_t fault_ipa)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(cs);
+> +    CPUARMState *env = &cpu->env;
+> +    hwaddr xlat, len;
+> +    AddressSpace *as = cs->as ? cs->as : &address_space_memory;
+
+I don't think you should need to test cs->as for NULL;
+qemu_init_vcpu() ensures that one is always set up.
+
+Probably the neatest way to get the AddressSpace* is to
+call arm_addressspace(cs, MEMTXATTRS_UNSPECIFIED).
+
+
+> +    int store_ins = ((esr_iss >> 6) & 1); /* WnR bit */
+
+This should be a bool (matching the argument type for
+address_space_translate), so you can just do
+   bool is_write = esr_iss & (1 << 6);
+
+> +    int ret;
+> +
+> +    /*
+> +     * Note: The ioctl for SET_EVENTS will be triggered before next
+> +     * KVM_RUN call though the vcpu regs need to be updated before hand
+> +     * so to not to overwrite changes done by KVM upon injecting the abort.
+> +     * This sadly requires running sync twice - shame ...
+> +     */
+> +    kvm_cpu_synchronize_state(cs);
+> +   /*
+> +    * ISS [23:14] is invalid so there is a limited info
+> +    * on what has just happened so the only *useful* thing that can
+> +    * be retrieved from ISS is WnR & DFSC (though in some cases WnR
+> +    * might be less of a value as well)
+> +    */
+> +    /* Verify whether the memory being accessed is even recognisable */
+> +    if (!address_space_translate(as, fault_ipa, &xlat, &len,
+> +                                 store_ins, MEMTXATTRS_UNSPECIFIED)) {
+> +        error_report("An attemp to access memory outside of the boundries"
+
+"attempt"; "boundaries". But I think what we should actually report here
+is:
+
+"Guest attempted to access memory/device at guest physical address
+0x... using an instruction that KVM could not emulate (no valid ISS).
+Injecting a data abort exception into guest."
+
+It doesn't seem to me worth distinguishing whether the guest
+physical address happens to have anything mapped there or not;
+we're going to inject a somewhat bogus dabt anyway.
+
+After the initial error_report(), supplemental information like
+the offending instruction should be printed with error_printf(),
+because it isn't a separate new error.
+
+> +                     "at 0x" TARGET_FMT_lx, (target_ulong) fault_ipa);
+> +    } else {
+> +        uint32_t ins;
+> +        uint8_t ins_fetched;
+> +
+> +        /*
+> +         * Get current PC before it will get updated to except vector entry
+
+"exception"
+
+> +         */
+> +        target_ulong ins_addr = is_a64(env) ? env->pc
+> +                                /* AArch32 mode vs T32 aka Thumb mode */
+> +                                : env->regs[15] - (env->thumb ? 4 : 8);
+> +
+> +        /*
+> +         * Get the faulting instruction
+> +         * Instructions have a fixed length of 32 bits
+> +         * and are always little-endian
+
+...unless they're 16-bit Thumb. In an ideal world you should handle
+the Thumb case by doing a 16-bit load, and then loading another 16-bit
+value if the top 3 bits of the first part are 0b111.
+
+At least we don't have to consider the possibility ofold-style
+really-big-endian-instruction-ordering :-)
+
+> +         */
+> +        ins_fetched = !cpu_memory_rw_debug(cs, ins_addr, (uint8_t *) &ins,
+> +                                           sizeof(uint32_t), store_ins) ;
+
+stray space before semicolon
+
+> +
+> +        error_report("Data abort exception with no valid ISS generated by "
+> +                     "memory access at 0x" TARGET_FMT_lx,
+> +                     (target_ulong)fault_ipa);
+> +        error_report(ins_fetched ? "%s: 0x%" PRIx32 " (encoded)" : "%s",
+> +                     "Unable to emulate memory instruction",
+> +                     (!ins_fetched ? 0 : ldl_le_p(&ins)));
+> +
+> +        error_report("Faulting instruction at 0x" TARGET_FMT_lx, ins_addr);
+> +    }
+> +    /*
+> +     * Set pending ext dabt amd trigger SET_EVENTS so that
+> +     * KVM can inject the abort
+> +     */
+> +    env->ext_dabt_pending = 1;
+> +
+> +    ret = kvm_put_vcpu_events(cpu);
+> +
+> +    /* Get the most up-tp-date state */
+
+"to"
+
+> +    if (!ret) {
+> +        /* Hacky but the sync needs to be forced */
+> +        kvm_cpu_synchronize_state_force(cs);
+> +    }
+> +    return ret;
+> +}
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 32bf8d6757..5539c3a3f2 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -240,6 +240,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      /* Check whether userspace can specify guest syndrome value */
+>      kvm_arm_init_serror_injection(cs);
+>
+> +    /* Set status for supporting the extarnal dabt injection */
+> +    kvm_arm_init_ext_dabt_injection(cs);
+> +
+>      return kvm_arm_init_cpreg_list(cpu);
+>  }
+>
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 876184b8fe..3da4e2e70e 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -792,6 +792,9 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      /* Check whether user space can specify guest syndrome value */
+>      kvm_arm_init_serror_injection(cs);
+>
+> +    /* Set status for supporting the extarnal dabt injection */
+> +    kvm_arm_init_ext_dabt_injection(cs);
+> +
+>      return kvm_arm_init_cpreg_list(cpu);
+>  }
+
+thanks
+-- PMM
 
