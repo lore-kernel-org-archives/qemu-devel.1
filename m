@@ -2,78 +2,85 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DD7C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C59EC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:08:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3F19207FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D885A2081E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:08:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGVN+828"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3F19207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4tyhqku"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D885A2081E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioXjG-0007bA-9Q
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:07:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52981)
+	id 1ioXjk-0008Ru-IG
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:08:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ioXOe-0004q5-Nd
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:46:38 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ioX4Z-0002jN-To
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ioXOZ-0003I5-7h
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:46:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59775
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioXOY-0003H8-PG
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:46:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578336389;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JtCAaREUfb5bmCXH03wjqlQoiSqbMgLqqNesZ69/gd4=;
- b=MGVN+828/9Cst5lD/Bi+HCpFFqB/b7eKHHHlhFjUZeGokRMi02zAC8WXPQ7NR+MxMWCoxC
- BCrvYudK6OBEn1SULzaU1hPtpB8O48oS4P4+OTcYQ2+aphsWuFIJoc/7xkUYVG6avYewc+
- cOQyfVmOG+mP3k+Kh+T0cH6nsq2k6K8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-14-Vrqdy2gFNkWXQMCgrwqM_A-1; Mon, 06 Jan 2020 13:46:28 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF1D619057B5;
- Mon,  6 Jan 2020 18:46:27 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-53.brq.redhat.com [10.40.204.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44F9060FA2;
- Mon,  6 Jan 2020 18:46:21 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH 3/3] gitlab-ci-edk2.yml: Use ccache
-Date: Mon,  6 Jan 2020 19:46:01 +0100
-Message-Id: <20200106184601.25453-4-philmd@redhat.com>
-In-Reply-To: <20200106184601.25453-1-philmd@redhat.com>
-References: <20200106184601.25453-1-philmd@redhat.com>
+ (envelope-from <danielhb413@gmail.com>) id 1ioX4Y-0004cN-Pr
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:51 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:42550)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1ioX4Y-0004bz-LQ; Mon, 06 Jan 2020 13:25:50 -0500
+Received: by mail-qk1-x744.google.com with SMTP id z14so39015038qkg.9;
+ Mon, 06 Jan 2020 10:25:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=hHc8KM4wbyx7oApuYrLldPmbj5H4j8u/5LpfmbUVXc8=;
+ b=T4tyhqkugSDw1fNHjAUkq2C8KOBU/8EGI4SIrpzht34zgrAhBGiAL0bL/pFJpErVl7
+ h2cXmZyXig9uRZ8Sbnb/yGrWNsLTrph9Yc5XGuKlAJD2YQBmXTF6rSc1eaOxdjKoke37
+ uhHunMIc06Nwk2lmSI1dCbTD8aQBIkVroN2MaFA3Hmx+10jmI8nxHgywNoHSGg0e9iEU
+ feoY75Nn7cB6QDRKhD+S/7jKbVMb8vyX0w7r3tZT9abXigC4i2uvWfsLllzjApbg4iiU
+ 4G/gpomo4ZCM6y87qSYolYLop1AtUd1d2lqc9uJheElCSIJv+zIySGazJYEz5BQsKMan
+ nyZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=hHc8KM4wbyx7oApuYrLldPmbj5H4j8u/5LpfmbUVXc8=;
+ b=ZywST0Zw/9YTNhZe+EXx5ME55hbL9ln6O44LoPkhAAbDiv+Nr/nOK8PMel9ghSNlAp
+ rPD+NZdQX08YDn+QEQcJQ36IT/brLa/Farq3qUhVLyZngdmWNMfjIVIJibwJ0r9eyKsa
+ dZ27lS+ZMUCFZ+oOpSbNcfP1G7WxvbIOka8BmTW2YTTjZlJwpjGl4JTav1aUYK1hPElK
+ FCpO+IZ0YH10s/SncnBm4bUenmD+YCI838flEQZ89v80/+RN6+OgeR4PBHWK4GPrJgIq
+ 3a8D5jvLO/SBf7/Qp9QoQwD+XeerPVW2JtfwFh6o5L705AWQXIn8VxZt+oi4Cfg3N0mP
+ qD0g==
+X-Gm-Message-State: APjAAAXSgMPspsGdk6z2s8Gsmk+zSmDBXzHp0YQHVa5DpTwxyWe8mUK0
+ cyjEImsaA+bcsLvhBQZY4iURwa7/
+X-Google-Smtp-Source: APXvYqziWR5ne9olzdjMctJpqGaccIPRjn1I2s35O8ZZA3yBuUdyRiz8JOcQsiLp1p1GmlxmHKMvlw==
+X-Received: by 2002:a37:801:: with SMTP id 1mr86585967qki.326.1578335150132;
+ Mon, 06 Jan 2020 10:25:50 -0800 (PST)
+Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
+ by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.25.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Jan 2020 10:25:49 -0800 (PST)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 32/59] qemu-img.c: remove 'out4' label in img_compare
+Date: Mon,  6 Jan 2020 15:23:58 -0300
+Message-Id: <20200106182425.20312-33-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200106182425.20312-1-danielhb413@gmail.com>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Vrqdy2gFNkWXQMCgrwqM_A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,70 +92,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By using ccache we reduce the job duration from
-40 minutes 26 seconds to 32 minutes 6 seconds.
+'out4' can be replaced by 'return 2'.
 
-  Running after script...
-  $ ccache --show-stats
-  cache hit (direct)                  6604
-  files in cache                     12090
-  cache size                         335.5 MB
-
-For now downloading this cache takes 16 seconds, archiving
-it 44 seconds.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: qemu-block@nongnu.org
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- .gitlab-ci-edk2.yml | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ qemu-img.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci-edk2.yml
-index abfaf52874..329ba24f20 100644
---- a/.gitlab-ci-edk2.yml
-+++ b/.gitlab-ci-edk2.yml
-@@ -14,12 +14,19 @@ build-edk2:
-    - edk2-stdout.log
-    - edk2-stderr.log
-  image: ubuntu:16.04 # Use Ubuntu Xenial
-+ variables:
-+   CCACHE_DIR: ${CI_PROJECT_DIR}/.ccache
-+ cache: # Use the same cache for all EDK2 jobs
-+   key: ubuntu16.04-edk2-ccache
-+   paths:
-+   - ${CCACHE_DIR}
-  before_script: # Install packages requiered to build EDK2
-  - apt-get update --quiet --quiet
-  - DEBIAN_FRONTEND=3Dnoninteractive
-    apt-get install --assume-yes --no-install-recommends --quiet --quiet
-      build-essential
-      ca-certificates
-+     ccache
-      dos2unix
-      gcc-aarch64-linux-gnu
-      gcc-arm-linux-gnueabi
-@@ -29,9 +36,13 @@ build-edk2:
-      nasm
-      python
-      uuid-dev
-+ - export PATH=3D/usr/lib/ccache:$PATH
-+ - ccache --zero-stats
-  script: # Clone the required submodules and build EDK2
-  - git submodule update --init roms/edk2
-  - git -C roms/edk2 submodule update --init
-  - export JOBS=3D$(($(getconf _NPROCESSORS_ONLN) + 1))
-  - echo "=3D=3D=3D Using ${JOBS} simultaneous jobs =3D=3D=3D"
-  - make -j${JOBS} -C roms efi 1>edk2-stdout.log 2> >(tee -a edk2-stderr.lo=
-g >&2)
-+ after_script:
-+ - ccache --show-stats
---=20
-2.21.1
+diff --git a/qemu-img.c b/qemu-img.c
+index 6233b8ca56..fc7b08e7ee 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1346,8 +1346,7 @@ static int img_compare(int argc, char **argv)
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+                                            optarg, true);
+             if (!opts) {
+-                ret = 2;
+-                goto out4;
++                return 2;
+             }
+         }   break;
+         case OPTION_IMAGE_OPTS:
+@@ -1371,8 +1370,7 @@ static int img_compare(int argc, char **argv)
+     if (qemu_opts_foreach(&qemu_object_opts,
+                           user_creatable_add_opts_foreach,
+                           qemu_img_object_print_help, &error_fatal)) {
+-        ret = 2;
+-        goto out4;
++        return 2;
+     }
+ 
+     /* Initialize before goto out */
+@@ -1559,7 +1557,6 @@ out2:
+     blk_unref(blk1);
+ out3:
+     qemu_progress_end();
+-out4:
+     return ret;
+ }
+ 
+-- 
+2.24.1
 
 
