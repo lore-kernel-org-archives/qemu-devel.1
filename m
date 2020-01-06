@@ -2,97 +2,79 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B48C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B95FEC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A7F2206DB
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:06:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrgdlZ+d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A7F2206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DE4E206DB
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 17:07:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE4E206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioVq7-00080m-IW
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:06:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43504)
+	id 1ioVr1-0000hr-J0
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 12:07:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44514)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ioVp9-00075H-MV
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:05:52 -0500
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ioVqI-0008K7-TQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ioVp4-0008Da-PQ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:05:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42548
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ioVqH-000148-A1
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:07:02 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2058 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ioVp4-0008D5-La
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 12:05:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578330346;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kovrPs1uR8E9eW21cu83x1YVGrQUxrI0NZQD9ns/75g=;
- b=hrgdlZ+dkp2UwbhI6L0+0TbN157s1Z1e5yU7n5ngkbeKZzDQphp4W0h5kUWjfQiKOh31LL
- JQJ/a18ZQdWMTMxOlhCiAWs32ckT2b3XZXZ2FkH5EpFWQ+KUjeHQhBQGK121V5o0X0O/Dw
- nZd6aRXtoV71GZwKbJrOvQw3oQ31A74=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-Ba8bJMXSPHWGWEnEg2EsyQ-1; Mon, 06 Jan 2020 12:05:44 -0500
-Received: by mail-qk1-f199.google.com with SMTP id d1so7639643qkk.15
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 09:05:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=7nrgiSGZGWya5NshyMRioDKxNvrJEVEu5x6Ov8Zq+RY=;
- b=RtZVPxTG1hyAkwCMa+HOjzZUwE8czjIHm69Jv59TnGlr4LtK7zec1OsEcqzd6K109S
- 2qk+a8OLmp6kYxWI+bqROEYvSzslIHMa5xeOClVmInY6zYilx9f9rT/cGcxTqylJi5L8
- TC+TUdGmUJTdX9pjdWNAtQJKRt9/xyxmbt59w+RdofuY1Pjz5n1hwe9+foJLATUV9ALF
- 5XMHrexpN24x2r4b+EMC2pB2a0zYbJE658w/DQus7gBBgwIDkptpSlTzuJVc6LcuTG+s
- 9cMLN1Cua+0PjnGkN5+IBSWY8fSBKRUV5coMwxJ22MJ/FSkMQAku4pioyowyMb9zy0iL
- tQqQ==
-X-Gm-Message-State: APjAAAWs3TDW62KLVcQsdHXByFz7xb0lJ34GZ/SuT5qu/y1xJLT0VH2J
- rz47PsRFYWx2vxFWPckRLegkcdS7y4MUJyDMy7SrUzNgImHCoogWabRByCNhsxqk2Dw+jmXYiR5
- Bw3zc4aQCCH8iin8=
-X-Received: by 2002:a37:4894:: with SMTP id
- v142mr70919253qka.220.1578330344401; 
- Mon, 06 Jan 2020 09:05:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyVopkZph7eDKQTeen8r/z9NFlZ9LXpXc5r8cp/4JAN+7F2S9FSIpDVZdj42/uNwbItyXKBeQ==
-X-Received: by 2002:a37:4894:: with SMTP id
- v142mr70919235qka.220.1578330344153; 
- Mon, 06 Jan 2020 09:05:44 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id a14sm21092274qko.92.2020.01.06.09.05.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 09:05:43 -0800 (PST)
-Date: Mon, 6 Jan 2020 12:05:39 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL v3 00/32] virtio, pci, pc: fixes, features
-Message-ID: <20200106120515-mutt-send-email-mst@kernel.org>
-References: <20200105125622.27231-1-mst@redhat.com>
- <CAFEAcA8u56NW2634q7_6BrgVOUxcNt037EQ_dNDg0RdqgUWUMQ@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8u56NW2634q7_6BrgVOUxcNt037EQ_dNDg0RdqgUWUMQ@mail.gmail.com>
-X-MC-Unique: Ba8bJMXSPHWGWEnEg2EsyQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ioVqA-0000oi-TT; Mon, 06 Jan 2020 12:06:55 -0500
+Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id DBAD9F27661A12FACF7E;
+ Mon,  6 Jan 2020 17:06:45 +0000 (GMT)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml703-cah.china.huawei.com (10.201.108.44) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 6 Jan 2020 17:06:32 +0000
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 6 Jan 2020 17:06:32 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Mon, 6 Jan 2020 17:06:32 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>, Jonathan Cameron
+ <jonathan.cameron@huawei.com>
+Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
+Thread-Topic: [PATCH 0/5] ARM virt: Add NVDIMM support
+Thread-Index: AQHVeswdQv2zL2ZjnU2+5S1CywnCCKdgnucAgAYn2ECANV3CUIAANK6AgAADjLCAARyUgIADW0wAgBGftACAAodbgIADcKzggCX7GsA=
+Date: Mon, 6 Jan 2020 17:06:32 +0000
+Message-ID: <8562f82b7c0140d3ad0c7f6616cb6f28@huawei.com>
+References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
+ <a133d4c4-3f60-2bb1-a7d7-35cdb06af265@redhat.com>
+ <441c818f24084b4191315cf2a6267cef@huawei.com>
+ <20191125164541.3f0a593f@redhat.com>
+ <444efcb441fe42e5aff58b3af3ab14b4@huawei.com>
+ <20191126095655.27227f59@redhat.com>
+ <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
+ <20191211085727.1ab9564e@redhat.com> 
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,65 +86,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "drjones@redhat.com" <drjones@redhat.com>,
+ "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
+ Auger Eric <eric.auger@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ "lersek@redhat.com" <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 06, 2020 at 04:48:19PM +0000, Peter Maydell wrote:
-> On Sun, 5 Jan 2020 at 12:57, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > Changes from v2:
-> > - rebased on master
-> > - a couple more bugfixes
-> >
-> > The following changes since commit f0dcfddecee8b860e015bb07d67cfcbdfbfd=
-51d9:
-> >
-> >   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-reques=
-t' into staging (2020-01-03 17:18:08 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> >
-> > for you to fetch changes up to 93ef96f3258f489f7bff28ca7b9e0dc74de2a75b=
-:
-> >
-> >   intel_iommu: add present bit check for pasid table entries (2020-01-0=
-5 07:41:10 -0500)
-> >
-> > ----------------------------------------------------------------
-> > virtio, pci, pc: fixes, features
-> >
-> > Bugfixes all over the place.
-> > HMAT support.
-> > New flags for vhost-user-blk utility.
-> > Auto-tuning of seg max for virtio storage.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->=20
-> Build failure for OSX:
->=20
-> /Users/pm215/src/qemu-for-merges/hw/scsi/virtio-scsi.c:904:35: error:
-> format specifies type 'unsigned short' but the argument has type
-> 'uint32_t' (aka 'unsigned int') [-Werror,-Wformat]
->                    "must be > 2", s->conf.virtqueue_size);
-> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
-> /Users/pm215/src/qemu-for-merges/include/qapi/error.h:166:35: note:
-> expanded from macro 'error_setg'
->                         (fmt), ## __VA_ARGS__)
->                                   ^~~~~~~~~~~
-> 1 error generated.
->=20
-> (Everything else passed OK.)
->=20
-> thanks
-> -- PMM
+Hi Igor,
 
-Fixed up now - can you try again pls?
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi
+> Sent: 13 December 2019 12:52
+> To: 'Igor Mammedov' <imammedo@redhat.com>
+> Cc: xiaoguangrong.eric@gmail.com; peter.maydell@linaro.org;
+> drjones@redhat.com; shannon.zhaosl@gmail.com; qemu-devel@nongnu.org;
+> Linuxarm <linuxarm@huawei.com>; Auger Eric <eric.auger@redhat.com>;
+> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
+> lersek@redhat.com
+> Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
+>=20
 
---=20
-MST
+[...]
+
+>=20
+> Thanks for your help. I did spend some more time debugging this further.
+> I tried to introduce a totally new Buffer field object with different
+> sizes and printing the size after creation.
+>=20
+> --- SSDT.dsl	2019-12-12 15:28:21.976986949 +0000
+> +++ SSDT-arm64-dbg.dsl	2019-12-13 12:17:11.026806186 +0000
+> @@ -18,7 +18,7 @@
+>   *     Compiler ID      "BXPC"
+>   *     Compiler Version 0x00000001 (1)
+>   */
+> -DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001)
+> +DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000002)
+>  {
+>      Scope (\_SB)
+>      {
+> @@ -48,6 +48,11 @@
+>                      RLEN,   32,
+>                      ODAT,   32736
+>                  }
+> +
+> +                Field (NRAM, DWordAcc, NoLock, Preserve)
+> +                {
+> +                    NBUF,   32768
+> +                }
+>=20
+>                  If ((Arg4 =3D=3D Zero))
+>                  {
+> @@ -87,6 +92,12 @@
+>                      Local3 =3D DerefOf (Local2)
+>                      FARG =3D Local3
+>                  }
+> +
+> +                Local2 =3D 0x2
+> +                printf("AML:NVDIMM Creating TBUF with bytes %o",
+> Local2)
+> +                CreateField (NBUF, Zero, (Local2 << 3), TBUF)
+> +                Concatenate (Buffer (Zero){}, TBUF, Local3)
+> +                printf("AML:NVDIMM Size of TBUF(Local3) %o",
+> SizeOf(Local3))
+>=20
+>                  NTFI =3D Local6
+>                  Local1 =3D (RLEN - 0x04)
+>=20
+> And run it by changing Local2 with different values, It looks on ARM64,
+>=20
+> For cases where, Local2 <8, the created buffer size is always 8 bytes
+>=20
+> "AML:NVDIMM Creating TBUF with bytes 0000000000000002"
+> "AML:NVDIMM Size of TBUF(Local3) 0000000000000008"
+>=20
+> ...
+> "AML:NVDIMM Creating TBUF with bytes 0000000000000005"
+> "AML:NVDIMM Size of TBUF(Local3) 0000000000000008"
+>=20
+> And once Local2 >=3D8, it gets the correct size,
+>=20
+> "AML:NVDIMM Creating TBUF with bytes 0000000000000009"
+> "AML:NVDIMM Size of TBUF(Local3) 0000000000000009"
+>=20
+>=20
+> But on x86, the behavior is like,
+>=20
+> For cases where, Local2 <4, the created buffer size is always 4 bytes
+>=20
+> "AML:NVDIMM Creating TBUF with bytes 00000002"
+> "AML:NVDIMM Size of TBUF(Local3) 00000004"
+> ....
+> "AML:NVDIMM Creating TBUF with bytes 00000003"
+> "AML:NVDIMM Size of TBUF(Local3) 00000004"
+>=20
+> And once Local2 >=3D 4, it is ok
+>=20
+> "AML:NVDIMM Creating TBUF with bytes 00000005"
+> "AML:NVDIMM Size of TBUF(Local3) 00000005"
+> ...
+> "AML:NVDIMM Creating TBUF with bytes 00000009"
+> "AML:NVDIMM Size of TBUF(Local3) 00000009"
+>=20
+> This is the reason why it works on x86 and not on ARM64. Because, if you
+> remember on second iteration of the FIT buffer, the requested buffer size=
+ is 4 .
+>=20
+> I tried changing the AccessType of the below NBUF field from DWordAcc to
+> ByteAcc/BufferAcc, but no luck.
+>=20
+> +                Field (NRAM, DWordAcc, NoLock, Preserve)
+> +                {
+> +                    NBUF,   32768
+> +                }
+>=20
+> Not sure what we need to change for ARM64 to create buffer object of size=
+ 4
+> here. Please let me know if you have any pointers to debug this further.
+>=20
+> (I am attaching both x86 and ARM64 SSDT dsl used for reference)
+
+(+Jonathan)
+
+Thanks to Jonathan for taking a fresh look at this issue and spotting this,
+https://elixir.bootlin.com/linux/v5.5-rc5/source/drivers/acpi/acpica/utmisc=
+.c#L109
+
+And, from ACPI 6.3, table 19-419
+
+"If the Buffer Field is smaller than or equal to the size of an Integer (in=
+ bits), it
+will be treated as an Integer. Otherwise, it will be treated as a Buffer. T=
+he size
+of an Integer is indicated by the Definition Block table header's Revision =
+field.
+A Revision field value less than 2 indicates that the size of an Integer is=
+ 32 bits.
+A value greater than or equal to 2 signifies that the size of an Integer is=
+ 64 bits."
+
+It looks like the main reason for the difference in behavior of the buffer =
+object
+size between x86 and ARM/virt, is because of the Revision number used in th=
+e
+DSDT table. On x86 it is 1 and ARM/virt it is 2.
+
+So most likely,
+
+>     CreateField (ODAT, Zero, Local1, OBUF)
+>     Concatenate (Buffer (Zero){}, OBUF, Local7)
+
+defaults to the minimum integer byte length based on DSDT revision number.
+
+I tried changing the DSDT rev number of x86 code to 2,
+=20
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 614e48ff38..2941edab8d 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2257,7 +2257,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+=A0 =A0 =A0g_array_append_vals(table_data, dsdt->buf->data, dsdt->buf->len)=
+;
+=A0 =A0 =A0build_header(linker, table_data,
+=A0 =A0 =A0 =A0 =A0(void *)(table_data->data + table_data->len - dsdt->buf-=
+>len),
+- =A0 =A0 =A0 =A0"DSDT", dsdt->buf->len, 1, NULL, NULL);
++ =A0 =A0 =A0 =A0"DSDT", dsdt->buf->len, 2, NULL, NULL);
+=A0 =A0 =A0free_aml_allocator();
+=A0}
+
+And the same issue was reported by Guest Kernel,
+
+[ =A0 =A01.636672] nfit ACPI0012:00: found a zero length table '0' parsing =
+nfit
+
+
+With a quick fix to the nvdimm aml code(below) everything seems to work
+now. But again this may not be the right fix/approach for this.
+
+Please take a look and let me know.
+
+Thanks,
+Shameer
+
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index 64eacfad08..621f9ffd41 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -1192,15 +1192,18 @@ static void nvdimm_build_fit(Aml *dev)
+=A0 =A0 =A0aml_append(method, ifctx);
+=A0
+=A0 =A0 =A0aml_append(method, aml_store(aml_sizeof(buf), buf_size));
+- =A0 =A0aml_append(method, aml_subtract(buf_size,
+- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0am=
+l_int(4) /* the size of "STAU" */,
+- =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bu=
+f_size));
+=A0
+=A0 =A0 =A0/* if we read the end of fit. */
+- =A0 =A0ifctx =3D aml_if(aml_equal(buf_size, aml_int(0)));
++ =A0 =A0ifctx =3D aml_if(aml_equal(aml_subtract(buf_size,
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 aml_sizeof(aml_in=
+t(0)), NULL),
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 aml_int(0)));
+=A0 =A0 =A0aml_append(ifctx, aml_return(aml_buffer(0, NULL)));
+=A0 =A0 =A0aml_append(method, ifctx);
+=A0
++ =A0 =A0aml_append(method, aml_subtract(buf_size,
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0am=
+l_int(4) /* the size of "STAU" */,
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0bu=
+f_size));
++
+=A0 =A0 =A0aml_append(method, aml_create_field(buf,
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0aml_int(4 * BITS=
+_PER_BYTE), /* offset at byte 4.*/
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0aml_shiftleft(bu=
+f_size, aml_int(3)), "BUFF"));
+
+
+
+
 
 
