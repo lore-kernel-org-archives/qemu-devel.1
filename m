@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD99C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 12:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2088AC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 12:54:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA9012072E
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 12:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E26C42072E
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 12:54:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jwk/iMBr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA9012072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="efqBmje0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26C42072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioRtj-0002Vf-Gn
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 07:54:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58252)
+	id 1ioRtn-0002bB-Jp
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 07:54:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58296)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1ioRsC-0000qF-Lk
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 07:52:45 -0500
+ (envelope-from <kraxel@redhat.com>) id 1ioRsE-0000rS-V7
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 07:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1ioRsB-0000oh-Kk
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 07:52:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51214
+ (envelope-from <kraxel@redhat.com>) id 1ioRsD-0000rc-Sn
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 07:52:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39298
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ioRsB-0000my-FM
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 07:52:43 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ioRsD-0000rP-Oa
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 07:52:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578315162;
+ s=mimecast20190719; t=1578315165;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rUKfZuNd1Qu2lKoFCCnXZ06t/YR98pMi3balpjSIsSo=;
- b=Jwk/iMBrck5d2WAVbA7Bv2KYzaRSsCtOu5z6silLz4aXeoFy88VZ88Vts57hqSieZP/495
- sMqzGs3kQEEvYoBpbiRiTODlzT+oR6lys8OJ1nWlPEQkoxWDffCJWfDQ/edkAEz/i0kZAz
- Vy1rLboWBRAt+8WDHFA3Y9nAHO3oJYw=
+ bh=lXOGosYvPW6jgvcFaLnN32Way/3Noo2iJQc1+mSjxOc=;
+ b=efqBmje0qIRrrqG1Cqw2IVAZiRtfT/wqKUD0k/BUDIYzQmJ3+2CWBZeQOioYPEyKq6brWZ
+ 58tDChagf73bd60uV40/6sxVfLonFHlBIzQMAZc4lnVpdiYt7LUs758Fm5ebjkpKJDbqRX
+ sVN9qXayKglHgoEWYmE2hpM21wnH1KQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-yI2feI0yMZuuG6khj3vIMQ-1; Mon, 06 Jan 2020 07:52:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-278-3elVJeAVMmeD-CBR-P-_fw-1; Mon, 06 Jan 2020 07:52:41 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D390800D4E;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D3F7800D48;
  Mon,  6 Jan 2020 12:52:40 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-98.ams2.redhat.com
  [10.36.116.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 83FEB5C57C;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 87A3484FE2;
  Mon,  6 Jan 2020 12:52:37 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A8B7831E49; Mon,  6 Jan 2020 13:52:36 +0100 (CET)
+ id 8ED756DF9; Mon,  6 Jan 2020 13:52:36 +0100 (CET)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/6] paaudio: try to drain the recording stream
-Date: Mon,  6 Jan 2020 13:52:34 +0100
-Message-Id: <20200106125236.24132-5-kraxel@redhat.com>
+Subject: [PULL 1/6] hda-codec: fix playback rate control
+Date: Mon,  6 Jan 2020 13:52:31 +0100
+Message-Id: <20200106125236.24132-2-kraxel@redhat.com>
 In-Reply-To: <20200106125236.24132-1-kraxel@redhat.com>
 References: <20200106125236.24132-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: yI2feI0yMZuuG6khj3vIMQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 3elVJeAVMmeD-CBR-P-_fw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -95,96 +95,47 @@ Sender: "Qemu-devel"
 
 From: Volker R=C3=BCmelin <vr_qemu@t-online.de>
 
-There is no guarantee a single call to pa_stream_peek every
-timer_period microseconds can read a recording stream faster
-than the data gets produced at the source. Let qpa_read try to
-drain the recording stream.
+Since commit 1930616b98 "audio: make mixeng optional" the
+function hda_audio_output_cb can no longer assume the function
+parameter avail contains the free buffer size. With the playback
+mixing-engine turned off this leads to a broken playback rate
+control and playback buffer drops in regular intervals.
 
-To reproduce the problem:
-
-Start qemu with -audiodev pa,id=3Daudio0,in.mixing-engine=3Doff
-
-On the host connect the qemu recording stream to the monitor of
-a hardware output device. While the problem can also be seen
-with a hardware input device, it's obvious with the monitor of
-a hardware output device.
-
-In the guest start audio recording with audacity and notice the
-slow recording data rate.
+This patch moves down the rate calculation, so the correct
+buffer fill level is used for the calculation.
 
 Signed-off-by: Volker R=C3=BCmelin <vr_qemu@t-online.de>
-Message-id: 20200104091122.13971-4-vr_qemu@t-online.de
+Message-id: 20200104091122.13971-1-vr_qemu@t-online.de
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/paaudio.c | 41 +++++++++++++++++++++++++----------------
- 1 file changed, 25 insertions(+), 16 deletions(-)
+ hw/audio/hda-codec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 7db1dc15f09e..b23274550e1c 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -156,34 +156,43 @@ static size_t qpa_read(HWVoiceIn *hw, void *data, siz=
-e_t length)
- {
-     PAVoiceIn *p =3D (PAVoiceIn *) hw;
-     PAConnection *c =3D p->g->conn;
--    size_t l;
--    int r;
-+    size_t total =3D 0;
-=20
-     pa_threaded_mainloop_lock(c->mainloop);
-=20
-     CHECK_DEAD_GOTO(c, p->stream, unlock_and_fail,
-                     "pa_threaded_mainloop_lock failed\n");
-=20
--    if (!p->read_length) {
--        r =3D pa_stream_peek(p->stream, &p->read_data, &p->read_length);
--        CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
--                           "pa_stream_peek failed\n");
--    }
-+    while (total < length) {
-+        size_t l;
-+        int r;
-=20
--    l =3D MIN(p->read_length, length);
--    memcpy(data, p->read_data, l);
-+        if (!p->read_length) {
-+            r =3D pa_stream_peek(p->stream, &p->read_data, &p->read_length=
-);
-+            CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
-+                               "pa_stream_peek failed\n");
-+            if (!p->read_length) {
-+                /* buffer is empty */
-+                break;
-+            }
-+        }
-=20
--    p->read_data +=3D l;
--    p->read_length -=3D l;
-+        l =3D MIN(p->read_length, length - total);
-+        memcpy((char *)data + total, p->read_data, l);
-=20
--    if (!p->read_length) {
--        r =3D pa_stream_drop(p->stream);
--        CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
--                           "pa_stream_drop failed\n");
-+        p->read_data +=3D l;
-+        p->read_length -=3D l;
-+        total +=3D l;
-+
-+        if (!p->read_length) {
-+            r =3D pa_stream_drop(p->stream);
-+            CHECK_SUCCESS_GOTO(c, r =3D=3D 0, unlock_and_fail,
-+                               "pa_stream_drop failed\n");
-+        }
+diff --git a/hw/audio/hda-codec.c b/hw/audio/hda-codec.c
+index f17e8d8dcea2..768ba31e7926 100644
+--- a/hw/audio/hda-codec.c
++++ b/hw/audio/hda-codec.c
+@@ -338,8 +338,6 @@ static void hda_audio_output_cb(void *opaque, int avail=
+)
+         return;
      }
 =20
-     pa_threaded_mainloop_unlock(c->mainloop);
--    return l;
-+    return total;
+-    hda_timer_sync_adjust(st, (wpos - rpos) - to_transfer - (B_SIZE >> 1))=
+;
+-
+     while (to_transfer) {
+         uint32_t start =3D (uint32_t) (rpos & B_MASK);
+         uint32_t chunk =3D (uint32_t) MIN(B_SIZE - start, to_transfer);
+@@ -351,6 +349,8 @@ static void hda_audio_output_cb(void *opaque, int avail=
+)
+             break;
+         }
+     }
++
++    hda_timer_sync_adjust(st, (wpos - rpos) - (B_SIZE >> 1));
+ }
 =20
- unlock_and_fail:
-     pa_threaded_mainloop_unlock(c->mainloop);
+ static void hda_audio_compat_input_cb(void *opaque, int avail)
 --=20
 2.18.1
 
