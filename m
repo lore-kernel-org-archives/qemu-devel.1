@@ -2,93 +2,79 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEB3C2D0D1
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6518C2D0D1
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:33:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32508206DA
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:30:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32508206DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 916DC20731
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 10:33:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UZs6C4V5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 916DC20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioPen-0003GW-9d
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 05:30:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41073)
+	id 1ioPht-0004Vq-NE
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 05:33:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42496)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ioPdw-0002BS-O5
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:29:54 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ioPgr-0003up-Ve
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:32:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ioPdv-0002qS-Ad
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:29:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50044)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ioPdv-0002pT-2I
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:29:51 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 006ASLaN076148
- for <qemu-devel@nongnu.org>; Mon, 6 Jan 2020 05:29:49 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xb92kwbqq-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 05:29:49 -0500
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Mon, 6 Jan 2020 10:29:47 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 6 Jan 2020 10:29:44 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 006AThuc49283148
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 6 Jan 2020 10:29:43 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A1580A405F;
- Mon,  6 Jan 2020 10:29:43 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6F762A405C;
- Mon,  6 Jan 2020 10:29:43 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.66.144])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  6 Jan 2020 10:29:43 +0000 (GMT)
-Subject: [PATCH] ppc/pnv: Drop "num-chips" machine property
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Date: Mon, 06 Jan 2020 11:29:42 +0100
-User-Agent: StGit/unknown-version
+ (envelope-from <peter.maydell@linaro.org>) id 1ioPgp-0005Hx-PH
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:32:53 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:39180)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ioPgp-0005Gi-G8
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 05:32:51 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id 77so71104362oty.6
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 02:32:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=hwtqCkMxywEpIh2oK4AK06EfpyPRdVNgeCMmDK3kAWE=;
+ b=UZs6C4V51LEH2pNcqxgkGgyNcZHVPZkeVTPoX2M50KsN0n6wNnDO7SNt376q1rqRUO
+ nWuVHBspe3FV1UPWDtvj0xGVaJ74RrEifqH1kkKtTWPDKVhX+K5BSR/1Kq1EPWpxgFrZ
+ MifzM6Ezwo77vJ2ibi4uLvdrjV/TrHz19grPClxDhsbmeUKRmAVUqzzliguPdT/rK4Xv
+ /OaNHZtDAePR8IZ9WHZyYrbVoBb55yAlFnYX5bKOXRH0ny43oq2Pzal/oAlZk1CC3fzW
+ tSay4htKqDTVBo2xrPzFbdcE/rX7xvwmOyhf+IX6s4ckkc0g6XxuTcjZX3R5nyrCjKxG
+ 0rww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=hwtqCkMxywEpIh2oK4AK06EfpyPRdVNgeCMmDK3kAWE=;
+ b=WPXRZVD+cYZN9Ts6/rE3KJoFjj4VO0hEBZXfRHSYBr+7uFyb2ZY3TjeYR1+VPIPY3E
+ wYg1+CKBKroIPe6SfiLZyp2c2IAZ3B2tnJ/8PQNz7IpXP8t0bmN8KzF+iY8YdvTlNTTu
+ QNDbmVww7BaXwJhXeTdJBTjmwHtaqurZ7wNSo+da3+m1HAUYQr3gxUYb4v8F9V9T+524
+ cEN82JrzDfHvwxllzTfRZM2qy+ql7Ctz4AWmEMDRlzToSrZvJm75HRy4bz6WTti86fjs
+ etXcqc3rLnkYgryYplvVG6Uzh11vEipdYCFMVrL95W2VPh2WiZcGphCe6gZnchS+JxJb
+ twWQ==
+X-Gm-Message-State: APjAAAVnfkGpMmSDBCrOowSKXxJJuFO9mi5eMZlLeMlQS8xfQ+sRSw4e
+ YMxZFMWi2PPy+A4Wb5mCIz8LAS1i0WbJnn0kReciB4GP6MY=
+X-Google-Smtp-Source: APXvYqwNOBsJR5EoZYqzQbiIwIPrVwnNDhinacyjz3foh3dRKcsZZvyRkHf1XtCSx1myAPr17yIf2Bq7lhR//OzaX48=
+X-Received: by 2002:a9d:644a:: with SMTP id m10mr11605392otl.97.1578306769618; 
+ Mon, 06 Jan 2020 02:32:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20010610-4275-0000-0000-0000039509F0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010610-4276-0000-0000-000038A8F24C
-Message-Id: <157830658266.533764.2214183961444213947.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2020-01-06_03:2020-01-06,2020-01-06 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 adultscore=0
- lowpriorityscore=0 spamscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 bulkscore=0 malwarescore=0 mlxlogscore=999 suspectscore=0
- clxscore=1034 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001060096
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+References: <20191220142644.31076-1-peter.maydell@linaro.org>
+In-Reply-To: <20191220142644.31076-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 6 Jan 2020 10:32:38 +0000
+Message-ID: <CAFEAcA_rS-ZYNuvoKPuTFdzpjizMATNDQc5dLqrrBP+q6nJoDw@mail.gmail.com>
+Subject: Re: [PULL 00/12] target-arm queue
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,138 +86,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The number of CPU chips of the powernv machine is configurable through a
-"num-chips" property. This doesn't fit well with the CPU topology, eg.
-some configurations can come up with more CPUs than the maximum of CPUs
-set in the toplogy. This causes assertion to be hit with mttcg:
+On Fri, 20 Dec 2019 at 14:26, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> One last arm pullreq before I stop work for the end of the year...
+>
+> -- PMM
+>
+> The following changes since commit 8e5943260a8f765216674ee87ce8588cc4e7463e:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging (2019-12-20 12:46:10 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191220
+>
+> for you to fetch changes up to c8fa6079eb35888587f1be27c1590da4edcc5098:
+>
+>   arm/arm-powerctl: rebuild hflags after setting CP15 bits in arm_set_cpu_on() (2019-12-20 14:03:00 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * Support emulating the generic timers at frequencies other than 62.5MHz
+>  * Various fixes for SMMUv3 emulation bugs
+>  * Improve assert error message for hflags mismatches
+>  * arm-powerctl: rebuild hflags after setting CP15 bits in arm_set_cpu_on()
+>
 
-   -machine powernv,num-chips=2 -smp cores=2 -accel tcg,thread=multi
 
-ERROR:
-tcg/tcg.c:789:tcg_register_thread: assertion failed: (n < ms->smp.max_cpus)
-Aborted (core dumped)
+Applied, thanks.
 
-Mttcg mandates the CPU topology to be dimensioned to the actual number
-of CPUs, depending on the number of chips the user asked for. That is,
-'-machine num-chips=N' should always have a '-smp' companion with a
-topology that meats the resulting number of CPUs, typically
-'-smp sockets=N'.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-It thus seems that "num-chips" doesn't bring anything but forcing the user
-to specify the requested number of chips on the command line twice. Simplify
-the command line by computing the number of chips based on the CPU topology
-exclusively. The powernv machine isn't a production thing ; it is mostly
-used by developpers to prepare the bringup of real HW. Because of this and
-for simplicity, this deliberately ignores the official deprecation process
-and dumps "num-chips" right away : '-smp sockets=N' is now the only way to
-control the number of CPU chips.
-
-This is done at machine init because smp_parse() is called after instance
-init.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/pnv.c |   62 +++++++++++-----------------------------------------------
- 1 file changed, 12 insertions(+), 50 deletions(-)
-
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index f77e7ca84ede..b225ffbb2c41 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -768,6 +768,18 @@ static void pnv_init(MachineState *machine)
-         exit(1);
-     }
- 
-+    pnv->num_chips =
-+        machine->smp.max_cpus / (machine->smp.cores * machine->smp.threads);
-+    /*
-+     * TODO: should we decide on how many chips we can create based
-+     * on #cores and Venice vs. Murano vs. Naples chip type etc...,
-+     */
-+    if (!is_power_of_2(pnv->num_chips) || pnv->num_chips > 4) {
-+        error_report("invalid number of chips: '%d'", pnv->num_chips);
-+        error_printf("Try '-smp sockets=N'. Valid values are : 1, 2 or 4.\n");
-+        exit(1);
-+    }
-+
-     pnv->chips = g_new0(PnvChip *, pnv->num_chips);
-     for (i = 0; i < pnv->num_chips; i++) {
-         char chip_name[32];
-@@ -1696,53 +1708,6 @@ PnvChip *pnv_get_chip(uint32_t chip_id)
-     return NULL;
- }
- 
--static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
--                              void *opaque, Error **errp)
--{
--    visit_type_uint32(v, name, &PNV_MACHINE(obj)->num_chips, errp);
--}
--
--static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
--                              void *opaque, Error **errp)
--{
--    PnvMachineState *pnv = PNV_MACHINE(obj);
--    uint32_t num_chips;
--    Error *local_err = NULL;
--
--    visit_type_uint32(v, name, &num_chips, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
--
--    /*
--     * TODO: should we decide on how many chips we can create based
--     * on #cores and Venice vs. Murano vs. Naples chip type etc...,
--     */
--    if (!is_power_of_2(num_chips) || num_chips > 4) {
--        error_setg(errp, "invalid number of chips: '%d'", num_chips);
--        return;
--    }
--
--    pnv->num_chips = num_chips;
--}
--
--static void pnv_machine_instance_init(Object *obj)
--{
--    PnvMachineState *pnv = PNV_MACHINE(obj);
--    pnv->num_chips = 1;
--}
--
--static void pnv_machine_class_props_init(ObjectClass *oc)
--{
--    object_class_property_add(oc, "num-chips", "uint32",
--                              pnv_get_num_chips, pnv_set_num_chips,
--                              NULL, NULL, NULL);
--    object_class_property_set_description(oc, "num-chips",
--                              "Specifies the number of processor chips",
--                              NULL);
--}
--
- static void pnv_machine_power8_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -1812,8 +1777,6 @@ static void pnv_machine_class_init(ObjectClass *oc, void *data)
-      */
-     mc->default_ram_size = INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
-     ispc->print_info = pnv_pic_print_info;
--
--    pnv_machine_class_props_init(oc);
- }
- 
- #define DEFINE_PNV8_CHIP_TYPE(type, class_initfn) \
-@@ -1866,7 +1829,6 @@ static const TypeInfo types[] = {
-         .parent        = TYPE_MACHINE,
-         .abstract       = true,
-         .instance_size = sizeof(PnvMachineState),
--        .instance_init = pnv_machine_instance_init,
-         .class_init    = pnv_machine_class_init,
-         .class_size    = sizeof(PnvMachineClass),
-         .interfaces = (InterfaceInfo[]) {
-
+-- PMM
 
