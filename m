@@ -2,86 +2,66 @@ Return-Path: <SRS0=kvq2=23=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33269C32771
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 06:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DEBC32771
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 07:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEE2A20848
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 06:46:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QDqMnOxn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEE2A20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 94D4520848
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 07:26:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94D4520848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioM9g-0003bJ-S0
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 01:46:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56449)
+	id 1ioMmW-0004tu-Ob
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 02:26:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33559)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1ioM90-00039Y-HO
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 01:45:43 -0500
+ (envelope-from <clg@kaod.org>) id 1ioMlw-00045z-FX
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 02:25:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1ioM8x-0000iL-2a
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 01:45:40 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33760
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ioMlv-0006MN-Hh
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 02:25:56 -0500
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:47856)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ioM8w-0000e3-KZ
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 01:45:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578293137;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jO8S9ctInXLxdKpCAmcsvls85J+UWUy3R+t37w3IXxs=;
- b=QDqMnOxnso6xagCw1ctcpuKRbmgxIYx2ZgLJtrZfpezpTMvAQv9Ta5Ll0TzwWZz/vklY1r
- fII7Z1AxiVl2jzqSAF4Ib3XeT6EpzSSWan30y/aPaD2fHp4ZomKNPGTz6fi4SOI9d5GV5t
- rVdL0eFctU+rIvKwpbWLXflWURSt/jo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-nR3NvCYgPAC7GWQeN-ozjw-1; Mon, 06 Jan 2020 01:45:36 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3513107ACC5;
- Mon,  6 Jan 2020 06:45:33 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-98.ams2.redhat.com
- [10.36.116.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BE9C660C87;
- Mon,  6 Jan 2020 06:45:27 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id D8D419B25; Mon,  6 Jan 2020 07:45:26 +0100 (CET)
-Date: Mon, 6 Jan 2020 07:45:26 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [Qemu-devel] What should a virtual board emulate?
-Message-ID: <20200106064526.zh6rt4wbibfjrscu@sirius.home.kraxel.org>
-References: <20190319144013.26584-1-pbonzini@redhat.com>
- <alpine.BSF.2.21.9999.1903192350550.11467@zero.eik.bme.hu>
- <87imwe847x.fsf_-_@dusky.pond.sub.org>
- <CAAdtpL5Z1OXqZ_zzA0RLq9soydNtTFt2oCOEfui1rq19bLKUgA@mail.gmail.com>
- <d9d5ac96-c0f5-dd83-d305-10e20c745dd1@redhat.com>
- <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ioMlv-00063n-CC
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 02:25:55 -0500
+Received: from player794.ha.ovh.net (unknown [10.108.16.238])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1BC041BD3CC
+ for <qemu-devel@nongnu.org>; Mon,  6 Jan 2020 08:25:44 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player794.ha.ovh.net (Postfix) with ESMTPSA id DF7E6ADD7C44;
+ Mon,  6 Jan 2020 07:25:40 +0000 (UTC)
+Subject: Re: [PATCH 2/2] ppc/pnv: Use the CPU topology to compute the default
+ number of chips
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157686069624.97184.12603452056634667288.stgit@bahia.lan>
+ <157686070815.97184.16561911770080665569.stgit@bahia.lan>
+ <20191221003906.GC15511@umbus.fritz.box> <20191221112849.68769d69@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2db93f13-2fa2-a569-d706-c92bc8adc06d@kaod.org>
+Date: Mon, 6 Jan 2020 08:25:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: nR3NvCYgPAC7GWQeN-ozjw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191221112849.68769d69@bahia.lan>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 16210706861067766611
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdegledguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeehnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 46.105.58.226
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,41 +73,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+On 12/21/19 11:28 AM, Greg Kurz wrote:
+> On Sat, 21 Dec 2019 11:39:06 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+> 
+>> On Fri, Dec 20, 2019 at 05:51:48PM +0100, Greg Kurz wrote:
+>>> Multi TCG mandates the CPU topology to be dimensioned to the actual
+>>> number of CPUs, depending on the number of chips the user asked for.
+>>> That is, '-machine num-chips=N' should always have a '-smp' companion
+>>> with a topology that meats the resulting number of CPUs, typically
+>>> '-smp sockets=N'.
+>>>
+>>> Simplify the command line for these setups by computing the default
+>>> number of chips based on the CPU topology, ie. no need to explicitely
+>>> set "num-chips" anymore. This must be done at machine init because
+>>> smp_parse() is called after instance init.
+>>>
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>
+>> Is there actually any reason to retain num-chips at all?  Or could we
+>> just set the number of chips equal to the number of sockets, which
+>> seems to make sense to me.
+>>
+> 
+> I don't quite know why "num-chips" was introduced in the first place... so
+> yes, if it turns out it isn't needed, I'll gladly drop the property.
 
-> 78c37d88f1b8b0b3ebcc632c458f0c3779fe2951 is the first bad commit
-> commit 78c37d88f1b8b0b3ebcc632c458f0c3779fe2951
-> Author: Paolo Bonzini <pbonzini@redhat.com>
-> Date:   Tue Mar 19 15:37:19 2019 +0100
->=20
->     mips-fulong2e: obey -vga none
->=20
->     Do not create an ATI VGA if "-vga none" was passed on the command lin=
-e.
+I concur. We have some freedom on the PowerNV machine options. 
+Let's replace "num-chips" with "sockets".
 
-> 1/ the Radeon chip is soldered on the motherboard,
->=20
-> 2/ the default BIOS expects the Radeon chip to be
->    unconditionally present,
->=20
-> I insist this patch is incorrect for the particular case of the Fuloong2e
-> board. I plan to revert it when I post the test.
+Thanks,
 
-Yep.  IMHO devices which you can't unplug on the physical board should
-be present even with "qemu -nodefaults".
-
-cheers,
-  Gerd
-
+C. 
 
