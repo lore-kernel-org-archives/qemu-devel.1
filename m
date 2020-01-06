@@ -8,71 +8,72 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BF2C33C8C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6ACC33C8C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 313DF2072C
-	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:05:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D4DD2072C
+	for <qemu-devel@archiver.kernel.org>; Mon,  6 Jan 2020 19:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rxgaaiaG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313DF2072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aCigGM45"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D4DD2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioXhN-00044O-QG
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:05:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46608)
+	id 1ioXhQ-0004A8-Lv
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 14:06:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45811)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ioX5K-00048o-9p
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:26:39 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1ioX4S-0002X8-Sw
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ioX5J-0005NT-0f
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:26:38 -0500
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:33737)
+ (envelope-from <danielhb413@gmail.com>) id 1ioX4R-0004VU-MJ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 13:25:44 -0500
+Received: from mail-qk1-x72b.google.com ([2607:f8b0:4864:20::72b]:41776)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ioX5I-0005ND-TK; Mon, 06 Jan 2020 13:26:36 -0500
-Received: by mail-qt1-x841.google.com with SMTP id d5so43225469qto.0;
- Mon, 06 Jan 2020 10:26:36 -0800 (PST)
+ id 1ioX4R-0004VB-Ia; Mon, 06 Jan 2020 13:25:43 -0500
+Received: by mail-qk1-x72b.google.com with SMTP id x129so40277788qke.8;
+ Mon, 06 Jan 2020 10:25:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=XLjlJHRdZ19eNFwu3xtUWDKA1dixiH7lhcQ1c7qm+lk=;
- b=rxgaaiaGGAXY4b6eaHrizaVp6uRoDPzxm0U99pvv3OC2vBkxMyVPG1nC3ijsI2Xeiu
- Io8w5WoSUPCizvSw3Sjyz0yfIZEp9HGSV+PbEBxooaWvy264gz4Ijm3NpxPMMPZin937
- 0iuI4IW00jfInthvUMN1kPBSZbQEWy3l8JL3I87w6KuqnCbX5V0wV8Iliqa5n4jI+ewh
- 3uki8cLhCINIkX0ml3n6wGlT2zkRxfCCdlGlsVyUa1UbSeQ559yHXsZh/WK5bv2cH5w2
- uk6FPikyAAHpY0NxBpSjTC/BxG+q7XOug+eBodSz16DcveCs8//r+mDJnLHs5X/t+Rff
- uj3A==
+ bh=Adi6YmWzd5BlIyjySU/FHh29puafqwS6MyW1XVUsuis=;
+ b=aCigGM45Roe/Nr1ZXPjbYM8Xz0GSFXDL5YrXrdeaqunEB+OI3Y2LN/2I5bPMtc5S8j
+ CGMl++arbFq6+4W/1Q33RBV8me0qDj45oXKxyynzYylUQnuirH625VTao0ior+8O3qFz
+ xIN4ehhT7CuPe+exRMgisa4ERBUk5Fyfv7wN9eqZEvjeCUXVXHs2zFK4EW5LgBgQGgDF
+ p+tQzfTuoWQNk0l4xKS44jJE2a/ik0xT352iQsjb6V7RhWs7FCkfZBlQNDsAAU/zjGxu
+ zl+jk5tZ7tXYfIiTIlZb4glU0uA69gLjeZNo3bgkwJKmZEbEjEO8+wU2ywCNKD0kvRiZ
+ Y9rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=XLjlJHRdZ19eNFwu3xtUWDKA1dixiH7lhcQ1c7qm+lk=;
- b=h0Wdu4AMAZ9i1Al8pg4+lE1Wf9n7a2LbFkCqcj9IBnFqgSkd2FCQBtN7UewMMIiTvB
- Acq4b+zOBOi6PkwjCmGGDwNfTrvLvCKp0PmSKmJNadgyM09pUYPRcCLNpocQuSxLPiHu
- wbBiSfGUWTTk9RyPUpMkx2yVMw+Gpu6DuWkeV2Ho5CF7PYkzCkJT3TJf1Me877csnsuF
- K5rU8yIlnUm52LVhKGOtVRn6MkHheyGjAaNkzh2mtv9GoFn4+pfujV2Qy7y7Km1YKFDE
- 0tmXpx5Hs3AEXFVVQvZRfEA73VhZxrzzZ1sADHmImTTq5teftV30PBTlBNRgucAp0bmt
- +15g==
-X-Gm-Message-State: APjAAAWKnQj+wzP5FEraDVG01drIAWBobEOgJFJmbQwHDKFS0n5nRVue
- sXGA8np8ZN/vtHlluzA7L/+ewfCo
-X-Google-Smtp-Source: APXvYqwqRExlnWSj4gM1GN00iSoFDDf0O6JVyrbbvKFfmIWOynI3GK8nhm+eTh7R+pmsda/kpSdNhA==
-X-Received: by 2002:ac8:5442:: with SMTP id d2mr78989156qtq.297.1578335196334; 
- Mon, 06 Jan 2020 10:26:36 -0800 (PST)
+ bh=Adi6YmWzd5BlIyjySU/FHh29puafqwS6MyW1XVUsuis=;
+ b=Vi54n9HzxSjjZja4aeMs2cWOWaNPxqHHeE0K7ReddM/v/3HWjFo+UNrJFO94oBo6rn
+ 8LjL+Jafo9/8MB8jJ/Qbia85OfOBA8Ur7fDlMkvMID5CLCiCW48xRi0jEUDyzUorJlD2
+ O7T/Q1RRT+1rwjaezDlECLUCQxefKNPlL/wYS2ZhUiWNtD9KHfKVWhbuVjghAb1VFC/K
+ Q8v5rTQKrBEllLMfr0oG9N48DtoS43oJxbDaeb8rEeF6BW8Czq6pVY8yHCW4BxQYUt75
+ hz+ZfQrOnJ+zVN+2uJHB3si6SYq+ABHC8ZRqW8DZVZ8r8AwSF92kzMS+9Aoz5R/7PGZW
+ 82nA==
+X-Gm-Message-State: APjAAAXgY8GzOA2N8+OZ5+X5jrK9qiSsDkklwJCsOgGlZoEA63CKQRXz
+ /UPpSJ5IUSIFXDKoFP82gv4AylND
+X-Google-Smtp-Source: APXvYqy9uuY+g/FFOUyP/GV4GYpoqMkRy1st8SV0/XE9bt2uTfjdO1LUISMtE5C85hik3nZV78SaHg==
+X-Received: by 2002:ae9:f711:: with SMTP id s17mr83111219qkg.238.1578335142878; 
+ Mon, 06 Jan 2020 10:25:42 -0800 (PST)
 Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.26.34
+ by smtp.gmail.com with ESMTPSA id b81sm21026522qkc.135.2020.01.06.10.25.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 10:26:35 -0800 (PST)
+ Mon, 06 Jan 2020 10:25:42 -0800 (PST)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 58/59] linux-user/syscall.c: remove unneeded labels
-Date: Mon,  6 Jan 2020 15:24:24 -0300
-Message-Id: <20200106182425.20312-59-danielhb413@gmail.com>
+Subject: [PATCH v1 28/59] qga/commands-win32.c: remove 'out' label in
+ get_pci_info
+Date: Mon,  6 Jan 2020 15:23:54 -0300
+Message-Id: <20200106182425.20312-29-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200106182425.20312-1-danielhb413@gmail.com>
 References: <20200106182425.20312-1-danielhb413@gmail.com>
@@ -80,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
+X-Received-From: 2607:f8b0:4864:20::72b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,113 +93,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'out2' label in do_sendrecvmsg_locked() can be replaced by
-'return' with the adequate exit value. Same thing with the
-label 'out' in do_ioctl_blkpg(), and in that function we
-can get rid of the 'ret' variable as well.
+'out' can be replaced by 'return pci' instead.
 
-CC: Riku Voipio <riku.voipio@iki.fi>
-CC: Laurent Vivier <laurent@vivier.eu>
+CC: Stefan Weil <sw@weilnetz.de>
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- linux-user/syscall.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+ qga/commands-win32.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 49c6151c2d..5db066921e 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2941,7 +2941,7 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
-              */
-             msg.msg_name = (void *)-1;
-         } else if (ret) {
--            goto out2;
-+            return ret;
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 2461fd19bf..c520a341df 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -513,7 +513,7 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
+                                    DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+     if (dev_info == INVALID_HANDLE_VALUE) {
+         error_setg_win32(errp, GetLastError(), "failed to get devices tree");
+-        goto out;
++        return pci;
+     }
+ 
+     g_debug("enumerating devices");
+@@ -584,7 +584,7 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
+                 } else {
+                     error_setg_win32(errp, GetLastError(),
+                                      "failed to get device instance ID");
+-                    goto out;
++                    return pci;
+                 }
+             }
+ 
+@@ -598,14 +598,14 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
+                 g_error("CM_Locate_DevInst failed with code %lx", cr);
+                 error_setg_win32(errp, GetLastError(),
+                                  "failed to get device instance");
+-                goto out;
++                return pci;
+             }
+             cr = CM_Get_Parent(&parent_dev_inst, dev_inst, 0);
+             if (cr != CR_SUCCESS) {
+                 g_error("CM_Get_Parent failed with code %lx", cr);
+                 error_setg_win32(errp, GetLastError(),
+                                  "failed to get parent device instance");
+-                goto out;
++                return pci;
+             }
+ 
+             cr = CM_Get_Device_ID_Size(&dev_id_size, parent_dev_inst, 0);
+@@ -613,7 +613,7 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
+                 g_error("CM_Get_Device_ID_Size failed with code %lx", cr);
+                 error_setg_win32(errp, GetLastError(),
+                                  "failed to get parent device ID length");
+-                goto out;
++                return pci;
+             }
+ 
+             ++dev_id_size;
+@@ -628,7 +628,7 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
+                 g_error("CM_Get_Device_ID failed with code %lx", cr);
+                 error_setg_win32(errp, GetLastError(),
+                                  "failed to get parent device ID");
+-                goto out;
++                return pci;
+             }
          }
-     } else {
-         msg.msg_name = NULL;
-@@ -2960,15 +2960,13 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
-         /* sendrcvmsg returns a different errno for this condition than
-          * readv/writev, so we must catch it here before lock_iovec() does.
-          */
--        ret = -TARGET_EMSGSIZE;
--        goto out2;
-+        return -TARGET_EMSGSIZE;
-     }
  
-     vec = lock_iovec(send ? VERIFY_READ : VERIFY_WRITE,
-                      target_vec, count, send);
-     if (vec == NULL) {
--        ret = -host_to_target_errno(errno);
--        goto out2;
-+        return -host_to_target_errno(errno);
-     }
-     msg.msg_iovlen = count;
-     msg.msg_iov = vec;
-@@ -3020,7 +3018,6 @@ static abi_long do_sendrecvmsg_locked(int fd, struct target_msghdr *msgp,
+@@ -642,14 +642,14 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
+         if (parent_dev_info == INVALID_HANDLE_VALUE) {
+             error_setg_win32(errp, GetLastError(),
+                              "failed to get parent device");
+-            goto out;
++            return pci;
+         }
  
- out:
-     unlock_iovec(vec, target_vec, count, !send);
--out2:
-     return ret;
- }
+         parent_dev_info_data.cbSize = sizeof(SP_DEVINFO_DATA);
+         if (!SetupDiEnumDeviceInfo(parent_dev_info, 0, &parent_dev_info_data)) {
+             error_setg_win32(errp, GetLastError(),
+                            "failed to get parent device data");
+-            goto out;
++            return pci;
+         }
  
-@@ -4952,7 +4949,6 @@ static abi_long do_ioctl_blkpg(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
-     int target_size;
-     const argtype *arg_type = ie->arg_type;
-     const argtype part_arg_type[] = { MK_STRUCT(STRUCT_blkpg_partition) };
--    abi_long ret;
+         for (j = 0;
+@@ -731,7 +731,6 @@ static GuestPCIAddress *get_pci_info(int number, Error **errp)
  
-     struct blkpg_ioctl_arg *host_blkpg = (void*)buf_temp;
-     struct blkpg_partition host_part;
-@@ -4962,8 +4958,7 @@ static abi_long do_ioctl_blkpg(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
-     target_size = thunk_type_size(arg_type, 0);
-     argptr = lock_user(VERIFY_READ, arg, target_size, 1);
-     if (!argptr) {
--        ret = -TARGET_EFAULT;
--        goto out;
-+        return -TARGET_EFAULT;
-     }
-     thunk_convert(buf_temp, argptr, arg_type, THUNK_HOST);
-     unlock_user(argptr, arg, 0);
-@@ -4975,8 +4970,7 @@ static abi_long do_ioctl_blkpg(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
-         break;
-     default:
-         /* Unknown opcode */
--        ret = -TARGET_EINVAL;
--        goto out;
-+        return -TARGET_EINVAL;
-     }
- 
-     /* Read and convert blkpg->data */
-@@ -4984,18 +4978,14 @@ static abi_long do_ioctl_blkpg(const IOCTLEntry *ie, uint8_t *buf_temp, int fd,
-     target_size = thunk_type_size(part_arg_type, 0);
-     argptr = lock_user(VERIFY_READ, arg, target_size, 1);
-     if (!argptr) {
--        ret = -TARGET_EFAULT;
--        goto out;
-+        return -TARGET_EFAULT;
-     }
-     thunk_convert(&host_part, argptr, part_arg_type, THUNK_HOST);
-     unlock_user(argptr, arg, 0);
- 
-     /* Swizzle the data pointer to our local copy and call! */
-     host_blkpg->data = &host_part;
--    ret = get_errno(safe_ioctl(fd, ie->host_cmd, host_blkpg));
--
+ free_dev_info:
+     SetupDiDestroyDeviceInfoList(dev_info);
 -out:
--    return ret;
-+    return get_errno(safe_ioctl(fd, ie->host_cmd, host_blkpg));
+     return pci;
  }
  
- static abi_long do_ioctl_rt(const IOCTLEntry *ie, uint8_t *buf_temp,
 -- 
 2.24.1
 
