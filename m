@@ -2,82 +2,88 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C09C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 218EAC33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D10A42070E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2EA0208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:52:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKANFpo0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10A42070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ix2fD45g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2EA0208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ionMP-0001e5-Ls
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:49:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42104)
+	id 1ionPH-0008Kr-Nj
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:52:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ion7s-0008AG-Qz
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:34:21 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iomlP-00037p-NQ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:11:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ion7q-0003sF-HA
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:34:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43509
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ion7q-0003rB-DO
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:34:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578396857;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZCagtfuTplucHWENQ+zJb41w91U1QLCqXIaEHdgW9RY=;
- b=aKANFpo0ZqQeFlQNeFrj5cHMPA7FnOKnh8OTAS6EWHUWkIa1x8zmXAcqXZtoNM7Tx36h+E
- 5bLgHRLaJ0hxR0mHmYJ+Rsb3pYCROMperQZDZo3YS+oLoXFMa9zwy+z6WXnmr2MNEQ5i77
- Rm2PSkOUybMPMLJDuFjmMJbDdo6zc8Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-9VTfdsSIMhiIv8J2hLmMeA-1; Tue, 07 Jan 2020 06:34:16 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96783801E6C
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:34:15 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E20595D9CA;
- Tue,  7 Jan 2020 11:34:11 +0000 (UTC)
-Date: Tue, 7 Jan 2020 11:34:08 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 078/104] virtiofsd: cleanup allocated resource in se
-Message-ID: <20200107113408.GS3368802@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-79-dgilbert@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iomlO-0007LN-Hm
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:11:07 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36788)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iomlO-0007Kb-AY
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:11:06 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p17so18927907wma.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 03:11:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=JBtnW38xXFl77T1JUBLmdP4GEJWaN4c6Sz81fJCaRAg=;
+ b=ix2fD45gp1sywu3oqGtyac8TpZzkxyPt55BeriKPyPvpWdcRbQnrfmw0So5r64sTAv
+ SETnG32lqHzJdOcxxG3pr6bwHhsMaZGcAmzfpXTOfkPUCEpn3WsqOhtx5KiYEYu8SneN
+ GsbQlorgGlrvKhl+SOkTVx/s8tZbk5OQ3mcRJWwG8Q86+tMBrIg2DgQAH25LFe+INcFB
+ nFP9UnD1ZEs1gr3Ik+94oe4OJZOM1HoQuk4skWL4PBqlXFsJmogarlNGpny6WhdPF0pT
+ ycsZ0Nli0c5heSaU4zk8Vhw/PXlddQdJE8pgZvqScRduTtNbSWP2DpaOKH8E96Ui5d8N
+ fOgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=JBtnW38xXFl77T1JUBLmdP4GEJWaN4c6Sz81fJCaRAg=;
+ b=IAw84VXqMBDSjkA+Z3UhNDjnnfLiOtk05dUFk16i3j3vAZKIj/ap3MyVoqBsG5dB4D
+ qA4mfg0a21EhzPpmXx9m17YctnCZBE7qwGMbBJHkEbRuLiRZFq/P3NTe2efzcezUKlhw
+ h9cqozWodDBjGlj1ZQk3jsG8mxgsgHzfjt5bkwUwerH/8GOSbzqEnJywGEJXJB6+6dpL
+ GhIHLBJMJEOIAmm2aJNWJOXBXiSWF8eLqKGpQhuYzAsKvO2SfMFU2rV0bIjsC3XPGu5n
+ l69Oq6HQ3UF2B/sW++GCfi8hDhyEsCbf1mgDziLrLly9hA/deIPW1noHwwuO0psrUpFY
+ wNzA==
+X-Gm-Message-State: APjAAAW4qAtFxQHBoMaqY4kDX8QWPWatLE0SdnJaikczZNjd3W/NNwfl
+ c/dH+Ipuj1rtHYyV7qlegPoo8A==
+X-Google-Smtp-Source: APXvYqwdsR+TiOMcqBfMrO7I5RF3rziP9Ju7x7D0c5D+prJHTHK1dY/rKw/W/0zGB2VklW8NPVWslg==
+X-Received: by 2002:a1c:1b41:: with SMTP id b62mr38861376wmb.53.1578395465400; 
+ Tue, 07 Jan 2020 03:11:05 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id r62sm27568657wma.32.2020.01.07.03.11.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 03:11:04 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5B1EE1FF87;
+ Tue,  7 Jan 2020 11:11:03 +0000 (GMT)
+References: <20200106123746.18201-1-kraxel@redhat.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH] freebsd: use python37
+In-reply-to: <20200106123746.18201-1-kraxel@redhat.com>
+Date: Tue, 07 Jan 2020 11:11:03 +0000
+Message-ID: <878smj5xo8.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-79-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 9VTfdsSIMhiIv8J2hLmMeA-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,37 +95,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:38PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: Liu Bo <bo.liu@linux.alibaba.com>
->=20
-> This cleans up unfreed resources in se on quiting, including
-> se->virtio_dev, se->vu_socket_path, se->vu_socketfd.
->=20
-> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+
+Gerd Hoffmann <kraxel@redhat.com> writes:
+
+> FreeBSD seems to use python37 by default now, which breaks the build
+> script.  Add python to the package list, to explicitly pick the version,
+> and also adapt the configure command line.
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Queued to testing/next, thanks.
+
 > ---
->  tools/virtiofsd/fuse_lowlevel.c | 7 +++++++
->  tools/virtiofsd/fuse_virtio.c   | 7 +++++++
->  tools/virtiofsd/fuse_virtio.h   | 2 +-
->  3 files changed, 15 insertions(+), 1 deletion(-)
+>  tests/vm/freebsd | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> index 1825cc58218b..33a736298a9a 100755
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -32,6 +32,7 @@ class FreeBSDVM(basevm.BaseVM):
+>          "git",
+>          "pkgconf",
+>          "bzip2",
+> +        "python37",
+>=20=20
+>          # gnu tools
+>          "bash",
+> @@ -63,7 +64,7 @@ class FreeBSDVM(basevm.BaseVM):
+>          mkdir src build; cd src;
+>          tar -xf /dev/vtbd1;
+>          cd ../build
+> -        ../src/configure --python=3Dpython3.6 {configure_opts};
+> +        ../src/configure --python=3Dpython3.7 {configure_opts};
+>          gmake --output-sync -j{jobs} {target} {verbose};
+>      """
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Alex Benn=C3=A9e
 
