@@ -2,89 +2,87 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24332C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3ADC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:54:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0BBB2187F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FDCD208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:54:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f/zmM2/8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0BBB2187F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NtlpDI2w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FDCD208C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqDu-0005IE-2O
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:52:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51893)
+	id 1ioqFD-0007mB-DY
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:54:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55381)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iopB6-0007ye-Aw
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:45:49 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIK-00006h-53
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iopB4-0005P2-Sb
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:45:47 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43495)
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIJ-0002Fq-2c
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:16 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45540)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iopB4-0005OI-Hj
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:45:46 -0500
-Received: by mail-wr1-x443.google.com with SMTP id d16so53979815wre.10
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:45:46 -0800 (PST)
+ id 1iopII-0002FO-Td
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:15 -0500
+Received: by mail-wr1-x444.google.com with SMTP id j42so53981351wrj.12
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:53:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=BfVg/WfB/npygxZ7/2hzRL6di2s8nJIO/3FCAV+HBXo=;
- b=f/zmM2/89ZBOc/ZBkTdNjUJ0qKPzzmlATj0Q7KipQpGLtto4nGwEN8vF3YrzvWZGyn
- Gi787c9smeoy1njzw5Cxge9WzPGXVB5K3/MJXYNrUXSMAVQ6lh9e75OvOEn+gckm+vuC
- NTs/Z35knaI0/Dpw0IF4rnaySYeSTyJw/6WpdRgjWMualUZvfMWaHUCH0Ilt3lEwriFn
- 02A9uGeL0PmRPQ4rqhr67ZDT4ssIvWmO9FeAakGlNQID/Ey4Xass8ONPl+YjVWrSQ29B
- X6LY5FM9qBPC+beTn2MDW/9Hbhclw60SUojPuwPEVVjxdGHhOndBzd8oVUZYsQWB0/oX
- kxKw==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JbIF6jq85tSSclAUoLQpO8ixEYiFXnjjbBfr9rsFDdg=;
+ b=NtlpDI2w9C6NTLiFfFsW6nrIbTLBtqWB4tKk8Qhu6dH4hb9mJHoYUQp7a4kvcLD2U5
+ 85aYYl9plw8qXWZciqJBE7jV8EGCiqGW4CdbJ8oTpDV9oLF/PzehRgQe1xOJn1EFsTvD
+ +nKQfiscSieJfM1SBRcnwX+XoFxHnlQLZRHxsp7cMrK7+C0tE2maHGbbadHaEGtPpPWu
+ ia5Mt7S9G4J2yfnEdEn+tA7EpLGnQoNfzNn7jWLHFG2JE8hylIMoupd+fiIlG92sj43g
+ yC7FYynzasqxBTSX1+7LMCSUt6MvZZviZ+KDesZX+Za371tAyNd6/c5XNPH5KG0wTfVu
+ unKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=BfVg/WfB/npygxZ7/2hzRL6di2s8nJIO/3FCAV+HBXo=;
- b=NCjez2pUSuPPlnh1BQWjqNpflhjSP+AOmUIMyNzPWhBt/41+HbJhzr48MGdKAGdrhF
- mRlbtWz8T9YTg32hLc74LJ8PsXCLmWsdBX05mVh7nSjYIcERVoNyX2GPDuURlDJBhvex
- g6yWE4R5Y1kfgx0z2ThCSK3r344a7wkjOu2oK+vO6n5SXnQJcXNT4yeDzsFa/N3lDqZ/
- CorxrLUx+zHF4WqLoubnvrEq2iNtd2M9yH9n8p9+tOgyDPxtX/PIeM35CN4UTQN5qhKr
- 4my59BcOVvJrlt8lByyEfnsOoeF1avFLaRH9Fmi1KmZ/Qbvke9FMefX4r2cdmE+5FIfN
- Du1Q==
-X-Gm-Message-State: APjAAAXlPHugiBvHuIaBtAQGuHVB+mho4v3WTcBPNx/t9eS7TPOgi8ns
- swh/hM4ZxzyzAOovaypqDNXkAw==
-X-Google-Smtp-Source: APXvYqziXbxFqLBJWCg0c+Jw4pP/R31MntQtcV+17gHQg+ds2IUNvFx1YHil6NriT3g3RPkvHvnhkA==
-X-Received: by 2002:adf:a141:: with SMTP id r1mr110862171wrr.285.1578404745311; 
- Tue, 07 Jan 2020 05:45:45 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JbIF6jq85tSSclAUoLQpO8ixEYiFXnjjbBfr9rsFDdg=;
+ b=UP/iEnAiZdrNl1vgA/iXGgeFXhXMY7eXlgzLFkeSDz9Pqrb7xkBQItvummKQVlDh7W
+ BrJYboAAMlyxM0fUpfpmkbuCWWsQjf0LCN3IBZW9sl0iRoJ1WHi2i1obqrly3uDeNQ/0
+ NC815DlWTd1V+FAOX2G3unbnwBOkQz07cX7E5cfASPboCaY9u2XY5H4djfHP+UuqqJvL
+ /VFLYb4mH+hMYCUM0vIpuPTPuRha74qyALA3ErtzKzyjnRQOvEZ2NHalY0V/4YlhRreQ
+ gHXzkyLjtpScaPuPwATJDZ+WBaIXKhrIpQxmL83dsNH8Z3WsH3Y5Lto/Ec5sS1L5sBlH
+ uUqA==
+X-Gm-Message-State: APjAAAVvs9q2S/8sN3sASdSDjhBjIeWJv9XRQKC8nmZ/254I2Dc/iEi1
+ xjArkPE9TcqdRUCK+NUo3FPFQg==
+X-Google-Smtp-Source: APXvYqwWeKxzqqCJDbhvw7rpySL4eTrbNwGlvcqRU0Fvrz7/FLMieQgU0+whWP0dJ4gziTXl5kP3zg==
+X-Received: by 2002:a5d:4692:: with SMTP id
+ u18mr108939846wrq.206.1578405193874; 
+ Tue, 07 Jan 2020 05:53:13 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n8sm77098417wrx.42.2020.01.07.05.45.44
+ by smtp.gmail.com with ESMTPSA id u18sm75862767wrt.26.2020.01.07.05.53.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 05:45:44 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9563F1FF87;
- Tue,  7 Jan 2020 13:45:43 +0000 (GMT)
-References: <20191218223441.23852-1-richard.henderson@linaro.org>
- <20191218223441.23852-8-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+ Tue, 07 Jan 2020 05:53:11 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 182C31FF87;
+ Tue,  7 Jan 2020 13:53:11 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 7/7] configure: Support -static-pie if requested
-In-reply-to: <20191218223441.23852-8-richard.henderson@linaro.org>
-Date: Tue, 07 Jan 2020 13:45:43 +0000
-Message-ID: <87ftgr4by0.fsf@linaro.org>
+Subject: [PATCH  v1 0/6] current testing/next (python and other fixes)
+Date: Tue,  7 Jan 2020 13:53:05 +0000
+Message-Id: <20200107135311.5215-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,78 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+This is my current testing/next queue. It contains one patch which
+should get merged through another tree shortly. Alongside some better
+debugging output for acceptance tests the other fixes are mostly
+python related fallout.
 
-> Recent toolchains support static and pie at the same time.
->
-> As with normal dynamic builds, allow --static to default to PIE
-> if supported by the toolchain.  Allow --enable/--disable-pie to
-> override the default.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+The following patches need review
+   01 - hw i386 x86 iommu Add missing stubs
+   06 - travis install homebrew python for OS X
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Alex Bennée (1):
+  travis: install homebrew python for OS X
 
-> ---
-> v2: Fix --disable-pie --static
-> ---
->  configure | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
->
-> diff --git a/configure b/configure
-> index f6ff079fab..55586c5498 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1024,7 +1024,6 @@ for opt do
->    ;;
->    --static)
->      static=3D"yes"
-> -    LDFLAGS=3D"-static $LDFLAGS"
->      QEMU_PKG_CONFIG_FLAGS=3D"--static $QEMU_PKG_CONFIG_FLAGS"
->    ;;
->    --mandir=3D*) mandir=3D"$optarg"
-> @@ -2000,11 +1999,6 @@ if test "$static" =3D "yes" ; then
->    if test "$modules" =3D "yes" ; then
->      error_exit "static and modules are mutually incompatible"
->    fi
-> -  if test "$pie" =3D "yes" ; then
-> -    error_exit "static and pie are mutually incompatible"
-> -  else
-> -    pie=3D"no"
-> -  fi
->  fi
->=20=20
->  # Unconditional check for compiler __thread support
-> @@ -2035,7 +2029,18 @@ if compile_prog "-Werror -fno-pie" "-no-pie"; then
->    LDFLAGS_NOPIE=3D"-no-pie"
->  fi
->=20=20
-> -if test "$pie" =3D "no"; then
-> +if test "$static" =3D "yes"; then
-> +  if test "$pie" !=3D "no" && compile_prog "-fPIE -DPIE" "-static-pie"; =
-then
-> +    QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
-> +    LDFLAGS=3D"-static-pie $LDFLAGS"
-> +    pie=3D"yes"
-> +  elif test "$pie" =3D "yes"; then
-> +    error_exit "-static-pie not available due to missing toolchain suppo=
-rt"
-> +  else
-> +    LDFLAGS=3D"-static $LDFLAGS"
-> +    pie=3D"no"
-> +  fi
-> +elif test "$pie" =3D "no"; then
->    QEMU_CFLAGS=3D"$CFLAGS_NOPIE $QEMU_CFLAGS"
->    LDFLAGS=3D"$LDFLAGS_NOPIE $LDFLAGS"
->  elif compile_prog "-fPIE -DPIE" "-pie"; then
+Gerd Hoffmann (2):
+  tests/vm: update openbsd to release 6.6
+  freebsd: use python37
 
+Philippe Mathieu-Daudé (1):
+  hw/i386/x86-iommu: Add missing stubs
 
---=20
-Alex Benn=C3=A9e
+Wainer dos Santos Moschetta (2):
+  travis.yml: avocado: Print logs of non-pass tests only
+  travis.yml: Detach build and test steps
+
+ hw/i386/x86-iommu-stub.c | 9 +++++++++
+ .travis.yml              | 8 +++++---
+ tests/vm/freebsd         | 3 ++-
+ tests/vm/openbsd         | 4 ++--
+ 4 files changed, 18 insertions(+), 6 deletions(-)
+
+-- 
+2.20.1
+
 
