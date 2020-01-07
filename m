@@ -2,98 +2,59 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F602C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4A5C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:49:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19393207FD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:47:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+lbb6xi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19393207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDBA0207FD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:49:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDBA0207FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioja9-0003EP-66
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 02:47:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51603)
+	id 1iojaa-0004FG-5A
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 02:47:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51357)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojOg-0003uI-9e
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:27 -0500
+ (envelope-from <clg@kaod.org>) id 1iojO0-00021Q-GA
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:34:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojOe-0007Gx-TR
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56243
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iojNy-0006i7-P4
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:34:44 -0500
+Received: from 15.mo7.mail-out.ovh.net ([87.98.180.21]:60259)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojOe-0007GU-Pb
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382524;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KTcB6zAIaRzY9EwvftE6Rtrz5u5tIha89kZ+phnxUYk=;
- b=A+lbb6xik6xx3tfdSdOe1A11GGlq1drlLiYCDPpW+CmqVpcBHg38GCkzBz7yH59l6iRm8j
- 02Luq0vArAGK2wRh5jufFsF0sQ3rYiXDUVFf4+UKi61ipRq4chvPhb7o5wdtLz6Yk2nJKi
- SRUwGOAn12QXAeslvGjjJXoQK4FWAek=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-i6RM7ghxNbG91c40pTq2WQ-1; Tue, 07 Jan 2020 02:35:23 -0500
-Received: by mail-qk1-f198.google.com with SMTP id f124so31118403qkb.22
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:35:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=RMQMUHnYVnq2AcC/aQn0pR+4gejts1KmX+FDMoG77/0=;
- b=eozGsTopnyAWBrSaP+j/jDAfh1GSs5tsNeeONmH0F+jGYIaJKnK63oArDkRQlvXUTX
- h+K0Lxl52KBRmhNfJAlkh1j5dTg2djnNfRCqlSOoj3vZC4YfmroC64W1b6tTOpzz9EZJ
- U6ebOlFyYF7m+qUMvVkv8OWNRKBl4yW4ZZ8+44RNaVgdcRMemAFZArI4tDJJNEJzG53h
- HRavLke4L46XPJaORcq4mLbfXw5jWqOj1RduWBOpedBm/PTGBCwW+epEwr1QpmkECVuq
- mmqJpXJIlf/zNnfCYRIDDjXE+fPBJ+L42sWn0yWpag/Ms6+AY9r9jF9/lgIvSvCxW/XC
- myDg==
-X-Gm-Message-State: APjAAAX6r8yInjdir+cvxShJ9OWKv5Smap+m3NcKSJAiC2TOTycm1U8y
- QxT+MbkOJSnjxy3MPQv1TyCApq7eDIBX3z9HAfnjeQurp6Sa1gALGothC+5PGGICstq9EVg+0NE
- +PR5bATbdoAFGu6w=
-X-Received: by 2002:a05:620a:16c6:: with SMTP id
- a6mr87981106qkn.140.1578382522512; 
- Mon, 06 Jan 2020 23:35:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxhLAdtiJPhE/aI4ePsC2UQ2u1aXK7XFKiPt5F8mBUxv5K/6rfSATmfaqEXSRnZqWhgvblc8g==
-X-Received: by 2002:a05:620a:16c6:: with SMTP id
- a6mr87981096qkn.140.1578382522334; 
- Mon, 06 Jan 2020 23:35:22 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id r205sm22044943qke.34.2020.01.06.23.35.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:35:21 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:35:18 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/32] virtio: make virtio_delete_queue idempotent
-Message-ID: <20200107073451.298261-3-mst@redhat.com>
-References: <20200107073451.298261-1-mst@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iojNy-0006cl-J0
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:34:42 -0500
+Received: from player755.ha.ovh.net (unknown [10.109.143.24])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 138F3149D84
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 08:34:32 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player755.ha.ovh.net (Postfix) with ESMTPSA id DDAC6DFE0B61;
+ Tue,  7 Jan 2020 07:34:25 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH 0/5] aspeed: extensions and fixes
+Date: Tue,  7 Jan 2020 08:34:18 +0100
+Message-Id: <20200107073423.30043-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
 MIME-Version: 1.0
-In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: i6RM7ghxNbG91c40pTq2WQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 3785275489691798289
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehuddguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 87.98.180.21
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,34 +66,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Pan Nengyuan <pannengyuan@huawei.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's make sure calling this twice is harmless -
-no known instances, but seems safer.
+Hi,
 
-Suggested-by: Pan Nengyuan <pannengyuan@huawei.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/virtio.c | 1 +
- 1 file changed, 1 insertion(+)
+Here is a short series adding :
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 31dd140990..6de3cfdc2c 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2337,6 +2337,7 @@ void virtio_delete_queue(VirtQueue *vq)
-     vq->handle_output =3D NULL;
-     vq->handle_aio_output =3D NULL;
-     g_free(vq->used_elems);
-+    vq->used_elems =3D NULL;
- }
-=20
- void virtio_del_queue(VirtIODevice *vdev, int n)
+ - a new eMMC controller model for the AST2600 SoC (Andrew)
+ - accessors to control the led state of the pca9552 device (Joel)
+ - a 'execute-in-place' property to boot directly from CE0
+
+Thanks,
+
+C.
+
+Andrew Jeffery (2):
+  hw/sd: Configure number of slots exposed by the ASPEED SDHCI model
+  hw/arm: ast2600: Wire up the eMMC controller
+
+C=C3=A9dric Le Goater (2):
+  ftgmac100: check RX and TX buffer alignment
+  hw/arm/aspeed: add a 'execute-in-place' property to boot directly from
+    CE0
+
+Joel Stanley (1):
+  misc/pca9552: Add qom set and get
+
+ include/hw/arm/aspeed.h      |  2 +
+ include/hw/arm/aspeed_soc.h  |  2 +
+ include/hw/sd/aspeed_sdhci.h |  1 +
+ hw/arm/aspeed.c              | 71 ++++++++++++++++++++++------
+ hw/arm/aspeed_ast2600.c      | 23 +++++++++
+ hw/arm/aspeed_soc.c          |  2 +
+ hw/misc/pca9552.c            | 90 ++++++++++++++++++++++++++++++++++++
+ hw/net/ftgmac100.c           | 13 ++++++
+ hw/sd/aspeed_sdhci.c         | 11 ++++-
+ 9 files changed, 198 insertions(+), 17 deletions(-)
+
 --=20
-MST
+2.21.1
 
 
