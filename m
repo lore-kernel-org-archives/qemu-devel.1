@@ -2,79 +2,96 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2065CC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8C0C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:59:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3A21206DB
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:59:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B56A4206DB
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+WxAhYz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A21206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EAV9cfjX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B56A4206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iosCA-00074s-W2
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:59:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37886)
+	id 1iosCT-0007gd-Jw
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:59:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ios7j-0001YF-4d
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:54:32 -0500
+ (envelope-from <mst@redhat.com>) id 1iorlO-0008C2-Bs
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:31:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ios7i-0006Y0-4Q
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:54:30 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32153
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iorlN-0005cU-5J
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:31:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25670
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ios7i-0006XT-0w
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:54:30 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iorlN-0005cF-1o
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:31:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578416069;
+ s=mimecast20190719; t=1578414684;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nFDOCPmSXH8bZUNWRQB5ZxxGg/sXOpSyOndloGfLzcg=;
- b=d+WxAhYznr1znLNrRP7Ez0/W1gwWMTAqHkL7uuvUOBMuDYw4dnQYU1EYla1Y3eOCPd/pLC
- YfKt7wjzmk2RCsGJLrNGJEcD1WH4VMwZjUEnlY4N9q2epIW5soU0E1zwaeWySgUkNyK64m
- SDZFRH2RvsW7NscnNjVEzZeHERxV3hg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-1F-4xrLHPoOnr2PhCe1c0g-1; Tue, 07 Jan 2020 11:54:26 -0500
-X-MC-Unique: 1F-4xrLHPoOnr2PhCe1c0g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 636CE800D4E;
- Tue,  7 Jan 2020 16:54:25 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC09385F13;
- Tue,  7 Jan 2020 16:54:24 +0000 (UTC)
-Date: Tue, 7 Jan 2020 16:54:23 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v1 17/59] block/dmg.c: remove unneeded 'fail' label in
- dmg_read_mish_block()
-Message-ID: <20200107165423.GA410801@stefanha-x1.localdomain>
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-18-danielhb413@gmail.com>
+ bh=5EhLJ8ESaItKzPeue3PIZ6PBy1w7sicN5shNVXQfGIo=;
+ b=EAV9cfjXaw2NTFyNadIfQNkGdEwgnd5byYhoW3OkvxYXFddP7hrZO2Q+mYmIBvwKnKT9lA
+ Ae3B9wO9TlhtAkYwuS6m+GVCOkqCo4iciSYV3KaWBY4xtqT7++RiRrZQT1jt1sKramkkR/
+ /5gzdZ/qXyns22idkELQGs0Frk86/yQ=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-M4vKjBZzNse9x2nYKlKJ-A-1; Tue, 07 Jan 2020 11:31:23 -0500
+Received: by mail-qv1-f69.google.com with SMTP id l1so238698qvu.13
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:31:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wp7IEacTPDnbh2fT1ey9LJUjRbVmj0GN0bCAT90OXe4=;
+ b=YwTSeQnfry0l1VpZW25HENuQmDLRiXgQ00plewEM9HdRevDQjsXB7laxWv2AzqVcJS
+ 4LNSO8OHDkFRjpDwKlfG85ow/ZHsKziCLHnZYSj5axC6Ebz52VHAFUCWT0DskzB/sNWW
+ bZlf8IxBpeRPb7MACSPD0rGXR+hLwZkPkooEME538+X6eA1y7Kxtvib44o0CY544kXnh
+ zA8Ozl/yFUrdFbLyD0RGHLxvOXT8GdrU8XoX3mqnKayYzOcHunTajuUyNtKag3WWqkh/
+ golETSGAYJP143X63OjpkzCoPIee3HLT+9Ju7Aa7/gZiU0Z2GxX8pNsL2uggp842H2j3
+ Ou7Q==
+X-Gm-Message-State: APjAAAUNQEan8L7AecAWY2eP6UGOQAqPAB8eQGMx/BSkofoZOhJ8N/MF
+ fG8/KLoJI1YvOH0aERp7uoVjTl7Rhs5fc4xlHvEoDji5/z/8RmM6ACEBaE8mnM2KcrHBQWMD4uz
+ cThZoCCav/MZv700=
+X-Received: by 2002:ae9:f80d:: with SMTP id x13mr156333qkh.226.1578414682835; 
+ Tue, 07 Jan 2020 08:31:22 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwS1Lsg7YmN4uiPzCU6FEB8sVBZTlaTRhM0vdtVfv26YYL71hps7Rz//4Khg6RLOFKISBC0bA==
+X-Received: by 2002:ae9:f80d:: with SMTP id x13mr156308qkh.226.1578414682582; 
+ Tue, 07 Jan 2020 08:31:22 -0800 (PST)
+Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
+ by smtp.gmail.com with ESMTPSA id o6sm36586qkk.53.2020.01.07.08.31.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 08:31:21 -0800 (PST)
+Date: Tue, 7 Jan 2020 11:31:18 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v3 24/32] vhost-user-scsi: reset the device if supported
+Message-ID: <20200107162850.411448-25-mst@redhat.com>
+References: <20200107162850.411448-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200106182425.20312-18-danielhb413@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200107162850.411448-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-MC-Unique: M4vKjBZzNse9x2nYKlKJ-A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zYM0uCDKw75PZbzx"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +103,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, David Vrabel <david.vrabel@nutanix.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---zYM0uCDKw75PZbzx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-On Mon, Jan 06, 2020 at 03:23:43PM -0300, Daniel Henrique Barboza wrote:
-> Both the 'fail' label and 'ret' variable can be removed from the
-> function. Instead, call 'return -EINVAL' in the error conditions.
->=20
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
-> CC: qemu-block@nongnu.org
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  block/dmg.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
+If the vhost-user-scsi backend supports the VHOST_USER_F_RESET_DEVICE
+protocol feature, then the device can be reset when requested.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+If this feature is not supported, do not try a reset as this will send
+a VHOST_USER_RESET_OWNER that the backend is not expecting,
+potentially putting into an inoperable state.
 
---zYM0uCDKw75PZbzx
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: David Vrabel <david.vrabel@nutanix.com>
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Message-Id: <1572385083-5254-3-git-send-email-raphael.norwitz@nutanix.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/scsi/vhost-user-scsi.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4Ut78ACgkQnKSrs4Gr
-c8hGYAgAqAa6OqSNkw7RLXe//mM1/mCxHdPmM2l5uck0jyyR37mxbdJfPS30eUGb
-urohApMEDZlbez4zZsRZRm/J1h7Nt81svz25cR88vJkaaEtFuoXLZjsfhm85fo50
-PBbdZ1sS/GVMdKCiSo40TgeAKVAduSzDa6fuhsTt4I7RA2MBNl5wYhQEI7Idyfo1
-3RWHR5WaWc47egMaaGbtOYA1z35Gts0xJV5lgRg+pGqEDRlswxKRFYn4vN524GnL
-J1rxHLjStb/veh6YTfqvbqXJOKsc3tyTNChvAqjHtHrPiFbDvukKkLZdo+Ho6pY3
-rqUVFBdheJEGNY9M5sr/5hP9h+cN0w==
-=/S9a
------END PGP SIGNATURE-----
-
---zYM0uCDKw75PZbzx--
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 6a6c15dd32..23f972df59 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -39,6 +39,10 @@ static const int user_feature_bits[] =3D {
+     VHOST_INVALID_FEATURE_BIT
+ };
+=20
++enum VhostUserProtocolFeature {
++    VHOST_USER_PROTOCOL_F_RESET_DEVICE =3D 13,
++};
++
+ static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
+ {
+     VHostUserSCSI *s =3D (VHostUserSCSI *)vdev;
+@@ -62,6 +66,25 @@ static void vhost_user_scsi_set_status(VirtIODevice *vde=
+v, uint8_t status)
+     }
+ }
+=20
++static void vhost_user_scsi_reset(VirtIODevice *vdev)
++{
++    VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(vdev);
++    struct vhost_dev *dev =3D &vsc->dev;
++
++    /*
++     * Historically, reset was not implemented so only reset devices
++     * that are expecting it.
++     */
++    if (!virtio_has_feature(dev->protocol_features,
++                            VHOST_USER_PROTOCOL_F_RESET_DEVICE)) {
++        return;
++    }
++
++    if (dev->vhost_ops->vhost_reset_device) {
++        dev->vhost_ops->vhost_reset_device(dev);
++    }
++}
++
+ static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+ {
+ }
+@@ -182,6 +205,7 @@ static void vhost_user_scsi_class_init(ObjectClass *kla=
+ss, void *data)
+     vdc->get_features =3D vhost_scsi_common_get_features;
+     vdc->set_config =3D vhost_scsi_common_set_config;
+     vdc->set_status =3D vhost_user_scsi_set_status;
++    vdc->reset =3D vhost_user_scsi_reset;
+     fwc->get_dev_path =3D vhost_scsi_common_get_fw_dev_path;
+ }
+=20
+--=20
+MST
 
 
