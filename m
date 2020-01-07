@@ -2,82 +2,79 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1075AC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DCDC33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:58:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEADD20678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:58:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5116720678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:58:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RBagUF5L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEADD20678
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uiiln+5h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5116720678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomZD-0005rF-UV
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:58:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45032)
+	id 1iomZS-0006si-Aw
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:58:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iolMx-00055c-Pe
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:41:48 -0500
+ (envelope-from <thuth@redhat.com>) id 1iomUN-0000O7-R1
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:53:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iolMw-0002QL-D6
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:41:47 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33852
+ (envelope-from <thuth@redhat.com>) id 1iomUM-0006Zv-Fp
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:53:31 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59979
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iolMw-0002Pu-9I
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:41:46 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iomUM-0006Zc-Bi
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:53:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578390105;
+ s=mimecast20190719; t=1578394409;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GFPXBN/1uuYladgUMQcjVL2NCUO5aw8OYL069tuw8z0=;
- b=RBagUF5LZb4jknc7Sojh8UdZgOqdvwQfYcMGdBx4rfRdU4w/lHNZSC91lnL0hc6Kxj6FVP
- 83ZxftzuAXHVQux52ncR3yCtMbGQfdAau6DM2YJ3+WMfM/UKzejxizqvL05K7//BK4cYLX
- RiyNpDbRk04ddZFuYzn6KHOMYal+P2Q=
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=vV1GLUhM7JgDjh0KEj8y2DRizEteVUZki1TyS3d7B/Q=;
+ b=Uiiln+5hoSRBVdJy8gb2BdJHE1U0R9HkVvxqaZydvFTTTkIu+c/4GicHB7yOODaDRWrwOQ
+ RscrP5nNqenI+NdaSVfNWeXtb4ydVZVJ5Xv49o4z4Yq+GCJld34e8p/ScoAektm8jc9zBV
+ yrRpuPFEo9ioO3lkCarHIHUAQwzi6/U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-3DmucBHWOGy3pf0uFtTtbQ-1; Tue, 07 Jan 2020 04:41:44 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-45-J3HDwmELMlidwnrFTmwifg-1; Tue, 07 Jan 2020 05:53:24 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B60A800D41;
- Tue,  7 Jan 2020 09:41:43 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-126.ams2.redhat.com
- [10.36.117.126])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA26260BEC;
- Tue,  7 Jan 2020 09:41:37 +0000 (UTC)
-Subject: Re: [PATCH 1/3] roms/edk2-funcs: Force softfloat ARM toolchain prefix
- on Debian
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200106184601.25453-1-philmd@redhat.com>
- <20200106184601.25453-2-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <6698fcbb-3fd2-45c1-309f-4e6bed14406a@redhat.com>
-Date: Tue, 7 Jan 2020 10:41:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF0EB64A7E;
+ Tue,  7 Jan 2020 10:53:22 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AF345D9D6;
+ Tue,  7 Jan 2020 10:53:19 +0000 (UTC)
+Subject: Re: [PATCH v3] docs: build an index page for the HTML docs
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191219135620.1626608-1-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <a9011505-79cd-27e0-d8f6-eb4d14b7669b@redhat.com>
+Date: Tue, 7 Jan 2020 11:53:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200106184601.25453-2-philmd@redhat.com>
+In-Reply-To: <20191219135620.1626608-1-stefanha@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 3DmucBHWOGy3pf0uFtTtbQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: J3HDwmELMlidwnrFTmwifg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -92,61 +89,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel Berrange <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/06/20 19:45, Philippe Mathieu-Daud=C3=A9 wrote:
-> The Debian (based) distributions currently provides 2 ARM
-> toolchains, documented as [1]:
->=20
-> * The ARM EABI (armel) port targets a range of older 32-bit ARM
->   devices, particularly those used in NAS hardware and a variety
->   of *plug computers.
-> * The newer ARM hard-float (armhf) port supports newer, more
->   powerful 32-bit devices using version 7 of the ARM architecture
->   specification.
->=20
-> For various reasons documented in [2], the EDK2 project suggests
-> to use the softfloat toolchain (named 'armel' by Debian).
->=20
-> Force the softfloat cross toolchain prefix on Debian distributions.
->=20
-> [1] https://www.debian.org/ports/arm/#status
-> [2] https://github.com/tianocore/edk2/commit/41203b9a
->=20
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 19/12/2019 14.56, Stefan Hajnoczi wrote:
+> There is no index.html start page for the QEMU HTML documentation.  An
+> index page is needed so that documentation can be browsed easily on the
+> web.
+> 
+> This patch adds an index.html.in template file where the QEMU version
+> number is expanded.  It is written in HTML instead of using the existing
+> sphinx (rST) and texi documentation generators because they are
+> heavyweight and would make this harder.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
-> v3: fixed s/hard/float/ typo (Laszlo)
-
-s/float/soft/, but OK otherwise :)
-
-Thanks
-Laszlo
-
+> v3:
+>  * Add <html lang="en"> attribute to satisfy the W3 Validator [Thomas Huth]
 > ---
->  roms/edk2-funcs.sh | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-> index 3f4485b201..cd6e4f2c82 100644
-> --- a/roms/edk2-funcs.sh
-> +++ b/roms/edk2-funcs.sh
-> @@ -112,6 +112,9 @@ qemu_edk2_get_cross_prefix()
->       ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); =
-then
->      # no cross-compiler needed
->      :
-> +  elif ( [ -e /etc/debian_version ] && [ "$gcc_arch" =3D=3D arm ] ); the=
-n
-> +    # force soft-float cross-compiler on Debian
-> +    printf 'arm-linux-gnueabi-'
->    else
->      printf '%s-linux-gnu-\n' "$gcc_arch"
->    fi
->=20
+>  Makefile           |  6 ++++++
+>  docs/index.html.in | 17 +++++++++++++++++
+>  2 files changed, 23 insertions(+)
+>  create mode 100644 docs/index.html.in
+> 
+> diff --git a/Makefile b/Makefile
+> index 1361def144..9da9cfda73 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -347,6 +347,7 @@ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/
+>  DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+>  DOCS+=docs/qemu-block-drivers.7
+>  DOCS+=docs/qemu-cpu-models.7
+> +DOCS+=$(MANUAL_BUILDDIR)/index.html
+>  ifdef CONFIG_VIRTFS
+>  DOCS+=fsdev/virtfs-proxy-helper.1
+>  endif
+> @@ -819,6 +820,7 @@ install-sphinxdocs: sphinxdocs
+>  
+>  install-doc: $(DOCS) install-sphinxdocs
+>  	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+> +	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/index.html "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
+>  	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)"
+> @@ -1025,6 +1027,10 @@ $(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+>  $(MANUAL_BUILDDIR)/interop/qemu-ga.8: $(call manual-deps,interop)
+>  	$(call build-manual,interop,man)
+>  
+> +$(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+> +	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
+> +             "GEN","$@")
+> +
+>  qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
+>  
+> diff --git a/docs/index.html.in b/docs/index.html.in
+> new file mode 100644
+> index 0000000000..94eb782cf7
+> --- /dev/null
+> +++ b/docs/index.html.in
+> @@ -0,0 +1,17 @@
+> +<!DOCTYPE html>
+> +<html lang="en">
+> +    <head>
+> +        <meta charset="UTF-8">
+> +        <title>QEMU @@VERSION@@ Documentation</title>
+> +    </head>
+> +    <body>
+> +        <h1>QEMU @@VERSION@@ Documentation</h1>
+> +        <ul>
+> +            <li><a href="qemu-doc.html">User Documentation</a></li>
+> +            <li><a href="qemu-qmp-ref.html">QMP Reference Manual</a></li>
+> +            <li><a href="qemu-ga-ref.html">Guest Agent Protocol Reference</a></li>
+> +            <li><a href="interop/index.html">System Emulation Management and Interoperability Guide</a></li>
+> +            <li><a href="specs/index.html">System Emulation Guest Hardware Specifications</a></li>
+> +        </ul>
+> +    </body>
+> +</html>
+> 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
