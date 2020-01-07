@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE19C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:08:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41261C32771
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCFE72072E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:08:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03DF82075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:26:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iKXNnS3W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCFE72072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XmaEdgVC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03DF82075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iocQM-0007c3-FA
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 19:08:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54982)
+	id 1iochw-00060t-LX
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 19:26:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54286)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iocJk-0007rC-No
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 19:01:54 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iocfT-0003g4-64
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 19:24:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iocJj-0005XU-9q
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 19:01:52 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:34553)
+ (envelope-from <dgibson@ozlabs.org>) id 1iocfR-0001Zw-Iz
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 19:24:18 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55791 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iocJi-0005PO-S8; Mon, 06 Jan 2020 19:01:51 -0500
+ id 1iocfQ-0001Ti-OQ; Mon, 06 Jan 2020 19:24:17 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47sCGd5qd2z9sQp; Tue,  7 Jan 2020 11:01:45 +1100 (AEDT)
+ id 47sCmX4b6Gz9sPn; Tue,  7 Jan 2020 11:24:12 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578355305;
- bh=JW2A0tTFBaP1VMkBWGg8bauxWYDN+FvFtnNVgZpjfAc=;
+ d=gibson.dropbear.id.au; s=201602; t=1578356652;
+ bh=7FL2mKYT12vc/4ydTTLO8ZgjBSwwQQOlQFPMUogsLzQ=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=iKXNnS3WipsppcULLme5EmE1NyiY+zGjnUwQEGEkvtc8luWjTfigfmob1iKruKquO
- FGdCFC6MQjyx21lX7Frea2zIimjfij1oWsb48uEvWGZmO07Rb/9sRHKf+HP8uXbi/t
- u6Sv6kWt6kDXmlo5x31vcY4PU8/Egc/jh+5OS2Qg=
-Date: Tue, 7 Jan 2020 10:44:35 +1100
+ b=XmaEdgVCQkEhhCYr0hGrF789SW8/PcJGd5NoWdr6lzcBm9g2Sd440LZzogdH4c4sb
+ wSN9I0BAFq4Zrd+0mtlo7fZ/TQ5/bC2qzZxmr4cJWKAh/scAvfzwzdiHs/C0mpuFA2
+ uH1d1MqMVz7HAyawDY6hutSQCqytWvCljShnjD18=
+Date: Tue, 7 Jan 2020 11:23:44 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v1 01/59] spapr.c: remove 'out' label in
- spapr_dt_cas_updates()
-Message-ID: <20200106234435.GX2098@umbus>
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-2-danielhb413@gmail.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v3 11/12] pnv/psi: Add device reset hook
+Message-ID: <20200107002344.GG2098@umbus>
+References: <20200106145645.4539-1-clg@kaod.org>
+ <20200106145645.4539-12-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="l4GQ7sizse6iPvDe"
+ protocol="application/pgp-signature"; boundary="169fIVB/g4KxrKrw"
 Content-Disposition: inline
-In-Reply-To: <20200106182425.20312-2-danielhb413@gmail.com>
+In-Reply-To: <20200106145645.4539-12-clg@kaod.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
@@ -70,62 +69,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---l4GQ7sizse6iPvDe
-Content-Type: text/plain; charset=us-ascii
+--169fIVB/g4KxrKrw
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 06, 2020 at 03:23:27PM -0300, Daniel Henrique Barboza wrote:
-> 'out' can be replaced by 'return' with the appropriate
-> return value.
+On Mon, Jan 06, 2020 at 03:56:44PM +0100, C=E9dric Le Goater wrote:
+> From: Greg Kurz <groug@kaod.org>
 >=20
-> CC: David Gibson <david@gibson.dropbear.id.au>
-> CC: qemu-ppc@nongnu.org
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
-Applied to ppc-for-5.0.  I see this is part of a larged series which
-might have a different merge plan, but it should be an easy conflict
-to resolve if that happens.
-
+> And call it from a QEMU reset handler. This allows each PNV child class to
+> override the reset hook if needed, eg. POWER8 doesn't but POWER9 does.
+> The proper way to do that would be to use device_class_set_parent_reset(),
+> but defining a Pnv8PsiClass and a Pnv9PsiClass types with a parent_reset
+> pointer adds a fair amount of code. Calling pnv_psi_reset() explicitely is
+> fine for now.
+>=20
+> A subsequent patch will consolidate the call to qemu_register_reset() in
+> a single place.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  hw/ppc/spapr.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+>  hw/ppc/pnv_psi.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index f11422fc41..1bfe47337c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -878,7 +878,7 @@ static int spapr_dt_cas_updates(SpaprMachineState *sp=
-apr, void *fdt,
->          g_assert(smc->dr_lmb_enabled);
->          ret =3D spapr_populate_drconf_memory(spapr, fdt);
->          if (ret) {
-> -            goto out;
-> +            return ret;
->          }
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index 4da3d2568624..cf21e42d93b7 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -455,7 +455,7 @@ static const MemoryRegionOps pnv_psi_xscom_ops =3D {
 >      }
+>  };
 > =20
-> @@ -889,11 +889,8 @@ static int spapr_dt_cas_updates(SpaprMachineState *s=
-papr, void *fdt,
->              return offset;
->          }
->      }
-> -    ret =3D spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
-> -                                 "ibm,architecture-vec-5");
-> -
-> -out:
-> -    return ret;
-> +    return spapr_ovec_populate_dt(fdt, offset, spapr->ov5_cas,
-> +                                  "ibm,architecture-vec-5");
+> -static void pnv_psi_reset(void *dev)
+> +static void pnv_psi_reset(DeviceState *dev)
+>  {
+>      PnvPsi *psi =3D PNV_PSI(dev);
+> =20
+> @@ -464,6 +464,13 @@ static void pnv_psi_reset(void *dev)
+>      psi->regs[PSIHB_XSCOM_BAR] =3D psi->bar | PSIHB_BAR_EN;
 >  }
 > =20
->  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+> +static void pnv_psi_reset_handler(void *dev)
+> +{
+> +    DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
+> +
+> +    dc->reset(DEVICE(dev));
+
+I think it would be better to use device_reset() here rather than
+explicitly accessing the dc->reset pointer yourself.
+
+> +}
+> +
+>  static void pnv_psi_power8_instance_init(Object *obj)
+>  {
+>      Pnv8Psi *psi8 =3D PNV8_PSI(obj);
+> @@ -526,7 +533,7 @@ static void pnv_psi_power8_realize(DeviceState *dev, =
+Error **errp)
+>              ((uint64_t) i << PSIHB_XIVR_SRC_SH);
+>      }
+> =20
+> -    qemu_register_reset(pnv_psi_reset, dev);
+> +    qemu_register_reset(pnv_psi_reset_handler, dev);
+>  }
+> =20
+>  static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xscom=
+_offset)
+> @@ -809,7 +816,7 @@ static void pnv_psi_power9_irq_set(PnvPsi *psi, int i=
+rq, bool state)
+>      qemu_set_irq(psi->qirqs[irq], state);
+>  }
+> =20
+> -static void pnv_psi_power9_reset(void *dev)
+> +static void pnv_psi_power9_reset(DeviceState *dev)
+>  {
+>      Pnv9Psi *psi =3D PNV9_PSI(dev);
+> =20
+> @@ -863,7 +870,7 @@ static void pnv_psi_power9_realize(DeviceState *dev, =
+Error **errp)
+> =20
+>      pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+> =20
+> -    qemu_register_reset(pnv_psi_power9_reset, dev);
+> +    qemu_register_reset(pnv_psi_reset_handler, dev);
+>  }
+> =20
+>  static void pnv_psi_power9_class_init(ObjectClass *klass, void *data)
+> @@ -875,6 +882,7 @@ static void pnv_psi_power9_class_init(ObjectClass *kl=
+ass, void *data)
+> =20
+>      dc->desc    =3D "PowerNV PSI Controller POWER9";
+>      dc->realize =3D pnv_psi_power9_realize;
+> +    dc->reset   =3D pnv_psi_power9_reset;
+> =20
+>      ppc->xscom_pcba =3D PNV9_XSCOM_PSIHB_BASE;
+>      ppc->xscom_size =3D PNV9_XSCOM_PSIHB_SIZE;
+> @@ -927,6 +935,7 @@ static void pnv_psi_class_init(ObjectClass *klass, vo=
+id *data)
+> =20
+>      dc->desc =3D "PowerNV PSI Controller";
+>      dc->props =3D pnv_psi_properties;
+> +    dc->reset =3D pnv_psi_reset;
+>  }
+> =20
+>  static const TypeInfo pnv_psi_info =3D {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -133,25 +186,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---l4GQ7sizse6iPvDe
+--169fIVB/g4KxrKrw
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4TxmAACgkQbDjKyiDZ
-s5KAURAAh8HW6gNLOiPojeb2WYWPsUFh9EctIsImKhszDVbE0XNIBZ2k/iEqZUb9
-23UqawnlqVziTtMEDRcAhxekwlGiZy1RFo3mkp+p/UPGLnmJPHBXnQIUbKURMUoZ
-WLjeI/y+hbl5BbbUijGKfrApCHnp1PueTwoMIgAOfpSCq5d9qnIlqKtTOasYJJkq
-WN2bGaOpbJlkkYe66Z7tVhFNZ1Bwz81/gV80tg6FKNo7rV6VlMys38gs1jjZRalO
-I2PyTEGEzyRqXlQ9J2b/nk52pkOArqiD/wl+AG5A9ceNqWUvlKK2iscQTZcHAdrn
-zht0Fgl7HUjyayyXZYlmexoy19/+qjWDlpp+9kf8DLD0xIGpmeDtx87k857Gfpod
-FzFQsbgD5JkMGJZSbeOXJwc/uM6B5hMnRWWrAMYhy7LLcZqGGOSsUfJ7K8XY4xDe
-f0AtYEt7M+eaC9X7jyZMJNpRz6X3tL2r7GTsM3uamL9D+/JM2i8Usu2yKlnkozft
-7Gn3LnIsPSyQhPYF1xRl8pKlFaA97zUjzS7hRiWzrGmX43opD91NVKZ0BmMtlVkZ
-W4rNZqZ9UkgibFTm4DViuc1uWy2tM4bL1YXYyu6UexPZ0vVkBCg6Oul5hQE57CUW
-DNuWki5aAGaVrh7xvRmWu1upxXf4atYEEH/QOnR4ksQ3SzmPbnI=
-=+++J
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4Tz5AACgkQbDjKyiDZ
+s5LLHRAAtCoKVYa4OEMyuZwTa8BtZkpjtbxgLjC8HvRdpg8pAo5H/qgjGyd+HeNZ
+d0ZUJ5hms8a6uPT3gZHak1HlqRTH+YEM8vw+QD9jvhz5b0L8q2e/udOJq+HGtZ6Y
+hTuvR2GzpUspRbepe11hQ9eUt1UX7V4y2Bpj0GEt7W0mLW2B9pp+Smab9BHNSHhE
+RjppqpwDKMwpWRDvQyEIdQc7CHhdhmHzaDuYnkLAnarSlG49wnXvRHBh3cFB8S5W
+DxwJZR8Zh1yisPgdRyOnTzzVRNqCgHn+hkBnyKP6+OMhBxp4957M0Q264bAkjEWM
+oekifUhE/TCdecfHxGUueznDo3sCDKiq7HPoOBrxMZkaV/dHbSIRxmoIw+Fdg2p+
+3vsSLoRQyEz9OAkWUGaV1AjvVkxNufMn8bj38swOfezzKZ3EAaClMbUrpe6kF+ik
+qKNCL6X1BAzn1RKXShca9F0eBHpPhY+szK9CvdTs4CDdGaTYjs2RXHfGPsyRf3Eo
+nF3tWFmO7eUVtx2l0Kg+fWvjBJtl22pjBEKAM5qI21+kzgw6Ed9VR/CLweDFIP6K
+64ad4mXQvmda8C2MRdOEuwVUTvjpyB/bVqi+CuJK8YFZxIHjUSuRunBSpf6TxHVE
+wh6QH8lr0xMTVF1XDI1pk73VaNtPJQcyCmjOOW8FIlNK/8g/Bgo=
+=q0cY
 -----END PGP SIGNATURE-----
 
---l4GQ7sizse6iPvDe--
+--169fIVB/g4KxrKrw--
 
