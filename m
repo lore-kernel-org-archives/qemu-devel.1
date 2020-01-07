@@ -2,59 +2,70 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27260C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98938C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:42:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE91B20715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:41:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE91B20715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6C94620715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:42:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C94620715
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioq3B-0000iR-S9
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:41:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39437)
+	id 1ioq3T-0001Ms-Gv
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:41:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45558)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eguan@linux.alibaba.com>) id 1iooZo-0002FM-Jj
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:07:18 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iootI-0001RT-6Y
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eguan@linux.alibaba.com>) id 1iooZh-00011O-P8
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:07:11 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:38383)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
- id 1iooZh-0000v9-EM
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:07:09 -0500
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R271e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04446; MF=eguan@linux.alibaba.com;
- NM=1; PH=DS; RN=4; SR=0; TI=SMTPD_---0Tn5TOVF_1578402409; 
-Received: from localhost(mailfrom:eguan@linux.alibaba.com
- fp:SMTPD_---0Tn5TOVF_1578402409) by smtp.aliyun-inc.com(127.0.0.1);
- Tue, 07 Jan 2020 21:06:50 +0800
-Date: Tue, 7 Jan 2020 21:06:49 +0800
-From: Eryu Guan <eguan@linux.alibaba.com>
+ (envelope-from <laurent@vivier.eu>) id 1iootG-0003NR-K6
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:27:23 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:59845)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iootG-0003Mu-Aa
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:27:22 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MOi1H-1j41zE1AY3-00Q8pI; Tue, 07 Jan 2020 14:27:19 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
-Message-ID: <20200107130649.GH41863@e18g06458.et15sqa>
-References: <20191231103434.GA41863@e18g06458.et15sqa>
- <20191231115136.7b967604@Igors-MacBook-Pro>
- <20200102020850.GB41863@e18g06458.et15sqa>
+Subject: [PULL 3/4] q800: implement mac rom reset function for BIOS-less mode
+Date: Tue,  7 Jan 2020 14:27:14 +0100
+Message-Id: <20200107132715.722101-4-laurent@vivier.eu>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200107132715.722101-1-laurent@vivier.eu>
+References: <20200107132715.722101-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200102020850.GB41863@e18g06458.et15sqa>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 47.88.44.36
+X-Provags-ID: V03:K1:ruiixvM/g2wpHv9nuJ8npVJ9Xn9/pNYvZ35CKwSulzKBhkGoLAJ
+ WNjETZ4dSkwKm0ks39yM1cq0TzfBZ0dyRonRkmtTU1h+Y4+TPOj9ghoLYTt3NQh8VN7nqbZ
+ cfs6B9lnDBH1OaAnR1OyvzVkAq5lmQMhHlLUkiHkAgWLisyAUUvkukWOeNxmu8GVhMmiUPt
+ UxUfkhmt4zCDVmMET4N3g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4KB2AEvc450=:H5kxfQStNUC8QUigOrvnF+
+ qyLl/VLovA+eMT2krwadYbc6P8/b9Pf07GvI23jHDdL3AmvkW5xVgqVnwc0VjPSVUMCM6FsE1
+ YTTm3ZwVmS56h9kzajDYeJlqOObgaDvplH8QGU8HoWZ95pkfaeI1d8xvT1Tfb3Dm2Pfih2exI
+ U1OSklnZ/uZKA0P4NlKu+Q3Gct+8hBZseM+2NlNn1k5vUaCrhCWH9sM9Edkj+A4BuwbdyMTkD
+ iiHbV9E9d5D+ErRKrcN0NB+Pc1IRFJ1V7zUGQOoqUbUE036w77pX0TUeYzwoQO3NPVG8STGXC
+ jIFUcrNckdUQJpvFp1iy0Zzbi6MqxTBxVIbfBTHGP20Lx00Zg7wIy6DrD3JgfHZAbZYbJt/b9
+ SZVcM/8EZ7i5YWjsgNoZZpta9XZPhE+0lPgFy7qTmQCXAPZNhTdCPj0QHFWIYgU9vuZ62bIwY
+ DjbzFOeGM7+r4lPqOhQsqmJ+2m03qt2NqByfMXYWu49xMkFPbGXVz7l51QHBOv1uih+SGblhO
+ fNiKrDn3hPHHgJ00H7FCClez+dw1XoOstdodcd/DrE6BPCccT2hBYw+TmOsjVHpOSwG9sxWOG
+ eW9ITEr0l6IvbnqfAkyHizu6lu0fCEs9fq2SXzPxYHJHnlvLiVz2Dhshb1nA/Xk8Z+Z/Nd4GU
+ Yj86chAglCE/56ii56P7DRDI9fKHp9s4bEdZZ5a75wVebIWZlBbDpzs6zmiKJKDq/iWYj37i+
+ b8VGzUflW4O2xnHGvLXkAa/LKvAp0wDANrEZXtMLjqi4ZAbKeHsrHcRbZ3pQhS58jdVUEsndQ
+ 4sg/U2wyKScPa65J8nkhbophsUns570UDV6q+rvRC4EDdOEoh7RJIeKZExEHK0BYaeiQfEJC2
+ AAuMBSMRP70fuirvTT3A==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,96 +77,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
-> On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
-> > On Tue, 31 Dec 2019 18:34:34 +0800
-> > Eryu Guan <eguan@linux.alibaba.com> wrote:
-> > 
-> > > Hi,
-> > > 
-> > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
-> > > think it's because io completion hits use-after-free when device is
-> > > already gone. Is this a known bug that has been fixed? (I went through
-> > > the git log but didn't find anything obvious).
-> > > 
-> > > gdb backtrace is:
-> > > 
-> > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
-> > > Program terminated with signal 11, Segmentation fault.
-> > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > 903        return obj->class;
-> > > (gdb) bt
-> > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
-> > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
-> > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
-> > >     opaque=0x558a2f2fd420, ret=0)
-> > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
-> > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
-> > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
-> > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
-> > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
-> > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
-> > > #6  0x00007fff9ed75780 in ?? ()
-> > > #7  0x0000000000000000 in ?? ()
-> > > 
-> > > It seems like qemu was completing a discard/write_zero request, but
-> > > parent BusState was already freed & set to NULL.
-> > > 
-> > > Do we need to drain all pending request before unrealizing virtio-blk
-> > > device? Like the following patch proposed?
-> > > 
-> > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
-> > > 
-> > > If more info is needed, please let me know.
-> > 
-> > may be this will help: https://patchwork.kernel.org/patch/11213047/
-> 
-> Yeah, this looks promising! I'll try it out (though it's a one-time
-> crash for me). Thanks!
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-After applying this patch, I don't see the original segfaut and
-backtrace, but I see this crash
+On Linux, calling `reboot(RB_AUTOBOOT);` will result in
+arch/m68k/mac/misc.c's mac_reset function being called. That in turn
+looks at the rombase (or uses 0x40800000 is there's no rombase), adds
+0xa, and jumps to that address. At the moment, there's nothing there, so
+the kernel just crashes when trying to reboot. So, this commit adds a
+very simple implementation at that location, which just writes to via2
+to power down. We also correct the value of ROMBASE while we're at it.
 
-[Thread debugging using libthread_db enabled]
-Using host libthread_db library "/lib64/libthread_db.so.1".
-Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
-Program terminated with signal 11, Segmentation fault.
-#0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
-Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
-(gdb) bt
-#0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-#1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
-#2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
-    at /usr/src/debug/qemu-4.0/memory.c:568
-#3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
-#4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
-    at /usr/src/debug/qemu-4.0/exec.c:3279
-#5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
-#6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
-#7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
-#8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
-#9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
-#10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
-#11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
-#12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200102120150.281082-1-Jason@zx2c4.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/m68k/q800.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-And I searched and found
-https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
-backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
-blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
-bug.
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+index 0c445c74bf..0e5a08f993 100644
+--- a/hw/m68k/q800.c
++++ b/hw/m68k/q800.c
+@@ -47,7 +47,7 @@
+ #include "sysemu/runstate.h"
+ #include "sysemu/reset.h"
+ 
+-#define MACROM_ADDR     0x40000000
++#define MACROM_ADDR     0x40800000
+ #define MACROM_SIZE     0x00100000
+ 
+ #define MACROM_FILENAME "MacROM.bin"
+@@ -128,6 +128,27 @@ static void main_cpu_reset(void *opaque)
+     cpu->env.pc = ldl_phys(cs->as, 4);
+ }
+ 
++static uint8_t fake_mac_rom[] = {
++    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
++
++    /* offset: 0xa - mac_reset */
++
++    /* via2[vDirB] |= VIA2B_vPower */
++    0x20, 0x7C, 0x50, 0xF0, 0x24, 0x00, /* moveal VIA2_BASE+vDirB,%a0 */
++    0x10, 0x10,                         /* moveb %a0@,%d0 */
++    0x00, 0x00, 0x00, 0x04,             /* orib #4,%d0 */
++    0x10, 0x80,                         /* moveb %d0,%a0@ */
++
++    /* via2[vBufB] &= ~VIA2B_vPower */
++    0x20, 0x7C, 0x50, 0xF0, 0x20, 0x00, /* moveal VIA2_BASE+vBufB,%a0 */
++    0x10, 0x10,                         /* moveb %a0@,%d0 */
++    0x02, 0x00, 0xFF, 0xFB,             /* andib #-5,%d0 */
++    0x10, 0x80,                         /* moveb %d0,%a0@ */
++
++    /* while (true) ; */
++    0x60, 0xFE                          /* bras [self] */
++};
++
+ static void q800_init(MachineState *machine)
+ {
+     M68kCPU *cpu = NULL;
+@@ -346,6 +367,12 @@ static void q800_init(MachineState *machine)
+                   (graphic_width * graphic_depth + 7) / 8);
+         BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
+ 
++        rom = g_malloc(sizeof(*rom));
++        memory_region_init_ram_ptr(rom, NULL, "m68k_fake_mac.rom",
++                                   sizeof(fake_mac_rom), fake_mac_rom);
++        memory_region_set_readonly(rom, true);
++        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
++
+         if (kernel_cmdline) {
+             BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
+                         kernel_cmdline);
+-- 
+2.24.1
 
-But I can still hit the bug even after applying the commit. Do I miss
-anything?
-
-Thanks,
-Eryu
-> Eryu
 
