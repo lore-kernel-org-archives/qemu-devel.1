@@ -2,75 +2,65 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 560EDC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E256EC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CB4020678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:24:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CB4020678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BA185208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:33:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA185208C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iosaN-0002B5-Cn
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 12:24:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55309)
+	id 1iosjk-00019D-Sj
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 12:33:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iosXD-0006Hs-1s
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:20:52 -0500
+ (envelope-from <groug@kaod.org>) id 1iosid-0000bE-1N
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iosXB-0000Gg-LB
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:20:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iosXB-0000Eq-FU
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:20:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iosX7-0002t3-CZ
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 17:20:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F081C2E80F9
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 17:20:43 +0000 (UTC)
+ (envelope-from <groug@kaod.org>) id 1iosib-00032o-OY
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:32:38 -0500
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:35237)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iosib-0002sC-Fu
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:32:37 -0500
+Received: from player796.ha.ovh.net (unknown [10.108.54.38])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id DC9A814F36E
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 18:32:27 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player796.ha.ovh.net (Postfix) with ESMTPSA id 42E59DE6225C;
+ Tue,  7 Jan 2020 17:32:17 +0000 (UTC)
+Date: Tue, 7 Jan 2020 18:32:15 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v2 02/10] ppc: Remove stub of PPC970 HID4 implementation
+Message-ID: <20200107183215.09ce18c6@bahia.lan>
+In-Reply-To: <20200107044827.471355-3-david@gibson.dropbear.id.au>
+References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
+ <20200107044827.471355-3-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2020 17:11:21 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <157841708125.27621.18439411825200307820.malone@chaenomeles.canonical.com>
-Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3bb14446aba5af546c506949268d4858bb61797d
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13883190279884020198
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehhedgtdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 46.105.79.203
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,70 +69,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: lvivier@redhat.com, aik@ozlabs.ru,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, paulus@samba.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Could you provide your binary uImage-2.6.32?
+On Tue,  7 Jan 2020 15:48:19 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
--- =
+> The PowerPC 970 CPU was a cut-down POWER4, which had hypervisor capability.
+> However, it can be (and often was) strapped into "Apple mode", where the
+> hypervisor capabilities were disabled (essentially putting it always in
+> hypervisor mode).
+> 
+> That's actually the only mode of the 970 we support in qemu, and we're
+> unlikely to change that any time soon.  However, we do have a partial
+> implementation of the 970's HID4 register which affects things only
+> relevant for hypervisor mode.
+> 
+> That stub is also really ugly, since it attempts to duplicate the effects
+> of HID4 by re-encoding it into the LPCR register used in newer CPUs, but
+> in a really confusing way.
+> 
+> Just get rid of it.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Title:
-  Virtio broken in qemu ppc in 4.2.0 and other versions
+>  target/ppc/mmu-hash64.c         | 28 +---------------------------
+>  target/ppc/translate_init.inc.c | 17 ++++++-----------
+>  2 files changed, 7 insertions(+), 38 deletions(-)
+> 
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index da8966ccf5..a881876647 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -1091,33 +1091,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+>  
+>      /* Filter out bits */
+>      switch (env->mmu_model) {
+> -    case POWERPC_MMU_64B: /* 970 */
+> -        if (val & 0x40) {
+> -            lpcr |= LPCR_LPES0;
+> -        }
+> -        if (val & 0x8000000000000000ull) {
+> -            lpcr |= LPCR_LPES1;
+> -        }
+> -        if (val & 0x20) {
+> -            lpcr |= (0x4ull << LPCR_RMLS_SHIFT);
+> -        }
+> -        if (val & 0x4000000000000000ull) {
+> -            lpcr |= (0x2ull << LPCR_RMLS_SHIFT);
+> -        }
+> -        if (val & 0x2000000000000000ull) {
+> -            lpcr |= (0x1ull << LPCR_RMLS_SHIFT);
+> -        }
+> -        env->spr[SPR_RMOR] = ((lpcr >> 41) & 0xffffull) << 26;
+> -
+> -        /*
+> -         * XXX We could also write LPID from HID4 here
+> -         * but since we don't tag any translation on it
+> -         * it doesn't actually matter
+> -         *
+> -         * XXX For proper emulation of 970 we also need
+> -         * to dig HRMOR out of HID5
+> -         */
+> -        break;
+>      case POWERPC_MMU_2_03: /* P5p */
+>          lpcr = val & (LPCR_RMLS | LPCR_ILE |
+>                        LPCR_LPES0 | LPCR_LPES1 |
+> @@ -1154,6 +1127,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
+>          }
+>          break;
+>      default:
+> +        g_assert_not_reached();
+>          ;
+>      }
+>      env->spr[SPR_LPCR] = lpcr;
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index d33d65dff7..436d0d5a51 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -7884,25 +7884,20 @@ static void spr_write_lpcr(DisasContext *ctx, int sprn, int gprn)
+>  {
+>      gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
+>  }
+> -
+> -static void spr_write_970_hid4(DisasContext *ctx, int sprn, int gprn)
+> -{
+> -#if defined(TARGET_PPC64)
+> -    spr_write_generic(ctx, sprn, gprn);
+> -    gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
+> -#endif
+> -}
+> -
+>  #endif /* !defined(CONFIG_USER_ONLY) */
+>  
+>  static void gen_spr_970_lpar(CPUPPCState *env)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+>      /* Logical partitionning */
+> -    /* PPC970: HID4 is effectively the LPCR */
+> +    /* PPC970: HID4 covers things later controlled by the LPCR and
+> +     * RMOR in later CPUs, but with a different encoding.  We only
+> +     * support the 970 in "Apple mode" which has all hypervisor
+> +     * facilities disabled by strapping, so we can basically just
+> +     * ignore it */
+>      spr_register(env, SPR_970_HID4, "HID4",
+>                   SPR_NOACCESS, SPR_NOACCESS,
+> -                 &spr_read_generic, &spr_write_970_hid4,
+> +                 &spr_read_generic, &spr_write_generic,
+>                   0x00000000);
+>  #endif
+>  }
 
-Status in QEMU:
-  New
-
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
-
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
-
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
-
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
