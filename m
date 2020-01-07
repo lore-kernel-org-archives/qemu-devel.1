@@ -7,80 +7,96 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE1DC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83349C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59A3C20656
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:46:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51C8F20656
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:49:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDAOlhsL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59A3C20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LgPM8erw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C8F20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iopBQ-0006af-SV
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:46:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48741)
+	id 1iopEU-0005V4-Iv
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:49:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iop3g-0001zz-SU
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:38:10 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ionsJ-0008An-9L
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:22:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iop3e-0000fh-B7
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:38:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48336
+ (envelope-from <pbonzini@redhat.com>) id 1ionsI-0007GG-4g
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:22:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27804
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iop3e-0000ea-7I
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:38:06 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ionsI-0007G5-1i
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:22:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578404285;
+ s=mimecast20190719; t=1578399737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=lyiBJWX71aFYoJlr3Qq2ST4rm3bkbSJNd4fsMCMwF2o=;
- b=LDAOlhsLISKbVdfBNFChx407fBDowqY/lZKKeG4J8bMtcTQvqmhexLg2Ey0qIISqTB/ScU
- abe4NbBzaWtux6OAXujIQ4mdDArkChh8+aNX0zNf3Ma/BbDNYasBw/csWWqzf+C4Nw6SIw
- uG74lsC0vS4wXT/lcP/NkCesAPP7ug8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-WUxZLKGGMAywbbg7qQ9Uvg-1; Tue, 07 Jan 2020 08:38:02 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B19A801E72;
- Tue,  7 Jan 2020 13:37:57 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ED13F7C015;
- Tue,  7 Jan 2020 13:37:55 +0000 (UTC)
-Subject: Re: [PATCH v1 38/59] s390x/sclp.c: remove unneeded label in
- sclp_service_call()
-To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-39-danielhb413@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <1d26e2d6-4a94-5d57-ef22-c46699c5781b@redhat.com>
-Date: Tue, 7 Jan 2020 14:37:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=MuhCTz+C6MaTpFxoNziRH6JqZlhj937Jrv0EFLky8Sk=;
+ b=LgPM8erw2/Z3UqeKun5f8y7I3AHUZFD22rLi9m20/TaQ9P6tnqASAIb073ZONmrColKSK2
+ zInlFHUiOXYsXtYYTqgM8Y1akpkPgxVEfxH6pSkG5BHvRcytX+Z+gN2/cpegvLGa2JemlV
+ ziBUHHksvnc2ZBX2GQLilztvo5lJ0CI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-Bg7ntxGaNdOxX9slddlIyw-1; Tue, 07 Jan 2020 07:22:16 -0500
+Received: by mail-wm1-f72.google.com with SMTP id 7so1891690wmf.9
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 04:22:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wqAJeqaN1FUy1p3MtuptAKhlaN745axb3tJUVhCfY7U=;
+ b=Y+jRK9BqCQOCnsAp8XRlvI3dgzPGY5C7rkSLJWEPLZD3dAILPdsekweM7zs9c+VrKl
+ WT9YW89K/+9RoKH0GHn6TaSZY9zSBGYIq7S10G1FR2grJgZxpNYP7B6g1TVCSTcbXV85
+ zhlJjJCzbSsyVSO6c39t+kCwTJBGY9j+AqzAtxIU4HoFqD1uGPG3aUGwcB/Al+fF3KV3
+ cod3bJXUr7ca7E8xnrE4d8BaWT0Ml0KsNhOkxQ0OW1aCFw8BP7U1hIpSXtslR5/MiD8X
+ F0t+Zh8T7PLhJ2hHl3w749l8msVy/GihpHBDdNHsPMnrT1qm1ijpx5IXQcVQ26p7QeSG
+ fSnA==
+X-Gm-Message-State: APjAAAWif7uXVqDcoeyJ3FyE2JmbDlJalr53tAqJUAxhFuVRn9sv8+YC
+ Yyigw3eQ5HY1vgY7/FtShXT7uyF63oTN+BzeqaCnMqOGB5YxiUGk6CBth8KfeAoedg52w+7hb4z
+ +dJKSvNvt7scnhR4=
+X-Received: by 2002:a1c:7ed0:: with SMTP id z199mr39307387wmc.58.1578399735084; 
+ Tue, 07 Jan 2020 04:22:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxkH39hJZcyPPUEai+OguMZZ8G0fZoCu5nbD6Q7LmnhnBkch7+9oVFscjGePNm6QvaTkzo0MQ==
+X-Received: by 2002:a1c:7ed0:: with SMTP id z199mr39307355wmc.58.1578399734829; 
+ Tue, 07 Jan 2020 04:22:14 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
+ ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+ by smtp.gmail.com with ESMTPSA id k13sm76207458wrx.59.2020.01.07.04.22.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jan 2020 04:22:14 -0800 (PST)
+Subject: Re: [PATCH 04/14] hw/i386: Restrict fw_cfg to the PC machines
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20191231183216.6781-1-philmd@redhat.com>
+ <20191231183216.6781-5-philmd@redhat.com>
+ <a5ba0619-e236-7fb0-8c17-028670b69501@redhat.com>
+ <20200107050921-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <21529c45-117d-ed7d-d518-e8073af86581@redhat.com>
+Date: Tue, 7 Jan 2020 13:22:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200106182425.20312-39-danielhb413@gmail.com>
+In-Reply-To: <20200107050921-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: WUxZLKGGMAywbbg7qQ9Uvg-1
+X-MC-Unique: Bg7ntxGaNdOxX9slddlIyw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,80 +108,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-ppc@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/01/2020 19.24, Daniel Henrique Barboza wrote:
-> 'out' label can be replaced by 'return' with the appropriate
-> value. The 'r' integer, which is used solely to set the
-> return value for this label, can also be removed.
-> 
-> CC: Cornelia Huck <cohuck@redhat.com>
-> CC: Halil Pasic <pasic@linux.ibm.com>
-> CC: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/s390x/sclp.c | 16 +++++-----------
->  1 file changed, 5 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index f57ce7b739..af0bfbc2ec 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -197,24 +197,20 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->  {
->      SCLPDevice *sclp = get_sclp_device();
->      SCLPDeviceClass *sclp_c = SCLP_GET_CLASS(sclp);
-> -    int r = 0;
->      SCCB work_sccb;
->  
->      hwaddr sccb_len = sizeof(SCCB);
->  
->      /* first some basic checks on program checks */
->      if (env->psw.mask & PSW_MASK_PSTATE) {
-> -        r = -PGM_PRIVILEGED;
-> -        goto out;
-> +        return -PGM_PRIVILEGED;
->      }
->      if (cpu_physical_memory_is_io(sccb)) {
-> -        r = -PGM_ADDRESSING;
-> -        goto out;
-> +        return -PGM_ADDRESSING;
->      }
->      if ((sccb & ~0x1fffUL) == 0 || (sccb & ~0x1fffUL) == env->psa
->          || (sccb & ~0x7ffffff8UL) != 0) {
-> -        r = -PGM_SPECIFICATION;
-> -        goto out;
-> +        return -PGM_SPECIFICATION;
->      }
->  
->      /*
-> @@ -226,8 +222,7 @@ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->  
->      /* Valid sccb sizes */
->      if (be16_to_cpu(work_sccb.h.length) < sizeof(SCCBHeader)) {
-> -        r = -PGM_SPECIFICATION;
-> -        goto out;
-> +        return -PGM_SPECIFICATION;
->      }
->  
->      switch (code & SCLP_CMD_CODE_MASK) {
-> @@ -257,8 +252,7 @@ out_write:
->  
->      sclp_c->service_interrupt(sclp, sccb);
->  
-> -out:
-> -    return r;
-> +    return 0;
->  }
->  
->  static void service_interrupt(SCLPDevice *sclp, uint32_t sccb)
-> 
+On 07/01/20 11:16, Michael S. Tsirkin wrote:
+> On Tue, Jan 07, 2020 at 11:01:48AM +0100, Paolo Bonzini wrote:
+>> On 31/12/19 19:32, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Only the PC-based machines use the fw_cfg device. In particular,
+>>> the MicroVM machine does not use it. Only compile/link it when
+>>> machines require it.
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> Cc: Sergio Lopez <slp@redhat.com>
+>>> ---
+>>>  hw/i386/Makefile.objs | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+>>> index 6ebb6d0cf0..48f2693546 100644
+>>> --- a/hw/i386/Makefile.objs
+>>> +++ b/hw/i386/Makefile.objs
+>>> @@ -5,7 +5,7 @@ obj-$(CONFIG_PC) +=3D pc.o pc_sysfw.o
+>>>  obj-$(CONFIG_I440FX) +=3D pc_piix.o
+>>>  obj-$(CONFIG_Q35) +=3D pc_q35.o
+>>>  obj-$(CONFIG_MICROVM) +=3D microvm.o
+>>> -obj-y +=3D fw_cfg.o
+>>> +obj-$(CONFIG_PC) +=3D fw_cfg.o
+>>>  obj-$(CONFIG_X86_IOMMU) +=3D x86-iommu.o
+>>>  obj-$(CONFIG_VTD) +=3D intel_iommu.o
+>>>  obj-$(CONFIG_AMD_IOMMU) +=3D amd_iommu.o
+>>>
+>>
+>> Ah no, this is hw/i386/fw_cfg.c; of course hw/nvram/fw_cfg.c has its own
+>> Kconfig symbol.
+>=20
+> Sorry couldn't find it. Which symbol is that?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+None. :)  fw_cfg has a bunch of uses in vl.c, it's not really going to
+be easy to stub it out and probably pointless because it's an easy way
+for firmware to get QEMU-specific information.
+
+Paolo
 
 
