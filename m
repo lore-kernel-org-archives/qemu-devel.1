@@ -2,89 +2,79 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731C6C33C9B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6695C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40801222D9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:33:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D63A222D9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="flyWfm8U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40801222D9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eol04kd2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D63A222D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iopv6-00052R-4Y
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:33:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37103)
+	id 1iopvM-0005QP-E4
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:33:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iooRp-0004i0-Hm
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:59:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iopsA-0001oP-V9
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:30:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iooRo-0003kT-9F
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:59:01 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53567)
+ (envelope-from <peter.maydell@linaro.org>) id 1iops9-00087s-Mw
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:30:18 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:40715)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iooRo-0003js-0y
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:59:00 -0500
-Received: by mail-wm1-x342.google.com with SMTP id m24so18837525wmc.3
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 04:58:59 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iops9-00087T-IK
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:30:17 -0500
+Received: by mail-oi1-x234.google.com with SMTP id c77so17377926oib.7
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 06:30:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=i175rk+8Kf76ICDOtYMU2bYqO0QEH6Bb0CbJbkc9bB0=;
- b=flyWfm8UG2uzTG/ieRXVNDHie23TgVWxnNns1B8M+Go4dTs32GoIh559B6DepQyBiL
- rxPuazM4yDscM/QCwKo4ZJtvpjk+U3sqqHB/Mqq3qBEdJAP0hbqKAvDLxPis98xuNTZ9
- om8FLW/b2YJ35+J0qpXBfMnjLgMryajZeXSUS2ZIIRBbfQyICjB9T/dBvx3KT7GvKYVk
- G3ooLmc58I3vvgJ64/tmE1bHD7bWzMKmiaQ2VjyEki3ZGljqyRHQei7SId/5OiXEWY1e
- kxqnPLfKy/8eRUMu58AJ9MZtAHAu3Wrp0mZHgZX/+StJn8LNxicJk1bxhA4P3gBARje8
- eBgA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0r4EeqIFNcJaYUfmKTNLb5Cc5ORQ6dUfd20+fFY6GqQ=;
+ b=eol04kd2hAqurD3Lm74/B66imoArADiusEH+RX6AXEEqVcyEnsvYyoTchnSU2D5kbq
+ j2LFyZCHYVSuUc+uB7YaSe6dJ9ZAq/wJT70PPCXTyC8vYkgdgXo9XDe20sOUYkeXJ5Z2
+ o1/KPv/9cVbhFkwW7haQhZ9XcyabgxnGhIkyNGytHReP95PjuyL+r+N5D8AFlXsxbYeW
+ 6/yJLrzdcVt8i/q0DGTCIqUN4f1d8Z1SlCJ7xlup1f3qjQwSE6LEnJg5gZVKpqj14JxK
+ CncKmyf9o9Tx9eETAoRLOpFnWDRvWSqggPKW4gIoAZTqmFTse0x/FW2NK8IlqMlEOSh+
+ 5kyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=i175rk+8Kf76ICDOtYMU2bYqO0QEH6Bb0CbJbkc9bB0=;
- b=RdAMuZ4lQUO2GkU6eXKYs7/fi3afWOC5Y5ViCE3d1HG3b72YUWN1cD5tjnusq20xNw
- Te0FRCYsbgnxEV+7gV56LQq6PFrr0TXSO3k9ork7UG+xsfTYEMiLb3pod8t+QvUDc80t
- gIhLxuqSIJHNIlXbnAC1FNMh60q6sp2EX7NNhUNsvjsqMZ+uDqzSP9Vnx4E/THqZLl13
- fcLKybsbfUOuZQ/ROczOlo0qldqC8O6rRNWN0FKx4VYqdx2DO7biRkHHyJhprsQm5bXl
- hyjL9UB/gefYED354BKHHRuBKrgq/KMnv+T0j1u5cKKEQ8yy37OmEnsHXhiUzhLG3eUI
- eFeg==
-X-Gm-Message-State: APjAAAWLtQwmVdaCI+OCmHRov5qXah6rPFLu6QujvPS3U3plP0GxuUNN
- VJdH4n5S3VQsxA4lm6rfbLaPEQ==
-X-Google-Smtp-Source: APXvYqwM6D2y9dGpFnMnLlD60QlAF/cqIW6puzQAWx/1LEMDBnzkDeSmY4+6AOgyv2vuc20IAn7TAA==
-X-Received: by 2002:a1c:4e03:: with SMTP id g3mr41632804wmh.22.1578401938827; 
- Tue, 07 Jan 2020 04:58:58 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p18sm26723207wmg.4.2020.01.07.04.58.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 04:58:57 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D15751FF87;
- Tue,  7 Jan 2020 12:58:56 +0000 (GMT)
-References: <20191218223441.23852-1-richard.henderson@linaro.org>
- <20191218223441.23852-4-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 3/7] configure: Do not force pie=no for non-x86
-In-reply-to: <20191218223441.23852-4-richard.henderson@linaro.org>
-Date: Tue, 07 Jan 2020 12:58:56 +0000
-Message-ID: <87r20b4e3z.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0r4EeqIFNcJaYUfmKTNLb5Cc5ORQ6dUfd20+fFY6GqQ=;
+ b=IDrMJdwyrOJPu/YQ1BlrP2sKJyJnqevEvbLxPZGdULdIZYSx+QlQmUKCR0Y1ha/UlF
+ wyUGP878WfcuHsY5+hjdlPDkPzMzVXUVW36KhqF6TcDesZqkPWJ8/CS6mnna7mfds3O1
+ cfCh8OKe6AbsVhnR+NynjURXQtB02cQRlggf3lQt/XM7tMo081CnjdUEWAKfgll2HZnv
+ dOxnGISu6eAhK5JOgEOcreiUJpmF7C0FgZCnt34lUVpaYc30SQ3nHt2YdUEeK3Xt0SKp
+ F+THFjbOGChpX4755oFKRdPjCJTXKKjS5bvCBwop5iKXeE+FbAyTOH0M0oYcqlOcwImJ
+ 1Z4Q==
+X-Gm-Message-State: APjAAAWF83SSs2jy0xJutPrkPJLj5moMTOJKiIep8qxGODr/PwRUMhcL
+ dOpP8tFNns44nuX+tnzJzXGXBDZwJx99aqlsTepEhG9IDv4=
+X-Google-Smtp-Source: APXvYqzb2frSu9CXPqOEM6vUxrIOXIRaNrxm/+3FWzI/b2J9w4Y6RZZBgai5dXLJVAe00NA7fwcdiJf/UqK/HFd3Hno=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr24688oid.98.1578407416731;
+ Tue, 07 Jan 2020 06:30:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <157834844263.18456.7231217269341794728.stgit@gimli.home>
+In-Reply-To: <157834844263.18456.7231217269341794728.stgit@gimli.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Jan 2020 14:30:05 +0000
+Message-ID: <CAFEAcA8tEOE7b0gXXitvOn_a84_cuM1m-X1oB3FOJjX4_7vmog@mail.gmail.com>
+Subject: Re: [PULL 0/1] VFIO fixes 2020-01-06
+To: Alex Williamson <alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::234
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,62 +86,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, i@maskray.me, philmd@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> PIE is supported on many other hosts besides x86.
+On Mon, 6 Jan 2020 at 22:11, Alex Williamson <alex.williamson@redhat.com> wrote:
 >
-> The default for non-x86 is now the same as x86: pie is used
-> if supported, and may be forced via --enable/--disable-pie.
+> The following changes since commit 48008198270e3ebcc9394401d676c54ed5ac139c:
 >
-> The original commit (40d6444e91c) said:
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-12-20 11:20:25 +0000)
 >
->   "Non-x86 are not changed, as they require TCG changes"
+> are available in the Git repository at:
 >
-> but I think that's wrong -- there's nothing about PIE that
-> affects TCG one way or another.
+>   git://github.com/awilliam/qemu-vfio.git tags/vfio-fixes-20200106.0
 >
-> Tested on aarch64 (bionic) and ppc64le (centos 7) hosts.
+> for you to fetch changes up to 0446f8121723b134ca1d1ed0b73e96d4a0a8689d:
 >
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Also I double checked OpenBSD still worked:
-
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  configure | 10 ----------
->  1 file changed, 10 deletions(-)
+>   vfio/pci: Don't remove irqchip notifier if not registered (2020-01-06 14:19:42 -0700)
 >
-> diff --git a/configure b/configure
-> index 30e3875c6b..99faf64a74 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2018,16 +2018,6 @@ if ! compile_prog "-Werror" "" ; then
->  	"Thread-Local Storage (TLS). Please upgrade to a version that does."
->  fi
->=20=20
-> -if test "$pie" =3D ""; then
-> -  case "$cpu-$targetos" in
-> -    i386-Linux|x86_64-Linux|x32-Linux|i386-OpenBSD|x86_64-OpenBSD)
-> -      ;;
-> -    *)
-> -      pie=3D"no"
-> -      ;;
-> -  esac
-> -fi
-> -
->  if test "$pie" !=3D "no" ; then
->    cat > $TMPC << EOF
+> ----------------------------------------------------------------
+> VFIO fixes 2020-01-06
+>
+>  - Fix irqchip notifier de-registration if not registered (Peter Xu)
+>
 
+Applied, thanks.
 
---=20
-Alex Benn=C3=A9e
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
