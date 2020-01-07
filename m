@@ -2,84 +2,89 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA6CC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90EDAC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:55:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A62208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39D9A208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:55:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XqlwS+p7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A62208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T9ZUESkh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39D9A208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqFO-00086Y-05
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:54:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50484)
+	id 1ioqGk-0001yW-B3
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:55:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iop7g-0005t3-8h
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:42:17 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIP-0000PJ-FG
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iop7e-0003EU-T0
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:42:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35829
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iop7e-0003EB-P6
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:42:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578404534;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=esTNyJI3A1E1uVV7RYU0tw93SQp2eHtDOzs7lxRNzCM=;
- b=XqlwS+p7ocAekMqLzY8yxJq/O9KpbOnnAETSHkd9ny0z0xYGalRUVgQJaiCM1Ct0d8+0dO
- LMJr0lGhL5UVTilttXnwfWjlWPRhOLldgAJbor0cYNmz+Qqj/kDJnfpDeozlicQOr/LCSG
- dquM8K2oDved5Fv9cSISeMfT2WQ9KS4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-ecK9DCATPqq5dgLDVCcO0g-1; Tue, 07 Jan 2020 08:42:13 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6215564A7F
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 13:42:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E9E2B10016DA;
- Tue,  7 Jan 2020 13:42:08 +0000 (UTC)
-Date: Tue, 7 Jan 2020 13:42:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v2 01/10] migration: Increase default number of multifd
- channels to 16
-Message-ID: <20200107134205.GM3368802@redhat.com>
-References: <20191218020119.3776-1-quintela@redhat.com>
- <20191218020119.3776-2-quintela@redhat.com>
- <20200103165832.GU2753983@redhat.com> <87mub4xurf.fsf@trasno.org>
- <20200107124934.GK3368802@redhat.com> <87muazpf2v.fsf@trasno.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIO-0002JS-BN
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:21 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52219)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iopIO-0002Ij-5r
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:20 -0500
+Received: by mail-wm1-x342.google.com with SMTP id d73so19037079wmd.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:53:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=5+y6glt1oNxJugm2Ypcxd+Fn7DJ6oHVA90lV4Ls02gw=;
+ b=T9ZUESkhNQBjOjLvg4vdncq9LWXZJGl1bSvfT8JJ3ZKgvYl1GymEsqIkGLEdoO3zbH
+ s+e7E6WyfXxrKxRLmCwEXyFFC0EHc4dRbIZlh69GBoN/VzT8kNI4TUAGffxEDAa4Cwwx
+ kjad6eWPXGlkteN3/sRrnA3PkCV16ETX3K4i6AuK8aozdsGBiwqGxxqKogRJrpkYjZRY
+ PKkRktvkLFZlRkNrkhPaLWBfUC1eHFA0SHRQX730mFX73Im2XVOMA7Q4PtrjSTRHgdb9
+ Z1EU6Iktk+BoA5IxY9hq3XAq8sOfamgKZ+mq3qSKLS7XjIfMQxDGmpKcuoE75veBtWzA
+ twmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=5+y6glt1oNxJugm2Ypcxd+Fn7DJ6oHVA90lV4Ls02gw=;
+ b=fea6kkhuZX22GzUDQVmqVT5sLuxtdyxJdJhCD/zxnKhEMaqTBOjA68zNM/Cf8WVAbS
+ OrQ5ymicTbq2l2Lfp1zOQVoaQcehz6E6BSrIuOhfAlXa1ZsleR0URxDRKuDtg7QpIG+l
+ k4p9bVWkk9gs4cpp6TcT+XoAc+aKC9Y87DVUt0YBALHtwnvU/UtADfL3L/4C6GVGf27B
+ +P82vq5lMxIHKxVQHoKRVDoFR4W6NiVl6VLE3HHRBN0i+iL5FX1N3bFEIQYfURE7Lx2O
+ Q1kEsdwGBz6NarMH4odZV+cekM1luZUFLH67fkoTMjhoXWxvK5thSBojuZ0ZgBzc36Hs
+ lFaA==
+X-Gm-Message-State: APjAAAWozwf+zOBb9zxbKuE0YjHEmMS/iolma408Pe3ioh/STR0ylkGq
+ soBw78SBmPfzTn45fipELpw45w==
+X-Google-Smtp-Source: APXvYqzInmGcd4F/ishrr0pzTmT9jpjhidj2veNpWAjnha9274YpQAbHxgV/P6C6WnHsjQouaychrw==
+X-Received: by 2002:a7b:c957:: with SMTP id i23mr40737020wml.49.1578405199240; 
+ Tue, 07 Jan 2020 05:53:19 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q3sm26279525wmj.38.2020.01.07.05.53.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 05:53:16 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 977CE1FF93;
+ Tue,  7 Jan 2020 13:53:11 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 6/6] travis: install homebrew python for OS X
+Date: Tue,  7 Jan 2020 13:53:11 +0000
+Message-Id: <20200107135311.5215-7-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200107135311.5215-1-alex.bennee@linaro.org>
+References: <20200107135311.5215-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87muazpf2v.fsf@trasno.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: ecK9DCATPqq5dgLDVCcO0g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,44 +96,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 07, 2020 at 02:32:24PM +0100, Juan Quintela wrote:
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> >> - What does libvirt prefferes
-> >
-> > Libvirt doesn't really have an opinion in this case. I believe we'll
-> > always set the number of channels on both src & dst, so we don't
-> > see the defaults.
->=20
-> What does libvirt does today for this value?
+Our python3 requirements now outstrip those of the build.
 
-Libvirt doesn't have any default value. By default migration uses a
-single connection.  The mgmt app can request multiple connections
-for the migration, which will cause libvirt to turn on multifd with
-the request channel count.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ .travis.yml | 1 +
+ 1 file changed, 1 insertion(+)
 
-Essentially we avoid the problem by not having a separate tunable
-for "multifd enable" & "multifd channels" - we only have one tunable
-"connection count".  Thus the idea of enabling multifd with a default
-channel count doesn't exist.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+diff --git a/.travis.yml b/.travis.yml
+index 848a2714efe..a86ca34f79d 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -57,6 +57,7 @@ addons:
+       - glib
+       - pixman
+       - gnu-sed
++      - python
+     update: true
+ 
+ 
+-- 
+2.20.1
 
 
