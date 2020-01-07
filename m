@@ -2,90 +2,90 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D683C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E9FC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:39:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB68F2080A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:39:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 143432080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:39:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9ldSnM2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB68F2080A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cs75ryBr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143432080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iorsw-0000N8-65
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:39:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46296)
+	id 1iorsz-0000S7-Lg
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:39:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iorkJ-000736-UE
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:30:21 -0500
+ (envelope-from <mst@redhat.com>) id 1iorkV-0007Hw-Ok
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:30:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iorkI-00051n-8V
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:30:19 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43642
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iorkT-00058G-Cw
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:30:31 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22744
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iorkI-00051Q-3W
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:30:18 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iorkT-00057m-7h
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:30:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578414617;
+ s=mimecast20190719; t=1578414628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2mjtemMUgB27JpLi8+N3bxzl1+0IVjBnBvvjPKdiAjc=;
- b=c9ldSnM2VvIdlBiak4kuwQsuCeFNctVJRUSVab5EqZOEDvaH4L2SILsPxQodEEMWHkBE6V
- l5h+NJ/PtJ0c3aLZ9a9uqRF1F24vY6DOxAqdHyyw2MJTRiIWaYmYxBghhlKvyVt1p9WRyS
- xb+nM9jif1H9w8z5lHMAgiiW5Vd2m1A=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-dHfgYL-LNYKThYYUF6a-Jw-1; Tue, 07 Jan 2020 11:30:16 -0500
-Received: by mail-qv1-f69.google.com with SMTP id n11so231433qvp.15
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:30:15 -0800 (PST)
+ bh=pXEsl8xj2B6C4J6CzOpzs7IZM8KuBGBRcno+vmHdxQg=;
+ b=cs75ryBrsojt8gH3/Ht+wqtiR4YztsVFUD1VFuZVzEzbsuMovlr0uuNn3b1nV2HT6m3qn+
+ y8CbL3sito0JhtNet5ky1DqPmXuUeUdu98LllApYUU6YbEt2S8JdznpxmCd16DQ/np14bP
+ QaMSrNlv90PU/V+0OQTds5d4jUqr/Hk=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-15-Os4ANBfAPQiwVF2CGQ22Mw-1; Tue, 07 Jan 2020 11:30:25 -0500
+Received: by mail-qt1-f199.google.com with SMTP id l56so127971qtk.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:30:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=P6B2QZEV+S1MRINFAeh/u30RoNzW+dHtR0xLU33u1wE=;
- b=t//CdrczMu455kZ7emNM2LK9+3UvFHtmVoupVIu7pTbS2wQe9fVOG+kO3MvoY3l3yM
- SZ1wNWZ5DAmGq0Mv2fEA6cnelWYah2SXtFa/U81Wsd1xUc28d+TeQxAV/zYA/f4NPGYe
- NrRJKBCrIAHvO1+f20xP9q7n9vZtA4Modpz21yoWYtqysgmvPnHbNyfKWyagQnLFSRFG
- L2N59JwNNTkqJ8uROQrTaip2pxCIlp4MF0gnMtLdAhFusFjl/WaeSEgKsvQ/iGolBTZR
- ICSeIWi/QL+KhGk5BwVqbtw/e5iBnp0G3MNp4g45bVTCujLfESBYERdLx4euvXQQXMht
- mgsw==
-X-Gm-Message-State: APjAAAWFAKti6hsssjlefAKhcy9FQm33K833nn8diTnW6CCNVCeQIbxF
- zkSTLB43rxCep9yXVSYGpPOzlAk4FMga/LmnvljXKR3847wwZRGswD/6SKk0pW2hJ/LJjJsg7VS
- w3PQJHZfSG+tNkak=
-X-Received: by 2002:a0c:fac7:: with SMTP id p7mr260249qvo.46.1578414614629;
- Tue, 07 Jan 2020 08:30:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzXsJKJIsaS7He1wfVLTgMn3Ym73X9jPiD1JuiMAF1cW/+YK1uU/tm4O29tSaxxe400Qlkw1A==
-X-Received: by 2002:a0c:fac7:: with SMTP id p7mr260217qvo.46.1578414614239;
- Tue, 07 Jan 2020 08:30:14 -0800 (PST)
+ bh=MPPKzQOazirg5jBND3h1wpeXbc817RV9EQNRRNDvGLg=;
+ b=C2RRmCW3zqtA7ONL8NUznS0zk0WN/WCSQ6nPIxZMB3/HvIUdWyNEv9r/0Y7/7YLRKf
+ /x8NGFBKNrkipxFEQIipcjJvGHl5WMOuatQEPCSq6V1xDF/rDcUng3talGvk1kedeokZ
+ Q8TWKo4gGm22xKH8egcwKxmccYs2mHXrjBNICpPxPwnwOG2i23gJW9cVr8cR/qaK3qdL
+ ic3OsltTOlQ3LBUeJMwGnt4m10xBqBbAyfu3ku/4Bzs7SsphkiNv5cNDcCUN9XrgqrQE
+ XdtgLS2byl92xjrDB0PcdGck7LABrkIwYuQRhgLV3Ii747d8aq/deT73HSzTpmGOUTyK
+ vUVA==
+X-Gm-Message-State: APjAAAUy8ozWcT+3ZvQwCZmVOkDVyicQUsnIPwWgh8ZT6aVXquRKgzqH
+ kgpwirnBVvUFR+9ZRmEvGpB0ej6tez5ku1hGt9Ii5Kg3Ugt2EWrNcq8hTf0KWZi2Ih2Aj76Pet3
+ cxN2a0i7ujyBAWz8=
+X-Received: by 2002:ac8:fae:: with SMTP id b43mr78931080qtk.122.1578414624176; 
+ Tue, 07 Jan 2020 08:30:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyIKfDncJlL+3r9vsQu4j/ayPHh4IwCXWWetDiGn071B8yMTzv2r6k96VXWlj+TJbFoU4zKng==
+X-Received: by 2002:ac8:fae:: with SMTP id b43mr78931049qtk.122.1578414623738; 
+ Tue, 07 Jan 2020 08:30:23 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id q2sm46946qkm.5.2020.01.07.08.30.12
+ by smtp.gmail.com with ESMTPSA id j1sm26918qkl.86.2020.01.07.08.30.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 08:30:13 -0800 (PST)
-Date: Tue, 7 Jan 2020 11:30:10 -0500
+ Tue, 07 Jan 2020 08:30:23 -0800 (PST)
+Date: Tue, 7 Jan 2020 11:30:19 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 09/32] Implement backend program convention command for
- vhost-user-blk
-Message-ID: <20200107162850.411448-10-mst@redhat.com>
+Subject: [PULL v3 11/32] numa: Extend CLI to provide initiator information
+ for numa nodes
+Message-ID: <20200107162850.411448-12-mst@redhat.com>
 References: <20200107162850.411448-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200107162850.411448-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: dHfgYL-LNYKThYYUF6a-Jw-1
+X-MC-Unique: Os4ANBfAPQiwVF2CGQ22Mw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
@@ -105,245 +105,342 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Micky Yun Chan <chanmickyyun@gmail.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Jingqi Liu <jingqi.liu@intel.com>,
+ Tao Xu <tao3.xu@intel.com>, Markus Armbruster <armbru@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Micky Yun Chan <chanmickyyun@gmail.com>
+From: Tao Xu <tao3.xu@intel.com>
 
-This patch is to add standard commands defined in docs/interop/vhost-user.r=
-st
-For vhost-user-* program
+In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),
+The initiator represents processor which access to memory. And in 5.2.27.3
+Memory Proximity Domain Attributes Structure, the attached initiator is
+defined as where the memory controller responsible for a memory proximity
+domain. With attached initiator information, the topology of heterogeneous
+memory can be described. Add new machine property 'hmat' to enable all
+HMAT specific options.
 
-Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
-Message-Id: <20191209015331.5455-1-chanmickyyun@gmail.com>
+Extend CLI of "-numa node" option to indicate the initiator numa node-id.
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables. Before using initiator option, enable HMAT with
+-machine hmat=3Don.
+
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
+Suggested-by: Dan Williams <dan.j.williams@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Message-Id: <20191213011929.2520-2-tao3.xu@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- docs/interop/vhost-user.json            |  31 +++++++
- contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
- docs/interop/vhost-user.rst             |  17 ++++
- 3 files changed, 112 insertions(+), 44 deletions(-)
+ qapi/machine.json     | 10 ++++++-
+ include/sysemu/numa.h |  5 ++++
+ hw/core/machine.c     | 64 +++++++++++++++++++++++++++++++++++++++++++
+ hw/core/numa.c        | 23 ++++++++++++++++
+ qemu-options.hx       | 35 +++++++++++++++++++----
+ 5 files changed, 131 insertions(+), 6 deletions(-)
 
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-index da6aaf51c8..ce0ef74db5 100644
---- a/docs/interop/vhost-user.json
-+++ b/docs/interop/vhost-user.json
-@@ -54,6 +54,37 @@
-   ]
- }
-=20
-+##
-+# @VHostUserBackendBlockFeature:
-+#
-+# List of vhost user "block" features.
-+#
-+# @read-only: The --read-only command line option is supported.
-+# @blk-file: The --blk-file command line option is supported.
-+#
-+# Since: 5.0
-+##
-+{
-+  'enum': 'VHostUserBackendBlockFeature',
-+  'data': [ 'read-only', 'blk-file' ]
-+}
-+
-+##
-+# @VHostUserBackendCapabilitiesBlock:
-+#
-+# Capabilities reported by vhost user "block" backends
-+#
-+# @features: list of supported features.
-+#
-+# Since: 5.0
-+##
-+{
-+  'struct': 'VHostUserBackendCapabilitiesBlock',
-+  'data': {
-+    'features': [ 'VHostUserBackendBlockFeature' ]
-+  }
-+}
-+
- ##
- # @VHostUserBackendInputFeature:
+diff --git a/qapi/machine.json b/qapi/machine.json
+index ca26779f1a..27d0e37534 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -463,6 +463,13 @@
+ # @memdev: memory backend object.  If specified for one node,
+ #          it must be specified for all nodes.
  #
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-b=
-lk/vhost-user-blk.c
-index ae61034656..6fd91c7e99 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -576,70 +576,90 @@ vub_new(char *blk_file)
-     return vdev_blk;
++# @initiator: defined in ACPI 6.3 Chapter 5.2.27.3 Table 5-145,
++#             points to the nodeid which has the memory controller
++#             responsible for this NUMA node. This field provides
++#             additional information as to the initiator node that
++#             is closest (as in directly attached) to this node, and
++#             therefore has the best performance (since 5.0)
++#
+ # Since: 2.1
+ ##
+ { 'struct': 'NumaNodeOptions',
+@@ -470,7 +477,8 @@
+    '*nodeid': 'uint16',
+    '*cpus':   ['uint16'],
+    '*mem':    'size',
+-   '*memdev': 'str' }}
++   '*memdev': 'str',
++   '*initiator': 'uint16' }}
+=20
+ ##
+ # @NumaDistOptions:
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index ae9c41d02b..788cbec7a2 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -18,6 +18,8 @@ struct NodeInfo {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+     bool present;
++    bool has_cpu;
++    uint16_t initiator;
+     uint8_t distance[MAX_NODES];
+ };
+=20
+@@ -33,6 +35,9 @@ struct NumaState {
+     /* Allow setting NUMA distance for different NUMA nodes */
+     bool have_numa_distance;
+=20
++    /* Detect if HMAT support is enabled. */
++    bool hmat_enabled;
++
+     /* NUMA nodes information */
+     NodeInfo nodes[MAX_NODES];
+ };
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 0854dcebdd..f5e2b32b3b 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -430,6 +430,20 @@ static void machine_set_nvdimm(Object *obj, bool value=
+, Error **errp)
+     ms->nvdimms_state->is_enabled =3D value;
  }
 =20
-+static int opt_fdnum =3D -1;
-+static char *opt_socket_path;
-+static char *opt_blk_file;
-+static gboolean opt_print_caps;
-+static gboolean opt_read_only;
++static bool machine_get_hmat(Object *obj, Error **errp)
++{
++    MachineState *ms =3D MACHINE(obj);
 +
-+static GOptionEntry entries[] =3D {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-+     "block device or file path", "PATH"},
-+    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-+      "Enable read-only", NULL }
-+};
++    return ms->numa_state->hmat_enabled;
++}
 +
- int main(int argc, char **argv)
++static void machine_set_hmat(Object *obj, bool value, Error **errp)
++{
++    MachineState *ms =3D MACHINE(obj);
++
++    ms->numa_state->hmat_enabled =3D value;
++}
++
+ static char *machine_get_nvdimm_persistence(Object *obj, Error **errp)
  {
--    int opt;
--    char *unix_socket =3D NULL;
--    char *blk_file =3D NULL;
--    bool enable_ro =3D false;
-     int lsock =3D -1, csock =3D -1;
-     VubDev *vdev_blk =3D NULL;
-+    GError *error =3D NULL;
-+    GOptionContext *context;
+     MachineState *ms =3D MACHINE(obj);
+@@ -557,6 +571,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                                const CpuInstanceProperties *props, Error *=
+*errp)
+ {
+     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
++    NodeInfo *numa_info =3D machine->numa_state->nodes;
+     bool match =3D false;
+     int i;
 =20
--    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
--        switch (opt) {
--        case 'b':
--            blk_file =3D g_strdup(optarg);
--            break;
--        case 's':
--            unix_socket =3D g_strdup(optarg);
--            break;
--        case 'r':
--            enable_ro =3D true;
--            break;
--        case 'h':
--        default:
--            printf("Usage: %s [ -b block device or file, -s UNIX domain so=
-cket"
--                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--            return 0;
-+    context =3D g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"block\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"read-only\",\n");
-+        g_print("    \"blk-file\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
+@@ -626,6 +641,17 @@ void machine_set_cpu_numa_node(MachineState *machine,
+         match =3D true;
+         slot->props.node_id =3D props->node_id;
+         slot->props.has_node_id =3D props->has_node_id;
 +
-+    if (!opt_blk_file) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (opt_socket_path) {
-+        lsock =3D unix_sock_new(opt_socket_path);
-+        if (lsock < 0) {
-+            exit(EXIT_FAILURE);
-         }
-+    } else if (opt_fdnum < 0) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    } else {
-+        lsock =3D opt_fdnum;
++        if (machine->numa_state->hmat_enabled) {
++            if ((numa_info[props->node_id].initiator < MAX_NODES) &&
++                (props->node_id !=3D numa_info[props->node_id].initiator))=
+ {
++                error_setg(errp, "The initiator of CPU NUMA node %" PRId64
++                        " should be itself", props->node_id);
++                return;
++            }
++            numa_info[props->node_id].has_cpu =3D true;
++            numa_info[props->node_id].initiator =3D props->node_id;
++        }
      }
 =20
--    if (!unix_socket || !blk_file) {
--        printf("Usage: %s [ -b block device or file, -s UNIX domain socket=
-"
--               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--        return -1;
--    }
--
--    lsock =3D unix_sock_new(unix_socket);
--    if (lsock < 0) {
--        goto err;
--    }
--
--    csock =3D accept(lsock, (void *)0, (void *)0);
-+    csock =3D accept(lsock, NULL, NULL);
-     if (csock < 0) {
--        fprintf(stderr, "Accept error %s\n", strerror(errno));
--        goto err;
-+        g_printerr("Accept error %s\n", strerror(errno));
-+        exit(EXIT_FAILURE);
+     if (!match) {
+@@ -846,6 +872,13 @@ static void machine_initfn(Object *obj)
+=20
+     if (mc->numa_mem_supported) {
+         ms->numa_state =3D g_new0(NumaState, 1);
++        object_property_add_bool(obj, "hmat",
++                                 machine_get_hmat, machine_set_hmat,
++                                 &error_abort);
++        object_property_set_description(obj, "hmat",
++                                        "Set on/off to enable/disable "
++                                        "ACPI Heterogeneous Memory Attribu=
+te "
++                                        "Table (HMAT)", NULL);
      }
 =20
--    vdev_blk =3D vub_new(blk_file);
-+    vdev_blk =3D vub_new(opt_blk_file);
-     if (!vdev_blk) {
--        goto err;
-+        exit(EXIT_FAILURE);
-     }
--    if (enable_ro) {
-+    if (opt_read_only) {
-         vdev_blk->enable_ro =3D true;
-     }
-=20
-     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
-                   vub_panic_cb, &vub_iface)) {
--        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
--        goto err;
-+        g_printerr("Failed to initialize libvhost-user-glib\n");
-+        exit(EXIT_FAILURE);
-     }
-=20
-     g_main_loop_run(vdev_blk->loop);
--
-+    g_main_loop_unref(vdev_blk->loop);
-+    g_option_context_free(context);
-     vug_deinit(&vdev_blk->parent);
--
--err:
-     vub_free(vdev_blk);
-     if (csock >=3D 0) {
-         close(csock);
-@@ -647,8 +667,8 @@ err:
-     if (lsock >=3D 0) {
-         close(lsock);
-     }
--    g_free(unix_socket);
--    g_free(blk_file);
-+    g_free(opt_socket_path);
-+    g_free(opt_blk_file);
-=20
-     return 0;
+     /* Register notifier when init is done for sysbus sanity checks */
+@@ -913,6 +946,32 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
+     return g_string_free(s, false);
  }
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 7827b710aa..015ac08177 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -1376,3 +1376,20 @@ Command line options:
-   Enable virgl rendering support.
 =20
-   (optional)
++static void numa_validate_initiator(NumaState *numa_state)
++{
++    int i;
++    NodeInfo *numa_info =3D numa_state->nodes;
 +
-+vhost-user-blk
-+--------------
++    for (i =3D 0; i < numa_state->num_nodes; i++) {
++        if (numa_info[i].initiator =3D=3D MAX_NODES) {
++            error_report("The initiator of NUMA node %d is missing, use "
++                         "'-numa node,initiator' option to declare it", i)=
+;
++            exit(1);
++        }
 +
-+Command line options:
++        if (!numa_info[numa_info[i].initiator].present) {
++            error_report("NUMA node %" PRIu16 " is missing, use "
++                         "'-numa node' option to declare it first",
++                         numa_info[i].initiator);
++            exit(1);
++        }
 +
-+--blk-file=3DPATH
++        if (!numa_info[numa_info[i].initiator].has_cpu) {
++            error_report("The initiator of NUMA node %d is invalid", i);
++            exit(1);
++        }
++    }
++}
 +
-+  Specify block device or file path.
+ static void machine_numa_finish_cpu_init(MachineState *machine)
+ {
+     int i;
+@@ -953,6 +1012,11 @@ static void machine_numa_finish_cpu_init(MachineState=
+ *machine)
+             machine_set_cpu_numa_node(machine, &props, &error_fatal);
+         }
+     }
 +
-+  (optional)
++    if (machine->numa_state->hmat_enabled) {
++        numa_validate_initiator(machine->numa_state);
++    }
 +
-+--read-only
+     if (s->len && !qtest_enabled()) {
+         warn_report("CPU(s) not present in any NUMA nodes: %s",
+                     s->str);
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index e3332a984f..e60da99293 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -133,6 +133,29 @@ static void parse_numa_node(MachineState *ms, NumaNode=
+Options *node,
+         numa_info[nodenr].node_mem =3D object_property_get_uint(o, "size",=
+ NULL);
+         numa_info[nodenr].node_memdev =3D MEMORY_BACKEND(o);
+     }
 +
-+  Enable read-only.
++    /*
++     * If not set the initiator, set it to MAX_NODES. And if
++     * HMAT is enabled and this node has no cpus, QEMU will raise error.
++     */
++    numa_info[nodenr].initiator =3D MAX_NODES;
++    if (node->has_initiator) {
++        if (!ms->numa_state->hmat_enabled) {
++            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
++                       "(HMAT) is disabled, enable it with -machine hmat=
+=3Don "
++                       "before using any of hmat specific options");
++            return;
++        }
 +
-+  (optional)
++        if (node->initiator >=3D MAX_NODES) {
++            error_report("The initiator id %" PRIu16 " expects an integer =
+"
++                         "between 0 and %d", node->initiator,
++                         MAX_NODES - 1);
++            return;
++        }
++
++        numa_info[nodenr].initiator =3D node->initiator;
++    }
+     numa_info[nodenr].present =3D true;
+     max_numa_nodeid =3D MAX(max_numa_nodeid, nodenr + 1);
+     ms->numa_state->num_nodes++;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index e9d6231438..b78bc52634 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -40,7 +40,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "                suppress-vmdesc=3Don|off disables self-describing mig=
+ration (default=3Doff)\n"
+     "                nvdimm=3Don|off controls NVDIMM support (default=3Dof=
+f)\n"
+     "                enforce-config-section=3Don|off enforce configuration=
+ section migration (default=3Doff)\n"
+-    "                memory-encryption=3D@var{} memory encryption object t=
+o use (default=3Dnone)\n",
++    "                memory-encryption=3D@var{} memory encryption object t=
+o use (default=3Dnone)\n"
++    "                hmat=3Don|off controls ACPI HMAT support (default=3Do=
+ff)\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -machine [type=3D]@var{name}[,prop=3D@var{value}[,...]]
+@@ -94,6 +95,9 @@ NOTE: this parameter is deprecated. Please use @option{-g=
+lobal}
+ @option{migration.send-configuration}=3D@var{on|off} instead.
+ @item memory-encryption=3D@var{}
+ Memory encryption object to use. The default is none.
++@item hmat=3Don|off
++Enables or disables ACPI Heterogeneous Memory Attribute Table (HMAT) suppo=
+rt.
++The default is off.
+ @end table
+ ETEXI
+=20
+@@ -168,14 +172,14 @@ If any on the three values is given, the total number=
+ of CPUs @var{n} can be omi
+ ETEXI
+=20
+ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+-    "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode]\n=
+"
+-    "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode]\=
+n"
++    "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][,=
+initiator=3Dnode]\n"
++    "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnode][=
+,initiator=3Dnode]\n"
+     "-numa dist,src=3Dsource,dst=3Ddestination,val=3Ddistance\n"
+     "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=3Dz=
+]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+-@item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu}]=
+][,nodeid=3D@var{node}]
+-@itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{lastcpu=
+}]][,nodeid=3D@var{node}]
++@item -numa node[,mem=3D@var{size}][,cpus=3D@var{firstcpu}[-@var{lastcpu}]=
+][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
++@itemx -numa node[,memdev=3D@var{id}][,cpus=3D@var{firstcpu}[-@var{lastcpu=
+}]][,nodeid=3D@var{node}][,initiator=3D@var{initiator}]
+ @itemx -numa dist,src=3D@var{source},dst=3D@var{destination},val=3D@var{di=
+stance}
+ @itemx -numa cpu,node-id=3D@var{node}[,socket-id=3D@var{x}][,core-id=3D@va=
+r{y}][,thread-id=3D@var{z}]
+ @findex -numa
+@@ -222,6 +226,27 @@ split equally between them.
+ @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+ if one node uses @samp{memdev}, all of them have to use it.
+=20
++@samp{initiator} is an additional option that points to an @var{initiator}
++NUMA node that has best performance (the lowest latency or largest bandwid=
+th)
++to this NUMA @var{node}. Note that this option can be set only when
++the machine property 'hmat' is set to 'on'.
++
++Following example creates a machine with 2 NUMA nodes, node 0 has CPU.
++node 1 has only memory, and its initiator is node 0. Note that because
++node 0 has CPU, by default the initiator of node 0 is itself and must be
++itself.
++@example
++-machine hmat=3Don \
++-m 2G,slots=3D2,maxmem=3D4G \
++-object memory-backend-ram,size=3D1G,id=3Dm0 \
++-object memory-backend-ram,size=3D1G,id=3Dm1 \
++-numa node,nodeid=3D0,memdev=3Dm0 \
++-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 \
++-smp 2,sockets=3D2,maxcpus=3D2  \
++-numa cpu,node-id=3D0,socket-id=3D0 \
++-numa cpu,node-id=3D0,socket-id=3D1
++@end example
++
+ @var{source} and @var{destination} are NUMA node IDs.
+ @var{distance} is the NUMA distance from @var{source} to @var{destination}=
+.
+ The distance from a node to itself is always 10. If any pair of nodes is
 --=20
 MST
 
