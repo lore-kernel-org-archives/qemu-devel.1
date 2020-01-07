@@ -2,96 +2,62 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE51C33C9B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B75C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:55:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DAEA208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:54:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZB9pA+L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DAEA208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1B37206DB
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:55:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B37206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ios7Q-0000AA-4g
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:54:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47325)
+	id 1ios95-0003EU-AP
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:55:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60644)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iorll-0000Dw-D1
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:31:50 -0500
+ (envelope-from <groug@kaod.org>) id 1ios13-00075C-07
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:47:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iorlk-0005pz-3j
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:31:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22511
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ios11-0000iT-Jb
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:47:36 -0500
+Received: from 18.mo6.mail-out.ovh.net ([46.105.73.110]:42456)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iorlk-0005ph-0V
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:31:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578414707;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9q2/1/1fqOdhU65sqIDbx6cBRpFU6//iIePNlnfAizE=;
- b=FZB9pA+L9vx+j3z7oqQz/23ayP6p9QrMcGpR7QfzoP1hof+TfnIj3XFwey5rEc0+p/fPhz
- 1MQCddgrY8OX+svNYKXRKGIZ25pc4oSA+UfOU4Fdq/Z9j2BzuiWWFTg8whwjY9J6K0g/Vh
- p0kYTNHptvh5axDfg7SU6OkthJwdVw4=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-eNt4qTNUPkuT-noPvjDTKQ-1; Tue, 07 Jan 2020 11:31:46 -0500
-Received: by mail-qk1-f198.google.com with SMTP id c202so153499qkg.4
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:31:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=6oUZcRx6oHUh2LroAUnKmJ6d2Eg7LapR5X4J56q3mek=;
- b=tRAu0e4J2ylB4C9n4cn9fSuJ40Wsx+yGUYsdDBbGCXf2LnkotB2Q2oUD0ILw3YEl9+
- fmFk2TSpH4ihQ2UGT4pkET/e1NdRG4jcKARmEYpxOrhD6HjvNfZnLQ0rr6J2z/qOzDdY
- Pyr3AuFXsnlMBIm2HtLJKZXR/mBZuzOIf2J6m4iRE6F7YuvIm6utoX/9muLMwQMtop+0
- XkZfQ/Y3exQYsU0ICs9m+TR8uqTBkrQjUsYlubsR0S4pL/Tds9YmdMNq8ETtcDtddHY/
- w8wFw7/zsRBZ5aMXB1CnslTWytFgQ+TPjuh1yaNm1Lc1GTdVKvkwL+sV+L7OK1FqX0Td
- 79kw==
-X-Gm-Message-State: APjAAAW2BeGOlVKLT9Bfta4K5yaKoy3Fp0VxOmK4ZxMYE+K9m4q+HNna
- d3ib87cw+Qi1Qfw4GZsgPbZgHSKdnxQsuvBAni4mfJ87wOfVyvw7Kb7VfE3jhV6bbVmVnBnRvf+
- 45eE26/qI1ncMt18=
-X-Received: by 2002:ad4:5429:: with SMTP id g9mr238612qvt.134.1578414705311;
- Tue, 07 Jan 2020 08:31:45 -0800 (PST)
-X-Google-Smtp-Source: APXvYqycIedPO/XbkLmXwdC3GRhqeryefbBc9k2Iip/xyAIWnnLN0jr2EGsuUgI/jvtGLrP72306Og==
-X-Received: by 2002:ad4:5429:: with SMTP id g9mr238590qvt.134.1578414705090;
- Tue, 07 Jan 2020 08:31:45 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id s20sm18909qkg.131.2020.01.07.08.31.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 08:31:44 -0800 (PST)
-Date: Tue, 7 Jan 2020 11:31:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v3 29/32] virtio: reset region cache when on queue deletion
-Message-ID: <20200107162850.411448-30-mst@redhat.com>
-References: <20200107162850.411448-1-mst@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ios10-0000fa-Be
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:47:35 -0500
+Received: from player772.ha.ovh.net (unknown [10.108.42.239])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id BA5D41F4AA4
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 17:47:31 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player772.ha.ovh.net (Postfix) with ESMTPSA id C95FFE02459E;
+ Tue,  7 Jan 2020 16:47:28 +0000 (UTC)
+Date: Tue, 7 Jan 2020 17:47:26 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH 1/1] 9p-local.c: always return -1 on error in
+ local_unlinkat_common
+Message-ID: <20200107174726.5640a059@bahia.lan>
+In-Reply-To: <20200107144718.391550-1-danielhb413@gmail.com>
+References: <20200107144718.391550-1-danielhb413@gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200107162850.411448-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: eNt4qTNUPkuT-noPvjDTKQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13124333742538463494
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehgedggeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.73.110
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,40 +69,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
+I've changed "9p-local.c:" to "9p: local:" which is the usual prefix used for
+fsdev backend specific changes.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480
-Fix leak of region reference that prevents complete
-device deletion on hot unplug.
+On Tue,  7 Jan 2020 11:47:18 -0300
+Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-Message-Id: <20191226043649.14481-2-yuri.benditovich@daynix.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/virtio.c | 1 +
- 1 file changed, 1 insertion(+)
+> local_unlinkat_common() is supposed to always return -1 on error.
+> This is being done by jumps to the 'err_out' label, which is
+> a 'return ret' call, and 'ret' is initialized with -1.
+> 
+> Unfortunately there is a condition in which the function will
+> return 0 on error: in a case where flags == AT_REMOVEDIR, 'ret'
+> will be 0 when reaching
+> 
+> map_dirfd = openat_dir(...)
+> 
+> And, if map_dirfd == -1 and errno != ENOENT, the existing 'err_out'
+> jump will execute 'return ret', when ret is still set to zero
+> at that point.
+> 
+> This patch fixes it by changing all 'err_out' labels by
+> 'return -1' calls, ensuring that the function will always
+> return -1 on error conditions. 'ret' can be left unintialized
+> since it's now being used just to store the result of 'unlinkat'
+> calls.
+> 
+> CC: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> ---
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 95d8ff8508..7b861e0ca0 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2344,6 +2344,7 @@ void virtio_delete_queue(VirtQueue *vq)
-     vq->handle_aio_output =3D NULL;
-     g_free(vq->used_elems);
-     vq->used_elems =3D NULL;
-+    virtio_virtqueue_reset_region_cache(vq);
- }
-=20
- void virtio_del_queue(VirtIODevice *vdev, int n)
---=20
-MST
+Applied to 9p-next.
+
+Thanks Daniel and feliz ano novo :)
+
+>  hw/9pfs/9p-local.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index ca641390fb..de61aca216 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1076,7 +1076,7 @@ out:
+>  static int local_unlinkat_common(FsContext *ctx, int dirfd, const char *name,
+>                                   int flags)
+>  {
+> -    int ret = -1;
+> +    int ret;
+>  
+>      if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+>          int map_dirfd;
+> @@ -1094,12 +1094,12 @@ static int local_unlinkat_common(FsContext *ctx, int dirfd, const char *name,
+>  
+>              fd = openat_dir(dirfd, name);
+>              if (fd == -1) {
+> -                goto err_out;
+> +                return -1;
+>              }
+>              ret = unlinkat(fd, VIRTFS_META_DIR, AT_REMOVEDIR);
+>              close_preserve_errno(fd);
+>              if (ret < 0 && errno != ENOENT) {
+> -                goto err_out;
+> +                return -1;
+>              }
+>          }
+>          map_dirfd = openat_dir(dirfd, VIRTFS_META_DIR);
+> @@ -1107,16 +1107,14 @@ static int local_unlinkat_common(FsContext *ctx, int dirfd, const char *name,
+>              ret = unlinkat(map_dirfd, name, 0);
+>              close_preserve_errno(map_dirfd);
+>              if (ret < 0 && errno != ENOENT) {
+> -                goto err_out;
+> +                return -1;
+>              }
+>          } else if (errno != ENOENT) {
+> -            goto err_out;
+> +            return -1;
+>          }
+>      }
+>  
+> -    ret = unlinkat(dirfd, name, flags);
+> -err_out:
+> -    return ret;
+> +    return unlinkat(dirfd, name, flags);
+>  }
+>  
+>  static int local_remove(FsContext *ctx, const char *path)
 
 
