@@ -2,87 +2,90 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DC8C282DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B304BC282DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:57:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF0DE2081E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:56:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8016D2081E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:57:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdaomzGP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0DE2081E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nb5tv+MI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8016D2081E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iou1Y-00057U-R1
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 13:56:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40119)
+	id 1iou2S-0005zc-Ms
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 13:57:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iou0t-0004Rp-6P
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:55:36 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1iou1d-0005Kh-Cc
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:56:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iou0p-0003oY-I2
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:55:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49080
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <alex.williamson@redhat.com>) id 1iou1b-0004eo-QI
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:56:21 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44943
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iou0n-0003lu-Td
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:55:30 -0500
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1iou1b-0004eC-Lf
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:56:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578423328;
+ s=mimecast20190719; t=1578423378;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qmZRXuDtnEeIEqoRlZMC18TtzT9fykK5v2Wd1H6c3iM=;
- b=bdaomzGPUTZWp9+Jmv8GJ1IK79lyDyeOu4kocHn7kt7IUd8kfy7RxT9XgTX/X7YqP+Ge3z
- OJXMOF5ik9f+xDKmdiZXgMKn+t0r7/zb+yBLNXxH+MolEFeOH+BCVQE9XoJ7E7FIidksNW
- 5UVpMiVIlXQ0zLC7zRzwOZCbrM7qOl4=
+ bh=eC2tkBULAWqXhye0bf//BBmsWkRf4gna7XuvdCNzRnI=;
+ b=Nb5tv+MIr9jnarbSndVBc1TLD07JuxmOUIzDGTlka0tgndQJ4gMOCAWZhLIYgTq4yaEXC6
+ UqYvGfKiu8R0Azs5Fh0JPZ9nFje96xVoFxkM8XGGrErOgKfmb7A/t/0HK6zMXDR+qEgCI1
+ YeajLJm8IMEr36VBPeHcct40ecPxuKg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-94p5iUUdP2ad6CTAU8IrIg-1; Tue, 07 Jan 2020 13:55:26 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-110-ICI4B1HNM-eKDbFSompWvQ-1; Tue, 07 Jan 2020 13:56:15 -0500
+X-MC-Unique: ICI4B1HNM-eKDbFSompWvQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8896800A02;
- Tue,  7 Jan 2020 18:55:24 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-126.ams2.redhat.com
- [10.36.117.126])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 06A871000328;
- Tue,  7 Jan 2020 18:55:20 +0000 (UTC)
-Subject: Re: [PATCH 2/3] gitlab-ci.yml: Add a job to build EDK2 firmware
- binaries
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200106184601.25453-1-philmd@redhat.com>
- <20200106184601.25453-3-philmd@redhat.com>
- <74b5d03a-c3a3-38b8-68cb-192dd04f1802@redhat.com>
- <505f9ed4-5b40-79d2-ac32-3ffb3d6c6976@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <af8fa8bd-5bf2-05bb-7723-1e2b00a6c63b@redhat.com>
-Date: Tue, 7 Jan 2020 19:55:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB65C801E72;
+ Tue,  7 Jan 2020 18:56:12 +0000 (UTC)
+Received: from w520.home (ovpn-116-26.phx2.redhat.com [10.3.116.26])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 76B785C1B0;
+ Tue,  7 Jan 2020 18:56:02 +0000 (UTC)
+Date: Tue, 7 Jan 2020 11:56:02 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20200107115602.25156c41@w520.home>
+In-Reply-To: <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+ <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
+ <20191216154406.023f912b@x1.home>
+ <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
+ <20191217114357.6496f748@x1.home>
+ <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
+ <20191219102706.0a316707@x1.home>
+ <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
+ <20191219140929.09fa24da@x1.home> <20200102182537.GK2927@work-vm>
+ <20200106161851.07871e28@w520.home>
+ <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
+ <20200107100923.2f7b5597@w520.home>
+ <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <505f9ed4-5b40-79d2-ac32-3ffb3d6c6976@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 94p5iUUdP2ad6CTAU8IrIg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,159 +97,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Zhengxiao.zx@alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/07/20 12:35, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/7/20 11:12 AM, Laszlo Ersek wrote:
->> On 01/06/20 19:46, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Add a GitLab job to build the EDK2 firmware binaries.
->>> This job is only built when the roms/edk2/ submodule is updated,
->>> when a git-ref starts with 'edk2' or when the last commit contains
->>> 'EDK2'.
->>
->> keyword "or"; okay.
->>
->>>
->>> GitLab CI generates an artifacts.zip file containing the firmware
->>> binaries.
->>>
->>> With edk2-stable201905, the job took 40 minutes 26 seconds,
->>> the artifacts.zip takes 10MiB.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>> =C2=A0 .gitlab-ci-edk2.yml | 37 +++++++++++++++++++++++++++++++++++++
->>> =C2=A0 .gitlab-ci.yml=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 3 +++
->>> =C2=A0 MAINTAINERS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 3 ++-
->>> =C2=A0 3 files changed, 42 insertions(+), 1 deletion(-)
->>> =C2=A0 create mode 100644 .gitlab-ci-edk2.yml
->>>
->>> diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci-edk2.yml
->>> new file mode 100644
->>> index 0000000000..abfaf52874
->>> --- /dev/null
->>> +++ b/.gitlab-ci-edk2.yml
->>> @@ -0,0 +1,37 @@
->>> +build-edk2:
->>> + rules: # Only run this job when ...
->>> + - changes: # ... roms/edk2/ is modified (submodule updated)
->>> +=C2=A0=C2=A0 - roms/edk2/*
->>> +=C2=A0=C2=A0 when: always
->>> + - if: '$CI_COMMIT_REF_NAME =3D~ /^edk2/' # ... the branch/tag starts
->>> with 'edk2'
->>
->> (1) can you add "or" in the comment here?
->>
->>> +=C2=A0=C2=A0 when: always
->>> + - if: '$CI_COMMIT_MESSAGE =3D~ /edk2/i' # last commit description
->>> contains 'EDK2'
->>
->> (2) ditto
->>
->>> +=C2=A0=C2=A0 when: always
->>> + artifacts:
->>> +=C2=A0=C2=A0 paths: # 'artifacts.zip' will contains the following file=
-s:
->>> +=C2=A0=C2=A0 - pc-bios/edk2*bz2
->>> +=C2=A0=C2=A0 - pc-bios/edk2-licenses.txt
->>> +=C2=A0=C2=A0 - edk2-stdout.log
->>> +=C2=A0=C2=A0 - edk2-stderr.log
->>> + image: ubuntu:16.04 # Use Ubuntu Xenial
->>> + before_script: # Install packages requiered to build EDK2
->>> + - apt-get update --quiet --quiet
->>> + - DEBIAN_FRONTEND=3Dnoninteractive
->>> +=C2=A0=C2=A0 apt-get install --assume-yes --no-install-recommends --qu=
-iet --quiet
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 build-essential
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 ca-certificates
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 dos2unix
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 gcc-aarch64-linux-gnu
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 gcc-arm-linux-gnueabi
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 git
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 iasl
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 make
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 nasm
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 python
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 uuid-dev
->>> + script: # Clone the required submodules and build EDK2
->>> + - git submodule update --init roms/edk2
->>
->> yes, this is needed; qemu users are used to updating top-level
->> submodules (which is why we didn't try to automate that away in the edk2
->> build stuff)
->>
->>> + - git -C roms/edk2 submodule update --init
->>
->> (3) but this should not be necessary. See the "submodules" target in
->> "roms/Makefile.edk2".
->=20
-> Hmm build fails without it:
-> https://gitlab.com/philmd/qemu/-/jobs/395644357#L436
->=20
-> The 'test -d edk2/.git' might be not enough?
+On Tue, 7 Jan 2020 23:23:17 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Huh, possibly a regression from commit f3e330e3c319
-("roms/Makefile.edk2: don't pull in submodules when building from
-tarball", 2019-10-07)?
+> On 1/7/2020 10:39 PM, Alex Williamson wrote:
+> > On Tue, 7 Jan 2020 12:58:22 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 1/7/2020 4:48 AM, Alex Williamson wrote:  
+> >>> On Thu, 2 Jan 2020 18:25:37 +0000
+> >>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >>>      
+> >>>> * Alex Williamson (alex.williamson@redhat.com) wrote:  
+> >>>>> On Fri, 20 Dec 2019 01:40:35 +0530
+> >>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>>>         
+> >>>>>> On 12/19/2019 10:57 PM, Alex Williamson wrote:
+> >>>>>>
+> >>>>>> <Snip>
+> >>>>>>         
+> >>>>
+> >>>> <snip>
+> >>>>     
+> >>>>>>
+> >>>>>> If device state it at pre-copy state (011b).
+> >>>>>> Transition, i.e., write to device state as stop-and-copy state (010b)
+> >>>>>> failed, then by previous state I meant device should return pre-copy
+> >>>>>> state(011b), i.e. previous state which was successfully set, or as you
+> >>>>>> said current state which was successfully set.  
+> >>>>>
+> >>>>> Yes, the point I'm trying to make is that this version of the spec
+> >>>>> tries to tell the user what they should do upon error according to our
+> >>>>> current interpretation of the QEMU migration protocol.  We're not
+> >>>>> defining the QEMU migration protocol, we're defining something that can
+> >>>>> be used in a way to support that protocol.  So I think we should be
+> >>>>> concerned with defining our spec, for example my proposal would be: "If
+> >>>>> a state transition fails the user can read device_state to determine the
+> >>>>> current state of the device.  This should be the previous state of the
+> >>>>> device unless the vendor driver has encountered an internal error, in
+> >>>>> which case the device may report the invalid device_state 110b.  The
+> >>>>> user must use the device reset ioctl in order to recover the device
+> >>>>> from this state.  If the device is indicated in a valid device state
+> >>>>> via reading device_state, the user may attempt to transition the device
+> >>>>> to any valid state reachable from the current state."  
+> >>>>
+> >>>> We might want to be able to distinguish between:
+> >>>>     a) The device has failed and needs a reset
+> >>>>     b) The migration has failed  
+> >>>
+> >>> I think the above provides this.  For Kirti's example above of
+> >>> transitioning from pre-copy to stop-and-copy, the device could refuse
+> >>> to transition to stop-and-copy, generating an error on the write() of
+> >>> device_state.  The user re-reading device_state would allow them to
+> >>> determine the current device state, still in pre-copy or failed.  Only
+> >>> the latter would require a device reset.
+> >>>      
+> >>>> If some part of the devices mechanics for migration fail, but the device
+> >>>> is otherwise operational then we should be able to decide to fail the
+> >>>> migration without taking the device down, which might be very bad for
+> >>>> the VM.
+> >>>> Losing a VM during migration due to a problem with migration really
+> >>>> annoys users; it's one thing the migration failing, but taking the VM
+> >>>> out as well really gets to them.
+> >>>>
+> >>>> Having the device automatically transition back to the 'running' state
+> >>>> seems a bad idea to me; much better to tell the hypervisor and provide
+> >>>> it with a way to clean up; for example, imagine a system with multiple
+> >>>> devices that are being migrated, most of them have happily transitioned
+> >>>> to stop-and-copy, but then the last device decides to fail - so now
+> >>>> someone is going to have to take all of them back to running.  
+> >>>
+> >>> Right, unless I'm missing one, it seems invalid->running is the only
+> >>> self transition the device should make, though still by way of user
+> >>> interaction via the reset ioctl.  Thanks,
+> >>>      
+> >>
+> >> Instead of using invalid state by vendor driver on device failure, I
+> >> think better to reserve one bit in device state which vendor driver can
+> >> set on device failure. When error bit is set, other bits in device state
+> >> should be ignored.  
+> > 
+> > Why is a separate bit better?  Saving and Restoring states are mutually
+> > exclusive, so we have an unused and invalid device state already
+> > without burning another bit.  Thanks,
+> >   
+> 
+> There are 3 invalid states:
+>   *  101b => Invalid state
+>   *  110b => Invalid state
+>   *  111b => Invalid state
+> 
+> why only 110b should be used to report error from vendor driver to 
+> report error? Aren't we adding more confusions in the interface?
 
-Anyway, let me jump forward to your latest posting.
+I think the only chance of confusion is poor documentation.  If we
+define all of the above as invalid and then say any invalid state
+indicates an error condition, then the burden is on the user to
+enumerate all the invalid states.  That's not a good idea.  Instead we
+could say 101b (_RESUMING|_RUNNING) is reserved, it's not currently
+used but it might be useful some day.  Therefore there are no valid
+transitions into or out of this state.  A vendor driver should fail a
+write(2) attempting to enter this state.
 
-Thanks!
-Laszlo
+That leaves 11Xb, where we consider _RESUMING and _SAVING as mutually
+exclusive, so neither are likely to ever be valid states.  Logically,
+if the device is in a failed state such that it needs to be reset to be
+recovered, I would hope the device is not running, so !_RUNNING (110b)
+seems appropriate.  I'm not sure we need that level of detail yet
+though, so I was actually just assuming both 11Xb states would indicate
+an error state and the undefined _RUNNING bit might differentiate
+something in the future.
 
->=20
->>> + - export JOBS=3D$(($(getconf _NPROCESSORS_ONLN) + 1))
->>> + - echo "=3D=3D=3D Using ${JOBS} simultaneous jobs =3D=3D=3D"
->>> + - make -j${JOBS} -C roms efi 1>edk2-stdout.log 2> >(tee -a
->>> edk2-stderr.log >&2)
->>
->> Process substitution is a nifty feature, but perhaps we can do without
->> it, for simplicity. (I realize this is bash-only; I just like to
->> minimize the use of non-portable features if there is a portable
->> replacement that is also simple.)
->>
->> Redirections are processed in the order they appear on the command line
->> [1], *after* stdout/stdin is redirected for pipelining [2]:
->>
->> [1]
->> https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.htm=
-l#tag_18_07
->>
->>
->> "If more than one redirection operator is specified with a command, the
->> order of evaluation is from beginning to end."
->>
->> [2]
->> https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.htm=
-l#tag_18_09_02
->>
->>
->> "The standard input, standard output, or both of a command shall be
->> considered to be assigned by the pipeline before any redirection
->> specified by redirection operators that are part of the command"
->>
->>
->> (4) Therefore, the following should work:
->>
->> =C2=A0=C2=A0 make -j${JOBS} -C roms efi 2>&1 1>edk2-stdout.log \
->> =C2=A0=C2=A0 | tee -a edk2-stderr.log >&2
->>
->> Untested, of course :)
->=20
-> This works like charm :>
->=20
->> Looks OK otherwise.
->=20
-> Thanks for the review!
->=20
->>
->> Thanks!
->> Laszlo
->=20
+Therefore, I think we'd have:
+
+ * 101b => Reserved
+ * 11Xb => Error
+
+Where the device can only self transition into the Error state on a
+failed device_state transition and the only exit from the Error state
+is via the reset ioctl.  The Reserved state is unreachable.  The vendor
+driver must error on device_state writes to enter or exit the Error
+state and must error on writes to enter Reserved states.  Is that still
+confusing?
+
+> Only 3 bits from 32 bits are yet used, one bit can be spared to 
+> represent error state from vendor driver.
+
+I just don't see that it adds any value to use a separate bit, we
+already have more error states than we need with the 3 bits we have.
+Thanks,
+
+Alex
 
 
