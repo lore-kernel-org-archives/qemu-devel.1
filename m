@@ -2,76 +2,87 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3A8C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A012C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:18:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0352087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 632DD2087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:18:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c/sHfPvK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0352087F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AL+o2Ugk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 632DD2087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqcU-0004Mg-47
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:18:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46192)
+	id 1ioqcu-00059z-Qp
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:18:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ioqDS-0004sE-8b
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:52:19 -0500
+ (envelope-from <thuth@redhat.com>) id 1ioq4E-00037W-Fu
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:42:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ioqDR-0002Vy-C2
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:52:18 -0500
-Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:41561)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ioqDR-0002VD-6b
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:52:17 -0500
-Received: by mail-ot1-x331.google.com with SMTP id r27so99456otc.8
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 06:52:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=h/jA0lsZC+KHXkwlBnEBjA1xv0an3aPYNKxDK6nX7lE=;
- b=c/sHfPvKHSbznpgO3lZ9XlpWP1eQYX6zNDKAD3OaaRKEx2dp4zFPvHx7drOxSzAz4Y
- lfqRo3TIZua1tqW9uWDCZTd2AgV5010q/sbQ+f5pSaZwMAEvOYfBnZt/TAUFEAr1HJi2
- NBysp6YfOk/s6KnI7nJzr2s6orS1o6WY5Q/E7qKnr0W/4OT1hU0RrrF2jnpZxHsSuBwC
- cMRGcrsHqWhNfgsYI4KTGs5hHHCGwvuCR5+BFHMfulO7W07UGmiz6DpOGnhdb+yx66kN
- G9eBrb9IkrNzc0mhphicH5oaZMyYNsdYpliRC3CiJaH0PK2fISuI1JTmzJBR9hB06uQo
- UW+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=h/jA0lsZC+KHXkwlBnEBjA1xv0an3aPYNKxDK6nX7lE=;
- b=cVIn3WA4cmos5R5e58ejdxTRnZvoXPssAOJBm2kfXB30BlPVcNm2Oo8rDGEfEb2IYB
- edToLZrbtEVYVqCT299Z0h2M5ftkAepToGC2/8CzUutItEpLZvV12Xz4PvuRVq+hySbV
- QSeqtz11w6hkM73yT1VP4sxqkc4MvPSadBLznmxA+DIMDW/66t9hBHjjzaQjo631XCjl
- jVYVTNJRqWcylVuL+hfJYqaRmsUPGQOdx7Q/ii250BLABhEN7/lSqMG852uatSy73DV6
- dApSOyxcBD6/jdCGCRqzoIyG5WvqZiAPGxIjnygFumhS5wZ+IgmOeBWdQ8ruhut//ASX
- 4buQ==
-X-Gm-Message-State: APjAAAVUX6Wfhzts7vZFPIdRikj0NKp3muXzIwibDqcVlyXP3q4KQkIn
- 0v2IdOHP4xc4Rd6qZNiKSE6dMqjPOGwsJnhxWJwVU+9rWe4=
-X-Google-Smtp-Source: APXvYqxdwrbYdxTm1KMZV4FR2dqov0Aj0LHkFsLKL/5+RzqiwXO9VaD81+Jl4gqScaum3gHzTP6J4dkE4OHLJwTtAMU=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr126309ota.232.1578408736387; 
- Tue, 07 Jan 2020 06:52:16 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1ioq4D-0005qe-F2
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:42:46 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49884
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ioq4D-0005pz-2G
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:42:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578408163;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=EcvpDXbfrED4TDgzoIKLdqr3hhn5oG2PdRsSW2xo5CE=;
+ b=AL+o2Ugkqn+s2jjIrHrmNtankbKVJ9FFsxwovf9dNx1Vx1SJ6ePKxYW9o5hnan4rLFBq86
+ UAac/2WMmyQN482AK6CvMgCkOmhjSt8emGgSlZG4ICHkWytkqVONyKaHECdGCCY4UgLYef
+ qHBf+/WQH2XlhfLZ6Z1Q32faOeQ7Y64=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63-LNBmD_6kNg6uEb-JvgXr0g-1; Tue, 07 Jan 2020 09:42:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 630011097F89;
+ Tue,  7 Jan 2020 14:42:41 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C98F272A1;
+ Tue,  7 Jan 2020 14:42:31 +0000 (UTC)
+Subject: Re: Priority of -accel (was: [PATCH] tests/qemu-iotests: Update tests
+ to recent desugarized -accel option)
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Christophe de Dinechin <dinechin@redhat.com>
+References: <20200106130951.29873-1-philmd@redhat.com>
+ <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
+ <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
+ <1A5859EA-4403-4921-B527-DFD07C59C702@redhat.com>
+ <360fa010-ba80-b02b-3a35-19c2b48a462d@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <82a310b7-9b99-163a-e0d3-967bb09e70f7@redhat.com>
+Date: Tue, 7 Jan 2020 15:42:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Jan 2020 14:52:05 +0000
-Message-ID: <CAFEAcA-Q_qprNny1gy1TX=JSrJm3um=6=dQbtrHVry1ODSCc_A@mail.gmail.com>
-Subject: kvm_set_user_memory_region() doesn't check ioctl return value
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::331
+In-Reply-To: <360fa010-ba80-b02b-3a35-19c2b48a462d@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: LNBmD_6kNg6uEb-JvgXr0g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,21 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Daniel Berrange <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity has just pointed out (CID 1412229) that the function
-kvm_set_user_memory_region() in accel/kvm/kvm-all.c calls
-kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, ...) twice, but
-it only checks the ioctl return value for failure in the
-second case. Shouldn't it be checking both calls?
+On 07/01/2020 15.37, Paolo Bonzini wrote:
+> On 07/01/20 14:55, Christophe de Dinechin wrote:
+>> So what about ranking the accelerators, so that all combinaisons
+>> -accel=3Dkvm:tcg, -accel=3Dtcg:kvm, -accel kvm -accel tcg, etc would
+>=20
+> (I assume you mean "-machine accel=3Dkvm:tcg" and "-machine accel=3Dtcg:k=
+vm"
+> for the first two.  This is the "older" way which has now become sugar
+> for "-accel kvm -accel tcg").
+>=20
+>> all pickup kvm if available, and tcg as a fallback? Implementation-wise,
+>> it would simply mean ranking the accelerators and updating the accelerat=
+or
+>> only if it=E2=80=99s available and better.
+>=20
+> This is an interesting idea.  I like this better than "-accel best",
+> because "-accel best" has the problem that you can't add suboptions to
+> it (the suboptions for the various accelerators are disjoint).
+>=20
+> It would break backwards compatibility for "-machine accel=3Dtcg:kvm",
+> which so far meant "use TCG if compiled in, otherwise use KVM".  This is
+> not something I would have a problem with... except that "tcg:kvm" is
+> the default if no -accel option is provided!
 
-(This code seems to have been in place for years so I guess
-Coverity has only just decided that kvm_vm_ioctl() passes its
-'needs return value checking' heuristic...)
+Note that we need "-M accel=3Dtcg:kvm" (or "-accel tcg -accel kvm" now) in
+tests/boot-serial-test.c for example, since some machines can't use KVM
+on certain hosts (e.g. with KVM-HV on POWER8/9).
 
-thanks
--- PMM
+ Thomas
+
 
