@@ -2,85 +2,90 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C51C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1399C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EA20207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:15:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5707E207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:18:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FnLSgXB5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EA20207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="EkZCcsRv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5707E207E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iompj-0005sx-J6
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:15:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50572)
+	id 1iomsE-0003Hj-Oc
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:18:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iolqR-0008ND-43
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:12:16 -0500
+ (envelope-from <yuri.benditovich@daynix.com>) id 1iomJr-0001R1-N1
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iolqP-0006cK-8D
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:12:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40844
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iolqP-0006c7-3i
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:12:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578391932;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VIKlIC18EuyvwnJ2pfH5VMHBgfyHNE2VFm0qfK7GFag=;
- b=FnLSgXB5xlJKxd5LGIJE/wd9gdjbNjXFP/yuxPRgIgXz206+UpYtMuh1m9h/V6YbZb+FNN
- RAJQvpaCpA5xMWQqa3IH8n08SmcZP61Bk5bxjvMiONf3vT/FUfCi5qJrVwUvm2sXW/eZ0n
- KSxU4K/ixjZnc03SEXORGsmbIVo5gQ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-SRPPA7_6Nr2_CZKiMl-4tg-1; Tue, 07 Jan 2020 05:12:09 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 951B110054E3;
- Tue,  7 Jan 2020 10:12:08 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-126.ams2.redhat.com
- [10.36.117.126])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B5AB9858BD;
- Tue,  7 Jan 2020 10:12:04 +0000 (UTC)
-Subject: Re: [PATCH 2/3] gitlab-ci.yml: Add a job to build EDK2 firmware
- binaries
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200106184601.25453-1-philmd@redhat.com>
- <20200106184601.25453-3-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <74b5d03a-c3a3-38b8-68cb-192dd04f1802@redhat.com>
-Date: Tue, 7 Jan 2020 11:12:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <yuri.benditovich@daynix.com>) id 1iomJp-0001cW-Ey
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:42:39 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:44212)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
+ id 1iomJp-0001bZ-09
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:42:37 -0500
+Received: by mail-io1-xd43.google.com with SMTP id b10so52071949iof.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:42:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=daynix-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=J7B5WcnRyDnnnfho/yUfYWKIYvoHROLyccR4zIOExhM=;
+ b=EkZCcsRvyxcDmgDF+Uj1SgCOXmXnVGK587CxfQaDFgj8Odei+2brm9EzkDnXmEF7I5
+ rwSG4HPKq/kihFSy9HomtMXTMyDXY11yNHUwIBhXrHe1nYvxrsYSKP/9WjoZgc9f2KK/
+ CqyDpS3379txdr83xgDriLVOyn1Yg+wpBM/mNjI9MMmX7zUuKIcVPxo941B3YurMRiIf
+ k5nWoFzJGrTrt9Wyl+KNwkSUZimYWVqmbeuGfzHL1TbMcut0YsSZEshopcnzvLfoHaWT
+ x54zJBUjFn3Ww8Fvt09P1vXuAu/oIKi+Q8kbsn8DmW4w267IuhJUESOUEdccf2H9rbcr
+ yrhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=J7B5WcnRyDnnnfho/yUfYWKIYvoHROLyccR4zIOExhM=;
+ b=I83Ew1Fl5I+w4CDtaVBjK82kPXs6ruKexcLWmLpJTcJI1xD7xlPgR31AT+wmABcqZg
+ 5klzlTPKfcCqPVArQS7RvDwj1Ymu7fc1CuQE8MecF2/KQqFH7avYQfRLwqFUbPJPg+sB
+ m3FDUXsFP6ahwoR3QFJl5q9bfJYS/1qBjExjak+WmqQdhSUM6Ph1lyg5sHWRtDiXuTaE
+ P/gTr1bJIPuloI25nvH4Epu8GbZRNPv4JqDzBoXXMH0rezuNtFo9CKg3vIIwjjyoHNna
+ Z6KU60PK6ZT4CSWXJ4C71AkcpDNliqZOESZQ7wePLzpitYOkHEsJR3MLSnjcSoOvcOkf
+ HIZA==
+X-Gm-Message-State: APjAAAXzZOa/m0A700hMh0IcDG5mEhYnnRBCXjM/utyh7SMsp+RbW4yv
+ 3I+6YnhrrnmgwA0kvrUGkvBdvE8Eg2nJ3r5SuM+mCw==
+X-Google-Smtp-Source: APXvYqwyU72FMlFVUKY1sHo40SkYB8LSbyFNC7EBZ6JXmZ/GY3Mzch8qz0s/7/zhac4lpZsvPl/yYvEKsvfsQsJb1Po=
+X-Received: by 2002:a02:5b45:: with SMTP id g66mr83796181jab.29.1578393755318; 
+ Tue, 07 Jan 2020 02:42:35 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200106184601.25453-3-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: SRPPA7_6Nr2_CZKiMl-4tg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20191226043649.14481-1-yuri.benditovich@daynix.com>
+ <20191226043649.14481-2-yuri.benditovich@daynix.com>
+ <05ead321-e93f-1b07-01cc-e0b023be8168@redhat.com>
+ <CAOEp5OdDj_=c_75FsM45iQnqDYBPz=Fn48FbR2FHcY=5D3rB-Q@mail.gmail.com>
+ <20200101184425-mutt-send-email-mst@kernel.org>
+ <CAOEp5Oefmj5dM5auk1QpQ3F+CeJXQy+0aXJC1VNmUOj1KHp8aw@mail.gmail.com>
+ <20200105063518-mutt-send-email-mst@kernel.org>
+ <CAOEp5Of0PYiCu9kPyi7W84ToHrGzTHFkPFBGd0A7AVFkwzVZOg@mail.gmail.com>
+ <CAOEp5Oec3x71vPVKDcTBWT4TkgrbSbUZmyDkd2bGF84sXEHUyQ@mail.gmail.com>
+ <20200106044351-mutt-send-email-mst@kernel.org>
+ <CAOEp5OfrGDAnpj_8W2GSZV95yzuJ=p3aK5a8qVVV-O6QL6EAQQ@mail.gmail.com>
+In-Reply-To: <CAOEp5OfrGDAnpj_8W2GSZV95yzuJ=p3aK5a8qVVV-O6QL6EAQQ@mail.gmail.com>
+From: Yuri Benditovich <yuri.benditovich@daynix.com>
+Date: Tue, 7 Jan 2020 12:42:21 +0200
+Message-ID: <CAOEp5Off5HxD2_igGF9OhUEp3peOoDL92KNaMTU-mXK1r9EuhA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] virtio: reset region cache when on queue deletion
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001a0e08059b8a6fa1"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,166 +97,454 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Yan Vugenfirer <yan@daynix.com>, pbonzini@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/06/20 19:46, Philippe Mathieu-Daud=C3=A9 wrote:
-> Add a GitLab job to build the EDK2 firmware binaries.
-> This job is only built when the roms/edk2/ submodule is updated,
-> when a git-ref starts with 'edk2' or when the last commit contains
-> 'EDK2'.
+--0000000000001a0e08059b8a6fa1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-keyword "or"; okay.
+On Mon, Jan 6, 2020 at 12:37 PM Yuri Benditovich <
+yuri.benditovich@daynix.com> wrote:
 
->=20
-> GitLab CI generates an artifacts.zip file containing the firmware
-> binaries.
->=20
-> With edk2-stable201905, the job took 40 minutes 26 seconds,
-> the artifacts.zip takes 10MiB.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  .gitlab-ci-edk2.yml | 37 +++++++++++++++++++++++++++++++++++++
->  .gitlab-ci.yml      |  3 +++
->  MAINTAINERS         |  3 ++-
->  3 files changed, 42 insertions(+), 1 deletion(-)
->  create mode 100644 .gitlab-ci-edk2.yml
->=20
-> diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci-edk2.yml
-> new file mode 100644
-> index 0000000000..abfaf52874
-> --- /dev/null
-> +++ b/.gitlab-ci-edk2.yml
-> @@ -0,0 +1,37 @@
-> +build-edk2:
-> + rules: # Only run this job when ...
-> + - changes: # ... roms/edk2/ is modified (submodule updated)
-> +   - roms/edk2/*
-> +   when: always
-> + - if: '$CI_COMMIT_REF_NAME =3D~ /^edk2/' # ... the branch/tag starts wi=
-th 'edk2'
-
-(1) can you add "or" in the comment here?
-
-> +   when: always
-> + - if: '$CI_COMMIT_MESSAGE =3D~ /edk2/i' # last commit description conta=
-ins 'EDK2'
-
-(2) ditto
-
-> +   when: always
-> + artifacts:
-> +   paths: # 'artifacts.zip' will contains the following files:
-> +   - pc-bios/edk2*bz2
-> +   - pc-bios/edk2-licenses.txt
-> +   - edk2-stdout.log
-> +   - edk2-stderr.log
-> + image: ubuntu:16.04 # Use Ubuntu Xenial
-> + before_script: # Install packages requiered to build EDK2
-> + - apt-get update --quiet --quiet
-> + - DEBIAN_FRONTEND=3Dnoninteractive
-> +   apt-get install --assume-yes --no-install-recommends --quiet --quiet
-> +     build-essential
-> +     ca-certificates
-> +     dos2unix
-> +     gcc-aarch64-linux-gnu
-> +     gcc-arm-linux-gnueabi
-> +     git
-> +     iasl
-> +     make
-> +     nasm
-> +     python
-> +     uuid-dev
-> + script: # Clone the required submodules and build EDK2
-> + - git submodule update --init roms/edk2
-
-yes, this is needed; qemu users are used to updating top-level
-submodules (which is why we didn't try to automate that away in the edk2
-build stuff)
-
-> + - git -C roms/edk2 submodule update --init
-
-(3) but this should not be necessary. See the "submodules" target in
-"roms/Makefile.edk2".
-
-> + - export JOBS=3D$(($(getconf _NPROCESSORS_ONLN) + 1))
-> + - echo "=3D=3D=3D Using ${JOBS} simultaneous jobs =3D=3D=3D"
-> + - make -j${JOBS} -C roms efi 1>edk2-stdout.log 2> >(tee -a edk2-stderr.=
-log >&2)
-
-Process substitution is a nifty feature, but perhaps we can do without
-it, for simplicity. (I realize this is bash-only; I just like to
-minimize the use of non-portable features if there is a portable
-replacement that is also simple.)
-
-Redirections are processed in the order they appear on the command line
-[1], *after* stdout/stdin is redirected for pipelining [2]:
-
-[1]
-https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#t=
-ag_18_07
-
-"If more than one redirection operator is specified with a command, the
-order of evaluation is from beginning to end."
-
-[2]
-https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#t=
-ag_18_09_02
-
-"The standard input, standard output, or both of a command shall be
-considered to be assigned by the pipeline before any redirection
-specified by redirection operators that are part of the command"
+>
+> On Mon, Jan 6, 2020 at 11:58 AM Michael S. Tsirkin <mst@redhat.com> wrote=
+:
+>
+>> I guess it somehow has to do with the following:
+>>
+>>     if (proxy->disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {
+>>         proxy->disable_legacy =3D pcie_port ? ON_OFF_AUTO_ON :
+>> ON_OFF_AUTO_OFF;
+>>     }
+>>
+>> so by default device on an express port does not have a legacy interface=
+.
+>>
+>> Somehow having a legacy interface fixes things?
+>>
+>
+>
+No, transitional virtio-net on q35 behaves exactly as the modern one.
 
 
-(4) Therefore, the following should work:
+>
+>
+>> Does enabling legacy on q35 without this patch fix things?
+>>
+>
+>
+No, legacy virtio-net on q35 has the same problem.
+There is also an additional problem with legacy device unplug on q35, but I
+think it is not in the scope of this discussion.
 
-  make -j${JOBS} -C roms efi 2>&1 1>edk2-stdout.log \
-  | tee -a edk2-stderr.log >&2
 
-Untested, of course :)
+>
+>
+>> And does disabling legacy on PIIX without this patch break thing?
+>>
+>
+>
+No, modern device on PIIX does hot unplug without problems.
 
-Looks OK otherwise.
 
-Thanks!
-Laszlo
+>
+>
+>>
+>> How can having a legacy interface fix things if it's not
+>> even active? I don't know. Is there a chance windows drivers use the
+>> legacy interface on a transitional device by mistake?
+>>
+>
+As far as I can see - no. The driver works with the device depending on
+VERSION_1
 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index ebcef0ebe9..f799246047 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -1,3 +1,6 @@
-> +include:
-> +  - local: '/.gitlab-ci-edk2.yml'
-> +
->  before_script:
->   - apt-get update -qq
->   - apt-get install -y -qq flex bison libglib2.0-dev libpixman-1-dev geni=
-soimage
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8571327881..22a1fd5824 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2346,6 +2346,7 @@ F: roms/edk2
->  F: roms/edk2-*
->  F: tests/data/uefi-boot-images/
->  F: tests/uefi-test-tools/
-> +F: .gitlab-ci-edk2.yml
-> =20
->  Usermode Emulation
->  ------------------
-> @@ -2689,7 +2690,7 @@ W: https://cirrus-ci.com/github/qemu/qemu
->  GitLab Continuous Integration
->  M: Thomas Huth <thuth@redhat.com>
->  S: Maintained
-> -F: .gitlab-ci.yml
-> +F: .gitlab-ci*.yml
-> =20
->  Guest Test Compilation Support
->  M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
 
+
+> I'll recheck it. I do not think we use legacy interface on modern device
+> even if it has one.
+>
+>
+>>
+>> On Mon, Jan 06, 2020 at 11:10:18AM +0200, Yuri Benditovich wrote:
+>> > Michael,
+>> > Can you please comment on Jason's question: why we have a problem only
+>> with q35
+>> > and not with legacy pc?
+>> > If you have a simple answer, it will help us in further work with othe=
+r
+>> hot
+>> > plug/unplug problems.
+>> >
+>> > Thanks,
+>> > Yuri Benditovich
+>> >
+>> > On Sun, Jan 5, 2020 at 6:21 PM Yuri Benditovich <
+>> yuri.benditovich@daynix.com>
+>> > wrote:
+>> >
+>> >
+>> >
+>> >     On Sun, Jan 5, 2020 at 1:39 PM Michael S. Tsirkin <mst@redhat.com>
+>> wrote:
+>> >
+>> >         On Thu, Jan 02, 2020 at 09:09:04AM +0200, Yuri Benditovich
+>> wrote:
+>> >         >
+>> >         >
+>> >         > On Thu, Jan 2, 2020 at 1:50 AM Michael S. Tsirkin <
+>> mst@redhat.com>
+>> >         wrote:
+>> >         >
+>> >         >     On Thu, Dec 26, 2019 at 11:29:50AM +0200, Yuri
+>> Benditovich wrote:
+>> >         >     > On Thu, Dec 26, 2019 at 10:58 AM Jason Wang <
+>> >         jasowang@redhat.com> wrote:
+>> >         >     > >
+>> >         >     > >
+>> >         >     > > On 2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditov=
+ich wrote:
+>> >         >     > > > https://bugzilla.redhat.com/show_bug.cgi?id=3D1708=
+480
+>> >         >     > > > Fix leak of region reference that prevents complet=
+e
+>> >         >     > > > device deletion on hot unplug.
+>> >         >     > >
+>> >         >     > >
+>> >         >     > > More information is needed here, the bug said only
+>> q35 can
+>> >         meet this
+>> >         >     > > issue. What makes q35 different here?
+>> >         >     > >
+>> >         >     >
+>> >         >     > I do not have any ready answer, I did not dig into it
+>> too much.
+>> >         >     > Probably Michael Tsirkin or Paolo Bonzini can answer
+>> without
+>> >         digging.
+>> >         >
+>> >         >
+>> >         >
+>> >         >     > >
+>> >         >     > > >
+>> >         >     > > > Signed-off-by: Yuri Benditovich <
+>> >         yuri.benditovich@daynix.com>
+>> >         >     > > > ---
+>> >         >     > > >   hw/virtio/virtio.c | 5 +++++
+>> >         >     > > >   1 file changed, 5 insertions(+)
+>> >         >     > > >
+>> >         >     > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio=
+.c
+>> >         >     > > > index 04716b5f6c..baadec8abc 100644
+>> >         >     > > > --- a/hw/virtio/virtio.c
+>> >         >     > > > +++ b/hw/virtio/virtio.c
+>> >         >     > > > @@ -2340,6 +2340,11 @@ void
+>> virtio_del_queue(VirtIODevice
+>> >         *vdev, int
+>> >         >     n)
+>> >         >     > > >       vdev->vq[n].vring.num_default =3D 0;
+>> >         >     > > >       vdev->vq[n].handle_output =3D NULL;
+>> >         >     > > >       vdev->vq[n].handle_aio_output =3D NULL;
+>> >         >     > > > +    /*
+>> >         >     > > > +     * with vring.num =3D 0 the queue will be ign=
+ored
+>> >         >     > > > +     * in later loops of region cache reset
+>> >         >     > > > +     */
+>> >         >     > >
+>> >         >     > >
+>> >         >     > > I can't get the meaning of this comment.
+>> >         >     > >
+>> >         >     > > Thanks
+>> >         >     > >
+>> >         >     > >
+>> >         >     > > > +
+>> virtio_virtqueue_reset_region_cache(&vdev->vq[n]);
+>> >         >
+>> >         >
+>> >         >     Do we need to drop this from
+>> virtio_device_free_virtqueues then?
+>> >         >
+>> >         >
+>> >         >
+>> >         > Not mandatory. Repetitive
+>> virtio_virtqueue_reset_region_cache does
+>> >         not do
+>> >         > anything bad.
+>> >         > Some of virtio devices do not do 'virtio_del_queue' at all.
+>> >         Currently
+>> >         > virtio_device_free_virtqueues resets region cache for them.
+>> >         > IMO, not calling 'virtio_del_queue' is a bug, but not in the
+>> scope of
+>> >         current
+>> >         > series, I'll take care of that later.
+>> >
+>> >         Maybe we should just del all queues in virtio_device_unrealize=
+?
+>> >         Will allow us to drop some logic tracking which vqs were
+>> created.
+>> >
+>> >
+>> >
+>> >     Yes, this is also possible with some rework of
+>> >     virtio_device_free_virtqueues.
+>> >     virtio-net has some additional operations around queue deletion, i=
+t
+>> deletes
+>> >     queues when switches from single queue to multiple.
+>> >
+>> >
+>> >
+>> >         >
+>> >         >     > > >       g_free(vdev->vq[n].used_elems);
+>> >         >     > > >   }
+>> >         >     > > >
+>> >         >     > >
+>> >         >
+>> >         >
+>> >
+>> >
+>>
+>>
+
+--0000000000001a0e08059b8a6fa1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jan 6, 2020 at 12:37 PM Yuri =
+Benditovich &lt;<a href=3D"mailto:yuri.benditovich@daynix.com">yuri.bendito=
+vich@daynix.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pad=
+ding-left:1ex"><div dir=3D"ltr"><div dir=3D"ltr"></div><br><div class=3D"gm=
+ail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Jan 6, 2020 at 11:=
+58 AM Michael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" target=3D"_b=
+lank">mst@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
+);padding-left:1ex">I guess it somehow has to do with the following:<br>
+<br>
+=C2=A0 =C2=A0 if (proxy-&gt;disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 proxy-&gt;disable_legacy =3D pcie_port ? ON_OFF=
+_AUTO_ON : ON_OFF_AUTO_OFF;<br>
+=C2=A0 =C2=A0 }<br>
+<br>
+so by default device on an express port does not have a legacy interface.<b=
+r>
+<br>
+Somehow having a legacy interface fixes things?<br></blockquote><div><br></=
+div></div></div></blockquote><div>=C2=A0=C2=A0</div><div>No, transitional v=
+irtio-net on q35 behaves exactly as the modern one.=C2=A0=C2=A0<br></div><d=
+iv>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
+x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=
+=3D"ltr"><div class=3D"gmail_quote"><div></div><div>=C2=A0</div><blockquote=
+ class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px so=
+lid rgb(204,204,204);padding-left:1ex">
+Does enabling legacy on q35 without this patch fix things?<br></blockquote>=
+<div><br></div></div></div></blockquote><div><br></div><div>No, legacy virt=
+io-net on q35 has the same problem.</div><div>There is also an additional p=
+roblem with legacy device unplug on q35, but I think it is not in the scope=
+ of this discussion.</div><div>=C2=A0<br></div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
+04);padding-left:1ex"><div dir=3D"ltr"><div class=3D"gmail_quote"><div></di=
+v><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
+x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+And does disabling legacy on PIIX without this patch break thing?<br></bloc=
+kquote><div><br></div><div><div></div></div></div></div></blockquote><div>=
+=C2=A0</div><div>No, modern device on PIIX does hot unplug without problems=
+.</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><di=
+v dir=3D"ltr"><div class=3D"gmail_quote"><div><div><br></div><div></div></d=
+iv><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
+px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+How can having a legacy interface fix things if it&#39;s not<br>
+even active? I don&#39;t know. Is there a chance windows drivers use the<br=
+>
+legacy interface on a transitional device by mistake?<br></blockquote></div=
+></div></blockquote><div><br></div><div>As far as I can see - no. The drive=
+r works with the device depending on VERSION_1</div><div><br></div><div>=C2=
+=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
+x;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr"=
+><div class=3D"gmail_quote"><div><div>I&#39;ll recheck it. I do not think w=
+e use legacy interface on modern device even if it has one.</div><div></div=
+></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0=
+px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+On Mon, Jan 06, 2020 at 11:10:18AM +0200, Yuri Benditovich wrote:<br>
+&gt; Michael,<br>
+&gt; Can you please comment on Jason&#39;s question: why we have a problem =
+only with q35<br>
+&gt; and not with legacy pc?<br>
+&gt; If you have a simple answer, it will help us in further work with othe=
+r hot<br>
+&gt; plug/unplug problems.<br>
+&gt; <br>
+&gt; Thanks,<br>
+&gt; Yuri Benditovich<br>
+&gt; <br>
+&gt; On Sun, Jan 5, 2020 at 6:21 PM Yuri Benditovich &lt;<a href=3D"mailto:=
+yuri.benditovich@daynix.com" target=3D"_blank">yuri.benditovich@daynix.com<=
+/a>&gt;<br>
+&gt; wrote:<br>
+&gt; <br>
+&gt; <br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0On Sun, Jan 5, 2020 at 1:39 PM Michael S. Tsirkin &=
+lt;<a href=3D"mailto:mst@redhat.com" target=3D"_blank">mst@redhat.com</a>&g=
+t; wrote:<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0On Thu, Jan 02, 2020 at 09:09:04AM +0=
+200, Yuri Benditovich wrote:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; On Thu, Jan 2, 2020 at 1:50 AM M=
+ichael S. Tsirkin &lt;<a href=3D"mailto:mst@redhat.com" target=3D"_blank">m=
+st@redhat.com</a>&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0wrote:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0On Thu, Dec 2=
+6, 2019 at 11:29:50AM +0200, Yuri Benditovich wrote:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; On Thu, =
+Dec 26, 2019 at 10:58 AM Jason Wang &lt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"mailto:jasowang@redhat.com=
+" target=3D"_blank">jasowang@redhat.com</a>&gt; wrote:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; On =
+2019/12/26 =E4=B8=8B=E5=8D=8812:36, Yuri Benditovich wrote:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; <a href=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480" rel=3D"=
+noreferrer" target=3D"_blank">https://bugzilla.redhat.com/show_bug.cgi?id=
+=3D1708480</a><br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; Fix leak of region reference that prevents complete<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; device deletion on hot unplug.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; Mor=
+e information is needed here, the bug said only q35 can<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0meet this<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; iss=
+ue. What makes q35 different here?<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; I do not=
+ have any ready answer, I did not dig into it too much.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; Probably=
+ Michael Tsirkin or Paolo Bonzini can answer without<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0digging.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; Signed-off-by: Yuri Benditovich &lt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"mailto:yuri.benditovich@da=
+ynix.com" target=3D"_blank">yuri.benditovich@daynix.com</a>&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; ---<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A0hw/virtio/virtio.c | 5 +++++<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A01 file changed, 5 insertions(+)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; index 04716b5f6c..baadec8abc 100644<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; --- a/hw/virtio/virtio.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; +++ b/hw/virtio/virtio.c<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; @@ -2340,6 +2340,11 @@ void virtio_del_queue(VirtIODevice<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*vdev, int<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0n)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev-&gt;vq[n].vring.num_default =3D 0;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev-&gt;vq[n].handle_output =3D NULL;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A0 =C2=A0 =C2=A0vdev-&gt;vq[n].handle_aio_output =3D NULL;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; +=C2=A0 =C2=A0 /*<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; +=C2=A0 =C2=A0 =C2=A0* with vring.num =3D 0 the queue will be ignored<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; +=C2=A0 =C2=A0 =C2=A0* in later loops of region cache reset<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; +=C2=A0 =C2=A0 =C2=A0*/<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; I c=
+an&#39;t get the meaning of this comment.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; Tha=
+nks<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+; +=C2=A0 =C2=A0 virtio_virtqueue_reset_region_cache(&amp;vdev-&gt;vq[n]);<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0Do we need to=
+ drop this from virtio_device_free_virtqueues then?<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; Not mandatory. Repetitive=C2=A0 =
+virtio_virtqueue_reset_region_cache=C2=A0does<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0not do<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; anything bad.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; Some of virtio devices do not do=
+ &#39;virtio_del_queue&#39; at all.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Currently=C2=A0<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; virtio_device_free_virtqueues re=
+sets region cache for them.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; IMO, not calling &#39;virtio_del=
+_queue&#39; is a bug, but not in the scope of<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0current<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; series, I&#39;ll take care of th=
+at later.<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Maybe we should just del all queues i=
+n virtio_device_unrealize?<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Will allow us to drop some logic trac=
+king which vqs were created.<br>
+&gt; <br>
+&gt; <br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0Yes, this is also possible with some rework of<br>
+&gt;=C2=A0 =C2=A0 =C2=A0virtio_device_free_virtqueues.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0virtio-net has some additional operations around qu=
+eue deletion, it deletes<br>
+&gt;=C2=A0 =C2=A0 =C2=A0queues when switches from single queue to multiple.=
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0<br>
+&gt; <br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A0 =C2=A0 =C2=A0g_free(vdev-&gt;vq[n].used_elems);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;=C2=A0 =C2=A0}<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt; &gt=
+;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0&gt; &gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt; <br>
+&gt; <br>
+<br>
+</blockquote></div></div>
+</blockquote></div></div>
+
+--0000000000001a0e08059b8a6fa1--
 
