@@ -2,96 +2,97 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F162BC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6036DC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC7542081E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B7962081E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:35:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJEl2Xe9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7542081E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmMkOHka"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7962081E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioroe-00036r-AE
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:34:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45810)
+	id 1iorpJ-0003yL-Ri
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:35:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iorjm-0006KI-77
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:29:47 -0500
+ (envelope-from <mst@redhat.com>) id 1iorjv-0006Y3-7k
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:29:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iorjl-0004XD-6E
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:29:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41016
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iorjt-0004cj-RH
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:29:55 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55129
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iorjl-0004Wq-2Y
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:29:45 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iorjt-0004c6-O0
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:29:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578414584;
+ s=mimecast20190719; t=1578414592;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ky3AoPDK1Dl90THjFQNp/2P2m3Le5A8fcjpKsYSUby0=;
- b=fJEl2Xe9Ib7uFfmiokp4KHemk60vM2VyacNmXmH54r718HU2kr+viZsqWc5oelrZbSk9gG
- /Qgc+53Fxm/dnFs5sT72SNlTQLi5KReKAEuEaQeC2KrGHB9VW6F4KBBpjnAbSWNOuakZbd
- cBFICAXAi5XJyZvzjWLUN6ANZAtjS30=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-llQ_2URYOzy6uzCwXl8Yug-1; Tue, 07 Jan 2020 11:29:41 -0500
-Received: by mail-qk1-f199.google.com with SMTP id f22so137173qka.10
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:29:41 -0800 (PST)
+ bh=Y+1AiFYA4jwJXgwLDoVnwKQ62HQ9au7D6spvhTUBGU8=;
+ b=fmMkOHkaSK0wl/Pn15EFL6dCIT/86BPzow2YlVajkQ0CGeEsxAzRK5i1Tn3tRPQbs83PAy
+ O2VoJ8tiF6xxh6hnZmYTIY5ehYBKfvPiZBMUMv1vcQtx0IGz0ZqXmTW3LTCPzZiKoq9gyD
+ FLWn6fysayVNB2KTviI5oJsD2m4vztE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-jF4ZBLVaPjqj0fc5k-b1cg-1; Tue, 07 Jan 2020 11:29:49 -0500
+Received: by mail-qv1-f70.google.com with SMTP id e10so226902qvq.18
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:29:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=S797ekb1koe77yVikHhjJoQQO+mcOVBkg02x1T+LNQw=;
- b=iDKl0cRUrCzRN4ainmFxCqiHbxboxdOBCwoyRtue2t4NJDyRwX9OLsZAc+LuvkTMTK
- YjW0HrDj5+6tU0tY7cheAwHP0X+CWj5KRsxwJstPmj0/TK71AkxIpizEmVLE1uzbeJur
- 4mX5eJXk5LidWW8ISkyM0XBSbwGRnaA23FAryWzlyfxk7M/vLNRA+cT4UdaCllf+9erV
- l375LWsgqKnECyn/zMgI83vJVQqz7KRFqrvOzZ63uprNLcs2rZcFKM3uOnUJdDJvgdz0
- XObQnOc234fsUKNYb4hvbFlRx7NiJ+8pRoTgHLYXry9G2c3uR1+0gyi2Fok/WeajJazp
- G10A==
-X-Gm-Message-State: APjAAAUAk1WGs/ym99z+OiFPk5o23pseC51zDEkDaMqy9LiMW/MsazRQ
- khEF7EcHtSTuUIiMacP2u4dUrFx4l8kwzUHVa8hZQtYuxcEJo6pL4mBAplW2krp5+5rs/nqWqp0
- 0QBhKoZ7oc2iPeto=
-X-Received: by 2002:aed:3fb7:: with SMTP id s52mr79810973qth.311.1578414580714; 
- Tue, 07 Jan 2020 08:29:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwBASJc7+GSyeLhPK1jDxVtCqoIoPn5+Nf3z6SRS2r7n+a3n0rxMCEKINFN+2AFYKpI0OFtrg==
-X-Received: by 2002:aed:3fb7:: with SMTP id s52mr79810955qth.311.1578414580543; 
- Tue, 07 Jan 2020 08:29:40 -0800 (PST)
+ bh=1upHWGgN+kA2iqb9NZ9XxvQ8bHfo9CqfdVL2Jr4HnRY=;
+ b=mHjhYzR55opKLECBbQjqt9gA9SK8PrZZ4ZW2cLexEIQg7XiGZ+adowClXpqihSsCMx
+ L1eEuZAtHjIP4tsx2FTOcD3/KknL+lWuiUTsCvWq0qCMN0ohaBPHFz1KJMpV2FK4OzV0
+ Qwhu8RFSxJrV0BXUmJx/fvaa9S+oA4IS2lN4Bpwey/jH67K3f/uJXyb3iaq1lpD4MMa6
+ M8c3ahkn737KYR5hyK6U271muLmO7nqk/P4ftBzAEvHHgjvjlRrRtfSqBPzk2hnzG86c
+ r/SCxWf6GXOwslVl6k/BAWtjqbiKQ3MuA3WMq8AED7CzMSWbDAoI8Ni7srZP+B0TmCsF
+ HFoA==
+X-Gm-Message-State: APjAAAVelDRpNoDirxNLh1Xn90RIGnxPRFMVmlwKu2SZPfGauXZwbjuP
+ mdUyncOokSjUW50R3gPE+jf95H3Tfds/3nFHJAPpMYsxH/zzbyzinq7XlxKE64MAr4o29gZC7qX
+ KdXNzFCvpdrlHzpU=
+X-Received: by 2002:a37:a02:: with SMTP id 2mr106849qkk.111.1578414588600;
+ Tue, 07 Jan 2020 08:29:48 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyqvQTo5HQ1VRAX3+nhHtgXoybUt2XZ5MfPBYpojY7FXmRoLOeiAbshDGQ4NeYsAg5b47pq+w==
+X-Received: by 2002:a37:a02:: with SMTP id 2mr106832qkk.111.1578414588397;
+ Tue, 07 Jan 2020 08:29:48 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id k14sm34585qki.66.2020.01.07.08.29.38
+ by smtp.gmail.com with ESMTPSA id u55sm114881qtc.28.2020.01.07.08.29.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 08:29:39 -0800 (PST)
-Date: Tue, 7 Jan 2020 11:29:37 -0500
+ Tue, 07 Jan 2020 08:29:47 -0800 (PST)
+Date: Tue, 7 Jan 2020 11:29:44 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 01/32] virtio: add ability to delete vq through a pointer
-Message-ID: <20200107162850.411448-2-mst@redhat.com>
+Subject: [PULL v3 03/32] virtio-balloon: fix memory leak while attach
+ virtio-balloon device
+Message-ID: <20200107162850.411448-4-mst@redhat.com>
 References: <20200107162850.411448-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200107162850.411448-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: llQ_2URYOzy6uzCwXl8Yug-1
+X-MC-Unique: jF4ZBLVaPjqj0fc5k-b1cg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,69 +105,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>
+ David Hildenbrand <david@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Devices tend to maintain vq pointers, allow deleting them trough a vq point=
-er.
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
+ivq/dvq/svq/free_page_vq is forgot to cleanup in
+virtio_balloon_device_unrealize, the memory leak stack is as follow:
+
+Direct leak of 14336 byte(s) in 2 object(s) allocated from:
+    #0 0x7f99fd9d8560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
+    #1 0x7f99fcb20015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
+    #2 0x557d90638437 in virtio_add_queue hw/virtio/virtio.c:2327
+    #3 0x557d9064401d in virtio_balloon_device_realize hw/virtio/virtio-bal=
+loon.c:793
+    #4 0x557d906356f7 in virtio_device_realize hw/virtio/virtio.c:3504
+    #5 0x557d9073f081 in device_set_realized hw/core/qdev.c:876
+    #6 0x557d908b1f4d in property_set_bool qom/object.c:2080
+    #7 0x557d908b655e in object_property_set_qobject qom/qom-qobject.c:26
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Message-Id: <1575444716-17632-2-git-send-email-pannengyuan@huawei.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- include/hw/virtio/virtio.h |  2 ++
- hw/virtio/virtio.c         | 15 ++++++++++-----
- 2 files changed, 12 insertions(+), 5 deletions(-)
+ hw/virtio/virtio-balloon.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index c32a815303..e18756d50d 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -183,6 +183,8 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int que=
-ue_size,
-=20
- void virtio_del_queue(VirtIODevice *vdev, int n);
-=20
-+void virtio_delete_queue(VirtQueue *vq);
-+
- void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
-                     unsigned int len);
- void virtqueue_flush(VirtQueue *vq, unsigned int count);
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 04716b5f6c..31dd140990 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2330,17 +2330,22 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int=
- queue_size,
-     return &vdev->vq[i];
- }
-=20
-+void virtio_delete_queue(VirtQueue *vq)
-+{
-+    vq->vring.num =3D 0;
-+    vq->vring.num_default =3D 0;
-+    vq->handle_output =3D NULL;
-+    vq->handle_aio_output =3D NULL;
-+    g_free(vq->used_elems);
-+}
-+
- void virtio_del_queue(VirtIODevice *vdev, int n)
- {
-     if (n < 0 || n >=3D VIRTIO_QUEUE_MAX) {
-         abort();
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 40b04f5180..57f3b9f22d 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -831,6 +831,13 @@ static void virtio_balloon_device_unrealize(DeviceStat=
+e *dev, Error **errp)
      }
-=20
--    vdev->vq[n].vring.num =3D 0;
--    vdev->vq[n].vring.num_default =3D 0;
--    vdev->vq[n].handle_output =3D NULL;
--    vdev->vq[n].handle_aio_output =3D NULL;
--    g_free(vdev->vq[n].used_elems);
-+    virtio_delete_queue(&vdev->vq[n]);
+     balloon_stats_destroy_timer(s);
+     qemu_remove_balloon_handler(s);
++
++    virtio_delete_queue(s->ivq);
++    virtio_delete_queue(s->dvq);
++    virtio_delete_queue(s->svq);
++    if (s->free_page_vq) {
++        virtio_delete_queue(s->free_page_vq);
++    }
+     virtio_cleanup(vdev);
  }
 =20
- static void virtio_set_isr(VirtIODevice *vdev, int value)
 --=20
 MST
 
