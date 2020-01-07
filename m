@@ -2,76 +2,85 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E34C3F68F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 637ADC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:12:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC78207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:09:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC78207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3129A2081E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:12:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UvOww9Tl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3129A2081E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomjv-0004i3-7a
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:09:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34855)
+	id 1iommR-0003Y9-4R
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:12:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iomgJ-0003Zl-JU
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:05:52 -0500
+ (envelope-from <thuth@redhat.com>) id 1iomF6-0001sh-DX
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:37:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iomgI-0004Nz-4p
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:05:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38396)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iomgH-0004MC-VE
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:05:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iomgG-0005Gt-Lt
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 11:05:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9F3982E80C0
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:05:48 +0000 (UTC)
+ (envelope-from <thuth@redhat.com>) id 1iomF4-0007Rh-Ig
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:37:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46477
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iomF4-0007RK-Ey
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:37:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578393461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=1WJ2Nw2yr7rj9GfDhdxH8lRmarWC/0F+bPFb42wGXFs=;
+ b=UvOww9TlK86/KcRDIaPY4UEeoH9DQY1eNjGctCeCjlrDC14dkNdEzpCzB2/qju91m/r1I/
+ ub1kAFzTv8gdNDEdZ4QcsryWqThpXEh19MjDwBuJb1/lOFPidVpzZeXyGW5UME5wQnsVa6
+ SWl/Nh/gmce3RcbgylGEhDUljl/HwnY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-195-hdzdWhr8PWiRYlRzM39G-A-1; Tue, 07 Jan 2020 05:37:38 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9572B184B1E4;
+ Tue,  7 Jan 2020 10:37:35 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 33DBC7FB5E;
+ Tue,  7 Jan 2020 10:37:32 +0000 (UTC)
+Subject: Re: [Bug 1858461] Re: Please refactor linux-user/mips/cpu_loop.c
+To: Bug 1858461 <1858461@bugs.launchpad.net>, qemu-devel@nongnu.org
+References: <157833123209.15024.12557979334447840996.malonedeb@wampee.canonical.com>
+ <157835389078.5353.3458278280613955417.malone@gac.canonical.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <f93996e4-bddc-826c-f80c-3c7cf69bbf9d@redhat.com>
+Date: Tue, 7 Jan 2020 11:37:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2020 10:50:46 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1858046@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: raito-bezarius
-X-Launchpad-Bug-Reporter: Ryan Lahfa (raito-bezarius)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <157791695959.3198.15546015289430538780.malonedeb@soybean.canonical.com>
-Message-Id: <157839424714.5755.8570846055537064801.launchpad@gac.canonical.com>
-Subject: [Bug 1858046] Re: qemu-aarch64 hangs on cptofs during a build of
- NixOS SD card image
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e32afba9ba304ebdfac34ffc17614d4fce716cce
+In-Reply-To: <157835389078.5353.3458278280613955417.malone@gac.canonical.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: hdzdWhr8PWiRYlRzM39G-A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,68 +89,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858046 <1858046@bugs.launchpad.net>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: linux-user
+On 07/01/2020 00.38, puchuu wrote:
+> ** Patch added: "generated_mips_syscall_table.template.patch"
+>    https://bugs.launchpad.net/qemu/+bug/1858461/+attachment/5318010/+files/generated_mips_syscall_table.template.patch
+> 
 
--- =
+Please do not attach patches to the bug tracker, send them to the
+qemu-devel list instead. See
+https://wiki.qemu.org/Contribute/SubmitAPatch for details. Thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858046
-
-Title:
-  qemu-aarch64 hangs on cptofs during a build of NixOS SD card image
-
-Status in QEMU:
-  New
-
-Bug description:
-  First, thank you for this incredible project.
-
-  While following this guide to build my own image of NixOS:
-  https://nixos.wiki/wiki/NixOS_on_ARM#Compiling_through_QEMU on ARM
-  Aarch64.
-
-  I encountered a very strange behavior, qemu is correctly used and
-  build most of the binaries until it executes this exact line over
-  qemu: https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-
-  ext4-fs.nix#L55
-
-  At this step, the qemu process goes to 100 % of CPU, hangs in a
-  certain syscall I don't know which one (according to strace & gdb
-  which has no symbols so breaking and looking the backtrace was
-  useless).
-
-  According to iotop, no I/O was done.
-
-  And it spent all its time in this syscall during more than 10 hours,
-  which looks anomalous to me.
-
-  I attach some of my CPU info:
-
-  model		: 142
-  model name	: Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz
-  stepping	: 10
-  microcode	: 0x96
-  cpu MHz		: 3107.071
-  cache size	: 8192 KB
-
-  I'm using a ThinkPad T480 to perform those builds, I'm uncertain of
-  how to debug further this issue, I discussed this with some people
-  over #nixos-aarch64 and they told me they didn't know how to debug it
-  further too.
-
-  I tried all with this package: https://aur.archlinux.org/packages
-  /qemu-arm-static/ =E2=80=94=C2=A0I'm currently compiling qemu-git to see =
-if it
-  happens on upstream too. Will comment when it's done.
-
-  Thank you in advance!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858046/+subscriptions
 
