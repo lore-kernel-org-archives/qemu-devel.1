@@ -2,96 +2,96 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A6FC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 181B4C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9720E2073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D76A62073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0zTNpiF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9720E2073D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnwMTUT/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76A62073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iokpr-0003iJ-Po
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 04:07:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52104)
+	id 1iokRv-0005vT-6D
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:42:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojQW-0006hC-3d
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:21 -0500
+ (envelope-from <mst@redhat.com>) id 1iojQq-0007T0-0T
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojQU-00005R-Kc
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33410
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iojQo-0000Jj-Lr
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:39 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49227
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojQU-0008WK-GH
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:18 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojQo-0000JO-Iq
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382638;
+ s=mimecast20190719; t=1578382658;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5EhLJ8ESaItKzPeue3PIZ6PBy1w7sicN5shNVXQfGIo=;
- b=R0zTNpiFzFzCekl+tFMgbbeCJ5piH+3iUFGwSA0B0DYy4DU3K6BhtkvV7ZAjYEyEaVbEEk
- /SMiXBqcOZR0zYFcx1pvw7AaQW4tFrnoe/cDhYqKmLJGPGdX0nk1726417j9VujGOcIWyU
- dlhG8EjA8TZPoFs/MAlDcodJe6ia41c=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-JTX6WB2VN0mMeu8uGfm9Hg-1; Tue, 07 Jan 2020 02:37:16 -0500
-Received: by mail-qt1-f200.google.com with SMTP id d18so19070208qtp.16
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:37:16 -0800 (PST)
+ bh=10wNZRiSDwsgBzUvgX+qZm4UOG4d0UwTiZy8rXJV4jo=;
+ b=KnwMTUT/ayyCjRT9/F1OjAWgzc9bS1MFh1gX5FleiI2frAtBsNT7r9hUiIi1CaGiBt0ZPF
+ lNQEGw9FI2h6HipH47B9wDyIHKplxxfAvvfTc9bs4U6RFn27b+Na+tys9QfhKxNNt4EJiM
+ 24y9Ggr4d4BgSjRBrWtmLarMOF7zGmI=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-293-1TY63rK3Mu-rjYGwW7Dh-g-1; Tue, 07 Jan 2020 02:37:36 -0500
+Received: by mail-qv1-f71.google.com with SMTP id e14so6012498qvr.6
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:37:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=wp7IEacTPDnbh2fT1ey9LJUjRbVmj0GN0bCAT90OXe4=;
- b=JbXt0AT1D13pB1CPI7xq8u2x9QFMzXsOMwVQOpBRDrowbNI0XNGJnlbe2YL4jqseUk
- PBKVY9oehjakV1jaQWpDafPx9ieZQnoiVNKEUSYcieCiGaT+ZgEgeV+YmpeGrYOx/WCY
- 8tLcC/ZUOloA1Q8urkKuKkE/VWpMKnRbN3P4E17mmWf3TsMJPFciad3+pISXo5SZI2XN
- aVDBr5qDFH3kSg0hjDw89NLs5Es0fneVFukNT5FVDv0rQvUbWYvHTFooGRtC+H5rOobS
- HPv2lBPDBio/Mmx/7T+DtT/SyO/lTgZXcBfnYoyRVn09+tklSMssnbUA/G4VNV5SDJYl
- XoTA==
-X-Gm-Message-State: APjAAAWhBbgYEuooif0tMB/hyh8gycmB6ZOot+vp7pkM6F7NUCag/s+A
- qmo7dmV7crmYwuohs7kWAmKL19jLGJmHtsgCVMAiXKsO4SB5n/k5D/qvzxL1s1ACTtv49fggxs5
- lhPzxiolMO90DLLI=
-X-Received: by 2002:ac8:454c:: with SMTP id z12mr78356990qtn.123.1578382636023; 
- Mon, 06 Jan 2020 23:37:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx3Vwgep2tNLi6KTR/rSWiF9ixPIZ1K02S9NiBerJDf87G5XHEOqFQ4DZoRzCZfzZ3974koeA==
-X-Received: by 2002:ac8:454c:: with SMTP id z12mr78356982qtn.123.1578382635847; 
- Mon, 06 Jan 2020 23:37:15 -0800 (PST)
+ bh=tfGwPPQntx/q9Ytbl/8/C6b7fB9jJ0SAUnXApOete/4=;
+ b=fMB6Tc784QkPBIVsVDZcRVxvsSHhHngMsmInkoBE+UDjxR4V34D+SldNULYMlCR9ek
+ 7nW7NJomDMIAgvoe3nSQ2tW2UMA7NVAIgUtZlZDa1022p6GqgOE0+KYS1aQlil7gsOdv
+ pT5WcCZbi/JkDEvwSv+st70xfPGaSzOV9flKY9JsXxVX97jUhqHea50lAIWxj21+c/L4
+ 0Nf4TwZkcp+yJ5a2x8rkuJYRZobpoV0P1VKAzdY/Er5d40Y3Sy8Dkr+QS9XOtScoFK4K
+ YZ2420CxNiUGheGuYXOi+jSMe3TA+2slMXgoeyh/K6CfkOb1eEs/8nsibJfde66EVM3z
+ pN7w==
+X-Gm-Message-State: APjAAAWxIPOXOVTZCFPvr0YZJK008tSArnxuf5QDfnLlwzVJ037xwMIH
+ Dy7kqtGIVotfIycP3liL+o50QN5gUp0hn3RXOuyvygO7RER3wb2eMRgYPpjrh/blqypqUolfmQZ
+ S6p27ryxcQ+VDRg8=
+X-Received: by 2002:ac8:1c43:: with SMTP id j3mr76672176qtk.316.1578382655130; 
+ Mon, 06 Jan 2020 23:37:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy5QKrWDYKpdXFMExmNHnQzb+SllAW9n6qaWuM27WedOIDrFvFG5tLHhnUb8G37wskVZ3RO0g==
+X-Received: by 2002:ac8:1c43:: with SMTP id j3mr76672171qtk.316.1578382654978; 
+ Mon, 06 Jan 2020 23:37:34 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id p19sm25008954qte.81.2020.01.06.23.37.13
+ by smtp.gmail.com with ESMTPSA id g62sm21970507qkd.25.2020.01.06.23.37.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:37:15 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:37:11 -0500
+ Mon, 06 Jan 2020 23:37:34 -0800 (PST)
+Date: Tue, 7 Jan 2020 02:37:31 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 24/32] vhost-user-scsi: reset the device if supported
-Message-ID: <20200107073451.298261-25-mst@redhat.com>
+Subject: [PULL v2 28/32] virtio-mmio: update queue size on guest write
+Message-ID: <20200107073451.298261-29-mst@redhat.com>
 References: <20200107073451.298261-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: JTX6WB2VN0mMeu8uGfm9Hg-1
+X-MC-Unique: 1TY63rK3Mu-rjYGwW7Dh-g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,82 +103,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, David Vrabel <david.vrabel@nutanix.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 
-If the vhost-user-scsi backend supports the VHOST_USER_F_RESET_DEVICE
-protocol feature, then the device can be reset when requested.
+Some guests read back queue size after writing it.
+Always update the on size write otherwise they might be confused.
 
-If this feature is not supported, do not try a reset as this will send
-a VHOST_USER_RESET_OWNER that the backend is not expecting,
-potentially putting into an inoperable state.
-
-Signed-off-by: David Vrabel <david.vrabel@nutanix.com>
-Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Message-Id: <1572385083-5254-3-git-send-email-raphael.norwitz@nutanix.com>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Message-Id: <20191224081446.17003-1-dplotnikov@virtuozzo.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/scsi/vhost-user-scsi.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ hw/virtio/virtio-mmio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 6a6c15dd32..23f972df59 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -39,6 +39,10 @@ static const int user_feature_bits[] =3D {
-     VHOST_INVALID_FEATURE_BIT
- };
-=20
-+enum VhostUserProtocolFeature {
-+    VHOST_USER_PROTOCOL_F_RESET_DEVICE =3D 13,
-+};
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index ef40b7a9b2..872f2cd237 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -308,8 +308,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offs=
+et, uint64_t value,
+         break;
+     case VIRTIO_MMIO_QUEUE_NUM:
+         trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
++        virtio_queue_set_num(vdev, vdev->queue_sel, value);
 +
- static void vhost_user_scsi_set_status(VirtIODevice *vdev, uint8_t status)
- {
-     VHostUserSCSI *s =3D (VHostUserSCSI *)vdev;
-@@ -62,6 +66,25 @@ static void vhost_user_scsi_set_status(VirtIODevice *vde=
-v, uint8_t status)
-     }
- }
-=20
-+static void vhost_user_scsi_reset(VirtIODevice *vdev)
-+{
-+    VHostSCSICommon *vsc =3D VHOST_SCSI_COMMON(vdev);
-+    struct vhost_dev *dev =3D &vsc->dev;
-+
-+    /*
-+     * Historically, reset was not implemented so only reset devices
-+     * that are expecting it.
-+     */
-+    if (!virtio_has_feature(dev->protocol_features,
-+                            VHOST_USER_PROTOCOL_F_RESET_DEVICE)) {
-+        return;
-+    }
-+
-+    if (dev->vhost_ops->vhost_reset_device) {
-+        dev->vhost_ops->vhost_reset_device(dev);
-+    }
-+}
-+
- static void vhost_dummy_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
- }
-@@ -182,6 +205,7 @@ static void vhost_user_scsi_class_init(ObjectClass *kla=
-ss, void *data)
-     vdc->get_features =3D vhost_scsi_common_get_features;
-     vdc->set_config =3D vhost_scsi_common_set_config;
-     vdc->set_status =3D vhost_user_scsi_set_status;
-+    vdc->reset =3D vhost_user_scsi_reset;
-     fwc->get_dev_path =3D vhost_scsi_common_get_fw_dev_path;
- }
-=20
+         if (proxy->legacy) {
+-            virtio_queue_set_num(vdev, vdev->queue_sel, value);
+             virtio_queue_update_rings(vdev, vdev->queue_sel);
+         } else {
+             proxy->vqs[vdev->queue_sel].num =3D value;
 --=20
 MST
 
