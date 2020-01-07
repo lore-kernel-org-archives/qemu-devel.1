@@ -2,102 +2,102 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7929C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 06:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3650C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 06:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BDBD2077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 06:33:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BDBD2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADF12206DB
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 06:57:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SC2HQJEI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF12206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioiQp-0004AW-2E
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 01:33:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37730)
+	id 1ioinv-0003jt-US
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 01:57:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41176)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1ioiLw-00055E-A4
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:28:33 -0500
+ (envelope-from <philmd@redhat.com>) id 1ioij7-0002fL-Km
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:52:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1ioiLu-00057z-LO
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:28:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15416
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1ioiLu-0004Et-H8
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:28:30 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0076RRfI119628
- for <qemu-devel@nongnu.org>; Tue, 7 Jan 2020 01:27:29 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2xb8n1h5jm-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 01:27:28 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Tue, 7 Jan 2020 06:27:13 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 7 Jan 2020 06:27:11 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0076RALM60424370
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 7 Jan 2020 06:27:10 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4DF4AA4051;
- Tue,  7 Jan 2020 06:27:10 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EC9BFA4057;
- Tue,  7 Jan 2020 06:27:08 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.124.35.97])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  7 Jan 2020 06:27:08 +0000 (GMT)
-Subject: Re: [PATCH v18 5/7] ppc: spapr: Handle "ibm,nmi-register" and
- "ibm,nmi-interlock" RTAS calls
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
- <20200102075111.25308-6-ganeshgr@linux.ibm.com> <20200103021959.GR2098@umbus>
-From: Ganesh <ganeshgr@linux.ibm.com>
-Date: Tue, 7 Jan 2020 11:57:08 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
+ (envelope-from <philmd@redhat.com>) id 1ioij4-0000kE-Qu
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:52:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29238
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ioij4-0000jg-Hp
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:52:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578379945;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aykahNjZDwQr6O7Ei0t7rhjNWEhbVqEikab5BCotye8=;
+ b=SC2HQJEIpC2pLdbUfkUlQrNn0K5qXFFmPFV/gM3I3fc/eXqN2+srL/5avpWKNps5pbFIya
+ 4AfrMBFzUGRLaHLFFpguGun8V4m1mP/NkJTvNbiusv2xDqJ5O4Bf309d1Uuq0t3OQvZZnb
+ fQNmD52rON7VqjXSg93V7WzqLOwBmUQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-AHhZywQgP6qhbuRC5BlUNw-1; Tue, 07 Jan 2020 01:52:22 -0500
+Received: by mail-wm1-f69.google.com with SMTP id t4so3695523wmf.2
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 22:52:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JqPgKiAkWEI0E39h5UQ3TMbWYgbg0Sv3OYtBzBdsRIg=;
+ b=J3Tf5owrR5XRtK/0oE0uei1IfmVGvhAPCKFPZd+mXMTI4GcC4PgqgDAkkj0ydQIRAd
+ j3BLaOzcHbW02+MR+KGSIuR3C4Z1ybvHkKQJ/lhc1EdO4Pur7Nt1g/WOvg1fM0CD7IOO
+ iK52/8Wz05F5PK7d/m9Mt8IyZWYcGkIu61OfytfIKy5LAEIi5U5dgRV+aZFcY2hvFTvH
+ MjLCVAueNiMguegkUmz6YnCRiUjhr/HOE6Z9cPai58bJbyOnFDOPAXT4w05q35IbdOt1
+ tXfuCRVqO5ourXOAK5MGd11rAOISuTvkx+OvSRnZ1Fku9L1Pvh30HsO9k5m3Agt9SYXE
+ ZyCw==
+X-Gm-Message-State: APjAAAUZ89MdfQzhKZNb9F6eXBH7IEB8b90on1xvuPK6ilW+D4DLWi5s
+ x8Fha1V6FpNd0VkySqYQFmT8EssXmNZelI6kar3DWKII4TyhJdmQSC2G+EuGVFeG51S82DUQV0F
+ VjXXZWtyGeSegvn4=
+X-Received: by 2002:adf:f28c:: with SMTP id
+ k12mr105276917wro.360.1578379940896; 
+ Mon, 06 Jan 2020 22:52:20 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyVETDi4s+cRglAdPIwST/e4qWPDGyxz1M0ut/YMdEy9mL/3vpmBDMm/CF362y1WY17iRnS9w==
+X-Received: by 2002:adf:f28c:: with SMTP id
+ k12mr105276887wro.360.1578379940578; 
+ Mon, 06 Jan 2020 22:52:20 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id m7sm25343047wma.39.2020.01.06.22.52.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 06 Jan 2020 22:52:19 -0800 (PST)
+Subject: Re: [PATCH v1 10/59] chardev/char-win.c: remove 'fail' label in
+ win_chr_serial_init()
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-11-danielhb413@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <a8b0b845-88df-f26e-e7e5-d92e7b6327f2@redhat.com>
+Date: Tue, 7 Jan 2020 07:52:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200103021959.GR2098@umbus>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200106182425.20312-11-danielhb413@gmail.com>
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 20010706-0016-0000-0000-000002DB0E5C
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010706-0017-0000-0000-0000333D83C1
-Message-Id: <279e921a-7540-d543-ba16-7fca55aff056@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2020-01-07_01:2020-01-06,2020-01-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 bulkscore=0
- phishscore=0 mlxscore=0 priorityscore=1501 suspectscore=0 spamscore=0
- adultscore=0 malwarescore=0 clxscore=1015 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001070050
+X-MC-Unique: AHhZywQgP6qhbuRC5BlUNw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id 0076RRfI119628
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,219 +109,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org, qemu-ppc@nongnu.org
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 1/6/20 7:23 PM, Daniel Henrique Barboza wrote:
+> The 'fail' label is a simply call to 'return -1' on error. Remove
+> it and do the return call instead.
+>=20
+> CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-On 1/3/20 7:49 AM, David Gibson wrote:
-> On Thu, Jan 02, 2020 at 01:21:09PM +0530, Ganesh Goudar wrote:
->> From: Aravinda Prasad <arawinda.p@gmail.com>
->>
->> This patch adds support in QEMU to handle "ibm,nmi-register"
->> and "ibm,nmi-interlock" RTAS calls.
->>
->> The machine check notification address is saved when the
->> OS issues "ibm,nmi-register" RTAS call.
->>
->> This patch also handles the case when multiple processors
->> experience machine check at or about the same time by
->> handling "ibm,nmi-interlock" call. In such cases, as per
->> PAPR, subsequent processors serialize waiting for the first
->> processor to issue the "ibm,nmi-interlock" call. The second
->> processor that also received a machine check error waits
->> till the first processor is done reading the error log.
->> The first processor issues "ibm,nmi-interlock" call
->> when the error log is consumed.
->>
->> [Move fwnmi registration to .apply hook]
->> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
->> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
->> ---
->>   hw/ppc/spapr_caps.c    |  6 +++++
->>   hw/ppc/spapr_rtas.c    | 58 ++++++++++++++++++++++++++++++++++++++++=
-++
->>   include/hw/ppc/spapr.h |  7 ++++-
->>   3 files changed, 70 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
->> index 3001098601..e922419cfb 100644
->> --- a/hw/ppc/spapr_caps.c
->> +++ b/hw/ppc/spapr_caps.c
->> @@ -502,6 +502,12 @@ static void cap_fwnmi_mce_apply(SpaprMachineState=
- *spapr, uint8_t val,
->>       if (!val) {
->>           return; /* Disabled by default */
->>       }
->> +
->> +    if (!spapr->fwnmi_calls_registered && !kvmppc_set_fwnmi()) {
-> So, we definitely need the kvmppc_set_fwnmi() call here.  But in the
-> case where we *do* have KVM, but the call fails, we should fail the
-> .apply hook, rather than ignoring it silently.
->
-> As we've discussed although TCG behaviour with fwnmi isn't 100%
-> correct, it's close enough to pass for most purposes - so it's
-> reasonable to continue if the cap is selected.  But if the cap is
-> selected and we're running with KVM we *must* enable the capability in
-> KVM or we're not providing the environment the user requested.
->
->> +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls=
- */
->> +        spapr_fwnmi_register();
-> We discussed registering the hypercalls here, but I thought after that
-> I suggested just always registering them, and having them bail out
-> when called if the cap is not set.  I see that you've implemented that
-> bailout for register, though not for interlock.  I think that's
-> simpler than registering them here.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-something like this?, with bailout in interlock as well.
-
-{
- =A0=A0=A0 if (!val) {
- =A0=A0=A0=A0=A0=A0=A0 return; /* Disabled by default */
- =A0=A0=A0 }
-
- =A0=A0=A0 if (kvm_enabled()) {
- =A0=A0=A0=A0=A0=A0=A0 if (kvmppc_set_fwnmi() < 0) {
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 error_report("Could not enable fwnmi c=
-apability");
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 exit(1)
- =A0=A0=A0 }
-
- =A0=A0=A0 if (!spapr->fwnmi_calls_registered) {
- =A0=A0=A0=A0=A0=A0=A0 /* Register ibm,nmi-register and ibm,nmi-interlock=
- RTAS calls */
- =A0=A0=A0=A0=A0=A0=A0 spapr_fwnmi_register();
- =A0=A0=A0=A0=A0=A0=A0 spapr->fwnmi_calls_registered =3D true;
- =A0=A0=A0 }
-}
-
->
->> +        spapr->fwnmi_calls_registered =3D true;
->> +    }
->>   }
->>  =20
->>   SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 2c066a372d..54b142f35b 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -400,6 +400,56 @@ static void rtas_get_power_level(PowerPCCPU *cpu,=
- SpaprMachineState *spapr,
->>       rtas_st(rets, 1, 100);
->>   }
->>  =20
->> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->> +                                  SpaprMachineState *spapr,
->> +                                  uint32_t token, uint32_t nargs,
->> +                                  target_ulong args,
->> +                                  uint32_t nret, target_ulong rets)
->> +{
->> +    hwaddr rtas_addr;
->> +
->> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_CAP_OF=
-F) {
->> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->> +        return;
->> +    }
->> +
->> +    rtas_addr =3D spapr_get_rtas_addr();
->> +    if (!rtas_addr) {
->> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->> +        return;
->> +    }
->> +
->> +    spapr->guest_machine_check_addr =3D rtas_ld(args, 1);
->> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +}
->> +
->> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->> +                                   SpaprMachineState *spapr,
->> +                                   uint32_t token, uint32_t nargs,
->> +                                   target_ulong args,
->> +                                   uint32_t nret, target_ulong rets)
->> +{
->> +    if (spapr->guest_machine_check_addr =3D=3D -1) {
->> +        /* NMI register not called */
->> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->> +        return;
->> +    }
->> +
->> +    if (spapr->mc_status !=3D cpu->vcpu_id) {
->> +        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock=
-" */
->> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->> +        return;
->> +    }
->> +
->> +    /*
->> +     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
->> +     * hence unset mc_status.
->> +     */
->> +    spapr->mc_status =3D -1;
->> +    qemu_cond_signal(&spapr->mc_delivery_cond);
->> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +}
->> +
->>   static struct rtas_call {
->>       const char *name;
->>       spapr_rtas_fn fn;
->> @@ -503,6 +553,14 @@ hwaddr spapr_get_rtas_addr(void)
->>       return (hwaddr)fdt32_to_cpu(*rtas_data);
->>   }
->>  =20
->> +void spapr_fwnmi_register(void)
->> +{
->> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
->> +                        rtas_ibm_nmi_register);
->> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
->> +                        rtas_ibm_nmi_interlock);
->> +}
->> +
->>   static void core_rtas_register_types(void)
->>   {
->>       spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 652a5514e8..a90e677cc3 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -218,6 +218,8 @@ struct SpaprMachineState {
->>  =20
->>       unsigned gpu_numa_id;
->>       SpaprTpmProxy *tpm_proxy;
->> +
->> +    bool fwnmi_calls_registered;
->>   };
->>  =20
->>   #define H_SUCCESS         0
->> @@ -656,8 +658,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, tar=
-get_ulong opcode,
->>   #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0=
-x28)
->>   #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0=
-x29)
->>   #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0=
-x2A)
->> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x=
-2B)
->> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x=
-2C)
->>  =20
->> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x=
-2B)
->> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x=
-2D)
->>  =20
->>   /* RTAS ibm,get-system-parameter token values */
->>   #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
->> @@ -908,4 +912,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr=
-, hwaddr pagesize,
->>  =20
->>   void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
->>   hwaddr spapr_get_rtas_addr(void);
->> +void spapr_fwnmi_register(void);
->>   #endif /* HW_SPAPR_H */
+> ---
+>   chardev/char-win.c | 19 ++++++++-----------
+>   1 file changed, 8 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/chardev/char-win.c b/chardev/char-win.c
+> index 34825f683d..72c232e6d9 100644
+> --- a/chardev/char-win.c
+> +++ b/chardev/char-win.c
+> @@ -85,12 +85,12 @@ int win_chr_serial_init(Chardev *chr, const char *fil=
+ename, Error **errp)
+>       s->hsend =3D CreateEvent(NULL, TRUE, FALSE, NULL);
+>       if (!s->hsend) {
+>           error_setg(errp, "Failed CreateEvent");
+> -        goto fail;
+> +        return -1;
+>       }
+>       s->hrecv =3D CreateEvent(NULL, TRUE, FALSE, NULL);
+>       if (!s->hrecv) {
+>           error_setg(errp, "Failed CreateEvent");
+> -        goto fail;
+> +        return -1;
+>       }
+>  =20
+>       s->file =3D CreateFile(filename, GENERIC_READ | GENERIC_WRITE, 0, N=
+ULL,
+> @@ -98,12 +98,12 @@ int win_chr_serial_init(Chardev *chr, const char *fil=
+ename, Error **errp)
+>       if (s->file =3D=3D INVALID_HANDLE_VALUE) {
+>           error_setg(errp, "Failed CreateFile (%lu)", GetLastError());
+>           s->file =3D NULL;
+> -        goto fail;
+> +        return -1;
+>       }
+>  =20
+>       if (!SetupComm(s->file, NRECVBUF, NSENDBUF)) {
+>           error_setg(errp, "Failed SetupComm");
+> -        goto fail;
+> +        return -1;
+>       }
+>  =20
+>       ZeroMemory(&comcfg, sizeof(COMMCONFIG));
+> @@ -114,29 +114,26 @@ int win_chr_serial_init(Chardev *chr, const char *f=
+ilename, Error **errp)
+>  =20
+>       if (!SetCommState(s->file, &comcfg.dcb)) {
+>           error_setg(errp, "Failed SetCommState");
+> -        goto fail;
+> +        return -1;
+>       }
+>  =20
+>       if (!SetCommMask(s->file, EV_ERR)) {
+>           error_setg(errp, "Failed SetCommMask");
+> -        goto fail;
+> +        return -1;
+>       }
+>  =20
+>       cto.ReadIntervalTimeout =3D MAXDWORD;
+>       if (!SetCommTimeouts(s->file, &cto)) {
+>           error_setg(errp, "Failed SetCommTimeouts");
+> -        goto fail;
+> +        return -1;
+>       }
+>  =20
+>       if (!ClearCommError(s->file, &err, &comstat)) {
+>           error_setg(errp, "Failed ClearCommError");
+> -        goto fail;
+> +        return -1;
+>       }
+>       qemu_add_polling_cb(win_chr_serial_poll, chr);
+>       return 0;
+> -
+> - fail:
+> -    return -1;
+>   }
+>  =20
+>   int win_chr_pipe_poll(void *opaque)
+>=20
 
 
