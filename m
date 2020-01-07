@@ -2,64 +2,71 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 281E9C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 05:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DDAAC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 06:04:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 838CA20678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 05:28:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XnO7c4g4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 838CA20678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 51BB52073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 06:04:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51BB52073D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=h3c.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iogsk-0003JE-VP
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 23:54:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44130)
+	id 1iohys-00014j-AP
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 01:04:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iognI-0005Kg-Ao
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 23:48:45 -0500
+ (envelope-from <wang.yongD@h3c.com>) id 1iohvv-0004BA-41
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:01:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iognH-0004ch-9C
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 23:48:40 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:34477 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iognG-0004Vu-VC; Mon, 06 Jan 2020 23:48:39 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47sKdX1c7qz9sRf; Tue,  7 Jan 2020 15:48:31 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578372512;
- bh=TfQTmXYbC8QhW9e6z4YK15NqUFRWl/4wKLoSPI7wBfQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=XnO7c4g4M44yHzlm8HFUJdT1t8yBD1JJUIv4f/H6ea5UdulOLl/a0Fj/x4pA4k8tx
- cX5jQEHsEuRUvezFlGXaqYdNdU7jRbzmej68JtpD3KVwrjqt05HCssABHpYi6RRTPH
- zXOYuFc3RYQ7NisC2MjmKy7sDlhDI3uJwseIJpZg=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: qemu-devel@nongnu.org,
-	groug@kaod.org,
-	philmd@redhat.com,
-	clg@kaod.org
-Subject: [PATCH v2 01/10] ppc: Drop PPC_EMULATE_32BITS_HYPV stub
-Date: Tue,  7 Jan 2020 15:48:18 +1100
-Message-Id: <20200107044827.471355-2-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200107044827.471355-1-david@gibson.dropbear.id.au>
-References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
+ (envelope-from <wang.yongD@h3c.com>) id 1iohvt-0005gt-Qw
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:01:38 -0500
+Received: from smtp.h3c.com ([60.191.123.50]:52480 helo=h3cspam02-ex.h3c.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wang.yongD@h3c.com>) id 1iohvs-0005aL-Fs
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 01:01:37 -0500
+Received: from DAG2EX07-IDC.srv.huawei-3com.com ([10.8.0.70])
+ by h3cspam02-ex.h3c.com with ESMTPS id 00760xDd057934
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Tue, 7 Jan 2020 14:00:59 +0800 (GMT-8)
+ (envelope-from wang.yongD@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX07-IDC.srv.huawei-3com.com (10.8.0.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 7 Jan 2020 14:01:01 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%6])
+ with mapi id 15.01.1713.004; Tue, 7 Jan 2020 14:01:01 +0800
+From: Wangyong <wang.yongD@h3c.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com"
+ <pbonzini@redhat.com>, "mark.kanda@oracle.com" <mark.kanda@oracle.com>,
+ "hch@lst.de" <hch@lst.de>
+Subject: [PATCH] linux-aio: increasing MAX_EVENTS to a larger hardcoded value
+Thread-Topic: [PATCH] linux-aio: increasing MAX_EVENTS to a larger hardcoded
+ value
+Thread-Index: AdXFH2NLa0A87O+DRx2QfJMBGFrevg==
+Date: Tue, 7 Jan 2020 06:01:01 +0000
+Message-ID: <faa5781afd354a96a0be152b288f636f@h3c.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.125.108.162]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+MIME-Version: 1.0
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com 00760xDd057934
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 60.191.123.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,57 +78,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
- paulus@samba.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Changlimin <changlimin@h3c.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only effect of the PPC_EMULATE_32BITS_HYPV define is to change how
-MSR_HVB is defined.  This appears to be something to handle hypervisor mo=
-de
-for 32-bit CPUs, but there's really no other code to handle this.  The
-MSR_THV bit, which it uses is implemented for no cpus we model.
+Since commit 6040aedddb5f474a9c2304b6a432a652d82b3d3c "virtio-blk:
+make queue size configurable",if the user set the queue size to
+more than 128 ,it will not take effect. That's because linux aio's
+maximum outstanding requests at a time is always less than or equal
+to 128.
 
-It's unlikely anyone is going to implement this any time soon, so just dr=
-op
-it.
+This patch simply increase MAX_EVENTS to a larger hardcoded value of
+1024 as a shortterm fix.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: wangyong <wang.yongD@h3c.com>
 ---
- target/ppc/cpu.h | 7 -------
- 1 file changed, 7 deletions(-)
+ block/linux-aio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 103bfe9dc2..2de9e2fa2b 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -26,8 +26,6 @@
- #include "exec/cpu-defs.h"
- #include "cpu-qom.h"
-=20
--/* #define PPC_EMULATE_32BITS_HYPV */
--
- #define TCG_GUEST_DEFAULT_MO 0
-=20
- #define TARGET_PAGE_BITS_64K 16
-@@ -450,14 +448,9 @@ typedef struct ppc_v3_pate_t {
- #define MSR_HVB (1ULL << MSR_SHV)
- #define msr_hv  msr_shv
- #else
--#if defined(PPC_EMULATE_32BITS_HYPV)
--#define MSR_HVB (1ULL << MSR_THV)
--#define msr_hv  msr_thv
--#else
- #define MSR_HVB (0ULL)
- #define msr_hv  (0)
- #endif
--#endif
-=20
- /* DSISR */
- #define DSISR_NOPTE              0x40000000
---=20
-2.24.1
+diff --git a/block/linux-aio.c b/block/linux-aio.c
+index c7eca9a256..91204a25a2 100644
+--- a/block/linux-aio.c
++++ b/block/linux-aio.c
+@@ -26,7 +26,7 @@
+  *      than this we will get EAGAIN from io_submit which is communicated =
+to
+  *      the guest as an I/O error.
+  */
+-#define MAX_EVENTS 128
++#define MAX_EVENTS 1024
 
+ struct qemu_laiocb {
+     Coroutine *co;
+--
+2.12.1.windows.1
 
