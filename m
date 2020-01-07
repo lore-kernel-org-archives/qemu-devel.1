@@ -2,66 +2,85 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 477EDC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 363FBC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:46:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D448820715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:45:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D448820715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 009BD2077B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:46:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LnDHb9fr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 009BD2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioq75-0000ry-00
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:45:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44808)
+	id 1ioq7l-0002hY-1T
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:46:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ioor7-0003bM-Pc
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:25:11 -0500
+ (envelope-from <quintela@redhat.com>) id 1iooyH-0004ZE-GJ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:32:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ioor6-0002Df-4j
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:25:09 -0500
-Received: from 8.mo69.mail-out.ovh.net ([46.105.56.233]:56020)
+ (envelope-from <quintela@redhat.com>) id 1iooyF-0005kU-IO
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:32:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50664
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ioor5-0002Bu-U3
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:25:08 -0500
-Received: from player699.ha.ovh.net (unknown [10.108.35.211])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 473A7794A8
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 14:25:05 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player699.ha.ovh.net (Postfix) with ESMTPSA id 55F54DEA9ABA;
- Tue,  7 Jan 2020 13:24:53 +0000 (UTC)
-Subject: Re: [PATCH v2 04/10] target/ppc: Introduce ppc_hash64_use_vrma()
- helper
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- groug@kaod.org, philmd@redhat.com
-References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
- <20200107044827.471355-5-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c0e48f0d-e495-549e-0835-4107d00be3bc@kaod.org>
-Date: Tue, 7 Jan 2020 14:24:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iooyF-0005jq-Cr
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:32:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578403950;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fQ8YZ4kxjS/Wvi2iTyW3cG1BWPlzmL6gE4ayGKp9Syw=;
+ b=LnDHb9frWaT1RU/FS/vbV0Sc31dm+qknQF/VPTJwNZXgGgE1qxFjkg8G6HTihHPbSrCybM
+ LH98AZwH1lKvlQn2+mnRbl3GV1E6jI6cuLRHDdRDhKGnPXRqLqO6R19iUHVjbaZtXMnitd
+ YJEU8wlJ8TVykfffbkq2P+wGq0scguQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-248-GYwiqeN3PdyEDhCVhyAzgA-1; Tue, 07 Jan 2020 08:32:29 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1E31DBA3
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 13:32:28 +0000 (UTC)
+Received: from redhat.com (ovpn-116-141.ams2.redhat.com [10.36.116.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DABD5D9CA;
+ Tue,  7 Jan 2020 13:32:28 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2 01/10] migration: Increase default number of multifd
+ channels to 16
+In-Reply-To: <20200107124934.GK3368802@redhat.com> ("Daniel P. =?utf-8?Q?B?=
+ =?utf-8?Q?errang=C3=A9=22's?=
+ message of "Tue, 7 Jan 2020 12:49:34 +0000")
+References: <20191218020119.3776-1-quintela@redhat.com>
+ <20191218020119.3776-2-quintela@redhat.com>
+ <20200103165832.GU2753983@redhat.com> <87mub4xurf.fsf@trasno.org>
+ <20200107124934.GK3368802@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Tue, 07 Jan 2020 14:32:24 +0100
+Message-ID: <87muazpf2v.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20200107044827.471355-5-david@gibson.dropbear.id.au>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: GYwiqeN3PdyEDhCVhyAzgA-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 9705257199232977702
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehgedgtdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.56.233
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,151 +92,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-ppc@nongnu.org, lvivier@redhat.com, paulus@samba.org
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/7/20 5:48 AM, David Gibson wrote:
-> When running guests under a hypervisor, the hypervisor obviously needs =
-to
-> be protected from guest accesses even if those are in what the guest
-> considers real mode (translation off).  The POWER hardware provides two
-> ways of doing that: The old way has guest real mode accesses simply off=
-set
-> and bounds checked into host addresses.  It works, but requires that a
-> significant chunk of the guest's memory - the RMA - be physically
-> contiguous in the host, which is pretty inconvenient.  The new way, kno=
-wn
-> as VRMA, has guest real mode accesses translated in roughly the normal =
-way
-> but with some special parameters.
->=20
-> In POWER7 and POWER8 the LPCR[VPM0] bit selected between the two modes,=
- but
-> in POWER9 only VRMA mode is supported and LPCR[VPM0] no longer exists. =
- We
-> handle that difference in behaviour in ppc_hash64_set_isi().. but not i=
-n
-> other places that we blindly check LPCR[VPM0].
->=20
-> Correct those instances with a new helper to tell if we should be in VR=
-MA
-> mode.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> On Fri, Jan 03, 2020 at 07:25:08PM +0100, Juan Quintela wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>> > On Wed, Dec 18, 2019 at 03:01:10AM +0100, Juan Quintela wrote:
+>> >> We can scale much better with 16, so we can scale to higher numbers.
+>> >
+>> > What was the test scenario showing such scaling ?
+>>=20
+>> On my test hardware, with 2 channels we can saturate around 8Gigabit max=
+,
+>> more than that, and the migration thread is not fast enough to fill the
+>> network bandwidth.
+>>=20
+>> With 8 that is enough to fill whatever we can find.
+>> We used to have a bug where we were getting trouble with more channels
+>> than cores.  That was the initial reason why the default was so low.
+>>=20
+>> So, pros/cons are:
+>> - have low value (2).  We are backwards compatible, but we are not using
+>>   all  bandwith.  Notice that we will dectect the error before 5.0 is
+>>   out and print a good error message.
+>>=20
+>> - have high value (I tested 8 and 16).  Found no performance loss when
+>>   moving to lower bandwidth limits, and clearly we were able to saturate
+>>   the higher speeds (I tested on localhost, so I had big enough bandwidt=
+h)
+>>=20
+>>=20
+>> > In the real world I'm sceptical that virt hosts will have
+>> > 16 otherwise idle CPU cores available that are permissible
+>> > to use for migration, or indeed whether they'll have network
+>> > bandwidth available to allow 16 cores to saturate the link.
+>>=20
+>> The problem here is that if you have such a host, and you want to have
+>> high speed migration, you need to configure it.  My measumermets are
+>> that high number of channels don't affect performance with low
+>> bandwidth, but low number of channels affect performance with high
+>> bandwidth speed.
+>
+> I'm not concerned about impact on performance of migration on a
+> low bandwidth link, rather I'm concerned about impact on performance
+> of other guests on the host. It will cause migration to contend with
+> other guest's vCPUs and network traffic.=20
+
+Two things here:
+- vcpus:  If you want migration to consume all the bandwidth, you are
+  happy with it using more vcpus.
+- bandwidth: It will only consume only the one that the guest has
+  assigned, split (we hope evenly) between all the channels.
+
+My main reason to have a higher number of channels is:
+- test better the code with more than one channel
+- work "magically" well in all scenarios.  With a low number of
+  channels, we are not going to be able to saturate a big network pipe.
 
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>
+>> So, if we want to have something that works "automatically" everywhere,
+>> we need to put it to at least 8.  Or we can trust that management app
+>> will do the right thing.
+>
+> Aren't we still setting the bandwidth limit to MB bandwidth out of the
+> box, so we already require mgmt app to change settings to use more
+> bandwidth ?=20
 
-> ---
->  target/ppc/mmu-hash64.c | 41 +++++++++++++++++++----------------------
->  1 file changed, 19 insertions(+), 22 deletions(-)
->=20
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index 5fabd93c92..d878180df5 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -668,6 +668,19 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCC=
-PU *cpu,
->      return 0;
->  }
-> =20
-> +static bool ppc_hash64_use_vrma(CPUPPCState *env)
-> +{
-> +    switch (env->mmu_model) {
-> +    case POWERPC_MMU_3_00:
-> +        /* ISAv3.0 (POWER9) always uses VRMA, the VPM0 field and RMOR
-> +         * register no longer exist */
-> +        return true;
-> +
-> +    default:
-> +        return !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> +    }
-> +}
-> +
->  static void ppc_hash64_set_isi(CPUState *cs, uint64_t error_code)
->  {
->      CPUPPCState *env =3D &POWERPC_CPU(cs)->env;
-> @@ -676,15 +689,7 @@ static void ppc_hash64_set_isi(CPUState *cs, uint6=
-4_t error_code)
->      if (msr_ir) {
->          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
->      } else {
-> -        switch (env->mmu_model) {
-> -        case POWERPC_MMU_3_00:
-> -            /* Field deprecated in ISAv3.00 - interrupts always go to =
-hyperv */
-> -            vpm =3D true;
-> -            break;
-> -        default:
-> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> -            break;
-> -        }
-> +        vpm =3D ppc_hash64_use_vrma(env);
->      }
->      if (vpm && !msr_hv) {
->          cs->exception_index =3D POWERPC_EXCP_HISI;
-> @@ -702,15 +707,7 @@ static void ppc_hash64_set_dsi(CPUState *cs, uint6=
-4_t dar, uint64_t dsisr)
->      if (msr_dr) {
->          vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM1);
->      } else {
-> -        switch (env->mmu_model) {
-> -        case POWERPC_MMU_3_00:
-> -            /* Field deprecated in ISAv3.00 - interrupts always go to =
-hyperv */
-> -            vpm =3D true;
-> -            break;
-> -        default:
-> -            vpm =3D !!(env->spr[SPR_LPCR] & LPCR_VPM0);
-> -            break;
-> -        }
-> +        vpm =3D ppc_hash64_use_vrma(env);
->      }
->      if (vpm && !msr_hv) {
->          cs->exception_index =3D POWERPC_EXCP_HDSI;
-> @@ -799,7 +796,7 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
->              if (!(eaddr >> 63)) {
->                  raddr |=3D env->spr[SPR_HRMOR];
->              }
-> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +        } else if (ppc_hash64_use_vrma(env)) {
->              /* Emulated VRMA mode */
->              slb =3D &env->vrma_slb;
->              if (!slb->sps) {
-> @@ -967,7 +964,7 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU *c=
-pu, target_ulong addr)
->          } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
->              /* In HV mode, add HRMOR if top EA bit is clear */
->              return raddr | env->spr[SPR_HRMOR];
-> -        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +        } else if (ppc_hash64_use_vrma(env)) {
->              /* Emulated VRMA mode */
->              slb =3D &env->vrma_slb;
->              if (!slb->sps) {
-> @@ -1056,8 +1053,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cp=
-u)
->      slb->sps =3D NULL;
-> =20
->      /* Is VRMA enabled ? */
-> -    lpcr =3D env->spr[SPR_LPCR];
-> -    if (!(lpcr & LPCR_VPM0)) {
-> +    if (ppc_hash64_use_vrma(env)) {
->          return;
->      }
-> =20
-> @@ -1065,6 +1061,7 @@ static void ppc_hash64_update_vrma(PowerPCCPU *cp=
-u)
->       * Make one up. Mostly ignore the ESID which will not be needed
->       * for translation
->       */
-> +    lpcr =3D env->spr[SPR_LPCR];
->      vsid =3D SLB_VSID_VRMA;
->      vrmasd =3D (lpcr & LPCR_VRMASD) >> LPCR_VRMASD_SHIFT;
->      vsid |=3D (vrmasd << 4) & (SLB_VSID_L | SLB_VSID_LP);
->=20
+Yeap.  This is the default bandwidth.
+
+#define MAX_THROTTLE  (32 << 20)
+
+
+>> If you are using a low value of bandwidth, the only difference with 16
+>> channels is that you are using a bit more memory (just the space for the
+>> stacks) and that you are having less contention for the locks (but with
+>> low bandwidth you are not having contention anyways).
+>>=20
+>> So,  I think that the question is:
+
+Note that my idea is to make multifd "default" in the near future (5.1
+timeframe or so).
+
+>> - What does libvirt prefferes
+>
+> Libvirt doesn't really have an opinion in this case. I believe we'll
+> always set the number of channels on both src & dst, so we don't
+> see the defaults.
+
+What does libvirt does today for this value?
+
+>> - What does ovirt/openstack preffer
+>
+> Libvirt should insulate them from any change in defaults in QEMU
+> in this case, but always explicitly setting channels on src & dst
+> to match.
+
+I agree here, they should don't care by default.
+
+>> - Do we really want that the user "have" to configure that value
+>
+> Right so this is the key quesiton - for a user not using libvirt
+> or a libvirt based mgmt app, what we do want out out of the box
+> migration to be tuned for ?
+
+In my opinion, we should have something like:
+- multifd: enabled by default
+- max downtime: 300 ms (current) looks right to me
+- max bandwidth: 32MB/s (current) seems a bit low. 100MB/s (i.e. almost
+  full gigabit ethernet) seems reasonable to me.  Having a default for
+  10Gigabit ethernet or similar seems too high.
+
+> If we want to maximise migration performance, at cost of anything
+> else, then we can change the migration channels count, but probably
+> also ought to remove the 32MB bandwidth cap as no useful guest with
+> active apps will succeed migration with a 32MB cap.
+
+Will start another series with the current values to discuss all the
+defaults, ok?
+
+thanks for the comments, Juan.
 
 
