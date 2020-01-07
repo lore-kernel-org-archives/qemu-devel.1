@@ -2,97 +2,66 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C98C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 232F9C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F3AE20656
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:56:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDGDxwYx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F3AE20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6D1420715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:58:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D1420715
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioken-0002z9-4h
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:56:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52253)
+	id 1iokhR-000129-1G
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:58:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34539)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojQy-0007s8-P3
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:49 -0500
+ (envelope-from <clg@kaod.org>) id 1iokLr-0008J3-9f
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 03:36:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojQx-0000Qv-HS
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:48 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30856
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iokLp-00011S-TK
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 03:36:34 -0500
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:60691)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojQx-0000QV-EF
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382667;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BgmNsnDUrIKv5qIqtQ+hIbBMXsq7KvX1kSU3ybRDZeQ=;
- b=bDGDxwYxjgq1328Mz46Yrp2hhwQ89NsGHwJ1x1hw0a1YtCZp2ANgGSQSrOPwx9Yp5Na2v+
- 5TIaTeI1lv+nsv5MxNe9h3qylQqfZzh9zz7tH+i7M1S65KExkRonM3s8pcWnUnXjFTgg/2
- ppEPResQ1/mQbZuFu/9Il2hoJJl072Y=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-p44CKW4mMgS9BL4wCQ6dFQ-1; Tue, 07 Jan 2020 02:37:45 -0500
-Received: by mail-qv1-f72.google.com with SMTP id e10so5028767qvq.18
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:37:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tdoWlLoYwJDJiT74CT7GYIP+izHUlkgXXi1RbTtf6v8=;
- b=fAWLH+/kc3cPjrSKMp2sN6eh39gCOc4viI1hAW/3JPBnNl03kyhbDc2lE3eOxFZHq5
- 46Da3CGZEt6fxgwKJx6HTv/CLD2FLr5CCqCD6mP1/bQp9bvKVvctzzFgY3U/maT2ms/K
- qKDDpm0Beyo9HdCbxd+O/GvCAwFZEz5IK7YoU1CIr2hiE75F/Y5Sb+YrcAUWZIlz3f/C
- LzBk4jq0RJfq18x6KESpXmVcEMizEeOP1DXE6Z8oh/y6YFV/0hsh6OIkqPy/a31nbcIl
- JYRc0kYj8jtc6N94lgMA2uAIuAaBhuC1F2evlzYqD0Oybj9ZoEo9qqVpXz9v+yl01I1m
- csHQ==
-X-Gm-Message-State: APjAAAXz9rCodn5yCv1HoY+D2oWQBN1sQ3F8k5QzSx5EHkqQrBbhVxyC
- gdiGLa+9uOFGj3AU25Yj1yRSXHKP6dhbjjl+YCcsNb90ZiWNDTypJbOHt429c9S4P02QVrqN6bs
- FpcnuxiPZ9p6V56s=
-X-Received: by 2002:ae9:eb56:: with SMTP id b83mr84984609qkg.123.1578382664490; 
- Mon, 06 Jan 2020 23:37:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxkxVXy8Z6rbJqWbSG3GqdciP9jGj9AX7KTv1EPoDdYvT9CajzD+HKFvSQ0i7kK3JHCoK+fIw==
-X-Received: by 2002:ae9:eb56:: with SMTP id b83mr84984601qkg.123.1578382664283; 
- Mon, 06 Jan 2020 23:37:44 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id 186sm22061395qkm.93.2020.01.06.23.37.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:37:43 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:37:39 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 30/32] virtio-net: delete also control queue when TX/RX
- deleted
-Message-ID: <20200107073451.298261-31-mst@redhat.com>
-References: <20200107073451.298261-1-mst@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iokLp-00010L-NM
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 03:36:33 -0500
+Received: from player759.ha.ovh.net (unknown [10.108.1.170])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 8B9007B0BB
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 09:36:31 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id 66698DF0BEBE;
+ Tue,  7 Jan 2020 08:36:25 +0000 (UTC)
+Subject: Re: [PATCH 3/5] ftgmac100: check RX and TX buffer alignment
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200107073423.30043-1-clg@kaod.org>
+ <20200107073423.30043-4-clg@kaod.org>
+ <1587acec-3d08-9dfa-0bcc-37140fd5e2ad@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ce0722d4-48ed-e7cd-2436-84d1ee24038f@kaod.org>
+Date: Tue, 7 Jan 2020 09:36:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: p44CKW4mMgS9BL4wCQ6dFQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1587acec-3d08-9dfa-0bcc-37140fd5e2ad@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 4832080926734519104
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehuddguddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 46.105.42.102
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,44 +73,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- qemu-stable@nongnu.org, Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
+On 1/7/20 9:27 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/7/20 8:34 AM, C=C3=A9dric Le Goater wrote:
+>> These buffers should be aligned on 16 bytes.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>> =C2=A0 hw/net/ftgmac100.c | 13 +++++++++++++
+>> =C2=A0 1 file changed, 13 insertions(+)
+>>
+>> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+>> index 86ac25894a89..051f7b7af2d6 100644
+>> --- a/hw/net/ftgmac100.c
+>> +++ b/hw/net/ftgmac100.c
+>> @@ -198,6 +198,8 @@ typedef struct {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 des3;
+>> =C2=A0 } FTGMAC100Desc;
+>> =C2=A0 +#define FTGMAC100_DESC_ALIGNMENT 16
+>> +
+>> =C2=A0 /*
+>> =C2=A0=C2=A0 * Specific RTL8211E MII Registers
+>> =C2=A0=C2=A0 */
+>> @@ -722,6 +724,12 @@ static void ftgmac100_write(void *opaque, hwaddr =
+addr,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->itc =3D valu=
+e;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case FTGMAC100_RXR_BADR: /* Ring buffer=
+ address */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!QEMU_IS_ALIGNED(value=
+, FTGMAC100_DESC_ALIGNMENT)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qe=
+mu_log_mask(LOG_GUEST_ERROR, "%s: Bad RX buffer alignment 0x%"
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 HWADDR_PRIx "\n", __func__, value);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
+turn;
+>=20
+> What is the hardware behavior?
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1708480
-If the control queue is not deleted together with TX/RX, it
-later will be ignored in freeing cache resources and hot
-unplug will not be completed.
+This is not documented :/
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-Message-Id: <20191226043649.14481-3-yuri.benditovich@daynix.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/net/virtio-net.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+C.
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index db3d7c38e6..f325440d01 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -3101,7 +3101,8 @@ static void virtio_net_device_unrealize(DeviceState *=
-dev, Error **errp)
-     for (i =3D 0; i < max_queues; i++) {
-         virtio_net_del_queue(n, i);
-     }
--
-+    /* delete also control vq */
-+    virtio_del_queue(vdev, max_queues * 2);
-     qemu_announce_timer_del(&n->announce_timer, false);
-     g_free(n->vqs);
-     qemu_del_nic(n->nic);
---=20
-MST
+>=20
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->rx_ring =3D =
+value;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->rx_descripto=
+r =3D s->rx_ring;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>> @@ -731,6 +739,11 @@ static void ftgmac100_write(void *opaque, hwaddr =
+addr,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case FTGMAC100_NPTXR_BADR: /* Tr=
+ansmit buffer address */
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!QEMU_IS_ALIGNED(value=
+, FTGMAC100_DESC_ALIGNMENT)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qe=
+mu_log_mask(LOG_GUEST_ERROR, "%s: Bad TX buffer alignment 0x%"
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 HWADDR_PRIx "\n", __func__, value);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
+turn;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->tx_ring =3D =
+value;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->tx_descripto=
+r =3D s->tx_ring;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>>
+>=20
 
 
