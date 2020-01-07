@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47670C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127C5C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:28:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 113712077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:27:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D223F20715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:28:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GNoPZeGL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 113712077B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtnCA/IK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D223F20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51450 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqlw-00039X-Ds
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:27:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56877)
+	id 1ioqmD-0003ba-FT
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:28:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqUF-0006iY-Cb
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:44 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqVW-0001kW-Ut
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqUA-0005lQ-9m
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:39 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53054
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqVV-0006q1-S9
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:10:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48269
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ioqU9-0005gH-1H
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:33 -0500
+ id 1ioqVV-0006pl-Oc
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:10:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578409768;
+ s=mimecast20190719; t=1578409857;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j8fewjeKg+zncBThUi9yhZeQUuxokLL3S6GoRnZbbtM=;
- b=GNoPZeGLXVdtfsANThS83Of3w3QuEdZ0pAxMIjRa9Un9XklLpBrszwP0O3uMI1jvjvkhCp
- NM/IlL4qZasU7hw3b8RMZKEUK+fVa2uXNeyjdQ74OZbW30Aw7szxIoNtw2C3Hso7gGpjWB
- qmd/pEyNdtONRmHSo5YLGt17u/IgR4c=
+ bh=JI6010Zba0jR7V5oioUNd1W8ZIeOPboPlX4JjxIfyT0=;
+ b=JtnCA/IKf+BAdnyl78unPVrKGKAEUvmE5M1+r3bhqiS0uovVTR230k2LPecBxrRAdRaEoR
+ hxXZ+mYpp3bEoXl2G85+KHNKKGf2OM+e48riydcbw80K5ktQ89TXzrvyw8UUre79D27uNb
+ wUgQgBTCE1FsFFQ6F8zX9cGZ0DA9yEM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-o8T9gjszPounq9Kqa2_3ZA-1; Tue, 07 Jan 2020 10:09:24 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-265-2vBbqoMgMm26WphpBmj_OA-1; Tue, 07 Jan 2020 10:10:55 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D4021005502;
- Tue,  7 Jan 2020 15:09:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E5981B18BCA;
+ Tue,  7 Jan 2020 15:10:54 +0000 (UTC)
 Received: from localhost (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4223B1001925;
- Tue,  7 Jan 2020 15:09:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA6E05C1BB;
+ Tue,  7 Jan 2020 15:10:52 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/37] lance: replace PROP_PTR with PROP_LINK
-Date: Tue,  7 Jan 2020 19:04:28 +0400
-Message-Id: <20200107150442.1727958-24-marcandre.lureau@redhat.com>
+Subject: [PULL 31/37] smbus-eeprom: remove PROP_PTR
+Date: Tue,  7 Jan 2020 19:04:36 +0400
+Message-Id: <20200107150442.1727958-32-marcandre.lureau@redhat.com>
 In-Reply-To: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 References: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: o8T9gjszPounq9Kqa2_3ZA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 2vBbqoMgMm26WphpBmj_OA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,83 +93,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The device remains non-user creatable since it is a sysbus device.
+Instead, set the initial data field directly.
+
+(the initial data is an array of 256 bytes. As I don't know if it may
+change over time, I keep the pointer to original buffer as is, but it
+might be worth to consider to copy it instead)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/net/pcnet.h       | 2 +-
- hw/dma/sparc32_dma.c | 2 +-
- hw/net/lance.c       | 5 ++---
- hw/net/pcnet-pci.c   | 2 +-
- 4 files changed, 5 insertions(+), 6 deletions(-)
+ hw/i2c/smbus_eeprom.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
-index 28d19a5c6f..f49b213c57 100644
---- a/hw/net/pcnet.h
-+++ b/hw/net/pcnet.h
-@@ -50,7 +50,7 @@ struct PCNetState_st {
-                          uint8_t *buf, int len, int do_bswap);
-     void (*phys_mem_write)(void *dma_opaque, hwaddr addr,
-                           uint8_t *buf, int len, int do_bswap);
--    void *dma_opaque;
-+    DeviceState *dma_opaque;
-     int tx_busy;
-     int looptest;
- };
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index 0e5bbcdc7f..3e4da0c47f 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -346,7 +346,7 @@ static void sparc32_ledma_device_realize(DeviceState *d=
-ev, Error **errp)
-     d =3D qdev_create(NULL, TYPE_LANCE);
-     object_property_add_child(OBJECT(dev), "lance", OBJECT(d), errp);
-     qdev_set_nic_properties(d, nd);
--    qdev_prop_set_ptr(d, "dma", dev);
-+    object_property_set_link(OBJECT(d), OBJECT(dev), "dma", errp);
-     qdev_init_nofail(d);
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index 54c86a0112..5adf3b15b5 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -44,7 +44,7 @@
+ typedef struct SMBusEEPROMDevice {
+     SMBusDevice smbusdev;
+     uint8_t data[SMBUS_EEPROM_SIZE];
+-    void *init_data;
++    uint8_t *init_data;
+     uint8_t offset;
+     bool accessed;
+ } SMBusEEPROMDevice;
+@@ -129,14 +129,14 @@ static void smbus_eeprom_reset(DeviceState *dev)
+=20
+ static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ {
++    SMBusEEPROMDevice *eeprom =3D SMBUS_EEPROM(dev);
++
+     smbus_eeprom_reset(dev);
++    if (eeprom->init_data =3D=3D NULL) {
++        error_setg(errp, "init_data cannot be NULL");
++    }
  }
 =20
-diff --git a/hw/net/lance.c b/hw/net/lance.c
-index 6631e2a4e0..4d96299041 100644
---- a/hw/net/lance.c
-+++ b/hw/net/lance.c
-@@ -138,7 +138,8 @@ static void lance_instance_init(Object *obj)
+-static Property smbus_eeprom_properties[] =3D {
+-    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
+-    DEFINE_PROP_END_OF_LIST(),
+-};
+-
+ static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -146,9 +146,8 @@ static void smbus_eeprom_class_initfn(ObjectClass *klas=
+s, void *data)
+     dc->reset =3D smbus_eeprom_reset;
+     sc->receive_byte =3D eeprom_receive_byte;
+     sc->write_data =3D eeprom_write_data;
+-    dc->props =3D smbus_eeprom_properties;
+     dc->vmsd =3D &vmstate_smbus_eeprom;
+-    /* Reason: pointer property "data" */
++    /* Reason: init_data */
+     dc->user_creatable =3D false;
  }
 =20
- static Property lance_properties[] =3D {
--    DEFINE_PROP_PTR("dma", SysBusPCNetState, state.dma_opaque),
-+    DEFINE_PROP_LINK("dma", SysBusPCNetState, state.dma_opaque,
-+                     TYPE_DEVICE, DeviceState *),
-     DEFINE_NIC_PROPERTIES(SysBusPCNetState, state.conf),
-     DEFINE_PROP_END_OF_LIST(),
- };
-@@ -153,8 +154,6 @@ static void lance_class_init(ObjectClass *klass, void *=
-data)
-     dc->reset =3D lance_reset;
-     dc->vmsd =3D &vmstate_lance;
-     dc->props =3D lance_properties;
--    /* Reason: pointer property "dma" */
--    dc->user_creatable =3D false;
+@@ -172,7 +171,8 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t addre=
+ss, uint8_t *eeprom_buf)
+=20
+     dev =3D qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
+     qdev_prop_set_uint8(dev, "address", address);
+-    qdev_prop_set_ptr(dev, "data", eeprom_buf);
++    /* FIXME: use an array of byte or block backend property? */
++    SMBUS_EEPROM(dev)->init_data =3D eeprom_buf;
+     qdev_init_nofail(dev);
  }
 =20
- static const TypeInfo lance_info =3D {
-diff --git a/hw/net/pcnet-pci.c b/hw/net/pcnet-pci.c
-index 4723c30c79..d067d21e2c 100644
---- a/hw/net/pcnet-pci.c
-+++ b/hw/net/pcnet-pci.c
-@@ -231,7 +231,7 @@ static void pci_pcnet_realize(PCIDevice *pci_dev, Error=
- **errp)
-     s->irq =3D pci_allocate_irq(pci_dev);
-     s->phys_mem_read =3D pci_physical_memory_read;
-     s->phys_mem_write =3D pci_physical_memory_write;
--    s->dma_opaque =3D pci_dev;
-+    s->dma_opaque =3D DEVICE(pci_dev);
-=20
-     pcnet_common_init(DEVICE(pci_dev), s, &net_pci_pcnet_info);
- }
 --=20
 2.25.0.rc1.20.g2443f3f80d
 
