@@ -2,93 +2,62 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96ABDC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E04E1C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:40:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FCC1207FD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:40:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OfprNLfa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FCC1207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B5318206DB
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 07:40:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5318206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iojTo-0004uZ-Iw
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 02:40:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51555)
+	id 1iojTt-0005MZ-Mh
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 02:40:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51369)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojOa-0003aC-1E
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:21 -0500
+ (envelope-from <clg@kaod.org>) id 1iojO1-00023d-8g
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:34:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojOX-0007B6-E6
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:18 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29144
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iojNz-0006ik-HL
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:34:44 -0500
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:58003)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojOX-0007AW-8y
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382516;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=osNeRsQBiMDd3DOA7hW5dqN5365yWBDdc0/UeNFqqTQ=;
- b=OfprNLfaLQzBRGjvNufEPDrrq/InvG9BIbrRmojxfP35mT4hqRMW83p65HiC/pUG/5t9sy
- laotO+udMUmOg4QPwbjjOqFdmU14sUR45mg9aC42V596pma8+Zz3a8ijQtr9whAYdUOW46
- 82E26wUkiYQdpFU4Ekactk2XO0D2Pzc=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-2xI33fkPPq2Q0G8MBl24HA-1; Tue, 07 Jan 2020 02:35:14 -0500
-Received: by mail-qk1-f200.google.com with SMTP id d1so8963422qkk.15
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:35:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:content-transfer-encoding;
- bh=2DcnikgCijavyhIBjId1j/9/bNOVoREVCQtujhPQ6M0=;
- b=dlmFttMJSAVMg4FtqNEzVxWmzjIranCFr9UoNIM7YGPR2gXhqeFK8fw2fb4H2/n4EP
- 5tQ6Kn62Kkw0/pNd0DF946rmBplaHsHVSk+/qt/Lbdwdszp6IUo2YIYcAhbOfEjzEARY
- w5zyIAQAcsb3ad1gV/A4UGe9MmunaiJtKRNkZyKGGEMUXvfvbKKWzdibdngoxRXOlfqx
- 46G/n+JSAxD/Ew4sK6Sc7H0WgId6rUe2DJTqYi901724YwB4DxO+gwbNCS1+4gGLviYI
- gbj0IUkvaP0NCks4Z7cqt9WWL2HJk4d30U6XQ7C6U80VsIYvCTwjml3aXMYEPisoOcT8
- y3nA==
-X-Gm-Message-State: APjAAAU+UM+OYdB8xmDU3Fhx3UtZ1xf6dN4pk6sokBugfXq/6nR2i9BM
- gDk1yAPdlOJBZ3evAocNOUlGCdh8Om3NUqi0MTNE4XU2oWixy0gMYvuqnwuDnFKzQ8acsZHkn+F
- mqWihG8C5gssYjuE=
-X-Received: by 2002:a37:548:: with SMTP id 69mr86297358qkf.222.1578382513468; 
- Mon, 06 Jan 2020 23:35:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwHlcKg9oUDvMZaDlc1sS3mKslxj34vSTKhew5PfVfVxr04vMcoJwPFxLNAjy7LmoZQYhusYA==
-X-Received: by 2002:a37:548:: with SMTP id 69mr86297349qkf.222.1578382513161; 
- Mon, 06 Jan 2020 23:35:13 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id 200sm22045830qkn.79.2020.01.06.23.35.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:35:12 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:35:09 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/32] virtio, pci, pc: fixes, features
-Message-ID: <20200107073451.298261-1-mst@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iojNz-0006ha-AP
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:34:43 -0500
+Received: from player755.ha.ovh.net (unknown [10.108.35.185])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5DC847B106
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 08:34:41 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player755.ha.ovh.net (Postfix) with ESMTPSA id A925ADFE0C27;
+ Tue,  7 Jan 2020 07:34:32 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH 1/5] hw/sd: Configure number of slots exposed by the ASPEED
+ SDHCI model
+Date: Tue,  7 Jan 2020 08:34:19 +0100
+Message-Id: <20200107073423.30043-2-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200107073423.30043-1-clg@kaod.org>
+References: <20200107073423.30043-1-clg@kaod.org>
 MIME-Version: 1.0
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: 2xI33fkPPq2Q0G8MBl24HA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 3787808764389329681
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehuddguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.42.102
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,157 +69,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit f0dcfddecee8b860e015bb07d67cfcbdfbfd51d9=
-:
+From: Andrew Jeffery <andrew@aj.id.au>
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' i=
-nto staging (2020-01-03 17:18:08 +0000)
+The AST2600 includes a second cut-down version of the SD/MMC controller
+found in the AST2500, named the eMMC controller. It's cut down in the
+sense that it only supports one slot rather than two, but it brings the
+total number of slots supported by the AST2600 to three.
 
-are available in the Git repository at:
+The existing code assumed that the SD controller always provided two
+slots. Rework the SDHCI object to expose the number of slots as a
+property to be set by the SoC configuration.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/sd/aspeed_sdhci.h |  1 +
+ hw/arm/aspeed.c              |  2 +-
+ hw/arm/aspeed_ast2600.c      |  2 ++
+ hw/arm/aspeed_soc.c          |  2 ++
+ hw/sd/aspeed_sdhci.c         | 11 +++++++++--
+ 5 files changed, 15 insertions(+), 3 deletions(-)
 
-for you to fetch changes up to 56fc1e6ac6bde95bc0369d358587f2234d4dddad:
-
-  intel_iommu: add present bit check for pasid table entries (2020-01-06 12=
-:04:51 -0500)
-
-----------------------------------------------------------------
-virtio, pci, pc: fixes, features
-
-Bugfixes all over the place.
-HMAT support.
-New flags for vhost-user-blk utility.
-Auto-tuning of seg max for virtio storage.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Denis Plotnikov (4):
-      hw: fix using 4.2 compat in 5.0 machine types for i440fx/q35
-      virtio: make seg_max virtqueue size dependent
-      tests: add virtio-scsi and virtio-blk seg_max_adjust test
-      virtio-mmio: update queue size on guest write
-
-Jean-Philippe Brucker (1):
-      virtio-mmio: Clear v2 transport state on soft reset
-
-Liu Jingqi (5):
-      numa: Extend CLI to provide memory latency and bandwidth information
-      numa: Extend CLI to provide memory side cache information
-      hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
-      hmat acpi: Build System Locality Latency and Bandwidth Information St=
-ructure(s)
-      hmat acpi: Build Memory Side Cache Information Structure(s)
-
-Liu Yi L (2):
-      intel_iommu: a fix to vtd_find_as_from_bus_num()
-      intel_iommu: add present bit check for pasid table entries
-
-Michael Roth (1):
-      virtio-pci: disable vring processing when bus-mastering is disabled
-
-Michael S. Tsirkin (5):
-      virtio: add ability to delete vq through a pointer
-      virtio: make virtio_delete_queue idempotent
-      virtio-input: convert to new virtio_delete_queue
-      virtio: update queue size on guest write
-      ACPI: add expected files for HMAT tests (acpihmat)
-
-Micky Yun Chan (1):
-      Implement backend program convention command for vhost-user-blk
-
-Pan Nengyuan (2):
-      virtio-balloon: fix memory leak while attach virtio-balloon device
-      virtio-serial-bus: fix memory leak while attach virtio-serial-bus
-
-Philippe Mathieu-Daud=C3=A9 (2):
-      hw/pci/pci_host: Remove redundant PCI_DPRINTF()
-      hw/pci/pci_host: Let pci_data_[read/write] use unsigned 'size' argume=
-nt
-
-Raphael Norwitz (2):
-      vhost-user: add VHOST_USER_RESET_DEVICE to reset devices
-      vhost-user-scsi: reset the device if supported
-
-Stefan Hajnoczi (1):
-      virtio: don't enable notifications during polling
-
-Tao Xu (3):
-      numa: Extend CLI to provide initiator information for numa nodes
-      tests/numa: Add case for QMP build HMAT
-      tests/bios-tables-test: add test cases for ACPI HMAT
-
-Yi Sun (1):
-      intel_iommu: fix bug to read DMAR_RTADDR_REG
-
-Yuri Benditovich (2):
-      virtio: reset region cache when on queue deletion
-      virtio-net: delete also control queue when TX/RX deleted
-
- docs/interop/vhost-user.json              |  31 ++++
- qapi/machine.json                         | 180 +++++++++++++++++-
- hw/acpi/hmat.h                            |  42 +++++
- hw/i386/intel_iommu_internal.h            |   1 +
- include/hw/pci/pci_host.h                 |   4 +-
- include/hw/virtio/virtio-blk.h            |   1 +
- include/hw/virtio/virtio-scsi.h           |   1 +
- include/hw/virtio/virtio.h                |  18 ++
- include/sysemu/numa.h                     |  63 +++++++
- contrib/vhost-user-blk/vhost-user-blk.c   | 108 ++++++-----
- hw/acpi/hmat.c                            | 268 ++++++++++++++++++++++++++=
+diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.h
+index dfdab4379021..dffbb46946b9 100644
+--- a/include/hw/sd/aspeed_sdhci.h
++++ b/include/hw/sd/aspeed_sdhci.h
+@@ -24,6 +24,7 @@ typedef struct AspeedSDHCIState {
+     SysBusDevice parent;
+=20
+     SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
++    uint8_t num_slots;
+=20
+     MemoryRegion iomem;
+     qemu_irq irq;
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index cc06af4fbb3e..4174e313cae5 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -263,7 +263,7 @@ static void aspeed_machine_init(MachineState *machine=
+)
+         amc->i2c_init(bmc);
+     }
+=20
+-    for (i =3D 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
++    for (i =3D 0; i < bmc->soc.sdhci.num_slots; i++) {
+         SDHCIState *sdhci =3D &bmc->soc.sdhci.slots[i];
+         DriveInfo *dinfo =3D drive_get_next(IF_SD);
+         BlockBackend *blk;
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 89e4b0095041..fb73c4043ea3 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -199,6 +199,8 @@ static void aspeed_soc_ast2600_init(Object *obj)
+     sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci=
+),
+                           TYPE_ASPEED_SDHCI);
+=20
++    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_ab=
+ort);
 +
- hw/block/virtio-blk.c                     |  18 +-
- hw/char/virtio-serial-bus.c               |   8 +
- hw/core/machine.c                         |  68 +++++++
- hw/core/numa.c                            | 297 ++++++++++++++++++++++++++=
-++++
- hw/i386/acpi-build.c                      |   5 +
- hw/i386/intel_iommu.c                     | 100 +++++++---
- hw/i386/pc_piix.c                         |   1 -
- hw/i386/pc_q35.c                          |   1 -
- hw/input/virtio-input.c                   |   5 +-
- hw/net/virtio-net.c                       |   3 +-
- hw/pci/pci_host.c                         |  25 +--
- hw/scsi/vhost-scsi.c                      |   2 +
- hw/scsi/vhost-user-scsi.c                 |  24 +++
- hw/scsi/virtio-scsi.c                     |  19 +-
- hw/virtio/vhost-user.c                    |   8 +-
- hw/virtio/virtio-balloon.c                |   7 +
- hw/virtio/virtio-mmio.c                   |  17 +-
- hw/virtio/virtio-pci.c                    |  14 +-
- hw/virtio/virtio.c                        |  64 +++++--
- tests/bios-tables-test.c                  |  44 +++++
- tests/numa-test.c                         | 213 +++++++++++++++++++++
- docs/interop/vhost-user.rst               |  32 ++++
- hw/acpi/Kconfig                           |   7 +-
- hw/acpi/Makefile.objs                     |   1 +
- qemu-options.hx                           |  95 +++++++++-
- tests/acceptance/virtio_seg_max_adjust.py | 134 ++++++++++++++
- tests/data/acpi/pc/APIC.acpihmat          | Bin 0 -> 128 bytes
- tests/data/acpi/pc/DSDT.acpihmat          | Bin 0 -> 6455 bytes
- tests/data/acpi/pc/HMAT.acpihmat          | Bin 0 -> 280 bytes
- tests/data/acpi/pc/SRAT.acpihmat          | Bin 0 -> 280 bytes
- tests/data/acpi/q35/APIC.acpihmat         | Bin 0 -> 128 bytes
- tests/data/acpi/q35/DSDT.acpihmat         | Bin 0 -> 9203 bytes
- tests/data/acpi/q35/HMAT.acpihmat         | Bin 0 -> 280 bytes
- tests/data/acpi/q35/SRAT.acpihmat         | Bin 0 -> 280 bytes
- 45 files changed, 1796 insertions(+), 133 deletions(-)
- create mode 100644 hw/acpi/hmat.h
- create mode 100644 hw/acpi/hmat.c
- create mode 100755 tests/acceptance/virtio_seg_max_adjust.py
- create mode 100644 tests/data/acpi/pc/APIC.acpihmat
- create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
- create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
- create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
- create mode 100644 tests/data/acpi/q35/APIC.acpihmat
- create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
- create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
- create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
+     /* Init sd card slot class here so that they're under the correct pa=
+rent */
+     for (i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+         sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]=
+),
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index a6237e594017..c15ceb683950 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -209,6 +209,8 @@ static void aspeed_soc_init(Object *obj)
+     sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci=
+),
+                           TYPE_ASPEED_SDHCI);
+=20
++    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_ab=
+ort);
++
+     /* Init sd card slot class here so that they're under the correct pa=
+rent */
+     for (i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+         sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]=
+),
+diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
+index cff3eb7dd21e..939d1510dedb 100644
+--- a/hw/sd/aspeed_sdhci.c
++++ b/hw/sd/aspeed_sdhci.c
+@@ -13,6 +13,7 @@
+ #include "qapi/error.h"
+ #include "hw/irq.h"
+ #include "migration/vmstate.h"
++#include "hw/qdev-properties.h"
+=20
+ #define ASPEED_SDHCI_INFO            0x00
+ #define  ASPEED_SDHCI_INFO_RESET     0x00030000
+@@ -120,14 +121,14 @@ static void aspeed_sdhci_realize(DeviceState *dev, =
+Error **errp)
+=20
+     /* Create input irqs for the slots */
+     qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_ir=
+q,
+-                                        sdhci, NULL, ASPEED_SDHCI_NUM_SL=
+OTS);
++                                        sdhci, NULL, sdhci->num_slots);
+=20
+     sysbus_init_irq(sbd, &sdhci->irq);
+     memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_op=
+s,
+                           sdhci, TYPE_ASPEED_SDHCI, 0x1000);
+     sysbus_init_mmio(sbd, &sdhci->iomem);
+=20
+-    for (int i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
++    for (int i =3D 0; i < sdhci->num_slots; ++i) {
+         Object *sdhci_slot =3D OBJECT(&sdhci->slots[i]);
+         SysBusDevice *sbd_slot =3D SYS_BUS_DEVICE(&sdhci->slots[i]);
+=20
+@@ -174,6 +175,11 @@ static const VMStateDescription vmstate_aspeed_sdhci=
+ =3D {
+     },
+ };
+=20
++static Property aspeed_sdhci_properties[] =3D {
++    DEFINE_PROP_UINT8("num-slots", AspeedSDHCIState, num_slots, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(classp);
+@@ -181,6 +187,7 @@ static void aspeed_sdhci_class_init(ObjectClass *clas=
+sp, void *data)
+     dc->realize =3D aspeed_sdhci_realize;
+     dc->reset =3D aspeed_sdhci_reset;
+     dc->vmsd =3D &vmstate_aspeed_sdhci;
++    dc->props =3D aspeed_sdhci_properties;
+ }
+=20
+ static TypeInfo aspeed_sdhci_info =3D {
+--=20
+2.21.1
 
 
