@@ -2,72 +2,69 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1903CC282DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A289DC282DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAA5C20715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DBEB20715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:12:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FdudtmFW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA5C20715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnKRIRyZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DBEB20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iouGF-0000Ia-MO
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 14:11:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48310)
+	id 1iouHc-0002MD-53
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 14:12:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iouDf-0005CY-7E
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:08:49 -0500
+ (envelope-from <thuth@redhat.com>) id 1iouDb-0005Ap-7k
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:08:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iouDc-00085V-RZ
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:08:47 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49593
+ (envelope-from <thuth@redhat.com>) id 1iouDY-00080a-Az
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:08:42 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45577
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iouDc-000853-NN
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:08:44 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iouDY-0007zD-5R
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:08:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578424124;
+ s=mimecast20190719; t=1578424118;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yfAa98zLsXPZKYF8sOrtF2Iiye9a3qFfI9op3uGWDy8=;
- b=FdudtmFWvlvSly9FWM2TccPFqsdguIqwYrs/aiqAfLbVKSY8LFxpjXLxItrY/cSaLKx+um
- wlg5IqvpTtZkRABYXmvtjFoFmXJp1BQS2euGdkGSZoy/YC0t3dyeO3+05tO2OIRT8+rE7j
- 98Gl8kt5ZJ9ljnZJ6o6Pd6dv+0g5ZOE=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7RAuKzfIAKBIAKNCe/KHfFwVjC9tlr8gge6dEsMjEn4=;
+ b=WnKRIRyZ9yIMfIL78B8PWFf9oJGyaiY0zsy+j74Mqzr1gD54YuL1nQdbtENTjPacZcMceG
+ 1MjSvUnbX1wWv0duMt91NlRev5+uaekt4zW5bDBjV0ihKW/jvEQg9B7kWwyhmU7rFFT72w
+ FlCU631H4nymtNzyuCbVyKieIVp8IkY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-sOFirEpcPiG2lZyw-dCmhg-1; Tue, 07 Jan 2020 14:08:40 -0500
+ us-mta-205-H63BH_lqO1Gy83xITeuxTg-1; Tue, 07 Jan 2020 14:08:35 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A57B12D5A1;
- Tue,  7 Jan 2020 19:08:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D5AE100F2C3;
+ Tue,  7 Jan 2020 19:08:34 +0000 (UTC)
 Received: from thuth.com (ovpn-116-83.ams2.redhat.com [10.36.116.83])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB5591EE;
- Tue,  7 Jan 2020 19:08:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CEA460E1C;
+ Tue,  7 Jan 2020 19:08:06 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 3/8] tests/Makefile: Remove 'tests/' and '$(EXESUF)' from the
- check-qtest variables
-Date: Tue,  7 Jan 2020 20:07:57 +0100
-Message-Id: <20200107190802.2257-4-thuth@redhat.com>
-In-Reply-To: <20200107190802.2257-1-thuth@redhat.com>
-References: <20200107190802.2257-1-thuth@redhat.com>
+Subject: [PULL 0/8] qtests and docs
+Date: Tue,  7 Jan 2020 20:07:54 +0100
+Message-Id: <20200107190802.2257-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: sOFirEpcPiG2lZyw-dCmhg-1
+X-MC-Unique: H63BH_lqO1Gy83xITeuxTg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -91,368 +88,396 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's much easier if we simply add the folder prefix and the exe suffix
-later via a substitution instead.
+ Hi!
 
-Message-Id: <20191218103059.11729-4-thuth@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include | 258 +++++++++++++++++++++--------------------
- 1 file changed, 130 insertions(+), 128 deletions(-)
+The following changes since commit f4d8cf148e43d942ef1202071e0cd66ce40322e0=
+:
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 7679d0369a..134d269add 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -152,151 +152,153 @@ check-block-$(call land,$(CONFIG_POSIX),$(CONFIG_SO=
-FTMMU)) +=3D tests/check-block.
- # All QTests for now are POSIX-only, but the dependencies are
- # really in libqtest, not in the testcases themselves.
-=20
--check-qtest-generic-y +=3D tests/qmp-test$(EXESUF)
--check-qtest-generic-y +=3D tests/qmp-cmd-test$(EXESUF)
--check-qtest-generic-$(CONFIG_MODULES) +=3D tests/modules-test$(EXESUF)
--
--check-qtest-generic-y +=3D tests/device-introspect-test$(EXESUF)
--check-qtest-generic-y +=3D tests/cdrom-test$(EXESUF)
--
--check-qtest-pci-$(CONFIG_RTL8139_PCI) +=3D tests/rtl8139-test$(EXESUF)
--check-qtest-pci-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
--check-qtest-pci-$(CONFIG_HDA) +=3D tests/intel-hda-test$(EXESUF)
--check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) +=3D tests/ivshmem-test$(EXESUF)
--
--check-qtest-i386-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESUF)
--check-qtest-i386-y +=3D tests/fdc-test$(EXESUF)
--check-qtest-i386-y +=3D tests/ide-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TOOLS) +=3D tests/ahci-test$(EXESUF)
--check-qtest-i386-y +=3D tests/hd-geo-test$(EXESUF)
--check-qtest-i386-y +=3D tests/boot-order-test$(EXESUF)
--check-qtest-i386-y +=3D tests/bios-tables-test$(EXESUF)
--check-qtest-i386-$(CONFIG_SGA) +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
--check-qtest-i386-y +=3D tests/rtc-test$(EXESUF)
--check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) +=3D tests/ipmi-kcs-test$(EXESUF)
-+check-qtest-generic-y +=3D qmp-test
-+check-qtest-generic-y +=3D qmp-cmd-test
-+check-qtest-generic-$(CONFIG_MODULES) +=3D modules-test
-+
-+check-qtest-generic-y +=3D device-introspect-test
-+check-qtest-generic-y +=3D cdrom-test
-+
-+check-qtest-pci-$(CONFIG_RTL8139_PCI) +=3D rtl8139-test
-+check-qtest-pci-$(CONFIG_VGA) +=3D display-vga-test
-+check-qtest-pci-$(CONFIG_HDA) +=3D intel-hda-test
-+check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem-test
-+
-+check-qtest-i386-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+check-qtest-i386-y +=3D fdc-test
-+check-qtest-i386-y +=3D ide-test
-+check-qtest-i386-$(CONFIG_TOOLS) +=3D ahci-test
-+check-qtest-i386-y +=3D hd-geo-test
-+check-qtest-i386-y +=3D boot-order-test
-+check-qtest-i386-y +=3D bios-tables-test
-+check-qtest-i386-$(CONFIG_SGA) +=3D boot-serial-test
-+check-qtest-i386-$(CONFIG_SLIRP) +=3D pxe-test
-+check-qtest-i386-y +=3D rtc-test
-+check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) +=3D ipmi-kcs-test
- ifdef CONFIG_LINUX
--check-qtest-i386-$(CONFIG_ISA_IPMI_BT) +=3D tests/ipmi-bt-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_ISA_IPMI_BT) +=3D ipmi-bt-test
- endif
--check-qtest-i386-y +=3D tests/i440fx-test$(EXESUF)
--check-qtest-i386-y +=3D tests/fw_cfg-test$(EXESUF)
--check-qtest-i386-y +=3D tests/device-plug-test$(EXESUF)
--check-qtest-i386-y +=3D tests/drive_del-test$(EXESUF)
--check-qtest-i386-$(CONFIG_WDT_IB700) +=3D tests/wdt_ib700-test$(EXESUF)
--check-qtest-i386-y +=3D tests/tco-test$(EXESUF)
-+check-qtest-i386-y +=3D i440fx-test
-+check-qtest-i386-y +=3D fw_cfg-test
-+check-qtest-i386-y +=3D device-plug-test
-+check-qtest-i386-y +=3D drive_del-test
-+check-qtest-i386-$(CONFIG_WDT_IB700) +=3D wdt_ib700-test
-+check-qtest-i386-y +=3D tco-test
- check-qtest-i386-y +=3D $(check-qtest-pci-y)
--check-qtest-i386-$(CONFIG_PVPANIC) +=3D tests/pvpanic-test$(EXESUF)
--check-qtest-i386-$(CONFIG_I82801B11) +=3D tests/i82801b11-test$(EXESUF)
--check-qtest-i386-$(CONFIG_IOH3420) +=3D tests/ioh3420-test$(EXESUF)
--check-qtest-i386-$(CONFIG_USB_UHCI) +=3D tests/usb-hcd-uhci-test$(EXESUF)
--check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) +=3D t=
-ests/usb-hcd-ehci-test$(EXESUF)
--check-qtest-i386-$(CONFIG_USB_XHCI_NEC) +=3D tests/usb-hcd-xhci-test$(EXES=
-UF)
--check-qtest-i386-y +=3D tests/cpu-plug-test$(EXESUF)
--check-qtest-i386-y +=3D tests/q35-test$(EXESUF)
--check-qtest-i386-y +=3D tests/vmgenid-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tests/tpm-crb-swtpm-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tests/tpm-crb-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tests/tpm-tis-swtpm-test$(EXESUF)
--check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tests/tpm-tis-test$(EXESUF)
--check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
--check-qtest-i386-$(CONFIG_POSIX) +=3D tests/test-filter-mirror$(EXESUF)
--check-qtest-i386-$(CONFIG_RTL8139_PCI) +=3D tests/test-filter-redirector$(=
-EXESUF)
--check-qtest-i386-y +=3D tests/migration-test$(EXESUF)
--check-qtest-i386-y +=3D tests/test-x86-cpuid-compat$(EXESUF)
--check-qtest-i386-y +=3D tests/numa-test$(EXESUF)
-+check-qtest-i386-$(CONFIG_PVPANIC) +=3D pvpanic-test
-+check-qtest-i386-$(CONFIG_I82801B11) +=3D i82801b11-test
-+check-qtest-i386-$(CONFIG_IOH3420) +=3D ioh3420-test
-+check-qtest-i386-$(CONFIG_USB_UHCI) +=3D usb-hcd-uhci-test
-+check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) +=3D u=
-sb-hcd-ehci-test
-+check-qtest-i386-$(CONFIG_USB_XHCI_NEC) +=3D usb-hcd-xhci-test
-+check-qtest-i386-y +=3D cpu-plug-test
-+check-qtest-i386-y +=3D q35-test
-+check-qtest-i386-y +=3D vmgenid-test
-+check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tpm-crb-swtpm-test
-+check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tpm-crb-test
-+check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tpm-tis-swtpm-test
-+check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tpm-tis-test
-+check-qtest-i386-$(CONFIG_SLIRP) +=3D test-netfilter
-+check-qtest-i386-$(CONFIG_POSIX) +=3D test-filter-mirror
-+check-qtest-i386-$(CONFIG_RTL8139_PCI) +=3D test-filter-redirector
-+check-qtest-i386-y +=3D migration-test
-+check-qtest-i386-y +=3D test-x86-cpuid-compat
-+check-qtest-i386-y +=3D numa-test
-+
- check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
-=20
--check-qtest-alpha-y +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-alpha-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
-+check-qtest-alpha-y +=3D boot-serial-test
-+check-qtest-alpha-$(CONFIG_VGA) +=3D display-vga-test
-=20
--check-qtest-hppa-y +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-hppa-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
-+check-qtest-hppa-y +=3D boot-serial-test
-+check-qtest-hppa-$(CONFIG_VGA) +=3D display-vga-test
-=20
--check-qtest-m68k-y =3D tests/boot-serial-test$(EXESUF)
-+check-qtest-m68k-y =3D boot-serial-test
-=20
--check-qtest-microblaze-y +=3D tests/boot-serial-test$(EXESUF)
-+check-qtest-microblaze-y +=3D boot-serial-test
-=20
--check-qtest-mips-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESUF)
--check-qtest-mips-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
-+check-qtest-mips-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+check-qtest-mips-$(CONFIG_VGA) +=3D display-vga-test
-=20
--check-qtest-mips64-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESUF=
-)
--check-qtest-mips64-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
-+check-qtest-mips64-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+check-qtest-mips64-$(CONFIG_VGA) +=3D display-vga-test
-=20
--check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXES=
-UF)
--check-qtest-mips64el-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
-+check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+check-qtest-mips64el-$(CONFIG_VGA) +=3D display-vga-test
-=20
--check-qtest-moxie-y +=3D tests/boot-serial-test$(EXESUF)
-+check-qtest-moxie-y +=3D boot-serial-test
-=20
--check-qtest-ppc-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESUF)
--check-qtest-ppc-y +=3D tests/boot-order-test$(EXESUF)
--check-qtest-ppc-y +=3D tests/prom-env-test$(EXESUF)
--check-qtest-ppc-y +=3D tests/drive_del-test$(EXESUF)
--check-qtest-ppc-y +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-ppc-$(CONFIG_M48T59) +=3D tests/m48t59-test$(EXESUF)
-+check-qtest-ppc-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+check-qtest-ppc-y +=3D boot-order-test
-+check-qtest-ppc-y +=3D prom-env-test
-+check-qtest-ppc-y +=3D drive_del-test
-+check-qtest-ppc-y +=3D boot-serial-test
-+check-qtest-ppc-$(CONFIG_M48T59) +=3D m48t59-test
-=20
- check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
--check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/device-plug-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_POWERNV) +=3D tests/pnv-xscom-test$(EXESUF)
--check-qtest-ppc64-y +=3D tests/migration-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_PSERIES) +=3D tests/rtas-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_USB_UHCI) +=3D tests/usb-hcd-uhci-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) +=3D tests/usb-hcd-xhci-test$(EXE=
-SUF)
--check-qtest-ppc64-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
--check-qtest-ppc64-$(CONFIG_POSIX) +=3D tests/test-filter-mirror$(EXESUF)
--check-qtest-ppc64-$(CONFIG_RTL8139_PCI) +=3D tests/test-filter-redirector$=
-(EXESUF)
--check-qtest-ppc64-$(CONFIG_VGA) +=3D tests/display-vga-test$(EXESUF)
--check-qtest-ppc64-y +=3D tests/numa-test$(EXESUF)
--check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) +=3D tests/ivshmem-test$(EXESUF=
-)
--check-qtest-ppc64-y +=3D tests/cpu-plug-test$(EXESUF)
--
--check-qtest-sh4-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESUF)
--
--check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESUF)
--
--check-qtest-sparc-y +=3D tests/prom-env-test$(EXESUF)
--check-qtest-sparc-y +=3D tests/m48t59-test$(EXESUF)
--check-qtest-sparc-y +=3D tests/boot-serial-test$(EXESUF)
--
--check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D tests/endianness-test$(EXESU=
-F)
--check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
--check-qtest-sparc64-y +=3D tests/boot-serial-test$(EXESUF)
--
--check-qtest-arm-y +=3D tests/arm-cpu-features$(EXESUF)
--check-qtest-arm-y +=3D tests/microbit-test$(EXESUF)
--check-qtest-arm-y +=3D tests/m25p80-test$(EXESUF)
--check-qtest-arm-y +=3D tests/test-arm-mptimer$(EXESUF)
--check-qtest-arm-y +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
--check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D tests/pflash-cfi02-test$(EXESU=
-F)
--
--check-qtest-aarch64-y +=3D tests/arm-cpu-features$(EXESUF)
--check-qtest-aarch64-y +=3D tests/numa-test$(EXESUF)
--check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
--check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
-+check-qtest-ppc64-$(CONFIG_PSERIES) +=3D device-plug-test
-+check-qtest-ppc64-$(CONFIG_POWERNV) +=3D pnv-xscom-test
-+check-qtest-ppc64-y +=3D migration-test
-+check-qtest-ppc64-$(CONFIG_PSERIES) +=3D rtas-test
-+check-qtest-ppc64-$(CONFIG_SLIRP) +=3D pxe-test
-+check-qtest-ppc64-$(CONFIG_USB_UHCI) +=3D usb-hcd-uhci-test
-+check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) +=3D usb-hcd-xhci-test
-+check-qtest-ppc64-$(CONFIG_SLIRP) +=3D test-netfilter
-+check-qtest-ppc64-$(CONFIG_POSIX) +=3D test-filter-mirror
-+check-qtest-ppc64-$(CONFIG_RTL8139_PCI) +=3D test-filter-redirector
-+check-qtest-ppc64-$(CONFIG_VGA) +=3D display-vga-test
-+check-qtest-ppc64-y +=3D numa-test
-+check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem-test
-+check-qtest-ppc64-y +=3D cpu-plug-test
-+
-+check-qtest-sh4-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+
-+check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+
-+check-qtest-sparc-y +=3D prom-env-test
-+check-qtest-sparc-y +=3D m48t59-test
-+check-qtest-sparc-y +=3D boot-serial-test
-+
-+check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D endianness-test
-+check-qtest-sparc64-y +=3D prom-env-test
-+check-qtest-sparc64-y +=3D boot-serial-test
-+
-+check-qtest-arm-y +=3D arm-cpu-features
-+check-qtest-arm-y +=3D microbit-test
-+check-qtest-arm-y +=3D m25p80-test
-+check-qtest-arm-y +=3D test-arm-mptimer
-+check-qtest-arm-y +=3D boot-serial-test
-+check-qtest-arm-y +=3D hexloader-test
-+check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D pflash-cfi02-test
-+
-+check-qtest-aarch64-y +=3D arm-cpu-features
-+check-qtest-aarch64-y +=3D numa-test
-+check-qtest-aarch64-y +=3D boot-serial-test
-+check-qtest-aarch64-y +=3D migration-test
-+
- # TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditio=
-nal
- ifneq ($(ARCH),arm)
--check-qtest-aarch64-y +=3D tests/bios-tables-test$(EXESUF)
-+check-qtest-aarch64-y +=3D bios-tables-test
- endif
-=20
- check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
-=20
- check-qtest-xtensaeb-y +=3D $(check-qtest-xtensa-y)
-=20
--check-qtest-s390x-y =3D tests/boot-serial-test$(EXESUF)
--check-qtest-s390x-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
--check-qtest-s390x-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
--check-qtest-s390x-$(CONFIG_POSIX) +=3D tests/test-filter-mirror$(EXESUF)
--check-qtest-s390x-$(CONFIG_POSIX) +=3D tests/test-filter-redirector$(EXESU=
-F)
--check-qtest-s390x-y +=3D tests/drive_del-test$(EXESUF)
--check-qtest-s390x-y +=3D tests/device-plug-test$(EXESUF)
--check-qtest-s390x-y +=3D tests/virtio-ccw-test$(EXESUF)
--check-qtest-s390x-y +=3D tests/cpu-plug-test$(EXESUF)
--check-qtest-s390x-y +=3D tests/migration-test$(EXESUF)
--
--check-qtest-generic-y +=3D tests/machine-none-test$(EXESUF)
--check-qtest-generic-y +=3D tests/qom-test$(EXESUF)
--check-qtest-generic-y +=3D tests/test-hmp$(EXESUF)
-+check-qtest-s390x-y =3D boot-serial-test
-+check-qtest-s390x-$(CONFIG_SLIRP) +=3D pxe-test
-+check-qtest-s390x-$(CONFIG_SLIRP) +=3D test-netfilter
-+check-qtest-s390x-$(CONFIG_POSIX) +=3D test-filter-mirror
-+check-qtest-s390x-$(CONFIG_POSIX) +=3D test-filter-redirector
-+check-qtest-s390x-y +=3D drive_del-test
-+check-qtest-s390x-y +=3D device-plug-test
-+check-qtest-s390x-y +=3D virtio-ccw-test
-+check-qtest-s390x-y +=3D cpu-plug-test
-+check-qtest-s390x-y +=3D migration-test
-+
-+check-qtest-generic-y +=3D machine-none-test
-+check-qtest-generic-y +=3D qom-test
-+check-qtest-generic-y +=3D test-hmp
-=20
- qapi-schema +=3D alternate-any.json
- qapi-schema +=3D alternate-array.json
-@@ -778,7 +780,7 @@ qos-test-obj-y +=3D tests/vmxnet3-test.o
- check-unit-y +=3D tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-=20
--check-qtest-generic-y +=3D tests/qos-test$(EXESUF)
-+check-qtest-generic-y +=3D qos-test
- tests/qos-test$(EXESUF): $(qos-test-obj-y)
-=20
- tests/qmp-test$(EXESUF): tests/qmp-test.o
-@@ -862,8 +864,8 @@ tests/migration/initrd-stress.img: tests/migration/stre=
-ss$(EXESUF)
- TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
- ifeq ($(CONFIG_POSIX),y)
- QTEST_TARGETS =3D $(TARGETS)
--check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
--check-qtest-y +=3D $(check-qtest-generic-y)
-+check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=
-=3Dtests/%$(EXESUF)))
-+check-qtest-y +=3D $(check-qtest-generic-y:%=3Dtests/%$(EXESUF))
- else
- QTEST_TARGETS =3D
- endif
-@@ -913,7 +915,7 @@ endef
-=20
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu/a=
-ll $(check-qtest-y)
--=09$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
-+=09$(call do_test_human,$(check-qtest-$*-y:%=3Dtests/%$(EXESUF)) $(check-q=
-test-generic-y:%=3Dtests/%$(EXESUF)), \
- =09  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- =09  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-=20
-@@ -926,7 +928,7 @@ check-speed: $(check-speed-y)
- # gtester tests with TAP output
-=20
- $(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qt=
-est-%.tap: %-softmmu/all $(check-qtest-y)
--=09$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
-+=09$(call do_test_tap, $(check-qtest-$*-y:%=3Dtests/%$(EXESUF)) $(check-qt=
-est-generic-y:%=3Dtests/%$(EXESUF)), \
- =09  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- =09  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-=20
-@@ -1192,7 +1194,7 @@ endif
- check: check-block check-qapi-schema check-unit check-softfloat check-qtes=
-t check-decodetree
- check-clean:
- =09rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
--=09rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
-arget)-y)) $(check-qtest-generic-y))
-+=09rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
-arget)-y:%=3Dtests/%$(EXESUF))) $(check-qtest-generic-y:%=3Dtests/%$(EXESUF=
-)))
- =09rm -f tests/test-qapi-gen-timestamp
- =09rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
-=20
---=20
-2.18.1
+  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-01-06=
+' into staging (2020-01-06 17:44:22 +0000)
+
+are available in the Git repository at:
+
+  https://gitlab.com/huth/qemu.git tags/pull-request-2020-01-07
+
+for you to fetch changes up to 2cf30f8ecb8b64cc5ccaf77244570e7def8075a5:
+
+  docs: build an index page for the HTML docs (2020-01-07 19:48:30 +0100)
+
+----------------------------------------------------------------
+* Move qtests into a separate directory
+* Build index.html for docs
+----------------------------------------------------------------
+
+Stefan Hajnoczi (1):
+      docs: build an index page for the HTML docs
+
+Thomas Huth (7):
+      tests/Makefile: test-char does not need libqtest
+      tests/ptimer: Remove unnecessary inclusion of libqtest.h
+      tests/Makefile: Remove 'tests/' and '$(EXESUF)' from the check-qtest =
+variables
+      tests/Makefile: Separate unit test dependencies from qtest dependenci=
+es
+      test: Move qtests to a separate directory
+      tests/Makefile: Move qtest-related settings to a separate Makefile.in=
+clude
+      tests/libqos: Move the libqos files under tests/qtest/
+
+ .gitlab-ci.yml                                     |  11 +-
+ MAINTAINERS                                        |  88 +++---
+ Makefile                                           |   6 +
+ configure                                          |   4 +-
+ docs/index.html.in                                 |  17 ++
+ tests/Makefile.include                             | 334 +----------------=
+----
+ tests/ptimer-test.c                                |   1 -
+ tests/qtest/Makefile.include                       | 310 +++++++++++++++++=
+++
+ tests/{ =3D> qtest}/ac97-test.c                      |   0
+ tests/{ =3D> qtest}/acpi-utils.c                     |   0
+ tests/{ =3D> qtest}/acpi-utils.h                     |   0
+ tests/{ =3D> qtest}/ahci-test.c                      |   0
+ tests/{ =3D> qtest}/arm-cpu-features.c               |   0
+ tests/{ =3D> qtest}/bios-tables-test-allowed-diff.h  |   0
+ tests/{ =3D> qtest}/bios-tables-test.c               |   0
+ tests/{ =3D> qtest}/boot-order-test.c                |   0
+ tests/{ =3D> qtest}/boot-sector.c                    |   0
+ tests/{ =3D> qtest}/boot-sector.h                    |   0
+ tests/{ =3D> qtest}/boot-serial-test.c               |   0
+ tests/{ =3D> qtest}/cdrom-test.c                     |   0
+ tests/{ =3D> qtest}/cpu-plug-test.c                  |   0
+ tests/{ =3D> qtest}/device-introspect-test.c         |   0
+ tests/{ =3D> qtest}/device-plug-test.c               |   0
+ tests/{ =3D> qtest}/display-vga-test.c               |   0
+ tests/{ =3D> qtest}/drive_del-test.c                 |   0
+ tests/{ =3D> qtest}/ds1338-test.c                    |   0
+ tests/{ =3D> qtest}/e1000-test.c                     |   0
+ tests/{ =3D> qtest}/e1000e-test.c                    |   0
+ tests/{ =3D> qtest}/eepro100-test.c                  |   0
+ tests/{ =3D> qtest}/endianness-test.c                |   0
+ tests/{ =3D> qtest}/es1370-test.c                    |   0
+ tests/{ =3D> qtest}/fdc-test.c                       |   0
+ tests/{ =3D> qtest}/fw_cfg-test.c                    |   0
+ tests/{ =3D> qtest}/hd-geo-test.c                    |   0
+ tests/{ =3D> qtest}/hexloader-test.c                 |   0
+ tests/{ =3D> qtest}/i440fx-test.c                    |   0
+ tests/{ =3D> qtest}/i82801b11-test.c                 |   0
+ tests/{ =3D> qtest}/ide-test.c                       |   0
+ tests/{ =3D> qtest}/intel-hda-test.c                 |   0
+ tests/{ =3D> qtest}/ioh3420-test.c                   |   0
+ tests/{ =3D> qtest}/ipmi-bt-test.c                   |   0
+ tests/{ =3D> qtest}/ipmi-kcs-test.c                  |   0
+ tests/{ =3D> qtest}/ipoctal232-test.c                |   0
+ tests/{ =3D> qtest}/ivshmem-test.c                   |   0
+ .../libqos/aarch64-xlnx-zcu102-machine.c           |   0
+ tests/{ =3D> qtest}/libqos/ahci.c                    |   0
+ tests/{ =3D> qtest}/libqos/ahci.h                    |   0
+ tests/{ =3D> qtest}/libqos/arm-imx25-pdk-machine.c   |   0
+ tests/{ =3D> qtest}/libqos/arm-n800-machine.c        |   0
+ tests/{ =3D> qtest}/libqos/arm-raspi2-machine.c      |   0
+ tests/{ =3D> qtest}/libqos/arm-sabrelite-machine.c   |   0
+ tests/{ =3D> qtest}/libqos/arm-smdkc210-machine.c    |   0
+ tests/{ =3D> qtest}/libqos/arm-virt-machine.c        |   0
+ .../libqos/arm-xilinx-zynq-a9-machine.c            |   0
+ tests/{ =3D> qtest}/libqos/e1000e.c                  |   0
+ tests/{ =3D> qtest}/libqos/e1000e.h                  |   0
+ tests/{ =3D> qtest}/libqos/fw_cfg.c                  |   0
+ tests/{ =3D> qtest}/libqos/fw_cfg.h                  |   0
+ tests/{ =3D> qtest}/libqos/i2c-imx.c                 |   0
+ tests/{ =3D> qtest}/libqos/i2c-omap.c                |   0
+ tests/{ =3D> qtest}/libqos/i2c.c                     |   0
+ tests/{ =3D> qtest}/libqos/i2c.h                     |   0
+ tests/{ =3D> qtest}/libqos/libqos-pc.c               |   0
+ tests/{ =3D> qtest}/libqos/libqos-pc.h               |   0
+ tests/{ =3D> qtest}/libqos/libqos-spapr.c            |   0
+ tests/{ =3D> qtest}/libqos/libqos-spapr.h            |   0
+ tests/{ =3D> qtest}/libqos/libqos.c                  |   0
+ tests/{ =3D> qtest}/libqos/libqos.h                  |   0
+ tests/{ =3D> qtest}/libqos/malloc-pc.c               |   0
+ tests/{ =3D> qtest}/libqos/malloc-pc.h               |   0
+ tests/{ =3D> qtest}/libqos/malloc-spapr.c            |   0
+ tests/{ =3D> qtest}/libqos/malloc-spapr.h            |   0
+ tests/{ =3D> qtest}/libqos/malloc.c                  |   0
+ tests/{ =3D> qtest}/libqos/malloc.h                  |   0
+ tests/{ =3D> qtest}/libqos/pci-pc.c                  |   0
+ tests/{ =3D> qtest}/libqos/pci-pc.h                  |   0
+ tests/{ =3D> qtest}/libqos/pci-spapr.c               |   0
+ tests/{ =3D> qtest}/libqos/pci-spapr.h               |   0
+ tests/{ =3D> qtest}/libqos/pci.c                     |   0
+ tests/{ =3D> qtest}/libqos/pci.h                     |   0
+ tests/{ =3D> qtest}/libqos/ppc64_pseries-machine.c   |   0
+ tests/{ =3D> qtest}/libqos/qgraph.c                  |   0
+ tests/{ =3D> qtest}/libqos/qgraph.h                  |   0
+ tests/{ =3D> qtest}/libqos/qgraph_internal.h         |   0
+ tests/{ =3D> qtest}/libqos/rtas.c                    |   0
+ tests/{ =3D> qtest}/libqos/rtas.h                    |   0
+ tests/{ =3D> qtest}/libqos/sdhci.c                   |   0
+ tests/{ =3D> qtest}/libqos/sdhci.h                   |   0
+ tests/{ =3D> qtest}/libqos/tpci200.c                 |   0
+ tests/{ =3D> qtest}/libqos/usb.c                     |   0
+ tests/{ =3D> qtest}/libqos/usb.h                     |   0
+ tests/{ =3D> qtest}/libqos/virtio-9p.c               |   0
+ tests/{ =3D> qtest}/libqos/virtio-9p.h               |   0
+ tests/{ =3D> qtest}/libqos/virtio-balloon.c          |   0
+ tests/{ =3D> qtest}/libqos/virtio-balloon.h          |   0
+ tests/{ =3D> qtest}/libqos/virtio-blk.c              |   0
+ tests/{ =3D> qtest}/libqos/virtio-blk.h              |   0
+ tests/{ =3D> qtest}/libqos/virtio-mmio.c             |   0
+ tests/{ =3D> qtest}/libqos/virtio-mmio.h             |   0
+ tests/{ =3D> qtest}/libqos/virtio-net.c              |   0
+ tests/{ =3D> qtest}/libqos/virtio-net.h              |   0
+ tests/{ =3D> qtest}/libqos/virtio-pci-modern.c       |   0
+ tests/{ =3D> qtest}/libqos/virtio-pci-modern.h       |   0
+ tests/{ =3D> qtest}/libqos/virtio-pci.c              |   0
+ tests/{ =3D> qtest}/libqos/virtio-pci.h              |   0
+ tests/{ =3D> qtest}/libqos/virtio-rng.c              |   0
+ tests/{ =3D> qtest}/libqos/virtio-rng.h              |   0
+ tests/{ =3D> qtest}/libqos/virtio-scsi.c             |   0
+ tests/{ =3D> qtest}/libqos/virtio-scsi.h             |   0
+ tests/{ =3D> qtest}/libqos/virtio-serial.c           |   0
+ tests/{ =3D> qtest}/libqos/virtio-serial.h           |   0
+ tests/{ =3D> qtest}/libqos/virtio.c                  |   0
+ tests/{ =3D> qtest}/libqos/virtio.h                  |   0
+ tests/{ =3D> qtest}/libqos/x86_64_pc-machine.c       |   0
+ tests/{ =3D> qtest}/libqtest-single.h                |   0
+ tests/{ =3D> qtest}/libqtest.c                       |   0
+ tests/{ =3D> qtest}/libqtest.h                       |   0
+ tests/{ =3D> qtest}/m25p80-test.c                    |   0
+ tests/{ =3D> qtest}/m48t59-test.c                    |   0
+ tests/{ =3D> qtest}/machine-none-test.c              |   0
+ tests/{ =3D> qtest}/megasas-test.c                   |   0
+ tests/{ =3D> qtest}/microbit-test.c                  |   0
+ tests/{ =3D> qtest}/migration-test.c                 |   0
+ tests/{ =3D> qtest}/modules-test.c                   |   0
+ tests/{ =3D> qtest}/ne2000-test.c                    |   0
+ tests/{ =3D> qtest}/numa-test.c                      |   0
+ tests/{ =3D> qtest}/nvme-test.c                      |   0
+ tests/{ =3D> qtest}/pca9552-test.c                   |   0
+ tests/{ =3D> qtest}/pci-test.c                       |   0
+ tests/{ =3D> qtest}/pcnet-test.c                     |   0
+ tests/{ =3D> qtest}/pflash-cfi02-test.c              |   0
+ tests/{ =3D> qtest}/pnv-xscom-test.c                 |   0
+ tests/{ =3D> qtest}/prom-env-test.c                  |   0
+ tests/{ =3D> qtest}/pvpanic-test.c                   |   0
+ tests/{ =3D> qtest}/pxe-test.c                       |   0
+ tests/{ =3D> qtest}/q35-test.c                       |   0
+ tests/{ =3D> qtest}/qmp-cmd-test.c                   |   0
+ tests/{ =3D> qtest}/qmp-test.c                       |   0
+ tests/{ =3D> qtest}/qom-test.c                       |   0
+ tests/{ =3D> qtest}/qos-test.c                       |   0
+ tests/{ =3D> qtest}/rtas-test.c                      |   0
+ tests/{ =3D> qtest}/rtc-test.c                       |   0
+ tests/{ =3D> qtest}/rtl8139-test.c                   |   0
+ tests/{ =3D> qtest}/sdhci-test.c                     |   0
+ tests/{ =3D> qtest}/spapr-phb-test.c                 |   0
+ tests/{ =3D> qtest}/tco-test.c                       |   0
+ tests/{ =3D> qtest}/test-arm-mptimer.c               |   0
+ tests/{ =3D> qtest}/test-filter-mirror.c             |   0
+ tests/{ =3D> qtest}/test-filter-redirector.c         |   0
+ tests/{ =3D> qtest}/test-hmp.c                       |   0
+ tests/{ =3D> qtest}/test-netfilter.c                 |   0
+ tests/{ =3D> qtest}/test-x86-cpuid-compat.c          |   0
+ tests/{ =3D> qtest}/tmp105-test.c                    |   0
+ tests/{ =3D> qtest}/tpm-crb-swtpm-test.c             |   0
+ tests/{ =3D> qtest}/tpm-crb-test.c                   |   0
+ tests/{ =3D> qtest}/tpm-emu.c                        |   0
+ tests/{ =3D> qtest}/tpm-emu.h                        |   0
+ tests/{ =3D> qtest}/tpm-tests.c                      |   0
+ tests/{ =3D> qtest}/tpm-tests.h                      |   0
+ tests/{ =3D> qtest}/tpm-tis-swtpm-test.c             |   0
+ tests/{ =3D> qtest}/tpm-tis-test.c                   |   0
+ tests/{ =3D> qtest}/tpm-util.c                       |   0
+ tests/{ =3D> qtest}/tpm-util.h                       |   0
+ tests/{ =3D> qtest}/usb-hcd-ehci-test.c              |   0
+ tests/{ =3D> qtest}/usb-hcd-ohci-test.c              |   0
+ tests/{ =3D> qtest}/usb-hcd-uhci-test.c              |   0
+ tests/{ =3D> qtest}/usb-hcd-xhci-test.c              |   0
+ tests/{ =3D> qtest}/vhost-user-test.c                |   0
+ tests/{ =3D> qtest}/virtio-9p-test.c                 |   0
+ tests/{ =3D> qtest}/virtio-blk-test.c                |   0
+ tests/{ =3D> qtest}/virtio-ccw-test.c                |   0
+ tests/{ =3D> qtest}/virtio-net-test.c                |   0
+ tests/{ =3D> qtest}/virtio-rng-test.c                |   0
+ tests/{ =3D> qtest}/virtio-scsi-test.c               |   0
+ tests/{ =3D> qtest}/virtio-serial-test.c             |   0
+ tests/{ =3D> qtest}/virtio-test.c                    |   0
+ tests/{ =3D> qtest}/vmgenid-test.c                   |   0
+ tests/{ =3D> qtest}/vmxnet3-test.c                   |   0
+ tests/{ =3D> qtest}/wdt_ib700-test.c                 |   0
+ 179 files changed, 397 insertions(+), 374 deletions(-)
+ create mode 100644 docs/index.html.in
+ create mode 100644 tests/qtest/Makefile.include
+ rename tests/{ =3D> qtest}/ac97-test.c (100%)
+ rename tests/{ =3D> qtest}/acpi-utils.c (100%)
+ rename tests/{ =3D> qtest}/acpi-utils.h (100%)
+ rename tests/{ =3D> qtest}/ahci-test.c (100%)
+ rename tests/{ =3D> qtest}/arm-cpu-features.c (100%)
+ rename tests/{ =3D> qtest}/bios-tables-test-allowed-diff.h (100%)
+ rename tests/{ =3D> qtest}/bios-tables-test.c (100%)
+ rename tests/{ =3D> qtest}/boot-order-test.c (100%)
+ rename tests/{ =3D> qtest}/boot-sector.c (100%)
+ rename tests/{ =3D> qtest}/boot-sector.h (100%)
+ rename tests/{ =3D> qtest}/boot-serial-test.c (100%)
+ rename tests/{ =3D> qtest}/cdrom-test.c (100%)
+ rename tests/{ =3D> qtest}/cpu-plug-test.c (100%)
+ rename tests/{ =3D> qtest}/device-introspect-test.c (100%)
+ rename tests/{ =3D> qtest}/device-plug-test.c (100%)
+ rename tests/{ =3D> qtest}/display-vga-test.c (100%)
+ rename tests/{ =3D> qtest}/drive_del-test.c (100%)
+ rename tests/{ =3D> qtest}/ds1338-test.c (100%)
+ rename tests/{ =3D> qtest}/e1000-test.c (100%)
+ rename tests/{ =3D> qtest}/e1000e-test.c (100%)
+ rename tests/{ =3D> qtest}/eepro100-test.c (100%)
+ rename tests/{ =3D> qtest}/endianness-test.c (100%)
+ rename tests/{ =3D> qtest}/es1370-test.c (100%)
+ rename tests/{ =3D> qtest}/fdc-test.c (100%)
+ rename tests/{ =3D> qtest}/fw_cfg-test.c (100%)
+ rename tests/{ =3D> qtest}/hd-geo-test.c (100%)
+ rename tests/{ =3D> qtest}/hexloader-test.c (100%)
+ rename tests/{ =3D> qtest}/i440fx-test.c (100%)
+ rename tests/{ =3D> qtest}/i82801b11-test.c (100%)
+ rename tests/{ =3D> qtest}/ide-test.c (100%)
+ rename tests/{ =3D> qtest}/intel-hda-test.c (100%)
+ rename tests/{ =3D> qtest}/ioh3420-test.c (100%)
+ rename tests/{ =3D> qtest}/ipmi-bt-test.c (100%)
+ rename tests/{ =3D> qtest}/ipmi-kcs-test.c (100%)
+ rename tests/{ =3D> qtest}/ipoctal232-test.c (100%)
+ rename tests/{ =3D> qtest}/ivshmem-test.c (100%)
+ rename tests/{ =3D> qtest}/libqos/aarch64-xlnx-zcu102-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/ahci.c (100%)
+ rename tests/{ =3D> qtest}/libqos/ahci.h (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-imx25-pdk-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-n800-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-raspi2-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-sabrelite-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-smdkc210-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-virt-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/arm-xilinx-zynq-a9-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/e1000e.c (100%)
+ rename tests/{ =3D> qtest}/libqos/e1000e.h (100%)
+ rename tests/{ =3D> qtest}/libqos/fw_cfg.c (100%)
+ rename tests/{ =3D> qtest}/libqos/fw_cfg.h (100%)
+ rename tests/{ =3D> qtest}/libqos/i2c-imx.c (100%)
+ rename tests/{ =3D> qtest}/libqos/i2c-omap.c (100%)
+ rename tests/{ =3D> qtest}/libqos/i2c.c (100%)
+ rename tests/{ =3D> qtest}/libqos/i2c.h (100%)
+ rename tests/{ =3D> qtest}/libqos/libqos-pc.c (100%)
+ rename tests/{ =3D> qtest}/libqos/libqos-pc.h (100%)
+ rename tests/{ =3D> qtest}/libqos/libqos-spapr.c (100%)
+ rename tests/{ =3D> qtest}/libqos/libqos-spapr.h (100%)
+ rename tests/{ =3D> qtest}/libqos/libqos.c (100%)
+ rename tests/{ =3D> qtest}/libqos/libqos.h (100%)
+ rename tests/{ =3D> qtest}/libqos/malloc-pc.c (100%)
+ rename tests/{ =3D> qtest}/libqos/malloc-pc.h (100%)
+ rename tests/{ =3D> qtest}/libqos/malloc-spapr.c (100%)
+ rename tests/{ =3D> qtest}/libqos/malloc-spapr.h (100%)
+ rename tests/{ =3D> qtest}/libqos/malloc.c (100%)
+ rename tests/{ =3D> qtest}/libqos/malloc.h (100%)
+ rename tests/{ =3D> qtest}/libqos/pci-pc.c (100%)
+ rename tests/{ =3D> qtest}/libqos/pci-pc.h (100%)
+ rename tests/{ =3D> qtest}/libqos/pci-spapr.c (100%)
+ rename tests/{ =3D> qtest}/libqos/pci-spapr.h (100%)
+ rename tests/{ =3D> qtest}/libqos/pci.c (100%)
+ rename tests/{ =3D> qtest}/libqos/pci.h (100%)
+ rename tests/{ =3D> qtest}/libqos/ppc64_pseries-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqos/qgraph.c (100%)
+ rename tests/{ =3D> qtest}/libqos/qgraph.h (100%)
+ rename tests/{ =3D> qtest}/libqos/qgraph_internal.h (100%)
+ rename tests/{ =3D> qtest}/libqos/rtas.c (100%)
+ rename tests/{ =3D> qtest}/libqos/rtas.h (100%)
+ rename tests/{ =3D> qtest}/libqos/sdhci.c (100%)
+ rename tests/{ =3D> qtest}/libqos/sdhci.h (100%)
+ rename tests/{ =3D> qtest}/libqos/tpci200.c (100%)
+ rename tests/{ =3D> qtest}/libqos/usb.c (100%)
+ rename tests/{ =3D> qtest}/libqos/usb.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-9p.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-9p.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-balloon.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-balloon.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-blk.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-blk.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-mmio.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-mmio.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-net.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-net.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-pci-modern.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-pci-modern.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-pci.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-pci.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-rng.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-rng.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-scsi.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-scsi.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-serial.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio-serial.h (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio.c (100%)
+ rename tests/{ =3D> qtest}/libqos/virtio.h (100%)
+ rename tests/{ =3D> qtest}/libqos/x86_64_pc-machine.c (100%)
+ rename tests/{ =3D> qtest}/libqtest-single.h (100%)
+ rename tests/{ =3D> qtest}/libqtest.c (100%)
+ rename tests/{ =3D> qtest}/libqtest.h (100%)
+ rename tests/{ =3D> qtest}/m25p80-test.c (100%)
+ rename tests/{ =3D> qtest}/m48t59-test.c (100%)
+ rename tests/{ =3D> qtest}/machine-none-test.c (100%)
+ rename tests/{ =3D> qtest}/megasas-test.c (100%)
+ rename tests/{ =3D> qtest}/microbit-test.c (100%)
+ rename tests/{ =3D> qtest}/migration-test.c (100%)
+ rename tests/{ =3D> qtest}/modules-test.c (100%)
+ rename tests/{ =3D> qtest}/ne2000-test.c (100%)
+ rename tests/{ =3D> qtest}/numa-test.c (100%)
+ rename tests/{ =3D> qtest}/nvme-test.c (100%)
+ rename tests/{ =3D> qtest}/pca9552-test.c (100%)
+ rename tests/{ =3D> qtest}/pci-test.c (100%)
+ rename tests/{ =3D> qtest}/pcnet-test.c (100%)
+ rename tests/{ =3D> qtest}/pflash-cfi02-test.c (100%)
+ rename tests/{ =3D> qtest}/pnv-xscom-test.c (100%)
+ rename tests/{ =3D> qtest}/prom-env-test.c (100%)
+ rename tests/{ =3D> qtest}/pvpanic-test.c (100%)
+ rename tests/{ =3D> qtest}/pxe-test.c (100%)
+ rename tests/{ =3D> qtest}/q35-test.c (100%)
+ rename tests/{ =3D> qtest}/qmp-cmd-test.c (100%)
+ rename tests/{ =3D> qtest}/qmp-test.c (100%)
+ rename tests/{ =3D> qtest}/qom-test.c (100%)
+ rename tests/{ =3D> qtest}/qos-test.c (100%)
+ rename tests/{ =3D> qtest}/rtas-test.c (100%)
+ rename tests/{ =3D> qtest}/rtc-test.c (100%)
+ rename tests/{ =3D> qtest}/rtl8139-test.c (100%)
+ rename tests/{ =3D> qtest}/sdhci-test.c (100%)
+ rename tests/{ =3D> qtest}/spapr-phb-test.c (100%)
+ rename tests/{ =3D> qtest}/tco-test.c (100%)
+ rename tests/{ =3D> qtest}/test-arm-mptimer.c (100%)
+ rename tests/{ =3D> qtest}/test-filter-mirror.c (100%)
+ rename tests/{ =3D> qtest}/test-filter-redirector.c (100%)
+ rename tests/{ =3D> qtest}/test-hmp.c (100%)
+ rename tests/{ =3D> qtest}/test-netfilter.c (100%)
+ rename tests/{ =3D> qtest}/test-x86-cpuid-compat.c (100%)
+ rename tests/{ =3D> qtest}/tmp105-test.c (100%)
+ rename tests/{ =3D> qtest}/tpm-crb-swtpm-test.c (100%)
+ rename tests/{ =3D> qtest}/tpm-crb-test.c (100%)
+ rename tests/{ =3D> qtest}/tpm-emu.c (100%)
+ rename tests/{ =3D> qtest}/tpm-emu.h (100%)
+ rename tests/{ =3D> qtest}/tpm-tests.c (100%)
+ rename tests/{ =3D> qtest}/tpm-tests.h (100%)
+ rename tests/{ =3D> qtest}/tpm-tis-swtpm-test.c (100%)
+ rename tests/{ =3D> qtest}/tpm-tis-test.c (100%)
+ rename tests/{ =3D> qtest}/tpm-util.c (100%)
+ rename tests/{ =3D> qtest}/tpm-util.h (100%)
+ rename tests/{ =3D> qtest}/usb-hcd-ehci-test.c (100%)
+ rename tests/{ =3D> qtest}/usb-hcd-ohci-test.c (100%)
+ rename tests/{ =3D> qtest}/usb-hcd-uhci-test.c (100%)
+ rename tests/{ =3D> qtest}/usb-hcd-xhci-test.c (100%)
+ rename tests/{ =3D> qtest}/vhost-user-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-9p-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-blk-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-ccw-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-net-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-rng-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-scsi-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-serial-test.c (100%)
+ rename tests/{ =3D> qtest}/virtio-test.c (100%)
+ rename tests/{ =3D> qtest}/vmgenid-test.c (100%)
+ rename tests/{ =3D> qtest}/vmxnet3-test.c (100%)
+ rename tests/{ =3D> qtest}/wdt_ib700-test.c (100%)
 
 
