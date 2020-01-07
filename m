@@ -2,52 +2,83 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C74C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F41C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:39:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77AC42087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:39:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77AC42087F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC2CB2087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:39:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e32tgti+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC2CB2087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioq1G-0005xW-4B
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:39:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41463)
+	id 1ioq1S-0006IG-Hz
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:39:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37597)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@siemens.com>) id 1iopyo-0002mA-6m
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:37:11 -0500
+ (envelope-from <quintela@redhat.com>) id 1iooT4-0006zN-7J
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:00:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@siemens.com>) id 1iopyi-00035Z-QR
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:37:09 -0500
-Received: from goliath.siemens.de ([192.35.17.28]:54898)
+ (envelope-from <quintela@redhat.com>) id 1iooT2-0004uV-M8
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:00:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56386
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
- id 1iopyi-0002wa-Fr
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:37:04 -0500
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
- by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 007EaiNQ008533
- (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 7 Jan 2020 15:36:44 +0100
-Received: from md1f2u6c.ad001.siemens.net ([139.25.68.37])
- by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 007Eai7Q011484;
- Tue, 7 Jan 2020 15:36:44 +0100
-From: Jan Kiszka <jan.kiszka@siemens.com>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [RFC][PATCH v2 0/3] IVSHMEM version 2 device for QEMU
-Date: Tue,  7 Jan 2020 15:36:39 +0100
-Message-Id: <cover.1578407802.git.jan.kiszka@siemens.com>
-X-Mailer: git-send-email 2.16.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 192.35.17.28
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iooT2-0004tg-Hq
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:00:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578402015;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9eo6Au6AL9qxIDF7nfivXVIB4aPc72kysfxZ9eW992E=;
+ b=e32tgti+QuMrFikKjdthxJck/gDwtUZvTxSvm21lK6SuHdVnpxp4VdeIulaRkuYBFX3GXh
+ de1/4PDGmVZZOVfboKlgAwPWFsSd5bQ5GgIRXhvydqgPMbcJd3wzDNcBa/lc494K1l/JSr
+ bA2j8kIM09Pj5XKrDf0ihERFvVN2Uc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-bq6Vmnb_MKK3QZaBbpY9-Q-1; Tue, 07 Jan 2020 08:00:13 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E0B9100551A
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 13:00:12 +0000 (UTC)
+Received: from redhat.com (ovpn-116-141.ams2.redhat.com [10.36.116.141])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A057F383;
+ Tue,  7 Jan 2020 13:00:11 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v2 05/10] migration: Make multifd_load_setup() get an
+ Error parameter
+In-Reply-To: <20200103172222.GP3804@work-vm> (David Alan Gilbert's message of
+ "Fri, 3 Jan 2020 17:22:22 +0000")
+References: <20191218020119.3776-1-quintela@redhat.com>
+ <20191218020119.3776-6-quintela@redhat.com>
+ <20200103172222.GP3804@work-vm>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Tue, 07 Jan 2020 14:00:06 +0100
+Message-ID: <8736crqv55.fsf@trasno.org>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: bq6Vmnb_MKK3QZaBbpY9-Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,92 +90,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liang yan <lyan@suse.com>, Jailhouse <jailhouse-dev@googlegroups.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Overdue update of the ivshmem 2.0 device model as presented at [1].
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> We need to change the full chain to pass the Error parameter.
+>>=20
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/migration.c | 10 +++++-----
+>>  migration/migration.h |  2 +-
+>>  migration/ram.c       |  2 +-
+>>  migration/ram.h       |  2 +-
+>>  migration/rdma.c      |  2 +-
+>>  5 files changed, 9 insertions(+), 9 deletions(-)
+>>=20
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 5a56bd0c91..cf6cec5fb6 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -518,11 +518,11 @@ fail:
+>>      exit(EXIT_FAILURE);
+>>  }
+>> =20
+>> -static void migration_incoming_setup(QEMUFile *f)
+>> +static void migration_incoming_setup(QEMUFile *f, Error **errp)
+>>  {
+>>      MigrationIncomingState *mis =3D migration_incoming_get_current();
+>> =20
+>> -    if (multifd_load_setup() !=3D 0) {
+>> +    if (multifd_load_setup(errp) !=3D 0) {
+>>          /* We haven't been able to create multifd threads
+>>             nothing better to do */
+>
+> But if you're taking an errp and the load fails, don't you want to
+> report the error before you exit? (with an error_get_pretty or
+> something?)
 
-Changes in v2:
- - changed PCI device ID to Siemens-granted one,
-   adjusted PCI device revision to 0
- - removed unused feature register from device
- - addressed feedback on specification document
- - rebased over master
+error_report_err() that is.
 
-This version is now fully in sync with the implementation for Jailhouse
-that is currently under review [2][3], UIO and virtio-ivshmem drivers
-are shared. Jailhouse will very likely pick up this revision of the
-device in order to move forward with stressing it.
+>
+>>          exit(EXIT_FAILURE);
+>> @@ -572,13 +572,13 @@ static bool postcopy_try_recover(QEMUFile *f)
+>>      return false;
+>>  }
+>> =20
+>> -void migration_fd_process_incoming(QEMUFile *f)
+>> +void migration_fd_process_incoming(QEMUFile *f, Error **errp)
+>>  {
+>>      if (postcopy_try_recover(f)) {
+>>          return;
+>>      }
+>> =20
+>> -    migration_incoming_setup(f);
+>> +    migration_incoming_setup(f, errp);
+>>      migration_incoming_process();
+>
+> and if you're making incoming_setup able to fail, don't you need
+> to.... hmm, skip the incoming_process?
 
-More details on the usage with QEMU were in the original cover letter
-(with adjustements to the new device ID):
+Changing it to test for errors, thanks.
 
-If you want to play with this, the basic setup of the shared memory
-device is described in patch 1 and 3. UIO driver and also the
-virtio-ivshmem prototype can be found at
+>>  }
+>> =20
+>> @@ -596,7 +596,7 @@ void migration_ioc_process_incoming(QIOChannel *ioc,=
+ Error **errp)
+>>              return;
+>>          }
+>> =20
+>> -        migration_incoming_setup(f);
+>> +        migration_incoming_setup(f, errp);
+>
+> Don't you need to make that use a local_err and propagate, like in the
+> other half of the if/else?
 
-    http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
+Changed the whole business.  It appears that each time that I use an
+Error ** I have to relearn how to use it.  Changed all places to use a
+local error and propagate/error_report_err() as apropiate.
 
-Accessing the device via UIO is trivial enough. If you want to use it
-for virtio, this is additionally to the description in patch 3 needed on
-the virtio console backend side:
+>>      rdma->migration_started_on_destination =3D 1;
+>> -    migration_fd_process_incoming(f);
+>> +    migration_fd_process_incoming(f, errp);
+>
+> Heck, the errp handling in rdma_accept_incoming_migration is very very
+> broken; I don't see how the errp ever gets reported or freed.
+> (But that's an existing problem)
 
-    modprobe uio_ivshmem
-    echo "110a 4106 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
-    linux/tools/virtio/virtio-ivshmem-console /dev/uio0
+Leaving this for next series.
 
-And for virtio block:
-
-    echo "110a 4106 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
-    linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
-
-After that, you can start the QEMU frontend instance with the
-virtio-ivshmem driver installed which can use the new /dev/hvc* or
-/dev/vda* as usual.
-
-Any feedback welcome!
-
-Jan
-
-PS: Let me know if I missed someone potentially interested in this topic
-on CC - or if you would like to be dropped from the list.
-
-[1] https://kvmforum2019.sched.com/event/TmxI
-[2] https://groups.google.com/forum/#!topic/jailhouse-dev/ffnCcRh8LOs
-[3] https://groups.google.com/forum/#!topic/jailhouse-dev/HX-0AGF1cjg
-
-Jan Kiszka (3):
-  hw/misc: Add implementation of ivshmem revision 2 device
-  docs/specs: Add specification of ivshmem device revision 2
-  contrib: Add server for ivshmem revision 2
-
- Makefile                                  |    3 +
- Makefile.objs                             |    1 +
- configure                                 |    1 +
- contrib/ivshmem2-server/Makefile.objs     |    1 +
- contrib/ivshmem2-server/ivshmem2-server.c |  462 ++++++++++++
- contrib/ivshmem2-server/ivshmem2-server.h |  158 +++++
- contrib/ivshmem2-server/main.c            |  313 +++++++++
- docs/specs/ivshmem-2-device-spec.md       |  376 ++++++++++
- hw/misc/Makefile.objs                     |    2 +-
- hw/misc/ivshmem2.c                        | 1085 +++++++++++++++++++++++++++++
- include/hw/misc/ivshmem2.h                |   48 ++
- include/hw/pci/pci_ids.h                  |    2 +
- 12 files changed, 2451 insertions(+), 1 deletion(-)
- create mode 100644 contrib/ivshmem2-server/Makefile.objs
- create mode 100644 contrib/ivshmem2-server/ivshmem2-server.c
- create mode 100644 contrib/ivshmem2-server/ivshmem2-server.h
- create mode 100644 contrib/ivshmem2-server/main.c
- create mode 100644 docs/specs/ivshmem-2-device-spec.md
- create mode 100644 hw/misc/ivshmem2.c
- create mode 100644 include/hw/misc/ivshmem2.h
-
--- 
-2.16.4
+Thanks, Juan.
 
 
