@@ -2,75 +2,100 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	TRACKER_ID autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB8DC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41075C282DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BB1020715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:11:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB1020715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0BF9720848
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:16:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DkzNjB+e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF9720848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iotKC-0003h8-Go
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 13:11:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36549)
+	id 1iotPC-0008BH-1z
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 13:16:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iotJY-0003Ek-Oa
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:10:50 -0500
+ (envelope-from <vkuznets@redhat.com>) id 1iotOP-0007k7-To
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iotJX-0005rS-GQ
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:10:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34186)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iotJX-0005pm-Ah
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:10:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iotJV-0000O0-BO
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 18:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 51F2B2E80C3
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 18:10:45 +0000 (UTC)
+ (envelope-from <vkuznets@redhat.com>) id 1iotOL-0002VS-Fs
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:15:49 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57654
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1iotOL-0002Uf-C6
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:15:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578420944;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3/Znpe6CzbNLFCN/lvf+0gBCG2gOvlIIa1pJ8bjqQJY=;
+ b=DkzNjB+ePN24c1mHFKZDPVzta/tkS8PcD91+3Y9rGEDO5vReTtvDjpU44ei/BdWKQD/gQh
+ QhlkbrqLg4tF5Ed2otyCT5bEoKyNq/O6ACogHBXAAzJ2gH1CfToQxSopVimxFOs6vz97nE
+ YZQQJz2QL+AgnrkPo8g5xMaJhyO9yok=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-201-rSsPqbX-MSC0g5u-rakPhQ-1; Tue, 07 Jan 2020 13:15:43 -0500
+Received: by mail-wm1-f69.google.com with SMTP id l11so3403544wmi.0
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 10:15:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+ :message-id:mime-version;
+ bh=ayJsf+Q7KB2XY9tednZraZBpIFaH2O9T5yjkmR8mFT0=;
+ b=uiUgLXIcr6uxQMv6LyGqUb/3EZ8JE6NBEjtH5BGZW5bV+0ul8HJ1abbzbghd8CUE4f
+ 6De3l4FkZdCBliU7x4/3G1XQzRKgpIIpw7gtPCcRdqDmmflGHLI8MR4699rve6Wrxgeo
+ szO38mzskbPucyzATGb/1+ixwY/LanC0QA3wXO9YYHzcpz0DsdZ7h5oREnynR3d+beiv
+ GTkhdy4Swia7TE9x4uO1V9btQP1S2hXSUU4eSGwbyASv8Rq3ZiaRdE52nrYIgjkTajRt
+ KCr29Jfo2iqYdKcc0E1W60kUzTKH5bLHIoTQph2rDQ6e/+OXWCgSvH/nwXoYfytoT+z8
+ UfpQ==
+X-Gm-Message-State: APjAAAUJot9JHdjUnZE80WlovLZwKYFwiFFDiNiCDvZ9S7zNb2dvh9Br
+ ih0rLqwWJ46cEj2UTpaYWaGFMymqfjCYsu046IXzTIRcaIzx6eCm+TKE547MxC1XkaGUefDn3jd
+ iZyf0ZWBmSBq21D4=
+X-Received: by 2002:a1c:6588:: with SMTP id z130mr381649wmb.0.1578420942288;
+ Tue, 07 Jan 2020 10:15:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxpqNvkbAFyfjBkHu3zxvyAVAz3eKtTSgRi+0UBuSx1/OB+0wSi8+hujDPcMcAluggD3dJUAw==
+X-Received: by 2002:a1c:6588:: with SMTP id z130mr381630wmb.0.1578420942111;
+ Tue, 07 Jan 2020 10:15:42 -0800 (PST)
+Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com.
+ [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id f1sm806716wru.6.2020.01.07.10.15.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 10:15:41 -0800 (PST)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH RFC] i386/kvm: fix enlightened VMCS with fine-grained VMX
+ feature enablement
+In-Reply-To: <7c4dcca1-a1e6-a00c-56fd-bcc6c8bcc474@redhat.com>
+References: <20200102203926.1179743-1-vkuznets@redhat.com>
+ <21556857-3d6a-ad66-5cf5-060b1ab67381@redhat.com>
+ <87zhezsc30.fsf@vitty.brq.redhat.com>
+ <7c4dcca1-a1e6-a00c-56fd-bcc6c8bcc474@redhat.com>
+Date: Tue, 07 Jan 2020 19:15:40 +0100
+Message-ID: <87imlnrv3n.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-MC-Unique: rSsPqbX-MSC0g5u-rakPhQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2020 18:01:24 -0000
-From: ecsdn <1856834@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <157842008481.2335.15171700808739534540.malone@soybean.canonical.com>
-Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a3836099995f4f732abbc0e9b937d4a8a69208b6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,75 +104,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: Roman Kagan <rkagan@virtuozzo.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Liran Alon <liran.alon@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With some precautionary measures I think I can provide it. Not sure what
-of our drivers may already be compiled in etc so I need to send it to
-you privately so only you have access for testing etc after which you
-would delete it once issue fixed or discovered etc. Is it possible to
-send you private message on here with such a link or better email?
-thanks
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
--- =
+> On 07/01/20 13:08, Vitaly Kuznetsov wrote:
+>> Honestly I forgot the story why we filtered out these features upon
+>> eVMCS enablement in KVM. As there are no corresponding eVMCS fields,
+>> there's no way a guest can actually use them.
+>
+> Well, mostly because we mimicked what Hyper-V was doing I guess.
+>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
+An update from reverse-engineering trenches.
 
-Title:
-  Virtio broken in qemu ppc in 4.2.0 and other versions
+I ran some tests to see if we can just drop the filtering and there is
+only one problematic control which Hyper-V enables:
 
-Status in QEMU:
-  New
+SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES
 
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
+the problem with it is that we don't have 'apic_access_addr' field in
+eVMCS ('virtual_apic_page_addr' is there). By running the same setup
+with eVMCS disabled I figured out which address can be hardcoded to make
+it boot. My guess was that the fields is present but not documented
+properly, I tried scanning eVMCS for the value but with no luck so far.
 
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
+I'll try to fish some information out of Microsoft.
 
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
+--=20
+Vitaly
 
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
