@@ -2,83 +2,75 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8106EC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB8DC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50A7C2146E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:09:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMKMqHzV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A7C2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9BB1020715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 18:11:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB1020715
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iotIY-0001WU-EP
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 13:09:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33810)
+	id 1iotKC-0003h8-Go
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 13:11:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1iotHt-0000oM-QO
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:09:06 -0500
+ (envelope-from <bounces@canonical.com>) id 1iotJY-0003Ek-Oa
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:10:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1iotHr-0003mh-3S
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:09:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41649
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iotHq-0003kh-LI
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:09:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578420541;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EavM4Os2T8kUZYY2JMZLlj8evJLxQBOR+QeNrhrFtdg=;
- b=LMKMqHzVrgid77LF5H88w3tol/zSaJdJaasrK86RPFg5nSU7aNCr+hr8ujytP8RQDcjTCW
- Wo62UPhVyQRzUGb9pn0024cAon5nj2hgjV4hQbO8H2XGC7o8NnRME5RDpSUIZxX7eMD3DE
- sFR/Y8zbTMf1uq9AvMC6/+YZ7MUvqT0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-cz5fz4fwOQuxjq6XK8p46A-1; Tue, 07 Jan 2020 13:08:58 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E194100551C;
- Tue,  7 Jan 2020 18:08:45 +0000 (UTC)
-Received: from redhat.com (ovpn-116-58.ams2.redhat.com [10.36.116.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 677AA271B4;
- Tue,  7 Jan 2020 18:08:41 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH] migration-test: ppc64: fix FORTH test program
-In-Reply-To: <20200107163437.52139-1-lvivier@redhat.com> (Laurent Vivier's
- message of "Tue, 7 Jan 2020 17:34:37 +0100")
-References: <20200107163437.52139-1-lvivier@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 07 Jan 2020 19:08:34 +0100
-Message-ID: <877e23jg0t.fsf@trasno.org>
+ (envelope-from <bounces@canonical.com>) id 1iotJX-0005rS-GQ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:10:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34186)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iotJX-0005pm-Ah
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 13:10:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iotJV-0000O0-BO
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 18:10:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 51F2B2E80C3
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 18:10:45 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: cz5fz4fwOQuxjq6XK8p46A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 07 Jan 2020 18:01:24 -0000
+From: ecsdn <1856834@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
+X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
+X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
+References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
+Message-Id: <157842008481.2335.15171700808739534540.malone@soybean.canonical.com>
+Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
+ versions
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a3836099995f4f732abbc0e9b937d4a8a69208b6
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,37 +79,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Wei Huang <wei@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laurent Vivier <lvivier@redhat.com> wrote:
-> Commit e51e711b1bef has moved the initialization of start_address and
-> end_address after the definition of the command line argument,
-> where the nvramrc is initialized, and thus the loop is between 0 and 0
-> rather than 1 MiB and 100 MiB.
->
-> It doesn't affect the result of the test if all the tests are run in
-> sequence because the two first tests don't run the loop, so the
-> values are correctly initialized when we actually need them.
->
-> But it hangs when we ask to run only one test, for instance:
->
->     QTEST_QEMU_BINARY=3Dppc64-softmmu/qemu-system-ppc64 \
->     tests/migration-test -m=3Dquick -p /ppc64/migration/validate_uuid_err=
-or
->
-> Fixes: e51e711b1bef ("tests/migration: Add migration-test header file")
-> Cc: wei@redhat.com
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+With some precautionary measures I think I can provide it. Not sure what
+of our drivers may already be compiled in etc so I need to send it to
+you privately so only you have access for testing etc after which you
+would delete it once issue fixed or discovered etc. Is it possible to
+send you private message on here with such a link or better email?
+thanks
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+-- =
 
-queued.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856834
 
+Title:
+  Virtio broken in qemu ppc in 4.2.0 and other versions
+
+Status in QEMU:
+  New
+
+Bug description:
+  The same qemu -M mpc... command that works on qemu-system-ppc version
+  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
+  version 4.2.0release and 4.19dirtygit:
+
+  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
+ccel kvm is set.
+  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
+e (slower).
+
+  ends/freezes at:
+  nbd: registered device at major 43
+  =C2=A0vda:
+
+  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
+  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
+  with 2.8.0 official release from git/github that I compiled/built
+  myself. But both of the newer releases fail on the same exact machine
+  same config.
+
+  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
+ed weren't, ie gave
+  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
+bus=3D0,unit=3D0
+  (but I removed -drive if=3Dmtd since wasn't using it anyway)
+
+  I also tried on windows but I think virtio doesn't work on windows
+  hosts at all? On windows host it fails the same way, even version 2.12
+  as well as 4.1.10...
+
+  used:
+  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
+
+  (basically all steps the same on same exact system same config, yet
+  2.8.0 works fine whether apt-get installed or built from source while
+  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
+
+  In case newer qemu versions act weird on various kernels, I did try with =
+both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
+ compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
+_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
+ich is why I can't use -M ppce500 instead..)
+  tx
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
