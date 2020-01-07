@@ -2,97 +2,99 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C33BC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A836BC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7D842075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71FB82075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:12:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7ZSmvRL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D842075A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EUwtVQ63"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71FB82075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iojy4-0002XA-Mv
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:12:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51936)
+	id 1iojyN-00031K-7N
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:12:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojPl-0005gN-T3
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:35 -0500
+ (envelope-from <mst@redhat.com>) id 1iojPI-00057p-A6
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojPh-0007wg-Aq
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:33 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33738
+ (envelope-from <mst@redhat.com>) id 1iojPG-0007e5-IJ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60485
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojPh-0007wM-5Q
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:29 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojPG-0007du-Ek
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382588;
+ s=mimecast20190719; t=1578382562;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FcK7WigJMJDie4qherce/SQbHzZxCxCRnKQYLmv9Zf4=;
- b=Z7ZSmvRLT6WPdPBhZyEd2eSLLKP+uo5yJTJJcFKqA/0NXEHsD6XTJ/VoMIo7Bw33Uiym32
- Q7/uArJfj23te21AFFq9rjYfsv1V99WkoExCn2IOfjpB0+lTWke2pO0vMNzUAw1xejH0rF
- W3TfDT1S/V+o5y5DuzYj+dh6XTrfmv0=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-niXntfV7OSKLizpzBDEjkg-1; Tue, 07 Jan 2020 02:36:26 -0500
-Received: by mail-qt1-f200.google.com with SMTP id p12so35900096qtu.6
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:36:26 -0800 (PST)
+ bh=2mjtemMUgB27JpLi8+N3bxzl1+0IVjBnBvvjPKdiAjc=;
+ b=EUwtVQ633ugwwJ955WJAJBmY5lSYaP0R8d3RlgwlaHf1A8fJ0UUZklrRWapNGuGwN8HNtj
+ hF6+kL32QY0mGWxrgHMfZe9haqbvCv5sboZPwPJIAiRfFEAjV2Ku0IHlxQObhJIeYkgGfF
+ C/AOLh9ETjycm2AC+eVc1/hchNSQirQ=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-c2H7NctTPy-pMV7lO2k2kA-1; Tue, 07 Jan 2020 02:35:58 -0500
+Received: by mail-qt1-f197.google.com with SMTP id e37so35931077qtk.7
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:35:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=OKLjdvfCJDfY6fGqKWe65+lk7+R2Zab8RzeVnW/XRtE=;
- b=P17ZlzSZ1vQCD8U1DOCy0S7sWC6ikMdSO7fyBmWFe3vlro8lCQc5IUeEl587D8Iai8
- gdS5z8r6c1788AVzw7B2o9/sz4QxuSxrlY3xiesyNVE/+v8w7AD3Fdr/F0RR7bbkxf65
- E8V/cctyJSpYKiJTnheu8lFcKqyTRgZsPN2GNqNh9LuyWecCnuDV7nxDWGXPUrUdZyXk
- XqtwO7c90QJlTXvYApSNVf+2y2taIxiME+ayhPJrfsPNToxehN+QXu1M/C4WsZh4ZZYa
- FowdTLz7oaXNS/NjRqj5uktQJe7ZTmFR5lJb+VhJNXL4eGCDyjMkXmVI/4wTSBcSc2qP
- XREg==
-X-Gm-Message-State: APjAAAW4dYRm597hu1CNbckXYRYYynOp/z2X2nboKavMKDXeIEM89Hk8
- JvFDeWha0eR41tg/ArPrqGhU56gusFegVrMIUmkrCHwr1wNpZLSGP6CL3ZyNd0JRbszAl+tFjcJ
- Oy5IXBzPphyC1LYE=
-X-Received: by 2002:a0c:ac4e:: with SMTP id m14mr80435420qvb.37.1578382585698; 
- Mon, 06 Jan 2020 23:36:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz0HdfNbG6wiu8D1U4XBcuQImR/uzu0X0TPGF2o9jVW9FsE/VdpFW81d7NYrJ8vcG/bU1GQqg==
-X-Received: by 2002:a0c:ac4e:: with SMTP id m14mr80435393qvb.37.1578382585294; 
- Mon, 06 Jan 2020 23:36:25 -0800 (PST)
+ bh=P6B2QZEV+S1MRINFAeh/u30RoNzW+dHtR0xLU33u1wE=;
+ b=N2/GvsOjw13SkZ0uNikrrgFn3WDbumUXDJLMdSv9Lp71LQfhJWi78+dZZju6z7Zk44
+ AvXzzJLsece+2JS5NfZvwUe35rItDbcFT4z5VxZK73FRhf1BTXBaeMGG92OoJ2zaDfgl
+ knt0yNiOiunoVWNccFFW5lziyeH52c/xEcoKpYjgQI8InJlmhX+WEzD9qMCV+jQPhRSr
+ B7I2xMfN6ovZBmKk+2diBDIiYghVmVtOfrbWgnAQWU7deGx2B1160M9qYY8hDi9h0ADz
+ KqeD/nPnR+h6l9S5WCs2dU0bkrTcqxjlnGRTjVAxX9OH5h/wMO/n8O9xymptuVkTyWEm
+ cfWw==
+X-Gm-Message-State: APjAAAWsdrkIweHqnol5YN54UzgE1uf22B1iwuAKRKXT/5CgubX8jAxp
+ ozI2G49/iOHfpLXSLAan4qIo+rskrgHxQQSEQkUXbUEhsqNVJdz4HAKOIAErxGRo0HPstPWVFxg
+ 8lf7Q2JH5Eady1F4=
+X-Received: by 2002:a05:620a:1227:: with SMTP id
+ v7mr12066157qkj.225.1578382557294; 
+ Mon, 06 Jan 2020 23:35:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyNlIg/pf9+BEIA0P3YXKNuszfONQF0anTzcPbUaKBPoZ7wosF1eE8513NvW4Msk7XIP5ggAQ==
+X-Received: by 2002:a05:620a:1227:: with SMTP id
+ v7mr12066138qkj.225.1578382556914; 
+ Mon, 06 Jan 2020 23:35:56 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id p185sm22139710qkd.126.2020.01.06.23.36.21
+ by smtp.gmail.com with ESMTPSA id u15sm21999829qku.67.2020.01.06.23.35.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:36:24 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:36:19 -0500
+ Mon, 06 Jan 2020 23:35:56 -0800 (PST)
+Date: Tue, 7 Jan 2020 02:35:53 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 14/32] hmat acpi: Build Memory Proximity Domain Attributes
- Structure(s)
-Message-ID: <20200107073451.298261-15-mst@redhat.com>
+Subject: [PULL v2 09/32] Implement backend program convention command for
+ vhost-user-blk
+Message-ID: <20200107073451.298261-10-mst@redhat.com>
 References: <20200107073451.298261-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: niXntfV7OSKLizpzBDEjkg-1
+X-MC-Unique: c2H7NctTPy-pMV7lO2k2kA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,278 +107,245 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Liu Jingqi <jingqi.liu@intel.com>,
- Tao Xu <tao3.xu@intel.com>, Markus Armbruster <armbru@redhat.com>,
- Daniel Black <daniel@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+ Micky Yun Chan <chanmickyyun@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+From: Micky Yun Chan <chanmickyyun@gmail.com>
 
-HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-(HMAT). The specification references below link:
-http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
+This patch is to add standard commands defined in docs/interop/vhost-user.r=
+st
+For vhost-user-* program
 
-It describes the memory attributes, such as memory side cache
-attributes and bandwidth and latency details, related to the
-Memory Proximity Domain. The software is
-expected to use this information as hint for optimization.
-
-This structure describes Memory Proximity Domain Attributes by memory
-subsystem and its associativity with processor proximity domain as well as
-hint for memory usage.
-
-In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-the platform's HMAT tables.
-
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
-Message-Id: <20191213011929.2520-5-tao3.xu@intel.com>
+Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
+Message-Id: <20191209015331.5455-1-chanmickyyun@gmail.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/hmat.h        | 42 ++++++++++++++++++
- hw/acpi/hmat.c        | 99 +++++++++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c  |  5 +++
- hw/acpi/Kconfig       |  7 ++-
- hw/acpi/Makefile.objs |  1 +
- 5 files changed, 152 insertions(+), 2 deletions(-)
- create mode 100644 hw/acpi/hmat.h
- create mode 100644 hw/acpi/hmat.c
+ docs/interop/vhost-user.json            |  31 +++++++
+ contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
+ docs/interop/vhost-user.rst             |  17 ++++
+ 3 files changed, 112 insertions(+), 44 deletions(-)
 
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-new file mode 100644
-index 0000000000..437dbc6872
---- /dev/null
-+++ b/hw/acpi/hmat.h
-@@ -0,0 +1,42 @@
-+/*
-+ * HMAT ACPI Implementation Header
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Tabl=
-e
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licens=
-es/>
-+ */
-+
-+#ifndef HMAT_H
-+#define HMAT_H
-+
-+#include "hw/acpi/aml-build.h"
-+
-+/*
-+ * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
-+ * Table 5-145, Field "flag", Bit [0]: set to 1 to indicate that data in
-+ * the Proximity Domain for the Attached Initiator field is valid.
-+ * Other bits reserved.
-+ */
-+#define HMAT_PROXIMITY_INITIATOR_VALID  0x1
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_st=
-ate);
-+
-+#endif
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-new file mode 100644
-index 0000000000..9ff79308a4
---- /dev/null
-+++ b/hw/acpi/hmat.c
-@@ -0,0 +1,99 @@
-+/*
-+ * HMAT ACPI Implementation
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Tabl=
-e
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licens=
-es/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/numa.h"
-+#include "hw/acpi/hmat.h"
-+
-+/*
-+ * ACPI 6.3:
-+ * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-145
-+ */
-+static void build_hmat_mpda(GArray *table_data, uint16_t flags,
-+                            uint32_t initiator, uint32_t mem_node)
+diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
+index da6aaf51c8..ce0ef74db5 100644
+--- a/docs/interop/vhost-user.json
++++ b/docs/interop/vhost-user.json
+@@ -54,6 +54,37 @@
+   ]
+ }
+=20
++##
++# @VHostUserBackendBlockFeature:
++#
++# List of vhost user "block" features.
++#
++# @read-only: The --read-only command line option is supported.
++# @blk-file: The --blk-file command line option is supported.
++#
++# Since: 5.0
++##
 +{
-+
-+    /* Memory Proximity Domain Attributes Structure */
-+    /* Type */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 40, 4);
-+    /* Flags */
-+    build_append_int_noprefix(table_data, flags, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Proximity Domain for the Attached Initiator */
-+    build_append_int_noprefix(table_data, initiator, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, mem_node, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Start Address of the System Physical
-+     * Address Range. Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Range Length of the region in bytes.
-+     * Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
++  'enum': 'VHostUserBackendBlockFeature',
++  'data': [ 'read-only', 'blk-file' ]
 +}
 +
-+/* Build HMAT sub table structures */
-+static void hmat_build_table_structs(GArray *table_data, NumaState *numa_s=
-tate)
++##
++# @VHostUserBackendCapabilitiesBlock:
++#
++# Capabilities reported by vhost user "block" backends
++#
++# @features: list of supported features.
++#
++# Since: 5.0
++##
 +{
-+    uint16_t flags;
-+    int i;
++  'struct': 'VHostUserBackendCapabilitiesBlock',
++  'data': {
++    'features': [ 'VHostUserBackendBlockFeature' ]
++  }
++}
 +
-+    for (i =3D 0; i < numa_state->num_nodes; i++) {
-+        flags =3D 0;
+ ##
+ # @VHostUserBackendInputFeature:
+ #
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-b=
+lk/vhost-user-blk.c
+index ae61034656..6fd91c7e99 100644
+--- a/contrib/vhost-user-blk/vhost-user-blk.c
++++ b/contrib/vhost-user-blk/vhost-user-blk.c
+@@ -576,70 +576,90 @@ vub_new(char *blk_file)
+     return vdev_blk;
+ }
+=20
++static int opt_fdnum =3D -1;
++static char *opt_socket_path;
++static char *opt_blk_file;
++static gboolean opt_print_caps;
++static gboolean opt_read_only;
 +
-+        if (numa_state->nodes[i].initiator < MAX_NODES) {
-+            flags |=3D HMAT_PROXIMITY_INITIATOR_VALID;
-+        }
++static GOptionEntry entries[] =3D {
++    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
++      "Print capabilities", NULL },
++    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
++      "Use inherited fd socket", "FDNUM" },
++    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
++      "Use UNIX socket path", "PATH" },
++    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
++     "block device or file path", "PATH"},
++    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
++      "Enable read-only", NULL }
++};
 +
-+        build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiator,=
- i);
+ int main(int argc, char **argv)
+ {
+-    int opt;
+-    char *unix_socket =3D NULL;
+-    char *blk_file =3D NULL;
+-    bool enable_ro =3D false;
+     int lsock =3D -1, csock =3D -1;
+     VubDev *vdev_blk =3D NULL;
++    GError *error =3D NULL;
++    GOptionContext *context;
+=20
+-    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
+-        switch (opt) {
+-        case 'b':
+-            blk_file =3D g_strdup(optarg);
+-            break;
+-        case 's':
+-            unix_socket =3D g_strdup(optarg);
+-            break;
+-        case 'r':
+-            enable_ro =3D true;
+-            break;
+-        case 'h':
+-        default:
+-            printf("Usage: %s [ -b block device or file, -s UNIX domain so=
+cket"
+-                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+-            return 0;
++    context =3D g_option_context_new(NULL);
++    g_option_context_add_main_entries(context, entries, NULL);
++    if (!g_option_context_parse(context, &argc, &argv, &error)) {
++        g_printerr("Option parsing failed: %s\n", error->message);
++        exit(EXIT_FAILURE);
 +    }
-+}
++    if (opt_print_caps) {
++        g_print("{\n");
++        g_print("  \"type\": \"block\",\n");
++        g_print("  \"features\": [\n");
++        g_print("    \"read-only\",\n");
++        g_print("    \"blk-file\"\n");
++        g_print("  ]\n");
++        g_print("}\n");
++        exit(EXIT_SUCCESS);
++    }
 +
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_st=
-ate)
-+{
-+    int hmat_start =3D table_data->len;
++    if (!opt_blk_file) {
++        g_print("%s\n", g_option_context_get_help(context, true, NULL));
++        exit(EXIT_FAILURE);
++    }
 +
-+    /* reserve space for HMAT header  */
-+    acpi_data_push(table_data, 40);
-+
-+    hmat_build_table_structs(table_data, numa_state);
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + hmat_start),
-+                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
-+}
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7b8da62d41..e25df838f0 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -68,6 +68,7 @@
- #include "hw/i386/intel_iommu.h"
-=20
- #include "hw/acpi/ipmi.h"
-+#include "hw/acpi/hmat.h"
-=20
- /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
-  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-@@ -2835,6 +2836,10 @@ void acpi_build(AcpiBuildTables *tables, MachineStat=
-e *machine)
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, machine);
++    if (opt_socket_path) {
++        lsock =3D unix_sock_new(opt_socket_path);
++        if (lsock < 0) {
++            exit(EXIT_FAILURE);
          }
-+        if (machine->numa_state->hmat_enabled) {
-+            acpi_add_table(table_offsets, tables_blob);
-+            build_hmat(tables_blob, tables->linker, machine->numa_state);
-+        }
++    } else if (opt_fdnum < 0) {
++        g_print("%s\n", g_option_context_get_help(context, true, NULL));
++        exit(EXIT_FAILURE);
++    } else {
++        lsock =3D opt_fdnum;
      }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index 12e3f1e86e..54209c6f2f 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -7,6 +7,7 @@ config ACPI_X86
-     select ACPI_NVDIMM
-     select ACPI_CPU_HOTPLUG
-     select ACPI_MEMORY_HOTPLUG
-+    select ACPI_HMAT
 =20
- config ACPI_X86_ICH
-     bool
-@@ -23,6 +24,10 @@ config ACPI_NVDIMM
-     bool
-     depends on ACPI
+-    if (!unix_socket || !blk_file) {
+-        printf("Usage: %s [ -b block device or file, -s UNIX domain socket=
+"
+-               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+-        return -1;
+-    }
+-
+-    lsock =3D unix_sock_new(unix_socket);
+-    if (lsock < 0) {
+-        goto err;
+-    }
+-
+-    csock =3D accept(lsock, (void *)0, (void *)0);
++    csock =3D accept(lsock, NULL, NULL);
+     if (csock < 0) {
+-        fprintf(stderr, "Accept error %s\n", strerror(errno));
+-        goto err;
++        g_printerr("Accept error %s\n", strerror(errno));
++        exit(EXIT_FAILURE);
+     }
 =20
-+config ACPI_HMAT
-+    bool
-+    depends on ACPI
+-    vdev_blk =3D vub_new(blk_file);
++    vdev_blk =3D vub_new(opt_blk_file);
+     if (!vdev_blk) {
+-        goto err;
++        exit(EXIT_FAILURE);
+     }
+-    if (enable_ro) {
++    if (opt_read_only) {
+         vdev_blk->enable_ro =3D true;
+     }
+=20
+     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+                   vub_panic_cb, &vub_iface)) {
+-        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+-        goto err;
++        g_printerr("Failed to initialize libvhost-user-glib\n");
++        exit(EXIT_FAILURE);
+     }
+=20
+     g_main_loop_run(vdev_blk->loop);
+-
++    g_main_loop_unref(vdev_blk->loop);
++    g_option_context_free(context);
+     vug_deinit(&vdev_blk->parent);
+-
+-err:
+     vub_free(vdev_blk);
+     if (csock >=3D 0) {
+         close(csock);
+@@ -647,8 +667,8 @@ err:
+     if (lsock >=3D 0) {
+         close(lsock);
+     }
+-    g_free(unix_socket);
+-    g_free(blk_file);
++    g_free(opt_socket_path);
++    g_free(opt_blk_file);
+=20
+     return 0;
+ }
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index 7827b710aa..015ac08177 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -1376,3 +1376,20 @@ Command line options:
+   Enable virgl rendering support.
+=20
+   (optional)
 +
- config ACPI_PCI
-     bool
-     depends on ACPI && PCI
-@@ -33,5 +38,3 @@ config ACPI_VMGENID
-     depends on PC
-=20
- config ACPI_HW_REDUCED
--    bool
--    depends on ACPI
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 99253057e1..777da07f4d 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -7,6 +7,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
- common-obj-$(CONFIG_ACPI_HW_REDUCED) +=3D generic_event_device.o
-+common-obj-$(CONFIG_ACPI_HMAT) +=3D hmat.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
- common-obj-$(call lnot,$(CONFIG_PC)) +=3D acpi-x86-stub.o
-=20
++vhost-user-blk
++--------------
++
++Command line options:
++
++--blk-file=3DPATH
++
++  Specify block device or file path.
++
++  (optional)
++
++--read-only
++
++  Enable read-only.
++
++  (optional)
 --=20
 MST
 
