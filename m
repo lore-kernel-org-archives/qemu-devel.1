@@ -2,89 +2,84 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BD9C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA4EC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 315ED208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7C15208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:59:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z+sAVM68"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 315ED208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3QGxYwT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7C15208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqJs-0006n8-6r
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:58:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55474)
+	id 1ioqK6-0007Aw-LP
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:59:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iopIQ-0000TY-P5
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:23 -0500
+ (envelope-from <thuth@redhat.com>) id 1ioqIs-0005lP-04
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:57:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iopIP-0002K9-IR
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:22 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:40134)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iopIP-0002JZ-CF
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:21 -0500
-Received: by mail-wr1-x435.google.com with SMTP id c14so54010601wrn.7
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:53:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=zyr350dP+8AP15d0xj3musU4lwX/lJBrE7DQSiVzx7k=;
- b=Z+sAVM68+8HQ1BEoNM8lawz8xDJeCe3I4y+eVHAgpELpDASodvaXYtJokp0ze7K7uf
- 0l/hae9yb+TQQIEr56fHZ30jCrrvsSq91WSTxuSPHI6LS9ui7wD30piezKEiksDuNJgT
- 4rZmsDmBE8/WPE+VlfJdwBLt4tN4V+2qYVZtuTzPhiDxqpGwCcA7gGpBzdrwFbg2IV5+
- g/s4jJpefVtXJDwsKsCokNF3Xt0I8qQedGkek+fhv+7wQEc9pA4IxOdCTrUjTYVjw6v+
- mi6vMQHGPw1HGstHMbIGG151hHi+lAdkzag0yf26I/GXe1cxgPL1ZhInjwjs7UKsJpr8
- NMZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=zyr350dP+8AP15d0xj3musU4lwX/lJBrE7DQSiVzx7k=;
- b=Sf3l+HxbQIgWEFjCU3g+uun6jbXdkN1FBsBLZpn/Xmi+7YJwl7Tu/LP0ez5QQR7VTR
- FakoZMJtge87KMaiveC9RURqff3LevoGWaCeuO9LuHJGynp+WOG6zPtR/8yKSUeRkNDZ
- 2PAY+z6PSF7+edLXqibdZcsLawxeY2iuQGUGjseFeuG3Cct9dxDf4Q2lQhw6vyBfT0sA
- G1cWeqfClSFHtGHUf1/d3ZfR9ojw1CGI2/rCUTSXSQ7Jz4Kz1pudAaHCvQUc6T/ipxxE
- Biwu4Zjwkl3rSehjrqHJdNp+1sbMMM0Pg8i6rqSHtMAJ2Yk1gQIOT/18r20m++PKBIOK
- 9rDg==
-X-Gm-Message-State: APjAAAVtToq1WMKDxdppa2yTmRoiizgDj9T1gsuCV2/VkATpnYTIOhqH
- Dlz2HUZag4pu5uQGrt+u3zBK2A==
-X-Google-Smtp-Source: APXvYqxPWc0ra4PApoEmwTrFqddjBqEt76qCmDewUUQjKbWWBWyzL075m9canW9NVoqsGaBcf5kf3Q==
-X-Received: by 2002:a5d:4847:: with SMTP id n7mr109472711wrs.30.1578405200385; 
- Tue, 07 Jan 2020 05:53:20 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q6sm81674422wrx.72.2020.01.07.05.53.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 05:53:16 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 83D6D1FF92;
- Tue,  7 Jan 2020 13:53:11 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 5/6] travis.yml: Detach build and test steps
-Date: Tue,  7 Jan 2020 13:53:10 +0000
-Message-Id: <20200107135311.5215-6-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200107135311.5215-1-alex.bennee@linaro.org>
+ (envelope-from <thuth@redhat.com>) id 1ioqIq-0006JN-V9
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:57:53 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31481
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ioqIq-0006JE-RA
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:57:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578409072;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=wVAt2gV1StjWYUg2pynwSyqGXRx5om7LQn0BCLkNYv4=;
+ b=V3QGxYwTRWlDKzzlQQocIgP+AR7ZnwdyPVHBvSNoypHQGF4R/XoljUziVrpdH9wkWkbn1G
+ W1aTtp7yTe+Xrze/pRCKkqELG0500+X6xX3tNCfq6NOTAsd4XGRNUkqWktIGdUzxlm9cs3
+ SptPogVcCZqcxrfJDeGl+EZ4BuER3nk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-4LvwHyvjOc6OBLCuZyBn2g-1; Tue, 07 Jan 2020 09:57:49 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EED3801E6C;
+ Tue,  7 Jan 2020 14:57:48 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F1C07FB63;
+ Tue,  7 Jan 2020 14:57:28 +0000 (UTC)
+Subject: Re: [PATCH v1 1/6] hw/i386/x86-iommu: Add missing stubs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 References: <20200107135311.5215-1-alex.bennee@linaro.org>
+ <20200107135311.5215-2-alex.bennee@linaro.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3c8073ed-6e26-73d4-433f-e7ed6a36eb81@redhat.com>
+Date: Tue, 7 Jan 2020 15:57:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::435
+In-Reply-To: <20200107135311.5215-2-alex.bennee@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 4LvwHyvjOc6OBLCuZyBn2g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,55 +91,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+On 07/01/2020 14.53, Alex Benn=C3=A9e wrote:
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> In commit 6c730e4af9 we introduced a stub to build the MicroVM
+> machine without Intel IOMMU. This stub is incomplete for the
+> other PC machines. Add the missing stubs.
+>=20
+> Fixes: 6c730e4af9
+> Reported-by: Travis-CI
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Message-Id: <20191220154225.25879-1-philmd@redhat.com>
+> ---
+>  hw/i386/x86-iommu-stub.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>=20
+> diff --git a/hw/i386/x86-iommu-stub.c b/hw/i386/x86-iommu-stub.c
+> index 03576cdccb4..c5ba077f9d1 100644
+> --- a/hw/i386/x86-iommu-stub.c
+> +++ b/hw/i386/x86-iommu-stub.c
+> @@ -32,3 +32,12 @@ X86IOMMUState *x86_iommu_get_default(void)
+>      return NULL;
+>  }
+> =20
+> +bool x86_iommu_ir_supported(X86IOMMUState *s)
+> +{
+> +    return false;
+> +}
+> +
+> +IommuType x86_iommu_get_type(void)
+> +{
+> +    abort();
+> +}
 
-Currently build and test commands are a single step in a
-Travis's `script` block. In order to see the output
-of the tests one needs to scroll down the log to find where
-the build messages ended and the limit is not clear. If
-they were in different steps then Travis would print the
-result build command, which can be easily grep'ed.
+I just ran into this issue today, too ... good to know that there is
+already a patch :-)
 
-So this change is made to detach those commands
-to ease the visualization of the output.
-
-Note that all steps on the `script` block is executed regardless
-if one previous has failed. To overcome it, let's save the
-return code of the build then check whether succeed or failed on
-the test step.
-
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20191230184327.2800-3-wainersm@redhat.com>
----
- .travis.yml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index 93838bf0f8b..848a2714efe 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -94,7 +94,8 @@ before_script:
-   - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-   - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log && exit 1; }
- script:
--  - make -j3 && travis_retry ${TEST_CMD}
-+  - BUILD_RC=0 && make -j3 || BUILD_RC=$?
-+  - if [ "$BUILD_RC" -eq 0 ] ; then travis_retry ${TEST_CMD} ; else $(exit $BUILD_RC); fi
- after_script:
-   - if command -v ccache ; then ccache --show-stats ; fi
- 
--- 
-2.20.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
