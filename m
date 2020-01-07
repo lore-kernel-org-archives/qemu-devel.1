@@ -2,90 +2,52 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2017C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C74C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:39:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 697592187F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:38:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y12b+XD4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697592187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 77AC42087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:39:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77AC42087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioq02-0003Pf-Ff
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:38:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44576)
+	id 1ioq1G-0005xW-4B
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:39:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iooqQ-0001ER-Ul
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:24:27 -0500
+ (envelope-from <jan.kiszka@siemens.com>) id 1iopyo-0002mA-6m
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iooqP-0001sr-Na
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:24:26 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45236)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iooqP-0001s8-G4
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:24:25 -0500
-Received: by mail-wr1-x442.google.com with SMTP id j42so53868945wrj.12
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:24:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=MEPaZjJKplBO7wj4d4sOLL0rEvJQo/YpJlQXN5dOdjo=;
- b=Y12b+XD4S1r1JdLNO2RJWlHuFLGZ1VVFoJ2vnTu9vGcwsMFu6H109HZ2sHfn2I5qps
- 0avj6Vpcw/GCnYcpVobECNMi64ySkxbScuphlGFr/ROPDrKKzOWwVyJf9QIrE8uPoGu2
- qaqE13QAG540WxwksbFdHMeXYTiyKREXs+DxGRTqeTsBa+6xJeTE7X0hDxxpxpYE99zM
- rEv5dzKoy8GJw9mu/FvSa1LqvgOCeS67HPi4lgMQpfvNwdR2pHzN+/ZhB2CpFKw+L26C
- InHFvw64ZpynAv4u8MhDzUHHBPtEJJEpb4/MeHNvIEd+tzR4kxN2K7Bp+j4B4tGsxpSQ
- 6VUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=MEPaZjJKplBO7wj4d4sOLL0rEvJQo/YpJlQXN5dOdjo=;
- b=U8wQzaUCjJ2idHF+OhXgIZ1L0Qm8sKOfdEqYTPV6gddB7YgSxTC+d8tSeJMsaPGuGN
- wIosBJQPiJWnk5KE3OnkkJZOhQJxlTeqs8qFBNI2xkOWE1gjdTSTzw7jNu39Cj3RULM+
- QAVZbTOwN0gg1tkJLHv7bFu46vi/kib0VmiWWbvV5GsVmW/vCce1ZlpkjIDhrDoNEd4o
- 9WkVSLlDXIg2gyfDC+iP4Juzy6ekLzxiu7CggmQ6yZls73z+GYyMw792FUnmTW6Mn22R
- anQc05vlwTIUs/0Acf8OdOJq9dn6YkbO7yhj6UbwIGPYP3bEegAUkGrdlipv5QukZlj/
- BJVw==
-X-Gm-Message-State: APjAAAW4A4nQN4ORXrF+EdSfwWgQX+EDTA9duQecEhOYN6kfEtG6guDp
- dmZxAN8xyR9/Irwea+K0a1NtSQ==
-X-Google-Smtp-Source: APXvYqzaulxMQHwyfPLOhki8M88MqRbSrVOlsN+srwhTGIQABunjNcExXu1gcAuTwzbq9eun4SAJWQ==
-X-Received: by 2002:adf:fc03:: with SMTP id i3mr111747490wrr.306.1578403464203; 
- Tue, 07 Jan 2020 05:24:24 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p18sm26801463wmg.4.2020.01.07.05.24.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 05:24:22 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BBAFA1FF87;
- Tue,  7 Jan 2020 13:24:21 +0000 (GMT)
-References: <20191218223441.23852-1-richard.henderson@linaro.org>
- <20191218223441.23852-7-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 6/7] configure: Override the os default with
- --disable-pie
-In-reply-to: <20191218223441.23852-7-richard.henderson@linaro.org>
-Date: Tue, 07 Jan 2020 13:24:21 +0000
-Message-ID: <87imln4cxm.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ (envelope-from <jan.kiszka@siemens.com>) id 1iopyi-00035Z-QR
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:37:09 -0500
+Received: from goliath.siemens.de ([192.35.17.28]:54898)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1iopyi-0002wa-Fr
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:37:04 -0500
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+ by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id 007EaiNQ008533
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 7 Jan 2020 15:36:44 +0100
+Received: from md1f2u6c.ad001.siemens.net ([139.25.68.37])
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id 007Eai7Q011484;
+ Tue, 7 Jan 2020 15:36:44 +0100
+From: Jan Kiszka <jan.kiszka@siemens.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [RFC][PATCH v2 0/3] IVSHMEM version 2 device for QEMU
+Date: Tue,  7 Jan 2020 15:36:39 +0100
+Message-Id: <cover.1578407802.git.jan.kiszka@siemens.com>
+X-Mailer: git-send-email 2.16.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 192.35.17.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,69 +59,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, Thomas Huth <thuth@redhat.com>, i@maskray.me,
- philmd@redhat.com
+Cc: liang yan <lyan@suse.com>, Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Overdue update of the ivshmem 2.0 device model as presented at [1].
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Changes in v2:
+ - changed PCI device ID to Siemens-granted one,
+   adjusted PCI device revision to 0
+ - removed unused feature register from device
+ - addressed feedback on specification document
+ - rebased over master
 
-> Some distributions, e.g. Ubuntu 19.10, enable PIE by default.
-> If for some reason one wishes to build a non-pie binary, we
-> must provide additional options to override.
->
-> At the same time, reorg the code to an elif chain.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This version is now fully in sync with the implementation for Jailhouse
+that is currently under review [2][3], UIO and virtio-ivshmem drivers
+are shared. Jailhouse will very likely pick up this revision of the
+device in order to move forward with stressing it.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+More details on the usage with QEMU were in the original cover letter
+(with adjustements to the new device ID):
 
-> ---
->  configure | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
->
-> diff --git a/configure b/configure
-> index 2503288654..f6ff079fab 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2035,19 +2035,18 @@ if compile_prog "-Werror -fno-pie" "-no-pie"; then
->    LDFLAGS_NOPIE=3D"-no-pie"
->  fi
->=20=20
-> -if test "$pie" !=3D "no" ; then
-> -  if compile_prog "-fPIE -DPIE" "-pie"; then
-> -    QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
-> -    LDFLAGS=3D"-pie $LDFLAGS"
-> -    pie=3D"yes"
-> -  else
-> -    if test "$pie" =3D "yes"; then
-> -      error_exit "PIE not available due to missing toolchain support"
-> -    else
-> -      echo "Disabling PIE due to missing toolchain support"
-> -      pie=3D"no"
-> -    fi
-> -  fi
-> +if test "$pie" =3D "no"; then
-> +  QEMU_CFLAGS=3D"$CFLAGS_NOPIE $QEMU_CFLAGS"
-> +  LDFLAGS=3D"$LDFLAGS_NOPIE $LDFLAGS"
-> +elif compile_prog "-fPIE -DPIE" "-pie"; then
-> +  QEMU_CFLAGS=3D"-fPIE -DPIE $QEMU_CFLAGS"
-> +  LDFLAGS=3D"-pie $LDFLAGS"
-> +  pie=3D"yes"
-> +elif test "$pie" =3D "yes"; then
-> +  error_exit "PIE not available due to missing toolchain support"
-> +else
-> +  echo "Disabling PIE due to missing toolchain support"
-> +  pie=3D"no"
->  fi
->=20=20
->  # Detect support for PT_GNU_RELRO + DT_BIND_NOW.
+If you want to play with this, the basic setup of the shared memory
+device is described in patch 1 and 3. UIO driver and also the
+virtio-ivshmem prototype can be found at
 
+    http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
 
---=20
-Alex Benn=C3=A9e
+Accessing the device via UIO is trivial enough. If you want to use it
+for virtio, this is additionally to the description in patch 3 needed on
+the virtio console backend side:
+
+    modprobe uio_ivshmem
+    echo "110a 4106 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
+    linux/tools/virtio/virtio-ivshmem-console /dev/uio0
+
+And for virtio block:
+
+    echo "110a 4106 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
+    linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
+
+After that, you can start the QEMU frontend instance with the
+virtio-ivshmem driver installed which can use the new /dev/hvc* or
+/dev/vda* as usual.
+
+Any feedback welcome!
+
+Jan
+
+PS: Let me know if I missed someone potentially interested in this topic
+on CC - or if you would like to be dropped from the list.
+
+[1] https://kvmforum2019.sched.com/event/TmxI
+[2] https://groups.google.com/forum/#!topic/jailhouse-dev/ffnCcRh8LOs
+[3] https://groups.google.com/forum/#!topic/jailhouse-dev/HX-0AGF1cjg
+
+Jan Kiszka (3):
+  hw/misc: Add implementation of ivshmem revision 2 device
+  docs/specs: Add specification of ivshmem device revision 2
+  contrib: Add server for ivshmem revision 2
+
+ Makefile                                  |    3 +
+ Makefile.objs                             |    1 +
+ configure                                 |    1 +
+ contrib/ivshmem2-server/Makefile.objs     |    1 +
+ contrib/ivshmem2-server/ivshmem2-server.c |  462 ++++++++++++
+ contrib/ivshmem2-server/ivshmem2-server.h |  158 +++++
+ contrib/ivshmem2-server/main.c            |  313 +++++++++
+ docs/specs/ivshmem-2-device-spec.md       |  376 ++++++++++
+ hw/misc/Makefile.objs                     |    2 +-
+ hw/misc/ivshmem2.c                        | 1085 +++++++++++++++++++++++++++++
+ include/hw/misc/ivshmem2.h                |   48 ++
+ include/hw/pci/pci_ids.h                  |    2 +
+ 12 files changed, 2451 insertions(+), 1 deletion(-)
+ create mode 100644 contrib/ivshmem2-server/Makefile.objs
+ create mode 100644 contrib/ivshmem2-server/ivshmem2-server.c
+ create mode 100644 contrib/ivshmem2-server/ivshmem2-server.h
+ create mode 100644 contrib/ivshmem2-server/main.c
+ create mode 100644 docs/specs/ivshmem-2-device-spec.md
+ create mode 100644 hw/misc/ivshmem2.c
+ create mode 100644 include/hw/misc/ivshmem2.h
+
+-- 
+2.16.4
+
 
