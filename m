@@ -2,84 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79544C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 450CAC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42C7D2077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:32:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13A1C2077B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:32:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g9iIBXtZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C7D2077B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ib/AaEQm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A1C2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ion5g-00019M-Ql
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:32:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52533)
+	id 1ion64-00020V-MO
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:32:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iolxy-0007P0-6W
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:20:03 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iomvd-0000FF-EC
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:21:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iolxw-0002Ue-OQ
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:20:01 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23165
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iomvc-0004mC-6Y
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:21:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35296
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iolxw-0002Tm-KY
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:20:00 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iomvc-0004ly-34
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:21:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578392400;
+ s=mimecast20190719; t=1578396099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=x+Yr2/bXyN9lnwWcWTxM2v8w0rpDwaWiPcSxQZOpx0M=;
- b=g9iIBXtZxvJOg+2tNZ1wEWPYFW171BcXervS+FJzKxVXVFIRkFnMW9zbrOJzbs4ljMnrIE
- MjZ6oCYkcsOKl08XIVE5imPNI0P8LMBxTc5b48emEYLvm8ti4VhTnL6GUa3CloG3/OdwGF
- frJax+VNYij4C3SFcK6y6XNzA+ZKAvc=
+ bh=XRU1fbeHj2mEmmyk9undtp1vHtmrOVjpgS4wUuIFOk4=;
+ b=ib/AaEQmX4vkdnUF89f7+7TkH3vk6L+SfocV9oEyq1caH5fjYEkWvzzdnZ2nj4lA7DaSFS
+ q81z6SLQa5aRNnoHv9K0uB6NiG+HNW39OlXp0bTU02FEDOdibSnyIMWmrgkd+rR3d6YXGu
+ BX+JeqyaxuR//P8GQJyp58fLF8SIL2A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-sMBC5PaqO16ZAREDaxnhxQ-1; Tue, 07 Jan 2020 05:19:59 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-98-wbaofb6TOmydSx9Y1xbDaQ-1; Tue, 07 Jan 2020 06:21:38 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31B4F801E6C;
- Tue,  7 Jan 2020 10:19:58 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-126.ams2.redhat.com
- [10.36.117.126])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB1D77C34A;
- Tue,  7 Jan 2020 10:19:54 +0000 (UTC)
-Subject: Re: [PATCH 3/3] gitlab-ci-edk2.yml: Use ccache
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200106184601.25453-1-philmd@redhat.com>
- <20200106184601.25453-4-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <b70f81d0-596d-d867-b722-f9e7aab0e935@redhat.com>
-Date: Tue, 7 Jan 2020 11:19:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94629801E72
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:21:37 +0000 (UTC)
+Received: from work-vm (ovpn-117-52.ams2.redhat.com [10.36.117.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 64EF185EE6;
+ Tue,  7 Jan 2020 11:21:36 +0000 (UTC)
+Date: Tue, 7 Jan 2020 11:21:33 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v2 2/3] migration: Make sure that we don't call write()
+ in case of error
+Message-ID: <20200107112133.GC2732@work-vm>
+References: <20200107104914.1814-1-quintela@redhat.com>
+ <20200107104914.1814-3-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200106184601.25453-4-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: sMBC5PaqO16ZAREDaxnhxQ-1
+In-Reply-To: <20200107104914.1814-3-quintela@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: wbaofb6TOmydSx9Y1xbDaQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,87 +89,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/06/20 19:46, Philippe Mathieu-Daud=C3=A9 wrote:
-> By using ccache we reduce the job duration from
-> 40 minutes 26 seconds to 32 minutes 6 seconds.
+* Juan Quintela (quintela@redhat.com) wrote:
+> If we are exiting due to an error/finish/.... Just don't try to even
+> touch the channel with one IO operation.
 >=20
->   Running after script...
->   $ ccache --show-stats
->   cache hit (direct)                  6604
->   files in cache                     12090
->   cache size                         335.5 MB
->=20
-> For now downloading this cache takes 16 seconds, archiving
-> it 44 seconds.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 > ---
->  .gitlab-ci-edk2.yml | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  migration/ram.c | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
 >=20
-> diff --git a/.gitlab-ci-edk2.yml b/.gitlab-ci-edk2.yml
-> index abfaf52874..329ba24f20 100644
-> --- a/.gitlab-ci-edk2.yml
-> +++ b/.gitlab-ci-edk2.yml
-> @@ -14,12 +14,19 @@ build-edk2:
->     - edk2-stdout.log
->     - edk2-stderr.log
->   image: ubuntu:16.04 # Use Ubuntu Xenial
-> + variables:
-> +   CCACHE_DIR: ${CI_PROJECT_DIR}/.ccache
-> + cache: # Use the same cache for all EDK2 jobs
-> +   key: ubuntu16.04-edk2-ccache
-> +   paths:
-> +   - ${CCACHE_DIR}
->   before_script: # Install packages requiered to build EDK2
->   - apt-get update --quiet --quiet
->   - DEBIAN_FRONTEND=3Dnoninteractive
->     apt-get install --assume-yes --no-install-recommends --quiet --quiet
->       build-essential
->       ca-certificates
-> +     ccache
->       dos2unix
->       gcc-aarch64-linux-gnu
->       gcc-arm-linux-gnueabi
-> @@ -29,9 +36,13 @@ build-edk2:
->       nasm
->       python
->       uuid-dev
-> + - export PATH=3D/usr/lib/ccache:$PATH
-> + - ccache --zero-stats
->   script: # Clone the required submodules and build EDK2
->   - git submodule update --init roms/edk2
->   - git -C roms/edk2 submodule update --init
->   - export JOBS=3D$(($(getconf _NPROCESSORS_ONLN) + 1))
->   - echo "=3D=3D=3D Using ${JOBS} simultaneous jobs =3D=3D=3D"
->   - make -j${JOBS} -C roms efi 1>edk2-stdout.log 2> >(tee -a edk2-stderr.=
-log >&2)
-> + after_script:
-> + - ccache --show-stats
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 96feb4062c..6e678dbd2e 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -900,6 +900,12 @@ struct {
+>      uint64_t packet_num;
+>      /* send channels ready */
+>      QemuSemaphore channels_ready;
+> +    /*
+> +     * Have we already run terminate threads.  There is a race when it
+> +     * happens that we got one error while we are exiting.
+> +     * We will use atomic operations.  Only valid values are 0 and 1.
+> +     */
+> +    int exiting;
+>  } *multifd_send_state;
+> =20
+>  /*
+> @@ -928,6 +934,10 @@ static int multifd_send_pages(RAMState *rs)
+>      MultiFDPages_t *pages =3D multifd_send_state->pages;
+>      uint64_t transferred;
+> =20
+> +    if (atomic_read(&multifd_send_state->exiting)) {
+> +        return -1;
+> +    }
+> +
+>      qemu_sem_wait(&multifd_send_state->channels_ready);
+>      for (i =3D next_channel;; i =3D (i + 1) % migrate_multifd_channels()=
+) {
+>          p =3D &multifd_send_state->params[i];
+> @@ -1009,6 +1019,16 @@ static void multifd_send_terminate_threads(Error *=
+err)
+>          }
+>      }
+> =20
+> +    /*
+> +     * We don't want to exit each threads twice.  Depending on where
+> +     * we get the error, or if there are two independent errors in two
+> +     * threads at the same time, we can end calling this function
+> +     * twice.
+> +     */
+
+Yeh that makes it cleaer.  Thanks
+
+> +    if (atomic_xchg(&multifd_send_state->exiting, 1)) {
+> +        return;
+> +    }
+> +
+>      for (i =3D 0; i < migrate_multifd_channels(); i++) {
+>          MultiFDSendParams *p =3D &multifd_send_state->params[i];
+> =20
+> @@ -1118,6 +1138,10 @@ static void *multifd_send_thread(void *opaque)
+> =20
+>      while (true) {
+>          qemu_sem_wait(&p->sem);
+> +
+> +        if (atomic_read(&multifd_send_state->exiting)) {
+> +            break;
+> +        }
+>          qemu_mutex_lock(&p->mutex);
+> =20
+>          if (p->pending_job) {
+> @@ -1224,6 +1248,7 @@ int multifd_save_setup(void)
+>      multifd_send_state->params =3D g_new0(MultiFDSendParams, thread_coun=
+t);
+>      multifd_send_state->pages =3D multifd_pages_init(page_count);
+>      qemu_sem_init(&multifd_send_state->channels_ready, 0);
+> +    atomic_set(&multifd_send_state->exiting, 0);
+> =20
+>      for (i =3D 0; i < thread_count; i++) {
+>          MultiFDSendParams *p =3D &multifd_send_state->params[i];
+> --=20
+> 2.24.1
 >=20
-
-I suggest dropping this patch. (In the first place: thank you for making
-this a separate patch!)
-
-I'm not a fan of ccache, to be honest. I've seen obscure failures with
-it in the past. Also, the edk2 build system is a complicated beast in
-itself; let's not compose that with another opaque thing. I'm especially
-not fond of caching artifacts between multiple edk2 jobs.
-
-For speeding up my builds, I used to use distcc instead; it worked
-better than ccache (using multiple machines in my home). But I abandoned
-even that, after a while.
-
-I certainly don't intend to nack this patch -- if others really like
-(and trust) ccache, they are welcome to ack. I'm just not a fan of it.
-
-Thanks,
-Laszlo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
