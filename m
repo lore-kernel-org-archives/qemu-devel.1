@@ -2,69 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D22A6C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:55:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D54A2C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:56:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B4F12075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:55:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FBDB2075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:56:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="d1kfI7/7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B4F12075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QtvXw5j9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FBDB2075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iooOg-0003OZ-HZ
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 07:55:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56199)
+	id 1iooPj-0005v5-AS
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 07:56:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ionvj-00018w-5N
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:25:52 -0500
+ (envelope-from <berrange@redhat.com>) id 1ionDf-0007zo-Ur
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ionvh-0000WB-PR
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:25:50 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:36753)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1ionvh-0000V1-Cu
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:25:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=dUHd+9G2AYjgCyzQ49UQCRBnmcpm08/n661jKXFbrMo=; b=d1kfI7/7UautXD0hhWyEpGLPRp
- bzPHDJdPQP6Jt66wCf997O/VHKA3sNn+uvlFALEStSqDcDOA0j35tBJI1jrH3DWq5/n5O0ncLecg7
- wh6u0a3NW840uPt+bENbPs+fWELA5ms4VlTTX55HiJgJsAmxTvdyeH9HnxP+Q8+5r6SfXwZtp48aB
- igdWvAaMKoKrp5vcM+4IAiHv1ApRIvws5OvQdWbaxxfpSTcaUGUXhNL2Z0Qy4OenQHA5ttiAEw/hq
- 9b02nIYEEls8Ksls9pJdG2bwQ8CDu+uw2OQy2YaccC/qvevcdWXFtRWhpDsTp+d6I7Yb9lNoH8Rqf
- tV4sKzU54xT1xFar71q4L1+zK+5aazRUDvEYwQwef9FooYlxt8igjy1dLvidHPp/JAoo2RsJ+Rizm
- 4CvbZhJTUaJ4lbraE3ls59nvIEPwa5I0evzzI1uIxBg5Q1uKfZVQFypv+vhW2kTv4wUFp0vYEr00B
- bpY8YIXtptz6EwgMAoR2eItIRhRM+LEqwi+26FCwnHLpkxuaih5SJugVWNmrt4WF+oq0os1TDy5Xn
- FCPIUp/F1bPyr0tvwEisJnuJ+XqNjkKGopVqyUP3Y8XUGDWmT2Bbn+yRkln9thYoXPiKl7E8SFX8f
- 41eBFJMqZ0Udv1Us4zEVh1gHJUCI1wxEkTHOLY7eo=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 4/9] tests/virtio-9p: added readdir test
-Date: Tue, 07 Jan 2020 13:25:46 +0100
-Message-ID: <10962452.xo9bJ14PLm@silver>
-In-Reply-To: <20200106182252.58dd6712@bahia.lan>
-References: <cover.1576678644.git.qemu_oss@crudebyte.com>
- <a8d6dab2625554d425bd44a4d54d84459f083b18.1576678644.git.qemu_oss@crudebyte.com>
- <20200106182252.58dd6712@bahia.lan>
+ (envelope-from <berrange@redhat.com>) id 1ionDa-0007ev-SY
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:40:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32136
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ionDa-0007cn-NG
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:40:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578397214;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rq0mhd/DNzUjb+TNvAOMtHqdsH433tgEJw+RqS73iV4=;
+ b=QtvXw5j9ae0lK9AipX4Uxq4YlayW6PqOp0OEDNKd3pL11yZEBfGQW34zJSVdg2dQ4fS3IG
+ Tpun4ZRZiLRjpqaQplZ7WHRfv0qnlM20v6fHXTgxqQmd0NEc7FkmUDmRObCjMHvUhjBXn7
+ nVJozjKLP4VqKGkTzsYUsUYhYip0280=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-0GQqfT-uPDiocWF0J33BAw-1; Tue, 07 Jan 2020 06:40:12 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44CE61005502
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:40:11 +0000 (UTC)
+Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6696260BEC;
+ Tue,  7 Jan 2020 11:40:04 +0000 (UTC)
+Date: Tue, 7 Jan 2020 11:40:01 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 080/104] virtiofsd: add helper for lo_data cleanup
+Message-ID: <20200107114001.GU3368802@redhat.com>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-81-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20191212163904.159893-81-dgilbert@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 0GQqfT-uPDiocWF0J33BAw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.189.157.229
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,143 +89,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Montag, 6. Januar 2020 18:22:52 CET Greg Kurz wrote:
-> > diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-> > index 06263edb53..48c0eca292 100644
-> > --- a/tests/virtio-9p-test.c
-> > +++ b/tests/virtio-9p-test.c
-> > @@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t
-> > len)> 
-> >      req->r_off += len;
-> >  
-> >  }
-> > 
-> > +static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-> > +{
-> > +    v9fs_memread(req, val, 1);
-> > +}
-> > +
-> > 
-> >  static void v9fs_uint16_write(P9Req *req, uint16_t val)
-> >  {
-> >  
-> >      uint16_t le_val = cpu_to_le16(val);
-> > 
-> > @@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t
-> > *val)> 
-> >      le32_to_cpus(val);
-> >  
-> >  }
-> > 
-> > +static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-> > +{
-> > +    v9fs_memread(req, val, 8);
-> > +    le64_to_cpus(val);
-> > +}
-> > +
-> > 
-> >  /* len[2] string[len] */
-> >  static uint16_t v9fs_string_size(const char *string)
-> >  {
-> > 
-> > @@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
-> > 
-> >          id == P9_RLOPEN ? "RLOPEN" :
-> >          id == P9_RWRITE ? "RWRITE" :
-> > 
-> >          id == P9_RFLUSH ? "RFLUSH" :
-> > +        id == P9_RREADDIR ? "READDIR" :
-> >          "<unknown>";
-> >  
-> >  }
-> > 
-> > @@ -348,6 +360,79 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid,
-> > v9fs_qid **wqid)> 
-> >      v9fs_req_free(req);
-> >  
-> >  }
-> > 
-> > +/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-> > +static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t
-> > offset,
-> > +                            uint32_t count, uint16_t tag)
-> > +{
-> > +    P9Req *req;
-> > +
-> > +    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-> > +    v9fs_uint32_write(req, fid);
-> > +    v9fs_uint64_write(req, offset);
-> > +    v9fs_uint32_write(req, count);
-> > +    v9fs_req_send(req);
-> > +    return req;
-> > +}
-> > +
-> > +struct v9fs_dirent {
-> 
-> The QEMU coding style calls for a CamelCase typedef,
-> 
-> ie.
-> 
-> typedef struct V9fsDirent V9fsDirent;
+On Thu, Dec 12, 2019 at 04:38:40PM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: Liu Bo <bo.liu@linux.alibaba.com>
+>=20
+> This offers an helper function for lo_data's cleanup.
+>=20
+> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 37 ++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 16 deletions(-)
 
-np
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-> > +    v9fs_qid qid;
-> 
-> Yeah... I should have done the same when I introduced this type ;-)
 
-So I'll probably address your sin with a separate patch then.
+>=20
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrou=
+gh_ll.c
+> index 45cf466178..097033aa00 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -2439,6 +2439,26 @@ static gboolean lo_key_equal(gconstpointer a, gcon=
+stpointer b)
+>      return la->ino =3D=3D lb->ino && la->dev =3D=3D lb->dev;
+>  }
+> =20
+> +static void fuse_lo_data_cleanup(struct lo_data *lo)
+> +{
+> +    if (lo->inodes) {
+> +        g_hash_table_destroy(lo->inodes);
+> +    }
+> +    lo_map_destroy(&lo->fd_map);
+> +    lo_map_destroy(&lo->dirp_map);
+> +    lo_map_destroy(&lo->ino_map);
+> +
+> +    if (lo->proc_self_fd >=3D 0) {
+> +        close(lo->proc_self_fd);
+> +    }
+> +
+> +    if (lo->root.fd >=3D 0) {
+> +        close(lo->root.fd);
+> +    }
+> +
+> +    free((char *)lo->source);
 
-> > +static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
-> > +{
-> > +    QVirtio9P *v9p = obj;
-> > +    alloc = t_alloc;
-> > +    char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-> > +    uint16_t nqid;
-> > +    v9fs_qid qid;
-> > +    uint32_t count, nentries;
-> > +    struct v9fs_dirent *entries = NULL;
-> > +    P9Req *req;
-> > +
-> > +    fs_attach(v9p, NULL, t_alloc);
-> > +    req = v9fs_twalk(v9p, 0, 1, 1, wnames, 0);
-> > +    v9fs_req_wait_for_reply(req, NULL);
-> > +    v9fs_rwalk(req, &nqid, NULL);
-> > +    g_assert_cmpint(nqid, ==, 1);
-> > +
-> > +    req = v9fs_tlopen(v9p, 1, O_DIRECTORY, 0);
-> > +    v9fs_req_wait_for_reply(req, NULL);
-> > +    v9fs_rlopen(req, &qid, NULL);
-> > +
-> > +    req = v9fs_treaddir(v9p, 1, 0, P9_MAX_SIZE - P9_IOHDRSZ, 0);
-> > +    v9fs_req_wait_for_reply(req, NULL);
-> > +    v9fs_rreaddir(req, &count, &nentries, &entries);
-> > +
-> > +    /*
-> > +     * Assuming msize (P9_MAX_SIZE) is large enough so we can retrieve
-> > all
-> > +     * dir entries with only one readdir request.
-> > +     */
-> > +    g_assert_cmpint(
-> > +        nentries, ==,
-> > +        QTEST_V9FS_SYNTH_READDIR_NFILES + 2 /* "." and ".." */
-> > +    );
-> 
-> What about coming up with a version of this test that loops until
-> it could read all the entries instead of this assumption ?
+This will need changing if you follow my comment on prev patch about
+removing the const & cast
 
-Yes, I had this planned a bit later though. And not as a replacement for this 
-one, but rather as a subsequent advanced readdir test. Because it makes sense 
-to cover both cases: readdir a large amount of entries with a single request, 
-but also splitted down by several readdir requests as subsequent, separate 
-test.
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>      struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
+> @@ -2594,22 +2614,7 @@ err_out2:
+>  err_out1:
+>      fuse_opt_free_args(&args);
+> =20
+> -    if (lo.inodes) {
+> -        g_hash_table_destroy(lo.inodes);
+> -    }
+> -    lo_map_destroy(&lo.fd_map);
+> -    lo_map_destroy(&lo.dirp_map);
+> -    lo_map_destroy(&lo.ino_map);
+> -
+> -    if (lo.proc_self_fd >=3D 0) {
+> -        close(lo.proc_self_fd);
+> -    }
+> -
+> -    if (lo.root.fd >=3D 0) {
+> -        close(lo.root.fd);
+> -    }
+> -
+> -    free((char *)lo.source);
+> +    fuse_lo_data_cleanup(&lo);
+> =20
+>      return ret ? 1 : 0;
+>  }
+> --=20
+> 2.23.0
+>=20
+>=20
 
-Best regards,
-Christian Schoenebeck
-
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
