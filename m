@@ -2,80 +2,99 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6662C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9314DC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:48:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 703452077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:48:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E7D32077B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:48:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mP+UCBgd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 703452077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cfzEIbfw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E7D32077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioq9W-0005jl-9D
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:48:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43856)
+	id 1ioq9c-0005rO-8R
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:48:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ioq7k-0003aG-2t
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:46:25 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iooxk-0003Vz-J0
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ioq7i-0007bY-0v
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:46:23 -0500
-Received: from mail-oi1-x232.google.com ([2607:f8b0:4864:20::232]:37553)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ioq7h-0007aw-RS
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:46:21 -0500
-Received: by mail-oi1-x232.google.com with SMTP id z64so11596398oia.4
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 06:46:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Ag51UugIS/CYNRWjM46vwlEZpfuT0F8y5cDLIO3+1M8=;
- b=mP+UCBgdzvplQg1AnAtbI3wZNvO5a+wy2J4gwrMgR4tz0HkWjUTz7OTkBlbZFWGEFk
- LV2YfBs6YblPOMncuFFoiCpvdaaVUuXQel74Mf4xFjC+iw9d2r6J/TJ6rzbVzkyAF7+8
- SgNm2wXZEk0Q6K7ZI6t+pjkvzPQsSATkoZh/Wf8A0FGvBPTHos0hfCCbnnl4uvB6X+wk
- SxDfFCrUzi7QOsnnJ6MkoAD4geXq0WXkPqEZT9wTcf6XdIOns1NATwN52cWH+38X3bGj
- ub1Xr11Hek2qP9+23spFOFK818z/Pdv6TzFbVeVA3XWtKz0WKKYvJRZhwjk2pV+26XOC
- MMTA==
+ (envelope-from <pbonzini@redhat.com>) id 1iooxj-0005OY-Cx
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:32:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30934
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iooxj-0005OJ-8v
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:31:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578403918;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nQ8k4187maCsiVkv/BlfiwiJbwIWL5nyIopjleGN2iA=;
+ b=cfzEIbfwNmaSzrrzarFjdMlZqWeb3o336EioqfEHZyUB7Qgcpt0ofH34UNc9XQSQ6lKyPC
+ 3V+4mLuRzFi8vnx8hef+4iv/Tx7t8vq6EtAo6EeItA1pmMuNi5uYurK2TuwS1/nHUgsuja
+ Bbq8v3ZBMWHCrvJW58pdnjVEF8FdZWk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-WXz1c3AxOy-aPo_381YY7A-1; Tue, 07 Jan 2020 08:31:57 -0500
+Received: by mail-wm1-f70.google.com with SMTP id m133so1950250wmf.2
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:31:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ag51UugIS/CYNRWjM46vwlEZpfuT0F8y5cDLIO3+1M8=;
- b=YTyN2H7RGvlo2R7eBgee7uqsTrfh0VXY+4UC79261zuN0ZRGjsJVrmSphpUqZ1Ga0b
- mMBPj27gmxLa+/t04K684vtuumT+E7tqqTrODYjlHoUHhxPPmgPG/PSnICkK06fTE8b4
- yIGo9E4JuAj9IaE6LQ0+KBk3XWq5k5kjDyW6gbssUAP9Ws5mwk6RzwFnfq72xZzNZZJh
- l2N8+KIR80B8XPweZttUeAptNijsTLUkDoZOJebSvegs/ypW9PKiwUdX+p1SxFvcBRFp
- cRAra6UZM9VfBdqx9tFM2Q92gK2iRo44vJP/S+gOtqyJ2eBZ5HRbRiMtcWdkbIgJwjfK
- BoPA==
-X-Gm-Message-State: APjAAAVCDHzDcIpmRugBXX8Gayygxt79y2H8E11d8wXdKexwcE8VerUf
- 3yRJ5sSi72Ms9d/9KG61npHaf/6xcJe8/Gi3RH1Z9A==
-X-Google-Smtp-Source: APXvYqw93KACrdvw4Z6UPYu5sAaf848o2Nd17xbirMGoA0n+JdcocJnOFu+5Wm8cDRA+xSQ9k89Skr0B19at6z9MpY4=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr67917oid.98.1578408380730;
- Tue, 07 Jan 2020 06:46:20 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nQ8k4187maCsiVkv/BlfiwiJbwIWL5nyIopjleGN2iA=;
+ b=PWMkMEiSA82NJnHAcsUbNf1ZMv29iMmM+GkAQsoFsg7M/mJW6FMdXmthjh9vkQNqSs
+ ViaQkSB/rKRa5+XJ/+dDL6sfCA0VD1WgcrmzpcMC6QkzEW0S3sbwZSeOD+j4zdkZUWXM
+ Q/0i5iIwkasyuTSRffcj/uuYrTEDkvt2PpkPcEF60fCn/LP6PcmezT1Eb+rufbktZ7fA
+ Ws9C4Skduk+U1bq5Al2qbAZFyD+Ok2StyZHckwrhIvD+alFiQ0FL6z77SdVqipZsmBnA
+ 1KdW8ZPXkRScBkIRBflWbnUNUzR+vKAesdPyUMWupRnjFafNNNNdBtoIp9x4TRq8WzFG
+ Ho3A==
+X-Gm-Message-State: APjAAAU2sBqekeQ85JnSlsSd4zgkky7CZnCwk7/BjxiRRH6kvDXUNBkp
+ WvwpXEchRFPGphOO4kZVblELJqr4X6/MvqN0f3af0VfF7CsqEWEGp0XThlwSaC2TYYRC5/uVyp3
+ +qYKqNlOyZZZx0dQ=
+X-Received: by 2002:adf:f308:: with SMTP id i8mr49050753wro.42.1578403916634; 
+ Tue, 07 Jan 2020 05:31:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxmdNxCxvc9k02zJuROx2zg1Xu3uFx3m2LXaQbKd4m6cPmsfKqYWE4pn3SDa5fw427OKIu2dg==
+X-Received: by 2002:adf:f308:: with SMTP id i8mr49050730wro.42.1578403916430; 
+ Tue, 07 Jan 2020 05:31:56 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
+ ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+ by smtp.gmail.com with ESMTPSA id a14sm81681169wrx.81.2020.01.07.05.31.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jan 2020 05:31:55 -0800 (PST)
+Subject: Re: [PATCH 0/2] Fix Cooperlake CPU model
+To: Xiaoyao Li <xiaoyao.li@intel.com>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20191225063018.20038-1-xiaoyao.li@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <93c9cc8c-09ec-d13f-f012-edf86fd945ab@redhat.com>
+Date: Tue, 7 Jan 2020 14:31:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
- <1576670573-48048-30-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1576670573-48048-30-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Jan 2020 14:46:09 +0000
-Message-ID: <CAFEAcA-qbxVxR6qWRjPjfXf+XQzoA=D6LfhDJ2Do4LfZALZ-EA@mail.gmail.com>
-Subject: Re: [PULL 29/87] kvm: convert "-machine kernel_irqchip" to an
- accelerator property
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::232
+In-Reply-To: <20191225063018.20038-1-xiaoyao.li@intel.com>
+Content-Language: en-US
+X-MC-Unique: WXz1c3AxOy-aPo_381YY7A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,59 +106,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Cathy Zhang <cathy.zhang@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 18 Dec 2019 at 12:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 25/12/19 07:30, Xiaoyao Li wrote:
+> Current Cooperlake CPU model lacks VMX features which are introduced by Paolo
+> several months ago, and it also lacks 2 security features in
+> MSR_IA32_ARCH_CAPABILITIES disclosed recently.
+> 
+> Xiaoyao Li (2):
+>   target/i386: Add new bit definitions of MSR_IA32_ARCH_CAPABILITIES
+>   target/i386: Add missed features to Cooperlake CPU model
+> 
+>  target/i386/cpu.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  target/i386/cpu.h | 13 +++++++-----
+>  2 files changed, 58 insertions(+), 6 deletions(-)
+> 
 
-> +static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
-> +                                   const char *name, void *opaque,
-> +                                   Error **errp)
-> +{
-> +    Error *err = NULL;
-> +    KVMState *s = KVM_STATE(obj);
-> +    OnOffSplit mode;
-> +
-> +    visit_type_OnOffSplit(v, name, &mode, &err);
+Queued, thanks.
 
-Coverity complains that this call uses 'mode' uninitialized,
-which seems correct since it starts off with 'value = *obj'.
-(CID 1412230)
+Paolo
 
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    } else {
-> +        switch (mode) {
-> +        case ON_OFF_SPLIT_ON:
-> +            s->kernel_irqchip_allowed = true;
-> +            s->kernel_irqchip_required = true;
-> +            s->kernel_irqchip_split = false;
-> +            break;
-> +        case ON_OFF_SPLIT_OFF:
-> +            s->kernel_irqchip_allowed = false;
-> +            s->kernel_irqchip_required = false;
-> +            s->kernel_irqchip_split = false;
-> +            break;
-> +        case ON_OFF_SPLIT_SPLIT:
-> +            s->kernel_irqchip_allowed = true;
-> +            s->kernel_irqchip_required = true;
-> +            s->kernel_irqchip_split = true;
-> +            break;
-> +        default:
-> +            /* The value was checked in visit_type_OnOffSplit() above. If
-> +             * we get here, then something is wrong in QEMU.
-> +             */
-> +            abort();
-> +        }
-> +    }
-> +}
-
-
-thanks
--- PMM
 
