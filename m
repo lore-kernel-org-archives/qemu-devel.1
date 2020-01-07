@@ -2,77 +2,61 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD1CC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF201C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 023882073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:15:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wp0u342s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023882073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 900612073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:20:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900612073D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53813 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iosSL-00083n-13
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 12:15:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41634)
+	id 1iosWP-0004dR-5g
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 12:20:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53041)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iosBi-0007Am-5L
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:58:40 -0500
+ (envelope-from <clg@kaod.org>) id 1iosUy-0002q8-Kg
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:18:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iosBf-0001um-NT
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:58:37 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46832
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iosUx-0006dM-Kz
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:18:32 -0500
+Received: from 16.mo7.mail-out.ovh.net ([46.105.72.216]:53278)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iosBf-0001u4-GG
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:58:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578416314;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D8O9Z9lDraeffrwSUfIqwjYBA4wfyWf4iHrjngATmdg=;
- b=Wp0u342ssooZiuGEtQYaqhqTR7i7a7hAsUvq+x+8q2lcWvr9sWl5XHG5/iTgC6kJaw0whw
- ks8Bafv2NxU/Kij11QqZGedWV32y9Ihlru6NWyaRDh3fie9+JtBVskrRg3lr3VHJW9B7Rp
- YwZNxQaGK9t1Wg1nnBi6pHoFtHDFRS0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-287-MG-cfYKJPEKUVuTu0bMX_w-1; Tue, 07 Jan 2020 11:58:31 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0861D1856A6B;
- Tue,  7 Jan 2020 16:58:30 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C88607FB4F;
- Tue,  7 Jan 2020 16:58:22 +0000 (UTC)
-Date: Tue, 7 Jan 2020 17:58:21 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: minyard@acm.org
-Subject: Re: [PATCH] i386:acpi: Remove _HID from the SMBus ACPI entry
-Message-ID: <20200107175821.72556c39@redhat.com>
-In-Reply-To: <20200106152705.8258-1-minyard@acm.org>
-References: <20200106152705.8258-1-minyard@acm.org>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iosUx-0006ZG-FK
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:18:31 -0500
+Received: from player798.ha.ovh.net (unknown [10.108.35.122])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 3BAB2149DCF
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 18:18:26 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player798.ha.ovh.net (Postfix) with ESMTPSA id 3EB0DE107721;
+ Tue,  7 Jan 2020 17:18:21 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH 2/2] ppc/pnv: fix check on return value of blk_getlength()
+Date: Tue,  7 Jan 2020 18:18:09 +0100
+Message-Id: <20200107171809.15556-3-clg@kaod.org>
+X-Mailer: git-send-email 2.21.1
+In-Reply-To: <20200107171809.15556-1-clg@kaod.org>
+References: <20200107171809.15556-1-clg@kaod.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: MG-cfYKJPEKUVuTu0bMX_w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 13646469823285332966
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehhedgtdehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.72.216
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,48 +68,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Corey Minyard <cminyard@mvista.com>,
- wanghaibin.wang@huawei.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  6 Jan 2020 09:27:05 -0600
-minyard@acm.org wrote:
+blk_getlength() returns an int64_t but the result is stored in a
+uint32_t. Errors (negative values) won't be caught by the check in
+pnv_pnor_realize() and blk_blockalign() will allocate a very large
+buffer in such cases.
 
-> From: Corey Minyard <cminyard@mvista.com>
-> 
-> Per the ACPI spec (version 6.1, section 6.1.5 _HID) it is not required
-> on enumerated buses (like PCI in this case), _ADR is required (and is
-> already there).  And the _HID value is wrong.  Linux appears to ignore
-> the _HID entry, but it confuses Windows.
+Fixes Coverity issue CID 1412226.
 
-Corey,
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/pnv_pnor.h | 2 +-
+ hw/ppc/pnv_pnor.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Could you clarify as what "confuses Windows" means?
-s/confuses Windows/description of the observed problem and on what windows version/
-
-> 
-> Signed-off-by: Corey Minyard <cminyard@mvista.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> ---
->  hw/i386/acpi-build.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 7b8da62d41..ab73a8f4c8 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1815,7 +1815,6 @@ static void build_smb0(Aml *table, I2CBus *smbus, int devnr, int func)
->      Aml *scope = aml_scope("_SB.PCI0");
->      Aml *dev = aml_device("SMB0");
->  
-> -    aml_append(dev, aml_name_decl("_HID", aml_eisaid("APP0005")));
->      aml_append(dev, aml_name_decl("_ADR", aml_int(devnr << 16 | func)));
->      build_acpi_ipmi_devices(dev, BUS(smbus), "\\_SB.PCI0.SMB0");
->      aml_append(scope, dev);
+diff --git a/include/hw/ppc/pnv_pnor.h b/include/hw/ppc/pnv_pnor.h
+index c3dd28643cae..4f96abdfb402 100644
+--- a/include/hw/ppc/pnv_pnor.h
++++ b/include/hw/ppc/pnv_pnor.h
+@@ -23,7 +23,7 @@ typedef struct PnvPnor {
+     BlockBackend   *blk;
+=20
+     uint8_t        *storage;
+-    uint32_t       size;
++    int64_t        size;
+     MemoryRegion   mmio;
+ } PnvPnor;
+=20
+diff --git a/hw/ppc/pnv_pnor.c b/hw/ppc/pnv_pnor.c
+index 0e86ae2feae6..b061106d1c0c 100644
+--- a/hw/ppc/pnv_pnor.c
++++ b/hw/ppc/pnv_pnor.c
+@@ -111,7 +111,7 @@ static void pnv_pnor_realize(DeviceState *dev, Error =
+**errp)
+ }
+=20
+ static Property pnv_pnor_properties[] =3D {
+-    DEFINE_PROP_UINT32("size", PnvPnor, size, 128 << 20),
++    DEFINE_PROP_INT64("size", PnvPnor, size, 128 << 20),
+     DEFINE_PROP_DRIVE("drive", PnvPnor, blk),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+--=20
+2.21.1
 
 
