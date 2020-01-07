@@ -2,76 +2,83 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D96C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F9E7C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:14:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA736207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:14:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA736207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 28FAC207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:14:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sm7fYBVk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28FAC207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomoO-0001k2-MB
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:14:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34897)
+	id 1iomoj-0002xZ-9J
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:14:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iomgO-0003uR-MS
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:05:57 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iomk3-00074a-KD
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:09:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iomgN-0004Ss-DY
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:05:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38664)
+ (envelope-from <peter.maydell@linaro.org>) id 1iomk2-0006Oy-2F
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:09:43 -0500
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:41284)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iomgN-0004SW-88
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:05:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iomgM-0005JO-8z
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 11:05:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 295BD2E80CC
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:05:54 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iomk1-0006O2-Qd
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:09:42 -0500
+Received: by mail-ot1-x330.google.com with SMTP id r27so75965950otc.8
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 03:09:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mUAJ3tsm7IdfG+X32No9AxPGQTjUZBa6KgCtKb6tE7s=;
+ b=Sm7fYBVk+1C6u9zY6fA/02/a0yAk7AYVj5m2pXJIUi7qh1u0wLy36VyXz8g58Ofm8O
+ XAtMT9J5KgCUiTq/5aDZ9xsanWWmM2FB0GoPHX3Bh0lkuTaEiIS+e4+YPgXmAoZOX/AU
+ jXE93gh7PkKGO3tPgCYUi9BGYaBaHHJVHNYVWlWmWpncaNbLvh1sz++3k2I1rpMqSZZw
+ yZ4Sh98447QCtqsPwBYOmLPFYgeqxS5hP3ncMqfZHtFPB9yiY9Q6ZDgs10JLXBSQi1Wp
+ uY/2rDB0YgHEhr3Aynp7oBPsqAvugReJMgLAOIPRk8S7HRe64AEl9NOsHsSXoFB5p7HO
+ MMGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mUAJ3tsm7IdfG+X32No9AxPGQTjUZBa6KgCtKb6tE7s=;
+ b=gHoYsiMZPhOjIBIuSMWLYpc32jvTBftoO+UB+OA2SsG8GcVx6AiB0gmpibOBIiPzgF
+ PacTWPpCqTAbR5adwYzrOjOWfGHcz8vFj6Nt9z6CuJxVdWF8X5LFR81o4JjJUYM1kjYI
+ AXXMBJFSMSzBNFpNgKvHmM+7SfnMtz4sP7K6OIMZvZnC7e5M1/tERtmiZTz9t4lSJNaM
+ O2QYSqX8K8NbiFM9eee5JMf0dRzEiQ9haA2QgBnJe2g5l0/NEoPY6E5kAa5rQJNvXG/L
+ G22pDZxA7Wb7hhnTPKoEZCk9ULCsloxNa4BI6vdfxlanPAv8Rb0CyQcIPY0/2Cddz69z
+ 23Cg==
+X-Gm-Message-State: APjAAAVNTa0ikqJz66cE3AwMBquoJtFEcg6lYfOZGglirhUMHXd9GyKI
+ VaTqvyIlVHqkc1feqdzU6TndSKfopEfWp9WAOqs57w==
+X-Google-Smtp-Source: APXvYqy2xF4B7f1AI0S4zvTwWV5LO5ZJLGMZoJATlu1jCmK1krNDy903AO1f3+Uu75AmjnOeVU3x7dCReJJKrhv1lfg=
+X-Received: by 2002:a05:6830:184:: with SMTP id
+ q4mr104908121ota.232.1578395380945; 
+ Tue, 07 Jan 2020 03:09:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2020 10:55:48 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1856549@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: i2c m68k rtc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dcb314 laurent-vivier philmd
-X-Launchpad-Bug-Reporter: dcb (dcb314)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <157649490094.7480.17075229014510714852.malonedeb@soybean.canonical.com>
-Message-Id: <157839454891.2574.3115010173944275179.malone@soybean.canonical.com>
-Subject: [Bug 1856549] Re: qemu-4.2.0/hw/misc/mac_via.c: 2 * bad test ?
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1a8e18483fed610ce312f5ad3e28036f17a8bbe2
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <20200106200434.27646-1-jcmvbkbc@gmail.com>
+In-Reply-To: <20200106200434.27646-1-jcmvbkbc@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Jan 2020 11:09:30 +0000
+Message-ID: <CAFEAcA9X+wS8vYaZUev69U2StzB6YZMp6R1cB6Ua20+8L=2m2A@mail.gmail.com>
+Subject: Re: [PULL 0/3] target/xtensa queue
+To: Max Filippov <jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::330
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,48 +87,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856549 <1856549@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch posted: https://www.mail-archive.com/qemu-
-devel@nongnu.org/msg666836.html
+On Mon, 6 Jan 2020 at 20:05, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>
+> Hi Peter,
+>
+> please pull the following target/xtensa batch.
+>
+> The following changes since commit f4d8cf148e43d942ef1202071e0cd66ce40322e0:
+>
+>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-01-06' into staging (2020-01-06 17:44:22 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/OSLL/qemu-xtensa.git tags/20200106-xtensa
+>
+> for you to fetch changes up to a153a3f73d8e028be996f1602fa99c7f3f53348c:
+>
+>   target/xtensa: use MPU background map from core configuration (2020-01-06 11:46:16 -0800)
+>
+> ----------------------------------------------------------------
+> target/xtensa improvements for v5.0:
+>
+> - fix ps.ring use in MPU configs;
+> - use MPU background map from the configuration overlay.
+>
+> ----------------------------------------------------------------
+> Max Filippov (3):
+>       target/xtensa: fix ps.ring use in MPU configs
+>       target/xtensa: import xtensa/config/core-isa.h
+>       target/xtensa: use MPU background map from core configuration
 
-** Changed in: qemu
-       Status: New =3D> In Progress
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856549
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Title:
-  qemu-4.2.0/hw/misc/mac_via.c: 2 * bad test ?
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  1.
-
-  qemu-4.2.0/hw/misc/mac_via.c:417:27: style: Expression is always false
-  because 'else if' condition matches previous condition at line 412.
-  [multiCondition]
-
-                  } else if ((m->data_out & 0xf3) =3D=3D 0xa1) {
-  ...
-                  } else if ((m->data_out & 0xf3) =3D=3D 0xa1) {
-
-  2.
-
-  qemu-4.2.0/hw/misc/mac_via.c:467:27: style: Expression is always false
-  because 'else if' condition matches previous condition at line 463.
-  [multiCondition]
-
-  Duplicate.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856549/+subscriptions
+-- PMM
 
