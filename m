@@ -2,83 +2,83 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA8AC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13F9C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:44:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79E8A20715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C3642146E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:44:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qw6u/ELI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79E8A20715
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gch5sodD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C3642146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioq52-00041K-Ku
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:43:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40094)
+	id 1ioq5S-0004nj-FP
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:44:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ioobT-0006mR-7E
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:09:00 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iootm-0002ao-Dd
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:27:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ioobS-0002Qf-1K
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:08:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49299
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iootk-0003aT-W8
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:27:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50745
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ioobR-0002QF-U0
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:08:57 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iootk-0003aC-SB
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:27:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578402537;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1578403672;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Gd5D1/Mo04YP1gum04D/CLbfkhw2V+UTQeme1m/yReQ=;
- b=Qw6u/ELIzGVaJdW2ZCY16HQBTGudrRBYXSsuunrjqHZfDGX5Bk2AUuKLa6oYH6/J+xzylX
- n0l6Ari1ZsgcS1seO/hVgMtzN0PMKoZ1o+PzvX6BPgp3uoGy4kZ4MnHipHVS4bua42RtGH
- XarNGvaLfCmMIU4QojqUaK+wOTDXyo4=
+ bh=RFHdwo3Nl4Hc/YwEFaJOyv2mMZkI7m8j3abRPQsvzSY=;
+ b=Gch5sodDVUUxJMpXvFN/4vMgD57hpHWlWMrC9lx+xLev+UklsvYB6HWaFuR4GK4IUEXSXn
+ wfnWL2LAnj6Oh/fL1opbf93yLuugxv5JDtWepEcR/h4fHW3KIZiSIE64WJEsVtWIxH6aUG
+ 1XdduZMjWBFdHgF1G2mI5WiRENz/fls=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-jq76exXkPeuAYrsjsy0F7A-1; Tue, 07 Jan 2020 08:08:53 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-219-9qOEjienNGqdvhn6BtVRjQ-1; Tue, 07 Jan 2020 08:27:50 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E31DA10054E3
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 13:08:52 +0000 (UTC)
-Received: from redhat.com (ovpn-116-141.ams2.redhat.com [10.36.116.141])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 449C97DB3E;
- Tue,  7 Jan 2020 13:08:52 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 07/10] migration: Make no compression operations into
- its own structure
-In-Reply-To: <20200103182038.GS3804@work-vm> (David Alan Gilbert's message of
- "Fri, 3 Jan 2020 18:20:38 +0000")
-References: <20191218020119.3776-1-quintela@redhat.com>
- <20191218020119.3776-8-quintela@redhat.com>
- <20200103182038.GS3804@work-vm>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 07 Jan 2020 14:08:47 +0100
-Message-ID: <87r20bpg68.fsf@trasno.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DECD100551D
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 13:27:49 +0000 (UTC)
+Received: from work-vm (ovpn-117-52.ams2.redhat.com [10.36.117.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 99202100164D;
+ Tue,  7 Jan 2020 13:27:45 +0000 (UTC)
+Date: Tue, 7 Jan 2020 13:27:43 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 097/104] virtiofsd: Fix data corruption with O_APPEND
+ wirte in writeback mode
+Message-ID: <20200107132743.GH2732@work-vm>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-98-dgilbert@redhat.com>
+ <20200107122007.GG3368802@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: jq76exXkPeuAYrsjsy0F7A-1
+In-Reply-To: <20200107122007.GG3368802@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 9qOEjienNGqdvhn6BtVRjQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,65 +90,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> It will be used later.
->>=20
->> +static int nocomp_recv_pages(MultiFDRecvParams *p, uint32_t used, Error=
- **errp)
->> +{
->> +    if (p->flags !=3D MULTIFD_FLAG_NOCOMP) {
->> +        error_setg(errp, "multifd %d: flags received %x flags expected =
-%x",
->> +                   p->id, MULTIFD_FLAG_NOCOMP, p->flags);
->
-> That looks the wrong way around to me - shouldn't that be
->    p->flags, MULTIFD_FLAG_NOCOMP
-> ?
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Thu, Dec 12, 2019 at 04:38:57PM +0000, Dr. David Alan Gilbert (git) wr=
+ote:
+> > From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+> >=20
+> > When writeback mode is enabled (-o writeback), O_APPEND handling is
+> > done in kernel. Therefore virtiofsd clears O_APPEND flag when open.
+> > Otherwise O_APPEND flag takes precedence over pwrite() and write
+> > data may corrupt.
+> >=20
+> > Currently clearing O_APPEND flag is done in lo_open(), but we also
+> > need the same operation in lo_create(). So, factor out the flag
+> > update operation in lo_open() to update_open_flags() and call it
+> > in both lo_open() and lo_create().
+> >=20
+> > This fixes the failure of xfstest generic/069 in writeback mode
+> > (which tests O_APPEND write data integrity).
+>=20
+> Seeing this mention of xfstest reminds me that there are no tests
+> added anywhere in this patch series.  Is there another followup
+> pending with tests or is it a todo item ?
 
-Good catch.
->> =20
->>          qemu_mutex_init(&p->mutex);
->>          qemu_sem_init(&p->sem, 0);
->> @@ -1240,8 +1405,12 @@ int multifd_save_setup(Error **errp)
->>          p->packet->version =3D cpu_to_be32(MULTIFD_VERSION);
->>          p->name =3D g_strdup_printf("multifdsend_%d", i);
->>          socket_send_channel_create(multifd_new_send_channel_async, p);
->> +        res =3D multifd_send_state->ops->send_setup(p, errp);
->> +        if (ret =3D=3D 0) {
->> +            ret =3D res;
->
-> How do you handle the errp's here - I think that if is so that you
-> get the 'ret' from the first thread that fails; but I don't think you're
-> allowed to call that twice if the first one set it's errp.
+We've got some github CI setup, but not too much automatic of as yet.
+As you spotted in another patch we need root to run this at the moment
+which makes life harder; we also need a full guest to drive fuse
+requests.
 
-You are right.  I was doing the res/ret variable right, and failed with
-the other.  Changed the code to two loops:
-- Everything that can't fail, done in the 1st loop.
-- Everything else on the second loop.  the time that we have one error,
-  we just stop the loop.
->> @@ -1448,6 +1622,10 @@ int multifd_load_setup(Error **errp)
->>                        + sizeof(ram_addr_t) * page_count;
->>          p->packet =3D g_malloc0(p->packet_len);
->>          p->name =3D g_strdup_printf("multifdrecv_%d", i);
->> +        ret =3D multifd_recv_state->ops->recv_setup(p, errp);
->> +        if (ret !=3D 0) {
->> +            return ret;
->> +        }
->
-> same question as the save case above
+> We can usefully wire up this xfstest program in the functional
+> tests of QEMU in some way ?
 
-Same solution.
+>=20
+> >=20
+> > Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+> > ---
+> >  tools/virtiofsd/passthrough_ll.c | 66 ++++++++++++++++----------------
+> >  1 file changed, 33 insertions(+), 33 deletions(-)
+>=20
+> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 
-Thanks, Juan.
+Thanks.
+
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
