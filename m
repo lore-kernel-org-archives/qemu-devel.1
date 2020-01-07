@@ -2,100 +2,85 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41969C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1075AC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:58:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CA5C20678
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:54:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEADD20678
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:58:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apCEjq/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CA5C20678
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RBagUF5L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEADD20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomVB-0000SB-5e
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:54:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49472)
+	id 1iomZD-0005rF-UV
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:58:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45032)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iollh-0003ZH-IO
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:07:22 -0500
+ (envelope-from <lersek@redhat.com>) id 1iolMx-00055c-Pe
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:41:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iollg-0004PQ-DR
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:07:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46654
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <lersek@redhat.com>) id 1iolMw-0002QL-D6
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:41:47 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33852
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iollg-0004PG-6V
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:07:20 -0500
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iolMw-0002Pu-9I
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:41:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578391639;
+ s=mimecast20190719; t=1578390105;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Oe6tmbp6970ilmTJSZbCPQnkZw69tO0IoMzHxH7GMdM=;
- b=apCEjq/VTIrLpSbTg7J93HVe4zDzXVFti/R90byQdkUcSnqbD5t8rbqhWWB6lvIEJJ6sCw
- 4oyqJ4OXC54MWqbAsSW0QZ7jze61O2+ePdqF6D/YL2TRlvJ+TgzRTOWfped7epWapOHoEE
- RX3O8DLOJCF7JaJZs3w5rleWqmpmedA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-TEV612P7OieSnxbuj01DTw-1; Tue, 07 Jan 2020 05:07:18 -0500
-Received: by mail-wr1-f69.google.com with SMTP id w6so27195054wrm.16
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:07:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=by9ZrA2wBZ8PWCrqn0KLcVqBKZTskPWrlIKzOuGZju8=;
- b=uoLe7bggxUC486QaCcF6xVDmu+mCmxjM9C6P0zq9YClJlA84odyzsaApsBPqOew0wv
- oT/C4IqujeE8+OU5aShHXe8FSGh6/swYnr1h4YG40jkbzdKESA/WTNpTdzKXm91KmVo3
- zgZQkbLyzv7PAiilVw4DZ/M+RERHK2ASXYA1agxHnZnaP6Dw2o25NFyJvsuY9dq4YyTi
- 7X6rNUUB1kZ8MC+ATwaBiy+3Uc6pDUCCJulZpacKSiAfi0tEdi4myA2VklF+NFUnbOmH
- bCjRODjaBXdFdK2rZpcpr+toog4Fd8ZdT5ZT4Fiw1b7ipAtWxJyyVBVxAOWKf2XfKKE7
- SZjw==
-X-Gm-Message-State: APjAAAVLu/Kg7vWRD/Yne/pI3ckchB+LHKOuAy0C4WBPAHt/L3e/oNv/
- bTijgK7Ws2QiR0eqQQBHJUZKTp4Gu0YeY3ERgDX28HX/b0WCDkN8BZXdMRcH8IoQcfxlCsQdkNy
- eynSFOw4Qm3ejhZs=
-X-Received: by 2002:adf:e609:: with SMTP id p9mr105033852wrm.397.1578391637229; 
- Tue, 07 Jan 2020 02:07:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxpBfpayfCVqSAgiHi7fQf8bQAXhW6tWX5H6qGNYui6yW1fnOnQ7uefDOpRPnrrD+YEQ08TMQ==
-X-Received: by 2002:adf:e609:: with SMTP id p9mr105033834wrm.397.1578391637017; 
- Tue, 07 Jan 2020 02:07:17 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id q15sm78458824wrr.11.2020.01.07.02.07.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jan 2020 02:07:16 -0800 (PST)
-Subject: Re: [PATCH 04/14] hw/i386: Restrict fw_cfg to the PC machines
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20191231183216.6781-1-philmd@redhat.com>
- <20191231183216.6781-5-philmd@redhat.com>
- <a5ba0619-e236-7fb0-8c17-028670b69501@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b8aa1238-fe00-5c26-953b-7b7b8d6595e0@redhat.com>
-Date: Tue, 7 Jan 2020 11:07:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ bh=GFPXBN/1uuYladgUMQcjVL2NCUO5aw8OYL069tuw8z0=;
+ b=RBagUF5LZb4jknc7Sojh8UdZgOqdvwQfYcMGdBx4rfRdU4w/lHNZSC91lnL0hc6Kxj6FVP
+ 83ZxftzuAXHVQux52ncR3yCtMbGQfdAau6DM2YJ3+WMfM/UKzejxizqvL05K7//BK4cYLX
+ RiyNpDbRk04ddZFuYzn6KHOMYal+P2Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-3DmucBHWOGy3pf0uFtTtbQ-1; Tue, 07 Jan 2020 04:41:44 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B60A800D41;
+ Tue,  7 Jan 2020 09:41:43 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-126.ams2.redhat.com
+ [10.36.117.126])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA26260BEC;
+ Tue,  7 Jan 2020 09:41:37 +0000 (UTC)
+Subject: Re: [PATCH 1/3] roms/edk2-funcs: Force softfloat ARM toolchain prefix
+ on Debian
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200106184601.25453-1-philmd@redhat.com>
+ <20200106184601.25453-2-philmd@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <6698fcbb-3fd2-45c1-309f-4e6bed14406a@redhat.com>
+Date: Tue, 7 Jan 2020 10:41:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <a5ba0619-e236-7fb0-8c17-028670b69501@redhat.com>
+In-Reply-To: <20200106184601.25453-2-philmd@redhat.com>
 Content-Language: en-US
-X-MC-Unique: TEV612P7OieSnxbuj01DTw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 3DmucBHWOGy3pf0uFtTtbQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,53 +92,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-ppc@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/7/20 11:01 AM, Paolo Bonzini wrote:
-> On 31/12/19 19:32, Philippe Mathieu-Daud=C3=A9 wrote:
->> Only the PC-based machines use the fw_cfg device. In particular,
->> the MicroVM machine does not use it. Only compile/link it when
->> machines require it.
->>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->> Cc: Sergio Lopez <slp@redhat.com>
->> ---
->>   hw/i386/Makefile.objs | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
->> index 6ebb6d0cf0..48f2693546 100644
->> --- a/hw/i386/Makefile.objs
->> +++ b/hw/i386/Makefile.objs
->> @@ -5,7 +5,7 @@ obj-$(CONFIG_PC) +=3D pc.o pc_sysfw.o
->>   obj-$(CONFIG_I440FX) +=3D pc_piix.o
->>   obj-$(CONFIG_Q35) +=3D pc_q35.o
->>   obj-$(CONFIG_MICROVM) +=3D microvm.o
->> -obj-y +=3D fw_cfg.o
->> +obj-$(CONFIG_PC) +=3D fw_cfg.o
->>   obj-$(CONFIG_X86_IOMMU) +=3D x86-iommu.o
->>   obj-$(CONFIG_VTD) +=3D intel_iommu.o
->>   obj-$(CONFIG_AMD_IOMMU) +=3D amd_iommu.o
->>
+On 01/06/20 19:45, Philippe Mathieu-Daud=C3=A9 wrote:
+> The Debian (based) distributions currently provides 2 ARM
+> toolchains, documented as [1]:
 >=20
-> Ah no, this is hw/i386/fw_cfg.c; of course hw/nvram/fw_cfg.c has its own
-> Kconfig symbol.  Can you rename the file to pc-fwcfg.c and adjust the
-> commit message?
+> * The ARM EABI (armel) port targets a range of older 32-bit ARM
+>   devices, particularly those used in NAS hardware and a variety
+>   of *plug computers.
+> * The newer ARM hard-float (armhf) port supports newer, more
+>   powerful 32-bit devices using version 7 of the ARM architecture
+>   specification.
+>=20
+> For various reasons documented in [2], the EDK2 project suggests
+> to use the softfloat toolchain (named 'armel' by Debian).
+>=20
+> Force the softfloat cross toolchain prefix on Debian distributions.
+>=20
+> [1] https://www.debian.org/ports/arm/#status
+> [2] https://github.com/tianocore/edk2/commit/41203b9a
+>=20
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> v3: fixed s/hard/float/ typo (Laszlo)
 
-Yes, will do (I'll try to post a new series with only patches you=20
-haven't picked already).
+s/float/soft/, but OK otherwise :)
+
+Thanks
+Laszlo
+
+> ---
+>  roms/edk2-funcs.sh | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+> index 3f4485b201..cd6e4f2c82 100644
+> --- a/roms/edk2-funcs.sh
+> +++ b/roms/edk2-funcs.sh
+> @@ -112,6 +112,9 @@ qemu_edk2_get_cross_prefix()
+>       ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); =
+then
+>      # no cross-compiler needed
+>      :
+> +  elif ( [ -e /etc/debian_version ] && [ "$gcc_arch" =3D=3D arm ] ); the=
+n
+> +    # force soft-float cross-compiler on Debian
+> +    printf 'arm-linux-gnueabi-'
+>    else
+>      printf '%s-linux-gnu-\n' "$gcc_arch"
+>    fi
+>=20
 
 
