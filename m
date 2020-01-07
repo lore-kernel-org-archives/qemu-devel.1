@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E71C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF31FC3F68F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:39:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F031E2081E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:39:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E3F82081E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:39:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+CKXFec"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F031E2081E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGMGpTJu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3F82081E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqwj-00055z-Hj
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:39:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56650)
+	id 1ioqx1-0005fq-RR
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:39:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqTq-00066s-Nv
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:15 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqUH-0006kf-7u
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqTp-0005PK-Di
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55854
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqUE-0005oo-UA
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:41 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45821
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ioqTp-0005Oa-A3
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:13 -0500
+ id 1ioqUE-0005nq-Pw
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:09:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578409752;
+ s=mimecast20190719; t=1578409778;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qWU06SAb2lQ4co3U/MTSi0noVCyj/2NfrdawA6tKgIk=;
- b=F+CKXFecLxCKhbBhOV/+d8FFj6usa18SxzIHdjQ/MtcDCN8RYONzsp/Aed6Ldw8NcRdQXH
- 77UI3mSFHNgmxErlvwn1ASF3HU01dZ0bWr+rE1594U1zz9hMiFh/obuS9GYFHYIbejH4om
- kWUnAK5c4Qcfk4XwEC7xutJxy9vjits=
+ bh=G5o3BZFfXOYMxsGVfHABUVa3/NLQ378y2wjX3/MhgO8=;
+ b=GGMGpTJuUvgkMdDNoLrsYDPrTng2SG4wAJdt+P7F2x6s6vrP2E0AgoRwOKp+62LKw623B7
+ gD9jHG70Gt6oC5cq1NRwsCuLzxvYrGo8PFd5a6r9fj9anWonjI6d9SnTmTreVDbbDhD+Am
+ sLdjWtO3JNjU/OlRv0msHH2ciMjMZn8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63-FWLcTUPUNbeLdjWWG_KppQ-1; Tue, 07 Jan 2020 10:09:05 -0500
+ us-mta-280-iksGxIo4P1yvzCZdR_BEAA-1; Tue, 07 Jan 2020 10:09:37 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 585F3800D41;
- Tue,  7 Jan 2020 15:09:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2214A107ACC5;
+ Tue,  7 Jan 2020 15:09:36 +0000 (UTC)
 Received: from localhost (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F41CE7C82C;
- Tue,  7 Jan 2020 15:08:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 963877C82C;
+ Tue,  7 Jan 2020 15:09:29 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 21/37] sm501: make SerialMM a child, export chardev property
-Date: Tue,  7 Jan 2020 19:04:26 +0400
-Message-Id: <20200107150442.1727958-22-marcandre.lureau@redhat.com>
+Subject: [PULL 24/37] etraxfs: remove PROP_PTR usage
+Date: Tue,  7 Jan 2020 19:04:29 +0400
+Message-Id: <20200107150442.1727958-25-marcandre.lureau@redhat.com>
 In-Reply-To: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 References: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: FWLcTUPUNbeLdjWWG_KppQ-1
+X-MC-Unique: iksGxIo4P1yvzCZdR_BEAA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,107 +93,122 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Embed the SerialMM sybus device, and re-export its "chardev" property.
-That way, we can get rid of PROP_PTR "chr-state" and better track
-devices relationship.
+etraxfs_dma_client are not Object, so can't be exposed to user with
+QOM path. Let's remove property usage and move the constructor to the
+.c unit, simplifying some code on the way.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/display/sm501.c | 29 +++++++++++++++++++++--------
- hw/sh4/r2d.c       |  2 +-
- 2 files changed, 22 insertions(+), 9 deletions(-)
+ include/hw/cris/etraxfs.h | 20 +++---------------
+ hw/net/etraxfs_eth.c      | 44 +++++++++++++++++++++++++++++----------
+ 2 files changed, 36 insertions(+), 28 deletions(-)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index 79bd7bc2d1..66a1bfbe60 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -1930,7 +1930,7 @@ typedef struct {
-     SM501State state;
-     uint32_t vram_size;
-     uint32_t base;
--    void *chr_state;
-+    SerialMM serial;
- } SM501SysBusState;
+diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
+index aa146a2cd8..403e7f95e6 100644
+--- a/include/hw/cris/etraxfs.h
++++ b/include/hw/cris/etraxfs.h
+@@ -30,23 +30,9 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/sysbus.h"
 =20
- static void sm501_realize_sysbus(DeviceState *dev, Error **errp)
-@@ -1938,6 +1938,7 @@ static void sm501_realize_sysbus(DeviceState *dev, Er=
-ror **errp)
-     SM501SysBusState *s =3D SYSBUS_SM501(dev);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
-     DeviceState *usb_dev;
-+    MemoryRegion *mr;
+-/* Instantiate an ETRAXFS Ethernet MAC.  */
+-static inline DeviceState *
+-etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
+-                 void *dma_out, void *dma_in)
+-{
+-    DeviceState *dev;
+-    qemu_check_nic_model(nd, "fseth");
+-
+-    dev =3D qdev_create(NULL, "etraxfs-eth");
+-    qdev_set_nic_properties(dev, nd);
+-    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
+-    qdev_prop_set_ptr(dev, "dma_out", dma_out);
+-    qdev_prop_set_ptr(dev, "dma_in", dma_in);
+-    qdev_init_nofail(dev);
+-    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
+-    return dev;
+-}
++DeviceState *etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
++                              struct etraxfs_dma_client *dma_out,
++                              struct etraxfs_dma_client *dma_in);
 =20
-     sm501_init(&s->state, dev, s->vram_size);
-     if (get_local_mem_size(&s->state) !=3D s->vram_size) {
-@@ -1958,15 +1959,15 @@ static void sm501_realize_sysbus(DeviceState *dev, =
-Error **errp)
-     sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+ static inline DeviceState *etraxfs_ser_create(hwaddr addr,
+                                               qemu_irq irq,
+diff --git a/hw/net/etraxfs_eth.c b/hw/net/etraxfs_eth.c
+index 4cfbf1135a..f30d963487 100644
+--- a/hw/net/etraxfs_eth.c
++++ b/hw/net/etraxfs_eth.c
+@@ -338,14 +338,8 @@ typedef struct ETRAXFSEthState
+     uint8_t macaddr[2][6];
+     uint32_t regs[FS_ETH_MAX_REGS];
 =20
-     /* bridge to serial emulation module */
--    serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
--                   NULL, /* TODO : chain irq to IRL */
--                   115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
-+    qdev_init_nofail(DEVICE(&s->serial));
-+    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->serial), 0);
-+    memory_region_add_subregion(&s->state.mmio_region, SM501_UART0, mr);
-+    /* TODO : chain irq to IRL */
- }
+-    union {
+-        void *vdma_out;
+-        struct etraxfs_dma_client *dma_out;
+-    };
+-    union {
+-        void *vdma_in;
+-        struct etraxfs_dma_client *dma_in;
+-    };
++    struct etraxfs_dma_client *dma_out;
++    struct etraxfs_dma_client *dma_in;
 =20
- static Property sm501_sysbus_properties[] =3D {
-     DEFINE_PROP_UINT32("vram-size", SM501SysBusState, vram_size, 0),
-     DEFINE_PROP_UINT32("base", SM501SysBusState, base, 0),
--    DEFINE_PROP_PTR("chr-state", SM501SysBusState, chr_state),
+     /* MDIO bus.  */
+     struct qemu_mdio mdio_bus;
+@@ -635,8 +629,6 @@ static void etraxfs_eth_realize(DeviceState *dev, Error=
+ **errp)
+=20
+ static Property etraxfs_eth_properties[] =3D {
+     DEFINE_PROP_UINT32("phyaddr", ETRAXFSEthState, phyaddr, 1),
+-    DEFINE_PROP_PTR("dma_out", ETRAXFSEthState, vdma_out),
+-    DEFINE_PROP_PTR("dma_in", ETRAXFSEthState, vdma_in),
+     DEFINE_NIC_PROPERTIES(ETRAXFSEthState, conf),
      DEFINE_PROP_END_OF_LIST(),
  };
-=20
-@@ -1997,9 +1998,20 @@ static void sm501_sysbus_class_init(ObjectClass *kla=
-ss, void *data)
-     dc->props =3D sm501_sysbus_properties;
-     dc->reset =3D sm501_reset_sysbus;
-     dc->vmsd =3D &vmstate_sm501_sysbus;
--    /* Note: pointer property "chr-state" may remain null, thus
--     * no need for dc->user_creatable =3D false;
--     */
-+}
-+
-+static void sm501_sysbus_init(Object *o)
-+{
-+    SM501SysBusState *sm501 =3D SYSBUS_SM501(o);
-+    SerialMM *smm =3D &sm501->serial;
-+
-+    sysbus_init_child_obj(o, "serial", smm, sizeof(SerialMM), TYPE_SERIAL_=
-MM);
-+    qdev_set_legacy_instance_id(DEVICE(smm), SM501_UART0, 2);
-+    qdev_prop_set_uint8(DEVICE(smm), "regshift", 2);
-+    qdev_prop_set_uint8(DEVICE(smm), "endianness", DEVICE_LITTLE_ENDIAN);
-+
-+    object_property_add_alias(o, "chardev",
-+                              OBJECT(smm), "chardev", &error_abort);
+@@ -648,10 +640,40 @@ static void etraxfs_eth_class_init(ObjectClass *klass=
+, void *data)
+     dc->realize =3D etraxfs_eth_realize;
+     dc->reset =3D etraxfs_eth_reset;
+     dc->props =3D etraxfs_eth_properties;
+-    /* Reason: pointer properties "dma_out", "dma_in" */
++    /* Reason: dma_out, dma_in are not user settable */
+     dc->user_creatable =3D false;
  }
 =20
- static const TypeInfo sm501_sysbus_info =3D {
-@@ -2007,6 +2019,7 @@ static const TypeInfo sm501_sysbus_info =3D {
++
++/* Instantiate an ETRAXFS Ethernet MAC.  */
++DeviceState *
++etraxfs_eth_init(NICInfo *nd, hwaddr base, int phyaddr,
++                 struct etraxfs_dma_client *dma_out,
++                 struct etraxfs_dma_client *dma_in)
++{
++    DeviceState *dev;
++    qemu_check_nic_model(nd, "fseth");
++
++    dev =3D qdev_create(NULL, "etraxfs-eth");
++    qdev_set_nic_properties(dev, nd);
++    qdev_prop_set_uint32(dev, "phyaddr", phyaddr);
++
++    /*
++     * TODO: QOM design, define a QOM interface for "I am an etraxfs
++     * DMA client" (which replaces the current 'struct
++     * etraxfs_dma_client' ad-hoc interface), implement it on the
++     * ethernet device, and then have QOM link properties on the DMA
++     * controller device so that you can pass the interface
++     * implementations to it.
++     */
++    ETRAX_FS_ETH(dev)->dma_out =3D dma_out;
++    ETRAX_FS_ETH(dev)->dma_in =3D dma_in;
++    qdev_init_nofail(dev);
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
++
++    return dev;
++}
++
+ static const TypeInfo etraxfs_eth_info =3D {
+     .name          =3D TYPE_ETRAX_FS_ETH,
      .parent        =3D TYPE_SYS_BUS_DEVICE,
-     .instance_size =3D sizeof(SM501SysBusState),
-     .class_init    =3D sm501_sysbus_class_init,
-+    .instance_init =3D sm501_sysbus_init,
- };
-=20
- #define TYPE_PCI_SM501 "sm501"
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index ee0840f380..72bb5285cc 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -272,7 +272,7 @@ static void r2d_init(MachineState *machine)
-     busdev =3D SYS_BUS_DEVICE(dev);
-     qdev_prop_set_uint32(dev, "vram-size", SM501_VRAM_SIZE);
-     qdev_prop_set_uint32(dev, "base", 0x10000000);
--    qdev_prop_set_ptr(dev, "chr-state", serial_hd(2));
-+    qdev_prop_set_chr(dev, "chardev", serial_hd(2));
-     qdev_init_nofail(dev);
-     sysbus_mmio_map(busdev, 0, 0x10000000);
-     sysbus_mmio_map(busdev, 1, 0x13e00000);
 --=20
 2.25.0.rc1.20.g2443f3f80d
 
