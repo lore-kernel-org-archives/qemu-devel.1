@@ -2,73 +2,68 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB66C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F113C33C9B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:23:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2346120715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:22:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2346120715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 11B0B21744
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:23:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B0B21744
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iopkX-0006PV-0t
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:22:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57551)
+	id 1iopl8-0007n0-Ct
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:23:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iopPx-0005gA-NB
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:01:10 -0500
+ (envelope-from <clg@kaod.org>) id 1iopk5-0005pc-GY
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:21:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iopPw-0006HS-79
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:01:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37422)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iopPw-0006G9-1U
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:01:08 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iopPr-0001lg-Jr
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 14:01:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 100922E80DB
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 14:01:00 +0000 (UTC)
+ (envelope-from <clg@kaod.org>) id 1iopk4-0001Xj-AW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:21:57 -0500
+Received: from 1.mo179.mail-out.ovh.net ([178.33.111.220]:47773)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iopk4-0001WU-44
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:21:56 -0500
+Received: from player787.ha.ovh.net (unknown [10.108.35.159])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id E141B145235
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 15:21:53 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id D2AF1E1F529A;
+ Tue,  7 Jan 2020 14:21:43 +0000 (UTC)
+Subject: Re: [PATCH v2 09/10] target/ppc: Correct RMLS table
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+ groug@kaod.org, philmd@redhat.com
+References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
+ <20200107044827.471355-10-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b4f4b0f9-759d-637d-9b40-d0fd3c0c21f6@kaod.org>
+Date: Tue, 7 Jan 2020 15:21:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2020 13:53:02 -0000
-From: puchuu <1858461@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aladjev-andrew
-X-Launchpad-Bug-Reporter: puchuu (aladjev-andrew)
-X-Launchpad-Bug-Modifier: puchuu (aladjev-andrew)
-References: <157833123209.15024.12557979334447840996.malonedeb@wampee.canonical.com>
-Message-Id: <157840518248.5706.13862044648842441564.malone@gac.canonical.com>
-Subject: [Bug 1858461] Re: Please refactor linux-user/mips/cpu_loop.c
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f5df5869d6a5e220525a990892c3b59260b102be
+In-Reply-To: <20200107044827.471355-10-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 10664805394386488102
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehgedgudekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 178.33.111.220
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,53 +72,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858461 <1858461@bugs.launchpad.net>
+Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-ppc@nongnu.org, lvivier@redhat.com, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unfortunately we can generate only very short table of syscalls using
-this method. Most of the syscalls are missing from "dwo" files. =3D(
+On 1/7/20 5:48 AM, David Gibson wrote:
+> The table of RMA limits based on the LPCR[RMLS] field is slightly wrong.
+> We're missing the RMLS == 0 => 256 GiB RMA option, which is available on
+> POWER8, so add that.
 
--- =
+Where is this defined ? 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858461
+C. 
 
-Title:
-  Please refactor linux-user/mips/cpu_loop.c
+> 
+> The comment that goes with the table is much more wrong.  We *don't* filter
+> invalid RMLS values when writing the LPCR, and there's not really a
+> sensible way to do so.  Furthermore, while in theory the set of RMLS values
+> is implementation dependent, it seems in practice the same set has been
+> available since around POWER4+ up until POWER8, the last model which
+> supports RMLS at all.  So, correct that as well.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  target/ppc/mmu-hash64.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index bb9ebeaf48..e6f24be93e 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -760,12 +760,12 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
+>  {
+>      CPUPPCState *env = &cpu->env;
+>      /*
+> -     * This is the full 4 bits encoding of POWER8. Previous
+> -     * CPUs only support a subset of these but the filtering
+> -     * is done when writing LPCR
+> +     * In theory the meanings of RMLS values are implementation
+> +     * dependent.  In practice, this seems to have been the set from
+> +     * POWER4+..POWER8, and RMLS is no longer supported in POWER9.
+>       */
+>      const target_ulong rma_sizes[] = {
+> -        [0] = 0,
+> +        [0] = 256 * GiB,
+>          [1] = 16 * GiB,
+>          [2] = 1 * GiB,
+>          [3] = 64 * MiB,
+> 
 
-Status in QEMU:
-  New
-
-Bug description:
-  Hello. I am working with qemu on test images. I've added a new syscall
-  (436) to qemu but received ENOSYS from mips application.
-
-  Please open "linux-user/mips/cpu_loop.c". I've added at the end of
-  "mips_syscall_args" the following:
-
-  ```
-  MIPS_SYS(sys_getdents64_x32, 3)
-  ```
-
-  But
-
-  ```
-  syscall_num =3D env->active_tc.gpr[2] - 4000;
-  if (syscall_num >=3D sizeof(mips_syscall_args)) {
-    ret =3D -TARGET_ENOSYS;
-  ```
-
-  returns -TARGET_ENOSYS
-
-  We can see that "linux-user/mips/cpu_loop.c" differs a lot from
-  "linux-user/arm/cpu_loop.c". Arm has it's own "ARM_NR_BASE" and etc.
-
-  Can you please refactor mips cpu loop in the same way as arm? Thank
-  you.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858461/+subscriptions
 
