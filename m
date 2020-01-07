@@ -2,86 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F39B4C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A067C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE117208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24A4E208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:19:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="OLIdfRRG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE117208C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arSVWYB2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24A4E208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iophA-0000mt-1C
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:18:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35861)
+	id 1iophH-0004rR-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:19:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35353)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <n54@gmx.com>) id 1iooNn-0003V2-QI
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:54:53 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iooLU-0006Qj-Ha
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <n54@gmx.com>) id 1iooNm-0000tL-8X
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:54:51 -0500
-Received: from mout.gmx.net ([212.227.15.18]:34979)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <n54@gmx.com>) id 1iooNl-0000r6-V8
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:54:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1578401685;
- bh=Esy/6Z9NMXlz6p4L3fdFRS0GPpSdZw4kBhSs2vKJIV8=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=OLIdfRRGkA1fEOXI1WAMZvtjgaafqUbQdDQC3wpXYNC2yRBzzyJ89eMJCpQOfUCYY
- VglFqkK8o6j67ksmM6qbiS/Lz5ZQOdIPuTs5Y++JaP3gXcecNtF0Xoy248EeRZoY+r
- IMVRedOqjStovLh1Suc5GrcWmy0B/Bg9NCQQxyCA=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from localhost.localdomain ([89.71.135.231]) by mail.gmx.com
- (mrgmx005 [212.227.17.184]) with ESMTPSA (Nemesis) id
- 1M5fMe-1in8M23BGc-007H5v; Tue, 07 Jan 2020 13:54:44 +0100
-From: Kamil Rytarowski <n54@gmx.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] Add the NVMM acceleration enlightenments
-Date: Tue,  7 Jan 2020 13:54:01 +0100
-Message-Id: <20200107125401.18126-5-n54@gmx.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20200107125401.18126-1-n54@gmx.com>
-References: <20200107125401.18126-1-n54@gmx.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iooLS-0007ye-RE
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:28 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41154)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iooLS-0007y4-KW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:26 -0500
+Received: by mail-wr1-x441.google.com with SMTP id c9so53806293wrw.8
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 04:52:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=IF2p0g9z3hjHu1vHCAsockZnOSXDZZid6UAbkQGw4BY=;
+ b=arSVWYB232D4avwssZqVHliOV65pTGQ6xlgetJdf/XdqpPK4Sc3var9/mz4Bsp2H7Q
+ D76pgXmuB8bWjvF671AGDfZJKYrVqcKR+bRPolTAv8iSaMZTEL16itL59xLghkDvppSA
+ 1G2V0t37E5fgOTytvmADVLZJa2InHs5Yc9zDqCltFyzUKvcIKvulH4eDuNNSKt4cAnWn
+ 5JUnPxaLu1bhhD/hrZLriZQlZtJAo1w2C1r/OjQo94lLIkv4T7qoSlkJTV9IpGb4xQmo
+ aormXReDoexaZuRGs/qTx/e3pXdfWFG6OuPWACE/U3+im2Ph/32jLFEHLi+f2RyY7Gmu
+ UJPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=IF2p0g9z3hjHu1vHCAsockZnOSXDZZid6UAbkQGw4BY=;
+ b=lSCHNfdMiWdbH4bCRbtW82zCoyweVH8v6267uKEqedS5wnB+sSqb0+3Si1FL3eKL19
+ //DuTW9gpRQXpNvNAV0ATXjPKad8MRlNxXLBuye84vIS4jxP/6Hea23JFQBq0USZ1p2C
+ 4bYLitsH+fPxN5I2/e19mZHwIcnl9jmnJe76TvsmkpEiYoYnj7jBq+pqX7UtoD6d9gsD
+ RDdP+qcY7N2x5eP0empiIbUX9cflopyMJJPT5dW+4cYFsbFzddWyPq8iegWwgDD4ipP/
+ RElkxzojoSCGyChl6tZzXVLzZRgkeTEPvzvHmrwhlfUH56KjM9BCaMZK2VHkNugS0Ueh
+ jDpA==
+X-Gm-Message-State: APjAAAWLcDDAG2ppzJkzbfHjDZsrzQTRrj5Fr8pYBXOhUAnOyexYuftk
+ ifUUt9A2sIEIaZ2aAnKEZ+3lli4GE62p+GfEarrIt812
+X-Google-Smtp-Source: APXvYqw3DJMucONxmeFATiA6hxnnScyiMtGpvr3x04dgQQE/eubuYIchbJoQ2JO8p7o2WydWgVOeK07yptxwkCh5IJc=
+X-Received: by 2002:a5d:66c3:: with SMTP id k3mr102240309wrw.370.1578401543841; 
+ Tue, 07 Jan 2020 04:52:23 -0800 (PST)
 MIME-Version: 1.0
+References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
+ <20191220134601.571905-13-marcandre.lureau@redhat.com>
+In-Reply-To: <20191220134601.571905-13-marcandre.lureau@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 7 Jan 2020 16:52:10 +0400
+Message-ID: <CAJ+F1CKSA8kvPQ973b3AfHG=nm83hDSyn7_oe7sbaOV6JZ4_sQ@mail.gmail.com>
+Subject: Re: [PATCH v5 12/37] serial: start making SerialMM a sysbus device
+To: QEMU <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:vNZ6nz0iU75MIVWsUHT2AsPq62FvQ01v2ST4svHbbtuRxqgN5AZ
- BlnZyWsn2FN5jgGspMcwXymWa+PqVsaxscv3CiU7ZxmVnXMTsIIeyiW85cnizPumaWku7Yl
- e+CCtdsTEZcnWJv7laXJyB7M2QkKIfjTibQsfT8jHXYVHcwnJ0I8FNY67cgOaR+Uzur9amE
- unE4oP+fUwnrrN9VbW3kw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XOcp1Ra8bCE=:W0c4Nc5RZAwy4zAqiBXP2r
- 7CAX/p4zeXc4tiMP1HDEpgXNvCi7caR9OFCtX9kM3eedW+KhFW28hdFsiQ1cfoiBwnm5F7236
- jEOXa49RY7f/jm0yQ2UiZQQntaH5eNL1dyHaiiGIv1kjylwqhNcfTy5eQ3w+lpT4iL6Q4BtBm
- QujXpkzgm75WN3KgpMILFc36Zk258qOy+qndqzuPN7OtIHvEowL8xC8ivbWzNIBJSzZpazNXj
- Lg7G6boBaS+w8EiJg8yxMHasdx1B/Id1p+WqOOsHIeigSC/qBd2AyEpXvUdyxTAxmOL2SMmaO
- KYZprv14TinmwipAFuUJdMhq3Et2RtLsCOuZ9GPJXHkAdhdOqv55M93itbT2+hSXu/w2V9WAj
- zN/DHD47J9lY/4jXEe5q9EcZC4lvQs1dHYJ+5ER9fi1yen9Pg6mwGsQiOpYmsRUx2yH/+cTg5
- sfJdnlVuhcAO+LggB0qPHA0pni+BtmEf+51kDNSK73pk8duZeyX9mYfHrfJZR97gtvHaNg7SR
- awAzwzUX0640roU1/K7pelXFbnLK1boHrWmvXq/gbwQ3hoaVfvkZ9do7KJnNPJXuodJ3/Bgc4
- QfWsYJX0pJMOD/ic6JFg2O3/0lNxTby/oPUFojiwYMckkeiGAU4NUYOic89N+IVJgHO+P58mh
- XWDpApeHyEF1v8xHdhZQb1NgO7Hl8ZweSMjlkW6KB0vB+VJtAcs3Sy/L3kjjcaA4FMirebnx5
- aPEvq/NVBFUjXQd/VEjhGjW+jHxiea4dritVmkjC0ZCIEbn8X2QIZ0q4Mdz7pGex2dgFd4Jo/
- 0vwEB4JRVdZeQT9oFEJkRBFqwo47UFuNXvXpKXKnmwZvBsV/SVjwI9rCftY19dcF7xsKtm0mt
- n2NlMpkhwzsq2zCdyvhhongv1Y8+2ocMGEGtQxmJNOBY21YsJViAxJVoE3UTwAn9sR6aE9ICK
- JZXyhYZAuujNURLk42eX9b2rJKxyeSv/WRSnfUYXHiarcX7u/GFkqxvWMlwIFdt3qtYDZVaZy
- k19cWLFKnvDJOrIW+x8pXhtdpCbCkqxaPEkgChMl8dzi/O1FolfsLoehQeWBKjizh48ODsdc1
- juuolkP//8bMaRvN5d+eRyRVSOE1KS0buICVXqE/vFAi4AO5YqrH67urF49s/Ms173OHbS1BF
- jze9eHJXiloIiRsmL98T6ImNEFX0debgnt+kUDPXYy+1mWwBVIauKRG+C/UzstoCUdA4XEpew
- /NOzSjWmGAjZizP9f9w3QVuHd9hBy1qz61F7Lig==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.15.18
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,187 +89,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Kamil Rytarowski <n54@gmx.com>,
- Maxime Villard <max@m00nbsd.net>, peter.maydell@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Maxime Villard <max@m00nbsd.net>
-
-Implements the NVMM accelerator cpu enlightenments to actually use the nvm=
-m-all
-accelerator on NetBSD platforms.
-
-Signed-off-by: Maxime Villard <max@m00nbsd.net>
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-=2D--
- cpus.c                    | 58 +++++++++++++++++++++++++++++++++++++++
- include/sysemu/hw_accel.h | 14 ++++++++++
- target/i386/helper.c      |  2 +-
- 3 files changed, 73 insertions(+), 1 deletion(-)
-
-diff --git a/cpus.c b/cpus.c
-index b472378b70..3c3f63588c 100644
-=2D-- a/cpus.c
-+++ b/cpus.c
-@@ -42,6 +42,7 @@
- #include "sysemu/hax.h"
- #include "sysemu/hvf.h"
- #include "sysemu/whpx.h"
-+#include "sysemu/nvmm.h"
- #include "exec/exec-all.h"
-
- #include "qemu/thread.h"
-@@ -1666,6 +1667,48 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
-     return NULL;
- }
-
-+static void *qemu_nvmm_cpu_thread_fn(void *arg)
-+{
-+    CPUState *cpu =3D arg;
-+    int r;
-+
-+    assert(nvmm_enabled());
-+
-+    rcu_register_thread();
-+
-+    qemu_mutex_lock_iothread();
-+    qemu_thread_get_self(cpu->thread);
-+    cpu->thread_id =3D qemu_get_thread_id();
-+    current_cpu =3D cpu;
-+
-+    r =3D nvmm_init_vcpu(cpu);
-+    if (r < 0) {
-+        fprintf(stderr, "nvmm_init_vcpu failed: %s\n", strerror(-r));
-+        exit(1);
-+    }
-+
-+    /* signal CPU creation */
-+    cpu->created =3D true;
-+    qemu_cond_signal(&qemu_cpu_cond);
-+
-+    do {
-+        if (cpu_can_run(cpu)) {
-+            r =3D nvmm_vcpu_exec(cpu);
-+            if (r =3D=3D EXCP_DEBUG) {
-+                cpu_handle_guest_debug(cpu);
-+            }
-+        }
-+        qemu_wait_io_event(cpu);
-+    } while (!cpu->unplug || cpu_can_run(cpu));
-+
-+    nvmm_destroy_vcpu(cpu);
-+    cpu->created =3D false;
-+    qemu_cond_signal(&qemu_cpu_cond);
-+    qemu_mutex_unlock_iothread();
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
- #ifdef _WIN32
- static void CALLBACK dummy_apc_func(ULONG_PTR unused)
+On Fri, Dec 20, 2019 at 5:57 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Memory mapped serial device is in fact a sysbus device. The following
+> patches will make use of sysbus facilities for resource and
+> registration. In particular, "serial-mm: use sysbus facilities" will
+> move internal serial realization to serial_mm_realize callback to
+> follow qdev best practices.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/char/omap_uart.c      |  2 +-
+>  hw/char/serial.c         | 66 +++++++++++++++++++++++++++++++---------
+>  hw/mips/boston.c         |  2 +-
+>  hw/mips/mips_malta.c     |  2 +-
+>  include/hw/char/serial.h | 20 +++++++++---
+>  5 files changed, 70 insertions(+), 22 deletions(-)
+>
+> diff --git a/hw/char/omap_uart.c b/hw/char/omap_uart.c
+> index 13e4f43c4c..e8da933378 100644
+> --- a/hw/char/omap_uart.c
+> +++ b/hw/char/omap_uart.c
+> @@ -27,7 +27,7 @@
+>  struct omap_uart_s {
+>      MemoryRegion iomem;
+>      hwaddr base;
+> -    SerialState *serial; /* TODO */
+> +    SerialMM *serial; /* TODO */
+>      struct omap_target_agent_s *ta;
+>      omap_clk fclk;
+>      qemu_irq irq;
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index ec388f3876..905b84c25f 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -1032,16 +1032,28 @@ static const TypeInfo serial_info =3D {
+>  static uint64_t serial_mm_read(void *opaque, hwaddr addr,
+>                                 unsigned size)
+>  {
+> -    SerialState *s =3D opaque;
+> -    return serial_ioport_read(s, addr >> s->it_shift, 1);
+> +    SerialMM *s =3D SERIAL_MM(opaque);
+> +    return serial_ioport_read(&s->serial, addr >> s->it_shift, 1);
+>  }
+>
+>  static void serial_mm_write(void *opaque, hwaddr addr,
+>                              uint64_t value, unsigned size)
+>  {
+> -    SerialState *s =3D opaque;
+> +    SerialMM *s =3D SERIAL_MM(opaque);
+>      value &=3D 255;
+> -    serial_ioport_write(s, addr >> s->it_shift, value, 1);
+> +    serial_ioport_write(&s->serial, addr >> s->it_shift, value, 1);
+> +}
+> +
+> +static void serial_mm_realize(DeviceState *dev, Error **errp)
+> +{
+> +    SerialMM *s =3D SERIAL_MM(dev);
+> +    Error *local_err =3D NULL;
+> +
+> +    object_property_set_bool(OBJECT(&s->serial), true, "realized", &loca=
+l_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  }
+>
+>  static const MemoryRegionOps serial_mm_ops[3] =3D {
+> @@ -1068,30 +1080,56 @@ static const MemoryRegionOps serial_mm_ops[3] =3D=
  {
-@@ -2029,6 +2072,19 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
- #endif
- }
+>      },
+>  };
+>
+> -SerialState *serial_mm_init(MemoryRegion *address_space,
+> +SerialMM *serial_mm_init(MemoryRegion *address_space,
+>                              hwaddr base, int it_shift,
+>                              qemu_irq irq, int baudbase,
+>                              Chardev *chr, enum device_endian end)
+>  {
+> -    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
+> -    SerialState *s =3D SERIAL(dev);
+> +    SerialMM *smm =3D SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
+> +    SerialState *s =3D &smm->serial;
+>
+> -    s->it_shift =3D it_shift;
+> +    smm->it_shift =3D it_shift;
+>      s->irq =3D irq;
+> -    qdev_prop_set_uint32(dev, "baudbase", baudbase);
+> -    qdev_prop_set_chr(dev, "chardev", chr);
+> -    qdev_set_legacy_instance_id(dev, base, 2);
+> -    qdev_init_nofail(dev);
+> +    qdev_prop_set_uint32(DEVICE(s), "baudbase", baudbase);
+> +    qdev_prop_set_chr(DEVICE(s), "chardev", chr);
+> +    qdev_set_legacy_instance_id(DEVICE(s), base, 2);
+>
+> -    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
+> +    qdev_init_nofail(DEVICE(smm));
+> +
+> +    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], smm,
+>                            "serial", 8 << it_shift);
+>      memory_region_add_subregion(address_space, base, &s->io);
+> -    return s;
+> +
+> +    return smm;
+> +}
+> +
+> +static void serial_mm_instance_init(Object *o)
+> +{
+> +    SerialMM *smm =3D SERIAL_MM(o);
+> +
+> +    object_initialize_child(o, "serial", &smm->serial, sizeof(smm->seria=
+l),
+> +                            TYPE_SERIAL, &error_abort, NULL);
+>  }
+>
+> +static void serial_mm_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +
+> +    dc->realize =3D serial_mm_realize;
+> +}
+> +
+> +static const TypeInfo serial_mm_info =3D {
+> +    .name =3D TYPE_SERIAL_MM,
+> +    .parent =3D TYPE_SYS_BUS_DEVICE,
+> +    .class_init =3D serial_mm_class_init,
+> +    .instance_init =3D serial_mm_instance_init,
+> +    .instance_size =3D sizeof(SerialMM),
+> +};
+> +
+>  static void serial_register_types(void)
+>  {
+>      type_register_static(&serial_info);
+> +    type_register_static(&serial_mm_info);
+>  }
+>
+>  type_init(serial_register_types)
+> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+> index ca7d813a52..23fdd5ec6a 100644
+> --- a/hw/mips/boston.c
+> +++ b/hw/mips/boston.c
+> @@ -50,7 +50,7 @@ typedef struct {
+>
+>      MachineState *mach;
+>      MIPSCPSState cps;
+> -    SerialState *uart;
+> +    SerialMM *uart;
+>
+>      CharBackend lcd_display;
+>      char lcd_content[8];
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index 783cd99848..ea92e5e27d 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -83,7 +83,7 @@ typedef struct {
+>      uint32_t i2csel;
+>      CharBackend display;
+>      char display_text[9];
+> -    SerialState *uart;
+> +    SerialMM *uart;
+>      bool display_inited;
+>  } MaltaFPGAState;
+>
+> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> index 548944b06a..730165347c 100644
+> --- a/include/hw/char/serial.h
+> +++ b/include/hw/char/serial.h
+> @@ -57,7 +57,6 @@ typedef struct SerialState {
+>      qemu_irq irq;
+>      CharBackend chr;
+>      int last_break_enable;
+> -    int it_shift;
+>      uint32_t baudbase;
+>      uint32_t tsr_retry;
+>      guint watch_tag;
+> @@ -80,6 +79,14 @@ typedef struct SerialState {
+>      MemoryRegion io;
+>  } SerialState;
+>
+> +typedef struct SerialMM {
+> +    SysBusDevice parent;
+> +
+> +    SerialState serial;
+> +
+> +    int it_shift;
+> +} SerialMM;
+> +
+>  extern const VMStateDescription vmstate_serial;
+>  extern const MemoryRegionOps serial_io_ops;
+>
+> @@ -88,12 +95,15 @@ void serial_set_frequency(SerialState *s, uint32_t fr=
+equency);
+>  #define TYPE_SERIAL "serial"
+>  #define SERIAL(s) OBJECT_CHECK(SerialState, (s), TYPE_SERIAL)
+>
+> +#define TYPE_SERIAL_MM "serial-mm"
+> +#define SERIAL_MM(s) OBJECT_CHECK(SerialMM, (s), TYPE_SERIAL_MM)
+> +
+>  SerialState *serial_init(int base, qemu_irq irq, int baudbase,
+>                           Chardev *chr, MemoryRegion *system_io);
+> -SerialState *serial_mm_init(MemoryRegion *address_space,
+> -                            hwaddr base, int it_shift,
+> -                            qemu_irq irq, int baudbase,
+> -                            Chardev *chr, enum device_endian end);
+> +SerialMM *serial_mm_init(MemoryRegion *address_space,
+> +                         hwaddr base, int it_shift,
+> +                         qemu_irq irq, int baudbase,
+> +                         Chardev *chr, enum device_endian end);
+>
+>  /* serial-isa.c */
+>
+> --
+> 2.24.0.308.g228f53135a
+>
+>
 
-+static void qemu_nvmm_start_vcpu(CPUState *cpu)
-+{
-+    char thread_name[VCPU_THREAD_NAME_SIZE];
-+
-+    cpu->thread =3D g_malloc0(sizeof(QemuThread));
-+    cpu->halt_cond =3D g_malloc0(sizeof(QemuCond));
-+    qemu_cond_init(cpu->halt_cond);
-+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/NVMM",
-+             cpu->cpu_index);
-+    qemu_thread_create(cpu->thread, thread_name, qemu_nvmm_cpu_thread_fn,
-+                       cpu, QEMU_THREAD_JOINABLE);
-+}
-+
- static void qemu_dummy_start_vcpu(CPUState *cpu)
- {
-     char thread_name[VCPU_THREAD_NAME_SIZE];
-@@ -2069,6 +2125,8 @@ void qemu_init_vcpu(CPUState *cpu)
-         qemu_tcg_init_vcpu(cpu);
-     } else if (whpx_enabled()) {
-         qemu_whpx_start_vcpu(cpu);
-+    } else if (nvmm_enabled()) {
-+        qemu_nvmm_start_vcpu(cpu);
-     } else {
-         qemu_dummy_start_vcpu(cpu);
-     }
-diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-index 0ec2372477..dbfa7a02f9 100644
-=2D-- a/include/sysemu/hw_accel.h
-+++ b/include/sysemu/hw_accel.h
-@@ -15,6 +15,7 @@
- #include "sysemu/hax.h"
- #include "sysemu/kvm.h"
- #include "sysemu/whpx.h"
-+#include "sysemu/nvmm.h"
+ping, thanks
 
- static inline void cpu_synchronize_state(CPUState *cpu)
- {
-@@ -27,6 +28,9 @@ static inline void cpu_synchronize_state(CPUState *cpu)
-     if (whpx_enabled()) {
-         whpx_cpu_synchronize_state(cpu);
-     }
-+    if (nvmm_enabled()) {
-+        nvmm_cpu_synchronize_state(cpu);
-+    }
- }
-
- static inline void cpu_synchronize_post_reset(CPUState *cpu)
-@@ -40,6 +44,10 @@ static inline void cpu_synchronize_post_reset(CPUState =
-*cpu)
-     if (whpx_enabled()) {
-         whpx_cpu_synchronize_post_reset(cpu);
-     }
-+    if (nvmm_enabled()) {
-+        nvmm_cpu_synchronize_post_reset(cpu);
-+    }
-+
- }
-
- static inline void cpu_synchronize_post_init(CPUState *cpu)
-@@ -53,6 +61,9 @@ static inline void cpu_synchronize_post_init(CPUState *c=
-pu)
-     if (whpx_enabled()) {
-         whpx_cpu_synchronize_post_init(cpu);
-     }
-+    if (nvmm_enabled()) {
-+        nvmm_cpu_synchronize_post_init(cpu);
-+    }
- }
-
- static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
-@@ -66,6 +77,9 @@ static inline void cpu_synchronize_pre_loadvm(CPUState *=
-cpu)
-     if (whpx_enabled()) {
-         whpx_cpu_synchronize_pre_loadvm(cpu);
-     }
-+    if (nvmm_enabled()) {
-+        nvmm_cpu_synchronize_pre_loadvm(cpu);
-+    }
- }
-
- #endif /* QEMU_HW_ACCEL_H */
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index c3a6e4fabe..2e79d61329 100644
-=2D-- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -981,7 +981,7 @@ void cpu_report_tpr_access(CPUX86State *env, TPRAccess=
- access)
-     X86CPU *cpu =3D env_archcpu(env);
-     CPUState *cs =3D env_cpu(env);
-
--    if (kvm_enabled() || whpx_enabled()) {
-+    if (kvm_enabled() || whpx_enabled() || nvmm_enabled()) {
-         env->tpr_access_type =3D access;
-
-         cpu_interrupt(cs, CPU_INTERRUPT_TPR);
-=2D-
-2.24.0
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
