@@ -2,62 +2,92 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B52EC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65756C33C9B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:08:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AC7E2087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:07:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AC7E2087F
+	by mail.kernel.org (Postfix) with ESMTPS id 3D73C2087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 17:08:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D73C2087F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iosKV-0004Vy-1A
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 12:07:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46400)
+	id 1iosLP-00067f-Rh
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 12:08:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iosIo-0001w4-I6
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:05:59 -0500
+ (envelope-from <groug@kaod.org>) id 1iormd-0001Mq-Ke
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:32:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iosIn-0006qu-6F
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:05:58 -0500
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:47045)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iosIm-0006q0-Ve
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 12:05:57 -0500
-Received: from player774.ha.ovh.net (unknown [10.109.143.216])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id BA8C68B499
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 18:05:54 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: groug@kaod.org)
- by player774.ha.ovh.net (Postfix) with ESMTPSA id DCA60E06B455;
- Tue,  7 Jan 2020 17:05:42 +0000 (UTC)
-Date: Tue, 7 Jan 2020 18:05:39 +0100
+ (envelope-from <groug@kaod.org>) id 1iormb-0006T4-Tc
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:32:43 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24092
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iormb-0006SL-N6
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:32:41 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 007GRqqe094084
+ for <qemu-devel@nongnu.org>; Tue, 7 Jan 2020 11:32:40 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2xb8n21t4y-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 11:32:40 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Tue, 7 Jan 2020 16:32:38 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 7 Jan 2020 16:32:36 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 007GWZAK48758948
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 7 Jan 2020 16:32:35 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5584452050;
+ Tue,  7 Jan 2020 16:32:35 +0000 (GMT)
+Received: from bahia.tlslab.ibm.com (unknown [9.101.4.41])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 22F525204F;
+ Tue,  7 Jan 2020 16:32:35 +0000 (GMT)
+Subject: [PATCH 0/2] ppc/pnv: Reset handler registration cleanup
 From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 01/10] ppc: Drop PPC_EMULATE_32BITS_HYPV stub
-Message-ID: <20200107180539.57ba0781@bahia.lan>
-In-Reply-To: <20200107044827.471355-2-david@gibson.dropbear.id.au>
-References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
- <20200107044827.471355-2-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+To: David Gibson <david@gibson.dropbear.id.au>,
+ =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Date: Tue, 07 Jan 2020 17:32:34 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13434800640545233382
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehhedgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeejgedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.74.227
+X-TM-AS-GCONF: 00
+x-cbid: 20010716-0028-0000-0000-000003CEF9E6
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20010716-0029-0000-0000-000024930A48
+Message-Id: <157841289975.66386.6463139590245180762.stgit@bahia.tlslab.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
+ definitions=2020-01-07_05:2020-01-07,
+ 2020-01-07 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=937 bulkscore=0
+ phishscore=0 mlxscore=0 priorityscore=1501 suspectscore=0 spamscore=0
+ adultscore=0 malwarescore=0 clxscore=1034 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-2001070135
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,62 +99,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, clg@kaod.org, paulus@samba.org, philmd@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  7 Jan 2020 15:48:18 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+These patches were initially posted in Cedric's "ppc/pnv: remove the use of
+qdev_get_machine()" series, which isn't really related to reset handlers
+BTW.
 
-> The only effect of the PPC_EMULATE_32BITS_HYPV define is to change how
-> MSR_HVB is defined.  This appears to be something to handle hypervisor mode
-> for 32-bit CPUs, but there's really no other code to handle this.  The
-> MSR_THV bit, which it uses is implemented for no cpus we model.
-> 
-> It's unlikely anyone is going to implement this any time soon, so just drop
-> it.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  target/ppc/cpu.h | 7 -------
->  1 file changed, 7 deletions(-)
-> 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 103bfe9dc2..2de9e2fa2b 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -26,8 +26,6 @@
->  #include "exec/cpu-defs.h"
->  #include "cpu-qom.h"
->  
-> -/* #define PPC_EMULATE_32BITS_HYPV */
-> -
->  #define TCG_GUEST_DEFAULT_MO 0
->  
->  #define TARGET_PAGE_BITS_64K 16
-> @@ -450,14 +448,9 @@ typedef struct ppc_v3_pate_t {
->  #define MSR_HVB (1ULL << MSR_SHV)
->  #define msr_hv  msr_shv
->  #else
-> -#if defined(PPC_EMULATE_32BITS_HYPV)
-> -#define MSR_HVB (1ULL << MSR_THV)
-> -#define msr_hv  msr_thv
-> -#else
+The only change is to call device_reset() instead of open-coding the
+invocation of DeviceReset::reset() as suggested by David.
 
-These lines come from commit a4f30719a8cd, which also introduced msr_thv
-and msr_shv to differentiate the 32 and 64 bits HV mode. Maybe you can go
-one step further: drop msr_thv and msr_shv and revert to msr_hv only, like
-before a4f30719a8cd ?
+--
+Greg
 
->  #define MSR_HVB (0ULL)
->  #define msr_hv  (0)
->  #endif
-> -#endif
->  
->  /* DSISR */
->  #define DSISR_NOPTE              0x40000000
+---
+
+Greg Kurz (2):
+      pnv/psi: Add device reset hook
+      pnv/psi: Consolidate some duplicated code in pnv_psi_realize()
+
+
+ hw/ppc/pnv_psi.c |   30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
 
