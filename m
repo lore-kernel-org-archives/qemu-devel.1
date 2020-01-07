@@ -6,79 +6,74 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9F9C32771
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 01:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86644C32771
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 01:57:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B46BC2072E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 01:46:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AB152072C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 01:57:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="G+6swR+2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B46BC2072E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="wNETPp8I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AB152072C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iodxO-0004iu-6A
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 20:46:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48751)
+	id 1ioe86-0007AP-7o
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 20:57:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1iodvL-0002mN-2f
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 20:44:48 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1ioe5X-0004lV-1r
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 20:55:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1iodvJ-0004l3-JA
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 20:44:46 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40868)
+ (envelope-from <aik@ozlabs.ru>) id 1ioe5V-00018Z-FQ
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 20:55:18 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54884)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iodvJ-0004hf-79
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 20:44:45 -0500
-Received: by mail-pf1-x444.google.com with SMTP id q8so27782202pfh.7
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 17:44:44 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ioe5V-00013S-1i
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 20:55:17 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id kx11so8307048pjb.4
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 17:55:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
  h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=5LYbdklAWfWgtvqBftEMYGyvQixbO0vqN5GIrM3PYZU=;
- b=G+6swR+2oyVTHNtprQ7icwQtv8K2sNL1jDScKGJ+XRYnqQ4ZNlC7168wRVKspiq7gB
- IcodVhO5d7rkWX1r623nj5otrUtQ7Tu7LhAxuYYBQaqeLgoh9YSCWIovWo0ckbCzut6y
- jwgYxuOXlFkF+hYwvsnl0Yr4kyKqkY4dRH23bIxw5FYOSrVoEH2JrSxd7nle5kD01P8C
- gIgr6O7rRttlFUOIA3vd4OwmxXO9LC7/857LZh21RDYFujjvuEFlRefLXdcyUgVZ0Bx1
- IFolm/Fr/Cz6riIT+KoALAOt2qzYHzLKghi2FPFaYOvtQFow7e0dH2WalB98gHG5dP14
- PT/A==
+ bh=mJVnbIqsLmy4u87acVTr//zETBGvYjJAi/sLCjIaixI=;
+ b=wNETPp8IiGcAgOYLCLTLIlKnPPQzFa6KrHxEmAfsdr5SUMPGDS11PeKn6ojyU1vHfk
+ FOC6titEmcax5HQqApq7Z2eTiyEkoM5ndGuMT654iwsIsU2xtGNB67I76HRq1yt5zRya
+ QDyozyC0tTVkWxm/GBrrDalkU2j6TZHni45L5ZtuhCjjIfvNTcYRTrXmb04FGZ68J96L
+ lyRO7PSGmZDXuHUmGi+J9wmiTtCQUkx0UhP3hvIGONsABHjFdCP7wCkxAkmV/abFoJ//
+ WZC54Ak+WMytBukDdV3FTHJBj9bhH3UPghYuvWd8uT07zz6TAZEIwCovdq3u/SXFk1FZ
+ FG5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=5LYbdklAWfWgtvqBftEMYGyvQixbO0vqN5GIrM3PYZU=;
- b=YzMTGMWpPB2XLhNunD9nx2n3WUWHXRTrDCOA+m4fEX4aWprkYGk3uAftrfM4Iggu56
- 2ExtZp1WBTxEejVfgCyDJwefxeV4eM/R5HZNdiQSoG8NnRJEoQ+WeAx+yvVFY6ki96nG
- h1ePYNSSKnZ1d+Y25yUF2YP8XjEJi2XXYvNpUa/Tjs+LnaLAxCfI+sE1RsmT0AgfAdr3
- v5CnEpKUk+G4qlW10ij/JCzpmDyf4sIucxaUnMQ62VhKnEb2sYqTLSh9caf/7q0ip3b6
- sFeUWYjWJrRfxjAqfQ/B2q/mSp5O6k9unzRfw8yUCmS6hGa3eaFMO1B+3ukx3h8eOkK3
- Yh6A==
-X-Gm-Message-State: APjAAAVBdz1/s3b50ThyAdJB7WnnYZoESMh1ZkVPxhDAJIklVCQRUzsf
- eEbeMuYOXg+c5mGee4ouq0A1QMdVtvw=
-X-Google-Smtp-Source: APXvYqy9TvZV6ufJHfMD9PtIkvi57++71fG/AFmyZJMcxihBfj1KKRKD7XvXIkdXgH88wtW/J8SO1A==
-X-Received: by 2002:a63:6d4f:: with SMTP id
- i76mr102767720pgc.301.1578361483760; 
- Mon, 06 Jan 2020 17:44:43 -0800 (PST)
+ bh=mJVnbIqsLmy4u87acVTr//zETBGvYjJAi/sLCjIaixI=;
+ b=lcIwny3SsVZCGvWSlZM/WX2G5SXimakSnnLma5Mo+/pOcM8YJcJJvx9wIe2kzDNsLr
+ AGMF01jUi+dGeaXLLsVAEM2XPxPjOBQFHl3AEinpPjqsGLTwxI2Pbagu3yDKJujCzn6s
+ vmnxdgwLmqPrF9UOTjQKHSrHJIB3tIEmkLtQemr3WBuliUwZkAxbt6MWnZL4ClkAIlTu
+ v1uMq71ecB5tMAk2dohMcn/gH9Xe6NATu9OIDJdBmy8cgVkhMIlredDt5+g1kEZgU5Tt
+ sWCgVFGnAlZIo7LdEUIA+U7Z/gcMzhrrWT5XYMkopas6UMnL9ke8vk+nnJLQ1ob/ePUk
+ KYcA==
+X-Gm-Message-State: APjAAAXJH/8EPd1XtiI8cCl87A9iHWAQuPWIYcusSdgXQYF5WUVdnId+
+ TXOGbTJ4mmf9IKUgPfhpJ5n9Ng==
+X-Google-Smtp-Source: APXvYqx0uiAJOxx4wNRfwtQZNoYf78An8UtS/eGM78usdyyD2q7hfa37UH8fKYHFWsiQnxITocGVTA==
+X-Received: by 2002:a17:902:343:: with SMTP id
+ 61mr57200666pld.332.1578362114964; 
+ Mon, 06 Jan 2020 17:55:14 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id b8sm79310692pff.114.2020.01.06.17.44.41
+ by smtp.gmail.com with ESMTPSA id o19sm26204284pjr.2.2020.01.06.17.55.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 06 Jan 2020 17:44:43 -0800 (PST)
-Subject: Re: [PATCH qemu v2] spapr: Kill SLOF
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goate?=
- =?UTF-8?Q?r?= <clg@kaod.org>
-References: <20200105234242.78897-1-aik@ozlabs.ru>
- <20200106041940.GV2098@umbus>
- <80157816-7859-3450-6a2c-ab151be5ee94@ozlabs.ru>
- <20200106085042.GW2098@umbus>
- <741e9b5e-6a7d-66a4-451d-e37c30697b2b@ozlabs.ru>
- <b0587d24-c7f6-ff1f-9527-ee389bd25b1f@kaod.org>
- <CAFEAcA9ZrTgPBxBq1rBo0u4z2SB=YHpWx_WUuycXK6pahARuXg@mail.gmail.com>
+ Mon, 06 Jan 2020 17:55:14 -0800 (PST)
+Subject: Re: [RFC PATCH qemu] spapr: Kill SLOF
+To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
+References: <20200103074404.30853-1-aik@ozlabs.ru>
+ <3cf3e733-199a-61ba-7aaa-05e9546cd4d9@ozlabs.ru>
+ <dd98618f-01c6-850f-ac00-454a2f798508@gmail.com>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
@@ -153,18 +148,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <fc507cb4-2ff3-02fe-19a1-4a0bfcd712ef@ozlabs.ru>
-Date: Tue, 7 Jan 2020 12:44:39 +1100
+Message-ID: <81f1f752-3ada-2c8d-38b7-1344c7633e14@ozlabs.ru>
+Date: Tue, 7 Jan 2020 12:55:07 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9ZrTgPBxBq1rBo0u4z2SB=YHpWx_WUuycXK6pahARuXg@mail.gmail.com>
+In-Reply-To: <dd98618f-01c6-850f-ac00-454a2f798508@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -176,7 +171,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Jose Ricardo Ziviani <joserz@linux.ibm.com>,
+ Fabiano Rosas <farosas@linux.ibm.com>, Sam Bobroff <sbobroff@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Paul Mackerras <paulus@ozlabs.org>, qemu-ppc@nongnu.org,
+ =?UTF-8?Q?Leonardo_Augusto_Guimar=c3=a3es_Garcia?= <lagarcia@br.ibm.com>,
+ Leonardo Bras <leonardo@linux.ibm.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -184,20 +185,51 @@ Sender: "Qemu-devel"
 
 
 
-On 07/01/2020 04:25, Peter Maydell wrote:
-> On Mon, 6 Jan 2020 at 17:09, Cédric Le Goater <clg@kaod.org> wrote:
->> ARM bootloaders are also embedded in QEMU's code. See hw/arm/boot.c.
->> You could improve a bit the definition though.
+On 07/01/2020 01:15, Daniel Henrique Barboza wrote:
+> Hey,
 > 
-> Given an opportunity to restart from scratch I don't know
-> that I'd do things the way hw/arm/boot.c does. The initial
-> idea was really simple and straightforward: 3 or 4 insns
-> which just set some registers and jumped to the kernel.
+> On 1/5/20 8:38 PM, Alexey Kardashevskiy wrote:
+>> Another version is coming, I'll start putting fewer people in the cc:
+>> list, watch qemu-ppc@nongnu.org for further updates if interested.
+>> Thanks,
+> 
+> 
+> Question: does Petitboot already replaces SLOF in every possible
+> scenario for all
+> the spapr machine features?
 
-I believe this is the case here - the previous blob like this (RTAS) has
-never changed. In fact it was compiled so rarely that when I did compile
-it, I found that it does not compile big-endian as it must :) Having a
-blob like this solves this too.
+Petitboot kernel+initramdisk almost replaces SLOF + GRUB.
+
+The difference here is that with SLOF + GRUB there is still OF client
+interface; and with Petitboot the target system does not get OF just
+because Petitboot kexec's to the target kernel which is a different
+booting mode in Linux.
+
+
+> Or is Petitboot 'good enough' to get the ball
+> rolling and then we'll incrementally improve Petitboot/spapr code to add
+> the
+> missing bits?
+
+For Linux guests it needs a bit more cleanup but in general it is quite
+good to go.
+
+However I seriously doubt if AIX and FreeBSD guests can be kexec'ed to
+and if they could, they may require some OF client interface services
+which a standard OF firmware (i.e. SLOF) provides and which I want to
+avoid adding into QEMU, such as network/disk booting. Not many care
+about this but it is not zero number of people either.
+
+
+> I am asking because this "SLOF-less" feature is something we'll want to
+> expose on
+> Libvirt - users will sure enjoy enjoy the shorter boot time - and I want
+> to brace
+> for impact when users starts opening bugs about the SLOF-less machine
+> missing stuff
+> that the SLOF version does.
+
+Too soon :)
 
 
 -- 
