@@ -2,96 +2,84 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6278EC33C9B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 173E9C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:16:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 309962073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:14:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D40422073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:16:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XklovNJU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 309962073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UpfYl1S5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40422073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iokwc-0005HL-L8
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 04:14:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52271)
+	id 1iokpO-0000rr-F9
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 04:07:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojR4-00087R-OS
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:55 -0500
+ (envelope-from <thuth@redhat.com>) id 1iojSU-0003ok-6i
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:39:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojR3-0000UA-D1
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:54 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46338
+ (envelope-from <thuth@redhat.com>) id 1iojSS-0001lH-UL
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:39:21 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53585
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojR3-0000Ty-9U
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:53 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iojSS-0001kz-Pp
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:39:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382672;
+ s=mimecast20190719; t=1578382760;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=s9CW2f1wTLCUXOOV0nNq1e86u0ryEb/Y8cd2jez9DrU=;
- b=XklovNJUDxm3oN1jFm4oY7G9eZKkSf2RydtN+8cJrZnCzS8lUEH9NQv1zkwJJ3zJ1Bg9yv
- NH89VpdKhWl0SOSMpSLphcwSIACO0E36+IQ1sA8wWHP87E+RGYpObKJEDvKKWrc0/qg16j
- 55ptChwUUuMcn07Ok1xGu0MGZr+J1UM=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-9xiM6zbuMO-cKVfxZz6BQQ-1; Tue, 07 Jan 2020 02:37:51 -0500
-Received: by mail-qt1-f197.google.com with SMTP id o24so30926973qtr.17
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:37:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=pNIx/NiIdCE26OJhITv4+Fn8KZTuaXrKqh88qEn+vzc=;
- b=qWjBjIuvLlKodFuc/x9DwNfrEZzYCvtDavzefzhOKdkuP3U1z2h7cIrc4ZZAE09PMX
- POIuX/cMOOe1HnBAiVr8pkdmBLzNqATEFDp4N9ERZpw/xZZCeLCjkSFvrlsLSEYLsA3o
- lXLkrH7RL/bxP3badkRnNtRdBsAoJ3y/HBHNG61Zsg2BGDByQQuQZe1Ut/Ukyi19sZRc
- Q1mvybtcWl+ZHIjxWIplM2dhUGwcbjRjuSUTuDFxhi3yOjvPpJcZ6BvwgNTfRwcu3+sm
- TK5lgmt4fnWc7neRse1W3zxsHE9BM4N1Fz5VKVgepDFivuJ2DemT7wiRy3lBmRg3I2yn
- I/Kg==
-X-Gm-Message-State: APjAAAUKGgdIbxZwbc6cNtHiUssN/14IbKeCE/86eLQ6/TPzXOFFPqHQ
- d6O1fl/8wVgKiJjS5dt3W1PdiUdTVidazxLQ3uMYPAlaWHFNF+ytryKsAbvcFtm/Q14aN7sryBg
- 4yWsnCegu+iBCogk=
-X-Received: by 2002:a0c:c542:: with SMTP id y2mr8192839qvi.225.1578382670544; 
- Mon, 06 Jan 2020 23:37:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxgYOWgdZPNRKFI/m8rAelRQ8xkjuX4GuLjRjJZ3OrZEWiR6go3CWQki2q9x5DhlL4L0NsH8Q==
-X-Received: by 2002:a0c:c542:: with SMTP id y2mr8192821qvi.225.1578382670343; 
- Mon, 06 Jan 2020 23:37:50 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id x19sm24688703qtm.47.2020.01.06.23.37.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:37:49 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:37:44 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 31/32] intel_iommu: a fix to vtd_find_as_from_bus_num()
-Message-ID: <20200107073451.298261-32-mst@redhat.com>
-References: <20200107073451.298261-1-mst@redhat.com>
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=XP6X6jfo2D1Ntt4i7WREXuOToJDDJqraHYyom/OfMhg=;
+ b=UpfYl1S5vTSmBqf8aiiRXymLWlyeBA7LDvf1TkHUlTap9tGYz5qwxb9pTaMAATMAOrU43Z
+ v+M6Jx3AmeYE5FvaXcWZ4lEf52bVWvoV0OyUrOe+NR562YyAjvtZmBMtzyfvNqoLom2t4E
+ tU6rFlntlITgXrZwtvkkio08SDIK6bE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-323-r5ygW_KtMd6V1DRyzLNExQ-1; Tue, 07 Jan 2020 02:39:19 -0500
+X-MC-Unique: r5ygW_KtMd6V1DRyzLNExQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E214800D4C;
+ Tue,  7 Jan 2020 07:39:17 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 074FB84672;
+ Tue,  7 Jan 2020 07:39:11 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 14/16] arm/run: Allow Migration tests
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20191216140235.10751-1-eric.auger@redhat.com>
+ <20191216140235.10751-15-eric.auger@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9b03fb14-008b-549b-9336-d5e91208a54f@redhat.com>
+Date: Tue, 7 Jan 2020 08:39:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: 9xiM6zbuMO-cKVfxZz6BQQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191216140235.10751-15-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,51 +91,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Kevin Tian <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-stable@nongnu.org,
- Peter Xu <peterx@redhat.com>, Liu Yi L <yi.l.liu@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: yuzenghui@huawei.com, andre.przywara@arm.com, drjones@redhat.com,
+ alexandru.elisei@arm.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Yi L <yi.l.liu@intel.com>
+On 16/12/2019 15.02, Eric Auger wrote:
+> Let's link getchar.o to use puts and getchar from the
+> tests.
+> 
+> Then allow tests belonging to the migration group to
+> trigger the migration from the test code by putting
+> "migrate" into the uart. Then the code can wait for the
+> migration completion by using getchar().
+> 
+> The __getchar implement is minimalist as it just reads the
+> data register. It is just meant to read the single character
+> emitted at the end of the migration by the runner script.
+> 
+> It is not meant to read more data (FIFOs are not enabled).
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/Makefile.common |  2 +-
+>  arm/run             |  2 +-
+>  lib/arm/io.c        | 13 +++++++++++++
+>  3 files changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 7cc0f04..327f112 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -32,7 +32,7 @@ CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
+>  asm-offsets = lib/$(ARCH)/asm-offsets.h
+>  include $(SRCDIR)/scripts/asm-offsets.mak
+>  
+> -cflatobjs += lib/util.o
+> +cflatobjs += lib/util.o lib/getchar.o
+>  cflatobjs += lib/alloc_phys.o
+>  cflatobjs += lib/alloc_page.o
+>  cflatobjs += lib/vmalloc.o
+> diff --git a/arm/run b/arm/run
+> index 277db9b..a390ca5 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -61,6 +61,6 @@ fi
+>  M+=",accel=$ACCEL"
+>  command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
+>  command+=" -display none -serial stdio -kernel"
+> -command="$(timeout_cmd) $command"
+> +command="$(migration_cmd) $(timeout_cmd) $command"
+>  
+>  run_qemu $command "$@"
+> diff --git a/lib/arm/io.c b/lib/arm/io.c
+> index 99fd315..aa9e1b5 100644
+> --- a/lib/arm/io.c
+> +++ b/lib/arm/io.c
+> @@ -87,6 +87,19 @@ void puts(const char *s)
+>  	spin_unlock(&uart_lock);
+>  }
+>  
+> +/*
+> + * Minimalist implementation for migration completion detection.
+> + * Needs to be improved for more advanced Rx cases
+> + */
+> +int __getchar(void)
+> +{
+> +	int ret;
+> +
+> +	ret =  readb(uart0_base);
 
-Ensure the return value of vtd_find_as_from_bus_num() is NULL by
-enforcing vtd_bus=3DNULL. This would help caller of vtd_find_as_from_bus_nu=
-m()
-to decide if any further operation on the returned vtd_bus.
+Duplicated space before "readb"...
 
-Cc: qemu-stable@nongnu.org
-Cc: Kevin Tian <kevin.tian@intel.com>
-Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-Message-Id: <1578058086-4288-2-git-send-email-yi.l.liu@intel.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/intel_iommu.c | 1 +
- 1 file changed, 1 insertion(+)
+> +	if (!ret)
+> +		return -1;
+> +	return ret;
+> +}
+>  
+>  /*
+>   * Defining halt to take 'code' as an argument guarantees that it will
+> 
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index ee06993675..609b80750a 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -948,6 +948,7 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState=
- *s, uint8_t bus_num)
-                 return vtd_bus;
-             }
-         }
-+        vtd_bus =3D NULL;
-     }
-     return vtd_bus;
- }
---=20
-MST
+... but apart from that nit:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
