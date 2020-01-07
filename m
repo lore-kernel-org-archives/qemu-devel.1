@@ -2,100 +2,100 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C08C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C130C33C9B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A190F2081E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE7AA2073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:04:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BMxrUdUM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A190F2081E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKF9psKz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE7AA2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomfQ-0006mN-30
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:04:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48370)
+	id 1iomfR-0006k0-Af
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:04:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iolgQ-0007nO-1K
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:01:55 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iomSt-0003ps-QA
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:52:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iolgO-00026n-Li
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:01:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56976
+ (envelope-from <pbonzini@redhat.com>) id 1iomSs-0005pH-IW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:51:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45382
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iolgO-00026c-Hu
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:01:52 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iomSs-0005oQ-E1
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:51:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578391312;
+ s=mimecast20190719; t=1578394315;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=F1NShKNPGQreq5TlN4FooVJm8/jBQ0AAY8Gnx45nSKE=;
- b=BMxrUdUMH7/Orcev0lKV4oSItjFmhfLN89ALgHsu8HJEkfbYnIpCdntmjWj4M2MKD454yv
- bOWMhF9B7OCuVigq8o1/ePg1FxD2NSFMDoIfcrqrs3zBPVl4gSCOipp+6YajPnzLWX6bcn
- Af5XqAT9wrU2fYM8h8USRk41DIH4n/k=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-60-Onf_4rSVNJmuDJ-9TwbuRw-1; Tue, 07 Jan 2020 05:01:51 -0500
-Received: by mail-wr1-f71.google.com with SMTP id z14so28603272wrs.4
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:01:50 -0800 (PST)
+ bh=dXzyNtVfsGJ9QALhNtnYA36feVWALD6cMJ1wh1QejOU=;
+ b=VKF9psKzkOeeng0BTDkN//yOp/00j5QqVu3uz+042Ne8wpyNQ7LhCZx7O6cCJ4x/13/k2J
+ Jw0XPem0YT1zNUU/HOSa0vj7Ccj4QVHgz1DGf45Uut+DAZKRGVQMKVwCmU9OJCAbyO2FXM
+ s9Ddz54TJYll/NDgfxsi2fK8QRNP964=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-67-HKDl5cMcOZKW2X6-30Hkrg-1; Tue, 07 Jan 2020 05:51:50 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z10so24247781wrt.21
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:51:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=m14dUcO9nYhGc07a/dbr7bGs6eBsDckucp42Kzd703s=;
- b=DvNvLSJgzNSdD04ViV4drpAVCImqSybZ9FIKkqRjk7XgRCuk0hZpP0Foied5jiio6p
- lUL8WLO3tjORx+gxe8a2GWg7zvH7XxzPen3UMPZosHHxt8NWXdoaHgue50wc4Md8yR7n
- sd4aBpJSI0MlYKg4fO3JsOaLKAUa4HrPsgnOG8j3fK5f9B5OSvlbxEDJADpnjixGs5AG
- WYVnDpiDclv1le9N8tF0O5NVGVQ2oCu7HJQyePVeAiF0uErLJ+kFAONZuqxMckoHiPTK
- tcQUI0zCTPsE3F4pyQn9hWWnpeXiWBZlMzMLeCXB1j0MtaUG+DF+VtBZk736doiYdPU0
- PXug==
-X-Gm-Message-State: APjAAAVzDwWqF07owQA2kEoEJigu0n3xYrjylh3Km0DILfdDRzxKVi9R
- 7iNiKyc+/LZ2/JxuQbn7olXbDDMaTotEoqCVbcn9pxWWQ/ap5Ewf2H4S1vDtIkiSCajaikWyRDS
- oIzPqYMDqdgt1qkU=
-X-Received: by 2002:a7b:c317:: with SMTP id k23mr40015786wmj.75.1578391309782; 
- Tue, 07 Jan 2020 02:01:49 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx+p131/0FyC/G5LqIJKDdq6YqPdQNFpIQJHqBMrJFAVpBxObFiGwNazYvpW5P+tCYsZrtEog==
-X-Received: by 2002:a7b:c317:: with SMTP id k23mr40015763wmj.75.1578391309583; 
- Tue, 07 Jan 2020 02:01:49 -0800 (PST)
+ bh=dXzyNtVfsGJ9QALhNtnYA36feVWALD6cMJ1wh1QejOU=;
+ b=UhNaxI9+imHqDG8oxaMC4/1RlCo5bF8ws/ZYmasPj45xC/36o0RXw1k7V79kpAZOs7
+ xNCwc1nVntPwqqchzWbYmxMLF3MX3+9/5wugBqmTv7L0qjW3Bjd7UdbaKIBepwF6DfHt
+ 4bKa8cKnsiP3yAftio+nvi5sUMhynaPtUzdWfeH5z/epaEUBPCrAyJgzYx2D2A9TQQVH
+ 4XtLpRTz2s2bakf28JqPSC+VTOlLi+jUu/J9Zyq6ZBNVjX7kTpAqOfv6J/apibAK4Q+J
+ Uj6XEJHJXfsTLrKYa6cGeVVnoDP5NNikdiif26c/e+tDyT/00YoiEnfFnGtIc57OvBW6
+ Ssow==
+X-Gm-Message-State: APjAAAXEOQJnpufX3+ZbkMxF3kRijS3KwC2toJsdCSJHAzrXJb7ji/ZF
+ WB1czua6SwOtd0u/fiAoDm8po9F6+++iaiVfRSo5cQXfQhLRxDiQ6cOmW4YNOetbEtkon9tW9eS
+ vv9ozQxxyYYu6cT4=
+X-Received: by 2002:adf:e3c1:: with SMTP id k1mr105009896wrm.151.1578394309204; 
+ Tue, 07 Jan 2020 02:51:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxRRd7TBwbA1TZbxtboRr9OmcnYRC7W84RJa0UuDGxQ6j/xvgalddEwvm5hfiT3+xTf08rnQA==
+X-Received: by 2002:adf:e3c1:: with SMTP id k1mr105009872wrm.151.1578394308936; 
+ Tue, 07 Jan 2020 02:51:48 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
  ([2001:b07:6468:f312:c6d:4079:b74c:e329])
- by smtp.gmail.com with ESMTPSA id v14sm74819004wrm.28.2020.01.07.02.01.48
+ by smtp.gmail.com with ESMTPSA id x14sm26223601wmj.42.2020.01.07.02.51.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jan 2020 02:01:49 -0800 (PST)
-Subject: Re: [PATCH 04/14] hw/i386: Restrict fw_cfg to the PC machines
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191231183216.6781-1-philmd@redhat.com>
- <20191231183216.6781-5-philmd@redhat.com>
+ Tue, 07 Jan 2020 02:51:48 -0800 (PST)
+Subject: Re: [PATCH v1] hw: fix using 4.2 compat in 5.0 machine types for
+ i440fx/q35
+To: Cornelia Huck <cohuck@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>
+References: <20191223072856.5369-1-dplotnikov@virtuozzo.com>
+ <20200107102426.3f31d4d6.cohuck@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a5ba0619-e236-7fb0-8c17-028670b69501@redhat.com>
-Date: Tue, 7 Jan 2020 11:01:48 +0100
+Message-ID: <d5710941-b626-1b1b-a08a-f5fbc5684e7d@redhat.com>
+Date: Tue, 7 Jan 2020 11:51:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191231183216.6781-5-philmd@redhat.com>
+In-Reply-To: <20200107102426.3f31d4d6.cohuck@redhat.com>
 Content-Language: en-US
-X-MC-Unique: Onf_4rSVNJmuDJ-9TwbuRw-1
+X-MC-Unique: HKDl5cMcOZKW2X6-30Hkrg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,50 +107,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-ppc@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: ehabkost@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/12/19 19:32, Philippe Mathieu-Daud=C3=A9 wrote:
-> Only the PC-based machines use the fw_cfg device. In particular,
-> the MicroVM machine does not use it. Only compile/link it when
-> machines require it.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Cc: Sergio Lopez <slp@redhat.com>
-> ---
->  hw/i386/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-> index 6ebb6d0cf0..48f2693546 100644
-> --- a/hw/i386/Makefile.objs
-> +++ b/hw/i386/Makefile.objs
-> @@ -5,7 +5,7 @@ obj-$(CONFIG_PC) +=3D pc.o pc_sysfw.o
->  obj-$(CONFIG_I440FX) +=3D pc_piix.o
->  obj-$(CONFIG_Q35) +=3D pc_q35.o
->  obj-$(CONFIG_MICROVM) +=3D microvm.o
-> -obj-y +=3D fw_cfg.o
-> +obj-$(CONFIG_PC) +=3D fw_cfg.o
->  obj-$(CONFIG_X86_IOMMU) +=3D x86-iommu.o
->  obj-$(CONFIG_VTD) +=3D intel_iommu.o
->  obj-$(CONFIG_AMD_IOMMU) +=3D amd_iommu.o
->=20
+On 07/01/20 10:24, Cornelia Huck wrote:
+> On Mon, 23 Dec 2019 10:28:56 +0300
+> Denis Plotnikov <dplotnikov@virtuozzo.com> wrote:
+> 
+>> 5.0 machine type uses 4.2 compats. This seems to be incorrect, since
+>> the latests machine type by now is 5.0 and it should use its own
+>> compat or shouldn't use any relying on the defaults.
+>> Seems, like this appeared because of some problems on merge/rebase.
+> 
+> Yes, I seem to have fat-fingered that while rebasing.
+> 
+>>
+>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>> ---
+>>  hw/i386/pc_piix.c | 1 -
+>>  hw/i386/pc_q35.c  | 1 -
+>>  2 files changed, 2 deletions(-)
+> 
+> I double checked that the other compat machines seem fine.
+> 
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> 
 
-Ah no, this is hw/i386/fw_cfg.c; of course hw/nvram/fw_cfg.c has its own
-Kconfig symbol.  Can you rename the file to pc-fwcfg.c and adjust the
-commit message?
+Queued, thanks.
 
 Paolo
 
