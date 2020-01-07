@@ -2,87 +2,91 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F3C2C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2EEC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:30:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF351222D9
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9334D222D9
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:30:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JMKi012S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF351222D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uLIoPH05"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9334D222D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49817 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioppt-0006u7-4m
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:27:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37531)
+	id 1ioprr-0000m7-57
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:29:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iopoU-0005Jd-DQ
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:26:33 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ioppO-0006YF-O9
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:27:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iopoS-0004j8-Fl
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:26:29 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44549
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iopoP-0004g5-Td
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:26:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578407183;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VVV/ibB7PnpiklHu6m3mhkl7dn6XgtXp6kCDjzOkSiE=;
- b=JMKi012SPPQdtFGwzElHsljCpU+HDQW347wfS9FCRhITMk2lJfI8xhUgp5dBhLwfXs2qTN
- EqPAub3umisJGlq41qxMCSVvknaGfAfQWaFpsSr4WQ3hhn11sgQHgdifqRBXkJHK6HlcBw
- adrmV+68IgIXnj2rCGAiU4PEvc5K0JA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-LOMhTOSbNUuUZPd2NV86hQ-1; Tue, 07 Jan 2020 09:26:22 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CAA6800D53;
- Tue,  7 Jan 2020 14:26:21 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98EE17BFFA;
- Tue,  7 Jan 2020 14:26:12 +0000 (UTC)
-Date: Tue, 7 Jan 2020 14:26:09 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: Priority of -accel (was: [PATCH] tests/qemu-iotests: Update
- tests to recent desugarized -accel option)
-Message-ID: <20200107142609.GB3368802@redhat.com>
-References: <20200106130951.29873-1-philmd@redhat.com>
- <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
- <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
- <58eb34db-7d32-8b0e-d9ef-98648209486b@redhat.com>
- <656169fc-1abe-b521-20a3-e7041739b914@redhat.com>
- <20200107125451.GL3368802@redhat.com>
- <3241dff4-6223-404f-55d4-846991763046@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1ioppL-0005Ox-Sf
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:27:25 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53091)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ioppL-0005NO-DU
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:27:23 -0500
+Received: by mail-wm1-x343.google.com with SMTP id p9so19171743wmc.2
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 06:27:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=4ay+vpKROKW8EYLuU4VepURpUz6gjW7YvMDbWzGZHs8=;
+ b=uLIoPH05ct8NZrBq2LapLTHrRYGLv/T0l+Y8QrOicY0RgNR6iTe4i/qoheTjULrRTH
+ 28v6UMHa/uWRxcz+7ja9FTcFFlj6J5buGAI8QT0buqCO/1usYRN8llDPs9s56F+7mZqL
+ xiWjS9Wg4EbWJUB3avBQ7lVR76YUwnj3X4tW4AVqj8OKWXLtQw1WZG812UXig/aAhivR
+ bBNnkhphNygIRCW57/rL89NYVxFX9wUVVyvg+PqdeaPo95UcxodBgWaxYkjT71M2pdDc
+ IMRIrK6v0IYqJIGwPES2rDNm0bsjAEi8a86LiMew6eG/urFkVkKIOxzc48QfN0pJW2Iv
+ 7q6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=4ay+vpKROKW8EYLuU4VepURpUz6gjW7YvMDbWzGZHs8=;
+ b=T4ZkrTUjyb7BkkJYhFsyZP98HWxgpCU6I/tKjp7QmSI1kp3wAEiG794K+/AyyHFwn0
+ 0z+cdd4DY4e2T4ZKuFIIeaKDN8S4Yw3zS0hKW9769GzvHadXWNJ+zYFgJVTtmw+PyhMq
+ sHlFud8hMdJMRTYM9nYuGgtP/6zBifuy0DnFNxP2rk1wFlKuDi8iMucfLGTuSQ2+nD0l
+ /HMLmrRAVBqrN/HnRrMbKBRShEUtZkORKxDqODvpBjO6QKqChvCaXsA1/JWP/3p2xPh+
+ tMg0fOve7KbiuCDYZEY6uU/1SAwQyUAlXPXahEuvJ481PhIt6BZEysjMIjyEed0v9V/8
+ wBOQ==
+X-Gm-Message-State: APjAAAU0kBqzqDibcc2PlR0Ac2uyQgUTvGBnBRDscX0x6wD6s5pqukJ6
+ crGgjASXpUOdmqEaPnp4WOJD9A==
+X-Google-Smtp-Source: APXvYqwWDqtSMVTvzD8QUx9RWa9s2vyJfwm7HSOJ/y2mqxzL4ShY7poHJ5RdQmIhlsf535z6q/wahg==
+X-Received: by 2002:a1c:407:: with SMTP id 7mr39171368wme.29.1578407241276;
+ Tue, 07 Jan 2020 06:27:21 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s3sm27196108wmh.25.2020.01.07.06.27.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 06:27:19 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2A4051FF87;
+ Tue,  7 Jan 2020 14:27:19 +0000 (GMT)
+References: <20191220132246.6759-1-alex.bennee@linaro.org>
+ <20191220132246.6759-6-alex.bennee@linaro.org>
+ <09322c6e-74d9-08d0-1138-f2d5581a7244@linaro.org>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 5/5] tests/tcg: add user version of dumb-as-bricks
+ semiconsole test
+In-reply-to: <09322c6e-74d9-08d0-1138-f2d5581a7244@linaro.org>
+Date: Tue, 07 Jan 2020 14:27:19 +0000
+Message-ID: <87d0bv4a0o.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <3241dff4-6223-404f-55d4-846991763046@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: LOMhTOSbNUuUZPd2NV86hQ-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,74 +98,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, keithp@keithp.com,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 07, 2020 at 03:14:52PM +0100, Thomas Huth wrote:
-> On 07/01/2020 13.54, Daniel P. Berrang=C3=A9 wrote:
-> > On Tue, Jan 07, 2020 at 01:23:18PM +0100, Paolo Bonzini wrote:
-> >> On 07/01/20 13:18, Thomas Huth wrote:
-> >>> I don't think we need a separate priority parameter here. But IMHO it=
-'s
-> >>>  really rather common practice to prioritize the last option. So whil=
-e
-> >>> it might be more "self-explanatory" to a CLI newbie if the first
-> >>> occurrence got the highest priority, it might be rather confusing
-> >>> instead for a CLI veteran...?
-> >>
-> >> Prioritising the last certainly makes sense for a choose-one-only
-> >> option, but I'm not sure it's the same for a choose-best option.  Afte=
-r
-> >> all it was -machine accel=3Dkvm:tcg, not -machine accel=3Dtcg:kvm...
-> >=20
-> > IIUC, the main use case for specifying multiple accelerators is
-> > so that lazy invokations can ask for a hardware virt, but then get
-> > fallback to TCG if not available. For things that should be platform
-> > portabile, there's more than just kvm to consider though, as we have
-> > many accelerators.  Listing all possible accelerators is kind of
-> > crazy though no matter what the syntax is.
-> >=20
-> > How about taking a completely different approach, inspired by the
-> > -cpu arg and implement:
-> >=20
-> >     -machine accel=3Dbest
->=20
-> Something like that sounds like the best solution to me, but I'd maybe
-> rather not call it "best", since the definition of "best" might depend
-> on your use-case (e.g. do you want to use a CPU close to the host or
-> something different which might be better emulated by TCG?).
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> On 12/21/19 12:22 AM, Alex Benn=C3=A9e wrote:
+>> +#if defined(__arm__)
+>> +    register uintptr_t t asm("r0") =3D type;
+>> +    register uintptr_t a0 asm("r1") =3D arg0;
+>> +    asm("svc 0xab"
+>> +        : "=3Dr" (t)
+>> +        : "r" (t), "r" (a0));
 >
-> What about "-accel any" or "-accel fastest" or something similar?
+> This is the #ifdef __thumb__ svc code.  Are you enforcing that with
+> command-line arguments?
 
-If there are many HW virt accelerators on a host, "fastest" might
-not be what we optimize for - we might prefer the more feature
-complete one even if theoeretically slower.
+No it is dealing with aarch64 vs 32 bit and the __arm__ is a compiler
+symbol.=20
 
-I suggested "best" as it intentionally somewhat vague about what
-particular criteria it optimizes for. I would document it as
+>
+> Might as well fix this, then test both arm and thumb.
 
-   "best: attempt to use a hardware virt accelerator for this
-          platform. Falls back to emulation if none is available
-          for use."
+I've enabled for Aarch64 just like the semihosting test.
 
-Utimately though this is just bikeshedding & I don't care much
-about the specific name choice, just the general concept.
+>
+>
+> r~
 
-Regards,
-Daniel
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Alex Benn=C3=A9e
 
