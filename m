@@ -2,100 +2,93 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DAD3C282DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58310C282DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:22:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD5FA2080A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 249CB20656
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 19:22:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DKTNRYoz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD5FA2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rZvg6DHB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249CB20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iouP4-0004P1-Ut
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 14:20:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49285)
+	id 1iouQv-0005vE-9x
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 14:22:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56934)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iouFG-0007Vg-Kd
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:10:27 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1iouQB-000528-I1
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:21:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iouFE-00018v-Qx
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:10:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22925
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iouFE-00018T-HA
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:10:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578424224;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DxkSyfkoE/UEqShzX/UQsg9E7/HXMQ9NdqUnYstX7Dg=;
- b=DKTNRYozwSqamhYaSjjKPj/fM/7vqO4YUHC93cWervanLbrmbJLvb8MVW2SRaLBkBdANQh
- ZDDgQDuZ2ES3BlnbheQxt2AjEGEpmKVVt73hG1uUrfrVEkRB85yiULE0Di4PY6oMEJU8Dc
- wN8hrtAR+YC3UgX5GTXCkgOQfY0GsnE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-rnE5r-XrNU2fEAjlquUYNA-1; Tue, 07 Jan 2020 14:10:22 -0500
-Received: by mail-wr1-f72.google.com with SMTP id c17so347148wrp.10
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 11:10:22 -0800 (PST)
+ (envelope-from <danielhb413@gmail.com>) id 1iouQA-0003Rq-AV
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:21:43 -0500
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:45809)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1iouQA-0003RK-6W
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 14:21:42 -0500
+Received: by mail-qk1-x741.google.com with SMTP id x1so384175qkl.12
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 11:21:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=LpscZTXyWM5lTXfwxjl7Kqj/be0nEhGa6bSXbLR9a2Q=;
+ b=rZvg6DHBmaUBHVYlIG38oSwAhWuE0EB20FQzq64kq2K+BINEEK+3ZMiHdRDAVbU1yy
+ dlCc8t4lBXyQYjZE4ii1AdnVimTL/04nk7NXdPdF15ykwHHgfnlE9XordGBt0JvzqBMw
+ mamIKuKH/HB/SvzQb2rhI7ajOK1ICOdZlhaEuKeEdSh/wJwg5yeJXFXhVAV7nJ60BV19
+ TBMrTtGsBUDH7jB663vItpXQ+rNZMRZ/05FM80sDy1D2ASzdSY6Z/nfrhvsJwfdizOmh
+ 4L++SykzSIbhIMuggZAiAq6ln3yj9P/erDDQvopT6HsKkDXEZzUeEV7so8iN7dd+1quP
+ YzDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=H4D+IQeHeBAFSAfk7sgUp01/2xHcZnO2vsGjQUEiLhA=;
- b=Zc6aO6hYonPkalAcOTwt5qd0k02CaVHXSNGA85D6CurjxfuAXlnCnHUb5zj0alDOfy
- NS9pDO7IksNg6JmiNF/2hcFBxywopv0XBXfFXxZUTy/Ncun29i18QkdFzP/Ushm9V+qG
- FtaIEHowUTN7XcxeBe/hUK3jLoHIeIQfQzHtkxHwyLth+sSgY6hV5qTK+D4LQqWXpF2S
- 83nqYE39KH+DYJKj+CoOpKohvzGfWjlLFo3+QbVgBlXyS3LAm+mLBnVQBh3yJFrExuKH
- TjXAR0eNcXIBafvYQWeXmIUX/Fc4opuHS7GskMyFOcgWhPh5RlwZ5G0ocmJcf2Szdcw/
- UTKQ==
-X-Gm-Message-State: APjAAAVinGpNwSrT/KWSZeHCMYFhPBiNrxR69DGZzrYFISYTNZ6mX8GF
- Z+MaXbZ8sW7Cs5D7oy5cq8NGUpXXG2XEWjmpNzcTUwIpDR9FwIMY7FMS7ADzaung/Q2KhcIUSRG
- kqSDaiHjqpbFf7Xo=
-X-Received: by 2002:adf:8541:: with SMTP id 59mr552578wrh.307.1578424221605;
- Tue, 07 Jan 2020 11:10:21 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw6MzHM863ywO1XWE8fEC1lYSC+VfHNKul8A6t7Tb8rK3NoNv7b7G4WrwPtZu23d/6r3l1YGw==
-X-Received: by 2002:adf:8541:: with SMTP id 59mr552553wrh.307.1578424221394;
- Tue, 07 Jan 2020 11:10:21 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id n3sm927022wrs.8.2020.01.07.11.10.20
+ bh=LpscZTXyWM5lTXfwxjl7Kqj/be0nEhGa6bSXbLR9a2Q=;
+ b=Fi+648sFihDI90DdIqVgEDhA8+tnjfl/HxeL6vBoBWvNE2E9k0BUGl8z0Uz6D7zIvG
+ RC/IpFBoaAuw2NHn++zcNXXE2VzfB/Jh7Ub0uii/HT+QZT5C+ZeEFMvICEHwZ4caIhh4
+ 1ZnZCheRosxV+kpvN1udC+fg7ND//UfYP0nZemW3d2AC6VwFn/mJSgmFUDh5OGN3whhZ
+ CHRJTJiDUqgzDKaapNt+lOkzYPBb4ocTUtn+yumR3ge1uAaxBZ78H8nR22defLbDrPls
+ 2EdNALiim9yukm0Cw9tR8JfjAzJJnk6h0pb+rJ1F5A6dIgaDpZU6QIZDV1zjnbVpAt99
+ IGWQ==
+X-Gm-Message-State: APjAAAXrQrBu/YIy4j2dAOag2TzAAofDc0a36sQGNFFogEfbzRIxuq5z
+ bt0A6W/WiC7dZ4+onZjQeuRT81VM
+X-Google-Smtp-Source: APXvYqxBe9GkQ8oq7MrsvM7jLGv4MDokOz+Tr7ubahkFHS/QKEjlev6kxa8xQmK3ODfQeaP2tfr7+A==
+X-Received: by 2002:a37:66c2:: with SMTP id a185mr836170qkc.211.1578424901306; 
+ Tue, 07 Jan 2020 11:21:41 -0800 (PST)
+Received: from ?IPv6:2804:431:c7c6:655b:9e1c:e865:3705:e1df?
+ ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
+ by smtp.gmail.com with ESMTPSA id c18sm335593qtn.71.2020.01.07.11.21.40
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jan 2020 11:10:20 -0800 (PST)
-Subject: Re: [PATCH v1 6/6] travis: install homebrew python for OS X
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200107135311.5215-1-alex.bennee@linaro.org>
- <20200107135311.5215-7-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cf1af57a-c397-9503-cc49-a93dc58a2cc0@redhat.com>
-Date: Tue, 7 Jan 2020 20:10:20 +0100
+ Tue, 07 Jan 2020 11:21:40 -0800 (PST)
+Subject: Re: [PATCH 1/1] 9p-local.c: always return -1 on error in
+ local_unlinkat_common
+To: Greg Kurz <groug@kaod.org>
+References: <20200107144718.391550-1-danielhb413@gmail.com>
+ <20200107174726.5640a059@bahia.lan>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <254ea08e-ef26-a61d-6144-404f035c21e8@gmail.com>
+Date: Tue, 7 Jan 2020 16:21:38 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200107135311.5215-7-alex.bennee@linaro.org>
-Content-Language: en-US
-X-MC-Unique: rnE5r-XrNU2fEAjlquUYNA-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <20200107174726.5640a059@bahia.lan>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,38 +100,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/7/20 2:53 PM, Alex Benn=C3=A9e wrote:
-> Our python3 requirements now outstrip those of the build.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   .travis.yml | 1 +
->   1 file changed, 1 insertion(+)
->=20
-> diff --git a/.travis.yml b/.travis.yml
-> index 848a2714efe..a86ca34f79d 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -57,6 +57,7 @@ addons:
->         - glib
->         - pixman
->         - gnu-sed
-> +      - python
->       update: true
->  =20
 
-This doesn't seem enough, I'm getting:
 
-./configure --disable-docs --disable-tools
-ERROR: Cannot use '/usr/local/bin/python', Python >=3D 3.5 is required.
+On 1/7/20 1:47 PM, Greg Kurz wrote:
+> I've changed "9p-local.c:" to "9p: local:" which is the usual prefix used for
+> fsdev backend specific changes.
 
-        Use --python=3D/path/to/python to specify a supported Python.
+Good to know. Thanks for fixing it up.
 
-Apparently we don't set this in PATH ourselves.
+> 
+> On Tue,  7 Jan 2020 11:47:18 -0300
+> Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+> 
+>> local_unlinkat_common() is supposed to always return -1 on error.
+>> This is being done by jumps to the 'err_out' label, which is
+>> a 'return ret' call, and 'ret' is initialized with -1.
+>>
+>> Unfortunately there is a condition in which the function will
+>> return 0 on error: in a case where flags == AT_REMOVEDIR, 'ret'
+>> will be 0 when reaching
+>>
+>> map_dirfd = openat_dir(...)
+>>
+>> And, if map_dirfd == -1 and errno != ENOENT, the existing 'err_out'
+>> jump will execute 'return ret', when ret is still set to zero
+>> at that point.
+>>
+>> This patch fixes it by changing all 'err_out' labels by
+>> 'return -1' calls, ensuring that the function will always
+>> return -1 on error conditions. 'ret' can be left unintialized
+>> since it's now being used just to store the result of 'unlinkat'
+>> calls.
+>>
+>> CC: Greg Kurz <groug@kaod.org>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>> ---
+> 
+> Applied to 9p-next.
+> 
+> Thanks Daniel and feliz ano novo :)
 
+
+Bonne année!
+
+
+
+
+> 
+>>   hw/9pfs/9p-local.c | 14 ++++++--------
+>>   1 file changed, 6 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+>> index ca641390fb..de61aca216 100644
+>> --- a/hw/9pfs/9p-local.c
+>> +++ b/hw/9pfs/9p-local.c
+>> @@ -1076,7 +1076,7 @@ out:
+>>   static int local_unlinkat_common(FsContext *ctx, int dirfd, const char *name,
+>>                                    int flags)
+>>   {
+>> -    int ret = -1;
+>> +    int ret;
+>>   
+>>       if (ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+>>           int map_dirfd;
+>> @@ -1094,12 +1094,12 @@ static int local_unlinkat_common(FsContext *ctx, int dirfd, const char *name,
+>>   
+>>               fd = openat_dir(dirfd, name);
+>>               if (fd == -1) {
+>> -                goto err_out;
+>> +                return -1;
+>>               }
+>>               ret = unlinkat(fd, VIRTFS_META_DIR, AT_REMOVEDIR);
+>>               close_preserve_errno(fd);
+>>               if (ret < 0 && errno != ENOENT) {
+>> -                goto err_out;
+>> +                return -1;
+>>               }
+>>           }
+>>           map_dirfd = openat_dir(dirfd, VIRTFS_META_DIR);
+>> @@ -1107,16 +1107,14 @@ static int local_unlinkat_common(FsContext *ctx, int dirfd, const char *name,
+>>               ret = unlinkat(map_dirfd, name, 0);
+>>               close_preserve_errno(map_dirfd);
+>>               if (ret < 0 && errno != ENOENT) {
+>> -                goto err_out;
+>> +                return -1;
+>>               }
+>>           } else if (errno != ENOENT) {
+>> -            goto err_out;
+>> +            return -1;
+>>           }
+>>       }
+>>   
+>> -    ret = unlinkat(dirfd, name, flags);
+>> -err_out:
+>> -    return ret;
+>> +    return unlinkat(dirfd, name, flags);
+>>   }
+>>   
+>>   static int local_remove(FsContext *ctx, const char *path)
+> 
 
