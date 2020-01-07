@@ -2,82 +2,103 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39379C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B82C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:19:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04E8D2073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:14:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B58F2073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:19:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nXSSbIn8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04E8D2073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hSbjEzQM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B58F2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iorVR-0001BK-6B
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:14:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38564)
+	id 1iorZl-0005T3-MC
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:19:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iorUp-0000Og-NW
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:14:20 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iorZ0-0004QF-L1
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iorUn-0004Zt-Ff
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:14:18 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43483)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iorUn-0004ZC-97
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:14:17 -0500
-Received: by mail-oi1-x241.google.com with SMTP id p125so15935083oif.10
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:14:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Pe1Q+5s/HuqyjI745fEx8zW5ARIcEczfiyXTiyOMXJI=;
- b=nXSSbIn8LovA76t+uFoMey0Gq+VUcwSPmdzIynwAoa/m/r+alForuwGwkdVzIscjjT
- mj5brO5Wae8J4ptDuyXwLrpzfcrQp74mmk9lh/pPdNCCSL+CZMjDAebucktdgXyxNvcE
- gt1+J1O5k2RyuEjRB4p2glYk+RkZF4fqcM7Ay+Y1+wW4Q500Z88GgzNxPHd1SwePNQod
- aI/hox0GphraZwqxZazShi7ShL9l5EswI+gWZb/Ugz82L/mJ4UQzGH3wWtHgB8r6nfeZ
- +AmzImjiEC3f+Iwv49G6lyqS/wLuFpr3Gr7btFGo5t4a7HHcivWt8dztB5hDIt7VBsZC
- XTEA==
+ (envelope-from <pbonzini@redhat.com>) id 1iorYz-0006m8-3I
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:18:38 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28133
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iorYy-0006lb-VW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:18:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578413915;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=af5qc1kW1UxCBHBp1i3XNcqOR40WKwLPjAEKLkrMKmU=;
+ b=hSbjEzQMxs4Q294QSAyTqH4mJNT7Ml34viV4rQQ+T/PK63yfYXU0gvV6kKRRYyX/uy9Zc0
+ FBJN5T0utxnGp4jlzTbGKwCtao1lXbCktVn6okJtRL03LDKW0lxPdVkA6UMH3JH/iIz/+Y
+ FRzq7+RQKORptxwaNqCpYco4O97HLJo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-KFMyDVQTM4CB-EXmoszJaA-1; Tue, 07 Jan 2020 11:18:34 -0500
+Received: by mail-wm1-f71.google.com with SMTP id p2so41378wma.3
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:18:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Pe1Q+5s/HuqyjI745fEx8zW5ARIcEczfiyXTiyOMXJI=;
- b=LDooxxFzjvokB6AUu0OnOyZesdJ93jy3H6Y+Lxr4T0nqp4ACfxtm/avYBd/WkJORBw
- 5yAl+5zGrYwzEfDchcWY65XaiKXcJlb7Z+csQYyYU8h+PyZ0DBERRJYWMzRwUp8woCIH
- XJ8BQOAF80yRHRoWP3SsLF1HssR9aSqbzofrZPyySnMiIXWZdT1VfCGXlseU4THj0JHs
- +A1Kpd0bg6dB741heIP1mIooS6oS/QAcURl7ljdWJ6SkOflkdCk2GAEHXnPhiQAbAaY6
- SS9mGLJfyr7FoI5NlhaM3GFHmYNK7/HOUTtLHqwedRlljcUiNA/wkfMHShkEj8E4SuFl
- GkxQ==
-X-Gm-Message-State: APjAAAVthQfzwVzB0BB/DxleLvnFHK25t9rL7G7DLo4JvmHT+qVUSs19
- zpPrWJXxGMfmipx0Jfam1/QNr5bm7AhN1pEIQxpd8w==
-X-Google-Smtp-Source: APXvYqw0FAagbl6EuW1/HRl0QoSeC/ria65T7Dlo9ovigOpqjjjaY4JsHUgoPL2ATOZdL/UEmW0ZxUPMkrylJnFwfM4=
-X-Received: by 2002:aca:3182:: with SMTP id x124mr296436oix.170.1578413655988; 
- Tue, 07 Jan 2020 08:14:15 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=af5qc1kW1UxCBHBp1i3XNcqOR40WKwLPjAEKLkrMKmU=;
+ b=hQ3HeXuIpmkzBDEPFHak0R8y92OOOJCIhvC6p+SL8UjQuSItsyOpyH7XRrvF+G8NdB
+ xTdPTpI03IPaT8CVVB6A1PLSM4dim1bcIGM9tM7+6wLFXUUesXY4wzSf4dgZUxDn2Xms
+ M5XDmSMgKAigl5VTzBa1wBcEshnm4j6sTV3IlDyRKFMrSfxOY/WL8UtsB/juori796FR
+ wYIyKLVcYpfgySuLf8SdMd2+alZ+yd/dyQaEg++INEwgn5yWHyHX0nG/C3J3lFu2G/zP
+ KnPb9oVuCFxwT0YsxdT3chIbkveJ9E6ZDtcaK4t/PiHBI+yrRoDlZfE8zuDdf8rFB3Ij
+ JIEw==
+X-Gm-Message-State: APjAAAX4o94+Z9HNqLr1uqaiPsQG8DuJoDlD8oujyfv5lrn2Xk+5MiHR
+ B6UiCq1O9m3Id+0wfKEyYILsHYr3SPJq/kUTqgHCAGTU6SBcZYHBm5RbwnYAICiUv4RMFJ6oF8P
+ NyfL6dZ1s6yaOiu8=
+X-Received: by 2002:a05:600c:2406:: with SMTP id
+ 6mr35649192wmp.30.1578413913178; 
+ Tue, 07 Jan 2020 08:18:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzlp4yGEOvjtN/bINsWALKoC+NVrugKLoCmp5iq1Xd/EdIS1Kk0mTztSnnWpre8N4EtCUhoQA==
+X-Received: by 2002:a05:600c:2406:: with SMTP id
+ 6mr35649181wmp.30.1578413912946; 
+ Tue, 07 Jan 2020 08:18:32 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
+ ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+ by smtp.gmail.com with ESMTPSA id t190sm85174wmt.44.2020.01.07.08.18.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jan 2020 08:18:32 -0800 (PST)
+Subject: Re: [PULL 29/87] kvm: convert "-machine kernel_irqchip" to an
+ accelerator property
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <1576670573-48048-1-git-send-email-pbonzini@redhat.com>
+ <1576670573-48048-30-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA-qbxVxR6qWRjPjfXf+XQzoA=D6LfhDJ2Do4LfZALZ-EA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8dff7f70-c06b-0757-3b8b-712bde8c733a@redhat.com>
+Date: Tue, 7 Jan 2020 17:18:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20200106144622.1520994-1-marcandre.lureau@redhat.com>
- <20200106144622.1520994-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20200106144622.1520994-7-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 7 Jan 2020 16:14:05 +0000
-Message-ID: <CAFEAcA8c3A_zXcHRF3kj9z3C2AtLLPatQ=h=NX2+Ywzj+OiyVg@mail.gmail.com>
-Subject: Re: [PULL v2 6/9] configure: add GDBUS_CODEGEN
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <CAFEAcA-qbxVxR6qWRjPjfXf+XQzoA=D6LfhDJ2Do4LfZALZ-EA@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: KFMyDVQTM4CB-EXmoszJaA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,62 +115,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 6 Jan 2020 at 14:47, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> gdbus-codegen generated code requires gio-unix on Unix, so add it to
-> GIO libs/cflags.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  configure | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/configure b/configure
-> index 747d3b4120..0ce2c0354a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3701,10 +3701,16 @@ if $pkg_config --atleast-version=3D$glib_req_ver =
-gio-2.0; then
->      gio=3Dyes
->      gio_cflags=3D$($pkg_config --cflags gio-2.0)
->      gio_libs=3D$($pkg_config --libs gio-2.0)
-> +    gdbus_codegen=3D$($pkg_config --variable=3Dgdbus_codegen gio-2.0)
->  else
->      gio=3Dno
->  fi
->
-> +if $pkg_config --atleast-version=3D$glib_req_ver gio-unix-2.0; then
-> +    gio_cflags=3D"$gio_cflags $($pkg_config --cflags gio-unix-2.0)"
-> +    gio_libs=3D"$gio_libs $($pkg_config --libs gio-unix-2.0)"
-> +fi
-> +
->  # Sanity check that the current size_t matches the
->  # size that glib thinks it should be. This catches
->  # problems on multi-arch where people try to build
-> @@ -6904,6 +6910,7 @@ if test "$gio" =3D "yes" ; then
->      echo "CONFIG_GIO=3Dy" >> $config_host_mak
->      echo "GIO_CFLAGS=3D$gio_cflags" >> $config_host_mak
->      echo "GIO_LIBS=3D$gio_libs" >> $config_host_mak
-> +    echo "GDBUS_CODEGEN=3D$gdbus_codegen" >> $config_host_mak
->  fi
+On 07/01/20 15:46, Peter Maydell wrote:
+> On Wed, 18 Dec 2019 at 12:26, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+>> +static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
+>> +                                   const char *name, void *opaque,
+>> +                                   Error **errp)
+>> +{
+>> +    Error *err = NULL;
+>> +    KVMState *s = KVM_STATE(obj);
+>> +    OnOffSplit mode;
+>> +
+>> +    visit_type_OnOffSplit(v, name, &mode, &err);
+> 
+> Coverity complains that this call uses 'mode' uninitialized,
+> which seems correct since it starts off with 'value = *obj'.
+> (CID 1412230)
 
-I've just noticed that this seems to cause problems for
-the NetBSD VM, because pkg-config reports a value for
-gdbus_codegen which isn't an installed binary:
+The visitor here is not supposed to look at value (rather it should fill
+it in)---but yeah this is an ugly part of the visitor API that we can
+work around most simply by initializing mode.
 
-localhost$ pkg-config --variable=3Dgdbus_codegen gio-2.0
-/usr/pkg/bin/gdbus-codegen
-localhost$ ls /usr/pkg/bin/gdbus-codegen
-ls: /usr/pkg/bin/gdbus-codegen: No such file or directory
+Paolo
 
-I think we need to install the 'gdbus-codegen' package in
-our netbsd VM image.
+> 
+>> +    if (err) {
+>> +        error_propagate(errp, err);
+>> +        return;
+>> +    } else {
+>> +        switch (mode) {
+>> +        case ON_OFF_SPLIT_ON:
+>> +            s->kernel_irqchip_allowed = true;
+>> +            s->kernel_irqchip_required = true;
+>> +            s->kernel_irqchip_split = false;
+>> +            break;
+>> +        case ON_OFF_SPLIT_OFF:
+>> +            s->kernel_irqchip_allowed = false;
+>> +            s->kernel_irqchip_required = false;
+>> +            s->kernel_irqchip_split = false;
+>> +            break;
+>> +        case ON_OFF_SPLIT_SPLIT:
+>> +            s->kernel_irqchip_allowed = true;
+>> +            s->kernel_irqchip_required = true;
+>> +            s->kernel_irqchip_split = true;
+>> +            break;
+>> +        default:
+>> +            /* The value was checked in visit_type_OnOffSplit() above. If
+>> +             * we get here, then something is wrong in QEMU.
+>> +             */
+>> +            abort();
+>> +        }
+>> +    }
+>> +}
+> 
+> 
+> thanks
+> -- PMM
+> 
 
-Maybe configure should check that it's actually got
-an executable file before trying to use it?
-
-thanks
--- PMM
 
