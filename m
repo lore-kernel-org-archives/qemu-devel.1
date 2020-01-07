@@ -2,82 +2,89 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A067C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C71EFC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24A4E208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95671208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:20:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arSVWYB2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24A4E208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vifs8tzJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95671208C4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iophH-0004rR-Mz
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:19:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35353)
+	id 1iopip-0002KC-B2
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:20:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iooLU-0006Qj-Ha
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:29 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIO-0000LS-DO
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iooLS-0007ye-RE
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:28 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41154)
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIN-0002IX-6h
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:20 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34785)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iooLS-0007y4-KW
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:26 -0500
-Received: by mail-wr1-x441.google.com with SMTP id c9so53806293wrw.8
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 04:52:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=IF2p0g9z3hjHu1vHCAsockZnOSXDZZid6UAbkQGw4BY=;
- b=arSVWYB232D4avwssZqVHliOV65pTGQ6xlgetJdf/XdqpPK4Sc3var9/mz4Bsp2H7Q
- D76pgXmuB8bWjvF671AGDfZJKYrVqcKR+bRPolTAv8iSaMZTEL16itL59xLghkDvppSA
- 1G2V0t37E5fgOTytvmADVLZJa2InHs5Yc9zDqCltFyzUKvcIKvulH4eDuNNSKt4cAnWn
- 5JUnPxaLu1bhhD/hrZLriZQlZtJAo1w2C1r/OjQo94lLIkv4T7qoSlkJTV9IpGb4xQmo
- aormXReDoexaZuRGs/qTx/e3pXdfWFG6OuPWACE/U3+im2Ph/32jLFEHLi+f2RyY7Gmu
- UJPg==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iopIN-0002Hm-0o
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:19 -0500
+Received: by mail-wr1-x431.google.com with SMTP id t2so54021810wrr.1
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:53:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=rt2Px2ccxS3QOQ8HuOIurdGrTuSjUHBCmbsVqBMFyYg=;
+ b=vifs8tzJQDPdeuSZ/l4ons41Se/4k3giz1UnLQytKoIAokVkbyeibWgkv8Vp2ukFZ9
+ sBkt2hJH8vohaNdvWY7EGjIVfFk5p5Im8/4BMHF/EN0PpcmidQAp6CFMQNORLSERmRrp
+ IpHeVOOs+WOVrsO4Y9fb8ZE3KBApyzhmxq3MYYYCMgYZ6PI0PaZ5qpC1xYv1caw5u3t5
+ x+2Dj9BQLfEH1C7XQnEeaF3vwNU5isIpZwCSh+jMKkCbPsO9us6m2fDif7JXGnZTIMh3
+ Q+/Oj9nvrBKOwNU1l2R2Sx5LMDQDSgraJbJUgxm1ELDnABZ3sE7FwPNFVKVkUaed+/jR
+ u4Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=IF2p0g9z3hjHu1vHCAsockZnOSXDZZid6UAbkQGw4BY=;
- b=lSCHNfdMiWdbH4bCRbtW82zCoyweVH8v6267uKEqedS5wnB+sSqb0+3Si1FL3eKL19
- //DuTW9gpRQXpNvNAV0ATXjPKad8MRlNxXLBuye84vIS4jxP/6Hea23JFQBq0USZ1p2C
- 4bYLitsH+fPxN5I2/e19mZHwIcnl9jmnJe76TvsmkpEiYoYnj7jBq+pqX7UtoD6d9gsD
- RDdP+qcY7N2x5eP0empiIbUX9cflopyMJJPT5dW+4cYFsbFzddWyPq8iegWwgDD4ipP/
- RElkxzojoSCGyChl6tZzXVLzZRgkeTEPvzvHmrwhlfUH56KjM9BCaMZK2VHkNugS0Ueh
- jDpA==
-X-Gm-Message-State: APjAAAWLcDDAG2ppzJkzbfHjDZsrzQTRrj5Fr8pYBXOhUAnOyexYuftk
- ifUUt9A2sIEIaZ2aAnKEZ+3lli4GE62p+GfEarrIt812
-X-Google-Smtp-Source: APXvYqw3DJMucONxmeFATiA6hxnnScyiMtGpvr3x04dgQQE/eubuYIchbJoQ2JO8p7o2WydWgVOeK07yptxwkCh5IJc=
-X-Received: by 2002:a5d:66c3:: with SMTP id k3mr102240309wrw.370.1578401543841; 
- Tue, 07 Jan 2020 04:52:23 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=rt2Px2ccxS3QOQ8HuOIurdGrTuSjUHBCmbsVqBMFyYg=;
+ b=FXAKRnyUebSObTp+bYlgXgmyUTWIansaxT/T+U+0LUjReAI5rjZ30yH3urGYtlntWx
+ aHltENjAxpUk1pgsGNRXyRuGngS5ljdD83xXMmwpzYUKTL1wfB82T+f1rWMkTP7pdx4f
+ IbV1mTY/KZtElynk3qn7pzEQM5CasMCrIMGKddcGRfJSNFs5L4ozIG2Sq4pMt7iRs3l2
+ jWnQeCilEFtErQwsBUTNA8Q4WQ3MB6PUNXk5IBZNdQ/ynDcic0MYdGvHKkWnu4W0Oimw
+ 75sjMCmNT69NRqXDpt0eqWHwX2QyHoVnG8eCOXlxqREgTkHnBlIpeXSPxc7JM3QcwJIk
+ t4lQ==
+X-Gm-Message-State: APjAAAVmHq+u2qlBaxCLxjt9rwfa78/ZxizdECgi+QwPc6H9/+lxTOxk
+ AQPIwLeB05r67oxEGEudNT43Pw==
+X-Google-Smtp-Source: APXvYqyUO1fFuM63aNzieakwp0CWr2eIsiYAR+DyyeC35FPcF6uVmfPAmzQ72n3kk0ZymaDEFBdebA==
+X-Received: by 2002:a5d:4847:: with SMTP id n7mr109472515wrs.30.1578405198050; 
+ Tue, 07 Jan 2020 05:53:18 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a1sm76084527wrr.80.2020.01.07.05.53.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 05:53:14 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5B66F1FF90;
+ Tue,  7 Jan 2020 13:53:11 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 3/6] freebsd: use python37
+Date: Tue,  7 Jan 2020 13:53:08 +0000
+Message-Id: <20200107135311.5215-4-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200107135311.5215-1-alex.bennee@linaro.org>
+References: <20200107135311.5215-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-References: <20191220134601.571905-1-marcandre.lureau@redhat.com>
- <20191220134601.571905-13-marcandre.lureau@redhat.com>
-In-Reply-To: <20191220134601.571905-13-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 7 Jan 2020 16:52:10 +0400
-Message-ID: <CAJ+F1CKSA8kvPQ973b3AfHG=nm83hDSyn7_oe7sbaOV6JZ4_sQ@mail.gmail.com>
-Subject: Re: [PATCH v5 12/37] serial: start making SerialMM a sysbus device
-To: QEMU <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,231 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 20, 2019 at 5:57 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Memory mapped serial device is in fact a sysbus device. The following
-> patches will make use of sysbus facilities for resource and
-> registration. In particular, "serial-mm: use sysbus facilities" will
-> move internal serial realization to serial_mm_realize callback to
-> follow qdev best practices.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/char/omap_uart.c      |  2 +-
->  hw/char/serial.c         | 66 +++++++++++++++++++++++++++++++---------
->  hw/mips/boston.c         |  2 +-
->  hw/mips/mips_malta.c     |  2 +-
->  include/hw/char/serial.h | 20 +++++++++---
->  5 files changed, 70 insertions(+), 22 deletions(-)
->
-> diff --git a/hw/char/omap_uart.c b/hw/char/omap_uart.c
-> index 13e4f43c4c..e8da933378 100644
-> --- a/hw/char/omap_uart.c
-> +++ b/hw/char/omap_uart.c
-> @@ -27,7 +27,7 @@
->  struct omap_uart_s {
->      MemoryRegion iomem;
->      hwaddr base;
-> -    SerialState *serial; /* TODO */
-> +    SerialMM *serial; /* TODO */
->      struct omap_target_agent_s *ta;
->      omap_clk fclk;
->      qemu_irq irq;
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index ec388f3876..905b84c25f 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -1032,16 +1032,28 @@ static const TypeInfo serial_info =3D {
->  static uint64_t serial_mm_read(void *opaque, hwaddr addr,
->                                 unsigned size)
->  {
-> -    SerialState *s =3D opaque;
-> -    return serial_ioport_read(s, addr >> s->it_shift, 1);
-> +    SerialMM *s =3D SERIAL_MM(opaque);
-> +    return serial_ioport_read(&s->serial, addr >> s->it_shift, 1);
->  }
->
->  static void serial_mm_write(void *opaque, hwaddr addr,
->                              uint64_t value, unsigned size)
->  {
-> -    SerialState *s =3D opaque;
-> +    SerialMM *s =3D SERIAL_MM(opaque);
->      value &=3D 255;
-> -    serial_ioport_write(s, addr >> s->it_shift, value, 1);
-> +    serial_ioport_write(&s->serial, addr >> s->it_shift, value, 1);
-> +}
-> +
-> +static void serial_mm_realize(DeviceState *dev, Error **errp)
-> +{
-> +    SerialMM *s =3D SERIAL_MM(dev);
-> +    Error *local_err =3D NULL;
-> +
-> +    object_property_set_bool(OBJECT(&s->serial), true, "realized", &loca=
-l_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->  }
->
->  static const MemoryRegionOps serial_mm_ops[3] =3D {
-> @@ -1068,30 +1080,56 @@ static const MemoryRegionOps serial_mm_ops[3] =3D=
- {
->      },
->  };
->
-> -SerialState *serial_mm_init(MemoryRegion *address_space,
-> +SerialMM *serial_mm_init(MemoryRegion *address_space,
->                              hwaddr base, int it_shift,
->                              qemu_irq irq, int baudbase,
->                              Chardev *chr, enum device_endian end)
->  {
-> -    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
-> -    SerialState *s =3D SERIAL(dev);
-> +    SerialMM *smm =3D SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
-> +    SerialState *s =3D &smm->serial;
->
-> -    s->it_shift =3D it_shift;
-> +    smm->it_shift =3D it_shift;
->      s->irq =3D irq;
-> -    qdev_prop_set_uint32(dev, "baudbase", baudbase);
-> -    qdev_prop_set_chr(dev, "chardev", chr);
-> -    qdev_set_legacy_instance_id(dev, base, 2);
-> -    qdev_init_nofail(dev);
-> +    qdev_prop_set_uint32(DEVICE(s), "baudbase", baudbase);
-> +    qdev_prop_set_chr(DEVICE(s), "chardev", chr);
-> +    qdev_set_legacy_instance_id(DEVICE(s), base, 2);
->
-> -    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
-> +    qdev_init_nofail(DEVICE(smm));
-> +
-> +    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], smm,
->                            "serial", 8 << it_shift);
->      memory_region_add_subregion(address_space, base, &s->io);
-> -    return s;
-> +
-> +    return smm;
-> +}
-> +
-> +static void serial_mm_instance_init(Object *o)
-> +{
-> +    SerialMM *smm =3D SERIAL_MM(o);
-> +
-> +    object_initialize_child(o, "serial", &smm->serial, sizeof(smm->seria=
-l),
-> +                            TYPE_SERIAL, &error_abort, NULL);
->  }
->
-> +static void serial_mm_class_init(ObjectClass *oc, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> +
-> +    dc->realize =3D serial_mm_realize;
-> +}
-> +
-> +static const TypeInfo serial_mm_info =3D {
-> +    .name =3D TYPE_SERIAL_MM,
-> +    .parent =3D TYPE_SYS_BUS_DEVICE,
-> +    .class_init =3D serial_mm_class_init,
-> +    .instance_init =3D serial_mm_instance_init,
-> +    .instance_size =3D sizeof(SerialMM),
-> +};
-> +
->  static void serial_register_types(void)
->  {
->      type_register_static(&serial_info);
-> +    type_register_static(&serial_mm_info);
->  }
->
->  type_init(serial_register_types)
-> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
-> index ca7d813a52..23fdd5ec6a 100644
-> --- a/hw/mips/boston.c
-> +++ b/hw/mips/boston.c
-> @@ -50,7 +50,7 @@ typedef struct {
->
->      MachineState *mach;
->      MIPSCPSState cps;
-> -    SerialState *uart;
-> +    SerialMM *uart;
->
->      CharBackend lcd_display;
->      char lcd_content[8];
-> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> index 783cd99848..ea92e5e27d 100644
-> --- a/hw/mips/mips_malta.c
-> +++ b/hw/mips/mips_malta.c
-> @@ -83,7 +83,7 @@ typedef struct {
->      uint32_t i2csel;
->      CharBackend display;
->      char display_text[9];
-> -    SerialState *uart;
-> +    SerialMM *uart;
->      bool display_inited;
->  } MaltaFPGAState;
->
-> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-> index 548944b06a..730165347c 100644
-> --- a/include/hw/char/serial.h
-> +++ b/include/hw/char/serial.h
-> @@ -57,7 +57,6 @@ typedef struct SerialState {
->      qemu_irq irq;
->      CharBackend chr;
->      int last_break_enable;
-> -    int it_shift;
->      uint32_t baudbase;
->      uint32_t tsr_retry;
->      guint watch_tag;
-> @@ -80,6 +79,14 @@ typedef struct SerialState {
->      MemoryRegion io;
->  } SerialState;
->
-> +typedef struct SerialMM {
-> +    SysBusDevice parent;
-> +
-> +    SerialState serial;
-> +
-> +    int it_shift;
-> +} SerialMM;
-> +
->  extern const VMStateDescription vmstate_serial;
->  extern const MemoryRegionOps serial_io_ops;
->
-> @@ -88,12 +95,15 @@ void serial_set_frequency(SerialState *s, uint32_t fr=
-equency);
->  #define TYPE_SERIAL "serial"
->  #define SERIAL(s) OBJECT_CHECK(SerialState, (s), TYPE_SERIAL)
->
-> +#define TYPE_SERIAL_MM "serial-mm"
-> +#define SERIAL_MM(s) OBJECT_CHECK(SerialMM, (s), TYPE_SERIAL_MM)
-> +
->  SerialState *serial_init(int base, qemu_irq irq, int baudbase,
->                           Chardev *chr, MemoryRegion *system_io);
-> -SerialState *serial_mm_init(MemoryRegion *address_space,
-> -                            hwaddr base, int it_shift,
-> -                            qemu_irq irq, int baudbase,
-> -                            Chardev *chr, enum device_endian end);
-> +SerialMM *serial_mm_init(MemoryRegion *address_space,
-> +                         hwaddr base, int it_shift,
-> +                         qemu_irq irq, int baudbase,
-> +                         Chardev *chr, enum device_endian end);
->
->  /* serial-isa.c */
->
-> --
-> 2.24.0.308.g228f53135a
->
->
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-ping, thanks
+FreeBSD seems to use python37 by default now, which breaks the build
+script.  Add python to the package list, to explicitly pick the version,
+and also adapt the configure command line.
 
---=20
-Marc-Andr=C3=A9 Lureau
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20200106123746.18201-1-kraxel@redhat.com>
+---
+ tests/vm/freebsd | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index 1825cc58218..33a736298a9 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -32,6 +32,7 @@ class FreeBSDVM(basevm.BaseVM):
+         "git",
+         "pkgconf",
+         "bzip2",
++        "python37",
+ 
+         # gnu tools
+         "bash",
+@@ -63,7 +64,7 @@ class FreeBSDVM(basevm.BaseVM):
+         mkdir src build; cd src;
+         tar -xf /dev/vtbd1;
+         cd ../build
+-        ../src/configure --python=python3.6 {configure_opts};
++        ../src/configure --python=python3.7 {configure_opts};
+         gmake --output-sync -j{jobs} {target} {verbose};
+     """
+ 
+-- 
+2.20.1
+
 
