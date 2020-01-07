@@ -2,84 +2,64 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA4EC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AF9C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:00:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7C15208C4
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:59:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3QGxYwT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7C15208C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 78219208C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:00:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78219208C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqK6-0007Aw-LP
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:59:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50132)
+	id 1ioqLN-0008VY-Vy
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:00:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57188)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ioqIs-0005lP-04
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:57:54 -0500
+ (envelope-from <groug@kaod.org>) id 1iopO3-0001f0-93
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:59:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ioqIq-0006JN-V9
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:57:53 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31481
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iopO2-0005Es-2R
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:59:11 -0500
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:35050)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ioqIq-0006JE-RA
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:57:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578409072;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=wVAt2gV1StjWYUg2pynwSyqGXRx5om7LQn0BCLkNYv4=;
- b=V3QGxYwTRWlDKzzlQQocIgP+AR7ZnwdyPVHBvSNoypHQGF4R/XoljUziVrpdH9wkWkbn1G
- W1aTtp7yTe+Xrze/pRCKkqELG0500+X6xX3tNCfq6NOTAsd4XGRNUkqWktIGdUzxlm9cs3
- SptPogVcCZqcxrfJDeGl+EZ4BuER3nk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-4LvwHyvjOc6OBLCuZyBn2g-1; Tue, 07 Jan 2020 09:57:49 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EED3801E6C;
- Tue,  7 Jan 2020 14:57:48 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F1C07FB63;
- Tue,  7 Jan 2020 14:57:28 +0000 (UTC)
-Subject: Re: [PATCH v1 1/6] hw/i386/x86-iommu: Add missing stubs
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200107135311.5215-1-alex.bennee@linaro.org>
- <20200107135311.5215-2-alex.bennee@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3c8073ed-6e26-73d4-433f-e7ed6a36eb81@redhat.com>
-Date: Tue, 7 Jan 2020 15:57:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iopNz-000590-OB
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:59:07 -0500
+Received: from player795.ha.ovh.net (unknown [10.109.143.210])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 5ECBB152B2D
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 14:59:02 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player795.ha.ovh.net (Postfix) with ESMTPSA id 46686DD123E4;
+ Tue,  7 Jan 2020 13:58:58 +0000 (UTC)
+Date: Tue, 7 Jan 2020 14:58:53 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v1 44/59] 9p-local.c: remove unneeded label in
+ local_unlinkat_common()
+Message-ID: <20200107145853.3f523dc6@bahia.lan>
+In-Reply-To: <16442994.pYkbpd2YfT@silver>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-45-danielhb413@gmail.com>
+ <16442994.pYkbpd2YfT@silver>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200107135311.5215-2-alex.bennee@linaro.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 4LvwHyvjOc6OBLCuZyBn2g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 10278903200864246080
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehgedguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelhedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.36.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,53 +71,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/01/2020 14.53, Alex Benn=C3=A9e wrote:
-> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> In commit 6c730e4af9 we introduced a stub to build the MicroVM
-> machine without Intel IOMMU. This stub is incomplete for the
-> other PC machines. Add the missing stubs.
->=20
-> Fixes: 6c730e4af9
-> Reported-by: Travis-CI
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Message-Id: <20191220154225.25879-1-philmd@redhat.com>
-> ---
->  hw/i386/x86-iommu-stub.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->=20
-> diff --git a/hw/i386/x86-iommu-stub.c b/hw/i386/x86-iommu-stub.c
-> index 03576cdccb4..c5ba077f9d1 100644
-> --- a/hw/i386/x86-iommu-stub.c
-> +++ b/hw/i386/x86-iommu-stub.c
-> @@ -32,3 +32,12 @@ X86IOMMUState *x86_iommu_get_default(void)
->      return NULL;
->  }
-> =20
-> +bool x86_iommu_ir_supported(X86IOMMUState *s)
-> +{
-> +    return false;
-> +}
-> +
-> +IommuType x86_iommu_get_type(void)
-> +{
-> +    abort();
-> +}
+On Tue, 07 Jan 2020 13:04:20 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-I just ran into this issue today, too ... good to know that there is
-already a patch :-)
+> On Montag, 6. Januar 2020 19:24:10 CET Daniel Henrique Barboza wrote:
+> > 'err_out' can be replaced by 'return ret' in the error conditions
+> > the jump was being made.
+> > 
+> > CC: Greg Kurz <groug@kaod.org>
+> > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> > ---
+> >  hw/9pfs/9p-local.c | 12 +++++-------
+> >  1 file changed, 5 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> > index ca641390fb..f9bdd2ad7c 100644
+> > --- a/hw/9pfs/9p-local.c
+> > +++ b/hw/9pfs/9p-local.c
+> > @@ -1094,12 +1094,12 @@ static int local_unlinkat_common(FsContext *ctx, int
+> > dirfd, const char *name,
+> > 
+> >              fd = openat_dir(dirfd, name);
+> >              if (fd == -1) {
+> > -                goto err_out;
+> > +                return ret;
+> >              }
+> >              ret = unlinkat(fd, VIRTFS_META_DIR, AT_REMOVEDIR);
+> >              close_preserve_errno(fd);
+> >              if (ret < 0 && errno != ENOENT) {
+> > -                goto err_out;
+> > +                return ret;
+> >              }
+> >          }
+> >          map_dirfd = openat_dir(dirfd, VIRTFS_META_DIR);
+> > @@ -1107,16 +1107,14 @@ static int local_unlinkat_common(FsContext *ctx, int
+> > dirfd, const char *name, ret = unlinkat(map_dirfd, name, 0);
+> >              close_preserve_errno(map_dirfd);
+> >              if (ret < 0 && errno != ENOENT) {
+> > -                goto err_out;
+> > +                return ret;
+> >              }
+> >          } else if (errno != ENOENT) {
+> > -            goto err_out;
+> > +            return ret;
+> >          }
+> >      }
+> > 
+> > -    ret = unlinkat(dirfd, name, flags);
+> > -err_out:
+> > -    return ret;
+> > +    return unlinkat(dirfd, name, flags);
+> >  }
+> > 
+> >  static int local_remove(FsContext *ctx, const char *path)
+> 
+> Well, personally I don't see any improvement by these changes. It probably 
+> makes the code slightly more elegant, but IMO not more readable. And return 
+> constructed functions vs. jump to label constructed functions are more likely 
+> to gather missing-cleanup bugs.
+> 
+> At least this patch does not cause any behaviour change, so I leave that up to 
+> you Greg to decide. ;-)
+> 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I don't care that much but in the present case, the function has a bug that
+can be fixed with a variant of this patch if 'goto err_out' is turned into
+'return -1'. I've hence asked Daniel to move this patch out of the series and
+to turn it into a real fix that I'll merge directly.
+
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
 
