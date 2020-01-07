@@ -2,83 +2,90 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72157C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1115EC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:01:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBA3B2072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD3372081E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:01:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JCGuSL49"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA3B2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wlMlBDN5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD3372081E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iopNh-0006El-9c
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:58:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54369)
+	id 1iopQ5-0003Ej-RL
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:01:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55413)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ionqP-0002rQ-Hy
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:20:22 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIM-0000Cy-6j
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ionqO-0006Bh-8v
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:20:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56953
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ionqO-0006Az-1z
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:20:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578399619;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dmAzUURucQszBHULNimRpqChcdE2WZHmVXYSQzpsv5g=;
- b=JCGuSL49pvGI/QN2T/CrCvFPL460MA5D77rXzUWkR/U3h7tuwGlpMfJPRYXZpwDZB4PPK0
- Vn0gtuYZV+AzrUnUJSXZ4twS3frp4YFOvE72u73eaNQ6r8o6sJMwDNOoGLRcavU0B8S3Wg
- yD2SYANW6Q7CC7u0/0KR5ehqEO8MNkk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-lzuwMYvWNqKJQabzo3xDfw-1; Tue, 07 Jan 2020 07:20:18 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71280100551A
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 12:20:17 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E8CA85D9CA;
- Tue,  7 Jan 2020 12:20:10 +0000 (UTC)
-Date: Tue, 7 Jan 2020 12:20:07 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 097/104] virtiofsd: Fix data corruption with O_APPEND
- wirte in writeback mode
-Message-ID: <20200107122007.GG3368802@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-98-dgilbert@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iopIK-0002Gu-PR
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:17 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43576)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iopIK-0002GR-JN
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 08:53:16 -0500
+Received: by mail-wr1-x441.google.com with SMTP id d16so54010271wre.10
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 05:53:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Butm6uDHOTmd1Tm6QI7qjPulemvQt3+T40NLuG/KpZ0=;
+ b=wlMlBDN5few0TxmTokuOHHvLaYxnWNQyGwVJJKXDFm0xE0ReCK66qP5Qyx5RY/LnAa
+ EffCP4fQObrxwOhaDM7gTCMrAdNU2Li+rWkClWTbhaLTqv56YXvodJz2Trz8Vqh3Tfwl
+ e75JjidZoMSMIC7I2ElfPOuSN+skewCqoWkMd8822ohinvK+rQI9F40uRoTsdGLrr716
+ 00K/JjEzG3kzxWoWdJjAb2o4tZ7NGmTeoC1HwCnyt5b0MtAvENavaBv7q4Cbc5/hws7D
+ 1eqyNsH+but7AGTqGi87GzVcxFFv00/GlK20aHXVs9axd/xeX/J+s46T29a8zqqoiBgG
+ 9Ezg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Butm6uDHOTmd1Tm6QI7qjPulemvQt3+T40NLuG/KpZ0=;
+ b=OWRCy4D3aSn2LZiNT8ROGIL0Eram0DTRUNW3hcHh8P2kqcf+C2TDsgbcsnR7mHu5dQ
+ UGaz1udhXxUxkJctl9vq327HXNcEN6zreFlGKYzCaCPSV4nF3nyeHfCn37BtYYxSKNGU
+ l1tWxh/hwI1Pa4kibjuisAYTCpRKK049U0Qk0Op6fk6wdtTfGc/c9baoSSsbo/EImt32
+ 8R4XuJaVb55b+v0mdtxXvz5akITj7J0axg6Mj5Z/elMmY4Nl8r79CdXOvBYOeQP2Ji61
+ hVwISl+NO6602YDnoKyMRPNDTLweZcmVeB+CfIc/n68vVg9RdrEmMmX25DtY+vKaR6Oh
+ FMew==
+X-Gm-Message-State: APjAAAUPgc3g1Y2cY80tfEYPe4r5FG60+9GrlyijoUH2sQAz+YoP2p60
+ svQhGnzQVPCumbjfPU+0ULGlOQ==
+X-Google-Smtp-Source: APXvYqwZTmNFsBo1/X+iGeezj/b2LD6G4IKT+SW6ac0QTG4xyqr1eUqgq30uabZzG3sS4VIqgNwUeA==
+X-Received: by 2002:adf:f1d0:: with SMTP id
+ z16mr105905643wro.209.1578405195609; 
+ Tue, 07 Jan 2020 05:53:15 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x14sm26801722wmj.42.2020.01.07.05.53.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 05:53:13 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6EF141FF91;
+ Tue,  7 Jan 2020 13:53:11 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 4/6] travis.yml: avocado: Print logs of non-pass tests only
+Date: Tue,  7 Jan 2020 13:53:09 +0000
+Message-Id: <20200107135311.5215-5-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200107135311.5215-1-alex.bennee@linaro.org>
+References: <20200107135311.5215-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-98-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: lzuwMYvWNqKJQabzo3xDfw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,53 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:57PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
->=20
-> When writeback mode is enabled (-o writeback), O_APPEND handling is
-> done in kernel. Therefore virtiofsd clears O_APPEND flag when open.
-> Otherwise O_APPEND flag takes precedence over pwrite() and write
-> data may corrupt.
->=20
-> Currently clearing O_APPEND flag is done in lo_open(), but we also
-> need the same operation in lo_create(). So, factor out the flag
-> update operation in lo_open() to update_open_flags() and call it
-> in both lo_open() and lo_create().
->=20
-> This fixes the failure of xfstest generic/069 in writeback mode
-> (which tests O_APPEND write data integrity).
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-Seeing this mention of xfstest reminds me that there are no tests
-added anywhere in this patch series.  Is there another followup
-pending with tests or is it a todo item ?
+The acceptance tests build on Travis is configured to print
+the entire Avocado's job log in case any test fail. Usually one is
+interested on failed tests only though. So this change the Travis
+configuration in order to show the log of tests which status is
+different from 'PASS' and 'SKIP' only. Note that 'CANCEL'-ed tests
+will have the log printed too because it can help to debug some
+condition on CI environment which is not being fulfilled.
 
-We can usefully wire up this xfstest program in the functional
-tests of QEMU in some way ?
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20191230184327.2800-2-wainersm@redhat.com>
+---
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
->=20
-> Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-> ---
->  tools/virtiofsd/passthrough_ll.c | 66 ++++++++++++++++----------------
->  1 file changed, 33 insertions(+), 33 deletions(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+diff --git a/.travis.yml b/.travis.yml
+index 638fba4799a..93838bf0f8b 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -262,8 +262,8 @@ matrix:
+     - env:
+         - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,ppc-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
+         - TEST_CMD="make check-acceptance"
+-      after_failure:
+-        - cat tests/results/latest/job.log
++      after_script:
++        - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
+       addons:
+         apt:
+           packages:
+-- 
+2.20.1
 
 
