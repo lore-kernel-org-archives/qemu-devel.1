@@ -2,65 +2,83 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF55C3F68F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:02:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A554CC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:04:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38EE42080A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:02:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38EE42080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6D2E92075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:04:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BaS6sDoT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2E92075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iooV7-0007zv-Og
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:02:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35384)
+	id 1iooWf-0001vF-Tb
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:04:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iooLY-0006aj-4o
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:33 -0500
+ (envelope-from <berrange@redhat.com>) id 1ionHS-0001tY-Em
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iooLW-00080p-Tw
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:31 -0500
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:48287)
+ (envelope-from <berrange@redhat.com>) id 1ionHR-0001TJ-3p
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:44:14 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46863
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iooLW-00080B-Nn
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:52:30 -0500
-Received: from player729.ha.ovh.net (unknown [10.108.42.66])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id 3A80111D2FF
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 13:52:29 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player729.ha.ovh.net (Postfix) with ESMTPSA id 95A3AE142458;
- Tue,  7 Jan 2020 12:52:17 +0000 (UTC)
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Subject: Re: [PATCH v2 01/10] ppc: Drop PPC_EMULATE_32BITS_HYPV stub
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- groug@kaod.org, philmd@redhat.com
-References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
- <20200107044827.471355-2-david@gibson.dropbear.id.au>
-Message-ID: <64259936-5392-6eb4-3c4e-2f4fa901ea57@kaod.org>
-Date: Tue, 7 Jan 2020 13:52:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ionHQ-0001Sz-W7
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:44:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578397452;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3LXvuItYxR7i6atdM1wGlIGqNwTRKmjKMcgCDbOvGGc=;
+ b=BaS6sDoTB9s2EQwab+0X4v9mONrbkIOVmhYYLR4Pt4t0qZ3csYzXap5xkm6hUsTyRW6T8z
+ y+Ljno6WH2Y6mfi0JLNIt0IWej5kf1Tcid56tmIpQBFUv4IX9RtuX4hapN1unPqVl7kzGi
+ bPD95c7n4yhDjzJkpEL/Hr5cwlENsB4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-mjQa46niNaGU_31Pkz-j0g-1; Tue, 07 Jan 2020 06:44:11 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13086911EA
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:44:10 +0000 (UTC)
+Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0AC960C88;
+ Tue,  7 Jan 2020 11:44:00 +0000 (UTC)
+Date: Tue, 7 Jan 2020 11:43:57 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 081/104] virtiofsd: Prevent multiply running with same
+ vhost_user_socket
+Message-ID: <20200107114357.GV3368802@redhat.com>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-82-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200107044827.471355-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20191212163904.159893-82-dgilbert@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: mjQa46niNaGU_31Pkz-j0g-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 9154973617539550091
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhuffvfhfkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedvledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.72.238
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,63 +90,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, aik@ozlabs.ru,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, paulus@samba.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/7/20 5:48 AM, David Gibson wrote:
-> The only effect of the PPC_EMULATE_32BITS_HYPV define is to change how
-> MSR_HVB is defined.  This appears to be something to handle hypervisor =
-mode
-> for 32-bit CPUs, but there's really no other code to handle this.  The
-> MSR_THV bit, which it uses is implemented for no cpus we model.
+On Thu, Dec 12, 2019 at 04:38:41PM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
 >=20
-> It's unlikely anyone is going to implement this any time soon, so just =
-drop
-> it.
+> virtiofsd can run multiply even if the vhost_user_socket is same path.
 >=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
+>   ]# ./virtiofsd -o vhost_user_socket=3D/tmp/vhostqemu -o source=3D/tmp/s=
+hare &
+>   [1] 244965
+>   virtio_session_mount: Waiting for vhost-user socket connection...
+>   ]# ./virtiofsd -o vhost_user_socket=3D/tmp/vhostqemu -o source=3D/tmp/s=
+hare &
+>   [2] 244966
+>   virtio_session_mount: Waiting for vhost-user socket connection...
+>   ]#
+>=20
+> The user will get confused about the situation and maybe the cause of the
+> unexpected problem. So it's better to prevent the multiple running.
+>=20
+> Create a regular file under localstatedir directory to exclude the
+> vhost_user_socket. To create and lock the file, use qemu_write_pidfile()
+> because the API has some sanity checks and file lock.
+>=20
+> Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>   Applied fixes from Stefan's review and moved osdep include
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  target/ppc/cpu.h | 7 -------
->  1 file changed, 7 deletions(-)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 103bfe9dc2..2de9e2fa2b 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -26,8 +26,6 @@
->  #include "exec/cpu-defs.h"
->  #include "cpu-qom.h"
-> =20
-> -/* #define PPC_EMULATE_32BITS_HYPV */
-> -
->  #define TCG_GUEST_DEFAULT_MO 0
-> =20
->  #define TARGET_PAGE_BITS_64K 16
+>  tools/virtiofsd/fuse_lowlevel.c |  1 +
+>  tools/virtiofsd/fuse_virtio.c   | 49 ++++++++++++++++++++++++++++++++-
+>  2 files changed, 49 insertions(+), 1 deletion(-)
 
-btw, this define ^ is unused.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-> @@ -450,14 +448,9 @@ typedef struct ppc_v3_pate_t {
->  #define MSR_HVB (1ULL << MSR_SHV)
->  #define msr_hv  msr_shv
->  #else
-> -#if defined(PPC_EMULATE_32BITS_HYPV)
-> -#define MSR_HVB (1ULL << MSR_THV)
-> -#define msr_hv  msr_thv
-> -#else
->  #define MSR_HVB (0ULL)
->  #define msr_hv  (0)
->  #endif
-> -#endif
-> =20
->  /* DSISR */
->  #define DSISR_NOPTE              0x40000000
->=20
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
