@@ -2,66 +2,97 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 232F9C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:58:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C37C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:59:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6D1420715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:58:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D1420715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 221F720715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:59:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cM9WxUMV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 221F720715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iokhR-000129-1G
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:58:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34539)
+	id 1ioki1-0001kO-Uc
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:59:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iokLr-0008J3-9f
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 03:36:36 -0500
+ (envelope-from <mst@redhat.com>) id 1iojQN-0006Sm-FR
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iokLp-00011S-TK
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 03:36:34 -0500
-Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:60691)
+ (envelope-from <mst@redhat.com>) id 1iojQI-0008OP-Nr
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60504
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iokLp-00010L-NM
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 03:36:33 -0500
-Received: from player759.ha.ovh.net (unknown [10.108.1.170])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 8B9007B0BB
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 09:36:31 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player759.ha.ovh.net (Postfix) with ESMTPSA id 66698DF0BEBE;
- Tue,  7 Jan 2020 08:36:25 +0000 (UTC)
-Subject: Re: [PATCH 3/5] ftgmac100: check RX and TX buffer alignment
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200107073423.30043-1-clg@kaod.org>
- <20200107073423.30043-4-clg@kaod.org>
- <1587acec-3d08-9dfa-0bcc-37140fd5e2ad@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ce0722d4-48ed-e7cd-2436-84d1ee24038f@kaod.org>
-Date: Tue, 7 Jan 2020 09:36:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojQI-0008Lt-Jf
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578382623;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WMQapAZoKHuzNu9Pp7IYAg1kGSgMFQ0zkXvOLbEXi5E=;
+ b=cM9WxUMVWuBf0T7EGgH0rJtxZX3rY3KCWsedHRB39AiouVaDMsptClYh06A4TGcExBXvT0
+ S9HVTfD7JOrNYYBE1m65tAVJs211fMsDrokUfqb1j9ZiarOpn3c6w1Y96nNBWFOetR7INv
+ yReGl7owaPQlNpKPj0e+JZ3VgvDA+L8=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-wPz_Jjr-PTC6m_gBat38Mw-1; Tue, 07 Jan 2020 02:37:02 -0500
+Received: by mail-qk1-f200.google.com with SMTP id c202so1847284qkg.4
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:37:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=kOPqzhUAAr1F9DHkT+R7bzvkT8C45cWHnUcu3/B6bq0=;
+ b=YgE4MB77G2PBWE3n0a2O4TgKy+0nlzrSrWT/DJr5EgSncANh3l9gfSaeUUsXVYt67B
+ WK9MU8UrF5TT7/4mfsBIFTF2XI/3Ire5J0Jb3hyMcTDhbu5hBqb0jTn2GiHFiN/S0aGl
+ z+W90Z9fAkn0CgRMLBvb7+2Y/lnx6rzqK+zPjS0Ayr7EcEjWv/PxYYVkEkwI044x8edc
+ S5Aow3pyC3RIPukHB0KtpyheqPRc+H4tIIZLV3xfZSOVLw6Lqg5TAbbSNxj7fIeUkNbz
+ yr4HMWB9niDMRBYELHH3FC+ZhMZ6aU5Mos5msGUU0pWCfIDUhrqV3bAeo+4wyaxV70PW
+ lE6Q==
+X-Gm-Message-State: APjAAAUF3H1rMldP2QkKhy81LSYNwXbGvF8a5mTOHOAoL9Br5P4xJ952
+ +TiQzadEOiGgDMcROhudLZwHOC+u3FUjpJOIRSpAJTSIq4AT3yduVPVbdjeqEJEM4wsn1IO+sIZ
+ u9UymhsWxQhIeMKM=
+X-Received: by 2002:a37:a30a:: with SMTP id m10mr83251752qke.56.1578382621467; 
+ Mon, 06 Jan 2020 23:37:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyEd4WjDrVFcGasoVsd/g+4kPqonsObYlED8RjNgSWxRh6zeMJySjnWk0gcA0KgreenRlLQ/w==
+X-Received: by 2002:a37:a30a:: with SMTP id m10mr83251745qke.56.1578382621260; 
+ Mon, 06 Jan 2020 23:37:01 -0800 (PST)
+Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
+ by smtp.gmail.com with ESMTPSA id f23sm21893397qke.104.2020.01.06.23.36.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 06 Jan 2020 23:37:00 -0800 (PST)
+Date: Tue, 7 Jan 2020 02:36:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 21/32] hw/pci/pci_host: Remove redundant PCI_DPRINTF()
+Message-ID: <20200107073451.298261-22-mst@redhat.com>
+References: <20200107073451.298261-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1587acec-3d08-9dfa-0bcc-37140fd5e2ad@redhat.com>
+In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-MC-Unique: wPz_Jjr-PTC6m_gBat38Mw-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 4832080926734519104
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehuddguddvfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.42.102
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,86 +104,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/7/20 9:27 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 1/7/20 8:34 AM, C=C3=A9dric Le Goater wrote:
->> These buffers should be aligned on 16 bytes.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->> =C2=A0 hw/net/ftgmac100.c | 13 +++++++++++++
->> =C2=A0 1 file changed, 13 insertions(+)
->>
->> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
->> index 86ac25894a89..051f7b7af2d6 100644
->> --- a/hw/net/ftgmac100.c
->> +++ b/hw/net/ftgmac100.c
->> @@ -198,6 +198,8 @@ typedef struct {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 des3;
->> =C2=A0 } FTGMAC100Desc;
->> =C2=A0 +#define FTGMAC100_DESC_ALIGNMENT 16
->> +
->> =C2=A0 /*
->> =C2=A0=C2=A0 * Specific RTL8211E MII Registers
->> =C2=A0=C2=A0 */
->> @@ -722,6 +724,12 @@ static void ftgmac100_write(void *opaque, hwaddr =
-addr,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->itc =3D valu=
-e;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case FTGMAC100_RXR_BADR: /* Ring buffer=
- address */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!QEMU_IS_ALIGNED(value=
-, FTGMAC100_DESC_ALIGNMENT)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qe=
-mu_log_mask(LOG_GUEST_ERROR, "%s: Bad RX buffer alignment 0x%"
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 HWADDR_PRIx "\n", __func__, value);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-turn;
->=20
-> What is the hardware behavior?
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-This is not documented :/
+In commit 3bf4dfdd111 we introduced the pci_cfg_[read/write]
+trace events in pci_host_config_[read/write]_common().
+We have the following call trace:
 
-C.
+  pci_host_data_[read/write]()
+    - PCI_DPRINTF()
+    - pci_data_[read/write]()
+        - PCI_DPRINTF()
+        - pci_host_config_[read/write]_common()
+            trace_pci_cfg_[read/write]()
 
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->rx_ring =3D =
-value;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->rx_descripto=
-r =3D s->rx_ring;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> @@ -731,6 +739,11 @@ static void ftgmac100_write(void *opaque, hwaddr =
-addr,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case FTGMAC100_NPTXR_BADR: /* Tr=
-ansmit buffer address */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!QEMU_IS_ALIGNED(value=
-, FTGMAC100_DESC_ALIGNMENT)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qe=
-mu_log_mask(LOG_GUEST_ERROR, "%s: Bad TX buffer alignment 0x%"
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 HWADDR_PRIx "\n", __func__, value);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 re=
-turn;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->tx_ring =3D =
-value;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->tx_descripto=
-r =3D s->tx_ring;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
->>
->=20
+Since the PCI_DPRINTF() calls are redundant with the trace
+events, remove them.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20191216002134.18279-2-philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/pci/pci_host.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
+
+diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+index c5f9244934..0958d157de 100644
+--- a/hw/pci/pci_host.c
++++ b/hw/pci/pci_host.c
+@@ -115,8 +115,6 @@ void pci_data_write(PCIBus *s, uint32_t addr, uint32_t =
+val, int len)
+         return;
+     }
+=20
+-    PCI_DPRINTF("%s: %s: addr=3D%02" PRIx32 " val=3D%08" PRIx32 " len=3D%d=
+\n",
+-                __func__, pci_dev->name, config_addr, val, len);
+     pci_host_config_write_common(pci_dev, config_addr, PCI_CONFIG_SPACE_SI=
+ZE,
+                                  val, len);
+ }
+@@ -125,18 +123,13 @@ uint32_t pci_data_read(PCIBus *s, uint32_t addr, int =
+len)
+ {
+     PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
+     uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
+-    uint32_t val;
+=20
+     if (!pci_dev) {
+         return ~0x0;
+     }
+=20
+-    val =3D pci_host_config_read_common(pci_dev, config_addr,
+-                                      PCI_CONFIG_SPACE_SIZE, len);
+-    PCI_DPRINTF("%s: %s: addr=3D%02"PRIx32" val=3D%08"PRIx32" len=3D%d\n",
+-                __func__, pci_dev->name, config_addr, val, len);
+-
+-    return val;
++    return pci_host_config_read_common(pci_dev, config_addr,
++                                       PCI_CONFIG_SPACE_SIZE, len);
+ }
+=20
+ static void pci_host_config_write(void *opaque, hwaddr addr,
+@@ -167,8 +160,7 @@ static void pci_host_data_write(void *opaque, hwaddr ad=
+dr,
+                                 uint64_t val, unsigned len)
+ {
+     PCIHostState *s =3D opaque;
+-    PCI_DPRINTF("write addr " TARGET_FMT_plx " len %d val %x\n",
+-                addr, len, (unsigned)val);
++
+     if (s->config_reg & (1u << 31))
+         pci_data_write(s->bus, s->config_reg | (addr & 3), val, len);
+ }
+@@ -177,14 +169,11 @@ static uint64_t pci_host_data_read(void *opaque,
+                                    hwaddr addr, unsigned len)
+ {
+     PCIHostState *s =3D opaque;
+-    uint32_t val;
++
+     if (!(s->config_reg & (1U << 31))) {
+         return 0xffffffff;
+     }
+-    val =3D pci_data_read(s->bus, s->config_reg | (addr & 3), len);
+-    PCI_DPRINTF("read addr " TARGET_FMT_plx " len %d val %x\n",
+-                addr, len, val);
+-    return val;
++    return pci_data_read(s->bus, s->config_reg | (addr & 3), len);
+ }
+=20
+ const MemoryRegionOps pci_host_conf_le_ops =3D {
+--=20
+MST
 
 
