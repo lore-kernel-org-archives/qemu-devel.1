@@ -6,54 +6,55 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FC9C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61903C32771
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 516AF206F0
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31DC9206F0
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 00:04:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eDiaHgoy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 516AF206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="JC1aG2fA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31DC9206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iocMk-0002Ke-Jv
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 19:04:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54984)
+	id 1iocMj-0002L7-AV
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 19:04:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54973)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iocJk-0007rD-Of
+ (envelope-from <dgibson@ozlabs.org>) id 1iocJk-0007qy-Nt
  for qemu-devel@nongnu.org; Mon, 06 Jan 2020 19:01:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iocJi-0005Wl-Vy
+ (envelope-from <dgibson@ozlabs.org>) id 1iocJj-0005XC-6a
  for qemu-devel@nongnu.org; Mon, 06 Jan 2020 19:01:52 -0500
-Received: from ozlabs.org ([203.11.71.1]:36621)
+Received: from ozlabs.org ([203.11.71.1]:41549)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iocJh-0005Q8-Ux; Mon, 06 Jan 2020 19:01:50 -0500
+ id 1iocJh-0005Pg-Uz; Mon, 06 Jan 2020 19:01:51 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47sCGf0C4Bz9sR0; Tue,  7 Jan 2020 11:01:45 +1100 (AEDT)
+ id 47sCGf236Hz9sR8; Tue,  7 Jan 2020 11:01:46 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1578355306;
- bh=lkrlRZ5SlIUul+FOscb0CcMcr9xArGnyW56ubkLf0m0=;
+ bh=Yr+XDBI6OhT4dlM9pRbUdGEOBejDaidLgTSKUOYnm3Y=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=eDiaHgoygQR0bzVP8BvHXzRXgDkEY/xo8DMaHGm76d6acdUp/Fo090pPMPlyQdDqZ
- GLxESO2enWxianALR4j+67xWLEjjbzXbNHOq5kPAWH2PnkNakDrPuovSeNRlF0ss0M
- AhKhtO5nSHKV5hMWcxnif4Ft0BwwXyggOnmt+X1Y=
-Date: Tue, 7 Jan 2020 10:49:19 +1100
+ b=JC1aG2fAwYcOlg9/PVtbujJ+Eb/xiQJ+jaLdtuDo35Wt97javw3aFXs3LVKyVwj0A
+ Ll8+goDHgjqcyprpSFSjVIpfLPCNnISW9vDXWeIfsL5vetgN5henW+dH313iDp5sK8
+ +WVL2Cbxqr7hSQqkFwcfmZCcftOdPLLqY/GZsKdw=
+Date: Tue, 7 Jan 2020 11:00:40 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] ppc/pnv: Drop "num-chips" machine property
-Message-ID: <20200106234919.GZ2098@umbus>
-References: <157830658266.533764.2214183961444213947.stgit@bahia.lan>
+Subject: Re: [PATCH] spapr/xive: remove redundant check in spapr_match_nvt()
+Message-ID: <20200107000040.GC2098@umbus>
+References: <20200106163207.4608-1-clg@kaod.org>
+ <20200106182931.54f12057@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TXtETX/xrt1zdi6e"
+ protocol="application/pgp-signature"; boundary="ozkSYTWEkbLDijvq"
 Content-Disposition: inline
-In-Reply-To: <157830658266.533764.2214183961444213947.stgit@bahia.lan>
+In-Reply-To: <20200106182931.54f12057@bahia.lan>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 203.11.71.1
@@ -75,151 +76,67 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TXtETX/xrt1zdi6e
-Content-Type: text/plain; charset=us-ascii
+--ozkSYTWEkbLDijvq
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 06, 2020 at 11:29:42AM +0100, Greg Kurz wrote:
-> The number of CPU chips of the powernv machine is configurable through a
-> "num-chips" property. This doesn't fit well with the CPU topology, eg.
-> some configurations can come up with more CPUs than the maximum of CPUs
-> set in the toplogy. This causes assertion to be hit with mttcg:
+On Mon, Jan 06, 2020 at 06:29:31PM +0100, Greg Kurz wrote:
+> On Mon,  6 Jan 2020 17:32:07 +0100
+> C=E9dric Le Goater <clg@kaod.org> wrote:
 >=20
->    -machine powernv,num-chips=3D2 -smp cores=3D2 -accel tcg,thread=3Dmulti
+> > spapr_match_nvt() is a XIVE operation and it used by the machine to
 >=20
-> ERROR:
-> tcg/tcg.c:789:tcg_register_thread: assertion failed: (n < ms->smp.max_cpu=
-s)
-> Aborted (core dumped)
->=20
-> Mttcg mandates the CPU topology to be dimensioned to the actual number
-> of CPUs, depending on the number of chips the user asked for. That is,
-> '-machine num-chips=3DN' should always have a '-smp' companion with a
-> topology that meats the resulting number of CPUs, typically
-> '-smp sockets=3DN'.
->=20
-> It thus seems that "num-chips" doesn't bring anything but forcing the user
-> to specify the requested number of chips on the command line twice. Simpl=
-ify
-> the command line by computing the number of chips based on the CPU topolo=
-gy
-> exclusively. The powernv machine isn't a production thing ; it is mostly
-> used by developpers to prepare the bringup of real HW. Because of this and
-> for simplicity, this deliberately ignores the official deprecation process
-> and dumps "num-chips" right away : '-smp sockets=3DN' is now the only way=
- to
-> control the number of CPU chips.
->=20
-> This is done at machine init because smp_parse() is called after instance
-> init.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ... and it "is" used by the machine...
 
-Applied to ppc-for-5.0, thanks.
+Adjusted in my tree.
 
-> ---
->  hw/ppc/pnv.c |   62 +++++++++++-----------------------------------------=
-------
->  1 file changed, 12 insertions(+), 50 deletions(-)
 >=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index f77e7ca84ede..b225ffbb2c41 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -768,6 +768,18 @@ static void pnv_init(MachineState *machine)
->          exit(1);
->      }
-> =20
-> +    pnv->num_chips =3D
-> +        machine->smp.max_cpus / (machine->smp.cores * machine->smp.threa=
-ds);
-> +    /*
-> +     * TODO: should we decide on how many chips we can create based
-> +     * on #cores and Venice vs. Murano vs. Naples chip type etc...,
-> +     */
-> +    if (!is_power_of_2(pnv->num_chips) || pnv->num_chips > 4) {
-> +        error_report("invalid number of chips: '%d'", pnv->num_chips);
-> +        error_printf("Try '-smp sockets=3DN'. Valid values are : 1, 2 or=
- 4.\n");
-> +        exit(1);
-> +    }
-> +
->      pnv->chips =3D g_new0(PnvChip *, pnv->num_chips);
->      for (i =3D 0; i < pnv->num_chips; i++) {
->          char chip_name[32];
-> @@ -1696,53 +1708,6 @@ PnvChip *pnv_get_chip(uint32_t chip_id)
->      return NULL;
->  }
-> =20
-> -static void pnv_get_num_chips(Object *obj, Visitor *v, const char *name,
-> -                              void *opaque, Error **errp)
-> -{
-> -    visit_type_uint32(v, name, &PNV_MACHINE(obj)->num_chips, errp);
-> -}
-> -
-> -static void pnv_set_num_chips(Object *obj, Visitor *v, const char *name,
-> -                              void *opaque, Error **errp)
-> -{
-> -    PnvMachineState *pnv =3D PNV_MACHINE(obj);
-> -    uint32_t num_chips;
-> -    Error *local_err =3D NULL;
-> -
-> -    visit_type_uint32(v, name, &num_chips, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> -
-> -    /*
-> -     * TODO: should we decide on how many chips we can create based
-> -     * on #cores and Venice vs. Murano vs. Naples chip type etc...,
-> -     */
-> -    if (!is_power_of_2(num_chips) || num_chips > 4) {
-> -        error_setg(errp, "invalid number of chips: '%d'", num_chips);
-> -        return;
-> -    }
-> -
-> -    pnv->num_chips =3D num_chips;
-> -}
-> -
-> -static void pnv_machine_instance_init(Object *obj)
-> -{
-> -    PnvMachineState *pnv =3D PNV_MACHINE(obj);
-> -    pnv->num_chips =3D 1;
-> -}
-> -
-> -static void pnv_machine_class_props_init(ObjectClass *oc)
-> -{
-> -    object_class_property_add(oc, "num-chips", "uint32",
-> -                              pnv_get_num_chips, pnv_set_num_chips,
-> -                              NULL, NULL, NULL);
-> -    object_class_property_set_description(oc, "num-chips",
-> -                              "Specifies the number of processor chips",
-> -                              NULL);
-> -}
-> -
->  static void pnv_machine_power8_class_init(ObjectClass *oc, void *data)
->  {
->      MachineClass *mc =3D MACHINE_CLASS(oc);
-> @@ -1812,8 +1777,6 @@ static void pnv_machine_class_init(ObjectClass *oc,=
- void *data)
->       */
->      mc->default_ram_size =3D INITRD_LOAD_ADDR + INITRD_MAX_SIZE;
->      ispc->print_info =3D pnv_pic_print_info;
-> -
-> -    pnv_machine_class_props_init(oc);
->  }
-> =20
->  #define DEFINE_PNV8_CHIP_TYPE(type, class_initfn) \
-> @@ -1866,7 +1829,6 @@ static const TypeInfo types[] =3D {
->          .parent        =3D TYPE_MACHINE,
->          .abstract       =3D true,
->          .instance_size =3D sizeof(PnvMachineState),
-> -        .instance_init =3D pnv_machine_instance_init,
->          .class_init    =3D pnv_machine_class_init,
->          .class_size    =3D sizeof(PnvMachineClass),
->          .interfaces =3D (InterfaceInfo[]) {
+> > look for a matching target when an event notification is being
+> > delivered. An assert checks that spapr_match_nvt() is called only when
+> > the machine has selected the XIVE interrupt mode but it is redundant
+> > with the XIVE_PRESENTER() dynamic cast.
+> >=20
+> > Apply the cast to spapr->active_intc and remove the assert.
+> >=20
+> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > ---
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> >  hw/ppc/spapr.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index e62c89b3dd40..5008b7563173 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -4198,19 +4198,19 @@ static void spapr_pic_print_info(InterruptStats=
+Provider *obj,
+> >                     kvm_irqchip_in_kernel() ? "in-kernel" : "emulated");
+> >  }
+> > =20
+> > +/*
+> > + * This is a XIVE only operation
+> > + */
+> >  static int spapr_match_nvt(XiveFabric *xfb, uint8_t format,
+> >                             uint8_t nvt_blk, uint32_t nvt_idx,
+> >                             bool cam_ignore, uint8_t priority,
+> >                             uint32_t logic_serv, XiveTCTXMatch *match)
+> >  {
+> >      SpaprMachineState *spapr =3D SPAPR_MACHINE(xfb);
+> > -    XivePresenter *xptr =3D XIVE_PRESENTER(spapr->xive);
+> > +    XivePresenter *xptr =3D XIVE_PRESENTER(spapr->active_intc);
+> >      XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
+> >      int count;
+> > =20
+> > -    /* This is a XIVE only operation */
+> > -    assert(spapr->active_intc =3D=3D SPAPR_INTC(spapr->xive));
+> > -
+> >      count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_ignor=
+e,
+> >                             priority, logic_serv, match);
+> >      if (count < 0) {
 >=20
 
 --=20
@@ -228,25 +145,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TXtETX/xrt1zdi6e
+--ozkSYTWEkbLDijvq
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4Tx38ACgkQbDjKyiDZ
-s5J4Ug/+Ib+kZS8JCmuZPtM6UDTirq8u93GDj3CXFD7xud2LD7rmIA7apRNq9Jxo
-AmM1Z3XSINcoS5dED7JOMvgmICt8BcNGQd7DSBHQW3x73QNgsCF9p0Ap7isggLnR
-1HZDfcqp/PfjVLSydOW5ADIItpNx2HtQkMUJUHn2i934FSycc0GawiR8u5Bk5O1k
-cbS7RE/jWOLimTzUwofgreza5X6MIl1ls3pxGXlnwIYJo3Z7svNBh7VFxqnwUzhH
-ZJYNTcDyp+YWxWA4udxUagL6adbtMLYe1MpBAuWXs/sHN7YX0P0Vr1RXMyV3bMM2
-al9T95VXaFdU+kMCgZtsjCj42QJK1dwOqd1V2Er2ETD4M+lX31H2R97K+HSjZI+9
-Em3bgRnwOaOaZK2Br91brjJzZhPSjlDZZjct9UE9FitvgP3P1CsCNLiL8s06cjJG
-+kmzyChx7PNMw1vdPZqvemfSeb6yY15Hh26GVoNv6d8gL4wnd+zCWa70Lqi+69SV
-VqBPY7BZ/wLu6K4BSUDEKsWq8nikykiMcze7Yja6xJ67JBaXhlhZk7A2feyF6MhT
-IpqudmgRV0RO9F5tAWbsvyZrL2nbgQfDltgJxLl+AARWwYTiAhtBtFKs7hLMO0ve
-0NQmqWXvVDhEjcuz0Nnll7DwBkG20PJnCF90wPfqsB4TpSSv774=
-=56io
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4TyigACgkQbDjKyiDZ
+s5LiqQ//dZCejbLIQXuIuTAB4O/y3oMaE9RYUnBclsGBMlHuMXMVjsJeIaJ/6OfS
+0raDLzMD3gMfj8Xd/9mEvaqCKSGZMJWgfQvrCPO3qvag6OB1PS9Wqoa5vm7fugQd
+hJJX3Jx1lxuGL8ZCeP4TEgETNqOUi7K/9Stg01PkIaqYkYocLb0YHAhPe2Gmh+3u
+KW3869WEcpAxAZroKRGpPuKIsLXG8GUaVuAal0nzY9Vf28yD+k3FdWi6Yjhp7ffo
+l+aGwR6kgoYE7DSwDb5D1r+SzgdZZL9IcCydQPeZR3VdXk2dRWeKzRiW91fbwxZj
+FJFzOibfXp39Kszt7DPpsm/PEHWR16wLMcFMveKqBPTXf/kb4aX+ICymPAwZyV0x
+3RFw3gl4sy/cK0zz15CXqtOonHgNJZpPsIcDWrd2cigw5xzJO32pK/Ta+SWAt47o
+/J5rripBTEWjz3ihmzaU0S5L9EYp7AsOAlry92mFqYUa5tf8VLcjghr6HVP3fLSG
+jlv6N5iuHYa8b4rSOafJYuOT3NiasvOU2qP4eNYNq+q4nhve1ZoIB323fHBMdWMV
+TL1eTnu+mkoIY3T108XJFysQHE76JN/bcjlgh8oL4//46/BQV4CS1D5QzvZMfoqQ
+L4OwuBGPdnpqqh2fudUQES/EiLbHL+neA2exoUIDd3B2Y2ORW1A=
+=NNJi
 -----END PGP SIGNATURE-----
 
---TXtETX/xrt1zdi6e--
+--ozkSYTWEkbLDijvq--
 
