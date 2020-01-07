@@ -2,83 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F734C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39379C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:14:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE2492073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:13:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04E8D2073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 16:14:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajHHVQE8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2492073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nXSSbIn8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04E8D2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iorU8-0007KL-IV
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:13:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37578)
+	id 1iorVR-0001BK-6B
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 11:14:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iorSp-0005ry-OM
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:12:16 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iorUp-0000Og-NW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:14:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iorSo-0003Rc-K6
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:12:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52536
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iorSo-0003RK-Fo
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:12:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578413534;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=j3U0+GlDFQXBu3uq7STQ+9EqvUlInv1Wuno9yW9EGyg=;
- b=ajHHVQE822COXI+BaKyhOph+O42ksVh5DAZv6nabYmnbQrrBwXinDLlSQMdRO4U8IHuRr9
- p0zgZ1RB6Vl8Yj1l4YrpVDPUk2VoZevqE5xXfnKms2/EdTbiIHLhVbXBd7IREPG2P7PfRk
- GlpmE6Ej/ZjX5S4gvR0qVqL5ezE7akI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-GWFEa4rDNXuSYCe4yb0IRw-1; Tue, 07 Jan 2020 11:12:11 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76FA3801E7B
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 16:12:10 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B2CD89CA3;
- Tue,  7 Jan 2020 16:12:09 +0000 (UTC)
-Subject: Re: [PATCH 51/86] m68k:next-cube: use memdev for RAM
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1577797450-88458-1-git-send-email-imammedo@redhat.com>
- <1577797450-88458-52-git-send-email-imammedo@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <2a2088ef-fba5-5ad1-8dfc-cee241e0ef5a@redhat.com>
-Date: Tue, 7 Jan 2020 17:12:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iorUn-0004Zt-Ff
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:14:18 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43483)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iorUn-0004ZC-97
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 11:14:17 -0500
+Received: by mail-oi1-x241.google.com with SMTP id p125so15935083oif.10
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 08:14:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Pe1Q+5s/HuqyjI745fEx8zW5ARIcEczfiyXTiyOMXJI=;
+ b=nXSSbIn8LovA76t+uFoMey0Gq+VUcwSPmdzIynwAoa/m/r+alForuwGwkdVzIscjjT
+ mj5brO5Wae8J4ptDuyXwLrpzfcrQp74mmk9lh/pPdNCCSL+CZMjDAebucktdgXyxNvcE
+ gt1+J1O5k2RyuEjRB4p2glYk+RkZF4fqcM7Ay+Y1+wW4Q500Z88GgzNxPHd1SwePNQod
+ aI/hox0GphraZwqxZazShi7ShL9l5EswI+gWZb/Ugz82L/mJ4UQzGH3wWtHgB8r6nfeZ
+ +AmzImjiEC3f+Iwv49G6lyqS/wLuFpr3Gr7btFGo5t4a7HHcivWt8dztB5hDIt7VBsZC
+ XTEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Pe1Q+5s/HuqyjI745fEx8zW5ARIcEczfiyXTiyOMXJI=;
+ b=LDooxxFzjvokB6AUu0OnOyZesdJ93jy3H6Y+Lxr4T0nqp4ACfxtm/avYBd/WkJORBw
+ 5yAl+5zGrYwzEfDchcWY65XaiKXcJlb7Z+csQYyYU8h+PyZ0DBERRJYWMzRwUp8woCIH
+ XJ8BQOAF80yRHRoWP3SsLF1HssR9aSqbzofrZPyySnMiIXWZdT1VfCGXlseU4THj0JHs
+ +A1Kpd0bg6dB741heIP1mIooS6oS/QAcURl7ljdWJ6SkOflkdCk2GAEHXnPhiQAbAaY6
+ SS9mGLJfyr7FoI5NlhaM3GFHmYNK7/HOUTtLHqwedRlljcUiNA/wkfMHShkEj8E4SuFl
+ GkxQ==
+X-Gm-Message-State: APjAAAVthQfzwVzB0BB/DxleLvnFHK25t9rL7G7DLo4JvmHT+qVUSs19
+ zpPrWJXxGMfmipx0Jfam1/QNr5bm7AhN1pEIQxpd8w==
+X-Google-Smtp-Source: APXvYqw0FAagbl6EuW1/HRl0QoSeC/ria65T7Dlo9ovigOpqjjjaY4JsHUgoPL2ATOZdL/UEmW0ZxUPMkrylJnFwfM4=
+X-Received: by 2002:aca:3182:: with SMTP id x124mr296436oix.170.1578413655988; 
+ Tue, 07 Jan 2020 08:14:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1577797450-88458-52-git-send-email-imammedo@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: GWFEa4rDNXuSYCe4yb0IRw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20200106144622.1520994-1-marcandre.lureau@redhat.com>
+ <20200106144622.1520994-7-marcandre.lureau@redhat.com>
+In-Reply-To: <20200106144622.1520994-7-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Jan 2020 16:14:05 +0000
+Message-ID: <CAFEAcA8c3A_zXcHRF3kj9z3C2AtLLPatQ=h=NX2+Ywzj+OiyVg@mail.gmail.com>
+Subject: Re: [PULL v2 6/9] configure: add GDBUS_CODEGEN
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,56 +89,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/12/2019 14.03, Igor Mammedov wrote:
-> memory_region_allocate_system_memory() API is going away, so
-> replace it with memdev allocated MemoryRegion. The later is
-> initialized by generic code, so board only needs to opt in
-> to memdev scheme by providing
->   MachineClass::default_ram_id
-> and using MachineState::ram instead of manually initializing
-> RAM memory region.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On Mon, 6 Jan 2020 at 14:47, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> gdbus-codegen generated code requires gio-unix on Unix, so add it to
+> GIO libs/cflags.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
->  hw/m68k/next-cube.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/m68k/next-cube.c b/hw/m68k/next-cube.c
-> index e534334..cd93d9e 100644
-> --- a/hw/m68k/next-cube.c
-> +++ b/hw/m68k/next-cube.c
-> @@ -860,7 +860,6 @@ static void next_cube_init(MachineState *machine)
->  {
->      M68kCPU *cpu;
->      CPUM68KState *env;
-> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      MemoryRegion *rom = g_new(MemoryRegion, 1);
->      MemoryRegion *mmiomem = g_new(MemoryRegion, 1);
->      MemoryRegion *scrmem = g_new(MemoryRegion, 1);
-> @@ -893,8 +892,7 @@ static void next_cube_init(MachineState *machine)
->      memcpy(ns->rtc.ram, rtc_ram2, 32);
->  
->      /* 64MB RAM starting at 0x04000000  */
-> -    memory_region_allocate_system_memory(ram, NULL, "next.ram", ram_size);
-> -    memory_region_add_subregion(sysmem, 0x04000000, ram);
-> +    memory_region_add_subregion(sysmem, 0x04000000, machine->ram);
->  
->      /* Framebuffer */
->      dev = qdev_create(NULL, TYPE_NEXTFB);
-> @@ -967,6 +965,7 @@ static void next_machine_class_init(ObjectClass *oc, void *data)
->      mc->desc = "NeXT Cube";
->      mc->init = next_cube_init;
->      mc->default_ram_size = RAM_SIZE;
-> +    mc->default_ram_id = "next.ram";
->      mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
->  }
->  
-> 
+>  configure | 7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/configure b/configure
+> index 747d3b4120..0ce2c0354a 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3701,10 +3701,16 @@ if $pkg_config --atleast-version=3D$glib_req_ver =
+gio-2.0; then
+>      gio=3Dyes
+>      gio_cflags=3D$($pkg_config --cflags gio-2.0)
+>      gio_libs=3D$($pkg_config --libs gio-2.0)
+> +    gdbus_codegen=3D$($pkg_config --variable=3Dgdbus_codegen gio-2.0)
+>  else
+>      gio=3Dno
+>  fi
+>
+> +if $pkg_config --atleast-version=3D$glib_req_ver gio-unix-2.0; then
+> +    gio_cflags=3D"$gio_cflags $($pkg_config --cflags gio-unix-2.0)"
+> +    gio_libs=3D"$gio_libs $($pkg_config --libs gio-unix-2.0)"
+> +fi
+> +
+>  # Sanity check that the current size_t matches the
+>  # size that glib thinks it should be. This catches
+>  # problems on multi-arch where people try to build
+> @@ -6904,6 +6910,7 @@ if test "$gio" =3D "yes" ; then
+>      echo "CONFIG_GIO=3Dy" >> $config_host_mak
+>      echo "GIO_CFLAGS=3D$gio_cflags" >> $config_host_mak
+>      echo "GIO_LIBS=3D$gio_libs" >> $config_host_mak
+> +    echo "GDBUS_CODEGEN=3D$gdbus_codegen" >> $config_host_mak
+>  fi
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+I've just noticed that this seems to cause problems for
+the NetBSD VM, because pkg-config reports a value for
+gdbus_codegen which isn't an installed binary:
 
+localhost$ pkg-config --variable=3Dgdbus_codegen gio-2.0
+/usr/pkg/bin/gdbus-codegen
+localhost$ ls /usr/pkg/bin/gdbus-codegen
+ls: /usr/pkg/bin/gdbus-codegen: No such file or directory
+
+I think we need to install the 'gdbus-codegen' package in
+our netbsd VM image.
+
+Maybe configure should check that it's actually got
+an executable file before trying to use it?
+
+thanks
+-- PMM
 
