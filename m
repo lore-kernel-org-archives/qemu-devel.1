@@ -2,100 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7FEC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC1FC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 267FF2081E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D921E2077B
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HGmdHvfg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267FF2081E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U1Ala2Lm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D921E2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomOh-0005qg-7Q
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:47:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48213)
+	id 1iomPj-0008KW-HC
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:48:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iolfV-0005lT-Lx
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:00:58 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iolIV-0005ib-BC
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:37:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iolfU-0001pD-8i
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:00:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54753
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1iolIT-0000HZ-LZ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:37:11 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28265
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iolfU-0001oq-4x
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:00:56 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iolIT-0000H3-HC
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 04:37:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578391255;
+ s=mimecast20190719; t=1578389828;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=m8wUBPjTJ1dygY4lgTlyXDryvNu9KcidWawrLd/Hi8A=;
- b=HGmdHvfg+FLnbmisAGi+STDUNCc80jNPJoUIld8QP9taMgaq+fJugo/S7Oj6SkBx1svyTE
- I1IeUQznzBEYVj0lUqplDoWLzDbq8vsGOixaxgM+dhFWoK7367l72hOy2M7dCH+Q494Ev/
- exfaXBeFuA0m4NXyEKZRyJ50mlwn5xE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-dhDmY_71P4et0mN2PyQ4oQ-1; Tue, 07 Jan 2020 05:00:54 -0500
-Received: by mail-wr1-f71.google.com with SMTP id c6so19051132wrm.18
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:00:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=FnZH1mOTI6S6trRWtwkB8lo9YA4/dfg4wGgJnrEExHw=;
- b=jIyNH7ueiCpzJAx8UBqlKvczwSyrIlgFySmHzG283gFggryoTEBSFUf6x1GhDnLmbf
- t9WGL2fRL8GlXfXWiSAOJ2+6UevU0F8e+W4lRe4vDQKu9+4WOenpgWVEEYytd9RKnk3f
- olIeiKs4B40U1oNw/goXUXk57M8t9/E1tajGvIf8YvwIwik+NIwJqhYyJ2YG4WC3sJsR
- HtyG71iA66z1rijpCXzcTfUFpltq8eMEOy9IO3GQQC5L9dAYBwwHbKctWWMezpROYK1G
- 6UPDUAEsNjpxTpyT2STnUV91frZiQg+zgU1/suFwnho4gnErvvbKI4/xzUbjyI1C8NRG
- eZJQ==
-X-Gm-Message-State: APjAAAVMbLve19dDyOvScgv+Qs3YRkx4AzOzw68VBCTJhKG9AVIb7Vk0
- +FQ1KvxYzo7vsRKPmOBOrswY0WjDMor4VBEzsc5eqwQx6lps0lhP/TigSuXRwY/dbbTy2UXazbK
- qDoHGAycrtAjUc/U=
-X-Received: by 2002:a5d:458d:: with SMTP id p13mr62372507wrq.314.1578391253227; 
- Tue, 07 Jan 2020 02:00:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzoevhckqjGJT3m7DvQUqJbJbNJj3yzVAlsWvbkOQy4Pwogb9D4lrWbHDH1NPepVhEk51c5mw==
-X-Received: by 2002:a5d:458d:: with SMTP id p13mr62372481wrq.314.1578391253019; 
- Tue, 07 Jan 2020 02:00:53 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
- ([2001:b07:6468:f312:c6d:4079:b74c:e329])
- by smtp.gmail.com with ESMTPSA id h2sm81728798wrt.45.2020.01.07.02.00.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jan 2020 02:00:52 -0800 (PST)
-Subject: Re: [PATCH 04/14] hw/i386: Restrict fw_cfg to the PC machines
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191231183216.6781-1-philmd@redhat.com>
- <20191231183216.6781-5-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <972f23b6-60f2-7f5b-5090-1baf9c8105c4@redhat.com>
-Date: Tue, 7 Jan 2020 11:00:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=41nvUBr59e3WRVw0HYn1zrcTgkUkat8OUGwKC9dTltk=;
+ b=U1Ala2LmVohwvle8LbZ/41ph+LPqy5yfybClF0r+vN1GTgfzrxWfPh5lFNVg0mn6/SSwrg
+ bSfbkWKqsJANW22UpNExF6we7ZmqFYTb6u8wkIOio/5qYDxOhq9Od5Sul6w8yZRc/iW1hL
+ 6QhjgHZRx0htwOjfj3OpZSa9BWK8pNw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-9p4IlR6MN6yqTjcpkfJyeQ-1; Tue, 07 Jan 2020 04:37:07 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49DD4800D41;
+ Tue,  7 Jan 2020 09:37:06 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-78.ams2.redhat.com [10.36.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 68F2E272A1;
+ Tue,  7 Jan 2020 09:36:56 +0000 (UTC)
+Date: Tue, 7 Jan 2020 10:36:55 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Michal =?iso-8859-1?B?UHLtdm96bu1r?= <mprivozn@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200107093655.GF4076@linux.fritz.box>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <87h81unja8.fsf@dusky.pond.sub.org>
+ <c445ecbe-1559-462a-31c2-f44f60e60a8b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191231183216.6781-5-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: dhDmY_71P4et0mN2PyQ4oQ-1
+In-Reply-To: <c445ecbe-1559-462a-31c2-f44f60e60a8b@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 9p4IlR6MN6yqTjcpkfJyeQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,49 +89,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>, qemu-ppc@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/12/19 19:32, Philippe Mathieu-Daud=C3=A9 wrote:
-> Only the PC-based machines use the fw_cfg device. In particular,
-> the MicroVM machine does not use it. Only compile/link it when
-> machines require it.
+Am 23.12.2019 um 16:04 hat Michal Pr=EDvozn=EDk geschrieben:
+> On 12/21/19 10:02 AM, Markus Armbruster wrote:
+> > Stefan Hajnoczi <stefanha@gmail.com> writes:
+> >=20
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Cc: Sergio Lopez <slp@redhat.com>
-> ---
->  hw/i386/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
-> index 6ebb6d0cf0..48f2693546 100644
-> --- a/hw/i386/Makefile.objs
-> +++ b/hw/i386/Makefile.objs
-> @@ -5,7 +5,7 @@ obj-$(CONFIG_PC) +=3D pc.o pc_sysfw.o
->  obj-$(CONFIG_I440FX) +=3D pc_piix.o
->  obj-$(CONFIG_Q35) +=3D pc_q35.o
->  obj-$(CONFIG_MICROVM) +=3D microvm.o
-> -obj-y +=3D fw_cfg.o
-> +obj-$(CONFIG_PC) +=3D fw_cfg.o
->  obj-$(CONFIG_X86_IOMMU) +=3D x86-iommu.o
->  obj-$(CONFIG_VTD) +=3D intel_iommu.o
->  obj-$(CONFIG_AMD_IOMMU) +=3D amd_iommu.o
+> >> 4. Go and Rust bindings would also be useful.  There is
+> >> https://github.com/intel/govmm but I think it makes sense to keep it
+> >> in qemu.git and provide an interface similar to our Python modules.
+> >=20
+> > Mapping QAPI/QMP commands and events to function signatures isn't hard
+> > (the QAPI code generator does).  Two problems (at least):
+> >=20
+> > 1. Leads to some pretty ridiculous functions.  Here's one:
+> >=20
+> >     void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+> >                              const char *device,
+> >                              const char *target,
+> >                              bool has_replaces, const char *replaces,
+> >                              MirrorSyncMode sync,
+> >                              bool has_speed, int64_t speed,
+> >                              bool has_granularity, uint32_t granularity=
+,
+> >                              bool has_buf_size, int64_t buf_size,
+> >                              bool has_on_source_error,
+> >                              BlockdevOnError on_source_error,
+> >                              bool has_on_target_error, BlockdevOnError =
+on_target_error,
+> >                              bool has_filter_node_name, const char *fil=
+ter_node_name,
+> >                              bool has_copy_mode, MirrorCopyMode copy_mo=
+de,=20
+> >                              bool has_auto_finalize, bool auto_finalize=
+,
+> >                              bool has_auto_dismiss, bool auto_dismiss,
+> >                              Error **errp);
+> >=20
+> >   We commonly use 'boxed': true for such beasts, which results in
+> >   functions like this one:
+> >=20
+> >     void qmp_blockdev_add(BlockdevOptions *arg, Error **errp);
+> >=20
+> > 2. Many schema changes that are nicely backward compatible in QMP are
+> >    anything but in such an "obvious" C API.  Adding optional arguments,
+> >    for instance, or changing integer type width.  The former is less of
+> >    an issue with 'boxed': true.
+> >=20
+> > Perhaps less of an issue with dynamic languages.
+> >=20
+> > I figure a static language would need much more expressive oomph than C
+> > to be a good target.  No idea how well Go or Rust bindings can work.
 >=20
+> This is something that bothered me for a while now. Even though it's not
+> as bad as it used to be because we are not adding so much wrappers for
+> monitor commands as we used to. I mean, in libvirt the wrapper for a
+> monitor command has to be written by hand. Worse, whenever I'm adding a
+> wrapper I look at the QMP schema of it and let my muscle memory write
+> the wrapper.
+>=20
+> However, it's not only what Markus already mentioned. Even if we
+> generated wrappers by a script, we need to be able to generate wrappers
+> for every single supported version of qemu.
+>=20
+> For instance, if qemu version X has a command that accepts some set of
+> arguments and this set changes in version X+1 then libvirt needs both
+> wrappers and decides at runtime (depending on what version it is talking
+> to) what wrapper to use.
+>=20
+> Unfortunately, I don't see any easy way out.
 
-It does use it, it calls fw_cfg_init_io_dma.
+The easy way out would be tying libvirt to a specific QEMU version. And
+I'm only half joking.
 
-Paolo
+If libvirt didn't exist yet and we needed a management library for QEMU,
+what we would build now would probably not look much like libvirt looks
+today. We wouldn't try to have basic support for every hypervisor out
+there, but integrate it much closer with QEMU and avoid much of the
+backwards compatibility requirements that the interface between QEMU and
+libvirt has (which requires us to deal with compatibility twice for
+everything).
+
+Maybe it would even be part of the QEMU repository, allowing a single
+patch series to implement a new feature in the system emulator and
+expose it in the API immediately instead of waiting for the next QEMU
+release before libvirt can even think about implementing support for it.
+
+So should libvirt move in that direction? Do people actually still make
+much use of its multi-hypervisor nature, or would it make sense to split
+it into separate libraries for each hypervisor that can be much tighter
+integrated with (a specific version of) the respective hypervisor?
+
+Kevin
 
 
