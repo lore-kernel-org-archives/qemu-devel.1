@@ -2,82 +2,92 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C0BC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F9FC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:11:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E68062081E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E13AD2072A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:11:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+Vg0WZr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E68062081E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTn2vPdr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E13AD2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iooba-0005Qb-NX
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:09:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45043)
+	id 1ioodt-0002fH-3x
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:11:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ionIC-0003aH-Q1
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:45:01 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1ioo7X-0005nY-He
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:38:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ionIB-0001s5-I0
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:45:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40969
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pmathieu@redhat.com>) id 1ioo7W-0006Kc-7O
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:38:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24250
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ionIB-0001qx-EH
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:44:59 -0500
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1ioo7W-0006KS-3w
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:38:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578397497;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1578400681;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DULW+6aQ7B72nlhunTqZicG/OFwvrNIOuHvb/ifg7tc=;
- b=e+Vg0WZrFhQtNzyKfe3NsKOwH+6a7nTH132u2MI/Ad2E/TJ2Ci6kw83+hXsI+0g1DUv7Ti
- 7HQTZJJETp+y7bAIbx0y6wi260F6h/8fV95M3i0sRS2bTvicDtoZLMyKawS/yYkaISZ1Jk
- eUqhmN2p6FnGmd6S3NuZERsvkZL7hPA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-WOcKc1n-M_-Aw5tiK__mqA-1; Tue, 07 Jan 2020 06:44:50 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7316B801E76
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:44:49 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 76E7A272A9;
- Tue,  7 Jan 2020 11:44:45 +0000 (UTC)
-Date: Tue, 7 Jan 2020 11:44:42 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 082/104] virtiofsd: enable PARALLEL_DIROPS during INIT
-Message-ID: <20200107114442.GW3368802@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-83-dgilbert@redhat.com>
+ bh=tqUhkJXsVQ4TuLxzB7hb07CeRJM/DKs21CrozLauia8=;
+ b=ZTn2vPdrQfFdLMbkp6xN7O5xTg7HZ43pjX+WjMxC3gxN8F7Bxv5BNGchN5yaIwhbBCWIwF
+ 4B4hHmloPLEoiqiHSQrxdgAHSDqJ4XDtsIKEPU5P0h37lcIMLdNM7hsShc6oDBQLymDx8N
+ ///O55KRt+3hsMBqiVzvNzi9t7e86DU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-195-yHgp0jnLPEiQeRiTYR3vAA-1; Tue, 07 Jan 2020 07:38:00 -0500
+Received: by mail-wr1-f71.google.com with SMTP id v17so26960312wrm.17
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 04:38:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=tqUhkJXsVQ4TuLxzB7hb07CeRJM/DKs21CrozLauia8=;
+ b=eqn9exGJph6uN9wqgeUXF9rvj0LX3iemPZqDVrpJ/E6co3QEgI7ZcVxTx5FtHFrBSJ
+ xwRYRt7G/iYHEZsuksL8BfhLkXOkjfD/vPXKxblA24XhgOac56BX+jcsb//JYrJk5Sel
+ q7gqbPX7R2KNbeuoWxmw5lJwRYy1/qjk9K/a3AVAD9MPI9GldTLPrHQYC4OOxcbocQUK
+ itpFMjL7gq9AeQpqle8514yPHSRQ34mMqgx52o9BlHbYirAslyxXYCBinZyUZ8L6LSUD
+ dSlxARcfj3noXR2stYE2v+vgDxdmB8QYlETLw6eZN25WfBhKoHvLN0xD6Q5eBCayqI/0
+ ZmRA==
+X-Gm-Message-State: APjAAAXJj30LL2r0PhI2Is7f5O/64sNxJ8FZjyyTKcWg/JoRtn64ywlF
+ 3qKcx6XRiSpxtRDI071Xv1k8RrwaifH2SwXl43d1xreBCh9jttFlvWMWpBhuIdf76TOSb8pgKV6
+ fEuPePuVLc27sQkpMHpxtspkQV0dHIJE=
+X-Received: by 2002:a1c:4004:: with SMTP id n4mr39787790wma.153.1578400679646; 
+ Tue, 07 Jan 2020 04:37:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyixcGA41IzkLxybhezBI5n4lUqk4raGxwM/LktYqux1bRDSveEHsP9hWwDS59CaKXBubCNVGWBz470dKyu9bM=
+X-Received: by 2002:a1c:4004:: with SMTP id n4mr39787765wma.153.1578400679443; 
+ Tue, 07 Jan 2020 04:37:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-83-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: WOcKc1n-M_-Aw5tiK__mqA-1
+References: <20200106130951.29873-1-philmd@redhat.com>
+ <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
+ <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
+ <58eb34db-7d32-8b0e-d9ef-98648209486b@redhat.com>
+ <7322b7c9-51a9-f8e3-9d90-1d242d1c8cb4@redhat.com>
+In-Reply-To: <7322b7c9-51a9-f8e3-9d90-1d242d1c8cb4@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 7 Jan 2020 13:37:48 +0100
+Message-ID: <CAP+75-XbPLNErEWGUZbFo8r74bacL9wkYaJFS8CzP59znf4SPg@mail.gmail.com>
+Subject: Re: Priority of -accel
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+X-MC-Unique: yHgp0jnLPEiQeRiTYR3vAA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +99,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:42PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: Liu Bo <bo.liu@linux.alibaba.com>
->=20
-> lookup is a RO operations, PARALLEL_DIROPS can be enabled.
->=20
-> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
-> ---
->  tools/virtiofsd/fuse_lowlevel.c | 3 +++
->  1 file changed, 3 insertions(+)
+On Tue, Jan 7, 2020 at 1:34 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om> wrote:
+> On 1/7/20 1:18 PM, Thomas Huth wrote:
+> > On 07/01/2020 11.14, Paolo Bonzini wrote:
+> >> On 07/01/20 11:03, Thomas Huth wrote:
+> >>>>
+> >>>>   vm =3D QEMUMachine(iotests.qemu_prog)
+> >>>> -vm.add_args('-machine', 'accel=3Dkvm:tcg')
+> >>>> +vm.add_args('-accel', 'kvm', '-accel', 'tcg')
+> >>> Looking at this, I wonder whether we really want the "-accel" option =
+to
+> >>> prioritize the accelerators in the order of appearance? A lot of othe=
+r
+> >>> CLI tools give the highest priority to the last parameter instead, e.=
+g.
+> >>> "gcc -O3 -O1" compiles with -O1, and not with -O3.
+> >>>
+> >>> Also I think it might be quite common that there are shell scripts wh=
+ich
+> >>> call "qemu-system-xxx -accel xyz $*" ... and if we don't invert the
+> >>> priorities of -accel, it will be impossible to override -accel in tha=
+t
+> >>> case...
+> >>
+> >> Hmm, it does match "-machine accel=3Dkvm:tcg" and in general I think i=
+t's
+> >> more self-explanatory.  However, it is indeed less friendly to scripts=
+.
+> >>   On one hand those could be changed to place "-accel xyz" after $* (o=
+r
+> >> better "$@"), on the other hand we could also add a priority option to
+> >> "-accel".  What do you think?
+> >
+> > I don't think we need a separate priority parameter here. But IMHO it's
+> >   really rather common practice to prioritize the last option. So while
+> > it might be more "self-explanatory" to a CLI newbie if the first
+> > occurrence got the highest priority, it might be rather confusing
+> > instead for a CLI veteran...?
+> >
+> > What do others on the list here think about this?
+>
+> We can make CLI more complex by adding a 'priority' option:
+>
+>    -accel tcg,priority=3D1 -accel kvm,priority=3D0
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+I meant "more explicit" =3D)
 
 
