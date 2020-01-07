@@ -6,86 +6,79 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923A2C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7563CC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:37:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60E572087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:37:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 407352087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 14:37:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMp8T/SF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60E572087F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RXju2+L9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407352087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iopye-0001ym-Nw
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:37:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40911)
+	id 1iopyl-000270-4R
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 09:37:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iopx3-0008DC-Dz
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:35:22 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iooQu-0002bb-9d
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iopx2-0002E4-7q
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:35:21 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53155
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1iooQs-00031Y-IF
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:58:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30221
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iopx2-0002Da-4W
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 09:35:20 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iooQs-00030I-Di
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:58:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578407719;
+ s=mimecast20190719; t=1578401880;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=XufDugD6uYUlfBGd82PuKlgRYcjdnsQKOQ7nhUL8Mgc=;
- b=fMp8T/SFONMTS1Hwn4IQhEeL/mABrwdmSHM/CE9Auq9wj8fpXIfisZCeaY8EuMHdwXzWtS
- InMYHhtchooQtmG2Qv2uMJppFf8bUmZCHhI+tlj838wJLFmxLoSrrb7bThdpxD0z0aiAtF
- e1sxZXlbRAWbAs7tdZORq/4d4UGmuDE=
+ in-reply-to:in-reply-to:references:references;
+ bh=Lnm4z2DqRHL/fUiTCfd3orJtiQGyrXovNTMmbQzFnPs=;
+ b=RXju2+L90UW9MKfmLsLignxR1HsdpDNzOCu5H1mRR0VcgDi95F5VfWUsNpr1SDZ10KR96B
+ 3cRXMErC4WvvuRKkGEoqOTe9kkm6LPvGbpw2SfjyxMFGknUVK1Z2v+Na8c6iFU28G8Mp+h
+ CCXQfKAvuQ+1iZGDQh/9K1nP3AsidXE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-2JdSoVrhPn-gRS9nxHzlnw-1; Tue, 07 Jan 2020 09:35:16 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-283-2iS-BO85MQmAObslLaw7Bw-1; Tue, 07 Jan 2020 07:57:58 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5102F802CA6;
- Tue,  7 Jan 2020 14:35:15 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E13E7DB3E;
- Tue,  7 Jan 2020 14:35:08 +0000 (UTC)
-Subject: Re: Priority of -accel
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200106130951.29873-1-philmd@redhat.com>
- <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
- <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
- <58eb34db-7d32-8b0e-d9ef-98648209486b@redhat.com>
- <656169fc-1abe-b521-20a3-e7041739b914@redhat.com>
- <20200107125451.GL3368802@redhat.com>
- <3241dff4-6223-404f-55d4-846991763046@redhat.com>
- <2ae2dee3-cd16-a247-971b-4b3482e596a5@redhat.com>
- <20200107142735.GC3368802@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <fb83df0a-da82-f981-fbda-d5c74e87cf5c@redhat.com>
-Date: Tue, 7 Jan 2020 15:35:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95D78801E72;
+ Tue,  7 Jan 2020 12:57:57 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-78.ams2.redhat.com [10.36.116.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B618760BE2;
+ Tue,  7 Jan 2020 12:57:46 +0000 (UTC)
+Date: Tue, 7 Jan 2020 13:57:45 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Michal Privoznik <mprivozn@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200107125745.GJ4076@linux.fritz.box>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <87h81unja8.fsf@dusky.pond.sub.org>
+ <c445ecbe-1559-462a-31c2-f44f60e60a8b@redhat.com>
+ <20200107093655.GF4076@linux.fritz.box>
+ <d18b8c0f-3054-dd63-0d10-dda6d0655175@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200107142735.GC3368802@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 2JdSoVrhPn-gRS9nxHzlnw-1
+In-Reply-To: <d18b8c0f-3054-dd63-0d10-dda6d0655175@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 2iS-BO85MQmAObslLaw7Bw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,64 +90,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/01/2020 15.27, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Jan 07, 2020 at 03:20:40PM +0100, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> On 1/7/20 3:14 PM, Thomas Huth wrote:
->>> On 07/01/2020 13.54, Daniel P. Berrang=C3=A9 wrote:
->>>> On Tue, Jan 07, 2020 at 01:23:18PM +0100, Paolo Bonzini wrote:
->>>>> On 07/01/20 13:18, Thomas Huth wrote:
->>>>>> I don't think we need a separate priority parameter here. But IMHO i=
-t's
->>>>>>   really rather common practice to prioritize the last option. So wh=
-ile
->>>>>> it might be more "self-explanatory" to a CLI newbie if the first
->>>>>> occurrence got the highest priority, it might be rather confusing
->>>>>> instead for a CLI veteran...?
->>>>>
->>>>> Prioritising the last certainly makes sense for a choose-one-only
->>>>> option, but I'm not sure it's the same for a choose-best option.  Aft=
-er
->>>>> all it was -machine accel=3Dkvm:tcg, not -machine accel=3Dtcg:kvm...
->>>>
->>>> IIUC, the main use case for specifying multiple accelerators is
->>>> so that lazy invokations can ask for a hardware virt, but then get
->>>> fallback to TCG if not available. For things that should be platform
->>>> portabile, there's more than just kvm to consider though, as we have
->>>> many accelerators.  Listing all possible accelerators is kind of
->>>> crazy though no matter what the syntax is.
->>>>
->>>> How about taking a completely different approach, inspired by the
->>>> -cpu arg and implement:
->>>>
->>>>      -machine accel=3Dbest
->>>
->>> Something like that sounds like the best solution to me, but I'd maybe
->>> rather not call it "best", since the definition of "best" might depend
->>> on your use-case (e.g. do you want to use a CPU close to the host or
->>> something different which might be better emulated by TCG?).
->>>
->>> What about "-accel any" or "-accel fastest" or something similar?
->>
->> 'any' is a russian roulette, you don't want it to return 'qtest' ;)
+Am 07.01.2020 um 11:55 hat Michal Privoznik geschrieben:
+> On 1/7/20 10:36 AM, Kevin Wolf wrote:
+> > The easy way out would be tying libvirt to a specific QEMU version. And
+> > I'm only half joking.
+> >=20
+> > If libvirt didn't exist yet and we needed a management library for QEMU=
+,
+> > what we would build now would probably not look much like libvirt looks
+> > today. We wouldn't try to have basic support for every hypervisor out
+> > there, but integrate it much closer with QEMU and avoid much of the
+> > backwards compatibility requirements that the interface between QEMU an=
+d
+> > libvirt has (which requires us to deal with compatibility twice for
+> > everything).
 >=20
-> We could make it return "qtest" only on April 1st ;-P
+> By doing this, you would force your consumers to implement compatibility
+> layer each on their own. Freshly finished blockdev is a beautiful example=
+ -
+> OpenStack, oVirt and whatnot - they all are/can use blockdev without even
+> noticing, because the API provided by libvirt is stable and provides
+> abstraction, i.e. you don't need to change anything in your domain XML to
+> use blockdev.
 
-... or we finally dare to let QEMU chose the "best" accelerator by
-default if no "-accel" option has been specified...
+Yes and no.
 
-Thus if no "-accel" has been specified, then use kvm/haxm/whpv if
-possible or TCG otherwise. And if "-accel" has been specified, then only
-use that accelerator and don't allow a second "-accel" to be specified.
+You could still keep using the same abstraction that libvirt has always
+used while doing this. What my imaginary newly written management
+library would do differently isn't necessarily the interface between
+libvirt and applications, but getting rid of backwards compatibility
+requirements in the interface between QEMU and libvirt.
 
- Thomas
+But of course, blockdev isn't even a feature per se. It's getting the
+abstraction right so that it's actually abstract enough to represent
+everything. As long as libvirt keeps using an abstraction that is based
+on simplistic setups, it won't be able to expose the full feature set of
+QEMU. This is less than satisfying. In the long run, libvirt will have
+to extend its abstraction to make full use of new features either way.
+
+> Of course, you can apply the argument one more time and have mgmt
+> application tied to a specific version of qemu. But even that is not
+> good enough, because with backports version is just meaningless
+> number.
+
+I think this would be too much indeed.
+
+> > Maybe it would even be part of the QEMU repository, allowing a single
+> > patch series to implement a new feature in the system emulator and
+> > expose it in the API immediately instead of waiting for the next QEMU
+> > release before libvirt can even think about implementing support for it=
+.
+>=20
+> Thing is, it's not just qmp that a mgmt application has to master, it's a=
+lso
+> process managing (and with growing number of helper binaries this is not =
+as
+> trivial as fork() + exec()). This would need to be the bare minimum your =
+API
+> layer has to provide to be consumable by anybody.
+> But then you have some advanced subsystems to take care of (CGroups,
+> SELinux, etc.) which are used heavily by OpenStack. oVirt and friends.
+
+Someone has to do this anyway. Note that here I'm still talking about
+the hypothetical case where no libvirt existed yet.
+
+If we cared only about OpenStack, oVirt and friends, this would still
+all be QEMU-based, so not a big problem to have it tied to QEMU.
+
+I'm not sure what this looks like in practice in libvirt: Are these
+components shared between multiple hypervisor interfaces or is it only
+for QEMU anyway?
+
+If multiple hypervisors make use of it, how crazy would it be to imagine
+reversing which project consumes which? Instead of having the libvirt
+core consume the hypervisor-specific sublibraries, could a QEMU-specific
+part live closer to QEMU and consume the libvirt core as an external
+library?
+
+I guess much of what I write in this thread is pure heresy. :-)
+Maybe most of it isn't even useful. But maybe there is an idea or two in
+it that are worth having a closer look at.
+
+> > So should libvirt move in that direction? Do people actually still make
+> > much use of its multi-hypervisor nature, or would it make sense to spli=
+t
+> > it into separate libraries for each hypervisor that can be much tighter
+> > integrated with (a specific version of) the respective hypervisor?
+>=20
+> Truth to be told, I don't think libvirt is held back by its attempts to
+> provide hypervisor agnostic APIs. Sure, it leads to some weirdness (e.g.
+> different naming in libvirt and qemu), but as a libvirt developer I don't
+> remember feeling blocked by this multi-hypervisor nature (not to mention
+> that this has saved us couple of times).
+
+I would imagine so, because the problem doesn't become visible in the
+daily work, but only in the bigger picture: The other hypervisors are
+what prevent libvirt from being more tightly intergrated with QEMU.
+
+This means that there is a boundary between QEMU and libvirt that makes
+it really slow to get new features to the user. And both QEMU and
+libvirt waste a lot of time for maintaining backwards compatibility in
+things that wouldn't necessarily have to be stable interfaces if the
+management library were developed in lockstep with QEMU.
+
+> Also, it would be not correct to think that a feature is implemented for =
+all
+> hypervisors in libvirt. I mean, when implementing a feature I usually
+> implement it only for qemu driver and don't even look at other drivers
+> (unless I'm doing a change in a core that causes build failures). On the
+> other hand, I do sometimes review patches posted by developers from other
+> companies which have interest in different hypervisors (e.g. there is a S=
+USE
+> guy working on LXC driver, and another SUSE guy working on libxenlight
+> (basically Xen)), so I do spend some time not working on qemu driver, but
+> I'd say it's negligible.
+
+Time spent on non-QEMU isn't really my concern. Time spent maintaining
+stable interface between QEMU and libvirt, and time spent waiting for
+QEMU releases before libvirt development starts are my concern.
+
+Kevin
 
 
