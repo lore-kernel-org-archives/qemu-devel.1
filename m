@@ -2,100 +2,83 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F0CC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3AEC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:45:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA4AC2070E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:43:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA4AC2070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id B8A7E2070E
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:45:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cLfYVF8+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8A7E2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ionGK-0005Xb-Sl
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:43:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41299)
+	id 1ionIk-00039L-1o
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:45:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1ion44-0007Bd-Vs
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:30:26 -0500
+ (envelope-from <thuth@redhat.com>) id 1iomaY-0004o2-Sc
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:59:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1ion43-00020f-RC
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:30:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21628)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1ion43-00020K-Ju
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:30:23 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 007BRNpD022475
- for <qemu-devel@nongnu.org>; Tue, 7 Jan 2020 06:30:22 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xb925byhp-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 06:30:22 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Tue, 7 Jan 2020 11:30:19 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 7 Jan 2020 11:30:15 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 007BTRfX45023534
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 7 Jan 2020 11:29:27 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 89CACA404D;
- Tue,  7 Jan 2020 11:30:14 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2641AA4055;
- Tue,  7 Jan 2020 11:30:13 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.124.35.97])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  7 Jan 2020 11:30:12 +0000 (GMT)
-Subject: Re: [PATCH v18 1/7] Wrapper function to wait on condition for the
- main loop mutex
-To: Greg Kurz <groug@kaod.org>
-References: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
- <20200102075111.25308-2-ganeshgr@linux.ibm.com>
- <20200105161708.6d4711b1@bahia.lan>
-From: Ganesh <ganeshgr@linux.ibm.com>
-Date: Tue, 7 Jan 2020 17:00:12 +0530
+ (envelope-from <thuth@redhat.com>) id 1iomaX-0001Mh-4r
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:59:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37924
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iomaX-0001MT-0W
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:59:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578394792;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=1KFr9OuGcJR2mzO5jrlO/rNIcg1HcaGI7rziaK4QNrk=;
+ b=cLfYVF8+V6rT3F39vQ1txyjtVkM8o0t1jlCOqUF66ZV3Rj8qspYqhrb1wJHDimkviBHGc5
+ WEwGn+7/PZAHdCK2HJ5vXHvF6kWHqv0+O86KLaXj6t+hyYnK8sIYtUo4ZmVZOiDTlJlxu/
+ JtCTPYdUs8tG2bVRbRZwtCAYTYY6QbE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-124-qdcei4M4Pja88MIppmSVbQ-1; Tue, 07 Jan 2020 05:59:49 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BA6B8024FC;
+ Tue,  7 Jan 2020 10:59:48 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8EB878208E;
+ Tue,  7 Jan 2020 10:59:46 +0000 (UTC)
+Subject: Re: [PATCH 2/2] target/mips: Correct data on deprecated r4k machine
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1576764920-24514-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1576764920-24514-3-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <e94ef3f3-0126-90e0-3fd0-039302010b81@redhat.com>
+Date: Tue, 7 Jan 2020 11:59:44 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200105161708.6d4711b1@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1576764920-24514-3-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 20010711-0028-0000-0000-000003CEE356
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20010711-0029-0000-0000-00002492F2CC
-Message-Id: <b69d4346-4705-8e84-4b1f-2cad0f7fede3@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2020-01-07_03:2020-01-06,2020-01-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0
- malwarescore=0 bulkscore=0 adultscore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-2001070094
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: qdcei4M4Pja88MIppmSVbQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,71 +90,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: aleksandar.rikalo@rt-rk.com, aurelien@aurel32.net,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 19/12/2019 15.15, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> Change the release since r4k machine is deprecated from 4.2 to 5.0.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  qemu-deprecated.texi | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 62680f7..f71c740 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -254,7 +254,7 @@ The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
+>  
+>  @section System emulator machines
+>  
+> -@subsection mips r4k platform (since 4.2)
+> +@subsection mips r4k platform (since 5.0)
+>  
+>  This machine type is very old and unmaintained. Users should use the 'malta'
+>  machine type instead.
+> 
 
-On 1/5/20 8:47 PM, Greg Kurz wrote:
-> On Thu,  2 Jan 2020 13:21:05 +0530
-> Ganesh Goudar <ganeshgr@linux.ibm.com> wrote:
->
->> From: Aravinda Prasad <arawinda.p@gmail.com>
->>
->> Introduce a wrapper function to wait on condition for
->> the main loop mutex. This function atomically releases
->> the main loop mutex and causes the calling thread to
->> block on the condition. This wrapper is required because
->> qemu_global_mutex is a static variable.
->>
->> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->> Reviewed-by: Greg Kurz <groug@kaod.org>
->> ---
-> This should have your Signed-off-by: tag as well.
-Sure, thanks
->
->>   cpus.c                   | 5 +++++
->>   include/qemu/main-loop.h | 8 ++++++++
->>   2 files changed, 13 insertions(+)
->>
->> diff --git a/cpus.c b/cpus.c
->> index b472378b70..79388d2b0f 100644
->> --- a/cpus.c
->> +++ b/cpus.c
->> @@ -1835,6 +1835,11 @@ void qemu_mutex_unlock_iothread(void)
->>       qemu_mutex_unlock(&qemu_global_mutex);
->>   }
->>   
->> +void qemu_cond_wait_iothread(QemuCond *cond)
->> +{
->> +    qemu_cond_wait(cond, &qemu_global_mutex);
->> +}
->> +
->>   static bool all_vcpus_paused(void)
->>   {
->>       CPUState *cpu;
->> diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
->> index f6ba78ea73..a6d20b0719 100644
->> --- a/include/qemu/main-loop.h
->> +++ b/include/qemu/main-loop.h
->> @@ -295,6 +295,14 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line);
->>    */
->>   void qemu_mutex_unlock_iothread(void);
->>   
->> +/*
->> + * qemu_cond_wait_iothread: Wait on condition for the main loop mutex
->> + *
->> + * This function atomically releases the main loop mutex and causes
->> + * the calling thread to block on the condition.
->> + */
->> +void qemu_cond_wait_iothread(QemuCond *cond);
->> +
->>   /* internal interfaces */
->>   
->>   void qemu_fd_register(int fd);
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
