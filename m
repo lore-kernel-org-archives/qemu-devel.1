@@ -7,91 +7,91 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54564C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D85C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:52:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F1B82075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DB122075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 08:52:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KgZS6Xd5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F1B82075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGSpRDnU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB122075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iokaP-0000LH-2p
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:51:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52044)
+	id 1iokNg-0002Ts-4b
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:38:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51998)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojQC-0006EZ-Cb
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:01 -0500
+ (envelope-from <mst@redhat.com>) id 1iojQ0-000629-1j
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojQB-0008JU-2x
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52339
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iojPy-00089o-0r
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:47 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60095
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojQA-0008JB-VG
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:59 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojPx-00087u-RS
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:36:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382618;
+ s=mimecast20190719; t=1578382603;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=75DSOPWG53BQMc2DQp8pZrGaf6WLAio2xZatEQc8yH4=;
- b=KgZS6Xd5jxKfp3NbWbLm6BB6Sa8HLmygrTGlxP+hN2WhbcH4v+r7mewGQu9ovllzOhXFzW
- hfIAmt3Xwi2Rbql9CrFpeJgNaIgK3Vz0x8ZE9UZkkYG2Wxx1jl+fZVMB+USGh/8g9bkkQb
- PUaJFMe1ikfd+AbpRMpI9sk+KzZhv7Y=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-3Tvah6I9MKCEEQrTnwcGkQ-1; Tue, 07 Jan 2020 02:36:57 -0500
-Received: by mail-qk1-f197.google.com with SMTP id d1so8965590qkk.15
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:36:57 -0800 (PST)
+ bh=Cp6Js316PIXYZH4FnO2Nl29XN8Dewk3Zb8G0nu+p7nE=;
+ b=WGSpRDnUcRYmcpH01Zt0NbIR3uFcN+E+KhxQ9zvpL7qYzcI7nRG3Cg4yEcianFCBGgYhiz
+ 093+1mAUpUIIIt0N9/rKB2+BFI0zws+D7Va4lkvEEaCZZ8Tat7PmU/1+JzSB7edU/CraP5
+ OO/WdwbkKLfeLL6diB/dDvMhQ1ieWNI=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-Sa9NJoSzPla0ZBlAknvmUQ-1; Tue, 07 Jan 2020 02:36:42 -0500
+Received: by mail-qv1-f69.google.com with SMTP id p3so9745616qvt.9
+ for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:36:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ilfUa7pwbD2DsrhFhXRw/VkM07xbn4jtSmYjKOWR/YA=;
- b=KpgXOz6kQ9CU/rQQ03eFzsTWlpDoFbvJwxAfi/iPZkVkTwRA6sVkKj75txY2Y6RrzQ
- 1ZD5N5giUdQaQMx3DKQPdzSTayDXfkouC+1FGC1gZ56T7IiBkmCwdLe6eR1JXU6+n4Tn
- v4RWTelmKRK2vwVeEeY/GnkMpb0kl5DA74l9zCk/k6VyxZerCn75Uqw8yK7o0hWW4Wvz
- X3dKBH2iiuBYtV9jEHc6Xf0EGUzv/FtLFyOkj+TLgaDg+UuHC0Q3a02SBBoVSsEM0la8
- PPHZZ1z+fFT281abhaCZD90T6ldh55sY1hk9QPUli5PpaCqPPZA1iPPFZsuhiy5qcNje
- BL4g==
-X-Gm-Message-State: APjAAAXY3z0Tm1x3EZH+h/kgoIZMxF3vChPk4CKEpgmrDGGvrBESa0+g
- b4SGF2IUyDXyUzWMkHCYTJaSamozj6V0Aznxb40/FlprWHPAFlc6kt0VjTS9pCBwtsJa/A4MUNt
- bRZlvw8OlUrVtq4A=
-X-Received: by 2002:a37:8e44:: with SMTP id q65mr86111629qkd.70.1578382616620; 
- Mon, 06 Jan 2020 23:36:56 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy+l3SXlWn8LCdeJOb1ypyIkmqnRvy/c2C0QOGdX2WZO6Dq1ZXTXQQA5mrqvvEsJXuW3KvO6Q==
-X-Received: by 2002:a37:8e44:: with SMTP id q65mr86111617qkd.70.1578382616357; 
- Mon, 06 Jan 2020 23:36:56 -0800 (PST)
+ bh=5G41uwHBTYAB+Ul1VVsmoX3H1jPszYS18zVu3nGvXFk=;
+ b=U4xRbLqMmIj1ukJZUVT8TaJbTZhLydYpElDagoUymK8Q9UuJowGKgnj/Zyzkzx/ApW
+ H1TaDIcQlSnvweay23wZB71bX7KfHab4DTvXxnu+bB4M0oUupn5GfPsFYFM/O9z8G/zO
+ IzCqjslqU1Rl8guiyJI1RgMgeJDoJDEPKEsmdocCdMrUm3n4mdDch1/Ev2MuVvLyuC6l
+ WpZzpKggtbuEN1aIVwuUrBf49q7DtETxD8pVK/XQUYdxvBxUzQr40kHslVOpBdyemE5C
+ HIjx9U93ZdZnehlig1o6lvWPxZ1PwjHO3rLfOpf6t8RcJukqnx5KjXAhZbi27ZOKcWP/
+ 8ocw==
+X-Gm-Message-State: APjAAAWIJF+pE3gkblbBZWVHK/hfl2HrpeIo7YJysYQrKPwd8Px3XtIn
+ KWFymXQJqCg5iEbID/X2/o2khXHe48GY0MFZqevL3W3ffnsJn9OssvsKqJna6XmbZd+c1r1To75
+ xmjElHM5/ooSxdaI=
+X-Received: by 2002:ac8:5457:: with SMTP id d23mr74635799qtq.93.1578382601567; 
+ Mon, 06 Jan 2020 23:36:41 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyzvPkt6eep4BbXLO2a1oKyby3ON5MvxTFUIzJzegaLl8FH6PV2kHJ2MEFncepF6HX9q14H7Q==
+X-Received: by 2002:ac8:5457:: with SMTP id d23mr74635779qtq.93.1578382601130; 
+ Mon, 06 Jan 2020 23:36:41 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id r37sm24890198qtj.44.2020.01.06.23.36.54
+ by smtp.gmail.com with ESMTPSA id k4sm24081530qtj.74.2020.01.06.23.36.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:36:55 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:36:52 -0500
+ Mon, 06 Jan 2020 23:36:40 -0800 (PST)
+Date: Tue, 7 Jan 2020 02:36:36 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 20/32] virtio-mmio: Clear v2 transport state on soft reset
-Message-ID: <20200107073451.298261-21-mst@redhat.com>
+Subject: [PULL v2 17/32] tests/numa: Add case for QMP build HMAT
+Message-ID: <20200107073451.298261-18-mst@redhat.com>
 References: <20200107073451.298261-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
 X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
 X-Mutt-Fcc: =sent
-X-MC-Unique: 3Tvah6I9MKCEEQrTnwcGkQ-1
+X-MC-Unique: Sa9NJoSzPla0ZBlAknvmUQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,76 +103,322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Tao Xu <tao3.xu@intel.com>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
+From: Tao Xu <tao3.xu@intel.com>
 
-At the moment when the guest writes a status of 0, we only reset the
-virtio core state but not the virtio-mmio state. The virtio-mmio
-specification says (v1.1 cs01, 4.2.2.1 Device Requirements:
-MMIO Device Register Layout):
+Check configuring HMAT usecase
 
-    Upon reset, the device MUST clear all bits in InterruptStatus and
-    ready bits in the QueueReady register for all queues in the device.
-
-The core already takes care of InterruptStatus by clearing isr, but we
-still need to clear QueueReady.
-
-It would be tempting to clean all registers, but since the specification
-doesn't say anything more, guests could rely on the registers keeping
-their state across reset. Linux for example, relies on this for
-GuestPageSize in the legacy MMIO tranport.
-
-Fixes: 44e687a4d9ab ("virtio-mmio: implement modern (v2) personality (virti=
-o-1)")
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Message-Id: <20191213095410.1516119-1-jean-philippe@linaro.org>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Message-Id: <20191213011929.2520-8-tao3.xu@intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/virtio/virtio-mmio.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ tests/numa-test.c | 213 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 213 insertions(+)
 
-diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-index 94d934c44b..ef40b7a9b2 100644
---- a/hw/virtio/virtio-mmio.c
-+++ b/hw/virtio/virtio-mmio.c
-@@ -65,6 +65,19 @@ static void virtio_mmio_stop_ioeventfd(VirtIOMMIOProxy *=
-proxy)
-     virtio_bus_stop_ioeventfd(&proxy->bus);
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index 8de8581231..17dd807d2a 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -327,6 +327,216 @@ static void pc_dynamic_cpu_cfg(const void *data)
+     qtest_quit(qs);
  }
 =20
-+static void virtio_mmio_soft_reset(VirtIOMMIOProxy *proxy)
++static void pc_hmat_build_cfg(const void *data)
 +{
-+    int i;
++    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig -machine hm=
+at=3Don "
++                     "-smp 2,sockets=3D2 "
++                     "-m 128M,slots=3D2,maxmem=3D1G "
++                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
++                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
++                     "-numa node,nodeid=3D0,memdev=3Dm0 "
++                     "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 "
++                     "-numa cpu,node-id=3D0,socket-id=3D0 "
++                     "-numa cpu,node-id=3D0,socket-id=3D1",
++                     data ? (char *)data : "");
 +
-+    if (proxy->legacy) {
-+        return;
-+    }
++    /* Fail: Initiator should be less than the number of nodes */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 2, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\" } }")))=
+;
 +
-+    for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
-+        proxy->vqs[i].enabled =3D 0;
-+    }
++    /* Fail: Target should be less than the number of nodes */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 2,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\" } }")))=
+;
++
++    /* Fail: Initiator should contain cpu */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 1, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\" } }")))=
+;
++
++    /* Fail: Data-type mismatch */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"write-latency\","
++        " 'bandwidth': 524288000 } }")));
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"read-bandwidth\","
++        " 'latency': 5 } }")));
++
++    /* Fail: Bandwidth should be 1MB (1048576) aligned */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
++        " 'bandwidth': 1048575 } }")));
++
++    /* Configuring HMAT bandwidth and latency details */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
++        " 'latency': 1 } }")));    /* 1 ns */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
++        " 'latency': 5 } }")));    /* Fail: Duplicate configuration */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
++        " 'bandwidth': 68717379584 } }")));    /* 65534 MB/s */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 1,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
++        " 'latency': 65534 } }")));    /* 65534 ns */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 1,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
++        " 'bandwidth': 34358689792 } }")));    /* 32767 MB/s */
++
++    /* Fail: node_id should be less than the number of nodes */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 2, 'size': 10240=
+,"
++        " 'level': 1, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++
++    /* Fail: level should be less than HMAT_LB_LEVELS (4) */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 4, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++
++    /* Fail: associativity option should be 'none', if level is 0 */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 0, 'associativity': \"direct\", 'policy': \"none\","
++        " 'line': 0 } }")));
++    /* Fail: policy option should be 'none', if level is 0 */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 0, 'associativity': \"none\", 'policy': \"write-back\",=
+"
++        " 'line': 0 } }")));
++    /* Fail: line option should be 0, if level is 0 */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 0, 'associativity': \"none\", 'policy': \"none\","
++        " 'line': 8 } }")));
++
++    /* Configuring HMAT memory side cache attributes */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 1, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 1, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));    /* Fail: Duplicate configuration */
++    /* Fail: The size of level 2 size should be small than level 1 */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 2, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++    /* Fail: The size of level 0 size should be larger than level 1 */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 0, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 1, 'size': 10240=
+,"
++        " 'level': 1, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++
++    /* let machine initialization to complete and run */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs,
++        "{ 'execute': 'x-exit-preconfig' }")));
++    qtest_qmp_eventwait(qs, "RESUME");
++
++    qtest_quit(qs);
 +}
 +
- static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned siz=
-e)
++static void pc_hmat_off_cfg(const void *data)
++{
++    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig "
++                     "-smp 2,sockets=3D2 "
++                     "-m 128M,slots=3D2,maxmem=3D1G "
++                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
++                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
++                     "-numa node,nodeid=3D0,memdev=3Dm0",
++                     data ? (char *)data : "");
++
++    /*
++     * Fail: Enable HMAT with -machine hmat=3Don
++     * before using any of hmat specific options
++     */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'node', 'nodeid': 1, 'memdev': \"m1\","
++        " 'initiator': 0 } }")));
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'node', 'nodeid': 1, 'memdev': \"m1\" } }=
+")));
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
++        " 'latency': 1 } }")));
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 1, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++
++    /* let machine initialization to complete and run */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs,
++        "{ 'execute': 'x-exit-preconfig' }")));
++    qtest_qmp_eventwait(qs, "RESUME");
++
++    qtest_quit(qs);
++}
++
++static void pc_hmat_erange_cfg(const void *data)
++{
++    QTestState *qs =3D qtest_initf("%s -nodefaults --preconfig -machine hm=
+at=3Don "
++                     "-smp 2,sockets=3D2 "
++                     "-m 128M,slots=3D2,maxmem=3D1G "
++                     "-object memory-backend-ram,size=3D64M,id=3Dm0 "
++                     "-object memory-backend-ram,size=3D64M,id=3Dm1 "
++                     "-numa node,nodeid=3D0,memdev=3Dm0 "
++                     "-numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0 "
++                     "-numa cpu,node-id=3D0,socket-id=3D0 "
++                     "-numa cpu,node-id=3D0,socket-id=3D1",
++                     data ? (char *)data : "");
++
++    /* Can't store the compressed latency */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
++        " 'latency': 1 } }")));    /* 1 ns */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 1,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
++        " 'latency': 65535 } }")));    /* 65535 ns */
++
++    /* Test the 0 input (bandwidth not provided) */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-no=
+de',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
++        " 'bandwidth': 0 } }")));    /* 0 MB/s */
++    /* Fail: bandwidth should be provided before memory side cache attribu=
+tes */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240=
+,"
++        " 'level': 1, 'associativity': \"direct\", 'policy': \"write-back\=
+","
++        " 'line': 8 } }")));
++
++    /* Can't store the compressed bandwidth */
++    g_assert_true(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-nod=
+e',"
++        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 1,"
++        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
++        " 'bandwidth': 68718428160 } }")));    /* 65535 MB/s */
++
++    /* let machine initialization to complete and run */
++    g_assert_false(qmp_rsp_is_err(qtest_qmp(qs,
++        "{ 'execute': 'x-exit-preconfig' }")));
++    qtest_qmp_eventwait(qs, "RESUME");
++
++    qtest_quit(qs);
++}
++
+ int main(int argc, char **argv)
  {
-     VirtIOMMIOProxy *proxy =3D (VirtIOMMIOProxy *)opaque;
-@@ -378,6 +391,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offs=
-et, uint64_t value,
+     const char *args =3D NULL;
+@@ -346,6 +556,9 @@ int main(int argc, char **argv)
+     if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
+         qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
+         qtest_add_data_func("/numa/pc/dynamic/cpu", args, pc_dynamic_cpu_c=
+fg);
++        qtest_add_data_func("/numa/pc/hmat/build", args, pc_hmat_build_cfg=
+);
++        qtest_add_data_func("/numa/pc/hmat/off", args, pc_hmat_off_cfg);
++        qtest_add_data_func("/numa/pc/hmat/erange", args, pc_hmat_erange_c=
+fg);
+     }
 =20
-         if (vdev->status =3D=3D 0) {
-             virtio_reset(vdev);
-+            virtio_mmio_soft_reset(proxy);
-         }
-         break;
-     case VIRTIO_MMIO_QUEUE_DESC_LOW:
+     if (!strcmp(arch, "ppc64")) {
 --=20
 MST
 
