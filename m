@@ -2,96 +2,84 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 181B4C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAEFC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D76A62073D
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24B5C2073D
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 09:08:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnwMTUT/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76A62073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igcD6iqO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24B5C2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iokRv-0005vT-6D
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 03:42:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52201)
+	id 1iokrA-0006or-6B
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 04:08:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iojQq-0007T0-0T
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:41 -0500
+ (envelope-from <thuth@redhat.com>) id 1iojOp-0004Ll-Rc
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iojQo-0000Jj-Lr
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:39 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49227
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iojOo-0007Nl-IZ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59611
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iojQo-0000JO-Iq
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:37:38 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iojOo-0007NQ-EW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 02:35:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578382658;
+ s=mimecast20190719; t=1578382534;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=10wNZRiSDwsgBzUvgX+qZm4UOG4d0UwTiZy8rXJV4jo=;
- b=KnwMTUT/ayyCjRT9/F1OjAWgzc9bS1MFh1gX5FleiI2frAtBsNT7r9hUiIi1CaGiBt0ZPF
- lNQEGw9FI2h6HipH47B9wDyIHKplxxfAvvfTc9bs4U6RFn27b+Na+tys9QfhKxNNt4EJiM
- 24y9Ggr4d4BgSjRBrWtmLarMOF7zGmI=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-1TY63rK3Mu-rjYGwW7Dh-g-1; Tue, 07 Jan 2020 02:37:36 -0500
-Received: by mail-qv1-f71.google.com with SMTP id e14so6012498qvr.6
- for <qemu-devel@nongnu.org>; Mon, 06 Jan 2020 23:37:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tfGwPPQntx/q9Ytbl/8/C6b7fB9jJ0SAUnXApOete/4=;
- b=fMB6Tc784QkPBIVsVDZcRVxvsSHhHngMsmInkoBE+UDjxR4V34D+SldNULYMlCR9ek
- 7nW7NJomDMIAgvoe3nSQ2tW2UMA7NVAIgUtZlZDa1022p6GqgOE0+KYS1aQlil7gsOdv
- pT5WcCZbi/JkDEvwSv+st70xfPGaSzOV9flKY9JsXxVX97jUhqHea50lAIWxj21+c/L4
- 0Nf4TwZkcp+yJ5a2x8rkuJYRZobpoV0P1VKAzdY/Er5d40Y3Sy8Dkr+QS9XOtScoFK4K
- YZ2420CxNiUGheGuYXOi+jSMe3TA+2slMXgoeyh/K6CfkOb1eEs/8nsibJfde66EVM3z
- pN7w==
-X-Gm-Message-State: APjAAAWxIPOXOVTZCFPvr0YZJK008tSArnxuf5QDfnLlwzVJ037xwMIH
- Dy7kqtGIVotfIycP3liL+o50QN5gUp0hn3RXOuyvygO7RER3wb2eMRgYPpjrh/blqypqUolfmQZ
- S6p27ryxcQ+VDRg8=
-X-Received: by 2002:ac8:1c43:: with SMTP id j3mr76672176qtk.316.1578382655130; 
- Mon, 06 Jan 2020 23:37:35 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy5QKrWDYKpdXFMExmNHnQzb+SllAW9n6qaWuM27WedOIDrFvFG5tLHhnUb8G37wskVZ3RO0g==
-X-Received: by 2002:ac8:1c43:: with SMTP id j3mr76672171qtk.316.1578382654978; 
- Mon, 06 Jan 2020 23:37:34 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id g62sm21970507qkd.25.2020.01.06.23.37.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 06 Jan 2020 23:37:34 -0800 (PST)
-Date: Tue, 7 Jan 2020 02:37:31 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 28/32] virtio-mmio: update queue size on guest write
-Message-ID: <20200107073451.298261-29-mst@redhat.com>
-References: <20200107073451.298261-1-mst@redhat.com>
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=9MB1EpwF/3QQ/vJ0P9V4XwfNz1wYN5CHQ5mAOEIgsWc=;
+ b=igcD6iqOM8T2TukFvz30JZooeK5i4+fssuKNLmen1Sjqt4jHOkX3+CEW3cCPtO5msGyFus
+ xM2RsGSElGcU3sieVeDjuscDdvIg1ss6UbAfbHp9OCLK3nVxSlMFLKlhuwAGWCn1mHXOYT
+ IM0BCaHYm6CQrJa4nKjMiS5lqm7DY8o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-FdoqD2fZOFKOIrQZOzg5-w-1; Tue, 07 Jan 2020 02:35:27 -0500
+X-MC-Unique: FdoqD2fZOFKOIrQZOzg5-w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4DCB801E76;
+ Tue,  7 Jan 2020 07:35:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-116.ams2.redhat.com [10.36.116.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 89F8E1C4;
+ Tue,  7 Jan 2020 07:35:20 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 01/16] libcflat: Add other size defines
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20191216140235.10751-1-eric.auger@redhat.com>
+ <20191216140235.10751-2-eric.auger@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <cab416f2-4e86-4cae-97e9-d78cfb7f2781@redhat.com>
+Date: Tue, 7 Jan 2020 08:35:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200107073451.298261-1-mst@redhat.com>
-X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
-X-Mutt-Fcc: =sent
-X-MC-Unique: 1TY63rK3Mu-rjYGwW7Dh-g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <20191216140235.10751-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,43 +91,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-stable@nongnu.org
+Cc: yuzenghui@huawei.com, andre.przywara@arm.com, drjones@redhat.com,
+ alexandru.elisei@arm.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+On 16/12/2019 15.02, Eric Auger wrote:
+> Introduce additional SZ_256, SZ_8K, SZ_16K macros that will
+> be used by ITS tests.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  lib/libcflat.h | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index ea19f61..7092af2 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -36,7 +36,10 @@
+>  #define ALIGN(x, a)		__ALIGN((x), (a))
+>  #define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
+>  
+> +#define SZ_256			(1 << 8)
+>  #define SZ_4K			(1 << 12)
+> +#define SZ_8K			(1 << 13)
+> +#define SZ_16K			(1 << 14)
+>  #define SZ_64K			(1 << 16)
+>  #define SZ_2M			(1 << 21)
+>  #define SZ_1G			(1 << 30)
+> 
 
-Some guests read back queue size after writing it.
-Always update the on size write otherwise they might be confused.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Message-Id: <20191224081446.17003-1-dplotnikov@virtuozzo.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/virtio-mmio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-index ef40b7a9b2..872f2cd237 100644
---- a/hw/virtio/virtio-mmio.c
-+++ b/hw/virtio/virtio-mmio.c
-@@ -308,8 +308,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offs=
-et, uint64_t value,
-         break;
-     case VIRTIO_MMIO_QUEUE_NUM:
-         trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
-+        virtio_queue_set_num(vdev, vdev->queue_sel, value);
-+
-         if (proxy->legacy) {
--            virtio_queue_set_num(vdev, vdev->queue_sel, value);
-             virtio_queue_update_rings(vdev, vdev->queue_sel);
-         } else {
-             proxy->vqs[vdev->queue_sel].num =3D value;
---=20
-MST
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
