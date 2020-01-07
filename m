@@ -2,64 +2,62 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620EBC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 04:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE36C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 05:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DC852075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 04:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A96FA2075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 05:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="crhWWj77"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC852075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BV5fei4J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96FA2075A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iogwP-0000Wy-Qj
-	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 23:58:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44126)
+	id 1iogsn-0003Ik-V3
+	for qemu-devel@archiver.kernel.org; Mon, 06 Jan 2020 23:54:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iognI-0005K4-F8
+ (envelope-from <dgibson@ozlabs.org>) id 1iognM-0005Lc-NQ
  for qemu-devel@nongnu.org; Mon, 06 Jan 2020 23:48:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iognG-0004bT-NS
- for qemu-devel@nongnu.org; Mon, 06 Jan 2020 23:48:39 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34365 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iognI-0004e8-8D
+ for qemu-devel@nongnu.org; Mon, 06 Jan 2020 23:48:44 -0500
+Received: from ozlabs.org ([2401:3900:2:1::2]:41111)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iognG-0004Vq-30; Mon, 06 Jan 2020 23:48:38 -0500
+ id 1iognH-0004Vc-U1; Mon, 06 Jan 2020 23:48:40 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47sKdX0QB4z9sRG; Tue,  7 Jan 2020 15:48:31 +1100 (AEDT)
+ id 47sKdW5mPgz9sRK; Tue,  7 Jan 2020 15:48:31 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578372512;
- bh=hKHBL40fvquvop2W00XL2m4WOhOqI+ZG7iI5VyXxM7g=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=crhWWj776waB4cRfVhWnKO6O/GXfdyo36re9dP4K8bJDvimHKEbFw/mNuvhu3qu17
- mwD7K5qqPPAzMob87rWVKi/3w/rGj3fWw0NAy7koNkbk85kh/Vrb2LeLhkO2Qv61V1
- uuyy2taKkTRcsqh9eoMoXp8pykFhfrbmQi4xYNH0=
+ d=gibson.dropbear.id.au; s=201602; t=1578372511;
+ bh=Y1fJLmHsx1ZlkSB3wbl8Ri4K1UbGDGFlzQzbv2B7WYU=;
+ h=From:To:Cc:Subject:Date:From;
+ b=BV5fei4JrPN1TkKMk0DpAoJiaZLaYm1qawLA7gdJ7RdobZ02JhtlmCLgwLHpbK5Se
+ kiXfizDlnfwFflmzi/j1sfhlTPBP6fkNSRVvRRwjtnEHzDJw4Dk9VHwrhRTZqvBSYc
+ RUMNuBdDj8OadN7buAoCZuf9WLZ8j3/c0Njp+qGk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org,
 	groug@kaod.org,
 	philmd@redhat.com,
 	clg@kaod.org
-Subject: [PATCH v2 02/10] ppc: Remove stub of PPC970 HID4 implementation
-Date: Tue,  7 Jan 2020 15:48:19 +1100
-Message-Id: <20200107044827.471355-3-david@gibson.dropbear.id.au>
+Subject: [PATCH v2 00/10] target/ppc: Correct some errors with real mode
+ handling
+Date: Tue,  7 Jan 2020 15:48:17 +1100
+Message-Id: <20200107044827.471355-1-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200107044827.471355-1-david@gibson.dropbear.id.au>
-References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,115 +76,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PowerPC 970 CPU was a cut-down POWER4, which had hypervisor capabilit=
-y.
-However, it can be (and often was) strapped into "Apple mode", where the
-hypervisor capabilities were disabled (essentially putting it always in
-hypervisor mode).
+POWER "book S" (server class) cpus have a concept of "real mode" where
+MMU translation is disabled... sort of.  In fact this can mean a bunch
+of slightly different things when hypervisor mode and other
+considerations are present.
 
-That's actually the only mode of the 970 we support in qemu, and we're
-unlikely to change that any time soon.  However, we do have a partial
-implementation of the 970's HID4 register which affects things only
-relevant for hypervisor mode.
+We had some errors in edge cases here, so clean some things up and
+correct them.
 
-That stub is also really ugly, since it attempts to duplicate the effects
-of HID4 by re-encoding it into the LPCR register used in newer CPUs, but
-in a really confusing way.
+Changes since RFCv1:
+ * Add a number of extra patches taking advantage of the initial
+   cleanups
 
-Just get rid of it.
+David Gibson (10):
+  ppc: Drop PPC_EMULATE_32BITS_HYPV stub
+  ppc: Remove stub of PPC970 HID4 implementation
+  target/ppc: Correct handling of real mode accesses with vhyp on hash
+    MMU
+  target/ppc: Introduce ppc_hash64_use_vrma() helper
+  spapr, ppc: Remove VPM0/RMLS hacks for POWER9
+  target/ppc: Remove RMOR register from POWER9 & POWER10
+  target/ppc: Use class fields to simplify LPCR masking
+  target/ppc: Streamline calculation of RMA limit from LPCR[RMLS]
+  target/ppc: Correct RMLS table
+  target/ppc: Only calculate RMLS derived RMA limit on demand
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/mmu-hash64.c         | 28 +---------------------------
- target/ppc/translate_init.inc.c | 17 ++++++-----------
- 2 files changed, 7 insertions(+), 38 deletions(-)
+ hw/ppc/spapr_cpu_core.c         |   6 +-
+ target/ppc/cpu-qom.h            |   1 +
+ target/ppc/cpu.h                |   8 --
+ target/ppc/mmu-hash64.c         | 241 ++++++++++++--------------------
+ target/ppc/translate_init.inc.c |  54 ++++---
+ 5 files changed, 130 insertions(+), 180 deletions(-)
 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index da8966ccf5..a881876647 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -1091,33 +1091,6 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong =
-val)
-=20
-     /* Filter out bits */
-     switch (env->mmu_model) {
--    case POWERPC_MMU_64B: /* 970 */
--        if (val & 0x40) {
--            lpcr |=3D LPCR_LPES0;
--        }
--        if (val & 0x8000000000000000ull) {
--            lpcr |=3D LPCR_LPES1;
--        }
--        if (val & 0x20) {
--            lpcr |=3D (0x4ull << LPCR_RMLS_SHIFT);
--        }
--        if (val & 0x4000000000000000ull) {
--            lpcr |=3D (0x2ull << LPCR_RMLS_SHIFT);
--        }
--        if (val & 0x2000000000000000ull) {
--            lpcr |=3D (0x1ull << LPCR_RMLS_SHIFT);
--        }
--        env->spr[SPR_RMOR] =3D ((lpcr >> 41) & 0xffffull) << 26;
--
--        /*
--         * XXX We could also write LPID from HID4 here
--         * but since we don't tag any translation on it
--         * it doesn't actually matter
--         *
--         * XXX For proper emulation of 970 we also need
--         * to dig HRMOR out of HID5
--         */
--        break;
-     case POWERPC_MMU_2_03: /* P5p */
-         lpcr =3D val & (LPCR_RMLS | LPCR_ILE |
-                       LPCR_LPES0 | LPCR_LPES1 |
-@@ -1154,6 +1127,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong v=
-al)
-         }
-         break;
-     default:
-+        g_assert_not_reached();
-         ;
-     }
-     env->spr[SPR_LPCR] =3D lpcr;
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-index d33d65dff7..436d0d5a51 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -7884,25 +7884,20 @@ static void spr_write_lpcr(DisasContext *ctx, int=
- sprn, int gprn)
- {
-     gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
- }
--
--static void spr_write_970_hid4(DisasContext *ctx, int sprn, int gprn)
--{
--#if defined(TARGET_PPC64)
--    spr_write_generic(ctx, sprn, gprn);
--    gen_helper_store_lpcr(cpu_env, cpu_gpr[gprn]);
--#endif
--}
--
- #endif /* !defined(CONFIG_USER_ONLY) */
-=20
- static void gen_spr_970_lpar(CPUPPCState *env)
- {
- #if !defined(CONFIG_USER_ONLY)
-     /* Logical partitionning */
--    /* PPC970: HID4 is effectively the LPCR */
-+    /* PPC970: HID4 covers things later controlled by the LPCR and
-+     * RMOR in later CPUs, but with a different encoding.  We only
-+     * support the 970 in "Apple mode" which has all hypervisor
-+     * facilities disabled by strapping, so we can basically just
-+     * ignore it */
-     spr_register(env, SPR_970_HID4, "HID4",
-                  SPR_NOACCESS, SPR_NOACCESS,
--                 &spr_read_generic, &spr_write_970_hid4,
-+                 &spr_read_generic, &spr_write_generic,
-                  0x00000000);
- #endif
- }
 --=20
 2.24.1
 
