@@ -2,82 +2,70 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD48C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3767EC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39C012072A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:34:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 035642072A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:34:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GjXnGSJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C012072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="NuycvI0Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 035642072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioo4E-0002Bh-4R
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 07:34:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38195)
+	id 1ioo4R-0002aB-1G
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 07:34:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iomsu-0000Vj-S0
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:18:53 -0500
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ionaz-0007q7-HE
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:04:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iomst-00038l-Jg
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:18:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55999
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iomst-00038d-GA
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:18:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578395931;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=D7G2Hr/IY5UK1IfLOmyjJsmLcxJDVV/rgKowardJw7c=;
- b=GjXnGSJP6UjbuvAYAr1sfwHwQBdmiPA6Ex7fbBtGNPpcFxqDjOX8EbIC5XDQebr0W9GSM+
- 1Q+8Ww4m2eXEGNdwlCt8CrYJevNPeMK9slJiKS0tAY/x/KQgw3sqURC6meTYCmEeFRUSMF
- VUunzXrQ/OYWtTZlbd2LHhEsQLBGGqo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-fHoip11rPUKnRbkJ3rHl4Q-1; Tue, 07 Jan 2020 06:18:49 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7314E801E72
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:18:48 +0000 (UTC)
-Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EDF15C1BB;
- Tue,  7 Jan 2020 11:18:43 +0000 (UTC)
-Date: Tue, 7 Jan 2020 11:18:40 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH 064/104] vhost-user: Print unexpected slave message types
-Message-ID: <20200107111840.GH3368802@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-65-dgilbert@redhat.com>
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ionay-00055U-5L
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:04:25 -0500
+Received: from kylie.crudebyte.com ([5.189.157.229]:48767)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1ionax-00054a-Nt; Tue, 07 Jan 2020 07:04:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=qwn+YflkmXMzVdg/qc9WtGHPelcy3T8p1Ct687icdtw=; b=NuycvI0YnEne/Wj+tZooHDrbWg
+ JHMW0BaIv740ddVqahQ3sS1gatgoUCAWddwjykSoKshHm5WXKNG5BKjrsg8AesZkDr/RprHL25mlq
+ pHklX4UbONXGqPm5OyAI3aj7JbkQFGQWYmxHKpoKb0rY76OweZUgOyUBEGl6h47ivI/WsLXTgZV/x
+ b7WklDH/AWw3kX1EAQMMfI4kJhakOyl2xCU4GzpQWyRdzi4d/MZHYekgWErZ8gUMPcFs6kjXIWzqv
+ iZw69OoU9nxD1uVwF+bGzwD3uQh08urYBjENMxS6Fz4d0ZDq1SGzcTcKbwmb49A9ut/4mt87BQnS7
+ 2Eul54CS+GOc/IeTIzsYANtvwvMSLYyRWp+AD+NSv5Sqmz/9/vtXmtN8LsVCGi1uMRvfkpbOJ8nft
+ drl1VZOvOBSBIU8D31AfV592qx02K1R4SR4mEtAcgYlvkYpfs0AIAleTYIAkZHfbyE4rhZMnNq7Ba
+ HwxuclEA/BqQfW1d37c+1NFBkBabvilMgl56PEa71uhtzeJDrMKF0O8Hh3EgWOMA0hDKPMJlcpsms
+ vZvJYaSPoOlHdXlSlbcTPV6g6Q7z6NGiagC9CUEssXczxx0XupmU1EmmuJRFz2l0oWAuohuM2UP7N
+ mF2+27EZiRPxTZEa2Feuo/ROtrnzuqdazG5WpmlHI=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-trivial@nongnu.org,
+ Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v1 44/59] 9p-local.c: remove unneeded label in
+ local_unlinkat_common()
+Date: Tue, 07 Jan 2020 13:04:20 +0100
+Message-ID: <16442994.pYkbpd2YfT@silver>
+In-Reply-To: <20200106182425.20312-45-danielhb413@gmail.com>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-45-danielhb413@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191212163904.159893-65-dgilbert@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: fHoip11rPUKnRbkJ3rHl4Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +77,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 04:38:24PM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> When we receive an unexpected message type on the slave fd, print
-> the type.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On Montag, 6. Januar 2020 19:24:10 CET Daniel Henrique Barboza wrote:
+> 'err_out' can be replaced by 'return ret' in the error conditions
+> the jump was being made.
+> 
+> CC: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > ---
->  hw/virtio/vhost-user.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/9pfs/9p-local.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index ca641390fb..f9bdd2ad7c 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1094,12 +1094,12 @@ static int local_unlinkat_common(FsContext *ctx, int
+> dirfd, const char *name,
+> 
+>              fd = openat_dir(dirfd, name);
+>              if (fd == -1) {
+> -                goto err_out;
+> +                return ret;
+>              }
+>              ret = unlinkat(fd, VIRTFS_META_DIR, AT_REMOVEDIR);
+>              close_preserve_errno(fd);
+>              if (ret < 0 && errno != ENOENT) {
+> -                goto err_out;
+> +                return ret;
+>              }
+>          }
+>          map_dirfd = openat_dir(dirfd, VIRTFS_META_DIR);
+> @@ -1107,16 +1107,14 @@ static int local_unlinkat_common(FsContext *ctx, int
+> dirfd, const char *name, ret = unlinkat(map_dirfd, name, 0);
+>              close_preserve_errno(map_dirfd);
+>              if (ret < 0 && errno != ENOENT) {
+> -                goto err_out;
+> +                return ret;
+>              }
+>          } else if (errno != ENOENT) {
+> -            goto err_out;
+> +            return ret;
+>          }
+>      }
+> 
+> -    ret = unlinkat(dirfd, name, flags);
+> -err_out:
+> -    return ret;
+> +    return unlinkat(dirfd, name, flags);
+>  }
+> 
+>  static int local_remove(FsContext *ctx, const char *path)
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Well, personally I don't see any improvement by these changes. It probably 
+makes the code slightly more elegant, but IMO not more readable. And return 
+constructed functions vs. jump to label constructed functions are more likely 
+to gather missing-cleanup bugs.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+At least this patch does not cause any behaviour change, so I leave that up to 
+you Greg to decide. ;-)
+
+Best regards,
+Christian Schoenebeck
+
 
 
