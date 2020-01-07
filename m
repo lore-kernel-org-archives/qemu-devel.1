@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 127C5C33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2A2C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:29:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D223F20715
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:28:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD61520715
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:29:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtnCA/IK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D223F20715
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgeE8h1l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD61520715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqmD-0003ba-FT
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:28:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57830)
+	id 1ioqnW-0005ky-9S
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:29:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55317)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqVW-0001kW-Ut
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:11:00 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqRt-00024O-MU
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:07:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqVV-0006q1-S9
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:10:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48269
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqRs-00040y-1C
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:07:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55074
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ioqVV-0006pl-Oc
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:10:57 -0500
+ id 1ioqRr-00040V-Qe
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:07:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578409857;
+ s=mimecast20190719; t=1578409631;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JI6010Zba0jR7V5oioUNd1W8ZIeOPboPlX4JjxIfyT0=;
- b=JtnCA/IKf+BAdnyl78unPVrKGKAEUvmE5M1+r3bhqiS0uovVTR230k2LPecBxrRAdRaEoR
- hxXZ+mYpp3bEoXl2G85+KHNKKGf2OM+e48riydcbw80K5ktQ89TXzrvyw8UUre79D27uNb
- wUgQgBTCE1FsFFQ6F8zX9cGZ0DA9yEM=
+ bh=c7cGot02nRRi0ZPDjFe9KWGgNNA0vm+nIgmhLwmAjqk=;
+ b=CgeE8h1lL9HcdnvbFVlik0EyJxXnWxQaIJNHrILGF5MqmjM1oDnPGcsqF4N3igpSKNYC/k
+ 4eQV/D48+CryWg3kDHAHFCp9aoME/Xkjy9ECArRMAqDSAxoHgeVoYh+Lk8mXxaUOHVOjmu
+ qQhn8PPrdnWCquL+s+/RpS349l7L1pg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-2vBbqoMgMm26WphpBmj_OA-1; Tue, 07 Jan 2020 10:10:55 -0500
+ us-mta-317-hP629AO3OJKZh0ERJEh0pw-1; Tue, 07 Jan 2020 10:07:10 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E5981B18BCA;
- Tue,  7 Jan 2020 15:10:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D5B2107ACC4;
+ Tue,  7 Jan 2020 15:07:09 +0000 (UTC)
 Received: from localhost (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA6E05C1BB;
- Tue,  7 Jan 2020 15:10:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C10185C1B0;
+ Tue,  7 Jan 2020 15:07:06 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 31/37] smbus-eeprom: remove PROP_PTR
-Date: Tue,  7 Jan 2020 19:04:36 +0400
-Message-Id: <20200107150442.1727958-32-marcandre.lureau@redhat.com>
+Subject: [PULL 12/37] serial: start making SerialMM a sysbus device
+Date: Tue,  7 Jan 2020 19:04:17 +0400
+Message-Id: <20200107150442.1727958-13-marcandre.lureau@redhat.com>
 In-Reply-To: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 References: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 2vBbqoMgMm26WphpBmj_OA-1
+X-MC-Unique: hP629AO3OJKZh0ERJEh0pw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -93,73 +93,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead, set the initial data field directly.
-
-(the initial data is an array of 256 bytes. As I don't know if it may
-change over time, I keep the pointer to original buffer as is, but it
-might be worth to consider to copy it instead)
+Memory mapped serial device is in fact a sysbus device. The following
+patches will make use of sysbus facilities for resource and
+registration. In particular, "serial-mm: use sysbus facilities" will
+move internal serial realization to serial_mm_realize callback to
+follow qdev best practices.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i2c/smbus_eeprom.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ include/hw/char/serial.h | 20 ++++++++---
+ hw/char/omap_uart.c      |  2 +-
+ hw/char/serial.c         | 72 ++++++++++++++++++++++++++++++----------
+ hw/mips/boston.c         |  2 +-
+ hw/mips/mips_malta.c     |  2 +-
+ 5 files changed, 73 insertions(+), 25 deletions(-)
 
-diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
-index 54c86a0112..5adf3b15b5 100644
---- a/hw/i2c/smbus_eeprom.c
-+++ b/hw/i2c/smbus_eeprom.c
-@@ -44,7 +44,7 @@
- typedef struct SMBusEEPROMDevice {
-     SMBusDevice smbusdev;
-     uint8_t data[SMBUS_EEPROM_SIZE];
--    void *init_data;
-+    uint8_t *init_data;
-     uint8_t offset;
-     bool accessed;
- } SMBusEEPROMDevice;
-@@ -129,14 +129,14 @@ static void smbus_eeprom_reset(DeviceState *dev)
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+index 548944b06a..730165347c 100644
+--- a/include/hw/char/serial.h
++++ b/include/hw/char/serial.h
+@@ -57,7 +57,6 @@ typedef struct SerialState {
+     qemu_irq irq;
+     CharBackend chr;
+     int last_break_enable;
+-    int it_shift;
+     uint32_t baudbase;
+     uint32_t tsr_retry;
+     guint watch_tag;
+@@ -80,6 +79,14 @@ typedef struct SerialState {
+     MemoryRegion io;
+ } SerialState;
 =20
- static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
- {
-+    SMBusEEPROMDevice *eeprom =3D SMBUS_EEPROM(dev);
++typedef struct SerialMM {
++    SysBusDevice parent;
 +
-     smbus_eeprom_reset(dev);
-+    if (eeprom->init_data =3D=3D NULL) {
-+        error_setg(errp, "init_data cannot be NULL");
++    SerialState serial;
++
++    int it_shift;
++} SerialMM;
++
+ extern const VMStateDescription vmstate_serial;
+ extern const MemoryRegionOps serial_io_ops;
+=20
+@@ -88,12 +95,15 @@ void serial_set_frequency(SerialState *s, uint32_t freq=
+uency);
+ #define TYPE_SERIAL "serial"
+ #define SERIAL(s) OBJECT_CHECK(SerialState, (s), TYPE_SERIAL)
+=20
++#define TYPE_SERIAL_MM "serial-mm"
++#define SERIAL_MM(s) OBJECT_CHECK(SerialMM, (s), TYPE_SERIAL_MM)
++
+ SerialState *serial_init(int base, qemu_irq irq, int baudbase,
+                          Chardev *chr, MemoryRegion *system_io);
+-SerialState *serial_mm_init(MemoryRegion *address_space,
+-                            hwaddr base, int it_shift,
+-                            qemu_irq irq, int baudbase,
+-                            Chardev *chr, enum device_endian end);
++SerialMM *serial_mm_init(MemoryRegion *address_space,
++                         hwaddr base, int it_shift,
++                         qemu_irq irq, int baudbase,
++                         Chardev *chr, enum device_endian end);
+=20
+ /* serial-isa.c */
+=20
+diff --git a/hw/char/omap_uart.c b/hw/char/omap_uart.c
+index 13e4f43c4c..e8da933378 100644
+--- a/hw/char/omap_uart.c
++++ b/hw/char/omap_uart.c
+@@ -27,7 +27,7 @@
+ struct omap_uart_s {
+     MemoryRegion iomem;
+     hwaddr base;
+-    SerialState *serial; /* TODO */
++    SerialMM *serial; /* TODO */
+     struct omap_target_agent_s *ta;
+     omap_clk fclk;
+     qemu_irq irq;
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index ec388f3876..824390817c 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -1032,16 +1032,28 @@ static const TypeInfo serial_info =3D {
+ static uint64_t serial_mm_read(void *opaque, hwaddr addr,
+                                unsigned size)
+ {
+-    SerialState *s =3D opaque;
+-    return serial_ioport_read(s, addr >> s->it_shift, 1);
++    SerialMM *s =3D SERIAL_MM(opaque);
++    return serial_ioport_read(&s->serial, addr >> s->it_shift, 1);
+ }
+=20
+ static void serial_mm_write(void *opaque, hwaddr addr,
+                             uint64_t value, unsigned size)
+ {
+-    SerialState *s =3D opaque;
++    SerialMM *s =3D SERIAL_MM(opaque);
+     value &=3D 255;
+-    serial_ioport_write(s, addr >> s->it_shift, value, 1);
++    serial_ioport_write(&s->serial, addr >> s->it_shift, value, 1);
++}
++
++static void serial_mm_realize(DeviceState *dev, Error **errp)
++{
++    SerialMM *s =3D SERIAL_MM(dev);
++    Error *local_err =3D NULL;
++
++    object_property_set_bool(OBJECT(&s->serial), true, "realized", &local_=
+err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
 +    }
  }
 =20
--static Property smbus_eeprom_properties[] =3D {
--    DEFINE_PROP_PTR("data", SMBusEEPROMDevice, init_data),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
- static void smbus_eeprom_class_initfn(ObjectClass *klass, void *data)
+ static const MemoryRegionOps serial_mm_ops[3] =3D {
+@@ -1068,30 +1080,56 @@ static const MemoryRegionOps serial_mm_ops[3] =3D {
+     },
+ };
+=20
+-SerialState *serial_mm_init(MemoryRegion *address_space,
+-                            hwaddr base, int it_shift,
+-                            qemu_irq irq, int baudbase,
+-                            Chardev *chr, enum device_endian end)
++SerialMM *serial_mm_init(MemoryRegion *address_space,
++                         hwaddr base, int it_shift,
++                         qemu_irq irq, int baudbase,
++                         Chardev *chr, enum device_endian end)
  {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-@@ -146,9 +146,8 @@ static void smbus_eeprom_class_initfn(ObjectClass *klas=
-s, void *data)
-     dc->reset =3D smbus_eeprom_reset;
-     sc->receive_byte =3D eeprom_receive_byte;
-     sc->write_data =3D eeprom_write_data;
--    dc->props =3D smbus_eeprom_properties;
-     dc->vmsd =3D &vmstate_smbus_eeprom;
--    /* Reason: pointer property "data" */
-+    /* Reason: init_data */
-     dc->user_creatable =3D false;
+-    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
+-    SerialState *s =3D SERIAL(dev);
++    SerialMM *smm =3D SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
++    SerialState *s =3D &smm->serial;
+=20
+-    s->it_shift =3D it_shift;
++    smm->it_shift =3D it_shift;
+     s->irq =3D irq;
+-    qdev_prop_set_uint32(dev, "baudbase", baudbase);
+-    qdev_prop_set_chr(dev, "chardev", chr);
+-    qdev_set_legacy_instance_id(dev, base, 2);
+-    qdev_init_nofail(dev);
++    qdev_prop_set_uint32(DEVICE(s), "baudbase", baudbase);
++    qdev_prop_set_chr(DEVICE(s), "chardev", chr);
++    qdev_set_legacy_instance_id(DEVICE(s), base, 2);
+=20
+-    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
++    qdev_init_nofail(DEVICE(smm));
++
++    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], smm,
+                           "serial", 8 << it_shift);
+     memory_region_add_subregion(address_space, base, &s->io);
+-    return s;
++
++    return smm;
++}
++
++static void serial_mm_instance_init(Object *o)
++{
++    SerialMM *smm =3D SERIAL_MM(o);
++
++    object_initialize_child(o, "serial", &smm->serial, sizeof(smm->serial)=
+,
++                            TYPE_SERIAL, &error_abort, NULL);
  }
 =20
-@@ -172,7 +171,8 @@ void smbus_eeprom_init_one(I2CBus *smbus, uint8_t addre=
-ss, uint8_t *eeprom_buf)
-=20
-     dev =3D qdev_create((BusState *) smbus, TYPE_SMBUS_EEPROM);
-     qdev_prop_set_uint8(dev, "address", address);
--    qdev_prop_set_ptr(dev, "data", eeprom_buf);
-+    /* FIXME: use an array of byte or block backend property? */
-+    SMBUS_EEPROM(dev)->init_data =3D eeprom_buf;
-     qdev_init_nofail(dev);
++static void serial_mm_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(oc);
++
++    dc->realize =3D serial_mm_realize;
++}
++
++static const TypeInfo serial_mm_info =3D {
++    .name =3D TYPE_SERIAL_MM,
++    .parent =3D TYPE_SYS_BUS_DEVICE,
++    .class_init =3D serial_mm_class_init,
++    .instance_init =3D serial_mm_instance_init,
++    .instance_size =3D sizeof(SerialMM),
++};
++
+ static void serial_register_types(void)
+ {
+     type_register_static(&serial_info);
++    type_register_static(&serial_mm_info);
  }
+=20
+ type_init(serial_register_types)
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index ca7d813a52..23fdd5ec6a 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -50,7 +50,7 @@ typedef struct {
+=20
+     MachineState *mach;
+     MIPSCPSState cps;
+-    SerialState *uart;
++    SerialMM *uart;
+=20
+     CharBackend lcd_display;
+     char lcd_content[8];
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index 783cd99848..ea92e5e27d 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -83,7 +83,7 @@ typedef struct {
+     uint32_t i2csel;
+     CharBackend display;
+     char display_text[9];
+-    SerialState *uart;
++    SerialMM *uart;
+     bool display_inited;
+ } MaltaFPGAState;
 =20
 --=20
 2.25.0.rc1.20.g2443f3f80d
