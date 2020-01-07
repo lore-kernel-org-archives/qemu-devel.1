@@ -7,77 +7,95 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 450CAC33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5CDC33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13A1C2077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:32:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D11820848
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 11:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ib/AaEQm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A1C2077B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="achWDeH1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D11820848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ion64-00020V-MO
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:32:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38925)
+	id 1ion91-0008Ow-Qe
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 06:35:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iomvd-0000FF-EC
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:21:42 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iomVZ-0004Rj-LZ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:54:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iomvc-0004mC-6Y
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:21:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35296
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iomVX-0007Dm-Up
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:54:45 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27468
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iomvc-0004ly-34
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:21:40 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iomVX-0007D9-RW
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:54:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578396099;
+ s=mimecast20190719; t=1578394483;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XRU1fbeHj2mEmmyk9undtp1vHtmrOVjpgS4wUuIFOk4=;
- b=ib/AaEQmX4vkdnUF89f7+7TkH3vk6L+SfocV9oEyq1caH5fjYEkWvzzdnZ2nj4lA7DaSFS
- q81z6SLQa5aRNnoHv9K0uB6NiG+HNW39OlXp0bTU02FEDOdibSnyIMWmrgkd+rR3d6YXGu
- BX+JeqyaxuR//P8GQJyp58fLF8SIL2A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-wbaofb6TOmydSx9Y1xbDaQ-1; Tue, 07 Jan 2020 06:21:38 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94629801E72
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:21:37 +0000 (UTC)
-Received: from work-vm (ovpn-117-52.ams2.redhat.com [10.36.117.52])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 64EF185EE6;
- Tue,  7 Jan 2020 11:21:36 +0000 (UTC)
-Date: Tue, 7 Jan 2020 11:21:33 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v2 2/3] migration: Make sure that we don't call write()
- in case of error
-Message-ID: <20200107112133.GC2732@work-vm>
-References: <20200107104914.1814-1-quintela@redhat.com>
- <20200107104914.1814-3-quintela@redhat.com>
+ bh=TjodyhE9M9oMNhZED49rT8Ro16OowE6OEG/lcmHdm+4=;
+ b=achWDeH1FO5tPr6SRl+uP8IdAOVZ7+uASQ1EDXYaH105dryytstl86YDiZKtHNpl+/hsZU
+ /5D6h/XIHfPdZyl6lxlOthkjWI28Zo74+hOtdas3LQMMfElW03Ggjeu2NDX1DXyZkhLg1i
+ LDtzOBf4mdkz1uqPUBFwVDxXImQy7CY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-184-x5di-fJAPF2gZ6ztStcMCg-1; Tue, 07 Jan 2020 05:54:42 -0500
+Received: by mail-wr1-f69.google.com with SMTP id u12so28470176wrt.15
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:54:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5457hFrQC5z9kErgtWtmvH8rSFNPXA9e5vzM+pY/1rY=;
+ b=Z3vJqVpYYAhkdMn5cyxtX+fR2D0V4kMi9NLGIe3RQ4N6hnIIcUAryEoNQA9FqagMzs
+ OGaZfwHZin8nAyrqkEBan8oXplo9V9K9JAmKNPB6gbb6YPk1U8WT//hZ4zTKdpZ42/6h
+ z5LOUG/Mr4gdHGCOaFwoBOtvO8v89lLpo+E9VVJvBpimyQOs554RDVCH+/OmtrpaIWrV
+ /hgNN/nKpkjOnIzyZnHBVT4uEYWclq4XCOuNIVsoUmqhJ4iqS8qFH4k0FdwI41op8IjP
+ 8663chGFuULkINhfpqtza1zeTjPkqEAAb0N1Abi7a2Kh0E7MdFI/lcCLNLICfOkzgTsa
+ MF+Q==
+X-Gm-Message-State: APjAAAXKrqxvkzc1MaKsTRqrjBtEYYKqYLrhOX+j/xK6FW10ZJcg57mc
+ DMka3AZB6v49LS8nQ5cB1N6Dnqlterq/DZAAhiIbmc048TEkjIqp89oQrC4ZyKxFmhpk57YAJhB
+ Pw44/VzHgEPcOh3I=
+X-Received: by 2002:a7b:cf39:: with SMTP id m25mr40202739wmg.146.1578394480659; 
+ Tue, 07 Jan 2020 02:54:40 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxveQL3hZ2QnDilbrDEMNPP9vZyLZC+g3A3mQqLxulCBFmSQCH9Ui3lRCyB0gmc8tBAU61G8Q==
+X-Received: by 2002:a7b:cf39:: with SMTP id m25mr40202714wmg.146.1578394480338; 
+ Tue, 07 Jan 2020 02:54:40 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
+ ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+ by smtp.gmail.com with ESMTPSA id f1sm76414366wru.6.2020.01.07.02.54.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jan 2020 02:54:39 -0800 (PST)
+Subject: Re: [PATCH v2 2/4] tcg: Search includes in the parent source directory
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200101112303.20724-1-philmd@redhat.com>
+ <20200101112303.20724-3-philmd@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f298aa7f-d9bf-36ea-ffdf-b07e02fe6575@redhat.com>
+Date: Tue, 7 Jan 2020 11:54:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20200107104914.1814-3-quintela@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: wbaofb6TOmydSx9Y1xbDaQ-1
+In-Reply-To: <20200101112303.20724-3-philmd@redhat.com>
+Content-Language: en-US
+X-MC-Unique: x5di-fJAPF2gZ6ztStcMCg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,97 +107,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
+ qemu-riscv@nongnu.org, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Claudio Fontana <claudio.fontana@huawei.com>,
+ Laurent Vivier <laurent@vivier.eu>, Michael Walle <michael@walle.cc>,
+ qemu-ppc@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> If we are exiting due to an error/finish/.... Just don't try to even
-> touch the channel with one IO operation.
+On 01/01/20 12:23, Philippe Mathieu-Daud=C3=A9 wrote:
+> All the *.inc.c files included by tcg/$TARGET/tcg-target.inc.c
+> are in tcg/, their parent directory. To simplify the preprocessor
+> search path, include the relative parent path: '..'.
 >=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Patch created mechanically by running:
+>=20
+>   $ for x in tcg-pool.inc.c tcg-ldst.inc.c; do \
+>     sed -i "s,#include \"$x\",#include \"../$x\"," \
+>       $(git grep -l "#include \"$x\""); \
+>     done
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Another possibility is to move the .inc.c files to include/tcg (probably
+renaming them to .inc.h in the meanwhile) but this is good too.
+
+Paolo
+
 > ---
->  migration/ram.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+>  tcg/aarch64/tcg-target.inc.c | 4 ++--
+>  tcg/arm/tcg-target.inc.c     | 4 ++--
+>  tcg/i386/tcg-target.inc.c    | 4 ++--
+>  tcg/mips/tcg-target.inc.c    | 2 +-
+>  tcg/ppc/tcg-target.inc.c     | 4 ++--
+>  tcg/riscv/tcg-target.inc.c   | 4 ++--
+>  tcg/s390/tcg-target.inc.c    | 4 ++--
+>  tcg/sparc/tcg-target.inc.c   | 2 +-
+>  8 files changed, 14 insertions(+), 14 deletions(-)
 >=20
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 96feb4062c..6e678dbd2e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -900,6 +900,12 @@ struct {
->      uint64_t packet_num;
->      /* send channels ready */
->      QemuSemaphore channels_ready;
-> +    /*
-> +     * Have we already run terminate threads.  There is a race when it
-> +     * happens that we got one error while we are exiting.
-> +     * We will use atomic operations.  Only valid values are 0 and 1.
-> +     */
-> +    int exiting;
->  } *multifd_send_state;
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index 3f921015d3..843fd0ca69 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -10,7 +10,7 @@
+>   * See the COPYING file in the top-level directory for details.
+>   */
 > =20
->  /*
-> @@ -928,6 +934,10 @@ static int multifd_send_pages(RAMState *rs)
->      MultiFDPages_t *pages =3D multifd_send_state->pages;
->      uint64_t transferred;
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
+>  #include "qemu/bitops.h"
 > =20
-> +    if (atomic_read(&multifd_send_state->exiting)) {
-> +        return -1;
-> +    }
-> +
->      qemu_sem_wait(&multifd_send_state->channels_ready);
->      for (i =3D next_channel;; i =3D (i + 1) % migrate_multifd_channels()=
-) {
->          p =3D &multifd_send_state->params[i];
-> @@ -1009,6 +1019,16 @@ static void multifd_send_terminate_threads(Error *=
-err)
->          }
->      }
+>  /* We're going to re-use TCGType in setting of the SF bit, which control=
+s
+> @@ -1541,7 +1541,7 @@ static void tcg_out_cltz(TCGContext *s, TCGType ext=
+, TCGReg d,
+>  }
 > =20
-> +    /*
-> +     * We don't want to exit each threads twice.  Depending on where
-> +     * we get the error, or if there are two independent errors in two
-> +     * threads at the same time, we can end calling this function
-> +     * twice.
-> +     */
-
-Yeh that makes it cleaer.  Thanks
-
-> +    if (atomic_xchg(&multifd_send_state->exiting, 1)) {
-> +        return;
-> +    }
-> +
->      for (i =3D 0; i < migrate_multifd_channels(); i++) {
->          MultiFDSendParams *p =3D &multifd_send_state->params[i];
+>  #ifdef CONFIG_SOFTMMU
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
 > =20
-> @@ -1118,6 +1138,10 @@ static void *multifd_send_thread(void *opaque)
+>  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+>   *                                     TCGMemOpIdx oi, uintptr_t ra)
+> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+> index 94d80d79d1..fffb6611e2 100644
+> --- a/tcg/arm/tcg-target.inc.c
+> +++ b/tcg/arm/tcg-target.inc.c
+> @@ -23,7 +23,7 @@
+>   */
 > =20
->      while (true) {
->          qemu_sem_wait(&p->sem);
-> +
-> +        if (atomic_read(&multifd_send_state->exiting)) {
-> +            break;
-> +        }
->          qemu_mutex_lock(&p->mutex);
+>  #include "elf.h"
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
 > =20
->          if (p->pending_job) {
-> @@ -1224,6 +1248,7 @@ int multifd_save_setup(void)
->      multifd_send_state->params =3D g_new0(MultiFDSendParams, thread_coun=
-t);
->      multifd_send_state->pages =3D multifd_pages_init(page_count);
->      qemu_sem_init(&multifd_send_state->channels_ready, 0);
-> +    atomic_set(&multifd_send_state->exiting, 0);
+>  int arm_arch =3D __ARM_ARCH;
 > =20
->      for (i =3D 0; i < thread_count; i++) {
->          MultiFDSendParams *p =3D &multifd_send_state->params[i];
-> --=20
-> 2.24.1
+> @@ -1131,7 +1131,7 @@ static TCGCond tcg_out_cmp2(TCGContext *s, const TC=
+GArg *args,
+>  }
+> =20
+>  #ifdef CONFIG_SOFTMMU
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
+> =20
+>  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+>   *                                     int mmu_idx, uintptr_t ra)
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index 9d8ed974e0..cdedcb2b25 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -22,7 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+> =20
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
+> =20
+>  #ifdef CONFIG_DEBUG_TCG
+>  static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] =3D {
+> @@ -1647,7 +1647,7 @@ static void tcg_out_nopn(TCGContext *s, int n)
+>  }
+> =20
+>  #if defined(CONFIG_SOFTMMU)
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
+> =20
+>  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+>   *                                     int mmu_idx, uintptr_t ra)
+> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+> index 5442167045..1da663ce84 100644
+> --- a/tcg/mips/tcg-target.inc.c
+> +++ b/tcg/mips/tcg-target.inc.c
+> @@ -1107,7 +1107,7 @@ static void tcg_out_call(TCGContext *s, tcg_insn_un=
+it *arg)
+>  }
+> =20
+>  #if defined(CONFIG_SOFTMMU)
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
+> =20
+>  static void * const qemu_ld_helpers[16] =3D {
+>      [MO_UB]   =3D helper_ret_ldub_mmu,
+> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+> index d308d69aba..ee1f9227c1 100644
+> --- a/tcg/ppc/tcg-target.inc.c
+> +++ b/tcg/ppc/tcg-target.inc.c
+> @@ -23,7 +23,7 @@
+>   */
+> =20
+>  #include "elf.h"
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
+> =20
+>  #if defined _CALL_DARWIN || defined __APPLE__
+>  #define TCG_TARGET_CALL_DARWIN
+> @@ -1845,7 +1845,7 @@ static const uint32_t qemu_exts_opc[4] =3D {
+>  };
+> =20
+>  #if defined (CONFIG_SOFTMMU)
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
+> =20
+>  /* helper signature: helper_ld_mmu(CPUState *env, target_ulong addr,
+>   *                                 int mmu_idx, uintptr_t ra)
+> diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc.c
+> index 7018509693..2bc0ba71f2 100644
+> --- a/tcg/riscv/tcg-target.inc.c
+> +++ b/tcg/riscv/tcg-target.inc.c
+> @@ -27,7 +27,7 @@
+>   * THE SOFTWARE.
+>   */
+> =20
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
+> =20
+>  #ifdef CONFIG_DEBUG_TCG
+>  static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] =3D {
+> @@ -921,7 +921,7 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
+>   */
+> =20
+>  #if defined(CONFIG_SOFTMMU)
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
+> =20
+>  /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+>   *                                     TCGMemOpIdx oi, uintptr_t ra)
+> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+> index 8aaa4cebe8..b07e9ff7d6 100644
+> --- a/tcg/s390/tcg-target.inc.c
+> +++ b/tcg/s390/tcg-target.inc.c
+> @@ -29,7 +29,7 @@
+>  #error "unsupported code generation mode"
+>  #endif
+> =20
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
+>  #include "elf.h"
+> =20
+>  /* ??? The translation blocks produced by TCG are generally small enough=
+ to
+> @@ -1536,7 +1536,7 @@ static void tcg_out_qemu_st_direct(TCGContext *s, M=
+emOp opc, TCGReg data,
+>  }
+> =20
+>  #if defined(CONFIG_SOFTMMU)
+> -#include "tcg-ldst.inc.c"
+> +#include "../tcg-ldst.inc.c"
+> =20
+>  /* We're expecting to use a 20-bit negative offset on the tlb memory ops=
+.  */
+>  QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
+> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+> index d7986cda5c..65fddb310d 100644
+> --- a/tcg/sparc/tcg-target.inc.c
+> +++ b/tcg/sparc/tcg-target.inc.c
+> @@ -22,7 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+> =20
+> -#include "tcg-pool.inc.c"
+> +#include "../tcg-pool.inc.c"
+> =20
+>  #ifdef CONFIG_DEBUG_TCG
+>  static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] =3D {
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
