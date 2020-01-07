@@ -2,95 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3147C33C99
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DA3C33C99
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:40:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C5902077B
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE3412080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 10:40:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJ2XwZQv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C5902077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SSLGwhez"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE3412080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46171 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iomHa-00084H-Jy
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:40:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53291)
+	id 1iomHx-0000O3-Cx
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 05:40:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1iom0G-0001H9-0Z
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:22:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iom7h-0003y7-Vs
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1iom0E-00046u-UV
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:22:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59754
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iom0E-00046H-Qe
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:22:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578392542;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bfFiZlrjL2+1me2zvC/8PzE/iU5WzxoO07KcMswUPVw=;
- b=iJ2XwZQvv+Edktw/tKqK5q8ivEITeWYNhBmbXGSNJjOFF9Alh8o9lCo6ULcMRxAFiXh/hE
- 3TMlBEa/JhicjmftwRh+nbko8Hz4mJv0KanSgVbZgNvHp5y1QZwlxtzuQMI9Ux1lWGS3Mo
- clCK1Nm9M/jtPwft/8e9pT8P3tW1DTI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-192-8d6Zo0maP9yaO10RCkKqRw-1; Tue, 07 Jan 2020 05:22:17 -0500
-Received: by mail-wr1-f69.google.com with SMTP id u12so28436809wrt.15
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:22:17 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1iom7f-0002Ri-Rj
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:30:05 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:41951)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iom7e-0002Ok-4w
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 05:30:02 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id r27so75828527otc.8
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 02:30:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=PcwXxgMbgfNFmznP6VilRDfSBCFpIzKjRBBdoaGkuDM=;
+ b=SSLGwhezAChNIv3f9hiuWR/yBWFrnJ8nVvibsWsDiQJBGEc3rlpifZrCSmlz4g3NyZ
+ VOhUHJUQxKW29e4X6c7ypOrnbIlklZ1rpznyY/RbaSbZuGqxFACWW01vtG/jerS88Nb2
+ GYgjfpgnePISjqeJH/Y+O2RVprf2eMih+IiZfcVAZQR+i52xJ5dUeUqubntjnbCsSDHf
+ fUaFUVzEKCD93T4EiEB18uVR8+uAC+647wJn4e0ZImHzjQvXNHc77WuONXRqqvlZ2A2V
+ xd16LdJz9XBckjHqgL786dx5z3B2Vsu6f7sfOliLmTLK0gwFn1UfDWGMVijEGWqM4b2H
+ bm4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=fQtUZKSyxRcIHhex5SLf6+Wtv5SZLUxWndPuKbjdgC4=;
- b=scGraLVX59e4gFS9ppdWfHf5G0+n+p6nJ/c8+kc40fTNCFq/PakF6pOV31Hj6+FsEe
- sUs2zdzF2X7pFJ0kcVEY+Mhia5RG8DXsYo377NZWwSPkPNxY44ih2BVlDnfG8uTe2i5L
- 7x+K3Ye9G756zNL16DrpstF/hLgE3kyh2uBvSbvJ80hMBF7RuQZc8+coDhuzk/962GPL
- jpmOcsLu/2Z9KoSJkSjImUgNxzD6cGbEFoXCwilIXkR5frOw+mqE1Z4fb0boUsjlMtXd
- eETm9h8FUC5le4NB/FFQNjYlJy0GW1z4GzAtbPPEM3I4ls/OGM7MpR42y352a8KpwZrZ
- zEhw==
-X-Gm-Message-State: APjAAAWDAc2r66GSW0loGmtTNhxf1n0eqbCcSm+nrDwHt+racuc2HGiR
- PkEOJ3A3kynIMWFdlExn9CdVB1pwDpy6kwfmvbg4w/etoo0jr4ZgXQrMVbGg61GETcjUc12vYbC
- 4zlQHnhqhsyvEScE=
-X-Received: by 2002:a7b:c946:: with SMTP id i6mr38755429wml.28.1578392536155; 
- Tue, 07 Jan 2020 02:22:16 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzLKH73/xgifMEt08njgZnJmBIJaCh/jvKuYByaLpvPhpAxplIS2yEe8zZP/TbwdHLzpy8d0A==
-X-Received: by 2002:a7b:c946:: with SMTP id i6mr38755407wml.28.1578392535931; 
- Tue, 07 Jan 2020 02:22:15 -0800 (PST)
-Received: from steredhat
- (host221-164-dynamic.248-95-r.retail.telecomitalia.it. [95.248.164.221])
- by smtp.gmail.com with ESMTPSA id s8sm74501677wrt.57.2020.01.07.02.22.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 02:22:15 -0800 (PST)
-Date: Tue, 7 Jan 2020 11:22:11 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] scripts/git.orderfile: Display decodetree before C source
-Message-ID: <20200107102211.rpadulqbox5tquzy@steredhat>
-References: <20191230082856.30556-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=PcwXxgMbgfNFmznP6VilRDfSBCFpIzKjRBBdoaGkuDM=;
+ b=ej/MjAHJBb/xs1/yUHp3ZnhIkWMSKvkp698ros9cYfWg8sc8/HshGRiRCsF1abFSOe
+ /dIcQ+wDq8EH7jSu3UFOjq71rqvC32uPbwRkNE31ALUvon1AbJL0rlxJvJoOwPDTmngS
+ ZqnfNqH7Ubhn2n7mUGdQWatJN5WBQIinkKI2x4/3mhf+6LB9fJkC9Rdu67N77BISBaf3
+ KwRnYwPaZ04GQPXcUupSsI/xUyoIAfLS531s2URMFIpOkanyPlN3mWMy6p+gb04HfN8V
+ y8seu5L17RnaSHBeM8dBaohTuN3dWiagllluTZMZCq+F4wkn40Ct2EXdgUzdyDBwswD2
+ aTZg==
+X-Gm-Message-State: APjAAAXFRpHvcodh2jGPtc5l0oJ0Pzn3bZcU2qLhdNj5YrT5OYEySEB/
+ gM19qDKwox+xCzGxpjV6SXvpJ9GP7p6eLuNfkWxaXA==
+X-Google-Smtp-Source: APXvYqwUwvM+Esmu36FiJzUWQffa1iLJm27mbVVq1SX2aHHwK/UVklchGrWbCp90IctsjUZWGnpjcCfHePNb57tHLig=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr16293otq.97.1578393000598; 
+ Tue, 07 Jan 2020 02:30:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191230082856.30556-1-philmd@redhat.com>
-X-MC-Unique: 8d6Zo0maP9yaO10RCkKqRw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
+References: <20200106144622.1520994-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200106144622.1520994-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Jan 2020 10:29:49 +0000
+Message-ID: <CAFEAcA_noBbQh3y6_5ZUu3n97o9pPDPVayLZKSnC1e7D4bjTnw@mail.gmail.com>
+Subject: Re: [PULL v2 0/9] Add dbus-vmstate
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,47 +89,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Sven Schnelle <svens@stackframe.org>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Stafford Horne <shorne@gmail.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 30, 2019 at 09:28:56AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> To avoid scrolling each instruction when reviewing tcg
-> helpers written for the decodetree script, display the
-> .decode files (similar to header declarations) before
-> the C source (implementation of previous declarations).
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  scripts/git.orderfile | 3 +++
->  1 file changed, 3 insertions(+)
+On Mon, 6 Jan 2020 at 14:46, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit b0b74e1f17508cb8cef8afd698558db1bd8999=
+cc:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-re=
+quest' into staging (2020-01-06 11:39:55 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/dbus-vmstate7-pull-request
+>
+> for you to fetch changes up to 586ca6ba3cd6d7a3a85ed5cdc4e53b1cd584b0c0:
+>
+>   tests: add dbus-vmstate-test (2020-01-06 18:41:32 +0400)
+>
+> ----------------------------------------------------------------
+> Add dbus-vmstate
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
->=20
-> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
-> index e89790941c..1f747b583a 100644
-> --- a/scripts/git.orderfile
-> +++ b/scripts/git.orderfile
-> @@ -25,5 +25,8 @@ qga/*.json
->  # headers
->  *.h
-> =20
-> +# decoding tree specification
-> +*.decode
-> +
->  # code
->  *.c
-> --=20
-> 2.21.0
->=20
->=20
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
