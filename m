@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA75BC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 328F6C33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:08:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95A162087F
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:07:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F06532087F
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 15:08:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZNJaZiMb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A162087F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4RvYdsH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F06532087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioqS1-0001Pe-CH
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:07:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54570)
+	id 1ioqSs-0003MT-Bd
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 10:08:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54212)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqQY-000859-9W
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:05:51 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqPr-0006ux-HD
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ioqQX-00038N-5K
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:05:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38579
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ioqPq-0002eF-E7
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:05:07 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55567
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ioqQX-00037u-13
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:05:49 -0500
+ id 1ioqPq-0002dQ-9o
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 10:05:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578409548;
+ s=mimecast20190719; t=1578409505;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iD53sfvHuOz9aFZ7VD08cf3w+xOVtsXXVcJul0CUx0E=;
- b=ZNJaZiMbXiVpWYZbRw2pfEQn6soDu29a38bHdtu80ST8eOW82iYeCSAOBOO61Jit5LuEhD
- qHIjbjYB0cOYcG3cCaL/0n+3IMgGhLJd3ljf+fUEy7ot9iHF9fhmTduYn33POYs+0SQ6l8
- 72xr5TAwR+YSwFpTCoLfW0QhGdX3lSc=
+ bh=EJrrTjRO7qkKTjto+Cu0IJJo24QPBMxltA3d3tq4Ry4=;
+ b=S4RvYdsH+XSt5iPg6SgQPWYxzcf1MKFh/baEOVwBhBtWhz70QBWqUKHprvgF1JZv9ckKPv
+ mXiEpqeUoq2elwkTmew3MrISLi4bHwPLAnnqldNdhBVW3tfNwPUyIz5XX/xEQoeas3yR1M
+ Q4pZmJzvGa+vxITApmYJPOp46f8Jio0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-NEUFo1JpORiK7seuIODVNw-1; Tue, 07 Jan 2020 10:05:47 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-296-ploy__zANKiJNveAzVu3Og-1; Tue, 07 Jan 2020 10:05:02 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5752519586C4;
- Tue,  7 Jan 2020 15:05:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE0D8802CAF;
+ Tue,  7 Jan 2020 15:05:00 +0000 (UTC)
 Received: from localhost (ovpn-112-42.ams2.redhat.com [10.36.112.42])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 099BA60C88;
- Tue,  7 Jan 2020 15:05:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F3B9A5D9CA;
+ Tue,  7 Jan 2020 15:04:58 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/37] serial-pci-multi: factor out
- multi_serial_get_port_count()
-Date: Tue,  7 Jan 2020 19:04:10 +0400
-Message-Id: <20200107150442.1727958-6-marcandre.lureau@redhat.com>
+Subject: [PULL 01/37] hw/display/sm501: Always map the UART0
+Date: Tue,  7 Jan 2020 19:04:06 +0400
+Message-Id: <20200107150442.1727958-2-marcandre.lureau@redhat.com>
 In-Reply-To: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 References: <20200107150442.1727958-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: NEUFo1JpORiK7seuIODVNw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: ploy__zANKiJNveAzVu3Og-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,89 +87,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Common function to be reused in next patch.
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+The SM501 is a Mobile Multimedia Companion Chip with 2 UARTs.
+This model only implements the first UART. Being part of the
+chipset, the UART block is always mapped in memory, regardless
+of whether we provide a chardev backend.
+
+Since commit 12051d82f, qemu_chr_fe_init() accepts a NULL chardev.
+Let's remove the chardev check and always map the UART in the
+chipset memory.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20191122133623.13004-1-philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/char/serial-pci-multi.c | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ hw/display/sm501.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/hw/char/serial-pci-multi.c b/hw/char/serial-pci-multi.c
-index 5f13b5663b..5c553c30d0 100644
---- a/hw/char/serial-pci-multi.c
-+++ b/hw/char/serial-pci-multi.c
-@@ -77,33 +77,34 @@ static void multi_serial_irq_mux(void *opaque, int n, i=
-nt level)
-     pci_set_irq(&pci->dev, pending);
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 1f33c87e65..79bd7bc2d1 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -1958,11 +1958,9 @@ static void sm501_realize_sysbus(DeviceState *dev, E=
+rror **errp)
+     sysbus_pass_irq(sbd, SYS_BUS_DEVICE(usb_dev));
+=20
+     /* bridge to serial emulation module */
+-    if (s->chr_state) {
+-        serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
+-                       NULL, /* TODO : chain irq to IRL */
+-                       115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
+-    }
++    serial_mm_init(&s->state.mmio_region, SM501_UART0, 2,
++                   NULL, /* TODO : chain irq to IRL */
++                   115200, s->chr_state, DEVICE_LITTLE_ENDIAN);
  }
 =20
-+static size_t multi_serial_get_port_count(PCIDeviceClass *pc)
-+{
-+    switch (pc->device_id) {
-+    case 0x0003:
-+        return 2;
-+    case 0x0004:
-+        return 4;
-+    }
-+
-+    g_assert_not_reached();
-+}
-+
-+
- static void multi_serial_pci_realize(PCIDevice *dev, Error **errp)
- {
-     PCIDeviceClass *pc =3D PCI_DEVICE_GET_CLASS(dev);
-     PCIMultiSerialState *pci =3D DO_UPCAST(PCIMultiSerialState, dev, dev);
-     SerialState *s;
-     Error *err =3D NULL;
--    int i, nr_ports =3D 0;
--
--    switch (pc->device_id) {
--    case 0x0003:
--        nr_ports =3D 2;
--        break;
--    case 0x0004:
--        nr_ports =3D 4;
--        break;
--    }
--    assert(nr_ports > 0);
--    assert(nr_ports <=3D PCI_SERIAL_MAX_PORTS);
-+    size_t i, nports =3D multi_serial_get_port_count(pc);
-=20
-     pci->dev.config[PCI_CLASS_PROG] =3D pci->prog_if;
-     pci->dev.config[PCI_INTERRUPT_PIN] =3D 0x01;
--    memory_region_init(&pci->iobar, OBJECT(pci), "multiserial", 8 * nr_por=
-ts);
-+    memory_region_init(&pci->iobar, OBJECT(pci), "multiserial", 8 * nports=
-);
-     pci_register_bar(&pci->dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &pci->iobar)=
-;
--    pci->irqs =3D qemu_allocate_irqs(multi_serial_irq_mux, pci,
--                                   nr_ports);
-+    pci->irqs =3D qemu_allocate_irqs(multi_serial_irq_mux, pci, nports);
-=20
--    for (i =3D 0; i < nr_ports; i++) {
-+    for (i =3D 0; i < nports; i++) {
-         s =3D pci->state + i;
-         s->baudbase =3D 115200;
-         serial_realize_core(s, &err);
-@@ -113,7 +114,7 @@ static void multi_serial_pci_realize(PCIDevice *dev, Er=
-ror **errp)
-             return;
-         }
-         s->irq =3D pci->irqs[i];
--        pci->name[i] =3D g_strdup_printf("uart #%d", i + 1);
-+        pci->name[i] =3D g_strdup_printf("uart #%zu", i + 1);
-         memory_region_init_io(&s->io, OBJECT(pci), &serial_io_ops, s,
-                               pci->name[i], 8);
-         memory_region_add_subregion(&pci->iobar, 8 * i, &s->io);
+ static Property sm501_sysbus_properties[] =3D {
 --=20
 2.25.0.rc1.20.g2443f3f80d
 
