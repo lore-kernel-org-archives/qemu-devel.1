@@ -2,69 +2,82 @@ Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCAAC33C8C
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B49AC33C8C
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:01:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D0DC2075A
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 12:59:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0DC2075A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CA8542075A
+	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 13:01:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqEfrr5c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA8542075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iooS8-0003N6-Fy
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 07:59:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56245)
+	id 1iooUU-0006Qg-53
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 08:01:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1ionvq-0001Y1-Qh
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:25:59 -0500
+ (envelope-from <berrange@redhat.com>) id 1ion2Y-0003js-Ou
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1ionvp-0000Zh-KX
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:25:58 -0500
-Resent-Date: Tue, 07 Jan 2020 07:25:58 -0500
-Resent-Message-Id: <E1ionvp-0000Zh-KX@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21116)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1ionvp-0000Z9-D5
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 07:25:57 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1578399942; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=GhYSYSwL4tHFo3GK3zx14nO58aQ/Uk1pP6RoaCL3p5ierRgQufsdsJWwT/9/MW/Rf0f9FVsToq50zeK6fKd/YgiO7VaEBv5efNF4yYxfGBWaFHDA6WEJ8JRn3WhzgnwTcI8GRoN7IfM7GdidtjHvtqhhXUzo881/jNrxQQtCES8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1578399942;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=mFl+xX00e6a0HXwfPIT5moPt5qklI19eggcmxCLmUU8=; 
- b=guG1L6SLybCpZA7x00DEir9HmO50wvoV1X02J1JNZlnnwwFtzp+qKUjSYtEDdCUjTahJsd/xTPyoEUNwpqElUiZQMs1I9be6UEz5eo9s95c7zIYrwLZyIYuS8uOWomAzsCxNlMNSmsPPpAbshRHNRBm88LO2EjtXrqbkD2bsOz4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1578399938378190.09249149101674;
- Tue, 7 Jan 2020 04:25:38 -0800 (PST)
-In-Reply-To: <20200107111340.334965-1-fflorensa@online.net>
-Subject: Re: [PATCH v2 0/1] block/rbd: Add support for ceph namespaces
-Message-ID: <157839993776.799.14711854682294607608@37313f22b938>
+ (envelope-from <berrange@redhat.com>) id 1ion2X-0000il-9J
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:28:50 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28445
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ion2X-0000iU-3S
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 06:28:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578396528;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=STscV//Al4z9cALDPQVOGRRlmBDUxPSdhvhyVVF25R8=;
+ b=dqEfrr5cVzuWwWh5CvXhZpJ1+ioVRdVQRvW2QuD5k0QkYDpR6Dr7/CRHJr7r2YEcALIBey
+ 9FxpbYgQEBU0FDPF6uz3HrYJ9/NAtEzj09vtouy7+AMfGSrwNy4uOY2BYbCqvl5X2ExrC1
+ 95Rwcqacq7kIlzlZhPlL2hGzImw/jpA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-mK6oKUCjPZCxSGdgKxY3PA-1; Tue, 07 Jan 2020 06:28:47 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D2921089B68
+ for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 11:28:46 +0000 (UTC)
+Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F5C87DB56;
+ Tue,  7 Jan 2020 11:28:41 +0000 (UTC)
+Date: Tue, 7 Jan 2020 11:28:38 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 074/104] virtiofsd: passthrough_ll: use hashtable
+Message-ID: <20200107112838.GO3368802@redhat.com>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-75-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: fflorensa@online.net
-Date: Tue, 7 Jan 2020 04:25:38 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191212163904.159893-75-dgilbert@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: mK6oKUCjPZCxSGdgKxY3PA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,21 +89,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, dillaman@redhat.com, sgarzare@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEwNzExMTM0MC4zMzQ5
-NjUtMS1mZmxvcmVuc2FAb25saW5lLm5ldC8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKTi9BLiBJbnRlcm5hbCBlcnJvciB3aGlsZSByZWFkaW5nIGxvZyBmaWxl
-CgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
-MjAyMDAxMDcxMTEzNDAuMzM0OTY1LTEtZmZsb3JlbnNhQG9ubGluZS5uZXQvdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Thu, Dec 12, 2019 at 04:38:34PM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: Miklos Szeredi <mszeredi@redhat.com>
+>=20
+> Improve performance of inode lookup by using a hash table.
+>=20
+> Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+> ---
+>  tools/virtiofsd/passthrough_ll.c | 81 ++++++++++++++++++--------------
+>  1 file changed, 45 insertions(+), 36 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
