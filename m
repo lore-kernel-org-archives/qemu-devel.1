@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD1EC33C9E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 052C0C33C9E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:34:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21323206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:34:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21323206DB
+	by mail.kernel.org (Postfix) with ESMTPS id D2127206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:34:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2127206DB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip9bk-0006yV-PP
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 06:34:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55543)
+	id 1ip9bn-00072U-KS
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 06:34:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1ip9Zq-0005Eg-IL
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:32:43 -0500
+ (envelope-from <gengdongjiu@huawei.com>) id 1ip9Zs-0005Gm-6J
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:32:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1ip9Zp-0002e5-Do
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:32:42 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2230 helo=huawei.com)
+ (envelope-from <gengdongjiu@huawei.com>) id 1ip9Zq-0002fc-Qh
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:32:44 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2668 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1ip9Zm-0002Y4-QS; Wed, 08 Jan 2020 06:32:39 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 9367E28A300D5AB3394B;
- Wed,  8 Jan 2020 19:32:32 +0800 (CST)
+ id 1ip9Zn-0002ay-Ho; Wed, 08 Jan 2020 06:32:39 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 8C568BEF8D604AA2D803;
+ Wed,  8 Jan 2020 19:32:37 +0800 (CST)
 Received: from localhost.localdomain (10.151.151.249) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 8 Jan 2020 19:32:25 +0800
+ 14.3.439.0; Wed, 8 Jan 2020 19:32:29 +0800
 From: Dongjiu Geng <gengdongjiu@huawei.com>
 To: <pbonzini@redhat.com>, <gengdongjiu@huawei.com>, <mst@redhat.com>,
  <imammedo@redhat.com>, <shannon.zhaosl@gmail.com>,
@@ -45,9 +45,10 @@ To: <pbonzini@redhat.com>, <gengdongjiu@huawei.com>, <mst@redhat.com>,
  <ehabkost@redhat.com>, <mtosatti@redhat.com>, <xuwei5@huawei.com>,
  <jonathan.cameron@huawei.com>, <james.morse@arm.com>,
  <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH v22 1/9] hw/arm/virt: Introduce a RAS machine option
-Date: Wed, 8 Jan 2020 19:32:15 +0800
-Message-ID: <1578483143-14905-2-git-send-email-gengdongjiu@huawei.com>
+Subject: [PATCH v22 6/9] KVM: Move hwpoison page related functions into
+ kvm-all.c
+Date: Wed, 8 Jan 2020 19:32:20 +0800
+Message-ID: <1578483143-14905-7-git-send-email-gengdongjiu@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
 References: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
@@ -74,71 +75,167 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RAS Virtualization feature is not supported now, so add a RAS machine
-option and disable it by default.
+kvm_hwpoison_page_add() and kvm_unpoison_all() will both
+be used by X86 and ARM platforms, so moving them into
+"accel/kvm/kvm-all.c" to avoid duplicate code.
+
+For architectures that don't use the poison-list functionality
+the reset handler will harmlessly do nothing, so let's register
+the kvm_unpoison_all() function in the generic kvm_init() function.
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
 Acked-by: Xiang Zheng <zhengxiang9@huawei.com>
 ---
- hw/arm/virt.c         | 23 +++++++++++++++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 24 insertions(+)
+ accel/kvm/kvm-all.c      | 36 ++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm_int.h | 12 ++++++++++++
+ target/i386/kvm.c        | 36 ------------------------------------
+ 3 files changed, 48 insertions(+), 36 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 39ab5f4..fe2571f 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1818,6 +1818,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
-     vms->its = value;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index b2f1a5b..404e863 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -44,6 +44,7 @@
+ #include "qapi/visitor.h"
+ #include "qapi/qapi-types-common.h"
+ #include "qapi/qapi-visit-common.h"
++#include "sysemu/reset.h"
+ 
+ #include "hw/boards.h"
+ 
+@@ -873,6 +874,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
+     return ret;
  }
  
-+static bool virt_get_ras(Object *obj, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++typedef struct HWPoisonPage {
++    ram_addr_t ram_addr;
++    QLIST_ENTRY(HWPoisonPage) list;
++} HWPoisonPage;
 +
-+    return vms->ras;
++static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
++    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
++
++static void kvm_unpoison_all(void *param)
++{
++    HWPoisonPage *page, *next_page;
++
++    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
++        QLIST_REMOVE(page, list);
++        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
++        g_free(page);
++    }
 +}
 +
-+static void virt_set_ras(Object *obj, bool value, Error **errp)
++void kvm_hwpoison_page_add(ram_addr_t ram_addr)
 +{
-+    VirtMachineState *vms = VIRT_MACHINE(obj);
++    HWPoisonPage *page;
 +
-+    vms->ras = value;
++    QLIST_FOREACH(page, &hwpoison_page_list, list) {
++        if (page->ram_addr == ram_addr) {
++            return;
++        }
++    }
++    page = g_new(HWPoisonPage, 1);
++    page->ram_addr = ram_addr;
++    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
 +}
 +
- static char *virt_get_gic_version(Object *obj, Error **errp)
+ static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
  {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-@@ -2121,6 +2135,15 @@ static void virt_instance_init(Object *obj)
-                                     "Valid values are none and smmuv3",
-                                     NULL);
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+@@ -2070,6 +2104,8 @@ static int kvm_init(MachineState *ms)
+         goto err;
+     }
  
-+    /* Default disallows RAS instantiation */
-+    vms->ras = false;
-+    object_property_add_bool(obj, "ras", virt_get_ras,
-+                             virt_set_ras, NULL);
-+    object_property_set_description(obj, "ras",
-+                                    "Set on/off to enable/disable reporting host memory errors "
-+                                    "to a KVM guest using ACPI and guest external abort exceptions",
-+                                    NULL);
++    qemu_register_reset(kvm_unpoison_all, NULL);
 +
-     vms->irqmap = a15irqmap;
+     if (s->kernel_irqchip_allowed) {
+         kvm_irqchip_create(s);
+     }
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index ac2d1f8..c660a70 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -42,4 +42,16 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+                                   AddressSpace *as, int as_id);
  
-     virt_flash_create(vms);
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 38f0c33..15057f7 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -122,6 +122,7 @@ typedef struct {
-     bool highmem_ecam;
-     bool its;
-     bool virt;
-+    bool ras;
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-     struct arm_boot_info bootinfo;
+ void kvm_set_max_memslot_size(hwaddr max_slot_size);
++
++/**
++ * kvm_hwpoison_page_add:
++ *
++ * Parameters:
++ *  @ram_addr: the address in the RAM for the poisoned page
++ *
++ * Add a poisoned page to the list
++ *
++ * Return: None.
++ */
++void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+ #endif
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 0b51190..66e7543 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -24,7 +24,6 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm_int.h"
+-#include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+ #include "kvm_i386.h"
+ #include "hyperv.h"
+@@ -522,40 +521,6 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+     }
+ }
+ 
+-
+-typedef struct HWPoisonPage {
+-    ram_addr_t ram_addr;
+-    QLIST_ENTRY(HWPoisonPage) list;
+-} HWPoisonPage;
+-
+-static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+-    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+-
+-static void kvm_unpoison_all(void *param)
+-{
+-    HWPoisonPage *page, *next_page;
+-
+-    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+-        QLIST_REMOVE(page, list);
+-        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+-        g_free(page);
+-    }
+-}
+-
+-static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+-{
+-    HWPoisonPage *page;
+-
+-    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+-        if (page->ram_addr == ram_addr) {
+-            return;
+-        }
+-    }
+-    page = g_new(HWPoisonPage, 1);
+-    page->ram_addr = ram_addr;
+-    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+-}
+-
+ static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
+                                      int *max_banks)
+ {
+@@ -2161,7 +2126,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         fprintf(stderr, "e820_add_entry() table is full\n");
+         return ret;
+     }
+-    qemu_register_reset(kvm_unpoison_all, NULL);
+ 
+     shadow_mem = object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
+     if (shadow_mem != -1) {
 -- 
 1.8.3.1
 
