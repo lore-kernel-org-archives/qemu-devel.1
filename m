@@ -2,98 +2,91 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AACBC00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D551BC00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 051E520673
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A131D20673
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:34:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TEFj1Bdp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 051E520673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="A9HKLxy/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A131D20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip8dx-0001XN-8b
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 05:32:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44412)
+	id 1ip8fO-000317-Rs
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 05:34:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45086)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vkuznets@redhat.com>) id 1ip8dJ-00016t-SD
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:32:14 -0500
+ (envelope-from <pizhenwei@bytedance.com>) id 1ip8ea-00020s-J7
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:33:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vkuznets@redhat.com>) id 1ip8dI-00055D-Of
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:32:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48447
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1ip8dI-00054Q-Ki
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:32:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578479531;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yC7jBnftyRU6h/I5ztxUDZSHEs957mZI73EBj0CIwo8=;
- b=TEFj1BdpjE07WUTpSMfMmdyGccKpH4MVBgqnA9KtIstB8jrwzq0ii/R1IuowLC7+P7C0jH
- 8C3uM/MEZ9JTtkUkNj+rXUJmS+U11HfNH2YBmdvU9DOhf2W3/i3RrIL0M/IPP5wP9Mqolz
- LNAusSiMJo74UEAd7G4gNz/aIT/iM5M=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-Kt0Nk4WFNbqu1bCxKfVq5Q-1; Wed, 08 Jan 2020 05:32:05 -0500
-Received: by mail-wm1-f71.google.com with SMTP id c4so665591wmb.8
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 02:32:05 -0800 (PST)
+ (envelope-from <pizhenwei@bytedance.com>) id 1ip8eW-0005qp-M8
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:33:30 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45585)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pizhenwei@bytedance.com>)
+ id 1ip8eV-0005pQ-NV
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:33:28 -0500
+Received: by mail-pf1-x444.google.com with SMTP id 2so1394677pfg.12
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 02:33:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language;
+ bh=cdSJSGbLnDpOdD7bx3wS9/M9UvrVrKVp1PIjFgljr+I=;
+ b=A9HKLxy/pITkNc/Pyc0HocIQ6oGOkJP+pINYqDMLvie0g/ZYw6B/J7dbuBIHnd/ky+
+ ivZdLq1hLu1Id5rY6nrgKqsYImO8pK0O7gG3WvUIn9PQFWZOCr2mxjAeDuAGi4F/Q9tl
+ XoiROmAZT17416Ni8nYdT7Ar1xNsEuqFaU5X4ZFb+AKBNg43/R2GBYDPsBxnf6BmhXr1
+ AYAABqHtFKpGT2euF8hyJIlXRXHWR9OscfKoFZJI5HbSFnb2JAAk2RVsJzwk/kLMPyTq
+ oiN2G7K7QsKEK7ymTBMlj5e1E4S/u0umKzrm8h4JPf37hJen/IUGfMZIj3ozBxe+UT1q
+ BFuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=S3X/3FJJOh9UemFynTLZQocz1929SfSf3CumRfk1tZs=;
- b=HqjgD8uHeQ/3GZEbVQU2GCJpZiln6vD5PShcJo2a66pZ16/+rPkYDzZcvnNJ3zikGB
- c+je9mL2RuWyA5JUHC17v7X6qPPfO/US7kIVynZlre3zdkAwnZHYBBmgk7Rd4t+Me1hN
- +7aKvkVE9AfLSkmTNxKg+JW/dqyNrwUjCphGLO6cegZVF3LWepbKiltQOmoEm/QF+qt9
- HFasSxvZMrVvchhomdczRAflcD2VCqjc34VdJQjv47EJ9sMpeGuQYZKAqGtczbuuMBbK
- DCUPi/4beAxp31ZfCqSPb6nMCa6uAPA9fEZ5PcwyN/Eu6cVqDkoKD+O/hBTef+XrLnoV
- YrhA==
-X-Gm-Message-State: APjAAAUG8JTQAX0LsPUHqyYquYdCcrzkIHbzlfditTYJ82irQ8pUDm+p
- Xwp7leJn9wpNQwym1Fxsh1wVwRec4NoBhE/4SZzAqx//qgs3sHP3lAiL8zRrLvKI+IPr3HuCoPs
- 5/0TgOLB9i0Kz3QA=
-X-Received: by 2002:a7b:c74c:: with SMTP id w12mr2984307wmk.1.1578479524602;
- Wed, 08 Jan 2020 02:32:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxaMh4WOpkMgahZ0wH3ix0AeXumc6uDQ4IUFGN/LZ5qIH+Q9LAp6IE+OvtAcNy0zDJNcd+MZQ==
-X-Received: by 2002:a7b:c74c:: with SMTP id w12mr2984277wmk.1.1578479524385;
- Wed, 08 Jan 2020 02:32:04 -0800 (PST)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id x10sm3531324wrv.60.2020.01.08.02.32.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 02:32:03 -0800 (PST)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH RFC] i386/kvm: fix enlightened VMCS with fine-grained VMX
- feature enablement
-In-Reply-To: <CABgObfYviBXJNOTrSQk6hZC5HpBW4fZL_eJGSC+vs=Fv9h40bg@mail.gmail.com>
-References: <20200102203926.1179743-1-vkuznets@redhat.com>
- <21556857-3d6a-ad66-5cf5-060b1ab67381@redhat.com>
- <87zhezsc30.fsf@vitty.brq.redhat.com>
- <7c4dcca1-a1e6-a00c-56fd-bcc6c8bcc474@redhat.com>
- <87imlnrv3n.fsf@vitty.brq.redhat.com>
- <CABgObfYviBXJNOTrSQk6hZC5HpBW4fZL_eJGSC+vs=Fv9h40bg@mail.gmail.com>
-Date: Wed, 08 Jan 2020 11:32:02 +0100
-Message-ID: <87a76ys0gt.fsf@vitty.brq.redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language;
+ bh=cdSJSGbLnDpOdD7bx3wS9/M9UvrVrKVp1PIjFgljr+I=;
+ b=W2o3uWw1qBpDwq+oKsPl477pIS7PFtaK4Kc03nSRzBBxw8WJZ0WAXZtgPBWjyACtOK
+ 2CyG5Q0SR4sB0Wg+DOdW9H3PAc1UI02SA9V3fe67U5hgUhbScoHhMDc8Bv1SyARroHfr
+ mJy9xegeCCfee3daUJY9SDQxznrn/94RNSgsGtgWIdPixcLNURTBwLoM0gOHVKCpL1sn
+ wSJkrMnm+HXzke5MWgpjxWbzkeRGJTu3nchQo/FSaG42M43Mdho16mD8ozt+aki+FG06
+ ISkguCAEDUeUzO663vjXySqfx3m9VqzelZ/YrkwoUQivb33gBkEbVcxjpKa6yuxPp7ad
+ IgIQ==
+X-Gm-Message-State: APjAAAXKcfj50bbDDgbfGUo4R97gH4YkfNLTP4G0+k52bq5+CmjBYqYb
+ m828Rg25VVRQdsB+3ZxC5x6A8A==
+X-Google-Smtp-Source: APXvYqwFxmMXXUqQHzBTYHfpXThNmvhnf4cnivJhcX8gkg7ff8/oulZN4lviTZyjHpcZs3n+SwU7ag==
+X-Received: by 2002:a63:4850:: with SMTP id x16mr4636101pgk.334.1578479605771; 
+ Wed, 08 Jan 2020 02:33:25 -0800 (PST)
+Received: from [10.2.24.220] ([61.120.150.77])
+ by smtp.gmail.com with ESMTPSA id a18sm2702537pjq.30.2020.01.08.02.33.22
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 08 Jan 2020 02:33:25 -0800 (PST)
+Subject: Re: [External] Re: discuss about pvpanic
+To: Paolo Bonzini <pbonzini@redhat.com>, Michal Privoznik <mprivozn@redhat.com>
+References: <2feff896-21fe-2bbe-6f68-9edfb476a110@bytedance.com>
+ <dd8e46c4-eac4-046a-82ec-7ae17df75035@redhat.com>
+ <d0c57f84-a25c-9984-560b-2419807444e1@redhat.com>
+ <05c5fcc0-24bd-ae6e-6bb8-23970ab0b56c@redhat.com>
+From: zhenwei pi <pizhenwei@bytedance.com>
+Message-ID: <d915c9e6-1ad7-4f8f-a66a-c418d43e977f@bytedance.com>
+Date: Wed, 8 Jan 2020 18:33:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-MC-Unique: Kt0Nk4WFNbqu1bCxKfVq5Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <05c5fcc0-24bd-ae6e-6bb8-23970ab0b56c@redhat.com>
+Content-Type: multipart/alternative;
+ boundary="------------D2987981BEE815CE9644A151"
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,46 +98,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Liran Alon <liran.alon@oracle.com>, Roman Kagan <rkagan@virtuozzo.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ Greg KH <gregkh@linuxfoundation.org>, qemu-devel@nongnu.org,
+ linux-kernel@vger.kernel.org, "yelu@bytedance.com" <yelu@bytedance.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This is a multi-part message in MIME format.
+--------------D2987981BEE815CE9644A151
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES
->>
->> the problem with it is that we don't have 'apic_access_addr' field in
->> eVMCS ('virtual_apic_page_addr' is there). By running the same setup
->> with eVMCS disabled I figured out which address can be hardcoded to make
->> it boot.
->>
+On 1/8/20 6:05 PM, Paolo Bonzini wrote:
+
+> On 08/01/20 10:58, Michal Privoznik wrote:
+>>> the kernel-side patch certainly makes sense.  I assume that you want the
+>>> event to propagate up from QEMU to Libvirt and so on?  The QEMU patch
+>>> would need to declare a new event (qapi/misc.json) and send it in
+>>> handle_event (hw/misc/pvpanic.c).  For Libvirt I'm not familiar, so I'm
+>>> adding the respective list.
+>> Adding an event is fairly easy, if everything you want libvirt to do is
+>> report the event to upper layers. I volunteer to do it. Question is, how
+>> qemu is going to report this, whether some attributes to GUEST_PANICKED
+>> event or some new event.
+> I think it should be a new event, using GUEST_PANICKED could cause upper
+> layers to react by shutting down or rebooting the guest.
 >
-> Maybe it's really hard coded (what is the value? Is it consistent across
-> Hyper-V version?) Can you try changing KVM to enable it and see if the
-> hardcoded APIC access address works?
+> Thanks,
+>
+> Paolo
+>
+>
+In previous patch(https://lkml.org/lkml/2019/12/14/265), I defined a new bit (bit 1)
+PVPANIC_CRASH_LOADED for guest crash loaded event. And suggested by KH Greg, I moved
+the bit definition to an uapi header file.
+Then QEMU could include the header file from linux header and handle the new event.
 
-Unfortunately, it's not the same even between BIOS and UEFI booted
-WS2016 (Gen1/Gen2). It is, however, the same across reboot for the same
-image so for example for WS2016Gen1 it is '0x294000' so if I do:
+-- 
+Thanks and Best Regards,
+zhenwei pi
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index fab7451a5793..8366b2a02b3b 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1433,6 +1433,8 @@ static int copy_enlightened_to_vmcs12(struct vcpu_vmx=
- *vmx)
-        vmcs12->tpr_threshold =3D evmcs->tpr_threshold;
-        vmcs12->guest_rip =3D evmcs->guest_rip;
-=20
-+       vmcs12->apic_access_addr =3D 0x294000;
 
-it all works. I'm really puzzled.
+--------------D2987981BEE815CE9644A151
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
---=20
-Vitaly
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body text="#000000" bgcolor="#FFFFFF">
+    <pre>On 1/8/20 6:05 PM, Paolo Bonzini wrote:</pre>
+    <blockquote type="cite"
+      cite="mid:05c5fcc0-24bd-ae6e-6bb8-23970ab0b56c@redhat.com">
+      <pre class="moz-quote-pre" wrap="">On 08/01/20 10:58, Michal Privoznik wrote:
+</pre>
+      <blockquote type="cite">
+        <blockquote type="cite">
+          <pre class="moz-quote-pre" wrap="">the kernel-side patch certainly makes sense.  I assume that you want the
+event to propagate up from QEMU to Libvirt and so on?  The QEMU patch
+would need to declare a new event (qapi/misc.json) and send it in
+handle_event (hw/misc/pvpanic.c).  For Libvirt I'm not familiar, so I'm
+adding the respective list.
+</pre>
+        </blockquote>
+        <pre class="moz-quote-pre" wrap="">
+Adding an event is fairly easy, if everything you want libvirt to do is
+report the event to upper layers. I volunteer to do it. Question is, how
+qemu is going to report this, whether some attributes to GUEST_PANICKED
+event or some new event.
+</pre>
+      </blockquote>
+      <pre class="moz-quote-pre" wrap="">
+I think it should be a new event, using GUEST_PANICKED could cause upper
+layers to react by shutting down or rebooting the guest.
 
+Thanks,
+
+Paolo
+
+</pre>
+      <pre>
+
+</pre>
+    </blockquote>
+    <pre>In previous patch(<a class="moz-txt-link-freetext" href="https://lkml.org/lkml/2019/12/14/265">https://lkml.org/lkml/2019/12/14/265</a>), I defined a new bit (bit 1)
+PVPANIC_CRASH_LOADED for guest crash loaded event. And suggested by KH Greg, I moved
+the bit definition to an uapi header file.
+Then QEMU could include the header file from linux header and handle the new event.
+</pre>
+    <pre class="moz-signature" cols="72">-- 
+Thanks and Best Regards,
+zhenwei pi</pre>
+  </body>
+</html>
+
+--------------D2987981BEE815CE9644A151--
 
