@@ -8,76 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1225C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65CEC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F6FF2053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81CF020720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OF+23Zua"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6FF2053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2fE1rPW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81CF020720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipHbq-0000QO-T7
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:07:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35344)
+	id 1ipHcJ-0000pW-9S
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:07:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35709)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVT-0001Hy-47
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:45 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVf-0001VC-HW
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVP-0002UK-FI
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:42 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34278)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVc-0002jL-N7
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:55 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38895)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ipHVP-0002Sm-5p; Wed, 08 Jan 2020 15:00:39 -0500
-Received: by mail-wr1-x442.google.com with SMTP id t2so4808829wrr.1;
- Wed, 08 Jan 2020 12:00:38 -0800 (PST)
+ id 1ipHVc-0002hu-EN; Wed, 08 Jan 2020 15:00:52 -0500
+Received: by mail-wm1-x341.google.com with SMTP id u2so216605wmc.3;
+ Wed, 08 Jan 2020 12:00:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=kPXqcCPJtRQyt8GSCKatgPtUrzsI5xU5eBHmljV4qS8=;
- b=OF+23ZuasZUpRk9xwjXrbrc2HitljbTrTJ1zytdZn7S3c4ciTOIWcwkLL/3GxR6VBZ
- QOF9c979aEucBmVcRASwYM/rKgbkFOEM9eyBhXsWZOo92iNFsuG9t/DyHpYeD0bF7rx7
- IfdXTZ6jQq5oUbkS625xfo0tkCNkggIRkKdEvskpnsKrYyKAxgvlzAGfi1s6lqmxTv5I
- akNfXfa8IOe0SIPECVNqOQGGzh5ZYIWhMfQJHB4bvdsVSRyKHopgWipc0BKQVPbFD2P4
- ddoRy/DoPddFRRa9BqdWaZBLmeVOAs7DV2Vp+tsnEbpcdBbDtZsva2aF5K4jzDiovJu1
- RlPA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=abuJiz5zWdyJ/CxH78fn4z3ySkdVr9/Q8yCzhfi86YQ=;
+ b=I2fE1rPW3S7z7nR945NS6ioIxTUgLlg2rgkZqmqCWrsz3CrF19sl89zVrvGGpvXF2G
+ FrPLgootpR4McDaX51gzzH/q/n3zzSDBU1NwVE9M8zAX6c0PQluTaIhsMeosz/BJw++q
+ YXZycPS0iT7ImVUTsZ4TOlD81AtEYyCPcStrJxv3HVvsXsUtAEqbJqW9X7SSE9J5wrzq
+ XvnHTjWNV3ZVbIAMS72wPrWunc1ZbEiwzQFv7NM0dHAp9gdhsAnh0Dq+PWwYKpC/jJ6/
+ 1kvMxLmI5TnuCKCX5CYueguWW8oo48PXbBY/7x3qi4F6DJnE6jnbHMz19S6UHjM7LuVF
+ ZAug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=kPXqcCPJtRQyt8GSCKatgPtUrzsI5xU5eBHmljV4qS8=;
- b=gHQieuXIbIq83uha8UT0IJbrtuB16RSKegdwpabfkVquhGMC8e1BZXHKBqkEWN22lg
- kjt/uaCarUUSVJqQqnW/R4o54P7bPex7EAmwAQigO7vLFxvyHZzz74NKJ5+HoAt8A2xv
- 188uOr8rEtW1Kl//9UwWg0OeFj97jNY9hp7N5fejefWqolALvXUYaK3WxztSqaTaAbRA
- Hd9ljrFWtjJGnIydszbcyvwIq4kpGvCHVFKx5OzVW7kaca7S3X/lyKIX3Xbv5n+Spkf2
- /ykgHRRHPoG9lp/nljGNyv3jQPhP7lJDHeYf+bLdi8ra6Ib3wwC6uNj9GwclPaefxw5D
- AuUA==
-X-Gm-Message-State: APjAAAXDzkSFjQoX1vopRkAZF7kEUyAIP6KSi+nEgkiHwriIqzzRfiPQ
- 5F1vlfwDsP6EHz3/UoihfQFZ31J4
-X-Google-Smtp-Source: APXvYqyWKziBTihr2bOOKbfFYYRXNBdu0nb99kaQtmbEGOkncbItfISbMmtszcVR7YeO9YP2OqNstA==
-X-Received: by 2002:adf:ca07:: with SMTP id o7mr6780335wrh.49.1578513635794;
- Wed, 08 Jan 2020 12:00:35 -0800 (PST)
+ :references:mime-version:content-transfer-encoding;
+ bh=abuJiz5zWdyJ/CxH78fn4z3ySkdVr9/Q8yCzhfi86YQ=;
+ b=FbHRYEiMJ8Kg5scrZ+zzWQKMCYhkSmJ8vRPbuxcct4smEaiOEIuy2CHiIvd/UV8QiN
+ bKLwDv1JR/TjJXGi1WX7/XSjgv23XF8OYhHemgYuTZTKAT2nOsFTbFWCDz2gFvDDhuhK
+ FW/VMCs2z/GiPDM/vYFP6JLwNAVFbxKB2hNzhbmuI6SpopYB459RPmgrCfb6w/QEygss
+ EKgUAPifftcUiZT87s4Qdzx73GJSUKVEF3RyGANvf/g8551KIRj1KvRCP0K6Rb6Oz0Qg
+ PzXOx9DG1/n0mxdEc7W3B5/CbQ+CGdjiLxROCqvI5uBPtTnGFdiiQy/lsoaw8lMuXj0C
+ MMVA==
+X-Gm-Message-State: APjAAAXCszRMn7xI7+i4V7pHEZbgAfRUWQfRFGKjK5kydTiqiL7/s0Ta
+ EIdG0kzeO2NTnBZrxcAYBX5fxpfq
+X-Google-Smtp-Source: APXvYqxxsx42BDNzIdi8HCWiY8PapnUsDGWamyiO9WYgw417TSeAk88JgJNaUNVvou505CSklTXxTw==
+X-Received: by 2002:a7b:c934:: with SMTP id h20mr316573wml.103.1578513651172; 
+ Wed, 08 Jan 2020 12:00:51 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.34
+ by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 12:00:34 -0800 (PST)
+ Wed, 08 Jan 2020 12:00:50 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 01/17] hw/arm: add Allwinner H3 System-on-Chip
-Date: Wed,  8 Jan 2020 21:00:04 +0100
-Message-Id: <20200108200020.4745-2-nieklinnenbank@gmail.com>
+Subject: [PATCH v3 16/17] tests/boot_linux_console: Add a SLOW test booting
+ Ubuntu on OrangePi PC
+Date: Wed,  8 Jan 2020 21:00:19 +0100
+Message-Id: <20200108200020.4745-17-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200108200020.4745-1-nieklinnenbank@gmail.com>
 References: <20200108200020.4745-1-nieklinnenbank@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,534 +95,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
- qemu-arm@nongnu.org, philmd@redhat.com
+ qemu-arm@nongnu.org, philmd@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Allwinner H3 is a System on Chip containing four ARM Cortex A7
-processor cores. Features and specifications include DDR2/DDR3 memory,
-SD/MMC storage cards, 10/100/1000Mbit ethernet, USB 2.0, HDMI and
-various I/O modules. This commit adds support for the Allwinner H3
-System on Chip.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+This test boots Ubuntu Bionic on a OrangePi PC board.
+
+As it requires 1GB of storage, and is slow, this test is disabled
+on automatic CI testing.
+
+It is useful for workstation testing. Currently Avocado timeouts too
+quickly, so we can't run userland commands.
+
+The kernel image and DeviceTree blob are built by the Armbian
+project (based on Debian):
+https://www.armbian.com/orange-pi-pc/
+
+The Ubuntu image is downloaded from:
+https://dl.armbian.com/orangepipc/Bionic_current
+
+This test can be run using:
+
+  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
+    avocado --show=app,console run -t machine:orangepi-pc \
+      tests/acceptance/boot_linux_console.py
+  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
+  console: DRAM: 1024 MiB
+  console: Failed to set core voltage! Can't set CPU frequency
+  console: Trying to boot from MMC1
+  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
+  console: CPU:   Allwinner H3 (SUN8I 0000)
+  console: Model: Xunlong Orange Pi PC
+  console: DRAM:  1 GiB
+  console: MMC:   mmc@1c0f000: 0
+  [...]
+  console: Uncompressing Linux... done, booting the kernel.
+  console: Booting Linux on physical CPU 0x0
+  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
+  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
+  console: CPU: div instructions available: patching division code
+  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
+  console: OF: fdt: Machine model: Xunlong Orange Pi PC
+  [...]
+  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
+  console: done.
+  console: Begin: Running /scripts/local-bottom ... done.
+  console: Begin: Running /scripts/init-bottom ... done.
+  console: systemd[1]: systemd 237 running in system mode. (...)
+  console: systemd[1]: Detected architecture arm.
+  console: Welcome to Ubuntu 18.04.3 LTS!
+  console: systemd[1]: Set hostname to <orangepipc>.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[NL: rename in commit message Raspbian to Armbian]
+[NL: changed test to boot from SD card via BootROM]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- default-configs/arm-softmmu.mak |   1 +
- include/hw/arm/allwinner-h3.h   | 107 +++++++++++
- hw/arm/allwinner-h3.c           | 328 ++++++++++++++++++++++++++++++++
- MAINTAINERS                     |   7 +
- hw/arm/Kconfig                  |   8 +
- hw/arm/Makefile.objs            |   1 +
- 6 files changed, 452 insertions(+)
- create mode 100644 include/hw/arm/allwinner-h3.h
- create mode 100644 hw/arm/allwinner-h3.c
+ tests/acceptance/boot_linux_console.py | 42 ++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 1f2e0e7fde..d75a239c2c 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -40,3 +40,4 @@ CONFIG_FSL_IMX25=y
- CONFIG_FSL_IMX7=y
- CONFIG_FSL_IMX6UL=y
- CONFIG_SEMIHOSTING=y
-+CONFIG_ALLWINNER_H3=y
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-new file mode 100644
-index 0000000000..4e2e6202a9
---- /dev/null
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -0,0 +1,107 @@
-+/*
-+ * Allwinner H3 System on Chip emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+/*
-+ * The Allwinner H3 is a System on Chip containing four ARM Cortex A7
-+ * processor cores. Features and specifications include DDR2/DDR3 memory,
-+ * SD/MMC storage cards, 10/100/1000Mbit ethernet, USB 2.0, HDMI and
-+ * various I/O modules.
-+ *
-+ * This implementation is based on the following datasheet:
-+ *
-+ *   https://linux-sunxi.org/File:Allwinner_H3_Datasheet_V1.2.pdf
-+ *
-+ * The latest datasheet and more info can be found on the Linux Sunxi wiki:
-+ *
-+ *   https://linux-sunxi.org/H3
-+ */
-+
-+#ifndef HW_ARM_ALLWINNER_H3_H
-+#define HW_ARM_ALLWINNER_H3_H
-+
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "qemu/error-report.h"
-+#include "qemu/units.h"
-+#include "hw/qdev-core.h"
-+#include "hw/arm/boot.h"
-+#include "hw/timer/allwinner-a10-pit.h"
-+#include "hw/intc/arm_gic.h"
-+#include "target/arm/cpu.h"
-+
-+/**
-+ * Allwinner H3 device list
-+ *
-+ * This enumeration is can be used refer to a particular device in the
-+ * Allwinner H3 SoC. For example, the physical memory base address for
-+ * each device can be found in the AwH3State object in the memmap member
-+ * using the device enum value as index.
-+ *
-+ * @see AwH3State
-+ */
-+enum {
-+    AW_H3_SRAM_A1,
-+    AW_H3_SRAM_A2,
-+    AW_H3_SRAM_C,
-+    AW_H3_PIT,
-+    AW_H3_UART0,
-+    AW_H3_UART1,
-+    AW_H3_UART2,
-+    AW_H3_UART3,
-+    AW_H3_GIC_DIST,
-+    AW_H3_GIC_CPU,
-+    AW_H3_GIC_HYP,
-+    AW_H3_GIC_VCPU,
-+    AW_H3_SDRAM
-+};
-+
-+/** Total number of CPU cores in the SoC */
-+#define AW_H3_NUM_CPUS      (4)
-+
-+/**
-+ * Allwinner H3 object model
-+ * @{
-+ */
-+
-+/** Object type for the Allwinner H3 SoC */
-+#define TYPE_AW_H3 "allwinner-h3"
-+
-+/** Convert input object to Allwinner H3 state object */
-+#define AW_H3(obj) OBJECT_CHECK(AwH3State, (obj), TYPE_AW_H3)
-+
-+/** @} */
-+
-+/**
-+ * Allwinner H3 object instance state
-+ */
-+typedef struct AwH3State {
-+    /*< private >*/
-+    DeviceState parent_obj;
-+    /*< public >*/
-+
-+    ARMCPU cpus[AW_H3_NUM_CPUS];
-+    const hwaddr *memmap;
-+    AwA10PITState timer;
-+    GICState gic;
-+    MemoryRegion sram_a1;
-+    MemoryRegion sram_a2;
-+    MemoryRegion sram_c;
-+} AwH3State;
-+
-+#endif /* HW_ARM_ALLWINNER_H3_H */
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-new file mode 100644
-index 0000000000..c1ef31e875
---- /dev/null
-+++ b/hw/arm/allwinner-h3.c
-@@ -0,0 +1,328 @@
-+/*
-+ * Allwinner H3 System on Chip emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "exec/address-spaces.h"
-+#include "qapi/error.h"
-+#include "qemu/module.h"
-+#include "qemu/units.h"
-+#include "cpu.h"
-+#include "hw/sysbus.h"
-+#include "hw/char/serial.h"
-+#include "hw/misc/unimp.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/arm/allwinner-h3.h"
-+
-+/* Memory map */
-+const hwaddr allwinner_h3_memmap[] = {
-+    [AW_H3_SRAM_A1]    = 0x00000000,
-+    [AW_H3_SRAM_A2]    = 0x00044000,
-+    [AW_H3_SRAM_C]     = 0x00010000,
-+    [AW_H3_PIT]        = 0x01c20c00,
-+    [AW_H3_UART0]      = 0x01c28000,
-+    [AW_H3_UART1]      = 0x01c28400,
-+    [AW_H3_UART2]      = 0x01c28800,
-+    [AW_H3_UART3]      = 0x01c28c00,
-+    [AW_H3_GIC_DIST]   = 0x01c81000,
-+    [AW_H3_GIC_CPU]    = 0x01c82000,
-+    [AW_H3_GIC_HYP]    = 0x01c84000,
-+    [AW_H3_GIC_VCPU]   = 0x01c86000,
-+    [AW_H3_SDRAM]      = 0x40000000
-+};
-+
-+/* List of unimplemented devices */
-+struct AwH3Unimplemented {
-+    const char *device_name;
-+    hwaddr base;
-+    hwaddr size;
-+} unimplemented[] = {
-+    { "d-engine",  0x01000000, 4 * MiB },
-+    { "d-inter",   0x01400000, 128 * KiB },
-+    { "syscon",    0x01c00000, 4 * KiB },
-+    { "dma",       0x01c02000, 4 * KiB },
-+    { "nfdc",      0x01c03000, 4 * KiB },
-+    { "ts",        0x01c06000, 4 * KiB },
-+    { "keymem",    0x01c0b000, 4 * KiB },
-+    { "lcd0",      0x01c0c000, 4 * KiB },
-+    { "lcd1",      0x01c0d000, 4 * KiB },
-+    { "ve",        0x01c0e000, 4 * KiB },
-+    { "mmc0",      0x01c0f000, 4 * KiB },
-+    { "mmc1",      0x01c10000, 4 * KiB },
-+    { "mmc2",      0x01c11000, 4 * KiB },
-+    { "sid",       0x01c14000, 1 * KiB },
-+    { "crypto",    0x01c15000, 4 * KiB },
-+    { "msgbox",    0x01c17000, 4 * KiB },
-+    { "spinlock",  0x01c18000, 4 * KiB },
-+    { "usb0-otg",  0x01c19000, 4 * KiB },
-+    { "usb0",      0x01c1a000, 4 * KiB },
-+    { "usb1",      0x01c1b000, 4 * KiB },
-+    { "usb2",      0x01c1c000, 4 * KiB },
-+    { "usb3",      0x01c1d000, 4 * KiB },
-+    { "smc",       0x01c1e000, 4 * KiB },
-+    { "ccu",       0x01c20000, 1 * KiB },
-+    { "pio",       0x01c20800, 1 * KiB },
-+    { "owa",       0x01c21000, 1 * KiB },
-+    { "pwm",       0x01c21400, 1 * KiB },
-+    { "keyadc",    0x01c21800, 1 * KiB },
-+    { "pcm0",      0x01c22000, 1 * KiB },
-+    { "pcm1",      0x01c22400, 1 * KiB },
-+    { "pcm2",      0x01c22800, 1 * KiB },
-+    { "audio",     0x01c22c00, 2 * KiB },
-+    { "smta",      0x01c23400, 1 * KiB },
-+    { "ths",       0x01c25000, 1 * KiB },
-+    { "uart0",     0x01c28000, 1 * KiB },
-+    { "uart1",     0x01c28400, 1 * KiB },
-+    { "uart2",     0x01c28800, 1 * KiB },
-+    { "uart3",     0x01c28c00, 1 * KiB },
-+    { "twi0",      0x01c2ac00, 1 * KiB },
-+    { "twi1",      0x01c2b000, 1 * KiB },
-+    { "twi2",      0x01c2b400, 1 * KiB },
-+    { "scr",       0x01c2c400, 1 * KiB },
-+    { "emac",      0x01c30000, 64 * KiB },
-+    { "gpu",       0x01c40000, 64 * KiB },
-+    { "hstmr",     0x01c60000, 4 * KiB },
-+    { "dramcom",   0x01c62000, 4 * KiB },
-+    { "dramctl0",  0x01c63000, 4 * KiB },
-+    { "dramphy0",  0x01c65000, 4 * KiB },
-+    { "spi0",      0x01c68000, 4 * KiB },
-+    { "spi1",      0x01c69000, 4 * KiB },
-+    { "csi",       0x01cb0000, 320 * KiB },
-+    { "tve",       0x01e00000, 64 * KiB },
-+    { "hdmi",      0x01ee0000, 128 * KiB },
-+    { "rtc",       0x01f00000, 1 * KiB },
-+    { "r_timer",   0x01f00800, 1 * KiB },
-+    { "r_intc",    0x01f00c00, 1 * KiB },
-+    { "r_wdog",    0x01f01000, 1 * KiB },
-+    { "r_prcm",    0x01f01400, 1 * KiB },
-+    { "r_twd",     0x01f01800, 1 * KiB },
-+    { "r_cpucfg",  0x01f01c00, 1 * KiB },
-+    { "r_cir-rx",  0x01f02000, 1 * KiB },
-+    { "r_twi",     0x01f02400, 1 * KiB },
-+    { "r_uart",    0x01f02800, 1 * KiB },
-+    { "r_pio",     0x01f02c00, 1 * KiB },
-+    { "r_pwm",     0x01f03800, 1 * KiB },
-+    { "core-dbg",  0x3f500000, 128 * KiB },
-+    { "tsgen-ro",  0x3f506000, 4 * KiB },
-+    { "tsgen-ctl", 0x3f507000, 4 * KiB },
-+    { "ddr-mem",   0x40000000, 2 * GiB },
-+    { "n-brom",    0xffff0000, 32 * KiB },
-+    { "s-brom",    0xffff0000, 64 * KiB }
-+};
-+
-+/* Per Processor Interrupts */
-+enum {
-+    AW_H3_GIC_PPI_MAINT     =  9,
-+    AW_H3_GIC_PPI_HYPTIMER  = 10,
-+    AW_H3_GIC_PPI_VIRTTIMER = 11,
-+    AW_H3_GIC_PPI_SECTIMER  = 13,
-+    AW_H3_GIC_PPI_PHYSTIMER = 14
-+};
-+
-+/* Shared Processor Interrupts */
-+enum {
-+    AW_H3_GIC_SPI_UART0     =  0,
-+    AW_H3_GIC_SPI_UART1     =  1,
-+    AW_H3_GIC_SPI_UART2     =  2,
-+    AW_H3_GIC_SPI_UART3     =  3,
-+    AW_H3_GIC_SPI_TIMER0    = 18,
-+    AW_H3_GIC_SPI_TIMER1    = 19,
-+};
-+
-+/* Allwinner H3 constants */
-+enum {
-+    AW_H3_GIC_NUM_SPI       = 128
-+};
-+
-+static void allwinner_h3_init(Object *obj)
-+{
-+    AwH3State *s = AW_H3(obj);
-+
-+    s->memmap = allwinner_h3_memmap;
-+
-+    for (int i = 0; i < AW_H3_NUM_CPUS; i++) {
-+        object_initialize_child(obj, "cpu[*]", &s->cpus[i], sizeof(s->cpus[i]),
-+                                ARM_CPU_TYPE_NAME("cortex-a7"),
-+                                &error_abort, NULL);
-+    }
-+
-+    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
-+                          TYPE_ARM_GIC);
-+
-+    sysbus_init_child_obj(obj, "timer", &s->timer, sizeof(s->timer),
-+                          TYPE_AW_A10_PIT);
-+    object_property_add_alias(obj, "clk0-freq", OBJECT(&s->timer),
-+                              "clk0-freq", &error_abort);
-+    object_property_add_alias(obj, "clk1-freq", OBJECT(&s->timer),
-+                              "clk1-freq", &error_abort);
-+}
-+
-+static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-+{
-+    AwH3State *s = AW_H3(dev);
-+    unsigned i = 0;
-+
-+    /* CPUs */
-+    for (i = 0; i < AW_H3_NUM_CPUS; i++) {
-+
-+        /* Provide Power State Coordination Interface */
-+        object_property_set_int(OBJECT(&s->cpus[i]), QEMU_PSCI_CONDUIT_HVC,
-+                                "psci-conduit", &error_abort);
-+
-+        /* Disable secondary CPUs */
-+        object_property_set_bool(OBJECT(&s->cpus[i]), i > 0,
-+                                "start-powered-off", &error_abort);
-+
-+        /* All exception levels required */
-+        object_property_set_bool(OBJECT(&s->cpus[i]),
-+                                 true, "has_el3", &error_abort);
-+
-+        object_property_set_bool(OBJECT(&s->cpus[i]),
-+                                 true, "has_el2", &error_abort);
-+
-+        /* Mark realized */
-+        qdev_init_nofail(DEVICE(&s->cpus[i]));
-+    }
-+
-+    /* Generic Interrupt Controller */
-+    qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", AW_H3_GIC_NUM_SPI +
-+                                                     GIC_INTERNAL);
-+    qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
-+    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", AW_H3_NUM_CPUS);
-+    qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", false);
-+    qdev_prop_set_bit(DEVICE(&s->gic), "has-virtualization-extensions", true);
-+    qdev_init_nofail(DEVICE(&s->gic));
-+
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 0, s->memmap[AW_H3_GIC_DIST]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 1, s->memmap[AW_H3_GIC_CPU]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 2, s->memmap[AW_H3_GIC_HYP]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 3, s->memmap[AW_H3_GIC_VCPU]);
-+
-+    /*
-+     * Wire the outputs from each CPU's generic timer and the GICv3
-+     * maintenance interrupt signal to the appropriate GIC PPI inputs,
-+     * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
-+     */
-+    for (i = 0; i < AW_H3_NUM_CPUS; i++) {
-+        DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
-+        int ppibase = AW_H3_GIC_NUM_SPI + i * GIC_INTERNAL + GIC_NR_SGIS;
-+        int irq;
-+        /*
-+         * Mapping from the output timer irq lines from the CPU to the
-+         * GIC PPI inputs used for this board.
-+         */
-+        const int timer_irq[] = {
-+            [GTIMER_PHYS] = AW_H3_GIC_PPI_PHYSTIMER,
-+            [GTIMER_VIRT] = AW_H3_GIC_PPI_VIRTTIMER,
-+            [GTIMER_HYP]  = AW_H3_GIC_PPI_HYPTIMER,
-+            [GTIMER_SEC]  = AW_H3_GIC_PPI_SECTIMER,
-+        };
-+
-+        /* Connect CPU timer outputs to GIC PPI inputs */
-+        for (irq = 0; irq < ARRAY_SIZE(timer_irq); irq++) {
-+            qdev_connect_gpio_out(cpudev, irq,
-+                                  qdev_get_gpio_in(DEVICE(&s->gic),
-+                                                   ppibase + timer_irq[irq]));
-+        }
-+
-+        /* Connect GIC outputs to CPU interrupt inputs */
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + AW_H3_NUM_CPUS,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + (2 * AW_H3_NUM_CPUS),
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + (3 * AW_H3_NUM_CPUS),
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
-+
-+        /* GIC maintenance signal */
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + (4 * AW_H3_NUM_CPUS),
-+                           qdev_get_gpio_in(DEVICE(&s->gic),
-+                                            ppibase + AW_H3_GIC_PPI_MAINT));
-+    }
-+
-+    /* Timer */
-+    qdev_init_nofail(DEVICE(&s->timer));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->timer), 0, s->memmap[AW_H3_PIT]);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer), 0,
-+                       qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_TIMER0));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer), 1,
-+                       qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_TIMER1));
-+
-+    /* SRAM */
-+    memory_region_init_ram(&s->sram_a1, OBJECT(dev), "sram A1",
-+                            64 * KiB, &error_abort);
-+    memory_region_init_ram(&s->sram_a2, OBJECT(dev), "sram A2",
-+                            32 * KiB, &error_abort);
-+    memory_region_init_ram(&s->sram_c, OBJECT(dev), "sram C",
-+                            44 * KiB, &error_abort);
-+    memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_A1],
-+                                &s->sram_a1);
-+    memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_A2],
-+                                &s->sram_a2);
-+    memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_C],
-+                                &s->sram_c);
-+
-+    /* UART0 */
-+    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART0], 2,
-+                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART0),
-+                   115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
-+    /* UART1 */
-+    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART1], 2,
-+                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART1),
-+                   115200, serial_hd(1), DEVICE_NATIVE_ENDIAN);
-+    /* UART2 */
-+    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART2], 2,
-+                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART2),
-+                   115200, serial_hd(2), DEVICE_NATIVE_ENDIAN);
-+    /* UART3 */
-+    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART3], 2,
-+                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART3),
-+                   115200, serial_hd(3), DEVICE_NATIVE_ENDIAN);
-+
-+    /* Unimplemented devices */
-+    for (int i = 0; i < ARRAY_SIZE(unimplemented); i++) {
-+        create_unimplemented_device(unimplemented[i].device_name,
-+                                    unimplemented[i].base,
-+                                    unimplemented[i].size);
-+    }
-+}
-+
-+static void allwinner_h3_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+
-+    dc->realize = allwinner_h3_realize;
-+    /* Reason: uses serial_hds and nd_table */
-+    dc->user_creatable = false;
-+}
-+
-+static const TypeInfo allwinner_h3_type_info = {
-+    .name = TYPE_AW_H3,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(AwH3State),
-+    .instance_init = allwinner_h3_init,
-+    .class_init = allwinner_h3_class_init,
-+};
-+
-+static void allwinner_h3_register_types(void)
-+{
-+    type_register_static(&allwinner_h3_type_info);
-+}
-+
-+type_init(allwinner_h3_register_types)
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cd2dc137a3..dc2d7991bf 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -481,6 +481,13 @@ F: hw/*/allwinner*
- F: include/hw/*/allwinner*
- F: hw/arm/cubieboard.c
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index d663106694..55d0b8b036 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -509,6 +509,48 @@ class BootLinuxConsole(Test):
+         exec_command_and_wait_for_pattern(self, 'reboot',
+                                                 'reboot: Restarting system')
  
-+Allwinner-h3
-+M: Niek Linnenbank <nieklinnenbank@gmail.com>
-+L: qemu-arm@nongnu.org
-+S: Maintained
-+F: hw/*/allwinner-h3*
-+F: include/hw/*/allwinner-h3*
++    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
++    def test_arm_orangepi_bionic(self):
++        """
++        :avocado: tags=arch:arm
++        :avocado: tags=machine:orangepi-pc
++        """
 +
- ARM PrimeCell and CMSDK devices
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index c6e7782580..ebf8d2325f 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -291,6 +291,14 @@ config ALLWINNER_A10
-     select SERIAL
-     select UNIMP
- 
-+config ALLWINNER_H3
-+    bool
-+    select ALLWINNER_A10_PIT
-+    select SERIAL
-+    select ARM_TIMER
-+    select ARM_GIC
-+    select UNIMP
++        # This test download a 196MB compressed image and expand it to 932MB...
++        image_url = ('https://dl.armbian.com/orangepipc/archive/'
++                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
++        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
++        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
++        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
++        image_path = os.path.join(self.workdir, image_name)
++        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
 +
- config RASPI
-     bool
-     select FRAMEBUFFER
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index fe749f65fd..956e496052 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -34,6 +34,7 @@ obj-$(CONFIG_DIGIC) += digic.o
- obj-$(CONFIG_OMAP) += omap1.o omap2.o
- obj-$(CONFIG_STRONGARM) += strongarm.o
- obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
-+obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3.o
- obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
- obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
- obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
++        self.vm.set_machine('orangepi-pc')
++        self.vm.set_console()
++        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
++                         '-nic', 'user',
++                         '-no-reboot')
++        self.vm.launch()
++
++        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=ttyS0,115200 '
++                               'loglevel=7 '
++                               'nosmp '
++                               'systemd.default_timeout_start_sec=9000 '
++                               'systemd.mask=armbian-zram-config.service '
++                               'systemd.mask=armbian-ramlog.service')
++
++        self.wait_for_console_pattern('U-Boot SPL')
++        self.wait_for_console_pattern('Autoboot in ')
++        exec_command_and_wait_for_pattern(self, ' ', '=>')
++        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
++                                                kernel_command_line + "'", '=>')
++        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
++
++        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
++                                      'to <orangepipc>')
++        self.wait_for_console_pattern('Starting Load Kernel Modules...')
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
 2.17.1
 
