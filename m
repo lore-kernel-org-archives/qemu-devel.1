@@ -2,164 +2,85 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC90C00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 204D3C33C9B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 763512067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:21:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFA7420720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:24:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="ntQE6lQI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 763512067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bg7IBiYI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA7420720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip2qM-0006np-Ji
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 23:21:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44846)
+	id 1ip2te-0008Rh-0u
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 23:24:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1ip2pc-0006GW-NI
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:20:33 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ip2sk-0007fJ-Iy
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ip2pX-00012c-Mc
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:20:32 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39447)
+ (envelope-from <richard.henderson@linaro.org>) id 1ip2sj-0003SR-Cj
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:23:46 -0500
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:44399)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ip2pX-00011z-Ee
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:20:27 -0500
-Received: by mail-pg1-x543.google.com with SMTP id b137so905649pga.6
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 20:20:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=jLTrJD2pTdsODhjtSKsqhhBKWzaVyZ4MvK4xM9c78kc=;
- b=ntQE6lQIrVf7jsSFnHxa5MQFRrY01fmfDuEbCIKUoHujz6x0g/OAct7Ov0KfLSvPYQ
- MoYxkkDa2b7I6yHa4sMOA/eXNAn0g3WRHm0kllhp+HGdSusBcYsePpUWTdaDG+tzVbhy
- KVaHeE5x/BFz5X7piC5Or9y85oPM0HihN3O7eJ/6Pwi5uTaj9LA5V2eJR4pvg0bmy8/b
- 8ND9r51b8Dt/9477KZKi7XagvKPrG8uqdSgRlj5z6oXo3bW80/2f1mKF7ntO3fsSpo5w
- oVmDu0tKlcLLNos4JH4ecHBzqPr/kwM/x67bvMhFbIdWg/7d/9A8mQx7ggkookV2hW+W
- wtFQ==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ip2sj-0003RM-60
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:23:45 -0500
+Received: by mail-pg1-x52c.google.com with SMTP id x7so893380pgl.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 20:23:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=XOT2U284lewRggywzzUb+XsTgut238IaHuwqpVxANi0=;
+ b=bg7IBiYI/OQtQYJUi2iceigaO+ATTGkitVRMRvrP3prC5eo0eHqfvMxjOvWcWN9t7d
+ VO1AGHGKtWZQ+U+002UAeTu981/cu/Fkbx3qtypszWlHyQhlcv5iK0QOnPk+cpjHFt1G
+ bUukzukUCy9OTZVKwTev6bDekhXH074SKyIOmvcAdQG5G+fhviU4w/2v/Xc5P/xRemWy
+ wBgtNipyyK2mtyW4OS1f6MWDoCQP6EV3QsQoNuRPqToPiU6N+5PXIi7V5u+sGK6JKM4y
+ 6u433q0tknXdM40B5JmtQowvhSACUGHqFTKp+bpwdAHHQkvuZz2rfo/u1cV89ECfloqb
+ pksw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=jLTrJD2pTdsODhjtSKsqhhBKWzaVyZ4MvK4xM9c78kc=;
- b=Bdf1Ipa1mxL4L8I9VN/B7nWOIpXq8vA3tYy/uoJvVMtbXluTUUM+HswqOt6wYcC3nx
- 1fTxxouv6BZQEHAK3KGmhCSmcbc3qML/REdGvDQNNOjf8FANAQmXQWC4uVKFQju9qHr/
- tl5fm2UG0/QhbTmf4MklgkUc+0TQgXb7/Vq63t56rZLRWNrRBc47AAyaKxNvqmRE/yG+
- P4PjdUzEVs9XCPVdpGd4obV9TWz3tWDR1aGzxHbolXogR0pHspv8ns6rJkgXbQw1fml5
- e7GkbMr5n1mtuYZ8M2SmgSlKIIysYkf6paJDMjZomkypkLWPs3i/seRAHoZqc4TmKkZQ
- Awvg==
-X-Gm-Message-State: APjAAAXJ4Egk8M9sctT1+4c5FVfC9wiTEOQQS7ySqP2dnNjdhbJ/eE1H
- W5rEPn0NP8lbpk52vETL6QZdqg==
-X-Google-Smtp-Source: APXvYqxvJgv1bBNkHkur8ozcCmrbNLZnM+dAekYUCZvQKpCF7CzUHcjYQN33MlTS5qXtTb+5Oha26g==
-X-Received: by 2002:a63:31cf:: with SMTP id x198mr3191059pgx.272.1578457226198; 
- Tue, 07 Jan 2020 20:20:26 -0800 (PST)
-Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id n24sm129976pff.12.2020.01.07.20.20.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Jan 2020 20:20:25 -0800 (PST)
-Subject: Re: [PATCH qemu v2] spapr: Kill SLOF
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200105234242.78897-1-aik@ozlabs.ru>
- <20200106041940.GV2098@umbus>
- <835b2928-aff9-c2d1-dfdf-60d915706404@ozlabs.ru>
- <20200107055436.GI2098@umbus>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Autocrypt: addr=aik@ozlabs.ru; keydata=
- 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
-Message-ID: <cf5bb030-167e-b073-f423-ea2f6c620b1f@ozlabs.ru>
-Date: Wed, 8 Jan 2020 15:20:22 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=XOT2U284lewRggywzzUb+XsTgut238IaHuwqpVxANi0=;
+ b=S8DdXG1VwPYYo0UmLtA2RpSVzWiKHNXAQEVfLCiZrGp43UO+p77O0nrz49zRukqh07
+ iVV47YmKWGj9ii+4TCxU9WN7RPsuJGBI+OpdHybtMWg7PGUZoMxg8uiP5zCzlecUy6yR
+ kyuWds55ypJARPu9xNPJd6l++Cmo03VkmD4SSMkzTPAHYV+2hSZxV0GS0St0SO/MmpMa
+ ni2MTYqelGN27IcC/SC3K2vI6dq3YnHOxLr7USm79L6/aucXIQg03hjVsoztrP21HI3K
+ t8IejBJehFphSuybxLvvnkOr2Dq2VtWuEaa7LWX2z+IrQ7MO4rTJfEXtIXi3fCR7dV0n
+ 3z7Q==
+X-Gm-Message-State: APjAAAWJ8ESLwiEq9I3uvUQ+QvswVvaDZcMKI+U8cMwyJmRtcLFWHfib
+ 5/+UELHIekDVtzIn5Gk/a8yC3PM1s0auQQ==
+X-Google-Smtp-Source: APXvYqwA/BTYENNrV1RlFnOivUIhjnCIWqkPzYMbvL+EYi/fz5RC6XxepwdrzR6qstS/PR/ymPPqcQ==
+X-Received: by 2002:a63:1418:: with SMTP id u24mr3067855pgl.279.1578457423617; 
+ Tue, 07 Jan 2020 20:23:43 -0800 (PST)
+Received: from localhost.localdomain (alanje.lnk.telstra.net.
+ [120.151.179.201])
+ by smtp.gmail.com with ESMTPSA id f9sm1192702pfd.141.2020.01.07.20.23.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 20:23:42 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/3] capstone update
+Date: Wed,  8 Jan 2020 15:23:35 +1100
+Message-Id: <20200108042338.9082-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200107055436.GI2098@umbus>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::52c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -171,76 +92,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 035eed4c0d257c905a556fa0f4865a0c077b4e7f:
 
+  Merge remote-tracking branch 'remotes/vivier/tags/q800-for-5.0-pull-request' into staging (2020-01-07 17:08:21 +0000)
 
-On 07/01/2020 16:54, David Gibson wrote:
-> On Tue, Jan 07, 2020 at 03:44:35PM +1100, Alexey Kardashevskiy wrote:
->>
->>
->> On 06/01/2020 15:19, David Gibson wrote:
->>>> +
->>>> +static uint32_t client_package_to_path(const void *fdt, uint32_t phandle,
->>>> +                                       uint32_t buf, uint32_t len)
->>>> +{
->>>> +    char tmp[256];
->>>
->>> Fixed sized buffers are icky.  You could either dynamically allocate
->>> this based on the size the client gives, or you could use
->>> memory_region_get_ram_ptr() to read the data from the tree directly
->>> into guest memory.
->>
->> @len comes from the guest, I am really not comfortable with allocating
->> whatever (broken) guest requested. And if I limit @len by 1024 or
->> similar, then a fixed size buffer will do too, no?
-> 
-> I see your point.  Does this call have a way to report failure?  In
-> that case you could outright fail the call if it requests too long a
-> length.
+are available in the Git repository at:
 
-It returns length which can be 0 to signal an error.
+  https://github.com/rth7680/qemu.git tags/pull-cap-20200108
 
-but with this particular method the bigger problem is that I cannot know
-in advance the actual path length from fdt_get_path(). I could double
-the size until fdt_get_path() succeeded, just seems overkill here.
+for you to fetch changes up to 7cc3836eac04a3e358b2496fbca704b3ee5197ae:
 
-Property names seem to be limited by 32:
+  capstone: Add skipdata hook for s390x (2020-01-08 14:53:54 +1100)
 
-OF1275:
-===
-nextprop
-IN:phandle, [string] previous, [address] buf
-OUT:  flag
+----------------------------------------------------------------
+Update capstone to next
 
-Copies the name of the property following previous in the property list
-of the device node identified by phandle into buf, as a null-terminated
-string. Buf is the address of a 32-byte region of memory. If previous is
-zero or a pointer to a null string, copies the name of the device node’s
-first property.
-===
+----------------------------------------------------------------
+Richard Henderson (3):
+      capstone: Update to next
+      capstone: Enable disassembly for s390x
+      capstone: Add skipdata hook for s390x
 
-
->> btw how exactly can I use memory_region_get_ram_ptr()?
->> get_system_memory() returns a root MR which is not RAM, RAM is a
->> "spapr.ram" sub-MR.
-> 
-> Right, but you know that RAM is always at offset 0 within that root
-> MR. 
-
-Well, it could potentially be more than just one level down in the MR
-tree, for example we could add NUMA MRs and place actual RAM MR under these.
-
-
-> That said, it doesn't look like it's that easy to bounds check
-> that pointer, so maybe that's not a good idea after all.
-
-ok.
-
-
--- 
-Alexey
+ Makefile           |  2 ++
+ disas.c            | 40 ++++++++++++++++++++++++++++++++++++++++
+ target/s390x/cpu.c |  4 ++++
+ capstone           |  2 +-
+ configure          |  2 +-
+ 5 files changed, 48 insertions(+), 2 deletions(-)
 
