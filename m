@@ -2,84 +2,83 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC521C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32949C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:39:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79C2B20692
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:37:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFE0D20692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:39:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0LgB9cQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C2B20692
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZxrSl3hU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFE0D20692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipBWE-0000Fe-Fv
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:37:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43630)
+	id 1ipBYf-0002it-Vv
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:39:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45940)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipBVA-0007Jp-5m
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:36:01 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ipBY3-0002Hl-13
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:39:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipBV8-0004jK-OA
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:36:00 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:38626)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ipBV8-0004i6-Hm
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:35:58 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id u2so2524713wmc.3
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 05:35:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6xRyv19a65AkckLvk7hDMNMBMxxO7kHnyttZlntZGko=;
- b=b0LgB9cQlZUFZRI8vhFVOmEzO8rIU8yblKaABNzhbBE61tbuIQ8uiyTM482H7Mr3FZ
- zZ45LZFL1vEPk0xt6FkTQu1aG8lDNLZy72ZuLQWvY0dO4jlDT56HkiBNH4M7ZQDViOBR
- mFgMEhVO0wTl7fWasmtLVewg0rqShpUaAfbJOaUQgFa4lO69B5Fbns58tcXnmMe5WcNr
- fg/aigH9WTw/9PZfw5DIie5SAdSHIGyBZDbp19/8LiAcTqLIQobX7N0LEqlFHCS52rXC
- 0+LrcvI+sFulecVDHhv6bO3Khv/wFuv31k9EGTN/LW1OzI0a642w43LeAfxpUnWjrJHR
- ikiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=6xRyv19a65AkckLvk7hDMNMBMxxO7kHnyttZlntZGko=;
- b=nTGrxcg/fo1uBt9s9bdrZMbm9Yj03mSX89PA0lrZu+nJVa4FGn0qK35j6OLT3Nbz/V
- f9Z7MZY4mMgtqc63Qs173EbmCO66E6KXsH3mnFBc2YYfB9vOJzDcFHj1OmZ3605TFES3
- v1BHnkJJQR3i/FUfwdSONiP3rxowiE5Ywzz9MIMRWcLs+sYhaMH4DsX85uyQIBOsRu6i
- nFN4pH8xQ9DU7NunmcvcjeN0ZUXv0/3W5R7mYduEwKR/P5aJSy9jdsNrUX3I0mAK2lsn
- 8iDz6OXOIpEkJFOzpg9ANT0PjL9NggjpDjWtYQ7Zb+REyQoRIdDC0ufDVsV2PSl7VDjj
- YhfA==
-X-Gm-Message-State: APjAAAXr2JszyURZy6OVnKy1F+UnhP81tB+Gf70BQy1HBwalVVE08rLo
- xR03Y1yELHaykJDxcTM3LzcrfCwz
-X-Google-Smtp-Source: APXvYqwhO5hUMd7rAEL8M+4M7sh8HysGcflo0kjlwsiXKttdTinj2YcLFdfKSbnHz/1aQTYIzb6EGw==
-X-Received: by 2002:a7b:cf01:: with SMTP id l1mr3777928wmg.86.1578490556850;
- Wed, 08 Jan 2020 05:35:56 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id f1sm3028235wmc.45.2020.01.08.05.35.56
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Jan 2020 05:35:56 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] tests: fix test-qga on macosx
-Date: Wed,  8 Jan 2020 14:35:55 +0100
-Message-Id: <1578490555-6363-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+ (envelope-from <kwolf@redhat.com>) id 1ipBY0-0007Vs-QM
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:38:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32887
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ipBY0-0007Ur-KD
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:38:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578490735;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S+bwzVLiVPCFFGkZaFZ2gJ92WzywA6AGl5h6UL4li5Y=;
+ b=ZxrSl3hUFtUJq2AJMz+WWQi5WtT68LxTIXvEo8c+fagfqQBEPV8BjolZXzQShFwUgOE0Oi
+ Q+Dkkc47OOmZE2K9pvzF/NrwHL0zvwMr5GlDyVBhBp6xSQ1h91PrQT+fW9gzuz5WM+1DYr
+ t7XXyj42ZLegTaZF5y4/IMlCG1SDTzA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-1oQGhAMiNvKU2g24sLZxeQ-1; Wed, 08 Jan 2020 08:38:54 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 585E8184B1E1;
+ Wed,  8 Jan 2020 13:38:53 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E6317C383;
+ Wed,  8 Jan 2020 13:38:43 +0000 (UTC)
+Date: Wed, 8 Jan 2020 14:38:42 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200108133842.GE5057@dhcp-200-226.str.redhat.com>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <1EFEF446-AFEA-429F-B6BA-3206A7C41836@redhat.com>
+ <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
+ <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32c
+In-Reply-To: <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 1oQGhAMiNvKU2g24sLZxeQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,156 +90,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Am 08.01.2020 um 12:40 hat Christophe de Dinechin geschrieben:
+> > On 8 Jan 2020, at 11:43, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 07.01.2020 um 18:11 hat Christophe de Dinechin geschrieben:
+> >> So I think that it might help, in the long run, to start defining the
+> >> language in question in some abstract way, and then to have rules
+> >> for how to transform that abstract language into concrete bindings.
+> >=20
+> > I think this abstract language is QAPI.
+>=20
+> Currently, yes, that=E2=80=99s the closest we have to a well-defined lang=
+uage,
+> I pointed it out in my mail, and there is qapi-code-gen.txt to prove it.
 
-Fix Unix socket connection & skip commands that are not implemented.
+Oh, did you? I must have missed that point, sorry.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- tests/Makefile.include |  2 +-
- tests/test-qga.c       | 25 ++++++++++++++++++-------
- 2 files changed, 19 insertions(+), 8 deletions(-)
+> So it would certainly make sense for the language I=E2=80=99m describing =
+to
+> be a forward evolution of QAPI, or something that is trivially transforme=
+d
+> to / from the existing json schema.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 49e3b0d..192a08e 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -119,7 +119,7 @@ check-unit-$(CONFIG_BLOCK) += tests/test-crypto-secret$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tlscredsx509$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tlssession$(EXESUF)
- ifneq (,$(findstring qemu-ga,$(TOOLS)))
--check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
-+check-unit-$(call land,$(CONFIG_POSIX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
- endif
- check-unit-y += tests/test-timed-average$(EXESUF)
- check-unit-$(CONFIG_INOTIFY1) += tests/test-util-filemonitor$(EXESUF)
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index d2b2435..191bfca 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -17,17 +17,17 @@ typedef struct {
- 
- static int connect_qga(char *path)
- {
--    int s, ret, len, i = 0;
-+    int s, ret, i = 0;
-     struct sockaddr_un remote;
- 
-     s = socket(AF_UNIX, SOCK_STREAM, 0);
-     g_assert(s != -1);
- 
-+    memset(&remote, 0, sizeof(struct sockaddr_un));
-     remote.sun_family = AF_UNIX;
-     do {
--        strcpy(remote.sun_path, path);
--        len = strlen(remote.sun_path) + sizeof(remote.sun_family);
--        ret = connect(s, (struct sockaddr *)&remote, len);
-+        strncpy(remote.sun_path, path, sizeof(remote.sun_path) - 1);
-+        ret = connect(s, (struct sockaddr *)&remote, sizeof(struct sockaddr_un));
-         if (ret == -1) {
-             g_usleep(G_USEC_PER_SEC);
-         }
-@@ -305,6 +305,7 @@ static void test_qga_info(gconstpointer fix)
-     qobject_unref(ret);
- }
- 
-+#if defined(CONFIG_LINUX)
- static void test_qga_get_vcpus(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -324,7 +325,9 @@ static void test_qga_get_vcpus(gconstpointer fix)
- 
-     qobject_unref(ret);
- }
-+#endif
- 
-+#if defined(CONFIG_LINUX)
- static void test_qga_get_fsinfo(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -348,6 +351,7 @@ static void test_qga_get_fsinfo(gconstpointer fix)
- 
-     qobject_unref(ret);
- }
-+#endif
- 
- static void test_qga_get_memory_block_info(gconstpointer fix)
- {
-@@ -394,6 +398,7 @@ static void test_qga_get_memory_blocks(gconstpointer fix)
-     qobject_unref(ret);
- }
- 
-+#if defined(CONFIG_LINUX)
- static void test_qga_network_get_interfaces(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -412,6 +417,7 @@ static void test_qga_network_get_interfaces(gconstpointer fix)
- 
-     qobject_unref(ret);
- }
-+#endif
- 
- static void test_qga_file_ops(gconstpointer fix)
- {
-@@ -682,7 +688,7 @@ static void test_qga_blacklist(gconstpointer data)
-     qobject_unref(ret);
- 
-     /* check something work */
--    ret = qmp_fd(fix.fd, "{'execute': 'guest-get-fsinfo'}");
-+    ret = qmp_fd(fix.fd, "{'execute': 'guest-info'}");
-     qmp_assert_no_error(ret);
-     qobject_unref(ret);
- 
-@@ -766,6 +772,7 @@ static void test_qga_config(gconstpointer data)
-     g_key_file_free(kf);
- }
- 
-+#if defined(CONFIG_LINUX)
- static void test_qga_fsfreeze_status(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
-@@ -781,6 +788,7 @@ static void test_qga_fsfreeze_status(gconstpointer fix)
- 
-     qobject_unref(ret);
- }
-+#endif
- 
- static void test_qga_guest_exec(gconstpointer fix)
- {
-@@ -976,12 +984,17 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/sync", &fix, test_qga_sync);
-     g_test_add_data_func("/qga/ping", &fix, test_qga_ping);
-     g_test_add_data_func("/qga/info", &fix, test_qga_info);
-+#if defined(CONFIG_LINUX)
-     g_test_add_data_func("/qga/network-get-interfaces", &fix,
-                          test_qga_network_get_interfaces);
-     if (!access("/sys/devices/system/cpu/cpu0", F_OK)) {
-         g_test_add_data_func("/qga/get-vcpus", &fix, test_qga_get_vcpus);
-     }
-     g_test_add_data_func("/qga/get-fsinfo", &fix, test_qga_get_fsinfo);
-+    g_test_add_data_func("/qga/fsfreeze-status", &fix,
-+                         test_qga_fsfreeze_status);
-+#endif
-+
-     g_test_add_data_func("/qga/get-memory-block-info", &fix,
-                          test_qga_get_memory_block_info);
-     g_test_add_data_func("/qga/get-memory-blocks", &fix,
-@@ -993,8 +1006,6 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob);
-     g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd);
-     g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_args);
--    g_test_add_data_func("/qga/fsfreeze-status", &fix,
--                         test_qga_fsfreeze_status);
- 
-     g_test_add_data_func("/qga/blacklist", NULL, test_qga_blacklist);
-     g_test_add_data_func("/qga/config", NULL, test_qga_config);
--- 
-1.8.3.1
+I guess I need to be more specific about what I mean with "QAPI". Of
+course, many things you can't currently do in QAPI because they are not
+implemented. When I'm talking about that QAPI should be used more, I'm
+mostly talking about applying its core concepts and infrastructure with
+the obvious extensions in some places, not about the existing
+implementation.
+
+So I guess "a forward evoluion of QAPI" is what I really have in mind.
+
+> > The problem is that we're not even close to using QAPI for everything.
+>=20
+> That=E2=80=99s the symptom of the problem. The problem as I see it is tha=
+t
+> we could not. at least not with today=E2=80=99s QAPI (maybe I=E2=80=99m w=
+rong).
+> A good example is shortcut command-line options. I don=E2=80=99t think
+> you can, today, derive a user-friendly command-line syntax from
+> qapi-schema.json, and even less so one that is compatible with what
+> we have today.
+
+Well, you can't because it's not implemented. Implementing it from
+scratch without compatibility requirements would be relatively easy, and
+we're in fact going to try it out with the qemu-storage-daemon.
+
+But there is nothing in defining a command line option that would
+inherently be different in structure from defining a QMP command, so I
+would consider providing a command line option that is described by a
+QAPI type not a problem, even though it's not implemented yet.
+
+Compatibility is much harder, which is not the least because the
+existing command line options are bad (primarily: using inconsistent
+syntax). The question is if we should make bad options work unchanged in
+the new infrastructure or if it wouldn't be better to replace them with
+something that behaves the same as the rest.
+
+> > Adding a new language on top of QAPI instead isn't going to make the
+> > conversion process any faster.
+>=20
+> I fully agree that whatever language we select has to have an easy,
+> systematic forward path from QAPI, but also from the other
+> existing meta-languages, like the .def files used for options,
+> or build configuration (there is a hint of the connection between
+> the two in the option =E2=80=98if=E2=80=99 member in the .json files).
+>=20
+> In other words, the language I have in mind would be something
+> that I could auto-generate from, say, the current qapi-schema.json
+> and the qemu-options.def. Maybe in the end, that would be simply
+> by having qemu-options.def being used to build qemu-options.json,
+> and then add the relevant entries in qemu-options.json. Maybe
+> there is a better way.
+
+I would rather say that .def should go away and its content should
+be converted to a JSON schema that becomes the new source format rather
+than an intermediate generated file. There is nothing in .def files that
+couldn't be represented in the schema.
+
+> >> This definition itself is not obvious (at least not to me). For
+> >> example, do we have, anywhere but in the C code, the specification
+> >> of how one can add a disk to qemu, and what it means?
+> >> Say, looking at qemu-options.def, how do I tell that -hda has
+> >> anything to do with -device or -blockdev or -help?
+> >=20
+> > BlockdevOptions in the QAPI schema is what tells you how it _really_
+> > works.
+>=20
+> Not really, IMO, in the sense that it gives me no clue as to how -hda
+> or -device relate to it.
+>=20
+> An important point that you raise through your response, though, is
+> that the QAPI schema is only an IDL (interface definition language).
+> In other words, it can tell me what a BlockdevOptions look like on
+> the wire, but at least in the current state, it cannot tell me what happe=
+ns
+> with it.
+>=20
+> This is probably a good thing (it=E2=80=99s already complicated enough as=
+ is),
+> but it=E2=80=99s worth pointing out that, even sticking to a declarative =
+language,
+> one could add constraints, as hinted by HAS_ARG in the .def file
+> (but we could have a richer constraints language, e.g. describing
+> -m option so that there can be at most one, the arg is a number,
+> can=E2=80=99t be negative or floating-point, and so on.
+
+To a certain degree, QAPI does just that, by supporting different data
+types for options. If necessary, I'm sure the type system could be
+extended, but it's not clear to me to which degree we actually need
+this.
+
+Just drawing parallels from what we do for QMP commands, I imagine
+something like this to describe the -m option as it actually exists in
+qemu-options.def today:
+
+##
+# @m:
+#
+# Configure guest RAM.
+#
+# @size: initial amount of guest memory
+# @slots: number of hotplug slots (default: none)
+# @maxmem: maximum amount of guest memory (default: none)
+##
+{ 'cmdline-option': 'm',
+  'arguments': {
+    'size': 'size',
+    'slots': '*int',
+    'maxmem': '*size'
+  },
+  'default-key': 'size',
+  'repeat': 'OVERRIDE' }
+
+HAS_ARG is automatically covered simply by 'arguments' being non-empty.
+
+(Markus probably already has a prototype with slightly different syntax,
+but the idea should be similar.)
+
+> And of course, we could decide to not stick to a declarative language,
+> but to have a way to have some, possibly limited, processing
+> described in the language. I=E2=80=99m thinking notably of what is called
+> =E2=80=9Cdesugaring=E2=80=9D in other threads.
+
+We could. But is it actually worth inventing a new programming language?
+I think this is something that should be done in C code even in the
+future. I think what we're looking for is a way to describe interfaces,
+not implementations.
+
+Even just for adding more sophisticated constraints, like in the example
+above that maxmem >=3D size, it's questionable whether doing this in the
+schema provides enough value for actually implementing it there.
+
+> >> A big issue, though, is that of compatibility. Doing the above startin=
+g
+> >> from scratch does not seem that complicated. Doing it in a way that
+> >> preserves a minimum of interoperability with earlier-generation
+> >> software is another ordeal.
+> >=20
+> > Indeed, this is the major reason why QAPI isn't as pervasive as it
+> > should be.
+>=20
+> Probably, but also because QAPI does not address the needs of
+> some of the things a slightly more general language could do.
+
+So what are the things that you would like to describe, but can't see an
+easy way to actually describe them with QAPI concepts?
+
+> >> So I think that Daniel is right. We may need at some point to start
+> >> a NEMU-style offshoot that does not attempt to be compatible,
+> >> but explores describing an increasing surface of the API using a
+> >> new meta-language from which we can generate, in a consistent
+> >> way, at least:
+> >>=20
+> >> - C bindings
+> >> - Command-line options
+> >> - Shell bindings (or =E2=80=9CHMP=E2=80=9D)
+> >> - JSON schema or qom description
+> >> - Bindings in other languages (Rust, Go, Python)
+> >> - Networked versions of the API (socket, REST)
+> >> - Client-side code e.g. for libvirt.
+> >> - Serialization / deserialization, e.g. for configuration files
+> >> - Documentation, including man page and API docs
+> >> - Command-line help
+> >=20
+> > I think the only thing in this list that can't obviously be covered
+> > easily by QAPI is QOM. Or rather, it's covered by passing through
+> > key=3Dvalue lists without describing their structure
+>=20
+> That=E2=80=99s close enough to me. (In my mind, that part was already =E2=
+=80=9Cdone=E2=80=9D
+> by QAPI, even if in the convoluted way you describe)
+
+That's not really close enough. If you are happy with this level of
+abstraction, you can define any command line option to be either a flag
+or take a string as its argument and be done. This is obviously not very
+helpful because it says nothing about the structure of that string. In
+the same way, QAPI can't say anything about the structure of a QOM
+object, and I think that's a problem.
+
+> > - which, as far as I
+> > understand, is mainly because QOM properties aren't necessarily static,
+> > so we can't provide a statically defined interface for them. Probably
+> > solvable in QEMU, but not without a major effort.
+>=20
+> Or maybe extend the language so that it=E2=80=99s internal semantics
+> knows about this aspect of QOM?
+
+My point is that for example you can't generate a C struct (which is
+statically defined) from something that has a dynamic structure. The
+best you could do is fall back to key=3Dvalue even in the C source, both
+key and value being strings. But then you still have to parse these
+strings manually, so it doesn't actually help much compared to a state
+without C bindings.
+
+Maybe what could be done is covering at least the static properties and
+then having key=3Dvalue for the dynamic part (which should be the
+exception).
+
+> >> - Relations, e.g. how we represent =E2=80=9Ccontains=E2=80=9D, =E2=80=
+=9Cderives from=E2=80=9D, =E2=80=9Cneeds=E2=80=9D,
+> >> =E2=80=9Cone of=E2=80=9D, =E2=80=9Cone or several=E2=80=9D, =E2=80=9Ca=
+ttaches to=E2=80=9D=E2=80=A6
+> >> - States, e.g. how do we represent the machine configuration,
+> >> or the desired new disk setting
+> >> - Verbs, e.g. how we represent =E2=80=9Cadd=E2=80=9D, =E2=80=9Cconnect=
+=E2=80=9D, =E2=80=9Cremove=E2=80=9D, =E2=80=9Cfind=E2=80=9D,
+> >> =E2=80=9Cstart=E2=80=9D, =E2=80=9Cnotify=E2=80=9D, etc. and how we des=
+cribe the kind of input they need.
+> >> - Possibly more subtle things like support for transactions, commit/ro=
+llback,
+> >> i.e. =E2=80=9CI want to add connect a virtual nic to some host vf, but=
+ if anything
+> >> along the way fails, I=E2=80=99d like all the cleanup to happen automa=
+tically)
+> >=20
+> > This sounds like a different approach from our current QAPI command set
+>=20
+> Well, except for purposefully trying to use a different wording to avoid
+> the risk of getting your mind stuck in one of the particular existing
+> meta-languages in QEMU, the approach is not very different.
+
+I didn't necessarily mean relations/state/verbs, which obviously exist,
+but the examples that seemed to express things in a deliberately
+different way from what we have today.
+
+> - Transactions do not exist today that I know of, although we see
+> signs of them in discussions about the fact that this options destroys
+> that back end but that option does not.
+
+We have a 'transaction' QMP command, but they are not an integral part
+of the language. Considering the trouble to implement transactional
+commands, I suppose we don't even want it to be a fundamental part of
+the language.
+
+> > Does it actually provide more functionality, though?
+>=20
+> It=E2=80=99s not intended to provide more, but to require less to do the =
+same thing.
+
+Though we always need to keep in mind that if requiring less for future
+additions requires a huge effort now, the investment may pay off only in
+a very distant future (if the abstraction we build even survives until
+then).
+
+Kevin
 
 
