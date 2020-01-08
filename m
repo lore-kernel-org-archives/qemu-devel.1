@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509F4C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9CA8C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:49:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 174702067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 772022067D
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:49:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWoTVDsn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 174702067D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEWvuMWM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 772022067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipAlj-0000Sz-VV
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:49:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60451)
+	id 1ipAlm-0000WM-QL
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:49:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60381)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWV-0003wr-Hw
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:20 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWR-0003qg-4h
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWU-0004PE-KS
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:19 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51292)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWQ-0004M3-1p
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:15 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:41923)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ipAWU-0004Of-Eg
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:18 -0500
-Received: by mail-wm1-x332.google.com with SMTP id d73so2307213wmd.1
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:18 -0800 (PST)
+ id 1ipAWP-0004Lb-Ry
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:14 -0500
+Received: by mail-wr1-x430.google.com with SMTP id c9so3167376wrw.8
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ZENGOtMS6+bKQUaERKPKm8qYGAS6+eCRE25grnCOJjk=;
- b=PWoTVDsnsWBBEB81pkQ8E/z2BjlJZNHqextjiw8AvAw47LiNz7Ge0kEnw/RictIOpq
- ZDFUfLhOD5JpKxuNrUqHCB3XtiYQ1eTACdD+nfBwGaCG8RZxLgQckLDclRZdwAda4qkw
- 048jfBQyxdPatXYJJtVlOzpnIKhvJhwtM9GtO+/5xz2KgsaSpv/OUNDt90DwXmPTMKFA
- P0jxTzOKPWb92Kdnm7PtXASf4aelwR9z2qrcqh7F4WKw94pYysbz3I0qb/TTvQfYhpoD
- /rt3hOF90EBXeQkhPuGIfF8E2f2CWt1C3dYd2Jq+xemHsvnKcALZFdEpe0Z8grVzyXLy
- jNtg==
+ bh=G/wfhSCVdFYk0kyTP7PLIWQJ6W1w4exviX2br2pbzUs=;
+ b=GEWvuMWMm0FIm13/D5imLf9jpwauudV0rGFLtWbzi/S4qLCjqKsfmZgeKaeEkWLFec
+ /J1e2flm0k1kJGMfUxJjsCc5tmZZnQKghumyLyEpMSw1sMpMDX7GSvLkOXq3r/7dqCgs
+ uMddYVZrY9WX4cdQsUp9TLjYFQ68mU8Q5lPSXeWAb0AwBsaoAY2rEPw4b4XgNuKO+xJ6
+ /leADosfxomPK37njXS5JZiJg7drLG8M4lqifqAmeLmLT7Jjp0xtma/fkfd1DMGR7tjJ
+ ORAtssJWHrOoxtC3+CaxMykaR17hmRH8i7D0q3Hg/YDY1n1KTZXlBkhlzYyNNFxjHctv
+ DdpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ZENGOtMS6+bKQUaERKPKm8qYGAS6+eCRE25grnCOJjk=;
- b=g6Q3RcAp82k4c+CnazdoPfwBhbJ8tF8FQol4/Fvy2XaeU20eG3b2EmlgmNUkx3TaMh
- MUVjN7UwM0RoDZ/iZgfyFnZG4ycYZQkZ2VLEj+VAok+js2ULalOj8sM9HwG2On9zP1ka
- mmyG93NbAYfS2yqVd74Z1x2EeMZY/LZIkrx0CrA+IoD6UeYg4X2J0gtEOcDIJQqxUXsY
- Y0ozjxbgmXGWYt3KB0fiV15xxLCVfCngkJe4/wggNe2NvL/09Cagx1chq9veboY/RTut
- f/xLYGTHbOSxFQniU/z3q130jpyOn1jimMQSFHjx0fwbf2YibXTjKvrTGvp8DlSEUmMz
- kmrg==
-X-Gm-Message-State: APjAAAWuK3ry/3sS1G76jRgwOC63TZFDVmeKzkQMnJd2sgzFICR44U1O
- k8Da+WL3IeOEPMjiq6igWZir2zJf
-X-Google-Smtp-Source: APXvYqwnv/cZtv7N/ojW3GZ3gVip8CNh+hKTEDwS47sKLhKzwdgn94qwPeFQvMK2TJamHGFY7G3j6Q==
-X-Received: by 2002:a05:600c:507:: with SMTP id
- i7mr3795819wmc.135.1578486797347; 
- Wed, 08 Jan 2020 04:33:17 -0800 (PST)
+ bh=G/wfhSCVdFYk0kyTP7PLIWQJ6W1w4exviX2br2pbzUs=;
+ b=j9batjcdpNIADDnBmBlYOyzHVRaev3oNfZ8SelU+3rKtbMDhTTdGyHM2sHb6Smu+TM
+ R3IWL1XkKIMKesaGiaDfUhTUGJaAOQpP0npTF6Mk/GG/juQ8hkrZgOw43Gt2ey21pK0A
+ roLss7IWo1KoYFghjsiQKsWaidaJ4Sjy7Fy2Q5C1XSfA1OdT5F6Jh9ImDeEFUsXVxByn
+ 49G3YXFs9QLPnA6s5R6CnvBz0l/7Qm164sI4LQMSnCsQGs/Qf8a3t+jLTQ9aGHlXhYFl
+ 6cBSLtV4SVk6MdkVkWt40uB6oOSIZyS7j32NEEvMJsu4CTP/h/YZJm7eBQi9RxV8naEQ
+ zfyg==
+X-Gm-Message-State: APjAAAXEbUnpgtkFvh0QDfh7TTbXJhwHbRzKrewDhjWP6EHcIo1qFSMx
+ dmm7SNW4W5Tm35iJhuuvpxdpYMKe
+X-Google-Smtp-Source: APXvYqxBLa9pMJtIac9q/Yyv/LI2wnh+TsNEOw5u7O+EArXvQGkkGNU9aSXzLrSkMh8oR83BzrZ98A==
+X-Received: by 2002:adf:f3d1:: with SMTP id g17mr4406509wrp.378.1578486791670; 
+ Wed, 08 Jan 2020 04:33:11 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.16
+ by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.10
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Jan 2020 04:33:16 -0800 (PST)
+ Wed, 08 Jan 2020 04:33:11 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 20/38] hw/rtc/mc146818: Add missing dependency on ISA Bus
-Date: Wed,  8 Jan 2020 13:32:37 +0100
-Message-Id: <1578486775-52247-21-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 15/38] hw/ppc/Makefile: Simplify the sPAPR PCI objects rule
+Date: Wed,  8 Jan 2020 13:32:32 +0100
+Message-Id: <1578486775-52247-16-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
 References: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +81,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,30 +100,37 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The MC146818 sits on an ISA bus. Since it can not be used
-without it, select ISA in the Kconfig.
+The CONFIG_PSERIES already selects CONFIG_PCI.
+Simplify the Makefile rules.
 
-Fixes: 82f5181777 ("kconfig: introduce kconfig files", 2019-03-07)
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191224111628.3551-1-philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20191231183216.6781-10-philmd@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/rtc/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ hw/ppc/Makefile.objs | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/hw/rtc/Kconfig b/hw/rtc/Kconfig
-index 45daa8d..3dc2dd6 100644
---- a/hw/rtc/Kconfig
-+++ b/hw/rtc/Kconfig
-@@ -17,6 +17,7 @@ config TWL92230
-     depends on I2C
+diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+index 101e9fc..79adf06 100644
+--- a/hw/ppc/Makefile.objs
++++ b/hw/ppc/Makefile.objs
+@@ -7,14 +7,11 @@ obj-$(CONFIG_PSERIES) += spapr_pci.o spapr_rtc.o spapr_drc.o
+ obj-$(CONFIG_PSERIES) += spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+ obj-$(CONFIG_PSERIES) += spapr_tpm_proxy.o
+ obj-$(CONFIG_SPAPR_RNG) +=  spapr_rng.o
++obj-$(call land,$(CONFIG_PSERIES),$(CONFIG_LINUX)) += spapr_pci_vfio.o spapr_pci_nvlink2.o
+ # IBM PowerNV
+ obj-$(CONFIG_POWERNV) += pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv_psi.o pnv_occ.o pnv_bmc.o
+ obj-$(CONFIG_POWERNV) += pnv_homer.o pnv_pnor.o
  
- config MC146818RTC
-+    depends on ISA_BUS
-     bool
- 
- config SUN4V_RTC
+-
+-ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+-obj-y += spapr_pci_vfio.o spapr_pci_nvlink2.o
+-endif
+ obj-$(CONFIG_PSERIES) += spapr_rtas_ddw.o
+ # PowerPC 4xx boards
+ obj-$(CONFIG_PPC405) += ppc405_boards.o ppc405_uc.o
 -- 
 1.8.3.1
 
