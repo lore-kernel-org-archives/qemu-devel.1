@@ -3,59 +3,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDF6C33C99
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F65C33C99
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:57:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D33D20678
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:55:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D33D20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 341832075A
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:57:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341832075A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=winaoe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip0Zc-0006jr-FM
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 20:55:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33416)
+	id 1ip0bF-0007nR-86
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 20:57:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eguan@linux.alibaba.com>) id 1ip0Yz-00063X-TK
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:55:15 -0500
+ (envelope-from <mail@winaoe.org>) id 1ip0aX-0007Ir-SG
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eguan@linux.alibaba.com>) id 1ip0Yr-00083u-Rc
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:55:07 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:16112)
+ (envelope-from <mail@winaoe.org>) id 1ip0aW-0001Tl-5S
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:56:49 -0500
+Received: from vanadinet.nl ([95.170.90.142]:34066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
- id 1ip0Yr-00080Y-Gz
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:55:05 -0500
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R161e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07486; MF=eguan@linux.alibaba.com;
- NM=1; PH=DS; RN=4; SR=0; TI=SMTPD_---0Tn7WaD1_1578448483; 
-Received: from localhost(mailfrom:eguan@linux.alibaba.com
- fp:SMTPD_---0Tn7WaD1_1578448483) by smtp.aliyun-inc.com(127.0.0.1);
- Wed, 08 Jan 2020 09:54:44 +0800
-Date: Wed, 8 Jan 2020 09:54:43 +0800
-From: Eryu Guan <eguan@linux.alibaba.com>
-To: Julia Suvorova <jusual@redhat.com>
-Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
-Message-ID: <20200108015443.GI41863@e18g06458.et15sqa>
-References: <20191231103434.GA41863@e18g06458.et15sqa>
- <20191231115136.7b967604@Igors-MacBook-Pro>
- <20200102020850.GB41863@e18g06458.et15sqa>
- <20200107130649.GH41863@e18g06458.et15sqa>
- <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
+ (Exim 4.71) (envelope-from <mail@winaoe.org>) id 1ip0aV-0001NE-SN
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:56:48 -0500
+Received: from [10.0.0.114] ([87.214.188.202]) (authenticated bits=0)
+ by vanadinet.nl (8.14.9/8.14.9) with ESMTP id 0081sV8h001736
+ (version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=NO)
+ for <qemu-devel@nongnu.org>; Wed, 8 Jan 2020 02:54:33 +0100
+To: qemu-devel@nongnu.org
+From: "V." <mail@winaoe.org>
+Subject: [PATCH/RFC 0/1] Vhost User Cross Cable: Intro
+Message-ID: <98d1e1f0-0e53-d207-78ce-ea9717673985@winaoe.org>
+Date: Wed, 8 Jan 2020 02:54:30 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 47.88.44.36
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by vanadinet.nl id
+ 0081sV8h001736
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 95.170.90.142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,107 +63,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 07, 2020 at 03:01:01PM +0100, Julia Suvorova wrote:
-> On Tue, Jan 7, 2020 at 2:06 PM Eryu Guan <eguan@linux.alibaba.com> wrote:
-> >
-> > On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
-> > > On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
-> > > > On Tue, 31 Dec 2019 18:34:34 +0800
-> > > > Eryu Guan <eguan@linux.alibaba.com> wrote:
-> > > >
-> > > > > Hi,
-> > > > >
-> > > > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
-> > > > > think it's because io completion hits use-after-free when device is
-> > > > > already gone. Is this a known bug that has been fixed? (I went through
-> > > > > the git log but didn't find anything obvious).
-> > > > >
-> > > > > gdb backtrace is:
-> > > > >
-> > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
-> > > > > Program terminated with signal 11, Segmentation fault.
-> > > > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > > > 903        return obj->class;
-> > > > > (gdb) bt
-> > > > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
-> > > > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
-> > > > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
-> > > > >     opaque=0x558a2f2fd420, ret=0)
-> > > > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
-> > > > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
-> > > > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
-> > > > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
-> > > > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
-> > > > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
-> > > > > #6  0x00007fff9ed75780 in ?? ()
-> > > > > #7  0x0000000000000000 in ?? ()
-> > > > >
-> > > > > It seems like qemu was completing a discard/write_zero request, but
-> > > > > parent BusState was already freed & set to NULL.
-> > > > >
-> > > > > Do we need to drain all pending request before unrealizing virtio-blk
-> > > > > device? Like the following patch proposed?
-> > > > >
-> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
-> > > > >
-> > > > > If more info is needed, please let me know.
-> > > >
-> > > > may be this will help: https://patchwork.kernel.org/patch/11213047/
-> > >
-> > > Yeah, this looks promising! I'll try it out (though it's a one-time
-> > > crash for me). Thanks!
-> >
-> > After applying this patch, I don't see the original segfaut and
-> > backtrace, but I see this crash
-> >
-> > [Thread debugging using libthread_db enabled]
-> > Using host libthread_db library "/lib64/libthread_db.so.1".
-> > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
-> > Program terminated with signal 11, Segmentation fault.
-> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-> > 1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
-> > Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
-> > (gdb) bt
-> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-> > #1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
-> > #2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
-> >     at /usr/src/debug/qemu-4.0/memory.c:568
-> > #3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
-> > #4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
-> >     at /usr/src/debug/qemu-4.0/exec.c:3279
-> > #5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
-> > #6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
-> > #7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
-> > #8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
-> > #9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
-> > #10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
-> > #11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
-> > #12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
-> >
-> > And I searched and found
-> > https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
-> > backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
-> > blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
-> > bug.
-> >
-> > But I can still hit the bug even after applying the commit. Do I miss
-> > anything?
-> 
-> Hi Eryu,
-> This backtrace seems to be caused by this bug (there were two bugs in
-> 1706759): https://bugzilla.redhat.com/show_bug.cgi?id=1708480
-> Although the solution hasn't been tested on virtio-blk yet, you may
-> want to apply this patch:
->     https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg05197.html
-> Let me know if this works.
+Hi List,
 
-Will try it out, thanks a lot!
+For my VM setup I tend to use a lot of VM to VM single network links to d=
+o routing, switching and bridging in VM's instead of the host.
+Also stemming from a silly fetish to sometimes use some OpenBSD VMs as fi=
+rewall, but that is besides the point here.
+I am using the standard, tested and true method of using a whole bunch=C2=
+=A0 of bridges, having 2 vhost taps each.
+This works and it's fast, but it is a nightmare to manage with all the in=
+terfaces on the host.
 
-Eryu
+So, I looked a bit into how I can improve this, basically coming down to =
+"How to connect 2 VM's together in a really fast and easy way".
+This however, is not as straightforward as I thought, without going the w=
+hole route of OVS/Snabb/any other big feature bloated
+software switch.
+Cause really, all I want is to connect 2 VM's in a fast and easy way. Sho=
+uldn't be that hard right?
+
+Anyways, I end up finding tests/vhost-user-bridge.c, which is very nicely=
+ doing half of what I wanted.
+After some doubling of the vhosts and eliminating udp, I came up with a V=
+host User Cross Cable. (patch in next post).
+It just opens 2 vhost sockets instead of 1 and does the forwarding betwee=
+n them.
+A terrible hack and slash of vhost-user-bridge.c, probably now with bugs =
+causing the dead of many puppies and the end of humanity,
+but it works!
+
+However... I now am left with some questions, which I hope some of you ca=
+n answer.
+
+1.
+I looked, googled, read and tried things, but it is likely that I am an c=
+omplete and utter moron and my google-fu has just been awful...
+Very likely... But is there really no other way then I have found to just=
+ link up 2 QEMU's in a fast non-bridge way? (No, not sockets.)
+Not that OVS and the likes are not fine software, but do we really need t=
+he whole DPDK to do this?
+
+2.
+In the unlikely chance that I'm not an idiot, then I guess now we have a =
+nice simple cross cable.
+However, I am still a complete vhost/virtio idiot who has no clue how it =
+works and just randomly brute-forced code into submission.
+Maybe not entirely true, but I would still appreciate it very much if som=
+eone with more knowledge into vhost to have a quick look at
+how things are done in cc.
+
+Specifically this monstrosity in TX (speed_killer is a 1MB buffer and kil=
+ls any speed):
+=C2=A0 ret =3D iov_from_buf(sg, num, 0, speed_killer,
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iov_to_buf(out_sg, out_num,=
+ 0, speed_killer,
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MIN(iov_size(out_sg, out_num), sizeo=
+f speed_killer)
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 )
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 );
+
+=C2=A0 vs. the commented:
+=C2=A0 //ret =3D iov_copy(sg, num, out_sg, out_num, 0,
+=C2=A0 //=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 MIN(iov_size(sg, num), iov_size(out_sg, out_num)));
+
+The first is obviously a quick fix to get things working, however, in my =
+meager understanding, should the 2nd one not work?
+Maybe I'm messing up my vectors here, or I am messing up my understanding=
+ of iov_copy, but shouldn't the 2nd form be the way to zero
+copy?
+
+3.
+Now if Cross Cable is actually a new and (after a code-rewrite of 10) a v=
+iable way to connect 2 QEMU's together, could I actually
+suggest a better way?
+I am thinking of a '-netdev vhost-user-slave' option to connect (as clien=
+t or server) to a master QEMU running '-netdev vhost-user'.
+This way there is no need for any external program at all, the master can=
+ have it's memory unshared and everything would just work
+and be fast.
+Also the whole thing can fall back to normal virtio if memory is not shar=
+ed and it would even work in pure usermode without any
+context switch.
+
+Building a patch for this idea I could maybe get around to, don't clearly=
+ have an idea how much work this would be but I've done
+crazier things.
+But is this is something that someone might be able to whip up in an hour=
+ or two? Someone who actually does have a clue about vhost
+and virtio maybe? ;-)
+
+4.
+Hacking together cc from bridge I noticed the use of container_of() to ge=
+t from vudev to state in the vu callbacks.
+Would it be an idea to add a context pointer to the callbacks (possibly g=
+otten from VuDevIface)?
+And I know. First post and I have the forwardness to even suggest an API =
+change! I know!
+But it makes things a bit simpler to avoid globals and it makes sense to =
+have some context in a callback to know what's going on,
+right? ;-)
+
+5.
+Last one, promise.
+I'm very much in the church of "less software =3D=3D less bugs =3D=3D les=
+s security problems".
+Running cc or a vhost-user-slave means QEMU has fast networking in usermo=
+de without the need for anything else then AF_UNIX + shared
+mem.
+So might it be possible to weed out any modern fancy stuff like the Inter=
+net Protocol, TCP, taps, bridges, ethernet and tokenring
+from a kernel and run QEMU on that?
+The idea here is a kernel with storage, a serial console, AF_UNIX and vfi=
+o-pci, only running QEMU.
+Would this be feasible? Or does QEMU need a kernel which at least has a g=
+rasp of understanding of what AF_INET and ethernet is?
+(Does a modern kernel even still support tokenring? No idea, Probably doe=
+s.)
+
+
+Finally, an example and some numbers.
+
+Compiling and starting the cross cable:
+./configure
+make tests/vhost-user-cc
+tests/vhost-user-cc -l /tmp/left.sock -r /tmp/right.sock
+
+(Note, the cross cable will quit if one of the vm's quits, but the VM's w=
+ill reconnect when cc starts again.)
+
+2 VM's, host1 and host2, Linux guests, run like this:
+
+host1:
+/qemu/bin/qemu-system-x86_64 \
+=C2=A0 -accel kvm -nodefaults -k en-us -vnc none -machine q35 -cpu host -=
+smp 8,cores=3D8 -m 2G -vga std \
+=C2=A0 -object memory-backend-file,id=3Dmemory,mem-path=3D/hugetlbfs,shar=
+e=3Don,size=3D2G \
+=C2=A0 -numa node,memdev=3Dmemory \
+=C2=A0 -drive if=3Dnone,cache=3Dnone,format=3Draw,aio=3Dnative,file=3D/de=
+v/lvm/host1,id=3Dsda \
+=C2=A0 -device virtio-scsi-pci,id=3Dscsi0 -device scsi-hd,drive=3Dsda,bus=
+=3Dscsi0.0 \
+=C2=A0 -nic tap,vhost=3Don,helper=3D/usr/libexec/qemu-bridge-helper,id=3D=
+eth0,model=3Dvirtio-net-pci,mac=3D52:54:00:aa:aa:aa,br=3Dbr0 \
+=C2=A0 -chardev socket,id=3Dleft,path=3D/tmp/left.sock,reconnect=3D1 \
+=C2=A0 -nic vhost-user,chardev=3Dleft,id=3Deth1,model=3Dvirtio-net-pci,ma=
+c=3D52:54:00:bb:bb:bb
+
+host2:
+/qemu/bin/qemu-system-x86_64 \
+=C2=A0 -accel kvm -nodefaults -k en-us -vnc none -machine q35 -cpu host -=
+smp 8,cores=3D8 -m 2G -vga std \
+=C2=A0 -object memory-backend-file,id=3Dmemory,mem-path=3D/hugetlbfs,shar=
+e=3Don,size=3D2G \
+=C2=A0 -numa node,memdev=3Dmemory \
+=C2=A0 -drive if=3Dnone,cache=3Dnone,format=3Draw,aio=3Dnative,file=3D/de=
+v/lvm/host2,id=3Dsda \
+=C2=A0 -device virtio-scsi-pci,id=3Dscsi0 -device scsi-hd,drive=3Dsda,bus=
+=3Dscsi0.0 \
+=C2=A0 -nic tap,vhost=3Don,helper=3D/usr/libexec/qemu-bridge-helper,id=3D=
+eth0,model=3Dvirtio-net-pci,mac=3D52:54:00:cc:cc:cc,br=3Dbr0 \
+=C2=A0 -chardev socket,id=3Dright,path=3D/tmp/right.sock,reconnect=3D1 \
+=C2=A0 -nic vhost-user,chardev=3Dright,id=3Deth1,model=3Dvirtio-net-pci,m=
+ac=3D52:54:00:dd:dd:dd
+
+
+First, speed via eth0 (bridged tap with vhost, host2 runs './iperf3 -s'):
+=C2=A0 root@host1:~/iperf-3.1.3/src# ./iperf3 -c 192.168.0.2 -i 1 -t 10
+=C2=A0 ...
+=C2=A0 [=C2=A0 4]=C2=A0=C2=A0 0.00-10.00=C2=A0 sec=C2=A0 10.7 GBytes=C2=A0=
+ 9.22 Gbits/sec=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 receiver
+
+Second, speed via eth1 (Vhost Cross Cable):
+=C2=A0 root@host1:~/iperf-3.1.3/src# ./iperf3 -c 192.168.1.2 -i 1 -t 10
+=C2=A0 ...
+=C2=A0 [=C2=A0 4]=C2=A0=C2=A0 0.00-10.00=C2=A0 sec=C2=A0 2.05 GBytes=C2=A0=
+ 1.76 Gbits/sec=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 receiver
+
+So, a factor of 6 slowdown against bridge. Not too bad, considering the b=
+ad iovec mem-copying I do.
+Lots of room for improvement though, but at least for me it's also 5 time=
+s faster as socket.
+
+V.
+
 
