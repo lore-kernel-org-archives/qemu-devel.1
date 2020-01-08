@@ -2,74 +2,94 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC38C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D041C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 968B72070E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:38:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3535420705
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:39:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cku7AyWK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 968B72070E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TJsG5a4p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3535420705
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipCTW-0000Zk-OO
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 09:38:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51456)
+	id 1ipCUU-0001yi-CS
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 09:39:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52126)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1ipCNY-000136-Ae
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:13 -0500
+ (envelope-from <philmd@redhat.com>) id 1ipCOU-0002E0-40
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1ipCNW-00061B-NF
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:12 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41971
+ (envelope-from <philmd@redhat.com>) id 1ipCOS-0006XI-MH
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:33:10 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36320
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1ipCNW-00060m-JU
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:10 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipCOS-0006W9-Hv
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:33:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578493930;
+ s=mimecast20190719; t=1578493988;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mMTtFLCmoXcDohIcRMb4cQQJh091sf79PJSYy2RWfNs=;
- b=Cku7AyWKhyrnD9gzZ5cUtOH2hoD338PnoRmd7Q6ATmlxV8GvlPQNYuywdJr2yyGUAzMd4H
- 5joxM1Nx78VNjMPe/EksqA54C/pKXeDlhELUaRp6sB3cKYTKDubIUpOTGjhhjTrUJiMUHE
- bTezgkLC8jhigc2ZtJXrUDsL0lZh8WA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-IXQVVHF8PCqnD-PzsB_Jtw-1; Wed, 08 Jan 2020 09:32:08 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDB70800D48;
- Wed,  8 Jan 2020 14:32:07 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.107])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 63A6E6FF0F;
- Wed,  8 Jan 2020 14:32:05 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 7/8] blockdev: Return bs to the proper context on snapshot
- abort
-Date: Wed,  8 Jan 2020 15:31:37 +0100
-Message-Id: <20200108143138.129909-8-slp@redhat.com>
-In-Reply-To: <20200108143138.129909-1-slp@redhat.com>
-References: <20200108143138.129909-1-slp@redhat.com>
+ bh=SD9tAS2fqOSiRhQDHrCuTc8J1fkQfGMjR3EfUfcFYtw=;
+ b=TJsG5a4puA6mcspZDxEWqAlRwD2R1/AmfRUvLKXvhsf7oJlB6eWzLviUbQu4Sv388PYmq4
+ mjY8cKYsiJKD7Iv4VfmSxTexwUcGb9FgCCoofCbCU1nvUtyP75d10FAU4T1pzSTI4EoYmm
+ ovTRWDWmhnkt4FMaT1yrQt6itP4HiGM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-LeVe1WNAMkCSKs6lB1DbWg-1; Wed, 08 Jan 2020 09:33:04 -0500
+Received: by mail-wr1-f69.google.com with SMTP id t3so1487903wrm.23
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 06:33:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=y+ZFrQt/4O+BcLCiuqUiQqazBu6klP4jSOde9XUsOFw=;
+ b=VetOAUUFZAX5MYUUJdhc5Kj8QfQaR23ov6DPC6qZR5lsNPYZAGMNtPssT3Y3soNgj6
+ Q+Pnwv183sB2SEppIWj0H964HK3tz6NybFkpZDKBjejZ3w+jL+q3r37kiR+9StYQ/4Cp
+ 9uxtDJdejnl4kcMuQdgUFU0s9OF8kpF/NHfLidNGM276u3aP0xYZE2Wzv06MWVC9EQeK
+ bprb7C/wFbSG0ut7lNXmqLjrAcV09E3h0IVmWnz8v502eEfNUrFoM1fopZ3JIpu6823t
+ oo3aNcZHiBLrp22uuWTTZLU7085hu6WxYj6j/QQnD6KhSJBWTj5hk0K4pve8V3lVFghh
+ ac5Q==
+X-Gm-Message-State: APjAAAXmQZ9Lh1PbNicmBkB18WlEg1XqLdZimWOS0uyZ3Vdnzjvp7M4o
+ XIeduhq97IjRTCu92rTUn0NaJIRAwWIwDR+WtPJVp0glF8I7rt1WV4g305CJXuxSHHbnbD8x01L
+ g9STzGOEUw1fZQs0=
+X-Received: by 2002:a5d:4ec2:: with SMTP id s2mr4689715wrv.291.1578493983551; 
+ Wed, 08 Jan 2020 06:33:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw6CXCRZmhgl9+VAA7oWDpAiUd74kyYrpt7cTpVMPRtu0qHVbiUYZWZn1jjtgHrPMwuKfPS7A==
+X-Received: by 2002:a5d:4ec2:: with SMTP id s2mr4689689wrv.291.1578493983287; 
+ Wed, 08 Jan 2020 06:33:03 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id i11sm4542120wrs.10.2020.01.08.06.33.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jan 2020 06:33:02 -0800 (PST)
+Subject: Re: [PATCH v2] tests: fix test-qga on macosx
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1578490555-6363-1-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <aca7f275-71ab-f634-72b7-915b70d42935@redhat.com>
+Date: Wed, 8 Jan 2020 15:33:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: IXQVVHF8PCqnD-PzsB_Jtw-1
+In-Reply-To: <1578490555-6363-1-git-send-email-pbonzini@redhat.com>
+Content-Language: en-US
+X-MC-Unique: LeVe1WNAMkCSKs6lB1DbWg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -85,136 +105,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Sergio Lopez <slp@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-external_snapshot_abort() calls to bdrv_set_backing_hd(), which
-returns state->old_bs to the main AioContext, as it's intended to be
-used then the BDS is going to be released. As that's not the case when
-aborting an external snapshot, return it to the AioContext it was
-before the call.
+On 1/8/20 2:35 PM, Paolo Bonzini wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> Fix Unix socket connection & skip commands that are not implemented.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   tests/Makefile.include |  2 +-
+>   tests/test-qga.c       | 25 ++++++++++++++++++-------
+>   2 files changed, 19 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 49e3b0d..192a08e 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -119,7 +119,7 @@ check-unit-$(CONFIG_BLOCK) +=3D tests/test-crypto-sec=
+ret$(EXESUF)
+>   check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) +=3D tests/tes=
+t-crypto-tlscredsx509$(EXESUF)
+>   check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) +=3D tests/tes=
+t-crypto-tlssession$(EXESUF)
+>   ifneq (,$(findstring qemu-ga,$(TOOLS)))
+> -check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) +=3D tes=
+ts/test-qga$(EXESUF)
+> +check-unit-$(call land,$(CONFIG_POSIX),$(CONFIG_VIRTIO_SERIAL)) +=3D tes=
+ts/test-qga$(EXESUF)
+>   endif
+>   check-unit-y +=3D tests/test-timed-average$(EXESUF)
+>   check-unit-$(CONFIG_INOTIFY1) +=3D tests/test-util-filemonitor$(EXESUF)
+> diff --git a/tests/test-qga.c b/tests/test-qga.c
+> index d2b2435..191bfca 100644
+> --- a/tests/test-qga.c
+> +++ b/tests/test-qga.c
+> @@ -17,17 +17,17 @@ typedef struct {
+>  =20
+>   static int connect_qga(char *path)
+>   {
+> -    int s, ret, len, i =3D 0;
+> +    int s, ret, i =3D 0;
+>       struct sockaddr_un remote;
 
-This issue can be triggered by issuing a transaction with two actions,
-a proper blockdev-snapshot-sync and a bogus one, so the second will
-trigger a transaction abort. This results in a crash with an stack
-trace like this one:
+Or
+         struct sockaddr_un remote =3D { };
+and remove memset().
 
- #0  0x00007fa1048b28df in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/u=
-nix/sysv/linux/raise.c:50
- #1  0x00007fa10489ccf5 in __GI_abort () at abort.c:79
- #2  0x00007fa10489cbc9 in __assert_fail_base
-     (fmt=3D0x7fa104a03300 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", ass=
-ertion=3D0x5572240b44d8 "bdrv_get_aio_context(old_bs) =3D=3D bdrv_get_aio_c=
-ontext(new_bs)", file=3D0x557224014d30 "block.c", line=3D2240, function=3D<=
-optimized out>) at assert.c:92
- #3  0x00007fa1048aae96 in __GI___assert_fail
-     (assertion=3Dassertion@entry=3D0x5572240b44d8 "bdrv_get_aio_context(ol=
-d_bs) =3D=3D bdrv_get_aio_context(new_bs)", file=3Dfile@entry=3D0x557224014=
-d30 "block.c", line=3Dline@entry=3D2240, function=3Dfunction@entry=3D0x5572=
-240b5d60 <__PRETTY_FUNCTION__.31620> "bdrv_replace_child_noperm") at assert=
-.c:101
- #4  0x0000557223e631f8 in bdrv_replace_child_noperm (child=3D0x557225b9c98=
-0, new_bs=3Dnew_bs@entry=3D0x557225c42e40) at block.c:2240
- #5  0x0000557223e68be7 in bdrv_replace_node (from=3D0x557226951a60, to=3D0=
-x557225c42e40, errp=3D0x5572247d6138 <error_abort>) at block.c:4196
- #6  0x0000557223d069c4 in external_snapshot_abort (common=3D0x557225d7e170=
-) at blockdev.c:1731
- #7  0x0000557223d069c4 in external_snapshot_abort (common=3D0x557225d7e170=
-) at blockdev.c:1717
- #8  0x0000557223d09013 in qmp_transaction (dev_list=3D<optimized out>, has=
-_props=3D<optimized out>, props=3D0x557225cc7d70, errp=3Derrp@entry=3D0x7ff=
-e704c0c98) at blockdev.c:2360
- #9  0x0000557223e32085 in qmp_marshal_transaction (args=3D<optimized out>,=
- ret=3D<optimized out>, errp=3D0x7ffe704c0d08) at qapi/qapi-commands-transa=
-ction.c:44
- #10 0x0000557223ee798c in do_qmp_dispatch (errp=3D0x7ffe704c0d00, allow_oo=
-b=3D<optimized out>, request=3D<optimized out>, cmds=3D0x5572247d3cc0 <qmp_=
-commands>) at qapi/qmp-dispatch.c:132
- #11 0x0000557223ee798c in qmp_dispatch (cmds=3D0x5572247d3cc0 <qmp_command=
-s>, request=3D<optimized out>, allow_oob=3D<optimized out>) at qapi/qmp-dis=
-patch.c:175
- #12 0x0000557223e06141 in monitor_qmp_dispatch (mon=3D0x557225c69ff0, req=
-=3D<optimized out>) at monitor/qmp.c:120
- #13 0x0000557223e0678a in monitor_qmp_bh_dispatcher (data=3D<optimized out=
->) at monitor/qmp.c:209
- #14 0x0000557223f2f366 in aio_bh_call (bh=3D0x557225b9dc60) at util/async.=
-c:117
- #15 0x0000557223f2f366 in aio_bh_poll (ctx=3Dctx@entry=3D0x557225b9c840) a=
-t util/async.c:117
- #16 0x0000557223f32754 in aio_dispatch (ctx=3D0x557225b9c840) at util/aio-=
-posix.c:459
- #17 0x0000557223f2f242 in aio_ctx_dispatch (source=3D<optimized out>, call=
-back=3D<optimized out>, user_data=3D<optimized out>) at util/async.c:260
- #18 0x00007fa10913467d in g_main_dispatch (context=3D0x557225c28e80) at gm=
-ain.c:3176
- #19 0x00007fa10913467d in g_main_context_dispatch (context=3Dcontext@entry=
-=3D0x557225c28e80) at gmain.c:3829
- #20 0x0000557223f31808 in glib_pollfds_poll () at util/main-loop.c:219
- #21 0x0000557223f31808 in os_host_main_loop_wait (timeout=3D<optimized out=
->) at util/main-loop.c:242
- #22 0x0000557223f31808 in main_loop_wait (nonblocking=3D<optimized out>) a=
-t util/main-loop.c:518
- #23 0x0000557223d13201 in main_loop () at vl.c:1828
- #24 0x0000557223bbfb82 in main (argc=3D<optimized out>, argv=3D<optimized =
-out>, envp=3D<optimized out>) at vl.c:4504
+Regardless:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1779036
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
- blockdev.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/blockdev.c b/blockdev.c
-index 292961a88d..cfed87f434 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1731,6 +1731,8 @@ static void external_snapshot_abort(BlkActionState *c=
-ommon)
-     if (state->new_bs) {
-         if (state->overlay_appended) {
-             AioContext *aio_context;
-+            AioContext *tmp_context;
-+            int ret;
-=20
-             aio_context =3D bdrv_get_aio_context(state->old_bs);
-             aio_context_acquire(aio_context);
-@@ -1738,6 +1740,25 @@ static void external_snapshot_abort(BlkActionState *=
-common)
-             bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backind_hd=
-()
-                                           close state->old_bs; we need it =
-*/
-             bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
-+
-+            /*
-+             * The call to bdrv_set_backing_hd() above returns state->old_=
-bs to
-+             * the main AioContext. As we're still going to be using it, r=
-eturn
-+             * it to the AioContext it was before.
-+             */
-+            tmp_context =3D bdrv_get_aio_context(state->old_bs);
-+            if (aio_context !=3D tmp_context) {
-+                aio_context_release(aio_context);
-+                aio_context_acquire(tmp_context);
-+
-+                ret =3D bdrv_try_set_aio_context(state->old_bs,
-+                                               aio_context, NULL);
-+                assert(ret =3D=3D 0);
-+
-+                aio_context_release(tmp_context);
-+                aio_context_acquire(aio_context);
-+            }
-+
-             bdrv_replace_node(state->new_bs, state->old_bs, &error_abort);
-             bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed old_b=
-s */
-=20
---=20
-2.23.0
+>  =20
+>       s =3D socket(AF_UNIX, SOCK_STREAM, 0);
+>       g_assert(s !=3D -1);
+>  =20
+> +    memset(&remote, 0, sizeof(struct sockaddr_un));
+>       remote.sun_family =3D AF_UNIX;
+>       do {
+> -        strcpy(remote.sun_path, path);
+> -        len =3D strlen(remote.sun_path) + sizeof(remote.sun_family);
+> -        ret =3D connect(s, (struct sockaddr *)&remote, len);
+> +        strncpy(remote.sun_path, path, sizeof(remote.sun_path) - 1);
+> +        ret =3D connect(s, (struct sockaddr *)&remote, sizeof(struct soc=
+kaddr_un));
+>           if (ret =3D=3D -1) {
+>               g_usleep(G_USEC_PER_SEC);
+>           }
+> @@ -305,6 +305,7 @@ static void test_qga_info(gconstpointer fix)
+>       qobject_unref(ret);
+>   }
+>  =20
+> +#if defined(CONFIG_LINUX)
+>   static void test_qga_get_vcpus(gconstpointer fix)
+>   {
+>       const TestFixture *fixture =3D fix;
+> @@ -324,7 +325,9 @@ static void test_qga_get_vcpus(gconstpointer fix)
+>  =20
+>       qobject_unref(ret);
+>   }
+> +#endif
+>  =20
+> +#if defined(CONFIG_LINUX)
+>   static void test_qga_get_fsinfo(gconstpointer fix)
+>   {
+>       const TestFixture *fixture =3D fix;
+> @@ -348,6 +351,7 @@ static void test_qga_get_fsinfo(gconstpointer fix)
+>  =20
+>       qobject_unref(ret);
+>   }
+> +#endif
+>  =20
+>   static void test_qga_get_memory_block_info(gconstpointer fix)
+>   {
+> @@ -394,6 +398,7 @@ static void test_qga_get_memory_blocks(gconstpointer =
+fix)
+>       qobject_unref(ret);
+>   }
+>  =20
+> +#if defined(CONFIG_LINUX)
+>   static void test_qga_network_get_interfaces(gconstpointer fix)
+>   {
+>       const TestFixture *fixture =3D fix;
+> @@ -412,6 +417,7 @@ static void test_qga_network_get_interfaces(gconstpoi=
+nter fix)
+>  =20
+>       qobject_unref(ret);
+>   }
+> +#endif
+>  =20
+>   static void test_qga_file_ops(gconstpointer fix)
+>   {
+> @@ -682,7 +688,7 @@ static void test_qga_blacklist(gconstpointer data)
+>       qobject_unref(ret);
+>  =20
+>       /* check something work */
+> -    ret =3D qmp_fd(fix.fd, "{'execute': 'guest-get-fsinfo'}");
+> +    ret =3D qmp_fd(fix.fd, "{'execute': 'guest-info'}");
+>       qmp_assert_no_error(ret);
+>       qobject_unref(ret);
+>  =20
+> @@ -766,6 +772,7 @@ static void test_qga_config(gconstpointer data)
+>       g_key_file_free(kf);
+>   }
+>  =20
+> +#if defined(CONFIG_LINUX)
+>   static void test_qga_fsfreeze_status(gconstpointer fix)
+>   {
+>       const TestFixture *fixture =3D fix;
+> @@ -781,6 +788,7 @@ static void test_qga_fsfreeze_status(gconstpointer fi=
+x)
+>  =20
+>       qobject_unref(ret);
+>   }
+> +#endif
+>  =20
+>   static void test_qga_guest_exec(gconstpointer fix)
+>   {
+> @@ -976,12 +984,17 @@ int main(int argc, char **argv)
+>       g_test_add_data_func("/qga/sync", &fix, test_qga_sync);
+>       g_test_add_data_func("/qga/ping", &fix, test_qga_ping);
+>       g_test_add_data_func("/qga/info", &fix, test_qga_info);
+> +#if defined(CONFIG_LINUX)
+>       g_test_add_data_func("/qga/network-get-interfaces", &fix,
+>                            test_qga_network_get_interfaces);
+>       if (!access("/sys/devices/system/cpu/cpu0", F_OK)) {
+>           g_test_add_data_func("/qga/get-vcpus", &fix, test_qga_get_vcpus=
+);
+>       }
+>       g_test_add_data_func("/qga/get-fsinfo", &fix, test_qga_get_fsinfo);
+> +    g_test_add_data_func("/qga/fsfreeze-status", &fix,
+> +                         test_qga_fsfreeze_status);
+> +#endif
+> +
+>       g_test_add_data_func("/qga/get-memory-block-info", &fix,
+>                            test_qga_get_memory_block_info);
+>       g_test_add_data_func("/qga/get-memory-blocks", &fix,
+> @@ -993,8 +1006,6 @@ int main(int argc, char **argv)
+>       g_test_add_data_func("/qga/invalid-oob", &fix, test_qga_invalid_oob=
+);
+>       g_test_add_data_func("/qga/invalid-cmd", &fix, test_qga_invalid_cmd=
+);
+>       g_test_add_data_func("/qga/invalid-args", &fix, test_qga_invalid_ar=
+gs);
+> -    g_test_add_data_func("/qga/fsfreeze-status", &fix,
+> -                         test_qga_fsfreeze_status);
+>  =20
+>       g_test_add_data_func("/qga/blacklist", NULL, test_qga_blacklist);
+>       g_test_add_data_func("/qga/config", NULL, test_qga_config);
+>=20
 
 
