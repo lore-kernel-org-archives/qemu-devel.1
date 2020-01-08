@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B38C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57601C33CA2
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70F102072A
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 246D1206F0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:58:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsHDMF5v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70F102072A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aoD84Moy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 246D1206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipAtq-0004ns-Ic
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:57:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60762)
+	id 1ipAub-000679-Mx
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:58:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWp-0004TZ-5N
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:40 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWn-0004QW-7P
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWn-0004dE-VR
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:39 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36212)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWm-0004bg-6b
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:37 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:54064)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ipAWn-0004ch-OM
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:37 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p17so2325038wma.1
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:37 -0800 (PST)
+ id 1ipAWm-0004bN-0f
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:36 -0500
+Received: by mail-wm1-x334.google.com with SMTP id m24so2291877wmc.3
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lI/UiO0FLtiZA09SZKe3jYpK18b21lSc4c4LR3K/VDs=;
- b=TsHDMF5vCHzvDgzxwEFl1FN1p9Pmbx3hHVrAzPLJZyivAg6AEG3NlQ6XH+pPl1S2py
- IrAJA5J3k1gEdBaJfhUE2QaZr0u2pbSEpy2nV76J21LpooLuiR08t1CdQyPvzpH//753
- Wx/1ZVpZBiCPbnqkXmlpvz5zQGPizKAsnH/OMpAWmE+rJAZE3tNaUbX0cEWnUcHscuCI
- MGdB4URatFXPYQDKJCBet2ZHh3VwEwaKWrvOBwQi+3m4dZbR+6JJvP9QMfav6WgEDAPb
- a2mJhBzL0ssjg+pEpxcHSHH6m2kyjd158dDzC56jrVNmG0/BW+lv1uyaHPokgsY0ByM9
- CThw==
+ bh=nCFDvneHvDjWpyCU9KybmAmT/8/EAEw7mDdY8fjzHtg=;
+ b=aoD84MoyXokD58csuHv96AC8jtTpWWB8KuAHrMgRBSvW/L6VqjvT12xqSrFzZQGPi2
+ GAbuxkJrv2u1wOA+WEqhJtkBaYPP42Z5AUFVGoI0jrH2CKLRa9xrB51Dy0H10lSAhBav
+ zmqOcg/dxkTfZHoMcRJ4mz2VXtkypKF2iNcjMkyz1FKIOTZbeUg1+e9CMQ0vOMcjD2QI
+ f2mdUcSmH2xmcmpNHhOTJp2O+w9l+3eZac6eyvH7SDG5T051YjTdyJ0eAOZftrE3so4A
+ 6dJkySQFutYmo55HxBugEHAKg8sOtNYNlkYxmwtluBiGFac2w8CZoHYNkWJBsblzx9td
+ TEQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=lI/UiO0FLtiZA09SZKe3jYpK18b21lSc4c4LR3K/VDs=;
- b=Qg1Nb6NtLbPiRJF6YscxpfCAtZuH9/6XY+rAdhmD+o1h5KMfbTDxc0AjOTx8lLKY0m
- GznBmHc6CPIb6ceUmDwrYTuL4id05u6FJkaVvYiKRrFDSPdh5xvS+n8Y1z/iYvPav/Ph
- vHLtjPpJGE7Kg4V8tkQCrT9lzwkaZFuOCc5PepjOTpHNjy1eW9mvhXa867uA16FBwrHy
- OwRVV+4pSLonjAb1ZIw0yG1fmUlHVgMYCrVwC5vtNwZDn1yWOjHOJ0pEQWXpHQ4VlPtL
- sXITjEysmEHV1QhKkS/+aD/uu6DZUCUwK/VsZouGxs91qbAtERl6o++TYIU/JFRt0Mux
- 4bLQ==
-X-Gm-Message-State: APjAAAX1/uavVuybHLs4o9a2ne4B9XK5nqWOhrpBWbdlJWzx5AxfxoDH
- kA3lFcvTRyC/g6g++aa9tVpgYK+C
-X-Google-Smtp-Source: APXvYqy+ghnelaFLwIt3+Em/6UBY35s+XLG+PaoIN8YJf9VfsfIm63foF9cPfXNu8A15xsvuHohdwg==
-X-Received: by 2002:a1c:66d5:: with SMTP id a204mr3503888wmc.64.1578486816630; 
- Wed, 08 Jan 2020 04:33:36 -0800 (PST)
+ bh=nCFDvneHvDjWpyCU9KybmAmT/8/EAEw7mDdY8fjzHtg=;
+ b=WV5FhVPx4QvMKkfsg+MbKaPPt/PskRQomkr5881JjzAjvOwFz5WA372fHDdE/vZCwa
+ mM+tE46kxJ+Kh75kgayGGKc9DRzarY06cwlGA1yOXQRFfjmi15OUmBFv6uu+r/5qBlnV
+ VlGrGpw4bf3vGj5b5QfpafqYV6C5xpu2HKIS4I2EkNZ7VSVRrT6LI8A0iEeOyMuBs5Sn
+ 6CMfvmPzkFiCs9WOShBTQAYlMsuXhQ5RT+0BEACxkqhiRusOaGGAdJOtatSm2YyZhuP/
+ 9miKVWWW0dBQ4Ch+sP9G8nZ6BVaf5rDbHScGThcA0zeoIh/e4WBffXe0EDJSxRSvBJnV
+ 7HTw==
+X-Gm-Message-State: APjAAAV57D18cWFI8+3pqMeNj27kD5dQkPY7gFcmOkWy2qvOn18M8W55
+ E5zT1YvCKVB6BWC5nvIayi0k4cb4
+X-Google-Smtp-Source: APXvYqz0F9gRx/UG72fiEBZ+ZvwrgDolXMcfeXsQMcZhqAU3JmJCsYOSdSVbdy8s5OubTu2q7XIKag==
+X-Received: by 2002:a7b:c389:: with SMTP id s9mr3618236wmj.7.1578486814862;
+ Wed, 08 Jan 2020 04:33:34 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.35
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.34
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Jan 2020 04:33:36 -0800 (PST)
+ Wed, 08 Jan 2020 04:33:34 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 37/38] chardev: use QEMUChrEvent instead of int
-Date: Wed,  8 Jan 2020 13:32:54 +0100
-Message-Id: <1578486775-52247-38-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 35/38] monitor/hmp: Explicit we ignore a QEMUChrEvent in
+ IOEventHandler
+Date: Wed,  8 Jan 2020 13:32:52 +0100
+Message-Id: <1578486775-52247-36-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
 References: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,111 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This uses the QEMUChrEvent enum everywhere except in IOEventHandler.
-The IOEventHandler change needs to happen at once for all front ends and
-is done with Coccinelle in the next patch.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-(Extracted from a patch by Philippe Mathieu-Daudé).
+The Chardev events are listed in the QEMUChrEvent enum. To be
+able to use this enum in the IOEventHandler typedef, we need to
+explicit an event ignored by this frontend, to silent the
+following GCC warning:
 
+    CC      monitor/hmp.o
+  monitor/hmp.c: In function ‘monitor_event’:
+  monitor/hmp.c:1330:5: error: enumeration value ‘CHR_EVENT_BREAK’ not handled in switch [-Werror=switch]
+   1330 |     switch (event) {
+        |     ^~~~~~
+  cc1: all warnings being treated as errors
+
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20191218172009.8868-13-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/char-mux.c         | 6 +++---
- chardev/char.c             | 4 ++--
- include/chardev/char-mux.h | 2 +-
- include/chardev/char.h     | 4 ++--
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ monitor/hmp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 200c62a..2675ae0 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -117,7 +117,7 @@ static void mux_print_help(Chardev *chr)
+diff --git a/monitor/hmp.c b/monitor/hmp.c
+index 8942e28..706ebe7 100644
+--- a/monitor/hmp.c
++++ b/monitor/hmp.c
+@@ -1371,6 +1371,10 @@ static void monitor_event(void *opaque, int event)
+         mon_refcount--;
+         monitor_fdsets_cleanup();
+         break;
++
++    case CHR_EVENT_BREAK:
++        /* Ignored */
++        break;
      }
  }
  
--static void mux_chr_send_event(MuxChardev *d, int mux_nr, int event)
-+static void mux_chr_send_event(MuxChardev *d, int mux_nr, QEMUChrEvent event)
- {
-     CharBackend *be = d->backends[mux_nr];
- 
-@@ -126,7 +126,7 @@ static void mux_chr_send_event(MuxChardev *d, int mux_nr, int event)
-     }
- }
- 
--static void mux_chr_be_event(Chardev *chr, int event)
-+static void mux_chr_be_event(Chardev *chr, QEMUChrEvent event)
- {
-     MuxChardev *d = MUX_CHARDEV(chr);
- 
-@@ -232,7 +232,7 @@ static void mux_chr_read(void *opaque, const uint8_t *buf, int size)
-         }
- }
- 
--void mux_chr_send_all_event(Chardev *chr, int event)
-+void mux_chr_send_all_event(Chardev *chr, QEMUChrEvent event)
- {
-     MuxChardev *d = MUX_CHARDEV(chr);
-     int i;
-diff --git a/chardev/char.c b/chardev/char.c
-index 739da11..4f598f8 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -48,7 +48,7 @@ static Object *get_chardevs_root(void)
-     return container_get(object_get_root(), "/chardevs");
- }
- 
--static void chr_be_event(Chardev *s, int event)
-+static void chr_be_event(Chardev *s, QEMUChrEvent event)
- {
-     CharBackend *be = s->be;
- 
-@@ -59,7 +59,7 @@ static void chr_be_event(Chardev *s, int event)
-     be->chr_event(be->opaque, event);
- }
- 
--void qemu_chr_be_event(Chardev *s, int event)
-+void qemu_chr_be_event(Chardev *s, QEMUChrEvent event)
- {
-     /* Keep track if the char device is open */
-     switch (event) {
-diff --git a/include/chardev/char-mux.h b/include/chardev/char-mux.h
-index 572cefd..417fe32 100644
---- a/include/chardev/char-mux.h
-+++ b/include/chardev/char-mux.h
-@@ -56,6 +56,6 @@ typedef struct MuxChardev {
-     object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_MUX)
- 
- void mux_set_focus(Chardev *chr, int focus);
--void mux_chr_send_all_event(Chardev *chr, int event);
-+void mux_chr_send_all_event(Chardev *chr, QEMUChrEvent event);
- 
- #endif /* CHAR_MUX_H */
-diff --git a/include/chardev/char.h b/include/chardev/char.h
-index 087b202..00589a6 100644
---- a/include/chardev/char.h
-+++ b/include/chardev/char.h
-@@ -210,7 +210,7 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
-  *
-  * Send an event from the back end to the front end.
-  */
--void qemu_chr_be_event(Chardev *s, int event);
-+void qemu_chr_be_event(Chardev *s, QEMUChrEvent event);
- 
- int qemu_chr_add_client(Chardev *s, int fd);
- Chardev *qemu_chr_find(const char *name);
-@@ -273,7 +273,7 @@ typedef struct ChardevClass {
-     void (*chr_accept_input)(Chardev *chr);
-     void (*chr_set_echo)(Chardev *chr, bool echo);
-     void (*chr_set_fe_open)(Chardev *chr, int fe_open);
--    void (*chr_be_event)(Chardev *s, int event);
-+    void (*chr_be_event)(Chardev *s, QEMUChrEvent event);
-     /* Return 0 if succeeded, 1 if failed */
-     int (*chr_machine_done)(Chardev *chr);
- } ChardevClass;
 -- 
 1.8.3.1
 
