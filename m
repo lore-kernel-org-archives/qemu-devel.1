@@ -2,60 +2,99 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B1BC33C9E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05521C33C9E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:41:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B81FE206DA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:40:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B81FE206DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2EE5206DA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:41:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyoAEQMm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2EE5206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip9hV-0008BQ-Sa
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 06:40:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55730)
+	id 1ip9i4-0000X4-SG
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 06:41:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33291)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1ip9Zv-0005Lp-Nx
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:32:50 -0500
+ (envelope-from <dinechin@redhat.com>) id 1ip9hA-0007v1-1o
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1ip9Zt-0002iE-DS
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:32:47 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2231 helo=huawei.com)
+ (envelope-from <dinechin@redhat.com>) id 1ip9h7-00009W-Rh
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:40:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38579
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1ip9Zn-0002Y3-MQ; Wed, 08 Jan 2020 06:32:40 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 89A5CE8EDA0EA525B289;
- Wed,  8 Jan 2020 19:32:32 +0800 (CST)
-Received: from localhost.localdomain (10.151.151.249) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 8 Jan 2020 19:32:24 +0800
-From: Dongjiu Geng <gengdongjiu@huawei.com>
-To: <pbonzini@redhat.com>, <gengdongjiu@huawei.com>, <mst@redhat.com>,
- <imammedo@redhat.com>, <shannon.zhaosl@gmail.com>,
- <peter.maydell@linaro.org>, <fam@euphon.net>, <rth@twiddle.net>,
- <ehabkost@redhat.com>, <mtosatti@redhat.com>, <xuwei5@huawei.com>,
- <jonathan.cameron@huawei.com>, <james.morse@arm.com>,
- <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>, <qemu-arm@nongnu.org>
-Subject: [PATCH v22 0/9] Add ARMv8 RAS virtualization support in QEMU
-Date: Wed, 8 Jan 2020 19:32:14 +0800
-Message-ID: <1578483143-14905-1-git-send-email-gengdongjiu@huawei.com>
-X-Mailer: git-send-email 2.7.4
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.151.151.249]
-X-CFilter-Loop: Reflected
+ (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1ip9h7-00008h-MI
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:40:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578483612;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gCaPLL6lX+sD/EGaq7USj6iMTLgEOaSzBvafdPqyjLs=;
+ b=LyoAEQMmdy83/7qEXbIWMhf68or7pLLCjzsqHELTGjdGeWRzYbKQGbu19r4CJbubsDJjD4
+ 3SRvNrVpTlqUKgmseiLTlFOoR9V529eW6xhathNcU03ZZZtvkUzNgGQ86uO13Yd8qDpJp3
+ Kd8I944WCWFMda1l3H4dD9uQYvbYYy8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267--RUrC4gROTe-LidMJLifiA-1; Wed, 08 Jan 2020 06:40:09 -0500
+Received: by mail-wr1-f70.google.com with SMTP id 90so1323162wrq.6
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 03:40:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+ :content-transfer-encoding:message-id:references:to;
+ bh=cikFrXApZDIOzlZrYLKa7HpqrCoGwXkWPIX04wcEaAQ=;
+ b=BSByg9/OwG/bPaAqWmQMeLs+2oDSi5/+bzJMe+uqSkN1nxV8qWK95PraxyZof8ZszI
+ mpk9/GgMhrf8cfR2zN9bRfjWv45jMiSaOX5TfSlBl5FrXeJOozDc8p0jU8vkwrcJxRi3
+ mEiUyR0LA6ERKacNYH5r0ZVEOVkwyTk8mq+9YiK/pG9rTrEnfoLgTmiS1KFMcItTr3Z4
+ yyxmCeUShKy7Gu60g+jrij5vViHp2WYGTSlNFZQdTGwIUx7ZTVMjUTbOo1ECafUkPWig
+ uAZmVfNxpo6M4HuHs1Lwt5f2rLu7JvhKKR8vA7B6BNpeACbHJ6lQcBpPU2XsGLDdDL5C
+ OmYQ==
+X-Gm-Message-State: APjAAAVspeaPjk2Ri5OviG8ArGG4XwZEa+P/oA0CnEGhSa37q0nFTjSi
+ cLWi+mUS21Vz1G1Bjwp96HnlCRWx8Sgv/dNVhnZ9STbO9RMslFTsahRPWXTjelKBVDITlT3BcSr
+ 3Q0tQ5d7/TPlWnSY=
+X-Received: by 2002:a05:6000:367:: with SMTP id
+ f7mr3960069wrf.174.1578483608018; 
+ Wed, 08 Jan 2020 03:40:08 -0800 (PST)
+X-Google-Smtp-Source: APXvYqweDDZ17pRwi47hRFp4K5jJd82eYbp6fkj8Bo/GFbQldn/LAFeDZ1PGvEfkc98ul2F1XbM5aw==
+X-Received: by 2002:a05:6000:367:: with SMTP id
+ f7mr3960015wrf.174.1578483607443; 
+ Wed, 08 Jan 2020 03:40:07 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:466:71c0:1136:b5d4:147f:7046?
+ ([2a01:e0a:466:71c0:1136:b5d4:147f:7046])
+ by smtp.gmail.com with ESMTPSA id p17sm3497709wmk.30.2020.01.08.03.40.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 08 Jan 2020 03:40:06 -0800 (PST)
+Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
+Subject: Re: Making QEMU easier for management tools and applications
+From: Christophe de Dinechin <dinechin@redhat.com>
+In-Reply-To: <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
+Date: Wed, 8 Jan 2020 12:40:03 +0100
+Message-Id: <97F153BD-FB8A-46C7-90D0-9E894B9E0292@redhat.com>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <1EFEF446-AFEA-429F-B6BA-3206A7C41836@redhat.com>
+ <20200108104306.GC5057@dhcp-200-226.str.redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+X-Mailer: Apple Mail (2.3608.40.2.2.4)
+X-MC-Unique: -RUrC4gROTe-LidMJLifiA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,292 +106,302 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhengxiang9@huawei.com, linuxarm@huawei.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the ARMv8 platform, the CPU error types are synchronous external abort(SEA)
-and SError Interrupt (SEI). If exception happens in guest, sometimes it's better
-for guest to perform the recovery, because host does not know the detailed
-information of guest. For example, if an exception happens in a user-space
-application within guest, host does not know which application encounters
-errors.
-
-For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
-After user space gets the notification, it will record the CPER into guest GHES
-buffer and inject an exception or IRQ into guest.
-
-In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
-treat it as a synchronous exception, and notify guest with ARMv8 SEA
-notification type after recording CPER into guest.
-
-This series of patches are based on Qemu 4.2, which include two parts:
-1. Generate APEI/GHES table.
-2. Handle the SIGBUS signal, record the CPER in runtime and fill it into guest
-   memory, then notify guest according to the type of SIGBUS.
-
-The whole solution was suggested by James(james.morse@arm.com); The solution of
-APEI section was suggested by Laszlo(lersek@redhat.com).
-Show some discussions in [1].
-
-This series of patches have already been tested on ARM64 platform with RAS
-feature enabled:
-Show the APEI part verification result in [2].
-Show the BUS_MCEERR_AR SIGBUS handling verification result in [3].
-
----
-Change since v21:
-1. Make the user-facing 'ras' option description more clearly to address Peter's comments.
-2. Update the doc description in "docs/specs/acpi_hest_ghes.rst"
-3. Split HEST/GHES patches to more patches to make the review easily
-4. Using source_id to index the location to save the CPER.
-5. Optimize and simplify the logic to build HEST/GHES table to address Igor/Michael/Beata comments.
-6. make ghes_addr_le a part of GED device.
-
-Change since v20:
-1. Move some implementation details from acpi_ghes.h to acpi_ghes.c
-2. Add the reviewers for the ACPI/APEI/GHES part
-
-Change since v19:
-1. Fix clang compile error
-2. Fix sphinx build error
-
-Change since v18:
-1. Fix some code-style and typo/grammar problems.
-2. Remove no_ras in the VirtMachineClass struct.
-3. Convert documentation to rst format.
-4. Simplize the code and add comments for some magic value.
-5. Move kvm_inject_arm_sea() function into the patch where it's used.
-6. Register the reset handler(kvm_unpoison_all()) in the kvm_init() function.
-
-Change since v17:
-1. Improve some commit messages and comments.
-2. Fix some code-style problems.
-3. Add a *ras* machine option.
-4. Move HEST/GHES related structures and macros into "hw/acpi/acpi_ghes.*".
-5. Move HWPoison page functions into "include/sysemu/kvm_int.h".
-6. Fix some bugs.
-7. Improve the design document.
-
-Change since v16:
-1. check whether ACPI table is enabled when handling the memory error in the SIGBUS handler.
-
-Change since v15:
-1. Add a doc-comment in the proper format for 'include/exec/ram_addr.h'
-2. Remove write_part_cpustate_to_list() because there is another bug fix patch
-   has been merged "arm: Allow system registers for KVM guests to be changed by QEMU code"
-3. Add some comments for kvm_inject_arm_sea() in 'target/arm/kvm64.c'
-4. Compare the arm_current_el() return value to 0,1,2,3, not to PSTATE_MODE_* constants.
-5. Change the RAS support wasn't introduced before 4.1 QEMU version.
-6. Move the no_ras flag  patch to begin in this series
-
-Change since v14:
-1. Remove the BUS_MCEERR_AO handling logic because this asynchronous signal was masked by main thread
-2. Address some Igor Mammedov's comments(ACPI part)
-   1) change the comments for the enum AcpiHestNotifyType definition and remove ditto in patch 1
-   2) change some patch commit messages and separate "APEI GHES table generation" patch to more patches.
-3. Address some peter's comments(arm64 Synchronous External Abort injection)
-   1) change some code notes
-   2) using arm_current_el() for current EL
-   2) use the helper functions for those (syn_data_abort_*).
-
-Change since v13:
-1. Move the patches that set guest ESR and inject virtual SError out of this series
-2. Clean and optimize the APEI part patches
-3. Update the commit messages and add some comments for the code
-
-Change since v12:
-1. Address Paolo's comments to move HWPoisonPage definition to accel/kvm/kvm-all.c
-2. Only call kvm_cpu_synchronize_state() when get the BUS_MCEERR_AR signal
-3. Only add and enable GPIO-Signal and ARMv8 SEA two hardware error sources
-4. Address Michael's comments to not sync SPDX from Linux kernel header file
-
-Change since v11:
-Address James's comments(james.morse@arm.com)
-1. Check whether KVM has the capability to to set ESR instead of detecting host CPU RAS capability
-2. For SIGBUS_MCEERR_AR SIGBUS, use Synchronous-External-Abort(SEA) notification type
-   for SIGBUS_MCEERR_AO SIGBUS, use GPIO-Signal notification
 
 
-Address Shannon's comments(for ACPI part):
-1. Unify hest_ghes.c and hest_ghes.h license declaration
-2. Remove unnecessary including "qmp-commands.h" in hest_ghes.c
-3. Unconditionally add guest APEI table based on James's comments(james.morse@arm.com)
-4. Add a option to virt machine for migration compatibility. On new virt machine it's on
-   by default while off for old ones, we enabled it since 2.12
-5. Refer to the ACPI spec version which introduces Hardware Error Notification first time
-6. Add ACPI_HEST_NOTIFY_RESERVED notification type
+> On 8 Jan 2020, at 11:43, Kevin Wolf <kwolf@redhat.com> wrote:
+>=20
+> Am 07.01.2020 um 18:11 hat Christophe de Dinechin geschrieben:
+>> So I think that it might help, in the long run, to start defining the
+>> language in question in some abstract way, and then to have rules
+>> for how to transform that abstract language into concrete bindings.
+>=20
+> I think this abstract language is QAPI.
 
-Address Igor's comments(for ACPI part):
-1. Add doc patch first which will describe how it's supposed to work between QEMU/firmware/guest
-   OS with expected flows.
-2. Move APEI diagrams into doc/spec patch
-3. Remove redundant g_malloc in ghes_record_cper()
-4. Use build_append_int_noprefix() API to compose whole error status block and whole APEI table,
-   and try to get rid of most structures in patch 1, as they will be left unused after that
-5. Reuse something like https://github.com/imammedo/qemu/commit/3d2fd6d13a3ea298d2ee814835495ce6241d085c
-   to build GAS
-6. Remove much offsetof() in the function
-7. Build independent tables first and only then build dependent tables passing to it pointers
-   to previously build table if necessary.
-8. Redefine macro GHES_ACPI_HEST_NOTIFY_RESERVED to ACPI_HEST_ERROR_SOURCE_COUNT to avoid confusion
+Currently, yes, that=E2=80=99s the closest we have to a well-defined langua=
+ge,
+I pointed it out in my mail, and there is qapi-code-gen.txt to prove it.
+
+So it would certainly make sense for the language I=E2=80=99m describing to
+be a forward evolution of QAPI, or something that is trivially transformed
+to / from the existing json schema.
+
+> The problem is that we're not even close to using QAPI for everything.
+
+That=E2=80=99s the symptom of the problem. The problem as I see it is that
+we could not. at least not with today=E2=80=99s QAPI (maybe I=E2=80=99m wro=
+ng).
+A good example is shortcut command-line options. I don=E2=80=99t think
+you can, today, derive a user-friendly command-line syntax from
+qapi-schema.json, and even less so one that is compatible with what
+we have today.
+
+> Adding a new language on top of QAPI instead isn't going to make the
+> conversion process any faster.
+
+I fully agree that whatever language we select has to have an easy,
+systematic forward path from QAPI, but also from the other
+existing meta-languages, like the .def files used for options,
+or build configuration (there is a hint of the connection between
+the two in the option =E2=80=98if=E2=80=99 member in the .json files).
+
+In other words, the language I have in mind would be something
+that I could auto-generate from, say, the current qapi-schema.json
+and the qemu-options.def. Maybe in the end, that would be simply
+by having qemu-options.def being used to build qemu-options.json,
+and then add the relevant entries in qemu-options.json. Maybe
+there is a better way.
+
+>=20
+>> This definition itself is not obvious (at least not to me). For
+>> example, do we have, anywhere but in the C code, the specification
+>> of how one can add a disk to qemu, and what it means?
+>> Say, looking at qemu-options.def, how do I tell that -hda has
+>> anything to do with -device or -blockdev or -help?
+>=20
+> BlockdevOptions in the QAPI schema is what tells you how it _really_
+> works.
+
+Not really, IMO, in the sense that it gives me no clue as to how -hda
+or -device relate to it.
+
+An important point that you raise through your response, though, is
+that the QAPI schema is only an IDL (interface definition language).
+In other words, it can tell me what a BlockdevOptions look like on
+the wire, but at least in the current state, it cannot tell me what happens
+with it.
+
+This is probably a good thing (it=E2=80=99s already complicated enough as i=
+s),
+but it=E2=80=99s worth pointing out that, even sticking to a declarative la=
+nguage,
+one could add constraints, as hinted by HAS_ARG in the .def file
+(but we could have a richer constraints language, e.g. describing
+-m option so that there can be at most one, the arg is a number,
+can=E2=80=99t be negative or floating-point, and so on.
+
+And of course, we could decide to not stick to a declarative language,
+but to have a way to have some, possibly limited, processing
+described in the language. I=E2=80=99m thinking notably of what is called
+=E2=80=9Cdesugaring=E2=80=9D in other threads.
+
+> The connection to the various command line syntaxes isn't defined
+> in a declarative way because we don't have a QAPIfied command line yet.
+> I know that Markus wants to work on this, but I don't know how much time
+> he actually has to invest in it.
+
+Agreed. As I said, that=E2=80=99s a symptom that QAPI is not the language
+I am talking about, but at best a subset of it.
+
+>=20
+>> I think that the following piece of code from vl.c is revealing:
+>>=20
+>>            case QEMU_OPTION_hda:
+>>            case QEMU_OPTION_hdb:
+>>            case QEMU_OPTION_hdc:
+>>            case QEMU_OPTION_hdd:
+>>                drive_add(IF_DEFAULT, popt->index - QEMU_OPTION_hda, opta=
+rg,
+>>                          HD_OPTS);
+>>                break;
+>>            case QEMU_OPTION_blockdev:
+>>                {
+>>                    Visitor *v;
+>>                    BlockdevOptionsQueueEntry *bdo;
+>>=20
+>>                    v =3D qobject_input_visitor_new_str(optarg, "driver",
+>>                                                      &error_fatal);
+>>=20
+>>                    bdo =3D g_new(BlockdevOptionsQueueEntry, 1);
+>>                    visit_type_BlockdevOptions(v, NULL, &bdo->bdo,
+>>                                               &error_fatal);
+>>                    visit_free(v);
+>>                    loc_save(&bdo->loc);
+>>                    QSIMPLEQ_INSERT_TAIL(&bdo_queue, bdo, entry);
+>>                    break;
+>>                }
+>>            case QEMU_OPTION_drive:
+>>                if (drive_def(optarg) =3D=3D NULL) {
+>>                    exit(1);
+>>                }
+>>                break;
+>>=20
+>> Here, we have three cases related to disks in a way or another,
+>> and three entirely different ways of doing things.
+>=20
+> I would say two different ways because drive_add() is just a small
+> wrapper around drive_def() that overrides a few options.
+
+Well, I stick to three, because one option has a test and an exit(1),
+and the other does not. Which is the kind of inconsistencies a
+well-defined language would get rid of.
+
+>=20
+> Describing the semantics of the -drive way is hard. This is one of the
+> reasons why I would love to get rid of it and replace it with a new
+> user-friendly option that has a more direct mapping to the -blockdev
+> way, which in turn just is BlockdevOptions mapped 1:1 to the command
+> line.
+
+I would love that too :-)
+
+>=20
+>> AFAICT, qemu already created several meta-languages to define
+>> several aspects of the API, from qemu-options.def to qapi-schema.json.
+>> But maybe at some point we need to go meta once more, and define
+>> a language defining the API from which we could automatically
+>> derive the various bindings, including FFI-style bindings for Rust and G=
+o,
+>> as well as some internal data structures. Ideally, that meta-definition
+>> is something that could be shared between libvirt and qemu so that they
+>> literally speak the same language. Or that could be used to automaticall=
+y
+>> build a REST interface.
+>=20
+> I think adding an output for additional languages to the QAPI generator
+> shouldn't be too hard. It already creates multiple things from a single
+> schema (C data structures and command wrappers, schema introspection
+> data, documentation, and probably other things that I forgot).
+
+Agreed.
+
+> libvirt already speaks QAPI, however without reusing the schema and the
+> generator from QEMU.
+
+That=E2=80=99s another thread ;-)
+
+>=20
+>> A big issue, though, is that of compatibility. Doing the above starting
+>> from scratch does not seem that complicated. Doing it in a way that
+>> preserves a minimum of interoperability with earlier-generation
+>> software is another ordeal.
+>=20
+> Indeed, this is the major reason why QAPI isn't as pervasive as it
+> should be.
+
+Probably, but also because QAPI does not address the needs of
+some of the things a slightly more general language could do.
+
+>=20
+>> So I think that Daniel is right. We may need at some point to start
+>> a NEMU-style offshoot that does not attempt to be compatible,
+>> but explores describing an increasing surface of the API using a
+>> new meta-language from which we can generate, in a consistent
+>> way, at least:
+>>=20
+>> - C bindings
+>> - Command-line options
+>> - Shell bindings (or =E2=80=9CHMP=E2=80=9D)
+>> - JSON schema or qom description
+>> - Bindings in other languages (Rust, Go, Python)
+>> - Networked versions of the API (socket, REST)
+>> - Client-side code e.g. for libvirt.
+>> - Serialization / deserialization, e.g. for configuration files
+>> - Documentation, including man page and API docs
+>> - Command-line help
+>=20
+> I think the only thing in this list that can't obviously be covered
+> easily by QAPI is QOM. Or rather, it's covered by passing through
+> key=3Dvalue lists without describing their structure
+
+That=E2=80=99s close enough to me. (In my mind, that part was already =E2=
+=80=9Cdone=E2=80=9D
+by QAPI, even if in the convoluted way you describe)
+
+> - which, as far as I
+> understand, is mainly because QOM properties aren't necessarily static,
+> so we can't provide a statically defined interface for them. Probably
+> solvable in QEMU, but not without a major effort.
+
+Or maybe extend the language so that it=E2=80=99s internal semantics
+knows about this aspect of QOM?
+
+> In a fork that doesn=E2=80=99t care about compatibility, it should be eas=
+ier.
+>=20
+>> At the most fundamental level, I think we need to describe:
+>>=20
+>> - Values, e.g. how we represent names, sizes, paths, etc, possibly
+>> with some user-friendly aspects, e.g. path shortcuts, memory units,
+>> spelling shortcuts (e.g. being able to consistently say -blo for -blockd=
+ev
+>> if that=E2=80=99s the shortest option that matches)
+>=20
+> I don't think user-friendly shortcuts on the command line are "most
+> fundamental".
+
+I agree, my phrasing was poor. What I meant is that the language in
+question should include a user-convenience dimension that is
+not necessary (and not present) in QAPI. Agree the details are not
+fundamental, I meant them as an illustration.
+
+> Whether to accept -blo is an implementation detail of the
+> command line parser which translates a bunch of strings into QAPI
+> objects.
+
+Yes.
+
+>=20
+>> - Relations, e.g. how we represent =E2=80=9Ccontains=E2=80=9D, =E2=80=9C=
+derives from=E2=80=9D, =E2=80=9Cneeds=E2=80=9D,
+>> =E2=80=9Cone of=E2=80=9D, =E2=80=9Cone or several=E2=80=9D, =E2=80=9Catt=
+aches to=E2=80=9D=E2=80=A6
+>> - States, e.g. how do we represent the machine configuration,
+>> or the desired new disk setting
+>> - Verbs, e.g. how we represent =E2=80=9Cadd=E2=80=9D, =E2=80=9Cconnect=
+=E2=80=9D, =E2=80=9Cremove=E2=80=9D, =E2=80=9Cfind=E2=80=9D,
+>> =E2=80=9Cstart=E2=80=9D, =E2=80=9Cnotify=E2=80=9D, etc. and how we descr=
+ibe the kind of input they need.
+>> - Possibly more subtle things like support for transactions, commit/roll=
+back,
+>> i.e. =E2=80=9CI want to add connect a virtual nic to some host vf, but i=
+f anything
+>> along the way fails, I=E2=80=99d like all the cleanup to happen automati=
+cally)
+>=20
+> This sounds like a different approach from our current QAPI command set
+
+Well, except for purposefully trying to use a different wording to avoid
+the risk of getting your mind stuck in one of the particular existing
+meta-languages in QEMU, the approach is not very different.
+
+- Relations already exist in QAPI for example: =E2=80=99struct=E2=80=99, =
+=E2=80=98union=E2=80=99, =E2=80=98alternate=E2=80=99
+
+- States exist, today represented using JSON
+
+- Verbs are called =E2=80=9Ccommands=E2=80=9D in the QAPI json files, and a=
+re what
+follows DEF( in the .def file
+
+- Transactions do not exist today that I know of, although we see
+signs of them in discussions about the fact that this options destroys
+that back end but that option does not.
+
+> (use a smaller set of operations that can work with a greater variety of
+> objects).
+
+More like trying to find terminology that lets you reason about it
+without being too mind-constrainted by existing stuff.
 
 
-Address Peter Maydell's comments
-1. linux-headers is done as a patch of their own created using scripts/update-linux-headers.sh run against a
-   mainline kernel tree
-2. Tested whether this patchset builds OK on aarch32
-3. Abstract Hwpoison page adding code  out properly into a cpu-independent source file from target/i386/kvm.c,
-   such as kvm-all.c
-4. Add doc-comment formatted documentation comment for new globally-visible function prototype in a header
+> Does it actually provide more functionality, though?
 
----
-[1]:
-https://lkml.org/lkml/2017/2/27/246
-https://patchwork.kernel.org/patch/9633105/
-https://patchwork.kernel.org/patch/9925227/
+It=E2=80=99s not intended to provide more, but to require less to do the sa=
+me thing.
 
-[2]:
-Note: the UEFI(QEMU_EFI.fd) is needed if guest want to use ACPI table.
 
-After guest boot up, dump the APEI table, then can see the initialized table
-(1) # iasl -p ./HEST -d /sys/firmware/acpi/tables/HEST
-(2) # cat HEST.dsl
-    /*
-     * Intel ACPI Component Architecture
-     * AML/ASL+ Disassembler version 20170728 (64-bit version)
-     * Copyright (c) 2000 - 2017 Intel Corporation
-     *
-     * Disassembly of /sys/firmware/acpi/tables/HEST, Mon Sep  5 07:59:17 2016
-     *
-     * ACPI Data Table [HEST]
-     *
-     * Format: [HexOffset DecimalOffset ByteLength]  FieldName : FieldValue
-     */
+Thanks,
+Christophe
 
-    ..................................................................................
-    [308h 0776   2]                Subtable Type : 000A [Generic Hardware Error Source V2]
-    [30Ah 0778   2]                    Source Id : 0001
-    [30Ch 0780   2]            Related Source Id : FFFF
-    [30Eh 0782   1]                     Reserved : 00
-    [30Fh 0783   1]                      Enabled : 01
-    [310h 0784   4]       Records To Preallocate : 00000001
-    [314h 0788   4]      Max Sections Per Record : 00000001
-    [318h 0792   4]          Max Raw Data Length : 00001000
-
-    [31Ch 0796  12]         Error Status Address : [Generic Address Structure]
-    [31Ch 0796   1]                     Space ID : 00 [SystemMemory]
-    [31Dh 0797   1]                    Bit Width : 40
-    [31Eh 0798   1]                   Bit Offset : 00
-    [31Fh 0799   1]         Encoded Access Width : 04 [QWord Access:64]
-    [320h 0800   8]                      Address : 00000000785D0040
-
-    [328h 0808  28]                       Notify : [Hardware Error Notification Structure]
-    [328h 0808   1]                  Notify Type : 08 [SEA]
-    [329h 0809   1]                Notify Length : 1C
-    [32Ah 0810   2]   Configuration Write Enable : 0000
-    [32Ch 0812   4]                 PollInterval : 00000000
-    [330h 0816   4]                       Vector : 00000000
-    [334h 0820   4]      Polling Threshold Value : 00000000
-    [338h 0824   4]     Polling Threshold Window : 00000000
-    [33Ch 0828   4]        Error Threshold Value : 00000000
-    [340h 0832   4]       Error Threshold Window : 00000000
-
-    [344h 0836   4]    Error Status Block Length : 00001000
-    [348h 0840  12]            Read Ack Register : [Generic Address Structure]
-    [348h 0840   1]                     Space ID : 00 [SystemMemory]
-    [349h 0841   1]                    Bit Width : 40
-    [34Ah 0842   1]                   Bit Offset : 00
-    [34Bh 0843   1]         Encoded Access Width : 04 [QWord Access:64]
-    [34Ch 0844   8]                      Address : 00000000785D0098
-
-    [354h 0852   8]            Read Ack Preserve : 00000000FFFFFFFE
-    [35Ch 0860   8]               Read Ack Write : 0000000000000001
-
-    .....................................................................................
-
-(3) After a synchronous external abort(SEA) happen, Qemu receive a SIGBUS and 
-    filled the CPER into guest GHES memory.  For example, according to above table,
-    the address that contains the physical address of a block of memory that holds
-    the error status data for this abort is 0x00000000785D0040
-(4) the address for SEA notification error source is 0x785d80b0
-    (qemu) xp /1 0x00000000785D0040
-    00000000785d0040: 0x785d80b0
-
-(5) check the content of generic error status block and generic error data entry
-    (qemu) xp /100x 0x785d80b0
-    00000000785d80b0: 0x00000001 0x00000000 0x00000000 0x00000098
-    00000000785d80c0: 0x00000000 0xa5bc1114 0x4ede6f64 0x833e63b8
-    00000000785d80d0: 0xb1837ced 0x00000000 0x00000300 0x00000050
-    00000000785d80e0: 0x00000000 0x00000000 0x00000000 0x00000000
-    00000000785d80f0: 0x00000000 0x00000000 0x00000000 0x00000000
-    00000000785d8100: 0x00000000 0x00000000 0x00000000 0x00004002
-(6) check the OSPM's ACK value(for example SEA)
-    /* Before OSPM acknowledges the error, check the ACK value */
-    (qemu) xp /1 0x00000000785D0098
-    00000000785d00f0: 0x00000000
-
-    /* After OSPM acknowledges the error, check the ACK value, it change to 1 from 0 */
-    (qemu) xp /1 0x00000000785D0098
-    00000000785d00f0: 0x00000001
-
-[3]: KVM deliver "BUS_MCEERR_AR" to Qemu, Qemu record the guest CPER and inject
-    synchronous external abort to notify guest, then guest do the recovery.
-
-[ 1552.516170] Synchronous External Abort: synchronous external abort (0x92000410) at 0x000000003751c6b4
-[ 1553.074073] {1}[Hardware Error]: Hardware error from APEI Generic Hardware Error Source: 8
-[ 1553.081654] {1}[Hardware Error]: event severity: recoverable
-[ 1554.034191] {1}[Hardware Error]:  Error 0, type: recoverable
-[ 1554.037934] {1}[Hardware Error]:   section_type: memory error
-[ 1554.513261] {1}[Hardware Error]:   physical_address: 0x0000000040fa6000
-[ 1554.513944] {1}[Hardware Error]:   error_type: 0, unknown
-[ 1555.041451] Memory failure: 0x40fa6: Killing mca-recover:1296 due to hardware memory corruption
-[ 1555.373116] Memory failure: 0x40fa6: recovery action for dirty LRU page: Recovered
-
-Dongjiu Geng (9):
-  hw/arm/virt: Introduce a RAS machine option
-  docs: APEI GHES generation and CPER record description
-  ACPI: Build related register address fields via hardware error fw_cfg
-    blob
-  ACPI: Build Hardware Error Source Table
-  ACPI: Record the Generic Error Status Block address
-  KVM: Move hwpoison page related functions into kvm-all.c
-  ACPI: Record Generic Error Status Block(GESB) table
-  target-arm: kvm64: handle SIGBUS signal from kernel or KVM
-  MAINTAINERS: Add ACPI/HEST/GHES entries
-
- MAINTAINERS                            |   9 +
- accel/kvm/kvm-all.c                    |  36 +++
- default-configs/arm-softmmu.mak        |   1 +
- docs/specs/acpi_hest_ghes.rst          | 110 ++++++++
- docs/specs/index.rst                   |   1 +
- hw/acpi/Kconfig                        |   4 +
- hw/acpi/Makefile.objs                  |   1 +
- hw/acpi/aml-build.c                    |   2 +
- hw/acpi/generic_event_device.c         |  15 +-
- hw/acpi/ghes.c                         | 446 +++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c               |  19 ++
- hw/arm/virt.c                          |  23 ++
- include/hw/acpi/aml-build.h            |   1 +
- include/hw/acpi/generic_event_device.h |   2 +
- include/hw/acpi/ghes.h                 |  75 ++++++
- include/hw/arm/virt.h                  |   1 +
- include/qemu/uuid.h                    |   5 +
- include/sysemu/kvm.h                   |   3 +-
- include/sysemu/kvm_int.h               |  12 +
- target/arm/cpu.h                       |   4 +
- target/arm/helper.c                    |   2 +-
- target/arm/internals.h                 |   5 +-
- target/arm/kvm64.c                     |  66 +++++
- target/arm/tlb_helper.c                |   2 +-
- target/i386/cpu.h                      |   2 +
- target/i386/kvm.c                      |  36 ---
- 26 files changed, 840 insertions(+), 43 deletions(-)
- create mode 100644 docs/specs/acpi_hest_ghes.rst
- create mode 100644 hw/acpi/ghes.c
- create mode 100644 include/hw/acpi/ghes.h
-
--- 
-1.8.3.1
 
