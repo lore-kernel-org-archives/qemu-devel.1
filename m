@@ -2,53 +2,82 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D82EAC33C99
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C86C8C33C99
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:31:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAB91206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:22:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB91206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
+	by mail.kernel.org (Postfix) with ESMTPS id 92C4A206F0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:31:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxdY0N5W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92C4A206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioz6v-0004BU-Ns
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 19:22:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49185)
+	id 1iozFq-0007UH-NL
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 19:31:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fthain@telegraphics.com.au>) id 1ioz6J-0003J3-Ba
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:21:32 -0500
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iozF7-00074G-L2
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:30:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>) id 1ioz6H-0003aT-Rq
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:21:31 -0500
-Received: from kvm5.telegraphics.com.au ([98.124.60.144]:33308)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <fthain@telegraphics.com.au>)
- id 1ioz6H-0003Xp-N3; Tue, 07 Jan 2020 19:21:29 -0500
-Received: from localhost (localhost.localdomain [127.0.0.1])
- by kvm5.telegraphics.com.au (Postfix) with ESMTP id 4BDB82A88E;
- Tue,  7 Jan 2020 19:21:22 -0500 (EST)
-Date: Wed, 8 Jan 2020 11:21:24 +1100 (AEDT)
-From: Finn Thain <fthain@telegraphics.com.au>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 02/13] dp8393x: Clean up endianness hacks
-In-Reply-To: <46e5c684-6fbb-fca2-82e5-d6c39a530c68@redhat.com>
-Message-ID: <alpine.LNX.2.21.1.2001081033550.8@nippy.intranet>
-References: <cover.1576815466.git.fthain@telegraphics.com.au>
- <e44d136b8b71414e17200bb1b7edfd94fe866705.1576815466.git.fthain@telegraphics.com.au>
- <alpine.LNX.2.21.1.2001061953150.65@nippy.intranet>
- <46e5c684-6fbb-fca2-82e5-d6c39a530c68@redhat.com>
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iozF6-0001rE-Kj
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:30:37 -0500
+Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:44992)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1iozF5-0001pF-UQ
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:30:36 -0500
+Received: by mail-lj1-x22d.google.com with SMTP id u71so1439280lje.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 16:30:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=I3hVRQZ2S4pGZMBjHNQmI+7oKqUFc2LBvXHEk2FX7yw=;
+ b=mxdY0N5WQi0qiGpYaQgP5Ps/ftym5Obc14SvrBlWvkYpDs3B8dXZm86QOI2cwnMNrx
+ Jk/Hdu42sJqEgAOqU89LpcUx+gaHNoX+2i5uZ7YRIJ+WUj23L5gnO4mfauxGlOYUPJYw
+ L3NbpkCE2znRa2qxiVZ5iM1kgDmt0UWFmbw4SPLSYmUP6zF7o5JkQgvTcZsdxrWQE+et
+ pxUIKj4JHkktoYz1VMzuQkbA3PI3lks+adm5fmTCnHFmrKKfdWZvQfQNF0VlDot83pam
+ aFpqMD1TE/YADZlTABH2E3gzQ0gf6EiMteYPzqI7SSrzlLHtkuawurtXpsuSv5aGp3ol
+ RAxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=I3hVRQZ2S4pGZMBjHNQmI+7oKqUFc2LBvXHEk2FX7yw=;
+ b=BswLJ6t/mW1Yunw9+4zX2LKvxt//qsIebTBxS3KM/eB6wxgXnCCyoF3RFN9R2whnsc
+ gy/u0ulLus2s04mkiA1JhOr8OE+u94D7QNjOR62c2G1fNUr3gI4UvxWImQVOw0jWhAtT
+ GLtdJjlk5Cx1hFR+suMGiPiN72r17tQosi9MWjdsk5X4Q25WpfYfO/A5GBEJfq/X5yt/
+ JY0L99J2Sj5mZLxoskkfjPFg2oOwr1TahAoPQF/MF1YG5suwsgxClhOGjVVte7AXXvsl
+ MFoduPYbVl+WouEuI0H+7UwxjYslXxIjVdcR4D/CV3cd/xzZpWOmQESdD29of3wV1H4G
+ qfpQ==
+X-Gm-Message-State: APjAAAXessTzGXSMtlbog36VyeAm4WUJzrGqe4J1q3F3LBRdkAIMi1/z
+ 9/mscmlQ1FG7msER4gAlbQiKFcw/oscGEGhuYXo=
+X-Google-Smtp-Source: APXvYqysdiZyccxsc/oN12/yJrs6X4cOPyyg/PyUQT8Qqct4c12eNw4/vulntNg6nvV720bLAIn+SYaQRExU3cTCvmU=
+X-Received: by 2002:a05:651c:1214:: with SMTP id
+ i20mr1232960lja.107.1578443433630; 
+ Tue, 07 Jan 2020 16:30:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 98.124.60.144
+References: <157658912470.5706.7275804988501900768.malonedeb@gac.canonical.com>
+ <bf392e35-7962-38fa-6dce-d4d8bb5ef485@redhat.com>
+In-Reply-To: <bf392e35-7962-38fa-6dce-d4d8bb5ef485@redhat.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Tue, 7 Jan 2020 17:30:21 -0700
+Message-ID: <CAJy5ezqveu3i_YC6hhS9yBipycFWUqNOBbmJuRmw2reqeYhUXA@mail.gmail.com>
+Subject: Re: [Bug 1856706] [NEW] target/mips/op_helper.c:971:duplicated
+ branches ?
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000028deec059b9600a1"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::22d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,171 +89,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>,
- =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, qemu-stable@nongnu.org
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Bug 1856706 <1856706@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 7 Jan 2020, Philippe Mathieu-Daud? wrote:
+--00000000000028deec059b9600a1
+Content-Type: text/plain; charset="UTF-8"
 
-> On 1/6/20 11:19 PM, Finn Thain wrote:
-> > On Fri, 20 Dec 2019, Finn Thain wrote:
-> > 
-> > > The in_use field is no different to the other words handled using
-> > > dp8393x_put() and dp8393x_get(). Use the same technique for in_use
-> > > that is used everywhere else.
-> > > 
-> > > Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-> > > ---
-> > > Changed since v1:
-> > >   - Use existing 'address' variable rather than declare a new one.
-> > > 
-> > > Laurent tells me that this clean-up has been tried before. He referred
-> > > me to commit c744cf7879 ("dp8393x: fix dp8393x_receive()") and
-> > > commit 409b52bfe1 ("net/dp8393x: correctly reset in_use field").
-> > > 
-> > > Both of those patches look wrong to me because they both pass the wrong
-> > > byte count to address_space_rw(). It's possible that those patches were
-> > > needed to work around some kind of bug elsewhere, for example, an
-> > > off-by-one result from dp8393x_crda(). The preceding patch in this series
-> > > might help there.
-> > 
-> > Unfortunately this patch really does break NetBSD/arc 5.1, just as
-> > Laurent said it would, just as commit c744cf7879 did.
-> > 
-> > Yet these patches are correct. What gives?
-> > 
-> > I found that one more change can make guests work (for both m68k q800 and
-> > mips64el magnum machines) --
-> > 
-> > --- a/hw/net/dp8393x.c
-> > +++ b/hw/net/dp8393x.c
-> > @@ -246,8 +246,10 @@ static void dp8393x_put(dp8393xState *s, int width,
-> > int offset,
-> >                           uint16_t val)
-> >   {
-> >       if (s->big_endian) {
-> > +          s->data[offset * width] = 0;
-> >           s->data[offset * width + width - 1] = cpu_to_be16(val);
-> >       } else {
-> > +          s->data[offset * width + width - 1] = 0;
-> >           s->data[offset * width] = cpu_to_le16(val);
-> >       }
-> >   }
-> > 
-> > For a wide bus interface, this forces the Most Significant Word (MSW) to
-> > zero. Yet another endianness hack, but it makes NetBSD 5.1 'sn' driver
-> > happy.
-> 
-> Can you write a list of real word addresses/values/result expected for each
-> endianess, so we can add a qtest for this?
-> 
+On Tue, 17 Dec. 2019, 09:28 Thomas Huth, <thuth@redhat.com> wrote:
 
-I'm afraid I've no idea how qtests work. If you are talking about a unit 
-test for dp8393x.c, this would be non-trivial because you need to have the 
-SONIC in bus master mode (i.e. you have to get the chip to do some DMA).
+> On 17/12/2019 14.25, dcb wrote:
+> > Public bug reported:
+> >
+> > qemu-4.2.0/target/mips/op_helper.c:971:8: warning: this condition has
+> > identical branches [-Wduplicated-branches]
+> >
+> > Source code is
+> >
+> >    if (other_tc == other->current_tc) {
+> >         tccause = other->CP0_Cause;
+> >     } else {
+> >         tccause = other->CP0_Cause;
+> >     }
+> >
+> > Possible cut'n'paste error ?
+>
+>  Hi Edgar,
+>
+> you added the code in 2011 ... do you still remember the details here,
+> whether that was on purpose or whether it should look differently?
+>
+>  Thomas
+>
 
-The chip datasheet says,
 
-    Data Bus: These bidirectional lines are used to transfer data on the 
-    system bus. When the SONIC is a bus master, 16-bit data is transferred 
-    on D15-D0 and 32-bit data is transferred on D31-D0. When the SONIC is 
-    accessed as a slave, register data is driven onto lines D15-D0. 
-    D31-D16 are held TRI-STATE if SONIC is in 16-bit mode. If SONIC is in 
-    32-bit mode, they are driven, but invalid.
+Hi Thomas,
 
-The datasheet does not explicitly state that D31-D16 are held low during a 
-DMA write, it just says they are "not used". But I'm beginning to think 
-that forcing the MSW to zero (see above) is the right thing to do.
+Sorry but I barely recall yesterday, 2011 was a long time ago... It does
+look weird.
 
-> > There is a similar issue with the Linux jazzsonic driver. This driver uses
-> > long-word-sized loads with word-sized MMIO registers --
-> > 
-> > #define SONIC_READ(reg) (*((volatile unsigned int *)dev->base_addr+reg))
-> > 
-> > This driver also expects the MSW to be zero. But the MSW actually equals
-> > the LSW, and the driver fails to probe:
-> > 
-> > SONIC ethernet controller not found (0x40004)
-> > 
-> > This seems to indicate that qemu-system-mips64el -M magnum is doing word
-> > smearing on the processor bus. Does anyone know how to prevent that?
-> 
-> I remember a similar issue with another MIPS board because QEMU doesn't model
-> the bus controller, which might do such magic.
-> 
+IIRC smp was kinda of working but the multithreading support wasn't. Some
+of these paths were probably not tested too much at the time.
 
-The bus slave situation relates to e.g. the Silicon Revision register 
-access. This is what breaks the Linux jazzsonic driver.
+Cheers,
+Edgar
 
-In that situation, the datasheet says that D31-D16 are "driven, but 
-invalid". I think the right fix for that is,
+>
+>
 
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -695,8 +695,8 @@ static void dp8393x_write(void *opaque, hwaddr addr, 
-uint64_t data,
- static const MemoryRegionOps dp8393x_ops = {
-     .read = dp8393x_read,
-     .write = dp8393x_write,
--    .impl.min_access_size = 2,
--    .impl.max_access_size = 2,
-+    .impl.min_access_size = 4,
-+    .impl.max_access_size = 4,
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
+--00000000000028deec059b9600a1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This change seems to fix Linux/mipsel and break Linux/m68k, even though 
-both use the chip in 32-bit mode... I guess there's another endianness 
-bug somewhere.
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">On Tue, 17 Dec. 2019, 09:28 Thomas Huth, &lt;<a href=
+=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br></div><bloc=
+kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
+c solid;padding-left:1ex">On 17/12/2019 14.25, dcb wrote:<br>
+&gt; Public bug reported:<br>
+&gt; <br>
+&gt; qemu-4.2.0/target/mips/op_helper.c:971:8: warning: this condition has<=
+br>
+&gt; identical branches [-Wduplicated-branches]<br>
+&gt; <br>
+&gt; Source code is<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 if (other_tc =3D=3D other-&gt;current_tc) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tccause =3D other-&gt;CP0_Cause;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0} else {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tccause =3D other-&gt;CP0_Cause;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0}<br>
+&gt; <br>
+&gt; Possible cut&#39;n&#39;paste error ?<br>
+<br>
+=C2=A0Hi Edgar,<br>
+<br>
+you added the code in 2011 ... do you still remember the details here,<br>
+whether that was on purpose or whether it should look differently?<br>
+<br>
+=C2=A0Thomas<br></blockquote></div></div><div dir=3D"auto"><br></div><div d=
+ir=3D"auto"><br></div><div dir=3D"auto">Hi Thomas,=C2=A0</div><div dir=3D"a=
+uto"><br></div><div dir=3D"auto">Sorry but I barely recall yesterday, 2011 =
+was a long time ago... It does look weird.</div><div dir=3D"auto"><br></div=
+><div dir=3D"auto">IIRC smp was kinda of working but the multithreading sup=
+port wasn&#39;t. Some of these paths were probably not tested too much at t=
+he time.=C2=A0</div><div dir=3D"auto"><br></div><div dir=3D"auto">Cheers,</=
+div><div dir=3D"auto">Edgar</div><div dir=3D"auto"><div class=3D"gmail_quot=
+e"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left=
+:1px #ccc solid;padding-left:1ex">
+<br>
+</blockquote></div></div></div>
 
-> > 
-> > > ---
-> > >   hw/net/dp8393x.c | 17 ++++++-----------
-> > >   1 file changed, 6 insertions(+), 11 deletions(-)
-> > > 
-> > > diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> > > index 1957bd391e..b2cc768d9b 100644
-> > > --- a/hw/net/dp8393x.c
-> > > +++ b/hw/net/dp8393x.c
-> > > @@ -765,8 +765,6 @@ static ssize_t dp8393x_receive(NetClientState *nc,
-> > > const uint8_t * buf,
-> > >           return -1;
-> > >       }
-> > >   -    /* XXX: Check byte ordering */
-> > > -
-> > >       /* Check for EOL */
-> > >       if (s->regs[SONIC_LLFA] & SONIC_DESC_EOL) {
-> > >           /* Are we still in resource exhaustion? */
-> > > @@ -836,15 +834,12 @@ static ssize_t dp8393x_receive(NetClientState *nc,
-> > > const uint8_t * buf,
-> > >           /* EOL detected */
-> > >           s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-> > >       } else {
-> > > -        /* Clear in_use, but it is always 16bit wide */
-> > > -        int offset = dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
-> > > -        if (s->big_endian && width == 2) {
-> > > -            /* we need to adjust the offset of the 16bit field */
-> > > -            offset += sizeof(uint16_t);
-> > > -        }
-> > > -        s->data[0] = 0;
-> > > -        address_space_rw(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
-> > > -                         (uint8_t *)s->data, sizeof(uint16_t), 1);
-> > > +        /* Clear in_use */
-> > > +        address = dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
-> > > +        size = sizeof(uint16_t) * width;
-> > > +        dp8393x_put(s, width, 0, 0);
-> > > +        address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-> > > +                         (uint8_t *)s->data, size, 1);
-> > >           s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-> > >           s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
-> > >           s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) |
-> > > (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
-> > > 
-> > 
-> 
-> 
+--00000000000028deec059b9600a1--
 
