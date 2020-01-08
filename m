@@ -2,56 +2,83 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11ABDC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FA6C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:45:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD3E3206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:45:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD3E3206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF8B2206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:45:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RJo/CU7K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF8B2206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipBeA-00081S-GX
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:45:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34790)
+	id 1ipBeC-00083D-Gz
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:45:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1ip9ji-0002VB-JW
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:42:55 -0500
+ (envelope-from <afscoelho@gmail.com>) id 1ipAu6-0005iM-NH
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:57:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1ip9jh-0001wL-9q
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:42:54 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2672 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1ip9jW-0001qv-Gd
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:42:42 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D86D518C5FA667C78DE2;
- Wed,  8 Jan 2020 19:42:33 +0800 (CST)
-Received: from HGHY4C002233111.china.huawei.com (10.133.205.93) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 8 Jan 2020 19:42:27 +0800
-From: <kuhn.chenqun@huawei.com>
-To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>
-Subject: [PATCH] vl: fix memory leak in configure_accelerators
-Date: Wed, 8 Jan 2020 19:42:07 +0800
-Message-ID: <20200108114207.58084-1-kuhn.chenqun@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
+ (envelope-from <afscoelho@gmail.com>) id 1ipAu5-0006u4-LR
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:57:42 -0500
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:45167)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <afscoelho@gmail.com>) id 1ipAu5-0006sH-HY
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:57:41 -0500
+Received: by mail-qt1-x841.google.com with SMTP id w30so1466077qtd.12
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:57:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=BJ2O4PQRw1ys8DhPlVU2A3mHoRVTkwiCzLu+4EEMMFE=;
+ b=RJo/CU7KPmVK+yVU3Isg+LDmVAPnLwoua90zVWOWLiyTBLzMEO6i7GlnFKVKLDSwQB
+ 6gGib2whmemSzZXmGIf2lAPKhKRWxls4VMf/E/CNSBnecgMtQt/Z3Hnzow3Llieek3Rn
+ W1m+Jip+25Ne564NXnUV7ff+XQA7zNcDOUDMl1pJrwohrntmtH3hzpe3BiFzAXx5slPY
+ XpLq2HTYbdudsSCkI+H2VwxmiKvt3W3WoX3MNjn1lsIgNtdQP73herNXqRK+Xl2n+NMZ
+ hwM29A4m5z2BXcp/kJN9AC8KSwPSKmNA9hufJkcFGU1brqRvSZsP+JWxrJE1CdcRKgxf
+ Lt0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=BJ2O4PQRw1ys8DhPlVU2A3mHoRVTkwiCzLu+4EEMMFE=;
+ b=aV0kC4FXyfKoSze5sthgPUjqWk5/mIRWj2uZBjDfMpqp+ErJEi9JiV+S6s4rgej3u6
+ cqSvrw/h2EnBvaebAwCx/B8bhGO5mhraN05yYhOHxoI2b4gGyI96kEcmadMisZodiOaF
+ SuP7MFfxMYn4PoBNVH+BLwuRonWFo7BrdHPmVSD5SP0nLqxjkEnM3LxpCcIKVKx60FHy
+ Se2yx91t+QvgZg/2pX54p75aA8McbkUR/FvYjIT1UGtdbnDbzMbBPZpBsMNrEGbNi1GU
+ KkG4Np6MH5DSX1QTng+RtnwvTQOn0KLrIeWBTGHsQS4iyDRP5pQO/Khw5HgCieFHfDRD
+ 4Z4w==
+X-Gm-Message-State: APjAAAXkLd5p8sm1Nck38bf3YFp9zAHvO6Z7HOqb3WVIqgq20BkCnmHL
+ Czwqvay723qTQYyn9SZm1hfeDgqP
+X-Google-Smtp-Source: APXvYqxI8mL2kPmjK2pEVhEL/dy8DqjI6OaSSQflavwt0BY2JUXlgBNy2kIYm/FyVKzp4LyWBBitMQ==
+X-Received: by 2002:ac8:f77:: with SMTP id l52mr3337782qtk.310.1578488260302; 
+ Wed, 08 Jan 2020 04:57:40 -0800 (PST)
+Received: from frodo.corp.eldorado.org.br ([200.168.210.66])
+ by smtp.gmail.com with ESMTPSA id z6sm1283615qkz.101.2020.01.08.04.57.38
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jan 2020 04:57:39 -0800 (PST)
+From: Andre Silva <afscoelho@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio: Prevent double swap due to target pre 1.0 VirtIO
+Date: Wed,  8 Jan 2020 09:56:57 -0300
+Message-Id: <20200108125658.208480-1-afscoelho@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.205.93]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::841
 X-Mailman-Approved-At: Wed, 08 Jan 2020 08:43:53 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -64,55 +91,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, Chen Qun <kuhn.chenqun@huawei.com>,
- pannengyuan@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Qun <kuhn.chenqun@huawei.com>
+Remove the bswap function calls after reading and before writing
+memory bytes in virtio_pci_config_read and virtio_pci_config_write
+because they are reverting back an already swapped bytes.
 
-The accel_list forgot to free, the asan output:
+Consider the table below in the context of virtio_pci_config_read
+function.
 
-Direct leak of 16 byte(s) in 1 object(s) allocated from:
-    #0 0xffff919331cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
-    #1 0xffff913f7163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
-    #2 0xffff91413d9b in g_strsplit (/lib64/libglib-2.0.so.0+0x73d9b)
-    #3 0xaaab42fb58e7 in configure_accelerators /qemu/vl.c:2777
-    #4 0xaaab42fb58e7 in main /qemu/vl.c:4121
-    #5 0xffff8f9b0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
-    #6 0xaaab42fc1dab  (/qemu/build/aarch64-softmmu/qemu-system-aarch64+0x8b1dab)
+Host   Target  virtio-config-read[wl]
+               swap?                   virtio-is-big-endian?   extra bswap?   Should be   Final result   Final result ok?
+----- ------- ------------------------ ----------------------- -------------- ----------- -------------- ------------------
+LE     BE      s(x)                    true                    s(s(x))        s(x)        x              No
+LE     LE      x                       false                   -              x           x              Yes
+BE     LE      s(x)                    false                   -              s(x)        s(x)           Yes
+BE     BE      x                       true                    s(x)           x           s(x)           No
 
-Indirect leak of 4 byte(s) in 1 object(s) allocated from:
-    #0 0xffff919331cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
-    #1 0xffff913f7163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
-    #2 0xffff9141243b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
-    #3 0xffff91413e6f in g_strsplit (/lib64/libglib-2.0.so.0+0x73e6f)
-    #4 0xaaab42fb58e7 in configure_accelerators /qemu/vl.c:2777
-    #5 0xaaab42fb58e7 in main /qemu/vl.c:4121
-    #6 0xffff8f9b0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
-    #7 0xaaab42fc1dab  (/qemu/build/aarch64-softmmu/qemu-system-aarch64+0x8b1dab)
+In table above, when target is big endian and VirtIO is pre 1.0,
+function virtio_is_big_endian would return true and the extra
+swap would be executed, reverting the previous swap made by
+virtio_config_read[wl].
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+The 's(x)' means that a swap function was applied at
+address x. 'LE' is little endian and 'BE' is big endian. The
+'Final result' column is the returned value from
+virtio_pci_config_read, considering a target Virtio pre 1.0.
+'x' means that target's value was not swapped in Qemu, 's(x)' means
+that Qemu will use a swapped value.
+
+If we remove the extra swap made in virtio_pci_config_read we will
+have the correct result in any host/target combination, both for
+VirtIO pre 1.0 or later versions.
+
+The same reasoning applies to virtio_pci_config_write.
+
+Signed-off-by: Andre Silva <afscoelho@gmail.com>
 ---
- vl.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/virtio/virtio-pci.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 86474a55c9..035a24e52b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2788,6 +2788,7 @@ static void configure_accelerators(const char *progname)
-                 error_report("invalid accelerator %s", *tmp);
-             }
-         }
-+        g_strfreev(accel_list);
-     } else {
-         if (accel != NULL) {
-             error_report("The -accel and \"-machine accel=\" options are incompatible");
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index c6b47a9c73..4ba9e847f3 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -431,15 +431,9 @@ static uint64_t virtio_pci_config_read(void *opaque, hwaddr addr,
+         break;
+     case 2:
+         val = virtio_config_readw(vdev, addr);
+-        if (virtio_is_big_endian(vdev)) {
+-            val = bswap16(val);
+-        }
+         break;
+     case 4:
+         val = virtio_config_readl(vdev, addr);
+-        if (virtio_is_big_endian(vdev)) {
+-            val = bswap32(val);
+-        }
+         break;
+     }
+     return val;
+@@ -465,15 +459,9 @@ static void virtio_pci_config_write(void *opaque, hwaddr addr,
+         virtio_config_writeb(vdev, addr, val);
+         break;
+     case 2:
+-        if (virtio_is_big_endian(vdev)) {
+-            val = bswap16(val);
+-        }
+         virtio_config_writew(vdev, addr, val);
+         break;
+     case 4:
+-        if (virtio_is_big_endian(vdev)) {
+-            val = bswap32(val);
+-        }
+         virtio_config_writel(vdev, addr, val);
+         break;
+     }
 -- 
-2.23.0
-
+2.24.1
 
 
