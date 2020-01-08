@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D920C33CA1
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1225C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3934C20720
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F6FF2053B
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeWR/4gO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3934C20720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OF+23Zua"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6FF2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipHbd-0000AK-5g
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:07:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35360)
+	id 1ipHbq-0000QO-T7
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:07:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVT-0001ID-SO
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:46 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVT-0001Hy-47
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVR-0002Vo-A0
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:43 -0500
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35951)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVP-0002UK-FI
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:42 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34278)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ipHVQ-0002UX-C2; Wed, 08 Jan 2020 15:00:41 -0500
-Received: by mail-wr1-x42d.google.com with SMTP id z3so4781548wru.3;
- Wed, 08 Jan 2020 12:00:40 -0800 (PST)
+ id 1ipHVP-0002Sm-5p; Wed, 08 Jan 2020 15:00:39 -0500
+Received: by mail-wr1-x442.google.com with SMTP id t2so4808829wrr.1;
+ Wed, 08 Jan 2020 12:00:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=4QLUuZ5WNgTIhPfyiIRv9tkqJpb6erRNsu9ro78s09c=;
- b=CeWR/4gOcekq4bedSHE7wQCatKmgHJaxaD6LnG5WsXcuhWT5nSIA8XZs+XmQccsRWL
- dae+UykRZWTlbwuoRnXA/7Gl+YdJ7N/I17chYmUYRUh3UMzJssmNO+DGJuZ7BpoKVyN7
- 6vQ1YnOHWncDb77sG0NdOYn+ZUZfDYDz77oqFtpPMDcxI7b0A+MMrcDPWC66YRi7mwEe
- JotikuwtK74021gpg3HJTg2bMQlCYnlmRKYwdzSL3qYUc3CeRG9l7vzd768tunyZ02gm
- IT4UTbKGcZ5tTva5IL1NfkblO6nZa+r3/vgpuNEUiiQ6ZbZu22ZGIJ2kGal+epvt0/pa
- YR0A==
+ bh=kPXqcCPJtRQyt8GSCKatgPtUrzsI5xU5eBHmljV4qS8=;
+ b=OF+23ZuasZUpRk9xwjXrbrc2HitljbTrTJ1zytdZn7S3c4ciTOIWcwkLL/3GxR6VBZ
+ QOF9c979aEucBmVcRASwYM/rKgbkFOEM9eyBhXsWZOo92iNFsuG9t/DyHpYeD0bF7rx7
+ IfdXTZ6jQq5oUbkS625xfo0tkCNkggIRkKdEvskpnsKrYyKAxgvlzAGfi1s6lqmxTv5I
+ akNfXfa8IOe0SIPECVNqOQGGzh5ZYIWhMfQJHB4bvdsVSRyKHopgWipc0BKQVPbFD2P4
+ ddoRy/DoPddFRRa9BqdWaZBLmeVOAs7DV2Vp+tsnEbpcdBbDtZsva2aF5K4jzDiovJu1
+ RlPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=4QLUuZ5WNgTIhPfyiIRv9tkqJpb6erRNsu9ro78s09c=;
- b=Bd3OEf5q9Wv0yw/t8qaxn1vqBTYIqyN9snGqhwuqo3JayfbVJARBb28PHP7tcUwc+M
- 2MxaNeGtz2sJgJOjTrUrWMm1q9EEBj+Kg7jm9xlpbTgllxFPzESQO9lA7WZja4u7tOGt
- rXA7kecwz0GuR02pg51xlpNX14BuNE0Te/Moip9Rcle3jwOnnYp+1Mt+2XFKTsdwAAlc
- GKqQvQVrSy09eTSLn+Co9HOpDkSyJ0Ba3wuY04PLGrD1GiZGWsjL48Ofm2CVQSeEbWzS
- XJruUL40dHqqq59ObME/7zXIKtGzYvP+OT2jWUANzbKOFnp/qvVLE+1hYhFElZbFEqw9
- pLcQ==
-X-Gm-Message-State: APjAAAVc1SQl49kcFcKUn5CX7imuFWw+crS6TzyxVCo7kCf4vM+bh7fw
- cRVcptmRYz1oUKIp6eEPAf478X67
-X-Google-Smtp-Source: APXvYqzWSdOoAanZh7sHWenHOpJBosa8tx1fWHN8J9ksCaEmgtSnFZV3QvIfNgsV/Sh1IIBJADDXDg==
-X-Received: by 2002:adf:fe12:: with SMTP id n18mr6377344wrr.158.1578513638926; 
- Wed, 08 Jan 2020 12:00:38 -0800 (PST)
+ bh=kPXqcCPJtRQyt8GSCKatgPtUrzsI5xU5eBHmljV4qS8=;
+ b=gHQieuXIbIq83uha8UT0IJbrtuB16RSKegdwpabfkVquhGMC8e1BZXHKBqkEWN22lg
+ kjt/uaCarUUSVJqQqnW/R4o54P7bPex7EAmwAQigO7vLFxvyHZzz74NKJ5+HoAt8A2xv
+ 188uOr8rEtW1Kl//9UwWg0OeFj97jNY9hp7N5fejefWqolALvXUYaK3WxztSqaTaAbRA
+ Hd9ljrFWtjJGnIydszbcyvwIq4kpGvCHVFKx5OzVW7kaca7S3X/lyKIX3Xbv5n+Spkf2
+ /ykgHRRHPoG9lp/nljGNyv3jQPhP7lJDHeYf+bLdi8ra6Ib3wwC6uNj9GwclPaefxw5D
+ AuUA==
+X-Gm-Message-State: APjAAAXDzkSFjQoX1vopRkAZF7kEUyAIP6KSi+nEgkiHwriIqzzRfiPQ
+ 5F1vlfwDsP6EHz3/UoihfQFZ31J4
+X-Google-Smtp-Source: APXvYqyWKziBTihr2bOOKbfFYYRXNBdu0nb99kaQtmbEGOkncbItfISbMmtszcVR7YeO9YP2OqNstA==
+X-Received: by 2002:adf:ca07:: with SMTP id o7mr6780335wrh.49.1578513635794;
+ Wed, 08 Jan 2020 12:00:35 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.36
+ by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 12:00:38 -0800 (PST)
+ Wed, 08 Jan 2020 12:00:34 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 03/17] hw/arm/allwinner-h3: add Clock Control Unit
-Date: Wed,  8 Jan 2020 21:00:06 +0100
-Message-Id: <20200108200020.4745-4-nieklinnenbank@gmail.com>
+Subject: [PATCH v3 01/17] hw/arm: add Allwinner H3 System-on-Chip
+Date: Wed,  8 Jan 2020 21:00:04 +0100
+Message-Id: <20200108200020.4745-2-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200108200020.4745-1-nieklinnenbank@gmail.com>
 References: <20200108200020.4745-1-nieklinnenbank@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,58 +95,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Clock Control Unit is responsible for clock signal generation,
-configuration and distribution in the Allwinner H3 System on Chip.
-This commit adds support for the Clock Control Unit which emulates
-a simple read/write register interface.
+The Allwinner H3 is a System on Chip containing four ARM Cortex A7
+processor cores. Features and specifications include DDR2/DDR3 memory,
+SD/MMC storage cards, 10/100/1000Mbit ethernet, USB 2.0, HDMI and
+various I/O modules. This commit adds support for the Allwinner H3
+System on Chip.
 
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- include/hw/arm/allwinner-h3.h      |   3 +
- include/hw/misc/allwinner-h3-ccu.h |  67 ++++++++
- hw/arm/allwinner-h3.c              |   9 +-
- hw/misc/allwinner-h3-ccu.c         | 243 +++++++++++++++++++++++++++++
- hw/misc/Makefile.objs              |   1 +
- 5 files changed, 322 insertions(+), 1 deletion(-)
- create mode 100644 include/hw/misc/allwinner-h3-ccu.h
- create mode 100644 hw/misc/allwinner-h3-ccu.c
+ default-configs/arm-softmmu.mak |   1 +
+ include/hw/arm/allwinner-h3.h   | 107 +++++++++++
+ hw/arm/allwinner-h3.c           | 328 ++++++++++++++++++++++++++++++++
+ MAINTAINERS                     |   7 +
+ hw/arm/Kconfig                  |   8 +
+ hw/arm/Makefile.objs            |   1 +
+ 6 files changed, 452 insertions(+)
+ create mode 100644 include/hw/arm/allwinner-h3.h
+ create mode 100644 hw/arm/allwinner-h3.c
 
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 1f2e0e7fde..d75a239c2c 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -40,3 +40,4 @@ CONFIG_FSL_IMX25=y
+ CONFIG_FSL_IMX7=y
+ CONFIG_FSL_IMX6UL=y
+ CONFIG_SEMIHOSTING=y
++CONFIG_ALLWINNER_H3=y
 diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index 4e2e6202a9..0dc18b927a 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -43,6 +43,7 @@
- #include "hw/arm/boot.h"
- #include "hw/timer/allwinner-a10-pit.h"
- #include "hw/intc/arm_gic.h"
-+#include "hw/misc/allwinner-h3-ccu.h"
- #include "target/arm/cpu.h"
- 
- /**
-@@ -59,6 +60,7 @@ enum {
-     AW_H3_SRAM_A1,
-     AW_H3_SRAM_A2,
-     AW_H3_SRAM_C,
-+    AW_H3_CCU,
-     AW_H3_PIT,
-     AW_H3_UART0,
-     AW_H3_UART1,
-@@ -98,6 +100,7 @@ typedef struct AwH3State {
-     ARMCPU cpus[AW_H3_NUM_CPUS];
-     const hwaddr *memmap;
-     AwA10PITState timer;
-+    AwH3ClockCtlState ccu;
-     GICState gic;
-     MemoryRegion sram_a1;
-     MemoryRegion sram_a2;
-diff --git a/include/hw/misc/allwinner-h3-ccu.h b/include/hw/misc/allwinner-h3-ccu.h
 new file mode 100644
-index 0000000000..0dcb08ecd1
+index 0000000000..4e2e6202a9
 --- /dev/null
-+++ b/include/hw/misc/allwinner-h3-ccu.h
-@@ -0,0 +1,67 @@
++++ b/include/hw/arm/allwinner-h3.h
+@@ -0,0 +1,107 @@
 +/*
-+ * Allwinner H3 Clock Control Unit emulation
++ * Allwinner H3 System on Chip emulation
 + *
 + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
@@ -164,103 +147,102 @@ index 0000000000..0dcb08ecd1
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef HW_MISC_ALLWINNER_H3_CCU_H
-+#define HW_MISC_ALLWINNER_H3_CCU_H
++/*
++ * The Allwinner H3 is a System on Chip containing four ARM Cortex A7
++ * processor cores. Features and specifications include DDR2/DDR3 memory,
++ * SD/MMC storage cards, 10/100/1000Mbit ethernet, USB 2.0, HDMI and
++ * various I/O modules.
++ *
++ * This implementation is based on the following datasheet:
++ *
++ *   https://linux-sunxi.org/File:Allwinner_H3_Datasheet_V1.2.pdf
++ *
++ * The latest datasheet and more info can be found on the Linux Sunxi wiki:
++ *
++ *   https://linux-sunxi.org/H3
++ */
++
++#ifndef HW_ARM_ALLWINNER_H3_H
++#define HW_ARM_ALLWINNER_H3_H
 +
 +#include "qemu/osdep.h"
 +#include "qom/object.h"
-+#include "hw/sysbus.h"
++#include "qemu/error-report.h"
++#include "qemu/units.h"
++#include "hw/qdev-core.h"
++#include "hw/arm/boot.h"
++#include "hw/timer/allwinner-a10-pit.h"
++#include "hw/intc/arm_gic.h"
++#include "target/arm/cpu.h"
 +
 +/**
-+ * @name Constants
++ * Allwinner H3 device list
++ *
++ * This enumeration is can be used refer to a particular device in the
++ * Allwinner H3 SoC. For example, the physical memory base address for
++ * each device can be found in the AwH3State object in the memmap member
++ * using the device enum value as index.
++ *
++ * @see AwH3State
++ */
++enum {
++    AW_H3_SRAM_A1,
++    AW_H3_SRAM_A2,
++    AW_H3_SRAM_C,
++    AW_H3_PIT,
++    AW_H3_UART0,
++    AW_H3_UART1,
++    AW_H3_UART2,
++    AW_H3_UART3,
++    AW_H3_GIC_DIST,
++    AW_H3_GIC_CPU,
++    AW_H3_GIC_HYP,
++    AW_H3_GIC_VCPU,
++    AW_H3_SDRAM
++};
++
++/** Total number of CPU cores in the SoC */
++#define AW_H3_NUM_CPUS      (4)
++
++/**
++ * Allwinner H3 object model
 + * @{
 + */
 +
-+/** Highest register address used by CCU device */
-+#define AW_H3_CCU_REGS_MAXADDR  (0x304)
++/** Object type for the Allwinner H3 SoC */
++#define TYPE_AW_H3 "allwinner-h3"
 +
-+/** Total number of known registers */
-+#define AW_H3_CCU_REGS_NUM      (AW_H3_CCU_REGS_MAXADDR / sizeof(uint32_t))
++/** Convert input object to Allwinner H3 state object */
++#define AW_H3(obj) OBJECT_CHECK(AwH3State, (obj), TYPE_AW_H3)
 +
 +/** @} */
 +
 +/**
-+ * @name Object model
-+ * @{
++ * Allwinner H3 object instance state
 + */
-+
-+#define TYPE_AW_H3_CCU    "allwinner-h3-ccu"
-+#define AW_H3_CCU(obj) \
-+    OBJECT_CHECK(AwH3ClockCtlState, (obj), TYPE_AW_H3_CCU)
-+
-+/** @} */
-+
-+/**
-+ * Allwinner H3 CCU object instance state.
-+ */
-+typedef struct AwH3ClockCtlState {
++typedef struct AwH3State {
 +    /*< private >*/
-+    SysBusDevice parent_obj;
++    DeviceState parent_obj;
 +    /*< public >*/
 +
-+    /** Maps I/O registers in physical memory */
-+    MemoryRegion iomem;
++    ARMCPU cpus[AW_H3_NUM_CPUS];
++    const hwaddr *memmap;
++    AwA10PITState timer;
++    GICState gic;
++    MemoryRegion sram_a1;
++    MemoryRegion sram_a2;
++    MemoryRegion sram_c;
++} AwH3State;
 +
-+    /** Array of hardware registers */
-+    uint32_t regs[AW_H3_CCU_REGS_NUM];
-+
-+} AwH3ClockCtlState;
-+
-+#endif /* HW_MISC_ALLWINNER_H3_CCU_H */
++#endif /* HW_ARM_ALLWINNER_H3_H */
 diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index c1ef31e875..b85edaea85 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -34,6 +34,7 @@ const hwaddr allwinner_h3_memmap[] = {
-     [AW_H3_SRAM_A1]    = 0x00000000,
-     [AW_H3_SRAM_A2]    = 0x00044000,
-     [AW_H3_SRAM_C]     = 0x00010000,
-+    [AW_H3_CCU]        = 0x01c20000,
-     [AW_H3_PIT]        = 0x01c20c00,
-     [AW_H3_UART0]      = 0x01c28000,
-     [AW_H3_UART1]      = 0x01c28400,
-@@ -75,7 +76,6 @@ struct AwH3Unimplemented {
-     { "usb2",      0x01c1c000, 4 * KiB },
-     { "usb3",      0x01c1d000, 4 * KiB },
-     { "smc",       0x01c1e000, 4 * KiB },
--    { "ccu",       0x01c20000, 1 * KiB },
-     { "pio",       0x01c20800, 1 * KiB },
-     { "owa",       0x01c21000, 1 * KiB },
-     { "pwm",       0x01c21400, 1 * KiB },
-@@ -170,6 +170,9 @@ static void allwinner_h3_init(Object *obj)
-                               "clk0-freq", &error_abort);
-     object_property_add_alias(obj, "clk1-freq", OBJECT(&s->timer),
-                               "clk1-freq", &error_abort);
-+
-+    sysbus_init_child_obj(obj, "ccu", &s->ccu, sizeof(s->ccu),
-+                          TYPE_AW_H3_CCU);
- }
- 
- static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -278,6 +281,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_C],
-                                 &s->sram_c);
- 
-+    /* Clock Control Unit */
-+    qdev_init_nofail(DEVICE(&s->ccu));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, s->memmap[AW_H3_CCU]);
-+
-     /* UART0 */
-     serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART0], 2,
-                    qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART0),
-diff --git a/hw/misc/allwinner-h3-ccu.c b/hw/misc/allwinner-h3-ccu.c
 new file mode 100644
-index 0000000000..ccf58ccdf2
+index 0000000000..c1ef31e875
 --- /dev/null
-+++ b/hw/misc/allwinner-h3-ccu.c
-@@ -0,0 +1,243 @@
++++ b/hw/arm/allwinner-h3.c
+@@ -0,0 +1,328 @@
 +/*
-+ * Allwinner H3 Clock Control Unit emulation
++ * Allwinner H3 System on Chip emulation
 + *
 + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
 + *
@@ -279,241 +261,363 @@ index 0000000000..ccf58ccdf2
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
++#include "exec/address-spaces.h"
++#include "qapi/error.h"
 +#include "qemu/module.h"
-+#include "hw/misc/allwinner-h3-ccu.h"
++#include "qemu/units.h"
++#include "cpu.h"
++#include "hw/sysbus.h"
++#include "hw/char/serial.h"
++#include "hw/misc/unimp.h"
++#include "sysemu/sysemu.h"
++#include "hw/arm/allwinner-h3.h"
 +
-+/* CCU register offsets */
-+enum {
-+    REG_PLL_CPUX             = 0x0000, /* PLL CPUX Control */
-+    REG_PLL_AUDIO            = 0x0008, /* PLL Audio Control */
-+    REG_PLL_VIDEO            = 0x0010, /* PLL Video Control */
-+    REG_PLL_VE               = 0x0018, /* PLL VE Control */
-+    REG_PLL_DDR              = 0x0020, /* PLL DDR Control */
-+    REG_PLL_PERIPH0          = 0x0028, /* PLL Peripherals 0 Control */
-+    REG_PLL_GPU              = 0x0038, /* PLL GPU Control */
-+    REG_PLL_PERIPH1          = 0x0044, /* PLL Peripherals 1 Control */
-+    REG_PLL_DE               = 0x0048, /* PLL Display Engine Control */
-+    REG_CPUX_AXI             = 0x0050, /* CPUX/AXI Configuration */
-+    REG_APB1                 = 0x0054, /* ARM Peripheral Bus 1 Config */
-+    REG_APB2                 = 0x0058, /* ARM Peripheral Bus 2 Config */
-+    REG_DRAM_CFG             = 0x00F4, /* DRAM Configuration */
-+    REG_MBUS                 = 0x00FC, /* MBUS Reset */
-+    REG_PLL_TIME0            = 0x0200, /* PLL Stable Time 0 */
-+    REG_PLL_TIME1            = 0x0204, /* PLL Stable Time 1 */
-+    REG_PLL_CPUX_BIAS        = 0x0220, /* PLL CPUX Bias */
-+    REG_PLL_AUDIO_BIAS       = 0x0224, /* PLL Audio Bias */
-+    REG_PLL_VIDEO_BIAS       = 0x0228, /* PLL Video Bias */
-+    REG_PLL_VE_BIAS          = 0x022C, /* PLL VE Bias */
-+    REG_PLL_DDR_BIAS         = 0x0230, /* PLL DDR Bias */
-+    REG_PLL_PERIPH0_BIAS     = 0x0234, /* PLL Peripherals 0 Bias */
-+    REG_PLL_GPU_BIAS         = 0x023C, /* PLL GPU Bias */
-+    REG_PLL_PERIPH1_BIAS     = 0x0244, /* PLL Peripherals 1 Bias */
-+    REG_PLL_DE_BIAS          = 0x0248, /* PLL Display Engine Bias */
-+    REG_PLL_CPUX_TUNING      = 0x0250, /* PLL CPUX Tuning */
-+    REG_PLL_DDR_TUNING       = 0x0260, /* PLL DDR Tuning */
++/* Memory map */
++const hwaddr allwinner_h3_memmap[] = {
++    [AW_H3_SRAM_A1]    = 0x00000000,
++    [AW_H3_SRAM_A2]    = 0x00044000,
++    [AW_H3_SRAM_C]     = 0x00010000,
++    [AW_H3_PIT]        = 0x01c20c00,
++    [AW_H3_UART0]      = 0x01c28000,
++    [AW_H3_UART1]      = 0x01c28400,
++    [AW_H3_UART2]      = 0x01c28800,
++    [AW_H3_UART3]      = 0x01c28c00,
++    [AW_H3_GIC_DIST]   = 0x01c81000,
++    [AW_H3_GIC_CPU]    = 0x01c82000,
++    [AW_H3_GIC_HYP]    = 0x01c84000,
++    [AW_H3_GIC_VCPU]   = 0x01c86000,
++    [AW_H3_SDRAM]      = 0x40000000
 +};
 +
-+#define REG_INDEX(offset)    (offset / sizeof(uint32_t))
-+
-+/* CCU register flags */
-+enum {
-+    REG_DRAM_CFG_UPDATE      = (1 << 16),
++/* List of unimplemented devices */
++struct AwH3Unimplemented {
++    const char *device_name;
++    hwaddr base;
++    hwaddr size;
++} unimplemented[] = {
++    { "d-engine",  0x01000000, 4 * MiB },
++    { "d-inter",   0x01400000, 128 * KiB },
++    { "syscon",    0x01c00000, 4 * KiB },
++    { "dma",       0x01c02000, 4 * KiB },
++    { "nfdc",      0x01c03000, 4 * KiB },
++    { "ts",        0x01c06000, 4 * KiB },
++    { "keymem",    0x01c0b000, 4 * KiB },
++    { "lcd0",      0x01c0c000, 4 * KiB },
++    { "lcd1",      0x01c0d000, 4 * KiB },
++    { "ve",        0x01c0e000, 4 * KiB },
++    { "mmc0",      0x01c0f000, 4 * KiB },
++    { "mmc1",      0x01c10000, 4 * KiB },
++    { "mmc2",      0x01c11000, 4 * KiB },
++    { "sid",       0x01c14000, 1 * KiB },
++    { "crypto",    0x01c15000, 4 * KiB },
++    { "msgbox",    0x01c17000, 4 * KiB },
++    { "spinlock",  0x01c18000, 4 * KiB },
++    { "usb0-otg",  0x01c19000, 4 * KiB },
++    { "usb0",      0x01c1a000, 4 * KiB },
++    { "usb1",      0x01c1b000, 4 * KiB },
++    { "usb2",      0x01c1c000, 4 * KiB },
++    { "usb3",      0x01c1d000, 4 * KiB },
++    { "smc",       0x01c1e000, 4 * KiB },
++    { "ccu",       0x01c20000, 1 * KiB },
++    { "pio",       0x01c20800, 1 * KiB },
++    { "owa",       0x01c21000, 1 * KiB },
++    { "pwm",       0x01c21400, 1 * KiB },
++    { "keyadc",    0x01c21800, 1 * KiB },
++    { "pcm0",      0x01c22000, 1 * KiB },
++    { "pcm1",      0x01c22400, 1 * KiB },
++    { "pcm2",      0x01c22800, 1 * KiB },
++    { "audio",     0x01c22c00, 2 * KiB },
++    { "smta",      0x01c23400, 1 * KiB },
++    { "ths",       0x01c25000, 1 * KiB },
++    { "uart0",     0x01c28000, 1 * KiB },
++    { "uart1",     0x01c28400, 1 * KiB },
++    { "uart2",     0x01c28800, 1 * KiB },
++    { "uart3",     0x01c28c00, 1 * KiB },
++    { "twi0",      0x01c2ac00, 1 * KiB },
++    { "twi1",      0x01c2b000, 1 * KiB },
++    { "twi2",      0x01c2b400, 1 * KiB },
++    { "scr",       0x01c2c400, 1 * KiB },
++    { "emac",      0x01c30000, 64 * KiB },
++    { "gpu",       0x01c40000, 64 * KiB },
++    { "hstmr",     0x01c60000, 4 * KiB },
++    { "dramcom",   0x01c62000, 4 * KiB },
++    { "dramctl0",  0x01c63000, 4 * KiB },
++    { "dramphy0",  0x01c65000, 4 * KiB },
++    { "spi0",      0x01c68000, 4 * KiB },
++    { "spi1",      0x01c69000, 4 * KiB },
++    { "csi",       0x01cb0000, 320 * KiB },
++    { "tve",       0x01e00000, 64 * KiB },
++    { "hdmi",      0x01ee0000, 128 * KiB },
++    { "rtc",       0x01f00000, 1 * KiB },
++    { "r_timer",   0x01f00800, 1 * KiB },
++    { "r_intc",    0x01f00c00, 1 * KiB },
++    { "r_wdog",    0x01f01000, 1 * KiB },
++    { "r_prcm",    0x01f01400, 1 * KiB },
++    { "r_twd",     0x01f01800, 1 * KiB },
++    { "r_cpucfg",  0x01f01c00, 1 * KiB },
++    { "r_cir-rx",  0x01f02000, 1 * KiB },
++    { "r_twi",     0x01f02400, 1 * KiB },
++    { "r_uart",    0x01f02800, 1 * KiB },
++    { "r_pio",     0x01f02c00, 1 * KiB },
++    { "r_pwm",     0x01f03800, 1 * KiB },
++    { "core-dbg",  0x3f500000, 128 * KiB },
++    { "tsgen-ro",  0x3f506000, 4 * KiB },
++    { "tsgen-ctl", 0x3f507000, 4 * KiB },
++    { "ddr-mem",   0x40000000, 2 * GiB },
++    { "n-brom",    0xffff0000, 32 * KiB },
++    { "s-brom",    0xffff0000, 64 * KiB }
 +};
 +
++/* Per Processor Interrupts */
 +enum {
-+    REG_PLL_ENABLE           = (1 << 31),
-+    REG_PLL_LOCK             = (1 << 28),
++    AW_H3_GIC_PPI_MAINT     =  9,
++    AW_H3_GIC_PPI_HYPTIMER  = 10,
++    AW_H3_GIC_PPI_VIRTTIMER = 11,
++    AW_H3_GIC_PPI_SECTIMER  = 13,
++    AW_H3_GIC_PPI_PHYSTIMER = 14
 +};
 +
-+
-+/* CCU register reset values */
++/* Shared Processor Interrupts */
 +enum {
-+    REG_PLL_CPUX_RST         = 0x00001000,
-+    REG_PLL_AUDIO_RST        = 0x00035514,
-+    REG_PLL_VIDEO_RST        = 0x03006207,
-+    REG_PLL_VE_RST           = 0x03006207,
-+    REG_PLL_DDR_RST          = 0x00001000,
-+    REG_PLL_PERIPH0_RST      = 0x00041811,
-+    REG_PLL_GPU_RST          = 0x03006207,
-+    REG_PLL_PERIPH1_RST      = 0x00041811,
-+    REG_PLL_DE_RST           = 0x03006207,
-+    REG_CPUX_AXI_RST         = 0x00010000,
-+    REG_APB1_RST             = 0x00001010,
-+    REG_APB2_RST             = 0x01000000,
-+    REG_DRAM_CFG_RST         = 0x00000000,
-+    REG_MBUS_RST             = 0x80000000,
-+    REG_PLL_TIME0_RST        = 0x000000FF,
-+    REG_PLL_TIME1_RST        = 0x000000FF,
-+    REG_PLL_CPUX_BIAS_RST    = 0x08100200,
-+    REG_PLL_AUDIO_BIAS_RST   = 0x10100000,
-+    REG_PLL_VIDEO_BIAS_RST   = 0x10100000,
-+    REG_PLL_VE_BIAS_RST      = 0x10100000,
-+    REG_PLL_DDR_BIAS_RST     = 0x81104000,
-+    REG_PLL_PERIPH0_BIAS_RST = 0x10100010,
-+    REG_PLL_GPU_BIAS_RST     = 0x10100000,
-+    REG_PLL_PERIPH1_BIAS_RST = 0x10100010,
-+    REG_PLL_DE_BIAS_RST      = 0x10100000,
-+    REG_PLL_CPUX_TUNING_RST  = 0x0A101000,
-+    REG_PLL_DDR_TUNING_RST   = 0x14880000,
++    AW_H3_GIC_SPI_UART0     =  0,
++    AW_H3_GIC_SPI_UART1     =  1,
++    AW_H3_GIC_SPI_UART2     =  2,
++    AW_H3_GIC_SPI_UART3     =  3,
++    AW_H3_GIC_SPI_TIMER0    = 18,
++    AW_H3_GIC_SPI_TIMER1    = 19,
 +};
 +
-+static uint64_t allwinner_h3_ccu_read(void *opaque, hwaddr offset,
-+                                      unsigned size)
++/* Allwinner H3 constants */
++enum {
++    AW_H3_GIC_NUM_SPI       = 128
++};
++
++static void allwinner_h3_init(Object *obj)
 +{
-+    const AwH3ClockCtlState *s = AW_H3_CCU(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
++    AwH3State *s = AW_H3(obj);
 +
-+    if (idx >= AW_H3_CCU_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
++    s->memmap = allwinner_h3_memmap;
++
++    for (int i = 0; i < AW_H3_NUM_CPUS; i++) {
++        object_initialize_child(obj, "cpu[*]", &s->cpus[i], sizeof(s->cpus[i]),
++                                ARM_CPU_TYPE_NAME("cortex-a7"),
++                                &error_abort, NULL);
 +    }
 +
-+    return s->regs[idx];
++    sysbus_init_child_obj(obj, "gic", &s->gic, sizeof(s->gic),
++                          TYPE_ARM_GIC);
++
++    sysbus_init_child_obj(obj, "timer", &s->timer, sizeof(s->timer),
++                          TYPE_AW_A10_PIT);
++    object_property_add_alias(obj, "clk0-freq", OBJECT(&s->timer),
++                              "clk0-freq", &error_abort);
++    object_property_add_alias(obj, "clk1-freq", OBJECT(&s->timer),
++                              "clk1-freq", &error_abort);
 +}
 +
-+static void allwinner_h3_ccu_write(void *opaque, hwaddr offset,
-+                                   uint64_t val, unsigned size)
++static void allwinner_h3_realize(DeviceState *dev, Error **errp)
 +{
-+    AwH3ClockCtlState *s = AW_H3_CCU(opaque);
-+    const uint32_t idx = REG_INDEX(offset);
++    AwH3State *s = AW_H3(dev);
++    unsigned i = 0;
 +
-+    if (idx >= AW_H3_CCU_REGS_NUM) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return;
++    /* CPUs */
++    for (i = 0; i < AW_H3_NUM_CPUS; i++) {
++
++        /* Provide Power State Coordination Interface */
++        object_property_set_int(OBJECT(&s->cpus[i]), QEMU_PSCI_CONDUIT_HVC,
++                                "psci-conduit", &error_abort);
++
++        /* Disable secondary CPUs */
++        object_property_set_bool(OBJECT(&s->cpus[i]), i > 0,
++                                "start-powered-off", &error_abort);
++
++        /* All exception levels required */
++        object_property_set_bool(OBJECT(&s->cpus[i]),
++                                 true, "has_el3", &error_abort);
++
++        object_property_set_bool(OBJECT(&s->cpus[i]),
++                                 true, "has_el2", &error_abort);
++
++        /* Mark realized */
++        qdev_init_nofail(DEVICE(&s->cpus[i]));
 +    }
 +
-+    switch (offset) {
-+    case REG_DRAM_CFG:    /* DRAM Configuration */
-+        val &= ~REG_DRAM_CFG_UPDATE;
-+        break;
-+    case REG_PLL_CPUX:    /* PLL CPUX Control */
-+    case REG_PLL_AUDIO:   /* PLL Audio Control */
-+    case REG_PLL_VIDEO:   /* PLL Video Control */
-+    case REG_PLL_VE:      /* PLL VE Control */
-+    case REG_PLL_DDR:     /* PLL DDR Control */
-+    case REG_PLL_PERIPH0: /* PLL Peripherals 0 Control */
-+    case REG_PLL_GPU:     /* PLL GPU Control */
-+    case REG_PLL_PERIPH1: /* PLL Peripherals 1 Control */
-+    case REG_PLL_DE:      /* PLL Display Engine Control */
-+        if (val & REG_PLL_ENABLE) {
-+            val |= REG_PLL_LOCK;
++    /* Generic Interrupt Controller */
++    qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", AW_H3_GIC_NUM_SPI +
++                                                     GIC_INTERNAL);
++    qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
++    qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", AW_H3_NUM_CPUS);
++    qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", false);
++    qdev_prop_set_bit(DEVICE(&s->gic), "has-virtualization-extensions", true);
++    qdev_init_nofail(DEVICE(&s->gic));
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 0, s->memmap[AW_H3_GIC_DIST]);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 1, s->memmap[AW_H3_GIC_CPU]);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 2, s->memmap[AW_H3_GIC_HYP]);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gic), 3, s->memmap[AW_H3_GIC_VCPU]);
++
++    /*
++     * Wire the outputs from each CPU's generic timer and the GICv3
++     * maintenance interrupt signal to the appropriate GIC PPI inputs,
++     * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
++     */
++    for (i = 0; i < AW_H3_NUM_CPUS; i++) {
++        DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
++        int ppibase = AW_H3_GIC_NUM_SPI + i * GIC_INTERNAL + GIC_NR_SGIS;
++        int irq;
++        /*
++         * Mapping from the output timer irq lines from the CPU to the
++         * GIC PPI inputs used for this board.
++         */
++        const int timer_irq[] = {
++            [GTIMER_PHYS] = AW_H3_GIC_PPI_PHYSTIMER,
++            [GTIMER_VIRT] = AW_H3_GIC_PPI_VIRTTIMER,
++            [GTIMER_HYP]  = AW_H3_GIC_PPI_HYPTIMER,
++            [GTIMER_SEC]  = AW_H3_GIC_PPI_SECTIMER,
++        };
++
++        /* Connect CPU timer outputs to GIC PPI inputs */
++        for (irq = 0; irq < ARRAY_SIZE(timer_irq); irq++) {
++            qdev_connect_gpio_out(cpudev, irq,
++                                  qdev_get_gpio_in(DEVICE(&s->gic),
++                                                   ppibase + timer_irq[irq]));
 +        }
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented write offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        break;
++
++        /* Connect GIC outputs to CPU interrupt inputs */
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
++                           qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + AW_H3_NUM_CPUS,
++                           qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + (2 * AW_H3_NUM_CPUS),
++                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + (3 * AW_H3_NUM_CPUS),
++                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
++
++        /* GIC maintenance signal */
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + (4 * AW_H3_NUM_CPUS),
++                           qdev_get_gpio_in(DEVICE(&s->gic),
++                                            ppibase + AW_H3_GIC_PPI_MAINT));
 +    }
 +
-+    s->regs[idx] = (uint32_t) val;
-+}
++    /* Timer */
++    qdev_init_nofail(DEVICE(&s->timer));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->timer), 0, s->memmap[AW_H3_PIT]);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer), 0,
++                       qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_TIMER0));
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->timer), 1,
++                       qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_TIMER1));
 +
-+static const MemoryRegionOps allwinner_h3_ccu_ops = {
-+    .read = allwinner_h3_ccu_read,
-+    .write = allwinner_h3_ccu_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
++    /* SRAM */
++    memory_region_init_ram(&s->sram_a1, OBJECT(dev), "sram A1",
++                            64 * KiB, &error_abort);
++    memory_region_init_ram(&s->sram_a2, OBJECT(dev), "sram A2",
++                            32 * KiB, &error_abort);
++    memory_region_init_ram(&s->sram_c, OBJECT(dev), "sram C",
++                            44 * KiB, &error_abort);
++    memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_A1],
++                                &s->sram_a1);
++    memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_A2],
++                                &s->sram_a2);
++    memory_region_add_subregion(get_system_memory(), s->memmap[AW_H3_SRAM_C],
++                                &s->sram_c);
 +
-+static void allwinner_h3_ccu_reset(DeviceState *dev)
-+{
-+    AwH3ClockCtlState *s = AW_H3_CCU(dev);
++    /* UART0 */
++    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART0], 2,
++                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART0),
++                   115200, serial_hd(0), DEVICE_NATIVE_ENDIAN);
++    /* UART1 */
++    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART1], 2,
++                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART1),
++                   115200, serial_hd(1), DEVICE_NATIVE_ENDIAN);
++    /* UART2 */
++    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART2], 2,
++                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART2),
++                   115200, serial_hd(2), DEVICE_NATIVE_ENDIAN);
++    /* UART3 */
++    serial_mm_init(get_system_memory(), s->memmap[AW_H3_UART3], 2,
++                   qdev_get_gpio_in(DEVICE(&s->gic), AW_H3_GIC_SPI_UART3),
++                   115200, serial_hd(3), DEVICE_NATIVE_ENDIAN);
 +
-+    /* Set default values for registers */
-+    s->regs[REG_INDEX(REG_PLL_CPUX)] = REG_PLL_CPUX_RST;
-+    s->regs[REG_INDEX(REG_PLL_AUDIO)] = REG_PLL_AUDIO_RST;
-+    s->regs[REG_INDEX(REG_PLL_VIDEO)] = REG_PLL_VIDEO_RST;
-+    s->regs[REG_INDEX(REG_PLL_VE)] = REG_PLL_VE_RST;
-+    s->regs[REG_INDEX(REG_PLL_DDR)] = REG_PLL_DDR_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH0)] = REG_PLL_PERIPH0_RST;
-+    s->regs[REG_INDEX(REG_PLL_GPU)] = REG_PLL_GPU_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH1)] = REG_PLL_PERIPH1_RST;
-+    s->regs[REG_INDEX(REG_PLL_DE)] = REG_PLL_DE_RST;
-+    s->regs[REG_INDEX(REG_CPUX_AXI)] = REG_CPUX_AXI_RST;
-+    s->regs[REG_INDEX(REG_APB1)] = REG_APB1_RST;
-+    s->regs[REG_INDEX(REG_APB2)] = REG_APB2_RST;
-+    s->regs[REG_INDEX(REG_DRAM_CFG)] = REG_DRAM_CFG_RST;
-+    s->regs[REG_INDEX(REG_MBUS)] = REG_MBUS_RST;
-+    s->regs[REG_INDEX(REG_PLL_TIME0)] = REG_PLL_TIME0_RST;
-+    s->regs[REG_INDEX(REG_PLL_TIME1)] = REG_PLL_TIME1_RST;
-+    s->regs[REG_INDEX(REG_PLL_CPUX_BIAS)] = REG_PLL_CPUX_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_AUDIO_BIAS)] = REG_PLL_AUDIO_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_VIDEO_BIAS)] = REG_PLL_VIDEO_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_VE_BIAS)] = REG_PLL_VE_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_DDR_BIAS)] = REG_PLL_DDR_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH0_BIAS)] = REG_PLL_PERIPH0_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_GPU_BIAS)] = REG_PLL_GPU_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_PERIPH1_BIAS)] = REG_PLL_PERIPH1_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_DE_BIAS)] = REG_PLL_DE_BIAS_RST;
-+    s->regs[REG_INDEX(REG_PLL_CPUX_TUNING)] = REG_PLL_CPUX_TUNING_RST;
-+    s->regs[REG_INDEX(REG_PLL_DDR_TUNING)] = REG_PLL_DDR_TUNING_RST;
-+}
-+
-+static void allwinner_h3_ccu_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwH3ClockCtlState *s = AW_H3_CCU(obj);
-+
-+    /* Memory mapping */
-+    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_h3_ccu_ops, s,
-+                          TYPE_AW_H3_CCU, 1 * KiB);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription allwinner_h3_ccu_vmstate = {
-+    .name = "allwinner-h3-ccu",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AwH3ClockCtlState, AW_H3_CCU_REGS_NUM),
-+        VMSTATE_END_OF_LIST()
++    /* Unimplemented devices */
++    for (int i = 0; i < ARRAY_SIZE(unimplemented); i++) {
++        create_unimplemented_device(unimplemented[i].device_name,
++                                    unimplemented[i].base,
++                                    unimplemented[i].size);
 +    }
-+};
-+
-+static void allwinner_h3_ccu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = allwinner_h3_ccu_reset;
-+    dc->vmsd = &allwinner_h3_ccu_vmstate;
 +}
 +
-+static const TypeInfo allwinner_h3_ccu_info = {
-+    .name          = TYPE_AW_H3_CCU,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_h3_ccu_init,
-+    .instance_size = sizeof(AwH3ClockCtlState),
-+    .class_init    = allwinner_h3_ccu_class_init,
-+};
-+
-+static void allwinner_h3_ccu_register(void)
++static void allwinner_h3_class_init(ObjectClass *oc, void *data)
 +{
-+    type_register_static(&allwinner_h3_ccu_info);
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = allwinner_h3_realize;
++    /* Reason: uses serial_hds and nd_table */
++    dc->user_creatable = false;
 +}
 +
-+type_init(allwinner_h3_ccu_register)
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index ba898a5781..4abd92dcee 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -28,6 +28,7 @@ common-obj-$(CONFIG_MACIO) += macio/
++static const TypeInfo allwinner_h3_type_info = {
++    .name = TYPE_AW_H3,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(AwH3State),
++    .instance_init = allwinner_h3_init,
++    .class_init = allwinner_h3_class_init,
++};
++
++static void allwinner_h3_register_types(void)
++{
++    type_register_static(&allwinner_h3_type_info);
++}
++
++type_init(allwinner_h3_register_types)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cd2dc137a3..dc2d7991bf 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -481,6 +481,13 @@ F: hw/*/allwinner*
+ F: include/hw/*/allwinner*
+ F: hw/arm/cubieboard.c
  
- common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
++Allwinner-h3
++M: Niek Linnenbank <nieklinnenbank@gmail.com>
++L: qemu-arm@nongnu.org
++S: Maintained
++F: hw/*/allwinner-h3*
++F: include/hw/*/allwinner-h3*
++
+ ARM PrimeCell and CMSDK devices
+ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index c6e7782580..ebf8d2325f 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -291,6 +291,14 @@ config ALLWINNER_A10
+     select SERIAL
+     select UNIMP
  
-+common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
- common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
- common-obj-$(CONFIG_NSERIES) += cbus.o
- common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
++config ALLWINNER_H3
++    bool
++    select ALLWINNER_A10_PIT
++    select SERIAL
++    select ARM_TIMER
++    select ARM_GIC
++    select UNIMP
++
+ config RASPI
+     bool
+     select FRAMEBUFFER
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index fe749f65fd..956e496052 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -34,6 +34,7 @@ obj-$(CONFIG_DIGIC) += digic.o
+ obj-$(CONFIG_OMAP) += omap1.o omap2.o
+ obj-$(CONFIG_STRONGARM) += strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
++obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3.o
+ obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
+ obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
+ obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
 -- 
 2.17.1
 
