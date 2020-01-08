@@ -2,79 +2,65 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 529F9C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE4CC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:37:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20F0020673
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:35:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VzdZoZdn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20F0020673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B36962067D
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:37:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B36962067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipDMg-0008Ai-Bs
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 10:35:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38961)
+	id 1ipDOs-0002eV-UB
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 10:37:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42126)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ipDLk-0007JX-Tw
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:34:25 -0500
+ (envelope-from <clg@kaod.org>) id 1ipDOG-00028b-Dd
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:37:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ipDLj-00068P-L4
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:34:24 -0500
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:37049)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ipDLj-000670-Dx
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:34:23 -0500
-Received: by mail-ot1-x32e.google.com with SMTP id k14so3966639otn.4
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 07:34:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=liIpu8WSwoFeXXflAjPLS5+QCtJEOL/ibA0I5UuWiO8=;
- b=VzdZoZdnL3K4y1D8C0IhSg7APzu4Q+TGdDaiftXiZKL7ieypqmPwo5Pu0treDid26m
- OXv6QYP52DPlggums1QQIExdxHU1N82bWoO1urlndAIL0IEPXl6xtAQJZg69MAAwvtIT
- uNhlIHI/GnRCT+ZK3Oe58t/OZvQwPXXEYJ85GzaW9+eXFKrRyiD9HlqYBEWLn8gThkAS
- eyUUwZeZXFsfcH0uWLdXO1OrMHqRu3Ftnx/5up7R0tmOeEcHF0igCRUIXQxBlAw/cwv7
- KRhGWJUFgRD/RiShHhF9z7M6AdUUJ7PuA68GnpZQO0HpwZZ8NUXwYoFUpUOuUmJSZo1S
- iQlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=liIpu8WSwoFeXXflAjPLS5+QCtJEOL/ibA0I5UuWiO8=;
- b=XcHAaT3Hol+D00KgZC4Pkq7P346z4GfqcW2SK4q150BX3YcvVavRqMIgPBNdvf3fkM
- VK0d/yVybtr6zFBR21kIccs6tOIc+aiLHoY0gFTboZuHh42WywWHbi6dfQUAHJcIipDs
- /BXQ1rccNOYSLrO01yOwrfLCynfPXuMJeppZqb9jAlsk+bqmOCXMtdTzIJsOd94+QFj4
- OEHfTNdEyTvB4/KnBta9KnVBrNZ5I2pNN3Q1r34+6m3HLY1dwE189FcvWyYJB3PkWJGr
- r8wncnjTIigKdtUxvq6ktjMyXICXYOLIdFN7ANNzjkZ6ZuG6bkeo50GesZ6pRl5VTxX8
- irrA==
-X-Gm-Message-State: APjAAAU0Czu79x8YtN7cJFgc84xDBiQhvo6u96ilGCtiGw85+XKE4vkE
- Bn+SGdLCm+prw+9KyJU0Tu2PeO5UgN0/ljXwdMvs6hXyunY=
-X-Google-Smtp-Source: APXvYqz4fThr0NWgIvwV2F9IdNc8cEz03K35e0sWwq4MIHrUNGI8RVT6HbaH2UOo/hzI/48Axg84SrssLBUVC8tz+IY=
-X-Received: by 2002:a05:6830:1586:: with SMTP id
- i6mr2842601otr.221.1578497661900; 
- Wed, 08 Jan 2020 07:34:21 -0800 (PST)
+ (envelope-from <clg@kaod.org>) id 1ipDOE-0000LM-Tt
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:37:00 -0500
+Received: from 20.mo7.mail-out.ovh.net ([46.105.49.208]:40191)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ipDOE-0000K0-OJ
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:36:58 -0500
+Received: from player762.ha.ovh.net (unknown [10.108.16.187])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 635F0148D01
+ for <qemu-devel@nongnu.org>; Wed,  8 Jan 2020 16:36:56 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player762.ha.ovh.net (Postfix) with ESMTPSA id 1C49BDFD64C4;
+ Wed,  8 Jan 2020 15:36:51 +0000 (UTC)
+Subject: Re: [PATCH 6/7] target/ppc: add support for Hypervisor Facility
+ Unavailable Exception
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191128134700.16091-1-clg@kaod.org>
+ <20191128134700.16091-7-clg@kaod.org> <20191219051246.GF2321@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6673b3eb-9dad-5e55-2013-d5edfde718d9@kaod.org>
+Date: Wed, 8 Jan 2020 16:36:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <CAMAD20mmgEa_W869C961T_1DQnx+J=dKYFJgv=2WEw5iDL5T1A@mail.gmail.com>
-In-Reply-To: <CAMAD20mmgEa_W869C961T_1DQnx+J=dKYFJgv=2WEw5iDL5T1A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 8 Jan 2020 15:34:11 +0000
-Message-ID: <CAFEAcA8AhKu53pieZTtArO26OJ2JLvBF8usVaSAya9FCxQL2Tg@mail.gmail.com>
-Subject: Re: riscv: How to debug a wrong pc after executing ret instruction?
-To: Ian Jiang <ianjiang.ict@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32e
+In-Reply-To: <20191219051246.GF2321@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 17804699654592564120
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehkedgjeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefheenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.49.208
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,36 +72,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Suraj Jitindar Singh <sjitindarsingh@gmail.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 at 09:23, Ian Jiang <ianjiang.ict@gmail.com> wrote:
->
-> Problem
-> ======
-> The next instruction after executing "ret" (i.e. jalr x0, 0(x1)) is not at 0x000000008000056c (x1/ra) as expected,  but at  0x000000008000056c.
-> How to debug this issue? Any suggestion is appreciated.
->
-> QEMU command
-> =============
-> qemu-system-riscv64 -nographic -machine virt -kernel my-test.elf -smp 1 -d in_asm,cpu
+On 12/19/19 6:12 AM, David Gibson wrote:
+> On Thu, Nov 28, 2019 at 02:46:59PM +0100, C=E9dric Le Goater wrote:
+>> The privileged message send and clear instructions (msgsndp & msgclrp)
+>> are privileged, but will generate a hypervisor facility unavailable
+>> exception if not enabled in the HFSCR and executed in privileged
+>> non-hypervisor state.
+>>
+>> Add checks when accessing the DPDES register and when using the
+>> msgsndp and msgclrp isntructions.
+>>
+>> Based on previous work from Suraj Jitindar Singh.
+>>
+>> Cc: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  target/ppc/cpu.h                |  6 ++++++
+>>  target/ppc/helper.h             |  1 +
+>>  target/ppc/excp_helper.c        |  9 +++++++++
+>>  target/ppc/misc_helper.c        | 24 ++++++++++++++++++++++++
+>>  target/ppc/translate.c          |  4 ++++
+>>  target/ppc/translate_init.inc.c | 18 ++++++++++++++++++
+>>  6 files changed, 62 insertions(+)
+>>
+>> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+>> index 8ffcfa0ea162..52608dfe6ff4 100644
+>> --- a/target/ppc/cpu.h
+>> +++ b/target/ppc/cpu.h
+>> @@ -397,6 +397,10 @@ typedef struct ppc_v3_pate_t {
+>>  #define PSSCR_ESL         PPC_BIT(42) /* Enable State Loss */
+>>  #define PSSCR_EC          PPC_BIT(43) /* Exit Criterion */
+>> =20
+>> +/* HFSCR bits */
+>> +#define HFSCR_MSGP     PPC_BIT(53) /* Privileged Message Send Facilit=
+ies */
+>> +#define HFSCR_IC_MSGP  0xA
+>> +
+>>  #define msr_sf   ((env->msr >> MSR_SF)   & 1)
+>>  #define msr_isf  ((env->msr >> MSR_ISF)  & 1)
+>>  #define msr_shv  ((env->msr >> MSR_SHV)  & 1)
+>> @@ -1333,6 +1337,8 @@ void cpu_ppc_set_vhyp(PowerPCCPU *cpu, PPCVirtua=
+lHypervisor *vhyp);
+>>  #endif
+>> =20
+>>  void store_fpscr(CPUPPCState *env, uint64_t arg, uint32_t mask);
+>> +void gen_hfscr_facility_check(DisasContext *ctx, int facility_sprn, i=
+nt bit,
+>> +                              int sprn, int cause);
+>> =20
+>>  static inline uint64_t ppc_dump_gpr(CPUPPCState *env, int gprn)
+>>  {
+>> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+>> index 76518a1df6f0..14c9a30a45c9 100644
+>> --- a/target/ppc/helper.h
+>> +++ b/target/ppc/helper.h
+>> @@ -643,6 +643,7 @@ DEF_HELPER_3(store_dcr, void, env, tl, tl)
+>> =20
+>>  DEF_HELPER_2(load_dump_spr, void, env, i32)
+>>  DEF_HELPER_2(store_dump_spr, void, env, i32)
+>> +DEF_HELPER_4(hfscr_facility_check, void, env, i32, i32, i32)
+>>  DEF_HELPER_4(fscr_facility_check, void, env, i32, i32, i32)
+>>  DEF_HELPER_4(msr_facility_check, void, env, i32, i32, i32)
+>>  DEF_HELPER_FLAGS_1(load_tbl, TCG_CALL_NO_RWG, tl, env)
+>> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+>> index 5a247945e97f..17dad626b74e 100644
+>> --- a/target/ppc/excp_helper.c
+>> +++ b/target/ppc/excp_helper.c
+>> @@ -469,6 +469,15 @@ static inline void powerpc_excp(PowerPCCPU *cpu, =
+int excp_model, int excp)
+>>      case POWERPC_EXCP_FU:         /* Facility unavailable exception  =
+        */
+>>  #ifdef TARGET_PPC64
+>>          env->spr[SPR_FSCR] |=3D ((target_ulong)env->error_code << 56)=
+;
+>> +#endif
+>> +        break;
+>> +    case POWERPC_EXCP_HV_FU:     /* Hypervisor Facility Unavailable E=
+xception */
+>> +#ifdef TARGET_PPC64
+>> +        env->spr[SPR_HFSCR] |=3D ((target_ulong)env->error_code << FS=
+CR_IC_POS);
+>> +        srr0 =3D SPR_HSRR0;
+>> +        srr1 =3D SPR_HSRR1;
+>> +        new_msr |=3D (target_ulong)MSR_HVB;
+>> +        new_msr |=3D env->msr & ((target_ulong)1 << MSR_RI);
+>>  #endif
+>>          break;
+>>      case POWERPC_EXCP_PIT:       /* Programmable interval timer inter=
+rupt    */
+>> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+>> index a0e7bd9c32d3..0cd44c6edd82 100644
+>> --- a/target/ppc/misc_helper.c
+>> +++ b/target/ppc/misc_helper.c
+>> @@ -41,6 +41,17 @@ void helper_store_dump_spr(CPUPPCState *env, uint32=
+_t sprn)
+>>  }
+>> =20
+>>  #ifdef TARGET_PPC64
+>> +static void raise_hv_fu_exception(CPUPPCState *env, uint32_t bit,
+>> +                                  uint32_t sprn, uint32_t cause,
+>> +                                  uintptr_t raddr)
+>> +{
+>> +    qemu_log("Facility SPR %d is unavailable (SPR HFSCR:%d)\n", sprn,=
+ bit);
+>=20
+> That looks overly verbose.  Leftover debugging?
 
-You are probably being confused by the tracing. 'in_asm' tracing traces the
-instructions when they are *translated*, not when they are *executed*.
-QEMU translates blocks of instructions at a time, and it caches the results,
-so if the guest binary re-executes a set of instructions you won't see any
-in_asm tracing at all for that. To see tracing that happens at execution
-time you can try the 'exec' or 'cpu' tracing (this produces a lot of output
-so it's slow). You may also want 'nochain' which suppresses an optimisation
-where we directly link blocks of translated code (which coincidentally
-means the 2nd linked block won't appear in the trace).
+No. It's inherited from raise_fu_exception(). Should we remove them ?
+or use mask CPU_LOG_INT ?
 
-Basically -d tracing traces things that are easy for QEMU to debug;
-to successfully interpret it you need to have some idea of what
-QEMU is doing under the hood.
 
-thanks
--- PMM
+>=20
+>> +    env->spr[SPR_HFSCR] &=3D ~((target_ulong)FSCR_IC_MASK << FSCR_IC_=
+POS);
+>> +
+>> +    raise_exception_err_ra(env, POWERPC_EXCP_HV_FU, cause, raddr);
+>> +}
+>> +
+>>  static void raise_fu_exception(CPUPPCState *env, uint32_t bit,
+>>                                 uint32_t sprn, uint32_t cause,
+>>                                 uintptr_t raddr)
+>> @@ -55,6 +66,17 @@ static void raise_fu_exception(CPUPPCState *env, ui=
+nt32_t bit,
+>>  }
+>>  #endif
+>> =20
+>> +void helper_hfscr_facility_check(CPUPPCState *env, uint32_t bit,
+>> +                                 uint32_t sprn, uint32_t cause)
+>> +{
+>> +#ifdef TARGET_PPC64
+>> +    if ((env->msr_mask & MSR_HVB) && !msr_hv &&
+>> +                                     !(env->spr[SPR_HFSCR] & (1UL << =
+bit))) {
+>> +        raise_hv_fu_exception(env, bit, sprn, cause, GETPC());
+>> +    }
+>> +#endif
+>> +}
+>> +
+>>  void helper_fscr_facility_check(CPUPPCState *env, uint32_t bit,
+>>                                  uint32_t sprn, uint32_t cause)
+>>  {
+>> @@ -108,6 +130,8 @@ void helper_store_pcr(CPUPPCState *env, target_ulo=
+ng value)
+>> =20
+>>  target_ulong helper_load_dpdes(CPUPPCState *env)
+>>  {
+>> +    helper_hfscr_facility_check(env, HFSCR_MSGP, SPR_DPDES,
+>> +                                HFSCR_IC_MSGP);
+>>      if (env->pending_interrupts & (1 << PPC_INTERRUPT_DOORBELL)) {
+>>          return 1;
+>>      }
+>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>> index ba759ab2bb0f..e9e70ca149fd 100644
+>> --- a/target/ppc/translate.c
+>> +++ b/target/ppc/translate.c
+>> @@ -6652,6 +6652,8 @@ static void gen_msgclrp(DisasContext *ctx)
+>>      GEN_PRIV;
+>>  #else
+>>      CHK_SV;
+>> +    gen_hfscr_facility_check(ctx, SPR_HFSCR, HFSCR_MSGP, 0,
+>> +                             HFSCR_IC_MSGP);
+>>      gen_helper_book3s_msgclrp(cpu_env, cpu_gpr[rB(ctx->opcode)]);
+>=20
+> Calling a helper for the facility check, then another helper for the
+> actual instruction is a bit yucky.  I'd prefer if you either call out
+> for the facility check within the instruction helper, or generate the
+> instructions necessary for the HFSCR check
+
+OK. I will take a look.=20
+
+C.
+
+>=20
+>>  #endif /* defined(CONFIG_USER_ONLY) */
+>>  }
+>> @@ -6662,6 +6664,8 @@ static void gen_msgsndp(DisasContext *ctx)
+>>      GEN_PRIV;
+>>  #else
+>>      CHK_SV;
+>> +    gen_hfscr_facility_check(ctx, SPR_HFSCR, HFSCR_MSGP, 0,
+>> +                             HFSCR_IC_MSGP);
+>>      gen_helper_book3s_msgsndp(cpu_gpr[rB(ctx->opcode)]);
+>>  #endif /* defined(CONFIG_USER_ONLY) */
+>>  }
+>> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_in=
+it.inc.c
+>> index 7c74a763ba66..154e01451270 100644
+>> --- a/target/ppc/translate_init.inc.c
+>> +++ b/target/ppc/translate_init.inc.c
+>> @@ -468,11 +468,15 @@ static void spr_write_pcr(DisasContext *ctx, int=
+ sprn, int gprn)
+>>  /* DPDES */
+>>  static void spr_read_dpdes(DisasContext *ctx, int gprn, int sprn)
+>>  {
+>> +    gen_hfscr_facility_check(ctx, SPR_HFSCR, HFSCR_MSGP, sprn,
+>> +                             HFSCR_IC_MSGP);
+>>      gen_helper_load_dpdes(cpu_gpr[gprn], cpu_env);
+>>  }
+>> =20
+>>  static void spr_write_dpdes(DisasContext *ctx, int sprn, int gprn)
+>>  {
+>> +    gen_hfscr_facility_check(ctx, SPR_HFSCR, HFSCR_MSGP, sprn,
+>> +                             HFSCR_IC_MSGP);
+>>      gen_helper_store_dpdes(cpu_env, cpu_gpr[gprn]);
+>>  }
+>>  #endif
+>> @@ -7523,6 +7527,20 @@ POWERPC_FAMILY(e600)(ObjectClass *oc, void *dat=
+a)
+>>  #define POWERPC970_HID5_INIT 0x00000000
+>>  #endif
+>> =20
+>> +void gen_hfscr_facility_check(DisasContext *ctx, int facility_sprn, i=
+nt bit,
+>> +                              int sprn, int cause)
+>> +{
+>> +    TCGv_i32 t1 =3D tcg_const_i32(bit);
+>> +    TCGv_i32 t2 =3D tcg_const_i32(sprn);
+>> +    TCGv_i32 t3 =3D tcg_const_i32(cause);
+>> +
+>> +    gen_helper_hfscr_facility_check(cpu_env, t1, t2, t3);
+>> +
+>> +    tcg_temp_free_i32(t3);
+>> +    tcg_temp_free_i32(t2);
+>> +    tcg_temp_free_i32(t1);
+>> +}
+>> +
+>>  static void gen_fscr_facility_check(DisasContext *ctx, int facility_s=
+prn,
+>>                                      int bit, int sprn, int cause)
+>>  {
+>=20
+
 
