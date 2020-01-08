@@ -7,84 +7,85 @@ X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6274DC33C99
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A96DC33C99
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 270692070E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:06:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1D2A2070E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BrQNVZu8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270692070E
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZF80TWv7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1D2A2070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioysD-0002IF-9T
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 19:06:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40665)
+	id 1ioyu2-0003fp-Rm
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 19:08:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1ioyrV-0001qF-U1
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:06:14 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1ioytC-0002mf-0o
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1ioyrU-0002nk-Rx
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:06:13 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45126)
+ (envelope-from <palmerdabbelt@google.com>) id 1ioytB-0003nC-39
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:07:57 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44069)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1ioyrU-0002mH-KY
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:06:12 -0500
-Received: by mail-pf1-x443.google.com with SMTP id 2so648847pfg.12
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 16:06:12 -0800 (PST)
+ id 1ioytA-0003mW-UB
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:07:57 -0500
+Received: by mail-pg1-x541.google.com with SMTP id x7so630205pgl.11
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 16:07:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:subject:cc:to:in-reply-to:references:message-id
  :mime-version:content-transfer-encoding;
- bh=z+in7Qiu0uJOVVZsPIL5WgzbcNDpsMijJxT+AW8sdZM=;
- b=BrQNVZu88EFfymKgzroYyrXsw2TosEf2+zRufJYJKCqgLpdPNKTYkzgG1zU9bLoISD
- 1p9F+2m2uXY0kXCz66mWRKvevzY8Et3XKLPKEBNKAyNFxlyVWwnELJSfpA5EhYYbZ5vB
- YtYpLJpASk2aJYnynIgvhLoydJkv4IeksJJqBBUHBhsLSR9wA6Fq73oZuEKJPS6YGNGI
- WLWFeFQfA2vzRJ0xhe4EmAbma80DKQlSCAMbUWOz/fNt+/ZW8J7xt6UiUv4cz+nGGZaf
- AOd3Bj9IacPCGtD7QYsiu6NdlMyMC+4SEI2sP/qlNXckiO5sUJdM03/8E4T0kkfXQz3m
- zgjg==
+ bh=Y6cMuBVs0196LTwcKZNj4poTRpEbBv+9KmEW8zwj1aI=;
+ b=ZF80TWv7XtmFg2VGfdZULY7o5W1nZ1V/JS0t/P3fo6fOJw/kj1KROTVHJzcbvH1eyD
+ 3Tct8wa2zVJSFAFCCIcJU+F3j+VacvZRFTtbSnL7xYg1XmSSwNzXrcimA5I6QnNxOElC
+ 0pTbKuuiG8a4xdsFS45DnQ6H6OkYKbSMKSyHJz9ZE+eunvnhSCWHZqbSh9F2CkR+9j6i
+ EBi6DcL+q2UIlkPG1zPz4pWSV/iR6kXM99jz96tfzeqKp75jy8EOoeqTeP1w8sunEkT/
+ EveGKHaBDJAkonaR23DXq4vJHWHiGmOcF+mdG5ZgS7Y8FvTQhfkJc9UquxQtrQU4bfMv
+ gRbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
  :message-id:mime-version:content-transfer-encoding;
- bh=z+in7Qiu0uJOVVZsPIL5WgzbcNDpsMijJxT+AW8sdZM=;
- b=IMeDkvmSi3cIVNApEbKwSTj4TsYf4GBg4iADEGXG0tAGEDR6DC/qm9imitcHHIgiNi
- 3EcyVUXZ3Rmy3IqioQuBKxeD7gR5Ql7pOSdv5OnRMZqRc+/stPgOYQPTLrLjehZIXLha
- 0wbgzgyf6pWpXm1LqNo6tuCykJGnitv9gtOPihAFa3CpS16k+cGBDQeJs/F6Na4DqUlC
- o++GiaGmgfHQVeASNj3aldxH3K7gOwKuskzXPBc9sEN+v1jQIDfrNvW3qIRUliKsuLXS
- QCm9+0hmvitECtV0+hhFRm64kFTwZrMlqNyMDeyqc4QcMpuFS/ccjseW3vUDzKYW7upH
- tvew==
-X-Gm-Message-State: APjAAAUDSt6P95sH8xlZe77Ln3klHUypgH4Z3BVBO907I21VMGWZliml
- rvOfHmYBoTVoJMLvymonwlCxC9xDFRQ=
-X-Google-Smtp-Source: APXvYqx+1ovn6xo4uVYCkbhllZpCoqrzAy2ljQI00lVFpWWjLRMWfHvTe+3fYRFsvf/Dfa6jRFu80g==
-X-Received: by 2002:a62:e30d:: with SMTP id g13mr2069468pfh.92.1578441971106; 
- Tue, 07 Jan 2020 16:06:11 -0800 (PST)
+ bh=Y6cMuBVs0196LTwcKZNj4poTRpEbBv+9KmEW8zwj1aI=;
+ b=UZOffvwj6dENMTVMddxcP3UBXvDmT8NnCA0vUNGO5b92pY7DLQyASYDz0WoGTWJgaN
+ N8hjpj6am0b+J+rfCiJIHil7ANWllEybXZUEeU4G7kvAm2Y/oPZD+if6cm1YSMwcy4R1
+ RkZPRiG7B+cypRg0Vo3ImNdSGi3psAPjM3r48O9lHJx/FM+vpI+z1ot9vEe98YmRxpro
+ RODc/NRysnnwnrSuAW0wnSlAsoiHEK2w5MyO3TT0M/GamQA4IynYrF+GYQ9z7mc5hHxL
+ OTP+lJnEjeGFqjKjsm1unhGFC/sk+QzAfw4+FAD0Lqz/zQ4lzDZhJSPprxjBhhfCjBUT
+ VHoQ==
+X-Gm-Message-State: APjAAAVi9kFYXh3CBfDbeaq1yNcYwGnKDCi7h6/3qsgL8wOMGvuRE9Pq
+ KZTvqAP+nU/ekXPV+vWNONN1N5dnyfc=
+X-Google-Smtp-Source: APXvYqzHyOcNMg6yhPbDCb4fW5EGJhEssiyAmmi5ZSvEgDPEGTd2PsHYPuVqoYJiTzdVmYUpLWpeeg==
+X-Received: by 2002:aa7:90cc:: with SMTP id k12mr2043713pfk.105.1578442075714; 
+ Tue, 07 Jan 2020 16:07:55 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
- by smtp.gmail.com with ESMTPSA id a16sm912684pgb.5.2020.01.07.16.06.10
+ by smtp.gmail.com with ESMTPSA id u128sm737573pfu.60.2020.01.07.16.07.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 16:06:10 -0800 (PST)
-Date: Tue, 07 Jan 2020 16:06:10 -0800 (PST)
-X-Google-Original-Date: Tue, 07 Jan 2020 16:06:08 PST (-0800)
+ Tue, 07 Jan 2020 16:07:55 -0800 (PST)
+Date: Tue, 07 Jan 2020 16:07:55 -0800 (PST)
+X-Google-Original-Date: Tue, 07 Jan 2020 16:07:52 PST (-0800)
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
-Subject: Re: [PATCH v1 09/36] target/riscv: Fix CSR perm checking for HS mode
+Subject: Re: [PATCH v1 14/36] target/riscv: Add Hypervisor virtual CSRs
+ accesses
 CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
  Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
 To: Alistair Francis <Alistair.Francis@wdc.com>
-In-Reply-To: <72b377cf058f6d159a40301b6880f017404ef9cd.1575914822.git.alistair.francis@wdc.com>
-References: <72b377cf058f6d159a40301b6880f017404ef9cd.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
-Message-ID: <mhng-304917e2-e6ff-4bca-8479-d71b5c13aff6@palmerdabbelt-glaptop>
+In-Reply-To: <6245a7d85ae108253970aecd57b47a3f6ddeec2c.1575914822.git.alistair.francis@wdc.com>
+References: <6245a7d85ae108253970aecd57b47a3f6ddeec2c.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
+Message-ID: <mhng-f31e4557-45d8-4bfc-92b8-5670f83b7502@palmerdabbelt-glaptop>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,46 +101,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 09 Dec 2019 10:11:04 PST (-0800), Alistair Francis wrote:
-> Update the CSR permission checking to work correctly when we are in
-> HS-mode.
->
+On Mon, 09 Dec 2019 10:11:17 PST (-0800), Alistair Francis wrote:
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  target/riscv/csr.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
+>  target/riscv/csr.c | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
 >
 > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index 6a0a59edfd..eebfc1823d 100644
+> index aaca1a6a0f..74e911af08 100644
 > --- a/target/riscv/csr.c
 > +++ b/target/riscv/csr.c
-> @@ -802,12 +802,22 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+> @@ -985,6 +985,30 @@ static int write_vsatp(CPURISCVState *env, int csrno, target_ulong val)
+>      return 0;
+>  }
 >
->      /* check privileges and return -1 if check fails */
->  #if !defined(CONFIG_USER_ONLY)
-> -    int csr_priv = get_field(csrno, 0x300);
-> +    int effective_priv = env->priv;
->      int read_only = get_field(csrno, 0xC00) == 3;
-> -    if ((!env->debugger) && (env->priv < csr_priv)) {
-> -        return -1;
+> +static int read_mtval2(CPURISCVState *env, int csrno, target_ulong *val)
+> +{
+> +    *val = env->mtval2;
+> +    return 0;
+> +}
 > +
-> +    if (riscv_has_ext(env, RVH) &&
-> +        env->priv == PRV_S &&
-> +        !riscv_cpu_virt_enabled(env)) {
-> +        /*
-> +         * We are in S mode without virtualisation, therefore we are in HS Mode.
-> +         * Add 1 to the effective privledge level to allow us to access the
-> +         * Hypervisor CSRs.
-> +         */
-> +        effective_priv++;
->      }
-> -    if (write_mask && read_only) {
+> +static int write_mtval2(CPURISCVState *env, int csrno, target_ulong val)
+> +{
+> +    env->mtval2 = val;
+> +    return 0;
+> +}
 > +
-> +    if ((write_mask && read_only) ||
-> +        (!env->debugger && (effective_priv < get_field(csrno, 0x300)))) {
->          return -1;
->      }
->  #endif
+> +static int read_mtinst(CPURISCVState *env, int csrno, target_ulong *val)
+> +{
+> +    *val = env->mtinst;
+> +    return 0;
+> +}
+> +
+> +static int write_mtinst(CPURISCVState *env, int csrno, target_ulong val)
+> +{
+> +    env->mtinst = val;
+> +    return 0;
+> +}
+> +
+>  /* Physical Memory Protection */
+>  static int read_pmpcfg(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+> @@ -1208,6 +1232,9 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+>      [CSR_VSTVAL] =              { hmode,   read_vstval,      write_vstval     },
+>      [CSR_VSATP] =               { hmode,   read_vsatp,       write_vsatp      },
+>
+> +    [CSR_MTVAL2] =              { hmode,   read_mtval2,      write_mtval2     },
+> +    [CSR_MTINST] =              { hmode,   read_mtinst,      write_mtinst     },
+> +
+>      /* Physical Memory Protection */
+>      [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
+>      [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
 
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 
