@@ -2,96 +2,79 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD3EC00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20031C00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:41:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96B51206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:40:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF6FE205F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:41:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n6PKa4wI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B51206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I8wfAXaD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6FE205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip8lU-00052n-Mz
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 05:40:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49503)
+	id 1ip8ly-0005oE-2W
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 05:41:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49873)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ip8kc-0004X5-Fi
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:39:47 -0500
+ (envelope-from <kraxel@redhat.com>) id 1ip8l0-0004t3-MK
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:40:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ip8kb-0002Rj-46
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:39:46 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:50295)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ip8ka-0002QX-S3
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:39:45 -0500
-Received: by mail-wm1-x331.google.com with SMTP id a5so1942064wmb.0
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 02:39:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=SIyeqLIwSoMd/MatJpRZTUs43Ydcm7mt3mmc10it78E=;
- b=n6PKa4wIUkb6pAYopFEQptdr8DjpyGxGzlEk5IM7VcLzgiPFhinBNYMDQey2zOQZuP
- K07L1sT6dhtfrN08vphDjZakGCni8N66hrb+vz157xt7A4dhXh30WbXNp8+Zobvj3bmE
- Uai+i2VnJhKXDzS7dF1yJUYSEFVdqo72OoBEsMS4NYl990wchYuBsgf+Q/sFsqCioUgR
- 7TpDgPFeF8T2kKEBBIAIbipwYm4cW+6TL+72MfGQHTdkeZdp2rFWXkzR19AnTAnnL4yN
- PI66Xfbz04APMiM4sfgI1uUDa8n/Q8gJFVeU0f99/bwNn8gQWsF4yk81I1GezZMT5d/+
- Mn+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=SIyeqLIwSoMd/MatJpRZTUs43Ydcm7mt3mmc10it78E=;
- b=e2/LaS809RigvqtDSyolmbyy+9EFoap6+FQMnySmmsVQEd5UqkWdiyJyvz6li5DHf2
- YFTSZ5JxGuSvHZNrdGskFOXOAGiZkwOQeV8AZa1xzd6jETe5tCnXYehdkLjVhvEoUofj
- 0YuxMMac8mQUdD7YPcvG71XYMGsbu210oNRuWHiPQtup08GpGaK5rIx//iQpteWLJsN8
- SBoURmzVrqcbRL082dinM7691LcEX01d/DU+nQKeAs5rQJx1Fvfe2jJZzbQup/IG9FDh
- NKRjGtgepKSJHjd7ZymvmPqZFYH1JQmqi0Fs42qMItCcm/9lXKe+vreAmfjutikDsGUv
- SYpg==
-X-Gm-Message-State: APjAAAXUQniFng/k9tvRSUmF1ea3shvAx3E+w5fO/uBu3v/HpJ1a2p2e
- jo/DuW1VRirebpB1B2CW2/EDHQ==
-X-Google-Smtp-Source: APXvYqzi8RpIld9UWOH/pMIpAL6u8x3Bh+LED4M0TCqQ16gjoXsE6tne2lddzf/F99V/AlBrVDBNsQ==
-X-Received: by 2002:a05:600c:210e:: with SMTP id
- u14mr3084741wml.28.1578479983014; 
- Wed, 08 Jan 2020 02:39:43 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q15sm3796817wrr.11.2020.01.08.02.39.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 02:39:41 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 35FB11FF87;
- Wed,  8 Jan 2020 10:39:41 +0000 (GMT)
-References: <20200106130951.29873-1-philmd@redhat.com>
- <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
- <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
- <58eb34db-7d32-8b0e-d9ef-98648209486b@redhat.com>
- <656169fc-1abe-b521-20a3-e7041739b914@redhat.com>
- <20200107125451.GL3368802@redhat.com>
- <3241dff4-6223-404f-55d4-846991763046@redhat.com>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: Priority of -accel (was: [PATCH] tests/qemu-iotests: Update
- tests to recent desugarized -accel option)
-In-reply-to: <3241dff4-6223-404f-55d4-846991763046@redhat.com>
-Date: Wed, 08 Jan 2020 10:39:41 +0000
-Message-ID: <87d0bujkpe.fsf@linaro.org>
+ (envelope-from <kraxel@redhat.com>) id 1ip8kz-0002td-La
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:40:10 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38876
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ip8kz-0002s8-He
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:40:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578480008;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Gk5FuMwr+1rqCqZ5AZAcPgLfCDw7n+uF6yKOUI46XaM=;
+ b=I8wfAXaDW+Y3vgM+rX2zzIWKDAJlhzv/sffNmifcZFoliRmw/IuR0iyCD6NcPbNxFOfgAX
+ 4dG6+3tJnkdvc8F+XKcGdyY4AJ3yTTi3UxqAsTXI/nNoIfIueswEFncuVtIwmvz2k8J15i
+ 8D6Yfs83VQqrrlKMVNxI5fiz+xJThXU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-s9ud41kuO-qesu25yrPp8A-1; Wed, 08 Jan 2020 05:40:05 -0500
+X-MC-Unique: s9ud41kuO-qesu25yrPp8A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FE171005502;
+ Wed,  8 Jan 2020 10:40:03 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-98.ams2.redhat.com
+ [10.36.116.98])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E854B10016DA;
+ Wed,  8 Jan 2020 10:40:02 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 23E7611AAA; Wed,  8 Jan 2020 11:40:02 +0100 (CET)
+Date: Wed, 8 Jan 2020 11:40:02 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: David Stevens <stevensd@chromium.org>
+Subject: Re: [virtio-dev][RFC PATCH v1 1/2] content: define what exporting a
+ resource is
+Message-ID: <20200108104002.jxh6amnrazhnamej@sirius.home.kraxel.org>
+References: <CAD=HUj6FA3VoTJqNa+gmAgVOv9zS7Qk9pdg46EY9NvtJOdz5_A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::331
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=HUj6FA3VoTJqNa+gmAgVOv9zS7Qk9pdg46EY9NvtJOdz5_A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,64 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: virtio-dev@lists.oasis-open.org, Zach Reizner <zachr@chromium.org>,
+ Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Alex Lau <alexlau@chromium.org>,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Jan 08, 2020 at 06:01:58PM +0900, David Stevens wrote:
+> Define a mechanism for sharing resources between different virtio
+> devices.
+> 
+> Signed-off-by: David Stevens <stevensd@chromium.org>
+> ---
+>  content.tex | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> 
+> diff --git a/content.tex b/content.tex
+> index b1ea9b9..73bd28e 100644
+> --- a/content.tex
+> +++ b/content.tex
+> @@ -373,6 +373,24 @@ \section{Driver Notifications}
+> \label{sec:Virtqueues / Driver notifications}
+> 
+>  \input{shared-mem.tex}
+> 
+> +\section{Exporting Resources}\label{sec:Basic Facilities of a Virtio
+> Device / Exporting Resources}
+> +
+> +When a resource created by one virtio device needs to be
+> +shared with a seperate virtio device, the first device can
+> +export the resource by generating a \field{uuid} which the
+> +guest can pass to the second device to identify the resource.
+> +
+> +What constitutes a resource, how to export resources, and
+> +how to import resources are defined by the individual device
+> +types. The generation method of a \field{uuid} is dependent
+> +upon the implementation of the exporting device.
+> +
+> +Whether a particular exported resource can be imported into
+> +a device is dependent upon the implementations of the exporting
+> +and importing devices. Generally speaking, the guest should
+> +have some knowledge of the host configuration before trying to
+> +use exported resources.
 
-Thomas Huth <thuth@redhat.com> writes:
+Hmm, I'd suggest to move the whole thing into the virtio-gpu section.
+There is no such thing as a "resource" in general virtio context ...
 
-> On 07/01/2020 13.54, Daniel P. Berrang=C3=A9 wrote:
->> On Tue, Jan 07, 2020 at 01:23:18PM +0100, Paolo Bonzini wrote:
->>> On 07/01/20 13:18, Thomas Huth wrote:
->>>> I don't think we need a separate priority parameter here. But IMHO it's
->>>>  really rather common practice to prioritize the last option. So while
->>>> it might be more "self-explanatory" to a CLI newbie if the first
->>>> occurrence got the highest priority, it might be rather confusing
->>>> instead for a CLI veteran...?
->>>
->>> Prioritising the last certainly makes sense for a choose-one-only
->>> option, but I'm not sure it's the same for a choose-best option.  After
->>> all it was -machine accel=3Dkvm:tcg, not -machine accel=3Dtcg:kvm...
->>=20
->> IIUC, the main use case for specifying multiple accelerators is
->> so that lazy invokations can ask for a hardware virt, but then get
->> fallback to TCG if not available. For things that should be platform
->> portabile, there's more than just kvm to consider though, as we have
->> many accelerators.  Listing all possible accelerators is kind of
->> crazy though no matter what the syntax is.
->>=20
->> How about taking a completely different approach, inspired by the
->> -cpu arg and implement:
->>=20
->>     -machine accel=3Dbest
->
-> Something like that sounds like the best solution to me, but I'd maybe
-> rather not call it "best", since the definition of "best" might depend
-> on your use-case (e.g. do you want to use a CPU close to the host or
-> something different which might be better emulated by TCG?).
+cheers,
+  Gerd
 
-Indeed - you may well want to do TCG on Aarch64 if you want to test new
-instructions.
-
->
-> What about "-accel any" or "-accel fastest" or something similar?
-
-"any" is just ambiguous, "fastest" is just begging for me to find a
-micro-benchmark that TCG outperforms on ;-)
-
-"-accel default" could be considered to have vibes of Do The Right
-Thing (tm) and could in time actually become so!
-
-Does qemu support any sort of configurable defaults mechanism via config
-file where we can punt this sort of thing to the distribution/packager?
-
---=20
-Alex Benn=C3=A9e
 
