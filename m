@@ -2,68 +2,87 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA88C00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B87C00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:10:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 873772070A
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:09:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873772070A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
+	by mail.kernel.org (Postfix) with ESMTPS id 327692070A
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 04:10:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nzc7aLYX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 327692070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip2fB-0004CF-9n
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 23:09:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60111)
+	id 1ip2gC-0006Ez-8z
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 23:10:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prime.zeng@hisilicon.com>) id 1ip2Y5-0001tQ-TB
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:02:27 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ip2Im-0004ai-Ig
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:46:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prime.zeng@hisilicon.com>) id 1ip2Y4-0008HF-Cf
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 23:02:25 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:33406 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prime.zeng@hisilicon.com>)
- id 1ip2Y0-00088w-QT; Tue, 07 Jan 2020 23:02:21 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id B23C8F73DEA1703FDE75;
- Wed,  8 Jan 2020 12:02:15 +0800 (CST)
-Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.143]) by
- DGGEMM406-HUB.china.huawei.com ([10.3.20.214]) with mapi id 14.03.0439.000;
- Wed, 8 Jan 2020 12:02:11 +0800
-From: "Zengtao (B)" <prime.zeng@hisilicon.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH] hw/arm/acpi: Pack the SRAT processors structure by
- node_id ascending order
-Thread-Topic: [PATCH] hw/arm/acpi: Pack the SRAT processors structure by
- node_id ascending order
-Thread-Index: AQHVxTwQeBqIZ8yXtEyanioq6c3U06feal4AgACT4nD//9VlAIABTx2w
-Date: Wed, 8 Jan 2020 04:02:10 +0000
-Message-ID: <678F3D1BB717D949B966B68EAEB446ED340B8B24@dggemm526-mbx.china.huawei.com>
-References: <1578388729-55540-1-git-send-email-prime.zeng@hisilicon.com>
- <20200107042918-mutt-send-email-mst@kernel.org>
- <678F3D1BB717D949B966B68EAEB446ED340B608D@dggemm526-mbx.china.huawei.com>
- <20200107164958.7811777d@redhat.com>
-In-Reply-To: <20200107164958.7811777d@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.74.221.187]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <richard.henderson@linaro.org>) id 1ip2Il-0003QK-5O
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:46:36 -0500
+Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:45074)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ip2Ik-0003Or-TD
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:46:35 -0500
+Received: by mail-pg1-x536.google.com with SMTP id b9so851831pgk.12
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 19:46:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=UNrK4ZquBPwuG+9pKKZp2KPV+Uf9shFIJ31MhFoEhsY=;
+ b=nzc7aLYXFi7mkTuqyvsQf9GXdE71CREQsWnW0Y0SjrxrtHJCPpk/cBpfkUNRwHHlso
+ luOIxjxbnOOrZXqFQ0fTVhHpkkvdViD+8GJPOn1+Ci+P16yaYZ1UMr0Gr1Vw/xEd5yP7
+ H4wq+t1RcHJB6pc/qgFBHAC85FKoW84wzsEazgL3ku3cGK8mV6cDSG7o9m3hG9F+wTjS
+ 9vaR9TikYpW0sGm4TP80quW/c9VONVgqLKtUTWZqXC82lw9cJSbYa+4o4K683C4iWYOy
+ iteOIYazzswl4oVVkJGHJfJJ6IRF3LC+vgBXLd3xAXIMisunVG3dagHLIbQ9G0/CzYJN
+ Jc8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=UNrK4ZquBPwuG+9pKKZp2KPV+Uf9shFIJ31MhFoEhsY=;
+ b=AihvJicWOJRVgdpDAied1sktue55d4wcHLkfrd8A66kOa6yN/k9HQFUf2VWa9PIeCi
+ sWDzCOl2YBtK2Qpv5GmRSFs8b+OUOcMOQZElSzn502fZMnc2QZ4cM2+a/6mtLolvD+4Q
+ wr7/FV2EkxFTyJnl+//vRNdtXZj1PFF6CBcb7/DtVURmdrtMzhXEYmqvvkA0inUrfST3
+ 6eLQJUkIYAB8iMPzDeq3V0/Iz/+wImVe1Rmb+3RUZEgfF1MietUvDUsKkUIQW4/jVun1
+ 0AG1HyDYH7r4owGSRNKu6T8YRQlvIVBEzCiLjYbf2u0deI1dFAB79VJAm7OLKLs+B3vf
+ R1gQ==
+X-Gm-Message-State: APjAAAV1Cyl8E4LhXyZgW/HUQb0vi7empjPP1KHACDGXAf9XnpHVPMza
+ ZRlxFlNtdgcbvJrkUFWiNy3IKbnvkWwemg==
+X-Google-Smtp-Source: APXvYqy39oA8xd7SPOMQMWt5M7e1Ka/KwZX+8mi8Msyko7VOoZASHpBJHCkIeV4VuRTWSTvDxOnM9Q==
+X-Received: by 2002:a62:62c4:: with SMTP id w187mr2943240pfb.216.1578455193742; 
+ Tue, 07 Jan 2020 19:46:33 -0800 (PST)
+Received: from localhost.localdomain (alanje.lnk.telstra.net.
+ [120.151.179.201])
+ by smtp.gmail.com with ESMTPSA id f23sm1198433pgj.76.2020.01.07.19.46.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 19:46:33 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 21/41] target/i386: Use cpu_*_mmuidx_ra instead of templates
+Date: Wed,  8 Jan 2020 14:45:03 +1100
+Message-Id: <20200108034523.17349-22-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200108034523.17349-1-richard.henderson@linaro.org>
+References: <20200108034523.17349-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.255
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::536
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,166 +94,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Igor Mammedov [mailto:imammedo@redhat.com]
-> Sent: Tuesday, January 07, 2020 11:50 PM
-> To: Zengtao (B)
-> Cc: Michael S. Tsirkin; qemu-devel@nongnu.org; qemu-trivial@nongnu.org;
-> Shannon Zhao; Peter Maydell; qemu-arm@nongnu.org
-> Subject: Re: [PATCH] hw/arm/acpi: Pack the SRAT processors structure by
-> node_id ascending order
->=20
-> On Tue, 7 Jan 2020 10:29:22 +0000
-> "Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
->=20
-> > > -----Original Message-----
-> > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> > > Sent: Tuesday, January 07, 2020 5:33 PM
-> > > To: Zengtao (B)
-> > > Cc: qemu-devel@nongnu.org; qemu-trivial@nongnu.org; Shannon
-> Zhao;
-> > > Peter Maydell; Igor Mammedov; qemu-arm@nongnu.org
-> > > Subject: Re: [PATCH] hw/arm/acpi: Pack the SRAT processors structure
-> by
-> > > node_id ascending order
-> > >
-> > > On Tue, Jan 07, 2020 at 05:18:49PM +0800, Zeng Tao wrote:
-> > > > When booting the guest linux with the following numa configuration:
-> > > > -numa node,node_id=3D1,cpus=3D0-3
-> > > > -numa node,node_id=3D0,cpus=3D4-7
-> > > > We can get the following numa topology in the guest system:
-> > > > Architecture:          aarch64
-> > > > Byte Order:            Little Endian
-> > > > CPU(s):                8
-> > > > On-line CPU(s) list:   0-7
-> > > > Thread(s) per core:    1
-> > > > Core(s) per socket:    8
-> > > > Socket(s):             1
-> > > > NUMA node(s):          2
-> > > > L1d cache:             unknown size
-> > > > L1i cache:             unknown size
-> > > > L2 cache:              unknown size
-> > > > NUMA node0 CPU(s):     0-3
-> > > > NUMA node1 CPU(s):     4-7
-> > > > The Cpus 0-3 is assigned with NUMA node 1 in QEMU while it get
-> NUMA
-> > > node
-> > > > 0 in the guest.
-> > > >
-> > > > In fact, In the linux kernel, numa_node_id is allocated per the ACP=
-I
-> > > > SRAT processors structure order,so the cpu 0 will be the first one =
-to
-> > > > allocate its NUMA node id, so it gets the NUMA node 0.
-> > > >
-> > > > To fix this issue, we pack the SRAT processors structure in numa no=
-de
-> id
-> > > > order but not the default cpu number order.
-> > > >
-> > > > Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>
-> > >
-> > >
-> > > Does this matter? If yes fixing linux to take node id from proximity
-> > > field in ACPI seems cleaner ...
-> > >
-> >
-> > In fact, I just want to align the node_id concept in QEMU and Linux.
-> > If we fix the kernel side, we need to align with all platforms.
-> > i think maybe not a good idea.
-> if linux makes up node ID's on it's own, it would be hard for it to
-> map SRAT entries to other tables that use proximity id as well.
->=20
-> So it would need to maintain map of [proximity id] -> [node id] (and reve=
-rse)
-> somewhere to resolve mappings on other tables.
-> If it doesn't do this then it's broken and works just by accident,
-> if it does the fix probably should be in that code and not in QEMU.
->=20
+Do not use exec/cpu_ldst_{,useronly_}template.h directly,
+but instead use the functional interface.
 
-Hmm, the problem is how to understand the concept of node id.
-1. In dts, there is node id. Both the QEMU and Linux can use it
-directly, so no conflict.
-2. In ACPI, there is only proximity domain, but no node id, there
- should be a mapping between them, while kernel and QEMU maintain
- their own rule, and unfortunately they conflict with each other=20
- sometimes.
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/i386/seg_helper.c | 56 ++++++++++++++++++++--------------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
 
-There is no specification to indicate what we should do to maintain the
-mapping, so it's hard to align the QEMU and Linux.
-
-Any suggestion, or we just accept it as a rule since it don't affect much?
-
-> >
-> > > > ---
-> > > >  hw/arm/virt-acpi-build.c | 23 +++++++++++++++--------
-> > > >  1 file changed, 15 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > > index bd5f771..497192b 100644
-> > > > --- a/hw/arm/virt-acpi-build.c
-> > > > +++ b/hw/arm/virt-acpi-build.c
-> > > > @@ -520,7 +520,8 @@ build_srat(GArray *table_data, BIOSLinker
-> > > *linker, VirtMachineState *vms)
-> > > >      AcpiSystemResourceAffinityTable *srat;
-> > > >      AcpiSratProcessorGiccAffinity *core;
-> > > >      AcpiSratMemoryAffinity *numamem;
-> > > > -    int i, srat_start;
-> > > > +    int i, j, srat_start;
-> > > > +    uint32_t node_id;
-> > > >      uint64_t mem_base;
-> > > >      MachineClass *mc =3D MACHINE_GET_CLASS(vms);
-> > > >      MachineState *ms =3D MACHINE(vms);
-> > > > @@ -530,13 +531,19 @@ build_srat(GArray *table_data, BIOSLinker
-> > > *linker, VirtMachineState *vms)
-> > > >      srat =3D acpi_data_push(table_data, sizeof(*srat));
-> > > >      srat->reserved1 =3D cpu_to_le32(1);
-> > > >
-> > > > -    for (i =3D 0; i < cpu_list->len; ++i) {
-> > > > -        core =3D acpi_data_push(table_data, sizeof(*core));
-> > > > -        core->type =3D ACPI_SRAT_PROCESSOR_GICC;
-> > > > -        core->length =3D sizeof(*core);
-> > > > -        core->proximity =3D
-> > > cpu_to_le32(cpu_list->cpus[i].props.node_id);
-> > > > -        core->acpi_processor_uid =3D cpu_to_le32(i);
-> > > > -        core->flags =3D cpu_to_le32(1);
-> > > > +    for (i =3D 0; i < ms->numa_state->num_nodes; ++i) {
-> > > > +        for (j =3D 0; j < cpu_list->len; ++j) {
-> > >
-> > > Hmm O(n ^2) isn't great ...
-> > Good suggestion, 3Q.
-> > >
-> > > > +            node_id =3D
-> cpu_to_le32(cpu_list->cpus[j].props.node_id);
-> > > > +            if (node_id !=3D i) {
-> > > > +                continue;
-> > > > +            }
-> > > > +            core =3D acpi_data_push(table_data, sizeof(*core));
-> > > > +            core->type =3D ACPI_SRAT_PROCESSOR_GICC;
-> > > > +            core->length =3D sizeof(*core);
-> > > > +            core->proximity =3D node_id;
-> > > > +            core->acpi_processor_uid =3D cpu_to_le32(j);
-> > > > +            core->flags =3D cpu_to_le32(1);
-> > > > +        }
-> > > >      }
-> > >
-> > > is the issue arm specific? wouldn't it affect x86 too?
-> > >
-> > Good question, I think it will affect x86, but I need to confirm.
-> >
-> > > >      mem_base =3D vms->memmap[VIRT_MEM].base;
-> > > > --
-> > > > 2.8.1
-> >
+diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+index 87a627f9dc..b96de068ca 100644
+--- a/target/i386/seg_helper.c
++++ b/target/i386/seg_helper.c
+@@ -37,37 +37,37 @@
+ # define LOG_PCALL_STATE(cpu) do { } while (0)
+ #endif
+ 
+-#ifdef CONFIG_USER_ONLY
+-#define MEMSUFFIX _kernel
+-#define DATA_SIZE 1
+-#include "exec/cpu_ldst_useronly_template.h"
++/*
++ * TODO: Convert callers to compute cpu_mmu_index_kernel once
++ * and use *_mmuidx_ra directly.
++ */
++#define cpu_ldub_kernel_ra(e, p, r) \
++    cpu_ldub_mmuidx_ra(e, p, cpu_mmu_index_kernel(e), r)
++#define cpu_lduw_kernel_ra(e, p, r) \
++    cpu_lduw_mmuidx_ra(e, p, cpu_mmu_index_kernel(e), r)
++#define cpu_ldl_kernel_ra(e, p, r) \
++    cpu_ldl_mmuidx_ra(e, p, cpu_mmu_index_kernel(e), r)
++#define cpu_ldq_kernel_ra(e, p, r) \
++    cpu_ldq_mmuidx_ra(e, p, cpu_mmu_index_kernel(e), r)
+ 
+-#define DATA_SIZE 2
+-#include "exec/cpu_ldst_useronly_template.h"
++#define cpu_stb_kernel_ra(e, p, v, r) \
++    cpu_stb_mmuidx_ra(e, p, v, cpu_mmu_index_kernel(e), r)
++#define cpu_stw_kernel_ra(e, p, v, r) \
++    cpu_stw_mmuidx_ra(e, p, v, cpu_mmu_index_kernel(e), r)
++#define cpu_stl_kernel_ra(e, p, v, r) \
++    cpu_stl_mmuidx_ra(e, p, v, cpu_mmu_index_kernel(e), r)
++#define cpu_stq_kernel_ra(e, p, v, r) \
++    cpu_stq_mmuidx_ra(e, p, v, cpu_mmu_index_kernel(e), r)
+ 
+-#define DATA_SIZE 4
+-#include "exec/cpu_ldst_useronly_template.h"
++#define cpu_ldub_kernel(e, p)    cpu_ldub_kernel_ra(e, p, 0)
++#define cpu_lduw_kernel(e, p)    cpu_lduw_kernel_ra(e, p, 0)
++#define cpu_ldl_kernel(e, p)     cpu_ldl_kernel_ra(e, p, 0)
++#define cpu_ldq_kernel(e, p)     cpu_ldq_kernel_ra(e, p, 0)
+ 
+-#define DATA_SIZE 8
+-#include "exec/cpu_ldst_useronly_template.h"
+-#undef MEMSUFFIX
+-#else
+-#define CPU_MMU_INDEX (cpu_mmu_index_kernel(env))
+-#define MEMSUFFIX _kernel
+-#define DATA_SIZE 1
+-#include "exec/cpu_ldst_template.h"
+-
+-#define DATA_SIZE 2
+-#include "exec/cpu_ldst_template.h"
+-
+-#define DATA_SIZE 4
+-#include "exec/cpu_ldst_template.h"
+-
+-#define DATA_SIZE 8
+-#include "exec/cpu_ldst_template.h"
+-#undef CPU_MMU_INDEX
+-#undef MEMSUFFIX
+-#endif
++#define cpu_stb_kernel(e, p, v)  cpu_stb_kernel_ra(e, p, v, 0)
++#define cpu_stw_kernel(e, p, v)  cpu_stw_kernel_ra(e, p, v, 0)
++#define cpu_stl_kernel(e, p, v)  cpu_stl_kernel_ra(e, p, v, 0)
++#define cpu_stq_kernel(e, p, v)  cpu_stq_kernel_ra(e, p, v, 0)
+ 
+ /* return non zero if error */
+ static inline int load_segment_ra(CPUX86State *env, uint32_t *e1_ptr,
+-- 
+2.20.1
 
 
