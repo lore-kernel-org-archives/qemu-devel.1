@@ -2,68 +2,83 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F39BC3F68F
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDF4C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:34:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41608206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:17:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41608206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2518C206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:34:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uVAAq1O5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2518C206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipAHC-0007BZ-Be
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:17:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53911)
+	id 1ipAXk-0005II-Rg
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:34:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1ipAGB-0005uL-1j
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:16:28 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWD-0003ZN-Uz
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1ipAG6-0001p0-7e
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:16:25 -0500
-Resent-Date: Wed, 08 Jan 2020 07:16:23 -0500
-Resent-Message-Id: <E1ipAG6-0001p0-7e@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21194)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1ipAG5-0001kO-RD; Wed, 08 Jan 2020 07:16:22 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1578485772; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=kmKGma6U1E0f9P9lreqGZegWBa5HwX5XZY9q4f20E4qfDsDyZ6MeRhKIq1AWJ/bBWAvCuL7I4RmWztmw2H9OH5vehEzn5twAS6izBZa6jIQ1mhLKnV8uqnL1GX8brAvnXUUk14qsGENIsehvkPpEBwE83mTla91mWuDP5k0nHRY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1578485772;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=NyQKkZx9en+Ka52cIC9Rz/z+soXP+Ffu10+K0r6pIV4=; 
- b=GWPrj8IeYfRlZm5z7nJpPWnJxpk+aiaNqhNzCngFvvqKkzl6AoiWTPLT3YHz5J2kB8iuJpg6fPRUWZEkeaXXXjQ1Bnd1WD7S+00nZmF2psqg5AJnHJPScDCf8oeLryIQw1LBsywxFEKv8QLNTtk67vtV/LGHdf6xcQlFKMGSutQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1578485769150825.605564080826;
- Wed, 8 Jan 2020 04:16:09 -0800 (PST)
-In-Reply-To: <20200108112220.499180-1-stefanha@redhat.com>
-Subject: Re: [PATCH 0/4] luks: add qemu-img measure support
-Message-ID: <157848576808.3775.16003679946263305504@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: stefanha@redhat.com
-Date: Wed, 8 Jan 2020 04:16:09 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWC-0004CF-JV
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:01 -0500
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:36677)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ipAWC-0004Bg-D1
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:00 -0500
+Received: by mail-wm1-x32d.google.com with SMTP id p17so2323114wma.1
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Gy9btQ6/hiFDb+yxtplkQokqmOK4xY8N+OZWF2JIRzg=;
+ b=uVAAq1O5zbSUP4gUAYETzx/Q1eW++7FFfF1E7r9RL4hvDqaLlY2ynJSlOhKZYCc+8e
+ xLXzS8pQ5CNs8PecKzp7lCPVDS9DZ/LI745N6iXvw7/hkAMcr1Y8OlJ0lsvOEXc/5EFa
+ 3vyukwO+D5yy6ht18JdKVthcI/4f90oxMTXpnH5DSKUbOaaFx9O9/6R5blFbs+CyyCVe
+ L7MsWdQIy5zvhUd0nDmWXd8xHMp6mNhDmtQpicYpW+ewoHCYbS3WbtX/EsMq1OXPIXcy
+ 0IawvP3TOjuNS7N/2zVBbSnPEzP70YcyRudNUC03wcNXPur94v8ARpI7lf6axZa+WfFQ
+ MAkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=Gy9btQ6/hiFDb+yxtplkQokqmOK4xY8N+OZWF2JIRzg=;
+ b=QRUq4WInDq1zCFrIBwoeC1GxbyTI/lcEdfYE7+iIYD2XPxJXkmdUTw1ol/kmZ4xt2b
+ evt6uF7LYsIL1SQ0tqWV9cDKGf2mmI0SMZv2FwHo0VtDyzeYbshYbQOuba1C7sLuvQRP
+ dGhuPEL61bYS3z+hd0vcOLz3BWSmarqAETq8FythYeZ84zN7zQKWO4gpX10cMp8rYjUy
+ 10BQ08mBsj+KT0jWIMlp5vFbFfRcobIm8JbeI0M3BWH/xUJA8StLZey6m04AntqhBDBK
+ xhk+OJKZFzMHTlhLuoAPLHa77xF2Gv71bxZPffZRbx5FM/EFyoRAVWhoRVsPOIciiT4Q
+ Xwaw==
+X-Gm-Message-State: APjAAAUV5bAuYdvrGA6P7e6oqjUc7ET9uQDYYNKhwNz5mJh7nS/VUJKA
+ hgFAQuvYayvOp5uLFX2L50rpS4eh
+X-Google-Smtp-Source: APXvYqxnaRJGuAXC10yDrED+U3B6O/guHPlCxhLbplE72TC6qq7sGS2xCsVqacVfX6DoqVzL+PV0Ww==
+X-Received: by 2002:a05:600c:22d3:: with SMTP id
+ 19mr3525935wmg.92.1578486779147; 
+ Wed, 08 Jan 2020 04:32:59 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.32.58
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 08 Jan 2020 04:32:58 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 02/38] accel/kvm: Make "kernel_irqchip" default on
+Date: Wed,  8 Jan 2020 13:32:19 +0100
+Message-Id: <1578486775-52247-3-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
+References: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,58 +90,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEwODExMjIyMC40OTkx
-ODAtMS1zdGVmYW5oYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-ZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
-b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
-bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
-SVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
-LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
-ZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBp
-by9jaGFubmVsLXdlYnNvY2subwogIENDICAgICAgaW8vY2hhbm5lbC11dGlsLm8KL3RtcC9xZW11
-LXRlc3Qvc3JjL2Jsb2NrL2NyeXB0by5jOiBJbiBmdW5jdGlvbiAnYmxvY2tfY3J5cHRvX21lYXN1
-cmUnOgovdG1wL3FlbXUtdGVzdC9zcmMvYmxvY2svY3J5cHRvLmM6NTczOjYwOiBlcnJvcjogcGFz
-c2luZyBhcmd1bWVudCAzIG9mICdibG9ja19jcnlwdG9fY2FsY3VsYXRlX3BheWxvYWRfb2Zmc2V0
-JyBmcm9tIGluY29tcGF0aWJsZSBwb2ludGVyIHR5cGUgWy1XZXJyb3I9aW5jb21wYXRpYmxlLXBv
-aW50ZXItdHlwZXNdCiAgICAgaWYgKCFibG9ja19jcnlwdG9fY2FsY3VsYXRlX3BheWxvYWRfb2Zm
-c2V0KG9wdHMsIE5VTEwsICZsdWtzX3BheWxvYWRfc2l6ZSwKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
-Ci90bXAvcWVtdS10ZXN0L3NyYy9ibG9jay9jcnlwdG8uYzoyMTE6NTI6IG5vdGU6IGV4cGVjdGVk
-ICdzaXplX3QgKicge2FrYSAndW5zaWduZWQgaW50IConfSBidXQgYXJndW1lbnQgaXMgb2YgdHlw
-ZSAndWludDY0X3QgKicge2FrYSAnbG9uZyBsb25nIHVuc2lnbmVkIGludCAqJ30KICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzaXplX3QgKmxlbiwKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB+fn5+fn5+fl5+fgpjYzE6IGFsbCB3
-YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0
-L3NyYy9ydWxlcy5tYWs6Njk6IGJsb2NrL2NyeXB0by5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
-aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBs
-YXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2MiwgaW4gPG1v
-ZHVsZT4KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJw
-cm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tl
-cicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTdjOTFjMTg4OGQ5
-NjQ1ODc5ODBkOWUxNTZiYzExOTlhJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1vcHQnLCAn
-c2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywg
-J0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywg
-J0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9j
-Y2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92
-YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1mazF0
-M3IxeC9zcmMvZG9ja2VyLXNyYy4yMDIwLTAxLTA4LTA3LjEwLjIxLjUzMjk6L3Zhci90bXAvcWVt
-dTp6LHJvJywgJ3FlbXU6ZmVkb3JhJywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtbWluZ3cn
-XScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVs
-PWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9N2M5MWMxODg4ZDk2NDU4Nzk4MGQ5ZTE1NmJjMTE5OWEK
-bWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0
-b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtZmsxdDNyMXgvc3JjJwptYWtlOiAqKiog
-W2RvY2tlci1ydW4tdGVzdC1taW5nd0BmZWRvcmFdIEVycm9yIDIKCnJlYWwgICAgNW00Ny44MDVz
-CnVzZXIgICAgMG04LjUwMXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzLzIwMjAwMTA4MTEyMjIwLjQ5OTE4MC0xLXN0ZWZhbmhhQHJlZGhhdC5j
-b20vdGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+
+Commit 11bc4a13d1f4 ("kvm: convert "-machine kernel_irqchip" to an
+accelerator property") moves kernel_irqchip property from "-machine" to
+"-accel kvm", but it forgets to set the default value of
+kernel_irqchip_allowed and kernel_irqchip_split.
+
+Also cleaning up the three useless members (kernel_irqchip_allowed,
+kernel_irqchip_required, kernel_irqchip_split) in struct MachineState.
+
+Fixes: 11bc4a13d1f4 ("kvm: convert "-machine kernel_irqchip" to an accelerator property")
+Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Message-Id: <20191228104326.21732-1-xiaoyao.li@intel.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ accel/kvm/kvm-all.c | 19 +++++++++++++------
+ include/hw/boards.h |  3 ---
+ 2 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index b2f1a5b..1ada2f4 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -98,7 +98,7 @@ struct KVMState
+     int kvm_shadow_mem;
+     bool kernel_irqchip_allowed;
+     bool kernel_irqchip_required;
+-    bool kernel_irqchip_split;
++    OnOffAuto kernel_irqchip_split;
+     bool sync_mmu;
+     bool manual_dirty_log_protect;
+     /* The man page (and posix) say ioctl numbers are signed int, but
+@@ -1783,6 +1783,7 @@ static void kvm_irqchip_create(KVMState *s)
+ {
+     int ret;
+ 
++    assert(s->kernel_irqchip_split != ON_OFF_AUTO_AUTO);
+     if (kvm_check_extension(s, KVM_CAP_IRQCHIP)) {
+         ;
+     } else if (kvm_check_extension(s, KVM_CAP_S390_IRQCHIP)) {
+@@ -1799,7 +1800,7 @@ static void kvm_irqchip_create(KVMState *s)
+      * in-kernel irqchip for us */
+     ret = kvm_arch_irqchip_create(s);
+     if (ret == 0) {
+-        if (s->kernel_irqchip_split) {
++        if (s->kernel_irqchip_split == ON_OFF_AUTO_ON) {
+             perror("Split IRQ chip mode not supported.");
+             exit(1);
+         } else {
+@@ -2070,6 +2071,10 @@ static int kvm_init(MachineState *ms)
+         goto err;
+     }
+ 
++    if (s->kernel_irqchip_split == ON_OFF_AUTO_AUTO) {
++        s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
++    }
++
+     if (s->kernel_irqchip_allowed) {
+         kvm_irqchip_create(s);
+     }
+@@ -3005,17 +3010,17 @@ static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
+         case ON_OFF_SPLIT_ON:
+             s->kernel_irqchip_allowed = true;
+             s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = false;
++            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+             break;
+         case ON_OFF_SPLIT_OFF:
+             s->kernel_irqchip_allowed = false;
+             s->kernel_irqchip_required = false;
+-            s->kernel_irqchip_split = false;
++            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
+             break;
+         case ON_OFF_SPLIT_SPLIT:
+             s->kernel_irqchip_allowed = true;
+             s->kernel_irqchip_required = true;
+-            s->kernel_irqchip_split = true;
++            s->kernel_irqchip_split = ON_OFF_AUTO_ON;
+             break;
+         default:
+             /* The value was checked in visit_type_OnOffSplit() above. If
+@@ -3038,7 +3043,7 @@ bool kvm_kernel_irqchip_required(void)
+ 
+ bool kvm_kernel_irqchip_split(void)
+ {
+-    return kvm_state->kernel_irqchip_split;
++    return kvm_state->kernel_irqchip_split == ON_OFF_AUTO_ON;
+ }
+ 
+ static void kvm_accel_instance_init(Object *obj)
+@@ -3046,6 +3051,8 @@ static void kvm_accel_instance_init(Object *obj)
+     KVMState *s = KVM_STATE(obj);
+ 
+     s->kvm_shadow_mem = -1;
++    s->kernel_irqchip_allowed = true;
++    s->kernel_irqchip_split = ON_OFF_AUTO_AUTO;
+ }
+ 
+ static void kvm_accel_class_init(ObjectClass *oc, void *data)
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 61f8bb8..fb1b43d 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -271,9 +271,6 @@ struct MachineState {
+ 
+     /*< public >*/
+ 
+-    bool kernel_irqchip_allowed;
+-    bool kernel_irqchip_required;
+-    bool kernel_irqchip_split;
+     char *dtb;
+     char *dumpdtb;
+     int phandle_start;
+-- 
+1.8.3.1
+
 
 
