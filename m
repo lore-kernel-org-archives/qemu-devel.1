@@ -6,64 +6,68 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DF0C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FAFC33CA2
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E21E52067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:10:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E21E52067D
+	by mail.kernel.org (Postfix) with ESMTPS id 9062B20692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:37:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9062B20692
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipErD-0001vf-1a
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 12:10:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55322)
+	id 1ipFGQ-00077g-Ku
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 12:37:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59207)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipEm5-0003vi-Qt
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:05:42 -0500
+ (envelope-from <bounces@canonical.com>) id 1ipFFJ-00069S-Hf
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:35:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipEm4-0000jp-R7
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:05:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45842)
+ (envelope-from <bounces@canonical.com>) id 1ipFFI-0003pH-C0
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:35:53 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55004)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipEm4-0000iM-GS
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:05:40 -0500
+ id 1ipFFG-0003nb-TN
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:35:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipEm3-00032R-Me
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 17:05:39 +0000
+ id 1ipFFE-0007lH-ET
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 17:35:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A84152E8042
- for <qemu-devel@nongnu.org>; Wed,  8 Jan 2020 17:05:39 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 57C662E80D0
+ for <qemu-devel@nongnu.org>; Wed,  8 Jan 2020 17:35:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Jan 2020 16:58:00 -0000
-From: puchuu <1858461@bugs.launchpad.net>
+Date: Wed, 08 Jan 2020 17:28:00 -0000
+From: =?utf-8?q?=C5=BDilvinas_=C5=BDaltiena?= <1811533@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aladjev-andrew amarkovic
-X-Launchpad-Bug-Reporter: puchuu (aladjev-andrew)
-X-Launchpad-Bug-Modifier: puchuu (aladjev-andrew)
-References: <157833123209.15024.12557979334447840996.malonedeb@wampee.canonical.com>
-Message-Id: <157850268022.14847.845500140606628941.malone@wampee.canonical.com>
-Subject: [Bug 1858461] Re: Please refactor linux-user/mips/cpu_loop.c
+X-Launchpad-Bug-Commenters: dgilbert-h djdatte vkuznets zaltysz
+X-Launchpad-Bug-Reporter: =?utf-8?q?=C5=BDilvinas_=C5=BDaltiena_=28zaltysz?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?=C5=BDilvinas_=C5=BDaltiena_=28zaltysz?=
+ =?utf-8?q?=29?=
+References: <154731859474.20612.3794172498936114295.malonedeb@soybean.canonical.com>
+Message-Id: <157850448093.5668.16996592979646474519.malone@gac.canonical.com>
+Subject: [Bug 1811533] Re: Unstable Win10 guest with qemu 3.1 + huge pages +
+ hv_stimer
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 992224395761fd73c93dcb392f1ec87b0e260768
+X-Launchpad-Hash: d6311958a423cfa880a960c8d64ce38ffcaced80
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -77,53 +81,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858461 <1858461@bugs.launchpad.net>
+Reply-To: Bug 1811533 <1811533@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I've just written these generators in ruby, but it can be rewritten in
-python, perl, etc.
+I have applied these patches on qemu 4.2 and it seems they do fix the
+problem: no more  vhost_region_add_section in the log, and I haven't
+observed network or general performance loss in the span of one hour.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858461
+https://bugs.launchpad.net/bugs/1811533
 
 Title:
-  Please refactor linux-user/mips/cpu_loop.c
+  Unstable Win10 guest with qemu 3.1 + huge pages + hv_stimer
 
 Status in QEMU:
-  New
+  Confirmed
 
 Bug description:
-  Hello. I am working with qemu on test images. I've added a new syscall
-  (436) to qemu but received ENOSYS from mips application.
+  Host:
+  Gentoo linux x86_64, kernel 4.20.1
+  Qemu 3.1.0 =
 
-  Please open "linux-user/mips/cpu_loop.c". I've added at the end of
-  "mips_syscall_args" the following:
+  CPU: Intel i7 6850K
+  Chipset: X99
 
-  ```
-  MIPS_SYS(sys_getdents64_x32, 3)
-  ```
+  Guest:
+  Windows 10 Pro 64bit (1809)
+  Machine type: pc-q35_3.1
+  Hyper-V enlightenments: hv_stimer,hv_reenlightenment,hv_frequencies,hv_va=
+pic,hv_reset,hv_synic,hv_runtime,hv_vpindex,hv_time,hv_relaxed,hv_spinlocks=
+=3D0x1fff
+  Memory: 16GB backed by 2MB huge pages
 
-  But
+  Issue:
+  Once guest is started, log gets flooded with:
 
-  ```
-  syscall_num =3D env->active_tc.gpr[2] - 4000;
-  if (syscall_num >=3D sizeof(mips_syscall_args)) {
-    ret =3D -TARGET_ENOSYS;
-  ```
+  qemu-system-x86_64: vhost_region_add_section: Overlapping but not
+  coherent sections at 103000
 
-  returns -TARGET_ENOSYS
+  or
 
-  We can see that "linux-user/mips/cpu_loop.c" differs a lot from
-  "linux-user/arm/cpu_loop.c". Arm has it's own "ARM_NR_BASE" and etc.
+  qemu-system-x86_64: vhost_region_add_section:Section rounded to 0
+  prior to previous 1f000
 
-  Can you please refactor mips cpu loop in the same way as arm? Thank
-  you.
+  (line endings change)
+
+  and as time goes guest loses network access (virtio-net-pci) and
+  general performance diminishes to extent of freezing applications.
+
+  Observations:
+  1) problem disappears when hv_stimer is removed
+  2) problem disappears when memory backing with huge pages is disabled
+  3) problem disappears when machine type is downgraded to pc-q35_3.0
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858461/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1811533/+subscriptions
 
