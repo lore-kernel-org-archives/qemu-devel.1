@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA8FC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE59C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 360342051A
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D9CFF20720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:57:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7viQz9h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 360342051A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uf3xqS+4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9CFF20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipAsI-0002Ms-Ns
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:55:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60716)
+	id 1ipAtk-0004an-Ok
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:57:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWm-0004PA-E3
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:37 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWe-0004AT-5c
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWl-0004bC-CI
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:36 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:50274)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWd-0004Vv-4M
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:28 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:32788)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ipAWl-0004ak-67
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:35 -0500
-Received: by mail-wm1-x333.google.com with SMTP id a5so2312312wmb.0
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:35 -0800 (PST)
+ id 1ipAWc-0004VI-UZ
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:27 -0500
+Received: by mail-wm1-x334.google.com with SMTP id d139so16419636wmd.0
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/fSkOiubeSR2RsQ2FE11TyyAzCwnm2uZ+zIHW+a+jmk=;
- b=k7viQz9hHdRB/kc7Z1yIt1Z1Fpa6raRZepLhOq6A4P7+nJnabr5MTuXWulgle7yKvI
- VgA0ANDuQruAO3BfZigEtOTGlYbSr9L8Yvv8N/0dFZXXupr0TzUsFeTVgifO0fiUu5Y/
- DE4kyw12rfH7ejWiX00ue4RMx3AeS9wG7dqOEHae/EEZneIKb8AFu58hxFxDPYlQhaja
- 9willGtvIb2u4tqgVogp1nuprxAScccDfXwCJdPgKFdlN9tIGNCkOKwaiYhANthemfOb
- ZWrxg5LvFtYfWgSqBUJ09WnQqTaDn8tR+oPawuwresAybbGey6e4ESXFTajDuaHHRYTn
- ijBg==
+ bh=2fCObtda3dtFVMnkAjzfMw4PP0ps8t+z4lqGgFq4nFE=;
+ b=Uf3xqS+4ELIJpm7ViawxoTE+qT9ahInu+fbcyEW3Ck9w9w1xHM9+ChUYGqVOY9aOS1
+ xi/wROEpGfxawIkMWgSRaxtCRAIGkNFlYIEI2Jf+3ysA4JX1MWJ04rPTkRLY+CQE6yIB
+ HukPc9MIYRDXyDgtXeK/HoL070yz1DzAV73QU7un61OYR63wwwyQX1sDnLlLZh304c+U
+ ZxxPoeJcgYlToe5c4YqQhi9QktPf329wwqC9KvIdLGB6CnEWmMY5qYx5AWZTtyAPxB5p
+ PgGBe852HAL4ZbtUT5stxeN4R7eFZnP/oUmTKgEZwzihudUzbD1yIAy9f9Ey01iE7D/u
+ e25w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=/fSkOiubeSR2RsQ2FE11TyyAzCwnm2uZ+zIHW+a+jmk=;
- b=ojmjDx4PsYG8k+7vroEhZ+kgUDd/lzg1DWdeJKh4//q1nLF+Wrb7l2lo7PUuZ7m4EP
- ABsN/1PPvvUMvcvTFD+Ldpdm5gtd8fes56LxB66xg9nutzh5EaFoJNRIevTORnvi6ANo
- Tp5L06/nqob0JLkI3LqzrCbpqtXo8R8zmswL+lYbUBUsPCrZQdLgaPDcPErrATWql+/x
- Nqkui0QBEHDoCVswntwUuyKE68YyYmMG2jqnhB5BdnpSwCxAsOPTAPw7qzL3flqqSvhd
- BUURL6VSn6kiFXcAj3NOV8YCJtV118NdUN7MmEQDPGbicpAvMo5S5IWNTfhFR2G2Zu8a
- F1AA==
-X-Gm-Message-State: APjAAAXCRIawqQidTlg1WHqUZkOt31VxFN8vh/a3aFFreq7+a2bfzCwa
- Y0LLo+gbWU/FWkprerUcJ2MrMtlp
-X-Google-Smtp-Source: APXvYqwsdN8LajZk8WgLJ7VW/Lty3R60qSgpIVrvWN5+uoXDjyxb2J3J0UjJ0Qt/jSIPUpYUOeFrww==
-X-Received: by 2002:a7b:c351:: with SMTP id l17mr3777149wmj.25.1578486813980; 
- Wed, 08 Jan 2020 04:33:33 -0800 (PST)
+ bh=2fCObtda3dtFVMnkAjzfMw4PP0ps8t+z4lqGgFq4nFE=;
+ b=kg4MqQs7UJz5pVHp5fUFnORidNBxgdI6CJTc0eCVvqcuTy+HlskQ3hcNgRIsok10D2
+ eDU/LFkhBYVcqy86kUD8dysn5j5C9QlwuiwX4ZWZxJJG4FqXLU9meOwGXQZgA1QfIoXd
+ JaeMmVnAYCTSnzToX6XqSL4qJxQHVY/CutdZwCyy//er3MuxY9FDNIKLP0K4/boynxk9
+ ADc4s0tGKaisoib7PsviTfin1dy0xD9VkMxdSv+oXnJfywTahGYeIUdM46YpskNT/W39
+ pUdHqdwlVRgNDN3cH94U7SV4ipMnLYKM/SEty+b0bdRBu8nSkICVjrcONeZU4ozvxFXH
+ cwKA==
+X-Gm-Message-State: APjAAAVBJibkb2exZYrmD3lEqWmW0y1x7HHDu0u/iGchS1xjSXI5i7gv
+ e/nJFH2GRfeQ15knIaacMgyrhr5I
+X-Google-Smtp-Source: APXvYqyA0b4mNM98RcHV53YUofbTs2+iVKgTTeOzjZqgiLC7LaWjw3mgLUqntSVcudvVygctM6fhiQ==
+X-Received: by 2002:a7b:cfc2:: with SMTP id f2mr3626384wmm.44.1578486805742;
+ Wed, 08 Jan 2020 04:33:25 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.32
+ by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.25
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Jan 2020 04:33:33 -0800 (PST)
+ Wed, 08 Jan 2020 04:33:25 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 34/38] monitor/qmp: Explicit we ignore few QEMUChrEvent in
- IOEventHandler
-Date: Wed,  8 Jan 2020 13:32:51 +0100
-Message-Id: <1578486775-52247-35-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 27/38] hw/usb/dev-serial: Explicit we ignore few QEMUChrEvent
+ in IOEventHandler
+Date: Wed,  8 Jan 2020 13:32:44 +0100
+Message-Id: <1578486775-52247-28-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
 References: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,37 +106,33 @@ able to use this enum in the IOEventHandler typedef, we need to
 explicit all the events ignored by this frontend, to silent the
 following GCC warning:
 
-    CC      monitor/qmp.o
-  monitor/qmp.c: In function ‘monitor_qmp_event’:
-  monitor/qmp.c:345:5: error: enumeration value ‘CHR_EVENT_BREAK’ not handled in switch [-Werror=switch]
-    345 |     switch (event) {
+  hw/usb/dev-serial.c: In function ‘usb_serial_event’:
+  hw/usb/dev-serial.c:468:5: error: enumeration value ‘CHR_EVENT_MUX_IN’ not handled in switch [-Werror=switch]
+    468 |     switch (event) {
         |     ^~~~~~
-  monitor/qmp.c:345:5: error: enumeration value ‘CHR_EVENT_MUX_IN’ not handled in switch [-Werror=switch]
-  monitor/qmp.c:345:5: error: enumeration value ‘CHR_EVENT_MUX_OUT’ not handled in switch [-Werror=switch]
+  hw/usb/dev-serial.c:468:5: error: enumeration value ‘CHR_EVENT_MUX_OUT’ not handled in switch [-Werror=switch]
   cc1: all warnings being treated as errors
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20191218172009.8868-12-philmd@redhat.com>
+Message-Id: <20191218172009.8868-5-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- monitor/qmp.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/usb/dev-serial.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/monitor/qmp.c b/monitor/qmp.c
-index b67a8e7..6c46be4 100644
---- a/monitor/qmp.c
-+++ b/monitor/qmp.c
-@@ -365,6 +365,11 @@ static void monitor_qmp_event(void *opaque, int event)
-         mon_refcount--;
-         monitor_fdsets_cleanup();
-         break;
-+    case CHR_EVENT_BREAK:
-+    case CHR_EVENT_MUX_IN:
-+    case CHR_EVENT_MUX_OUT:
-+        /* Ignore */
-+        break;
+diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+index 45cc741..2ba6870 100644
+--- a/hw/usb/dev-serial.c
++++ b/hw/usb/dev-serial.c
+@@ -479,6 +479,10 @@ static void usb_serial_event(void *opaque, int event)
+                 usb_device_detach(&s->dev);
+             }
+             break;
++        case CHR_EVENT_MUX_IN:
++        case CHR_EVENT_MUX_OUT:
++            /* Ignore */
++            break;
      }
  }
  
