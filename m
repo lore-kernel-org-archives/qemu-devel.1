@@ -2,87 +2,65 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DB4C00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 08:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 037D3C33C9E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 08:30:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFA5F206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 08:26:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="DkzjrSWK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA5F206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	by mail.kernel.org (Postfix) with ESMTPS id CACC220705
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 08:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CACC220705
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip6fm-0003x8-Ty
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 03:26:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56826)
+	id 1ip6jI-0005Kc-15
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 03:30:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58835)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pizhenwei@bytedance.com>) id 1ip6fB-0003LK-IF
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 03:26:04 -0500
+ (envelope-from <clg@kaod.org>) id 1ip6iK-0004hC-Dr
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 03:29:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pizhenwei@bytedance.com>) id 1ip6f8-000875-Jq
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 03:25:59 -0500
-Received: from mail-pl1-x62c.google.com ([2607:f8b0:4864:20::62c]:39383)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pizhenwei@bytedance.com>)
- id 1ip6f8-000860-7K
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 03:25:58 -0500
-Received: by mail-pl1-x62c.google.com with SMTP id g6so823080plp.6
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 00:25:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:subject:to:cc:message-id:date:user-agent:mime-version
- :content-language;
- bh=9fIGVi/07qTm9ZIqBSPTg25qlPyGoP5iVnAMD5cxIYs=;
- b=DkzjrSWKtn76Cxe56ipuHet8LcB58R35LDlWd6UdviMMmCmYkOID2UZtEH8UMsyMJ1
- wxs69lj6b9qXyBeKORIbFfaVQa3xg57GUys0JaVXQFMOz4s/dwvXWxyp/2Uydmb0Acy6
- fwFMKai7UqIrBVOTtavauXhQxyFqWEXT2oI+/9kDsJmvsOnbr3QwvCxLMv+sS8/7Um5j
- qWTO6Skmgqn4BdZgoVjFfM1gww937P2EiZBQnO6E9KExtL15q35RySI8hPPcg6iANsyo
- LjzQOnkMbdzMfSF38CIF5C01/gZ7L7hwS4di3T0l37aosaNfjpmt6glYqHFAaOscQx5D
- u0XQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
- :mime-version:content-language;
- bh=9fIGVi/07qTm9ZIqBSPTg25qlPyGoP5iVnAMD5cxIYs=;
- b=eHysaSpmzjhp/rsBL/DGfJuBx0xnfWLsB3UZSmfvYGIaVtd8hT8GwgymIGbRSHS3LV
- AFC0QQgoRDC3Zk6XF/hVkw3tFd+2PKYjsjQlSA6JyEAazSE9nPW92F8IvpnIgKmUh5GQ
- PNQgeSNbXbdtIXOJcl5Ukh6IoBAu2P4UH3TRW0+UNRtLNGCXMXumJxn+PCNqmYSe5w0U
- hqN6nH01s0vxGQ7jt8CO3L63tVGSb3aNgenI2mBTU7WzAOvPZEo9IhIgaoSP/XZ21/qr
- 5KK7z+IrEtVOCLBCITPY7mXuNEkQMrlEjrPv7T3v1fXAsX4yi6p9cytN5W0eK3tLOHxJ
- JOzQ==
-X-Gm-Message-State: APjAAAWsrUiO29XIw2kaq1M+PK5F+STE/lI67dAcRyVdgfIGxY8p24nA
- 2E+mcMmI9+VoGfBKVyoTtFDGOQ==
-X-Google-Smtp-Source: APXvYqzfQg2H8F4qoR1igNv0HH9J3AJgnnPgbmNB++EfpBMmvd9PkzGaPk95Q9lbdcLfYgIeflh9pQ==
-X-Received: by 2002:a17:90a:8584:: with SMTP id
- m4mr3058297pjn.123.1578471956259; 
- Wed, 08 Jan 2020 00:25:56 -0800 (PST)
-Received: from [10.2.24.220] ([61.120.150.77])
- by smtp.gmail.com with ESMTPSA id j7sm2808911pgn.0.2020.01.08.00.25.53
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Jan 2020 00:25:55 -0800 (PST)
-From: zhenwei pi <pizhenwei@bytedance.com>
-Subject: discuss about pvpanic
-To: pbonzini@redhat.com
-Message-ID: <2feff896-21fe-2bbe-6f68-9edfb476a110@bytedance.com>
-Date: Wed, 8 Jan 2020 16:25:52 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <clg@kaod.org>) id 1ip6iJ-0001vH-4N
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 03:29:16 -0500
+Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:39880)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ip6iI-0001mQ-UI
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 03:29:15 -0500
+Received: from player732.ha.ovh.net (unknown [10.108.57.50])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id C62DA11B5EB
+ for <qemu-devel@nongnu.org>; Wed,  8 Jan 2020 09:29:05 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player732.ha.ovh.net (Postfix) with ESMTPSA id 80F04DD9FD39;
+ Wed,  8 Jan 2020 08:28:55 +0000 (UTC)
+Subject: Re: [PATCH v2 09/10] target/ppc: Correct RMLS table
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
+ groug@kaod.org, philmd@redhat.com
+References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
+ <20200107044827.471355-10-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <6a7b89f5-978f-e728-5702-65da4250ebd3@kaod.org>
+Date: Wed, 8 Jan 2020 09:28:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="------------B451C23F20E8876804ADF693"
+In-Reply-To: <20200107044827.471355-10-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::62c
+X-Ovh-Tracer-Id: 10579237000790903590
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdehjedguddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeefvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 178.33.107.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,73 +72,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Greg KH <gregkh@linuxfoundation.org>, qemu-devel@nongnu.org,
- linux-kernel@vger.kernel.org, "yelu@bytedance.com" <yelu@bytedance.com>
+Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-ppc@nongnu.org, lvivier@redhat.com, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------B451C23F20E8876804ADF693
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+On 1/7/20 5:48 AM, David Gibson wrote:
+> The table of RMA limits based on the LPCR[RMLS] field is slightly wrong=
+.
+> We're missing the RMLS =3D=3D 0 =3D> 256 GiB RMA option, which is avail=
+able on
+> POWER8, so add that.
+>=20
+> The comment that goes with the table is much more wrong.  We *don't* fi=
+lter
+> invalid RMLS values when writing the LPCR, and there's not really a
+> sensible way to do so.  Furthermore, while in theory the set of RMLS va=
+lues
+> is implementation dependent, it seems in practice the same set has been
+> available since around POWER4+ up until POWER8, the last model which
+> supports RMLS at all.  So, correct that as well.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-Hey, Paolo
-
-Currently, pvpapic only supports bit 0(PVPANIC_PANICKED).
-We usually expect that guest writes ioport (typical 0x505) in panic_notifier_list callback
-during handling panic, then we can handle pvpapic event PVPANIC_PANICKED in QEMU.
-
-On the other hand, guest wants to handle the crash by kdump-tools, and reboots without any
-panic_notifier_list callback. So QEMU only knows that guest has rebooted (because guest
-write 0xcf9 ioport for RCR request), but QEMU can't identify why guest resets.
-
-In production environment, we hit about 100+ guest reboot event everyday, sadly we
-can't separate the abnormal reboot from normal operation.
-
-We want to add a new bit for pvpanic event(maybe PVPANIC_CRASHLOADED) to represent the guest has crashed,
-and the panic is handled by the guest kernel. (here is the previous patchhttps://lkml.org/lkml/2019/12/14/265)
-
-What do you think about this solution? Or do you have any other suggestions?
-
--- 
-Thanks and Best Regards,
-zhenwei pi
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
 
---------------B451C23F20E8876804ADF693
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 7bit
+> ---
+>  target/ppc/mmu-hash64.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index bb9ebeaf48..e6f24be93e 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -760,12 +760,12 @@ static target_ulong rmls_limit(PowerPCCPU *cpu)
+>  {
+>      CPUPPCState *env =3D &cpu->env;
+>      /*
+> -     * This is the full 4 bits encoding of POWER8. Previous
+> -     * CPUs only support a subset of these but the filtering
+> -     * is done when writing LPCR
+> +     * In theory the meanings of RMLS values are implementation
+> +     * dependent.  In practice, this seems to have been the set from
+> +     * POWER4+..POWER8, and RMLS is no longer supported in POWER9.
+>       */
+>      const target_ulong rma_sizes[] =3D {
+> -        [0] =3D 0,
+> +        [0] =3D 256 * GiB,
+>          [1] =3D 16 * GiB,
+>          [2] =3D 1 * GiB,
+>          [3] =3D 64 * MiB,
+>=20
 
-<html>
-  <head>
-
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  </head>
-  <body text="#000000" bgcolor="#FFFFFF">
-    <pre>Hey, Paolo</pre>
-    <pre>
-Currently, pvpapic only supports bit 0(PVPANIC_PANICKED).
-We usually expect that guest writes ioport (typical 0x505) in panic_notifier_list callback
-during handling panic, then we can handle pvpapic event PVPANIC_PANICKED in QEMU.
-
-On the other hand, guest wants to handle the crash by kdump-tools, and reboots without any
-panic_notifier_list callback. So QEMU only knows that guest has rebooted (because guest
-write 0xcf9 ioport for RCR request), but QEMU can't identify why guest resets.
-
-In production environment, we hit about 100+ guest reboot event everyday, sadly we 
-can't separate the abnormal reboot from normal operation.
-
-We want to add a new bit for pvpanic event(maybe PVPANIC_CRASHLOADED) to represent the guest has crashed, 
-and the panic is handled by the guest kernel. (here is the previous patch <a href="https://lkml.org/lkml/2019/12/14/265">https://lkml.org/lkml/2019/12/14/265</a>)
-
-What do you think about this solution? Or do you have any other suggestions?
-</pre>
-    <pre class="moz-signature" cols="72">-- 
-Thanks and Best Regards,
-zhenwei pi</pre>
-  </body>
-</html>
-
---------------B451C23F20E8876804ADF693--
 
