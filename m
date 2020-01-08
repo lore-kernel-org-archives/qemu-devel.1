@@ -2,100 +2,95 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ADAAC00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9AE0C00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 357332075D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1AAE20692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 10:53:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dI1b7lAU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 357332075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvzrD/lr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1AAE20692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip8tc-0002LV-Cb
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 05:49:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56029)
+	id 1ip8yG-0004JR-QC
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 05:53:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ip8su-0001vG-Bc
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:48:21 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1ip8xe-0003t2-6Z
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ip8ss-0002R4-Sy
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:48:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36791
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <sgarzare@redhat.com>) id 1ip8xc-0006K5-Nk
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:53:14 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48276
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ip8ss-0002Qb-Pa
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:48:18 -0500
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ip8xc-0006J9-IZ
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 05:53:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578480498;
+ s=mimecast20190719; t=1578480791;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3qYOahYJeE7qMzSZ4NIX+rDkd6puWt8RGy6TJ6GnYDY=;
- b=dI1b7lAUH9x7uufSiGg5zPrr6KmRbwdAk0cKdQ1WMkCny6V605BKFDU8Zb3qZdtuDNC4w2
- AtwTGnNL+F208sESy/5/wL5hvMDI7v60i/OOicqzIpWmWX1TxuloDKrMj4YIw/wjhZCEMa
- BCNW7JGBsS7YSr3DuaqFSRySCL4PWAw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-hlR0yXv1NLG2A7cEsiGlsA-1; Wed, 08 Jan 2020 05:48:16 -0500
-Received: by mail-wm1-f72.google.com with SMTP id z2so292477wmf.5
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 02:48:15 -0800 (PST)
+ bh=qKV8I4m93BGrQLycQ3EZBom+dthpI24xFMeLXO4DgzE=;
+ b=FvzrD/lriuat2Uj9LfeQ/pdpbXHQpu7ZPq0KSP5v27+h89omUcEhWFHq5FcA1yMlc2HGDW
+ 4cDcgK9HLxkrhJaPZt7z6xFJRLxgHtzfn+NkBOoYFe58Q4ilY7/Dg+/ZDFwRK9OWPGK+Zd
+ jmftmXjyg/mFlz0zB141KaLYiqbHKVM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-aDwfFlaWMbWxOWXY3vVr5A-1; Wed, 08 Jan 2020 05:53:09 -0500
+Received: by mail-wr1-f71.google.com with SMTP id j13so1265781wrr.20
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 02:53:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MIYeXQ3oEWfXa9GTaLH3sjQx2MPq4A21LtHJM/IyMn0=;
- b=EXeE4EVnftiEFV8PxQgG1wtqw0Q+hYeTS2FqbIqPyW7qVNtxv/g4Qlzx37LtdLfsJy
- mpFHVBu16QgpB3jcq2PwkNaDY1RZbezlMJXzz7ZrHtTWHxnVkjyn23rowC7cQ4p8Vp1z
- 6HlZ39t+DHRDOqiokciUaec0OVuPHy9jKXC06BuzTm2YWKUb8FWfDszW3DF9H+nsL3GK
- Hh2GobW0PI8cSpZn3ZbWDhjqOnXs01y1PdC6YOHZ6l9kkduGmcjymEIfX9bZ9/Iaw3OK
- RijHew3tId5WZB/jjXk4Ih05ccgkEo5fswMBUeDsWEcyYrCEzZzx3NcHiGeQG47ZJ2yd
- Z0KA==
-X-Gm-Message-State: APjAAAVeUZwCYheQhwxZ3hkx71lpn6T6fulh0P9+5ge4yIBAB+p+mwLs
- Biev69eRDHe7PsoG9gxqrvUNV4WTwmQjJV4btX/f5YMmHOzvfaVCHUG3Eatq7lbGFEOstAsjYEO
- QOiENmlEHElvlJPk=
-X-Received: by 2002:adf:ea51:: with SMTP id j17mr3783644wrn.83.1578480494926; 
- Wed, 08 Jan 2020 02:48:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxP2l79zZZOyKYMOVCnN3ZhLnwejC311SdGol2Q1b7oLvoCAFwHRzo2da45Z6/TrqlOTm5KGg==
-X-Received: by 2002:adf:ea51:: with SMTP id j17mr3783625wrn.83.1578480494606; 
- Wed, 08 Jan 2020 02:48:14 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id c4sm3336770wml.7.2020.01.08.02.48.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 08 Jan 2020 02:48:14 -0800 (PST)
-Subject: Re: [PATCH v1 6/6] travis: install homebrew python for OS X
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200107135311.5215-1-alex.bennee@linaro.org>
- <20200107135311.5215-7-alex.bennee@linaro.org>
- <cf1af57a-c397-9503-cc49-a93dc58a2cc0@redhat.com> <87ftgqjuv2.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2313ed3f-ae42-c935-6a7b-a7ddfaa02720@redhat.com>
-Date: Wed, 8 Jan 2020 11:48:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=9QHn42btW2PCoDicZs7D5ouuepBDDzTrVk327vWlT2E=;
+ b=pots1p3yLx1sOGE67RZJ1AxxF3wTBHmyZzuU8uMj9RofSN5CgPcDXpVkgpVg5mc4od
+ nqlxtjmnG4XP9gCgxogEyiFbKbo64mesQ7cXUuVsbEInfQRMcBl/OeETQIqRpdxDfQQy
+ uf1cwaXdcbTdYjVNOaCJsLBKoE6VJfDuRzheQsHfA+uny/jitaapCg8j6M1PrUR4qAj1
+ h4zXmrER2C1gaDkg7oIadfnbzP55Xt2pj7GhB2T4+MFJ1QdUlzAlkYqjZECUPlFadl8B
+ 7IPgQVjEpJwr8dKXn90ht9LdHg0nC6QX/Jk9D5dcq3ylf0ajg3C5FwqPTsq9kwfg+Hnm
+ nzYw==
+X-Gm-Message-State: APjAAAWt0gEjcJRopUC/DZYZx2gF83pKUjveyL46a0TsK7kh9kYoOauq
+ RPSdntVMN1HkqI8DQ/ProrM8Vgkk9jRW/9roY37V/uJcJK42rxCEVRfxGtNKl8P0EstN5i0GvHY
+ ORxWPg/K4wNgW8jQ=
+X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr2992649wml.176.1578480787926; 
+ Wed, 08 Jan 2020 02:53:07 -0800 (PST)
+X-Google-Smtp-Source: APXvYqydG4Sge79AFZqC+wjEU9PD15qFx1qMNvypwrwxNwnGbq1F0arQRddVo8pbYzu6aEn1mSZAhw==
+X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr2992626wml.176.1578480787581; 
+ Wed, 08 Jan 2020 02:53:07 -0800 (PST)
+Received: from steredhat
+ (host221-164-dynamic.248-95-r.retail.telecomitalia.it. [95.248.164.221])
+ by smtp.gmail.com with ESMTPSA id n189sm3437671wme.33.2020.01.08.02.53.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jan 2020 02:53:07 -0800 (PST)
+Date: Wed, 8 Jan 2020 11:53:03 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Florian Florensa <fflorensa@online.net>
+Subject: Re: [PATCH v2 1/1] block/rbd: Add support for ceph namespaces
+Message-ID: <20200108105303.45wmorodzqcrq74y@steredhat>
+References: <20200107111340.334965-1-fflorensa@online.net>
+ <20200107111340.334965-2-fflorensa@online.net>
 MIME-Version: 1.0
-In-Reply-To: <87ftgqjuv2.fsf@linaro.org>
-Content-Language: en-US
-X-MC-Unique: hlR0yXv1NLG2A7cEsiGlsA-1
+In-Reply-To: <20200107111340.334965-2-fflorensa@online.net>
+X-MC-Unique: aDwfFlaWMbWxOWXY3vVr5A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,150 +102,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, dillaman@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/8/20 8:00 AM, Alex Benn=C3=A9e wrote:
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->> On 1/7/20 2:53 PM, Alex Benn=C3=A9e wrote:
->>> Our python3 requirements now outstrip those of the build.
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> ---
->>>    .travis.yml | 1 +
->>>    1 file changed, 1 insertion(+)
->>> diff --git a/.travis.yml b/.travis.yml
->>> index 848a2714efe..a86ca34f79d 100644
->>> --- a/.travis.yml
->>> +++ b/.travis.yml
->>> @@ -57,6 +57,7 @@ addons:
->>>          - glib
->>>          - pixman
->>>          - gnu-sed
->>> +      - python
->>>        update: true
->>>   =20
->>
->> This doesn't seem enough, I'm getting:
->>
->> ./configure --disable-docs --disable-tools
->> ERROR: Cannot use '/usr/local/bin/python', Python >=3D 3.5 is required.
->>
->>         Use --python=3D/path/to/python to specify a supported Python.
->>
->> Apparently we don't set this in PATH ourselves.
->=20
-> It looks like brew fell over:
->=20
->    =3D=3D> Downloading https://homebrew.bintray.com/bottles/python-3.7.6_=
-1.mojave.bottl
->=20
->    =3D=3D> Downloading from https://akamai.bintray.com/64/643d627c2b4fc03=
-a3286c397d2992
->=20
->    ######################################################################=
-## 100.0%
->=20
->    =3D=3D> Pouring python-3.7.6_1.mojave.bottle.tar.gz
->=20
->    Error: The `brew link` step did not complete successfully
->=20
->    The formula built, but is not symlinked into /usr/local
->=20
->    Could not symlink Frameworks/Python.framework/Headers
->=20
->    Target /usr/local/Frameworks/Python.framework/Headers
->=20
->    is a symlink belonging to python@2. You can unlink it:
->=20
->      brew unlink python@2
->=20
->    To force the link and overwrite all conflicting files:
->=20
->      brew link --overwrite python
->=20
->    To list all files that would be deleted:
->=20
->      brew link --overwrite --dry-run python
->=20
->    Possible conflicting files are:
->=20
->    /usr/local/Frameworks/Python.framework/Headers -> /usr/local/Cellar/py=
-thon@2/2.7.17/Frameworks/Python.framework/Headers
->=20
->    /usr/local/Frameworks/Python.framework/Python -> /usr/local/Cellar/pyt=
-hon@2/2.7.17/Frameworks/Python.framework/Python
->=20
->    /usr/local/Frameworks/Python.framework/Resources -> /usr/local/Cellar/=
-python@2/2.7.17/Frameworks/Python.framework/Resources
->=20
->    /usr/local/Frameworks/Python.framework/Versions/Current -> /usr/local/=
-Cellar/python@2/2.7.17/Frameworks/Python.framework/Versions/Current
->=20
->    =3D=3D> /usr/local/Cellar/python/3.7.6_1/bin/python3 -s setup.py --no-=
-user-cfg insta
->=20
->    =3D=3D> /usr/local/Cellar/python/3.7.6_1/bin/python3 -s setup.py --no-=
-user-cfg insta
->=20
->    =3D=3D> /usr/local/Cellar/python/3.7.6_1/bin/python3 -s setup.py --no-=
-user-cfg insta
->=20
->    =3D=3D> Caveats
->=20
->    Python has been installed as
->=20
->      /usr/local/bin/python3
+Hi Florian,
+the patch LGTM but there are few style issues to fix:
 
-Based on this I tried:
+On Tue, Jan 07, 2020 at 12:13:40PM +0100, Florian Florensa wrote:
+> Starting from ceph Nautilus, RBD has support for namespaces, allowing
+> for finer grain ACLs on images inside a pool, and tenant isolation.
+>=20
+> In the rbd cli tool documentation, the new image-spec and snap-spec are :
+>  - [pool-name/[namespace-name/]]image-name
+>  - [pool-name/[namespace-name/]]image-name@snap-name
+>=20
+> When using an non namespace's enabled qemu, it complains about not
+> finding the image called namespace-name/image-name, thus we only need to
+> parse the image once again to find if there is a '/' in its name, and if
+> there is, use what is before it as the name of the namespace to later
+> pass it to rados_ioctx_set_namespace.
+> rados_ioctx_set_namespace if called with en empty string or a null
+> pointer as the namespace parameters pretty much does nothing, as it then
+> defaults to the default namespace.
+>=20
+> The namespace is extracted inside qemu_rbd_parse_filename, stored in the
+> qdict, and used in qemu_rbd_connect to make it work with both qemu-img,
+> and qemu itself.
+>=20
+> Signed-off-by: Florian Florensa <fflorensa@online.net>
+> ---
+>  block/rbd.c          | 45 ++++++++++++++++++++++++++++++--------------
+>  qapi/block-core.json |  4 ++++
+>  2 files changed, 35 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 027cbcc695..8df0e3b65e 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -104,6 +104,7 @@ typedef struct BDRVRBDState {
+>      rbd_image_t image;
+>      char *image_name;
+>      char *snap;
+> +    char *namespace;
+>      uint64_t image_size;
+>  } BDRVRBDState;
+> =20
+> @@ -152,7 +153,7 @@ static void qemu_rbd_parse_filename(const char *filen=
+ame, QDict *options,
+>      const char *start;
+>      char *p, *buf;
+>      QList *keypairs =3D NULL;
+> -    char *found_str;
+> +    char *found_str, *image_name;
+> =20
+>      if (!strstart(filename, "rbd:", &start)) {
+>          error_setg(errp, "File name must start with 'rbd:'");
+> @@ -171,18 +172,24 @@ static void qemu_rbd_parse_filename(const char *fil=
+ename, QDict *options,
+>      qdict_put_str(options, "pool", found_str);
+> =20
+>      if (strchr(p, '@')) {
+> -        found_str =3D qemu_rbd_next_tok(p, '@', &p);
+> -        qemu_rbd_unescape(found_str);
+> -        qdict_put_str(options, "image", found_str);
+> +        image_name =3D qemu_rbd_next_tok(p, '@', &p);
+> =20
+>          found_str =3D qemu_rbd_next_tok(p, ':', &p);
+>          qemu_rbd_unescape(found_str);
+>          qdict_put_str(options, "snapshot", found_str);
+>      } else {
+> -        found_str =3D qemu_rbd_next_tok(p, ':', &p);
+> -        qemu_rbd_unescape(found_str);
+> -        qdict_put_str(options, "image", found_str);
+> +        image_name =3D qemu_rbd_next_tok(p, ':', &p);
+> +    }
+> +    /* Check for namespace in the image_name */
+> +    if (strchr(image_name, '/')) {
+> +=09found_str =3D qemu_rbd_next_tok(image_name, '/', &image_name);
+> +=09qemu_rbd_unescape(found_str);
+> +=09qdict_put_str(options, "namespace", found_str);
+> +    } else {
+> +=09qdict_put_str(options, "namespace", "");
+    ^
+    Please use space instead of tabs in the lines above.
 
--- >8 --
-  before_script:
--  - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ] ; then export=20
-PATH=3D"/usr/local/opt/ccache/libexec:$PATH" ; fi
-+  - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ] ; then export=20
-PATH=3D"/usr/local/opt/ccache/libexec:$PATH" BASE_CONFIG=3D"$BASE_CONFIG=20
---python=3D/usr/local/bin/python3"; fi
-    - if command -v ccache ; then ccache --zero-stats ; fi
-    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-    - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log=20
-&& exit 1; }
----
+>      }
+> +    qemu_rbd_unescape(image_name);
+> +    qdict_put_str(options, "image", image_name);
+>      if (!p) {
+>          goto done;
+>      }
+> @@ -343,6 +350,11 @@ static QemuOptsList runtime_opts =3D {
+>              .type =3D QEMU_OPT_STRING,
+>              .help =3D "Rados pool name",
+>          },
+> +        {
+> +            .name =3D "namespace",
+> +            .type =3D QEMU_OPT_STRING,
+> +            .help =3D "Rados namespace name in the pool",
+> +        },
+>          {
+>              .name =3D "image",
+>              .type =3D QEMU_OPT_STRING,
+> @@ -467,13 +479,14 @@ static int coroutine_fn qemu_rbd_co_create_opts(con=
+st char *filename,
+>       * schema, but when they come from -drive, they're all QString.
+>       */
+>      loc =3D rbd_opts->location;
+> -    loc->pool     =3D g_strdup(qdict_get_try_str(options, "pool"));
+> -    loc->conf     =3D g_strdup(qdict_get_try_str(options, "conf"));
+> -    loc->has_conf =3D !!loc->conf;
+> -    loc->user     =3D g_strdup(qdict_get_try_str(options, "user"));
+> -    loc->has_user =3D !!loc->user;
+> -    loc->image    =3D g_strdup(qdict_get_try_str(options, "image"));
+> -    keypairs      =3D qdict_get_try_str(options, "=3Dkeyvalue-pairs");
+> +    loc->pool        =3D g_strdup(qdict_get_try_str(options, "pool"));
+> +    loc->conf        =3D g_strdup(qdict_get_try_str(options, "conf"));
+> +    loc->has_conf    =3D !!loc->conf;
+> +    loc->user        =3D g_strdup(qdict_get_try_str(options, "user"));
+> +    loc->has_user    =3D !!loc->user;
+> +    loc->q_namespace =3D g_strdup(qdict_get_try_str(options, "namespace"=
+));
+> +    loc->image       =3D g_strdup(qdict_get_try_str(options, "image"));
+> +    keypairs         =3D qdict_get_try_str(options, "=3Dkeyvalue-pairs")=
+;
+> =20
+>      ret =3D qemu_rbd_do_create(create_options, keypairs, password_secret=
+, errp);
+>      if (ret < 0) {
+> @@ -648,6 +661,10 @@ static int qemu_rbd_connect(rados_t *cluster, rados_=
+ioctx_t *io_ctx,
+>          error_setg_errno(errp, -r, "error opening pool %s", opts->pool);
+>          goto failed_shutdown;
+>      }
+> +    /* Set the namespace after opening the io context on the pool,
+> +     * if nspace =3D=3D NULL or if nspace =3D=3D "", it is just as we di=
+d nothing
+> +     */
 
-Still:
+Block comment should use a leading /* on a separate line.
 
-../configure: line 1845: /usr/local/bin/python3: No such file or directory
+> +    rados_ioctx_set_namespace(*io_ctx, opts->q_namespace);
+> =20
+>      return 0;
+> =20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index fcb52ec24f..c6f187ec9b 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3661,6 +3661,9 @@
+>  #
+>  # @pool:               Ceph pool name.
+>  #
+> +# @namespace:          Rados namespace name in the Ceph pool.
+> +#                      (Since 5.0)
+> +#
+>  # @image:              Image name in the Ceph pool.
+>  #
+>  # @conf:               path to Ceph configuration file.  Values
+> @@ -3687,6 +3690,7 @@
+>  ##
+>  { 'struct': 'BlockdevOptionsRbd',
+>    'data': { 'pool': 'str',
+> +            '*namespace': 'str',
+>              'image': 'str',
+>              '*conf': 'str',
+>              '*snapshot': 'str',
+> --=20
+> 2.24.1
+>=20
 
-ERROR: Cannot use '/usr/local/bin/python3', Python >=3D 3.5 is required.
+You can use scripts/checkpatch.pl before submitting, to be sure there are
+no style problems in your patches.
 
-        Use --python=3D/path/to/python to specify a supported Python.
-
->=20
->    Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
->=20
->    `python3`, `python3-config`, `pip3` etc., respectively, have been inst=
-alled into
->=20
->      /usr/local/opt/python/libexec/bin
->=20
->    If you need Homebrew's Python 2.7 run
->=20
->      brew install python@2
->=20
->    You can install Python packages with
->=20
->      pip3 install <package>
->=20
->    They will install into the site-package directory
->=20
->      /usr/local/lib/python3.7/site-packages
->=20
->    See: https://docs.brew.sh/Homebrew-and-Python
->=20
->    =3D=3D> Summary
->=20
->    =F0=9F=8D=BA  /usr/local/Cellar/python/3.7.6_1: 3,977 files, 60.8MB
->=20
+Thanks,
+Stefano
 
 
