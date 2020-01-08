@@ -2,90 +2,60 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56754C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3770C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18A4520692
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:47:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KZr0y4qS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18A4520692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE0D820692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:49:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE0D820692
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipBgY-0002iP-Su
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:47:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39868)
+	id 1ipBhn-0003OP-Qw
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:49:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49742)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@google.com>) id 1ip98b-0004iN-7D
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:04:34 -0500
+ (envelope-from <pl@kamp.de>) id 1ipBeT-0000Ki-OY
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:45:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@google.com>) id 1ip98Z-0008SV-0y
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:04:32 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:42156)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stevensd@google.com>) id 1ip98Y-0008Nk-Ly
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:04:30 -0500
-Received: by mail-lj1-x244.google.com with SMTP id y4so2840268ljj.9
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 03:04:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GPrQXU7r+8TzRDkPJO/Bd8pkbD2/ocdKHXv4Gtb6bio=;
- b=KZr0y4qSlDhNV7qd/WU0KFsW4rQ10koeM7ltZ47PDf/xkOAgPg+CO8SawpL8Nu2Xap
- ZlYe+qjlf9wuKZxJe12MNmC3pIc48j3rbyx+hPUOYZH05ilxdIAdK6Qfo2YpfnUj+/a2
- fEJb1NqaJTe56CToJryA7frL72vlk1R1uJym0zxO207guv+R6aIwTbb77lJuBdgz/Ylc
- cFYgyY1+EE4G9UtMkUNs3LT9+rvSNfL7X9AUJozMXrel9ZjGmqimuovVXGAC5u8dvwSZ
- feaNwQLDDmlv3MXXJly4KfsndCVMuZvMaHnoLPL3+NEw6Zxopalx2bvCLUAo1Q15K0w1
- LSZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GPrQXU7r+8TzRDkPJO/Bd8pkbD2/ocdKHXv4Gtb6bio=;
- b=nojkcfD65uspJGW8zpVoNALHgu2bY/rvRDP/LPxznQ/HNQJfqxH0hdb20um+9mPLdz
- 9fbS/ql/MAG8KsxihF7aQziXSCclUa9pxVTZYoHBidnM2WcsxKj92O5FPlDiTd9WGc4G
- zvSsOcXqNgEBmrDZRLnZCB+3/MxOvbfop151m+Tps0V44XaiAVBuGcpnl2UyXpI9YsbB
- K+ddpGp5LkhmU1gErMrGhVT4P+3US7QJAclZwgtPd5TIk717RfcII7G2c5VljwRLnwdo
- a3Ex1ZZHpHm0Vn0lh4l+hP5ri2+ILnq3X/MF9AMIt5H6K1l99tDxFLqQbQoAeWsRBgKc
- 5mCg==
-X-Gm-Message-State: APjAAAWjqU4vU5eXXKFYPFwvtyExyPLAOt0nct/qF0YjCn3nr72oZAtv
- o3DVap871XUauu6gIjX7NcpJU4db2DNqewP8Mnt3yA==
-X-Google-Smtp-Source: APXvYqws3/HwIKqBCkja9W+hEagukHWxJPaQ99txhgJJvv2brBb8a9BbAtoGAvQgUKcfopn2JcbVrQAwMxEkctRXS8k=
-X-Received: by 2002:a2e:9942:: with SMTP id r2mr2613964ljj.182.1578481466681; 
- Wed, 08 Jan 2020 03:04:26 -0800 (PST)
+ (envelope-from <pl@kamp.de>) id 1ipBeS-0005Au-Dn
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:45:37 -0500
+Received: from kerio.kamp.de ([195.62.97.192]:54474)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pl@kamp.de>) id 1ipBeS-00054U-29
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:45:36 -0500
+X-Footer: a2FtcC5kZQ==
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+ for qemu-devel@nongnu.org; Wed, 8 Jan 2020 14:45:23 +0100
+Received: (qmail 49015 invoked from network); 8 Jan 2020 13:45:24 -0000
+Received: from ac1.vpn.kamp-intra.net (HELO ?172.20.250.1?)
+ (pl@kamp.de@::ffff:172.20.250.1)
+ by submission.kamp.de with ESMTPS (AES128-SHA encrypted) ESMTPA;
+ 8 Jan 2020 13:45:24 -0000
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+From: Peter Lieven <pl@kamp.de>
+Subject: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior to
+ previous a0000
+Message-ID: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
+Date: Wed, 8 Jan 2020 14:45:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <CAD=HUj6FA3VoTJqNa+gmAgVOv9zS7Qk9pdg46EY9NvtJOdz5_A@mail.gmail.com>
- <20200108104002.jxh6amnrazhnamej@sirius.home.kraxel.org>
-In-Reply-To: <20200108104002.jxh6amnrazhnamej@sirius.home.kraxel.org>
-From: David Stevens <stevensd@google.com>
-Date: Wed, 8 Jan 2020 20:04:15 +0900
-Message-ID: <CAOiLmNHMAz6UqxuEsiq6Y_dSNcCvtBrFR-FHG6voJAhpF8SeeA@mail.gmail.com>
-Subject: Re: [virtio-dev][RFC PATCH v1 1/2] content: define what exporting a
- resource is
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: David Stevens <stevensd@chromium.org>, virtio-dev@lists.oasis-open.org, 
- Dylan Reid <dgreid@chromium.org>, Tomasz Figa <tfiga@chromium.org>, 
- Zach Reizner <zachr@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>, 
- Alexandre Courbot <acourbot@chromium.org>, Alex Lau <alexlau@chromium.org>, 
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>, 
- Pawel Osciak <posciak@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>, 
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, 
- Linux Media Mailing List <linux-media@vger.kernel.org>
-Content-Type: multipart/alternative; boundary="0000000000001bcba4059b9edb4b"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
-X-Mailman-Approved-At: Wed, 08 Jan 2020 08:43:53 -0500
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 195.62.97.192
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,40 +71,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001bcba4059b9edb4b
-Content-Type: text/plain; charset="UTF-8"
+Hi,
 
->
-> Hmm, I'd suggest to move the whole thing into the virtio-gpu section.
-> There is no such thing as a "resource" in general virtio context ...
->
 
-If this is moved into the virtio-gpu section, then any device type that
-imports resources will have to refer to something defined by the GPU device
-type. This would make the GPU device type a sort of special device type
-that isn't just a leaf node of the spec. I think it's better to define
-'resource' as a top level concept for virtio devices, even if the specifics
-of what a 'resource' is are defined by individual device types.
+I have a Qemu 4.0.1 machine with vhost-net network adapter, thats polluting the log with the above message.
 
--David
+Is this something known? Googling revealed the following patch in Nemu (with seems to be a Qemu fork from Intel):
 
---0000000000001bcba4059b9edb4b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f56e
 
-<div dir=3D"ltr"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">Hmm, I&#39;d suggest to move the whole thing into the vi=
-rtio-gpu section.<br>
-There is no such thing as a &quot;resource&quot; in general virtio context =
-...<br></blockquote><div><br></div><div>If this is moved into the virtio-gp=
-u section, then any device type that imports resources will have to refer t=
-o something defined by the GPU device type. This would make the GPU device =
-type a sort of special device type that isn&#39;t just a leaf node of the s=
-pec. I think it&#39;s better to define &#39;resource&#39; as a top level co=
-ncept for virtio devices, even if the specifics of what a &#39;resource&#39=
-; is are defined by individual device types.</div><div><br></div><div>-Davi=
-d=C2=A0</div></div></div>
 
---0000000000001bcba4059b9edb4b--
+The network stopped functioning. After a live-migration the vServer is reachable again.
+
+
+Any ideas?
+
+
+Thanks,
+
+Peter
+
+
+
 
