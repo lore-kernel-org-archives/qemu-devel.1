@@ -6,75 +6,76 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5853C33CA2
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 16:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F65C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 16:14:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8B9E206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 16:12:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B9E206F0
+	by mail.kernel.org (Postfix) with ESMTPS id EF0342070E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 16:14:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF0342070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipDwb-0002ky-B2
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 11:12:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41742)
+	id 1ipDyf-0004z2-CX
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 11:14:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1ipDua-0000XS-SZ
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 11:10:26 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1ipDuj-0000fp-40
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 11:10:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1ipDuZ-0000qK-O5
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 11:10:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:29084)
+ (envelope-from <stefanb@linux.ibm.com>) id 1ipDui-00010Q-2G
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 11:10:32 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20834)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1ipDuZ-0000pF-Fi; Wed, 08 Jan 2020 11:10:23 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ id 1ipDuh-0000zb-Qr; Wed, 08 Jan 2020 11:10:32 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 008G7roq146587; Wed, 8 Jan 2020 11:10:19 -0500
+ 008G7hxS188744; Wed, 8 Jan 2020 11:10:28 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xcu57tama-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xaq80d4fm-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 08 Jan 2020 11:10:19 -0500
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 008G7rII146602;
- Wed, 8 Jan 2020 11:10:18 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2xcu57takn-1
+ Wed, 08 Jan 2020 11:10:28 -0500
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 008G80tr189516;
+ Wed, 8 Jan 2020 11:10:22 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2xaq80d4dw-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 08 Jan 2020 11:10:18 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 008GA0IF010579;
- Wed, 8 Jan 2020 16:10:17 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma04dal.us.ibm.com with ESMTP id 2xajb6y7ar-1
+ Wed, 08 Jan 2020 11:10:22 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 008G9Xx6014585;
+ Wed, 8 Jan 2020 16:10:20 GMT
+Received: from b03cxnp07028.gho.boulder.ibm.com
+ (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
+ by ppma02dal.us.ibm.com with ESMTP id 2xajb77667-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 08 Jan 2020 16:10:17 +0000
+ Wed, 08 Jan 2020 16:10:19 +0000
 Received: from b03ledav003.gho.boulder.ibm.com
  (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 008GAGEu51839294
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 008GAI9K44499436
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 8 Jan 2020 16:10:16 GMT
+ Wed, 8 Jan 2020 16:10:18 GMT
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6C1426A04F;
- Wed,  8 Jan 2020 16:10:16 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 84EBB6A054;
+ Wed,  8 Jan 2020 16:10:18 +0000 (GMT)
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EE04B6A057;
- Wed,  8 Jan 2020 16:10:15 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 0716D6A047;
+ Wed,  8 Jan 2020 16:10:17 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed,  8 Jan 2020 16:10:15 +0000 (GMT)
+ Wed,  8 Jan 2020 16:10:17 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v8 2/6] spapr: Implement get_dt_compatible() callback
-Date: Wed,  8 Jan 2020 11:10:08 -0500
-Message-Id: <20200108161012.1821385-3-stefanb@linux.ibm.com>
+Subject: [PATCH v8 5/6] hw/ppc/Kconfig: Enable TPM_SPAPR as part of PSERIES
+ config
+Date: Wed,  8 Jan 2020 11:10:11 -0500
+Message-Id: <20200108161012.1821385-6-stefanb@linux.ibm.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108161012.1821385-1-stefanb@linux.ibm.com>
 References: <20200108161012.1821385-1-stefanb@linux.ibm.com>
@@ -85,10 +86,10 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138, 18.0.572
  definitions=2020-01-08_04:2020-01-08,
  2020-01-08 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 clxscore=1015
- bulkscore=0 adultscore=0 lowpriorityscore=0 mlxlogscore=999
- impostorscore=0 spamscore=0 phishscore=0 priorityscore=1501 suspectscore=1
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ spamscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 clxscore=1015 bulkscore=0
+ mlxscore=0 lowpriorityscore=0 suspectscore=1 adultscore=0 impostorscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-2001080132
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.156.1
@@ -112,58 +113,23 @@ Sender: "Qemu-devel"
 
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-For devices that cannot be statically initialized, implement a
-get_dt_compatible() callback that allows us to ask the device for
-the 'compatible' value.
-
 Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- hw/ppc/spapr_vio.c         | 11 +++++++++--
- include/hw/ppc/spapr_vio.h |  1 +
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ hw/ppc/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index 554de9930d..4b24b81797 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -87,6 +87,7 @@ static int vio_make_devnode(SpaprVioDevice *dev,
-     SpaprVioDeviceClass *pc = VIO_SPAPR_DEVICE_GET_CLASS(dev);
-     int vdevice_off, node_off, ret;
-     char *dt_name;
-+    const char *dt_compatible;
+diff --git a/hw/ppc/Kconfig b/hw/ppc/Kconfig
+index f927ec9c74..b5b3519158 100644
+--- a/hw/ppc/Kconfig
++++ b/hw/ppc/Kconfig
+@@ -10,6 +10,7 @@ config PSERIES
+     select XICS_SPAPR
+     select XIVE_SPAPR
+     select MSI_NONBROKEN
++    select TPM_SPAPR
  
-     vdevice_off = fdt_path_offset(fdt, "/vdevice");
-     if (vdevice_off < 0) {
-@@ -113,9 +114,15 @@ static int vio_make_devnode(SpaprVioDevice *dev,
-         }
-     }
- 
--    if (pc->dt_compatible) {
-+    if (pc->get_dt_compatible) {
-+        dt_compatible = pc->get_dt_compatible(dev);
-+    } else {
-+        dt_compatible = pc->dt_compatible;
-+    }
-+
-+    if (dt_compatible) {
-         ret = fdt_setprop_string(fdt, node_off, "compatible",
--                                 pc->dt_compatible);
-+                                 dt_compatible);
-         if (ret < 0) {
-             return ret;
-         }
-diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-index 72762ed16b..67f58b7f98 100644
---- a/include/hw/ppc/spapr_vio.h
-+++ b/include/hw/ppc/spapr_vio.h
-@@ -58,6 +58,7 @@ typedef struct SpaprVioDeviceClass {
-     void (*realize)(SpaprVioDevice *dev, Error **errp);
-     void (*reset)(SpaprVioDevice *dev);
-     int (*devnode)(SpaprVioDevice *dev, void *fdt, int node_off);
-+    const char *(*get_dt_compatible)(SpaprVioDevice *dev);
- } SpaprVioDeviceClass;
- 
- struct SpaprVioDevice {
+ config SPAPR_RNG
+     bool
 -- 
 2.24.1
 
