@@ -2,65 +2,165 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F20C00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 374D4C00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:54:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 716D3206DA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:48:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F36BA205F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:54:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="j3nJRdSj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 716D3206DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="KbdbIUnT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36BA205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip4CH-0002wE-E7
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 00:48:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60151)
+	id 1ip4IC-0006Ob-1u
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 00:54:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36301)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ip4B8-0001tu-Ag
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:46:52 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1ip4HK-0005Zr-OB
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:53:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ip4B6-0001Z9-IH
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:46:50 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:41671 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ip4B6-0001VC-5V; Wed, 08 Jan 2020 00:46:48 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47sytD23Vpz9sPn; Wed,  8 Jan 2020 16:46:44 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578462404;
- bh=O14BKnd8gMQgfY2vWM6ko1K8ja1wBVse8/gGCZbr888=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=j3nJRdSjJeeBVNHQ1rdqvGuBR/kXZT+SnTRVSiZ+tqGKunjt5UsosMdE4TSdh6/5G
- akyZZPf/ZmGCcR25nMk4sxhe7990ixMpjPKLFjhuEKplfxNd02/ziVS5Lx4AzL2eoj
- VsRnfXpGrc4hatGQVlqmgDbS/kI3bNtn2dEW7tKs=
-Date: Wed, 8 Jan 2020 16:45:43 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Ganesh <ganeshgr@linux.ibm.com>
-Subject: Re: [PATCH v18 6/7] migration: Include migration support for machine
- check handling
-Message-ID: <20200108054543.GA8586@umbus.fritz.box>
-References: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
- <20200102075111.25308-7-ganeshgr@linux.ibm.com>
- <20200103022540.GS2098@umbus>
- <066a1db3-254a-5607-915e-0392fefd72e6@linux.ibm.com>
+ (envelope-from <aik@ozlabs.ru>) id 1ip4HI-00088V-L3
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:53:13 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:50939)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ip4HI-00086t-8R
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:53:12 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id r67so585128pjb.0
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 21:53:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=La4dhpXVT/XR/Ussvr7zyqdizfwnsBKkOl8+h2XRhnk=;
+ b=KbdbIUnTDeS9cYuyicTcBYjTarDOrORk91UoiqbFnwl7h6HYwzFxhojU767AzJAoRt
+ w6SkDGa6amgQ9V4QwKIHp50kXtbcef3EUzIbtlHl6A4m7zMd24hk+gZCX/UDGfgm7oLW
+ PgRmkcBH52K6yY8AqQMHxtLw2yMOUsga6o9V8OZmz62Prz6C3/kw2dyIWL3Nmkpc3nmD
+ jkY9rjlIgs7F2bg59W1I7XqevbDAsKkV048WTJwDI4WGhlmSBEX9rsm66LjDIrWimyHK
+ xGoRh9l4hBzeoX6CXx2O8Z3Mr+CRMl7SIyE6W+aXR5eJH1xmKt8hAzqjz4ZcFkBcxdpq
+ ukyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=La4dhpXVT/XR/Ussvr7zyqdizfwnsBKkOl8+h2XRhnk=;
+ b=HJTU1/eTIsxW47plTgqhBmbn95aVIjT2qybsR786N5e5jIZFx2O0eTDnZvg7znUUKU
+ lzoNQKJp5SMLa26w1JPYwHGfyphn0oZDwAt7W8P2oEM1Dl6J63g7/9PntF2LSh2sVF6n
+ /xs819TNPiIEB91j22AXtuV3nbrAXW96xXvodrsIZw8o4+QHXZpI0sWxpWcTKYsMD9lj
+ UEbmatuaru3zFHTpTYnbWl5O+8TUnfi7U6hmtVgZGXQB9mC2iqOaDlMCfHA4XO4ILjqM
+ 1RU5QfvyNnxhb+MLNLpElX8pPNlu7+VvATnTB4LwZdrRuMdQU99xRNLvlMr1WWvpbUWJ
+ 9UyA==
+X-Gm-Message-State: APjAAAVZBoM1vkkjBNjRjCxtdjh5k2xDXkhjgKYXgIMMdw5epga2Ag8w
+ 04rbWZmoLI6F1ygI73xknsRPtA==
+X-Google-Smtp-Source: APXvYqwXTwadqj8OkmExTN/CGS4xon4iLNQwHhcbLbFQzGddQcIFXaBGvs+NA9v24OfvCjtIo9mlgQ==
+X-Received: by 2002:a17:902:442:: with SMTP id 60mr3764578ple.0.1578462790848; 
+ Tue, 07 Jan 2020 21:53:10 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id i11sm1516413pjg.0.2020.01.07.21.53.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 07 Jan 2020 21:53:09 -0800 (PST)
+Subject: Re: [PATCH qemu v2] spapr: Kill SLOF
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200105234242.78897-1-aik@ozlabs.ru>
+ <20200106041940.GV2098@umbus>
+ <835b2928-aff9-c2d1-dfdf-60d915706404@ozlabs.ru>
+ <20200107055436.GI2098@umbus>
+ <cf5bb030-167e-b073-f423-ea2f6c620b1f@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <90bb7907-5b81-45e4-b227-e037f41af67e@ozlabs.ru>
+Date: Wed, 8 Jan 2020 16:53:06 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Q68bSM7Ycu6FN28Q"
-Content-Disposition: inline
-In-Reply-To: <066a1db3-254a-5607-915e-0392fefd72e6@linux.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <cf5bb030-167e-b073-f423-ea2f6c620b1f@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,271 +172,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org, qemu-ppc@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Q68bSM7Ycu6FN28Q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 07, 2020 at 04:58:14PM +0530, Ganesh wrote:
->=20
-> On 1/3/20 7:55 AM, David Gibson wrote:
-> > On Thu, Jan 02, 2020 at 01:21:10PM +0530, Ganesh Goudar wrote:
-> > > From: Aravinda Prasad <arawinda.p@gmail.com>
-> > >=20
-> > > This patch includes migration support for machine check
-> > > handling. Especially this patch blocks VM migration
-> > > requests until the machine check error handling is
-> > > complete as these errors are specific to the source
-> > > hardware and is irrelevant on the target hardware.
-> > >=20
-> > > [Do not set FWNMI cap in post_load, now its done in .apply hook]
-> > > Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-> > > Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-> > > ---
-> > >   hw/ppc/spapr.c         | 41 +++++++++++++++++++++++++++++++++++++++=
-++
-> > >   hw/ppc/spapr_events.c  | 20 +++++++++++++++++++-
-> > >   hw/ppc/spapr_rtas.c    |  4 ++++
-> > >   include/hw/ppc/spapr.h |  1 +
-> > >   4 files changed, 65 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 975d7da734..4acdc30100 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -46,6 +46,7 @@
-> > >   #include "migration/qemu-file-types.h"
-> > >   #include "migration/global_state.h"
-> > >   #include "migration/register.h"
-> > > +#include "migration/blocker.h"
-> > >   #include "mmu-hash64.h"
-> > >   #include "mmu-book3s-v3.h"
-> > >   #include "cpu-models.h"
-> > > @@ -1685,6 +1686,8 @@ static void spapr_machine_reset(MachineState *m=
-achine)
-> > >       /* Signal all vCPUs waiting on this condition */
-> > >       qemu_cond_broadcast(&spapr->mc_delivery_cond);
-> > > +
-> > > +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
-> > >   }
-> > >   static void spapr_create_nvram(SpaprMachineState *spapr)
-> > > @@ -1967,6 +1970,43 @@ static const VMStateDescription vmstate_spapr_=
-dtb =3D {
-> > >       },
-> > >   };
-> > > +static bool spapr_fwnmi_needed(void *opaque)
-> > > +{
-> > > +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
-> > > +
-> > > +    return spapr->fwnmi_calls_registered;
-> > I think it would be better to base this directly on the cap, rather
-> > than a variable set later.
-> Ok, ill revert to older way
-> >=20
-> > > +}
-> > > +
-> > > +static int spapr_fwnmi_pre_save(void *opaque)
-> > > +{
-> > > +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
-> > > +
-> > > +    /*
-> > > +     * Check if machine check handling is in progress and print a
-> > > +     * warning message.
-> > > +     */
-> > > +    if (spapr->mc_status !=3D -1) {
-> > > +        warn_report("A machine check is being handled during migrati=
-on. The"
-> > > +                "handler may run and log hardware error on the desti=
-nation");
-> > > +    }
-> > > +
-> > > +    return 0;
-> > > +}
-> > > +
-> > > +static const VMStateDescription vmstate_spapr_machine_check =3D {
-> > > +    .name =3D "spapr_machine_check",
-> > > +    .version_id =3D 1,
-> > > +    .minimum_version_id =3D 1,
-> > > +    .needed =3D spapr_fwnmi_needed,
-> > > +    .pre_save =3D spapr_fwnmi_pre_save,
-> > > +    .fields =3D (VMStateField[]) {
-> > > +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
-> > > +        VMSTATE_INT32(mc_status, SpaprMachineState),
-> > > +        VMSTATE_BOOL(fwnmi_calls_registered, SpaprMachineState),
-> > This doesn't make sense to migrate - it will always have its final
-> > value by the time the guest is running in a migratable state.
-> Ok, ill remove it.
-> >=20
-> > > +        VMSTATE_END_OF_LIST()
-> > > +    },
-> > > +};
-> > > +
-> > >   static const VMStateDescription vmstate_spapr =3D {
-> > >       .name =3D "spapr",
-> > >       .version_id =3D 3,
-> > > @@ -2001,6 +2041,7 @@ static const VMStateDescription vmstate_spapr =
-=3D {
-> > >           &vmstate_spapr_cap_large_decr,
-> > >           &vmstate_spapr_cap_ccf_assist,
-> > >           &vmstate_spapr_cap_fwnmi,
-> > > +        &vmstate_spapr_machine_check,
-> > >           NULL
-> > >       }
-> > >   };
-> > > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> > > index 54eaf28a9e..7092687fa0 100644
-> > > --- a/hw/ppc/spapr_events.c
-> > > +++ b/hw/ppc/spapr_events.c
-> > > @@ -43,6 +43,7 @@
-> > >   #include "qemu/main-loop.h"
-> > >   #include "hw/ppc/spapr_ovec.h"
-> > >   #include <libfdt.h>
-> > > +#include "migration/blocker.h"
-> > >   #define RTAS_LOG_VERSION_MASK                   0xff000000
-> > >   #define   RTAS_LOG_VERSION_6                    0x06000000
-> > > @@ -843,6 +844,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool re=
-covered)
-> > >   {
-> > >       SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> > >       CPUState *cs =3D CPU(cpu);
-> > > +    int ret;
-> > > +    Error *local_err =3D NULL;
-> > >       if (spapr->guest_machine_check_addr =3D=3D -1) {
-> > >           /*
-> > > @@ -872,8 +875,23 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool r=
-ecovered)
-> > >               return;
-> > >           }
-> > >       }
-> > > -    spapr->mc_status =3D cpu->vcpu_id;
-> > > +    error_setg(&spapr->fwnmi_migration_blocker,
-> > > +               "Live migration not supported during machine check ha=
-ndling");
-> > > +    ret =3D migrate_add_blocker(spapr->fwnmi_migration_blocker, &loc=
-al_err);
-> > > +    if (ret =3D=3D -EBUSY) {
-> > > +        /*
-> > > +         * We don't want to abort so we let the migration to continu=
-e.
-> > > +         * In a rare case, the machine check handler will run on the=
- target.
-> > > +         * Though this is not preferable, it is better than aborting
-> > > +         * the migration or killing the VM.
-> > > +         */
-> > > +        error_free(spapr->fwnmi_migration_blocker);
-> > > +        spapr->fwnmi_migration_blocker =3D NULL;
-> > > +        warn_report("Received a fwnmi while migration was in progres=
-s");
-> > Didn't we change from initializing the blocker Error at init time
-> > because there was a case where we could have two migration blockers
-> > registered at once?  If that's so then we need entirely different
-> > instances of the blocker Error.  Just dynamiically allocating them
-> > doesn't help us if there can still only be one at a time.
->=20
-> I agree, but this how we were doing it before.
->=20
-> Are you suggesting to have per cpu blocker Error instance ?
+On 08/01/2020 15:20, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 07/01/2020 16:54, David Gibson wrote:
+>> On Tue, Jan 07, 2020 at 03:44:35PM +1100, Alexey Kardashevskiy wrote:
+>>>
+>>>
+>>> On 06/01/2020 15:19, David Gibson wrote:
+>>>>> +
+>>>>> +static uint32_t client_package_to_path(const void *fdt, uint32_t phandle,
+>>>>> +                                       uint32_t buf, uint32_t len)
+>>>>> +{
+>>>>> +    char tmp[256];
+>>>>
+>>>> Fixed sized buffers are icky.  You could either dynamically allocate
+>>>> this based on the size the client gives, or you could use
+>>>> memory_region_get_ram_ptr() to read the data from the tree directly
+>>>> into guest memory.
+>>>
+>>> @len comes from the guest, I am really not comfortable with allocating
+>>> whatever (broken) guest requested. And if I limit @len by 1024 or
+>>> similar, then a fixed size buffer will do too, no?
+>>
+>> I see your point.  Does this call have a way to report failure?  In
+>> that case you could outright fail the call if it requests too long a
+>> length.
+> 
+> It returns length which can be 0 to signal an error.
+> 
+> but with this particular method the bigger problem is that I cannot know
+> in advance the actual path length from fdt_get_path(). I could double
+> the size until fdt_get_path() succeeded, just seems overkill here.
+> 
+> Property names seem to be limited by 32:
 
-I was, but..
 
-> I think initializing the blocker Error at init time and not freeing it, is
-> much simpler
->=20
-> and cleaner. And if we receive multiple fwnmi events on different cpus
-> almost
->=20
-> at the same time, Though we will be prepending same migration blocker
-> instance
->=20
-> multiple times to the migration_blockers list, IIUC we will not be
-> unblocking migration
->=20
-> till the migration_blockers list is empty. Please let me know if you are =
-ok
-> with initializing
->=20
-> blocker error at init time.
+>>> len("ibm,query-interrupt-source-number")
+33
 
-=2E. I realized I was mistaken.  It wasn't premature unblocking I was
-concerned about, but corrupting the actual list structure.  I thought
-we were using an intrusive linked list like the QLIST_*() stuff for
-this, which can't tolerate double adding an element.  In fact we're
-using g_slist_*() which has it's own wrapper nodes around the pointers
-given here, so we're ok after all.
+Awesome. Oh well :(
 
-So creating the blocker error at init time is the way to go after all.
 
-> > > +    }
-> > > +
-> > > +    spapr->mc_status =3D cpu->vcpu_id;
-> > >       spapr_mce_dispatch_elog(cpu, recovered);
-> > >   }
-> > > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > > index 54b142f35b..3409f6b896 100644
-> > > --- a/hw/ppc/spapr_rtas.c
-> > > +++ b/hw/ppc/spapr_rtas.c
-> > > @@ -50,6 +50,7 @@
-> > >   #include "hw/ppc/fdt.h"
-> > >   #include "target/ppc/mmu-hash64.h"
-> > >   #include "target/ppc/mmu-book3s-v3.h"
-> > > +#include "migration/blocker.h"
-> > >   static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineSta=
-te *spapr,
-> > >                                      uint32_t token, uint32_t nargs,
-> > > @@ -448,6 +449,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cp=
-u,
-> > >       spapr->mc_status =3D -1;
-> > >       qemu_cond_signal(&spapr->mc_delivery_cond);
-> > >       rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> > > +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
-> > > +    error_free(spapr->fwnmi_migration_blocker);
-> > > +    spapr->fwnmi_migration_blocker =3D NULL;
-> > >   }
-> > >   static struct rtas_call {
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index a90e677cc3..ac246c8be3 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -220,6 +220,7 @@ struct SpaprMachineState {
-> > >       SpaprTpmProxy *tpm_proxy;
-> > >       bool fwnmi_calls_registered;
-> > > +    Error *fwnmi_migration_blocker;
-> > >   };
-> > >   #define H_SUCCESS         0
->=20
+> 
+> OF1275:
+> ===
+> nextprop
+> IN:phandle, [string] previous, [address] buf
+> OUT:  flag
+> 
+> Copies the name of the property following previous in the property list
+> of the device node identified by phandle into buf, as a null-terminated
+> string. Buf is the address of a 32-byte region of memory. If previous is
+> zero or a pointer to a null string, copies the name of the device node’s
+> first property.
+> ===
+> 
+> 
+>>> btw how exactly can I use memory_region_get_ram_ptr()?
+>>> get_system_memory() returns a root MR which is not RAM, RAM is a
+>>> "spapr.ram" sub-MR.
+>>
+>> Right, but you know that RAM is always at offset 0 within that root
+>> MR. 
+> 
+> Well, it could potentially be more than just one level down in the MR
+> tree, for example we could add NUMA MRs and place actual RAM MR under these.
+> 
+> 
+>> That said, it doesn't look like it's that easy to bounds check
+>> that pointer, so maybe that's not a good idea after all.
+> 
+> ok.
+> 
+> 
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Q68bSM7Ycu6FN28Q
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4VbIQACgkQbDjKyiDZ
-s5JBKQ/+L6tFhVDIIicBN5kPzxRh2jeC+QXgZ1biIC6/to3tE4RXiMoI5NyHOPN4
-XeUsFn+MTzYJVb8VBYqYrLt59kdnvKncnYLnncm4RIYsBObJnRIBko4vqxdu03mr
-4DlblrP2sOHSgQX5xEb6KNrM80TkXN+h6WWeukEhj/Jt9B91lEYLBvaPlmSdbRDh
-LXmx5ep0ADWSPm2ny3J+uwWqr+H75ZveVFGN0IXCjieaURv+SnMVk1elW+9xaVQC
-2lfLHbDZJWhCHYDuheKp7xmzrws7tr3JZ/UbdXNyVQhDYQU3pfz/2VhLqmAMwNCI
-djPe8nTtCbetyaH55agBxTdpUUN8fLG1b6zsSjQBiNsovPoojMgoAd38uGSEx7tx
-AFwPIo6yMo/MMtMxyGz+KtYvdGVVUFwf+fpEXYKx/7SKJIBO8fKDlVJny0NYued0
-S0RvRfv1iRZoyi4TlZzeDPj+QSTcGto/VlV+iDoZKchi+ZZxSXLBUsZUg7PGUXRG
-qWA+yYYFKDzrf/1cGb36EI0K1rBQSCwzKRkPDFzLiF2RW/U/4d6KyvPsOArTAYtO
-xRgyzAKz6c//DU9gkZeU5X1e3iPg5nr7tCYyecTLTGc+/FsrHKb7nXWTOGLm0vsP
-ygqwevPV9hX08236K3zID/ZR0gZuzxZzL34F3LCUaqUvGYzH7cU=
-=zO2m
------END PGP SIGNATURE-----
-
---Q68bSM7Ycu6FN28Q--
+-- 
+Alexey
 
