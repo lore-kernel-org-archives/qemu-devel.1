@@ -8,81 +8,76 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B65CEC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7F3C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:10:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81CF020720
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB5C32072A
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:09:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I2fE1rPW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81CF020720
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3n01yer"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB5C32072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipHcJ-0000pW-9S
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:07:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35709)
+	id 1ipHeQ-0003ob-Ei
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:09:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35411)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVf-0001VC-HW
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:57 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVV-0001J5-Li
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVc-0002jL-N7
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:55 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38895)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVT-0002Y3-Li
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:45 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34280)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ipHVc-0002hu-EN; Wed, 08 Jan 2020 15:00:52 -0500
-Received: by mail-wm1-x341.google.com with SMTP id u2so216605wmc.3;
- Wed, 08 Jan 2020 12:00:52 -0800 (PST)
+ id 1ipHVT-0002Wd-2W; Wed, 08 Jan 2020 15:00:43 -0500
+Received: by mail-wr1-x443.google.com with SMTP id t2so4809058wrr.1;
+ Wed, 08 Jan 2020 12:00:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=abuJiz5zWdyJ/CxH78fn4z3ySkdVr9/Q8yCzhfi86YQ=;
- b=I2fE1rPW3S7z7nR945NS6ioIxTUgLlg2rgkZqmqCWrsz3CrF19sl89zVrvGGpvXF2G
- FrPLgootpR4McDaX51gzzH/q/n3zzSDBU1NwVE9M8zAX6c0PQluTaIhsMeosz/BJw++q
- YXZycPS0iT7ImVUTsZ4TOlD81AtEYyCPcStrJxv3HVvsXsUtAEqbJqW9X7SSE9J5wrzq
- XvnHTjWNV3ZVbIAMS72wPrWunc1ZbEiwzQFv7NM0dHAp9gdhsAnh0Dq+PWwYKpC/jJ6/
- 1kvMxLmI5TnuCKCX5CYueguWW8oo48PXbBY/7x3qi4F6DJnE6jnbHMz19S6UHjM7LuVF
- ZAug==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=UipVhQnGToIvBs6HWEW+2NxLBIAsKeGOVR5aBQdUr/4=;
+ b=O3n01yerlwSqHsDnlHVZH9PJeHcB/T/41QmvRIdtpftrWUCuk4FRMChWF9d999SnFJ
+ rgf9rBsoBi6mEsDfA+6D4LqJawRh28h3jHVEYhC0B51mpdiRJwMOctCMy2T192Z5HhEw
+ vPbO6HgffkIDu1+b3rzpVBJGKTc6mJLmVsyBt5ycJsDOU5gHlvjSEp6Lfkvsq+XhudBb
+ fstJZWpLbxbonMh2EYHB8HKBBrQyxClx/8A6WMUf3+oGo08rJBRseYzRPQoDz0YUgBa7
+ 6WD3EJhYktQt5PLhkXAts+Y6PEdYnJ8JdD/8wRz5IPy5yo2XEYv6W8wQeOlKdTIS1NTd
+ eYbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=abuJiz5zWdyJ/CxH78fn4z3ySkdVr9/Q8yCzhfi86YQ=;
- b=FbHRYEiMJ8Kg5scrZ+zzWQKMCYhkSmJ8vRPbuxcct4smEaiOEIuy2CHiIvd/UV8QiN
- bKLwDv1JR/TjJXGi1WX7/XSjgv23XF8OYhHemgYuTZTKAT2nOsFTbFWCDz2gFvDDhuhK
- FW/VMCs2z/GiPDM/vYFP6JLwNAVFbxKB2hNzhbmuI6SpopYB459RPmgrCfb6w/QEygss
- EKgUAPifftcUiZT87s4Qdzx73GJSUKVEF3RyGANvf/g8551KIRj1KvRCP0K6Rb6Oz0Qg
- PzXOx9DG1/n0mxdEc7W3B5/CbQ+CGdjiLxROCqvI5uBPtTnGFdiiQy/lsoaw8lMuXj0C
- MMVA==
-X-Gm-Message-State: APjAAAXCszRMn7xI7+i4V7pHEZbgAfRUWQfRFGKjK5kydTiqiL7/s0Ta
- EIdG0kzeO2NTnBZrxcAYBX5fxpfq
-X-Google-Smtp-Source: APXvYqxxsx42BDNzIdi8HCWiY8PapnUsDGWamyiO9WYgw417TSeAk88JgJNaUNVvou505CSklTXxTw==
-X-Received: by 2002:a7b:c934:: with SMTP id h20mr316573wml.103.1578513651172; 
- Wed, 08 Jan 2020 12:00:51 -0800 (PST)
+ :references;
+ bh=UipVhQnGToIvBs6HWEW+2NxLBIAsKeGOVR5aBQdUr/4=;
+ b=CxpmoCYUyzlNYyPk42Hjpot1X6sFplVOdT3QAoYoWc1w5N1Z2Zxo+V4B1y7l+m78f8
+ LL18D9f0cQXQZRRf+gAsANj0a3vZHSNa+l5Nl/WcW1JqkK2IS8uNSr3iZeqkqX1bC8iv
+ SjqM0zHSneTN0wtWf4n1OBdFm1O1XDmY9p2xtMLlWN4FbLHAUHoE1AJPR0/beqSK+OgV
+ hk38pv8zIme6STxdCcQUC6+DRjIj/w85brg/647oC+XGQVMM72u6jC8ahb1zUv2iTGxF
+ 45UgRpwBrY4yLoBxDzrjGUgj0BI60N7+nKVvtH6Im94IdghYnsRrCnB7hMEZfqPwDtWW
+ KRfQ==
+X-Gm-Message-State: APjAAAUQPW9hno4AXLB7+ZLOy9NFtWMEYaoexwlErGocyi7MyWcZFyGb
+ +Hp5sNzgcuu4nXlKHhJm9ZJO2a2B
+X-Google-Smtp-Source: APXvYqxxeQxsFkK/ztubCdUEYWPYNhEQmBi3ODZZLMce39tUG8i+wkAv01Z7fUvqGsPN1JoUJ8qyzw==
+X-Received: by 2002:adf:eb46:: with SMTP id u6mr6714629wrn.239.1578513641519; 
+ Wed, 08 Jan 2020 12:00:41 -0800 (PST)
 Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.50
+ by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 12:00:50 -0800 (PST)
+ Wed, 08 Jan 2020 12:00:40 -0800 (PST)
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 16/17] tests/boot_linux_console: Add a SLOW test booting
- Ubuntu on OrangePi PC
-Date: Wed,  8 Jan 2020 21:00:19 +0100
-Message-Id: <20200108200020.4745-17-nieklinnenbank@gmail.com>
+Subject: [PATCH v3 05/17] hw/arm/allwinner-h3: add System Control module
+Date: Wed,  8 Jan 2020 21:00:08 +0100
+Message-Id: <20200108200020.4745-6-nieklinnenbank@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200108200020.4745-1-nieklinnenbank@gmail.com>
 References: <20200108200020.4745-1-nieklinnenbank@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,122 +90,328 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
- qemu-arm@nongnu.org, philmd@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ qemu-arm@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The Allwinner H3 System on Chip has an System Control
+module that provides system wide generic controls and
+device information. This commit adds support for the
+Allwinner H3 System Control module.
 
-This test boots Ubuntu Bionic on a OrangePi PC board.
-
-As it requires 1GB of storage, and is slow, this test is disabled
-on automatic CI testing.
-
-It is useful for workstation testing. Currently Avocado timeouts too
-quickly, so we can't run userland commands.
-
-The kernel image and DeviceTree blob are built by the Armbian
-project (based on Debian):
-https://www.armbian.com/orange-pi-pc/
-
-The Ubuntu image is downloaded from:
-https://dl.armbian.com/orangepipc/Bionic_current
-
-This test can be run using:
-
-  $ AVOCADO_ALLOW_LARGE_STORAGE=yes \
-    avocado --show=app,console run -t machine:orangepi-pc \
-      tests/acceptance/boot_linux_console.py
-  console: U-Boot SPL 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100)
-  console: DRAM: 1024 MiB
-  console: Failed to set core voltage! Can't set CPU frequency
-  console: Trying to boot from MMC1
-  console: U-Boot 2019.04-armbian (Nov 18 2019 - 23:08:35 +0100) Allwinner Technology
-  console: CPU:   Allwinner H3 (SUN8I 0000)
-  console: Model: Xunlong Orange Pi PC
-  console: DRAM:  1 GiB
-  console: MMC:   mmc@1c0f000: 0
-  [...]
-  console: Uncompressing Linux... done, booting the kernel.
-  console: Booting Linux on physical CPU 0x0
-  console: Linux version 5.3.9-sunxi (root@builder) (gcc version 8.3.0 (GNU Toolchain for the A-profile Architecture 8.3-2019.03 (arm-rel-8.36))) #19.11.3 SMP Mon Nov 18 18:49:43 CET 2019
-  console: CPU: ARMv7 Processor [410fc075] revision 5 (ARMv7), cr=50c5387d
-  console: CPU: div instructions available: patching division code
-  console: CPU: PIPT / VIPT nonaliasing data cache, VIPT aliasing instruction cache
-  console: OF: fdt: Machine model: Xunlong Orange Pi PC
-  [...]
-  console: EXT4-fs (mmcblk0p1): mounted filesystem with writeback data mode. Opts: (null)
-  console: done.
-  console: Begin: Running /scripts/local-bottom ... done.
-  console: Begin: Running /scripts/init-bottom ... done.
-  console: systemd[1]: systemd 237 running in system mode. (...)
-  console: systemd[1]: Detected architecture arm.
-  console: Welcome to Ubuntu 18.04.3 LTS!
-  console: systemd[1]: Set hostname to <orangepipc>.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[NL: rename in commit message Raspbian to Armbian]
-[NL: changed test to boot from SD card via BootROM]
 Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
 ---
- tests/acceptance/boot_linux_console.py | 42 ++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ include/hw/arm/allwinner-h3.h          |   3 +
+ include/hw/misc/allwinner-h3-sysctrl.h |  68 ++++++++++++
+ hw/arm/allwinner-h3.c                  |   9 +-
+ hw/misc/allwinner-h3-sysctrl.c         | 140 +++++++++++++++++++++++++
+ hw/misc/Makefile.objs                  |   1 +
+ 5 files changed, 220 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/misc/allwinner-h3-sysctrl.h
+ create mode 100644 hw/misc/allwinner-h3-sysctrl.c
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index d663106694..55d0b8b036 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -509,6 +509,48 @@ class BootLinuxConsole(Test):
-         exec_command_and_wait_for_pattern(self, 'reboot',
-                                                 'reboot: Restarting system')
+diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
+index e03d3f318f..26706f4fa6 100644
+--- a/include/hw/arm/allwinner-h3.h
++++ b/include/hw/arm/allwinner-h3.h
+@@ -44,6 +44,7 @@
+ #include "hw/timer/allwinner-a10-pit.h"
+ #include "hw/intc/arm_gic.h"
+ #include "hw/misc/allwinner-h3-ccu.h"
++#include "hw/misc/allwinner-h3-sysctrl.h"
+ #include "target/arm/cpu.h"
  
-+    @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
-+    def test_arm_orangepi_bionic(self):
-+        """
-+        :avocado: tags=arch:arm
-+        :avocado: tags=machine:orangepi-pc
-+        """
+ /**
+@@ -60,6 +61,7 @@ enum {
+     AW_H3_SRAM_A1,
+     AW_H3_SRAM_A2,
+     AW_H3_SRAM_C,
++    AW_H3_SYSCTRL,
+     AW_H3_EHCI0,
+     AW_H3_OHCI0,
+     AW_H3_EHCI1,
+@@ -109,6 +111,7 @@ typedef struct AwH3State {
+     const hwaddr *memmap;
+     AwA10PITState timer;
+     AwH3ClockCtlState ccu;
++    AwH3SysCtrlState sysctrl;
+     GICState gic;
+     MemoryRegion sram_a1;
+     MemoryRegion sram_a2;
+diff --git a/include/hw/misc/allwinner-h3-sysctrl.h b/include/hw/misc/allwinner-h3-sysctrl.h
+new file mode 100644
+index 0000000000..cd0f3f5ce1
+--- /dev/null
++++ b/include/hw/misc/allwinner-h3-sysctrl.h
+@@ -0,0 +1,68 @@
++/*
++ * Allwinner H3 System Control emulation
++ *
++ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+        # This test download a 196MB compressed image and expand it to 932MB...
-+        image_url = ('https://dl.armbian.com/orangepipc/archive/'
-+                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
-+        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
-+        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
-+        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
-+        image_path = os.path.join(self.workdir, image_name)
-+        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
++#ifndef HW_MISC_ALLWINNER_H3_SYSCTRL_H
++#define HW_MISC_ALLWINNER_H3_SYSCTRL_H
 +
-+        self.vm.set_machine('orangepi-pc')
-+        self.vm.set_console()
-+        self.vm.add_args('-drive', 'file=' + image_path + ',if=sd,format=raw',
-+                         '-nic', 'user',
-+                         '-no-reboot')
-+        self.vm.launch()
++#include "qemu/osdep.h"
++#include "qom/object.h"
++#include "hw/sysbus.h"
 +
-+        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-+                               'console=ttyS0,115200 '
-+                               'loglevel=7 '
-+                               'nosmp '
-+                               'systemd.default_timeout_start_sec=9000 '
-+                               'systemd.mask=armbian-zram-config.service '
-+                               'systemd.mask=armbian-ramlog.service')
++/**
++ * @name Constants
++ * @{
++ */
 +
-+        self.wait_for_console_pattern('U-Boot SPL')
-+        self.wait_for_console_pattern('Autoboot in ')
-+        exec_command_and_wait_for_pattern(self, ' ', '=>')
-+        exec_command_and_wait_for_pattern(self, "setenv extraargs '" +
-+                                                kernel_command_line + "'", '=>')
-+        exec_command_and_wait_for_pattern(self, 'boot', 'Starting kernel ...');
++/** Highest register address used by System Control device */
++#define AW_H3_SYSCTRL_REGS_MAXADDR   (0x30)
 +
-+        self.wait_for_console_pattern('systemd[1]: Set hostname ' +
-+                                      'to <orangepipc>')
-+        self.wait_for_console_pattern('Starting Load Kernel Modules...')
++/** Total number of known registers */
++#define AW_H3_SYSCTRL_REGS_NUM       ((AW_H3_SYSCTRL_REGS_MAXADDR / \
++                                      sizeof(uint32_t)) + 1)
 +
-     def test_s390x_s390_ccw_virtio(self):
-         """
-         :avocado: tags=arch:s390x
++/** @} */
++
++/**
++ * @name Object model
++ * @{
++ */
++
++#define TYPE_AW_H3_SYSCTRL    "allwinner-h3-sysctrl"
++#define AW_H3_SYSCTRL(obj) \
++    OBJECT_CHECK(AwH3SysCtrlState, (obj), TYPE_AW_H3_SYSCTRL)
++
++/** @} */
++
++/**
++ * Allwinner H3 System Control object instance state
++ */
++typedef struct AwH3SysCtrlState {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    /** Maps I/O registers in physical memory */
++    MemoryRegion iomem;
++
++    /** Array of hardware registers */
++    uint32_t regs[AW_H3_SYSCTRL_REGS_NUM];
++
++} AwH3SysCtrlState;
++
++#endif /* HW_MISC_ALLWINNER_H3_SYSCTRL_H */
+diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
+index 1dc3209c03..d261d7b2be 100644
+--- a/hw/arm/allwinner-h3.c
++++ b/hw/arm/allwinner-h3.c
+@@ -35,6 +35,7 @@ const hwaddr allwinner_h3_memmap[] = {
+     [AW_H3_SRAM_A1]    = 0x00000000,
+     [AW_H3_SRAM_A2]    = 0x00044000,
+     [AW_H3_SRAM_C]     = 0x00010000,
++    [AW_H3_SYSCTRL]    = 0x01c00000,
+     [AW_H3_EHCI0]      = 0x01c1a000,
+     [AW_H3_OHCI0]      = 0x01c1a400,
+     [AW_H3_EHCI1]      = 0x01c1b000,
+@@ -64,7 +65,6 @@ struct AwH3Unimplemented {
+ } unimplemented[] = {
+     { "d-engine",  0x01000000, 4 * MiB },
+     { "d-inter",   0x01400000, 128 * KiB },
+-    { "syscon",    0x01c00000, 4 * KiB },
+     { "dma",       0x01c02000, 4 * KiB },
+     { "nfdc",      0x01c03000, 4 * KiB },
+     { "ts",        0x01c06000, 4 * KiB },
+@@ -190,6 +190,9 @@ static void allwinner_h3_init(Object *obj)
+ 
+     sysbus_init_child_obj(obj, "ccu", &s->ccu, sizeof(s->ccu),
+                           TYPE_AW_H3_CCU);
++
++    sysbus_init_child_obj(obj, "sysctrl", &s->sysctrl, sizeof(s->sysctrl),
++                          TYPE_AW_H3_SYSCTRL);
+ }
+ 
+ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+@@ -302,6 +305,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
+     qdev_init_nofail(DEVICE(&s->ccu));
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, s->memmap[AW_H3_CCU]);
+ 
++    /* System Control */
++    qdev_init_nofail(DEVICE(&s->sysctrl));
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysctrl), 0, s->memmap[AW_H3_SYSCTRL]);
++
+     /* Universal Serial Bus */
+     sysbus_create_simple(TYPE_AW_H3_EHCI, s->memmap[AW_H3_EHCI0],
+                          qdev_get_gpio_in(DEVICE(&s->gic),
+diff --git a/hw/misc/allwinner-h3-sysctrl.c b/hw/misc/allwinner-h3-sysctrl.c
+new file mode 100644
+index 0000000000..1d07efa880
+--- /dev/null
++++ b/hw/misc/allwinner-h3-sysctrl.c
+@@ -0,0 +1,140 @@
++/*
++ * Allwinner H3 System Control emulation
++ *
++ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation, either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "hw/sysbus.h"
++#include "migration/vmstate.h"
++#include "qemu/log.h"
++#include "qemu/module.h"
++#include "hw/misc/allwinner-h3-sysctrl.h"
++
++/* System Control register offsets */
++enum {
++    REG_VER               = 0x24,  /* Version */
++    REG_EMAC_PHY_CLK      = 0x30,  /* EMAC PHY Clock */
++};
++
++#define REG_INDEX(offset)   (offset / sizeof(uint32_t))
++
++/* System Control register reset values */
++enum {
++    REG_VER_RST           = 0x0,
++    REG_EMAC_PHY_CLK_RST  = 0x58000,
++};
++
++static uint64_t allwinner_h3_sysctrl_read(void *opaque, hwaddr offset,
++                                          unsigned size)
++{
++    const AwH3SysCtrlState *s = AW_H3_SYSCTRL(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    if (idx >= AW_H3_SYSCTRL_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return 0;
++    }
++
++    return s->regs[idx];
++}
++
++static void allwinner_h3_sysctrl_write(void *opaque, hwaddr offset,
++                                       uint64_t val, unsigned size)
++{
++    AwH3SysCtrlState *s = AW_H3_SYSCTRL(opaque);
++    const uint32_t idx = REG_INDEX(offset);
++
++    if (idx >= AW_H3_SYSCTRL_REGS_NUM) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
++                      __func__, (uint32_t)offset);
++        return;
++    }
++
++    switch (offset) {
++    case REG_VER:       /* Version */
++        break;
++    default:
++        s->regs[idx] = (uint32_t) val;
++        break;
++    }
++}
++
++static const MemoryRegionOps allwinner_h3_sysctrl_ops = {
++    .read = allwinner_h3_sysctrl_read,
++    .write = allwinner_h3_sysctrl_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++    .impl.min_access_size = 4,
++};
++
++static void allwinner_h3_sysctrl_reset(DeviceState *dev)
++{
++    AwH3SysCtrlState *s = AW_H3_SYSCTRL(dev);
++
++    /* Set default values for registers */
++    s->regs[REG_INDEX(REG_VER)] = REG_VER_RST;
++    s->regs[REG_INDEX(REG_EMAC_PHY_CLK)] = REG_EMAC_PHY_CLK_RST;
++}
++
++static void allwinner_h3_sysctrl_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    AwH3SysCtrlState *s = AW_H3_SYSCTRL(obj);
++
++    /* Memory mapping */
++    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_h3_sysctrl_ops, s,
++                           TYPE_AW_H3_SYSCTRL, 4 * KiB);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static const VMStateDescription allwinner_h3_sysctrl_vmstate = {
++    .name = "allwinner-h3-sysctrl",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, AwH3SysCtrlState, AW_H3_SYSCTRL_REGS_NUM),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void allwinner_h3_sysctrl_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->reset = allwinner_h3_sysctrl_reset;
++    dc->vmsd = &allwinner_h3_sysctrl_vmstate;
++}
++
++static const TypeInfo allwinner_h3_sysctrl_info = {
++    .name          = TYPE_AW_H3_SYSCTRL,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_init = allwinner_h3_sysctrl_init,
++    .instance_size = sizeof(AwH3SysCtrlState),
++    .class_init    = allwinner_h3_sysctrl_class_init,
++};
++
++static void allwinner_h3_sysctrl_register(void)
++{
++    type_register_static(&allwinner_h3_sysctrl_info);
++}
++
++type_init(allwinner_h3_sysctrl_register)
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 4abd92dcee..2d6b1a4257 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -29,6 +29,7 @@ common-obj-$(CONFIG_MACIO) += macio/
+ common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
+ 
+ common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
++common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-sysctrl.o
+ common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
+ common-obj-$(CONFIG_NSERIES) += cbus.o
+ common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
 -- 
 2.17.1
 
