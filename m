@@ -2,75 +2,72 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87ECAC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 23:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 586AEC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 23:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5198E2051A
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 23:32:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PGLa9x9V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5198E2051A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 27CB6206DA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 23:46:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CB6206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50553 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipKol-0006cX-BD
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 18:32:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44373)
+	id 1ipL2H-0005EH-8O
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 18:46:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ipKns-00061m-Iv
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:31:57 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ipL1P-00042f-R4
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ipKnq-0006Ej-5n
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:31:55 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49991
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipKnp-0006Bq-Ms
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:31:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578526312;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=4TLV+2FjLc1eKhAICJTQWDBMbNh+X5s6qOSjOf6svOs=;
- b=PGLa9x9VNbb6gPAWjSoRKX7oN7d4KS9WcqIAKaamWj+7OQCmPTpu/IqM/R9WZBMg3dCHmi
- +YhqY6w+xColKHmoEgynQ/XG8wQgEQy1Yh4IjPXLb9dKqpFQIwF4MG9iI7Y/pZyOBnE9hD
- AHH3jT/8qvzyyImVkl2bUKQtR+U0SB0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-mdfTKEaYPp6A0R_eozedVw-1; Wed, 08 Jan 2020 18:31:49 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F49F1800D4E
- for <qemu-devel@nongnu.org>; Wed,  8 Jan 2020 23:31:48 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-35.brq.redhat.com [10.40.204.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B53C37C82C;
- Wed,  8 Jan 2020 23:31:41 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/smbios/smbios: Use MachineState::ram_size instead of
- global one
-Date: Thu,  9 Jan 2020 00:31:38 +0100
-Message-Id: <20200108233138.20434-1-philmd@redhat.com>
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ipL1O-0001yR-MG
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:45:55 -0500
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:42913)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ipL1O-0001x3-Ga
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:45:54 -0500
+Received: by mail-yw1-f67.google.com with SMTP id l14so1567680ywj.9
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 15:45:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=LaRxDyN9Zei6sp3dmKq6KngQ0uY+P1VAKUrl4l2nk/c=;
+ b=Yey9rzJ4Vn5NObpFjjmUhQ4Hj2YkhDLMbj8GqRQV083T2o0xlb0dhP3KU6JkNUWatJ
+ tpwZi7uoWvU8Ku7+VGBti7gfDNHXEgwBqWvG57dAjREprBhwtpj0n5sMIGSZQX2g289T
+ HbjRJnOLVQLqtuh9Y18vlhrIRvas2Gll+SNieQcT1XNFvD8++guRJ/L7yCi6y7+oLHvU
+ WoNTCLhoaXojcSiM0sDgLfmZX2Gy/k/pvJK5q/1CdR/uonYsSJTrOU3yrwTBYFM7aJ86
+ OrjQ5dZZGyeXFRilPOU0VfiSyMpMRKblCApFLJ3YhrI4EBswc8hql3uyW28SaabjcovJ
+ SYRQ==
+X-Gm-Message-State: APjAAAXH/berh0KGlunJI4ATVnz4b41cABdRK29IHawrMa7fhcSRy7Ks
+ i23yzzBhmIQrTAYjkkOCVWYQaQJxhgZO4CJx6Wc=
+X-Google-Smtp-Source: APXvYqz8t8DwNXqrI59zJVTpdtb1fcPqKaBeBNE1Ne/k60rmpp+KlRgbtB9OueRMcbSShzFdBR8BW9VwUBlumBa7ioc=
+X-Received: by 2002:a81:69c5:: with SMTP id e188mr5468616ywc.443.1578527153345; 
+ Wed, 08 Jan 2020 15:45:53 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: mdfTKEaYPp6A0R_eozedVw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+References: <20200108181425.21485-1-f4bug@amsat.org>
+ <20200108181425.21485-3-f4bug@amsat.org>
+ <6997ceed-9a68-796c-f03d-02bfd7d76803@gmx.de>
+In-Reply-To: <6997ceed-9a68-796c-f03d-02bfd7d76803@gmx.de>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 9 Jan 2020 00:45:42 +0100
+Message-ID: <CAAdtpL4xOtGdpsa42=-xNBV-fMyj4=C2_WE03VwpxpfverLjBQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] hw/hppa/machine: Do not limit the RAM to 3840MB
+To: Helge Deller <deller@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.85.161.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,53 +79,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Sven Schnelle <svens@stackframe.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The smbios_get_tables() function has access the a machine state.
-Use the field instead of accessing the global ram_size variable.
+On Wed, Jan 8, 2020 at 10:39 PM Helge Deller <deller@gmx.de> wrote:
+> On 08.01.20 19:14, Philippe Mathieu-Daud=C3=A9 wrote:
+> > The hardware expects DIMM slots of 1 or 2 GB, allowing up to
+> > 4 GB of memory. Accept the same amount of memory the hardware
+> > can deal with.
+> >
+> > The CPU doesn't have access to the RAM mapped in the
+> > [0xf0000000 - 0xf1000000] range because this is the PDC area
+> > (Processor Dependent Code) where the firmware is loaded.
+> > To keep this region with higher priority than the RAM, lower
+> > the RAM priority. The PDC will overlap it.
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> >  hw/hppa/machine.c | 11 +++++------
+> >  1 file changed, 5 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
+> > index 6775d879f8..d10c967d06 100644
+> > --- a/hw/hppa/machine.c
+> > +++ b/hw/hppa/machine.c
+> > @@ -90,16 +90,15 @@ static void machine_hppa_init(MachineState *machine=
+)
+> >          g_free(name);
+> >      }
+> >
+> > -    /* Limit main memory. */
+> > -    if (ram_size > FIRMWARE_START) {
+> > -        machine->ram_size =3D ram_size =3D FIRMWARE_START;
+> > -    }
+> > -
+> >      /* Main memory region. */
+> > +    if (machine->ram_size > 4 * GiB) {
+> > +        error_report("RAM size of 4GB or more is not supported");
+> > +        exit(EXIT_FAILURE);
+> > +    }
+>
+> My suggestion is to initially then limit it to max. 3GB, e.g.
+> > +    if (machine->ram_size > 3 * GiB) {
+> > +        error_report("RAM size of 3GB or more is not supported");
+> > +        exit(EXIT_FAILURE);
+>
+> That way you don't need to work around the 4GB SeaBIOS limitation
+> in your other RFC patch.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/smbios/smbios.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+If you are happy with this outcome, I'm happy too, this is simpler :)
 
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 11d476c4a2..ded5f1f4e2 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -630,7 +630,7 @@ static void smbios_build_type_11_table(void)
-=20
- #define MAX_T16_STD_SZ 0x80000000 /* 2T in Kilobytes */
-=20
--static void smbios_build_type_16_table(unsigned dimm_cnt)
-+static void smbios_build_type_16_table(ram_addr_t ram_size, unsigned dimm_=
-cnt)
- {
-     uint64_t size_kb;
-=20
-@@ -847,6 +847,7 @@ void smbios_get_tables(MachineState *ms,
-                        uint8_t **anchor, size_t *anchor_len)
- {
-     unsigned i, dimm_cnt;
-+    ram_addr_t ram_size =3D ms->ram_size;
-=20
-     if (smbios_legacy) {
-         *tables =3D *anchor =3D NULL;
-@@ -876,7 +877,7 @@ void smbios_get_tables(MachineState *ms,
-=20
-         dimm_cnt =3D QEMU_ALIGN_UP(ram_size, MAX_DIMM_SZ) / MAX_DIMM_SZ;
-=20
--        smbios_build_type_16_table(dimm_cnt);
-+        smbios_build_type_16_table(ram_size, dimm_cnt);
-=20
-         for (i =3D 0; i < dimm_cnt; i++) {
-             smbios_build_type_17_table(i, GET_DIMM_SZ);
---=20
-2.21.1
+> So, people can start it with:
+> qemu-system-hppa -m 3g -serial stdio
+>
+> Later then we can fix SeaBIOS, at least if 64bit support gets added later=
+ on.
 
+Agreed.
+
+> >      ram_region =3D g_new(MemoryRegion, 1);
+> >      memory_region_allocate_system_memory(ram_region, OBJECT(machine),
+> >                                           "ram", ram_size);
+>
+> ^^^ here is still "ram_size". Do you need to change it?
+
+No, because it is not modified, it still contains the size requested
+from the user, and the size has been validated.
+Hopefully it will simplify Igor series.
+
+> > -    memory_region_add_subregion(addr_space, 0, ram_region);
+> > +    memory_region_add_subregion_overlap(addr_space, 0, ram_region, -1)=
+;
+> >
+> >      /* Init Dino (PCI host bus chip).  */
+> >      pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
+> >
+>
+> Helge
 
