@@ -2,82 +2,86 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA521C33CA2
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDFCC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:11:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68B8120720
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:10:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BF3520720
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 20:11:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nk86Jzrz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68B8120720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="SqfSEQ/f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF3520720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipHeo-0004Qk-Us
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:10:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35665)
+	id 1ipHfl-0006Kj-Um
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 15:11:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36330)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVe-0001Ta-81
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:58 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1ipHWM-0002AL-Kz
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:01:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ipHVZ-0002fg-OS
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:00:54 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:56316)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ipHVZ-0002de-DR; Wed, 08 Jan 2020 15:00:49 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id q9so229417wmj.5;
- Wed, 08 Jan 2020 12:00:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Qmp/VetiNkxb//J2gxaFRdy/OdsG0Vcv2n2tNLLCTTw=;
- b=Nk86JzrzOmnzAt+buE3OWbMN55bcx40WsN8hvre80BLZCuyFLlpF1Zuh/jEtEQfvx5
- S0ARWxBb/XHP+r32dCC6+0AwKFK/yK2YR4xZ1Uq9igvroARS/XVh+z81EjanDfSAusMF
- gCcU6WvZWrKJtSWjeNBSJhu6E6uMLctFkH4bNIcty8oB4i3PUm2uO2EzMJZyp3Wa6xhm
- wmYdJ5V4ZqxGPSwW1NAfc5ym1H2DFWa2exCHsNrTfpm8bv8qPFmUHkYVcIQu19VkTXIs
- +CcsGrWJ7dAVZyT7HBEE5rrd489ggCgJw2TGUO5uo6aeccg6KEdnU0n47jBOJWa3huS+
- +6sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=Qmp/VetiNkxb//J2gxaFRdy/OdsG0Vcv2n2tNLLCTTw=;
- b=pu3o5uatDlgKMt0DogljMHxi+E+KxITcR4JwknW59Lqe9fSs4j1Xiea7RLrBwOPnKr
- tXkDzcwcQ01REtzW4jPmigQhnr5sKwYIGKEVRYog3ivPHvxfBeyVBqE4FaP9Vhu/IU54
- lTiRYO6ck5hHSWxzGtc1o6lFM0WplnPxMqGmtxB/TFmrWC2hw1+8ZqqbcwcDUC1KKMEy
- o+zxEwVOMLAdoMZFzXJE2N5GrHZji/pZHbkHN7lH4r8q7zx5U/YpeErT9Qb9yKsBtoGO
- I5NNkifvd9/4dVMH1qNMfUVl0cG6wFJjQnJLStvFIWwn57yVTkmdTBymEM7WuZzH63G+
- okUw==
-X-Gm-Message-State: APjAAAUimBmh96Ep0+T7MEvvlLLySVqrv+M+zFG8GtThOBn65nyxtBSe
- AqHpTyQ6SySFO9mn3xmZfhCyx1OD
-X-Google-Smtp-Source: APXvYqxgVWukYVst2rVcPXeJApmNO9ALGxfjKdjiq0oKTGE2uX/8NBA+YEdQPPOTO5XjhE/bl4pZWA==
-X-Received: by 2002:a1c:2187:: with SMTP id h129mr383209wmh.44.1578513647727; 
- Wed, 08 Jan 2020 12:00:47 -0800 (PST)
-Received: from pavilion.home ([2a02:a456:6be8:1:8edc:d4ff:fe8b:18b7])
- by smtp.gmail.com with ESMTPSA id u18sm4970099wrt.26.2020.01.08.12.00.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 12:00:47 -0800 (PST)
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/17] hw/arm/allwinner: add RTC device support
-Date: Wed,  8 Jan 2020 21:00:15 +0100
-Message-Id: <20200108200020.4745-13-nieklinnenbank@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200108200020.4745-1-nieklinnenbank@gmail.com>
-References: <20200108200020.4745-1-nieklinnenbank@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32a
+ (envelope-from <kwankhede@nvidia.com>) id 1ipHWK-0003NI-QS
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:01:38 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:4834)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1ipHWK-0003JU-Ia
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 15:01:36 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e1635090001>; Wed, 08 Jan 2020 12:01:13 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 08 Jan 2020 12:01:31 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 08 Jan 2020 12:01:31 -0800
+Received: from [10.40.100.122] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 8 Jan
+ 2020 20:01:21 +0000
+Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to for
+ dirty pages tracking.
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
+ <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
+ <20191217151203.342b686a@x1.home>
+ <ebd08133-e258-9f5e-5c8f-f88d7165cd7a@nvidia.com>
+ <20200107150223.0dab0a85@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
+Date: Thu, 9 Jan 2020 01:31:16 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
+MIME-Version: 1.0
+In-Reply-To: <20200107150223.0dab0a85@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1578513674; bh=rTykfQvHrYyZEKPRHyxOkgPV3jZF1IBbSkNxe8rRI00=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=SqfSEQ/fNqEzLKki1wECvxFTP7sJzm0QreQGiBR9Shc1VPST3PWtlVoe3vDz3E3m0
+ 9ulY/ahhX3HWzsNS+bV3EdP/inH4qlr7lg9jgg2MFcXJd05y5dU4IiFCBstMfMxHu5
+ SCedSecJSKT4VBErRAJkXB2wLuuaFiu4MBHB/KKbfRZw4gXJcYuR2A+hVjnqWiNE2O
+ PhwGcwCCbpDwMfwO2DbUhPG/SPp+hhVjINihcV0C9djGgYJV573w+/heoZ14beN/DE
+ ra+22/1fF6GicsVNYmw5wCzT0osgFmO4gxkx8bCbWp8Ww3kEInTxSmnrfbtEw8LXY6
+ IMDiagHymvIuQ==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,715 +93,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Niek Linnenbank <nieklinnenbank@gmail.com>,
- qemu-arm@nongnu.org, philmd@redhat.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allwinner System-on-Chips usually contain a Real Time Clock (RTC)
-for non-volatile system date and time keeping. This commit adds a generic
-Allwinner RTC device that supports the RTC devices found in Allwinner SoC
-family sun4i (A10), sun7i (A20) and sun6i and newer (A31, H2+, H3, etc).
-The following RTC functionality and features are implemented:
 
- * Year-Month-Day read/write
- * Hour-Minute-Second read/write
- * General Purpose storage
 
-The following boards are extended with the RTC device:
+On 1/8/2020 3:32 AM, Alex Williamson wrote:
+> On Wed, 8 Jan 2020 01:37:03 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
 
- * Cubieboard (hw/arm/cubieboard.c)
- * Orange Pi PC (hw/arm/orangepi.c)
+<snip>
 
-Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
----
- include/hw/arm/allwinner-a10.h |   4 +-
- include/hw/arm/allwinner-h3.h  |   3 +
- include/hw/rtc/allwinner-rtc.h | 129 +++++++++++
- hw/arm/allwinner-a10.c         |   7 +
- hw/arm/allwinner-h3.c          |   9 +-
- hw/rtc/allwinner-rtc.c         | 386 +++++++++++++++++++++++++++++++++
- hw/rtc/Makefile.objs           |   1 +
- hw/rtc/trace-events            |   4 +
- 8 files changed, 541 insertions(+), 2 deletions(-)
- create mode 100644 include/hw/rtc/allwinner-rtc.h
- create mode 100644 hw/rtc/allwinner-rtc.c
+>>>> +
+>>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+>>>>    
+>>>>    	if (do_accounting)
+>>>>    		vfio_lock_acct(dma, -unlocked, true);
+>>>> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>    
+>>>>    		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+>>>>    		if (vpfn) {
+>>>> -			phys_pfn[i] = vpfn->pfn;
+>>>> -			continue;
+>>>> +			if (vpfn->unpinned)
+>>>> +				vfio_remove_from_pfn_list(dma, vpfn);
+>>>
+>>> This seems inefficient, we have an allocated vpfn at the right places
+>>> in the list, wouldn't it be better to repin the page?
+>>>    
+>>
+>> vfio_pin_page_external() takes care of pinning and accounting as well.
+> 
+> Yes, but could we call vfio_pin_page_external() without {unlinking,
+> freeing} and {re-allocating, linking} on either side of it since it's
+> already in the list?  That's the inefficient part.  Maybe at least a
+> TODO comment?
+> 
 
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a10.h
-index 0e8250b244..81a16092e7 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -9,6 +9,7 @@
- #include "hw/net/allwinner_emac.h"
- #include "hw/sd/allwinner-sdhost.h"
- #include "hw/ide/ahci.h"
-+#include "hw/rtc/allwinner-rtc.h"
- 
- #include "target/arm/cpu.h"
- 
-@@ -18,7 +19,7 @@
- #define AW_A10_UART0_REG_BASE   0x01c28000
- #define AW_A10_EMAC_BASE        0x01c0b000
- #define AW_A10_SATA_BASE        0x01c18000
+Changing it as below:
+
+                 vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+                 if (vpfn) {
+-                       phys_pfn[i] = vpfn->pfn;
+-                       continue;
++                       if (vpfn->ref_count > 1) {
++                               phys_pfn[i] = vpfn->pfn;
++                               continue;
++                       }
+                 }
+
+                 remote_vaddr = dma->vaddr + iova - dma->iova;
+                 ret = vfio_pin_page_external(dma, remote_vaddr, 
+&phys_pfn[i],
+                                              do_accounting);
+                 if (ret)
+                         goto pin_unwind;
 -
-+#define AW_A10_RTC_BASE         0x01c20d00
- #define AW_A10_SDRAM_BASE       0x40000000
- 
- #define TYPE_AW_A10 "allwinner-a10"
-@@ -36,6 +37,7 @@ typedef struct AwA10State {
-     AwEmacState emac;
-     AllwinnerAHCIState sata;
-     AwSdHostState mmc0;
-+    AwRtcState rtc;
-     MemoryRegion sram_a;
- } AwA10State;
- 
-diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-index d1b3d7ca67..1c275a34ed 100644
---- a/include/hw/arm/allwinner-h3.h
-+++ b/include/hw/arm/allwinner-h3.h
-@@ -50,6 +50,7 @@
- #include "hw/misc/allwinner-sid.h"
- #include "hw/sd/allwinner-sdhost.h"
- #include "hw/net/allwinner-sun8i-emac.h"
-+#include "hw/rtc/allwinner-rtc.h"
- #include "target/arm/cpu.h"
- #include "sysemu/block-backend.h"
- 
-@@ -92,6 +93,7 @@ enum {
-     AW_H3_GIC_CPU,
-     AW_H3_GIC_HYP,
-     AW_H3_GIC_VCPU,
-+    AW_H3_RTC,
-     AW_H3_CPUCFG,
-     AW_H3_SDRAM
- };
-@@ -130,6 +132,7 @@ typedef struct AwH3State {
-     AwSidState sid;
-     AwSdHostState mmc0;
-     AwSun8iEmacState emac;
-+    AwRtcState rtc;
-     GICState gic;
-     MemoryRegion sram_a1;
-     MemoryRegion sram_a2;
-diff --git a/include/hw/rtc/allwinner-rtc.h b/include/hw/rtc/allwinner-rtc.h
-new file mode 100644
-index 0000000000..e29dfc775f
---- /dev/null
-+++ b/include/hw/rtc/allwinner-rtc.h
-@@ -0,0 +1,129 @@
-+/*
-+ * Allwinner Real Time Clock emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef HW_MISC_ALLWINNER_RTC_H
-+#define HW_MISC_ALLWINNER_RTC_H
-+
-+#include "qemu/osdep.h"
-+#include "qom/object.h"
-+#include "hw/sysbus.h"
-+
-+/**
-+ * Constants
-+ * @{
-+ */
-+
-+/** Highest register address used by RTC device */
-+#define AW_RTC_REGS_MAXADDR     (0x1F4)
-+
-+/** Total number of known registers */
-+#define AW_RTC_REGS_NUM         (AW_RTC_REGS_MAXADDR / sizeof(uint32_t))
-+
-+/** @} */
-+
-+/**
-+ * Object model types
-+ * @{
-+ */
-+
-+/** Generic Allwinner RTC device (abstract) */
-+#define TYPE_AW_RTC          "allwinner-rtc"
-+
-+/** Allwinner RTC sun4i family (A10, A12) */
-+#define TYPE_AW_RTC_SUN4I    TYPE_AW_RTC "-sun4i"
-+
-+/** Allwinner RTC sun6i family and newer (A31, H2+, H3, etc) */
-+#define TYPE_AW_RTC_SUN6I    TYPE_AW_RTC "-sun6i"
-+
-+/** Allwinner RTC sun7i family (A20) */
-+#define TYPE_AW_RTC_SUN7I    TYPE_AW_RTC "-sun7i"
-+
-+/** @} */
-+
-+/**
-+ * Object model macros
-+ * @{
-+ */
-+
-+#define AW_RTC(obj) \
-+    OBJECT_CHECK(AwRtcState, (obj), TYPE_AW_RTC)
-+#define AW_RTC_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(AwRtcClass, (klass), TYPE_AW_RTC)
-+#define AW_RTC_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(AwRtcClass, (obj), TYPE_AW_RTC)
-+
-+/** @} */
-+
-+/**
-+ * Allwinner RTC per-object instance state.
-+ */
-+typedef struct AwRtcState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    /** Maps I/O registers in physical memory */
-+    MemoryRegion iomem;
-+
-+    /** Array of hardware registers */
-+    uint32_t regs[AW_RTC_REGS_NUM];
-+
-+} AwRtcState;
-+
-+/**
-+ * Allwinner RTC class-level struct.
-+ *
-+ * This struct is filled by each sunxi device specific code
-+ * such that the generic code can use this struct to support
-+ * all devices.
-+ */
-+typedef struct AwRtcClass {
-+    /*< private >*/
-+    SysBusDeviceClass parent_class;
-+    /*< public >*/
-+
-+    /** Defines device specific register map */
-+    const uint8_t *regmap;
-+
-+    /** Number of entries in regmap */
-+    size_t regmap_size;
-+
-+    /** Device offset in years to 1900, for struct tm.tm_year */
-+    uint8_t year_offset;
-+
-+    /**
-+     * Read device specific register
-+     *
-+     * @offset: register offset to read
-+     * @return true if register read successful, false otherwise
-+     */
-+    bool (*read)(AwRtcState *s, uint32_t offset);
-+
-+    /**
-+     * Write device specific register
-+     *
-+     * @offset: register offset to write
-+     * @data: value to set in register
-+     * @return true if register write successful, false otherwise
-+     */
-+    bool (*write)(AwRtcState *s, uint32_t offset, uint32_t data);
-+
-+} AwRtcClass;
-+
-+#endif /* HW_MISC_ALLWINNER_RTC_H */
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 61cf3550a6..3f8f9d0d19 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -46,6 +46,9 @@ static void aw_a10_init(Object *obj)
- 
-     sysbus_init_child_obj(obj, "mmc0", &s->mmc0, sizeof(s->mmc0),
-                           TYPE_AW_SDHOST_SUN4I);
-+
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-+                          TYPE_AW_RTC_SUN4I);
- }
- 
- static void aw_a10_realize(DeviceState *dev, Error **errp)
-@@ -128,6 +131,10 @@ static void aw_a10_realize(DeviceState *dev, Error **errp)
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->mmc0), 0, s->irq[32]);
-     object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->mmc0),
-                               "sd-bus", &error_abort);
-+
-+    /* RTC */
-+    qdev_init_nofail(DEVICE(&s->rtc));
-+    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->rtc), 0, AW_A10_RTC_BASE, 10);
- }
- 
- static void aw_a10_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-index 77b823e7d8..caa4d8b196 100644
---- a/hw/arm/allwinner-h3.c
-+++ b/hw/arm/allwinner-h3.c
-@@ -61,6 +61,7 @@ const hwaddr allwinner_h3_memmap[] = {
-     [AW_H3_GIC_CPU]    = 0x01c82000,
-     [AW_H3_GIC_HYP]    = 0x01c84000,
-     [AW_H3_GIC_VCPU]   = 0x01c86000,
-+    [AW_H3_RTC]        = 0x01f00000,
-     [AW_H3_CPUCFG]     = 0x01f01c00,
-     [AW_H3_SDRAM]      = 0x40000000
- };
-@@ -116,7 +117,6 @@ struct AwH3Unimplemented {
-     { "csi",       0x01cb0000, 320 * KiB },
-     { "tve",       0x01e00000, 64 * KiB },
-     { "hdmi",      0x01ee0000, 128 * KiB },
--    { "rtc",       0x01f00000, 1 * KiB },
-     { "r_timer",   0x01f00800, 1 * KiB },
-     { "r_intc",    0x01f00c00, 1 * KiB },
-     { "r_wdog",    0x01f01000, 1 * KiB },
-@@ -244,6 +244,9 @@ static void allwinner_h3_init(Object *obj)
-                              "ram-addr", &error_abort);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->dramc),
-                               "ram-size", &error_abort);
-+
-+    sysbus_init_child_obj(obj, "rtc", &s->rtc, sizeof(s->rtc),
-+                          TYPE_AW_RTC_SUN6I);
- }
- 
- static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-@@ -437,6 +440,10 @@ static void allwinner_h3_realize(DeviceState *dev, Error **errp)
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 1, s->memmap[AW_H3_DRAMCTL]);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->dramc), 2, s->memmap[AW_H3_DRAMPHY]);
- 
-+    /* RTC */
-+    qdev_init_nofail(DEVICE(&s->rtc));
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, s->memmap[AW_H3_RTC]);
-+
-     /* Unimplemented devices */
-     for (int i = 0; i < ARRAY_SIZE(unimplemented); i++) {
-         create_unimplemented_device(unimplemented[i].device_name,
-diff --git a/hw/rtc/allwinner-rtc.c b/hw/rtc/allwinner-rtc.c
-new file mode 100644
-index 0000000000..812fe7f10b
---- /dev/null
-+++ b/hw/rtc/allwinner-rtc.c
-@@ -0,0 +1,386 @@
-+/*
-+ * Allwinner Real Time Clock emulation
-+ *
-+ * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/units.h"
-+#include "hw/sysbus.h"
-+#include "migration/vmstate.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "qemu-common.h"
-+#include "hw/rtc/allwinner-rtc.h"
-+#include "trace.h"
-+
-+/* RTC registers */
-+enum {
-+    REG_LOSC = 1,        /* Low Oscillator Control */
-+    REG_YYMMDD,          /* RTC Year-Month-Day */
-+    REG_HHMMSS,          /* RTC Hour-Minute-Second */
-+    REG_ALARM1_WKHHMMSS, /* Alarm1 Week Hour-Minute-Second */
-+    REG_ALARM1_EN,       /* Alarm1 Enable */
-+    REG_ALARM1_IRQ_EN,   /* Alarm1 IRQ Enable */
-+    REG_ALARM1_IRQ_STA,  /* Alarm1 IRQ Status */
-+    REG_GP0,             /* General Purpose Register 0 */
-+    REG_GP1,             /* General Purpose Register 1 */
-+    REG_GP2,             /* General Purpose Register 2 */
-+    REG_GP3,             /* General Purpose Register 3 */
-+
-+    /* sun4i registers */
-+    REG_ALARM1_DDHHMMSS, /* Alarm1 Day Hour-Minute-Second */
-+    REG_CPUCFG,          /* CPU Configuration Register */
-+
-+    /* sun6i registers */
-+    REG_LOSC_AUTOSTA,    /* LOSC Auto Switch Status */
-+    REG_INT_OSC_PRE,     /* Internal OSC Clock Prescaler */
-+    REG_ALARM0_COUNTER,  /* Alarm0 Counter */
-+    REG_ALARM0_CUR_VLU,  /* Alarm0 Counter Current Value */
-+    REG_ALARM0_ENABLE,   /* Alarm0 Enable */
-+    REG_ALARM0_IRQ_EN,   /* Alarm0 IRQ Enable */
-+    REG_ALARM0_IRQ_STA,  /* Alarm0 IRQ Status */
-+    REG_ALARM_CONFIG,    /* Alarm Config */
-+    REG_LOSC_OUT_GATING, /* LOSC Output Gating Register */
-+    REG_GP4,             /* General Purpose Register 4 */
-+    REG_GP5,             /* General Purpose Register 5 */
-+    REG_GP6,             /* General Purpose Register 6 */
-+    REG_GP7,             /* General Purpose Register 7 */
-+    REG_RTC_DBG,         /* RTC Debug Register */
-+    REG_GPL_HOLD_OUT,    /* GPL Hold Output Register */
-+    REG_VDD_RTC,         /* VDD RTC Regulate Register */
-+    REG_IC_CHARA,        /* IC Characteristics Register */
-+};
-+
-+/* RTC register flags */
-+enum {
-+    REG_LOSC_YMD   = (1 << 7),
-+    REG_LOSC_HMS   = (1 << 8),
-+};
-+
-+/* RTC sun4i register map (offset to name) */
-+const uint8_t allwinner_rtc_sun4i_regmap[] = {
-+    [0x0000] = REG_LOSC,
-+    [0x0004] = REG_YYMMDD,
-+    [0x0008] = REG_HHMMSS,
-+    [0x000C] = REG_ALARM1_DDHHMMSS,
-+    [0x0010] = REG_ALARM1_WKHHMMSS,
-+    [0x0014] = REG_ALARM1_EN,
-+    [0x0018] = REG_ALARM1_IRQ_EN,
-+    [0x001C] = REG_ALARM1_IRQ_STA,
-+    [0x0020] = REG_GP0,
-+    [0x0024] = REG_GP1,
-+    [0x0028] = REG_GP2,
-+    [0x002C] = REG_GP3,
-+    [0x003C] = REG_CPUCFG,
-+};
-+
-+/* RTC sun6i register map (offset to name) */
-+const uint8_t allwinner_rtc_sun6i_regmap[] = {
-+    [0x0000] = REG_LOSC,
-+    [0x0004] = REG_LOSC_AUTOSTA,
-+    [0x0008] = REG_INT_OSC_PRE,
-+    [0x0010] = REG_YYMMDD,
-+    [0x0014] = REG_HHMMSS,
-+    [0x0020] = REG_ALARM0_COUNTER,
-+    [0x0024] = REG_ALARM0_CUR_VLU,
-+    [0x0028] = REG_ALARM0_ENABLE,
-+    [0x002C] = REG_ALARM0_IRQ_EN,
-+    [0x0030] = REG_ALARM0_IRQ_STA,
-+    [0x0040] = REG_ALARM1_WKHHMMSS,
-+    [0x0044] = REG_ALARM1_EN,
-+    [0x0048] = REG_ALARM1_IRQ_EN,
-+    [0x004C] = REG_ALARM1_IRQ_STA,
-+    [0x0050] = REG_ALARM_CONFIG,
-+    [0x0060] = REG_LOSC_OUT_GATING,
-+    [0x0100] = REG_GP0,
-+    [0x0104] = REG_GP1,
-+    [0x0108] = REG_GP2,
-+    [0x010C] = REG_GP3,
-+    [0x0110] = REG_GP4,
-+    [0x0114] = REG_GP5,
-+    [0x0118] = REG_GP6,
-+    [0x011C] = REG_GP7,
-+    [0x0170] = REG_RTC_DBG,
-+    [0x0180] = REG_GPL_HOLD_OUT,
-+    [0x0190] = REG_VDD_RTC,
-+    [0x01F0] = REG_IC_CHARA,
-+};
-+
-+static bool allwinner_rtc_sun4i_read(AwRtcState *s, uint32_t offset)
-+{
-+    /* no sun4i specific registers currently implemented */
-+    return false;
-+}
-+
-+static bool allwinner_rtc_sun4i_write(AwRtcState *s, uint32_t offset,
-+                                      uint32_t data)
-+{
-+    /* no sun4i specific registers currently implemented */
-+    return false;
-+}
-+
-+static bool allwinner_rtc_sun6i_read(AwRtcState *s, uint32_t offset)
-+{
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
-+
-+    switch (c->regmap[offset]) {
-+    case REG_GP4:             /* General Purpose Register 4 */
-+    case REG_GP5:             /* General Purpose Register 5 */
-+    case REG_GP6:             /* General Purpose Register 6 */
-+    case REG_GP7:             /* General Purpose Register 7 */
-+        return true;
-+    default:
-+        break;
-+    }
-+    return false;
-+}
-+
-+static bool allwinner_rtc_sun6i_write(AwRtcState *s, uint32_t offset,
-+                                      uint32_t data)
-+{
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
-+
-+    switch (c->regmap[offset]) {
-+    case REG_GP4:             /* General Purpose Register 4 */
-+    case REG_GP5:             /* General Purpose Register 5 */
-+    case REG_GP6:             /* General Purpose Register 6 */
-+    case REG_GP7:             /* General Purpose Register 7 */
-+        return true;
-+    default:
-+        break;
-+    }
-+    return false;
-+}
-+
-+static uint64_t allwinner_rtc_read(void *opaque, hwaddr offset,
-+                                   unsigned size)
-+{
-+    AwRtcState *s = AW_RTC(opaque);
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
-+    uint64_t val = 0;
-+
-+    if (offset >= AW_RTC_REGS_MAXADDR) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    if (!c->regmap[offset]) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
-+        return 0;
-+    }
-+
-+    switch (c->regmap[offset]) {
-+    case REG_LOSC:       /* Low Oscillator Control */
-+        val = s->regs[REG_LOSC];
-+        s->regs[REG_LOSC] &= ~(REG_LOSC_YMD | REG_LOSC_HMS);
-+        break;
-+    case REG_YYMMDD:     /* RTC Year-Month-Day */
-+    case REG_HHMMSS:     /* RTC Hour-Minute-Second */
-+    case REG_GP0:        /* General Purpose Register 0 */
-+    case REG_GP1:        /* General Purpose Register 1 */
-+    case REG_GP2:        /* General Purpose Register 2 */
-+    case REG_GP3:        /* General Purpose Register 3 */
-+        val = s->regs[c->regmap[offset]];
-+        break;
-+    default:
-+        if (!c->read(s, offset)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: unimplemented register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
-+        }
-+        val = s->regs[c->regmap[offset]];
-+        break;
-+    }
-+
-+    trace_allwinner_rtc_read(offset, val);
-+    return val;
-+}
-+
-+static void allwinner_rtc_write(void *opaque, hwaddr offset,
-+                                uint64_t val, unsigned size)
-+{
-+    AwRtcState *s = AW_RTC(opaque);
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(s);
-+
-+    if (offset >= AW_RTC_REGS_MAXADDR) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: out-of-bounds offset 0x%04x\n",
-+                      __func__, (uint32_t)offset);
-+        return;
-+    }
-+
-+    if (!c->regmap[offset]) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
-+        return;
-+    }
-+
-+    trace_allwinner_rtc_write(offset, val);
-+
-+    switch (c->regmap[offset]) {
-+    case REG_YYMMDD:     /* RTC Year-Month-Day */
-+        s->regs[REG_YYMMDD] = val;
-+        s->regs[REG_LOSC]  |= REG_LOSC_YMD;
-+        break;
-+    case REG_HHMMSS:     /* RTC Hour-Minute-Second */
-+        s->regs[REG_HHMMSS] = val;
-+        s->regs[REG_LOSC]  |= REG_LOSC_HMS;
-+        break;
-+    case REG_GP0:        /* General Purpose Register 0 */
-+    case REG_GP1:        /* General Purpose Register 1 */
-+    case REG_GP2:        /* General Purpose Register 2 */
-+    case REG_GP3:        /* General Purpose Register 3 */
-+        s->regs[c->regmap[offset]] = val;
-+        break;
-+    default:
-+        if (!c->write(s, offset, val)) {
-+            qemu_log_mask(LOG_UNIMP, "%s: unimplemented register 0x%04x\n",
-+                          __func__, (uint32_t)offset);
-+        }
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps allwinner_rtc_ops = {
-+    .read = allwinner_rtc_read,
-+    .write = allwinner_rtc_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+    .impl.min_access_size = 4,
-+};
-+
-+static void allwinner_rtc_reset(DeviceState *dev)
-+{
-+    AwRtcState *s = AW_RTC(dev);
-+    const AwRtcClass *c = AW_RTC_GET_CLASS(dev);
-+    struct tm now;
-+
-+    /* Clear registers */
-+    memset(s->regs, 0, sizeof(s->regs));
-+
-+    /* Get current datetime */
-+    qemu_get_timedate(&now, 0);
-+
-+    /* Set RTC with current datetime */
-+    s->regs[REG_YYMMDD] =  ((now.tm_year - c->year_offset) << 16) |
-+                           ((now.tm_mon + 1) << 8) |
-+                             now.tm_mday;
-+    s->regs[REG_HHMMSS] = (((now.tm_wday + 6) % 7) << 29) |
-+                              (now.tm_hour << 16) |
-+                              (now.tm_min << 8) |
-+                               now.tm_sec;
-+}
-+
-+static void allwinner_rtc_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    AwRtcState *s = AW_RTC(obj);
-+
-+    /* Memory mapping */
-+    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_rtc_ops, s,
-+                          TYPE_AW_RTC, 1 * KiB);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static const VMStateDescription allwinner_rtc_vmstate = {
-+    .name = "allwinner-rtc",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, AwRtcState, AW_RTC_REGS_NUM),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void allwinner_rtc_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = allwinner_rtc_reset;
-+    dc->vmsd = &allwinner_rtc_vmstate;
-+}
-+
-+static void allwinner_rtc_sun4i_class_init(ObjectClass *klass, void *data)
-+{
-+    AwRtcClass *arc = AW_RTC_CLASS(klass);
-+
-+    arc->regmap = allwinner_rtc_sun4i_regmap;
-+    arc->regmap_size = ARRAY_SIZE(allwinner_rtc_sun4i_regmap);
-+    arc->year_offset = 110;
-+    arc->read = allwinner_rtc_sun4i_read;
-+    arc->write = allwinner_rtc_sun4i_write;
-+}
-+
-+static void allwinner_rtc_sun6i_class_init(ObjectClass *klass, void *data)
-+{
-+    AwRtcClass *arc = AW_RTC_CLASS(klass);
-+
-+    arc->regmap = allwinner_rtc_sun6i_regmap;
-+    arc->regmap_size = ARRAY_SIZE(allwinner_rtc_sun6i_regmap);
-+    arc->year_offset = 70;
-+    arc->read = allwinner_rtc_sun6i_read;
-+    arc->write = allwinner_rtc_sun6i_write;
-+}
-+
-+static void allwinner_rtc_sun7i_class_init(ObjectClass *klass, void *data)
-+{
-+    AwRtcClass *arc = AW_RTC_CLASS(klass);
-+
-+    allwinner_rtc_sun4i_class_init(klass, arc);
-+    arc->year_offset = 70;
-+}
-+
-+static const TypeInfo allwinner_rtc_info = {
-+    .name          = TYPE_AW_RTC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_init = allwinner_rtc_init,
-+    .instance_size = sizeof(AwRtcState),
-+    .class_init    = allwinner_rtc_class_init,
-+    .class_size    = sizeof(AwRtcClass),
-+    .abstract      = true,
-+};
-+
-+static const TypeInfo allwinner_rtc_sun4i_info = {
-+    .name          = TYPE_AW_RTC_SUN4I,
-+    .parent        = TYPE_AW_RTC,
-+    .class_init    = allwinner_rtc_sun4i_class_init,
-+};
-+
-+static const TypeInfo allwinner_rtc_sun6i_info = {
-+    .name          = TYPE_AW_RTC_SUN6I,
-+    .parent        = TYPE_AW_RTC,
-+    .class_init    = allwinner_rtc_sun6i_class_init,
-+};
-+
-+static const TypeInfo allwinner_rtc_sun7i_info = {
-+    .name          = TYPE_AW_RTC_SUN7I,
-+    .parent        = TYPE_AW_RTC,
-+    .class_init    = allwinner_rtc_sun7i_class_init,
-+};
-+
-+static void allwinner_rtc_register(void)
-+{
-+    type_register_static(&allwinner_rtc_info);
-+    type_register_static(&allwinner_rtc_sun4i_info);
-+    type_register_static(&allwinner_rtc_sun6i_info);
-+    type_register_static(&allwinner_rtc_sun7i_info);
-+}
-+
-+type_init(allwinner_rtc_register)
-diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
-index 8dc9fcd3a9..12d92feebf 100644
---- a/hw/rtc/Makefile.objs
-+++ b/hw/rtc/Makefile.objs
-@@ -11,3 +11,4 @@ common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
- obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
- common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
- common-obj-$(CONFIG_ASPEED_SOC) += aspeed_rtc.o
-+common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-rtc.o
-diff --git a/hw/rtc/trace-events b/hw/rtc/trace-events
-index d6749f4616..eb57de3bd6 100644
---- a/hw/rtc/trace-events
-+++ b/hw/rtc/trace-events
-@@ -1,5 +1,9 @@
- # See docs/devel/tracing.txt for syntax documentation.
- 
-+# allwinner-rtc.c
-+allwinner_rtc_read(uint64_t addr, uint64_t value) "addr 0x%" PRIx64 " value 0x%" PRIx64
-+allwinner_rtc_write(uint64_t addr, uint64_t value) "addr 0x%" PRIx64 " value 0x%" PRIx64
-+
- # sun4v-rtc.c
- sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " value 0x%" PRIx64
- sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 " value 0x%" PRIx64
--- 
-2.17.1
+-               ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+-               if (ret) {
+-                       vfio_unpin_page_external(dma, iova, do_accounting);
+-                       goto pin_unwind;
+-               }
++               if (!vpfn) {
++                       ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
++                       if (ret) {
++                               vfio_unpin_page_external(dma, iova,
++                                                        do_accounting, 
+false);
++                               goto pin_unwind;
++                       }
++               } else
++                       vpfn->pfn = phys_pfn[i];
+         }
 
+
+
+
+>>>> +			else {
+>>>> +				phys_pfn[i] = vpfn->pfn;
+>>>> +				continue;
+>>>> +			}
+>>>>    		}
+>>>>    
+>>>>    		remote_vaddr = dma->vaddr + iova - dma->iova;
+>>>> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>    
+>>>>    		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+>>>>    		if (ret) {
+>>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
+>>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
+>>>> +						 false);
+>>>>    			goto pin_unwind;
+>>>>    		}
+>>>>    	}
+
+<snip>
+
+>>
+>>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+>>>> +			iommu->dirty_page_tracking = true;
+>>>> +			return 0;
+>>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+>>>> +			iommu->dirty_page_tracking = false;
+>>>> +
+>>>> +			mutex_lock(&iommu->lock);
+>>>> +			vfio_remove_unpinned_from_dma_list(iommu);
+>>>> +			mutex_unlock(&iommu->lock);
+>>>> +			return 0;
+>>>> +
+>>>> +		} else if (range.flags &
+>>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+>>>> +			uint64_t iommu_pgmask;
+>>>> +			unsigned long pgshift = __ffs(range.pgsize);
+>>>> +			unsigned long *bitmap;
+>>>> +			long bsize;
+>>>> +
+>>>> +			iommu_pgmask =
+>>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+>>>> +
+>>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+>>>> +			    (range.pgsize - 1))
+>>>> +				return -EINVAL;
+>>>> +
+>>>> +			if (range.iova & iommu_pgmask)
+>>>> +				return -EINVAL;
+>>>> +			if (!range.size || range.size > SIZE_MAX)
+>>>> +				return -EINVAL;
+>>>> +			if (range.iova + range.size < range.iova)
+>>>> +				return -EINVAL;
+>>>> +
+>>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+>>>> +						   range.bitmap_size);
+>>>> +			if (bsize < 0)
+>>>> +				return ret;
+>>>> +
+>>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+>>>
+>>> I think I remember mentioning previously that we cannot allocate an
+>>> arbitrary buffer on behalf of the user, it's far too easy for them to
+>>> kill the kernel that way.  kmalloc is also limited in what it can
+>>> alloc.
+>>
+>> That's the reason added verify_bitmap_size(), so that size is verified
+> 
+> That's only a consistency test, it only verifies that the user claims
+> to provide a bitmap sized sufficiently for the range they're trying to
+> request.  range.size is limited to SIZE_MAX, so 2^64, divided by page
+> size for 2^52 bits, 8bits per byte for 2^49 bytes of bitmap that we'd
+> try to kmalloc (512TB).  kmalloc is good for a couple MB AIUI.
+> Meanwhile the user doesn't actually need to allocate that bitmap in
+> order to crash the kernel.
+> 
+>>> Can't we use the user buffer directly or only work on a part of
+>>> it at a time?
+>>>    
+>>
+>> without copy_from_user(), how?
+> 
+> For starters, what's the benefit of copying the bitmap from the user
+> in the first place?  We presume the data is zero'd and if it's not,
+> that's the user's bug to sort out (we just need to define the API to
+> specify that).  Therefore the copy_from_user() is unnecessary anyway and
+> we really just need to copy_to_user() for any places we're setting
+> bits.  We could just walk through the range with an unsigned long
+> bitmap buffer, writing it out to userspace any time we reach the end
+> with bits set, zeroing it and shifting it as a window to the user
+> buffer.  We could improve batching by allocating a larger buffer in the
+> kernel, with a kernel defined maximum size and performing the same
+> windowing scheme.
+> 
+
+Ok removing copy_from_user().
+But AFAIK, calling copy_to_user() multiple times is not efficient in 
+terms of performance.
+
+Checked code in virt/kvm/kvm_main.c: __kvm_set_memory_region() where 
+dirty_bitmap is allocated, that has generic checks, user space address 
+check, memory overflow check and KVM_MEM_MAX_NR_PAGES as below. I'll add 
+access_ok check. I already added overflow check.
+
+         /* General sanity checks */
+         if (mem->memory_size & (PAGE_SIZE - 1))
+                 goto out;
+
+        !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+                         mem->memory_size)))
+
+         if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+                 goto out;
+
+         if (npages > KVM_MEM_MAX_NR_PAGES)
+                 goto out;
+
+
+Where KVM_MEM_MAX_NR_PAGES is:
+
+/*
+  * Some of the bitops functions do not support too long bitmaps.
+  * This number must be determined not to exceed such limits.
+  */
+#define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+
+But we can't use KVM specific KVM_MEM_MAX_NR_PAGES check in vfio module.
+Should we define similar limit in vfio module instead of SIZE_MAX?
+
+> I don't know if there's a way to directly map the user buffer rather
+> than copy_to_user(), but I thought I'd ask in case there's some obvious
+> efficiency improvement to be had there.
+> 
+>>>> +			if (!bitmap)
+>>>> +				return -ENOMEM;
+>>>> +
+>>>> +			ret = copy_from_user(bitmap,
+>>>> +			     (void __user *)range.bitmap, bsize) ? -EFAULT : 0;
+>>>> +			if (ret)
+>>>> +				goto bitmap_exit;
+>>>> +
+>>>> +			iommu->dirty_page_tracking = false;
+>>>
+>>> a) This is done outside of the mutex and susceptible to races,
+>>
+>> moving inside lock
+>>
+>>> b) why is this done?
+>> once bitmap is read, dirty_page_tracking should be stopped. Right?
+> 
+> Absolutely not.  Dirty bit page tracking should remain enabled until
+> the user turns it off, doing otherwise precludes both iterative and
+> partial dirty page collection from userspace.  I think both of those
+> are fundamentally required of this interface.  Thanks,
+> 
+
+OK.
+
+Thanks,
+Kirti
 
