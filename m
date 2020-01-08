@@ -2,88 +2,102 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FB0C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B5CC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A36EF2067D
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:09:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B3BF20705
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 17:09:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTnQ/PZ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36EF2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OJaxCQmU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B3BF20705
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipEpV-0007uN-6N
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 12:09:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53819)
+	id 1ipEq4-0000XP-LR
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 12:09:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1ipEk3-0001W5-8w
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:03:36 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ipEnK-0005a9-HI
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:06:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1ipEk1-0007NT-E2
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:03:35 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36151)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ipEk0-0007MQ-Tn
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:03:33 -0500
-Received: by mail-wm1-x342.google.com with SMTP id p17so3299296wma.1
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 09:03:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=lg9PwxG0WHlA67baDX/lcRy6wsfV3A83QjuJ0K6QUsE=;
- b=cTnQ/PZ0Vkerl86IteKB3UoR7eVoct6T4bjCXqWWplxYzy40KnNl0geTi9mrbxMmWm
- km3F+alMFxDSgVghX5VEhlcqSgGDMVBBh9zG4yQAV4K/t2EjdplM/upjNr5iUfO5vg0Q
- q8jRHXh69jWpdmBf1TAwuhcee5EmZclbGI33pH0EpMjhIsfqG2cIE//bHWTIeYE5GVoZ
- OeAAR/rjPVdjWGn/qjgQ7zBd7nKzv49APu2vPsCpx0N4REVoS39+rLu0REfD4N+WUVh0
- wUb5j+4UXFEH3FiLZASJjIy5OZZ35orvLbdvhLOMPkVf/LESpeU2TMl1u5YfJITtFXwX
- cPeA==
+ (envelope-from <pbonzini@redhat.com>) id 1ipEnI-0001nQ-0y
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:06:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56087
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ipEnH-0001m7-M2
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 12:06:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578503214;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xljsfmVNGPNxuk7FDMgcbUPbIKzv4OpYgcxiC9c3Lno=;
+ b=OJaxCQmUMBejEx6xTaCwPcXX6xUDfIyLxTDj+skK1hjzeuzWsQCWDRstM4Se3gc/419mkm
+ AATdLjPk/U04YCaFZ+XFfWjfheQZ8e0l9z8XH7FAc6IZ9dmvb40qNiDUvcKugvQVj1aBeq
+ rzNDQKWEqlrbcCnx6POaITJ/IYEMIMY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-n_4N2NhPNreAV-DaA1TYSw-1; Wed, 08 Jan 2020 12:06:51 -0500
+Received: by mail-wr1-f72.google.com with SMTP id k18so1690319wrw.9
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 09:06:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=lg9PwxG0WHlA67baDX/lcRy6wsfV3A83QjuJ0K6QUsE=;
- b=R6dxgpyMzEVvwjALTuynKASl3cNEx8+rVdWVUIZfYE9uxAp1f78fz1IjpQvbHBq+XV
- EuEZh0LF+7H7fTt9nATMLBH3AFyVY8IOZEFXQwy6JHEULNrQhHoJR1/vURJQQYLByVLA
- 3cnSQwYFoOTPjnPuxtAy8Nj2HODimDNccrfzm2XbdpzbkYzO7Ak1EenFN8bLhB36jPqo
- PJrLu/hLVx+ZxTacIHvtQ6p0agN2nA/TU7ONqfGMBPk2LAzqXXk9W4oqyCo4kgpm6GEq
- vumHuqx/MJt+vCerM0sGGRTK5x+EGCrWmWbxrPOfr5Hse2Z2YFyyKLoN5NfbLlYkVGoy
- ziHw==
-X-Gm-Message-State: APjAAAX8UyflUibVemD9de4OE/l+ccK7UggGjk9LGZuXakr4+t/aY0I2
- TFyc9FJXSA2UNF/kbVbsRpA=
-X-Google-Smtp-Source: APXvYqxR63T/PzTbXK/tsM4A/UNi2QwHHc5uyeobXEUtrzheU0Hp2nZZEhEPJihQPP+M5Zsak225jw==
-X-Received: by 2002:a7b:cc6a:: with SMTP id n10mr5295770wmj.170.1578503011727; 
- Wed, 08 Jan 2020 09:03:31 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id u13sm4653477wmd.36.2020.01.08.09.03.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 09:03:30 -0800 (PST)
-Date: Wed, 8 Jan 2020 17:03:29 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v6 12/21] libqtest: add in-process qtest.c tx/rx handlers
-Message-ID: <20200108170329.GD501521@stefanha-x1.localdomain>
-References: <20191129213424.6290-1-alxndr@bu.edu>
- <20191129213424.6290-13-alxndr@bu.edu>
- <20200103111518.GG130240@stefanha-x1.localdomain>
- <20200105195544.rysht5cz43fzppwz@mozz.bu.edu>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=d8eTdDIXvxWUlzXdJJ4soe0bL5qfH7LzvgLtD3JYCIk=;
+ b=E/gAt47b0PBcMlyd09stshvAI5dMyJDT6f/PGw1cEaUayhveqtzeZgZT7mxYfO8hGb
+ ElEoEfNpxtvlYLPCDD7GbnAt2rmTuqZEPEWqYpoW5N2FEVfJZGYEnm4srC9whF5zE7Af
+ kDAmjEy3mLcW9/DiMs3XxYpNlO5Vr+C45lY036j0Kf/KE56M3sVNlDKuQTmF1P3mh+I4
+ OzY5ANLWeYJ9lpHr5VU8bGe5oulotbwDAI9hgvXxXN0VffWeif13Z55sXmJgSf/5xLdn
+ m8Wnl1xKq/2N5GQu2m4rpXes/rYw9AUW3wi5xh52mWBSa9EreQ0tn4p3JoIrhe1tM/vq
+ 9hdg==
+X-Gm-Message-State: APjAAAUuQH2izN0g7D2QP1LcmsdWPe6hyGSdTGcRXEZgDLDhH/I75snK
+ +PoOAtPVOXltly36XyVYWhnVf01aV0YC2JU3xsyt/IgnJ/n+2qjucU6fnOpXXLcASWNdd2pdD/D
+ +mG2LOEKM4LOUPR0=
+X-Received: by 2002:adf:e3d0:: with SMTP id k16mr5845607wrm.241.1578503210120; 
+ Wed, 08 Jan 2020 09:06:50 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyuXgbKZNKJPmZO9w18p2izGIUU/89C3bgo7ZOhc6RWuLqQ8WhbM9Fg5CiFEqStZqMVdVkRIA==
+X-Received: by 2002:adf:e3d0:: with SMTP id k16mr5845577wrm.241.1578503209899; 
+ Wed, 08 Jan 2020 09:06:49 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:c6d:4079:b74c:e329?
+ ([2001:b07:6468:f312:c6d:4079:b74c:e329])
+ by smtp.gmail.com with ESMTPSA id n189sm4662479wme.33.2020.01.08.09.06.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jan 2020 09:06:48 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] misc: use QEMU_IS_ALIGNED
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200103074000.1006389-1-marcandre.lureau@redhat.com>
+ <20200103074000.1006389-2-marcandre.lureau@redhat.com>
+ <2668c259-8ee9-06eb-9d7e-c09ca12aace4@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <a135ce07-a9ef-6d32-4119-4aca8dc65dfe@redhat.com>
+Date: Wed, 8 Jan 2020 18:06:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Q0rSlbzrZN6k9QnT"
-Content-Disposition: inline
-In-Reply-To: <20200105195544.rysht5cz43fzppwz@mozz.bu.edu>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+In-Reply-To: <2668c259-8ee9-06eb-9d7e-c09ca12aace4@redhat.com>
+Content-Language: en-US
+X-MC-Unique: n_4N2NhPNreAV-DaA1TYSw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,72 +109,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "bsd@redhat.com" <bsd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---Q0rSlbzrZN6k9QnT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, Jan 05, 2020 at 02:55:44PM -0500, Alexander Bulekov wrote:
-> On 200103 1115, Stefan Hajnoczi wrote:
-> > On Fri, Nov 29, 2019 at 09:34:47PM +0000, Oleinik, Alexander wrote:
-> > > +QTestState *qtest_inproc_init(QTestState **s, bool log, const char* =
-arch,
-> > > +                    void (*send)(void*, const char*))
-> > > +{
-> > > +    QTestState *qts;
-> > > +    qts =3D g_new0(QTestState, 1);
-> > > +    *s =3D qts; /* Expose qts early on, since the query endianness r=
-elies on it */
-> > > +    qts->wstatus =3D 0;
-> > > +    for (int i =3D 0; i < MAX_IRQ; i++) {
-> > > +        qts->irq_level[i] =3D false;
-> > > +    }
-> > > +
-> > > +    qtest_client_set_rx_handler(qts, qtest_client_inproc_recv_line);
-> > > +
-> > > +    /* send() may not have a matching protoype, so use a type-safe w=
-rapper */
-> > > +    qts->ops.external_send =3D send;
-> > > +    qtest_client_set_tx_handler(qts, send_wrapper);
-> > > +
-> > > +    qts->big_endian =3D qtest_query_target_endianness(qts);
-> > > +    gchar *bin_path =3D g_strconcat("/qemu-system-", arch, NULL);
-> > > +    setenv("QTEST_QEMU_BINARY", bin_path, 0);
-> > > +    g_free(bin_path);
-> >=20
-> > Is this a dummy path that is needed to make other code happy?  Or does
-> > the user need to have an actual file at /qemu-system-ARCH?
+On 03/01/20 08:43, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 1/3/20 8:39 AM, Marc-Andr=C3=A9 Lureau wrote:
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>> =C2=A0 exec.c=C2=A0=C2=A0=C2=A0 | 4 ++--
+>> =C2=A0 roms/SLOF | 2 +-
+>> =C2=A0 2 files changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index d4b769d0d4..1feda49ca1 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -3895,7 +3895,7 @@ int ram_block_discard_range(RAMBlock *rb,
+>> uint64_t start, size_t length)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t *host_startaddr =3D rb->ho=
+st + start;
+>> =C2=A0 -=C2=A0=C2=A0=C2=A0 if ((uintptr_t)host_startaddr & (rb->page_siz=
+e - 1)) {
+>> +=C2=A0=C2=A0=C2=A0 if (!QEMU_PTR_IS_ALIGNED(host_startaddr, rb->page_si=
+ze)) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("ram=
+_block_discard_range: Unaligned start
+>> address: %p",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 host_startaddr=
+);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto err;
+>> @@ -3903,7 +3903,7 @@ int ram_block_discard_range(RAMBlock *rb,
+>> uint64_t start, size_t length)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if ((start + length) <=3D rb->used=
+_length) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool need_madvise=
+, need_fallocate;
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (length & (rb->page_size =
+- 1)) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!QEMU_IS_ALIGNED(length,=
+ rb->page_size)) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 error_report("ram_block_discard_range: Unaligned length:
+>> %zx",
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 length);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 goto err;
+>> diff --git a/roms/SLOF b/roms/SLOF
+>> index 9546892a80..8ebf2f55e1 160000
+>> --- a/roms/SLOF
+>> +++ b/roms/SLOF
+>> @@ -1 +1 @@
+>> -Subproject commit 9546892a80d5a4c73deea6719de46372f007f4a6
+>> +Subproject commit 8ebf2f55e1ba1492b942ba4b682160e644fc0f98
 >=20
-> Yes - with the inproc mode this is only needed to make qtest_get_arch
-> happy, which simply returns the suffix of the env variable. Standard
-> qtest initialization relies on it in qtest_init_without_qmp_handshake,
-> but that function is not used by the fuzzer.
+> Without the SLOF submodule update:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Cool, please add a comment to the code.
+Also without the SLOF update:
 
---Q0rSlbzrZN6k9QnT
-Content-Type: application/pgp-signature; name="signature.asc"
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
------BEGIN PGP SIGNATURE-----
+Paolo
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4WC2AACgkQnKSrs4Gr
-c8htIggApVBjXVTTBHuWXoh4o8wXvsghJYTGQB+fKf/FZSM7PrPgHLDIG8Tjh2WT
-1EZXa+IjxI96wQYHdcOZ7KlTAKv2mNyK9dFxL7ZO0tFwuYH5MzRouYdyzug55jbx
-N/2aewsYjFrURuA9eN9ibeG1uNTE6ECNOM4dPCou9gmrN9qAPjrFiTUvSX1DQi3N
-1O3hXtCBZB+H4JdcGTRmpLFBNX25xa/3ylqsUNFQElPO5vJpI3TEgvPFbHqqn+r1
-NPcBcUXyDvu8UsJKQwt4yuHjjZVEQf/STFZkvrFychg73vBt0BINOvWnjhVw27QW
-mf3mB6iaaMoQsVlLuMqVAKV8PIYjXg==
-=Du+v
------END PGP SIGNATURE-----
-
---Q0rSlbzrZN6k9QnT--
 
