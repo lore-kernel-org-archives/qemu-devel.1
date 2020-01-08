@@ -2,78 +2,78 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4311C00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 03:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19899C00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 03:48:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C4332070A
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 03:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D68D92070A
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 03:48:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZUhKDNsb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C4332070A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XSX0wIsT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68D92070A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip2Jn-0005Fd-Re
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 22:47:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48384)
+	id 1ip2K8-0005iQ-5W
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 22:48:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48716)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ip2Hp-0002wj-4R
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:45:38 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ip2I4-0003Jo-Sp
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:45:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ip2Hn-0002QL-NZ
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:45:37 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46710)
+ (envelope-from <richard.henderson@linaro.org>) id 1ip2I3-0002k5-Lv
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:45:52 -0500
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:36286)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ip2Hn-0002PE-GX
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:45:35 -0500
-Received: by mail-pg1-x543.google.com with SMTP id z124so846545pgb.13
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 19:45:35 -0800 (PST)
+ id 1ip2I3-0002jG-GK
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 22:45:51 -0500
+Received: by mail-pf1-x432.google.com with SMTP id x184so912797pfb.3
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 19:45:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xIsBUaQmXMuEnS1tO54/55Y3/tYO/CJY1dsQmwqrvNE=;
- b=ZUhKDNsbepBldOdc5ELNy1AvL8cYTDY1m3Ol1SmDYh8vstL5R758B6yy9WMKF8CNBE
- lGdTacVSGdRHUFmSC7HTkjZyu+Mtv1BjZPwNAMTvK9Qp8CUK7CpPPPoTWwRSIaAge/M1
- JFoGQo0fOZCIUxpoHoFZ263MSx5SycZkd2GxbPneMMZzytS1V4rJE5wyqMx55WlRsYTD
- 1PEQPlerxa9ft1fEnQvnVFvQ9+Z6rwXeLhMdmmm2WWl+J6mfok7KAVJNImssmkuvhFX4
- QB9rRpwAoRvPInI8EdHEj40Jm09AytU2HkCJ6LUmehPscAA2P4HoJfk99hxvUYQlod7t
- 6VEA==
+ bh=WAyFVokvd/qDR4nuAyVDRmGp5pg99piONaTKi+oPUR0=;
+ b=XSX0wIsTN6Rprrhea0R4b3vHQgYQIZeUwGeWQqqBru0235sJqfM8YgMes6LEFPAzjY
+ vl9W9J8ta5W1IvJKv+cIcvq0mhrrB8bn9lR90lKhQaFr0xfPiCaQyd//mhmR3uoIFhH3
+ PtljSA9Rv7KZmpgH+3XeftjsxKqBcnLQX6lYy72nZNv2xxq6yS0Quc+0sTot0x2HWbNj
+ w+gZnxrghhtGTAs0uXHpFRZX5NLPebL7ZFy/+j13RnyDjVp0qtGw6kUEzRpfh1EIehnB
+ /wRAaBf8lNmioV3vU62AKolgVLqHmBEi04AlM/Sluxefm5btMrtTRpFToIHpI8fcWJt2
+ s+dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xIsBUaQmXMuEnS1tO54/55Y3/tYO/CJY1dsQmwqrvNE=;
- b=DO+AenAjfYK8NpN8tHyZ8+nCxBAgSzwMkz6AufdshotyMYJVKDNbDeERG4yswS4qk7
- RFEWkewnl4G4e6QLdIgqZXkf2fmySsjypmysrWCZ/RNa+EZam2nKua0gFf71ZyFJKi34
- S21mAFoxO+qzFesJtbrXSstERWMTC7lGS3FSfl1oWTtHPXup5zG3+M4FlDP70kaLgxLX
- XrVJIg3SNbMJYhT/+g+m4vXd7j12L9wyw3xl1WHa9+gJLxxdkvqr07Ht1uO/Zkhl/JZ2
- q1bfKupICqSihCZDyuZXvHvleUN7hu2qkZsRCJaBl5GRfpC5pqbnvpjSPk8LFhu1YCQ0
- cIgw==
-X-Gm-Message-State: APjAAAW6/O+z88fyaIpQMeHYyp8LP92JeibdUCINkeKWQzIqGtFc2R1w
- DGnqKZYrrAY6dyWvuSNaMpEMNnmgmkUTCg==
-X-Google-Smtp-Source: APXvYqzxFGnYm333AbApw5ouC64DuR5n6kW4w6fbCfqlzwMItaZquLghfC6FJw7Ofon5MBhHQWXotg==
-X-Received: by 2002:a63:4702:: with SMTP id u2mr3090426pga.125.1578455134000; 
- Tue, 07 Jan 2020 19:45:34 -0800 (PST)
+ bh=WAyFVokvd/qDR4nuAyVDRmGp5pg99piONaTKi+oPUR0=;
+ b=CjGhaT6+SgcQM/7s1N+L5i6wX10F3E6fnNSmPJA/mALBXWdQ0IzfKb4Y+Wb7VsYX/P
+ 1jwczXz8AgOv+I0wcVjXqPutQjtZ6wR69N6LlpBVN7HDTJtA5mO/U0rNUeWheQ/W0HsF
+ VNxeU6HuKMAwtbV1SRqcABCyxXX1Rdtg6aHgPpEylXDVU/DZAbTW3oTHsaZTI5a6CVCs
+ MIMr/AffvB6hsrP+AafcpoS2d83cqf5rrUNMM8sq2G1LVqZIxHe263vxY+CKRPFOiEtW
+ Ytbnxui7I+7Eb+fIS6BPCCEgQxuAV48u1mby2h47kE8UmYMxTYkhC+OjOYYQujh2R0kT
+ eqoA==
+X-Gm-Message-State: APjAAAUQ/MfVaRC9+r/MrV83Z+z2tAAwHA5U6ZMeQnzKhjhDGJf+4JB4
+ QPYJe/Hm4mKkAHbluhLUp3QNPPht9tPfvA==
+X-Google-Smtp-Source: APXvYqyo/y2l25JmbNfQkGSc1w2aPPLpQGGsNPAUw3XCnrc9H28Pb+HKce6TKkJczk3PZpNcPL4Sdw==
+X-Received: by 2002:a62:62c4:: with SMTP id w187mr2940652pfb.216.1578455150297; 
+ Tue, 07 Jan 2020 19:45:50 -0800 (PST)
 Received: from localhost.localdomain (alanje.lnk.telstra.net.
  [120.151.179.201])
- by smtp.gmail.com with ESMTPSA id f23sm1198433pgj.76.2020.01.07.19.45.31
+ by smtp.gmail.com with ESMTPSA id f23sm1198433pgj.76.2020.01.07.19.45.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Jan 2020 19:45:33 -0800 (PST)
+ Tue, 07 Jan 2020 19:45:49 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/41] tcg: Remove softmmu code_gen_buffer fixed address
-Date: Wed,  8 Jan 2020 14:44:44 +1100
-Message-Id: <20200108034523.17349-3-richard.henderson@linaro.org>
+Subject: [PULL 07/41] configure: Support -static-pie if requested
+Date: Wed,  8 Jan 2020 14:44:49 +1100
+Message-Id: <20200108034523.17349-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200108034523.17349-1-richard.henderson@linaro.org>
 References: <20200108034523.17349-1-richard.henderson@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,84 +94,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>,
+Cc: peter.maydell@linaro.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The commentary talks about "in concert with the addresses
-assigned in the relevant linker script", except there is no
-linker script for softmmu, nor has there been for some time.
+Recent toolchains support static and pie at the same time.
 
-(Do not confuse the user-only linker script editing that was
-removed in the previous patch, because user-only does not
-use this code_gen_buffer allocation method.)
+As with normal dynamic builds, allow --static to default to PIE
+if supported by the toolchain.  Allow --enable/--disable-pie to
+override the default.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/translate-all.c | 37 +++++--------------------------------
- 1 file changed, 5 insertions(+), 32 deletions(-)
+v2: Fix --disable-pie --static
+---
+ configure | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index bb325a2bc4..7749c3dda5 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1032,47 +1032,20 @@ static inline void *alloc_code_gen_buffer(void)
- {
-     int prot = PROT_WRITE | PROT_READ | PROT_EXEC;
-     int flags = MAP_PRIVATE | MAP_ANONYMOUS;
--    uintptr_t start = 0;
-     size_t size = tcg_ctx->code_gen_buffer_size;
-     void *buf;
+diff --git a/configure b/configure
+index de2c4867ad..94a4b1c848 100755
+--- a/configure
++++ b/configure
+@@ -1025,7 +1025,6 @@ for opt do
+   ;;
+   --static)
+     static="yes"
+-    LDFLAGS="-static $LDFLAGS"
+     QEMU_PKG_CONFIG_FLAGS="--static $QEMU_PKG_CONFIG_FLAGS"
+   ;;
+   --mandir=*) mandir="$optarg"
+@@ -2001,11 +2000,6 @@ if test "$static" = "yes" ; then
+   if test "$modules" = "yes" ; then
+     error_exit "static and modules are mutually incompatible"
+   fi
+-  if test "$pie" = "yes" ; then
+-    error_exit "static and pie are mutually incompatible"
+-  else
+-    pie="no"
+-  fi
+ fi
  
--    /* Constrain the position of the buffer based on the host cpu.
--       Note that these addresses are chosen in concert with the
--       addresses assigned in the relevant linker script file.  */
--# if defined(__PIE__) || defined(__PIC__)
--    /* Don't bother setting a preferred location if we're building
--       a position-independent executable.  We're more likely to get
--       an address near the main executable if we let the kernel
--       choose the address.  */
--# elif defined(__x86_64__) && defined(MAP_32BIT)
--    /* Force the memory down into low memory with the executable.
--       Leave the choice of exact location with the kernel.  */
--    flags |= MAP_32BIT;
--    /* Cannot expect to map more than 800MB in low memory.  */
--    if (size > 800u * 1024 * 1024) {
--        tcg_ctx->code_gen_buffer_size = size = 800u * 1024 * 1024;
--    }
--# elif defined(__sparc__)
--    start = 0x40000000ul;
--# elif defined(__s390x__)
--    start = 0x90000000ul;
--# elif defined(__mips__)
--#  if _MIPS_SIM == _ABI64
--    start = 0x128000000ul;
--#  else
--    start = 0x08000000ul;
--#  endif
--# endif
--
--    buf = mmap((void *)start, size, prot, flags, -1, 0);
-+    buf = mmap(NULL, size, prot, flags, -1, 0);
-     if (buf == MAP_FAILED) {
-         return NULL;
-     }
+ # Unconditional check for compiler __thread support
+@@ -2036,7 +2030,18 @@ if compile_prog "-Werror -fno-pie" "-no-pie"; then
+   LDFLAGS_NOPIE="-no-pie"
+ fi
  
- #ifdef __mips__
-     if (cross_256mb(buf, size)) {
--        /* Try again, with the original still mapped, to avoid re-acquiring
--           that 256mb crossing.  This time don't specify an address.  */
-+        /*
-+         * Try again, with the original still mapped, to avoid re-acquiring
-+         * the same 256mb crossing.
-+         */
-         size_t size2;
-         void *buf2 = mmap(NULL, size, prot, flags, -1, 0);
-         switch ((int)(buf2 != MAP_FAILED)) {
+-if test "$pie" = "no"; then
++if test "$static" = "yes"; then
++  if test "$pie" != "no" && compile_prog "-fPIE -DPIE" "-static-pie"; then
++    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
++    LDFLAGS="-static-pie $LDFLAGS"
++    pie="yes"
++  elif test "$pie" = "yes"; then
++    error_exit "-static-pie not available due to missing toolchain support"
++  else
++    LDFLAGS="-static $LDFLAGS"
++    pie="no"
++  fi
++elif test "$pie" = "no"; then
+   QEMU_CFLAGS="$CFLAGS_NOPIE $QEMU_CFLAGS"
+   LDFLAGS="$LDFLAGS_NOPIE $LDFLAGS"
+ elif compile_prog "-fPIE -DPIE" "-pie"; then
 -- 
 2.20.1
 
