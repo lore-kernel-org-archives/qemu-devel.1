@@ -7,78 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDF4C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAD3C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:34:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2518C206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:34:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99F14206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:34:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uVAAq1O5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2518C206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEUoe9th"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F14206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipAXk-0005II-Rg
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:34:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60200)
+	id 1ipAXn-0005LU-6y
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:34:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60183)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWD-0003ZN-Uz
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:03 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWC-0004CF-JV
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWD-0003ZL-0d
  for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:01 -0500
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:36677)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWB-0004Bq-Sc
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:00 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:42673)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ipAWC-0004Bg-D1
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:00 -0500
-Received: by mail-wm1-x32d.google.com with SMTP id p17so2323114wma.1
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:00 -0800 (PST)
+ id 1ipAWB-0004BL-MO
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:32:59 -0500
+Received: by mail-wr1-x435.google.com with SMTP id q6so3157187wro.9
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:32:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Gy9btQ6/hiFDb+yxtplkQokqmOK4xY8N+OZWF2JIRzg=;
- b=uVAAq1O5zbSUP4gUAYETzx/Q1eW++7FFfF1E7r9RL4hvDqaLlY2ynJSlOhKZYCc+8e
- xLXzS8pQ5CNs8PecKzp7lCPVDS9DZ/LI745N6iXvw7/hkAMcr1Y8OlJ0lsvOEXc/5EFa
- 3vyukwO+D5yy6ht18JdKVthcI/4f90oxMTXpnH5DSKUbOaaFx9O9/6R5blFbs+CyyCVe
- L7MsWdQIy5zvhUd0nDmWXd8xHMp6mNhDmtQpicYpW+ewoHCYbS3WbtX/EsMq1OXPIXcy
- 0IawvP3TOjuNS7N/2zVBbSnPEzP70YcyRudNUC03wcNXPur94v8ARpI7lf6axZa+WfFQ
- MAkg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=mcf3x4qvRFnXt/JzGXBT9qpotUnB0PCEc7IeTyjDok0=;
+ b=aEUoe9thOY5O2uX16d5s+KzacDxsYT+CNZ0m+WcpRWnivnNzLRZJqLdUHh3yYtUwsb
+ CMnRNnXLzO9Z5eIWjc+8ya3bx4H220ojhYFzclARXoJjed4k0tO/fgjuV6HeLslZogk8
+ N/3gNmU+RI67+o6897l0O7igQmhxXffJtqPK2aX6kuVJyd6XFDSNQul48A66G/jJsnHY
+ zYEbSjLpO/1y6CKhnTvWyDXGe5lS12olknml7Kv8Yymin+sHgwcgHrUeVOUoD3X19vSy
+ ERcT9Pyx8i9x+VgJnarC6By9IUBUYLXKsKD8r/bVJc0BeykAL9BnH8fCjeGU76Z+FPza
+ LLvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=Gy9btQ6/hiFDb+yxtplkQokqmOK4xY8N+OZWF2JIRzg=;
- b=QRUq4WInDq1zCFrIBwoeC1GxbyTI/lcEdfYE7+iIYD2XPxJXkmdUTw1ol/kmZ4xt2b
- evt6uF7LYsIL1SQ0tqWV9cDKGf2mmI0SMZv2FwHo0VtDyzeYbshYbQOuba1C7sLuvQRP
- dGhuPEL61bYS3z+hd0vcOLz3BWSmarqAETq8FythYeZ84zN7zQKWO4gpX10cMp8rYjUy
- 10BQ08mBsj+KT0jWIMlp5vFbFfRcobIm8JbeI0M3BWH/xUJA8StLZey6m04AntqhBDBK
- xhk+OJKZFzMHTlhLuoAPLHa77xF2Gv71bxZPffZRbx5FM/EFyoRAVWhoRVsPOIciiT4Q
- Xwaw==
-X-Gm-Message-State: APjAAAUV5bAuYdvrGA6P7e6oqjUc7ET9uQDYYNKhwNz5mJh7nS/VUJKA
- hgFAQuvYayvOp5uLFX2L50rpS4eh
-X-Google-Smtp-Source: APXvYqxnaRJGuAXC10yDrED+U3B6O/guHPlCxhLbplE72TC6qq7sGS2xCsVqacVfX6DoqVzL+PV0Ww==
-X-Received: by 2002:a05:600c:22d3:: with SMTP id
- 19mr3525935wmg.92.1578486779147; 
- Wed, 08 Jan 2020 04:32:59 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.32.58
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=mcf3x4qvRFnXt/JzGXBT9qpotUnB0PCEc7IeTyjDok0=;
+ b=io/vTQvOM11uTi00oT/lkf1RMFmw3HrE862xJHBPVzNre68vNXiU4hN2X1j6352SJk
+ eSO//sJuYO9JAI3pnTAk7MonMERjFen6dka+gdX///i4DXC1tCeMpWiyrYr/KWBUaT+0
+ /GDzDgyEa93fJigIsTXMlXssEUb1BIy5eupk1c7PsceCV3FIGqeTGFUkLd2PLtX2fup0
+ YNclsVAM4dMQKOQku2m8DEXLMQVPin6j5G4tO+7+a1r5oAwKpnuUufRqKxf8TBRwVNOr
+ sHeG2X9nuYQe/dCauXTJOidJbg76KnkM64Ddm5pUKeAc+O7SMyc2IjvDb+ZTNbWrSWND
+ TaXg==
+X-Gm-Message-State: APjAAAXjTWlup3eXihuoUgzG+S9WrhX1tCns0N4UkMHmsrpv0IYgf5JS
+ axCPJjbhN9o89p8Hh4sZXdVCAVEk
+X-Google-Smtp-Source: APXvYqy1hoF20pauo+Nf7KebetkMxrjdW2A/aPGTwV5+EnUe+ntXMesJbmGThB16t/ojxPlwrsrMcw==
+X-Received: by 2002:a5d:6b88:: with SMTP id n8mr4521273wrx.288.1578486778116; 
  Wed, 08 Jan 2020 04:32:58 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.32.57
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 08 Jan 2020 04:32:57 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/38] accel/kvm: Make "kernel_irqchip" default on
-Date: Wed,  8 Jan 2020 13:32:19 +0100
-Message-Id: <1578486775-52247-3-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 01/38] x86: Check for machine state object class before
+ typecasting it
+Date: Wed,  8 Jan 2020 13:32:18 +0100
+Message-Id: <1578486775-52247-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
 References: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,125 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xiaoyao Li <xiaoyao.li@intel.com>
+From: Michal Privoznik <mprivozn@redhat.com>
 
-Commit 11bc4a13d1f4 ("kvm: convert "-machine kernel_irqchip" to an
-accelerator property") moves kernel_irqchip property from "-machine" to
-"-accel kvm", but it forgets to set the default value of
-kernel_irqchip_allowed and kernel_irqchip_split.
+In ed9e923c3c ("x86: move SMM property to X86MachineState", 2019-12-17)
+In v4.2.0-246-ged9e923c3c the SMM property was moved from PC
+machine class to x86 machine class. Makes sense, but the change
+was too aggressive: in target/i386/kvm.c:kvm_arch_init() it
+altered check which sets SMRAM if given machine has SMM enabled.
+The line that detects whether given machine object is class of
+PC_MACHINE was removed from the check. This makes qemu try to
+enable SMRAM for all machine types, which is not what we want.
 
-Also cleaning up the three useless members (kernel_irqchip_allowed,
-kernel_irqchip_required, kernel_irqchip_split) in struct MachineState.
-
-Fixes: 11bc4a13d1f4 ("kvm: convert "-machine kernel_irqchip" to an accelerator property")
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Message-Id: <20191228104326.21732-1-xiaoyao.li@intel.com>
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Fixes: ed9e923c3c ("x86: move SMM property to X86MachineState", 2019-12-17)
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <7cc91bab3191bfd7e071bdd3fdf7fe2a2991deb0.1577692822.git.mprivozn@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c | 19 +++++++++++++------
- include/hw/boards.h |  3 ---
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ target/i386/kvm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b2f1a5b..1ada2f4 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -98,7 +98,7 @@ struct KVMState
-     int kvm_shadow_mem;
-     bool kernel_irqchip_allowed;
-     bool kernel_irqchip_required;
--    bool kernel_irqchip_split;
-+    OnOffAuto kernel_irqchip_split;
-     bool sync_mmu;
-     bool manual_dirty_log_protect;
-     /* The man page (and posix) say ioctl numbers are signed int, but
-@@ -1783,6 +1783,7 @@ static void kvm_irqchip_create(KVMState *s)
- {
-     int ret;
- 
-+    assert(s->kernel_irqchip_split != ON_OFF_AUTO_AUTO);
-     if (kvm_check_extension(s, KVM_CAP_IRQCHIP)) {
-         ;
-     } else if (kvm_check_extension(s, KVM_CAP_S390_IRQCHIP)) {
-@@ -1799,7 +1800,7 @@ static void kvm_irqchip_create(KVMState *s)
-      * in-kernel irqchip for us */
-     ret = kvm_arch_irqchip_create(s);
-     if (ret == 0) {
--        if (s->kernel_irqchip_split) {
-+        if (s->kernel_irqchip_split == ON_OFF_AUTO_ON) {
-             perror("Split IRQ chip mode not supported.");
-             exit(1);
-         } else {
-@@ -2070,6 +2071,10 @@ static int kvm_init(MachineState *ms)
-         goto err;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 0b51190..7ee3202 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2173,6 +2173,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
      }
  
-+    if (s->kernel_irqchip_split == ON_OFF_AUTO_AUTO) {
-+        s->kernel_irqchip_split = mc->default_kernel_irqchip_split ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-+    }
-+
-     if (s->kernel_irqchip_allowed) {
-         kvm_irqchip_create(s);
-     }
-@@ -3005,17 +3010,17 @@ static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
-         case ON_OFF_SPLIT_ON:
-             s->kernel_irqchip_allowed = true;
-             s->kernel_irqchip_required = true;
--            s->kernel_irqchip_split = false;
-+            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
-             break;
-         case ON_OFF_SPLIT_OFF:
-             s->kernel_irqchip_allowed = false;
-             s->kernel_irqchip_required = false;
--            s->kernel_irqchip_split = false;
-+            s->kernel_irqchip_split = ON_OFF_AUTO_OFF;
-             break;
-         case ON_OFF_SPLIT_SPLIT:
-             s->kernel_irqchip_allowed = true;
-             s->kernel_irqchip_required = true;
--            s->kernel_irqchip_split = true;
-+            s->kernel_irqchip_split = ON_OFF_AUTO_ON;
-             break;
-         default:
-             /* The value was checked in visit_type_OnOffSplit() above. If
-@@ -3038,7 +3043,7 @@ bool kvm_kernel_irqchip_required(void)
- 
- bool kvm_kernel_irqchip_split(void)
- {
--    return kvm_state->kernel_irqchip_split;
-+    return kvm_state->kernel_irqchip_split == ON_OFF_AUTO_ON;
- }
- 
- static void kvm_accel_instance_init(Object *obj)
-@@ -3046,6 +3051,8 @@ static void kvm_accel_instance_init(Object *obj)
-     KVMState *s = KVM_STATE(obj);
- 
-     s->kvm_shadow_mem = -1;
-+    s->kernel_irqchip_allowed = true;
-+    s->kernel_irqchip_split = ON_OFF_AUTO_AUTO;
- }
- 
- static void kvm_accel_class_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 61f8bb8..fb1b43d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -271,9 +271,6 @@ struct MachineState {
- 
-     /*< public >*/
- 
--    bool kernel_irqchip_allowed;
--    bool kernel_irqchip_required;
--    bool kernel_irqchip_split;
-     char *dtb;
-     char *dumpdtb;
-     int phandle_start;
+     if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
++        object_dynamic_cast(OBJECT(ms), TYPE_X86_MACHINE) &&
+         x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
+         smram_machine_done.notify = register_smram_listener;
+         qemu_add_machine_init_done_notifier(&smram_machine_done);
 -- 
 1.8.3.1
 
