@@ -7,49 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6537C33C9B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:27:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9513DC00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:28:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94FFE20705
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:27:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61AF520705
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:28:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="npF+cXpb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FFE20705
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bVsPWdop"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61AF520705
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip3se-0001ZI-Ac
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 00:27:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47450)
+	id 1ip3tP-0002nk-Mm
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 00:28:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ip3oa-0003r3-8m
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:23:33 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ip3oc-0003t5-CA
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:23:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ip3oY-0002gx-QE
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:23:32 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56133 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ip3oa-0002lU-VY
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:23:34 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:37385 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ip3oY-0002de-Ez; Wed, 08 Jan 2020 00:23:30 -0500
+ id 1ip3oa-0002ht-K4; Wed, 08 Jan 2020 00:23:32 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47syMC1LTHz9sST; Wed,  8 Jan 2020 16:23:18 +1100 (AEDT)
+ id 47syMC6WDfz9sSY; Wed,  8 Jan 2020 16:23:19 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1578460999;
- bh=xuXCUv7AbtgO81cRSWzQUqJbuB77DWavVOto6WrS4/U=;
+ bh=kGaZI5Lnwcj97tGSIjPD6mGjpb+lCMs2T2ZbPDSKe04=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=npF+cXpbIbKNA8MYsN+2VjGfTfBrrPfWIwpum8DVkMiSVAn8FwLAD8ri63kiYB1Oy
- dFLxwgisNzTyctVh4sc/SORXPRx+n3Apzn0evJMQR1IBXbITaEDPzaYaHvsRuJkcAi
- QCci/T0J2Aqv3XAOj2NXs5+qnl5ArIreSqCx/f0Q=
+ b=bVsPWdopg+WJF2wYvKkxHm2aAg/D+w5phEjkJAM+/4UCZacOe8uIanPYICagBrBQQ
+ Lrb6vUgH1aDevyX/kqqEKnlj7CwOe3HV3nZu/KsmkCSE8iThl80e3eAXD2XoLXaAIk
+ tIIgweDaKUCqqvnHWL8So4SYpJfx7qNYOi6zgdJU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 18/26] ppc/pnv: Add an "nr-threads" property to the base chip
- class
-Date: Wed,  8 Jan 2020 16:23:04 +1100
-Message-Id: <20200108052312.238710-19-david@gibson.dropbear.id.au>
+Subject: [PULL 22/26] pnv/xive: Deduce the PnvXive pointer from XiveTCTX::xptr
+Date: Wed,  8 Jan 2020 16:23:08 +1100
+Message-Id: <20200108052312.238710-23-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108052312.238710-1-david@gibson.dropbear.id.au>
 References: <20200108052312.238710-1-david@gibson.dropbear.id.au>
@@ -78,74 +77,77 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-Set it at chip creation and forward it to the cores. This allows to drop
-a call to qdev_get_machine().
+And use it instead of reaching out to the machine. This allows to get
+rid of pnv_get_chip().
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20200106145645.4539-7-clg@kaod.org>
+Message-Id: <20200106145645.4539-11-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c         | 8 +++++---
- include/hw/ppc/pnv.h | 1 +
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ hw/intc/pnv_xive.c   |  8 ++------
+ hw/ppc/pnv.c         | 14 --------------
+ include/hw/ppc/pnv.h |  2 --
+ 3 files changed, 2 insertions(+), 22 deletions(-)
 
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 6412cf222e..715fca61ae 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -472,12 +472,8 @@ static uint8_t pnv_xive_get_block_id(XiveRouter *xrt=
+r)
+ static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
+ {
+     int pir =3D ppc_cpu_pir(cpu);
+-    PnvChip *chip;
+-    PnvXive *xive;
+-
+-    chip =3D pnv_get_chip(PNV9_PIR2CHIP(pir));
+-    assert(chip);
+-    xive =3D &PNV9_CHIP(chip)->xive;
++    XivePresenter *xptr =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc)->xptr;
++    PnvXive *xive =3D PNV_XIVE(xptr);
+=20
+     if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
+         xive_error(xive, "IC: CPU %x is not enabled", pir);
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index ead92d52b2..6a0aa78d53 100644
+index 19fc5d4ddb..e2735bb8dd 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -802,6 +802,8 @@ static void pnv_init(MachineState *machine)
-                                 &error_fatal);
-         object_property_set_int(chip, machine->smp.cores,
-                                 "nr-cores", &error_fatal);
-+        object_property_set_int(chip, machine->smp.threads,
-+                                "nr-threads", &error_fatal);
-         /*
-          * The POWER8 machine use the XICS interrupt interface.
-          * Propagate the XICS fabric to the chip and its controllers.
-@@ -1526,7 +1528,6 @@ static void pnv_chip_core_sanitize(PnvChip *chip, E=
-rror **errp)
+@@ -1717,20 +1717,6 @@ static int pnv_match_nvt(XiveFabric *xfb, uint8_t =
+format,
+     return total_count;
+ }
 =20
- static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+-PnvChip *pnv_get_chip(uint32_t chip_id)
+-{
+-    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
+-    int i;
+-
+-    for (i =3D 0; i < pnv->num_chips; i++) {
+-        PnvChip *chip =3D pnv->chips[i];
+-        if (chip->chip_id =3D=3D chip_id) {
+-            return chip;
+-        }
+-    }
+-    return NULL;
+-}
+-
+ static void pnv_machine_power8_class_init(ObjectClass *oc, void *data)
  {
--    MachineState *ms =3D MACHINE(qdev_get_machine());
-     Error *error =3D NULL;
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-     const char *typename =3D pnv_chip_core_typename(chip);
-@@ -1562,8 +1563,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
-ror **errp)
-         object_property_add_child(OBJECT(chip), core_name, OBJECT(pnv_co=
-re),
-                                   &error_abort);
-         chip->cores[i] =3D pnv_core;
--        object_property_set_int(OBJECT(pnv_core), ms->smp.threads, "nr-t=
-hreads",
--                                &error_fatal);
-+        object_property_set_int(OBJECT(pnv_core), chip->nr_threads,
-+                                "nr-threads", &error_fatal);
-         object_property_set_int(OBJECT(pnv_core), core_hwid,
-                                 CPU_CORE_PROP_CORE_ID, &error_fatal);
-         object_property_set_int(OBJECT(pnv_core),
-@@ -1602,6 +1603,7 @@ static Property pnv_chip_properties[] =3D {
-     DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
-     DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
-     DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
-+    DEFINE_PROP_UINT32("nr-threads", PnvChip, nr_threads, 1),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
+     MachineClass *mc =3D MACHINE_CLASS(oc);
 diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 56277862dd..4b9012f994 100644
+index 2504d8cd4f..d65dd32036 100644
 --- a/include/hw/ppc/pnv.h
 +++ b/include/hw/ppc/pnv.h
-@@ -48,6 +48,7 @@ typedef struct PnvChip {
-     uint64_t     ram_size;
+@@ -219,8 +219,6 @@ struct PnvMachineState {
+     PnvPnor      *pnor;
+ };
 =20
-     uint32_t     nr_cores;
-+    uint32_t     nr_threads;
-     uint64_t     cores_mask;
-     PnvCore      **cores;
+-PnvChip *pnv_get_chip(uint32_t chip_id);
+-
+ #define PNV_FDT_ADDR          0x01000000
+ #define PNV_TIMEBASE_FREQ     512000000ULL
 =20
 --=20
 2.24.1
