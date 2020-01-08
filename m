@@ -2,73 +2,85 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 323B7C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 18:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E611EC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 19:08:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10A4020705
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 18:57:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A4020705
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B47CA206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 19:08:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RyiQGd1D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B47CA206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipGWd-0001EN-2q
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 13:57:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49135)
+	id 1ipGgw-0006uc-RS
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 14:08:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60613)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipGUV-0006pT-Tj
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 13:55:41 -0500
+ (envelope-from <quintela@redhat.com>) id 1ipGgA-0006TC-Jk
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 14:07:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipGUU-0000Ll-Nc
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 13:55:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39620)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipGUU-0000KR-I8
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 13:55:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipGUT-0008La-LM
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 18:55:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9D3102E806B
- for <qemu-devel@nongnu.org>; Wed,  8 Jan 2020 18:55:37 +0000 (UTC)
+ (envelope-from <quintela@redhat.com>) id 1ipGg8-00072z-4o
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 14:07:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54270
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipGg7-00070z-Kr
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 14:07:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578510458;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ODHbSgO0j+hboYZIB5j0laro593dYqw0dcGH0hdhIeY=;
+ b=RyiQGd1DYNg9T4roqdRPn9TV7EgfkXgiot89bEV1SGwOC60rLTyeMcq1K2EEysSOeh2eSU
+ 02/0i/31OeI44Ofw9zFfckQFzPwCeaMWnbyaGrVkj4G+RpsANjAdiu7oZObvHMO9jVMiyG
+ aOwJ3Z6WmJgF8AMIoPsok95vpJVk3+w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-X3Sv4ex9OXyrGsYa4YqjoQ-1; Wed, 08 Jan 2020 14:07:35 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B9CA10054E3;
+ Wed,  8 Jan 2020 19:07:34 +0000 (UTC)
+Received: from redhat.com (ovpn-116-97.ams2.redhat.com [10.36.116.97])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 39F137C370;
+ Wed,  8 Jan 2020 19:07:32 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Scott Cheloha <cheloha@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2 1/2] migration: add savevm_state_handler_remove()
+In-Reply-To: <20191017205953.13122-2-cheloha@linux.vnet.ibm.com> (Scott
+ Cheloha's message of "Thu, 17 Oct 2019 15:59:52 -0500")
+References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
+ <20191017205953.13122-2-cheloha@linux.vnet.ibm.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+Date: Wed, 08 Jan 2020 20:07:13 +0100
+Message-ID: <87tv5522e6.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: X3Sv4ex9OXyrGsYa4YqjoQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 08 Jan 2020 18:49:16 -0000
-From: Aleksandar Markovic <1858461@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: aladjev-andrew amarkovic pmaydell
-X-Launchpad-Bug-Reporter: puchuu (aladjev-andrew)
-X-Launchpad-Bug-Modifier: Aleksandar Markovic (amarkovic)
-References: <157833123209.15024.12557979334447840996.malonedeb@wampee.canonical.com>
-Message-Id: <157850935641.27774.918715209442438715.malone@chaenomeles.canonical.com>
-Subject: [Bug 1858461] Re: Please refactor linux-user/mips/cpu_loop.c
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e4c0e486aa650be01fd1fed3a554f76614aa1020
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,54 +89,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858461 <1858461@bugs.launchpad.net>
+Reply-To: quintela@redhat.com
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also, can you please add more info on "emerge" problem, so that I can
-repro it with the current QEMU. I would prefer to know the roots cause,
-rather than just accept that the problem disappeared.
+Scott Cheloha <cheloha@linux.vnet.ibm.com> wrote:
+> Create a function to abstract common logic needed when removing a
+> SaveStateEntry element from the savevm_state.handlers queue.
+>
+> For now we just remove the element.  Soon it will involve additional
+> cleanup.
+>
+> Signed-off-by: Scott Cheloha <cheloha@linux.vnet.ibm.com>
 
--- =
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858461
+queued
 
-Title:
-  Please refactor linux-user/mips/cpu_loop.c
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello. I am working with qemu on test images. I've added a new syscall
-  (436) to qemu but received ENOSYS from mips application.
-
-  Please open "linux-user/mips/cpu_loop.c". I've added at the end of
-  "mips_syscall_args" the following:
-
-  ```
-  MIPS_SYS(sys_getdents64_x32, 3)
-  ```
-
-  But
-
-  ```
-  syscall_num =3D env->active_tc.gpr[2] - 4000;
-  if (syscall_num >=3D sizeof(mips_syscall_args)) {
-    ret =3D -TARGET_ENOSYS;
-  ```
-
-  returns -TARGET_ENOSYS
-
-  We can see that "linux-user/mips/cpu_loop.c" differs a lot from
-  "linux-user/arm/cpu_loop.c". Arm has it's own "ARM_NR_BASE" and etc.
-
-  Can you please refactor mips cpu loop in the same way as arm? Thank
-  you.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858461/+subscriptions
 
