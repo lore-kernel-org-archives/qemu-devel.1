@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFB8C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A685C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37809206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9236206F0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 12:55:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fKQYfVei"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37809206F0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRYRp0rU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9236206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipArS-0001Im-Ko
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:54:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60572)
+	id 1ipAre-0001Tp-0W
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 07:55:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWc-00047S-C6
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:27 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWj-0004Ic-4u
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWb-0004UP-7H
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:26 -0500
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:35590)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ipAWi-0004Yy-3g
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:33 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:44181)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ipAWb-0004Tv-1U
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:25 -0500
-Received: by mail-wm1-x32e.google.com with SMTP id p17so2338075wmb.0
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:24 -0800 (PST)
+ id 1ipAWh-0004YT-Ty
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:33:32 -0500
+Received: by mail-wr1-x435.google.com with SMTP id q10so3146282wrm.11
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 04:33:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tU6eadOpHxdCLO2/As2DBQQOOukvsgPCPd77EIUHGOo=;
- b=fKQYfVeiqIzIF9umosjm6GyV5t7AsbxwOW1Btwi1N/+3mKnwbcA6LxJM2rK6WgC/8j
- ZRfxLcA1dwMaOkZlgthhQCHDIscdTtRnXR2Uwy0Tw3m4OPjWBm9RATmGTJPhrI6TjaVK
- K1YIErnCO35gHvVU15n/pxFbyjTvRs0n/N+gzKnyftwrOYakg5mJuOEh2gUpF/D9kfv1
- COtGLt2shB2hUa9OO+Awc6Yec17TTnDwkAvX2vo+bDQLH2sHN+qGkVuk3BOsa/LYbSN3
- w/9CwaMq9HGpiuaPrAzFceruqtDU3FdUag3tWQz9dnmxee1Vmoa7DgazSsfoz6L3+J/Z
- pIbg==
+ bh=0DFURfcrdlZMFc5Cww9NVOEhGZMTURpWj94rU1e8DFs=;
+ b=bRYRp0rUZJU0nvnAn06ZCG5z1UKtS9nM1be8EcEJaEb5qi6TKcEzq8PgH94Sjpz/X4
+ /e6WiB8K7V9WntAYFkj2ZrbF/aPwAIl7rsTz9U1Cf+U1q3atHyOYQyKMfr2Y3OoitQKB
+ HZIGdr5+G8rLIIGJsYOeCkyPzSh2IalEeXYCyvYniXB+RM3nQIjg1aOx/wSRbahqwYqW
+ jTtpWaqQwybpqXMyQRBSCDfhZhaDzyAjyjKMEExDrhDRIA/Pso0UjngkH4MiF8qxV/BE
+ MWBjnzPu/OJkJZPH00HJ2tnjOa/aXqf6vqHuIJzZZ1C1oukUvJnqiWr7FsfUei9aLkgz
+ BvsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=tU6eadOpHxdCLO2/As2DBQQOOukvsgPCPd77EIUHGOo=;
- b=mvEVf2dy7M4IL+4j3aPBEMJZDKocA6b2EcyUCffAHVWjP1lr9kHgPvmdQqZ+s/tD6n
- FoDjfs89yBQuoHNHjuzkm5W1k5AYOQqnN3HUxi3Vv83xXQ8DDE5lnqDz5HeDZIrxFTIj
- 4VG+QJqK1nNqF1twxyYN0EC6HJOYl7BwzxbUaPs3FQtKFfCCUI56S5W8IHKOEfXXI3yy
- LD75V/w2d7OZdSFrdtcRPPvs9UGlBUjNSPaTO1chgEu87Euo8lxN3gZLYJ7gq3vtBqev
- 9W0JczwrH0Vgd+nnP1CiY5Uo9MKsoiH/n92sXTOvhUosJObF3bRqSttsBC4OfQWhgeTK
- 5Qsg==
-X-Gm-Message-State: APjAAAXBt4ultTP0J67vbx6XxvigWcuWRDQ91TS8qmxs88OFM8k/a50I
- L7tJ9ql4LtWVDszPBkni7ejDJisZ
-X-Google-Smtp-Source: APXvYqwXilYPPA/5J97+42APDOl8pjk8bA1FK3bWCLj5mvWtst3d8Sc7hCeWklPJsNg5MwVHZYiPWg==
-X-Received: by 2002:a7b:cb01:: with SMTP id u1mr3180513wmj.156.1578486803861; 
- Wed, 08 Jan 2020 04:33:23 -0800 (PST)
+ bh=0DFURfcrdlZMFc5Cww9NVOEhGZMTURpWj94rU1e8DFs=;
+ b=Qd8nf5POYxpkxsLr4VZlZLNexBjXI9faXktT0XjGz4Mb5RBq0cQdPsUZXidkDWzZiR
+ 6ydddV7+zvCNM7N+QqESq7t45GIaI2tHBv4hqXesLudCWLJweDOt9g/elJsMZtJOU/g9
+ XlZzDAfYqkSvtf8m+oLG2OMZRPdEOn48HdN4yp6/G2YGg6qg+5m/otXbzuwaVVA3aQYy
+ yMsBJ/n+BA4qRq9aPg5ylbeAmt3Yz0Z+xVoa9/4rtNcsAFs52kpih1xBSvMVAwR869Dn
+ GXDVzV3UnSV1X5t7/3uH+JPO7hjy1uCdqoNH+6WjcOGzmirgB4ds53fqavmJvmUlcTpC
+ 6GRg==
+X-Gm-Message-State: APjAAAVirjqP/MSoIduaAuhAjFfmMiPFBdsIaFYgGVakFON5/a1LNcl7
+ 9Hb3uNZtDIeKKnyqrtyUtSYowQER
+X-Google-Smtp-Source: APXvYqyBHVFY5D7Fk19GnkeaVc3yyQtNrJfcNMJ/IX5p5l/o+WgSgkZgxZ+z62uNJsFNxpiS1gdTEA==
+X-Received: by 2002:adf:f1d0:: with SMTP id z16mr4194631wro.209.1578486810188; 
+ Wed, 08 Jan 2020 04:33:30 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.22
+ by smtp.gmail.com with ESMTPSA id o4sm4037750wrw.97.2020.01.08.04.33.29
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 08 Jan 2020 04:33:22 -0800 (PST)
+ Wed, 08 Jan 2020 04:33:29 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 25/38] hw/ipmi: Explicit we ignore some QEMUChrEvent in
+Subject: [PULL 31/38] vhost-user-net: Explicit we ignore few QEMUChrEvent in
  IOEventHandler
-Date: Wed,  8 Jan 2020 13:32:42 +0100
-Message-Id: <1578486775-52247-26-git-send-email-pbonzini@redhat.com>
+Date: Wed,  8 Jan 2020 13:32:48 +0100
+Message-Id: <1578486775-52247-32-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
 References: <1578486775-52247-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,41 +106,40 @@ able to use this enum in the IOEventHandler typedef, we need to
 explicit all the events ignored by this frontend, to silent the
 following GCC warning:
 
-  hw/ipmi/ipmi_bmc_extern.c: In function ‘chr_event’:
-  hw/ipmi/ipmi_bmc_extern.c:389:5: error: enumeration value ‘CHR_EVENT_BREAK’ not handled in switch [-Werror=switch]
-    389 |     switch (event) {
+    CC      net/vhost-user.o
+  net/vhost-user.c: In function ‘net_vhost_user_event’:
+  net/vhost-user.c:269:5: error: enumeration value ‘CHR_EVENT_BREAK’ not handled in switch [-Werror=switch]
+    269 |     switch (event) {
         |     ^~~~~~
-  hw/ipmi/ipmi_bmc_extern.c:389:5: error: enumeration value ‘CHR_EVENT_MUX_IN’ not handled in switch [-Werror=switch]
-  hw/ipmi/ipmi_bmc_extern.c:389:5: error: enumeration value ‘CHR_EVENT_MUX_OUT’ not handled in switch [-Werror=switch]
+  net/vhost-user.c:269:5: error: enumeration value ‘CHR_EVENT_MUX_IN’ not handled in switch [-Werror=switch]
+  net/vhost-user.c:269:5: error: enumeration value ‘CHR_EVENT_MUX_OUT’ not handled in switch [-Werror=switch]
   cc1: all warnings being treated as errors
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Corey Minyard <cminyard@mvista.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191218172009.8868-3-philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20191218172009.8868-9-philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ipmi/ipmi_bmc_extern.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/vhost-user.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
-index 450926e..adf2afe 100644
---- a/hw/ipmi/ipmi_bmc_extern.c
-+++ b/hw/ipmi/ipmi_bmc_extern.c
-@@ -435,6 +435,12 @@ static void chr_event(void *opaque, int event)
-             k->handle_rsp(s, ibe->outbuf[0], ibe->inbuf + 1, 3);
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index 014199d..c54c9c7 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -294,6 +294,11 @@ static void net_vhost_user_event(void *opaque, int event)
+             aio_bh_schedule_oneshot(ctx, chr_closed_bh, opaque);
          }
          break;
-+
 +    case CHR_EVENT_BREAK:
 +    case CHR_EVENT_MUX_IN:
 +    case CHR_EVENT_MUX_OUT:
 +        /* Ignore */
 +        break;
      }
- }
  
+     if (err) {
 -- 
 1.8.3.1
 
