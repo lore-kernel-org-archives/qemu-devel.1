@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 033EBC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 21:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A04C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 21:43:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF57B206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 21:20:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3912C20692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 21:43:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="ZNnZvA30"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF57B206DB
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="NyPTTcAo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3912C20692
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipIkL-0007uR-Kg
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 16:20:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60754)
+	id 1ipJ6Z-00083B-0p
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 16:43:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1ipIgJ-0006Va-RE
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:16:01 -0500
+ (envelope-from <deller@gmx.de>) id 1ipJ2p-0006cS-EF
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1ipIgI-0001OP-Oz
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:15:59 -0500
-Received: from mout.gmx.net ([212.227.17.21]:39153)
+ (envelope-from <deller@gmx.de>) id 1ipJ2o-0007ZO-5g
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:39:15 -0500
+Received: from mout.gmx.net ([212.227.17.22]:50915)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <deller@gmx.de>) id 1ipIgI-0001M8-C0
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:15:58 -0500
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1ipJ2n-0007Xr-OE
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:39:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1578518144;
- bh=LY5832VXgoqu/8iAYPUrF7mbuo3VYMRD045YAPFVnrw=;
+ s=badeba3b8450; t=1578519543;
+ bh=rTcHkZBYQrSG2TnSNDI5ffT33HqkQgm4YI4ihjaLd3w=;
  h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=ZNnZvA30mZIMSyGaQx+MixSEu7WYJLLCHyJQo4R+idCAyesBVY54Ogb0tH/yd8InK
- pxpNiTTJ7gK9GDEwdIZfa1saxFbJ6v7LgULXcF1K+azL68Tgv3XgIFW+fyImDHTaAL
- sTYY7TMohHlCU4IlSE7d9aGVBLiM4Z1IQ7RSl56s=
+ b=NyPTTcAonAVIq8hXck3ukhUtcHwDYR+3f4wDUExWO2mQOgX7jsCStqL+Ic3LrlyPJ
+ eHfHzBloe2yUkWg/z0opaq4ZsGdQIBcHZ6iB3aVjhhekhjwdz0hznzaXVDEMahxESs
+ 9l31meso2+80EJwFL04C93tMpx/3pSxJZN8EFrUQ=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.128.161]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MJE27-1j8lND2BsR-00KgeO; Wed, 08
- Jan 2020 22:15:44 +0100
-Subject: Re: [PATCH 1/3] hw/hppa/machine: Correctly check the firmware is in
- PDC range
+Received: from [192.168.20.60] ([92.116.128.161]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mo6ux-1jV0N33P5v-00pfA3; Wed, 08
+ Jan 2020 22:39:02 +0100
+Subject: Re: [PATCH 2/3] hw/hppa/machine: Do not limit the RAM to 3840MB
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
  Sven Schnelle <svens@stackframe.org>
 References: <20200108181425.21485-1-f4bug@amsat.org>
- <20200108181425.21485-2-f4bug@amsat.org>
+ <20200108181425.21485-3-f4bug@amsat.org>
 From: Helge Deller <deller@gmx.de>
 Autocrypt: addr=deller@gmx.de; keydata=
  mQINBF3Ia3MBEAD3nmWzMgQByYAWnb9cNqspnkb2GLVKzhoH2QD4eRpyDLA/3smlClbeKkWT
@@ -111,41 +110,41 @@ Autocrypt: addr=deller@gmx.de; keydata=
  XzCscCr+pggvqX7kI33AQsxo1DT19sNYLU5dJ5Qxz1+zdNkB9kK9CcTVFXMYehKueBkk5MaU
  ou0ZH9LCDjtnOKxPuUWstxTXWzsinSpLDIpkP//4fN6asmPo2cSXMXE0iA5WsWAXcK8uZ4jD
  c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <25674517-77f3-eb1a-1a4c-db953ef4e04b@gmx.de>
-Date: Wed, 8 Jan 2020 22:15:41 +0100
+Message-ID: <6997ceed-9a68-796c-f03d-02bfd7d76803@gmx.de>
+Date: Wed, 8 Jan 2020 22:39:01 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200108181425.21485-2-f4bug@amsat.org>
+In-Reply-To: <20200108181425.21485-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:1kGK9dQCdfLhjhSuMJLA+7bHHcrJqpc2ZrgSVn8Sw+EqjwpP75Q
- FzBDE0VaBIxajfukxhAIUrQdThbMoaB8Gfuvep6USh+SuMbsaCUt22C6ECKEtU9lsFxFvGi
- nr4uBtrsAp6gB2HoavGAZXVinACKkHw4D/HsCSGw7LkWUgcZ0o9Dog2EMovJRAGP2oyCZzv
- 2PFGli2XNdNVBU6WB7zvA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JmhTNZt6GvI=:jm13GR2LqWmJXk2h+BgBNU
- 07BwO2+XjTMmc03IL/WYHg47c1KwqV4NZmrRehGNacY47yOodovTBkaQSwFIzPnVa/wPFI00v
- OddRzCSKzpIovtgMOy5xLCpVkkivjGX7K39gURnW4SAySG5/i9YnzG60MQuixvMUAQ1IGhSGB
- TwCpyZOtfE0k4nvhCwKvLqJ0NniogXmSV/uRA4xz+wc102UeibtgMH5zwkdbcRDTERq/whHv/
- 5nXnn0/qFceizEQV1lVUqb9eDxeZ93ElyRHdLwnsRrhKSeVlNaVO5kSNhJE4Y1yWSNmg5vMaB
- Waq1wSsB7XNjReXD/tBWRAV23DAeyifHSeFSh9vzxuRtAe6RDW5+5PMhSKVS/1Rtii9KSVwkA
- dfDpC/qcSxqShmQ2c+2BPrt2nTqgaey/uBOsSt0GmmEODDDU+/UnbwlnCwG0t2hHfHx2hRcem
- wuy1aQVWHPfjgnosQuslXON1eEFqqDCp2LZMJ/3TNFXMbWoj6eb2paMRLHlC2L4H5ql4/l+3/
- 1HMiMBxKdHstnPL6fErxCwP3TAiYfZD+XkccwEgS5HpEtids68LWpMvd6ycze7iKg3IsgY9Y8
- ByRqmlssSacLEAfCqZWIHsIcK0cRi150XhGSddlr40IKt2HX9iqIwrZvCCARhmk1RAsRORWaF
- QiX6t9cG6PgwPK9brietQesKW08dVWl5W7RMgxCO47/dmHzvBRkKDL8kLcc5Vqj6+LjXFp4E8
- OKcxGPI+8se/Ckw+V6ESdnENiPM7/i1dV+en9aOGeqdoSdHUo1zHOgM2B81EGc89wvMI+tzQV
- adaJEYoGT1rP8KEWcUJCYRQs5eb1WYqxIuVCB0LgvY+e1T6nbT2ENSTYLH6SW6Ui705EDviAI
- /lrBqU+M5YTvhDjJDnqj2Ocxs8dgTOmuYW074EzBuF0ljv90mOVRTS/GkWjK5Wco7xX9o48sD
- As1TyJzA/6LFkZgJhh1yJXVobXYC/R5J11YFzjsWf+f1fCDe/ElhqiUmJEI011CuZeS7DcsQB
- 6F5TAChxduxcXN8Yej2XlhKZUe2LR6h+ReFV9ChEHYYXud79AIxDNPlRaeOrBTBcoYFhRBfE6
- JYZC9aE9nTceRak5VZkxbfOudONJqE8Bstc7OAf0D1wgrkq5hADeiS2hxGaf77936Mh4YuTSU
- 212n4fKggb3+AtVYPD13MalE7eU44jqGTmLLxMKvfYwN+It6Z2NmFGfpdyBBqfFdRopDChULX
- qWAU7omAri1+xkklTyBdUe4Mi82kWpE1HqS4eQg==
+X-Provags-ID: V03:K1:zA1YZeAXdYA6tdXF/IQh0SBBT0u/Mz3pzxYyTxKQKIUNnkiobmn
+ BtPWZCCNf1krLSImpAdGBWkp7a1ArSduBZg93F4ZhMYLRXDLh5PCd1SdABXtJswyOo4dJmr
+ +WdLdqeuUVJZB+yw5yvwF1V5xXVTG9XAWOon57XaIU8KvKVsR75Ya2V42TtcUavTyDcWeVW
+ vEI+jAqTSFyQGCjKMxMWA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:5iCwhSNB11g=:MvvA+FQyHMB6B4fp2uJ23t
+ hZ8xR6F6BmzuhJwqMKVjTRko72NkJPyY+8r52DFRkD/hTqtj+MyUsy5ogYIDWZdRp58Lnbdeo
+ MLdbiJdgdzmne62O95W79VJjeRya8sUaxRzUWgxc4bGYYMEHQ+/qY63Q0C+nRMDgqKcP8xFpz
+ sBY3orlVmsTlp5IFFIHWGI4EhBSrwkpchU3MMi/6hjBsgEdq7Lb3szuFYQXO+n7ACvtLh7mnI
+ A8S0uUByJR/Nj2PiEEnoGjTlzS+UMJXoB5P2APoKvJtAzL+wbWoFHUDkGwJM6zyKcqYkn0tt+
+ OzMqOhHHazZjVjGnhmS5/l8Yzgx5SqW3hwXj5UuY1rkQ5z3fAlN9cVnGKPAL7uK5qI8Y2uKO3
+ etVqijJr9ACNq5PgCRUT5aAELbxFlMT8VNL5eTCl2HR60Km/J3i6RYbJUEZcSgTdb2lu3CAlS
+ isyGYwEvtT543fQb9Xtj98SMwS/vtVnNEtFGZ2LgXOfS5gklbtv5gURlWhfvBZZNwcWfuIgL3
+ ZMr3338ZxM9Z+uSbgFGEIEge1RHu09ar3n3SisVxLi29g0q0UiXvnEMFxgtAJ/V2Eq7FhnHCt
+ w3b2/V+rLLsA64d0PTkI0VdJlzy2z3V54iprCxe5zxkLnOBYiCadrDLBi5n9ddWL81RsJnrUz
+ mQo9oCquLbfo4ZCRW/EOQwI3J/xy+jKoQKFaFM6+DGZ8F/5h8tQbkZwio4Q+WarL+pg/EV1+O
+ 0yrAp9RGbHUlhpkolI9Y5FBiNBZR6b6YQgjXA545tyEt6em78rY2njTkeH59AgYoig3m6hdK7
+ z2I72WfPg5VESSSe0XnlPdcezb8PNnb5J3l6MWVmiicu9aTLocU/Z5pTvGejF4eAUOZwXUyit
+ c8r254imXdczmcV9li2BkqVWAOHDIVSw5VKF1h/+WtLoFVeejHsacDVUztfTDV2NHHI8G/PhE
+ 2Qg0iMarR6HU0iQVJQv5S64TKjPmDV4bcYHUdNlA+CRF9ZGjBsLMFUr6i9OACArm3c9AwXUsv
+ jLqTWeUu8f55TJ3MAIhNGcPkDeyo7LTQUZeYluAwIDrpYR6lRUZ73DkVMJtEVSnt28B1C6tq+
+ NhN2ShtM/9AGSq3eghbLjCCvg7DouCviRTZv8GUqwBC6S7nQZG/K7wLoa1XqJleAZIuiWMDsD
+ KUqgue1t2ySnwC5QA5i4Pg2VSIAiYQWWVhNoQJcaSo02WqsSbCNxAkK+XVcaEEF8blSnAjYvm
+ Lh6NHjCM2T52KLJhdB2ngoeOpZ9nel5x4YCSzig==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.21
+X-Received-From: 212.227.17.22
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,35 +162,65 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 08.01.20 19:14, Philippe Mathieu-Daud=C3=A9 wrote:
-> The firmware has to reside in the PDC range. If the Elf file
-> expects to load it below FIRMWARE_START, it is incorrect,
-> regardless the RAM size.
+> The hardware expects DIMM slots of 1 or 2 GB, allowing up to
+> 4 GB of memory. Accept the same amount of memory the hardware
+> can deal with.
+>
+> The CPU doesn't have access to the RAM mapped in the
+> [0xf0000000 - 0xf1000000] range because this is the PDC area
+> (Processor Dependent Code) where the firmware is loaded.
+> To keep this region with higher priority than the RAM, lower
+> the RAM priority. The PDC will overlap it.
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Acked-by: Helge Deller <deller@gmx.de>
-
 > ---
-> Note we define FIRMWARE_END=3D0xf0800000 but in the specs
-> the PDC ends at 0xf1000000.
-> ---
->  hw/hppa/machine.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/hppa/machine.c | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
 >
 > diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index 5d0de26140..6775d879f8 100644
+> index 6775d879f8..d10c967d06 100644
 > --- a/hw/hppa/machine.c
 > +++ b/hw/hppa/machine.c
-> @@ -155,7 +155,7 @@ static void machine_hppa_init(MachineState *machine)
->      qemu_log_mask(CPU_LOG_PAGE, "Firmware loaded at 0x%08" PRIx64
->                    "-0x%08" PRIx64 ", entry at 0x%08" PRIx64 ".\n",
->                    firmware_low, firmware_high, firmware_entry);
-> -    if (firmware_low < ram_size || firmware_high >=3D FIRMWARE_END) {
-> +    if (firmware_low < FIRMWARE_START || firmware_high >=3D FIRMWARE_EN=
-D) {
->          error_report("Firmware overlaps with memory or IO space");
->          exit(1);
+> @@ -90,16 +90,15 @@ static void machine_hppa_init(MachineState *machine)
+>          g_free(name);
 >      }
 >
+> -    /* Limit main memory. */
+> -    if (ram_size > FIRMWARE_START) {
+> -        machine->ram_size =3D ram_size =3D FIRMWARE_START;
+> -    }
+> -
+>      /* Main memory region. */
+> +    if (machine->ram_size > 4 * GiB) {
+> +        error_report("RAM size of 4GB or more is not supported");
+> +        exit(EXIT_FAILURE);
+> +    }
 
+My suggestion is to initially then limit it to max. 3GB, e.g.
+> +    if (machine->ram_size > 3 * GiB) {
+> +        error_report("RAM size of 3GB or more is not supported");
+> +        exit(EXIT_FAILURE);
+
+That way you don't need to work around the 4GB SeaBIOS limitation
+in your other RFC patch.
+So, people can start it with:
+qemu-system-hppa -m 3g -serial stdio
+
+Later then we can fix SeaBIOS, at least if 64bit support gets added later =
+on.
+
+>      ram_region =3D g_new(MemoryRegion, 1);
+>      memory_region_allocate_system_memory(ram_region, OBJECT(machine),
+>                                           "ram", ram_size);
+
+^^^ here is still "ram_size". Do you need to change it?
+
+> -    memory_region_add_subregion(addr_space, 0, ram_region);
+> +    memory_region_add_subregion_overlap(addr_space, 0, ram_region, -1);
+>
+>      /* Init Dino (PCI host bus chip).  */
+>      pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
+>
+
+Helge
 
