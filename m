@@ -2,80 +2,84 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F81C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE61C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:05:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E50620678
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:05:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9850C20678
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:05:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lvuemCdN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E50620678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="swGWagYM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9850C20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipCtM-0006xZ-Jn
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 10:05:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43692)
+	id 1ipCtT-0007B8-V6
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 10:05:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ipCrK-0004hQ-Rq
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:02:59 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ipCrR-0004qG-Ia
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:03:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ipCrJ-0000rI-P6
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:02:58 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38532)
+ (envelope-from <alex.bennee@linaro.org>) id 1ipCrQ-0000wW-6m
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:03:05 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35862)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ipCrJ-0000qU-Ie
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:02:57 -0500
-Received: by mail-wm1-x341.google.com with SMTP id u2so2849261wmc.3
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 07:02:57 -0800 (PST)
+ id 1ipCrQ-0000wA-05
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:03:04 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p17so2854442wma.1
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 07:03:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ZR+fSZ65G9mh9dWenUCDIdFjZP+YKTJKCn5ENAM0Yck=;
- b=lvuemCdNBwgcFWY3z67e9djxeT0mCluOdSmQvYhKtrKSiUNaMEp5CLuWmDh3RDnhjN
- zUjFIlwuRgPYq5zjtiMUaG6lkRU8y9fnVY/OrcCO/CvfDbLsSBqwfjdUusQYpJhJSLa6
- iUOscw4oq8dnR9EKVFDfXXlfa2FOGdHx472hIpZosuIE2y6/aLPI7kXpqCBtVbs8J4+5
- N4G00M5lNeFa531RzbpsI2sPRuwoUct0wqrXKp33UBOsYRbsTSTHAILuKGE//LfnrgkH
- jugl7Vb4XRAPGT6i4mYUZ+C1xrjkIP6iKrdvdW7NsqF5VWqpTRBf16/XOVmEUG8SVL22
- 0v4Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=tWCHuSggB5szQdLA+HidJI7cGodm3lgcmToLZIxmHFk=;
+ b=swGWagYMry1Jdy12VPJ1h2eLBouDR70SwNzTte+TF26FtU5WCEIaxEnS2dq2yBzpld
+ jdv5P0tQHPfjxi9PVkobAPNRaMuDlImo2BsUX4/wWBd/4gViCm6pNSnNQEPSEv7hqpSb
+ Y4IAWZmuDc8MO+K3AWf7atsTgzk/E55gTqzBXaGAbaGcgwPRrCsr5q2ccWIu3cJTNb7t
+ ZaChmjWwCDt+OHAs2kWrW1j3O1V23KvSLeoJDiGqV2334It23SaPP9CQkvM6yedP/vcy
+ QIQextG/jzqUnqprCFLQM9nElqYWNAxS2YleMCxyTA+XjD22Q97pRl97RJ4TkHjrpA8r
+ XhAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ZR+fSZ65G9mh9dWenUCDIdFjZP+YKTJKCn5ENAM0Yck=;
- b=bY9APrYdWxIC1+soS8gVYlKi9FV/k6aZw+UM8/R2r0Zl9srY0Ip0AfXiw5rWJAvmue
- I0cGim5k0M2zorJJtAUmbRgFHOyTzUCDiaVYKCHZHii1zcQPJ/bqaeKZVjO9LKO0ppIa
- LcEbncUqh4g1UW9YeTLiA2v5bsUF6EbBhucSOb1sZOIo3YV1jCQj0oVtZiFzB02MFUrq
- KcPSMA9v+rEQReT2ADrqzUECfTGlc9rha+/3y9QlYR3mp43o4laNw5StzDVfwiKzSOwB
- F3IJXGrnlin38XaXY2+eFpABnNbemSIMblm5Mbt5bfTXQZ3jTitehEwlvub9LXSgcj5i
- P3lA==
-X-Gm-Message-State: APjAAAU85ri4tIjd4Hm68EK2uxOnvYR+85A2m0L80o1TLOacPA9DTuQo
- E1Pi35/GdTGAZRkMC+D+gb9hrA==
-X-Google-Smtp-Source: APXvYqxau346v9TJftgCyciiJsJD68g3lMo/CP7WimLQElcmd5g7PBt68lJB8wFQxVz3s5KB4n0psA==
-X-Received: by 2002:a1c:6a07:: with SMTP id f7mr4496202wmc.171.1578495776354; 
- Wed, 08 Jan 2020 07:02:56 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=tWCHuSggB5szQdLA+HidJI7cGodm3lgcmToLZIxmHFk=;
+ b=oESQjMw5cVDOwOYC3ivAKk3ex7qoeMaqtKaxinXfDugGmJPCaSV2jyxSvc2ccT97eJ
+ RMPW5Kp5SuTzsjyMfsfTX2EqD+XcP3GBl732dMqDfU8O/6aQ3MiaQ83tjwfpj7wSmRc+
+ WKQSa7eO7eDnSLe1ystBJcbQwz9qNZvvxMWe5OM0Ot21tR/FzMROjCoBvRKTEzkhGM6d
+ tJ3d1zYeT4T/xRfJLdivp441DWBCm6d1yHDfZ2vI0uTp2uEdCJaiD9j7f2YoEg5WydQ6
+ KQIo9w66opIYnZ+95FJnQ3aFd73jXdX9jHuojX08vzN/ETfWv0Jze0i0fDcfRp0yeFER
+ /2WA==
+X-Gm-Message-State: APjAAAWi76D/c4tG4OjQ3LzVmMqrU3TU6sTIUTaWY96blpxzhI5THsAp
+ cCe4upHjpS/LDG512sBVYPYYeQ==
+X-Google-Smtp-Source: APXvYqz78JEN1/xD/Vaisyak2INRO53JvRa3CY0pP177yI4npGLT+ZuJ3QPBEpAR+ONW7yWof/2swQ==
+X-Received: by 2002:a7b:cb46:: with SMTP id v6mr4323837wmj.117.1578495782807; 
+ Wed, 08 Jan 2020 07:03:02 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m10sm4566150wrx.19.2020.01.08.07.02.53
+ by smtp.gmail.com with ESMTPSA id z21sm3922551wml.5.2020.01.08.07.02.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 07:02:53 -0800 (PST)
+ Wed, 08 Jan 2020 07:02:57 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E5EA71FF87;
- Wed,  8 Jan 2020 15:02:52 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 58E2E1FF91;
+ Wed,  8 Jan 2020 15:02:53 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v3 0/6] semihosting read console support
-Date: Wed,  8 Jan 2020 15:02:46 +0000
-Message-Id: <20200108150252.6216-1-alex.bennee@linaro.org>
+Subject: [PATCH v3 4/6] tests/tcg: add a dumb-as-bricks semihosting console
+ test
+Date: Wed,  8 Jan 2020 15:02:50 +0000
+Message-Id: <20200108150252.6216-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200108150252.6216-1-alex.bennee@linaro.org>
+References: <20200108150252.6216-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -93,58 +97,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: keithp@keithp.com, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, keithp@keithp.com,
+ qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+We don't run this during check-tcg as we would need to check stuff is
+echoed back. However we can still build the binary so people can test
+it manually.
 
-No major changes from the previous version except some tweaking of the
-tests to exercise both thumb and arm modes. There is a minor
-refactoring so the __semi_call helper can be re-used. I'm planning on
-sending the PR in with my gdbstub fixes later this week.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-The following patches need review
-  05 - tests tcg extract __semi_call into a header and e
-  06 - tests tcg add user version of dumb as bricks semi
-
-Alex Bennée (5):
-  target/arm: remove unused EXCP_SEMIHOST leg
-  target/arm: only update pc after semihosting completes
-  tests/tcg: add a dumb-as-bricks semihosting console test
-  tests/tcg: extract __semi_call into a header and expand
-  tests/tcg: add user version of dumb-as-bricks semiconsole test
-
-Keith Packard (1):
-  semihosting: add qemu_semihosting_console_inc for SYS_READC
-
- include/hw/semihosting/console.h          | 16 +++++
- include/hw/semihosting/semihost.h         |  4 ++
- tests/tcg/arm/semicall.h                  | 35 ++++++++++
- hw/semihosting/console.c                  | 79 +++++++++++++++++++++++
- linux-user/aarch64/cpu_loop.c             |  1 +
- linux-user/arm/cpu_loop.c                 |  1 +
- linux-user/arm/semihost.c                 | 27 ++++++++
- stubs/semihost.c                          |  4 ++
- target/arm/arm-semi.c                     |  3 +-
- target/arm/helper.c                       |  8 +--
- target/arm/m_helper.c                     |  1 +
- target/arm/translate-a64.c                |  2 +-
- target/arm/translate.c                    |  6 +-
- tests/tcg/aarch64/system/semiconsole.c    | 38 +++++++++++
- tests/tcg/arm/semiconsole.c               | 27 ++++++++
- tests/tcg/arm/semihosting.c               | 21 +-----
- vl.c                                      |  3 +
- tests/tcg/aarch64/Makefile.softmmu-target |  9 ++-
- tests/tcg/aarch64/Makefile.target         |  7 ++
- tests/tcg/arm/Makefile.target             | 28 ++++++++
- 20 files changed, 287 insertions(+), 33 deletions(-)
- create mode 100644 tests/tcg/arm/semicall.h
+---
+v8
+  - actually return the result!
+---
+ tests/tcg/aarch64/system/semiconsole.c    | 38 +++++++++++++++++++++++
+ tests/tcg/aarch64/Makefile.softmmu-target |  9 +++++-
+ 2 files changed, 46 insertions(+), 1 deletion(-)
  create mode 100644 tests/tcg/aarch64/system/semiconsole.c
- create mode 100644 tests/tcg/arm/semiconsole.c
 
+diff --git a/tests/tcg/aarch64/system/semiconsole.c b/tests/tcg/aarch64/system/semiconsole.c
+new file mode 100644
+index 00000000000..bfe7c9e26b4
+--- /dev/null
++++ b/tests/tcg/aarch64/system/semiconsole.c
+@@ -0,0 +1,38 @@
++/*
++ * Semihosting Console Test
++ *
++ * Copyright (c) 2019 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include <inttypes.h>
++#include <minilib.h>
++
++#define SYS_READC 0x7
++
++uintptr_t __semi_call(uintptr_t type, uintptr_t arg0)
++{
++    register uintptr_t t asm("x0") = type;
++    register uintptr_t a0 asm("x1") = arg0;
++    asm("hlt 0xf000"
++        : "=r" (t)
++        : "r" (t), "r" (a0));
++
++    return t;
++}
++
++int main(void)
++{
++    char c;
++
++    ml_printf("Semihosting Console Test\n");
++    ml_printf("hit X to exit:");
++
++    do {
++        c = __semi_call(SYS_READC, 0);
++        __sys_outc(c);
++    } while (c != 'X');
++
++    return 0;
++}
+diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
+index 950dbb4bac2..9bdcfd9e7e4 100644
+--- a/tests/tcg/aarch64/Makefile.softmmu-target
++++ b/tests/tcg/aarch64/Makefile.softmmu-target
+@@ -31,7 +31,14 @@ LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
+ memory: CFLAGS+=-DCHECK_UNALIGNED=1
+ 
+ # Running
+-QEMU_OPTS+=-M virt -cpu max -display none -semihosting-config enable=on,target=native,chardev=output -kernel
++QEMU_BASE_MACHINE=-M virt -cpu max -display none
++QEMU_OPTS+=$(QEMU_BASE_MACHINE) -semihosting-config enable=on,target=native,chardev=output -kernel
++
++# console test is manual only
++QEMU_SEMIHOST=-chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -mon chardev=stdio0,mode=readline
++run-semiconsole: QEMU_OPTS=$(QEMU_BASE_MACHINE) $(QEMU_SEMIHOST)  -kernel
++run-semiconsole: semiconsole
++	$(call skip-test, $<, "MANUAL ONLY")
+ 
+ # Simple Record/Replay Test
+ .PHONY: memory-record
 -- 
 2.20.1
 
