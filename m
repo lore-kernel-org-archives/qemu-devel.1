@@ -2,86 +2,77 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FC6C33C9E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2904C33CA2
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:23:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4B80206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A052A206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 11:23:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FESHySM+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B80206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UuiyKT2Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A052A206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip9Ps-0003cK-Px
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 06:22:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49271)
+	id 1ip9RI-0005Yy-Id
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 06:23:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pavlica.nikola@gmail.com>) id 1ip9P8-0002pp-Pz
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:21:39 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ip9Q3-0003tP-Ip
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:22:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavlica.nikola@gmail.com>) id 1ip9P6-0003xL-8R
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:21:37 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34770)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pavlica.nikola@gmail.com>)
- id 1ip9P6-0003wO-0d
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:21:36 -0500
-Received: by mail-wm1-x342.google.com with SMTP id w5so1006669wmi.1
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 03:21:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=mE2lnlrRD/lR6rpbLiZ24E0msmA8lV+tPD7M/Fd7f3M=;
- b=FESHySM+6CfufVwmvbg6DtXwO1OL3g2eWhDMnzDJ1b16bXlaWNyzxe3sLmMxgF9YGB
- sYJSriiX2II7rUbO7SWymRzrfoDbeiuJrOkezQ4bs4DGxpDudBmwjpHX3q1t5Uumqz1c
- nF3QqMo7geeIFxl3lS5sHAEz2G1WiDR+DmE3Tp1+/3ZPZPSADLTd1ttCjPlqrxe5hvZX
- ogWX7vQBqer46ADGxoRnZplcAiGZD711IPjExDbMO9HEgUx5xVA3LNLt0brRQJpxli0W
- RrhxgOvomuLe0zkdgyl7rC9v3HEHJNNy+C0sWaPQfwGCsrAv+caXrSMLPjM45iOtZXAF
- Fn6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=mE2lnlrRD/lR6rpbLiZ24E0msmA8lV+tPD7M/Fd7f3M=;
- b=tMRUVmkLIiChykssOz1Spizmv5MT5euxgykWxRK7p1KAMPo43WdPAsBQ+wiGv6pq3j
- XARW2HfLggNdX2570QyiJR5RaNQ2NrcYWxss4NZf1BLKS5pyK4SVxtAq5b4+TfKg+Km0
- Jg7iTZ2zlJ52mQi3Jy72l6cYtoWCDidoJf7ipdsbqrvo02vySyH14O5om0cTyYHq86UL
- fLBvMyxq6RCBTz7AIIBVyRaGZDJFoTCX6lvvjJWeC4aPc5SmUBsb3F5gfGK5l4VVkWC9
- WjAsGicdDwv5aCU6z0pDm2NrmoP3hStO0JqHc6JrVYAy8bpOrymYwfe8xdXxmdcQ6k08
- ABIQ==
-X-Gm-Message-State: APjAAAV7kpgY3lg5kyVV9ATqxbvQZELfzYUyAB9CiT8LnK/lBkMvUWg7
- 2B5h+UHVh8B2vzzFLurNQCVLEAjaKBS+bA==
-X-Google-Smtp-Source: APXvYqzz4/6HP2S5xi9XPhpb48t7ijr9XurqfGBxyH49aq+eHiJbpZQtQSQTIqdhD1LC2y0aBW8iDw==
-X-Received: by 2002:a05:600c:2150:: with SMTP id
- v16mr3002845wml.156.1578482494608; 
- Wed, 08 Jan 2020 03:21:34 -0800 (PST)
-Received: from localhost.localdomain (93-139-26-156.adsl.net.t-com.hr.
- [93.139.26.156])
- by smtp.gmail.com with ESMTPSA id w20sm3318177wmk.34.2020.01.08.03.21.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 03:21:34 -0800 (PST)
-From: pavlica.nikola@gmail.com
+ (envelope-from <stefanha@redhat.com>) id 1ip9Q0-0004Vt-Ne
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:22:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32492
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ip9Q0-0004VH-CY
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 06:22:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578482551;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=asjGjJ+5UzsC27I8IX7Zxas5kupKb/Y//VGwbMRwWOo=;
+ b=UuiyKT2QIin9F/hNsa6IsclDCbBUpOCRoW0ABfRPKZXW8x5VKyFkjy70rYt0SSjivy+nGW
+ 2Ggcj4PSNQki4M4BLYp6gaNLbXiIpv2uP0fLKBuMVkhBzEko/4rp9pBeeW1Tz0S39Ym+oi
+ uFP8DRF+NthF4qiAf81xZukVBp/PZfc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-MSkLTDWaMc6WM1Mn1ajo6A-1; Wed, 08 Jan 2020 06:22:30 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FB03801E77;
+ Wed,  8 Jan 2020 11:22:29 +0000 (UTC)
+Received: from localhost (ovpn-116-249.ams2.redhat.com [10.36.116.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9769960CD3;
+ Wed,  8 Jan 2020 11:22:26 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4] display/gtk: get proper refreshrate
-Date: Wed,  8 Jan 2020 12:20:41 +0100
-Message-Id: <20200108112041.24447-1-pavlica.nikola@gmail.com>
-X-Mailer: git-send-email 2.24.1
+Subject: [PATCH 1/4] luks: extract block_crypto_calculate_payload_offset()
+Date: Wed,  8 Jan 2020 11:22:17 +0000
+Message-Id: <20200108112220.499180-2-stefanha@redhat.com>
+In-Reply-To: <20200108112220.499180-1-stefanha@redhat.com>
+References: <20200108112220.499180-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: MSkLTDWaMc6WM1Mn1ajo6A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,99 +84,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kraxel@redhat.com, Nikola Pavlica <pavlica.nikola@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nikola Pavlica <pavlica.nikola@gmail.com>
+The qcow2 .bdrv_measure() code calculates the crypto payload offset.
+This logic really belongs in block/crypto.c where it can be reused by
+other image formats.
 
-Hi,
-QEMU mailing list.
+The "luks" block driver will need this same logic in order to implement
+.bdrv_measure(), so extract the block_crypto_calculate_payload_offset()
+function now.
 
-This is the fourth revision of the patch involving the GTK display
-output getting the proper refresh rate for your particular display
-output.
-
-Because some VMs in QEMU can get GPU virtualization (using technologies
-such as iGVT-g, as mentioned previously), they could produce a video
-output that had a higher display refresh rate than of what the GTK
-display was displaying. (fxp. Playing a video game inside of a Windows
-VM at 60 Hz, while the output stood locked at 33 Hz because of defaults
-set in include/ui/console.h)
-
-Since QEMU does indeed have internal systems for determining frame
-times as defined in ui/console.c.
-The code checks for a variable called update_interval that it later
-uses for time calculation. This variable, however, isn't defined
-anywhere in ui/gtk.c and instead ui/console.c just sets it to
-GUI_REFRESH_INTERVAL_DEFAULT which is 30
-
-update_interval represents the number of milliseconds per display
-refresh, and by doing some math we get that 1000/30 = 33.33... Hz
-
-This creates the mentioned problem and what this patch does is that it
-checks for the display refresh rate reported by GTK itself (we can take
-this as a safe value) and just converts it back to a number of
-milliseconds per display refresh.
-
-Explinations of each revision:
-v1: initial patch
-v2: moved code to a more appropriate place and reduced overhead and
-memory usage (by not creating a new GdkDisplay)
-v3: removed magic value and turned it into something more readable and
-added checks for an error state where GTK was unable to get the refresh
-rate, in which case we use the already existing default
-v4: fixed wrapping and repositioned variable names
-
-Signed-off-by: Nikola Pavlica <pavlica.nikola@gmail.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/ui/gtk.h |  2 ++
- ui/gtk.c         | 10 ++++++++++
- 2 files changed, 12 insertions(+)
+ block/crypto.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/crypto.h |  5 ++++
+ block/qcow2.c  | 59 ++++------------------------------------------
+ 3 files changed, 73 insertions(+), 55 deletions(-)
 
-diff --git a/include/ui/gtk.h b/include/ui/gtk.h
-index d9eedad976..d1b230848a 100644
---- a/include/ui/gtk.h
-+++ b/include/ui/gtk.h
-@@ -28,6 +28,8 @@
- #include "ui/egl-context.h"
- #endif
- 
-+#define MILLISEC_PER_SEC 1000000
+diff --git a/block/crypto.c b/block/crypto.c
+index 24823835c1..ed32202fa2 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -185,6 +185,70 @@ block_crypto_create_opts_init(QDict *opts, Error **err=
+p)
+ }
+=20
+=20
++static ssize_t block_crypto_headerlen_hdr_init_func(QCryptoBlock *block,
++        size_t headerlen, void *opaque, Error **errp)
++{
++    size_t *headerlenp =3D opaque;
 +
- typedef struct GtkDisplayState GtkDisplayState;
- 
- typedef struct VirtualGfxConsole {
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 692ccc7bbb..eb0efc70ee 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1966,6 +1966,10 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-                               GSList *group, GtkWidget *view_menu)
- {
-     bool zoom_to_fit = false;
-+    int refresh_rate_millihz;
-+    GdkDisplay *dpy = gtk_widget_get_display(s->window);
-+    GdkWindow *win = gtk_widget_get_window(s->window);
-+    GdkMonitor *monitor = gdk_display_get_monitor_at_window(dpy, win);
- 
-     vc->label = qemu_console_get_label(con);
-     vc->s = s;
-@@ -2026,6 +2030,12 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
- 
-     vc->gfx.kbd = qkbd_state_init(con);
-     vc->gfx.dcl.con = con;
++    /* Stash away the payload size */
++    *headerlenp =3D headerlen;
++    return 0;
++}
 +
-+    refresh_rate_millihz = gdk_monitor_get_refresh_rate(monitor);
-+    if (refresh_rate_millihz) {
-+        vc->gfx.dcl.update_interval = MILLISEC_PER_SEC / refresh_rate_millihz;
++
++static ssize_t block_crypto_headerlen_hdr_write_func(QCryptoBlock *block,
++        size_t offset, const uint8_t *buf, size_t buflen,
++        void *opaque, Error **errp)
++{
++    /* Discard the bytes, we're not actually writing to an image */
++    return buflen;
++}
++
++
++/* Determine the number of bytes for the crypto header */
++bool block_crypto_calculate_payload_offset(QemuOpts *opts,
++                                           const char *optprefix,
++                                           size_t *len,
++                                           Error **errp)
++{
++    QDict *cryptoopts_qdict;
++    QCryptoBlockCreateOptions *cryptoopts;
++    QCryptoBlock *crypto;
++
++    /* Extract options into a qdict */
++    if (optprefix) {
++        QDict *opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
++
++        qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, optprefix);
++        qobject_unref(opts_qdict);
++    } else {
++        cryptoopts_qdict =3D qemu_opts_to_qdict(opts, NULL);
 +    }
 +
-     register_displaychangelistener(&vc->gfx.dcl);
- 
-     gd_connect_vc_gfx_signals(vc);
--- 
++    /* Build QCryptoBlockCreateOptions object from qdict */
++    qdict_put_str(cryptoopts_qdict, "format", "luks");
++
++    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp);
++    qobject_unref(cryptoopts_qdict);
++    if (!cryptoopts) {
++        return false;
++    }
++
++    /* Fake LUKS creation in order to determine the payload size */
++    crypto =3D qcrypto_block_create(cryptoopts, optprefix,
++                                  block_crypto_headerlen_hdr_init_func,
++                                  block_crypto_headerlen_hdr_write_func,
++                                  len, errp);
++    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
++    if (!crypto) {
++        return false;
++    }
++
++    qcrypto_block_free(crypto);
++    return true;
++}
++
++
+ static int block_crypto_open_generic(QCryptoBlockFormat format,
+                                      QemuOptsList *opts_spec,
+                                      BlockDriverState *bs,
+diff --git a/block/crypto.h b/block/crypto.h
+index b935695e79..5a39bee71b 100644
+--- a/block/crypto.h
++++ b/block/crypto.h
+@@ -94,4 +94,9 @@ block_crypto_create_opts_init(QDict *opts, Error **errp);
+ QCryptoBlockOpenOptions *
+ block_crypto_open_opts_init(QDict *opts, Error **errp);
+=20
++bool block_crypto_calculate_payload_offset(QemuOpts *opts,
++                                           const char *optprefix,
++                                           size_t *len,
++                                           Error **errp);
++
+ #endif /* BLOCK_CRYPTO_H */
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7fbaac8457..cbdcc8695f 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4561,60 +4561,6 @@ static coroutine_fn int qcow2_co_flush_to_os(BlockDr=
+iverState *bs)
+     return ret;
+ }
+=20
+-static ssize_t qcow2_measure_crypto_hdr_init_func(QCryptoBlock *block,
+-        size_t headerlen, void *opaque, Error **errp)
+-{
+-    size_t *headerlenp =3D opaque;
+-
+-    /* Stash away the payload size */
+-    *headerlenp =3D headerlen;
+-    return 0;
+-}
+-
+-static ssize_t qcow2_measure_crypto_hdr_write_func(QCryptoBlock *block,
+-        size_t offset, const uint8_t *buf, size_t buflen,
+-        void *opaque, Error **errp)
+-{
+-    /* Discard the bytes, we're not actually writing to an image */
+-    return buflen;
+-}
+-
+-/* Determine the number of bytes for the LUKS payload */
+-static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
+-                                         Error **errp)
+-{
+-    QDict *opts_qdict;
+-    QDict *cryptoopts_qdict;
+-    QCryptoBlockCreateOptions *cryptoopts;
+-    QCryptoBlock *crypto;
+-
+-    /* Extract "encrypt." options into a qdict */
+-    opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
+-    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
+-    qobject_unref(opts_qdict);
+-
+-    /* Build QCryptoBlockCreateOptions object from qdict */
+-    qdict_put_str(cryptoopts_qdict, "format", "luks");
+-    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp);
+-    qobject_unref(cryptoopts_qdict);
+-    if (!cryptoopts) {
+-        return false;
+-    }
+-
+-    /* Fake LUKS creation in order to determine the payload size */
+-    crypto =3D qcrypto_block_create(cryptoopts, "encrypt.",
+-                                  qcow2_measure_crypto_hdr_init_func,
+-                                  qcow2_measure_crypto_hdr_write_func,
+-                                  len, errp);
+-    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
+-    if (!crypto) {
+-        return false;
+-    }
+-
+-    qcrypto_block_free(crypto);
+-    return true;
+-}
+-
+ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *i=
+n_bs,
+                                        Error **errp)
+ {
+@@ -4667,7 +4613,10 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opt=
+s, BlockDriverState *in_bs,
+     if (has_luks) {
+         size_t headerlen;
+=20
+-        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err)) {
++        if (!block_crypto_calculate_payload_offset(opts,
++                                                   "encrypt.",
++                                                   &headerlen,
++                                                   &local_err)) {
+             goto err;
+         }
+=20
+--=20
 2.24.1
 
 
