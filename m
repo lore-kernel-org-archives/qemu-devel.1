@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86CB1C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C24DC33CA2
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:17:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51216205F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:12:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE56A205F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:17:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WfMYl2UG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51216205F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzPSCZTY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE56A205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipB8m-0008GP-Gu
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:12:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56740)
+	id 1ipBDB-00028z-3V
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:17:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60119)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipB5v-0004cM-04
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:09:56 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ipBCR-0001cj-Ti
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:16:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipB5s-0002Eo-53
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:09:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39246
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1ipBCQ-0007DT-Us
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:16:39 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53292
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipB5s-0002E9-1d
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:09:52 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ipBBy-0006vp-4t
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 08:16:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578488991;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1578489368;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ViuSItCm4Gf8TH93ZqXZKxJHXGkSkcoRjYUYAhg6l/s=;
- b=WfMYl2UGjvXACehS5g5rOp4tnHCI2tCu5gMwtteg+wdwqS0GJy+aWG2shul34Jk/xaAbSg
- jvs56ktDnl425ZD/APMuIuTzqIV6oh5N2A/xROye8p99OmM5dCQvDvWciX1+/gpNnvo/+W
- SXu0XiIEqonsxbYu99AL1saNVPKiOZY=
+ bh=nPcmk0b6yRUBu9FYvwhg+6bf/76SqxpUR2t7+mUQVoE=;
+ b=ZzPSCZTYrHsnQ0efXFWIdIScQ7xdNHqMAOp2LLwFM2ACa+zf+EAm087nn9TXxvno1E40s5
+ bl9QAowGdHwYjbskX0fiwzWdVbFe/wdg90aEV51AUcl5JIl9pninRomIAT4oI9pmVp7xmD
+ pCt/4XeavYy7S7TwNWg3D3Gja7oJXcM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-2-JmH3KlMem1piqOX4jAeg-1; Wed, 08 Jan 2020 08:09:49 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-123-5frj8CK_OQOzT6ZooWMIyw-1; Wed, 08 Jan 2020 08:16:04 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 787051005514;
- Wed,  8 Jan 2020 13:09:48 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.118.112])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BB2C19C58;
- Wed,  8 Jan 2020 13:09:42 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v6] migration: Support QLIST migration
-In-Reply-To: <20191122171621.1307-1-eric.auger@redhat.com> (Eric Auger's
- message of "Fri, 22 Nov 2019 18:16:21 +0100")
-References: <20191122171621.1307-1-eric.auger@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Wed, 08 Jan 2020 14:09:38 +0100
-Message-ID: <87tv56gkml.fsf@secure.laptop>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D6AE800D41;
+ Wed,  8 Jan 2020 13:16:03 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 65BC65C1B0;
+ Wed,  8 Jan 2020 13:16:02 +0000 (UTC)
+Date: Wed, 8 Jan 2020 14:16:00 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v1 38/59] s390x/sclp.c: remove unneeded label in
+ sclp_service_call()
+Message-ID: <20200108141600.23c879c0.cohuck@redhat.com>
+In-Reply-To: <20200106182425.20312-39-danielhb413@gmail.com>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-39-danielhb413@gmail.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 2-JmH3KlMem1piqOX4jAeg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 5frj8CK_OQOzT6ZooWMIyw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,27 +87,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: peterx@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- eric.auger.pro@gmail.com
+Cc: qemu-trivial@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ Christian Borntraeger <borntraeger@de.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Auger <eric.auger@redhat.com> wrote:
-> Support QLIST migration using the same principle as QTAILQ:
-> 94869d5c52 ("migration: migrate QTAILQ").
->
-> The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
-> The change mainly resides in QLIST RAW macros: QLIST_RAW_INSERT_HEAD
-> and QLIST_RAW_REVERSE.
->
-> Tests also are provided.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On Mon,  6 Jan 2020 15:24:04 -0300
+Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+> 'out' label can be replaced by 'return' with the appropriate
+> value. The 'r' integer, which is used solely to set the
+> return value for this label, can also be removed.
+> 
+> CC: Cornelia Huck <cohuck@redhat.com>
+> CC: Halil Pasic <pasic@linux.ibm.com>
+> CC: Christian Borntraeger <borntraeger@de.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> ---
+>  hw/s390x/sclp.c | 16 +++++-----------
+>  1 file changed, 5 insertions(+), 11 deletions(-)
 
-queued
+Thanks, applied.
 
 
