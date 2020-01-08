@@ -1,76 +1,93 @@
-Return-Path: <SRS0=ZO09=24=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C28C282DD
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 23:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6274DC33C99
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:06:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2C932068E
-	for <qemu-devel@archiver.kernel.org>; Tue,  7 Jan 2020 23:56:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2C932068E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 270692070E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 00:06:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BrQNVZu8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270692070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ioyi0-00074v-Ud
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 18:56:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33384)
+	id 1ioysD-0002IF-9T
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 19:06:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ioyhI-0006aQ-2A
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 18:55:41 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1ioyrV-0001qF-U1
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ioyhG-0004MY-Dk
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 18:55:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51984)
+ (envelope-from <palmerdabbelt@google.com>) id 1ioyrU-0002nk-Rx
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:06:13 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45126)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ioyhG-0004LS-84
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 18:55:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ioyhF-0008El-0j
- for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 23:55:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E60B82E80C9
- for <qemu-devel@nongnu.org>; Tue,  7 Jan 2020 23:55:36 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 07 Jan 2020 23:49:56 -0000
-From: Aleksandar Markovic <1835865@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: acpi piix
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: amarkovic philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: Aleksandar Markovic (amarkovic)
-References: <156264634854.21327.17484948855790653898.malonedeb@gac.canonical.com>
-Message-Id: <157844099649.14296.14564465102089957385.malone@wampee.canonical.com>
-Subject: [Bug 1835865] Re: piix crashes on mips when accessing acpi-pci-hotplug
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5015c196507eb48e371995708f9953bb60d41626
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1ioyrU-0002mH-KY
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 19:06:12 -0500
+Received: by mail-pf1-x443.google.com with SMTP id 2so648847pfg.12
+ for <qemu-devel@nongnu.org>; Tue, 07 Jan 2020 16:06:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:subject:cc:to:in-reply-to:references:message-id
+ :mime-version:content-transfer-encoding;
+ bh=z+in7Qiu0uJOVVZsPIL5WgzbcNDpsMijJxT+AW8sdZM=;
+ b=BrQNVZu88EFfymKgzroYyrXsw2TosEf2+zRufJYJKCqgLpdPNKTYkzgG1zU9bLoISD
+ 1p9F+2m2uXY0kXCz66mWRKvevzY8Et3XKLPKEBNKAyNFxlyVWwnELJSfpA5EhYYbZ5vB
+ YtYpLJpASk2aJYnynIgvhLoydJkv4IeksJJqBBUHBhsLSR9wA6Fq73oZuEKJPS6YGNGI
+ WLWFeFQfA2vzRJ0xhe4EmAbma80DKQlSCAMbUWOz/fNt+/ZW8J7xt6UiUv4cz+nGGZaf
+ AOd3Bj9IacPCGtD7QYsiu6NdlMyMC+4SEI2sP/qlNXckiO5sUJdM03/8E4T0kkfXQz3m
+ zgjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
+ :message-id:mime-version:content-transfer-encoding;
+ bh=z+in7Qiu0uJOVVZsPIL5WgzbcNDpsMijJxT+AW8sdZM=;
+ b=IMeDkvmSi3cIVNApEbKwSTj4TsYf4GBg4iADEGXG0tAGEDR6DC/qm9imitcHHIgiNi
+ 3EcyVUXZ3Rmy3IqioQuBKxeD7gR5Ql7pOSdv5OnRMZqRc+/stPgOYQPTLrLjehZIXLha
+ 0wbgzgyf6pWpXm1LqNo6tuCykJGnitv9gtOPihAFa3CpS16k+cGBDQeJs/F6Na4DqUlC
+ o++GiaGmgfHQVeASNj3aldxH3K7gOwKuskzXPBc9sEN+v1jQIDfrNvW3qIRUliKsuLXS
+ QCm9+0hmvitECtV0+hhFRm64kFTwZrMlqNyMDeyqc4QcMpuFS/ccjseW3vUDzKYW7upH
+ tvew==
+X-Gm-Message-State: APjAAAUDSt6P95sH8xlZe77Ln3klHUypgH4Z3BVBO907I21VMGWZliml
+ rvOfHmYBoTVoJMLvymonwlCxC9xDFRQ=
+X-Google-Smtp-Source: APXvYqx+1ovn6xo4uVYCkbhllZpCoqrzAy2ljQI00lVFpWWjLRMWfHvTe+3fYRFsvf/Dfa6jRFu80g==
+X-Received: by 2002:a62:e30d:: with SMTP id g13mr2069468pfh.92.1578441971106; 
+ Tue, 07 Jan 2020 16:06:11 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
+ by smtp.gmail.com with ESMTPSA id a16sm912684pgb.5.2020.01.07.16.06.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 07 Jan 2020 16:06:10 -0800 (PST)
+Date: Tue, 07 Jan 2020 16:06:10 -0800 (PST)
+X-Google-Original-Date: Tue, 07 Jan 2020 16:06:08 PST (-0800)
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject: Re: [PATCH v1 09/36] target/riscv: Fix CSR perm checking for HS mode
+CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+To: Alistair Francis <Alistair.Francis@wdc.com>
+In-Reply-To: <72b377cf058f6d159a40301b6880f017404ef9cd.1575914822.git.alistair.francis@wdc.com>
+References: <72b377cf058f6d159a40301b6880f017404ef9cd.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
+Message-ID: <mhng-304917e2-e6ff-4bca-8479-d71b5c13aff6@palmerdabbelt-glaptop>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,114 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1835865 <1835865@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe, is this fixed with your piix improvenents? Thanks, A. @philmd
+On Mon, 09 Dec 2019 10:11:04 PST (-0800), Alistair Francis wrote:
+> Update the CSR permission checking to work correctly when we are in
+> HS-mode.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/csr.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
+>
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 6a0a59edfd..eebfc1823d 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -802,12 +802,22 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>
+>      /* check privileges and return -1 if check fails */
+>  #if !defined(CONFIG_USER_ONLY)
+> -    int csr_priv = get_field(csrno, 0x300);
+> +    int effective_priv = env->priv;
+>      int read_only = get_field(csrno, 0xC00) == 3;
+> -    if ((!env->debugger) && (env->priv < csr_priv)) {
+> -        return -1;
+> +
+> +    if (riscv_has_ext(env, RVH) &&
+> +        env->priv == PRV_S &&
+> +        !riscv_cpu_virt_enabled(env)) {
+> +        /*
+> +         * We are in S mode without virtualisation, therefore we are in HS Mode.
+> +         * Add 1 to the effective privledge level to allow us to access the
+> +         * Hypervisor CSRs.
+> +         */
+> +        effective_priv++;
+>      }
+> -    if (write_mask && read_only) {
+> +
+> +    if ((write_mask && read_only) ||
+> +        (!env->debugger && (effective_priv < get_field(csrno, 0x300)))) {
+>          return -1;
+>      }
+>  #endif
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1835865
-
-Title:
-  piix crashes on mips when accessing acpi-pci-hotplug
-
-Status in QEMU:
-  New
-
-Bug description:
-  $ qemu-system-mips --version
-  QEMU emulator version 4.0.50 (v4.0.0-1975-gf34edbc760)
-
-  $ qemu-system-mips -machine malta -bios /dev/null -nodefaults -monitor st=
-dio -S
-  (qemu) o 0xaf00 0
-  qemu-system-mips: hw/acpi/cpu.c:197: cpu_hotplug_hw_init: Assertion `mc->=
-possible_cpu_arch_ids' failed.
-  Aborted (core dumped)
-
-  (gdb) bt
-  #0  0x00007f6fd748957f in raise () at /lib64/libc.so.6
-  #1  0x00007f6fd7473895 in abort () at /lib64/libc.so.6
-  #2  0x00007f6fd7473769 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
-  #3  0x00007f6fd7481a26 in .annobin_assert.c_end () at /lib64/libc.so.6
-  #4  0x00005646d58ca7bd in cpu_hotplug_hw_init (as=3D0x5646d6ae3300, owner=
-=3D0x5646d6fd5b10, state=3D0x5646d6fd7a30, base_addr=3D44800) at hw/acpi/cp=
-u.c:197
-  #5  0x00005646d58c5284 in acpi_switch_to_modern_cphp (gpe_cpu=3D0x5646d6f=
-d7910, cpuhp_state=3D0x5646d6fd7a30, io_port=3D44800) at hw/acpi/cpu_hotplu=
-g.c:107
-  #6  0x00005646d58c3431 in piix4_set_cpu_hotplug_legacy (obj=3D0x5646d6fd5=
-b10, value=3Dfalse, errp=3D0x5646d61cdb28 <error_abort>) at hw/acpi/piix4.c=
-:617
-  #7  0x00005646d5b00c70 in property_set_bool (obj=3D0x5646d6fd5b10, v=3D0x=
-5646d7697d30, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", opaque=3D0x5646d7=
-07d110, errp=3D0x5646d61cdb28 <error_abort>) at qom/object.c:2076
-  #8  0x00005646d5afeee6 in object_property_set (obj=3D0x5646d6fd5b10, v=3D=
-0x5646d7697d30, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", errp=3D0x5646d6=
-1cdb28 <error_abort>) at qom/object.c:1268
-  #9  0x00005646d5b01fb8 in object_property_set_qobject (obj=3D0x5646d6fd5b=
-10, value=3D0x5646d75b5450, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", err=
-p=3D0x5646d61cdb28 <error_abort>) at qom/qom-qobject.c:26
-  #10 0x00005646d5aff1cb in object_property_set_bool (obj=3D0x5646d6fd5b10,=
- value=3Dfalse, name=3D0x5646d5cf3a90 "cpu-hotplug-legacy", errp=3D0x5646d6=
-1cdb28 <error_abort>) at qom/object.c:1334
-  #11 0x00005646d58c4fce in cpu_status_write (opaque=3D0x5646d6fd7910, addr=
-=3D0, data=3D0, size=3D1) at hw/acpi/cpu_hotplug.c:44
-  #12 0x00005646d569c707 in memory_region_write_accessor (mr=3D0x5646d6fd79=
-20, addr=3D0, value=3D0x7ffc18053068, size=3D1, shift=3D0, mask=3D255, attr=
-s=3D...) at memory.c:503
-  #13 0x00005646d569c917 in access_with_adjusted_size (addr=3D0, value=3D0x=
-7ffc18053068, size=3D1, access_size_min=3D1, access_size_max=3D4, access_fn=
-=3D0x5646d569c61e <memory_region_write_accessor>, mr=3D0x5646d6fd7920, attr=
-s=3D...)
-      at memory.c:569
-  #14 0x00005646d569f8f3 in memory_region_dispatch_write (mr=3D0x5646d6fd79=
-20, addr=3D0, data=3D0, size=3D1, attrs=3D...) at memory.c:1497
-  #15 0x00005646d563e5c5 in flatview_write_continue (fv=3D0x5646d751b000, a=
-ddr=3D44800, attrs=3D..., buf=3D0x7ffc180531d4 "", len=3D4, addr1=3D0, l=3D=
-1, mr=3D0x5646d6fd7920) at exec.c:3324
-  #16 0x00005646d563e70a in flatview_write (fv=3D0x5646d751b000, addr=3D448=
-00, attrs=3D..., buf=3D0x7ffc180531d4 "", len=3D4) at exec.c:3363
-  #17 0x00005646d563ea0f in address_space_write (as=3D0x5646d618abc0 <addre=
-ss_space_io>, addr=3D44800, attrs=3D..., buf=3D0x7ffc180531d4 "", len=3D4) =
-at exec.c:3453
-  #18 0x00005646d5696ee5 in cpu_outl (addr=3D44800, val=3D0) at ioport.c:80
-  #19 0x00005646d57585d0 in hmp_ioport_write (mon=3D0x5646d6bc70e0, qdict=
-=3D0x5646d6cf7140) at monitor/misc.c:1058
-  #20 0x00005646d5a77b99 in handle_hmp_command (mon=3D0x5646d6bc70e0, cmdli=
-ne=3D0x5646d6bc2542 "0xaf00 0") at monitor/hmp.c:1082
-  #21 0x00005646d5a7540a in monitor_command_cb (opaque=3D0x5646d6bc70e0, cm=
-dline=3D0x5646d6bc2540 "o 0xaf00 0", readline_opaque=3D0x0) at monitor/hmp.=
-c:47
-  #22 0x00005646d5c71450 in readline_handle_byte (rs=3D0x5646d6bc2540, ch=
-=3D13) at util/readline.c:408
-  #23 0x00005646d5a7858f in monitor_read (opaque=3D0x5646d6bc70e0, buf=3D0x=
-7ffc180533d0 "\rtc\327FV", size=3D1) at monitor/hmp.c:1312
-  #24 0x00005646d5bc8d17 in qemu_chr_be_write_impl (s=3D0x5646d6add000, buf=
-=3D0x7ffc180533d0 "\rtc\327FV", len=3D1) at chardev/char.c:177
-  #25 0x00005646d5bc8d7b in qemu_chr_be_write (s=3D0x5646d6add000, buf=3D0x=
-7ffc180533d0 "\rtc\327FV", len=3D1) at chardev/char.c:189
-  #26 0x00005646d5bcb6bf in fd_chr_read (chan=3D0x5646d6a80d60, cond=3DG_IO=
-_IN, opaque=3D0x5646d6add000) at chardev/char-fd.c:68
-  #27 0x00005646d5bec485 in qio_channel_fd_source_dispatch (source=3D0x5646=
-d765a480, callback=3D0x5646d5bcb561 <fd_chr_read>, user_data=3D0x5646d6add0=
-00) at io/channel-watch.c:84
-  #28 0x00007f6fd9c1606d in g_main_context_dispatch () at /lib64/libglib-2.=
-0.so.0
-  #29 0x00005646d5c5323a in glib_pollfds_poll () at util/main-loop.c:213
-  #30 0x00005646d5c532b4 in os_host_main_loop_wait (timeout=3D29821719) at =
-util/main-loop.c:236
-  #31 0x00005646d5c533b9 in main_loop_wait (nonblocking=3D0) at util/main-l=
-oop.c:512
-  #32 0x00005646d581d1a1 in main_loop () at vl.c:1791
-  #33 0x00005646d582485f in main (argc=3D11, argv=3D0x7ffc18054868, envp=3D=
-0x7ffc180548c8) at vl.c:4473
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1835865/+subscriptions
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 
