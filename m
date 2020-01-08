@@ -2,79 +2,82 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0606EC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F78FC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:08:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0FDC205F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:08:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D4D1205F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 13:08:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Txmkxqi/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0FDC205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BGN9M53t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4D1205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipB4I-0002Ny-0W
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:08:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39056)
+	id 1ipB4M-0002Uy-AZ
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 08:08:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40738)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ipAj5-0006fO-Gr
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:46:20 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ipAmT-00022q-0R
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:49:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ipAj3-0004qA-OV
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:46:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50820
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ipAj3-0004pg-G1
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:46:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578487577;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QIiMM6Pf4/QASnshpSy0W4cEb84s+FeC+lukYms/+NQ=;
- b=Txmkxqi/xBdNtWc+yztvJ1iJM8uQPdpuaRLQO0gHC+qbDqDCwnR2xxZjRTqB45EhjkM2Y2
- lKQd8alw4n2fZTKycfKC3GvpFZGAjXg57oaOuq/xvVPbEPqN4Y4o/wi20FcINcjC+n9ZZ6
- nuv12GDlkeSNhqYwGBzpagqJT1e+spo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-fzbetnrYOUCRm0uHMNpk2w-1; Wed, 08 Jan 2020 07:46:13 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58E15593A1;
- Wed,  8 Jan 2020 12:46:12 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A35519C58;
- Wed,  8 Jan 2020 12:46:11 +0000 (UTC)
-Date: Wed, 8 Jan 2020 13:46:08 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v1 37/59] s390x/event-facility.c: remove unneeded labels
-Message-ID: <20200108134608.17c8c76c.cohuck@redhat.com>
-In-Reply-To: <20200106182425.20312-38-danielhb413@gmail.com>
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-38-danielhb413@gmail.com>
-Organization: Red Hat GmbH
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ipAmR-00075s-Sm
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 07:49:48 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44367)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1ipAmR-00075P-Mg; Wed, 08 Jan 2020 07:49:47 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q10so3199335wrm.11;
+ Wed, 08 Jan 2020 04:49:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=3nSD+C0NYHVQUPjtC1lGASSOIFia0uW6qYw+c8vOsn4=;
+ b=BGN9M53tGhuMF6fDWSmj1k/v48RW30de8yl1VPgdX0avBfoh+bsPMEPyjjUtMCibjI
+ 9SmTLjQLrDwo+Q0FYUUkivgRKKTNuReLczEsU6ol4GgnkWqhWPK6s7hKIZ8ZSavRY+PQ
+ WVQbx+Fj6OMg/+HkOCeAaDbtvbYIdfYhUHq8hH/qwqoJuXny6WxDEfB55iPtuPYaMuJj
+ 0DgLcd8CFmVas6fJRhkVRo85WlCI0lmqgUJpDopoouIj0AokHacsofVkGzbhB3I2czg0
+ xaQ3cGOEish88LplLvBaLIzoFouyNg2PXYMsagshO/zAIPApG5s4Ldj743NecQqj28K9
+ g9oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=3nSD+C0NYHVQUPjtC1lGASSOIFia0uW6qYw+c8vOsn4=;
+ b=N7OuyDTxsA6dUWfoSq4LUUGZ94KvnF80RFWbQ6OeQE6tbpOqEf8owXfKbKXY8q7FNL
+ Ed3DjGjmBMxvxXDHXrI/z9tkD3syQAh1v8jBZ4JkJA4N5jgBc0VIQOedf3xkNgrlU/wk
+ VeJSuLUjy0RX0/tLBeUzWSMe7TzmSaeTTQnxiJ4yaXXNnMi/SmauxioL5xhpclcpGTMc
+ jSyeHGVuocit6TCdeq6rOcyIEHt+ROHz3l2HHHkxS1up90h7zcafTLQ7TCLhr74L6ClJ
+ LbUu+wA1op09+c7is9EIiJByviCbs4v+LGCjVC6iQdFkC1wn/5WqJCNjCJiWPrcl5Cs+
+ KsWQ==
+X-Gm-Message-State: APjAAAWTomFF0n4JFZ8u+FQWiGpH7+Wt65/N/eWSQxWyc7i32eHldtKY
+ 5ml6lAiViYq8GBz4u5soJm7d3Paf4fCWcV4h5DA=
+X-Google-Smtp-Source: APXvYqyBjTYZB0nEeaunys2fOpuR6fD5TVjnWAWD2/QF9Wx8l3W5ZL07f4kshQgotmidHtKkab5J1XNZEk6kd52I+Is=
+X-Received: by 2002:a5d:66c3:: with SMTP id k3mr4162674wrw.370.1578487786643; 
+ Wed, 08 Jan 2020 04:49:46 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: fzbetnrYOUCRm0uHMNpk2w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20200103074000.1006389-1-marcandre.lureau@redhat.com>
+ <20200103074000.1006389-3-marcandre.lureau@redhat.com>
+ <20200103100233.GA3804@work-vm> <20200108112902.GB3184@work-vm>
+In-Reply-To: <20200108112902.GB3184@work-vm>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 8 Jan 2020 16:49:32 +0400
+Message-ID: <CAJ+F1CJp1rxiwZ30HCH43Yxw4QgUt5QEdyRk9Z3bWyZat1NMAA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] tpm-ppi: page-align PPI RAM
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,165 +89,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-stable <qemu-stable@nongnu.org>,
+ QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  6 Jan 2020 15:24:03 -0300
-Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+Hi
 
-> 'out' label from write_event_mask(), handle_sccb_read_events()
-> and write_event_data() can be replaced by 'return'.
-> 
-> CC: Cornelia Huck <cohuck@redhat.com>
-> CC: Halil Pasic <pasic@linux.ibm.com>
-> CC: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/s390x/event-facility.c | 21 ++++++---------------
->  1 file changed, 6 insertions(+), 15 deletions(-)
-> 
-> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-> index 6afe278cad..f3b9661f32 100644
-> --- a/hw/s390x/event-facility.c
-> +++ b/hw/s390x/event-facility.c
-> @@ -182,11 +182,11 @@ static void write_event_data(SCLPEventFacility *ef, SCCB *sccb)
->  {
->      if (sccb->h.function_code != SCLP_FC_NORMAL_WRITE) {
->          sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_FUNCTION);
-> -        goto out;
-> +        return;
->      }
->      if (be16_to_cpu(sccb->h.length) < 8) {
->          sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> -        goto out;
-> +        return;
->      }
->      /* first do a sanity check of the write events */
->      sccb->h.response_code = cpu_to_be16(write_event_length_check(sccb));
-> @@ -196,9 +196,6 @@ static void write_event_data(SCLPEventFacility *ef, SCCB *sccb)
->          sccb->h.response_code =
->                  cpu_to_be16(handle_sccb_write_events(ef, sccb));
->      }
-> -
-> -out:
-> -    return;
->  }
+On Wed, Jan 8, 2020 at 3:29 PM Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > > post-copy migration fails on destination with error such as:
+> > > 2019-12-26T10:22:44.714644Z qemu-kvm: ram_block_discard_range:
+> > > Unaligned start address: 0x559d2afae9a0
+> >
+> > Ah good, we got a sane error message!
+> >
+> > > Use qemu_memalign() to constrain the PPI RAM memory alignment.
+> > >
+> > > Cc: qemu-stable@nongnu.org
+> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > ---
+> > >  hw/tpm/tpm_ppi.c | 3 ++-
+> > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
+> > > index ff314592b4..6d9c1a3e40 100644
+> > > --- a/hw/tpm/tpm_ppi.c
+> > > +++ b/hw/tpm/tpm_ppi.c
+> > > @@ -43,7 +43,8 @@ void tpm_ppi_reset(TPMPPI *tpmppi)
+> > >  void tpm_ppi_init(TPMPPI *tpmppi, struct MemoryRegion *m,
+> > >                    hwaddr addr, Object *obj)
+> > >  {
+> > > -    tpmppi->buf =3D g_malloc0(HOST_PAGE_ALIGN(TPM_PPI_ADDR_SIZE));
+> > > +    tpmppi->buf =3D qemu_memalign(qemu_real_host_page_size,
+> > > +                                HOST_PAGE_ALIGN(TPM_PPI_ADDR_SIZE));
+> >
+> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> I just noticed a bit in the CODING_STYLE that says:
+>
+>   Memory allocated by qemu_memalign or qemu_blockalign must be freed with
+>   qemu_vfree, since breaking this will cause problems on Win32.
+>
+> so I guess this is wrong?
 
-I'm fine with the changes to write_event_data().
+The buf is not freed, TPM are not hotpluggable. For strictness, we
+could have a finalize later.
 
->  
->  static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
-> @@ -262,7 +259,7 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
->  
->      if (be16_to_cpu(sccb->h.length) != SCCB_SIZE) {
->          sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
-> -        goto out;
-> +        return;
->      }
->  
->      sclp_cp_receive_mask = ef->receive_mask;
-> @@ -280,18 +277,15 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
->              (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
->              sccb->h.response_code =
->                      cpu_to_be16(SCLP_RC_INVALID_SELECTION_MASK);
-> -            goto out;
-> +            return;
->          }
->          break;
->      default:
->          sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_FUNCTION);
-> -        goto out;
-> +        return;
->      }
->      sccb->h.response_code = cpu_to_be16(
->              handle_sccb_read_events(ef, sccb, sclp_active_selection_mask));
-> -
-> -out:
-> -    return;
->  }
-
-I think read_event_data() is still a bit confusing, even if we get rid
-of the 'out:' label, as the flow remains the same. How about something
-like the following, which makes it clear that we handle the sccb events
-for unconditional read and for a selective read with a valid mask:
-
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 6afe278cad15..877721d6601e 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -262,17 +262,17 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
- 
-     if (be16_to_cpu(sccb->h.length) != SCCB_SIZE) {
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
--        goto out;
-+        return;
-     }
- 
--    sclp_cp_receive_mask = ef->receive_mask;
--
--    /* get active selection mask */
-     switch (sccb->h.function_code) {
-     case SCLP_UNCONDITIONAL_READ:
--        sclp_active_selection_mask = sclp_cp_receive_mask;
-+        sccb->h.response_code = cpu_to_be16(
-+            handle_sccb_read_events(ef, sccb, ef->receive_mask));
-         break;
-     case SCLP_SELECTIVE_READ:
-+        sclp_cp_receive_mask = ef->receive_mask;
-+        /* get active selection mask */
-         copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
-                   sizeof(sclp_active_selection_mask), ef->mask_length);
-         sclp_active_selection_mask = be64_to_cpu(sclp_active_selection_mask);
-@@ -280,18 +280,14 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
-             (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
-             sccb->h.response_code =
-                     cpu_to_be16(SCLP_RC_INVALID_SELECTION_MASK);
--            goto out;
-+        } else {
-+            sccb->h.response_code = cpu_to_be16(
-+                handle_sccb_read_events(ef, sccb, sclp_active_selection_mask));
-         }
-         break;
-     default:
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_FUNCTION);
--        goto out;
-     }
--    sccb->h.response_code = cpu_to_be16(
--            handle_sccb_read_events(ef, sccb, sclp_active_selection_mask));
--
--out:
--    return;
- }
- 
- static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
+>
+> Dave
+>
+> >
+> > >      memory_region_init_ram_device_ptr(&tpmppi->ram, obj, "tpm-ppi",
+> > >                                        TPM_PPI_ADDR_SIZE, tpmppi->buf=
+);
+> > >      vmstate_register_ram(&tpmppi->ram, DEVICE(obj));
+> > > --
+> > > 2.24.0.308.g228f53135a
+> > >
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
 
 
->  
->  static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-> @@ -303,7 +297,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->      if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
->          ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
->          sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
-> -        goto out;
-> +        return;
->      }
->  
->      /*
-> @@ -328,9 +322,6 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
->  
->      sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
->      ef->mask_length = mask_length;
-> -
-> -out:
-> -    return;
->  }
->  
->  /* qemu object creation and initialization functions */
-
-The changes to write_event_mask() look fine to me as well.
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
