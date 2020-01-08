@@ -3,64 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C37C33C99
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDF6C33C99
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:55:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F60820692
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:33:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F60820692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D33D20678
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 01:55:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D33D20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip0Dt-0007ly-Ed
-	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 20:33:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44670)
+	id 1ip0Zc-0006jr-FM
+	for qemu-devel@archiver.kernel.org; Tue, 07 Jan 2020 20:55:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1ip0DG-0007K3-S8
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:32:48 -0500
+ (envelope-from <eguan@linux.alibaba.com>) id 1ip0Yz-00063X-TK
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:55:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhiwei_liu@c-sky.com>) id 1ip0DE-0007W0-MF
- for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:32:46 -0500
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:60589)
+ (envelope-from <eguan@linux.alibaba.com>) id 1ip0Yr-00083u-Rc
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:55:07 -0500
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:16112)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1ip0DE-0007QY-3K; Tue, 07 Jan 2020 20:32:44 -0500
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.07436294|-1; CH=green;
- DM=CONTINUE|CONTINUE|true|0.200841-0.0081891-0.79097;
- DS=CONTINUE|ham_enroll_verification|0.0641648-0.000136801-0.935698;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03296; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=9; RT=9; SR=0; TI=SMTPD_---.GYCpkVL_1578447157; 
-Received: from 172.16.31.150(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.GYCpkVL_1578447157)
- by smtp.aliyun-inc.com(10.147.41.121);
- Wed, 08 Jan 2020 09:32:38 +0800
-Subject: Re: [Qemu-devel] [PATCH v2 05/17] RISC-V: add vector extension load
- and store instructions
-To: Richard Henderson <richard.henderson@linaro.org>,
- Alistair.Francis@wdc.com, palmer@dabbelt.com,
- Chih-Min Chao <chihmin.chao@sifive.com>
-References: <1568183141-67641-1-git-send-email-zhiwei_liu@c-sky.com>
- <1568183141-67641-6-git-send-email-zhiwei_liu@c-sky.com>
- <4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <b927f28a-2057-ed1e-c426-63cf9fade27f@c-sky.com>
-Date: Wed, 8 Jan 2020 09:32:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
+ id 1ip0Yr-00080Y-Gz
+ for qemu-devel@nongnu.org; Tue, 07 Jan 2020 20:55:05 -0500
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R161e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07486; MF=eguan@linux.alibaba.com;
+ NM=1; PH=DS; RN=4; SR=0; TI=SMTPD_---0Tn7WaD1_1578448483; 
+Received: from localhost(mailfrom:eguan@linux.alibaba.com
+ fp:SMTPD_---0Tn7WaD1_1578448483) by smtp.aliyun-inc.com(127.0.0.1);
+ Wed, 08 Jan 2020 09:54:44 +0800
+Date: Wed, 8 Jan 2020 09:54:43 +0800
+From: Eryu Guan <eguan@linux.alibaba.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
+Message-ID: <20200108015443.GI41863@e18g06458.et15sqa>
+References: <20191231103434.GA41863@e18g06458.et15sqa>
+ <20191231115136.7b967604@Igors-MacBook-Pro>
+ <20200102020850.GB41863@e18g06458.et15sqa>
+ <20200107130649.GH41863@e18g06458.et15sqa>
+ <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org>
-Content-Type: multipart/alternative;
- boundary="------------3DE5936481B0F275A8101956"
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 47.88.44.36
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,444 +67,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wenmeng_zhang <wenmeng_zhang@c-sky.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, wxy194768@alibaba-inc.com, Jim Wilson <jimw@sifive.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------3DE5936481B0F275A8101956
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+On Tue, Jan 07, 2020 at 03:01:01PM +0100, Julia Suvorova wrote:
+> On Tue, Jan 7, 2020 at 2:06 PM Eryu Guan <eguan@linux.alibaba.com> wrote:
+> >
+> > On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
+> > > On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
+> > > > On Tue, 31 Dec 2019 18:34:34 +0800
+> > > > Eryu Guan <eguan@linux.alibaba.com> wrote:
+> > > >
+> > > > > Hi,
+> > > > >
+> > > > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
+> > > > > think it's because io completion hits use-after-free when device is
+> > > > > already gone. Is this a known bug that has been fixed? (I went through
+> > > > > the git log but didn't find anything obvious).
+> > > > >
+> > > > > gdb backtrace is:
+> > > > >
+> > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
+> > > > > Program terminated with signal 11, Segmentation fault.
+> > > > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
+> > > > > 903        return obj->class;
+> > > > > (gdb) bt
+> > > > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
+> > > > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
+> > > > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
+> > > > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
+> > > > >     opaque=0x558a2f2fd420, ret=0)
+> > > > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
+> > > > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
+> > > > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
+> > > > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
+> > > > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
+> > > > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
+> > > > > #6  0x00007fff9ed75780 in ?? ()
+> > > > > #7  0x0000000000000000 in ?? ()
+> > > > >
+> > > > > It seems like qemu was completing a discard/write_zero request, but
+> > > > > parent BusState was already freed & set to NULL.
+> > > > >
+> > > > > Do we need to drain all pending request before unrealizing virtio-blk
+> > > > > device? Like the following patch proposed?
+> > > > >
+> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
+> > > > >
+> > > > > If more info is needed, please let me know.
+> > > >
+> > > > may be this will help: https://patchwork.kernel.org/patch/11213047/
+> > >
+> > > Yeah, this looks promising! I'll try it out (though it's a one-time
+> > > crash for me). Thanks!
+> >
+> > After applying this patch, I don't see the original segfaut and
+> > backtrace, but I see this crash
+> >
+> > [Thread debugging using libthread_db enabled]
+> > Using host libthread_db library "/lib64/libthread_db.so.1".
+> > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
+> > Program terminated with signal 11, Segmentation fault.
+> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
+> > 1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
+> > Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
+> > (gdb) bt
+> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
+> > #1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
+> > #2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
+> >     at /usr/src/debug/qemu-4.0/memory.c:568
+> > #3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
+> > #4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
+> >     at /usr/src/debug/qemu-4.0/exec.c:3279
+> > #5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
+> > #6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
+> > #7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
+> > #8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
+> > #9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
+> > #10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
+> > #11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
+> > #12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
+> >
+> > And I searched and found
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
+> > backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
+> > blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
+> > bug.
+> >
+> > But I can still hit the bug even after applying the commit. Do I miss
+> > anything?
+> 
+> Hi Eryu,
+> This backtrace seems to be caused by this bug (there were two bugs in
+> 1706759): https://bugzilla.redhat.com/show_bug.cgi?id=1708480
+> Although the solution hasn't been tested on virtio-blk yet, you may
+> want to apply this patch:
+>     https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg05197.html
+> Let me know if this works.
 
-Hi Richard,
+Will try it out, thanks a lot!
 
-Sorry to reply so late for this comment.  I will move forward on part 2.
-On 2019/9/12 22:23, Richard Henderson wrote:
->> +static bool  vector_lmul_check_reg(CPURISCVState *env, uint32_t lmul,
->> +        uint32_t reg, bool widen)
->> +{
->> +    int legal = widen ? (lmul * 2) : lmul;
->> +
->> +    if ((lmul != 1 && lmul != 2 && lmul != 4 && lmul != 8) ||
->> +        (lmul == 8 && widen)) {
->> +        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
->> +        return false;
->> +    }
->> +
->> +    if (reg % legal != 0) {
->> +        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
->> +        return false;
->> +    }
->> +    return true;
->> +}
-> These exceptions will not do the right thing.
->
-> You cannot call helper_raise_exception from another helper, or from something
-> called from another helper, as here.  You need to use riscv_raise_exception, as
-> you do elsewhere in this patch, with a GETPC() value passed down from the
-> outermost helper.
->
-> Ideally you would check these conditions at translate time.
-> I've mentioned how to do this in reply to your v1.
-As discussed in part1,  I will check these conditions at translate time.
->> +        } else if (i < vl) {
->> +            switch (width) {
->> +            case 8:
->> +                if (vector_elem_mask(env, vm, width, lmul, i)) {
->> +                    while (k >= 0) {
->> +                        read = i * (nf + 1)  + k;
->> +                        env->vfp.vreg[dest + k * lmul].u8[j] =
->> +                            cpu_ldub_data(env, env->gpr[rs1] + read);
-> You must not modify vreg[x] before you've recognized all possible exceptions,
-> e.g. validating that a subsequent access will not trigger a page fault.
-> Otherwise you will have a partially modified register value when the exception
-> handler is entered.
-There are two questions here.
-
-1) How to validate access before real access to registers?
-
-As pointed in another comment for patchset v1,
-
-"instructions that perform more than one host store must probe
-       the entire range to be stored before performing any stores.
-"
-
-I didn't see the validation of page in SVE,  for example, sve_st1_r,
-which directly use the  helper_ret_*_mmu  that may cause an page fault 
-exception or ovelap a watchpoint,
-before probe the entire range to be stored .
-
-2) Why not use the  cpu_ld*  API?
-
-I see in SVE that ld*_p is used to directly access the host memory. And 
-helper_ret_*_mmu
-is used to access guest memory. But from the definition of cpu_ld*, it's 
-the combination of
-ld*_p and helper_ret_*_mmu.
-
-     entry = tlb_entry(env, mmu_idx, addr);
-     if (unlikely(entry->ADDR_READ !=
-                  (addr & (TARGET_PAGE_MASK | (DATA_SIZE - 1))))) {
-         oi = make_memop_idx(SHIFT, mmu_idx);
-         res = glue(glue(helper_ret_ld, URETSUFFIX), MMUSUFFIX)(env, addr,
-oi, retaddr);
-     } else {
-         uintptr_t hostaddr = addr + entry->addend;
-         res = glue(glue(ld, USUFFIX), _p)((uint8_t *)hostaddr);
-     }
-
-
-So I don't know  why not use cpu_ld* API?
-> Without a stride, and without a predicate mask, this can be done with at most
-> two calls to probe_access (one per page).  This is the simplification that
-> makes splitting the helper into two very helpful.
->
-> With a stride or with a predicate mask requires either
-> (1) temporary storage for the loads, and copy back to env at the end, or
-> (2) use probe_access for each load, and then perform the actual loads directly
-> into env.
->
-> FWIW, ARM SVE uses (1), as probe_access is very new.
->
->> +                        k--;
->> +                    }
->> +                    env->vfp.vstart++;
->> +                }
->> +                break;
->> +            case 16:
->> +                if (vector_elem_mask(env, vm, width, lmul, i)) {
->> +                    while (k >= 0) {
->> +                        read = i * (nf + 1)  + k;
->> +                        env->vfp.vreg[dest + k * lmul].u16[j] =
->> +                            cpu_ldub_data(env, env->gpr[rs1] + read);
-> I don't see anything in these assignments to vreg[x].uN[y] that take the
-> endianness of the host into account.
->
-> You need to think about how the architecture defines the overlap of elements --
-> particularly across vlset -- and make adjustments.
->
-> I can imagine, if you have explicit tests for this, your tests are passing
-> because the architecture defines a little-endian based indexing of the register
-> file, and you have only run tests on a little-endian host, like x86_64.
->
-> For ARM, we define the representation as a little-endian indexed array of
-> host-endian uint64_t.  This means that a big-endian host needs to adjust the
-> address of any element smaller than 64-bit.  E.g.
->
-> #ifdef HOST_WORDS_BIGENDIAN
-> #define H1(x)   ((x) ^ 7)
-> #define H2(x)   ((x) ^ 3)
-> #define H4(x)   ((x) ^ 1)
-> #else
-> #define H1(x)   (x)
-> #define H2(x)   (x)
-> #define H4(x)   (x)
-> #endif
->
->      env->vfp.vreg[reg + k * lmul].u16[H2(j)]
->
-I will take it.  However I didn't have  a big-endian host to test the 
-feature.
->
->> +        if (base >= abs_off) {
->> +            return base - abs_off;
->> +        }
->> +    } else {
->> +        if ((target_ulong)((target_ulong)offset + base) >= base) {
->> +            return (target_ulong)offset + base;
->> +        }
->> +    }
-> Why all the extra casting here?  They are exactly what is implied by C.
->
->> +    helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
->> +    return 0;
-> (1) This exception call won't work, as above,
-> (2) Where does this condition against wraparound come from?
->      I don't see it in the specification.
-> (3) You certainly cannot detect this after having written a
->      previous element to the register file.
->
-> [ Skipping lots of functions that are basically the same. ]
->
->> +void VECTOR_HELPER(vsxe_v)(CPURISCVState *env, uint32_t nf, uint32_t vm,
->> +    uint32_t rs1, uint32_t rs2, uint32_t rd)
-> Pass rs1 by value.
->
->> +            case 8:
->> +                if (vector_elem_mask(env, vm, width, lmul, i)) {
->> +                    while (k >= 0) {
->> +                        addr = vector_get_index(env, rs1, src2, j, 1, width, k);
->> +                        cpu_stb_data(env, addr,
->> +                            env->vfp.vreg[dest + k * lmul].s8[j]);
-> Must probe_access all of the memory before any stores.
-> Unlike loads, you don't have the option of storing into a temporary.
-> Which suggests a common subroutine to perform the probe(s), rather
-> than bother with a temporary for loads.
->
-> r~
-Thanks again for your informative comments.
-
-Best Regards,
-Zhiwei
-
-
---------------3DE5936481B0F275A8101956
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: 8bit
-
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    Hi Richard,<br>
-    <br>
-    Sorry to reply so late for this comment.  I will move forward on
-    part 2. <br>
-    <div class="moz-cite-prefix">On 2019/9/12 22:23, Richard Henderson
-      wrote:<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org">
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+static bool  vector_lmul_check_reg(CPURISCVState *env, uint32_t lmul,
-+        uint32_t reg, bool widen)
-+{
-+    int legal = widen ? (lmul * 2) : lmul;
-+
-+    if ((lmul != 1 &amp;&amp; lmul != 2 &amp;&amp; lmul != 4 &amp;&amp; lmul != 8) ||
-+        (lmul == 8 &amp;&amp; widen)) {
-+        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
-+        return false;
-+    }
-+
-+    if (reg % legal != 0) {
-+        helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
-+        return false;
-+    }
-+    return true;
-+}
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-These exceptions will not do the right thing.
-
-You cannot call helper_raise_exception from another helper, or from something
-called from another helper, as here.  You need to use riscv_raise_exception, as
-you do elsewhere in this patch, with a GETPC() value passed down from the
-outermost helper.
-
-Ideally you would check these conditions at translate time.
-I've mentioned how to do this in reply to your v1.
-</pre>
-    </blockquote>
-    As discussed in part1,  I will check these conditions at translate
-    time.<br>
-    <blockquote type="cite"
-      cite="mid:4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org">
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+        } else if (i &lt; vl) {
-+            switch (width) {
-+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    while (k &gt;= 0) {
-+                        read = i * (nf + 1)  + k;
-+                        env-&gt;vfp.vreg[dest + k * lmul].u8[j] =
-+                            cpu_ldub_data(env, env-&gt;gpr[rs1] + read);
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-You must not modify vreg[x] before you've recognized all possible exceptions,
-e.g. validating that a subsequent access will not trigger a page fault.
-Otherwise you will have a partially modified register value when the exception
-handler is entered.
-</pre>
-    </blockquote>
-    There are two questions here.<br>
-    <br>
-    1) How to validate access before real access to registers?<br>
-    <br>
-    As pointed in another comment for patchset v1,  <br>
-    <pre class="moz-quote-pre" wrap="">"instructions that perform more than one host store must probe
-      the entire range to be stored before performing any stores.
-"</pre>
-    I didn't see the validation of page in SVE,  for example, sve_st1_r,
-    <br>
-    which directly use the  helper_ret_*_mmu  that may cause an page
-    fault exception or ovelap a watchpoint,<br>
-    before probe the entire range to be stored .<br>
-    <br>
-    2) Why not use the  cpu_ld*  API?<br>
-    <br>
-    I see in SVE that ld*_p is used to directly access the host memory.
-    And helper_ret_*_mmu<br>
-    is used to access guest memory. But from the definition of cpu_ld*,
-    it's the combination of<br>
-    ld*_p and helper_ret_*_mmu.<br>
-       <br>
-    <table width="932" height="252" cellspacing="2" cellpadding="2"
-      border="1">
-      <tbody>
-        <tr>
-          <td valign="top">    entry = tlb_entry(env, mmu_idx, addr);<br>
-                if (unlikely(entry-&gt;ADDR_READ !=<br>
-                             (addr &amp; (TARGET_PAGE_MASK | (DATA_SIZE
-            - 1))))) {<br>
-                    oi = make_memop_idx(SHIFT, mmu_idx);<br>
-                    res = glue(glue(helper_ret_ld, URETSUFFIX),
-            MMUSUFFIX)(env, addr,<br>
-                                                                       
-            oi, retaddr);<br>
-                } else {<br>
-                    uintptr_t hostaddr = addr + entry-&gt;addend;<br>
-                    res = glue(glue(ld, USUFFIX), _p)((uint8_t
-            *)hostaddr);<br>
-                }</td>
-        </tr>
-      </tbody>
-    </table>
-    <br>
-    So I don't know  why not use cpu_ld* API?<br>
-    <blockquote type="cite"
-      cite="mid:4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-Without a stride, and without a predicate mask, this can be done with at most
-two calls to probe_access (one per page).  This is the simplification that
-makes splitting the helper into two very helpful.
-
-With a stride or with a predicate mask requires either
-(1) temporary storage for the loads, and copy back to env at the end, or
-(2) use probe_access for each load, and then perform the actual loads directly
-into env.
-
-FWIW, ARM SVE uses (1), as probe_access is very new.
-</pre>
-    </blockquote>
-    <blockquote type="cite"
-      cite="mid:4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+                        k--;
-+                    }
-+                    env-&gt;vfp.vstart++;
-+                }
-+                break;
-+            case 16:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    while (k &gt;= 0) {
-+                        read = i * (nf + 1)  + k;
-+                        env-&gt;vfp.vreg[dest + k * lmul].u16[j] =
-+                            cpu_ldub_data(env, env-&gt;gpr[rs1] + read);
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-I don't see anything in these assignments to vreg[x].uN[y] that take the
-endianness of the host into account.
-
-You need to think about how the architecture defines the overlap of elements --
-particularly across vlset -- and make adjustments.
-
-I can imagine, if you have explicit tests for this, your tests are passing
-because the architecture defines a little-endian based indexing of the register
-file, and you have only run tests on a little-endian host, like x86_64.
-
-For ARM, we define the representation as a little-endian indexed array of
-host-endian uint64_t.  This means that a big-endian host needs to adjust the
-address of any element smaller than 64-bit.  E.g.
-
-#ifdef HOST_WORDS_BIGENDIAN
-#define H1(x)   ((x) ^ 7)
-#define H2(x)   ((x) ^ 3)
-#define H4(x)   ((x) ^ 1)
-#else
-#define H1(x)   (x)
-#define H2(x)   (x)
-#define H4(x)   (x)
-#endif
-
-    env-&gt;vfp.vreg[reg + k * lmul].u16[H2(j)]
-
-</pre>
-    </blockquote>
-    I will take it.  However I didn't have  a big-endian host to test
-    the feature.<br>
-    <blockquote type="cite"
-      cite="mid:4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org"><br>
-      <pre class="moz-quote-pre" wrap="">
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+        if (base &gt;= abs_off) {
-+            return base - abs_off;
-+        }
-+    } else {
-+        if ((target_ulong)((target_ulong)offset + base) &gt;= base) {
-+            return (target_ulong)offset + base;
-+        }
-+    }
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-Why all the extra casting here?  They are exactly what is implied by C.
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+    helper_raise_exception(env, RISCV_EXCP_ILLEGAL_INST);
-+    return 0;
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-(1) This exception call won't work, as above,
-(2) Where does this condition against wraparound come from?
-    I don't see it in the specification.
-(3) You certainly cannot detect this after having written a
-    previous element to the register file.
-
-[ Skipping lots of functions that are basically the same. ]
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+void VECTOR_HELPER(vsxe_v)(CPURISCVState *env, uint32_t nf, uint32_t vm,
-+    uint32_t rs1, uint32_t rs2, uint32_t rd)
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-Pass rs1 by value.
-
-</pre>
-      <blockquote type="cite">
-        <pre class="moz-quote-pre" wrap="">+            case 8:
-+                if (vector_elem_mask(env, vm, width, lmul, i)) {
-+                    while (k &gt;= 0) {
-+                        addr = vector_get_index(env, rs1, src2, j, 1, width, k);
-+                        cpu_stb_data(env, addr,
-+                            env-&gt;vfp.vreg[dest + k * lmul].s8[j]);
-</pre>
-      </blockquote>
-      <pre class="moz-quote-pre" wrap="">
-Must probe_access all of the memory before any stores.
-Unlike loads, you don't have the option of storing into a temporary.
-Which suggests a common subroutine to perform the probe(s), rather
-than bother with a temporary for loads.
-
-</pre>
-      <pre class="moz-quote-pre" wrap="">r~</pre>
-    </blockquote>
-    Thanks again for your informative comments.<br>
-    <br>
-    Best Regards,<br>
-    Zhiwei<br>
-    <blockquote type="cite"
-      cite="mid:4da4da5b-afb8-c9be-99af-0544c6eeb233@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-</pre>
-    </blockquote>
-    <br>
-  </body>
-</html>
-
---------------3DE5936481B0F275A8101956--
+Eryu
 
