@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CD0C33CA3
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC38C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B90D2070E
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:38:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 968B72070E
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:38:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zy9tpdDF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B90D2070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cku7AyWK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 968B72070E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipCTG-00008d-5I
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 09:38:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51523)
+	id 1ipCTW-0000Zk-OO
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 09:38:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1ipCNb-00017R-FA
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:17 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1ipCNZ-000636-H1
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36995
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1ipCNZ-00062i-Cg
+ (envelope-from <slp@redhat.com>) id 1ipCNY-000136-Ae
  for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:13 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <slp@redhat.com>) id 1ipCNW-00061B-NF
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:12 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41971
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1ipCNW-00060m-JU
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:32:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578493932;
+ s=mimecast20190719; t=1578493930;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=14vK0vgZxcrVgXTApZ8satsEy+e861b7T9N1gndgzGw=;
- b=Zy9tpdDFNCuBWhLdBaJtLsfcTx7liVzmGdlher1ABKtKCCSeSWvD2Ex9MhckvF3PrSewdx
- gEM9IQMyMbbA7SlObEDCfaYV2iRdFKR3Y1OojQcB0xXvgGBM+gNSa4ssFAJ46KWVDabage
- y+TxSdPldmY6429EUTAx4aK6YF8RufU=
+ bh=mMTtFLCmoXcDohIcRMb4cQQJh091sf79PJSYy2RWfNs=;
+ b=Cku7AyWKhyrnD9gzZ5cUtOH2hoD338PnoRmd7Q6ATmlxV8GvlPQNYuywdJr2yyGUAzMd4H
+ 5joxM1Nx78VNjMPe/EksqA54C/pKXeDlhELUaRp6sB3cKYTKDubIUpOTGjhhjTrUJiMUHE
+ bTezgkLC8jhigc2ZtJXrUDsL0lZh8WA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-MyVQfuh1NLmtWmuVJelzsA-1; Wed, 08 Jan 2020 09:32:11 -0500
+ us-mta-90-IXQVVHF8PCqnD-PzsB_Jtw-1; Wed, 08 Jan 2020 09:32:08 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71D83800EBF;
- Wed,  8 Jan 2020 14:32:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDB70800D48;
+ Wed,  8 Jan 2020 14:32:07 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.107])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 36BB56FF0F;
- Wed,  8 Jan 2020 14:32:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 63A6E6FF0F;
+ Wed,  8 Jan 2020 14:32:05 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 8/8] iotests: Test handling of AioContexts with some
- blockdev actions
-Date: Wed,  8 Jan 2020 15:31:38 +0100
-Message-Id: <20200108143138.129909-9-slp@redhat.com>
+Subject: [PATCH v6 7/8] blockdev: Return bs to the proper context on snapshot
+ abort
+Date: Wed,  8 Jan 2020 15:31:37 +0100
+Message-Id: <20200108143138.129909-8-slp@redhat.com>
 In-Reply-To: <20200108143138.129909-1-slp@redhat.com>
 References: <20200108143138.129909-1-slp@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: MyVQfuh1NLmtWmuVJelzsA-1
+X-MC-Unique: IXQVVHF8PCqnD-PzsB_Jtw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,315 +92,128 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Includes the following tests:
+external_snapshot_abort() calls to bdrv_set_backing_hd(), which
+returns state->old_bs to the main AioContext, as it's intended to be
+used then the BDS is going to be released. As that's not the case when
+aborting an external snapshot, return it to the AioContext it was
+before the call.
 
- - Adding a dirty bitmap.
-   * RHBZ: 1782175
+This issue can be triggered by issuing a transaction with two actions,
+a proper blockdev-snapshot-sync and a bogus one, so the second will
+trigger a transaction abort. This results in a crash with an stack
+trace like this one:
 
- - Starting a drive-mirror to an NBD-backed target.
-   * RHBZ: 1746217, 1773517
+ #0  0x00007fa1048b28df in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/u=
+nix/sysv/linux/raise.c:50
+ #1  0x00007fa10489ccf5 in __GI_abort () at abort.c:79
+ #2  0x00007fa10489cbc9 in __assert_fail_base
+     (fmt=3D0x7fa104a03300 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", ass=
+ertion=3D0x5572240b44d8 "bdrv_get_aio_context(old_bs) =3D=3D bdrv_get_aio_c=
+ontext(new_bs)", file=3D0x557224014d30 "block.c", line=3D2240, function=3D<=
+optimized out>) at assert.c:92
+ #3  0x00007fa1048aae96 in __GI___assert_fail
+     (assertion=3Dassertion@entry=3D0x5572240b44d8 "bdrv_get_aio_context(ol=
+d_bs) =3D=3D bdrv_get_aio_context(new_bs)", file=3Dfile@entry=3D0x557224014=
+d30 "block.c", line=3Dline@entry=3D2240, function=3Dfunction@entry=3D0x5572=
+240b5d60 <__PRETTY_FUNCTION__.31620> "bdrv_replace_child_noperm") at assert=
+.c:101
+ #4  0x0000557223e631f8 in bdrv_replace_child_noperm (child=3D0x557225b9c98=
+0, new_bs=3Dnew_bs@entry=3D0x557225c42e40) at block.c:2240
+ #5  0x0000557223e68be7 in bdrv_replace_node (from=3D0x557226951a60, to=3D0=
+x557225c42e40, errp=3D0x5572247d6138 <error_abort>) at block.c:4196
+ #6  0x0000557223d069c4 in external_snapshot_abort (common=3D0x557225d7e170=
+) at blockdev.c:1731
+ #7  0x0000557223d069c4 in external_snapshot_abort (common=3D0x557225d7e170=
+) at blockdev.c:1717
+ #8  0x0000557223d09013 in qmp_transaction (dev_list=3D<optimized out>, has=
+_props=3D<optimized out>, props=3D0x557225cc7d70, errp=3Derrp@entry=3D0x7ff=
+e704c0c98) at blockdev.c:2360
+ #9  0x0000557223e32085 in qmp_marshal_transaction (args=3D<optimized out>,=
+ ret=3D<optimized out>, errp=3D0x7ffe704c0d08) at qapi/qapi-commands-transa=
+ction.c:44
+ #10 0x0000557223ee798c in do_qmp_dispatch (errp=3D0x7ffe704c0d00, allow_oo=
+b=3D<optimized out>, request=3D<optimized out>, cmds=3D0x5572247d3cc0 <qmp_=
+commands>) at qapi/qmp-dispatch.c:132
+ #11 0x0000557223ee798c in qmp_dispatch (cmds=3D0x5572247d3cc0 <qmp_command=
+s>, request=3D<optimized out>, allow_oob=3D<optimized out>) at qapi/qmp-dis=
+patch.c:175
+ #12 0x0000557223e06141 in monitor_qmp_dispatch (mon=3D0x557225c69ff0, req=
+=3D<optimized out>) at monitor/qmp.c:120
+ #13 0x0000557223e0678a in monitor_qmp_bh_dispatcher (data=3D<optimized out=
+>) at monitor/qmp.c:209
+ #14 0x0000557223f2f366 in aio_bh_call (bh=3D0x557225b9dc60) at util/async.=
+c:117
+ #15 0x0000557223f2f366 in aio_bh_poll (ctx=3Dctx@entry=3D0x557225b9c840) a=
+t util/async.c:117
+ #16 0x0000557223f32754 in aio_dispatch (ctx=3D0x557225b9c840) at util/aio-=
+posix.c:459
+ #17 0x0000557223f2f242 in aio_ctx_dispatch (source=3D<optimized out>, call=
+back=3D<optimized out>, user_data=3D<optimized out>) at util/async.c:260
+ #18 0x00007fa10913467d in g_main_dispatch (context=3D0x557225c28e80) at gm=
+ain.c:3176
+ #19 0x00007fa10913467d in g_main_context_dispatch (context=3Dcontext@entry=
+=3D0x557225c28e80) at gmain.c:3829
+ #20 0x0000557223f31808 in glib_pollfds_poll () at util/main-loop.c:219
+ #21 0x0000557223f31808 in os_host_main_loop_wait (timeout=3D<optimized out=
+>) at util/main-loop.c:242
+ #22 0x0000557223f31808 in main_loop_wait (nonblocking=3D<optimized out>) a=
+t util/main-loop.c:518
+ #23 0x0000557223d13201 in main_loop () at vl.c:1828
+ #24 0x0000557223bbfb82 in main (argc=3D<optimized out>, argv=3D<optimized =
+out>, envp=3D<optimized out>) at vl.c:4504
 
- - Aborting an external snapshot transaction.
-   * RHBZ: 1779036
-
- - Aborting a blockdev backup transaction.
-   * RHBZ: 1782111
-
-For each one of them, a VM with a number of disks running in an
-IOThread AioContext is used.
-
+RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=3D1779036
 Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- tests/qemu-iotests/281     | 247 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/281.out |   5 +
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 253 insertions(+)
- create mode 100755 tests/qemu-iotests/281
- create mode 100644 tests/qemu-iotests/281.out
+ blockdev.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/tests/qemu-iotests/281 b/tests/qemu-iotests/281
-new file mode 100755
-index 0000000000..269d583b2c
---- /dev/null
-+++ b/tests/qemu-iotests/281
-@@ -0,0 +1,247 @@
-+#!/usr/bin/env python
-+#
-+# Test cases for blockdev + IOThread interactions
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/blockdev.c b/blockdev.c
+index 292961a88d..cfed87f434 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1731,6 +1731,8 @@ static void external_snapshot_abort(BlkActionState *c=
+ommon)
+     if (state->new_bs) {
+         if (state->overlay_appended) {
+             AioContext *aio_context;
++            AioContext *tmp_context;
++            int ret;
+=20
+             aio_context =3D bdrv_get_aio_context(state->old_bs);
+             aio_context_acquire(aio_context);
+@@ -1738,6 +1740,25 @@ static void external_snapshot_abort(BlkActionState *=
+common)
+             bdrv_ref(state->old_bs);   /* we can't let bdrv_set_backind_hd=
+()
+                                           close state->old_bs; we need it =
+*/
+             bdrv_set_backing_hd(state->new_bs, NULL, &error_abort);
 +
-+import os
-+import iotests
-+from iotests import qemu_img
++            /*
++             * The call to bdrv_set_backing_hd() above returns state->old_=
+bs to
++             * the main AioContext. As we're still going to be using it, r=
+eturn
++             * it to the AioContext it was before.
++             */
++            tmp_context =3D bdrv_get_aio_context(state->old_bs);
++            if (aio_context !=3D tmp_context) {
++                aio_context_release(aio_context);
++                aio_context_acquire(tmp_context);
 +
-+image_len =3D 64 * 1024 * 1024
++                ret =3D bdrv_try_set_aio_context(state->old_bs,
++                                               aio_context, NULL);
++                assert(ret =3D=3D 0);
 +
-+# Test for RHBZ#1782175
-+class TestDirtyBitmapIOThread(iotests.QMPTestCase):
-+    drive0_img =3D os.path.join(iotests.test_dir, 'drive0.img')
-+    images =3D { 'drive0': drive0_img }
-+
-+    def setUp(self):
-+        for name in self.images:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     self.images[name], str(image_len))
-+
-+        self.vm =3D iotests.VM()
-+        self.vm.add_object('iothread,id=3Diothread0')
-+
-+        for name in self.images:
-+            self.vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3D=
-file_%s'
-+                                 % (self.images[name], name))
-+            self.vm.add_blockdev('driver=3Dqcow2,file=3Dfile_%s,node-name=
-=3D%s'
-+                                 % (name, name))
-+
-+        self.vm.launch()
-+        self.vm.qmp('x-blockdev-set-iothread',
-+                    node_name=3D'drive0', iothread=3D'iothread0',
-+                    force=3DTrue)
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        for name in self.images:
-+            os.remove(self.images[name])
-+
-+    def test_add_dirty_bitmap(self):
-+        result =3D self.vm.qmp(
-+            'block-dirty-bitmap-add',
-+            node=3D'drive0',
-+            name=3D'bitmap1',
-+            persistent=3DTrue,
-+        )
-+
-+        self.assert_qmp(result, 'return', {})
-+
-+
-+# Test for RHBZ#1746217 & RHBZ#1773517
-+class TestNBDMirrorIOThread(iotests.QMPTestCase):
-+    nbd_sock =3D os.path.join(iotests.sock_dir, 'nbd.sock')
-+    drive0_img =3D os.path.join(iotests.test_dir, 'drive0.img')
-+    mirror_img =3D os.path.join(iotests.test_dir, 'mirror.img')
-+    images =3D { 'drive0': drive0_img, 'mirror': mirror_img }
-+
-+    def setUp(self):
-+        for name in self.images:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     self.images[name], str(image_len))
-+
-+        self.vm_src =3D iotests.VM(path_suffix=3D'src')
-+        self.vm_src.add_object('iothread,id=3Diothread0')
-+        self.vm_src.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3D=
-file0'
-+                          % (self.drive0_img))
-+        self.vm_src.add_blockdev('driver=3Dqcow2,file=3Dfile0,node-name=3D=
-drive0')
-+        self.vm_src.launch()
-+        self.vm_src.qmp('x-blockdev-set-iothread',
-+                        node_name=3D'drive0', iothread=3D'iothread0',
-+                        force=3DTrue)
-+
-+        self.vm_tgt =3D iotests.VM(path_suffix=3D'tgt')
-+        self.vm_tgt.add_object('iothread,id=3Diothread0')
-+        self.vm_tgt.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3D=
-file0'
-+                          % (self.mirror_img))
-+        self.vm_tgt.add_blockdev('driver=3Dqcow2,file=3Dfile0,node-name=3D=
-drive0')
-+        self.vm_tgt.launch()
-+        self.vm_tgt.qmp('x-blockdev-set-iothread',
-+                        node_name=3D'drive0', iothread=3D'iothread0',
-+                        force=3DTrue)
-+
-+    def tearDown(self):
-+        self.vm_src.shutdown()
-+        self.vm_tgt.shutdown()
-+        for name in self.images:
-+            os.remove(self.images[name])
-+
-+    def test_nbd_mirror(self):
-+        result =3D self.vm_tgt.qmp(
-+            'nbd-server-start',
-+            addr=3D{
-+                'type': 'unix',
-+                'data': { 'path': self.nbd_sock }
++                aio_context_release(tmp_context);
++                aio_context_acquire(aio_context);
 +            }
-+        )
-+        self.assert_qmp(result, 'return', {})
 +
-+        result =3D self.vm_tgt.qmp(
-+            'nbd-server-add',
-+            device=3D'drive0',
-+            writable=3DTrue
-+        )
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm_src.qmp(
-+            'drive-mirror',
-+            device=3D'drive0',
-+            target=3D'nbd+unix:///drive0?socket=3D' + self.nbd_sock,
-+            sync=3D'full',
-+            mode=3D'existing',
-+            speed=3D64*1024*1024,
-+            job_id=3D'j1'
-+        )
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.vm_src.event_wait(name=3D"BLOCK_JOB_READY")
-+
-+
-+# Test for RHBZ#1779036
-+class TestExternalSnapshotAbort(iotests.QMPTestCase):
-+    drive0_img =3D os.path.join(iotests.test_dir, 'drive0.img')
-+    snapshot_img =3D os.path.join(iotests.test_dir, 'snapshot.img')
-+    images =3D { 'drive0': drive0_img, 'snapshot': snapshot_img }
-+
-+    def setUp(self):
-+        for name in self.images:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     self.images[name], str(image_len))
-+
-+        self.vm =3D iotests.VM()
-+        self.vm.add_object('iothread,id=3Diothread0')
-+        self.vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3Dfile=
-0'
-+                          % (self.drive0_img))
-+        self.vm.add_blockdev('driver=3Dqcow2,file=3Dfile0,node-name=3Ddriv=
-e0')
-+        self.vm.launch()
-+        self.vm.qmp('x-blockdev-set-iothread',
-+                    node_name=3D'drive0', iothread=3D'iothread0',
-+                    force=3DTrue)
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        for name in self.images:
-+            os.remove(self.images[name])
-+
-+    def test_external_snapshot_abort(self):
-+        # Use a two actions transaction with a bogus values on the second
-+        # one to trigger an abort of the transaction.
-+        result =3D self.vm.qmp('transaction', actions=3D[
-+            {
-+                'type': 'blockdev-snapshot-sync',
-+                'data': { 'node-name': 'drive0',
-+                          'snapshot-file': self.snapshot_img,
-+                          'snapshot-node-name': 'snap1',
-+                          'mode': 'absolute-paths',
-+                          'format': 'qcow2' }
-+            },
-+            {
-+                'type': 'blockdev-snapshot-sync',
-+                'data': { 'node-name': 'drive0',
-+                          'snapshot-file': '/fakesnapshot',
-+                          'snapshot-node-name': 'snap2',
-+                          'mode': 'absolute-paths',
-+                          'format': 'qcow2' }
-+            },
-+        ])
-+
-+        # Crashes on failure, we expect this error.
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+
-+
-+# Test for RHBZ#1782111
-+class TestBlockdevBackupAbort(iotests.QMPTestCase):
-+    drive0_img =3D os.path.join(iotests.test_dir, 'drive0.img')
-+    drive1_img =3D os.path.join(iotests.test_dir, 'drive1.img')
-+    snap0_img =3D os.path.join(iotests.test_dir, 'snap0.img')
-+    snap1_img =3D os.path.join(iotests.test_dir, 'snap1.img')
-+    images =3D { 'drive0': drive0_img,
-+               'drive1': drive1_img,
-+               'snap0': snap0_img,
-+               'snap1': snap1_img }
-+
-+    def setUp(self):
-+        for name in self.images:
-+            qemu_img('create', '-f', iotests.imgfmt,
-+                     self.images[name], str(image_len))
-+
-+        self.vm =3D iotests.VM()
-+        self.vm.add_object('iothread,id=3Diothread0')
-+        self.vm.add_device('virtio-scsi,iothread=3Diothread0')
-+
-+        for name in self.images:
-+            self.vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3D=
-file_%s'
-+                                 % (self.images[name], name))
-+            self.vm.add_blockdev('driver=3Dqcow2,file=3Dfile_%s,node-name=
-=3D%s'
-+                                 % (name, name))
-+
-+        self.vm.add_device('scsi-hd,drive=3Ddrive0')
-+        self.vm.add_device('scsi-hd,drive=3Ddrive1')
-+        self.vm.launch()
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        for name in self.images:
-+            os.remove(self.images[name])
-+
-+    def test_blockdev_backup_abort(self):
-+        # Use a two actions transaction with a bogus values on the second
-+        # one to trigger an abort of the transaction.
-+        result =3D self.vm.qmp('transaction', actions=3D[
-+            {
-+                'type': 'blockdev-backup',
-+                'data': { 'device': 'drive0',
-+                          'target': 'snap0',
-+                          'sync': 'full',
-+                          'job-id': 'j1' }
-+            },
-+            {
-+                'type': 'blockdev-backup',
-+                'data': { 'device': 'drive1',
-+                          'target': 'snap1',
-+                          'sync': 'full' }
-+            },
-+        ])
-+
-+        # Hangs on failure, we expect this error.
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+
-+if __name__ =3D=3D '__main__':
-+    iotests.main(supported_fmts=3D['qcow2'],
-+                 supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/281.out b/tests/qemu-iotests/281.out
-new file mode 100644
-index 0000000000..89968f35d7
---- /dev/null
-+++ b/tests/qemu-iotests/281.out
-@@ -0,0 +1,5 @@
-+....
-+----------------------------------------------------------------------
-+Ran 4 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index cb2b789e44..e041cc1ee3 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -288,3 +288,4 @@
- 277 rw quick
- 279 rw backing quick
- 280 rw migration quick
-+281 rw quick
+             bdrv_replace_node(state->new_bs, state->old_bs, &error_abort);
+             bdrv_unref(state->old_bs); /* bdrv_replace_node() ref'ed old_b=
+s */
+=20
 --=20
 2.23.0
 
