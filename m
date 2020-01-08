@@ -2,149 +2,83 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A04C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 21:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CA6C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 22:31:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3912C20692
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 21:43:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E74DB20692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 22:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="NyPTTcAo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3912C20692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZaGMBHgB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E74DB20692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipJ6Z-00083B-0p
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 16:43:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56294)
+	id 1ipJrF-0000Us-RO
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 17:31:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <deller@gmx.de>) id 1ipJ2p-0006cS-EF
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:39:16 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1ipJpk-0007Gm-7g
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:29:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <deller@gmx.de>) id 1ipJ2o-0007ZO-5g
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:39:15 -0500
-Received: from mout.gmx.net ([212.227.17.22]:50915)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <deller@gmx.de>) id 1ipJ2n-0007Xr-OE
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 16:39:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1578519543;
- bh=rTcHkZBYQrSG2TnSNDI5ffT33HqkQgm4YI4ihjaLd3w=;
- h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
- b=NyPTTcAonAVIq8hXck3ukhUtcHwDYR+3f4wDUExWO2mQOgX7jsCStqL+Ic3LrlyPJ
- eHfHzBloe2yUkWg/z0opaq4ZsGdQIBcHZ6iB3aVjhhekhjwdz0hznzaXVDEMahxESs
- 9l31meso2+80EJwFL04C93tMpx/3pSxJZN8EFrUQ=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.20.60] ([92.116.128.161]) by mail.gmx.com (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mo6ux-1jV0N33P5v-00pfA3; Wed, 08
- Jan 2020 22:39:02 +0100
-Subject: Re: [PATCH 2/3] hw/hppa/machine: Do not limit the RAM to 3840MB
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org,
- Sven Schnelle <svens@stackframe.org>
-References: <20200108181425.21485-1-f4bug@amsat.org>
- <20200108181425.21485-3-f4bug@amsat.org>
-From: Helge Deller <deller@gmx.de>
-Autocrypt: addr=deller@gmx.de; keydata=
- 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
- c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
-Message-ID: <6997ceed-9a68-796c-f03d-02bfd7d76803@gmx.de>
-Date: Wed, 8 Jan 2020 22:39:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <alex.williamson@redhat.com>) id 1ipJpg-0001Ba-VU
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:29:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54226
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1ipJpg-00019P-Mi
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:29:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578522584;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eeoF1sYvyY8I9ti0kR+cfmLLTVxMhMv4ZrFm5YTgMQk=;
+ b=ZaGMBHgBDwDuymtLhAo2wdSUI+PQkYBePbgt4YXZSgTK9lyLQ7kC3LkxsCOYqNbA93Db2i
+ UFDT0MYo3hPFC8k2yt2rhGvSokiMqAJ8vOlmWKbXxDHurVzHvSJ/HeeUy/GQ6VTUQLs1bI
+ Sl9y/QAdFX2u2bWKFI5g5hYfSed3yb4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-ecyQMbROMwKXvNAabViK7g-1; Wed, 08 Jan 2020 17:29:40 -0500
+X-MC-Unique: ecyQMbROMwKXvNAabViK7g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD7EEDBA3;
+ Wed,  8 Jan 2020 22:29:37 +0000 (UTC)
+Received: from w520.home (ovpn-118-62.phx2.redhat.com [10.3.118.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7E55A7BA39;
+ Wed,  8 Jan 2020 22:29:35 +0000 (UTC)
+Date: Wed, 8 Jan 2020 15:29:34 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to
+ for dirty pages tracking.
+Message-ID: <20200108152934.68cd0e85@w520.home>
+In-Reply-To: <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
+References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
+ <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
+ <20191217151203.342b686a@x1.home>
+ <ebd08133-e258-9f5e-5c8f-f88d7165cd7a@nvidia.com>
+ <20200107150223.0dab0a85@w520.home>
+ <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200108181425.21485-3-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zA1YZeAXdYA6tdXF/IQh0SBBT0u/Mz3pzxYyTxKQKIUNnkiobmn
- BtPWZCCNf1krLSImpAdGBWkp7a1ArSduBZg93F4ZhMYLRXDLh5PCd1SdABXtJswyOo4dJmr
- +WdLdqeuUVJZB+yw5yvwF1V5xXVTG9XAWOon57XaIU8KvKVsR75Ya2V42TtcUavTyDcWeVW
- vEI+jAqTSFyQGCjKMxMWA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5iCwhSNB11g=:MvvA+FQyHMB6B4fp2uJ23t
- hZ8xR6F6BmzuhJwqMKVjTRko72NkJPyY+8r52DFRkD/hTqtj+MyUsy5ogYIDWZdRp58Lnbdeo
- MLdbiJdgdzmne62O95W79VJjeRya8sUaxRzUWgxc4bGYYMEHQ+/qY63Q0C+nRMDgqKcP8xFpz
- sBY3orlVmsTlp5IFFIHWGI4EhBSrwkpchU3MMi/6hjBsgEdq7Lb3szuFYQXO+n7ACvtLh7mnI
- A8S0uUByJR/Nj2PiEEnoGjTlzS+UMJXoB5P2APoKvJtAzL+wbWoFHUDkGwJM6zyKcqYkn0tt+
- OzMqOhHHazZjVjGnhmS5/l8Yzgx5SqW3hwXj5UuY1rkQ5z3fAlN9cVnGKPAL7uK5qI8Y2uKO3
- etVqijJr9ACNq5PgCRUT5aAELbxFlMT8VNL5eTCl2HR60Km/J3i6RYbJUEZcSgTdb2lu3CAlS
- isyGYwEvtT543fQb9Xtj98SMwS/vtVnNEtFGZ2LgXOfS5gklbtv5gURlWhfvBZZNwcWfuIgL3
- ZMr3338ZxM9Z+uSbgFGEIEge1RHu09ar3n3SisVxLi29g0q0UiXvnEMFxgtAJ/V2Eq7FhnHCt
- w3b2/V+rLLsA64d0PTkI0VdJlzy2z3V54iprCxe5zxkLnOBYiCadrDLBi5n9ddWL81RsJnrUz
- mQo9oCquLbfo4ZCRW/EOQwI3J/xy+jKoQKFaFM6+DGZ8F/5h8tQbkZwio4Q+WarL+pg/EV1+O
- 0yrAp9RGbHUlhpkolI9Y5FBiNBZR6b6YQgjXA545tyEt6em78rY2njTkeH59AgYoig3m6hdK7
- z2I72WfPg5VESSSe0XnlPdcezb8PNnb5J3l6MWVmiicu9aTLocU/Z5pTvGejF4eAUOZwXUyit
- c8r254imXdczmcV9li2BkqVWAOHDIVSw5VKF1h/+WtLoFVeejHsacDVUztfTDV2NHHI8G/PhE
- 2Qg0iMarR6HU0iQVJQv5S64TKjPmDV4bcYHUdNlA+CRF9ZGjBsLMFUr6i9OACArm3c9AwXUsv
- jLqTWeUu8f55TJ3MAIhNGcPkDeyo7LTQUZeYluAwIDrpYR6lRUZ73DkVMJtEVSnt28B1C6tq+
- NhN2ShtM/9AGSq3eghbLjCCvg7DouCviRTZv8GUqwBC6S7nQZG/K7wLoa1XqJleAZIuiWMDsD
- KUqgue1t2ySnwC5QA5i4Pg2VSIAiYQWWVhNoQJcaSo02WqsSbCNxAkK+XVcaEEF8blSnAjYvm
- Lh6NHjCM2T52KLJhdB2ngoeOpZ9nel5x4YCSzig==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.22
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -156,71 +90,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08.01.20 19:14, Philippe Mathieu-Daud=C3=A9 wrote:
-> The hardware expects DIMM slots of 1 or 2 GB, allowing up to
-> 4 GB of memory. Accept the same amount of memory the hardware
-> can deal with.
->
-> The CPU doesn't have access to the RAM mapped in the
-> [0xf0000000 - 0xf1000000] range because this is the PDC area
-> (Processor Dependent Code) where the firmware is loaded.
-> To keep this region with higher priority than the RAM, lower
-> the RAM priority. The PDC will overlap it.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/hppa/machine.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> index 6775d879f8..d10c967d06 100644
-> --- a/hw/hppa/machine.c
-> +++ b/hw/hppa/machine.c
-> @@ -90,16 +90,15 @@ static void machine_hppa_init(MachineState *machine)
->          g_free(name);
->      }
->
-> -    /* Limit main memory. */
-> -    if (ram_size > FIRMWARE_START) {
-> -        machine->ram_size =3D ram_size =3D FIRMWARE_START;
-> -    }
+On Thu, 9 Jan 2020 01:31:16 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> On 1/8/2020 3:32 AM, Alex Williamson wrote:
+> > On Wed, 8 Jan 2020 01:37:03 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> 
+> <snip>
+> 
+> >>>> +
+> >>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+> >>>>    
+> >>>>    	if (do_accounting)
+> >>>>    		vfio_lock_acct(dma, -unlocked, true);
+> >>>> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>>>    
+> >>>>    		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+> >>>>    		if (vpfn) {
+> >>>> -			phys_pfn[i] = vpfn->pfn;
+> >>>> -			continue;
+> >>>> +			if (vpfn->unpinned)
+> >>>> +				vfio_remove_from_pfn_list(dma, vpfn);  
+> >>>
+> >>> This seems inefficient, we have an allocated vpfn at the right places
+> >>> in the list, wouldn't it be better to repin the page?
+> >>>      
+> >>
+> >> vfio_pin_page_external() takes care of pinning and accounting as well.  
+> > 
+> > Yes, but could we call vfio_pin_page_external() without {unlinking,
+> > freeing} and {re-allocating, linking} on either side of it since it's
+> > already in the list?  That's the inefficient part.  Maybe at least a
+> > TODO comment?
+> >   
+> 
+> Changing it as below:
+> 
+>                  vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+>                  if (vpfn) {
+> -                       phys_pfn[i] = vpfn->pfn;
+> -                       continue;
+> +                       if (vpfn->ref_count > 1) {
+> +                               phys_pfn[i] = vpfn->pfn;
+> +                               continue;
+> +                       }
+>                  }
+> 
+>                  remote_vaddr = dma->vaddr + iova - dma->iova;
+>                  ret = vfio_pin_page_external(dma, remote_vaddr, 
+> &phys_pfn[i],
+>                                               do_accounting);
+>                  if (ret)
+>                          goto pin_unwind;
 > -
->      /* Main memory region. */
-> +    if (machine->ram_size > 4 * GiB) {
-> +        error_report("RAM size of 4GB or more is not supported");
-> +        exit(EXIT_FAILURE);
-> +    }
+> -               ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> -               if (ret) {
+> -                       vfio_unpin_page_external(dma, iova, do_accounting);
+> -                       goto pin_unwind;
+> -               }
+> +               if (!vpfn) {
+> +                       ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> +                       if (ret) {
+> +                               vfio_unpin_page_external(dma, iova,
+> +                                                        do_accounting, 
+> false);
+> +                               goto pin_unwind;
+> +                       }
+> +               } else
+> +                       vpfn->pfn = phys_pfn[i];
+>          }
+> 
+> 
+> 
+> 
+> >>>> +			else {
+> >>>> +				phys_pfn[i] = vpfn->pfn;
+> >>>> +				continue;
+> >>>> +			}
+> >>>>    		}
+> >>>>    
+> >>>>    		remote_vaddr = dma->vaddr + iova - dma->iova;
+> >>>> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+> >>>>    
+> >>>>    		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+> >>>>    		if (ret) {
+> >>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
+> >>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
+> >>>> +						 false);
+> >>>>    			goto pin_unwind;
+> >>>>    		}
+> >>>>    	}  
+> 
+> <snip>
+> 
+> >>  
+> >>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+> >>>> +			iommu->dirty_page_tracking = true;
+> >>>> +			return 0;
+> >>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+> >>>> +			iommu->dirty_page_tracking = false;
+> >>>> +
+> >>>> +			mutex_lock(&iommu->lock);
+> >>>> +			vfio_remove_unpinned_from_dma_list(iommu);
+> >>>> +			mutex_unlock(&iommu->lock);
+> >>>> +			return 0;
+> >>>> +
+> >>>> +		} else if (range.flags &
+> >>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+> >>>> +			uint64_t iommu_pgmask;
+> >>>> +			unsigned long pgshift = __ffs(range.pgsize);
+> >>>> +			unsigned long *bitmap;
+> >>>> +			long bsize;
+> >>>> +
+> >>>> +			iommu_pgmask =
+> >>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+> >>>> +
+> >>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+> >>>> +			    (range.pgsize - 1))
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			if (range.iova & iommu_pgmask)
+> >>>> +				return -EINVAL;
+> >>>> +			if (!range.size || range.size > SIZE_MAX)
+> >>>> +				return -EINVAL;
+> >>>> +			if (range.iova + range.size < range.iova)
+> >>>> +				return -EINVAL;
+> >>>> +
+> >>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+> >>>> +						   range.bitmap_size);
+> >>>> +			if (bsize < 0)
+> >>>> +				return ret;
+> >>>> +
+> >>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);  
+> >>>
+> >>> I think I remember mentioning previously that we cannot allocate an
+> >>> arbitrary buffer on behalf of the user, it's far too easy for them to
+> >>> kill the kernel that way.  kmalloc is also limited in what it can
+> >>> alloc.  
+> >>
+> >> That's the reason added verify_bitmap_size(), so that size is verified  
+> > 
+> > That's only a consistency test, it only verifies that the user claims
+> > to provide a bitmap sized sufficiently for the range they're trying to
+> > request.  range.size is limited to SIZE_MAX, so 2^64, divided by page
+> > size for 2^52 bits, 8bits per byte for 2^49 bytes of bitmap that we'd
+> > try to kmalloc (512TB).  kmalloc is good for a couple MB AIUI.
+> > Meanwhile the user doesn't actually need to allocate that bitmap in
+> > order to crash the kernel.
+> >   
+> >>> Can't we use the user buffer directly or only work on a part of
+> >>> it at a time?
+> >>>      
+> >>
+> >> without copy_from_user(), how?  
+> > 
+> > For starters, what's the benefit of copying the bitmap from the user
+> > in the first place?  We presume the data is zero'd and if it's not,
+> > that's the user's bug to sort out (we just need to define the API to
+> > specify that).  Therefore the copy_from_user() is unnecessary anyway and
+> > we really just need to copy_to_user() for any places we're setting
+> > bits.  We could just walk through the range with an unsigned long
+> > bitmap buffer, writing it out to userspace any time we reach the end
+> > with bits set, zeroing it and shifting it as a window to the user
+> > buffer.  We could improve batching by allocating a larger buffer in the
+> > kernel, with a kernel defined maximum size and performing the same
+> > windowing scheme.
+> >   
+> 
+> Ok removing copy_from_user().
+> But AFAIK, calling copy_to_user() multiple times is not efficient in 
+> terms of performance.
 
-My suggestion is to initially then limit it to max. 3GB, e.g.
-> +    if (machine->ram_size > 3 * GiB) {
-> +        error_report("RAM size of 3GB or more is not supported");
-> +        exit(EXIT_FAILURE);
+Right, but even with a modestly sized internal buffer for batching we
+can cover quite a large address space.  128MB for a 4KB buffer, 32GB
+with 1MB buffer.  __put_user() is more lightweight than copy_to_user(),
+I wonder where the inflection point is in batching the latter versus
+more iterations of the former.
 
-That way you don't need to work around the 4GB SeaBIOS limitation
-in your other RFC patch.
-So, people can start it with:
-qemu-system-hppa -m 3g -serial stdio
+> Checked code in virt/kvm/kvm_main.c: __kvm_set_memory_region() where 
+> dirty_bitmap is allocated, that has generic checks, user space address 
+> check, memory overflow check and KVM_MEM_MAX_NR_PAGES as below. I'll add 
+> access_ok check. I already added overflow check.
+> 
+>          /* General sanity checks */
+>          if (mem->memory_size & (PAGE_SIZE - 1))
+>                  goto out;
+> 
+>         !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+>                          mem->memory_size)))
+> 
+>          if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+>                  goto out;
+> 
+>          if (npages > KVM_MEM_MAX_NR_PAGES)
+>                  goto out;
+> 
+> 
+> Where KVM_MEM_MAX_NR_PAGES is:
+> 
+> /*
+>   * Some of the bitops functions do not support too long bitmaps.
+>   * This number must be determined not to exceed such limits.
+>   */
+> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+> 
+> But we can't use KVM specific KVM_MEM_MAX_NR_PAGES check in vfio module.
+> Should we define similar limit in vfio module instead of SIZE_MAX?
 
-Later then we can fix SeaBIOS, at least if 64bit support gets added later =
-on.
+If we have ranges that are up to 2^31 pages, that's still 2^28 bytes.
+Does it seem reasonable to have a kernel interface that potentially
+allocates 256MB of kernel space with kmalloc accessible to users?  That
+still seems like a DoS attack vector to me, especially since the user
+doesn't need to be able to map that much memory (8TB) to access it.
 
->      ram_region =3D g_new(MemoryRegion, 1);
->      memory_region_allocate_system_memory(ram_region, OBJECT(machine),
->                                           "ram", ram_size);
+I notice that KVM allocate the bitmap (kvzalloc) relative to the actual
+size of the memory slot when dirty logging is enabled, maybe that's the
+right approach rather than walking vpfn lists and maintaining unpinned
+vpfns for the purposes of tracking.  For example, when dirty logging is
+enabled, walk all vfio_dmas and allocate a dirty bitmap anywhere the
+vpfn list is not empty and walk the vpfn list to set dirty bits in the
+bitmap.  When new pages are pinned, allocate a bitmap if not already
+present and set the dirty bit.  When unpinned, update the vpfn list but
+leave the dirty bit set.  When the dirty bitmap is read, copy out the
+current bitmap to the user, memset it to zero, then re-walk the vpfn
+list to set currently dirty pages.  A vfio_dma without a dirty bitmap
+would consider the entire range dirty.  At least that way the overhead
+of the bitmap is just that, overhead rather than a future exploit.
+Does this seem like a better approach?  Thanks,
 
-^^^ here is still "ram_size". Do you need to change it?
+Alex
 
-> -    memory_region_add_subregion(addr_space, 0, ram_region);
-> +    memory_region_add_subregion_overlap(addr_space, 0, ram_region, -1);
->
->      /* Init Dino (PCI host bus chip).  */
->      pci_bus =3D dino_init(addr_space, &rtc_irq, &serial_irq);
->
-
-Helge
 
