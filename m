@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 293A7C00523
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 09:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD15AC00523
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 09:04:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9F0C206DA
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 09:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77767206DA
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 09:04:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="B7I9lf3X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F0C206DA
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="DYbgTGSP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77767206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip7FH-0003hq-1s
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 04:03:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50732)
+	id 1ip7GR-0005Dd-E5
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 04:04:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1ip7EF-0002Ur-9A
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 04:02:16 -0500
+ (envelope-from <stevensd@chromium.org>) id 1ip7EA-0002QF-Gk
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 04:02:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1ip7EE-00060X-6F
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 04:02:15 -0500
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:45548)
+ (envelope-from <stevensd@chromium.org>) id 1ip7E9-0005xS-I2
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 04:02:10 -0500
+Received: from mail-qk1-x72d.google.com ([2607:f8b0:4864:20::72d]:38756)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1ip7EE-00060C-2h
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 04:02:14 -0500
-Received: by mail-qk1-x743.google.com with SMTP id x1so1928670qkl.12
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 01:02:13 -0800 (PST)
+ id 1ip7E9-0005x2-EJ
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 04:02:09 -0500
+Received: by mail-qk1-x72d.google.com with SMTP id k6so1975688qki.5
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 01:02:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
  h=mime-version:from:date:message-id:subject:to;
- bh=YLJj0mJcsiWZwcGJQfC2/Am8KkGfccyx1B+T1mfpzBE=;
- b=B7I9lf3X8OH5s2QgLQ3VUszD2IKt6VUU85pFa9iNMdrEj2Pb0cry/HqqJQpH+smc2Q
- XWZzpInO4EfR2e6sPAErnlfGEfgLOJjoRhNbWmR1bf/PoNeaizCLcjabgqTUol9rlAYT
- ma76CbkvnWwjeFxZbl5yNP/fLZ1eyjohAIafU=
+ bh=MvBXFmubHjfTSZqX6gGxSDOdnp6QUUqOLQUXD/uSqGE=;
+ b=DYbgTGSP4mdzTCAqDQe0ONLDdXBCvCrs3Gf/qEYQ3nonNazP44qqR3UAJhoN3bcQWX
+ bQ2M/rSn1WnKbQ+SA+qoy1OFUAwukrU7HbG4Inels53VYSIMMPYpRV2TcKUFdlz7IZ+s
+ BlgcIAJI+EA2lI+1aLJOK0EB7NrpI9sWVCWq0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=YLJj0mJcsiWZwcGJQfC2/Am8KkGfccyx1B+T1mfpzBE=;
- b=o8iCd2yOWnn0qAZpBPF3j3+zxGxVsvmbZNOefyfGguDJJvg9d8O+Dq543WcQI+xFmP
- +kDyVkGEiaJJZn49yUXpLlOzZ3gpuW07SHlskPYNxOcwojAtdiGwwqVyTNHG+AO0LPBS
- Zy1N7FTsJdf/EgDHYr5R4C7lrwYJbZ2u/fKR+BMz6A98GrLZJXRYnJ4jv01Poju1ootw
- 3WVu1HpVwJACZeO2uXCMnCbkmpWxjXoFSrMDs1jXqbqxjLFu47hzPVIPKrWP/ENaROE0
- qqF4tAmgZbTeFm50bKYhDg9ucabtn5QlNTZKyr0ZPtTqfpmZrzgBkEP2ypx9Gh6eCwa9
- h6QA==
-X-Gm-Message-State: APjAAAXJRriYfjy0G4vK8byetIniUE5TfsVMbcIWWBQ9c+9fDHUgE/z5
- uTuz3IzFpEMf/WcFaa5aOIWIV3rcijBwAy/7kX6nxw==
-X-Google-Smtp-Source: APXvYqyOhO7E4NDMVSLVTTWbMjBEmnBCWdbVQupSDkJ7fdK3WLAPNZj4EXc3WCQxkYsMxMB5lMPtNcFY2kFCzAPiZ2w=
-X-Received: by 2002:a05:620a:817:: with SMTP id
- s23mr3310134qks.391.1578474133357; 
- Wed, 08 Jan 2020 01:02:13 -0800 (PST)
+ bh=MvBXFmubHjfTSZqX6gGxSDOdnp6QUUqOLQUXD/uSqGE=;
+ b=srTivzQIdwS5mo6kbZo/6SJPfF6dV2NrQ/spSKkOnddinMfc1ZtgdFJiVZWO/uXago
+ qDVRxbwKWBdnOUIS012bOsyQJaDO3iKmz18PCkO9g715Hjwp/kkAVw4HKOLcUIOhrJKS
+ 3+3bZc+yWwpL0HPxzs/7ZUcZS4Q42qy8rcqlpvh7iGOTGAr2j8GhLZq5As8dZsUHBvOT
+ D+HttlJSRRGmnmW/R+5GQ0HnKZO1wuVypx0KSNm/mGlNa16fbjFpdGX+8TTOZJsEivEx
+ Y3mGlVepwKRlK9VKHudrfdEu056cnp+ua6MZp39Xu3hOIydhG2erbQYuBe+AMofwwcFm
+ JFjw==
+X-Gm-Message-State: APjAAAUTwDbrlpFg/V7kwmxztL3xeJau9uBOOsMfe75XR/1eZ1vntf9f
+ OPacis5nQSp+Vx1zNE7J1oEPq5TOSFzyHleMOniuGg==
+X-Google-Smtp-Source: APXvYqweJlXV88c+PKT192DC2KihUtPe6TwZU6GCiLW50z8aM6eR4XRmfbWIQhisZ6FPS+0icbkxvHNLUyZA9fpTYc4=
+X-Received: by 2002:a05:620a:101b:: with SMTP id
+ z27mr3076885qkj.241.1578474128857; 
+ Wed, 08 Jan 2020 01:02:08 -0800 (PST)
 MIME-Version: 1.0
 From: David Stevens <stevensd@chromium.org>
-Date: Wed, 8 Jan 2020 18:02:02 +0900
-Message-ID: <CAD=HUj5U-TxqbPJiRRbyMHON21sht75q3nisvwvKrO+Bf=n8ng@mail.gmail.com>
-Subject: [virtio-dev][RFC PATCH v1 2/2] virtio-gpu: add the ability to export
- resources
+Date: Wed, 8 Jan 2020 18:01:58 +0900
+Message-ID: <CAD=HUj6FA3VoTJqNa+gmAgVOv9zS7Qk9pdg46EY9NvtJOdz5_A@mail.gmail.com>
+Subject: [virtio-dev][RFC PATCH v1 1/2] content: define what exporting a
+ resource is
 To: virtio-dev@lists.oasis-open.org, Gerd Hoffmann <kraxel@redhat.com>, 
  Dylan Reid <dgreid@chromium.org>, Tomasz Figa <tfiga@chromium.org>, 
  Zach Reizner <zachr@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>, 
@@ -78,7 +78,7 @@ To: virtio-dev@lists.oasis-open.org, Gerd Hoffmann <kraxel@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::743
+X-Received-From: 2607:f8b0:4864:20::72d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,67 +94,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Define a mechanism for sharing resources between different virtio
+devices.
+
 Signed-off-by: David Stevens <stevensd@chromium.org>
 ---
- virtio-gpu.tex | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ content.tex | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/virtio-gpu.tex b/virtio-gpu.tex
-index af4ca61..522f478 100644
---- a/virtio-gpu.tex
-+++ b/virtio-gpu.tex
-@@ -186,12 +186,16 @@ \subsubsection{Device Operation: Request
-header}\label{sec:Device Types / GPU De
-         VIRTIO_GPU_CMD_UPDATE_CURSOR = 0x0300,
-         VIRTIO_GPU_CMD_MOVE_CURSOR,
+diff --git a/content.tex b/content.tex
+index b1ea9b9..73bd28e 100644
+--- a/content.tex
++++ b/content.tex
+@@ -373,6 +373,24 @@ \section{Driver Notifications}
+\label{sec:Virtqueues / Driver notifications}
 
-+        /* misc commands */
-+        VIRTIO_GPU_CMD_EXPORT_RESOURCE = 0x0400,
-+
-         /* success responses */
-         VIRTIO_GPU_RESP_OK_NODATA = 0x1100,
-         VIRTIO_GPU_RESP_OK_DISPLAY_INFO,
-         VIRTIO_GPU_RESP_OK_CAPSET_INFO,
-         VIRTIO_GPU_RESP_OK_CAPSET,
-         VIRTIO_GPU_RESP_OK_EDID,
-+        VIRTIO_GPU_RESP_OK_EXPORT_RESOURCE,
+ \input{shared-mem.tex}
 
-         /* error responses */
-         VIRTIO_GPU_RESP_ERR_UNSPEC = 0x1200,
-@@ -454,6 +458,31 @@ \subsubsection{Device Operation:
-controlq}\label{sec:Device Types / GPU Device /
- This detaches any backing pages from a resource, to be used in case of
- guest swapping or object destruction.
++\section{Exporting Resources}\label{sec:Basic Facilities of a Virtio
+Device / Exporting Resources}
++
++When a resource created by one virtio device needs to be
++shared with a seperate virtio device, the first device can
++export the resource by generating a \field{uuid} which the
++guest can pass to the second device to identify the resource.
++
++What constitutes a resource, how to export resources, and
++how to import resources are defined by the individual device
++types. The generation method of a \field{uuid} is dependent
++upon the implementation of the exporting device.
++
++Whether a particular exported resource can be imported into
++a device is dependent upon the implementations of the exporting
++and importing devices. Generally speaking, the guest should
++have some knowledge of the host configuration before trying to
++use exported resources.
++
+ \chapter{General Initialization And Device
+Operation}\label{sec:General Initialization And Device Operation}
 
-+\item[VIRTIO_GPU_CMD_EXPORT_RESOURCE] Exports a resource for use by other
-+  virtio devices. Request data is \field{struct
-+    virtio_gpu_export_resource}.  Response type is
-+  VIRTIO_GPU_RESP_OK_EXPORT_RESOURCE, response data is \field{struct
-+    virtio_gpu_resp_export_resource}.
-+
-+\begin{lstlisting}
-+struct virtio_gpu_export_resource {
-+        struct virtio_gpu_ctrl_hdr hdr;
-+        le32 resource_id;
-+        le32 padding;
-+};
-+
-+struct virtio_gpu_resp_export_resource {
-+        struct virtio_gpu_ctrl_hdr hdr;
-+        le64 uuid_low;
-+        le64 uuid_high;
-+};
-+\end{lstlisting}
-+
-+The response contains a uuid which identifies the host private resource to
-+other virtio devices. Note that if the resource has an attached backing,
-+modifications made to an exported resource by other devices are not visible
-+in the attached backing until they are transferred into the backing.
-+
- \end{description}
-
- \subsubsection{Device Operation: cursorq}\label{sec:Device Types /
-GPU Device / Device Operation / Device Operation: cursorq}
+ We start with an overview of device initialization, then expand on the
 -- 
 2.24.1.735.g03f4e72817-goog
 
