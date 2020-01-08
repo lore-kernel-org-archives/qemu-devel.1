@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F28C33C9E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6537C33C9B
 	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:27:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 002D920705
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:27:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94FFE20705
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 05:27:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k/OrmbWb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 002D920705
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="npF+cXpb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FFE20705
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ip3sd-0001Wv-NY
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 00:27:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47465)
+	id 1ip3se-0001ZI-Ac
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 00:27:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ip3oa-0003rD-Ei
+ (envelope-from <dgibson@ozlabs.org>) id 1ip3oa-0003r3-8m
  for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:23:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ip3oY-0002ha-Uq
+ (envelope-from <dgibson@ozlabs.org>) id 1ip3oY-0002gx-QE
  for qemu-devel@nongnu.org; Wed, 08 Jan 2020 00:23:32 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58843 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56133 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ip3oY-0002da-Ir; Wed, 08 Jan 2020 00:23:30 -0500
+ id 1ip3oY-0002de-Ez; Wed, 08 Jan 2020 00:23:30 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47syMB5t59z9sSG; Wed,  8 Jan 2020 16:23:18 +1100 (AEDT)
+ id 47syMC1LTHz9sST; Wed,  8 Jan 2020 16:23:18 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578460998;
- bh=mBUMRDLOn4RhQLMiLfYdwaUWkSfy6s7D/PbVF3ODnjw=;
+ d=gibson.dropbear.id.au; s=201602; t=1578460999;
+ bh=xuXCUv7AbtgO81cRSWzQUqJbuB77DWavVOto6WrS4/U=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=k/OrmbWbBLZfcr4wJrVvzaAtVHfv53WELUCgaltDaMzx2gqn45IAk/T5qKzB8Aef1
- xXdPp/6bKA2Qn3jVqTJr8iD4OLgS4JX/ucIVEgwOXPubkva7jdAH7NWq3eadgbfm9u
- h9H0N0YX7u3LI9Z2AQ9EZtUKtHuoVxiPk8nQE7rM=
+ b=npF+cXpbIbKNA8MYsN+2VjGfTfBrrPfWIwpum8DVkMiSVAn8FwLAD8ri63kiYB1Oy
+ dFLxwgisNzTyctVh4sc/SORXPRx+n3Apzn0evJMQR1IBXbITaEDPzaYaHvsRuJkcAi
+ QCci/T0J2Aqv3XAOj2NXs5+qnl5ArIreSqCx/f0Q=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 07/26] spapr/xive: Use device_class_set_parent_realize()
-Date: Wed,  8 Jan 2020 16:22:53 +1100
-Message-Id: <20200108052312.238710-8-david@gibson.dropbear.id.au>
+Subject: [PULL 18/26] ppc/pnv: Add an "nr-threads" property to the base chip
+ class
+Date: Wed,  8 Jan 2020 16:23:04 +1100
+Message-Id: <20200108052312.238710-19-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200108052312.238710-1-david@gibson.dropbear.id.au>
 References: <20200108052312.238710-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,94 +78,75 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-The XIVE router base class currently inherits an empty realize hook
-from the sysbus device base class, but it will soon implement one
-of its own to perform some sanity checks. Do the preliminary plumbing
-to have it called.
+Set it at chip creation and forward it to the cores. This allows to drop
+a call to qdev_get_machine().
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20191219181155.32530-6-clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20200106145645.4539-7-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c        | 12 +++++++++++-
- include/hw/ppc/spapr_xive.h | 10 ++++++++++
- 2 files changed, 21 insertions(+), 1 deletion(-)
+ hw/ppc/pnv.c         | 8 +++++---
+ include/hw/ppc/pnv.h | 1 +
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 57305c56d7..32322470a8 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -286,10 +286,17 @@ static void spapr_xive_instance_init(Object *obj)
- static void spapr_xive_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index ead92d52b2..6a0aa78d53 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -802,6 +802,8 @@ static void pnv_init(MachineState *machine)
+                                 &error_fatal);
+         object_property_set_int(chip, machine->smp.cores,
+                                 "nr-cores", &error_fatal);
++        object_property_set_int(chip, machine->smp.threads,
++                                "nr-threads", &error_fatal);
+         /*
+          * The POWER8 machine use the XICS interrupt interface.
+          * Propagate the XICS fabric to the chip and its controllers.
+@@ -1526,7 +1528,6 @@ static void pnv_chip_core_sanitize(PnvChip *chip, E=
+rror **errp)
+=20
+ static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
  {
-     SpaprXive *xive =3D SPAPR_XIVE(dev);
-+    SpaprXiveClass *sxc =3D SPAPR_XIVE_GET_CLASS(xive);
-     XiveSource *xsrc =3D &xive->source;
-     XiveENDSource *end_xsrc =3D &xive->end_source;
-     Error *local_err =3D NULL;
+-    MachineState *ms =3D MACHINE(qdev_get_machine());
+     Error *error =3D NULL;
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+     const char *typename =3D pnv_chip_core_typename(chip);
+@@ -1562,8 +1563,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+         object_property_add_child(OBJECT(chip), core_name, OBJECT(pnv_co=
+re),
+                                   &error_abort);
+         chip->cores[i] =3D pnv_core;
+-        object_property_set_int(OBJECT(pnv_core), ms->smp.threads, "nr-t=
+hreads",
+-                                &error_fatal);
++        object_property_set_int(OBJECT(pnv_core), chip->nr_threads,
++                                "nr-threads", &error_fatal);
+         object_property_set_int(OBJECT(pnv_core), core_hwid,
+                                 CPU_CORE_PROP_CORE_ID, &error_fatal);
+         object_property_set_int(OBJECT(pnv_core),
+@@ -1602,6 +1603,7 @@ static Property pnv_chip_properties[] =3D {
+     DEFINE_PROP_UINT64("ram-size", PnvChip, ram_size, 0),
+     DEFINE_PROP_UINT32("nr-cores", PnvChip, nr_cores, 1),
+     DEFINE_PROP_UINT64("cores-mask", PnvChip, cores_mask, 0x0),
++    DEFINE_PROP_UINT32("nr-threads", PnvChip, nr_threads, 1),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 =20
-+    sxc->parent_realize(dev, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     if (!xive->nr_irqs) {
-         error_setg(errp, "Number of interrupt needs to be greater 0");
-         return;
-@@ -760,10 +767,12 @@ static void spapr_xive_class_init(ObjectClass *klas=
-s, void *data)
-     XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
-     SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_CLASS(klass);
-     XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
-+    SpaprXiveClass *sxc =3D SPAPR_XIVE_CLASS(klass);
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 56277862dd..4b9012f994 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -48,6 +48,7 @@ typedef struct PnvChip {
+     uint64_t     ram_size;
 =20
-     dc->desc    =3D "sPAPR XIVE Interrupt Controller";
-     dc->props   =3D spapr_xive_properties;
--    dc->realize =3D spapr_xive_realize;
-+    device_class_set_parent_realize(dc, spapr_xive_realize,
-+                                    &sxc->parent_realize);
-     dc->vmsd    =3D &vmstate_spapr_xive;
+     uint32_t     nr_cores;
++    uint32_t     nr_threads;
+     uint64_t     cores_mask;
+     PnvCore      **cores;
 =20
-     xrc->get_eas =3D spapr_xive_get_eas;
-@@ -794,6 +803,7 @@ static const TypeInfo spapr_xive_info =3D {
-     .instance_init =3D spapr_xive_instance_init,
-     .instance_size =3D sizeof(SpaprXive),
-     .class_init =3D spapr_xive_class_init,
-+    .class_size =3D sizeof(SpaprXiveClass),
-     .interfaces =3D (InterfaceInfo[]) {
-         { TYPE_SPAPR_INTC },
-         { }
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 3a103c224d..93d09d68de 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -15,6 +15,10 @@
-=20
- #define TYPE_SPAPR_XIVE "spapr-xive"
- #define SPAPR_XIVE(obj) OBJECT_CHECK(SpaprXive, (obj), TYPE_SPAPR_XIVE)
-+#define SPAPR_XIVE_CLASS(klass)                                         =
-\
-+    OBJECT_CLASS_CHECK(SpaprXiveClass, (klass), TYPE_SPAPR_XIVE)
-+#define SPAPR_XIVE_GET_CLASS(obj)                               \
-+    OBJECT_GET_CLASS(SpaprXiveClass, (obj), TYPE_SPAPR_XIVE)
-=20
- typedef struct SpaprXive {
-     XiveRouter    parent;
-@@ -47,6 +51,12 @@ typedef struct SpaprXive {
-     VMChangeStateEntry *change;
- } SpaprXive;
-=20
-+typedef struct SpaprXiveClass {
-+    XiveRouterClass parent;
-+
-+    DeviceRealize parent_realize;
-+} SpaprXiveClass;
-+
- /*
-  * The sPAPR machine has a unique XIVE IC device. Assign a fixed value
-  * to the controller block id value. It can nevertheless be changed
 --=20
 2.24.1
 
