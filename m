@@ -2,87 +2,83 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A998C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 22:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A63C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 23:08:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FE8C2053B
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 22:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C515A20692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 23:08:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HYDgFLID"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FE8C2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9sRfK1t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C515A20692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50267 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipKAD-0003OB-Tv
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 17:50:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36116)
+	id 1ipKR1-0002Cp-Co
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 18:08:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ipK9N-0002eg-GA
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:50:07 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1ipKPc-0000dT-3U
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 18:06:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ipK9L-00067Q-JW
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:50:05 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46848)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ipK9L-00065W-BD
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:50:03 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z7so5168776wrl.13
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 14:50:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=juWdlFfCQgG7NNhvtKKXUAUEZcw1xkA/MgzcDE7RTAk=;
- b=HYDgFLIDUDXKgOP07UDaydZIbNTBp6QgOJOSYg75Er5ZkkVO5AaRKPfSNTGVLfAGVt
- M3DTLE7OOxrjfaaXWMH/p/7Vc/bKKCBoQdi0ZzFxbFg6xtBZ4XYCmIhi97g6n0Y4fK+O
- PUrjvq165UwomTUZdf7fUax8BW9ItjaYR7ptvHld5DJ5RlmVLvCJGs6Zax0TtGm4vGst
- lRH+WkaPr4UGMVeyRAccz+xkA5In5YESyjoFCr0c4443/tepj0vZ9SNt623InEnPUST9
- KOBFS+yPqrziJOxRoDZnl07GjRQm3Ryi3rXT2FRpcWlth+30jMtuiEJ6jswpNjj/EhLn
- IPhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=juWdlFfCQgG7NNhvtKKXUAUEZcw1xkA/MgzcDE7RTAk=;
- b=RhsHOPTaKs+U8MlrcsOBzywBWkCa889LCKxVWinSjfRW43YdjXy8JREoLEXSDL60jn
- eUK/v+pPCRQqQm0R1hZv7QwA7cHdpE9H1vmzzpB9ubgOTGmS/itBYVPF3iqTZ3RI6k10
- /6OHYXRjb0Qdms+Laxfw5ZVXXhWtI+Ajq/z3LFsoMzd6+F0ManPhL6Iv94No0Mc6BSO5
- yxAPTtQ+g0iDEHv0nspI6qfLA4bTH4MjUB1GWodEEEiduHrN52J2SryD7439TfHv1QTZ
- qQeCJsLAbJNBgKd0qisx5PlmrsnZRiuxSrH2y97XRQ9EIPvV9yxQ4U/apathW1WscFdN
- oePQ==
-X-Gm-Message-State: APjAAAVrGuWg1zxaTHOZkk/W2w7YmPfPPPTIHmu1hkKH5QmxQA8AQCz1
- u/Q9HAGSPBDL59rTvxaqHwv6Yw==
-X-Google-Smtp-Source: APXvYqzdt3NnHuoXWGxwimKwDbVTrAdM3YC/vyFyvDxCkoCY4/sjG0sajdokPlyvBbRdlrl0DGaBEw==
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr7218190wrs.184.1578523801559; 
- Wed, 08 Jan 2020 14:50:01 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z21sm654697wml.5.2020.01.08.14.50.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 14:50:00 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6CA3A1FF87;
- Wed,  8 Jan 2020 22:49:59 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH] travis.yml: split into build stages
-Date: Wed,  8 Jan 2020 22:49:52 +0000
-Message-Id: <20200108224952.17988-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <alex.williamson@redhat.com>) id 1ipKIl-0005u9-6E
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:59:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60675
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1ipKIk-0005po-70
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 17:59:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578524385;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OqLbt1MJpD/2l5pEoZdMNVoLWGTl0KHDQB1cd3hrBlI=;
+ b=b9sRfK1t9UWQfhqhQc4u6aSJh9xUIHanbbvLwrm7ttCxMp19aIQtiLXGKlqylGVDpkW38K
+ s8WqcLuMpb40A1TdbDZY7BW/m9Hbf3FxHcyu+g+EvdDYz/niovykI+006AuJ3jVPDMd8gW
+ 60Fgvfm62ayN/eT++/xnmZIqmNCc4II=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-5lA3Di29O3u2mxZAUm_foQ-1; Wed, 08 Jan 2020 17:59:41 -0500
+X-MC-Unique: 5lA3Di29O3u2mxZAUm_foQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28159107ACC4;
+ Wed,  8 Jan 2020 22:59:39 +0000 (UTC)
+Received: from w520.home (ovpn-118-62.phx2.redhat.com [10.3.118.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 311095C241;
+ Wed,  8 Jan 2020 22:59:37 +0000 (UTC)
+Date: Wed, 8 Jan 2020 15:59:36 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v11 Kernel 6/6] vfio: Selective dirty page tracking if
+ IOMMU backed device pins pages
+Message-ID: <20200108155936.5e725eaa@w520.home>
+In-Reply-To: <17069da7-279b-872f-db15-d9995cf46285@nvidia.com>
+References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
+ <1576602651-15430-7-git-send-email-kwankhede@nvidia.com>
+ <20191217171219.7cc3fc1d@x1.home>
+ <66512c1f-aedc-a718-8594-b52d266f4b60@nvidia.com>
+ <20200107170929.74c9c92e@w520.home>
+ <17069da7-279b-872f-db15-d9995cf46285@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,262 +90,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The idea of this is split the build across stages so any failure in
-one stage will save time running later stages. So far I have have
-arbitrarily chosen:
+On Thu, 9 Jan 2020 02:22:26 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-  canary: up-front quick to build and run
-  platforms: common build configurations
-  rest: everything else
+> On 1/8/2020 5:39 AM, Alex Williamson wrote:
+> > On Wed, 8 Jan 2020 02:15:01 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> On 12/18/2019 5:42 AM, Alex Williamson wrote:  
+> >>> On Tue, 17 Dec 2019 22:40:51 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>      
+> >>
+> >> <snip>
+> >>  
+> >>>
+> >>> This will fail when there are devices within the IOMMU group that are
+> >>> not represented as vfio_devices.  My original suggestion was:
+> >>>
+> >>> On Thu, 14 Nov 2019 14:06:25 -0700
+> >>> Alex Williamson <alex.williamson@redhat.com> wrote:  
+> >>>> I think it does so by pinning pages.  Is it acceptable that if the
+> >>>> vendor driver pins any pages, then from that point forward we consider
+> >>>> the IOMMU group dirty page scope to be limited to pinned pages?  There
+> >>>> are complications around non-singleton IOMMU groups, but I think we're
+> >>>> already leaning towards that being a non-worthwhile problem to solve.
+> >>>> So if we require that only singleton IOMMU groups can pin pages and we  
+> >>>
+> >>> We could tag vfio_groups as singleton at vfio_add_group_dev() time with
+> >>> an iommu_group_for_each_dev() walk so that we can cache the value on
+> >>> the struct vfio_group.  
+> >>
+> >> I don't think iommu_group_for_each_dev() is required. Checking
+> >> group->device_list in vfio_add_group_dev() if there are more than one
+> >> device should work, right?
+> >>
+> >>           list_for_each_entry(vdev, &group->device_list, group_next) {
+> >>                   if (group->is_singleton) {
+> >>                           group->is_singleton = false;
+> >>                           break;
+> >>                   } else {
+> >>                           group->is_singleton = true;
+> >>                   }
+> >>           }  
+> > 
+> > Hmm, I think you're taking a different approach to this than I was
+> > thinking.  Re-reading my previous comments, the fact that both vfio.c
+> > and vfio_iommu_type1.c each have their own private struct vfio_group
+> > makes things rather unclear.  I was intending to use the struct
+> > iommu_group as the object vfio.c provides to type1.c to associate the
+> > pinning.  This would require that not only the vfio view of devices in
+> > the group to be singleton, but also the actual iommu group to be
+> > singleton.  Otherwise the set of devices vfio.c has in the group might
+> > only be a subset of the group.  Maybe a merger of the approaches is
+> > easier though.
+> > 
+> > Tracking whether the vfio.c view of a group is singleton is even easier
+> > than above, we could simply add a device_count field to vfio_group,
+> > increment it in vfio_group_create_device() and decrement it in
+> > vfio_device_release().  vfio_pin_pages() could return error if
+> > device_count is not 1.  We could still add the iommu_group pointer to
+> > the type1 pin_pages callback, but perhaps type1 simply assumes that the
+> > group is singleton when pin pages is called and it's vfio.c's
+> > responsibility to maintain that group as singleton once pages have been
+> > pinned.  vfio.c would therefore also need to set a field on the
+> > vfio_group if pages have been pinned such that vfio_add_group_dev()
+> > could return error if a new device attempts to join the group.  We'd
+> > need to make sure that field is cleared when the group is released from
+> > use and pay attention to races that might occur between adding devices
+> > to a group and pinning pages.
+> >   
+> 
+> Thinking aloud, will adding singleton check could cause issues in near 
+> future? - may be in future support for p2p and direct RDMA will be added 
+> for mdev devices. In that case the two devices should be in same 
+> iommu_domain, but should be in different iommu_group - is that 
+> understanding correct?
 
-The ideal should be canary and platforms catch the most common and
-frequent build breakages and the "rest" aims for completeness.
+The ACS redirection stuff is the only thing that actually changes iommu
+grouping relative to p2p/RDMA and that's specifically for untranslated
+DMA, aiui.  If we wanted translated p2p DMA to be routed downstream of
+the IOMMU we'd need to enable ACS direct translation.  In any case,
+those are about shortening the path for p2p between devices.  We
+actually don't even need devices to be in the same iommu domain to
+allow p2p, we only need the iommu domain for each respective device to
+map the mmio spaces of the other device.  I don't think we're doing
+anything here that would cause us trouble later in this space, but it's
+also just a policy decision, we wouldn't be breaking ABI to change the
+implementation later.
+ 
+> >>> vfio_group_nb_add_dev() could update this if
+> >>> the IOMMU group composition changes.  
+> >>
+> >> I don't see vfio_group_nb_add_dev() calls vfio_add_group_dev() (?)
+> >> If checking is_singleton is taken care in vfio_group_nb_add_dev(), which
+> >> is the only place where vfio_group is allocated, that should work, I think.  
+> > 
+> > This was relative to maintaining that the iommu group itself is
+> > singleton, not just the vfio view of the group.  If we use the latter
+> > as our basis, then you're right, we should need this, but vfio.c would
+> > need to enforce that the group remains singleton if it has pinned
+> > pages.  Does that make sense?  Thanks,
+> >   
+> 
+> Which route should be taken - iommu_group view or vfio.c group view?
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+The latter seems easier, more flexible, and lower overhead as far as I
+can see.  Thanks,
 
-diff --git a/.travis.yml b/.travis.yml
-index 6c1038a0f1a..648c523ce59 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -17,8 +17,12 @@ cache:
-   pip: true
-   directories:
-   - $HOME/avocado/data/cache
-+stages:
-+  - canary
-+  - platforms
-+  - rest
- 
--
-+  
- addons:
-   apt:
-     packages:
-@@ -97,17 +101,20 @@ matrix:
-     - env:
-         - CONFIG="--disable-system --static"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+      stage: canary
- 
- 
-     # we split the system builds as it takes a while to build them all
-     - env:
-         - CONFIG="--disable-user --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+      stage: canary
- 
- 
-     - env:
-         - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+      stage: canary
- 
- 
-     # Just build tools and run minimal unit and softfloat checks
-@@ -116,28 +123,33 @@ matrix:
-         - CONFIG="--disable-user --disable-system"
-         - TEST_CMD="make check-unit check-softfloat -j3"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+      stage: canary
- 
- 
-     # --enable-debug implies --enable-debug-tcg, also runs quite a bit slower
-     - env:
-         - CONFIG="--enable-debug --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug"
-+      stage: rest
- 
- 
-     # TCG debug can be run just on its own and is mostly agnostic to user/softmmu distinctions
-     - env:
-         - CONFIG="--enable-debug-tcg --disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
-+      stage: rest
- 
--
-+      
-     - env:
-         - CONFIG="--disable-linux-aio --disable-cap-ng --disable-attr --disable-brlapi --disable-libusb --disable-replication --target-list=${MAIN_SOFTMMU_TARGETS}"
-+      stage: rest
- 
- 
-     # Module builds are mostly of interest to major distros
-     - env:
-         - CONFIG="--enable-modules --target-list=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+      stage: rest
- 
- 
-     # Alternate coroutines implementations are only really of interest to KVM users
-@@ -145,11 +157,13 @@ matrix:
-     - env:
-         - CONFIG="--with-coroutine=ucontext --disable-tcg"
-         - TEST_CMD="make check-unit -j3 V=1"
-+      stage: rest
- 
- 
-     - env:
-         - CONFIG="--with-coroutine=sigaltstack --disable-tcg"
-         - TEST_CMD="make check-unit -j3 V=1"
-+      stage: rest
- 
- 
-     # Check we can build docs and tools (out of tree)
-@@ -158,6 +172,7 @@ matrix:
-         - BASE_CONFIG="--enable-tools --enable-docs"
-         - CONFIG="--target-list=x86_64-softmmu,aarch64-linux-user"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-+      stage: rest
-       addons:
-         apt:
-           packages:
-@@ -171,11 +186,13 @@ matrix:
-         - CONFIG="--disable-system"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-       compiler: clang
-+      stage: platforms
- 
- 
-     - env:
-         - CONFIG="--target-list=${MAIN_SOFTMMU_TARGETS} "
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-sanitize"
-+      stage: platforms
-       compiler: clang
-       before_script:
-         - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-@@ -185,12 +202,14 @@ matrix:
-     - env:
-         - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-clang-default"
-+      stage: platforms
-       compiler: clang
- 
- 
-     # gprof/gcov are GCC features
-     - env:
-         - CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=${MAIN_SOFTMMU_TARGETS}"
-+      stage: rest
-       after_success:
-         - ${SRC_DIR}/scripts/travis/coverage-summary.sh
- 
-@@ -200,6 +219,7 @@ matrix:
-         - CONFIG="--without-default-devices --disable-user"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-         - TEST_CMD=""
-+      stage: rest
- 
- 
-     # Check the TCG interpreter (TCI)
-@@ -207,22 +227,26 @@ matrix:
-         - CONFIG="--enable-debug-tcg --enable-tcg-interpreter --disable-kvm --disable-containers
-             --target-list=alpha-softmmu,arm-softmmu,hppa-softmmu,m68k-softmmu,microblaze-softmmu,moxie-softmmu,ppc-softmmu,s390x-softmmu,x86_64-softmmu"
-         - TEST_CMD="make check-qtest check-tcg V=1"
-+      stage: rest
- 
- 
-     # We don't need to exercise every backend with every front-end
-     - env:
-         - CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
-         - TEST_CMD=""
-+      stage: rest
- 
- 
-     - env:
-         - CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
-         - TEST_CMD=""
-+      stage: rest
- 
- 
-     - env:
-         - CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
-         - TEST_CMD=""
-+      stage: rest
- 
- 
-     # MacOSX builds - cirrus.yml also tests some MacOS builds including latest Xcode
-@@ -232,6 +256,7 @@ matrix:
-       os: osx
-       osx_image: xcode10.3
-       compiler: clang
-+      stage: platforms
-       addons:
-         homebrew:
-           packages:
-@@ -256,6 +281,7 @@ matrix:
-       language: python
-       python:
-         - "3.5"
-+      stage: platforms
- 
- 
-     - env:
-@@ -264,6 +290,7 @@ matrix:
-       language: python
-       python:
-         - "3.6"
-+      stage: platforms
- 
- 
-     # Acceptance (Functional) tests
-@@ -272,6 +299,7 @@ matrix:
-         - TEST_CMD="make check-acceptance"
-       after_script:
-         - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-+      stage: rest
-       addons:
-         apt:
-           packages:
-@@ -321,6 +349,7 @@ matrix:
-             - uuid-dev
-       language: generic
-       compiler: none
-+      stage: platforms
-       env:
-         - COMPILER_NAME=gcc CXX=g++-9 CC=gcc-9
-         - CONFIG="--cc=gcc-9 --cxx=g++-9 --disable-pie --disable-linux-user"
-@@ -343,6 +372,7 @@ matrix:
-         - CONFIG="--disable-system --enable-plugins --enable-debug-tcg --target-list-exclude=sparc64-linux-user"
-         - TEST_CMD="make -j3 check-tcg V=1"
-         - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
-+      stage: rest
- 
- 
-     # Run check-tcg against softmmu targets
-@@ -383,6 +413,7 @@ matrix:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+      stage: platforms
-       env:
-         - TEST_CMD="make check check-tcg V=1"
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS}"
-@@ -412,6 +443,7 @@ matrix:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+      stage: platforms
-       env:
-         - TEST_CMD="make check check-tcg V=1"
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},ppc64le-linux-user"
-@@ -441,6 +473,7 @@ matrix:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+      stage: platforms
-       env:
-         - TEST_CMD="make check check-tcg V=1"
-         - CONFIG="--disable-containers --target-list=${MAIN_SOFTMMU_TARGETS},s390x-linux-user"
--- 
-2.20.1
+Alex
 
 
