@@ -2,84 +2,100 @@ Return-Path: <SRS0=peXq=25=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18CF5C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E02D7C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:55:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D623A206F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA318206F0
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 14:55:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tz60S+C6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D623A206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wdgkc4E4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA318206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipCj7-0002tn-VV
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 09:54:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39140)
+	id 1ipCk1-0003r5-RK
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 09:55:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <danielhb413@gmail.com>) id 1ipCiV-0002MC-Qx
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:53:53 -0500
+ (envelope-from <philmd@redhat.com>) id 1ipCjP-0003Nk-Dv
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <danielhb413@gmail.com>) id 1ipCiU-00049l-AE
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:53:51 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41050)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
- id 1ipCiU-00048f-3u
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:53:50 -0500
-Received: by mail-pf1-x442.google.com with SMTP id w62so1746278pfw.8
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 06:53:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AjdNpjSTzIXvK5TJRDwa33zTflDFXaUtZ+UpigZK9FI=;
- b=tz60S+C6AwDtZhBQUSvMvsfBEJ9mK7UbtUcvvkDZbKXx0SCCKtDZSpve3vq145ZcsD
- ksjlqAS+cjjkGbSiP0ZUJ1DfQGg5BuBQeUYiiRrOnxbnFyAtIx+J33bmnDG1We1hF/Jz
- q2N1cmID7hlK+/3HCeWTusdu25J8InZ4bnina9AIsXgkO1TATLgd8IrkKrQTQuWutY6X
- yPEslY34HhxlXUFpEsMqaI/gVc1oELcwhUlmFgKf4qBWElK/VADaHlJuFF+yS/ZAdUfL
- eEV7+QCU91imLAbpF+QydLGJx/RWDjtbtj37SP44V4pmlQOfPJpr1hsjKvSRwDkmR8dG
- g4OQ==
+ (envelope-from <philmd@redhat.com>) id 1ipCjN-0004c6-Te
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:54:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59182
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipCjN-0004bd-QE
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 09:54:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578495284;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FKMFwHwcp3S4teaTvF5S1W76ib2em1IlING8Bv+AlrE=;
+ b=Wdgkc4E4qzCicQ1dFfIc2ipUpu2Z7K76nQWYvvvas1lEkj6QxAmI1ckugRZki0iOxMZf7e
+ L/0wFOAjPVJku/PkCAcW/vx86vZpS8DEDl2pq4BEhNS6cNm+qUy/LBhN4hGfswlY09RqUw
+ 0NL5Gm6L9cBStmSm/g4BW8s5S5B7zzM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-auEnwYjkN_CoQEWB2yvevQ-1; Wed, 08 Jan 2020 09:54:43 -0500
+Received: by mail-wm1-f69.google.com with SMTP id t17so456584wmi.7
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 06:54:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=AjdNpjSTzIXvK5TJRDwa33zTflDFXaUtZ+UpigZK9FI=;
- b=qiTom/HNQurvSGlGbAmJNxBTxVCczaWmNDAaVF/zfXqMgACrRlgI3xcKqmpf2kO4Rw
- XnzdYZEJVZLC9QEoq46NUd25h64u90LeBwf+f3sK7Bdb9LvwYSzCEwniVVju5torYmhn
- JD+uDbNW2ig5YqyhgMJsbv7TWGAJxKU7DfhfcbLGfol+GvDZwW0bcxOhuyL+EB7OC0vR
- 6+qs2u27WtnAO9CTE2ahul3KfWAR7+Ilq4Thh5FkjDlyjpCNK8UKcxsggo30Lkf09/Dh
- A3MxYSHHWZ7ux30F+1G2FwnHYOaJ9ZuXqRDFDuh6oK5sFpIcCJ0dGD/M5k9Gi73uBy07
- jyTA==
-X-Gm-Message-State: APjAAAWZAeiQLs3WScYjClcieFcwU7kFchB4avmET5nXCt+ufTjwyeEh
- P3/4iDXCOkActodyMMKkQsvuEDnn
-X-Google-Smtp-Source: APXvYqwDLtvGYTrssEpPvYmiMrqHnnp5YUagpuGmGhlIpOJBfoKLfs1rPxWWzosF/T7dl6CAiMiocw==
-X-Received: by 2002:ad4:4f84:: with SMTP id em4mr4417119qvb.119.1578494782057; 
- Wed, 08 Jan 2020 06:46:22 -0800 (PST)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:655b:9e1c:e865:3705:e1df])
- by smtp.gmail.com with ESMTPSA id d5sm1495372qke.130.2020.01.08.06.46.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 06:46:21 -0800 (PST)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/1] s390x/event-facility.c: remove unneeded labels
-Date: Wed,  8 Jan 2020 11:46:07 -0300
-Message-Id: <20200108144607.878862-1-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.24.1
+ bh=IRnOR3h18LwvqVjiwUt+1p8pdr8Nc3iMzfbu1+teEjs=;
+ b=QN/HqMb3dJhFEpaRFGKyu5iqnmeJ0noT68iJsNWagTioxpY9jK/jQzCZZtoJBhHmo9
+ IyMPEWT3z6I7wtoZg/LnYy/+tkK8rG2HiLsnv+cDWxHX2ugMBWs4fMp1Slp3vv7YVlJd
+ p1H51zorZk1JhHD7Ez8LYfRQ1m/3x8A8zjBolQ6KoVaf2FQ8MLzPsoSu0KXudUBJBWsm
+ jQet7grV0EhzuCtcsjqcFCAH3C+9yzDYfy10AWGQtWt3/H+Kl5NyQCLQq+TGvyvjGdtN
+ R1vibmWHT4IrfbNAMUdU7GJ0Z5IoJUsfQBQaQpDw4szHbSTnMO+2Xkehqd5zVTCsD6fn
+ yM5A==
+X-Gm-Message-State: APjAAAWHSOIHzDmO7d0pkGgYVE3QpE+YraPMvf+46emDfmxTK8B3yUQ3
+ R/gEvIx52jtz0R9qk73JBdeQgm7N4CAufhttL1IBhvPQDbkqCG8N1ReehzLFWpetfhsv5UwbGtP
+ nwW0dkgdVPihvNek=
+X-Received: by 2002:a05:600c:298:: with SMTP id
+ 24mr4140833wmk.141.1578495282218; 
+ Wed, 08 Jan 2020 06:54:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzginRqJtnaAwNtacobE8QKSjLjbkXihLohXcZs6kaSqMFSIsY2r9Ip4WJyW35gj9PYiZZfLQ==
+X-Received: by 2002:a05:600c:298:: with SMTP id
+ 24mr4140817wmk.141.1578495282025; 
+ Wed, 08 Jan 2020 06:54:42 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id u22sm4462709wru.30.2020.01.08.06.54.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jan 2020 06:54:41 -0800 (PST)
+Subject: Re: [PATCH v5] display/gtk: get proper refreshrate
+To: pavlica.nikola@gmail.com, qemu-devel@nongnu.org
+References: <20200108121342.29597-1-pavlica.nikola@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <34341431-40ea-6bab-e93d-5be15c7aa5da@redhat.com>
+Date: Wed, 8 Jan 2020 15:54:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+In-Reply-To: <20200108121342.29597-1-pavlica.nikola@gmail.com>
+Content-Language: en-US
+X-MC-Unique: auEnwYjkN_CoQEWB2yvevQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,136 +107,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Cornelia Huck <cohuck@redhat.com>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'out' label from write_event_mask() and and write_event_data()
-can be replaced by 'return'.
+On 1/8/20 1:13 PM, pavlica.nikola@gmail.com wrote:
+> From: Nikola Pavlica <pavlica.nikola@gmail.com>
+>=20
+> Because some VMs in QEMU can get GPU virtualization (using technologies
+> such as iGVT-g, as mentioned previously), they could produce a video
+> output that had a higher display refresh rate than of what the GTK
+> display was displaying. (fxp. Playing a video game inside of a Windows
+> VM at 60 Hz, while the output stood locked at 33 Hz because of defaults
+> set in include/ui/console.h)
+>=20
+> Since QEMU does indeed have internal systems for determining frame
+> times as defined in ui/console.c.
+> The code checks for a variable called update_interval that it later
+> uses for time calculation. This variable, however, isn't defined
+> anywhere in ui/gtk.c and instead ui/console.c just sets it to
+> GUI_REFRESH_INTERVAL_DEFAULT which is 30
+>=20
+> update_interval represents the number of milliseconds per display
+> refresh, and by doing some math we get that 1000/30 =3D 33.33... Hz
+>=20
+> This creates the mentioned problem and what this patch does is that it
+> checks for the display refresh rate reported by GTK itself (we can take
+> this as a safe value) and just converts it back to a number of
+> milliseconds per display refresh.
+>=20
+> Signed-off-by: Nikola Pavlica <pavlica.nikola@gmail.com>
 
-The 'out' label from read_event_data() can also be replaced.
-However, as suggested by Cornelia Huck, instead of simply
-replacing the 'out' label, let's also change the code flow
-a bit to make it clearer that sccb events are always handled
-regardless of the mask for unconditional reads, while selective
-reads are handled if the mask is valid.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-CC: Cornelia Huck <cohuck@redhat.com>
-CC: Thomas Huth <thuth@redhat.com>
-CC: Halil Pasic <pasic@linux.ibm.com>
-CC: Christian Borntraeger <borntraeger@de.ibm.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
-
-This is the v2 of patch 37 sent in the series:
-
-https://patchwork.kernel.org/cover/11319771/
-
-after this review from Cornelia:
-
-https://patchwork.kernel.org/patch/11319847/#23088037
-
- hw/s390x/event-facility.c | 33 ++++++++++++---------------------
- 1 file changed, 12 insertions(+), 21 deletions(-)
-
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 6afe278cad..8a93b8a1da 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -182,11 +182,11 @@ static void write_event_data(SCLPEventFacility *ef, SCCB *sccb)
- {
-     if (sccb->h.function_code != SCLP_FC_NORMAL_WRITE) {
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_FUNCTION);
--        goto out;
-+        return;
-     }
-     if (be16_to_cpu(sccb->h.length) < 8) {
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
--        goto out;
-+        return;
-     }
-     /* first do a sanity check of the write events */
-     sccb->h.response_code = cpu_to_be16(write_event_length_check(sccb));
-@@ -196,9 +196,6 @@ static void write_event_data(SCLPEventFacility *ef, SCCB *sccb)
-         sccb->h.response_code =
-                 cpu_to_be16(handle_sccb_write_events(ef, sccb));
-     }
--
--out:
--    return;
- }
- 
- static uint16_t handle_sccb_read_events(SCLPEventFacility *ef, SCCB *sccb,
-@@ -262,17 +259,18 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
- 
-     if (be16_to_cpu(sccb->h.length) != SCCB_SIZE) {
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INSUFFICIENT_SCCB_LENGTH);
--        goto out;
-+        return;
-     }
- 
--    sclp_cp_receive_mask = ef->receive_mask;
--
--    /* get active selection mask */
-     switch (sccb->h.function_code) {
-     case SCLP_UNCONDITIONAL_READ:
--        sclp_active_selection_mask = sclp_cp_receive_mask;
-+        sccb->h.response_code = cpu_to_be16(
-+            handle_sccb_read_events(ef, sccb, ef->receive_mask));
-         break;
-     case SCLP_SELECTIVE_READ:
-+        /* get active selection mask */
-+        sclp_cp_receive_mask = ef->receive_mask;
-+
-         copy_mask((uint8_t *)&sclp_active_selection_mask, (uint8_t *)&red->mask,
-                   sizeof(sclp_active_selection_mask), ef->mask_length);
-         sclp_active_selection_mask = be64_to_cpu(sclp_active_selection_mask);
-@@ -280,18 +278,14 @@ static void read_event_data(SCLPEventFacility *ef, SCCB *sccb)
-             (sclp_active_selection_mask & ~sclp_cp_receive_mask)) {
-             sccb->h.response_code =
-                     cpu_to_be16(SCLP_RC_INVALID_SELECTION_MASK);
--            goto out;
-+        } else {
-+            sccb->h.response_code = cpu_to_be16(
-+                handle_sccb_read_events(ef, sccb, sclp_active_selection_mask));
-         }
-         break;
-     default:
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_FUNCTION);
--        goto out;
-     }
--    sccb->h.response_code = cpu_to_be16(
--            handle_sccb_read_events(ef, sccb, sclp_active_selection_mask));
--
--out:
--    return;
- }
- 
- static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-@@ -303,7 +297,7 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
-     if (!mask_length || (mask_length > SCLP_EVENT_MASK_LEN_MAX) ||
-         ((mask_length != 4) && !ef->allow_all_mask_sizes)) {
-         sccb->h.response_code = cpu_to_be16(SCLP_RC_INVALID_MASK_LENGTH);
--        goto out;
-+        return;
-     }
- 
-     /*
-@@ -328,9 +322,6 @@ static void write_event_mask(SCLPEventFacility *ef, SCCB *sccb)
- 
-     sccb->h.response_code = cpu_to_be16(SCLP_RC_NORMAL_COMPLETION);
-     ef->mask_length = mask_length;
--
--out:
--    return;
- }
- 
- /* qemu object creation and initialization functions */
--- 
-2.24.1
+> ---
+>   include/ui/gtk.h |  2 ++
+>   ui/gtk.c         | 10 ++++++++++
+>   2 files changed, 12 insertions(+)
+>=20
+> diff --git a/include/ui/gtk.h b/include/ui/gtk.h
+> index d9eedad976..d1b230848a 100644
+> --- a/include/ui/gtk.h
+> +++ b/include/ui/gtk.h
+> @@ -28,6 +28,8 @@
+>   #include "ui/egl-context.h"
+>   #endif
+>  =20
+> +#define MILLISEC_PER_SEC 1000000
+> +
+>   typedef struct GtkDisplayState GtkDisplayState;
+>  =20
+>   typedef struct VirtualGfxConsole {
+> diff --git a/ui/gtk.c b/ui/gtk.c
+> index 692ccc7bbb..eb0efc70ee 100644
+> --- a/ui/gtk.c
+> +++ b/ui/gtk.c
+> @@ -1966,6 +1966,10 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, =
+VirtualConsole *vc,
+>                                 GSList *group, GtkWidget *view_menu)
+>   {
+>       bool zoom_to_fit =3D false;
+> +    int refresh_rate_millihz;
+> +    GdkDisplay *dpy =3D gtk_widget_get_display(s->window);
+> +    GdkWindow *win =3D gtk_widget_get_window(s->window);
+> +    GdkMonitor *monitor =3D gdk_display_get_monitor_at_window(dpy, win);
+>  =20
+>       vc->label =3D qemu_console_get_label(con);
+>       vc->s =3D s;
+> @@ -2026,6 +2030,12 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, =
+VirtualConsole *vc,
+>  =20
+>       vc->gfx.kbd =3D qkbd_state_init(con);
+>       vc->gfx.dcl.con =3D con;
+> +
+> +    refresh_rate_millihz =3D gdk_monitor_get_refresh_rate(monitor);
+> +    if (refresh_rate_millihz) {
+> +        vc->gfx.dcl.update_interval =3D MILLISEC_PER_SEC / refresh_rate_=
+millihz;
+> +    }
+> +
+>       register_displaychangelistener(&vc->gfx.dcl);
+>  =20
+>       gd_connect_vc_gfx_signals(vc);
+>=20
 
 
