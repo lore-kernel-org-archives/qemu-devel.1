@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 949E5C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC06C282DD
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:19:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6658A20692
-	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:12:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6658A20692
+	by mail.kernel.org (Postfix) with ESMTPS id 6001220692
+	for <qemu-devel@archiver.kernel.org>; Wed,  8 Jan 2020 15:19:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6001220692
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipD0v-0002kg-B2
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 10:12:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50462)
+	id 1ipD7R-0006M6-9q
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 10:19:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52651)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ipCz9-0000oc-CR
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:11:04 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ipD21-0003QS-J2
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:14:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ipCz8-0007K8-7f
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:11:03 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:44017)
+ (envelope-from <laurent@vivier.eu>) id 1ipD20-0001LB-E9
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:14:01 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:40667)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1ipCyi-00075H-Qq; Wed, 08 Jan 2020 10:10:56 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ipD20-0001KA-5O
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 10:14:00 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MatZt-1jQkqz3nFz-00cRhy; Wed, 08 Jan 2020 16:10:31 +0100
-Subject: Re: [PATCH v2] arm/translate-a64: fix uninitialized variable warning
-To: pannengyuan@huawei.com, peter.maydell@linaro.org
-References: <20200108023915.52288-1-pannengyuan@huawei.com>
+ 1MuDPf-1jgdUX4BeH-00uX7c; Wed, 08 Jan 2020 16:13:49 +0100
+Subject: Re: [PATCH] vl: fix memory leak in configure_accelerators
+To: kuhn.chenqun@huawei.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+References: <20200108114207.58084-1-kuhn.chenqun@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <4274ef7b-8a2d-cb4f-c002-97d06211e744@vivier.eu>
-Date: Wed, 8 Jan 2020 16:10:29 +0100
+Message-ID: <ae9bae62-6c59-813a-187b-e7b670294399@vivier.eu>
+Date: Wed, 8 Jan 2020 16:13:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200108023915.52288-1-pannengyuan@huawei.com>
+In-Reply-To: <20200108114207.58084-1-kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:EXRRJFu6b3cCD7Ongt0goDgiAyC/7vEBVFleNuALvlgtiX2SoyD
- hq4XxKpNSSoV/mAC9A5+cNcd5mkbzFUgcvilaz8EAGKUyRDudz3Ub9g13wYNbmAKG0lOje+
- fiR7ZF00ikwzC+Ra28GQfqdTR7q3iLZdYo0IjZcIwy6L6AxeBoR1V7u29dGUh+w3n+x6dPB
- 7t72eddL2yYVvQFASoT2Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WSoWEOtO0UU=:qaR+bzvh3rTjjV2KfKBJhq
- 4XDdbbQPBACeJlR65iSkdOCDMSfcy4i/oVzjARp8o3CGPAEoEey72r+HPcAUhzpW+aMbhszd8
- 7Xi4r84fPU6Du1OjxUpkM4YileEWD7JOFcxImNZaMlsBiWC2c5CBOTfIC7qfj8KPgrErqDtwP
- 119OpXKibv65uSDefpV5tcUoRnP9Q3Oxz1/oqHJy0fQW6nodKZaZ/z0RrScH7Vev8eTWF1gEy
- Yek2jR6OuSI60Cm+7c/+QrZGtAjpY7YedJKBBO3FSGYmftBlYZOXbNaNgXnM9pUAQ/lz2z4sG
- qMWK80emr9g6QZawRWUQ8/uxHOaTYQcAw35eXJm/y+rClG4dv5E8OgaRgifqJZK0wV1+MFO46
- 5L2uLSFvxeq2B/BZtl4AbxwStN7VA/DWP1krlJkl0Rzs0D6CzIO9gtpGwnK3RREPgW5pV6qfH
- BNAPzu+7D2jkTSnK5ogHxgA349UAUF8XAqTp5xtXz/uoSWz4DptYx6oZzKJO/2UGbd7j7Smgm
- lWdvq3CLWfHDwIacmKI0tiHxN47BIE/NDk3vsTOlOa4FIETmvwQgJtMOMx7dnvNRoMk+HBBnE
- OjhueJwZpE8ihu7lgg/HgLWAbk1vFC4NSFkFMw65rkOs0fhKZRl4wBIjVntZsuPnlk+Xj/CJI
- gvhFt+KwVf+KBbIHAjwbhJXxqLyL9e7CUOWcA+TxxbiRgas/D4pinuoTRcGaa3oNc/mrDUEnU
- WHDDq0zWI+m18+ctyFRly9iQRBHX9bkhEA8017AAypCpth7T2nFLTBJharK/gi1qvbaAuwwYG
- CDsLt+PfgFbmvqQhLIwcw5dHljDPIAQBrRUBjmT7OR411jBnRJAISaeZ2c2V+r2dF4C5MZLGT
- 4YUIzLbqz7j1byF1lATA==
+X-Provags-ID: V03:K1:dQd7kD+AoiiV0hqL/Dt9qIHtyxrSKGGjGjk7UBwP/mzAxnaW9DM
+ UzLaSWJhWGc/j8RkSR08IL4RYZOhsuGTqel50ikDL0yXvcny6bEC7TwW0ThY1jKTKA6ENra
+ uY4tibIMYaMWMDPAQTgkv3WTFlECE8WEmLSLWxCf8981vhhN4mK53TGnYTwASBBEok9xvJa
+ RUT+kRwZTkqoONV/8++Hw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qp78Gpi3bnU=:x9lzMFa42Tx62S0CGaNvrz
+ 0bEsjUBe3anItG70335GDczyvY9rN9bx1VVtPVWqzNtVPNKzLvqo079L/v8qJzyBXBx5RNARI
+ g6JKpSWAiuXi/u0coAMA36xihwvHcE3QqtqnJ050VDVpBFC7q+4UkH9aHBlNXbTG9QyHCJL79
+ 8Sc9QD84fVz4a4tRKt/fmi3NguOS4YFy+YVdMV2qBiqgS4zsnu5sSDKkFSexP9jFGs8NFpAQ5
+ jPD487ZjYQsz62xyP90ghgAKFqMeBcalhasEaakznj46cByRuraB0mykGxShR9KCTdnrWE3xq
+ 90eos7jwCTxB53FspCXKoWZ+cMhgWZ/x68PPYfUl3coNM9BxcjJWJpGsatmkjiMbRS3pj9i48
+ 4nvntOFJT5B36xu+pWjhOW638fYXdz2gl0Shfo07KWNFWcggAhqeCEXhJYD1Ra13bvsfdmwy4
+ 4dwLBZnSAK7thJ3cTNyp0QJftBs6jbc0QWFJGNdNcp39bj5vfIpbOtsMf9e0eBvKonIdP2aLl
+ Ar2q4RkO8KQsR8ahR38y5H783W9gD78LV3PMZuXjVf2STPpGpqdZzB2QfO32YFzC4St6SYLXg
+ sf9onsy6DhYwsiT1c0U8S6FkZkrEDGnaY5kdrqXhw+R5TgAyQQDd9kp4jFr25NLfIiYvMa3YM
+ +t45snDIVaeZRGFFwC1kv4Md4/EErRR0QyLTMmuDqazAEZLNKS+9LuHl7CvK+4haFpdZUsuIw
+ g9Yf5cGyoWzHMdRSGS4QYeIXC0BOnCYJxpjvIXyqu0M1z4Uhoa670TEI1y+QU7oJfNlOL2mO7
+ H6TmzwAlaOwlV0Kw/iJmoav399lSOeezG61IBgvDNK1UB7Bpoi/wCVe9rlrz68g3+LVxuLxhx
+ dgP82RwkTPFiTkxguinA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.73
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,45 +122,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Euler Robot <euler.robot@huawei.com>,
- qemu-arm@nongnu.org, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+Cc: liyiting@huawei.com, pannengyuan@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 08/01/2020 à 03:39, pannengyuan@huawei.com a écrit :
-> From: Pan Nengyuan <pannengyuan@huawei.com>
+Le 08/01/2020 à 12:42, kuhn.chenqun@huawei.com a écrit :
+> From: Chen Qun <kuhn.chenqun@huawei.com>
 > 
-> Fixes:
-> target/arm/translate-a64.c: In function 'disas_crypto_three_reg_sha512':
-> target/arm/translate-a64.c:13625:9: error: 'genfn' may be used uninitialized in this function [-Werror=maybe-uninitialized]
->     genfn(tcg_rd_ptr, tcg_rn_ptr, tcg_rm_ptr);
->     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> qemu/target/arm/translate-a64.c:13609:8: error: 'feature' may be used uninitialized in this function [-Werror=maybe-uninitialized]
->     if (!feature) {
+> The accel_list forgot to free, the asan output:
+> 
+> Direct leak of 16 byte(s) in 1 object(s) allocated from:
+>     #0 0xffff919331cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
+>     #1 0xffff913f7163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+>     #2 0xffff91413d9b in g_strsplit (/lib64/libglib-2.0.so.0+0x73d9b)
+>     #3 0xaaab42fb58e7 in configure_accelerators /qemu/vl.c:2777
+>     #4 0xaaab42fb58e7 in main /qemu/vl.c:4121
+>     #5 0xffff8f9b0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+>     #6 0xaaab42fc1dab  (/qemu/build/aarch64-softmmu/qemu-system-aarch64+0x8b1dab)
+> 
+> Indirect leak of 4 byte(s) in 1 object(s) allocated from:
+>     #0 0xffff919331cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31cb)
+>     #1 0xffff913f7163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+>     #2 0xffff9141243b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
+>     #3 0xffff91413e6f in g_strsplit (/lib64/libglib-2.0.so.0+0x73e6f)
+>     #4 0xaaab42fb58e7 in configure_accelerators /qemu/vl.c:2777
+>     #5 0xaaab42fb58e7 in main /qemu/vl.c:4121
+>     #6 0xffff8f9b0b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+>     #7 0xaaab42fc1dab  (/qemu/build/aarch64-softmmu/qemu-system-aarch64+0x8b1dab)
 > 
 > Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 > ---
-> Changes v2 to v1:
-> - add a default label to fix uninitialized warnings(suggested by Richard Henderson)
-> ---
->  target/arm/translate-a64.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  vl.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index d4bebbe629..63a3d26687 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -13585,6 +13585,8 @@ static void disas_crypto_three_reg_sha512(DisasContext *s, uint32_t insn)
->              feature = dc_isar_feature(aa64_sha3, s);
->              genfn = NULL;
->              break;
-> +        default:
-> +            g_assert_not_reached();
+> diff --git a/vl.c b/vl.c
+> index 86474a55c9..035a24e52b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2788,6 +2788,7 @@ static void configure_accelerators(const char *progname)
+>                  error_report("invalid accelerator %s", *tmp);
+>              }
 >          }
+> +        g_strfreev(accel_list);
 >      } else {
->          switch (opcode) {
+>          if (accel != NULL) {
+>              error_report("The -accel and \"-machine accel=\" options are incompatible");
 > 
 
 Applied to my trivial-patches branch.
