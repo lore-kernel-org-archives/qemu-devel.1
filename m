@@ -6,76 +6,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD61C33CA1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C3AC3F68F
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABE5D2067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:52:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CCB72067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:54:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cObnf7dc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE5D2067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FjTCffSg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CCB72067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipZAR-0001n5-6I
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 09:52:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41903)
+	id 1ipZCC-0004BY-PN
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 09:54:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ipZ3L-0008JE-ND
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:44:52 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipZ3b-0000Cj-M5
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ipZ3K-0002K3-05
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:44:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37901
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ipZ3Z-0003Wd-V0
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23259
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ipZ3J-0002I0-RI
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:44:49 -0500
+ id 1ipZ3Z-0003Ty-Da
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578581089;
+ s=mimecast20190719; t=1578581104;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MQ/sFE7Qfd2ahndqfZ8IPJWnzqpw0qRbrgh4mNdSRT8=;
- b=cObnf7dc5CNVUuPAZjWx0LH4RvI76HJF+fwWiwRUwnQ9NTHZpJxM1VKO86nmHCP8rEULG9
- oUP4VGsIad8MfFRI/+NqZZXXDqW3auckFfGKnYUz8PuUUmdYD20/8vwhbCX0GI62CDb8/I
- yNaHjO0MeWk1ny/hcXrqx9ZRpSb1BU8=
+ bh=bwVZf5MPVcfOeYB7Ki1otyVFRt0yhzoOOPhFjI3YElI=;
+ b=FjTCffSgVpVdzc6PbI2abtxkQ9B3LZMTXa9DuXhyaVUpHVGcsZYHMYVc/Jf7ivKYeics6n
+ cs63mBQHwSyCw0LJZSZz7Yh1H73Gg3v8TypocwKRl3UzcZmWyWA3+DH9cFH642CnRYBdsG
+ SxL30MvT/+NbFRZ2DOZjf8I72HPycvU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-HN8jvO8fMGKWJ9ns1_c6wA-1; Thu, 09 Jan 2020 09:44:48 -0500
+ us-mta-186-Wp_gtBP5OzuB-c4CeDmtYg-1; Thu, 09 Jan 2020 09:45:03 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B27D0800583;
- Thu,  9 Jan 2020 14:44:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95AE9108593C;
+ Thu,  9 Jan 2020 14:45:01 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 51B4960FC6;
- Thu,  9 Jan 2020 14:44:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1464F6106A;
+ Thu,  9 Jan 2020 14:44:46 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, jean-philippe@linaro.org,
  dgilbert@redhat.com, quintela@redhat.com, mst@redhat.com, peterx@redhat.com
-Subject: [PATCH v12 09/13] virtio-iommu: Implement fault reporting
-Date: Thu,  9 Jan 2020 15:43:15 +0100
-Message-Id: <20200109144319.15912-10-eric.auger@redhat.com>
+Subject: [PATCH v12 10/13] virtio-iommu-pci: Add virtio iommu pci support
+Date: Thu,  9 Jan 2020 15:43:16 +0100
+Message-Id: <20200109144319.15912-11-eric.auger@redhat.com>
 In-Reply-To: <20200109144319.15912-1-eric.auger@redhat.com>
 References: <20200109144319.15912-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: HN8jvO8fMGKWJ9ns1_c6wA-1
+X-MC-Unique: Wp_gtBP5OzuB-c4CeDmtYg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,167 +92,182 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The event queue allows to report asynchronous errors.
-The translate function now injects faults when relevant.
+This patch adds virtio-iommu-pci, which is the pci proxy for
+the virtio-iommu device.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
 ---
 
 v11 -> v12:
-- reporting the addr associated with the fault and set the
-  VIRTIO_IOMMU_FAULT_F_ADDRESS flag.
-- added cpu_to_le<n>
+- added Jean's R-b
+- remove the array of intervals. Will be introduced later?
 
 v10 -> v11:
-- change a virtio_error into an error_report_once
-  (no buffer available for output faults)
----
- hw/virtio/trace-events   |  1 +
- hw/virtio/virtio-iommu.c | 73 +++++++++++++++++++++++++++++++++++++---
- 2 files changed, 69 insertions(+), 5 deletions(-)
+- add the reserved_regions array property
 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 095aa8b509..e83500bee9 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -72,3 +72,4 @@ virtio_iommu_put_endpoint(uint32_t ep_id) "Free endpoint=
-=3D%d"
- virtio_iommu_get_domain(uint32_t domain_id) "Alloc domain=3D%d"
- virtio_iommu_put_domain(uint32_t domain_id) "Free domain=3D%d"
- virtio_iommu_translate_out(uint64_t virt_addr, uint64_t phys_addr, uint32_=
-t sid) "0x%"PRIx64" -> 0x%"PRIx64 " for sid=3D%d"
-+virtio_iommu_report_fault(uint8_t reason, uint32_t flags, uint32_t endpoin=
-t, uint64_t addr) "FAULT reason=3D%d flags=3D%d endpoint=3D%d address =3D0x=
-%"PRIx64
-diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-index d192bcb505..09193970ee 100644
---- a/hw/virtio/virtio-iommu.c
-+++ b/hw/virtio/virtio-iommu.c
-@@ -477,6 +477,51 @@ out:
-     }
- }
-=20
-+static void virtio_iommu_report_fault(VirtIOIOMMU *viommu, uint8_t reason,
-+                                      int flags, uint32_t endpoint,
-+                                      uint64_t address)
+v9 -> v10:
+- include "hw/qdev-properties.h" header
+
+v8 -> v9:
+- add the msi-bypass property
+- create virtio-iommu-pci.c
+---
+ hw/virtio/Makefile.objs          |  1 +
+ hw/virtio/virtio-iommu-pci.c     | 88 ++++++++++++++++++++++++++++++++
+ include/hw/pci/pci.h             |  1 +
+ include/hw/virtio/virtio-iommu.h |  1 +
+ qdev-monitor.c                   |  1 +
+ 5 files changed, 92 insertions(+)
+ create mode 100644 hw/virtio/virtio-iommu-pci.c
+
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 2fd9da7410..4e4d39a0a4 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -29,6 +29,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) +=3D virtio-input-host-pc=
+i.o
+ obj-$(CONFIG_VIRTIO_INPUT) +=3D virtio-input-pci.o
+ obj-$(CONFIG_VIRTIO_RNG) +=3D virtio-rng-pci.o
+ obj-$(CONFIG_VIRTIO_BALLOON) +=3D virtio-balloon-pci.o
++obj-$(CONFIG_VIRTIO_IOMMU) +=3D virtio-iommu-pci.o
+ obj-$(CONFIG_VIRTIO_9P) +=3D virtio-9p-pci.o
+ obj-$(CONFIG_VIRTIO_SCSI) +=3D virtio-scsi-pci.o
+ obj-$(CONFIG_VIRTIO_BLK) +=3D virtio-blk-pci.o
+diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
+new file mode 100644
+index 0000000000..4cfae1f9df
+--- /dev/null
++++ b/hw/virtio/virtio-iommu-pci.c
+@@ -0,0 +1,88 @@
++/*
++ * Virtio IOMMU PCI Bindings
++ *
++ * Copyright (c) 2019 Red Hat, Inc.
++ * Written by Eric Auger
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 or
++ *  (at your option) any later version.
++ */
++
++#include "qemu/osdep.h"
++
++#include "virtio-pci.h"
++#include "hw/virtio/virtio-iommu.h"
++#include "hw/qdev-properties.h"
++
++typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
++
++/*
++ * virtio-iommu-pci: This extends VirtioPCIProxy.
++ *
++ */
++#define VIRTIO_IOMMU_PCI(obj) \
++        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
++
++struct VirtIOIOMMUPCI {
++    VirtIOPCIProxy parent_obj;
++    VirtIOIOMMU vdev;
++};
++
++static Property virtio_iommu_pci_properties[] =3D {
++    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **err=
+p)
 +{
-+    VirtIODevice *vdev =3D &viommu->parent_obj;
-+    VirtQueue *vq =3D viommu->event_vq;
-+    struct virtio_iommu_fault fault;
-+    VirtQueueElement *elem;
-+    size_t sz;
++    VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(vpci_dev);
++    DeviceState *vdev =3D DEVICE(&dev->vdev);
 +
-+    memset(&fault, 0, sizeof(fault));
-+    fault.reason =3D reason;
-+    fault.flags =3D cpu_to_le32(flags);
-+    fault.endpoint =3D cpu_to_le32(endpoint);
-+    fault.address =3D cpu_to_le64(address);
-+
-+    for (;;) {
-+        elem =3D virtqueue_pop(vq, sizeof(VirtQueueElement));
-+
-+        if (!elem) {
-+            error_report_once(
-+                "no buffer available in event queue to report event");
-+            return;
-+        }
-+
-+        if (iov_size(elem->in_sg, elem->in_num) < sizeof(fault)) {
-+            virtio_error(vdev, "error buffer of wrong size");
-+            virtqueue_detach_element(vq, elem, 0);
-+            g_free(elem);
-+            continue;
-+        }
-+        break;
-+    }
-+    /* we have a buffer to fill in */
-+    sz =3D iov_from_buf(elem->in_sg, elem->in_num, 0,
-+                      &fault, sizeof(fault));
-+    assert(sz =3D=3D sizeof(fault));
-+
-+    trace_virtio_iommu_report_fault(reason, flags, endpoint, address);
-+    virtqueue_push(vq, elem, sz);
-+    virtio_notify(vdev, vq);
-+    g_free(elem);
-+
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
++    object_property_set_link(OBJECT(dev),
++                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
++                             "primary-bus", errp);
++    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
 +}
 +
- static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemoryRegion *mr, hwaddr =
-addr,
-                                             IOMMUAccessFlags flag,
-                                             int iommu_idx)
-@@ -485,9 +530,10 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemor=
-yRegion *mr, hwaddr addr,
-     VirtIOIOMMUInterval interval, *mapping_key;
-     VirtIOIOMMUMapping *mapping_value;
-     VirtIOIOMMU *s =3D sdev->viommu;
-+    bool read_fault, write_fault;
-     VirtIOIOMMUEndpoint *ep;
-+    uint32_t sid, flags;
-     bool bypass_allowed;
--    uint32_t sid;
-     bool found;
-=20
-     interval.low =3D addr;
-@@ -513,6 +559,9 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemory=
-Region *mr, hwaddr addr,
-     if (!ep) {
-         if (!bypass_allowed) {
-             error_report_once("%s sid=3D%d is not known!!", __func__, sid)=
-;
-+            virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_UNKNOWN,
-+                                      VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                      sid, addr);
-         } else {
-             entry.perm =3D flag;
-         }
-@@ -524,6 +573,9 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemory=
-Region *mr, hwaddr addr,
-             error_report_once("%s %02x:%02x.%01x not attached to any domai=
-n",
-                               __func__, PCI_BUS_NUM(sid),
-                               PCI_SLOT(sid), PCI_FUNC(sid));
-+            virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_DOMAIN,
-+                                      VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                      sid, addr);
-         } else {
-             entry.perm =3D flag;
-         }
-@@ -536,15 +588,26 @@ static IOMMUTLBEntry virtio_iommu_translate(IOMMUMemo=
-ryRegion *mr, hwaddr addr,
-     if (!found) {
-         error_report_once("%s no mapping for 0x%"PRIx64" for sid=3D%d",
-                           __func__, addr, sid);
-+        virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                  VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                  sid, addr);
-         goto unlock;
-     }
-=20
--    if (((flag & IOMMU_RO) &&
--            !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_READ)) ||
--        ((flag & IOMMU_WO) &&
--            !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_WRITE))) {
-+    read_fault =3D (flag & IOMMU_RO) &&
-+                    !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_READ);
-+    write_fault =3D (flag & IOMMU_WO) &&
-+                    !(mapping_value->flags & VIRTIO_IOMMU_MAP_F_WRITE);
++static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++    VirtioPCIClass *k =3D VIRTIO_PCI_CLASS(klass);
++    PCIDeviceClass *pcidev_k =3D PCI_DEVICE_CLASS(klass);
++    k->realize =3D virtio_iommu_pci_realize;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->props =3D virtio_iommu_pci_properties;
++    pcidev_k->vendor_id =3D PCI_VENDOR_ID_REDHAT_QUMRANET;
++    pcidev_k->device_id =3D PCI_DEVICE_ID_VIRTIO_IOMMU;
++    pcidev_k->revision =3D VIRTIO_PCI_ABI_VERSION;
++    pcidev_k->class_id =3D PCI_CLASS_OTHERS;
++}
 +
-+    flags =3D read_fault ? VIRTIO_IOMMU_FAULT_F_READ : 0;
-+    flags |=3D write_fault ? VIRTIO_IOMMU_FAULT_F_WRITE : 0;
-+    if (flags) {
-         error_report_once("%s permission error on 0x%"PRIx64"(%d): allowed=
-=3D%d",
-                           __func__, addr, flag, mapping_value->flags);
-+        flags |=3D VIRTIO_IOMMU_FAULT_F_ADDRESS;
-+        virtio_iommu_report_fault(s, VIRTIO_IOMMU_FAULT_R_MAPPING,
-+                                  flags | VIRTIO_IOMMU_FAULT_F_ADDRESS,
-+                                  sid, addr);
-         goto unlock;
-     }
-     entry.translated_addr =3D addr - mapping_key->low + mapping_value->phy=
-s_addr;
++static void virtio_iommu_pci_instance_init(Object *obj)
++{
++    VirtIOIOMMUPCI *dev =3D VIRTIO_IOMMU_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VIRTIO_IOMMU);
++}
++
++static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info =3D {
++    .base_name             =3D TYPE_VIRTIO_IOMMU_PCI,
++    .generic_name          =3D "virtio-iommu-pci",
++    .transitional_name     =3D "virtio-iommu-pci-transitional",
++    .non_transitional_name =3D "virtio-iommu-pci-non-transitional",
++    .instance_size =3D sizeof(VirtIOIOMMUPCI),
++    .instance_init =3D virtio_iommu_pci_instance_init,
++    .class_init    =3D virtio_iommu_pci_class_init,
++};
++
++static void virtio_iommu_pci_register(void)
++{
++    virtio_pci_types_register(&virtio_iommu_pci_info);
++}
++
++type_init(virtio_iommu_pci_register)
++
++
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 2acd8321af..cfedf5a995 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -86,6 +86,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
+ #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
+ #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
++#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
+=20
+ #define PCI_VENDOR_ID_REDHAT             0x1b36
+ #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
+diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-io=
+mmu.h
+index c6c33b4af0..ce695bf827 100644
+--- a/include/hw/virtio/virtio-iommu.h
++++ b/include/hw/virtio/virtio-iommu.h
+@@ -25,6 +25,7 @@
+ #include "hw/pci/pci.h"
+=20
+ #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
++#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
+ #define VIRTIO_IOMMU(obj) \
+         OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
+=20
+diff --git a/qdev-monitor.c b/qdev-monitor.c
+index 3465a1e2d0..97f4022b51 100644
+--- a/qdev-monitor.c
++++ b/qdev-monitor.c
+@@ -66,6 +66,7 @@ static const QDevAlias qdev_alias_table[] =3D {
+     { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
+     { "virtio-input-host-pci", "virtio-input-host",
+             QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
++    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X=
+ },
+     { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
+     { "virtio-keyboard-pci", "virtio-keyboard",
+             QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
 --=20
 2.20.1
 
