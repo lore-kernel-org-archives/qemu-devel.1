@@ -2,156 +2,90 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFC3C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B5EC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:50:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9A06206DA
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E4AE2070E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:50:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZZBFHzV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A06206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="feh1JZ0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E4AE2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipLdM-0001GR-Lg
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 19:25:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45396)
+	id 1ipM1x-0003zL-00
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 19:50:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56252)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ipLcG-0000Nu-I3
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:24:01 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1ipM0Y-0002gZ-6i
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ipLcF-00026P-Cr
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:24:00 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42684
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ipLcF-000259-5d
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:23:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578529438;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=OzP+jqORZwL+Djf3hUdaSxAdNYb5N2CUuvDOdrfXzeI=;
- b=VZZBFHzVeHqqMbog5fBAHLWjMj3UY8wKCTEojRDZhEYCST/0wzLYdXB4yC+s2ZwGzha/e0
- cp4p2I5hf9AoHI4XR7lRvYIa8thr0Agzz6+zGivPtZnwuMAG6QaLqs+f/LyusG/6oesYMo
- J+v6YlcMfMD9cZWL1KXZZcns7QvELvk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-HVHjDJYuPYaVxlReSSf8mQ-1; Wed, 08 Jan 2020 19:23:57 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E6AD800EBF
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 00:23:56 +0000 (UTC)
-Received: from [10.18.17.134] (dhcp-17-134.bos.redhat.com [10.18.17.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A8DBB5D9E5;
- Thu,  9 Jan 2020 00:23:53 +0000 (UTC)
-Subject: Re: [PATCH 5/5] python/qemu: qmp: Remove unnused attributes
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
-References: <20191227134101.244496-1-wainersm@redhat.com>
- <20191227134101.244496-6-wainersm@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <337e22b1-5553-314f-bb65-768b23d3cff5@redhat.com>
-Date: Wed, 8 Jan 2020 19:23:53 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
-MIME-Version: 1.0
-In-Reply-To: <20191227134101.244496-6-wainersm@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: HVHjDJYuPYaVxlReSSf8mQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <palmerdabbelt@google.com>) id 1ipM0W-00082e-AS
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:05 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35123)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1ipM0W-00080r-4C
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:04 -0500
+Received: by mail-pl1-x641.google.com with SMTP id g6so1820058plt.2
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 16:49:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:subject:cc:to:in-reply-to:references:message-id
+ :mime-version:content-transfer-encoding;
+ bh=H3zSPRBKP4ZzdR/6KbzozHd86904u26K/mFmLx9RqzI=;
+ b=feh1JZ0rixUc1SjMjv50oJb+Uu0jBd1QfUGkdIbmUF5sZoItk0fH7Db7tog+l1OVyA
+ O9NQCNB3K0pra7lD1nuchRau60eAPdIIErh1IksBuIYc8iCau2N4YV9zKFu7WISVT6yQ
+ TslejvK561l3b7IBA6S2mxO8r5zvPGciY6HWySoKnBKNMhISoHLeoUNR9YZtTcyC7qYV
+ af2TWoNv6xqbeZPY8tHdFQ8st2A7+q21hHZKH17TftXAaUgbdiwUQlb2Kyub0atwwukS
+ wE3Dliy7tKS4c5OqmFn6aaibx7MInXh7JDJ6vcd3G5SC4l0mbxFH+NGJgyxyC8a/IowV
+ rI6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
+ :message-id:mime-version:content-transfer-encoding;
+ bh=H3zSPRBKP4ZzdR/6KbzozHd86904u26K/mFmLx9RqzI=;
+ b=QfeZzS3MuZJgTEMkMU4nPuCXoo8Bd9J1R9RQq2JXnsyEXmtmpjr5DEs2F21YEwG2hG
+ RIIt1ctG2fLljffax47f9Sov/7i3TfGaTVZQvMUuHegVGQVbdS/VKHHq98XEnhKQjN8O
+ rk/BOXz+g7u1ARcq0Vw+yEPEDo/8eH9CqyS8Ke33Hcj9sI/d7T/bayqY6VuSHWxyatbO
+ dfcxdxfakZdW+rP2wwFJeRZKMm8B3DPI9uPN5MkP/knsWzIbv/qFWOOcQKMr5ik/sSd6
+ z2HW13vUuX/81/j8q6Bv3VIStoDaHDuIwEXS0J+lUTlEoaBPJgpfliqZ9xY9xwHO/wCL
+ jUKw==
+X-Gm-Message-State: APjAAAWHSp+9Q3WKsKx8fPHrHKd/y9CHIUZCvzoUt3d5+jqBz3tXKFGj
+ uukR2g4/xtOzsYOPhb9XPhF2uha7t2c=
+X-Google-Smtp-Source: APXvYqxlNnHVU8Ubb9ccyNzIKNObfpQSyuIe2VJ4nm//zGUmzvwpz4fhSU0OO4ISvy8yuiRoUV5gow==
+X-Received: by 2002:a17:90a:a88d:: with SMTP id
+ h13mr1739046pjq.55.1578530942843; 
+ Wed, 08 Jan 2020 16:49:02 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
+ by smtp.gmail.com with ESMTPSA id z29sm5115273pge.21.2020.01.08.16.49.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jan 2020 16:49:02 -0800 (PST)
+Date: Wed, 08 Jan 2020 16:49:02 -0800 (PST)
+X-Google-Original-Date: Wed, 08 Jan 2020 14:40:48 PST (-0800)
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject: Re: [PATCH v1 26/36] target/riscv: Remove the hret instruction
+CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+To: Alistair Francis <Alistair.Francis@wdc.com>
+In-Reply-To: <c83aac89b3f1825c4c3ae282495a28572031f7d5.1575914822.git.alistair.francis@wdc.com>
+References: <c83aac89b3f1825c4c3ae282495a28572031f7d5.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
+Message-ID: <mhng-5bd4e131-6645-4d27-8255-5837e004f8c2@palmerdabbelt-glaptop>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,43 +97,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 12/27/19 8:41 AM, Wainer dos Santos Moschetta wrote:
-> The `error` and `timeout` attributes in QEMUMonitorProtocol are
-> not used, so this delete them.
->=20
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
+On Mon, 09 Dec 2019 10:11:48 PST (-0800), Alistair Francis wrote:
+> The hret instruction does not exist in the new spec versions, so remove
+> it from QEMU.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  python/qemu/qmp.py | 4 ----
->  1 file changed, 4 deletions(-)
->=20
-> diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-> index 6d55f53595..cddb94bb3c 100644
-> --- a/python/qemu/qmp.py
-> +++ b/python/qemu/qmp.py
-> @@ -45,10 +45,6 @@ class QEMUMonitorProtocol:
-> =20
->      #: Logger object for debugging messages
->      logger =3D logging.getLogger('QMP')
-> -    #: Socket's error class
-> -    error =3D socket.error
-> -    #: Socket's timeout
-> -    timeout =3D socket.timeout
-> =20
->      def __init__(self, address, server=3DFalse):
->          """
->=20
+>  target/riscv/insn32.decode                     | 1 -
+>  target/riscv/insn_trans/trans_privileged.inc.c | 5 -----
+>  2 files changed, 6 deletions(-)
+>
+> diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+> index cfd9ca6d2b..b883672e63 100644
+> --- a/target/riscv/insn32.decode
+> +++ b/target/riscv/insn32.decode
+> @@ -75,7 +75,6 @@ ecall       000000000000     00000 000 00000 1110011
+>  ebreak      000000000001     00000 000 00000 1110011
+>  uret        0000000    00010 00000 000 00000 1110011
+>  sret        0001000    00010 00000 000 00000 1110011
+> -hret        0010000    00010 00000 000 00000 1110011
+>  mret        0011000    00010 00000 000 00000 1110011
+>  wfi         0001000    00101 00000 000 00000 1110011
+>  hfence_gvma 0110001    ..... ..... 000 00000 1110011 @hfence_gvma
+> diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc.c
+> index b9b5a89b52..76c2fad71c 100644
+> --- a/target/riscv/insn_trans/trans_privileged.inc.c
+> +++ b/target/riscv/insn_trans/trans_privileged.inc.c
+> @@ -58,11 +58,6 @@ static bool trans_sret(DisasContext *ctx, arg_sret *a)
+>  #endif
+>  }
+>
+> -static bool trans_hret(DisasContext *ctx, arg_hret *a)
+> -{
+> -    return false;
+> -}
+> -
+>  static bool trans_mret(DisasContext *ctx, arg_mret *a)
+>  {
+>  #ifndef CONFIG_USER_ONLY
 
---=20
-=E2=80=94js
-
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 
