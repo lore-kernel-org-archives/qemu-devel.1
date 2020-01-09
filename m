@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 873FEC32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57A1C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 505BD20656
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:13:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80C8F20656
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:14:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S75x/UNO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505BD20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QB0BNK3T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C8F20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipVky-0001ov-9P
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 06:13:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53030)
+	id 1ipVlQ-0002W8-Jn
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 06:14:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ipVhr-0005NQ-SZ
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:29 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ipVi4-0005l5-C9
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ipVhn-0006PM-RR
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:27 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41857
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1ipVi2-00070G-DB
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43826
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ipVhn-0006NH-LT
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:23 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ipVi2-0006wX-7b
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578568223;
+ s=mimecast20190719; t=1578568237;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=42aHYTnraCF8j7ZCDpVic9NDY8Kr1Y0zecMVba/0vVE=;
- b=S75x/UNO/dwrbxBeXsbUWQVRnwZ/qBBE1DyCpaxqAJ+F0LbCDqE1GrrqGjjp1Fgx6E/SDk
- ba3Cr5/l1wrsds/8krGBsZCp5fFed0haUsnk/ObH4/iGEOc+LAe/Cb7f2lAS3fRG5QkjZ7
- AlYeklHVyVM8haOyUFcA9OrGN5e5AQc=
+ bh=mgOxQ5uyZJfjGUoehj3MJnX8mFael+qy0RPkOBV6Evw=;
+ b=QB0BNK3TT9/U/sfzMcLk7e+maYST4aX/IWANzp9Za8QSSvl5Aoy8uTSW5mNKu7cMvcYAvE
+ B4PEmExhl6JP+uHvpIl3BZmyx7H/jS8LJHv1nmxlXSZ+C88LVhxFVM9S9r0wMJQB4zXwXw
+ CDbZN6lVtaQXC/VJSv9yDEPIh4QiQEY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-PaE4XJxTOg2LatNWb9x-RA-1; Thu, 09 Jan 2020 06:10:21 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-149-i_jV-WqFObKbq2Qfe0CzRA-1; Thu, 09 Jan 2020 06:10:36 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB5E8107ACCC;
- Thu,  9 Jan 2020 11:10:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A146800C78;
+ Thu,  9 Jan 2020 11:10:35 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D1C9710027A6;
- Thu,  9 Jan 2020 11:10:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 608315DA2C;
+ Thu,  9 Jan 2020 11:10:32 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] luks: extract block_crypto_calculate_payload_offset()
-Date: Thu,  9 Jan 2020 11:10:09 +0000
-Message-Id: <20200109111012.559052-2-stefanha@redhat.com>
+Subject: [PATCH v2 4/4] iotests: add 282 luks qemu-img measure test
+Date: Thu,  9 Jan 2020 11:10:12 +0000
+Message-Id: <20200109111012.559052-5-stefanha@redhat.com>
 In-Reply-To: <20200109111012.559052-1-stefanha@redhat.com>
 References: <20200109111012.559052-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: PaE4XJxTOg2LatNWb9x-RA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: i_jV-WqFObKbq2Qfe0CzRA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,191 +90,168 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The qcow2 .bdrv_measure() code calculates the crypto payload offset.
-This logic really belongs in block/crypto.c where it can be reused by
-other image formats.
-
-The "luks" block driver will need this same logic in order to implement
-.bdrv_measure(), so extract the block_crypto_calculate_payload_offset()
-function now.
+This test exercises the block/crypto.c "luks" block driver
+.bdrv_measure() code.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/crypto.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/crypto.h |  5 ++++
- block/qcow2.c  | 59 ++++------------------------------------------
- 3 files changed, 73 insertions(+), 55 deletions(-)
+ tests/qemu-iotests/282     | 93 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/282.out | 30 ++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 124 insertions(+)
+ create mode 100755 tests/qemu-iotests/282
+ create mode 100644 tests/qemu-iotests/282.out
 
-diff --git a/block/crypto.c b/block/crypto.c
-index 24823835c1..ed32202fa2 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -185,6 +185,70 @@ block_crypto_create_opts_init(QDict *opts, Error **err=
-p)
- }
-=20
-=20
-+static ssize_t block_crypto_headerlen_hdr_init_func(QCryptoBlock *block,
-+        size_t headerlen, void *opaque, Error **errp)
+diff --git a/tests/qemu-iotests/282 b/tests/qemu-iotests/282
+new file mode 100755
+index 0000000000..6c62065aef
+--- /dev/null
++++ b/tests/qemu-iotests/282
+@@ -0,0 +1,93 @@
++#!/usr/bin/env bash
++#
++# qemu-img measure tests for LUKS images
++#
++# Copyright (C) 2020 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=3Dstefanha@redhat.com
++
++seq=3D`basename $0`
++echo "QA output created by $seq"
++
++status=3D1    # failure is the default!
++
++_cleanup()
 +{
-+    size_t *headerlenp =3D opaque;
-+
-+    /* Stash away the payload size */
-+    *headerlenp =3D headerlen;
-+    return 0;
++    _cleanup_test_img
++    rm -f "$TEST_IMG.converted"
 +}
++trap "_cleanup; exit \$status" 0 1 2 3 15
 +
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.pattern
 +
-+static ssize_t block_crypto_headerlen_hdr_write_func(QCryptoBlock *block,
-+        size_t offset, const uint8_t *buf, size_t buflen,
-+        void *opaque, Error **errp)
-+{
-+    /* Discard the bytes, we're not actually writing to an image */
-+    return buflen;
-+}
++_supported_fmt luks
++_supported_proto file
++_supported_os Linux
 +
++SECRET=3Dsecret,id=3Dsec0,data=3Dpassphrase
 +
-+/* Determine the number of bytes for the crypto header */
-+bool block_crypto_calculate_payload_offset(QemuOpts *opts,
-+                                           const char *optprefix,
-+                                           size_t *len,
-+                                           Error **errp)
-+{
-+    QDict *cryptoopts_qdict;
-+    QCryptoBlockCreateOptions *cryptoopts;
-+    QCryptoBlock *crypto;
++echo "=3D=3D measure 1G image file =3D=3D"
++echo
 +
-+    /* Extract options into a qdict */
-+    if (optprefix) {
-+        QDict *opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
++$QEMU_IMG measure --object "$SECRET" \
++=09          -O "$IMGFMT" \
++=09=09  -o key-secret=3Dsec0,iter-time=3D10 \
++=09=09  --size 1G
 +
-+        qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, optprefix);
-+        qobject_unref(opts_qdict);
-+    } else {
-+        cryptoopts_qdict =3D qemu_opts_to_qdict(opts, NULL);
-+    }
++echo
++echo "=3D=3D create 1G image file (size should be no greater than measured=
+) =3D=3D"
++echo
 +
-+    /* Build QCryptoBlockCreateOptions object from qdict */
-+    qdict_put_str(cryptoopts_qdict, "format", "luks");
++_make_test_img 1G
++stat -c "image file size in bytes: %s" "$TEST_IMG_FILE"
 +
-+    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp);
-+    qobject_unref(cryptoopts_qdict);
-+    if (!cryptoopts) {
-+        return false;
-+    }
++echo
++echo "=3D=3D modified 1G image file (size should be no greater than measur=
+ed) =3D=3D"
++echo
 +
-+    /* Fake LUKS creation in order to determine the payload size */
-+    crypto =3D qcrypto_block_create(cryptoopts, optprefix,
-+                                  block_crypto_headerlen_hdr_init_func,
-+                                  block_crypto_headerlen_hdr_write_func,
-+                                  len, errp);
-+    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
-+    if (!crypto) {
-+        return false;
-+    }
++$QEMU_IO --object "$SECRET" --image-opts "$TEST_IMG" -c "write -P 0x51 0x1=
+0000 0x400" | _filter_qemu_io | _filter_testdir
++stat -c "image file size in bytes: %s" "$TEST_IMG_FILE"
 +
-+    qcrypto_block_free(crypto);
-+    return true;
-+}
++echo
++echo "=3D=3D measure preallocation=3Dfalloc 1G image file =3D=3D"
++echo
 +
++$QEMU_IMG measure --object "$SECRET" \
++=09          -O "$IMGFMT" \
++=09=09  -o key-secret=3Dsec0,iter-time=3D10,preallocation=3Dfalloc \
++=09=09  --size 1G
 +
- static int block_crypto_open_generic(QCryptoBlockFormat format,
-                                      QemuOptsList *opts_spec,
-                                      BlockDriverState *bs,
-diff --git a/block/crypto.h b/block/crypto.h
-index b935695e79..5a39bee71b 100644
---- a/block/crypto.h
-+++ b/block/crypto.h
-@@ -94,4 +94,9 @@ block_crypto_create_opts_init(QDict *opts, Error **errp);
- QCryptoBlockOpenOptions *
- block_crypto_open_opts_init(QDict *opts, Error **errp);
-=20
-+bool block_crypto_calculate_payload_offset(QemuOpts *opts,
-+                                           const char *optprefix,
-+                                           size_t *len,
-+                                           Error **errp);
++echo
++echo "=3D=3D measure with input image file =3D=3D"
++echo
 +
- #endif /* BLOCK_CRYPTO_H */
-diff --git a/block/qcow2.c b/block/qcow2.c
-index cef9d72b3a..3aaf79bbf6 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4609,60 +4609,6 @@ static coroutine_fn int qcow2_co_flush_to_os(BlockDr=
-iverState *bs)
-     return ret;
- }
-=20
--static ssize_t qcow2_measure_crypto_hdr_init_func(QCryptoBlock *block,
--        size_t headerlen, void *opaque, Error **errp)
--{
--    size_t *headerlenp =3D opaque;
--
--    /* Stash away the payload size */
--    *headerlenp =3D headerlen;
--    return 0;
--}
--
--static ssize_t qcow2_measure_crypto_hdr_write_func(QCryptoBlock *block,
--        size_t offset, const uint8_t *buf, size_t buflen,
--        void *opaque, Error **errp)
--{
--    /* Discard the bytes, we're not actually writing to an image */
--    return buflen;
--}
--
--/* Determine the number of bytes for the LUKS payload */
--static bool qcow2_measure_luks_headerlen(QemuOpts *opts, size_t *len,
--                                         Error **errp)
--{
--    QDict *opts_qdict;
--    QDict *cryptoopts_qdict;
--    QCryptoBlockCreateOptions *cryptoopts;
--    QCryptoBlock *crypto;
--
--    /* Extract "encrypt." options into a qdict */
--    opts_qdict =3D qemu_opts_to_qdict(opts, NULL);
--    qdict_extract_subqdict(opts_qdict, &cryptoopts_qdict, "encrypt.");
--    qobject_unref(opts_qdict);
--
--    /* Build QCryptoBlockCreateOptions object from qdict */
--    qdict_put_str(cryptoopts_qdict, "format", "luks");
--    cryptoopts =3D block_crypto_create_opts_init(cryptoopts_qdict, errp);
--    qobject_unref(cryptoopts_qdict);
--    if (!cryptoopts) {
--        return false;
--    }
--
--    /* Fake LUKS creation in order to determine the payload size */
--    crypto =3D qcrypto_block_create(cryptoopts, "encrypt.",
--                                  qcow2_measure_crypto_hdr_init_func,
--                                  qcow2_measure_crypto_hdr_write_func,
--                                  len, errp);
--    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
--    if (!crypto) {
--        return false;
--    }
--
--    qcrypto_block_free(crypto);
--    return true;
--}
--
- static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *i=
-n_bs,
-                                        Error **errp)
- {
-@@ -4715,7 +4661,10 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opt=
-s, BlockDriverState *in_bs,
-     if (has_luks) {
-         size_t headerlen;
-=20
--        if (!qcow2_measure_luks_headerlen(opts, &headerlen, &local_err)) {
-+        if (!block_crypto_calculate_payload_offset(opts,
-+                                                   "encrypt.",
-+                                                   &headerlen,
-+                                                   &local_err)) {
-             goto err;
-         }
-=20
++IMGFMT=3Draw IMGKEYSECRET=3D IMGOPTS=3D _make_test_img 1G | _filter_imgfmt
++QEMU_IO_OPTIONS=3D IMGOPTSSYNTAX=3D $QEMU_IO -f raw -c "write -P 0x51 0x10=
+000 0x400" "$TEST_IMG_FILE" | _filter_qemu_io | _filter_testdir
++$QEMU_IMG measure --object "$SECRET" \
++=09          -O "$IMGFMT" \
++=09=09  -o key-secret=3Dsec0,iter-time=3D10 \
++=09=09  -f raw \
++=09=09  "$TEST_IMG_FILE"
++
++# success, all done
++echo "*** done"
++rm -f $seq.full
++status=3D0
+diff --git a/tests/qemu-iotests/282.out b/tests/qemu-iotests/282.out
+new file mode 100644
+index 0000000000..8f4737aef7
+--- /dev/null
++++ b/tests/qemu-iotests/282.out
+@@ -0,0 +1,30 @@
++QA output created by 282
++=3D=3D measure 1G image file =3D=3D
++
++required size: 2068480
++fully allocated size: 1075810304
++
++=3D=3D create 1G image file (size should be no greater than measured) =3D=
+=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824
++image file size in bytes: 1075810304
++
++=3D=3D modified 1G image file (size should be no greater than measured) =
+=3D=3D
++
++wrote 1024/1024 bytes at offset 65536
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++image file size in bytes: 1075810304
++
++=3D=3D measure preallocation=3Dfalloc 1G image file =3D=3D
++
++required size: 1075810304
++fully allocated size: 1075810304
++
++=3D=3D measure with input image file =3D=3D
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824
++wrote 1024/1024 bytes at offset 65536
++1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++required size: 2076672
++fully allocated size: 1075810304
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index cb2b789e44..d114e2c971 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -288,3 +288,4 @@
+ 277 rw quick
+ 279 rw backing quick
+ 280 rw migration quick
++282 quick
 --=20
 2.24.1
 
