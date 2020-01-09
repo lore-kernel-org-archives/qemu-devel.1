@@ -2,66 +2,122 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B39C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C433BC32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E65C206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:37:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D7702075D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:39:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="cIi/5o7z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E65C206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="HoEsW9L5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D7702075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipX46-0003kd-9F
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 07:37:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53501)
+	id 1ipX5f-0004jR-Nt
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 07:39:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34187)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1ipX3U-0003GL-Qo
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:36:53 -0500
+ (envelope-from <rkagan@virtuozzo.com>) id 1ipX4u-0004J2-3k
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:38:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1ipX3T-00017d-NA
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:36:52 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:52129)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1ipX3T-0000zg-Cm; Thu, 09 Jan 2020 07:36:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=Gobdt2gwN2OZ2oF/u+M1tlpvTOLjlt6o6s+RMHDe8oo=; 
- b=cIi/5o7zJqXNhFdYkpobc1whD+v5Cm/rWUwPoErAyAUj93Q9cY/oWOw6yPC75qykBjsnqh5DfEdrAnL46PnVVZFo/PFR/dIhhXRN6bnN4pjMjQCnlemyjEuZNsT4prI8GXdD29a5Oa0YM9gFs5JkqOkQZDXhnYvBFyPeOwana/3ag0kFjr01YosDkqwUYbha0PoyDwQ5RcXGbNtLzs6kWvmoU3Bb2xEOhB9e+QARGR0RpZ/M067TwaEc4F5IG+6Sc70NjtvkYVe1PhhDopwBSuLXM7rwD5MS4NVahpVmfWvJ3wzdJgn/0WbxNwG/vtEBw3xApXtvZ6Oaai0sP9Gwnw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1ipX3Q-0007ZA-LS; Thu, 09 Jan 2020 13:36:48 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1ipX3Q-0003Fq-Bd; Thu, 09 Jan 2020 13:36:48 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Nir Soffer <nsoffer@redhat.com>
-Subject: Re: [PATCH 1/3] qcow2: Require that the virtual size is a multiple of
- the sector size
-In-Reply-To: <CAMRbyysKuC8cx7eaCDKwXG6ierQFEZGTQQ6PCtAjR9WQR5TvAQ@mail.gmail.com>
-References: <cover.1578505678.git.berto@igalia.com>
- <4a27dc359f8211700662949bdecdd992f8918c12.1578505678.git.berto@igalia.com>
- <CAMRbyysKuC8cx7eaCDKwXG6ierQFEZGTQQ6PCtAjR9WQR5TvAQ@mail.gmail.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 09 Jan 2020 13:36:48 +0100
-Message-ID: <w517e20bycf.fsf@maestria.local.igalia.com>
+ (envelope-from <rkagan@virtuozzo.com>) id 1ipX4s-0007DC-Mq
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:38:19 -0500
+Received: from mail-ve1eur04hn2042.outbound.protection.outlook.com
+ ([52.101.139.42]:58434 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1ipX4s-00073d-1V
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:38:18 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RDzIsmbm6MjlPq/EJTM3JVIV1qhVvIUrVqn/0V+qw0sco7uN2xq0SpLoemrYfPn467HUnxOq2dLn6CKSizDEy/Vl1SpHJzQ4sa3FaL4wWE7N1abWRI5Tc35Q4UdZLJXPuvZieDZuloNx8d2+qtTbwuFJa8yx5HXNeOytfJZcwckcriMb4fKNabzm0nuY9+x8FUs1W2kObImDb6rPqmtJKypu3ba6lqAdZmY/KnZvXAmGaMSVwz2waDUkM2qcdZwZOiGnMZBm3GZrnsmjtFQtxkUxzwQA7GXsvGnH5GRMlAx27BkNXoqI1EqqdqqICFKRqskXypqQS2cAmV+yZhEHwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OY04DdZbqQkyfOaegVLSfuOBTpI6IiNINXC5ZPvJSKE=;
+ b=gZ0/UbequC9pt2pK54AtuAns6Wm7SWL+dti/4SUTVr66RRUa0OY+ZTIOo0MnvK56vNamjk6VTrCL2mDj0Kbx4N5LSRYg44PhzSiI0GG1hUpSDKV1FDFb4VQcLhtqchM+Djyl9adRTdfNELOmY8qATj4Yy40BxYBe87XBW7py8P5S1gUWkEnmczBI6kXzkt0BqiTjDq+FutrItATKrVvlx5ObE26akqUd2USVe4ofaP1esFJ1M+qhq11dWl4eplFD2AT505RkAqSR4CM0Iqr5pZsMR95bbGNQsAkRKBwcShCSHsKueb+lQCXnp6c7LpMszqNJTJ+cKbGIir0eF/OctA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OY04DdZbqQkyfOaegVLSfuOBTpI6IiNINXC5ZPvJSKE=;
+ b=HoEsW9L5SNnnZlOPAujoVCvXtnwDK2kLDCzVcutrjAin+7oR6aBH6ldksQJ4833D8L3bCDH3SGu1OZuN5WOJ454UWTHOgPkvYxpC8S74IgZxcbjo4JOdRpPItthbFh3+YQNqDHdJTkW8gs7dc1tIlhZUeHyySlUWyuco+jbDSPk=
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
+ VI1PR08MB4285.eurprd08.prod.outlook.com (20.179.26.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9; Thu, 9 Jan 2020 12:38:07 +0000
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::acb0:a61d:f08a:1c12]) by VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::acb0:a61d:f08a:1c12%7]) with mapi id 15.20.2602.018; Thu, 9 Jan 2020
+ 12:38:07 +0000
+Received: from rkaganb.sw.ru (185.231.240.5) by
+ HE1PR0202CA0012.eurprd02.prod.outlook.com (2603:10a6:3:8c::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9 via Frontend Transport; Thu, 9 Jan 2020 12:38:06 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 1/2] vhost: Don't pass ram device sections
+Thread-Topic: [PATCH 1/2] vhost: Don't pass ram device sections
+Thread-Index: AQHVxis3tBYOS6DQvEWgJ8SABOU/mqfiRu8A
+Date: Thu, 9 Jan 2020 12:38:07 +0000
+Message-ID: <20200109123804.GB3147@rkaganb.sw.ru>
+References: <20200108135353.75471-1-dgilbert@redhat.com>
+ <20200108135353.75471-2-dgilbert@redhat.com>
+In-Reply-To: <20200108135353.75471-2-dgilbert@redhat.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>, "Dr. David Alan Gilbert
+ (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ vkuznets@redhat.com, mst@redhat.com,	jasowang@redhat.com
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR0202CA0012.eurprd02.prod.outlook.com
+ (2603:10a6:3:8c::22) To VI1PR08MB4608.eurprd08.prod.outlook.com
+ (2603:10a6:803:c0::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e1aa39b9-0634-4960-befc-08d79500c76f
+x-ms-traffictypediagnostic: VI1PR08MB4285:|VI1PR08MB4285:|VI1PR08MB4285:
+x-microsoft-antispam-prvs: <VI1PR08MB428531374291E2AD0CF668B6C9390@VI1PR08MB4285.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:246;
+x-forefront-prvs: 02778BF158
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(396003)(39840400004)(366004)(136003)(346002)(376002)(199004)(189003)(33656002)(2906002)(86362001)(316002)(956004)(26005)(66476007)(66446008)(64756008)(81166006)(9686003)(186003)(66556008)(66946007)(5660300002)(54906003)(1076003)(8936002)(55016002)(16526019)(8676002)(4326008)(6916009)(7696005)(81156014)(52116002)(36756003)(6506007)(478600001)(71200400001)(30126003);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB4285;
+ H:VI1PR08MB4608.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; CAT:OSPM; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: KNlki1GkHrhpTg4hzw9Df2EMnzz8bdwTYogxg9CQfDX7odYgc4ZvPjVFxKN2gA6S6yyyfzfU5rCR1pNfGJxTjhnE1i9BKqnjYVNEQxbr7rH6mCCNYheElBG+2WcUdaheayCenYhQbFFlGnivD0Zq8LX9HHQS2sxGvmfNr0JsfdbEBDa02uV5mJehdz5aI9VsEAxR0znQ0VjUrY7fPFdYkJ8/eW7srL4/BeRPWoix6CwQ0a4nhOr35Q2HI5MZTZOfSQnnfCVUtHHiYjQupWXCc77G1+QD9FQM7I+GLCNncSJuXyaQhhD8ZPJkDcM4sQbv1G71CNm8+cNTVUi67M6n480+Kjy8DU20pdC4qZ/XhzrRJw7wtEFHEKvRlA2vC6Tc8nPPRVtetqdsTuaP++KeIS+5g12Fx1x9QOgKJ2yygu1QsMfqtAdkyiF1vzL4VEEVWq3kF5NSO0kKHfCpL2z8YojAYaL+FvwpdeFsQYgrjDkD9ZJjaFSwQMXpSqHD9o4x48ywkRTJIq8wiClPtkkmX2vfN5SW/K9x6dWmJknynxEkr2qKcfhe3ZpVph82rm1GbxUOBNjFR4ASsTu70tvyPj1t0Hqov/7adF0DY7Dd0fFtgKXr5faVFdNlXhQWO5XydzsqbLAx2ErnGehtO1Y7EE2B/rWbmieaoRLhQgQcV1nAXzvCUL/SR7l4073T0RVAtnsnOwRISUV+VtwsfpPbFJgz8EjYhZ55pr/UQqi4Qs4Oa+NG+m1fMDFybdlJTntxiGbjf4om+/MuaHA3w+OwhA==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <AD47C658D6C00F4483C95DCF3AEFD287@eurprd08.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1aa39b9-0634-4960-befc-08d79500c76f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2020 12:38:07.6391 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0PxqwcJI/mikDRedkZxj0K4zo34fBBqEPZNJDwz6BoLkSlk6/SoQWCG5wvhUsEoGTnMox2wPhkoKmuNzCaOwgA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB4285
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.139.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,48 +129,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 08 Jan 2020 08:46:11 PM CET, Nir Soffer wrote:
->> However when an image is opened the virtual size is rounded down,
->> which means that trying to access the last few advertised bytes will
->> result in an error. As seen above QEMU cannot create such images and
->> there's no good use case that would require us to try to handle them
->> so let's just treat them as unsupported.
->
-> Making error impossible is best.
->
-> Can we require multiple of 4k to avoid unaligned read/write at the end
-> of an image aligned to 512 bytes on storage with 4k sector size?
+On Wed, Jan 08, 2020 at 01:53:52PM +0000, Dr. David Alan Gilbert (git) wrote:
+> Don't pass RAM blocks that are marked as ram devices to vhost.
+> There's normally something special about them and they're not
+> normally just shared memory.
 
-I wouldn't force that on the user. The only reason why I'm not allowing
-the non-sector-aligned case is because it's currently broken, but I
-wouldn't have a problem with it if it was working fine.
+Does this something special about them, whatever it is, make them
+automatically ineligible for DMA?  Why should vhost ignore them?
 
->> +echo
->> +echo "== Image size not a multiple of the sector size =="
->> +_make_test_img 64k
->
-> Logging the change here would make the test and the output more clear:
->
->     echo "modifying virtual size to 65535"
+/me goes reading what ram_device memory regions are...
 
-Ok
+Roman.
 
->> +== Image size not a multiple of the sector size ==
->> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65536
->> +qemu-io: can't open device TEST_DIR/t.qcow2: Virtual size is not a multiple of 512
->
-> The output is confusing, looks like we created image with aligned
-> size, and on the next line it complains about the size.
-
-Ok, I can also replace the "qemu-io write" with a "qemu-img info" or
-something like that to make it a bit less confusing (i.e. the error
-happens already when you open the image, not when you write to it).
-
-Berto
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/virtio/vhost.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 4da0d5a6c5..c81f0be71b 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -402,6 +402,7 @@ static bool vhost_section(struct vhost_dev *dev, MemoryRegionSection *section)
+>      bool log_dirty = memory_region_get_dirty_log_mask(section->mr) &
+>                       ~(1 << DIRTY_MEMORY_MIGRATION);
+>      result = memory_region_is_ram(section->mr) &&
+> +        !memory_region_is_ram_device(section->mr) &&
+>          !memory_region_is_rom(section->mr);
+>  
+>      /* Vhost doesn't handle any block which is doing dirty-tracking other
+> -- 
+> 2.24.1
+> 
+> 
 
