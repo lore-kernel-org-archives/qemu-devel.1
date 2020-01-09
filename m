@@ -2,60 +2,57 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 526A3C33CA2
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 04:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 604C9C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 06:14:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B963206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 04:59:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B963206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34B4120673
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 06:14:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B4120673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipPup-0000WV-5T
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 23:59:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58577)
+	id 1ipR53-0006sT-AG
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 01:14:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eguan@linux.alibaba.com>) id 1ipPu4-0008UA-AK
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:58:41 -0500
+ (envelope-from <dovgaluk@ispras.ru>) id 1ipR4J-0006EQ-Tx
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:13:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eguan@linux.alibaba.com>) id 1ipPtw-0007Zm-NY
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:58:34 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:54978)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
- id 1ipPtw-0007JB-9T
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:58:32 -0500
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R181e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07487; MF=eguan@linux.alibaba.com;
- NM=1; PH=DS; RN=4; SR=0; TI=SMTPD_---0TnDRs4L_1578545886; 
-Received: from localhost(mailfrom:eguan@linux.alibaba.com
- fp:SMTPD_---0TnDRs4L_1578545886) by smtp.aliyun-inc.com(127.0.0.1);
- Thu, 09 Jan 2020 12:58:07 +0800
-Date: Thu, 9 Jan 2020 12:58:06 +0800
-From: Eryu Guan <eguan@linux.alibaba.com>
-To: Julia Suvorova <jusual@redhat.com>
-Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
-Message-ID: <20200109045806.GB79586@e18g06458.et15sqa>
-References: <20191231103434.GA41863@e18g06458.et15sqa>
- <20191231115136.7b967604@Igors-MacBook-Pro>
- <20200102020850.GB41863@e18g06458.et15sqa>
- <20200107130649.GH41863@e18g06458.et15sqa>
- <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
+ (envelope-from <dovgaluk@ispras.ru>) id 1ipR4G-0007qq-VO
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:13:19 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:53844)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <dovgaluk@ispras.ru>) id 1ipR4G-0007el-G3
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:13:16 -0500
+Received: from PASHAISP (unknown [85.142.117.226])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 07925A2201;
+ Thu,  9 Jan 2020 09:13:11 +0300 (MSK)
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+To: "'Pavel Dovgalyuk'" <pavel.dovgaluk@gmail.com>,
+	<qemu-devel@nongnu.org>
+References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
+In-Reply-To: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
+Subject: RE: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
+Date: Thu, 9 Jan 2020 09:13:11 +0300
+Message-ID: <003a01d5c6b3$df62afd0$9e280f70$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 47.88.44.36
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Office Outlook 12.0
+Thread-Index: AdW5dchLWdUIxCsjSTynAOt3PgDYHANPhEXQ
+Content-Language: ru
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 83.149.199.45
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,112 +64,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
+ quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com,
+ crosthwaite.peter@gmail.com, armbru@redhat.com, mreitz@redhat.com,
+ alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com,
+ kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com,
+ pbonzini@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 07, 2020 at 03:01:01PM +0100, Julia Suvorova wrote:
-> On Tue, Jan 7, 2020 at 2:06 PM Eryu Guan <eguan@linux.alibaba.com> wrote:
-> >
-> > On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
-> > > On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
-> > > > On Tue, 31 Dec 2019 18:34:34 +0800
-> > > > Eryu Guan <eguan@linux.alibaba.com> wrote:
-> > > >
-> > > > > Hi,
-> > > > >
-> > > > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
-> > > > > think it's because io completion hits use-after-free when device is
-> > > > > already gone. Is this a known bug that has been fixed? (I went through
-> > > > > the git log but didn't find anything obvious).
-> > > > >
-> > > > > gdb backtrace is:
-> > > > >
-> > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
-> > > > > Program terminated with signal 11, Segmentation fault.
-> > > > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > > > 903        return obj->class;
-> > > > > (gdb) bt
-> > > > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
-> > > > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
-> > > > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
-> > > > >     opaque=0x558a2f2fd420, ret=0)
-> > > > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
-> > > > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
-> > > > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
-> > > > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
-> > > > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
-> > > > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
-> > > > > #6  0x00007fff9ed75780 in ?? ()
-> > > > > #7  0x0000000000000000 in ?? ()
-> > > > >
-> > > > > It seems like qemu was completing a discard/write_zero request, but
-> > > > > parent BusState was already freed & set to NULL.
-> > > > >
-> > > > > Do we need to drain all pending request before unrealizing virtio-blk
-> > > > > device? Like the following patch proposed?
-> > > > >
-> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
-> > > > >
-> > > > > If more info is needed, please let me know.
-> > > >
-> > > > may be this will help: https://patchwork.kernel.org/patch/11213047/
-> > >
-> > > Yeah, this looks promising! I'll try it out (though it's a one-time
-> > > crash for me). Thanks!
-> >
-> > After applying this patch, I don't see the original segfaut and
-> > backtrace, but I see this crash
-> >
-> > [Thread debugging using libthread_db enabled]
-> > Using host libthread_db library "/lib64/libthread_db.so.1".
-> > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
-> > Program terminated with signal 11, Segmentation fault.
-> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-> > 1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
-> > Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
-> > (gdb) bt
-> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-> > #1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
-> > #2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
-> >     at /usr/src/debug/qemu-4.0/memory.c:568
-> > #3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
-> > #4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
-> >     at /usr/src/debug/qemu-4.0/exec.c:3279
-> > #5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
-> > #6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
-> > #7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
-> > #8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
-> > #9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
-> > #10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
-> > #11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
-> > #12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
-> >
-> > And I searched and found
-> > https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
-> > backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
-> > blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
-> > bug.
-> >
-> > But I can still hit the bug even after applying the commit. Do I miss
-> > anything?
+Ping.
+
+
+
+Pavel Dovgalyuk
+
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:pavel.dovgaluk@gmail.com]
+> Sent: Monday, December 23, 2019 12:46 PM
+> To: qemu-devel@nongnu.org
+> Cc: kwolf@redhat.com; peter.maydell@linaro.org; crosthwaite.peter@gmail.com;
+> boost.lists@gmail.com; artem.k.pisarenko@gmail.com; quintela@redhat.com;
+> ciro.santilli@gmail.com; jasowang@redhat.com; mst@redhat.com; armbru@redhat.com;
+> mreitz@redhat.com; maria.klimushenkova@ispras.ru; dovgaluk@ispras.ru; kraxel@redhat.com;
+> pavel.dovgaluk@ispras.ru; thomas.dullien@googlemail.com; pbonzini@redhat.com;
+> alex.bennee@linaro.org; dgilbert@redhat.com; rth@twiddle.net
+> Subject: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
 > 
-> Hi Eryu,
-> This backtrace seems to be caused by this bug (there were two bugs in
-> 1706759): https://bugzilla.redhat.com/show_bug.cgi?id=1708480
-> Although the solution hasn't been tested on virtio-blk yet, you may
-> want to apply this patch:
->     https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg05197.html
-> Let me know if this works.
+> GDB remote protocol supports reverse debugging of the targets.
+> It includes 'reverse step' and 'reverse continue' operations.
+> The first one finds the previous step of the execution,
+> and the second one is intended to stop at the last breakpoint that
+> would happen when the program is executed normally.
+> 
+> Reverse debugging is possible in the replay mode, when at least
+> one snapshot was created at the record or replay phase.
+> QEMU can use these snapshots for travelling back in time with GDB.
+> 
+> Running the execution in replay mode allows using GDB reverse debugging
+> commands:
+>  - reverse-stepi (or rsi): Steps one instruction to the past.
+>    QEMU loads on of the prior snapshots and proceeds to the desired
+>    instruction forward. When that step is reaches, execution stops.
+>  - reverse-continue (or rc): Runs execution "backwards".
+>    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+>    and replaying the execution. Then QEMU loads snapshots again and
+>    replays to the latest breakpoint. When there are no breakpoints in
+>    the examined section of the execution, QEMU finds one more snapshot
+>    and tries again. After the first snapshot is processed, execution
+>    stops at this snapshot.
+> 
+> The set of patches include the following modifications:
+>  - gdbstub update for reverse debugging support
+>  - functions that automatically perform reverse step and reverse
+>    continue operations
+>  - hmp/qmp commands for manipulating the replay process
+>  - improvement of the snapshotting for saving the execution step
+>    in the snapshot parameters
+> 
+> The patches are available in the repository:
+> https://github.com/ispras/qemu/tree/rr-191223
+> 
+> ---
+> 
+> Pavel Dovgaluk (11):
+>       replay: provide an accessor for rr filename
+>       qcow2: introduce icount field for snapshots
+>       migration: introduce icount field for snapshots
+>       qapi: introduce replay.json for record/replay-related stuff
+>       replay: introduce info hmp/qmp command
+>       replay: introduce breakpoint at the specified step
+>       replay: implement replay-seek command
+>       replay: flush rr queue before loading the vmstate
+>       gdbstub: add reverse step support in replay mode
+>       gdbstub: add reverse continue support in replay mode
+>       replay: describe reverse debugging in docs/replay.txt
+> 
+> 
+>  MAINTAINERS               |    1
+>  accel/tcg/translator.c    |    1
+>  block/qapi.c              |   18 ++
+>  block/qcow2-snapshot.c    |    9 +
+>  block/qcow2.h             |    3
+>  blockdev.c                |   10 +
+>  cpus.c                    |   19 ++-
+>  docs/interop/qcow2.txt    |    4 +
+>  docs/replay.txt           |   33 +++++
+>  exec.c                    |    8 +
+>  gdbstub.c                 |   64 ++++++++-
+>  hmp-commands-info.hx      |   14 ++
+>  hmp-commands.hx           |   53 +++++++
+>  include/block/snapshot.h  |    1
+>  include/monitor/hmp.h     |    4 +
+>  include/sysemu/replay.h   |   24 +++
+>  migration/savevm.c        |   17 ++
+>  qapi/Makefile.objs        |    2
+>  qapi/block-core.json      |    8 +
+>  qapi/block.json           |    3
+>  qapi/misc.json            |   18 --
+>  qapi/qapi-schema.json     |    1
+>  qapi/replay.json          |  121 +++++++++++++++++
+>  replay/Makefile.objs      |    1
+>  replay/replay-debugging.c |  325 +++++++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-internal.h  |    6 +
+>  replay/replay.c           |   22 +++
+>  stubs/replay.c            |   10 +
+>  28 files changed, 761 insertions(+), 39 deletions(-)
+>  create mode 100644 qapi/replay.json
+>  create mode 100644 replay/replay-debugging.c
+> 
+> --
+> Pavel Dovgalyuk
 
-Unfortunately, I still see the same segfault & backtrace after applying
-commit 421afd2fe8dd ("virtio: reset region cache when on queue
-deletion")
-
-Anything I can help to debug?
-
-Thanks,
-Eryu
 
