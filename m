@@ -2,57 +2,87 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 604C9C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 06:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A89F8C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 06:19:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34B4120673
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 06:14:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B4120673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 30CFE2067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 06:19:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=braap-org.20150623.gappssmtp.com header.i=@braap-org.20150623.gappssmtp.com header.b="LvUCcvBE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30CFE2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=braap.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipR53-0006sT-AG
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 01:14:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40540)
+	id 1ipR9n-0000ra-2R
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 01:18:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dovgaluk@ispras.ru>) id 1ipR4J-0006EQ-Tx
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:13:22 -0500
+ (envelope-from <cota@braap.org>) id 1ipR9B-0000Qq-1u
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:18:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1ipR4G-0007qq-VO
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:13:19 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:53844)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1ipR4G-0007el-G3
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:13:16 -0500
-Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 07925A2201;
- Thu,  9 Jan 2020 09:13:11 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: "'Pavel Dovgalyuk'" <pavel.dovgaluk@gmail.com>,
-	<qemu-devel@nongnu.org>
-References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
-In-Reply-To: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
-Subject: RE: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
-Date: Thu, 9 Jan 2020 09:13:11 +0300
-Message-ID: <003a01d5c6b3$df62afd0$9e280f70$@ru>
+ (envelope-from <cota@braap.org>) id 1ipR9A-0003jC-0q
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:18:20 -0500
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:45966)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <cota@braap.org>) id 1ipR99-0003gC-LG
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 01:18:19 -0500
+Received: by mail-qk1-x741.google.com with SMTP id x1so4958637qkl.12
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 22:18:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=braap-org.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=3Rdhq6g32Z/x4o0cSyYHE6X135X9G6tjQBtCP0xIDCw=;
+ b=LvUCcvBEmsd8sh2PmHD+n6yocdRqBu+VF9HGUddhbY3Hh5KdxXZJDrZP4Y8SDfFjxO
+ CwL9B8SDwkfb+vpHzuc7XFP2zrvDXzbHQjW0ZJZNPnuRdfI3XKvIJnxRCPsK8tiexY19
+ rRa9OxhXwPeM/Txt8CQxzzfl6S1U/I7T5QD1b4uZPLkRoV7vGZ4uAjuNzxqxP2Z4XzjG
+ OEnDZrtxZG42yOOUdt0HA4EZGXdhIiRdh3Ft9XNGSqWVi7SoJ/GDclQikBHyKrQi3cZ0
+ bVuboOXMxiWJ3C2a3VrnFOwFXlV66y05SkDmg9PGKDDhVN1qZ0OZcS8FuGIXaVnxlSSb
+ CRzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=3Rdhq6g32Z/x4o0cSyYHE6X135X9G6tjQBtCP0xIDCw=;
+ b=OoFzd4Nt3bD5xpHw8bQHyoXV0415Hj+hVJbGa4ThFYsZd16VjGddOqE6w8fFRTkTe+
+ i2lzAD3N5Gsuh7Q6oeiawBBAB2iuHnB97Hcm9dMTGSIzoFowNoaFR0j5w5DmuTWhk32j
+ c4xj56CMdFvMtdBk7SEqvcEs/XgrgbtsN//hHiKsTbJCI8zdkK6QLeCX+5bexDYYJLEZ
+ JPsElIOimfMqNYvGItZ4ktoIhucFDbY7vJplPLwTLURwcpXjvWT40zuGubOATWvNERMq
+ jY59qbL8GZ1rn7ZG0Vn4yREbhdx/L65GYmIOJBxNzbVByNefHAdqGsx+oEIleG3O4zYJ
+ 7vGA==
+X-Gm-Message-State: APjAAAUXNx58atrIq2q0iG5dcLZyhR/JcaGOJhLy0jioilgU1pRMP+y3
+ TJ1I4gJjUjHDM2GMhdcPpJh3Zg==
+X-Google-Smtp-Source: APXvYqxFzqxhzwVDOEuIevdD6Waj/oaeY1L3ASmT8FRL5tM78bHRIcYj5HN8Hx2tr4DjxBKWIKOcaw==
+X-Received: by 2002:a37:6704:: with SMTP id b4mr8210747qkc.32.1578550698681;
+ Wed, 08 Jan 2020 22:18:18 -0800 (PST)
+Received: from localhost ([70.19.54.161])
+ by smtp.gmail.com with ESMTPSA id f23sm2538591qke.104.2020.01.08.22.18.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jan 2020 22:18:18 -0800 (PST)
+Date: Thu, 9 Jan 2020 01:18:17 -0500
+From: "Emilio G. Cota" <cota@braap.org>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH] testing: don't nest build for fp-test
+Message-ID: <20200109061817.GA9406@t420>
+References: <20200107180003.6753-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdW5dchLWdUIxCsjSTynAOt3PgDYHANPhEXQ
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 83.149.199.45
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200107180003.6753-1-alex.bennee@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::741
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,118 +94,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com,
- crosthwaite.peter@gmail.com, armbru@redhat.com, mreitz@redhat.com,
- alex.bennee@linaro.org, maria.klimushenkova@ispras.ru, mst@redhat.com,
- kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com,
- pbonzini@redhat.com, artem.k.pisarenko@gmail.com, dgilbert@redhat.com,
- rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping.
+On Tue, Jan 07, 2020 at 18:00:03 +0000, Alex Bennée wrote:
+> Re-calling the main make is counter-productive and really messes up
+> with parallel builds. Just ensure we have built the pre-requisites
+> before we build the fp-test bits. If the user builds manually just
+> complain if the parent build hasn't got the bits we need.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 
-
-Pavel Dovgalyuk
-
-> -----Original Message-----
-> From: Pavel Dovgalyuk [mailto:pavel.dovgaluk@gmail.com]
-> Sent: Monday, December 23, 2019 12:46 PM
-> To: qemu-devel@nongnu.org
-> Cc: kwolf@redhat.com; peter.maydell@linaro.org; crosthwaite.peter@gmail.com;
-> boost.lists@gmail.com; artem.k.pisarenko@gmail.com; quintela@redhat.com;
-> ciro.santilli@gmail.com; jasowang@redhat.com; mst@redhat.com; armbru@redhat.com;
-> mreitz@redhat.com; maria.klimushenkova@ispras.ru; dovgaluk@ispras.ru; kraxel@redhat.com;
-> pavel.dovgaluk@ispras.ru; thomas.dullien@googlemail.com; pbonzini@redhat.com;
-> alex.bennee@linaro.org; dgilbert@redhat.com; rth@twiddle.net
-> Subject: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
-> 
-> GDB remote protocol supports reverse debugging of the targets.
-> It includes 'reverse step' and 'reverse continue' operations.
-> The first one finds the previous step of the execution,
-> and the second one is intended to stop at the last breakpoint that
-> would happen when the program is executed normally.
-> 
-> Reverse debugging is possible in the replay mode, when at least
-> one snapshot was created at the record or replay phase.
-> QEMU can use these snapshots for travelling back in time with GDB.
-> 
-> Running the execution in replay mode allows using GDB reverse debugging
-> commands:
->  - reverse-stepi (or rsi): Steps one instruction to the past.
->    QEMU loads on of the prior snapshots and proceeds to the desired
->    instruction forward. When that step is reaches, execution stops.
->  - reverse-continue (or rc): Runs execution "backwards".
->    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
->    and replaying the execution. Then QEMU loads snapshots again and
->    replays to the latest breakpoint. When there are no breakpoints in
->    the examined section of the execution, QEMU finds one more snapshot
->    and tries again. After the first snapshot is processed, execution
->    stops at this snapshot.
-> 
-> The set of patches include the following modifications:
->  - gdbstub update for reverse debugging support
->  - functions that automatically perform reverse step and reverse
->    continue operations
->  - hmp/qmp commands for manipulating the replay process
->  - improvement of the snapshotting for saving the execution step
->    in the snapshot parameters
-> 
-> The patches are available in the repository:
-> https://github.com/ispras/qemu/tree/rr-191223
-> 
-> ---
-> 
-> Pavel Dovgaluk (11):
->       replay: provide an accessor for rr filename
->       qcow2: introduce icount field for snapshots
->       migration: introduce icount field for snapshots
->       qapi: introduce replay.json for record/replay-related stuff
->       replay: introduce info hmp/qmp command
->       replay: introduce breakpoint at the specified step
->       replay: implement replay-seek command
->       replay: flush rr queue before loading the vmstate
->       gdbstub: add reverse step support in replay mode
->       gdbstub: add reverse continue support in replay mode
->       replay: describe reverse debugging in docs/replay.txt
-> 
-> 
->  MAINTAINERS               |    1
->  accel/tcg/translator.c    |    1
->  block/qapi.c              |   18 ++
->  block/qcow2-snapshot.c    |    9 +
->  block/qcow2.h             |    3
->  blockdev.c                |   10 +
->  cpus.c                    |   19 ++-
->  docs/interop/qcow2.txt    |    4 +
->  docs/replay.txt           |   33 +++++
->  exec.c                    |    8 +
->  gdbstub.c                 |   64 ++++++++-
->  hmp-commands-info.hx      |   14 ++
->  hmp-commands.hx           |   53 +++++++
->  include/block/snapshot.h  |    1
->  include/monitor/hmp.h     |    4 +
->  include/sysemu/replay.h   |   24 +++
->  migration/savevm.c        |   17 ++
->  qapi/Makefile.objs        |    2
->  qapi/block-core.json      |    8 +
->  qapi/block.json           |    3
->  qapi/misc.json            |   18 --
->  qapi/qapi-schema.json     |    1
->  qapi/replay.json          |  121 +++++++++++++++++
->  replay/Makefile.objs      |    1
->  replay/replay-debugging.c |  325 +++++++++++++++++++++++++++++++++++++++++++++
->  replay/replay-internal.h  |    6 +
->  replay/replay.c           |   22 +++
->  stubs/replay.c            |   10 +
->  28 files changed, 761 insertions(+), 39 deletions(-)
->  create mode 100644 qapi/replay.json
->  create mode 100644 replay/replay-debugging.c
-> 
-> --
-> Pavel Dovgalyuk
-
+		E.
 
