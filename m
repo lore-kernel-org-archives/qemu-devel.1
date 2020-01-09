@@ -2,82 +2,63 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A86F0C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A55C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63A5D20721
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:42:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtPQBNLI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63A5D20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9426520678
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:45:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9426520678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipbpf-0007IM-He
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:42:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60749)
+	id 1ipbrh-0000kL-JA
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:45:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39202)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ipbou-0006Tg-BY
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:42:09 -0500
+ (envelope-from <groug@kaod.org>) id 1ipbqu-0008Tt-2r
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:44:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ipbot-0008VX-0o
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:42:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32796
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ipbqs-0007qM-Rn
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:44:11 -0500
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:46358)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ipbos-0008St-Oz
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:42:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578591726;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ozFjmZyp2lcykqJRazyA26Na0g2o5U3XCSIZB8aEoGY=;
- b=XtPQBNLIOo9+E9CldaVIrpQxmKqDooFkLONLxa2mzN5BQpxV1QGaDmcX9sZp9mtfDeciVm
- JptAaAkxwwYOT66/kfqOHWxy5j5fnsjZ1oAobj4/KBiUmxcVEGYvZtS7/FaDcxK4nKIVyM
- xzDq1bfRdW8jvwn3YWoBb8anXPxFTCw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-rO_CszkjMpesLKLG01nexw-1; Thu, 09 Jan 2020 12:42:00 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B6DA107ACC7
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 17:41:59 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA8AC1A8E2;
- Thu,  9 Jan 2020 17:41:55 +0000 (UTC)
-Date: Thu, 9 Jan 2020 17:41:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 080/104] virtiofsd: add helper for lo_data cleanup
-Message-ID: <20200109174153.GP6795@work-vm>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-81-dgilbert@redhat.com>
- <20200107114001.GU3368802@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ipbqs-0007es-Hw
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:44:10 -0500
+Received: from player690.ha.ovh.net (unknown [10.109.146.240])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 28B1B7B66D
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 18:44:07 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player690.ha.ovh.net (Postfix) with ESMTPSA id 23679DEC9C13;
+ Thu,  9 Jan 2020 17:43:50 +0000 (UTC)
+Date: Thu, 9 Jan 2020 18:43:49 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
+ single switch case
+Message-ID: <20200109184349.1aefa074@bahia.lan>
+In-Reply-To: <20200109152133.23649-5-philmd@redhat.com>
+References: <20200109152133.23649-1-philmd@redhat.com>
+ <20200109152133.23649-5-philmd@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200107114001.GU3368802@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: rO_CszkjMpesLKLG01nexw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+X-Ovh-Tracer-Id: 7378866518583449891
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdeiuddgieelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeltddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.50.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,108 +70,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Thu, Dec 12, 2019 at 04:38:40PM +0000, Dr. David Alan Gilbert (git) wr=
-ote:
-> > From: Liu Bo <bo.liu@linux.alibaba.com>
-> >=20
-> > This offers an helper function for lo_data's cleanup.
-> >=20
-> > Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
-> > ---
-> >  tools/virtiofsd/passthrough_ll.c | 37 ++++++++++++++++++--------------
-> >  1 file changed, 21 insertions(+), 16 deletions(-)
->=20
-> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+On Thu,  9 Jan 2020 16:21:22 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Thanks.
+> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
+> case, restrict their scope to avoid unnecessary initialization.
+>=20
 
->=20
-> >=20
-> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthr=
-ough_ll.c
-> > index 45cf466178..097033aa00 100644
-> > --- a/tools/virtiofsd/passthrough_ll.c
-> > +++ b/tools/virtiofsd/passthrough_ll.c
-> > @@ -2439,6 +2439,26 @@ static gboolean lo_key_equal(gconstpointer a, gc=
-onstpointer b)
-> >      return la->ino =3D=3D lb->ino && la->dev =3D=3D lb->dev;
-> >  }
-> > =20
-> > +static void fuse_lo_data_cleanup(struct lo_data *lo)
-> > +{
-> > +    if (lo->inodes) {
-> > +        g_hash_table_destroy(lo->inodes);
-> > +    }
-> > +    lo_map_destroy(&lo->fd_map);
-> > +    lo_map_destroy(&lo->dirp_map);
-> > +    lo_map_destroy(&lo->ino_map);
-> > +
-> > +    if (lo->proc_self_fd >=3D 0) {
-> > +        close(lo->proc_self_fd);
-> > +    }
-> > +
-> > +    if (lo->root.fd >=3D 0) {
-> > +        close(lo->root.fd);
-> > +    }
-> > +
-> > +    free((char *)lo->source);
->=20
-> This will need changing if you follow my comment on prev patch about
-> removing the const & cast
+I guess a decent compiler can be smart enough detect that the initialization
+isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branch...
+Anyway, reducing scope isn't bad. The only hitch I could see is that some
+people do prefer to have all variables declared upfront, but there's a nest=
+ed
+param_val variable already so I guess it's okay.
 
-Done.
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/ppc/spapr_rtas.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 6f06e9d7fe..7237e5ebf2 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -267,8 +267,6 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
+*cpu,
+>                                            uint32_t nret, target_ulong re=
+ts)
+>  {
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> -    MachineState *ms =3D MACHINE(spapr);
+> -    unsigned int max_cpus =3D ms->smp.max_cpus;
+>      target_ulong parameter =3D rtas_ld(args, 0);
+>      target_ulong buffer =3D rtas_ld(args, 1);
+>      target_ulong length =3D rtas_ld(args, 2);
+> @@ -276,6 +274,8 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
+*cpu,
+> =20
+>      switch (parameter) {
+>      case RTAS_SYSPARM_SPLPAR_CHARACTERISTICS: {
+> +        MachineState *ms =3D MACHINE(spapr);
+> +        unsigned int max_cpus =3D ms->smp.max_cpus;
 
->=20
-> > +}
-> > +
-> >  int main(int argc, char *argv[])
-> >  {
-> >      struct fuse_args args =3D FUSE_ARGS_INIT(argc, argv);
-> > @@ -2594,22 +2614,7 @@ err_out2:
-> >  err_out1:
-> >      fuse_opt_free_args(&args);
-> > =20
-> > -    if (lo.inodes) {
-> > -        g_hash_table_destroy(lo.inodes);
-> > -    }
-> > -    lo_map_destroy(&lo.fd_map);
-> > -    lo_map_destroy(&lo.dirp_map);
-> > -    lo_map_destroy(&lo.ino_map);
-> > -
-> > -    if (lo.proc_self_fd >=3D 0) {
-> > -        close(lo.proc_self_fd);
-> > -    }
-> > -
-> > -    if (lo.root.fd >=3D 0) {
-> > -        close(lo.root.fd);
-> > -    }
-> > -
-> > -    free((char *)lo.source);
-> > +    fuse_lo_data_cleanup(&lo);
-> > =20
-> >      return ret ? 1 : 0;
-> >  }
-> > --=20
-> > 2.23.0
-> >=20
-> >=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The max_cpus variable used to be a global. Now that it got moved
+below ms->smp, I'm not sure it's worth keeping it IMHO. What about
+dropping it completely and do:
+
+        char *param_val =3D g_strdup_printf("MaxEntCap=3D%d,"
+                                          "DesMem=3D%" PRIu64 ","
+                                          "DesProcs=3D%d,"
+                                          "MaxPlatProcs=3D%d",
+                                          ms->smp.max_cpus,
+                                          current_machine->ram_size / MiB,
+                                          ms->smp.cpus,
+                                          ms->smp.max_cpus);
+
+And maybe insert an empty line between the declaration of param_val
+and the code for a better readability ?
+
+>          char *param_val =3D g_strdup_printf("MaxEntCap=3D%d,"
+>                                            "DesMem=3D%" PRIu64 ","
+>                                            "DesProcs=3D%d,"
 
 
