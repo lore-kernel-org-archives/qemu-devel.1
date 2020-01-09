@@ -6,77 +6,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62269C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB77C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:54:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 326192067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:54:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEED32067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:54:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CfvMjgBV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326192067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zo3XCs1p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEED32067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipZCa-00052K-Uq
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 09:54:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43376)
+	id 1ipZCi-0005Pi-Oq
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 09:54:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ipZ3m-0000Ip-Mi
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:20 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipZ3v-0000XF-63
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ipZ3k-0003tZ-NC
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55131
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ipZ3t-0004Sz-Lb
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:26 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34058
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ipZ3j-0003qQ-97
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:15 -0500
+ id 1ipZ3t-0004QU-EE
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:45:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578581114;
+ s=mimecast20190719; t=1578581125;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GBs3GEjCZe5spJhv/qOveCF81Xk48mqI/sz4P00Onok=;
- b=CfvMjgBVR6Yk30m654PP5qljKBo9pnlPN9Gy03KNanwr2PI7mGuo6RGrKRnau1kY+vt5xt
- fXbr41TY5ZPXZWHRlHBhdUQUD20iITYEtYxMl/t3qBd8Fru8oT/K8Gwxv0FzaqfLQf6502
- MP0fwgMSFhI4BGQ9N/7SIWmy5JQtxe0=
+ bh=BwsKgup0PF9AdJUkXvO1e3EUDfI/8GZGVoq6i5tiHOc=;
+ b=Zo3XCs1pzSDZvAJH+iw7RjyGKCXAnQ414eQZUbamJborsxjVBGiY/l/lPlU3Nw7SGEOX/4
+ zwAS9J/98NlHcEgc0/GqpbN2KTXkq7NFh1xLdZYJS5MHvWT5rokZBUzhpbklghngufdj05
+ vhyaRQWNHDFJBjHr38sCcMLUqIJ9fjo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-KT9C13FqPJKrLSIN4L7F_w-1; Thu, 09 Jan 2020 09:45:13 -0500
+ us-mta-288-_taMJoTZNseMFAM59GmIOA-1; Thu, 09 Jan 2020 09:45:21 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2720BDB63;
- Thu,  9 Jan 2020 14:45:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C0CC18CA240;
+ Thu,  9 Jan 2020 14:45:20 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EFB2160C88;
- Thu,  9 Jan 2020 14:45:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7BBA760C88;
+ Thu,  9 Jan 2020 14:45:12 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org, peter.maydell@linaro.org, jean-philippe@linaro.org,
  dgilbert@redhat.com, quintela@redhat.com, mst@redhat.com, peterx@redhat.com
-Subject: [PATCH v12 11/13] hw/arm/virt: Add the virtio-iommu device tree
- mappings
-Date: Thu,  9 Jan 2020 15:43:17 +0100
-Message-Id: <20200109144319.15912-12-eric.auger@redhat.com>
+Subject: [PATCH v12 12/13] virtio-iommu: Support migration
+Date: Thu,  9 Jan 2020 15:43:18 +0100
+Message-Id: <20200109144319.15912-13-eric.auger@redhat.com>
 In-Reply-To: <20200109144319.15912-1-eric.auger@redhat.com>
 References: <20200109144319.15912-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: KT9C13FqPJKrLSIN4L7F_w-1
+X-MC-Unique: _taMJoTZNseMFAM59GmIOA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,173 +92,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adds the "virtio,pci-iommu" node in the host bridge node and
-the RID mapping, excluding the IOMMU RID.
+Add Migration support. We rely on recently added gtree and qlist
+migration. We only migrate the domain gtree. The endpoint gtree
+is re-constructed in a post-load operation.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
 
 ---
 
 v11 -> v12:
-- Added Jean's R-b
-
-v10 -> v11:
-- remove msi_bypass
-
-v8 -> v9:
-- disable msi-bypass property
-- addition of the subnode is handled is the hotplug handler
-  and IOMMU RID is notimposed anymore
-
-v6 -> v7:
-- align to the smmu instantiation code
-
-v4 -> v5:
-- VirtMachineClass no_iommu added in this patch
-- Use object_resolve_path_type
+- do not migrate the endpoint gtree but reconstruct it from the
+  domain gtree (Peter's suggestion)
+- add MIG_PRI_IOMMU
 ---
- hw/arm/virt.c         | 54 ++++++++++++++++++++++++++++++++++++-------
- include/hw/arm/virt.h |  2 ++
- 2 files changed, 48 insertions(+), 8 deletions(-)
+ hw/virtio/virtio-iommu.c | 109 +++++++++++++++++++++++++++++++++++----
+ 1 file changed, 99 insertions(+), 10 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 39ab5f47e0..689e5a3bd5 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -32,6 +32,7 @@
- #include "qemu-common.h"
- #include "qemu/units.h"
- #include "qemu/option.h"
-+#include "monitor/qdev.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "hw/boards.h"
-@@ -54,6 +55,7 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "hw/pci-host/gpex.h"
-+#include "hw/virtio/virtio-pci.h"
- #include "hw/arm/sysbus-fdt.h"
- #include "hw/platform-bus.h"
- #include "hw/qdev-properties.h"
-@@ -71,6 +73,7 @@
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
- #include "hw/acpi/generic_event_device.h"
-+#include "hw/virtio/virtio-iommu.h"
-=20
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1180,6 +1183,30 @@ static void create_smmu(const VirtMachineState *vms,
-     g_free(node);
+diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
+index 09193970ee..b0fde3af6f 100644
+--- a/hw/virtio/virtio-iommu.c
++++ b/hw/virtio/virtio-iommu.c
+@@ -655,16 +655,6 @@ static uint64_t virtio_iommu_get_features(VirtIODevice=
+ *vdev, uint64_t f,
+     return f;
  }
 =20
-+static void create_virtio_iommu(VirtMachineState *vms, Error **errp)
-+{
-+    const char compat[] =3D "virtio,pci-iommu";
-+    uint16_t bdf =3D vms->virtio_iommu_bdf;
-+    char *node;
-+
-+    vms->iommu_phandle =3D qemu_fdt_alloc_phandle(vms->fdt);
-+
-+    node =3D g_strdup_printf("%s/virtio_iommu@%d", vms->pciehb_nodename, b=
-df);
-+    qemu_fdt_add_subnode(vms->fdt, node);
-+    qemu_fdt_setprop(vms->fdt, node, "compatible", compat, sizeof(compat))=
-;
-+    qemu_fdt_setprop_sized_cells(vms->fdt, node, "reg",
-+                                 1, bdf << 8, 1, 0, 1, 0,
-+                                 1, 0, 1, 0);
-+
-+    qemu_fdt_setprop_cell(vms->fdt, node, "#iommu-cells", 1);
-+    qemu_fdt_setprop_cell(vms->fdt, node, "phandle", vms->iommu_phandle);
-+    g_free(node);
-+
-+    qemu_fdt_setprop_cells(vms->fdt, vms->pciehb_nodename, "iommu-map",
-+                           0x0, vms->iommu_phandle, 0x0, bdf,
-+                           bdf + 1, vms->iommu_phandle, bdf + 1, 0xffff - =
-bdf);
+-/*
+- * Migration is not yet supported: most of the state consists
+- * of balanced binary trees which are not yet ready for getting
+- * migrated
+- */
+-static const VMStateDescription vmstate_virtio_iommu_device =3D {
+-    .name =3D "virtio-iommu-device",
+-    .unmigratable =3D 1,
+-};
+-
+ static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+ {
+     guint ua =3D GPOINTER_TO_UINT(a);
+@@ -748,9 +738,108 @@ static void virtio_iommu_instance_init(Object *obj)
+ {
+ }
+=20
++#define VMSTATE_INTERVAL                               \
++{                                                      \
++    .name =3D "interval",                                \
++    .version_id =3D 1,                                   \
++    .minimum_version_id =3D 1,                           \
++    .fields =3D (VMStateField[]) {                       \
++        VMSTATE_UINT64(low, VirtIOIOMMUInterval),      \
++        VMSTATE_UINT64(high, VirtIOIOMMUInterval),     \
++        VMSTATE_END_OF_LIST()                          \
++    }                                                  \
 +}
 +
- static void create_pcie(VirtMachineState *vms)
- {
-     hwaddr base_mmio =3D vms->memmap[VIRT_PCIE_MMIO].base;
-@@ -1258,7 +1285,7 @@ static void create_pcie(VirtMachineState *vms)
-         }
-     }
-=20
--    nodename =3D g_strdup_printf("/pcie@%" PRIx64, base);
-+    nodename =3D vms->pciehb_nodename =3D g_strdup_printf("/pcie@%" PRIx64=
-, base);
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-     qemu_fdt_setprop_string(vms->fdt, nodename,
-                             "compatible", "pci-host-ecam-generic");
-@@ -1301,13 +1328,16 @@ static void create_pcie(VirtMachineState *vms)
-     if (vms->iommu) {
-         vms->iommu_phandle =3D qemu_fdt_alloc_phandle(vms->fdt);
-=20
--        create_smmu(vms, pci->bus);
--
--        qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
--                               0x0, vms->iommu_phandle, 0x0, 0x10000);
-+        switch (vms->iommu) {
-+        case VIRT_IOMMU_SMMUV3:
-+            create_smmu(vms, pci->bus);
-+            qemu_fdt_setprop_cells(vms->fdt, nodename, "iommu-map",
-+                                   0x0, vms->iommu_phandle, 0x0, 0x10000);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-     }
--
--    g_free(nodename);
- }
-=20
- static void create_platform_bus(VirtMachineState *vms)
-@@ -1971,6 +2001,13 @@ static void virt_machine_device_plug_cb(HotplugHandl=
-er *hotplug_dev,
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         virt_memory_plug(hotplug_dev, dev, errp);
-     }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI)) {
-+        PCIDevice *pdev =3D PCI_DEVICE(dev);
++#define VMSTATE_MAPPING                               \
++{                                                     \
++    .name =3D "mapping",                                \
++    .version_id =3D 1,                                  \
++    .minimum_version_id =3D 1,                          \
++    .fields =3D (VMStateField[]) {                      \
++        VMSTATE_UINT64(phys_addr, VirtIOIOMMUMapping),\
++        VMSTATE_UINT32(flags, VirtIOIOMMUMapping),    \
++        VMSTATE_END_OF_LIST()                         \
++    },                                                \
++}
 +
-+        vms->iommu =3D VIRT_IOMMU_VIRTIO;
-+        vms->virtio_iommu_bdf =3D pci_get_bdf(pdev);
-+        create_virtio_iommu(vms, errp);
++static const VMStateDescription vmstate_interval_mapping[2] =3D {
++    VMSTATE_MAPPING,   /* value */
++    VMSTATE_INTERVAL   /* key   */
++};
++
++static int domain_preload(void *opaque)
++{
++    VirtIOIOMMUDomain *domain =3D opaque;
++
++    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
++                                       NULL, g_free, g_free);
++    return 0;
++}
++
++static const VMStateDescription vmstate_endpoint =3D {
++    .name =3D "endpoint",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(id, VirtIOIOMMUEndpoint),
++        VMSTATE_END_OF_LIST()
 +    }
- }
-=20
- static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_=
-dev,
-@@ -1984,7 +2021,8 @@ static HotplugHandler *virt_machine_get_hotplug_handl=
-er(MachineState *machine,
-                                                         DeviceState *dev)
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
--       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_IOMMU_PCI))) {
-         return HOTPLUG_HANDLER(machine);
-     }
-=20
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 38f0c33c77..165035fa8f 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -124,8 +124,10 @@ typedef struct {
-     bool virt;
-     int32_t gic_version;
-     VirtIOMMUType iommu;
-+    uint16_t virtio_iommu_bdf;
-     struct arm_boot_info bootinfo;
-     MemMapEntry *memmap;
-+    char *pciehb_nodename;
-     const int *irqmap;
-     int smp_cpus;
-     void *fdt;
++};
++
++static const VMStateDescription vmstate_domain =3D {
++    .name =3D "domain",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .pre_load =3D domain_preload,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(id, VirtIOIOMMUDomain),
++        VMSTATE_GTREE_V(mappings, VirtIOIOMMUDomain, 1,
++                        vmstate_interval_mapping,
++                        VirtIOIOMMUInterval, VirtIOIOMMUMapping),
++        VMSTATE_QLIST_V(endpoint_list, VirtIOIOMMUDomain, 1,
++                        vmstate_endpoint, VirtIOIOMMUEndpoint, next),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static gboolean reconstruct_endpoints(gpointer key, gpointer value,
++                                      gpointer data)
++{
++    VirtIOIOMMU *s =3D (VirtIOIOMMU *)data;
++    VirtIOIOMMUDomain *d =3D (VirtIOIOMMUDomain *)value;
++    VirtIOIOMMUEndpoint *iter;
++
++    QLIST_FOREACH(iter, &d->endpoint_list, next) {
++        iter->domain =3D d;
++        g_tree_insert(s->endpoints, GUINT_TO_POINTER(iter->id), iter);
++    }
++    return false; /* continue the domain traversal */
++}
++
++static int iommu_post_load(void *opaque, int version_id)
++{
++    VirtIOIOMMU *s =3D opaque;
++
++    g_tree_foreach(s->domains, reconstruct_endpoints, s);
++    return 0;
++}
++
++static const VMStateDescription vmstate_virtio_iommu_device =3D {
++    .name =3D "virtio-iommu-device",
++    .minimum_version_id =3D 1,
++    .version_id =3D 1,
++    .post_load =3D iommu_post_load,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_GTREE_DIRECT_KEY_V(domains, VirtIOIOMMU, 1,
++                                   &vmstate_domain, VirtIOIOMMUDomain),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static const VMStateDescription vmstate_virtio_iommu =3D {
+     .name =3D "virtio-iommu",
+     .minimum_version_id =3D 1,
++    .priority =3D MIG_PRI_IOMMU,
+     .version_id =3D 1,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_VIRTIO_DEVICE,
 --=20
 2.20.1
 
