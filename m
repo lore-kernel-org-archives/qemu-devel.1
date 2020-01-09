@@ -6,45 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03788C33CA1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCF7C3F68F
 	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:58:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB19C2072A
+	by mail.kernel.org (Postfix) with ESMTPS id D0EE32072E
 	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:58:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB19C2072A
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0EE32072E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipUaP-0003y7-FJ
+	id 1ipUaP-0003wU-Ga
 	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 04:58:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42141)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <fengzhimin1@huawei.com>) id 1ipPvC-000106-EJ
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:59:52 -0500
+ (envelope-from <fengzhimin1@huawei.com>) id 1ipPvB-000100-Kd
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:59:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <fengzhimin1@huawei.com>) id 1ipPv9-0001Im-Vm
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:59:50 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2288 helo=huawei.com)
+ (envelope-from <fengzhimin1@huawei.com>) id 1ipPv9-0001Iu-Vp
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:59:49 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2289 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <fengzhimin1@huawei.com>)
- id 1ipPv9-000172-Hz
+ id 1ipPv9-000175-IM
  for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:59:47 -0500
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D95024124071CE2929B8;
+ by Forcepoint Email with ESMTP id CEC3FDBFB5913F201A51;
  Thu,  9 Jan 2020 12:59:40 +0800 (CST)
 Received: from huawei.com (10.173.220.198) by DGGEMS411-HUB.china.huawei.com
  (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Thu, 9 Jan 2020
- 12:59:31 +0800
+ 12:59:32 +0800
 From: Zhimin Feng <fengzhimin1@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>, <armbru@redhat.com>,
  <eblake@redhat.com>
-Subject: [PATCH RFC 01/12] migration: Add multiRDMA capability support
-Date: Thu, 9 Jan 2020 12:59:11 +0800
-Message-ID: <20200109045922.904-2-fengzhimin1@huawei.com>
+Subject: [PATCH RFC 02/12] migration: Export the 'migration_incoming_setup'
+ function and add the 'migrate_use_rdma_pin_all' function
+Date: Thu, 9 Jan 2020 12:59:12 +0800
+Message-ID: <20200109045922.904-3-fengzhimin1@huawei.com>
 X-Mailer: git-send-email 2.24.0.windows.2
 In-Reply-To: <20200109045922.904-1-fengzhimin1@huawei.com>
 References: <20200109045922.904-1-fengzhimin1@huawei.com>
@@ -76,78 +77,65 @@ Sender: "Qemu-devel"
 
 From: fengzhimin <fengzhimin1@huawei.com>
 
+We need to call the 'migration_incoming_setup' function in migration/rdma=
+.c,
+so it has to be changed to a global function.
+
 Signed-off-by: fengzhimin <fengzhimin1@huawei.com>
 ---
- migration/migration.c | 11 +++++++++++
- migration/migration.h |  1 +
- qapi/migration.json   |  4 +++-
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ migration/migration.c | 11 ++++++++++-
+ migration/migration.h |  2 ++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 354ad072fa..e98e236ef9 100644
+index e98e236ef9..d9d73a5eac 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -2176,6 +2176,15 @@ bool migrate_use_events(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_EVENTS];
+@@ -518,7 +518,7 @@ fail:
+     exit(EXIT_FAILURE);
  }
 =20
-+bool migrate_use_multiRDMA(void)
+-static void migration_incoming_setup(QEMUFile *f)
++void migration_incoming_setup(QEMUFile *f)
+ {
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+=20
+@@ -2185,6 +2185,15 @@ bool migrate_use_multiRDMA(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_MULTIRDMA];
+ }
+=20
++bool migrate_use_rdma_pin_all(void)
 +{
 +    MigrationState *s;
 +
 +    s =3D migrate_get_current();
 +
-+    return s->enabled_capabilities[MIGRATION_CAPABILITY_MULTIRDMA];
++    return s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL];
 +}
 +
  bool migrate_use_multifd(void)
  {
      MigrationState *s;
-@@ -3509,6 +3518,8 @@ static Property migration_properties[] =3D {
-     DEFINE_PROP_MIG_CAP("x-block", MIGRATION_CAPABILITY_BLOCK),
-     DEFINE_PROP_MIG_CAP("x-return-path", MIGRATION_CAPABILITY_RETURN_PAT=
-H),
-     DEFINE_PROP_MIG_CAP("x-multifd", MIGRATION_CAPABILITY_MULTIFD),
-+    DEFINE_PROP_MIG_CAP("x-multirdma",
-+                        MIGRATION_CAPABILITY_MULTIRDMA),
-=20
-     DEFINE_PROP_END_OF_LIST(),
- };
 diff --git a/migration/migration.h b/migration/migration.h
-index 79b3dda146..bb488028a6 100644
+index bb488028a6..0a23375b2f 100644
 --- a/migration/migration.h
 +++ b/migration/migration.h
-@@ -296,6 +296,7 @@ bool migrate_ignore_shared(void);
- bool migrate_validate_uuid(void);
+@@ -265,6 +265,7 @@ struct MigrationState
+=20
+ void migrate_set_state(int *state, int old_state, int new_state);
+=20
++void migration_incoming_setup(QEMUFile *f);
+ void migration_fd_process_incoming(QEMUFile *f);
+ void migration_ioc_process_incoming(QIOChannel *ioc, Error **errp);
+ void migration_incoming_process(void);
+@@ -297,6 +298,7 @@ bool migrate_validate_uuid(void);
 =20
  bool migrate_auto_converge(void);
-+bool migrate_use_multiRDMA(void);
+ bool migrate_use_multiRDMA(void);
++bool migrate_use_rdma_pin_all(void);
  bool migrate_use_multifd(void);
  bool migrate_pause_before_switchover(void);
  int migrate_multifd_channels(void);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index b7348d0c8b..c995ffdc4c 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -421,6 +421,8 @@
- # @validate-uuid: Send the UUID of the source to allow the destination
- #                 to ensure it is the same. (since 4.2)
- #
-+# @multirdma: Use more than one channels for rdma migration. (since 4.2)
-+#
- # Since: 1.2
- ##
- { 'enum': 'MigrationCapability',
-@@ -428,7 +430,7 @@
-            'compress', 'events', 'postcopy-ram', 'x-colo', 'release-ram'=
-,
-            'block', 'return-path', 'pause-before-switchover', 'multifd',
-            'dirty-bitmaps', 'postcopy-blocktime', 'late-block-activate',
--           'x-ignore-shared', 'validate-uuid' ] }
-+           'x-ignore-shared', 'validate-uuid', 'multirdma' ] }
-=20
- ##
- # @MigrationCapabilityStatus:
 --=20
 2.19.1
 
