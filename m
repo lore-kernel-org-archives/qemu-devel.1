@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57A1C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B56D6C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:15:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80C8F20656
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CD4220656
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:15:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QB0BNK3T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C8F20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IqPsZOUf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CD4220656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipVlQ-0002W8-Jn
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 06:14:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54186)
+	id 1ipVmK-0004Ep-H0
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 06:15:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ipVi4-0005l5-C9
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:42 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ipVi0-0005cJ-CJ
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ipVi2-00070G-DB
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43826
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1ipVhy-0006hK-1h
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:36 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58964
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ipVi2-0006wX-7b
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:38 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ipVhx-0006fG-PY
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:10:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578568237;
+ s=mimecast20190719; t=1578568233;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mgOxQ5uyZJfjGUoehj3MJnX8mFael+qy0RPkOBV6Evw=;
- b=QB0BNK3TT9/U/sfzMcLk7e+maYST4aX/IWANzp9Za8QSSvl5Aoy8uTSW5mNKu7cMvcYAvE
- B4PEmExhl6JP+uHvpIl3BZmyx7H/jS8LJHv1nmxlXSZ+C88LVhxFVM9S9r0wMJQB4zXwXw
- CDbZN6lVtaQXC/VJSv9yDEPIh4QiQEY=
+ bh=pP+UUPL3KtjmGguKCUXvjDL7hdspl0SO6dUXr7IRjH8=;
+ b=IqPsZOUfTjj0+1yru9/hHu/zPTacTcBBBZFQbyH1Y+A3lprnQPnO4JupYFaFQajXvAlhjg
+ 9sptlIeXiCPUG553naYvGGZ4cNoxs5rabglNMntc+hQM2Cx96VWMWVP07QgvftcdV/jAlJ
+ jE5ipAYaIMbqpGgIeQVSRkNcJ8f7aEM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-i_jV-WqFObKbq2Qfe0CzRA-1; Thu, 09 Jan 2020 06:10:36 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-403-MA3g_YOWN6qlgdMKvijqEA-1; Thu, 09 Jan 2020 06:10:32 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A146800C78;
- Thu,  9 Jan 2020 11:10:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3FA8800C75;
+ Thu,  9 Jan 2020 11:10:30 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 608315DA2C;
- Thu,  9 Jan 2020 11:10:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A78FA19E9C;
+ Thu,  9 Jan 2020 11:10:27 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] iotests: add 282 luks qemu-img measure test
-Date: Thu,  9 Jan 2020 11:10:12 +0000
-Message-Id: <20200109111012.559052-5-stefanha@redhat.com>
+Subject: [PATCH v2 3/4] qemu-img: allow qemu-img measure --object without a
+ filename
+Date: Thu,  9 Jan 2020 11:10:11 +0000
+Message-Id: <20200109111012.559052-4-stefanha@redhat.com>
 In-Reply-To: <20200109111012.559052-1-stefanha@redhat.com>
 References: <20200109111012.559052-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: i_jV-WqFObKbq2Qfe0CzRA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: MA3g_YOWN6qlgdMKvijqEA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,168 +91,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test exercises the block/crypto.c "luks" block driver
-.bdrv_measure() code.
+In most qemu-img sub-commands the --object option only makes sense when
+there is a filename.  qemu-img measure is an exception because objects
+may be referenced from the image creation options instead of an existing
+image file.  Allow --object without a filename.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/282     | 93 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/282.out | 30 ++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 124 insertions(+)
- create mode 100755 tests/qemu-iotests/282
- create mode 100644 tests/qemu-iotests/282.out
+ qemu-img.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/282 b/tests/qemu-iotests/282
-new file mode 100755
-index 0000000000..6c62065aef
---- /dev/null
-+++ b/tests/qemu-iotests/282
-@@ -0,0 +1,93 @@
-+#!/usr/bin/env bash
-+#
-+# qemu-img measure tests for LUKS images
-+#
-+# Copyright (C) 2020 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dstefanha@redhat.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1    # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+    rm -f "$TEST_IMG.converted"
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+. ./common.pattern
-+
-+_supported_fmt luks
-+_supported_proto file
-+_supported_os Linux
-+
-+SECRET=3Dsecret,id=3Dsec0,data=3Dpassphrase
-+
-+echo "=3D=3D measure 1G image file =3D=3D"
-+echo
-+
-+$QEMU_IMG measure --object "$SECRET" \
-+=09          -O "$IMGFMT" \
-+=09=09  -o key-secret=3Dsec0,iter-time=3D10 \
-+=09=09  --size 1G
-+
-+echo
-+echo "=3D=3D create 1G image file (size should be no greater than measured=
-) =3D=3D"
-+echo
-+
-+_make_test_img 1G
-+stat -c "image file size in bytes: %s" "$TEST_IMG_FILE"
-+
-+echo
-+echo "=3D=3D modified 1G image file (size should be no greater than measur=
-ed) =3D=3D"
-+echo
-+
-+$QEMU_IO --object "$SECRET" --image-opts "$TEST_IMG" -c "write -P 0x51 0x1=
-0000 0x400" | _filter_qemu_io | _filter_testdir
-+stat -c "image file size in bytes: %s" "$TEST_IMG_FILE"
-+
-+echo
-+echo "=3D=3D measure preallocation=3Dfalloc 1G image file =3D=3D"
-+echo
-+
-+$QEMU_IMG measure --object "$SECRET" \
-+=09          -O "$IMGFMT" \
-+=09=09  -o key-secret=3Dsec0,iter-time=3D10,preallocation=3Dfalloc \
-+=09=09  --size 1G
-+
-+echo
-+echo "=3D=3D measure with input image file =3D=3D"
-+echo
-+
-+IMGFMT=3Draw IMGKEYSECRET=3D IMGOPTS=3D _make_test_img 1G | _filter_imgfmt
-+QEMU_IO_OPTIONS=3D IMGOPTSSYNTAX=3D $QEMU_IO -f raw -c "write -P 0x51 0x10=
-000 0x400" "$TEST_IMG_FILE" | _filter_qemu_io | _filter_testdir
-+$QEMU_IMG measure --object "$SECRET" \
-+=09          -O "$IMGFMT" \
-+=09=09  -o key-secret=3Dsec0,iter-time=3D10 \
-+=09=09  -f raw \
-+=09=09  "$TEST_IMG_FILE"
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-diff --git a/tests/qemu-iotests/282.out b/tests/qemu-iotests/282.out
-new file mode 100644
-index 0000000000..8f4737aef7
---- /dev/null
-+++ b/tests/qemu-iotests/282.out
-@@ -0,0 +1,30 @@
-+QA output created by 282
-+=3D=3D measure 1G image file =3D=3D
-+
-+required size: 2068480
-+fully allocated size: 1075810304
-+
-+=3D=3D create 1G image file (size should be no greater than measured) =3D=
-=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824
-+image file size in bytes: 1075810304
-+
-+=3D=3D modified 1G image file (size should be no greater than measured) =
-=3D=3D
-+
-+wrote 1024/1024 bytes at offset 65536
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+image file size in bytes: 1075810304
-+
-+=3D=3D measure preallocation=3Dfalloc 1G image file =3D=3D
-+
-+required size: 1075810304
-+fully allocated size: 1075810304
-+
-+=3D=3D measure with input image file =3D=3D
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1073741824
-+wrote 1024/1024 bytes at offset 65536
-+1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+required size: 2076672
-+fully allocated size: 1075810304
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index cb2b789e44..d114e2c971 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -288,3 +288,4 @@
- 277 rw quick
- 279 rw backing quick
- 280 rw migration quick
-+282 quick
+diff --git a/qemu-img.c b/qemu-img.c
+index 6233b8ca56..4f3e58f13b 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4903,10 +4903,8 @@ static int img_measure(int argc, char **argv)
+         filename =3D argv[optind];
+     }
+=20
+-    if (!filename &&
+-        (object_opts || image_opts || fmt || snapshot_name || sn_opts)) {
+-        error_report("--object, --image-opts, -f, and -l "
+-                     "require a filename argument.");
++    if (!filename && (image_opts || fmt || snapshot_name || sn_opts)) {
++        error_report("--image-opts, -f, and -l require a filename argument=
+.");
+         goto out;
+     }
+     if (filename && img_size !=3D UINT64_MAX) {
 --=20
 2.24.1
 
