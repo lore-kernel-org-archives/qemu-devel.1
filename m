@@ -2,68 +2,73 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A4DC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:14:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC669C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:23:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 578DA206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:14:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 578DA206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 836562072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:23:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HlRgdg4L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 836562072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipZVb-0002O2-CL
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 10:14:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54974)
+	id 1ipZfB-00007k-4u
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 10:23:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36535)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1ipZV0-0001oU-Du
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:13:28 -0500
+ (envelope-from <philmd@redhat.com>) id 1ipZdD-00067h-BG
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:21:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1ipZUy-0002Hn-PE
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:13:25 -0500
-Resent-Date: Thu, 09 Jan 2020 10:13:25 -0500
-Resent-Message-Id: <E1ipZUy-0002Hn-PE@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21192)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1ipZUy-00026H-Fw; Thu, 09 Jan 2020 10:13:24 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1578582782; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=kBS7/GQYz5gC0+ZbFbiAlHdw1SAUqGrN585N2B3A15EeDZuMnH0O+huUbYr8Np8VT2pmlRe/cGRY2k10lZkNY07j9DL6URzzd3NbOCaW6vLBMefa0iVgiJhbJbZBX1RuAURez3oXX6Qypo1+BCO4lK4iLW79IaiTe4sy822LW00=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1578582782;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ddVp8ND7Kl/wMUaqnHDncxX4FWAN1DQjdQPag2p8LIE=; 
- b=cK5/FW+ypCK2dOQKutFQfIZp7EUudTFUtuZ8nEveha51g8coZ3KGrJ/aqcfrw7NxHmqPlW4J+cKepR8U9L+9IJNfzqotOzlU3AgqqW4x0Bb2+WbDgOPXsF66eo+Jl7iqBpJaCptAdFc8EnpqvE/sImYF8/axnHUdbdmJ97HE+b4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1578582777749657.5808867795997;
- Thu, 9 Jan 2020 07:12:57 -0800 (PST)
-In-Reply-To: <20200109144319.15912-1-eric.auger@redhat.com>
-Subject: Re: [PATCH v12 00/13] VIRTIO-IOMMU device
-Message-ID: <157858277631.10632.10417491075155237341@37313f22b938>
+ (envelope-from <philmd@redhat.com>) id 1ipZdB-0001X3-4O
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:21:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46915
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipZdA-0001RR-Mh
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:21:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578583311;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=P5RGdQrGsYtgUOKj0M4myzDzBUaBMtcy1aS0kbUYf64=;
+ b=HlRgdg4L1OFxKuK1oL71gdPD2nLs5sEInQxTz/meMDlxcrBIgjIpGc5/87km2Q6QcKMaX6
+ 8tNR0boKB1PbNvm/vL7rZqs6Bquv9gU6Dn07jOadxA4vMJPb5hB5mO99TQrft2gxW9jXA5
+ z7GY2FgOBhmKjwdp4kaglMzZYpyw1LA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-Z6-I5PgHMWWbDGkeCQozUg-1; Thu, 09 Jan 2020 10:21:48 -0500
+X-MC-Unique: Z6-I5PgHMWWbDGkeCQozUg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACD758C2BE1;
+ Thu,  9 Jan 2020 15:21:45 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-180.brq.redhat.com [10.40.204.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F14D27FB5C;
+ Thu,  9 Jan 2020 15:21:36 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 00/15] Replace current_machine by qdev_get_machine()
+Date: Thu,  9 Jan 2020 16:21:18 +0100
+Message-Id: <20200109152133.23649-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eric.auger@redhat.com
-Date: Thu, 9 Jan 2020 07:12:57 -0800 (PST)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,54 +80,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- jean-philippe@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org,
- peterx@redhat.com, dgilbert@redhat.com, eric.auger@redhat.com,
- bharatb.linux@gmail.com, qemu-arm@nongnu.org, mst@redhat.com,
- eric.auger.pro@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDEwOTE0NDMxOS4xNTkx
-Mi0xLWVyaWMuYXVnZXJAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
-IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
-IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hlY2st
-cXRlc3QteDg2XzY0OiB0ZXN0cy90ZXN0LWhtcAogIFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0
-OiB0ZXN0cy9xb3MtdGVzdAoqKgpFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdmlydGlv
-LWlvbW11LXRlc3QuYzo0NjpwY2lfY29uZmlnOiBhc3NlcnRpb24gZmFpbGVkIChwcm9iZV9zaXpl
-ID09IDB4MjAwKTogKDB4MDAwMDAwMDAgPT0gMHgwMDAwMDIwMCkKRVJST1IgLSBCYWlsIG91dCEg
-RVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3ZpcnRpby1pb21tdS10ZXN0LmM6NDY6cGNp
-X2NvbmZpZzogYXNzZXJ0aW9uIGZhaWxlZCAocHJvYmVfc2l6ZSA9PSAweDIwMCk6ICgweDAwMDAw
-MDAwID09IDB4MDAwMDAyMDApCm1ha2U6ICoqKiBbY2hlY2stcXRlc3QteDg2XzY0XSBFcnJvciAx
-Cm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBjaGVj
-ay1xdGVzdC1hYXJjaDY0OiB0ZXN0cy90ZXN0LWhtcAogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAy
-MjAKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9j
-ZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcics
-ICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWRlMjE1NDE2MWNjZjQ0
-NjhhZjVlYmQzNWNiY2JkYzAzJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2Vj
-Y29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VY
-VFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RF
-QlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2Nh
-Y2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zh
-ci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLV9hcDZ1
-bGNoL3NyYy9kb2NrZXItc3JjLjIwMjAtMDEtMDktMTAuMDEuMDUuMzI0NzI6L3Zhci90bXAvcWVt
-dTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNr
-J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJl
-bD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWRlMjE1NDE2MWNjZjQ0NjhhZjVlYmQzNWNiY2JkYzAz
-Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVj
-dG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLV9hcDZ1bGNoL3NyYycKbWFrZTogKioq
-IFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxMW01MC44
-OThzCnVzZXIgICAgMG04LjAyM3MKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMTA5MTQ0MzE5LjE1OTEyLTEtZXJpYy5hdWdlckByZWRo
-YXQuY29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
-YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
-cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
-b20=
+Blurb from previous question [1]:
+
+  "hw/boards.h" declare current_machine, and vl.c defines it:
+
+    current_machine =3D MACHINE(object_new_with_class(OBJECT_CLASS(machin=
+e_class)));
+    object_property_add_child(object_get_root(), "machine",
+                              OBJECT(current_machine), &error_abort);
+
+  The bigger user of 'current_machine' is the accel/KVM code.
+
+  Recently in a0628599f..cc7d44c2e0 "Replace global smp variables
+  with machine smp properties" we started to use MACHINE(qdev_get_machine=
+()).
+  Following a0628599f..cc7d44c2e0, a5e0b33119 use 'current_machine' again=
+.
+
+  qdev_get_machine() resolves the machine in the QOM composition tree.
+
+Paolo answered [2]:
+
+> I would always use MACHINE(qdev_get_machine()), espeecially outside
+> vl.c.  Ideally, current_machine would be static within vl.c or even
+> unused outside the object_property_add_child() that you quote above.
+
+Let's remove the global current_machine.
+
+I am still confused by this comment:
+
+  /* qdev_get_machine() can return something that's not TYPE_MACHINE
+   * if this is one of the user-only emulators; in that case there's
+   * no need to check the ignore_memory_transaction_failures board flag.
+   */
+
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669475.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg669493.html
+
+Philippe Mathieu-Daud=C3=A9 (15):
+  target/arm/kvm: Use CPUState::kvm_state in kvm_arm_pmu_supported()
+  hw/ppc/spapr_rtas: Use local MachineState variable
+  hw/ppc/spapr_rtas: Access MachineState via SpaprMachineState argument
+  hw/ppc/spapr_rtas: Restrict variables scope to single switch case
+  device-hotplug: Replace current_machine by qdev_get_machine()
+  migration/savevm: Replace current_machine by qdev_get_machine()
+  hw/core/machine-qmp-cmds: Replace current_machine by
+    qdev_get_machine()
+  target/arm/monitor: Replace current_machine by qdev_get_machine()
+  device_tree: Replace current_machine by qdev_get_machine()
+  memory: Replace current_machine by qdev_get_machine()
+  exec: Replace current_machine by qdev_get_machine()
+  accel: Introduce the current_accel() method
+  accel: Replace current_machine->accelerator by current_accel() method
+  accel/accel: Replace current_machine by qdev_get_machine()
+  vl: Make current_machine a local variable
+
+ include/hw/boards.h        |  2 --
+ include/sysemu/accel.h     |  2 ++
+ accel/accel.c              |  7 +++++++
+ accel/kvm/kvm-all.c        |  4 ++--
+ accel/tcg/tcg-all.c        |  2 +-
+ device-hotplug.c           |  2 +-
+ device_tree.c              |  4 +++-
+ exec.c                     | 10 ++++++----
+ hw/core/machine-qmp-cmds.c |  4 ++--
+ hw/ppc/spapr_rtas.c        |  6 +++---
+ memory.c                   |  6 ++++--
+ migration/savevm.c         | 10 +++++-----
+ target/arm/kvm.c           |  4 +---
+ target/arm/kvm64.c         |  4 ++--
+ target/arm/monitor.c       |  3 ++-
+ target/i386/kvm.c          |  2 +-
+ target/ppc/kvm.c           |  2 +-
+ vl.c                       |  6 +++---
+ 18 files changed, 46 insertions(+), 34 deletions(-)
+
+--=20
+2.21.1
 
 
