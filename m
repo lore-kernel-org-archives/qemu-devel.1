@@ -2,81 +2,127 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D820C33CA2
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 16:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 554AFC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 16:13:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B5A32072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 16:09:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 234CE206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 16:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUZCU7GC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B5A32072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RGkmM1dN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234CE206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipaMl-0003f9-UF
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 11:08:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51477)
+	id 1ipaQn-0006LG-5z
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 11:13:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ipaLx-0002vQ-Tk
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:08:11 -0500
+ (envelope-from <rkagan@virtuozzo.com>) id 1ipaPw-0005v6-5N
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:12:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ipaLv-00057E-UP
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:08:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21228
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ipaLv-00054G-Pu
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:08:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578586087;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9n3MIJ2DeLD98iErPP6o0avcoWZGXc9nCEUOvuizaxE=;
- b=bUZCU7GC6VnzGaMyXZdSPpofR/hHDwediW/g+yRZ7YlbzTSdUKEIeGgW77Su26s13Zc/FQ
- IhCKzn17uVSZO7HhqgrM0N0pNhjaUzYH97pK6sA2l12FbivygMMEEjWTXSJV1fNfbPl9pK
- cWIVzYyjRlCZAMyfsBUhTWcCX883vl0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-UbczhdzpO7SEBFja513NLQ-1; Thu, 09 Jan 2020 11:08:03 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 19E6D19AD4E8;
- Thu,  9 Jan 2020 16:08:02 +0000 (UTC)
-Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B64D97C3E1;
- Thu,  9 Jan 2020 16:07:54 +0000 (UTC)
-Subject: Re: [PATCH v12 00/13] VIRTIO-IOMMU device
-To: qemu-devel@nongnu.org
-References: <157858277631.10632.10417491075155237341@37313f22b938>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <0701f56d-bcba-3c17-d894-f52254f06c2e@redhat.com>
-Date: Thu, 9 Jan 2020 17:07:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <157858277631.10632.10417491075155237341@37313f22b938>
+ (envelope-from <rkagan@virtuozzo.com>) id 1ipaPu-000788-Oy
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:12:15 -0500
+Received: from mail-bgr052101129050.outbound.protection.outlook.com
+ ([52.101.129.50]:35374 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1ipaPt-0006qZ-SO
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:12:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BW7Gu0uE5YJb912A1WFOMeRtbXQVF7uv4zhHgPencqWbiLcyOaqtsUhTyCln3X6BD/uiSzwPsrYn6i8dpTPWYJQ7ZTsNdFOydLYjExRnkHIE8T/mYHtp+ihKqkMmXXnp/fEVdCT2vXjNrpEcV0rW6sCzTrUIMJ8zeNwKAupxvUYm6XIBdw4LWRetcKgV0r4nYoxCYNVpRLr9ebx0KFQ7ejLCA4N+UpoNnRg45qEIpZ7Z6AGplv1oSHGaXhB1s1eXPnB7sEmm1AsXiDBkk/myx1alad+HG14yhF1ndRornaLa096CbaiZnglVECu2WmntnrbjaU2cl1xDlv99fWT6vw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+8xJWx1Qd8pH+Hvd4PCZP0zliB+huO+JwyJkoMk21Lc=;
+ b=hWLfhizGyRJoeFmfGQD0E6YRk9d+tw+p/UW1bfuOVCC0JpQFm87pbhecQoGUpSX4WTtwoGY60+XscekhGYJLj98PLmlXNifMzbzkgRnUBklG97eYIxKAw6AUtWtmSJt+uLYauHem6gTCOFiyQP6a6tb+HN54Ft9sleGYfZZcYqgqpPGsbkJHjnp1QyJUtviARtRzLqasGGEQLykWzECcioGKrExBUWJort5z4LqLNeuyonrCZ718PFZpaEsOiRGEJOKB2Y1f4KdA1gCls20IDyIDhJ5lWmGRgURIhFdqlQB7+cP4SAb/UAciD/CMOANU28UBMW5bHNRuynpOxeInFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+8xJWx1Qd8pH+Hvd4PCZP0zliB+huO+JwyJkoMk21Lc=;
+ b=RGkmM1dNIAt+Wrxvugr272otJWShOVyVQY9YeWmJZfFq6EIwmZ+ojKHbnBzr10MV5XlgP1N/702EI/N5JsmXJ4ve1X57RXOHDCjYHRejld/M/6exmW05qP5wWe1g5Meyxs/9dtkPmjz8r0iOubIxikcrVdTt8DSce5alwiE0D3w=
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
+ VI1PR08MB3903.eurprd08.prod.outlook.com (20.178.81.11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.10; Thu, 9 Jan 2020 16:12:00 +0000
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::acb0:a61d:f08a:1c12]) by VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::acb0:a61d:f08a:1c12%7]) with mapi id 15.20.2602.018; Thu, 9 Jan 2020
+ 16:12:00 +0000
+Received: from rkaganb.sw.ru (185.231.240.5) by
+ HE1PR09CA0085.eurprd09.prod.outlook.com (2603:10a6:7:3d::29) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9 via Frontend Transport; Thu, 9 Jan 2020 16:11:59 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 2/2] hyperv/synic: Allocate as ram_device
+Thread-Topic: [PATCH 2/2] hyperv/synic: Allocate as ram_device
+Thread-Index: AQHVxityEM59bZyv8EecProoJvSi/6fiOPyAgAAFpACAAALigIAAARuAgAAKcgCAAAbbAIAAARGAgAAttAA=
+Date: Thu, 9 Jan 2020 16:12:00 +0000
+Message-ID: <20200109161156.GE3147@rkaganb.sw.ru>
+References: <20200108135353.75471-1-dgilbert@redhat.com>
+ <20200108135353.75471-3-dgilbert@redhat.com>
+ <20200109064527-mutt-send-email-mst@kernel.org>
+ <20200109120820.GB6795@work-vm>
+ <20200109071454-mutt-send-email-mst@kernel.org>
+ <20200109122237.GD6795@work-vm> <87r208rdin.fsf@vitty.brq.redhat.com>
+ <20200109132432.GD3147@rkaganb.sw.ru> <20200109132821.GG6795@work-vm>
+In-Reply-To: <20200109132821.GG6795@work-vm>
+Accept-Language: en-US, ru-RU
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: UbczhdzpO7SEBFja513NLQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>, "Dr. David Alan Gilbert"
+ <dgilbert@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ qemu-devel@nongnu.org,	jasowang@redhat.com, "Michael S. Tsirkin"
+ <mst@redhat.com>
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR09CA0085.eurprd09.prod.outlook.com
+ (2603:10a6:7:3d::29) To VI1PR08MB4608.eurprd08.prod.outlook.com
+ (2603:10a6:803:c0::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 20762967-5604-4ee8-9c0f-08d7951ea842
+x-ms-traffictypediagnostic: VI1PR08MB3903:|VI1PR08MB3903:|VI1PR08MB3903:
+x-microsoft-antispam-prvs: <VI1PR08MB39037D5650D9442418071B24C9390@VI1PR08MB3903.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 02778BF158
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(396003)(39850400004)(346002)(376002)(136003)(366004)(189003)(199004)(36756003)(16526019)(86362001)(81156014)(8676002)(81166006)(4326008)(5660300002)(1076003)(2906002)(64756008)(66556008)(66946007)(66476007)(186003)(26005)(66446008)(6506007)(6666004)(316002)(9686003)(55016002)(52116002)(7696005)(6916009)(956004)(478600001)(33656002)(71200400001)(8936002)(54906003)(30126003);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB3903;
+ H:VI1PR08MB4608.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; CAT:OSPM; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: HKgkMS4dspbDZJMnR1OBo2JvPFzAVPc44dk6ZPxqXrP9qUgfuhNuLtakxQPY8jZcl5MjLi6HBIxse6a1IgW+Ohb0HaFa1/B+vAA1EGz3UFbeK0dYJYVnsdKxs4pdtPw0fMXiKHM1t8OKkuIXbGX7FkTknxRXXgkk5JzA0IMeVaxAltNh46MMnB+VcrYi3rGbrsljVEFfzw1obuWgnsT6Q8+a84OgP+EOCqQGyCD9UJTXK3j2K68Fgyl6GIABRbj5I13ymKH1k9tXupZl1ZPludxTHhvvFnj3RpIhOOxNNhSGXfGZBjqRKmcFxTaoMoDhhquSFwt2s0Qsiszy6eFlbuvxcWpVft3o+U/eTdqBL2xm2+gBvStL6vvEuj0ep3krNfF3p8duUpzptGPC6jMZgujkAWvxRdO1mNZ+7z05XY2yNGZzg8CoH0kQaTSBPueUUbyFVJ+Wi9QKfgcNvKCHj/IrDAuF5Ox8UjRU2+1u8QNZ0OyulkWci6k5WpOUYm+wxkmfEwL9R7mejzEJRyqRADbHPjUA8cArRywu8D4YB7e7Bx18l0Ix/l55+QteOZzRXSwbhp7mjPVrjGHElOEOClSsxJibtk2mRZnyPBHlPYAm4BrUIgJ+grZgNxNXRkYTlm7nlr27g4qkzpOoSnBnxXzBFljOIa8zUhYcSThQCY7OOyvp3ULsUKnzhE8Vl21VYT6+sNGPKzdcWkS3GQNtWfNMIbK6UPvVlYhujDY6GOehkpxdWTvIrO9dYV2CduG7CYGXmTBe7Qbs/4mpWSRL5Q==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3C63CAB6173D214C93F192824A551FFB@eurprd08.prod.outlook.com>
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 20762967-5604-4ee8-9c0f-08d7951ea842
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2020 16:12:00.2408 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: W39S3I7SbM25y78PR4bJ2MHbCz9pIXpSmopgI6I6RXiO6gERZ8o+T65Aq29GPYFdMP3Ksu69KTBiAyKJ8QbZLQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3903
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.129.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,67 +134,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- jean-philippe@linaro.org, quintela@redhat.com, dgilbert@redhat.com,
- peterx@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- mst@redhat.com, eric.auger.pro@gmail.com
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Thu, Jan 09, 2020 at 01:28:21PM +0000, Dr. David Alan Gilbert wrote:
+> * Roman Kagan (rkagan@virtuozzo.com) wrote:
+> > On Thu, Jan 09, 2020 at 02:00:00PM +0100, Vitaly Kuznetsov wrote:
+> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> > > 
+> > > > And I think vhost-user will fail if you have too many sections - and
+> > > > the 16 sections from synic I think will blow the slots available.
+> > > >
+> > > 
+> > > SynIC is percpu, it will allocate two 4k pages for every vCPU the guest
+> > > has so we're potentially looking at hundreds of such regions.
+> > 
+> > Indeed.
+> > 
+> > I think my original idea to implement overlay pages word-for-word to the
+> > HyperV spec was a mistake, as it lead to fragmentation and memslot
+> > waste.
+> > 
+> > I'll look into reworking it without actually mapping extra pages over
+> > the existing RAM, but achieving overlay semantics by just shoving the
+> > *content* of the "overlaid" memory somewhere.
+> > 
+> > That said, I haven't yet fully understood how the reported issue came
+> > about, and thus whether the proposed approach would resolve it too.
+> 
+> The problem happens when we end up with:
+> 
+>  a)  0-512k  RAM
+>  b)  512k +  synic
+>  c)  570kish-640k  RAM
+> 
+> the page alignment code rounds
+>   (a) to 0-2MB   - aligning to the hugepage it's in
+>   (b) leaves as is
+>   (c) aligns to 0-2MB
+> 
+>   it then tries to coalesce (c) and (a) and notices (b) got in the way
+> and fails it.
 
-On 1/9/20 4:12 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200109144319.15912-1-eric.auger@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> make docker-image-centos7 V=1 NETWORK=1
-> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
->   TEST    check-qtest-x86_64: tests/test-hmp
->   TEST    check-qtest-x86_64: tests/qos-test
-> **
-> ERROR:/tmp/qemu-test/src/tests/virtio-iommu-test.c:46:pci_config: assertion failed (probe_size == 0x200): (0x00000000 == 0x00000200)
-> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/virtio-iommu-test.c:46:pci_config: assertion failed (probe_size == 0x200): (0x00000000 == 0x00000200)
+I see, thanks.  The only bit I still haven't quite followed is how this
+failure results in a quiet vhost malfunction rather than a refusal to
+start vhost.
 
-OK sorry that's because I eventually removed "virtio-iommu: Implement
-probe request" patch from the sent series. I will remove that probe_size
-field test on next round.
+> Given the guest can put Synic anywhere I'm not sure that changing it's
+> implementatino would help here.
 
-Thanks
+There would be no (b) nor (separate) (c): synic would just refer to some
+memory straight from (a), regardless of its paging granularity.
 
-Eric
-> make: *** [check-qtest-x86_64] Error 1
-> make: *** Waiting for unfinished jobs....
->   TEST    check-qtest-aarch64: tests/test-hmp
->   TEST    iotest-qcow2: 220
-> ---
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=de2154161ccf4468af5ebd35cbcbdc03', '-u', '1003', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew2/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-_ap6ulch/src/docker-src.2020-01-09-10.01.05.32472:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
-> filter=--filter=label=com.qemu.instance.uuid=de2154161ccf4468af5ebd35cbcbdc03
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-_ap6ulch/src'
-> make: *** [docker-run-test-quick@centos7] Error 2
-> 
-> real    11m50.898s
-> user    0m8.023s
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20200109144319.15912-1-eric.auger@redhat.com/testing.docker-quick@centos7/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+> (And changing it's implementation would probably break migration
+> compatibility).
 
+I'm afraid I see no better option.
+
+Thanks,
+Roman.
 
