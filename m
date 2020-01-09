@@ -2,89 +2,88 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE63C3F68F
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E27DAC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:32:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEEE920661
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:31:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C22D20661
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:32:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UVJNMCJr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEEE920661
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jcHRgPyP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C22D20661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipXtv-0000sl-8Q
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:31:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57125)
+	id 1ipXvH-0002Jz-Vc
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:32:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ipXrT-0007aH-Ve
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:28:33 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1ipXsv-0000b9-Qo
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ipXrS-0003Gd-RK
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:28:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33919
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwankhede@nvidia.com>) id 1ipXst-0007bu-H5
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:30:01 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:13092)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ipXrS-0003EO-MD
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:28:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578576510;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6AVBfRtfwuMEztusIH4++UCty1Jo+w+nLEgEvCvCjIk=;
- b=UVJNMCJrODXSsix6XfYRwb+jMxHAyf858T4Hr85yqG5rPVWL9WVXDoNSuSMCv6avqCAlbS
- GjIDbyn4cQKVKvacZcILBueBERIORYT1KcJkLiVVB8BXzUlRoLiMWCzoC78Qh3DONb5JRg
- ABdXadHHHtESXBQOTrOp36U5YSRT7Tk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-X19nO7igPv21CxfvHMbL5A-1; Thu, 09 Jan 2020 08:28:28 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3EBF10054E3;
- Thu,  9 Jan 2020 13:28:27 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C59C519C69;
- Thu,  9 Jan 2020 13:28:23 +0000 (UTC)
-Date: Thu, 9 Jan 2020 13:28:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Roman Kagan <rkagan@virtuozzo.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org,
- jasowang@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 2/2] hyperv/synic: Allocate as ram_device
-Message-ID: <20200109132821.GG6795@work-vm>
-References: <20200108135353.75471-1-dgilbert@redhat.com>
- <20200108135353.75471-3-dgilbert@redhat.com>
- <20200109064527-mutt-send-email-mst@kernel.org>
- <20200109120820.GB6795@work-vm>
- <20200109071454-mutt-send-email-mst@kernel.org>
- <20200109122237.GD6795@work-vm>
- <87r208rdin.fsf@vitty.brq.redhat.com>
- <20200109132432.GD3147@rkaganb.sw.ru>
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1ipXst-0007Yw-75
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:29:59 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5e172ac20000>; Thu, 09 Jan 2020 05:29:38 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Thu, 09 Jan 2020 05:29:56 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Thu, 09 Jan 2020 05:29:56 -0800
+Received: from [10.40.100.122] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 9 Jan
+ 2020 13:29:46 +0000
+Subject: Re: [PATCH v11 Kernel 3/6] vfio iommu: Implementation of ioctl to for
+ dirty pages tracking.
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1576602651-15430-1-git-send-email-kwankhede@nvidia.com>
+ <1576602651-15430-4-git-send-email-kwankhede@nvidia.com>
+ <20191217151203.342b686a@x1.home>
+ <ebd08133-e258-9f5e-5c8f-f88d7165cd7a@nvidia.com>
+ <20200107150223.0dab0a85@w520.home>
+ <d2faa3fe-d656-5ba7-475a-9646298e3d50@nvidia.com>
+ <20200108152934.68cd0e85@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <f7db5eae-b650-6078-edb2-7fe20d71bd47@nvidia.com>
+Date: Thu, 9 Jan 2020 18:59:40 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200109132432.GD3147@rkaganb.sw.ru>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: X19nO7igPv21CxfvHMbL5A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20200108152934.68cd0e85@w520.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1578576578; bh=WLosg172xkRx+5jPpNCzwwLMPD277ArYB9VNeXC4qMo=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=jcHRgPyPxwJhhWQFJxbmtxPTwGewSuocVbGGZm3NuXxbrLR1fn/P/e3tF7qkJo+I/
+ 2xutw/MvLSX/ZzfMlhVoXft2W3Wcyrzvjo84XNv1JEoL19gdRV9DfKSjo1cb6Z6MGq
+ uJxHfvsBOPuheyH0/2ARugObm/YH3NzkGmKoN8suGGt3MWO+vPYTlUwkDDvvCs92bR
+ HV9WcCSBZtkE/Koz+E6G5yVD22ql0nsQi0ZnEpancsxwn4lA+0ju1rEYOquBc6kROS
+ 8XJhtAqonLu+T9ciGEBgpnUkErTfDK8zSRqSRWTdREbwl9bvkHNe6FyGd6zLqHYjrO
+ MJiLPHpi/nm0g==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,59 +95,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
+ dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
+ pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
+ Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Roman Kagan (rkagan@virtuozzo.com) wrote:
-> On Thu, Jan 09, 2020 at 02:00:00PM +0100, Vitaly Kuznetsov wrote:
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
-> >=20
-> > > And I think vhost-user will fail if you have too many sections - and
-> > > the 16 sections from synic I think will blow the slots available.
-> > >
-> >=20
-> > SynIC is percpu, it will allocate two 4k pages for every vCPU the guest
-> > has so we're potentially looking at hundreds of such regions.
->=20
-> Indeed.
->=20
-> I think my original idea to implement overlay pages word-for-word to the
-> HyperV spec was a mistake, as it lead to fragmentation and memslot
-> waste.
->=20
-> I'll look into reworking it without actually mapping extra pages over
-> the existing RAM, but achieving overlay semantics by just shoving the
-> *content* of the "overlaid" memory somewhere.
->=20
-> That said, I haven't yet fully understood how the reported issue came
-> about, and thus whether the proposed approach would resolve it too.
 
-The problem happens when we end up with:
 
- a)  0-512k  RAM
- b)  512k +  synic
- c)  570kish-640k  RAM
+On 1/9/2020 3:59 AM, Alex Williamson wrote:
+> On Thu, 9 Jan 2020 01:31:16 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 1/8/2020 3:32 AM, Alex Williamson wrote:
+>>> On Wed, 8 Jan 2020 01:37:03 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>
+>> <snip>
+>>
+>>>>>> +
+>>>>>> +	unlocked = vfio_iova_put_vfio_pfn(dma, vpfn, dirty_tracking);
+>>>>>>     
+>>>>>>     	if (do_accounting)
+>>>>>>     		vfio_lock_acct(dma, -unlocked, true);
+>>>>>> @@ -571,8 +606,12 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>>>     
+>>>>>>     		vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+>>>>>>     		if (vpfn) {
+>>>>>> -			phys_pfn[i] = vpfn->pfn;
+>>>>>> -			continue;
+>>>>>> +			if (vpfn->unpinned)
+>>>>>> +				vfio_remove_from_pfn_list(dma, vpfn);
+>>>>>
+>>>>> This seems inefficient, we have an allocated vpfn at the right places
+>>>>> in the list, wouldn't it be better to repin the page?
+>>>>>       
+>>>>
+>>>> vfio_pin_page_external() takes care of pinning and accounting as well.
+>>>
+>>> Yes, but could we call vfio_pin_page_external() without {unlinking,
+>>> freeing} and {re-allocating, linking} on either side of it since it's
+>>> already in the list?  That's the inefficient part.  Maybe at least a
+>>> TODO comment?
+>>>    
+>>
+>> Changing it as below:
+>>
+>>                   vpfn = vfio_iova_get_vfio_pfn(dma, iova);
+>>                   if (vpfn) {
+>> -                       phys_pfn[i] = vpfn->pfn;
+>> -                       continue;
+>> +                       if (vpfn->ref_count > 1) {
+>> +                               phys_pfn[i] = vpfn->pfn;
+>> +                               continue;
+>> +                       }
+>>                   }
+>>
+>>                   remote_vaddr = dma->vaddr + iova - dma->iova;
+>>                   ret = vfio_pin_page_external(dma, remote_vaddr,
+>> &phys_pfn[i],
+>>                                                do_accounting);
+>>                   if (ret)
+>>                           goto pin_unwind;
+>> -
+>> -               ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+>> -               if (ret) {
+>> -                       vfio_unpin_page_external(dma, iova, do_accounting);
+>> -                       goto pin_unwind;
+>> -               }
+>> +               if (!vpfn) {
+>> +                       ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+>> +                       if (ret) {
+>> +                               vfio_unpin_page_external(dma, iova,
+>> +                                                        do_accounting,
+>> false);
+>> +                               goto pin_unwind;
+>> +                       }
+>> +               } else
+>> +                       vpfn->pfn = phys_pfn[i];
+>>           }
+>>
+>>
+>>
+>>
+>>>>>> +			else {
+>>>>>> +				phys_pfn[i] = vpfn->pfn;
+>>>>>> +				continue;
+>>>>>> +			}
+>>>>>>     		}
+>>>>>>     
+>>>>>>     		remote_vaddr = dma->vaddr + iova - dma->iova;
+>>>>>> @@ -583,7 +622,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>>>     
+>>>>>>     		ret = vfio_add_to_pfn_list(dma, iova, phys_pfn[i]);
+>>>>>>     		if (ret) {
+>>>>>> -			vfio_unpin_page_external(dma, iova, do_accounting);
+>>>>>> +			vfio_unpin_page_external(dma, iova, do_accounting,
+>>>>>> +						 false);
+>>>>>>     			goto pin_unwind;
+>>>>>>     		}
+>>>>>>     	}
+>>
+>> <snip>
+>>
+>>>>   
+>>>>>> +		if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_START) {
+>>>>>> +			iommu->dirty_page_tracking = true;
+>>>>>> +			return 0;
+>>>>>> +		} else if (range.flags & VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP) {
+>>>>>> +			iommu->dirty_page_tracking = false;
+>>>>>> +
+>>>>>> +			mutex_lock(&iommu->lock);
+>>>>>> +			vfio_remove_unpinned_from_dma_list(iommu);
+>>>>>> +			mutex_unlock(&iommu->lock);
+>>>>>> +			return 0;
+>>>>>> +
+>>>>>> +		} else if (range.flags &
+>>>>>> +				 VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP) {
+>>>>>> +			uint64_t iommu_pgmask;
+>>>>>> +			unsigned long pgshift = __ffs(range.pgsize);
+>>>>>> +			unsigned long *bitmap;
+>>>>>> +			long bsize;
+>>>>>> +
+>>>>>> +			iommu_pgmask =
+>>>>>> +			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
+>>>>>> +
+>>>>>> +			if (((range.pgsize - 1) & iommu_pgmask) !=
+>>>>>> +			    (range.pgsize - 1))
+>>>>>> +				return -EINVAL;
+>>>>>> +
+>>>>>> +			if (range.iova & iommu_pgmask)
+>>>>>> +				return -EINVAL;
+>>>>>> +			if (!range.size || range.size > SIZE_MAX)
+>>>>>> +				return -EINVAL;
+>>>>>> +			if (range.iova + range.size < range.iova)
+>>>>>> +				return -EINVAL;
+>>>>>> +
+>>>>>> +			bsize = verify_bitmap_size(range.size >> pgshift,
+>>>>>> +						   range.bitmap_size);
+>>>>>> +			if (bsize < 0)
+>>>>>> +				return ret;
+>>>>>> +
+>>>>>> +			bitmap = kmalloc(bsize, GFP_KERNEL);
+>>>>>
+>>>>> I think I remember mentioning previously that we cannot allocate an
+>>>>> arbitrary buffer on behalf of the user, it's far too easy for them to
+>>>>> kill the kernel that way.  kmalloc is also limited in what it can
+>>>>> alloc.
+>>>>
+>>>> That's the reason added verify_bitmap_size(), so that size is verified
+>>>
+>>> That's only a consistency test, it only verifies that the user claims
+>>> to provide a bitmap sized sufficiently for the range they're trying to
+>>> request.  range.size is limited to SIZE_MAX, so 2^64, divided by page
+>>> size for 2^52 bits, 8bits per byte for 2^49 bytes of bitmap that we'd
+>>> try to kmalloc (512TB).  kmalloc is good for a couple MB AIUI.
+>>> Meanwhile the user doesn't actually need to allocate that bitmap in
+>>> order to crash the kernel.
+>>>    
+>>>>> Can't we use the user buffer directly or only work on a part of
+>>>>> it at a time?
+>>>>>       
+>>>>
+>>>> without copy_from_user(), how?
+>>>
+>>> For starters, what's the benefit of copying the bitmap from the user
+>>> in the first place?  We presume the data is zero'd and if it's not,
+>>> that's the user's bug to sort out (we just need to define the API to
+>>> specify that).  Therefore the copy_from_user() is unnecessary anyway and
+>>> we really just need to copy_to_user() for any places we're setting
+>>> bits.  We could just walk through the range with an unsigned long
+>>> bitmap buffer, writing it out to userspace any time we reach the end
+>>> with bits set, zeroing it and shifting it as a window to the user
+>>> buffer.  We could improve batching by allocating a larger buffer in the
+>>> kernel, with a kernel defined maximum size and performing the same
+>>> windowing scheme.
+>>>    
+>>
+>> Ok removing copy_from_user().
+>> But AFAIK, calling copy_to_user() multiple times is not efficient in
+>> terms of performance.
+> 
+> Right, but even with a modestly sized internal buffer for batching we
+> can cover quite a large address space.  128MB for a 4KB buffer, 32GB
+> with 1MB buffer.  __put_user() is more lightweight than copy_to_user(),
+> I wonder where the inflection point is in batching the latter versus
+> more iterations of the former.
+> 
+>> Checked code in virt/kvm/kvm_main.c: __kvm_set_memory_region() where
+>> dirty_bitmap is allocated, that has generic checks, user space address
+>> check, memory overflow check and KVM_MEM_MAX_NR_PAGES as below. I'll add
+>> access_ok check. I already added overflow check.
+>>
+>>           /* General sanity checks */
+>>           if (mem->memory_size & (PAGE_SIZE - 1))
+>>                   goto out;
+>>
+>>          !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+>>                           mem->memory_size)))
+>>
+>>           if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+>>                   goto out;
+>>
+>>           if (npages > KVM_MEM_MAX_NR_PAGES)
+>>                   goto out;
+>>
+>>
+>> Where KVM_MEM_MAX_NR_PAGES is:
+>>
+>> /*
+>>    * Some of the bitops functions do not support too long bitmaps.
+>>    * This number must be determined not to exceed such limits.
+>>    */
+>> #define KVM_MEM_MAX_NR_PAGES ((1UL << 31) - 1)
+>>
+>> But we can't use KVM specific KVM_MEM_MAX_NR_PAGES check in vfio module.
+>> Should we define similar limit in vfio module instead of SIZE_MAX?
+> 
+> If we have ranges that are up to 2^31 pages, that's still 2^28 bytes.
+> Does it seem reasonable to have a kernel interface that potentially
+> allocates 256MB of kernel space with kmalloc accessible to users?  That
+> still seems like a DoS attack vector to me, especially since the user
+> doesn't need to be able to map that much memory (8TB) to access it.
+> 
+> I notice that KVM allocate the bitmap (kvzalloc) relative to the actual
+> size of the memory slot when dirty logging is enabled, maybe that's the
+> right approach rather than walking vpfn lists and maintaining unpinned
+> vpfns for the purposes of tracking.  For example, when dirty logging is
+> enabled, walk all vfio_dmas and allocate a dirty bitmap anywhere the
+> vpfn list is not empty and walk the vpfn list to set dirty bits in the
+> bitmap. 
 
-the page alignment code rounds
-  (a) to 0-2MB   - aligning to the hugepage it's in
-  (b) leaves as is
-  (c) aligns to 0-2MB
+Bitmap will be allocated per vfio_dma, not as per 
+VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP request, right?
 
-  it then tries to coalesce (c) and (a) and notices (b) got in the way
-and fails it.
+> When new pages are pinned, allocate a bitmap if not already
+> present and set the dirty bit.  When unpinned, update the vpfn list but
+> leave the dirty bit set.  When the dirty bitmap is read, copy out the
+> current bitmap to the user, memset it to zero, then re-walk the vpfn
+> list to set currently dirty pages.
 
-Given the guest can put Synic anywhere I'm not sure that changing it's
-implementatino would help here.
-(And changing it's implementation would probably break migration
-compatibility).
+Why re-walk is required again? Pinning /unpinning or reporting dirty 
+pages are done holding iommu->lock, there shouldn't be race condition.
 
-Dave
+>  A vfio_dma without a dirty bitmap
+> would consider the entire range dirty.
 
-> Thanks,
-> Roman.
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+That will depend on (!iommu->pinned_page_dirty_scope && 
+dma->iommu_mapped) condition to mark entire range dirty.
+Here even if vpfn list is empty, memory for dirty_bitmap need to be 
+allocated, memset all bits to 1, then copy_to_user().
 
+If we go with this approach, then I think there should be restriction to 
+get bitmap as per the way mappings were created, multiple mappings can 
+be clubbed together, but shouldn't bisect the mappings - similar to 
+unmap restriction.
+
+Thanks,
+Kirti
+
+>  At least that way the overhead
+> of the bitmap is just that, overhead rather than a future exploit.
+> Does this seem like a better approach?  Thanks,
+> 
+> Alex
+> 
 
