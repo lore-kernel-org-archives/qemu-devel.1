@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7B5C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB14BC32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 094712073A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:42:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A60F12073A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZYxtjtL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 094712073A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0/hfU9q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A60F12073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipUKt-0007ge-6H
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 04:42:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41056)
+	id 1ipULw-0000yO-Hy
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 04:43:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50627)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipUK7-0006Ir-1k
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:41:51 -0500
+ (envelope-from <quintela@redhat.com>) id 1ipUL3-0008OO-JB
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:42:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipUK6-00080l-2i
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:41:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23616
+ (envelope-from <quintela@redhat.com>) id 1ipUL2-0003Va-HI
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:42:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44701
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipUK5-0007y1-Qi
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:41:49 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipUL2-0003Sw-AU
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:42:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578562909;
+ s=mimecast20190719; t=1578562967;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CWhQQkqJtqV9PLtVE/kPxBiO8PjaWFBfyfxlwNjb1qk=;
- b=CZYxtjtLul2TYBrOUN3q+Y3evMyKNWoMEygTNh1nwQqrooE5xEwCvRu542XWQC0NsHI+4H
- POc2zEF9Hr1aj4VJ/e3LA/ZlZf43+lIk1OM4jszkS45JE8ZHGxJb7SCVymY30p1rdRm8pM
- k3MW0Pvzbfj4ADSsjx1DTd8a8w1r5tA=
+ bh=PD3DmMY9dXO0zuNQ4qIUSELgJ35Z4wNTPTG7/TZ6WRg=;
+ b=Y0/hfU9qZqJ8B2BXIxa9BDdxmYdBGapyHQF00UPdmwPEZRb8ZUyK7xBqWptcspcTM4IgNZ
+ 8+cpUj6tRpy3X4Tr4CtUrj/witO/2d+NIO8UjXEo1QIoWCjAa9+BeBaGfb6PtqM0PJu8Fe
+ Gx88MyadEPrEL2nWsmrPDp86uHLNbEo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-SYcj9JNNM1qL-Ki9Y3l0NQ-1; Thu, 09 Jan 2020 04:41:47 -0500
+ us-mta-330-8A9iWVWGP62OmBuvnaIksQ-1; Thu, 09 Jan 2020 04:42:43 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC160DBE5;
- Thu,  9 Jan 2020 09:41:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE377184B1EC;
+ Thu,  9 Jan 2020 09:42:42 +0000 (UTC)
 Received: from redhat.com (ovpn-116-22.ams2.redhat.com [10.36.116.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 804C110027AA;
- Thu,  9 Jan 2020 09:41:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8538A10027AA;
+ Thu,  9 Jan 2020 09:42:42 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [Patch v2 4/6] migration/postcopy: set all_zero to true on the
- first target page
-In-Reply-To: <20191107123907.29791-5-richardw.yang@linux.intel.com> (Wei
- Yang's message of "Thu, 7 Nov 2019 20:39:05 +0800")
+Subject: Re: [Patch v2 5/6] migration/postcopy: enable random order target
+ page arrival
+In-Reply-To: <20191107123907.29791-6-richardw.yang@linux.intel.com> (Wei
+ Yang's message of "Thu, 7 Nov 2019 20:39:06 +0800")
 References: <20191107123907.29791-1-richardw.yang@linux.intel.com>
- <20191107123907.29791-5-richardw.yang@linux.intel.com>
+ <20191107123907.29791-6-richardw.yang@linux.intel.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Thu, 09 Jan 2020 10:41:44 +0100
-Message-ID: <878smh0xwn.fsf@secure.laptop>
+Date: Thu, 09 Jan 2020 10:42:40 +0100
+Message-ID: <874kx50xv3.fsf@secure.laptop>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: SYcj9JNNM1qL-Ki9Y3l0NQ-1
+X-MC-Unique: 8A9iWVWGP62OmBuvnaIksQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
@@ -97,13 +97,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Wei Yang <richardw.yang@linux.intel.com> wrote:
-> For the first target page, all_zero is set to true for this round check.
+> After using number of target page received to track one host page, we
+> could have the capability to handle random order target page arrival in
+> one host page.
 >
-> After target_pages introduced, we could leverage this variable instead
-> of checking the address offset.
+> This is a preparation for enabling compress during postcopy.
 >
 > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+> ---
+> v2:
+>    * use uintptr_t to calculate place_dest
+>    * check target pages belongs to the same host page
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 
