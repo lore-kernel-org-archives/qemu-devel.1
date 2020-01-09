@@ -2,82 +2,96 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43992C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B322C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:10:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F35B2067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 031FA2067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 12:10:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBOjwW9/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F35B2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AneMZqLZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 031FA2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipWdQ-00039T-2K
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 07:09:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50639)
+	id 1ipWde-0003c9-Su
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 07:10:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ipWc4-00025E-P8
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:08:33 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ipWc2-0004hS-74
+ (envelope-from <alex.bennee@linaro.org>) id 1ipWc2-00023Y-5s
  for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:08:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43394
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ipWc2-0004dG-23
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1ipWc0-0004an-Ka
  for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:08:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578571709;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ED7XSBQ45eTsIGI8SCbNh0PxXfKdZEEwXOD4GbBljmg=;
- b=IBOjwW9/pX+liWQEuz947j3X4OO7pQJ+U1o8Mceus+/VYp3auRK3Q0lwmJtc5ApKZqUUaq
- jBRwbdDuRwMPoTnOrRQwiSAxUUDQ0b23ZcNyu1ZhVIANCkUiVVVTxgZFUtvheLtrsQK04o
- PrvAltB56Gf1CRhnj/G5bK1dncyyjUQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-yFJaVQM8Np6Q3aNDPGRa7w-1; Thu, 09 Jan 2020 07:08:27 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B273581E62F
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 12:08:26 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ABC875DA66;
- Thu,  9 Jan 2020 12:08:23 +0000 (UTC)
-Date: Thu, 9 Jan 2020 12:08:20 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 2/2] hyperv/synic: Allocate as ram_device
-Message-ID: <20200109120820.GB6795@work-vm>
-References: <20200108135353.75471-1-dgilbert@redhat.com>
- <20200108135353.75471-3-dgilbert@redhat.com>
- <20200109064527-mutt-send-email-mst@kernel.org>
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41230)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ipWc0-0004Su-5a
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 07:08:28 -0500
+Received: by mail-wr1-x444.google.com with SMTP id c9so7117975wrw.8
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 04:08:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=pvgMkc8GtlJutYg7wm+ThtN/AGv81cMgc2rTC1/nGe8=;
+ b=AneMZqLZKsoU128OKr+v60pRo2s0XhvhddB/ZCcdzSCpZxeddyPeThM6FERI1IkRC/
+ L8cndN3k1qznSAhn59RWtCTMVUh2rk1rYDYt+KeTqLprrn++QWaYjwEuuR3q/pebDDwG
+ ShuFdhkzW5VC+sr5Bv82+vOALsKtQLkQMGpts8dUU5k52fU1RcRlMQKtX1aVxtlj8kc7
+ YOOeAogtvmOuJX9kdJx8yEcY7YVmJfCCV3zzRjkDdgTqLCigj8cwI8J+B/rYzV3E1YEU
+ EbcUJRweVkCMY9lSMCC/L0bqCJqDSiNgRsSVuIV2GprcirSv2kp7A49x/rnkZMAkEIII
+ 7HgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=pvgMkc8GtlJutYg7wm+ThtN/AGv81cMgc2rTC1/nGe8=;
+ b=sCzMAAIb6kgpdGOAzKMJsqahWsh1H3EZNrULH6zRS12kR5lSOWDt6RanvI+9tm9uSw
+ cHinJaDdhaVwIQ+AMEEBDCXbv9jCCCnfcLb+39FKKDz1qyoHeDvLWT3HohCwM8O/ljRJ
+ UbWy8tXASI6mtv3kLqDcv4ZnZL3B2RV2YTRcdxqWsIH/qI3/LLA8aSDzT2BQ5qTcrtTD
+ f+7DSC2rVAqa1j7MJR0oWPfZ7ffcLc1C4klnViRDbWOSl3TK7uhr03Ponao8ctZ1OyZp
+ T+FensIJobtwIfxcgaZ0+CwKeEM93scAgq/27TWJpVFVaLQ7Z/5dMhsfkp5iUdRf1azV
+ hgFQ==
+X-Gm-Message-State: APjAAAWKGnhso4MWZxskpx9L1f9E6+wzVVlrDHKnmSoGK1SvCsw6RKXM
+ 9l5Dm7GVXmTHnYbLLTOVD7mT6g==
+X-Google-Smtp-Source: APXvYqyWYeL81c0Vu55BqLLra89FsYZrH40EtqZge2EzRAVozswZnSK836NmaGvI9l/Th9SgvxkYwA==
+X-Received: by 2002:adf:d848:: with SMTP id k8mr10220810wrl.328.1578571706422; 
+ Thu, 09 Jan 2020 04:08:26 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q6sm8325699wrx.72.2020.01.09.04.08.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Jan 2020 04:08:24 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 31C531FF87;
+ Thu,  9 Jan 2020 12:08:24 +0000 (GMT)
+References: <20191211170520.7747-1-alex.bennee@linaro.org>
+ <20191211170520.7747-13-alex.bennee@linaro.org>
+ <69e10c48-8bdf-cbe0-3372-815b647f8312@linaro.org>
+ <87k16sdt4d.fsf@linaro.org>
+ <5c6dd0a9-23ba-63ff-5738-8bac11aad810@linaro.org>
+ <87eewzdtqg.fsf@linaro.org>
+ <81e43d43-29f8-ec56-5270-bb90dd1bc077@linaro.org>
+ <889CE29C-C705-4EB4-B52A-62F88A6121A2@arm.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alan Hayward <Alan.Hayward@arm.com>
+Subject: Re: [PATCH v3 12/20] target/arm: generate xml description of our
+ SVE registers
+In-reply-to: <889CE29C-C705-4EB4-B52A-62F88A6121A2@arm.com>
+Date: Thu, 09 Jan 2020 12:08:24 +0000
+Message-ID: <87muawj0hz.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200109064527-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: yFJaVQM8Np6Q3aNDPGRa7w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,84 +103,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jasowang@redhat.com, vkuznets@redhat.com, qemu-devel@nongnu.org
+Cc: "damien.hedde@greensocs.com" <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Luis Machado <luis.machado@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "open
+ list:ARM TCG CPUs" <qemu-arm@nongnu.org>, nd <nd@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Wed, Jan 08, 2020 at 01:53:53PM +0000, Dr. David Alan Gilbert (git) wr=
-ote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >=20
-> > Mark the synic pages as ram_device so that they won't be visible
-> > to vhost.
-> >=20
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
->=20
-> I think I disagree with this one.
->  * A RAM device represents a mapping to a physical device, such as to a P=
-CI
->  * MMIO BAR of an vfio-pci assigned device.  The memory region may be map=
-ped
->  * into the VM address space and access to the region will modify memory
->  * directly.  However, the memory region should not be included in a memo=
-ry
->  * dump (device may not be enabled/mapped at the time of the dump), and
->  * operations incompatible with manipulating MMIO should be avoided.  Rep=
-laces
->  * skip_dump flag.
->=20
-> Looks like an abuse of notation.
 
-OK, it did feel a bit like that - any suggestions of another way to do
-it?
-  This clearly isn't normal RAM.
+Alan Hayward <Alan.Hayward@arm.com> writes:
 
-Dave
+>> On 20 Dec 2019, at 13:18, Luis Machado <luis.machado@linaro.org> wrote:
+>>=20
+>> On 12/20/19 10:14 AM, Alex Benn=C3=A9e wrote:
+>>> Luis Machado <luis.machado@linaro.org> writes:
+>>>> On 12/19/19 4:15 PM, Alex Benn=C3=A9e wrote:
+>>>>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>>>>=20
+>>>>>> On 12/11/19 9:05 AM, Alex Benn=C3=A9e wrote:
+>>>>>>> +static struct TypeSize vec_lanes[] =3D {
+>>>>>>=20
+>>>>>> const.
+>>>>>>=20
+>>>>>>> +    case 51:
+>>>>>>> +        return gdb_get_reg64(buf, (cpu->env.vfp.zcr_el[1] & 0xf) +=
+ 1);
+>>>>>>=20
+>>>>>> You need to use sve_zcr_len_for_el to get the effective vq.
+>>>>>> Also, I thought vg =3D=3D 2 * vq.
+>>>>>>   > +    case 51:
+>>>>>>> +    {
+>>>>>>> +        uint64_t val =3D *(uint64_t *) buf;
+>>>>>>> +        cpu->env.vfp.zcr_el[1] =3D (val - 1) & 0xf;
+>>>>>>=20
+>>>>>> You cannot hard-code EL1 without ifdef CONFIG_USER_ONLY.  If the eff=
+ective vq
+>>>>>> decreases, you must call aarch64_sve_narrow_vq.  You must call arm_r=
+ebuild_hflags.
+>>>>> I'm just going to drop vg (and therefor the ability to set it) from
+>>>>> the
+>>>>> regset. It was only meant to be an indicator and gdb doesn't actually
+>>>>> look to it to size it's output. The likely dynamic extension will just
+>>>>> re-transmit the whole XML when a change occurs.
+>>>>>=20
+>
+> [...rebooting self after festive break]
+>
+> Yes, when using a gdb stub, changes to the VG value should be silently ig=
+nored by the
+> stub.
+> In addition, if the vector length on the system does magically change whi=
+lst the program
+> is running, then the stub should continue to use the register sizes for t=
+he originally
+> transmitted XML, truncating/extending the register values as required.
+>
+> Why? Because once the stub has sent the XML description to GDB on program=
+ start, then GDB
+> assumes the XML description will never change. GDB will error if sent pac=
+kets with different
+> register lengths.
 
->=20
->=20
-> > ---
-> >  hw/hyperv/hyperv.c | 14 ++++++++------
-> >  1 file changed, 8 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-> > index da8ce82725..4de3ec411d 100644
-> > --- a/hw/hyperv/hyperv.c
-> > +++ b/hw/hyperv/hyperv.c
-> > @@ -95,12 +95,14 @@ static void synic_realize(DeviceState *dev, Error *=
-*errp)
-> >      msgp_name =3D g_strdup_printf("synic-%u-msg-page", vp_index);
-> >      eventp_name =3D g_strdup_printf("synic-%u-event-page", vp_index);
-> > =20
-> > -    memory_region_init_ram(&synic->msg_page_mr, obj, msgp_name,
-> > -                           sizeof(*synic->msg_page), &error_abort);
-> > -    memory_region_init_ram(&synic->event_page_mr, obj, eventp_name,
-> > -                           sizeof(*synic->event_page), &error_abort);
-> > -    synic->msg_page =3D memory_region_get_ram_ptr(&synic->msg_page_mr)=
-;
-> > -    synic->event_page =3D memory_region_get_ram_ptr(&synic->event_page=
-_mr);
-> > +    synic->msg_page =3D qemu_memalign(qemu_real_host_page_size,
-> > +                                    sizeof(*synic->msg_page));
-> > +    synic->event_page =3D qemu_memalign(qemu_real_host_page_size,
-> > +                                      sizeof(*synic->event_page));
-> > +    memory_region_init_ram_device_ptr(&synic->msg_page_mr, obj, msgp_n=
-ame,
-> > +                           sizeof(*synic->msg_page), synic->msg_page);
-> > +    memory_region_init_ram_device_ptr(&synic->event_page_mr, obj, even=
-tp_name,
-> > +                           sizeof(*synic->event_page), synic->event_pa=
-ge);
-> > =20
-> >      g_free(msgp_name);
-> >      g_free(eventp_name);
-> > --=20
-> > 2.24.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Ack. The test "test-sve-ioctl.py" covers this and works as expected.
 
+<snip>
+>
+> When using GDB a real SVE Linux box without a stub/gdbserver, then:
+>
+<snip>
+>
+> Blindly enabling the above when using a stub results in in GDB *constantl=
+y* asking the
+> stub for a new XML description, spamming the pipe, so this needs somethin=
+g more nuanced.=20
+>
+> I plan on sending Luis my ideas I had for VG changing when using a
+> stub.
+
+Is this going to be a more general solution because I'm sure there are
+other cases where the XML description is out of date. A big one is
+execution modes (thumb/32/64 bit) and I think x86 runs into similar
+problems with it's various mode changes in early boot-up.
+
+For now I'll just let qemu provide it's own xml without vg shenanigans.
+
+>>> But this is all special casing for feature
+>>> name=3D"org.gnu.gdb.aarch64.sve" right?
+>>=20
+>> Yes, vg is only available if feature org.gnu.gdb.aarch64.sve is availabl=
+e.
+>
+> Nod.
+
+Thanks and hi ;-)
+
+--=20
+Alex Benn=C3=A9e
 
