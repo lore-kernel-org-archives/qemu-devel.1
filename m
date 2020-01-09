@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B6EC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED05DC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:24:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 782C22067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFA9F206DA
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:24:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxFSILEQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 782C22067D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iAAdxr5Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFA9F206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipLXk-0006al-Fh
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 19:19:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43698)
+	id 1ipLcl-0000YS-Lw
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 19:24:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ipLWu-0005oH-J2
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:18:29 -0500
+ (envelope-from <jsnow@redhat.com>) id 1ipLbr-0008TC-1V
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:23:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ipLWs-0001VN-BU
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:18:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31128
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1ipLbp-0001Ic-DQ
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:23:34 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53875
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ipLWs-0001UV-6V
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:18:26 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ipLbp-0001H1-8Y
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:23:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578529105;
+ s=mimecast20190719; t=1578529412;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=uG1Zvkp0kIR9bE20fKHvOw5dl5I30u1VmZVGDKfjqJE=;
- b=MxFSILEQMB2sdK+QX39oNjWHnEdAdb2a6g+vNtq9qkJQ6e4hyx/WU7qD9dDM5s24NPogR2
- +CwK6DpGU9BL6eQzLFtl+A05Rbpa90y7gG9+8biS+uXYKOQYsx8vnpnBKfdgp+AbFbQPTM
- rWOqTIWGhB1N0lgAanajyKNluRwQpak=
+ bh=i73GdfYSies0lmo63OHh5frwwGJBvHHqyDVZLk1EABg=;
+ b=iAAdxr5QLdp2Cn57zH7oCymFYMOP0w8jR/EM/j9CbwgswA9Rt0kdQceKL0fto0J5PWU1ei
+ vHlQGH1zSLmr9QrYpnPSS+Es5sXmRzsx1w3UM7u+KN6HF1ThmJvTM4D4el0cciT27kyjbI
+ zh1176+V84SlHkJ1TWqjigOaJmokvPo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-42-YTDQpgAjO0G7ot-fF4NXLA-1; Wed, 08 Jan 2020 19:18:24 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-299-FF9G5TqVNju7VkEfRcwU2w-1; Wed, 08 Jan 2020 19:23:31 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9738E1800D4E
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 00:18:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46D22800D48
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 00:23:30 +0000 (UTC)
 Received: from [10.18.17.134] (dhcp-17-134.bos.redhat.com [10.18.17.134])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A947660CD3;
- Thu,  9 Jan 2020 00:18:20 +0000 (UTC)
-Subject: Re: [PATCH 3/5] python/qemu: qmp: Make accept()'s timeout configurable
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 16ECE62926;
+ Thu,  9 Jan 2020 00:23:27 +0000 (UTC)
+Subject: Re: [PATCH 4/5] python/qemu: qmp: Make QEMUMonitorProtocol a context
+ manager
 To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
 References: <20191227134101.244496-1-wainersm@redhat.com>
- <20191227134101.244496-4-wainersm@redhat.com>
+ <20191227134101.244496-5-wainersm@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -137,21 +138,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <303e47ef-22be-89b4-c9fe-eebc9e568a1f@redhat.com>
-Date: Wed, 8 Jan 2020 19:18:20 -0500
+Message-ID: <b32d57ea-de80-bbe2-b771-ae736ef485b1@redhat.com>
+Date: Wed, 8 Jan 2020 19:23:26 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20191227134101.244496-4-wainersm@redhat.com>
+In-Reply-To: <20191227134101.244496-5-wainersm@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: YTDQpgAjO0G7ot-fF4NXLA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: FF9G5TqVNju7VkEfRcwU2w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -170,44 +171,60 @@ Sender: "Qemu-devel"
 
 
 
-On 12/27/19 8:40 AM, Wainer dos Santos Moschetta wrote:
-> Currently the timeout of QEMUMonitorProtocol.accept() is
-> hard-coded to 15 seconds. This added the parameter `timeout`
-> so the value can be configured by the user.
+On 12/27/19 8:41 AM, Wainer dos Santos Moschetta wrote:
+> This implement the __enter__ and __exit__ functions on
+> QEMUMonitorProtocol class so that it can be used on 'with'
+> statement and the resources will be free up on block end:
+> 
+> with QEMUMonitorProtocol(socket_path) as qmp:
+>     qmp.connect()
+>     qmp.command('query-status')
 > 
 > Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 > ---
->  python/qemu/qmp.py | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  python/qemu/qmp.py | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
 > 
 > diff --git a/python/qemu/qmp.py b/python/qemu/qmp.py
-> index f4e04a6683..914b8c6774 100644
+> index 914b8c6774..6d55f53595 100644
 > --- a/python/qemu/qmp.py
 > +++ b/python/qemu/qmp.py
-> @@ -154,16 +154,17 @@ class QEMUMonitorProtocol:
->              return self.__negotiate_capabilities()
->          return None
+> @@ -139,6 +139,15 @@ class QEMUMonitorProtocol:
+>                  raise QMPConnectError("Error while reading from socket")
+>              self.__sock.settimeout(None)
 >  
-> -    def accept(self):
-> +    def accept(self, timeout=15):
+> +    def __enter__(self):
+> +        # Implement context manager enter function.
+> +        return self
+> +
+> +    def __exit__(self, exc_type, exc_value, exc_traceback):
+> +        # Implement context manager exit function.
+> +        self.close()
+> +        return False
+> +
+>      def connect(self, negotiate=True):
 >          """
->          Await connection from QMP Monitor and perform capabilities negotiation.
+>          Connect to the QMP Monitor and perform capabilities negotiation.
+> @@ -259,8 +268,10 @@ class QEMUMonitorProtocol:
+>          """
+>          Close the socket and socket file.
+>          """
+> -        self.__sock.close()
+> -        self.__sockfile.close()
+> +        if self.__sock:
+> +            self.__sock.close()
+> +        if self.__sockfile:
+> +            self.__sockfile.close()
+
+Not evident on cold read: does self.close() change self.__sock and
+self.__sockfile such that they are false-ish?
+
+close() I suspect might need to actually unset the __sock and __sockfile
+fields.
+
 >  
-> +        @param timeout (float): timeout in seconds. Default is 15.
-
-What happens if I pass -1 or 0? Please document the valid range for this
-parameter.
-
->          @return QMP greeting dict
->          @raise OSError on socket connection errors
->          @raise QMPConnectError if the greeting is not received
->          @raise QMPCapabilitiesError if fails to negotiate capabilities
+>      def settimeout(self, timeout):
 >          """
-> -        self.__sock.settimeout(15)
-> +        self.__sock.settimeout(timeout)
->          self.__sock, _ = self.__sock.accept()
->          self.__sockfile = self.__sock.makefile()
->          return self.__negotiate_capabilities()
 > 
 
 
