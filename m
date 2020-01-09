@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4821AC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A1AC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 120982067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:42:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD9662067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:43:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLHA/X9q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120982067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKvc+0Fo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD9662067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipZx0-0000f3-Sj
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 10:42:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35216)
+	id 1ipZy6-0002ys-QS
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 10:43:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34808)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ipZv6-0007K7-Oe
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:40:25 -0500
+ (envelope-from <philmd@redhat.com>) id 1ipZv2-0007DJ-MZ
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:40:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ipZv5-0004DF-Pk
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:40:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27775
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ipZv1-0003qw-9k
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:40:20 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28641
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipZv5-0004Ah-Jj
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:40:23 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipZv0-0003mv-Vt
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:40:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578584423;
+ s=mimecast20190719; t=1578584418;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JDfqeVIMdGnCS4eTJugjhOwJVmgpisKHOiVhHALOiSg=;
- b=BLHA/X9q8XqBYEOvLEWSrmmL+47U7Dh2IOlOgtJh9hj/qUn4BlMqsRts77W2a+8T6Yti/5
- cmIrKm93cSoSZRVfArfeB9GTttltxVLPxNxf/gZD2x/5PUjpV79je728t8q+5XIO7HL7nB
- UmoKV6lvV6Foz5qXtNBTqGAFWq/F5EE=
+ bh=uvMUId5CAgve5E5mWjadx78NUWbTZqBc9nfElX7Eg10=;
+ b=UKvc+0Fo/RxCTOzVQvcKJ7h+cIyXc9kqvryWKyuKb4XCHJuQbJ3D4qlL84FY48aIVQ3w7V
+ hhdm4u+pyaMU3mIqBIu37jjSWD/p+APd4FjTQ5AwgGpDGtFpcv3M9ScRmHkp/VSpMVIbyq
+ e8l+DYZID0xskUi+k8buxLXRhBU5qGo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-cbPAk3gTNKCRAJSrpWZP6Q-1; Thu, 09 Jan 2020 10:40:21 -0500
+ us-mta-140-jwR0XzlnPp2phPzFg0i5-w-1; Thu, 09 Jan 2020 10:40:15 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C90B4101FB16;
- Thu,  9 Jan 2020 15:40:20 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-180.brq.redhat.com [10.40.204.180])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E7E786CBB;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EB4F8C0C40;
  Thu,  9 Jan 2020 15:40:14 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-180.brq.redhat.com [10.40.204.180])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B710687EC5;
+ Thu,  9 Jan 2020 15:40:02 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] Makefile: Remove unhelpful comment
-Date: Thu,  9 Jan 2020 16:39:39 +0100
-Message-Id: <20200109153939.27173-5-philmd@redhat.com>
+Subject: [PATCH 3/4] Makefile: Restrict system emulation and tools objects
+Date: Thu,  9 Jan 2020 16:39:38 +0100
+Message-Id: <20200109153939.27173-4-philmd@redhat.com>
 In-Reply-To: <20200109153939.27173-1-philmd@redhat.com>
 References: <20200109153939.27173-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: cbPAk3gTNKCRAJSrpWZP6Q-1
+X-MC-Unique: jwR0XzlnPp2phPzFg0i5-w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,32 +93,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is pointless to keep qapi/ object separate from the other
-common-objects. Drop the comment.
+Restrict all the system emulation and tools objects with a
+Makefile IF (CONFIG_SOFTMMU OR CONFIG_TOOLS) check.
+
+Using the same description over and over is not very helpful.
+Use it once, just before the if() block.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- Makefile.objs | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ Makefile.objs | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
 diff --git a/Makefile.objs b/Makefile.objs
-index 395dd1e670..c6321d0465 100644
+index 5aae561984..395dd1e670 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -71,11 +71,9 @@ qemu-seccomp.o-libs :=3D $(SECCOMP_LIBS)
+@@ -4,16 +4,15 @@ stub-obj-y =3D stubs/
+ util-obj-y =3D crypto/ util/ qobject/ qapi/
+ qom-obj-y =3D qom/
 =20
- common-obj-$(CONFIG_FDT) +=3D device_tree.o
-=20
--######################################################################
--# qapi
--
- common-obj-y +=3D qapi/
--endif
++#######################################################################
++# code used by both qemu system emulation and qemu-img
 +
-+endif # CONFIG_SOFTMMU
++ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
++
+ chardev-obj-y =3D chardev/
 =20
- #######################################################################
- # Target-independent parts used in system and user emulation
+-#######################################################################
+-# authz-obj-y is code used by both qemu system emulation and qemu-img
+-
+ authz-obj-y =3D authz/
+=20
+-#######################################################################
+-# block-obj-y is code used by both qemu system emulation and qemu-img
+-
+ block-obj-y =3D nbd/
+ block-obj-y +=3D block.o blockjob.o job.o
+ block-obj-y +=3D block/ scsi/
+@@ -22,16 +21,12 @@ block-obj-$(CONFIG_REPLICATION) +=3D replication.o
+=20
+ block-obj-m =3D block/
+=20
+-#######################################################################
+-# crypto-obj-y is code used by both qemu system emulation and qemu-img
+-
+ crypto-obj-y =3D crypto/
+=20
+-#######################################################################
+-# io-obj-y is code used by both qemu system emulation and qemu-img
+-
+ io-obj-y =3D io/
+=20
++endif # CONFIG_SOFTMMU or CONFIG_TOOLS
++
+ ######################################################################
+ # Target independent part of system emulation. The long term path is to
+ # suppress *all* target specific code in case of system emulation, i.e. a
 --=20
 2.21.1
 
