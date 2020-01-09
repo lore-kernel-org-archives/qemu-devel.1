@@ -2,67 +2,60 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5450BC33CA3
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 04:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 526A3C33CA2
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 04:59:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22C47206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 04:28:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="p9xvEC+h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C47206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 2B963206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 04:59:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B963206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipPQT-0004X2-Qv
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 23:28:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37759)
+	id 1ipPup-0000WV-5T
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 23:59:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ipPOq-0003AI-BG
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:26:26 -0500
+ (envelope-from <eguan@linux.alibaba.com>) id 1ipPu4-0008UA-AK
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ipPOo-0000ka-Hl
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:26:24 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:58463 helo=ozlabs.org)
+ (envelope-from <eguan@linux.alibaba.com>) id 1ipPtw-0007Zm-NY
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:58:34 -0500
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:54978)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ipPOo-0000c7-2m; Wed, 08 Jan 2020 23:26:22 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47tY2x4HQJz9sRY; Thu,  9 Jan 2020 15:26:17 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578543977;
- bh=k35VB7jck5EdbAcJ/pE469Ier18LRiHhJg9+zSffLQM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=p9xvEC+hQV8S7mojEmKjmOrtLdNQZRfIsnlceV3W/nUXyInUTTfzmzKbpy/s/cizU
- +SK43OYnuqAzoDQQIoR+z5fKlC4vTu9HvVhmKZXI7Hrx4A1wyxky78FchVVGjoMKVp
- rv+K8qsA7oLLTeUSz4NQGkeaET3hzQQkg4ocxZC4=
-Date: Thu, 9 Jan 2020 15:07:15 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH qemu v2] spapr: Kill SLOF
-Message-ID: <20200109040715.GM8586@umbus.fritz.box>
-References: <20200105234242.78897-1-aik@ozlabs.ru>
- <20200106041940.GV2098@umbus>
- <80157816-7859-3450-6a2c-ab151be5ee94@ozlabs.ru>
- <20200106085042.GW2098@umbus>
- <741e9b5e-6a7d-66a4-451d-e37c30697b2b@ozlabs.ru>
- <20200107052604.GH2098@umbus>
- <a76e906f-4cf0-aa49-759d-e64b7f219a1b@ozlabs.ru>
+ (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
+ id 1ipPtw-0007JB-9T
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 23:58:32 -0500
+X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R181e4; CH=green; DM=||false|;
+ DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07487; MF=eguan@linux.alibaba.com;
+ NM=1; PH=DS; RN=4; SR=0; TI=SMTPD_---0TnDRs4L_1578545886; 
+Received: from localhost(mailfrom:eguan@linux.alibaba.com
+ fp:SMTPD_---0TnDRs4L_1578545886) by smtp.aliyun-inc.com(127.0.0.1);
+ Thu, 09 Jan 2020 12:58:07 +0800
+Date: Thu, 9 Jan 2020 12:58:06 +0800
+From: Eryu Guan <eguan@linux.alibaba.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
+Message-ID: <20200109045806.GB79586@e18g06458.et15sqa>
+References: <20191231103434.GA41863@e18g06458.et15sqa>
+ <20191231115136.7b967604@Igors-MacBook-Pro>
+ <20200102020850.GB41863@e18g06458.et15sqa>
+ <20200107130649.GH41863@e18g06458.et15sqa>
+ <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="xHbokkKX1kTiQeDC"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a76e906f-4cf0-aa49-759d-e64b7f219a1b@ozlabs.ru>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 47.88.44.36
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,158 +67,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Jan 07, 2020 at 03:01:01PM +0100, Julia Suvorova wrote:
+> On Tue, Jan 7, 2020 at 2:06 PM Eryu Guan <eguan@linux.alibaba.com> wrote:
+> >
+> > On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
+> > > On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
+> > > > On Tue, 31 Dec 2019 18:34:34 +0800
+> > > > Eryu Guan <eguan@linux.alibaba.com> wrote:
+> > > >
+> > > > > Hi,
+> > > > >
+> > > > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
+> > > > > think it's because io completion hits use-after-free when device is
+> > > > > already gone. Is this a known bug that has been fixed? (I went through
+> > > > > the git log but didn't find anything obvious).
+> > > > >
+> > > > > gdb backtrace is:
+> > > > >
+> > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
+> > > > > Program terminated with signal 11, Segmentation fault.
+> > > > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
+> > > > > 903        return obj->class;
+> > > > > (gdb) bt
+> > > > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
+> > > > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
+> > > > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
+> > > > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
+> > > > >     opaque=0x558a2f2fd420, ret=0)
+> > > > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
+> > > > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
+> > > > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
+> > > > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
+> > > > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
+> > > > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
+> > > > > #6  0x00007fff9ed75780 in ?? ()
+> > > > > #7  0x0000000000000000 in ?? ()
+> > > > >
+> > > > > It seems like qemu was completing a discard/write_zero request, but
+> > > > > parent BusState was already freed & set to NULL.
+> > > > >
+> > > > > Do we need to drain all pending request before unrealizing virtio-blk
+> > > > > device? Like the following patch proposed?
+> > > > >
+> > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
+> > > > >
+> > > > > If more info is needed, please let me know.
+> > > >
+> > > > may be this will help: https://patchwork.kernel.org/patch/11213047/
+> > >
+> > > Yeah, this looks promising! I'll try it out (though it's a one-time
+> > > crash for me). Thanks!
+> >
+> > After applying this patch, I don't see the original segfaut and
+> > backtrace, but I see this crash
+> >
+> > [Thread debugging using libthread_db enabled]
+> > Using host libthread_db library "/lib64/libthread_db.so.1".
+> > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
+> > Program terminated with signal 11, Segmentation fault.
+> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
+> > 1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
+> > Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
+> > (gdb) bt
+> > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
+> > #1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
+> > #2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
+> >     at /usr/src/debug/qemu-4.0/memory.c:568
+> > #3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
+> > #4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
+> >     at /usr/src/debug/qemu-4.0/exec.c:3279
+> > #5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
+> > #6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
+> > #7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
+> > #8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
+> > #9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
+> > #10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
+> > #11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
+> > #12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
+> >
+> > And I searched and found
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
+> > backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
+> > blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
+> > bug.
+> >
+> > But I can still hit the bug even after applying the commit. Do I miss
+> > anything?
+> 
+> Hi Eryu,
+> This backtrace seems to be caused by this bug (there were two bugs in
+> 1706759): https://bugzilla.redhat.com/show_bug.cgi?id=1708480
+> Although the solution hasn't been tested on virtio-blk yet, you may
+> want to apply this patch:
+>     https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg05197.html
+> Let me know if this works.
 
---xHbokkKX1kTiQeDC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Unfortunately, I still see the same segfault & backtrace after applying
+commit 421afd2fe8dd ("virtio: reset region cache when on queue
+deletion")
 
-On Wed, Jan 08, 2020 at 03:07:41PM +1100, Alexey Kardashevskiy wrote:
->=20
->=20
-> On 07/01/2020 16:26, David Gibson wrote:
->=20
-> >>>>>> +static uint32_t client_setprop(SpaprMachineState *sm,
-> >>>>>> +                               uint32_t nodeph, uint32_t pname,
-> >>>>>> +                               uint32_t valaddr, uint32_t vallen)
-> >>>>>> +{
-> >>>>>> +    char propname[64];
-> >>>>>> +    uint32_t ret =3D -1;
-> >>>>>> +    int proplen =3D 0;
-> >>>>>> +    const void *prop;
-> >>>>>> +
-> >>>>>> +    readstr(pname, propname);
-> >>>>>> +    if (vallen =3D=3D sizeof(uint32_t) &&
-> >>>>>> +        ((strncmp(propname, "linux,rtas-base", 15) =3D=3D 0) ||
-> >>>>>> +         (strncmp(propname, "linux,rtas-entry", 16) =3D=3D 0))) {
-> >>>>>> +
-> >>>>>> +        sm->rtas_base =3D readuint32(valaddr);
-> >>>>>> +        prop =3D fdt_getprop_namelen(sm->fdt_blob,
-> >>>>>> +                                   fdt_node_offset_by_phandle(sm-=
->fdt_blob,
-> >>>>>> +                                                              nod=
-eph),
-> >>>>>> +                                   propname, strlen(propname), &p=
-roplen);
-> >>>>>> +        if (proplen =3D=3D vallen) {
-> >>>>>> +            *(uint32_t *) prop =3D cpu_to_be32(sm->rtas_base);
-> >>>>>> +            ret =3D proplen;
-> >>>>>> +        }
-> >>>>>
-> >>>>> Is there a particular reason to restrict this to the rtas propertie=
-s,
-> >>>>> rather than just allowing the guest to fdt_setprop() something
-> >>>>> arbitrary?
-> >>>>
-> >>>> The FDT is flatten and I am not quite sure if libfdt can handle upda=
-ting
-> >>>> properties if the length has changed.
-> >>>
-> >>> fdt_setprop() will handle updating properties with changed length (in
-> >>> fact there's a special fdt_setprop_inplace() optimized for the case
-> >>> where you don't need that).  It's not particularly efficient, but it
-> >>> should work fine for the cases we have here.  In fact, I think you're
-> >>> already relying on this for the code that adds the phandles to
-> >>> everything.
-> >>
-> >> Well, I used to add phandles before calling fdt_pack() so it is not ex=
-actly the same.
-> >=20
-> > Ah, right, that's why adding the phandles worked.
-> >=20
-> >>> One complication is that it can return FDT_ERR_NOSPACE if there isn't
-> >>> enough buffer for the increased thing.  We could either trap that,
-> >>> resize and retry, or we could leave a bunch of extra space.  The
-> >>> latter would be basically equivalent to not doing fdt_pack() on the
-> >>> blob in the nobios case.
-> >>
-> >>
-> >> This is what I ended up doing.
-> >>
-> >>
-> >>>> Also, more importantly, potentially property changes like this may h=
-ave
-> >>>> to be reflected in the QEMU device tree so I allowed only the proper=
-ties
-> >>>> which I know how to deal with.
-> >>>
-> >>> That's a reasonable concern, but the nice thing about not having SLOF
-> >>> is that there's only one copy of the device tree - the blob in qemu.
-> >>> So a setprop() on that is automatically a setprop() everywhere (this
-> >>> is another reason not to write the fdt into guest memory in the nobios
-> >>> case - it will become stale as soon as the client changes anything).
-> >>
-> >>
-> >> True to a degree. It is "setprop" to the current fdt blob which we do =
-not
-> >> analyze after we build the fdt. We either need to do parse the tree be=
-fore
-> >> we rebuild it as CAS so we do not lose the updates or do selective cha=
-nges
-> >> to the QEMUs objects from the "setprop" handler (this is what I do
-> >> now).
-> >=20
-> > Hrm.. do those setprops happen before CAS?
->=20
-> Yes, vmlinux/zimage call "setprop" for "linux,initrd-start",
-> "linux,initrd-end", "bootargs", "linux,stdout-path"; vmlinux sets
-> properties if linux,initrd-* came from r3/r4 and zImage sets properties
-> no matter how it discovered them - from r3/r4 or the device tree.
+Anything I can help to debug?
 
-Ok, and those setprops happen before CAS?
-
-In a sense this is kind of a fundamental problem with rebuilding the
-whole DT at CAS time.  Except that strictly speaking it's a problem
-even without that: we just get away with it by accident because CAS
-isn't likely to change the same things that guest setprops do.
-
-It's still basically unsynchronized mutations by two parties to a
-shared data structure.
-
-> btw we write them as "cells" (=3D=3D4bytes long) in qemu but vminux chang=
-es
-> them to 8 bytes and zImage keeps it 4 bytes. Not a problem but an
-> interesting fact, this is why I had to allow extending the properties in
-> "setprop" :)
->=20
->=20
-> >  I would have thought we'd
-> > call CAS before instantiating RTAS.
->=20
-> This is correct but I do not think the order is mandatory.
-
-Hm, right.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---xHbokkKX1kTiQeDC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4WpvMACgkQbDjKyiDZ
-s5IUCxAArxHkB46xPz2fbIgd1ZgxUoJRdmhBaLdXt+8WQAHPIiVea1Q29q6RYpkG
-fCrSpu5f4T/dgBbl/fSWVG1WD3jR8zmi9TOgbn9eViL0tUqVfVJEgy/avNsTUIaJ
-N/FYqkp9oOQEbod0Q1dJmxWhya+Cf58L4NZa5/jdFovun7gWZVIFMVUKKIUmJQ+W
-TjtHdPsmCZkzAQiERSORv2jVWknuvghGdIpTGS1Uw0XhQhlLSHZRk5Fl4Xcp8SpA
-vGvpg9iG3OdJ1CpvEsvKHp6DIOzT/WwoIv4kyZibraNoLGhlNxSnL18lHIugK6/D
-tbHTV9iX8EgLGpjeY8wMW8wvD+8B+NtFnKMc6yRq8OQvyOiIRy89KEHgGradDxTX
-8tNZmpHdpNapnlXVRQDW6PdDJKCY5KidnCTrvODEUQ5wYnWmIDLuUC/Cf1v3uDmz
-K/g4Sr3jU2kgKuxiGGVUuXDJIfJ7UslqOsNmVAR49ZFgOfz0h20zOXufg7zDsIIQ
-rmUTWlFZEof/0HpPXoa26Ktf3WEkyb8Ay0+b+6JytSj8dVN3kpXvldNDhCMMK1ME
-Mc93vuD4HvsH/PDJw6y6Eqb8eh4TJzWJyIWU5iL2OaM20O3uObceqzc0gRkMTrvd
-yl/g1UoNeyYitQaQ9oArqrPkGikwuWlhGl679TAIdJBQuFDfki0=
-=iFOZ
------END PGP SIGNATURE-----
-
---xHbokkKX1kTiQeDC--
+Thanks,
+Eryu
 
