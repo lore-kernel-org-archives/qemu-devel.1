@@ -2,75 +2,109 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92183C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68067C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BCF2206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:26:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BCF2206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3B394206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:34:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B394206ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipbZy-0005Zg-FT
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:26:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54934)
+	id 1ipbhs-00008m-0W
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:34:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipbZ9-0004FD-5y
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:25:52 -0500
+ (envelope-from <andre.przywara@arm.com>) id 1ipbdT-0007Pt-Gk
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:30:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipbZ7-0005rn-FD
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:25:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55374)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipbZ7-0005kE-7m
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:25:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipbZ4-0004pQ-93
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 17:25:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D6E832E80D7
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 17:25:45 +0000 (UTC)
+ (envelope-from <andre.przywara@arm.com>) id 1ipbdQ-0000tO-PC
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:30:19 -0500
+Received: from foss.arm.com ([217.140.110.172]:43064)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <andre.przywara@arm.com>)
+ id 1ipbdM-0000SM-LP; Thu, 09 Jan 2020 12:30:12 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 35477328;
+ Thu,  9 Jan 2020 09:30:11 -0800 (PST)
+Received: from [192.168.3.111] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EF75D3F703;
+ Thu,  9 Jan 2020 09:30:08 -0800 (PST)
+Subject: Re: [kvm-unit-tests PATCH 04/10] arm: pmu: Check Required Event
+ Support
+To: Auger Eric <eric.auger@redhat.com>
+References: <20191216204757.4020-1-eric.auger@redhat.com>
+ <20191216204757.4020-5-eric.auger@redhat.com>
+ <20200103181251.72cfcae2@donnerap.cambridge.arm.com>
+ <ce0ce49f-7e19-21d4-5eba-386dd2f96301@redhat.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Autocrypt: addr=andre.przywara@arm.com; prefer-encrypt=mutual; keydata=
+ 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
+ i4aIXCH3Wv6K
+Organization: ARM Ltd.
+Message-ID: <380b27cb-a762-0622-af9c-1d2afc3a4b5e@arm.com>
+Date: Thu, 9 Jan 2020 17:30:00 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jan 2020 17:19:49 -0000
-From: Thomas Huth <1835827@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alistair2323 shacknetisp th-huth
-X-Launchpad-Bug-Reporter: shacknetisp (shacknetisp)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156261335686.24679.15455554757536791509.malonedeb@soybean.canonical.com>
-Message-Id: <157859038921.3101.15142578332689341609.malone@soybean.canonical.com>
-Subject: [Bug 1835827] Re: HTIF symbols no longer recognized by RISC-V spike
- board
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1d7deaffd0cf8c1b5b49b904fd0c0c0498f9687d
+In-Reply-To: <ce0ce49f-7e19-21d4-5eba-386dd2f96301@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 217.140.110.172
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,37 +113,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1835827 <1835827@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andrew.murray@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch has been included in QEMU v4.2:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D6478dd745dca49d632
+On 09/01/2020 16:54, Auger Eric wrote:
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Hi Eric,
 
--- =
+> On 1/3/20 7:12 PM, Andre Przywara wrote:
+>> On Mon, 16 Dec 2019 21:47:51 +0100
+>> Eric Auger <eric.auger@redhat.com> wrote:
+>>
+>> Hi Eric,
+>>
+>>> If event counters are implemented check the common events
+>>> required by the PMUv3 are implemented.
+>>>
+>>> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+>>> either INST_RETIRED or INST_SPEC). Some others only are
+>>> required if the implementation implements some other features.
+>>>
+>>> Check those wich are unconditionally required.
+>>>
+>>> This test currently fails on TCG as neither INST_RETIRED
+>>> or INST_SPEC are supported.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> ---
+>>>
+>>> v1 ->v2:
+>>> - add a comment to explain the PMCEID0/1 splits
+>>> ---
+>>>  arm/pmu.c         | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+>>>  arm/unittests.cfg |  6 ++++
+>>>  2 files changed, 77 insertions(+)
+>>>
+>>> diff --git a/arm/pmu.c b/arm/pmu.c
+>>> index d24857e..d88ef22 100644
+>>> --- a/arm/pmu.c
+>>> +++ b/arm/pmu.c
+>>> @@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>>>  	: "cc");
+>>>  }
+>>> +
+>>> +/* event counter tests only implemented for aarch64 */
+>>> +static void test_event_introspection(void) {}
+>>> +
+>>>  #elif defined(__aarch64__)
+>>>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>>>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+>>> @@ -139,6 +143,70 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>>>  	: [pmcr] "r" (pmcr)
+>>>  	: "cc");
+>>>  }
+>>> +
+>>> +#define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
+>>> +
+>>> +static bool is_event_supported(uint32_t n, bool warn)
+>>> +{
+>>> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+>>> +	uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+>>> +	bool supported;
+>>> +	uint32_t reg;
+>>> +
+>>> +	/*
+>>> +	 * The low 32-bits of PMCEID0/1 respectly describe
+>>> +	 * event support for events 0-31/32-63. Their High
+>>> +	 * 32-bits describe support for extended events
+>>> +	 * starting at 0x4000, using the same split.
+>>> +	 */
+>>> +	if (n >= 0x0  && n <= 0x1F)
+>>> +		reg = pmceid0 & 0xFFFFFFFF;
+>>> +	else if  (n >= 0x4000 && n <= 0x401F)
+>>> +		reg = pmceid0 >> 32;
+>>> +	else if (n >= 0x20  && n <= 0x3F)
+>>> +		reg = pmceid1 & 0xFFFFFFFF;
+>>> +	else if (n >= 0x4020 && n <= 0x403F)
+>>> +		reg = pmceid1 >> 32;
+>>> +	else
+>>> +		abort();
+>>> +
+>>> +	supported =  reg & (1 << n);
+>>
+>> Don't we need to mask off everything but the lowest 5 bits of "n"? Probably also using "1U" is better.
+> I added an assert to check n is less or equal than 0x3F
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1835827
+But "n" will definitely be bigger than that in case of an extended
+event, won't it? So you adjust "reg" accordingly, but miss to do
+something similar to "n"?
 
-Title:
-  HTIF symbols no longer recognized by RISC-V spike board
+>>
+>>> +	if (!supported && warn)
+>>> +		report_info("event %d is not supported", n);
+>>> +	return supported;
+>>> +}
+>>> +
+>>> +static void test_event_introspection(void)
+>>
+>> "introspection" sounds quite sophisticated. Are you planning to extend this? If not, could we maybe rename it to "test_available_events"?
+> Yes this test is a placeholder for looking at the PMU characteristics
+> and we may add some other queries there.
+>>
+>>> +{
+>>> +	bool required_events;
+>>> +
+>>> +	if (!pmu.nb_implemented_counters) {
+>>> +		report_skip("No event counter, skip ...");
+>>> +		return;
+>>> +	}
+>>> +
+>>> +	/* PMUv3 requires an implementation includes some common events */
+>>> +	required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+>>> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+>>> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+>>> +			   is_event_supported(0x1B, true) /* INST_PREC */);
+>>> +
+>>> +	if (pmu.version == 0x4) {
+>>> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+>>> +		required_events = required_events ||
+>>> +				  is_event_supported(0x23, true) ||
+>>
+>> Shouldn't those two operators be '&&' instead?
+> yes definitively
+>>
+>>> +				  is_event_supported(0x24, true);
+>>> +	}
+>>> +
+>>> +	/*
+>>> +	 * L1D_CACHE_REFILL(0x3) and L1D_CACHE(0x4) are only required if
+>>> +	 * L1 data / unified cache. BR_MIS_PRED(0x10), BR_PRED(0x12) are only
+>>> +	 * required if program-flow prediction is implemented.
+>>> +	 */
+>>
+>> Is this a TODO?
+> yes. Added TODO. I do not know how to check whether the conditions are
+> satisfied? Do you have any idea?
 
-Status in QEMU:
-  Fix Released
+Well, AFAICS KVM doesn't filter PMCEIDn, right? So some basic checks are
+surely fine, but I wouldn't go crazy about checking every possible
+aspect of it. After all you would just check the hardware, as we pass
+this register on.
 
-Bug description:
-  Tested commit: f34edbc760b0f689deddd175fc08732ecb46665f
+Cheers,
+Andre.
 
-  I belive this was introduced in
-  0ac24d56c5e7d32423ea78ac58a06b444d1df04d when the spike's
-  load_kernel() was moved to riscv_load_kernel() which no longer
-  included htif_symbol_callback().
+> Thank you for the review!
+> 
+> Eric
+>>
+>> Cheers,
+>> Andre
+>>
+>>
+>>> +
+>>> +	report(required_events, "Check required events are implemented");
+>>> +}
+>>> +
+>>>  #endif
+>>>  
+>>>  /*
+>>> @@ -326,6 +394,9 @@ int main(int argc, char *argv[])
+>>>  		       "Monotonically increasing cycle count");
+>>>  		report(check_cpi(cpi), "Cycle/instruction ratio");
+>>>  		pmccntr64_test();
+>>> +	} else if (strcmp(argv[1], "event-introspection") == 0) {
+>>> +		report_prefix_push(argv[1]);
+>>> +		test_event_introspection();
+>>>  	} else {
+>>>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>>>  	}
+>>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>>> index 79f0d7a..4433ef3 100644
+>>> --- a/arm/unittests.cfg
+>>> +++ b/arm/unittests.cfg
+>>> @@ -66,6 +66,12 @@ file = pmu.flat
+>>>  groups = pmu
+>>>  extra_params = -append 'cycle-counter 0'
+>>>  
+>>> +[pmu-event-introspection]
+>>> +file = pmu.flat
+>>> +groups = pmu
+>>> +arch = arm64
+>>> +extra_params = -append 'event-introspection'
+>>> +
+>>>  # Test PMU support (TCG) with -icount IPC=1
+>>>  #[pmu-tcg-icount-1]
+>>>  #file = pmu.flat
+>>
+> 
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1835827/+subscriptions
 
