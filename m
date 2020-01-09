@@ -2,61 +2,92 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F8EC33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:32:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C12C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6D1A2067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:32:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4C902067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:34:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Lz83aYQw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6D1A2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vtb6BQbG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C902067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipNcv-0002t3-Sh
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 21:32:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33132)
+	id 1ipNew-00061B-U3
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 21:34:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59993)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ipNaJ-0008Rm-QI
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:30:10 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ipNdw-0004og-OM
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:33:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ipNaD-0000Sy-JG
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:30:07 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:33513 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ipNaC-0000Gw-77; Wed, 08 Jan 2020 21:30:01 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47tVSg4wfsz9sRY; Thu,  9 Jan 2020 13:29:55 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578536995;
- bh=kLoKoYPF03j77nWoj3ePyUk3E/pGbgi42kFIS+n4cvA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Lz83aYQwiGPY9DejxiFllwMpsUJiaH3HFjFsQRvOBDWcyb4QJT+hlEH26qFoV6qB8
- gyE3yY6S0Khg+iKpicF3jsqAwNUL0YyP8DvELtyz6tMmizkG41/kOWk3bCytdWlUo+
- F2nSd7JY0i4N/8kGn97sd+yMlujqwzTdwYk9UnSo=
-Date: Thu, 9 Jan 2020 13:29:39 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 0/2] ppc/pnv: PNOR cleanups
-Message-ID: <20200109022939.GK8586@umbus.fritz.box>
-References: <20200108090348.21224-1-clg@kaod.org>
+ (envelope-from <richard.henderson@linaro.org>) id 1ipNdr-0008Dv-Ud
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:33:51 -0500
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36602)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ipNdr-00089v-2B
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:33:47 -0500
+Received: by mail-pf1-x443.google.com with SMTP id x184so2596008pfb.3
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 18:33:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=dzbZeJ1AmuhqCmb+aBieEB+CAtkvNLr1xBssq6CpAf0=;
+ b=Vtb6BQbGYLY2s+0W7WooxVUejGgs6eHG2iQBswd40q2aawdXKcYNUd+rLiI4qF6D+V
+ cQwLh2Ud0yimPHVsmEpVTLvl3g6Es2YwmBSUTYDhNE8XBLgaKbY4OTNufpNWrWqqtK1J
+ 3rU24YUqN8567GCZaT/W+sWnmwHWO48/2bl+BNQzhB32PjS1Tn8pcyYJpb9Q4XDoXLB4
+ TlpFS1Cbbd5tNA/2edFIoY1UxnwDT9OM3hzlYaVqgyDMDn5HBYB9E27arV8NkBNzngbg
+ Wx5t3MuXDnR2Lyq92k7BBJ8MqpNz3BYHHWN5jjMCvet+/mfpkj4sC5klo1t0lZt6bFXw
+ ebEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dzbZeJ1AmuhqCmb+aBieEB+CAtkvNLr1xBssq6CpAf0=;
+ b=k3kPq9hYAmjiDOxzP3r+OQU3uQcoMa7DeE6MP2B7JNZau9tRfaAGc1HUrpR/szVZlN
+ r3FDabSG2cPu0lD1/buDl5zw1qN0lk4aHtGRcxCv7HEQi1PtxZm90X6gOakxjvlJzn3I
+ uhkx4CafkkMnXLDH4yqIfPn6ulJnk9VLNr1mChR3JD6GLTMbkovgYyj/NlJLrdiiuD4V
+ THtUMS38gydFPBNEQedoywDBsaPO9dp+DPxvAyynFjXzV6GMpkTmCRIawT2tZREDXerX
+ 91YGA9m6KByLYwKjQS7r7JewJi0bCYpU0MUZPYQhUj3rBsTE4kBfqS51ATjMFK7E1Qur
+ 1q6w==
+X-Gm-Message-State: APjAAAVucBjAJIsUg2jvI4lSO8OS0kf33kilnD18Ac/D+fT0S2aggG+P
+ y4Jlgu6Nr21+FlCwh/VENPu1Qw==
+X-Google-Smtp-Source: APXvYqy13ScqvGzA0BpAqddmBg1gNyMf6JOmLtEHTs34w37xSfEg25z2i9/aaJrlOzcTah1Uz9OVdg==
+X-Received: by 2002:a63:5818:: with SMTP id m24mr8733836pgb.358.1578537225660; 
+ Wed, 08 Jan 2020 18:33:45 -0800 (PST)
+Received: from [192.168.15.12] (alanje.lnk.telstra.net. [120.151.179.201])
+ by smtp.gmail.com with ESMTPSA id k12sm4853409pgm.65.2020.01.08.18.33.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Jan 2020 18:33:45 -0800 (PST)
+Subject: Re: [PATCH v1 20/36] target/riscv: Add support for virtual interrupt
+ setting
+To: Palmer Dabbelt <palmerdabbelt@google.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
+References: <2389483485d4642a6e5670e2546c62e493e91fd6.1575914822.git.alistair.francis@wdc.com>
+ <cover.1575914822.git.alistair.francis@wdc.com>
+ <mhng-6814f8b9-d54a-4663-900c-83023307a658@palmerdabbelt-glaptop>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <200650e5-cb77-0518-8f27-30d0cf23de22@linaro.org>
+Date: Thu, 9 Jan 2020 13:33:40 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vA66WO2vHvL/CRSR"
-Content-Disposition: inline
-In-Reply-To: <20200108090348.21224-1-clg@kaod.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <mhng-6814f8b9-d54a-4663-900c-83023307a658@palmerdabbelt-glaptop>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,64 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 1/9/20 11:49 AM, Palmer Dabbelt wrote:
+>> +    irqs = (pending & ~env->mideleg & -mie) | (pending &  env->mideleg & -sie);
+> 
+> Isn't "-unsigned" implementation defined?  I can't get GCC to throw a warning
+> and it was already there, so maybe I'm just wrong?
 
---vA66WO2vHvL/CRSR
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+(1) You're confusing implementation defined with undefined, and unsigned
+arithmetic is the former not the latter.
 
-On Wed, Jan 08, 2020 at 10:03:46AM +0100, C=E9dric Le Goater wrote:
-> Hello,
->=20
-> Here are small cleanups of the PnvPNOR model.
+(2) There is no such thing as ones-compliment or sign-magnitude integer
+hardware anymore, so for this case "implementation defined" is in fact universal.
 
-Applied to ppc-for-5.0, thanks.
+(3) We build with -fwrapv, so we're explicitly asking for sane behaviour from
+our signed types as well.
 
->=20
-> Thanks,
->=20
-> C.
->=20
-> C=E9dric Le Goater (2):
->   ppc/pnv: use QEMU unit definition MiB
->   ppc/pnv: improve error logging when a PNOR update fails
->=20
->  hw/ppc/pnv_pnor.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---vA66WO2vHvL/CRSR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4WkBEACgkQbDjKyiDZ
-s5JQDBAA3/7DplIHpe/Rq8SP4p5k1RRnI74/Mjs4osbxF7dxXAKDEjwYWNg6Bv2B
-5OoZjTIuucuO/aBegwCLTr/w7bVvcYo4srtIbUJrqtMUyUwJsQfPWB6fREe9xV6M
-pxVsJXhJJEiUxsqjYRjlT8TVHVEKwe7qQq+dRzGvoHo1RUCc8sbJFc/tvf6uPX2i
-TgNg16HJUNZbrTZYGgqIDYX4cWT7YUaMKoQG0mqo3TiIdIXdzqExLq0wk7qHC6kf
-rkupScjgI/3RBiqcGneaYV4BAF/WvrfTp3lHAOKscGX+82CWASgomCx+GdeJDSp6
-f5es3fjzyp982KalYcnMvShcJZDfZq1Zq5CU0Y00zsmc0kXG8IJPzINMchV1RwL2
-04SViQw0vAO5cjkblU4iuUxE4Fz0LE/6h6bfNJTpTu9WiVPCAe8CF34kCLQt0zXu
-VdCRzcjcTkjg6G7i57bUtW1Ee/BeoGWUcCJiCfSRTy+ro9wOPafV2zx66sUsXd/S
-/DuXzMV90QBiNjWQLGRqGYMyJwoP0Tfl0NTT8UrjQjyoSUNNO2pMv82UY8fdKu9K
-uOxdmHoUqLaCK5+nZKzcZ9arc6Pv5Qsmwvxm8Lvn/dO5Bnb3cN8zokgvy7180MPe
-zvTnDyBbIxnCFa9rgBM8doqeofYIokqs7nC2cuuftgH6hsmbL1A=
-=1Wpa
------END PGP SIGNATURE-----
-
---vA66WO2vHvL/CRSR--
+r~
 
