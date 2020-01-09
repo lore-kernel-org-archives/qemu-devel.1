@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF27C33CA2
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33617C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 784CB20661
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:41:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 784CB20661
+	by mail.kernel.org (Postfix) with ESMTPS id 0834020661
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:42:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0834020661
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipY48-0005RA-F5
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:41:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57172)
+	id 1ipY57-0006o7-7S
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:42:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57313)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipY3O-0004aH-1k
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:40:51 -0500
+ (envelope-from <bounces@canonical.com>) id 1ipY3P-0004bK-1L
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipY3M-0004cy-7i
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:40:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33796)
+ (envelope-from <bounces@canonical.com>) id 1ipY3N-0004e9-Tw
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:40:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33812)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipY3L-0004a3-W4
+ id 1ipY3M-0004br-3X
  for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:40:48 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipY3J-00018S-1J
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 13:40:45 +0000
+ id 1ipY3K-00017N-Fg
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 13:40:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0804B2E80C3
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 13:40:45 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 7586D2E8074
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 13:40:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jan 2020 13:35:08 -0000
-From: Thomas Huth <1844597@bugs.launchpad.net>
+Date: Thu, 09 Jan 2020 13:32:13 -0000
+From: Thomas Huth <1841491@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
  assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: nathanchance pmaydell
-X-Launchpad-Bug-Reporter: Nathan Chancellor (nathanchance)
+X-Launchpad-Bug-Commenters: 7-pc rth th-huth
+X-Launchpad-Bug-Reporter: Paul Clarke (7-pc)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156885735889.27264.8945287928013294736.malonedeb@soybean.canonical.com>
-Message-Id: <157857691664.5123.9629642231421372082.launchpad@gac.canonical.com>
-Subject: [Bug 1844597] Re: fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a
- kernel panic in vfp_init on a clang built kernel
+References: <156686849716.6431.16425651381928336460.malonedeb@gac.canonical.com>
+Message-Id: <157857673323.2497.12116916948054570736.malone@soybean.canonical.com>
+Subject: [Bug 1841491] Re: floating point emulation can fail to set
+ FE_UNDERFLOW
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7b276db8feed151bb77170824d83db92af576c7a
+X-Launchpad-Hash: 330b2d80ac5aeb9ef5c7815228950e3a802ae4af
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,152 +79,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844597 <1844597@bugs.launchpad.net>
+Reply-To: Bug 1841491 <1841491@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+A patch for this bug has been merged here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dcbc65a8f22b29680f3
+... can we close this ticket now or is there more to do?
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844597
+https://bugs.launchpad.net/bugs/1841491
 
 Title:
-  fc1120a7f5f2d4b601003205c598077d3eb11ad2 causes a kernel panic in
-  vfp_init on a clang built kernel
+  floating point emulation can fail to set FE_UNDERFLOW
 
 Status in QEMU:
-  Fix Released
+  Confirmed
 
 Bug description:
-  Commit 4cdabee7d6d2 ("ARM: configs: aspeed_g5: Enable AST2600") [1] in
-  the Linux kernel enabled CONFIG_VFP. When building this config with
-  Clang, the resulting kernel does not boot after commit fc1120a7f5
-  ("target/arm: Implement NSACR gating of floating point") [2] (present
-  since the 4.1.0 release).
+  Floating point emulation can fail to set FE_UNDERFLOW in some
+  circumstances. This shows up often in glibc's "math" tests. A similar
+  test is attached.
 
-  The QEMU command:
+  This is similar to bug #1841442, but not the same problem, and I don't
+  think the fix will be in the same code.
 
-  qemu-system-arm -m 512m \
-                  -machine romulus-bmc \
-                  -no-reboot \
-                  -dtb out/arch/arm/boot/dts/aspeed-bmc-opp-romulus.dtb \
-                  -initrd rootfs.cpio \
-                  -display none \
-                  -serial mon:stdio \
-                  -kernel ${KBF}/arch/arm/boot/zImage
+  On ppc64le native:
+  --
+  $ gcc -c -O2 fma.c
+  $ gcc -O2 test-fma.c fma.o -lm -o test-fma
+  $ ./test-fma $(./test-fma)
+  fma(0x1.ffffffffffffcp-1022, 0x1.0000000000001p-1, 0x0.0000000000001p-102=
+2)
+  0x0
 
-  If it is needed, the rootfs we are using is provided at a link below
-  [3].
+  0xa000000
+  FE_INEXACT FE_UNDERFLOW =
 
-  Debugging with QEMU reveals that the kernel panics in vfp_init,
-  specifically at the line:
+  0x1p-1022
+  --
 
-  vfpsid =3D fmrx(FPSID);
+  On qemu-system-ppc64:
+  --
+  $ ./test-fma $(./test-fma)
+  fma(0x1.ffffffffffffcp-1022, 0x1.0000000000001p-1, 0x0.0000000000001p-102=
+2)
+  0x0
 
-  in arch/arm/vfp/vfpmodule.c because of an illegal instruction:
+  0x2000000
+  FE_INEXACT =
 
-  [    0.058685] VFP support v0.3: =
+  0x1p-1022
+  --
 
-  [    0.059159] Internal error: Oops - undefined instruction: 0 [#1] SMP A=
-RM
-  [    0.059525] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.3.0-next-20190=
-918-dirty #1
-  [    0.059547] Hardware name: Generic DT based system
-  [    0.059702] PC is at vfp_init+0x50/0x1f4
-  [    0.059721] LR is at vfp_init+0x4c/0x1f4
-  [    0.059738] pc : [<80b0383c>]    lr : [<80b03838>]    psr: 60000153
-  [    0.059756] sp : 9e497ec0  ip : 00000020  fp : 9e497ed8
-  [    0.059773] r10: 00000000  r9 : ffffe000  r8 : 80c06048
-  [    0.059792] r7 : 00000000  r6 : 80c0caac  r5 : 80c6c418  r4 : 80b037ec
-  [    0.059811] r3 : 00000000  r2 : 339aa372  r1 : 00000000  r0 : 00000012
-  [    0.059859] Flags: nZCv  IRQs on  FIQs off  Mode SVC_32  ISA ARM  Segm=
-ent none
-  [    0.059883] Control: 00c5387d  Table: 80004008  DAC: 00000051
-  [    0.059997] Process swapper/0 (pid: 1, stack limit =3D 0x(ptrval))
-  [    0.060048] Stack: (0x9e497ec0 to 0x9e498000)
-  [    0.060205] 7ec0: 80b037ec 80b6bf0c 80b037ec ffffffff 00000000 0000000=
-0 9e497f48 80b01100
-  [    0.060310] 7ee0: 00000000 9eeff9e0 80a85734 809eb9be 00000000 8014b7f=
-4 9eeff9e0 80a85734
-  [    0.060408] 7f00: 9e497f48 8014b7f4 000000a4 00000001 00000001 0000000=
-0 80b0133c 9e497f38
-  [    0.060509] 7f20: 00000000 9eeff9d5 339aa372 80b6be80 80b6bf0c 0000000=
-0 00000000 00000000
-  [    0.060606] 7f40: 00000000 00000000 9e497f70 80b01864 00000001 0000000=
-1 00000000 80b0133c
-  [    0.060703] 7f60: 00000001 8085d268 00000000 00000000 9e497f80 80b0175=
-8 00000000 00000000
-  [    0.060800] 7f80: 9e497f90 80b015e4 00000000 8085d268 9e497fa8 8085d27=
-c 00000000 8085d268
-  [    0.060897] 7fa0: 00000000 00000000 00000000 801010e8 00000000 0000000=
-0 00000000 00000000
-  [    0.060993] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
-0 00000000 00000000
-  [    0.061090] 7fe0: 00000000 00000000 00000000 00000000 00000013 0000000=
-0 00000000 00000000
-  [    0.061625] [<80b0383c>] (vfp_init) from [<80b01100>] (do_one_initcall=
-+0xa8/0x1e0)
-  [    0.061722] [<80b01100>] (do_one_initcall) from [<80b01864>] (do_initc=
-all_level+0xfc/0x12c)
-  [    0.061742] [<80b01864>] (do_initcall_level) from [<80b01758>] (do_bas=
-ic_setup+0x2c/0x3c)
-  [    0.061759] [<80b01758>] (do_basic_setup) from [<80b015e4>] (kernel_in=
-it_freeable+0x68/0x104)
-  [    0.061777] [<80b015e4>] (kernel_init_freeable) from [<8085d27c>] (ker=
-nel_init+0x14/0x26c)
-  [    0.061798] [<8085d27c>] (kernel_init) from [<801010e8>] (ret_from_for=
-k+0x14/0x2c)
-  [    0.061835] Exception stack(0x9e497fb0 to 0x9e497ff8)
-  [    0.061896] 7fa0:                                     00000000 0000000=
-0 00000000 00000000
-  [    0.061998] 7fc0: 00000000 00000000 00000000 00000000 00000000 0000000=
-0 00000000 00000000
-  [    0.062080] 7fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-  [    0.062263] Code: e5860000 e59f0174 ebd9d8fc e59f5170 (eef04a10) =
+  QEMU versions vary, but not too much, and are pretty close to git HEAD:
+  - 586f3dced9 (HEAD -> master, origin/master, origin/HEAD) Merge remote-tr=
+acking branch 'remotes/cohuck/tags/s390x-20190822' into staging
+  - 864ab31 Update version for v4.1.0-rc4 release
 
-  [    0.062679] ---[ end trace 2d338c91e4e74562 ]---
-
-  Before fc1120a7f5:
-
-  [    0.069418] VFP support v0.3: implementor 41 architecture 1 part 20
-  variant b rev 5
-
-  Should you need to reproduce this locally:
-
-  * clang 9.0.0 or later is needed to build this config. If you do not
-  have easy access to such a build, we have a clang build script
-  available [4] that can help with this:
-
-  % ./build-llvm.py --branch llvmorg-9.0.0-rc6 \
-                    --build-stage1-only \
-                    --projects clang \
-                    --targets ARM
-
-  * Because of an unrelated build issue, linux-next needs to be used (or
-  the singular patch that resolves it needs to be cherry-picked on top
-  of 4cdabee7d6d2 [5]). The kernel make command used:
-
-  % make -j$(nproc) -s \
-         ARCH=3Darm \
-         CC=3Dclang \
-         CROSS_COMPILE=3Darm-linux-gnueabi- \
-         O=3Dout \
-         distclean aspeed_g5_defconfig all
-
-  [1]: https://git.kernel.org/linus/4cdabee7d6d2e439fea726a101e448c4ca6837f4
-  [2]: https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dfc1120a7f5f2d4b601=
-003205c598077d3eb11ad2
-  [3]: https://github.com/ClangBuiltLinux/continuous-integration/blob/800d8=
-4bf8c55ee04c50ed4c78144a96d889a91c5/images/arm/rootfs.cpio
-  [4]: https://github.com/ClangBuiltLinux/tc-build
-  [5]: http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?id=3D7b3948597=
-372e5a6b314208ac320362c204b7f0f
+  There are worse symptoms on qemu-x86_64, but this is apparently not
+  surprising per
+  https://bugs.launchpad.net/qemu/+bug/1841442/comments/6.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844597/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1841491/+subscriptions
 
