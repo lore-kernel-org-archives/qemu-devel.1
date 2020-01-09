@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACAAC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB538C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 409EF2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:10:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409EF2072A
+	by mail.kernel.org (Postfix) with ESMTPS id 8233820656
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:11:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8233820656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipXZv-00079I-7y
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:10:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36498)
+	id 1ipXaa-00083U-5Q
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:11:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQc-0003JH-MW
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:54 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQg-0003N1-L6
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQa-00039p-S1
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:46 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:42115 helo=mail.rt-rk.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQa-00039d-Qw
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:50 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:42111 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1ipXQY-00034z-Of
+ id 1ipXQY-00034w-Ol
  for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:44 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 0708C1A20C3;
+ by mail.rt-rk.com (Postfix) with ESMTP id 50DAE1A2161;
  Thu,  9 Jan 2020 13:59:34 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id DA46C1A213D;
- Thu,  9 Jan 2020 13:59:33 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 32B821A2136;
+ Thu,  9 Jan 2020 13:59:34 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/12] linux-user: Add support for getting/setting RTC PLL
- correction using ioctls
-Date: Thu,  9 Jan 2020 13:59:16 +0100
-Message-Id: <1578574763-8327-6-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH 10/12] linux-user: Add support for selecting alsa timer using
+ ioctl
+Date: Thu,  9 Jan 2020 13:59:21 +0100
+Message-Id: <1578574763-8327-11-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
 References: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
@@ -68,113 +68,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionalities of following ioctls:
+This patch implements functionality of following ioctl:
 
-RTC_PLL_GET - Getting PLL correction
+SNDRV_TIMER_IOCTL_SELECT - Selecting timer
 
-    Read the PLL correction for RTCs that support PLL. The PLL correction
-    is returned in the following structure:
+    Selects the timer which id is specified. The timer id is specified in the
+    following strcuture:
 
-        struct rtc_pll_info {
-            int pll_ctrl;        /* placeholder for fancier control */
-            int pll_value;       /* get/set correction value */
-            int pll_max;         /* max +ve (faster) adjustment value */
-            int pll_min;         /* max -ve (slower) adjustment value */
-            int pll_posmult;     /* factor for +ve correction */
-            int pll_negmult;     /* factor for -ve correction */
-            long pll_clock;      /* base PLL frequency */
-        };
+    struct snd_timer_select {
+        struct snd_timer_id id;         /* timer ID */
+        unsigned char reserved[32];     /* reserved */
+    };
 
-    A pointer to this structure should be passed as the third
-    ioctl's argument.
-
-RTC_PLL_SET - Setting PLL correction
-
-    Sets the PLL correction for RTCs that support PLL. The PLL correction
-    that is set is specified by the rtc_pll_info structure pointed to by
-    the third ioctl's' argument.
+    A pointer to this structure should be passed as the third ioctl's argument.
+    Before calling the ioctl, the field "tid" should be initialized with the id
+    information for the timer which is to be selected. If there is no timer
+    device with the specified id, the error ENODEV ("No such device") is
+    returned.
 
 Implementation notes:
 
-    All ioctls in this patch have a pointer to a structure rtc_pll_info
-    as their third argument. All elements of this structure are of
-    type 'int', except the last one that is of type 'long'. That is
-    the reason why a separate target structure (target_rtc_pll_info)
-    is defined in linux-user/syscall_defs. The rest of the
-    implementation is straightforward.
+    Ioctl implemented in this patch has a pointer to a
+    'struct snd_timer_select' as its third argument.
+    That is the reason why a corresponding definition
+    was added in 'linux-user/syscall_types.h'. The rest
+    of the implementation was straightforward.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 ---
- linux-user/ioctls.h        |  2 ++
- linux-user/syscall_defs.h  | 14 ++++++++++++++
- linux-user/syscall_types.h |  9 +++++++++
- 3 files changed, 25 insertions(+)
+ linux-user/ioctls.h        | 2 ++
+ linux-user/syscall_defs.h  | 7 +++++++
+ linux-user/syscall_types.h | 4 ++++
+ 3 files changed, 13 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index b09396e..0a4e3f1 100644
+index 989eb9b..7652117 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -87,6 +87,8 @@
-      IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
-      IOCTL(RTC_WKALM_RD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
-      IOCTL(RTC_WKALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
-+     IOCTL(RTC_PLL_GET, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_pll_info)))
-+     IOCTL(RTC_PLL_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_pll_info)))
+@@ -459,6 +459,8 @@
+         MK_PTR(MK_STRUCT(STRUCT_snd_timer_gparams)))
+   IOCTL(SNDRV_TIMER_IOCTL_GSTATUS, IOC_RW,
+         MK_PTR(MK_STRUCT(STRUCT_snd_timer_gstatus)))
++  IOCTL(SNDRV_TIMER_IOCTL_SELECT, IOC_W,
++        MK_PTR(MK_STRUCT(STRUCT_snd_timer_select)))
  
-      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(HDIO_GETGEO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_hd_geometry)))
+   IOCTL(HDIO_GET_UNMASKINTR, IOC_R, MK_PTR(TYPE_INT))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 37504a2..8370f41 100644
+index 4d4dad3..9a33b71 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -763,6 +763,16 @@ struct target_pollfd {
- #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flags] */
- #define TARGET_KDSIGACCEPT     0x4B4E
+@@ -2462,6 +2462,11 @@ struct target_snd_timer_gstatus {
+     unsigned char reserved[32];
+ };
  
-+struct target_rtc_pll_info {
-+    int pll_ctrl;
-+    int pll_value;
-+    int pll_max;
-+    int pll_min;
-+    int pll_posmult;
-+    int pll_negmult;
-+    abi_long pll_clock;
++struct target_snd_timer_select {
++    struct target_snd_timer_id id;
++    unsigned char reserved[32];
 +};
 +
- /* real time clock ioctls */
- #define TARGET_RTC_AIE_ON           TARGET_IO('p', 0x01)
- #define TARGET_RTC_AIE_OFF          TARGET_IO('p', 0x02)
-@@ -782,6 +792,10 @@ struct target_pollfd {
- #define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
- #define TARGET_RTC_WKALM_RD         TARGET_IOR('p', 0x10, struct rtc_wkalrm)
- #define TARGET_RTC_WKALM_SET        TARGET_IOW('p', 0x0f, struct rtc_wkalrm)
-+#define TARGET_RTC_PLL_GET          TARGET_IOR('p', 0x11,                      \
-+                                               struct target_rtc_pll_info)
-+#define TARGET_RTC_PLL_SET          TARGET_IOW('p', 0x12,                      \
-+                                               struct target_rtc_pll_info)
+ /* alsa timer ioctls */
+ #define TARGET_SNDRV_TIMER_IOCTL_PVERSION     TARGET_IOR('T', 0x00, int)
+ #define TARGET_SNDRV_TIMER_IOCTL_NEXT_DEVICE  TARGET_IOWR('T', 0x01,                     \
+@@ -2473,6 +2478,8 @@ struct target_snd_timer_gstatus {
+                                                          struct target_snd_timer_gparams)
+ #define TARGET_SNDRV_TIMER_IOCTL_GSTATUS      TARGET_IOWR('T', 0x05,                     \
+                                                           struct target_snd_timer_gstatus)
++#define TARGET_SNDRV_TIMER_IOCTL_SELECT       TARGET_IOW('T', 0x10,                      \
++                                                         struct target_snd_timer_select)
  
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
+ /* vfat ioctls */
+ #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
 diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 820bc8e..4027272 100644
+index 4e90716..767632d 100644
 --- a/linux-user/syscall_types.h
 +++ b/linux-user/syscall_types.h
-@@ -271,6 +271,15 @@ STRUCT(rtc_wkalrm,
-        TYPE_CHAR, /* pending */
-        MK_STRUCT(STRUCT_rtc_time)) /* time */
+@@ -116,6 +116,10 @@ STRUCT(snd_timer_gstatus,
+        TYPE_ULONG, /* resolution_den */
+        MK_ARRAY(TYPE_CHAR, 32)) /* reserved */
  
-+STRUCT(rtc_pll_info,
-+       TYPE_INT, /* pll_ctrl */
-+       TYPE_INT, /* pll_value */
-+       TYPE_INT, /* pll_max */
-+       TYPE_INT, /* pll_min */
-+       TYPE_INT, /* pll_posmult */
-+       TYPE_INT, /* pll_negmult */
-+       TYPE_LONG) /* pll_clock */
++STRUCT(snd_timer_select,
++       MK_STRUCT(STRUCT_snd_timer_id), /* id */
++       MK_ARRAY(TYPE_CHAR, 32)) /* reserved */
 +
- STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* op */
-        TYPE_INT, /* flags */
+ /* loop device ioctls */
+ STRUCT(loop_info,
+        TYPE_INT,                 /* lo_number */
 -- 
 2.7.4
 
