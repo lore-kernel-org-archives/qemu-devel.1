@@ -2,81 +2,84 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B716C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 962B8C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:54:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA18220673
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:54:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F64920673
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 09:54:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VEhKFNIn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA18220673
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NthiUDk8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F64920673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipUWE-0008Rj-2o
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 04:54:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55328)
+	id 1ipUWY-0000nz-FY
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 04:54:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipUVU-0007Yu-Sh
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:53:37 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ipUVh-0007lR-Qu
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipUVT-0007eo-Ol
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:53:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24251
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1ipUVg-0008Ve-57
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:53:49 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59037
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipUVT-0007ap-GR
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:53:35 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ipUVf-0008Th-W5
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 04:53:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578563614;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1578563627;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=s46TB4gYdA75mF/WjjCkh0IGG8+pmCR9htiZTZZtlP8=;
- b=VEhKFNInG+8CBxVY+/EEoR1YphMbtH0hSecPapxqcLa0qvWbEEKlFdw31bnkffM//cCTWh
- duAfdWw15Hd+EsGma4V3+O/PLZLQ0Hv+XAblEu/wdxuGf1ndBuNGXC14wI2oaDC/dWZIci
- Kjf22t81Ket22Ru6bs/IOgUhSmYzr/E=
+ bh=WHrti+oi0PWS6PL6/3+AmKzs3oZp/cyYsqebZKGl6Bg=;
+ b=NthiUDk80+EKJqIzN5cGz2pajie0A9eorDt1ZAbYDncos18e8pWOS5NRZ0lkiKyUdMtFCS
+ tvRFvmc9Gkp44TvNWqa5p2Ny3W0LkA5lyWt10m2hTWIXT75NcMem7BJec/aOx1gnPP1TuP
+ TTvsfxGIZECK3zohDrH6z74vc6nCpcI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-H3Ib-EIJPjyRM6wG6UQVIw-1; Thu, 09 Jan 2020 04:53:31 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-259-pqSkHHwRO_yS6AS7IDr2bQ-1; Thu, 09 Jan 2020 04:53:44 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 859068014DA;
- Thu,  9 Jan 2020 09:53:30 +0000 (UTC)
-Received: from redhat.com (ovpn-116-22.ams2.redhat.com [10.36.116.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0225E66834;
- Thu,  9 Jan 2020 09:53:29 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: cenjiahui <cenjiahui@huawei.com>
-Subject: Re: [PATCH 1/3] migration/multifd: fix nullptr access in terminating
- multifd threads
-In-Reply-To: <20191023043002.8788-1-cenjiahui@huawei.com>
- (cenjiahui@huawei.com's message of "Wed, 23 Oct 2019 12:30:02 +0800")
-References: <20191023043002.8788-1-cenjiahui@huawei.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Thu, 09 Jan 2020 10:53:27 +0100
-Message-ID: <87pnftymzs.fsf@secure.laptop>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D87B4184B1E0;
+ Thu,  9 Jan 2020 09:53:42 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD5F386C54;
+ Thu,  9 Jan 2020 09:53:38 +0000 (UTC)
+Date: Thu, 9 Jan 2020 10:53:36 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Zengtao (B)" <prime.zeng@hisilicon.com>
+Subject: Re: [PATCH] hw/arm/acpi: Pack the SRAT processors structure by
+ node_id ascending order
+Message-ID: <20200109105336.4932267b@redhat.com>
+In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED340BD19F@dggemm526-mbx.china.huawei.com>
+References: <1578388729-55540-1-git-send-email-prime.zeng@hisilicon.com>
+ <20200107042918-mutt-send-email-mst@kernel.org>
+ <678F3D1BB717D949B966B68EAEB446ED340B608D@dggemm526-mbx.china.huawei.com>
+ <20200107164958.7811777d@redhat.com>
+ <678F3D1BB717D949B966B68EAEB446ED340B8B24@dggemm526-mbx.china.huawei.com>
+ <20200108173832.61508f8b@redhat.com>
+ <678F3D1BB717D949B966B68EAEB446ED340BD19F@dggemm526-mbx.china.huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: H3Ib-EIJPjyRM6wG6UQVIw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: pqSkHHwRO_yS6AS7IDr2bQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,60 +91,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: fangying1@huawei.com, zhouyibo3@huawei.com, dgilbert@redhat.com,
- peterx@redhat.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cenjiahui <cenjiahui@huawei.com> wrote:
-> From: Jiahui Cen <cenjiahui@huawei.com>
->
-> One multifd channel will shutdown all the other multifd's IOChannel when =
-it
-> fails to receive an IOChannel. In this senario, if some multifds had not
-> received its IOChannel yet, it would try to shutdown its IOChannel which =
-could
-> cause nullptr access at qio_channel_shutdown.
->
-> Here is the coredump stack:
->     #0  object_get_class (obj=3Dobj@entry=3D0x0) at qom/object.c:908
->     #1  0x00005563fdbb8f4a in qio_channel_shutdown (ioc=3D0x0, how=3DQIO_=
-CHANNEL_SHUTDOWN_BOTH, errp=3D0x0) at io/channel.c:355
->     #2  0x00005563fd7b4c5f in multifd_recv_terminate_threads (err=3D<opti=
-mized out>) at migration/ram.c:1280
->     #3  0x00005563fd7bc019 in multifd_recv_new_channel (ioc=3Dioc@entry=
-=3D0x556400255610, errp=3Derrp@entry=3D0x7ffec07dce00) at migration/ram.c:1=
-478
->     #4  0x00005563fda82177 in migration_ioc_process_incoming (ioc=3Dioc@e=
-ntry=3D0x556400255610, errp=3Derrp@entry=3D0x7ffec07dce30) at migration/mig=
-ration.c:605
->     #5  0x00005563fda8567d in migration_channel_process_incoming (ioc=3D0=
-x556400255610) at migration/channel.c:44
->     #6  0x00005563fda83ee0 in socket_accept_incoming_migration (listener=
-=3D0x5563fff6b920, cioc=3D0x556400255610, opaque=3D<optimized out>) at migr=
-ation/socket.c:166
->     #7  0x00005563fdbc25cd in qio_net_listener_channel_func (ioc=3D<optim=
-ized out>, condition=3D<optimized out>, opaque=3D<optimized out>) at io/net=
--listener.c:54
->     #8  0x00007f895b6fe9a9 in g_main_context_dispatch () from /usr/lib64/=
-libglib-2.0.so.0
->     #9  0x00005563fdc18136 in glib_pollfds_poll () at util/main-loop.c:21=
-8
->     #10 0x00005563fdc181b5 in os_host_main_loop_wait (timeout=3D100000000=
-0) at util/main-loop.c:241
->     #11 0x00005563fdc183a2 in main_loop_wait (nonblocking=3Dnonblocking@e=
-ntry=3D0) at util/main-loop.c:517
->     #12 0x00005563fd8edb37 in main_loop () at vl.c:1791
->     #13 0x00005563fd74fd45 in main (argc=3D<optimized out>, argv=3D<optim=
-ized out>, envp=3D<optimized out>) at vl.c:4473
->
-> To fix it up, let's check p->c before calling qio_channel_shutdown.
->
-> Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
-> Signed-off-by: Ying Fang <fangying1@huawei.com>
+On Thu, 9 Jan 2020 02:45:58 +0000
+"Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+> > -----Original Message-----
+> > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > Sent: Thursday, January 09, 2020 12:39 AM
+> > To: Zengtao (B)
+> > Cc: Michael S. Tsirkin; qemu-devel@nongnu.org; qemu-trivial@nongnu.org;
+> > Shannon Zhao; Peter Maydell; qemu-arm@nongnu.org
+> > Subject: Re: [PATCH] hw/arm/acpi: Pack the SRAT processors structure by
+> > node_id ascending order
+> > 
+> > On Wed, 8 Jan 2020 04:02:10 +0000
+> > "Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
+> >   
+> > > > -----Original Message-----
+> > > > From: Igor Mammedov [mailto:imammedo@redhat.com]
+> > > > Sent: Tuesday, January 07, 2020 11:50 PM
+> > > > To: Zengtao (B)
+> > > > Cc: Michael S. Tsirkin; qemu-devel@nongnu.org;  
+> > qemu-trivial@nongnu.org;  
+> > > > Shannon Zhao; Peter Maydell; qemu-arm@nongnu.org
+> > > > Subject: Re: [PATCH] hw/arm/acpi: Pack the SRAT processors structure  
+> > by  
+> > > > node_id ascending order
+> > > >
+> > > > On Tue, 7 Jan 2020 10:29:22 +0000
+> > > > "Zengtao (B)" <prime.zeng@hisilicon.com> wrote:
+> > > >  
+> > > > > > -----Original Message-----
+> > > > > > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > > > > > Sent: Tuesday, January 07, 2020 5:33 PM
+> > > > > > To: Zengtao (B)
+> > > > > > Cc: qemu-devel@nongnu.org; qemu-trivial@nongnu.org; Shannon  
+> > > > Zhao;  
+> > > > > > Peter Maydell; Igor Mammedov; qemu-arm@nongnu.org
+> > > > > > Subject: Re: [PATCH] hw/arm/acpi: Pack the SRAT processors  
+> > structure  
+> > > > by  
+> > > > > > node_id ascending order
+> > > > > >
+> > > > > > On Tue, Jan 07, 2020 at 05:18:49PM +0800, Zeng Tao wrote:  
+> > > > > > > When booting the guest linux with the following numa  
+> > configuration:  
+> > > > > > > -numa node,node_id=1,cpus=0-3
+> > > > > > > -numa node,node_id=0,cpus=4-7
+> > > > > > > We can get the following numa topology in the guest system:
+> > > > > > > Architecture:          aarch64
+> > > > > > > Byte Order:            Little Endian
+> > > > > > > CPU(s):                8
+> > > > > > > On-line CPU(s) list:   0-7
+> > > > > > > Thread(s) per core:    1
+> > > > > > > Core(s) per socket:    8
+> > > > > > > Socket(s):             1
+> > > > > > > NUMA node(s):          2
+> > > > > > > L1d cache:             unknown size
+> > > > > > > L1i cache:             unknown size
+> > > > > > > L2 cache:              unknown size
+> > > > > > > NUMA node0 CPU(s):     0-3
+> > > > > > > NUMA node1 CPU(s):     4-7
+> > > > > > > The Cpus 0-3 is assigned with NUMA node 1 in QEMU while it get  
+> > > > NUMA  
+> > > > > > node  
+> > > > > > > 0 in the guest.
+> > > > > > >
+> > > > > > > In fact, In the linux kernel, numa_node_id is allocated per the  
+> > ACPI  
+> > > > > > > SRAT processors structure order,so the cpu 0 will be the first one  
+> > to  
+> > > > > > > allocate its NUMA node id, so it gets the NUMA node 0.
+> > > > > > >
+> > > > > > > To fix this issue, we pack the SRAT processors structure in numa  
+> > node  
+> > > > id  
+> > > > > > > order but not the default cpu number order.
+> > > > > > >
+> > > > > > > Signed-off-by: Zeng Tao <prime.zeng@hisilicon.com>  
+> > > > > >
+> > > > > >
+> > > > > > Does this matter? If yes fixing linux to take node id from proximity
+> > > > > > field in ACPI seems cleaner ...
+> > > > > >  
+> > > > >
+> > > > > In fact, I just want to align the node_id concept in QEMU and Linux.
+> > > > > If we fix the kernel side, we need to align with all platforms.
+> > > > > i think maybe not a good idea.  
+> > > > if linux makes up node ID's on it's own, it would be hard for it to
+> > > > map SRAT entries to other tables that use proximity id as well.
+> > > >
+> > > > So it would need to maintain map of [proximity id] -> [node id] (and  
+> > reverse)  
+> > > > somewhere to resolve mappings on other tables.
+> > > > If it doesn't do this then it's broken and works just by accident,
+> > > > if it does the fix probably should be in that code and not in QEMU.
+> > > >  
+> > >
+> > > Hmm, the problem is how to understand the concept of node id.
+> > > 1. In dts, there is node id. Both the QEMU and Linux can use it
+> > > directly, so no conflict.
+> > > 2. In ACPI, there is only proximity domain, but no node id, there
+> > >  should be a mapping between them, while kernel and QEMU maintain
+> > >  their own rule, and unfortunately they conflict with each other
+> > >  sometimes.
+> > >
+> > > There is no specification to indicate what we should do to maintain the
+> > > mapping, so it's hard to align the QEMU and Linux.
+> > >
+> > > Any suggestion, or we just accept it as a rule since it don't affect much?  
+> > 
+> > If node id generation is driven by SRAT content, it might be reasonable to
+> > ask for SRAT parser in kernel to create node ids using proximity value
+> > instead of the order ACPI_SRAT_PROCESSOR_GICC structures are
+> > enumerated.
+> > That way node id would match ACPI spec.
+> >   
+> 
+> I don't quite understand "That way node id would match ACPI spec."
+> I check the ACPI 6.3 spec, I didn't find any description that node id should
+> be equal to proximity value, in section 6.2.15, there is indeed an example
+> which node numbers equals to proximity value. 
+
+There is only proximity id in spec (which conceptually is the same as node id).
+What I'm saying is that linux kernel ACPI parser could use it as node id
+instead of using counter for making up node ids.
+
+(issue with it is that proximity values could be sparse, so one
+would need to audit current node id users to make sure that using
+proximity id won't break anything)
+
+> Thanks
+> 
+> > But even with that I'd wouldn't expect cpu ids match as its basically
+> > arbitrary numbers on both sided. One would need to use arch specific ids
+> > to reliably match cpus on both sides (MPIDR in ARM case or APICID in x86).
+> >.   
+> > > > >  
+> > > > > > > ---
+> > > > > > >  hw/arm/virt-acpi-build.c | 23 +++++++++++++++--------
+> > > > > > >  1 file changed, 15 insertions(+), 8 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > > > > > index bd5f771..497192b 100644
+> > > > > > > --- a/hw/arm/virt-acpi-build.c
+> > > > > > > +++ b/hw/arm/virt-acpi-build.c
+> > > > > > > @@ -520,7 +520,8 @@ build_srat(GArray *table_data,  
+> > BIOSLinker  
+> > > > > > *linker, VirtMachineState *vms)  
+> > > > > > >      AcpiSystemResourceAffinityTable *srat;
+> > > > > > >      AcpiSratProcessorGiccAffinity *core;
+> > > > > > >      AcpiSratMemoryAffinity *numamem;
+> > > > > > > -    int i, srat_start;
+> > > > > > > +    int i, j, srat_start;
+> > > > > > > +    uint32_t node_id;
+> > > > > > >      uint64_t mem_base;
+> > > > > > >      MachineClass *mc = MACHINE_GET_CLASS(vms);
+> > > > > > >      MachineState *ms = MACHINE(vms);
+> > > > > > > @@ -530,13 +531,19 @@ build_srat(GArray *table_data,  
+> > BIOSLinker  
+> > > > > > *linker, VirtMachineState *vms)  
+> > > > > > >      srat = acpi_data_push(table_data, sizeof(*srat));
+> > > > > > >      srat->reserved1 = cpu_to_le32(1);
+> > > > > > >
+> > > > > > > -    for (i = 0; i < cpu_list->len; ++i) {
+> > > > > > > -        core = acpi_data_push(table_data, sizeof(*core));
+> > > > > > > -        core->type = ACPI_SRAT_PROCESSOR_GICC;
+> > > > > > > -        core->length = sizeof(*core);
+> > > > > > > -        core->proximity =  
+> > > > > > cpu_to_le32(cpu_list->cpus[i].props.node_id);  
+> > > > > > > -        core->acpi_processor_uid = cpu_to_le32(i);
+> > > > > > > -        core->flags = cpu_to_le32(1);
+> > > > > > > +    for (i = 0; i < ms->numa_state->num_nodes; ++i) {
+> > > > > > > +        for (j = 0; j < cpu_list->len; ++j) {  
+> > > > > >
+> > > > > > Hmm O(n ^2) isn't great ...  
+> > > > > Good suggestion, 3Q.  
+> > > > > >  
+> > > > > > > +            node_id =  
+> > > > cpu_to_le32(cpu_list->cpus[j].props.node_id);  
+> > > > > > > +            if (node_id != i) {
+> > > > > > > +                continue;
+> > > > > > > +            }
+> > > > > > > +            core = acpi_data_push(table_data, sizeof(*core));
+> > > > > > > +            core->type = ACPI_SRAT_PROCESSOR_GICC;
+> > > > > > > +            core->length = sizeof(*core);
+> > > > > > > +            core->proximity = node_id;
+> > > > > > > +            core->acpi_processor_uid = cpu_to_le32(j);
+> > > > > > > +            core->flags = cpu_to_le32(1);
+> > > > > > > +        }
+> > > > > > >      }  
+> > > > > >
+> > > > > > is the issue arm specific? wouldn't it affect x86 too?
+> > > > > >  
+> > > > > Good question, I think it will affect x86, but I need to confirm.
+> > > > >  
+> > > > > > >      mem_base = vms->memmap[VIRT_MEM].base;
+> > > > > > > --
+> > > > > > > 2.8.1  
+> > > > >  
+> > >  
+> 
 
 
