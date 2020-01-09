@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D0BC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 23:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AEC0C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 23:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A23532072E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 23:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64B5820661
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 23:33:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="PveBCBoe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A23532072E
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="f0dWSfp+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64B5820661
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipgsV-0006R9-OT
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 18:06:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60010)
+	id 1iphJF-00021p-Hu
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 18:33:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1ipgrk-0005eB-BK
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 18:05:25 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1iphIR-0001ZB-BE
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 18:33:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ipgri-0003M4-IB
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 18:05:23 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39320)
+ (envelope-from <aik@ozlabs.ru>) id 1iphIP-0007xY-IP
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 18:32:58 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38823)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ipgri-000356-18
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 18:05:22 -0500
-Received: by mail-pf1-x444.google.com with SMTP id q10so136706pfs.6
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 15:05:20 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iphIO-0007ms-V1
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 18:32:57 -0500
+Received: by mail-pf1-x441.google.com with SMTP id x185so167596pfc.5
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 15:32:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=JxbM6/Db4vu00i3iBs32BgPIfDVN4nXnFlDihkKa7UI=;
- b=PveBCBoeJVRHkwg0TIkMu+UXhDUk1FT/H2kDwG85UWM3Dyys1AgGW9JTOGnZxZ1NCs
- 9ly/8d6wOvFJ21r5znhM2NIZ3rr2k8dpXKh7JKTz05ajOhglqxQ/Mcg37XAEKj0MwBME
- g3NOffwLfzL4Dd77EK/moj5wXexV9tWt8NXSZOqm6rCMNUXPGOPVYBPHwrHMi40dtjkI
- p8iOb7eQF/3IXeeDSbhPzcuoAkR7CEasmuJZi5FG3oMJ3s4wL3AaBMdSaSOuCVGn/zA6
- 7GA7f1jIu8VNWJoB0MxK+2NIVPAFhPkpl99H4wxe36vZxFWOkYteokLZHPkVEchxNqge
- dxgQ==
+ bh=OqEevWftWcEMdjGipyLZTqUBojftlgZXYr8QIYwKbDk=;
+ b=f0dWSfp+JxJ6+051qQFBUxirV49JRsAEZHIAEkjf5e2Mb6BAg1Z2v2uBe6+45qNYhq
+ AuqBGBRQTXGahTketokhtTbTDQCmj4QyHA2ehpMZY/yc6QEFOtfham7MVqR+Q9jNiwbQ
+ qBo3/Y3BH0AqGI5v/i0lM8ygIb63QFDxPCDseAv+wI+fQDaaIIlMrVCzHaYdCPQ4wbHN
+ 3KYMyWN7k05IP7cjH1s8QoM9rHAOJ2d5uQ0lS/13hhXuPZfCpfskbXX8twBskZQKeA+5
+ XPuskdfJT9ozj6gsH4xWTbm89OfhmNBD5NRkSOTXp36BhkoqaYqFnSSXbfL05Iq8fuds
+ AM8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=JxbM6/Db4vu00i3iBs32BgPIfDVN4nXnFlDihkKa7UI=;
- b=hlCfAstaUIu9E1L2vMc8IdYzkOhU4zFqmwbisbiq0Hmoy1c4tsMF+VlaEuZv1110UZ
- onthTYr5bzHHVUQfYpkBT3KrZga7d2FLDHL5Ml4EoCDO44j+8/3Fizg6y7LsAob+lB1D
- qEzPH9v+9Z942mXrqmiA+z2Ta3kDrhVSC+jOz5rDk4P7pS7eYGr0ruuWKPLpo1wOwOOA
- NoJd+aXIYOPigd0JXSiAvflGT1DDYhoVS/JMzdAMEUfCEXALO5ThTrNstD7hMDJxyE1s
- gLGV51cjxVSCgAiXDqtV6ySqIm6dMS63mvm4v/5Sa8av4cqTl1TYztmvc2U7iebttaR/
- y/BA==
-X-Gm-Message-State: APjAAAWwIsnUGYjPxXHz27BkQ778N4dMfexgMGsCGV1h3AnJn5TL8Iw/
- XZ90A1bdKuGR/jB6uRT3Ava6jk3PH9k=
-X-Google-Smtp-Source: APXvYqyxZFWwCehtVJTZ4HVmdBzRD9SBw3rVNIVNKzihGlQfrevDBwQ2wToGR+oUoXvHLFI9YDCHGQ==
-X-Received: by 2002:aa7:8d8f:: with SMTP id i15mr322369pfr.220.1578611118608; 
- Thu, 09 Jan 2020 15:05:18 -0800 (PST)
+ bh=OqEevWftWcEMdjGipyLZTqUBojftlgZXYr8QIYwKbDk=;
+ b=OC/BGcHzkDZeDUYl03kD8DwNzqJ0+F2sZEu8xHwNZcgkJlOzBI248m4wE2zSNCyiaZ
+ CaKGHuJDzYpKGXg5le2TriwRuA/0CePgQo8njPiPRs1h1gwGPA5ji3Yni7gFRrdGAU/g
+ Ipv2BE/zgffawXNE481yoUdt3WnyYCwr7EgD0G3tU3x6sgaO2sIMq5qkcxji9akwSaR2
+ zm4ph56Gl+bXCKzLkwQKIvhe3IS2OxQiW0auKEWsKU2Jn/ZcT30MFVOZJcUqaanRqzQH
+ 2NJ01ABYyx2gO+IhYqBYRoUQbrvLoti1R0Ngj5IgqQb79UpskeJl0te03wAqpwJma+T9
+ yfzQ==
+X-Gm-Message-State: APjAAAU9qi6KXBLtAILbLYgEKVQ0mrv6j22/uEtJxOwK3I5vjjgBwU7d
+ Wx+2VTYJDkFv7vTVGUpC1FrlFm9u6RU=
+X-Google-Smtp-Source: APXvYqy3JEMgQeSSJkQ0xy7TwcbiBxNtRW5fojWhiJd7tdiutwjsZVK+vn160durP7qRKZR8iqwOIg==
+X-Received: by 2002:a62:87c5:: with SMTP id i188mr470589pfe.52.1578612774801; 
+ Thu, 09 Jan 2020 15:32:54 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id r62sm90851pfc.89.2020.01.09.15.05.16
+ by smtp.gmail.com with ESMTPSA id l2sm133305pff.59.2020.01.09.15.32.53
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 09 Jan 2020 15:05:18 -0800 (PST)
+ Thu, 09 Jan 2020 15:32:54 -0800 (PST)
 Subject: Re: [PATCH qemu v4] spapr: Kill SLOF
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 To: qemu-devel@nongnu.org
 References: <20200108061856.4554-1-aik@ozlabs.ru>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+ <b4011a6b-d502-b514-84ad-4e6a1580449d@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
  EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
@@ -146,18 +147,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <b4011a6b-d502-b514-84ad-4e6a1580449d@ozlabs.ru>
-Date: Fri, 10 Jan 2020 10:05:14 +1100
+Message-ID: <75b2a298-b549-dcc9-519b-7bf7c388110b@ozlabs.ru>
+Date: Fri, 10 Jan 2020 10:32:51 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20200108061856.4554-1-aik@ozlabs.ru>
+In-Reply-To: <b4011a6b-d502-b514-84ad-4e6a1580449d@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -176,68 +177,81 @@ Sender: "Qemu-devel"
 
 
 
-On 08/01/2020 17:18, Alexey Kardashevskiy wrote:
-> The Petitboot bootloader is way more advanced than SLOF is ever going to
-> be as Petitboot comes with the full-featured Linux kernel with all
-> the drivers, and initramdisk with quite user friendly interface.
-> The problem with ditching SLOF is that an unmodified pseries kernel can
-> either start via:
-> 1. kexec, this requires presence of RTAS and skips
-> ibm,client-architecture-support entirely;
-> 2. normal boot, this heavily relies on the OF1275 client interface to
-> fetch the device tree and do early setup (claim memory).
+On 10/01/2020 10:05, Alexey Kardashevskiy wrote:
 > 
-> This adds a new bios-less mode to the pseries machine: "bios=on|off".
-> When enabled, QEMU does not load SLOF and jumps to the kernel from
-> "-kernel".
 > 
-> The client interface is implemented exactly as RTAS - a 20 bytes blob,
-> right next after the RTAS blob. The entry point is passed to the kernel
-> via GPR5.
+> On 08/01/2020 17:18, Alexey Kardashevskiy wrote:
+>> The Petitboot bootloader is way more advanced than SLOF is ever going to
+>> be as Petitboot comes with the full-featured Linux kernel with all
+>> the drivers, and initramdisk with quite user friendly interface.
+>> The problem with ditching SLOF is that an unmodified pseries kernel can
+>> either start via:
+>> 1. kexec, this requires presence of RTAS and skips
+>> ibm,client-architecture-support entirely;
+>> 2. normal boot, this heavily relies on the OF1275 client interface to
+>> fetch the device tree and do early setup (claim memory).
+>>
+>> This adds a new bios-less mode to the pseries machine: "bios=on|off".
+>> When enabled, QEMU does not load SLOF and jumps to the kernel from
+>> "-kernel".
+>>
+>> The client interface is implemented exactly as RTAS - a 20 bytes blob,
+>> right next after the RTAS blob. The entry point is passed to the kernel
+>> via GPR5.
+>>
+>> This implements a handful of client interface methods just to get going.
+>> In particular, this implements the device tree fetching,
+>> ibm,client-architecture-support and instantiate-rtas.
+>>
+>> This implements changing FDT properties for RTAS (for vmlinux and zImage)
+>> and initramdisk location (for zImage). To make this work, this skips
+>> fdt_pack() when bios=off as not packing the blob leaves some room for
+>> appending.
+>>
+>> This assigns "phandles" to device tree nodes as there is no more SLOF
+>> and OF nodes addresses of which served as phandle values.
+>> This keeps predefined nodes (such as XICS/NVLINK/...) unchanged.
+>> phandles are regenerated at every FDT rebuild.
+>>
+>> This defines phandles for VIO devices to have phandle assigned to
+>> the default stdout device at the point when we write "/chosen/stdout"
+>> which an ihandle which the OS uses to write to the console.
 > 
-> This implements a handful of client interface methods just to get going.
-> In particular, this implements the device tree fetching,
-> ibm,client-architecture-support and instantiate-rtas.
 > 
-> This implements changing FDT properties for RTAS (for vmlinux and zImage)
-> and initramdisk location (for zImage). To make this work, this skips
-> fdt_pack() when bios=off as not packing the blob leaves some room for
-> appending.
-> 
-> This assigns "phandles" to device tree nodes as there is no more SLOF
-> and OF nodes addresses of which served as phandle values.
-> This keeps predefined nodes (such as XICS/NVLINK/...) unchanged.
-> phandles are regenerated at every FDT rebuild.
-> 
-> This defines phandles for VIO devices to have phandle assigned to
-> the default stdout device at the point when we write "/chosen/stdout"
-> which an ihandle which the OS uses to write to the console.
+> And I do not really need to preallocate phandles for stdout as it is a
+> leftover from when I populated /chosen/stdout before populating VIO
+> nodes, now /chosen/stdout is added at the very end. Thanks,
 
 
-And I do not really need to preallocate phandles for stdout as it is a
-leftover from when I populated /chosen/stdout before populating VIO
-nodes, now /chosen/stdout is added at the very end. Thanks,
-
+Ah noo, I do, to implement "write" to the selected stdout as I need to
+trace ihandle back to Object* and  object_resolve_path() does not know
+about FDT path, it is /machine/peripheral/svty0 in QOM. The commit log
+needs an update, or this needs a fix but I cannot think of a nicer one.
+Thanks,
 
 
 > 
-> When bios=off, this adds "/chosen" every time QEMU builds a tree.
 > 
-> This implements "claim" which the client (Linux) uses for memory
-> allocation; this is also  used by QEMU for claiming kernel/initrd images,
-> client interface entry point, RTAS and the initial stack.
 > 
-> While at this, add a "kernel-addr" machine parameter to allow moving
-> the kernel in memory. This is useful for debugging if the kernel is
-> loaded at @0, although not necessary.
+>>
+>> When bios=off, this adds "/chosen" every time QEMU builds a tree.
+>>
+>> This implements "claim" which the client (Linux) uses for memory
+>> allocation; this is also  used by QEMU for claiming kernel/initrd images,
+>> client interface entry point, RTAS and the initial stack.
+>>
+>> While at this, add a "kernel-addr" machine parameter to allow moving
+>> the kernel in memory. This is useful for debugging if the kernel is
+>> loaded at @0, although not necessary.
+>>
+>> This adds very basic instances support which are managed by a hashmap
+>> ihandle->phandle.
+>>
+>> Note that a 64bit PCI fix is required for Linux:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=df5be5be8735e
 > 
-> This adds very basic instances support which are managed by a hashmap
-> ihandle->phandle.
 > 
-> Note that a 64bit PCI fix is required for Linux:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=df5be5be8735e
-
-
+> 
 
 -- 
 Alexey
