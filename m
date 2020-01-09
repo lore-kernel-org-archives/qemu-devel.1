@@ -2,51 +2,54 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B73C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8806C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CA072067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:04:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CA072067D
+	by mail.kernel.org (Postfix) with ESMTPS id AD6E12067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:06:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD6E12067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipXUN-00076g-QA
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:04:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36666)
+	id 1ipXWC-0000x1-Iw
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:06:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQe-0003LT-HL
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:50 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQY-00036g-RB
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQc-0003JR-Rg
  for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:48 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:38453 helo=mail.rt-rk.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQa-00038c-HY
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:46 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:42117 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1ipXQW-0007zN-IK
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:42 -0500
+ id 1ipXQY-000353-II
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:43 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id BFCEA1A20A4;
- Thu,  9 Jan 2020 13:59:33 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 1F8761A2142;
+ Thu,  9 Jan 2020 13:59:34 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 9F1AE1A1F8D;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 0233B1A20DC;
  Thu,  9 Jan 2020 13:59:33 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 00/12] linux-user: Add support for real time clock and
-Date: Thu,  9 Jan 2020 13:59:11 +0100
-Message-Id: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH 07/12] linux-user: Add support for getting alsa timer version
+ and id
+Date: Thu,  9 Jan 2020 13:59:18 +0100
+Message-Id: <1578574763-8327-8-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,250 +68,124 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+This patch implements functionalities of following ioctls:
 
-This series covers following RTC and sound timer ioctls:
+SNDRV_TIMER_IOCTL_PVERSION - Getting the sound timer version
 
-  RTC ioctls(22):
+    Read the sound timer version. The third ioctl's argument is
+    a pointer to an int in which the specified timers version
+    is returned.
 
-    * RTC_AIE_ON          * RTC_ALM_SET         * RTC_WKALM_SET
-    * RTC_AIE_OFF         * RTC_ALM_READ        * RTC_WKALM_RD
-    * RTC_UIE_ON          * RTC_RD_TIME         * RTC_PLL_GET
-    * RTC_UIE_OFF         * RTC_SET_TIME        * RTC_PLL_SET
-    * RTC_PIE_ON          * RTC_IRQP_READ       * RTC_VL_READ
-    * RTC_PIE_OFF         * RTC_IRQP_SET        * RTC_VL_CLR
-    * RTC_WIE_ON          * RTC_EPOCH_READ
-    * RTC_WIE_OFF         * RTC_EPOCH_SET
+SNDRV_TIMER_IOCTL_NEXT_DEVICE - Getting id information about next timer
 
-  Sound timer ioctls(14):
+    Read id information about the next timer device from the sound timer
+    device list. The id infomration is returned in the following structure:
 
-    * SNDRV_TIMER_IOCTL_PVERSION          * SNDRV_TIMER_IOCTL_INFO
-    * SNDRV_TIMER_IOCTL_NEXT_DEVICE       * SNDRV_TIMER_IOCTL_PARAMS
-    * SNDRV_TIMER_IOCTL_TREAD             * SNDRV_TIMER_IOCTL_STATUS
-    * SNDRV_TIMER_IOCTL_GINFO             * SNDRV_TIMER_IOCTL_START
-    * SNDRV_TIMER_IOCTL_GPARAMS           * SNDRV_TIMER_IOCTL_STOP
-    * SNDRV_TIMER_IOCTL_GSTATUS           * SNDRV_TIMER_IOCTL_CONTINUE
-    * SNDRV_TIMER_IOCTL_SELECT            * SNDRV_TIMER_IOCTL_PAUSE
+        struct snd_timer_id {
+            int dev_class;    /* timer device class number */
+            int dev_sclass;   /* slave device class number (unused) */
+            int card;         /* card number */
+            int device;       /* device number */
+            int subdevice;    /* sub-device number */
+        };
 
-The functionalities of individual ioctls were described in this series
-patch commit messages.
+    The devices in the sound timer device list are arranged by the fields
+    of this structure respectively (first by dev_class number, then by
+    card number, ...). A pointer to this structure should be passed as
+    the third ioctl's argument. Before calling the ioctl, the parameters
+    of this structure should be initialized in relation to the next timer
+    device which information is to be obtained. For example, if a wanted
+    timer device has the device class number equal to or bigger then 2,
+    the field dev_class should be initialized to 2. After the ioctl call,
+    the structure fields are filled with values from the next device in
+    the sound timer device list. If there is no next device in the list,
+    then the structure is filled with "zero" id values (in that case all
+    fields are filled with value -1).
 
-Testing method for RTC ioctls:
+Implementation notes:
 
-    Mini test programs were written for each ioctl. Those programs were
-    compiled (sometimes using cross-compilers) for the following
-    architectures:
+    The ioctl 'SNDRV_TIMER_IOCTL_NEXT_DEVICE' has a pointer to a
+    'struct snd_timer_id' as its third argument. That is the reason why
+    corresponding definition is added in 'linux-user/syscall_types.h'.
+    Since all elements of this structure are of type 'int', the rest of
+    the implementation is straightforward.
 
-        * Intel 64-bit (little endian)
-        * Power pc 32-bit (big endian)
-        * Power pc 64-bit (big endian)
+    The line '#include <linux/rtc.h>' was added to recognize
+    preprocessor definitions for these ioctls. This needs to be
+    done only once in this series of commits. Also, the content
+    of this file (with respect to ioctl definitions) remained
+    unchanged for a long time, therefore there is no need to
+    worry about supporting older Linux kernel version.
 
-    The corresponding native programs were executed without using
-    QEMU on following hosts:
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ linux-user/ioctls.h        | 4 ++++
+ linux-user/syscall.c       | 1 +
+ linux-user/syscall_defs.h  | 5 +++++
+ linux-user/syscall_types.h | 7 +++++++
+ 4 files changed, 17 insertions(+)
 
-        * Intel Core i7-4790K (x86_64 host)
-        * Power 7447A (ppc32 host)
-
-    All applicable compiled programs were in turn executed through QEMU
-    and the results obtained were the same ones gotten for native
-    execution.
-
-    Example of a test program:
-
-        For ioctl RTC_RD_TIME the following test program was used:
-
-        #include <stdio.h>
-        #include <stdlib.h>
-        #include <linux/rtc.h>
-        #include <fcntl.h>
-        #include <linux/input.h>
-        #include <sys/types.h>
-        #include <unistd.h>
-
-        #define ERROR -1
-
-        int main()
-        {
-
-            int fd = open("/dev/rtc", O_RDWR | O_NONBLOCK);
-
-            if(fd == ERROR)
-            {
-                perror("open");
-                return -1;
-            }
-
-            struct rtc_time cur_time;
-
-            if(ioctl(fd, RTC_RD_TIME, &cur_time) < 0)
-            {
-                perror("ioctl");
-                return -1;
-            }
-
-            printf("Second: %d, Minute: %d, Hour: %d, Day: %d, Month: %d, Year: %d,",
-                cur_time.tm_sec, cur_time.tm_min, cur_time.tm_hour, 
-                cur_time.tm_mday, cur_time.tm_mon, cur_time.tm_year);
-
-            return 0;
-        }
-
-    Limitations of testing:
-
-        The test host pc that was used for testing (intel pc) has RTC
-        that doesn't support all RTC features that are accessible
-        through ioctls. This means that testing can't discover
-        functionality errors related to the third argument of ioctls
-        that are used for features which are not supported. For example,
-        running the test program for ioctl RTC_EPOCH_READ gives
-        the error output: inappropriate ioctl for device. As expected,
-        the same output was obtained through QEMU which means that this
-        ioctl is recognized in QEMU but doesn't really do anything
-        because it is not supported in the host computer's RTC.
-
-        Conclusion: Some RTC ioctls need to be tested on computers
-        that support their functionalities so that it can be inferred
-        that they are really supported in QEMU. In absence of such
-        test hosts, the specifications of those ioctls need to be
-        carefully checked manually and the implementations should be
-        updated accordingly.
-
-Testing method for sound timer ioctls:
-
-    The alsa ioctl test suite, that can be found on github
-    ("https://github.com/alsa-project/alsa-utils"), was used the test
-    the implemented ioctls. The file "timer.c", located in this test
-    suite, contains test functions that are used to test alsa timer
-    ioctls. This file was compiled (sometimes using cross-compilers) 
-    for the following architectures:
-
-        * Intel 64-bit (little endian)
-        * Power pc 32-bit (big endian)
-        * Power pc 64-bit (big endian)
-
-    The corresponding compiled test files were executed without using
-    QEMU on following hosts:
-
-        * Intel Core i7-4790K (x86_64 host)
-        * Power 7447A (ppc32 host)
-
-    The corresponding native compiled test files were executed without using
-    QEMU on following hosts:
-
-        * Intel Core i7-4790K (x86_64 host)
-        * Power 7447A (ppc32 host)
-
-    All compiled test files were in turn executed through QEMU
-    and the results obtained were the same ones gotten for native
-    execution.
-
-    Also, mini test programs were written to test further functionalities
-    of individual ioctls. Those programs were, like the file "timer.c",
-    compiled for different architectures and were executed both natively
-    and thgrough QEMU to compare the results.
-
-    Example of a test program:
-
-        For ioctl SNDRV_TIMER_IOCTL_GINFO the following test program was used:
-
-        #include <stdio.h>
-        #include <stdlib.h>
-        #include <sys/types.h>
-        #include <fcntl.h>
-        #include <sys/ioctl.h>
-        #include <sound/asound.h>
-
-        #define ERROR -1
-
-        int main()
-        {
-            int fd = open("/dev/snd/timer", O_RDWR);
-
-            if(fd == ERROR)
-            {
-                perror("open");
-                return -1;
-            }
-
-            struct snd_timer_id id = {SNDRV_TIMER_CLASS_GLOBAL, 
-                                      SNDRV_TIMER_SCLASS_NONE, -1, 
-                                      SNDRV_TIMER_GLOBAL_SYSTEM, 0};
-
-            struct snd_timer_ginfo ginfo;
-            ginfo.tid = id;
-
-            if(ioctl(fd, SNDRV_TIMER_IOCTL_GINFO, &ginfo) == ERROR)
-            {
-                perror("ioctl");
-                return -1;
-            }
-
-            printf("flags: %u\n", ginfo.flags);
-            printf("card: %d\n", ginfo.card);
-            printf("id: %s\n", ginfo.id);
-            printf("name: %s\n", ginfo.name);
-            printf("reserved0: %lu\n", ginfo.reserved0);
-            printf("resolution: %lu\n", ginfo.resolution);
-            printf("resolution_min: %lu\n", ginfo.resolution_min);
-            printf("reolution_max: %lu\n", ginfo.resolution_max);
-            printf("clients: %u\n", ginfo.clients);
-            printf("reserved: %s\n", ginfo.reserved);
-
-            return 0;
-        }
-
-v5:
-
-    * added support for alsa sound timer ioctls
-
-v4:
-
-    * changed patch descriptions so that they are better
-      formatted and more cemprehensible
-
-v3:
-
-    * changed two instances of MK_PTR(TYPE_ULONG) to TYPE_ULONG
-
-v2:
-
-    * added description of each ioctl in patches
-    * wrote a more detailed cover letter with description of testing
-    * changed one instance of TYPE_INT to MK_PTR(TYPE_INT)
-
-
-Filip Bozuta (12):
-  linux-user: Add support for enabling/disabling RTC features using
-    ioctls
-  linux-user: Add support for getting/setting RTC time and alarm using
-    ioctls
-  linux-user: Add support for getting/setting RTC periodic interrupt and
-    epoch using ioctls
-  linux-user: Add support for getting/setting RTC wakeup alarm using
-    ioctls
-  linux-user: Add support for getting/setting RTC PLL correction using
-    ioctls
-  linux-user: Add support for read/clear RTC voltage low detector using
-    ioctls
-  linux-user: Add support for getting alsa timer version and id
-  linux-user: Add support for setting alsa timer enhanced read using
-    ioctl
-  linux-user: Add support for getting/setting specified alsa timer
-    parameters using ioctls
-  linux-user: Add support for selecting alsa timer using ioctl
-  linux-user: Add support for getting/setting selected alsa timer
-    parameters using ioctls
-  linux-user: Add support for selected alsa timer instructions using
-    ioctls
-
- linux-user/ioctls.h        |  45 +++++++++++++++++
- linux-user/syscall.c       |   2 +
- linux-user/syscall_defs.h  | 121 +++++++++++++++++++++++++++++++++++++++++++++
- linux-user/syscall_types.h |  91 ++++++++++++++++++++++++++++++++++
- 4 files changed, 259 insertions(+)
-
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 1f1f3e6..ed1bd4c 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -449,6 +449,10 @@
+   IOCTL(SOUND_MIXER_WRITE_LOUD, IOC_W, MK_PTR(TYPE_INT))
+   IOCTL(SOUND_MIXER_WRITE_RECSRC, IOC_W, MK_PTR(TYPE_INT))
+ 
++  IOCTL(SNDRV_TIMER_IOCTL_PVERSION, IOC_R, MK_PTR(TYPE_INT))
++  IOCTL(SNDRV_TIMER_IOCTL_NEXT_DEVICE, IOC_RW,
++        MK_PTR(MK_STRUCT(STRUCT_snd_timer_id)))
++
+   IOCTL(HDIO_GETGEO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_hd_geometry)))
+   IOCTL(HDIO_GET_UNMASKINTR, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(HDIO_GET_MULTCOUNT, IOC_R, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 74c3c08..a3993a2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -108,6 +108,7 @@
+ #include <linux/netlink.h>
+ #include <linux/if_alg.h>
+ #include <linux/rtc.h>
++#include <sound/asound.h>
+ #include "linux_loop.h"
+ #include "uname.h"
+ 
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index af4f366..7409021 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2425,6 +2425,11 @@ struct target_statfs64 {
+ 
+ #define TARGET_SOUND_MIXER_WRITE_RECSRC	TARGET_MIXER_WRITE(SOUND_MIXER_RECSRC)
+ 
++/* alsa timer ioctls */
++#define TARGET_SNDRV_TIMER_IOCTL_PVERSION     TARGET_IOR('T', 0x00, int)
++#define TARGET_SNDRV_TIMER_IOCTL_NEXT_DEVICE  TARGET_IOWR('T', 0x01,                     \
++                                                          struct snd_timer_id)
++
+ /* vfat ioctls */
+ #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
+ #define TARGET_VFAT_IOCTL_READDIR_SHORT   TARGET_IORU('r', 2)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4027272..2f4cd78 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -83,6 +83,13 @@ STRUCT(buffmem_desc,
+ STRUCT(mixer_info,
+        MK_ARRAY(TYPE_CHAR, 16), MK_ARRAY(TYPE_CHAR, 32), TYPE_INT, MK_ARRAY(TYPE_INT, 10))
+ 
++STRUCT(snd_timer_id,
++       TYPE_INT, /* dev_class */
++       TYPE_INT, /* dev_sclass */
++       TYPE_INT, /* card */
++       TYPE_INT, /* device */
++       TYPE_INT) /* subdevice */
++
+ /* loop device ioctls */
+ STRUCT(loop_info,
+        TYPE_INT,                 /* lo_number */
 -- 
 2.7.4
 
