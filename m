@@ -2,81 +2,65 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E06EFC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:53:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52C2C33CA2
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 16:07:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A98A1206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 15:53:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kcd3vzhB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A98A1206ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B987120661
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 16:07:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B987120661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipa7x-0002gZ-Q1
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 10:53:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35691)
+	id 1ipaLT-0002QB-Rs
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 11:07:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ipa7D-0001zB-71
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:52:56 -0500
+ (envelope-from <groug@kaod.org>) id 1ipaKg-0001h8-4q
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:06:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ipa7B-0005ff-4S
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:52:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49461
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ipaKe-0007Qj-5i
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:06:49 -0500
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:32775)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ipa7A-0005cT-WA
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 10:52:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578585172;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zdpsRvVV+rWRsUq3Er8dozQIkuoysYx4uKpmTNPoOUA=;
- b=Kcd3vzhBO+N7P12vlfs1mdyIxBhxFV20Mt/k3Rf+hnUETC6gxrpqrNkC0EZGV51o+yOQSt
- YVW4VO82pOHw97uDcbRJAgqwEtJb3YOApcq91AxgfhcrobJIzyfMGwf2vbLAhRcAOha5y6
- dtJXh2Gmq3WXpcjQC9MnkLPZSKB+f58=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-FRT1QSlLOnmD2luXA1AkkA-1; Thu, 09 Jan 2020 10:52:48 -0500
-X-MC-Unique: FRT1QSlLOnmD2luXA1AkkA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EBF6E802C96;
- Thu,  9 Jan 2020 15:52:46 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AF1565F700;
- Thu,  9 Jan 2020 15:52:40 +0000 (UTC)
-Date: Thu, 9 Jan 2020 15:52:38 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 06/15] migration/savevm: Replace current_machine by
- qdev_get_machine()
-Message-ID: <20200109155238.GK6795@work-vm>
-References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-7-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ipaKd-0007ET-TL
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 11:06:48 -0500
+Received: from player787.ha.ovh.net (unknown [10.108.54.13])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 5D4B911DC10
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 17:06:45 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 551B7E392BDD;
+ Thu,  9 Jan 2020 16:06:42 +0000 (UTC)
+Date: Thu, 9 Jan 2020 17:06:40 +0100
+From: Greg Kurz <groug@kaod.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] virtio: Prevent double swap due to target pre 1.0 VirtIO
+Message-ID: <20200109170640.4c3fa148@bahia.lan>
+In-Reply-To: <20200109073529-mutt-send-email-mst@kernel.org>
+References: <20200108161618.221116-1-afscoelho@gmail.com>
+ <20200109054233-mutt-send-email-mst@kernel.org>
+ <CAGTcC7yLjP5h4oWfgvrOYobChW-cw-oL5EBmMCH45O41+yuvyA@mail.gmail.com>
+ <20200109073529-mutt-send-email-mst@kernel.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20200109152133.23649-7-philmd@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 5734208229011986905
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdeiuddghedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehqvghmuhdrohhrghenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.51.249
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,80 +72,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?B?QW5kcsOp?= Silva <afscoelho@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> As we want to remove the global current_machine,
-> replace MACHINE_GET_CLASS(current_machine) by
-> MACHINE_GET_CLASS(qdev_get_machine()).
+On Thu, 9 Jan 2020 07:39:17 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+> On Thu, Jan 09, 2020 at 09:25:42AM -0300, Andr=C3=A9 Silva wrote:
+> > Hi Michael!
+> > Thanks for reviewing the patch!
+> >=20
+> > > we always get LE values from memory subsystem,
+> > > not target endian values:
+> >=20
+> > I see. So do you think the patch is correct in eliminating the extra
+> > swap (as virtio_config_readw for example already makes a swap)?
+> >=20
+> > Thanks,
+> > andr=C3=A9
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  migration/savevm.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> I don't think it is, I think we do need an extra swap
+> in some cases. It's possible that some cross-endian
+> setups are broken now, if so pls include testing
+> result not just theoretical analysis.
 >=20
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 59efc1981d..0e8b6a4715 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -292,7 +292,8 @@ static uint32_t get_validatable_capabilities_count(=
-void)
->  static int configuration_pre_save(void *opaque)
->  {
->      SaveState *state =3D opaque;
-> -    const char *current_name =3D MACHINE_GET_CLASS(current_machine)->n=
-ame;
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
-> +    const char *current_name =3D mc->name;
 
-For migration:
+I confirm that we must keep the extra swap otherwise
+read/write in cross-endian setups will have wrong
+endian. Please read this commit for a more detailed
+explanation:
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+commit 82afa58641b0e67abbaf4da6c325ebd7c2513262
+Author: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Date:   Tue Jan 10 01:35:11 2012 +0000
 
-(Personally I'd keep it on one line, but that's just taste)
+    virtio-pci: Fix endianness of virtio config
 
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D82afa58641b0e67abbaf4=
+da6c325ebd7c2513262
 
->      MigrationState *s =3D migrate_get_current();
->      int i, j;
-> =20
-> @@ -362,7 +363,8 @@ static bool configuration_validate_capabilities(Sav=
-eState *state)
->  static int configuration_post_load(void *opaque, int version_id)
->  {
->      SaveState *state =3D opaque;
-> -    const char *current_name =3D MACHINE_GET_CLASS(current_machine)->n=
-ame;
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
-> +    const char *current_name =3D mc->name;
-> =20
->      if (strncmp(state->name, current_name, state->len) !=3D 0) {
->          error_report("Machine type received is '%.*s' and local is '%s=
-'",
-> @@ -615,9 +617,7 @@ static void dump_vmstate_vmsd(FILE *out_file,
-> =20
->  static void dump_machine_type(FILE *out_file)
->  {
-> -    MachineClass *mc;
-> -
-> -    mc =3D MACHINE_GET_CLASS(current_machine);
-> +    MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
-> =20
->      fprintf(out_file, "  \"vmschkmachine\": {\n");
->      fprintf(out_file, "    \"Name\": \"%s\"\n", mc->name);
-> --=20
-> 2.21.1
->=20
+This is especially critical on ppc64 since _all_ hosts are now LE
+but the first piece of code in the guest that is likely to drive
+the device is the SLOF firmware which is BE.
+
+This is what we get with this patch when trying to run a pseries guest on a
+ppc64le host:
+
+Trying to load:  from: /pci@800000020000000/scsi@0 ... virtioblk_transfer: =
+Access beyond end of device!
+
+Cheers,
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Greg
+
+> > On Thu, Jan 9, 2020 at 7:50 AM Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
+> > >
+> > > On Wed, Jan 08, 2020 at 01:16:18PM -0300, Andre Silva wrote:
+> > > > Remove the bswap function calls after reading and before writing
+> > > > memory bytes in virtio_pci_config_read and virtio_pci_config_write
+> > > > because they are reverting back an already swapped bytes.
+> > > >
+> > > > Consider the table below in the context of virtio_pci_config_read
+> > > > function.
+> > > >
+> > > > Host   Target  virtio-config-read[wl]
+> > > >                swap?                   virtio-is-big-endian?   extr=
+a bswap?   Should be   Final result   Final result ok?
+> > > > ----- ------- ------------------------ ----------------------- ----=
+---------- ----------- -------------- ------------------
+> > > > LE     BE      s(x)                    true                    s(s(=
+x))        s(x)        x              No
+> > > > LE     LE      x                       false                   -   =
+           x           x              Yes
+> > > > BE     LE      s(x)                    false                   -   =
+           s(x)        s(x)           Yes
+> > > > BE     BE      x                       true                    s(x)=
+           x           s(x)           No
+> > >
+> > > we always get LE values from memory subsystem,
+> > > not target endian values:
+> > >
+> > > static const MemoryRegionOps virtio_pci_config_ops =3D {
+> > >     .read =3D virtio_pci_config_read,
+> > >     .write =3D virtio_pci_config_write,
+> > >     .impl =3D {
+> > >         .min_access_size =3D 1,
+> > >         .max_access_size =3D 4,
+> > >     },
+> > >     .endianness =3D DEVICE_LITTLE_ENDIAN,
+> > > };
+> > >
+> > >
+> > > This triggers another swap in address_space_ldl_internal
+> > > (memory_ldst.inc.c).
+> > >
+> > >
+> > > > In table above, when target is big endian and VirtIO is pre 1.0,
+> > > > function virtio_is_big_endian would return true and the extra
+> > > > swap would be executed, reverting the previous swap made by
+> > > > virtio_config_read[wl].
+> > > >
+> > > > The 's(x)' means that a swap function was applied at
+> > > > address x. 'LE' is little endian and 'BE' is big endian. The
+> > > > 'Final result' column is the returned value from
+> > > > virtio_pci_config_read, considering a target Virtio pre 1.0.
+> > > > 'x' means that target's value was not swapped in Qemu, 's(x)' means
+> > > > that Qemu will use a swapped value.
+> > > >
+> > > > If we remove the extra swap made in virtio_pci_config_read we will
+> > > > have the correct result in any host/target combination, both for
+> > > > VirtIO pre 1.0 or later versions.
+> > > >
+> > > > The same reasoning applies to virtio_pci_config_write.
+> > > >
+> > > > Signed-off-by: Andre Silva <afscoelho@gmail.com>
+> > > > ---
+> > > >  hw/virtio/virtio-pci.c | 12 ------------
+> > > >  1 file changed, 12 deletions(-)
+> > > >
+> > > > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > > > index c6b47a9c73..4ba9e847f3 100644
+> > > > --- a/hw/virtio/virtio-pci.c
+> > > > +++ b/hw/virtio/virtio-pci.c
+> > > > @@ -431,15 +431,9 @@ static uint64_t virtio_pci_config_read(void *o=
+paque, hwaddr addr,
+> > > >          break;
+> > > >      case 2:
+> > > >          val =3D virtio_config_readw(vdev, addr);
+> > > > -        if (virtio_is_big_endian(vdev)) {
+> > > > -            val =3D bswap16(val);
+> > > > -        }
+> > > >          break;
+> > > >      case 4:
+> > > >          val =3D virtio_config_readl(vdev, addr);
+> > > > -        if (virtio_is_big_endian(vdev)) {
+> > > > -            val =3D bswap32(val);
+> > > > -        }
+> > > >          break;
+> > > >      }
+> > > >      return val;
+> > > > @@ -465,15 +459,9 @@ static void virtio_pci_config_write(void *opaq=
+ue, hwaddr addr,
+> > > >          virtio_config_writeb(vdev, addr, val);
+> > > >          break;
+> > > >      case 2:
+> > > > -        if (virtio_is_big_endian(vdev)) {
+> > > > -            val =3D bswap16(val);
+> > > > -        }
+> > > >          virtio_config_writew(vdev, addr, val);
+> > > >          break;
+> > > >      case 4:
+> > > > -        if (virtio_is_big_endian(vdev)) {
+> > > > -            val =3D bswap32(val);
+> > > > -        }
+> > > >          virtio_config_writel(vdev, addr, val);
+> > > >          break;
+> > > >      }
+> > > > --
+> > > > 2.24.1
+> > >
+>=20
+>=20
 
 
