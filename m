@@ -2,49 +2,49 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA380C33CA1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF49C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:56:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83ADB206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:52:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83ADB206ED
+	by mail.kernel.org (Postfix) with ESMTPS id 804EE206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:56:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804EE206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipYF2-0001Bg-Ld
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:52:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51666)
+	id 1ipYIt-0003VM-Bc
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:56:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipYCr-0005rY-D3
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:50:38 -0500
+ (envelope-from <bounces@canonical.com>) id 1ipYHo-0002ZF-Uo
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipYCp-0006oy-VS
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:50:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35064)
+ (envelope-from <bounces@canonical.com>) id 1ipYHn-0002JM-Ki
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35658)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipYCp-0006kd-Ns
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:50:35 -0500
+ id 1ipYHn-0002Et-Dp
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:43 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipYCo-0001rG-7j
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 13:50:34 +0000
+ id 1ipYHm-0002Vo-4o
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 13:55:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 383C02E80C9
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 13:50:34 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1AC482E80C7
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 13:55:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jan 2020 13:41:02 -0000
-From: Thomas Huth <1852115@bugs.launchpad.net>
+Date: Thu, 09 Jan 2020 13:48:23 -0000
+From: Thomas Huth <1846451@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -52,20 +52,19 @@ X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: crobinso laurent-vivier pmaydell
-X-Launchpad-Bug-Reporter: Cole Robinson (crobinso)
+X-Launchpad-Bug-Commenters: kraxel-redhat rokups th-huth
+X-Launchpad-Bug-Reporter: Rokas Kupstys (rokups)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <157349721480.22191.14354362512617460510.malonedeb@soybean.canonical.com>
-Message-Id: <157857726373.3160.9086072880784722168.launchpad@soybean.canonical.com>
-Subject: [Bug 1852115] Re: qemu --static user build fails with fedora rawhide
- glibc-2.30.9000
+References: <157008676845.21009.5220720197845563324.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157857770348.2925.13357463074327806567.malone@soybean.canonical.com>
+Subject: [Bug 1846451] Re: K800 keyboard no longer works when attached to a VM
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: dab0ce62986d9481b76fb5049f267ba4f0063005
+X-Launchpad-Hash: e597941e5f310f50f35b6da1e78a2f1acfe29a61
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,83 +78,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852115 <1852115@bugs.launchpad.net>
+Reply-To: Bug 1846451 <1846451@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Patch has been included here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D1dfe2b91dcb1633d0ba450
+... and been released with QEMU v4.2
+
 ** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+       Status: New =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852115
+https://bugs.launchpad.net/bugs/1846451
 
 Title:
-  qemu --static user build fails with fedora rawhide glibc-2.30.9000
+  K800 keyboard no longer works when attached to a VM
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Building qemu latest git 654efcb511d on fedora rawhide fails with this
-  configure line:
+  I use Logitech K800 keyboard which is connected to a PC through
+  Logitech unifying receiver. In order to control my windows VM i attach
+  unifying receiver USB device to a VM using "virsh attach-device VM-
+  Name ./device.xml". Device ID as seen in lsusb is 046d:c52b.
 
-  ./configure \
-  	--static \
-  	--disable-system \
-  	--enable-linux-user \
-  	--disable-werror \
-  	--disable-tools \
-  	--disable-capstone
+  As of v4.1.0 keyboard no longer works when attached to a windows VM.
+  When attached receiver is still at least partially functional.
+  Logitech pairing utility properly displays paired keyboard, pressing
+  buttons on the keyboard shows changing indicator icon in pairing
+  utility. Pairing and unpairing works. Pressing keys however fails to
+  register any key presses.
 
-  make fails with:
+  Downgrading to v4.0.0 fixes the issue.
 
-  /usr/bin/ld: linux-user/syscall.o: in function `do_syscall1':
-  /root/qemu.git/linux-user/syscall.c:7769: undefined reference to `stime'
-  collect2: error: ld returned 1 exit status
+  device.xml used to attach USB device:
+  ```
+  <hostdev mode=3D'subsystem' type=3D'usb'>
+          <source>
+                  <vendor id=3D'0x046d'/>
+                  <product id=3D'0xc52b'/>
+          </source>
+  </hostdev>
 
-  Seems related to this glibc change:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D12cbde1dae6fa4a9=
-a792b64564c7e0debf7544cc
-
-  ...
-
-  +* The obsolete function stime is no longer available to newly linked
-  +  binaries and it has been removed from <time.h> header.  This function
-  +  has been deprecated in favor of clock_settime.
-  +
-
-  # rpm -q glibc
-  glibc-2.30.9000-17.fc32.x86_64
-
-  =
-
-  FWIW there's some other messages but I don't think they are fatal:
-
-  /usr/bin/ld: /usr/lib/gcc/x86_64-redhat-linux/9/../../../../lib64/libglib=
--2.0.a(gutils.c.o): in function `g_get_user_database_entry':
-  (.text+0x267): warning: Using 'getpwuid' in statically linked application=
-s requires at runtime the shared libraries from the glibc version used for =
-linking
-  /usr/bin/ld: (.text+0xe0): warning: Using 'getpwnam_r' in statically link=
-ed applications requires at runtime the shared libraries from the glibc ver=
-sion used for linking
-  /usr/bin/ld: (.text+0x11e): warning: Using 'getpwuid_r' in statically lin=
-ked applications requires at runtime the shared libraries from the glibc ve=
-rsion used for linking
-
-  =
-
-  Also, --disable-capstone is required to avoid this error, but it is pre-e=
-xisting, not sure if it's a bug, if so I can file a separate one:
-
-    LINK    aarch64-linux-user/qemu-aarch64
-  /usr/bin/ld: cannot find -lcapstone
-  collect2: error: ld returned 1 exit status
+  ```
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852115/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1846451/+subscriptions
 
