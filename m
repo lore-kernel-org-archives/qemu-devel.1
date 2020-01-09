@@ -2,89 +2,66 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B6DC33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 01:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17102C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 01:53:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7413E2067D
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 01:42:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3FCA206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 01:53:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bKLNTpF0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7413E2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="p5E3sPoO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3FCA206ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipMq8-0000EJ-JR
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 20:42:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43236)
+	id 1ipN0U-0005Zn-0a
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 20:53:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43686)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1ipMpP-00089h-GW
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:41:43 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ipMzD-0004b9-8J
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:51:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1ipMpJ-0004mz-2p
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:41:38 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34239)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1ipMpH-0004gD-1N
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:41:31 -0500
-Received: by mail-pl1-x641.google.com with SMTP id x17so1874189pln.1
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 17:41:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:subject:cc:to:in-reply-to:references:message-id
- :mime-version:content-transfer-encoding;
- bh=WuWhx15qnOyg1gRVt71tiFMKU0IEV7PZgk3YZc3+yfc=;
- b=bKLNTpF0eKeK4W3nB9oZgYLwyA/xSzkWm6xZFjve7ko+IL3TQzBNLzKkxbsrWa+hey
- PzyFbM1+DqsOUgUSLv+J4gdOBJqPyiCKRt1MGsnQrPpSFp6lTmW+qCEx5u/Z1wUEgrQW
- pYHpjIaA+dQJOd5mv3F8sYYjNFdAXrBQE4ZCDQcvm6m5e+KDYrxChcKspdkW/Qw9jGki
- OsTdBWQIvcGArzcogNx+8+zITz6yfJ3uzZHlMF/DXvDMbYdWLcynbhWNdNVGbQ56HXIr
- 8zmzHz2szPwn2Plgkm7KlOOYP8sBiuNkeUYTPDwFbLxRgywVO3ykEwu7kBY9w4CKex+y
- qCWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
- :message-id:mime-version:content-transfer-encoding;
- bh=WuWhx15qnOyg1gRVt71tiFMKU0IEV7PZgk3YZc3+yfc=;
- b=pcgazTUC9+v6W3iocHdZnOIxuJkV/ziJt/2t1mPAUieZwAbrDupc54/YdkMXPBmSxo
- pakSNHERuE4cdfB4m+MpQ9ZAZSmYDxbeTaDmrjrKcI7XlCBLxUXIaCwriUba+5OiU6R3
- CqyDgzwL8pYcQ9ylMbPOacbelOr04ulJrrgEGeJ2o5FzxHqCJHrz3xKacShYbkFMWen4
- ieNgYAI98VY6QbCyLT6DJH6NlsD99SnUWIW01oRKUuphCUAXWBRzrHiYg/8GlTW4XB5J
- gtlDq7USngsIWI2A3+TXZpHnnVHgscrAbXJCGKO3ag5YnDG8n7YWvuTLaEv8UCdVMC5W
- gCNQ==
-X-Gm-Message-State: APjAAAXJDISGlb9tD9RcOdlQyR0oxqI/9K4jHFaPuINKeoUCRYhlCu8v
- PN7F/4FhFAq7nPU1uGk3otgJIxQJ+kk=
-X-Google-Smtp-Source: APXvYqzgViiZt/G9S9d71YjHtPwmtjtD0UQDgwf2fMFh+trl1DfyOhFqmyHaAqIFPZiM0LSaWSgGDA==
-X-Received: by 2002:a17:90a:8545:: with SMTP id a5mr2061993pjw.3.1578534088977; 
- Wed, 08 Jan 2020 17:41:28 -0800 (PST)
-Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
- by smtp.gmail.com with ESMTPSA id a15sm5084494pfh.169.2020.01.08.17.41.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 17:41:28 -0800 (PST)
-Date: Wed, 08 Jan 2020 17:41:28 -0800 (PST)
-X-Google-Original-Date: Wed, 08 Jan 2020 17:41:27 PST (-0800)
-From: Palmer Dabbelt <palmerdabbelt@google.com>
-X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
-Subject: Re: [PATCH v1 30/36] target/riscv: Allow specifying MMU stage
-CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
-To: Alistair Francis <Alistair.Francis@wdc.com>
-In-Reply-To: <1cd8d1423b81dd4705e03923f644840e35143ed5.1575914822.git.alistair.francis@wdc.com>
-References: <1cd8d1423b81dd4705e03923f644840e35143ed5.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
-Message-ID: <mhng-e5d082cc-1654-401c-bd75-d218ace4aad4@palmerdabbelt-glaptop>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <dgibson@ozlabs.org>) id 1ipMzA-0000nS-7X
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:51:46 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52461 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ipMz9-0000ar-4z; Wed, 08 Jan 2020 20:51:44 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47tTcT451dz9sRf; Thu,  9 Jan 2020 12:51:37 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1578534697;
+ bh=5z+73++uW+K09ix6A262zZJiXGmBjuSc6+80Yg5XvfY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=p5E3sPoOzRH7gtdLXAFsBlCw2SKN88kn3D8ki2/nD2PhO+aTIycK0QmrdollhZ6jM
+ hi0obE9mB6qDeNZqTQ0Dogbq2AxFZHD/OVB7fqIQju22NSYya6FEI1KrcW6NtJeFIg
+ mmZq1I6kTKRUzPH3IQoB1pvzW8gCwzR8Wh+Gatso=
+Date: Thu, 9 Jan 2020 12:33:46 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 2/2] pnv/psi: Consolidate some duplicated code in
+ pnv_psi_realize()
+Message-ID: <20200109013346.GC8586@umbus.fritz.box>
+References: <157841289975.66386.6463139590245180762.stgit@bahia.tlslab.ibm.com>
+ <157841476667.66386.13659183399113837990.stgit@bahia.tlslab.ibm.com>
+ <56272b35-c0ed-65de-310d-f97090e2b8c1@redhat.com>
+ <20200108005453.GD2137@umbus.fritz.box>
+ <20200108115845.07f10453@bahia.lan>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="da4uJneut+ArUgXk"
+Content-Disposition: inline
+In-Reply-To: <20200108115845.07f10453@bahia.lan>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,99 +73,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 09 Dec 2019 10:11:59 PST (-0800), Alistair Francis wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
->  target/riscv/cpu_helper.c | 39 ++++++++++++++++++++++++++++++---------
->  1 file changed, 30 insertions(+), 9 deletions(-)
->
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 2040fc0208..8b234790a7 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -279,10 +279,19 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
->   *
->   * Adapted from Spike's mmu_t::translate and mmu_t::walk
->   *
-> + * @env: CPURISCVState
-> + * @physical: This will be set to the calculated physical address
-> + * @prot: The returned protection attributes
-> + * @addr: The virtual address to be translated
-> + * @access_type: The type of MMU access
-> + * @mmu_idx: Indicates current privilege level
-> + * @first_stage: Are we in first stage translation?
-> + *               Second stage is used for hypervisor guest translation
->   */
->  static int get_physical_address(CPURISCVState *env, hwaddr *physical,
->                                  int *prot, target_ulong addr,
-> -                                int access_type, int mmu_idx)
-> +                                int access_type, int mmu_idx,
-> +                                bool first_stage)
->  {
->      /* NOTE: the env->pc value visible here will not be
->       * correct, but the value visible to the exception handler
-> @@ -485,13 +494,23 @@ restart:
->  }
->
->  static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
-> -                                MMUAccessType access_type, bool pmp_violation)
-> +                                MMUAccessType access_type, bool pmp_violation,
-> +                                bool first_stage)
->  {
->      CPUState *cs = env_cpu(env);
-> -    int page_fault_exceptions =
-> -        (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-> -        get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-> -        !pmp_violation;
-> +    int page_fault_exceptions;
-> +    if (first_stage) {
-> +        page_fault_exceptions =
-> +            (env->priv_ver >= PRIV_VERSION_1_10_0) &&
-> +            get_field(env->satp, SATP_MODE) != VM_1_10_MBARE &&
-> +            !pmp_violation;
-> +        riscv_cpu_set_force_hs_excep(env, 0);
-> +    } else {
-> +        page_fault_exceptions =
-> +            get_field(env->hgatp, HGATP_MODE) != VM_1_10_MBARE &&
-> +            !pmp_violation;
-> +        riscv_cpu_set_force_hs_excep(env, 1);
-> +    }
->      switch (access_type) {
->      case MMU_INST_FETCH:
->          cs->exception_index = page_fault_exceptions ?
-> @@ -518,7 +537,8 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
->      int prot;
->      int mmu_idx = cpu_mmu_index(&cpu->env, false);
->
-> -    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx)) {
-> +    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
-> +                             true)) {
->          return -1;
->      }
->      return phys_addr;
-> @@ -583,7 +603,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
->                    __func__, address, access_type, mmu_idx);
->
-> -    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
-> +    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
-> +                               true);
->
->      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
->          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
-> @@ -610,7 +631,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
->      } else if (probe) {
->          return false;
->      } else {
-> -        raise_mmu_exception(env, address, access_type, pmp_violation);
-> +        raise_mmu_exception(env, address, access_type, pmp_violation, true);
->          riscv_raise_exception(env, cs->exception_index, retaddr);
->      }
->  #else
 
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+--da4uJneut+ArUgXk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jan 08, 2020 at 11:58:45AM +0100, Greg Kurz wrote:
+> On Wed, 8 Jan 2020 11:54:53 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Tue, Jan 07, 2020 at 07:32:03PM +0100, Philippe Mathieu-Daud=E9 wrot=
+e:
+> > > Hi Greg,
+> > >=20
+> > > On 1/7/20 5:32 PM, Greg Kurz wrote:
+> > > > The proper way to do that would be to use device_class_set_parent_r=
+ealize(),
+> > > > but defining a Pnv8PsiClass and a Pnv9PsiClass types with a parent_=
+realize
+> > > > pointer adds a fair amount of code. Calling pnv_psi_realize() expli=
+citely
+> > > > is fine for now.
+> > > >=20
+> > > > This should probably be achieved with a device realize hook in the
+> > > > PSI base class and device_class_set_parent_realize() in the children
+> > > > classes.
+> > >=20
+>=20
+> I realize that this last paragraph is a leftover. First paragraph already
+> mentions device_class_set_parent_realize() as being the "proper way".
+>=20
+> David,
+>=20
+> Can you remove it in your tree ? No big deal if you can't.
+
+Sorry, not any more - I've already sent the PR.
+
+>=20
+> > > Can you add a note explaining why the POWER10 PSI doesn't need it?
+> >=20
+> > For now, POWER10 uses the Pnv9PsiClass, I believe, so the question
+> > doesn't arise.
+> >=20
+>=20
+> This is correct and also a bit confusing, as proves Philippe's remark.
+> Maybe we should come up with a PnvXivePsiClass and specialize it for
+> POWER9 and POWER10.
+>=20
+> > >=20
+> > > >=20
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > > > ---
+> > > >   hw/ppc/pnv_psi.c |   19 ++++++++++++-------
+> > > >   1 file changed, 12 insertions(+), 7 deletions(-)
+> > > >=20
+> > > > diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> > > > index 6c94781e377d..546232106756 100644
+> > > > --- a/hw/ppc/pnv_psi.c
+> > > > +++ b/hw/ppc/pnv_psi.c
+> > > > @@ -469,6 +469,16 @@ static void pnv_psi_reset_handler(void *dev)
+> > > >       device_reset(DEVICE(dev));
+> > > >   }
+> > > > +static void pnv_psi_realize(DeviceState *dev, Error **errp)
+> > > > +{
+> > > > +    PnvPsi *psi =3D PNV_PSI(dev);
+> > > > +
+> > > > +    /* Default BAR for MMIO region */
+> > > > +    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+> > > > +
+> > > > +    qemu_register_reset(pnv_psi_reset_handler, dev);
+> > > > +}
+> > > > +
+> > > >   static void pnv_psi_power8_instance_init(Object *obj)
+> > > >   {
+> > > >       Pnv8Psi *psi8 =3D PNV8_PSI(obj);
+> > > > @@ -528,9 +538,6 @@ static void pnv_psi_power8_realize(DeviceState =
+*dev, Error **errp)
+> > > >       memory_region_init_io(&psi->regs_mr, OBJECT(dev), &psi_mmio_o=
+ps, psi,
+> > > >                             "psihb", PNV_PSIHB_SIZE);
+> > > > -    /* Default BAR for MMIO region */
+> > > > -    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+> > > > -
+> > > >       /* Default sources in XIVR */
+> > > >       for (i =3D 0; i < PSI_NUM_INTERRUPTS; i++) {
+> > > >           uint8_t xivr =3D irq_to_xivr[i];
+> > > > @@ -538,7 +545,7 @@ static void pnv_psi_power8_realize(DeviceState =
+*dev, Error **errp)
+> > > >               ((uint64_t) i << PSIHB_XIVR_SRC_SH);
+> > > >       }
+> > > > -    qemu_register_reset(pnv_psi_reset_handler, dev);
+> > > > +    pnv_psi_realize(dev, errp);
+> > > >   }
+> > > >   static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, in=
+t xscom_offset)
+> > > > @@ -873,9 +880,7 @@ static void pnv_psi_power9_realize(DeviceState =
+*dev, Error **errp)
+> > > >       memory_region_init_io(&psi->regs_mr, OBJECT(dev), &pnv_psi_p9=
+_mmio_ops, psi,
+> > > >                             "psihb", PNV9_PSIHB_SIZE);
+> > > > -    pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+> > > > -
+> > > > -    qemu_register_reset(pnv_psi_reset_handler, dev);
+> > > > +    pnv_psi_realize(dev, errp);
+> > > >   }
+> > > >   static void pnv_psi_power9_class_init(ObjectClass *klass, void *d=
+ata)
+> > > >=20
+> > > >=20
+> > >=20
+> >=20
+>=20
+
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--da4uJneut+ArUgXk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4WgvgACgkQbDjKyiDZ
+s5Lk5g/9HKY4cTbGRE7Ie4bDSHTdXQuCyFkUMRXy4IW1IQscExMFWf4RbYmU2fBu
+htq7GchnqdzdvSllaqPxXJcQ6OZYtvPmo7O8aG7hHwNuozcIlNCWNDFynJa4UuWr
+DZdNSqmKM6w2M3lCuU33OjMCp7hTI8Sx34EaRrc8W3+J8sQPQcMXOIB6X19Wgnlr
+2hbJHicIlC7Ri1N7vFCWMqmPWA5ES5QifSpjGbYwLKO7GyGOgOA4M/vsBFF1q9un
+edMA5vXuN54w/jmIjk0H1w45DCIfljrIqMSC4zmkpdpS+OldM9Wv+2Ond66J2uar
+olfFd/COJ+vI33i0EoGiY0UceOIByOdhGFlBJAvl34b8H5jGVNqF0N+b67ammjPw
+x1yZhhxyvZq+zYcdDVBEfXhaMY/Z7uSUxgkrLPiTkDK5alY9YaRY5A+dpL87620t
+hPPgR6FujkGFn249g1EJj7WSsWLvPoPxgerghX8PywS77zakRHk5gTdj14BBWRDw
+30hE/Lb4uVwQ6VpdaRv7XK7skXFdN/XeH3aYuOCMg9Yz1h/ETVVwrFR1vKdD38f5
+SJUJ7/vdV+iUXcK2iLYmh5GMRxyJucFknSiN61BOJizuHfeN4t9uqLpmZRhv6U70
+rhDGUa/ztsNnW8yUhoYvC8P5lwevYH9cHNMdmd3dAoW4yvAmvHM=
+=kOs6
+-----END PGP SIGNATURE-----
+
+--da4uJneut+ArUgXk--
 
