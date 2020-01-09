@@ -2,74 +2,89 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C57CC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8FCEC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5318620661
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:38:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5318620661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A36CC20661
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:38:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LkpG5FFZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36CC20661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipbkx-0002jx-4y
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:38:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45444)
+	id 1ipblh-00045g-Ix
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:38:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipbdp-0007ah-GR
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:30:43 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipbkg-0002hW-1c
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:37:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipbdn-0001jv-Qu
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:30:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56104)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipbdn-0001e8-Kv
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:30:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipbdm-0005N5-IL
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 17:30:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8A0C72E80CC
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 17:30:38 +0000 (UTC)
+ (envelope-from <eric.auger@redhat.com>) id 1ipbkc-0005gD-Vn
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:37:44 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30548
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1ipbkc-0005Zc-Ht
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:37:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578591461;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+hd1spx0j5nExGhcsZntaXPkm5mIhaB1M+8iBPreXT8=;
+ b=LkpG5FFZxopiaShAMDqLMS/gS280WAIHuPYcB/sq7LdccPUTAF56IYi63RgbQatONqFHrq
+ kEjMOofTj2FV/MFTlVfM6wFFGr9yxB20gfna++XWUapq1H5cvgTnh0BVrC5ohvsIMoCbyu
+ HsZ+QHa3W0YMBLEeohPub3HyIS/h58c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-x2Z3y9lrNSyM08zcJ_75fg-1; Thu, 09 Jan 2020 12:37:38 -0500
+X-MC-Unique: x2Z3y9lrNSyM08zcJ_75fg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E5B310054E3;
+ Thu,  9 Jan 2020 17:37:36 +0000 (UTC)
+Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C210F10013A7;
+ Thu,  9 Jan 2020 17:37:33 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 04/10] arm: pmu: Check Required Event
+ Support
+To: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+References: <20191216204757.4020-1-eric.auger@redhat.com>
+ <20191216204757.4020-5-eric.auger@redhat.com>
+ <20200103181251.72cfcae2@donnerap.cambridge.arm.com>
+ <ce0ce49f-7e19-21d4-5eba-386dd2f96301@redhat.com>
+ <380b27cb-a762-0622-af9c-1d2afc3a4b5e@arm.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <c1831b6c-dc75-1bd3-6657-0375682c30af@redhat.com>
+Date: Thu, 9 Jan 2020 18:37:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <380b27cb-a762-0622-af9c-1d2afc3a4b5e@arm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jan 2020 17:24:58 -0000
-From: Thomas Huth <1850000@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gschafer th-huth xanclic
-X-Launchpad-Bug-Reporter: Toolybird (gschafer)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <157212805514.19102.17568097209992499457.malonedeb@wampee.canonical.com>
-Message-Id: <157859069854.16932.17125380376932850841.malone@soybean.canonical.com>
-Subject: [Bug 1850000] Re: 4.1.0 bogus QCOW2 corruption reported after compress
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d38bb6949c7249a703eefdb1fbf826dd3aefc866
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,119 +93,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1850000 <1850000@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andrew.murray@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix has been included in QEMU v4.2:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D24552feb6ae2f615b76c2
+Hi Andre,
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+On 1/9/20 6:30 PM, Andr=E9 Przywara wrote:
+> On 09/01/2020 16:54, Auger Eric wrote:
+>=20
+> Hi Eric,
+>=20
+>> On 1/3/20 7:12 PM, Andre Przywara wrote:
+>>> On Mon, 16 Dec 2019 21:47:51 +0100
+>>> Eric Auger <eric.auger@redhat.com> wrote:
+>>>
+>>> Hi Eric,
+>>>
+>>>> If event counters are implemented check the common events
+>>>> required by the PMUv3 are implemented.
+>>>>
+>>>> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+>>>> either INST_RETIRED or INST_SPEC). Some others only are
+>>>> required if the implementation implements some other features.
+>>>>
+>>>> Check those wich are unconditionally required.
+>>>>
+>>>> This test currently fails on TCG as neither INST_RETIRED
+>>>> or INST_SPEC are supported.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>
+>>>> ---
+>>>>
+>>>> v1 ->v2:
+>>>> - add a comment to explain the PMCEID0/1 splits
+>>>> ---
+>>>>  arm/pmu.c         | 71 ++++++++++++++++++++++++++++++++++++++++++++=
++++
+>>>>  arm/unittests.cfg |  6 ++++
+>>>>  2 files changed, 77 insertions(+)
+>>>>
+>>>> diff --git a/arm/pmu.c b/arm/pmu.c
+>>>> index d24857e..d88ef22 100644
+>>>> --- a/arm/pmu.c
+>>>> +++ b/arm/pmu.c
+>>>> @@ -101,6 +101,10 @@ static inline void precise_instrs_loop(int loop=
+, uint32_t pmcr)
+>>>>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>>>>  	: "cc");
+>>>>  }
+>>>> +
+>>>> +/* event counter tests only implemented for aarch64 */
+>>>> +static void test_event_introspection(void) {}
+>>>> +
+>>>>  #elif defined(__aarch64__)
+>>>>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>>>>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+>>>> @@ -139,6 +143,70 @@ static inline void precise_instrs_loop(int loop=
+, uint32_t pmcr)
+>>>>  	: [pmcr] "r" (pmcr)
+>>>>  	: "cc");
+>>>>  }
+>>>> +
+>>>> +#define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
+>>>> +
+>>>> +static bool is_event_supported(uint32_t n, bool warn)
+>>>> +{
+>>>> +	uint64_t pmceid0 =3D read_sysreg(pmceid0_el0);
+>>>> +	uint64_t pmceid1 =3D read_sysreg_s(PMCEID1_EL0);
+>>>> +	bool supported;
+>>>> +	uint32_t reg;
+>>>> +
+>>>> +	/*
+>>>> +	 * The low 32-bits of PMCEID0/1 respectly describe
+>>>> +	 * event support for events 0-31/32-63. Their High
+>>>> +	 * 32-bits describe support for extended events
+>>>> +	 * starting at 0x4000, using the same split.
+>>>> +	 */
+>>>> +	if (n >=3D 0x0  && n <=3D 0x1F)
+>>>> +		reg =3D pmceid0 & 0xFFFFFFFF;
+>>>> +	else if  (n >=3D 0x4000 && n <=3D 0x401F)
+>>>> +		reg =3D pmceid0 >> 32;
+>>>> +	else if (n >=3D 0x20  && n <=3D 0x3F)
+>>>> +		reg =3D pmceid1 & 0xFFFFFFFF;
+>>>> +	else if (n >=3D 0x4020 && n <=3D 0x403F)
+>>>> +		reg =3D pmceid1 >> 32;
+>>>> +	else
+>>>> +		abort();
+>>>> +
+>>>> +	supported =3D  reg & (1 << n);
+>>>
+>>> Don't we need to mask off everything but the lowest 5 bits of "n"? Pr=
+obably also using "1U" is better.
+>> I added an assert to check n is less or equal than 0x3F
+>=20
+> But "n" will definitely be bigger than that in case of an extended
+> event, won't it? So you adjust "reg" accordingly, but miss to do
+> something similar to "n"?
+ouch yes. Sorry. I Will do what you suggest. Nethertheless this would be
+test code error.
+>=20
+>>>
+>>>> +	if (!supported && warn)
+>>>> +		report_info("event %d is not supported", n);
+>>>> +	return supported;
+>>>> +}
+>>>> +
+>>>> +static void test_event_introspection(void)
+>>>
+>>> "introspection" sounds quite sophisticated. Are you planning to exten=
+d this? If not, could we maybe rename it to "test_available_events"?
+>> Yes this test is a placeholder for looking at the PMU characteristics
+>> and we may add some other queries there.
+>>>
+>>>> +{
+>>>> +	bool required_events;
+>>>> +
+>>>> +	if (!pmu.nb_implemented_counters) {
+>>>> +		report_skip("No event counter, skip ...");
+>>>> +		return;
+>>>> +	}
+>>>> +
+>>>> +	/* PMUv3 requires an implementation includes some common events */
+>>>> +	required_events =3D is_event_supported(0x0, true) /* SW_INCR */ &&
+>>>> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+>>>> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+>>>> +			   is_event_supported(0x1B, true) /* INST_PREC */);
+>>>> +
+>>>> +	if (pmu.version =3D=3D 0x4) {
+>>>> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+>>>> +		required_events =3D required_events ||
+>>>> +				  is_event_supported(0x23, true) ||
+>>>
+>>> Shouldn't those two operators be '&&' instead?
+>> yes definitively
+>>>
+>>>> +				  is_event_supported(0x24, true);
+>>>> +	}
+>>>> +
+>>>> +	/*
+>>>> +	 * L1D_CACHE_REFILL(0x3) and L1D_CACHE(0x4) are only required if
+>>>> +	 * L1 data / unified cache. BR_MIS_PRED(0x10), BR_PRED(0x12) are o=
+nly
+>>>> +	 * required if program-flow prediction is implemented.
+>>>> +	 */
+>>>
+>>> Is this a TODO?
+>> yes. Added TODO. I do not know how to check whether the conditions are
+>> satisfied? Do you have any idea?
+>=20
+> Well, AFAICS KVM doesn't filter PMCEIDn, right? So some basic checks ar=
+e
+> surely fine, but I wouldn't go crazy about checking every possible
+> aspect of it. After all you would just check the hardware, as we pass
+> this register on.
 
--- =
+I agree I can skip those.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1850000
+Thanks
 
-Title:
-  4.1.0 bogus QCOW2 corruption reported after compress
+Eric
+>=20
+> Cheers,
+> Andre.
+>=20
+>> Thank you for the review!
+>>
+>> Eric
+>>>
+>>> Cheers,
+>>> Andre
+>>>
+>>>
+>>>> +
+>>>> +	report(required_events, "Check required events are implemented");
+>>>> +}
+>>>> +
+>>>>  #endif
+>>>> =20
+>>>>  /*
+>>>> @@ -326,6 +394,9 @@ int main(int argc, char *argv[])
+>>>>  		       "Monotonically increasing cycle count");
+>>>>  		report(check_cpi(cpi), "Cycle/instruction ratio");
+>>>>  		pmccntr64_test();
+>>>> +	} else if (strcmp(argv[1], "event-introspection") =3D=3D 0) {
+>>>> +		report_prefix_push(argv[1]);
+>>>> +		test_event_introspection();
+>>>>  	} else {
+>>>>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>>>>  	}
+>>>> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+>>>> index 79f0d7a..4433ef3 100644
+>>>> --- a/arm/unittests.cfg
+>>>> +++ b/arm/unittests.cfg
+>>>> @@ -66,6 +66,12 @@ file =3D pmu.flat
+>>>>  groups =3D pmu
+>>>>  extra_params =3D -append 'cycle-counter 0'
+>>>> =20
+>>>> +[pmu-event-introspection]
+>>>> +file =3D pmu.flat
+>>>> +groups =3D pmu
+>>>> +arch =3D arm64
+>>>> +extra_params =3D -append 'event-introspection'
+>>>> +
+>>>>  # Test PMU support (TCG) with -icount IPC=3D1
+>>>>  #[pmu-tcg-icount-1]
+>>>>  #file =3D pmu.flat
+>>>
+>>
+>=20
 
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Creating a compressed image then running `qemu-img check <..>.qcow2'
-  on said image seems to report bogus corruption in some (but not all)
-  cases:
-
-  Step 1.
-
-  # qemu-img info win7-base.qcow2
-  image: win7-base.qcow2
-  file format: qcow2
-  virtual size: 20 GiB (21474836480 bytes)
-  disk size: 12.2 GiB
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: true
-      refcount bits: 16
-      corrupt: false
-
-  # qemu-img check win7-base.qcow2
-  No errors were found on the image.
-  327680/327680 =3D 100.00% allocated, 0.00% fragmented, 0.00% compressed c=
-lusters
-  Image end offset: 21478375424
-
-  Step 2.
-
-  # qemu-img convert -f qcow2 -O qcow2 -c win7-base.qcow2 test1-z.qcow2
-
-  Step 3.
-
-  # qemu-img info test1-z.qcow2
-  image: test1-z.qcow2
-  file format: qcow2
-  virtual size: 20 GiB (21474836480 bytes)
-  disk size: 5.78 GiB
-  cluster_size: 65536
-  Format specific information:
-      compat: 1.1
-      lazy refcounts: false
-      refcount bits: 16
-      corrupt: false
-
-  # qemu-img check test1-z.qcow2
-  ERROR cluster 1191 refcount=3D1 reference=3D2
-  ERROR cluster 1194 refcount=3D1 reference=3D4
-  ERROR cluster 1195 refcount=3D1 reference=3D7
-  ERROR cluster 1196 refcount=3D1 reference=3D7
-  ERROR cluster 1197 refcount=3D1 reference=3D6
-  ERROR cluster 1198 refcount=3D1 reference=3D4
-  ERROR cluster 1199 refcount=3D1 reference=3D4
-  ERROR cluster 1200 refcount=3D1 reference=3D5
-  ERROR cluster 1201 refcount=3D1 reference=3D3
-  <...> snip many errors
-  Leaked cluster 94847 refcount=3D3 reference=3D0
-  Leaked cluster 94848 refcount=3D3 reference=3D0
-  Leaked cluster 94849 refcount=3D11 reference=3D0
-  Leaked cluster 94850 refcount=3D14 reference=3D0
-
-  20503 errors were found on the image.
-  Data may be corrupted, or further writes to the image may corrupt it.
-
-  20503 leaked clusters were found on the image.
-  This means waste of disk space, but no harm to data.
-  197000/327680 =3D 60.12% allocated, 89.32% fragmented, 88.50% compressed =
-clusters
-  Image end offset: 6216220672
-
-  =
-
-  The resultant image seems to work fine in a VM when used as a backing fil=
-e.
-
-  Interestingly, if I substitute a qemu-img binary from qemu-4.0 then no
-  errors are reported.
-
-  # /tmp/qemu-img check test1-z.qcow2
-  No errors were found on the image.
-  197000/327680 =3D 60.12% allocated, 89.32% fragmented, 88.50% compressed =
-clusters
-  Image end offset: 6216220672
-
-  Is the image corrupted or not? I'm guessing not.
-
-  Just in case it matters, this is ext4 fs on rotational disk. Latest
-  Arch Linux but self compiled 4.1.0 with recent QCOW2 corruption fixes
-  added.
-
-  I haven't tried latest trunk but might do so if time permits.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1850000/+subscriptions
 
