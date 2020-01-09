@@ -2,69 +2,70 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF49C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5162C33CA3
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 804EE206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:56:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804EE206ED
+	by mail.kernel.org (Postfix) with ESMTPS id BBE1F20848
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:57:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBE1F20848
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipYIt-0003VM-Bc
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:56:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49741)
+	id 1ipYJA-0003n9-M5
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:57:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50034)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ipYHo-0002ZF-Uo
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:46 -0500
+ (envelope-from <bounces@canonical.com>) id 1ipYHw-0002de-1S
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ipYHn-0002JM-Ki
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35658)
+ (envelope-from <bounces@canonical.com>) id 1ipYHu-0002bd-T8
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35924)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ipYHn-0002Et-Dp
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:43 -0500
+ id 1ipYHu-0002ZM-Jz
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:55:50 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ipYHm-0002Vo-4o
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 13:55:42 +0000
+ id 1ipYHs-0002d9-4l
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 13:55:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1AC482E80C7
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 13:55:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 095A12E80C7
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 13:55:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Jan 2020 13:48:23 -0000
-From: Thomas Huth <1846451@bugs.launchpad.net>
+Date: Thu, 09 Jan 2020 13:45:50 -0000
+From: Thomas Huth <1811758@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Wishlist;
  assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: kraxel-redhat rokups th-huth
-X-Launchpad-Bug-Reporter: Rokas Kupstys (rokups)
+X-Launchpad-Bug-Commenters: amitshah dkg0 laurent-vivier th-huth
+X-Launchpad-Bug-Reporter: dkg (dkg0)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <157008676845.21009.5220720197845563324.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157857770348.2925.13357463074327806567.malone@soybean.canonical.com>
-Subject: [Bug 1846451] Re: K800 keyboard no longer works when attached to a VM
+References: <154753485996.31938.10842883255904010357.malonedeb@wampee.canonical.com>
+Message-Id: <157857755125.10029.9981649073324416715.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1811758] Re: virtio-rng backend should use getentropy() syscall
+ when available
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e597941e5f310f50f35b6da1e78a2f1acfe29a61
+X-Launchpad-Hash: f6d6a9e7f9abc244c00af9a73811c15a1e95c010
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -78,56 +79,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846451 <1846451@bugs.launchpad.net>
+Reply-To: Bug 1811758 <1811758@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch has been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D1dfe2b91dcb1633d0ba450
-... and been released with QEMU v4.2
-
 ** Changed in: qemu
-       Status: New =3D> Fix Released
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846451
+https://bugs.launchpad.net/bugs/1811758
 
 Title:
-  K800 keyboard no longer works when attached to a VM
+  virtio-rng backend should use getentropy() syscall when available
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  I use Logitech K800 keyboard which is connected to a PC through
-  Logitech unifying receiver. In order to control my windows VM i attach
-  unifying receiver USB device to a VM using "virsh attach-device VM-
-  Name ./device.xml". Device ID as seen in lsusb is 046d:c52b.
+  According to https://wiki.qemu.org/Features/VirtIORNG the default
+  backend for `virtio-rng-pci` is `/dev/random`.  Alternately, the user
+  can point it to a different backend file, like `/dev/urandom`.
 
-  As of v4.1.0 keyboard no longer works when attached to a windows VM.
-  When attached receiver is still at least partially functional.
-  Logitech pairing utility properly displays paired keyboard, pressing
-  buttons on the keyboard shows changing indicator icon in pairing
-  utility. Pairing and unpairing works. Pressing keys however fails to
-  register any key presses.
-
-  Downgrading to v4.0.0 fixes the issue.
-
-  device.xml used to attach USB device:
-  ```
-  <hostdev mode=3D'subsystem' type=3D'usb'>
-          <source>
-                  <vendor id=3D'0x046d'/>
-                  <product id=3D'0xc52b'/>
-          </source>
-  </hostdev>
-
-  ```
+  However, both of these files have suboptimal behavior in one way or
+  another, as documented in `random(7)`.  Instead, the default behavior
+  should be to pull the requested octets from the `getrandom()` system
+  call, if available, called with no flags set.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846451/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1811758/+subscriptions
 
