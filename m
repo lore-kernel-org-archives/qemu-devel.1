@@ -2,87 +2,82 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C563C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE74C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 03:01:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 351B9205F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:58:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2CBF205F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 03:01:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iIG46fRp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 351B9205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rv44L5i5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CBF205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipO1H-0006SI-9t
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 21:57:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53708)
+	id 1ipO4q-0008Lr-GX
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 22:01:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46839)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ipNt9-00037M-0G
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:49:37 -0500
+ (envelope-from <jasowang@redhat.com>) id 1ipO3s-0007pb-0F
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 22:00:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ipNt6-0006UC-W8
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:49:34 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38160)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ipNt6-0006SQ-Nr
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:49:32 -0500
-Received: by mail-pl1-x642.google.com with SMTP id f20so1924843plj.5
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 18:49:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=bI837W0qu61ZCvf0+RXhi7DDjyBjyOrHLVOGWGh4Vsw=;
- b=iIG46fRp5ogMZwkYU6WuosNs1OINhSRHQhTCR9vDcxL+xBJXTkPoX+uyWMziexP0l4
- 9EkpqqqU69DPscWfYLa2EeeuVQMjftx6IVjmfiIIaW9aVfEooLfYU5li63N6zF1AsWIL
- 76liK7RFPBG2oRM1/Iu5i92JYpPTC8SrBziSQVt6mbAdpn8XQioo0goqdB2EDwfI26F/
- GXeTsT9LmMT9Yi9b+gef/ohV19Yvl9qTKrhftH4d+UknHYFz63j+fTfQ44W8GE9a4Lfn
- 9znMOZZvpMb6vL42PonCvvdwu2W1X72yZvn6qMHZW0GZIs3GikgofENjztnlZTEdsjEy
- t6bQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=bI837W0qu61ZCvf0+RXhi7DDjyBjyOrHLVOGWGh4Vsw=;
- b=MVlUNEB1kuprsPBb+uFhEf5uOLCe7Vs3dgXtDIkpB7OG2XCCjaDGEM7Ll0QSfER1y0
- Nq/7AdQ/xrdrrXEAxLX0xiBoLcXItGe0jEFWK5YDubrds1CA98txJZQ3lw8j+IA+57o9
- ivPZRk7b2PeIZs8ChamzoSKWj8chGsSiJ38or3nPfZ3LDB0i+V/ljDaUhYAE4dVzT7Sm
- AeUXUf3MieX5W0WZqDjyI4lLuCWK2IG48kFSOqMTEP4DUx5Vd2+ugDMK13cV5Xrlgb08
- jy1c85/2RTQD+H4oKjg5WUSNmw9ZYZl1mzlNArQzRYr7v0sRp7h75sxAUbS1yLyJlK8J
- MLyg==
-X-Gm-Message-State: APjAAAXRAW7gcs3RIMaXrfXFlGYc35cA7AtWnOzklanF4qE4LTBm/toV
- B/6PMMTD466xku9erTUDe7ORESpgqSTqtA==
-X-Google-Smtp-Source: APXvYqyHP1IQLEA6CCkod6mdY9rvNUD7i9hhClVVfqN1PGuWVkL933E/ykEYvE1l4aqQ50uF0exGdw==
-X-Received: by 2002:a17:902:7792:: with SMTP id
- o18mr8409379pll.31.1578538171454; 
- Wed, 08 Jan 2020 18:49:31 -0800 (PST)
-Received: from localhost.localdomain (alanje.lnk.telstra.net.
- [120.151.179.201])
- by smtp.gmail.com with ESMTPSA id b4sm5337844pfd.18.2020.01.08.18.49.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 18:49:30 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 8/9] cputlb: Initialize tlbs as flushed
-Date: Thu,  9 Jan 2020 13:49:06 +1100
-Message-Id: <20200109024907.2730-9-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200109024907.2730-1-richard.henderson@linaro.org>
-References: <20200109024907.2730-1-richard.henderson@linaro.org>
+ (envelope-from <jasowang@redhat.com>) id 1ipO3m-0004Jv-PP
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 22:00:37 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43737
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ipO3m-0004G2-1V
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 22:00:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578538833;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=O01+Udo52H5L/qd/P/ro+XqbXcxDKpi9kRJxPDt4YTg=;
+ b=Rv44L5i5HZn4V9kbRVDeQ4XTszyJIwxZykiyQ6xoTzD96UnPyGOFMqS/pp1tAB4KHpvlj4
+ UzABBBvmjtzIwmRSN5Z7BFeywWYAKRs2fnC589Gd7uk6wN+tSbXFt8D3Yn+4Ay8J6jSATl
+ vZOWVfEeI29q41taFxQ2r7OirpMoGOs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-81_wnmO8Oa6oAFEyZDL6bg-1; Wed, 08 Jan 2020 22:00:31 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0D92107ACC5
+ for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 03:00:30 +0000 (UTC)
+Received: from [10.72.12.226] (ovpn-12-226.pek2.redhat.com [10.72.12.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A83F5DA60;
+ Thu,  9 Jan 2020 03:00:26 +0000 (UTC)
+Subject: Re: [PATCH 0/2] exclude hyperv synic sections from vhost
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, vkuznets@redhat.com, mst@redhat.com
+References: <20200108135353.75471-1-dgilbert@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <53359208-3cd9-b0b6-f424-a5135e770fca@redhat.com>
+Date: Thu, 9 Jan 2020 11:00:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+In-Reply-To: <20200108135353.75471-1-dgilbert@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 81_wnmO8Oa6oAFEyZDL6bg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,43 +89,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There's little point in leaving these data structures half initialized,
-and relying on a flush to be done during reset.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- accel/tcg/cputlb.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On 2020/1/8 =E4=B8=8B=E5=8D=889:53, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> Hyperv's synic (that we emulate) is a feature that allows the guest
+> to place some magic (4k) pages of RAM anywhere it likes in GPA.
+> This confuses vhost's RAM section merging when these pages
+> land over the top of hugepages.
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index c7c34b185b..761e9d44d7 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -240,6 +240,7 @@ static void tlb_mmu_init(CPUTLBDesc *desc, CPUTLBDescFast *fast, int64_t now)
-     fast->mask = (n_entries - 1) << CPU_TLB_ENTRY_BITS;
-     fast->table = g_new(CPUTLBEntry, n_entries);
-     desc->iotlb = g_new(CPUIOTLBEntry, n_entries);
-+    tlb_mmu_flush_locked(desc, fast);
- }
- 
- static inline void tlb_n_used_entries_inc(CPUArchState *env, uintptr_t mmu_idx)
-@@ -260,8 +261,8 @@ void tlb_init(CPUState *cpu)
- 
-     qemu_spin_init(&env_tlb(env)->c.lock);
- 
--    /* Ensure that cpu_reset performs a full flush.  */
--    env_tlb(env)->c.dirty = ALL_MMUIDX_BITS;
-+    /* All tlbs are initialized flushed. */
-+    env_tlb(env)->c.dirty = 0;
- 
-     for (i = 0; i < NB_MMU_MODES; i++) {
-         tlb_mmu_init(&env_tlb(env)->d[i], &env_tlb(env)->f[i], now);
--- 
-2.20.1
+
+Hi David:
+
+A silly question, is this because the alignment when adding sections? If=20
+yes, what's the reason for doing alignment which is not a must for vhost=20
+memory table.
+
+Thanks
+
+
+>
+> Since they're not normal RAM, and they shouldn't have vhost DMAing
+> into them, exclude them from the vhost set.
+>
+> I do that by marking them as device-ram and then excluding device-ram
+> from vhost.
+>
+> bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D1779041
+>
+> Dr. David Alan Gilbert (2):
+>    vhost: Don't pass ram device sections
+>    hyperv/synic: Allocate as ram_device
+>
+>   hw/hyperv/hyperv.c | 14 ++++++++------
+>   hw/virtio/vhost.c  |  1 +
+>   2 files changed, 9 insertions(+), 6 deletions(-)
+>
 
 
