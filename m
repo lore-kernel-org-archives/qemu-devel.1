@@ -2,63 +2,59 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A55C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B6DC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 18:21:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9426520678
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 17:45:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9426520678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 146C5206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 18:21:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 146C5206ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kamp.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipbrh-0000kL-JA
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 12:45:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39202)
+	id 1ipcQg-0006hj-6m
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 13:21:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ipbqu-0008Tt-2r
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:44:13 -0500
+ (envelope-from <pl@kamp.de>) id 1ipcPl-0006AO-0W
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 13:20:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ipbqs-0007qM-Rn
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:44:11 -0500
-Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:46358)
+ (envelope-from <pl@kamp.de>) id 1ipcPj-0007f0-77
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 13:20:12 -0500
+Received: from kerio.kamp.de ([195.62.97.192]:42085)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ipbqs-0007es-Hw
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 12:44:10 -0500
-Received: from player690.ha.ovh.net (unknown [10.109.146.240])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 28B1B7B66D
- for <qemu-devel@nongnu.org>; Thu,  9 Jan 2020 18:44:07 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player690.ha.ovh.net (Postfix) with ESMTPSA id 23679DEC9C13;
- Thu,  9 Jan 2020 17:43:50 +0000 (UTC)
-Date: Thu, 9 Jan 2020 18:43:49 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
- single switch case
-Message-ID: <20200109184349.1aefa074@bahia.lan>
-In-Reply-To: <20200109152133.23649-5-philmd@redhat.com>
-References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-5-philmd@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <pl@kamp.de>) id 1ipcPi-0007BE-VB
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 13:20:11 -0500
+X-Footer: a2FtcC5kZQ==
+Received: from [172.21.12.60] ([172.21.12.60]) (authenticated user pl@kamp.de)
+ by kerio.kamp.de with ESMTPSA
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
+ Thu, 9 Jan 2020 19:19:57 +0100
+Subject: Re: qemu-4.0.1: vhost_region_add_section:Section rounded to 0 prior
+ to previous a0000
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <985fea06-ede6-dcb7-8829-a48a9416bc09@kamp.de>
+ <20200108150458.GC3184@work-vm>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <ca222a5f-1ec6-477c-ed83-6ef52ea9e97f@kamp.de>
+Date: Thu, 9 Jan 2020 19:19:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 7378866518583449891
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdeiuddgieelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeltddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+In-Reply-To: <20200108150458.GC3184@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.50.32
+X-Received-From: 195.62.97.192
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,78 +66,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  9 Jan 2020 16:21:22 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+Am 08.01.20 um 16:04 schrieb Dr. David Alan Gilbert:
+> * Peter Lieven (pl@kamp.de) wrote:
+>> Hi,
+>>
+>>
+>> I have a Qemu 4.0.1 machine with vhost-net network adapter, thats polluting the log with the above message.
+>>
+>> Is this something known? Googling revealed the following patch in Nemu (with seems to be a Qemu fork from Intel):
+>>
+>> https://github.com/intel/nemu/commit/03940ded7f5370ce7492c619dccced114ef7f56e
+>>
+>>
+>> The network stopped functioning. After a live-migration the vServer is reachable again.
+>>
+>>
+>> Any ideas?
+> What guest are you running and what does your qemu commandline look
+> like?
 
-> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
-> case, restrict their scope to avoid unnecessary initialization.
->=20
 
-I guess a decent compiler can be smart enough detect that the initialization
-isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branch...
-Anyway, reducing scope isn't bad. The only hitch I could see is that some
-people do prefer to have all variables declared upfront, but there's a nest=
-ed
-param_val variable already so I guess it's okay.
+Its running debian9. We have hundreds of other VMs with identical setup. Do not know why this one makes trouble.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/ppc/spapr_rtas.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 6f06e9d7fe..7237e5ebf2 100644
-> --- a/hw/ppc/spapr_rtas.c
-> +++ b/hw/ppc/spapr_rtas.c
-> @@ -267,8 +267,6 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
-*cpu,
->                                            uint32_t nret, target_ulong re=
-ts)
->  {
->      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> -    MachineState *ms =3D MACHINE(spapr);
-> -    unsigned int max_cpus =3D ms->smp.max_cpus;
->      target_ulong parameter =3D rtas_ld(args, 0);
->      target_ulong buffer =3D rtas_ld(args, 1);
->      target_ulong length =3D rtas_ld(args, 2);
-> @@ -276,6 +274,8 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
-*cpu,
-> =20
->      switch (parameter) {
->      case RTAS_SYSPARM_SPLPAR_CHARACTERISTICS: {
-> +        MachineState *ms =3D MACHINE(spapr);
-> +        unsigned int max_cpus =3D ms->smp.max_cpus;
+Here is the cmdline:
 
-The max_cpus variable used to be a global. Now that it got moved
-below ms->smp, I'm not sure it's worth keeping it IMHO. What about
-dropping it completely and do:
 
-        char *param_val =3D g_strdup_printf("MaxEntCap=3D%d,"
-                                          "DesMem=3D%" PRIu64 ","
-                                          "DesProcs=3D%d,"
-                                          "MaxPlatProcs=3D%d",
-                                          ms->smp.max_cpus,
-                                          current_machine->ram_size / MiB,
-                                          ms->smp.cpus,
-                                          ms->smp.max_cpus);
+/usr/bin/qemu-4.0.0  -enable-kvm  -M pc-i440fx-2.9  -nodefaults -netdev type=tap,id=guest0,script=no,downscript=no,ifname=tap0,vhost=on,vnet_hdr=on -device virtio-net-pci,netdev=guest0,mac=52:54:00:80:07:bc -iscsi 
+initiator-name=iqn.2005-03.org.virtual-core:0025b51f006c,timeout=30 -object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0,max-bytes=65536,period=1000  -drive 
+format=raw,discard=on,detect-zeroes=off,file=XXX,if=none,cache=writeback,aio=native,id=disk0 -device virtio-scsi-pci  -device scsi-hd,drive=disk0  -serial null  -parallel null  -m 1024,slots=16,maxmem=393216M  -smp 
+1,sockets=64,cores=1,threads=1,maxcpus=64  -monitor tcp:0:4001,server,nowait,nodelay -vnc :1 -qmp tcp:0:3001,server,nowait,nodelay  -name 'debian9'  -drive index=2,media=cdrom,if=ide,aio=native,readonly=on  -boot order=c,menu=off  -k de  -pidfile 
+/var/run/qemu/vm-5182.pid -mem-path /hugepages  -mem-prealloc  -cpu Westmere,+pcid,enforce -rtc base=utc -usb -device usb-tablet -no-hpet -vga vmware -chardev socket,host=127.0.0.1,port=2001,id=qga0,server,nowait,nodelay -device virtio-serial -device 
+virtserialport,chardev=qga0,name=org.qemu.guest_agent.0
 
-And maybe insert an empty line between the declaration of param_val
-and the code for a better readability ?
 
->          char *param_val =3D g_strdup_printf("MaxEntCap=3D%d,"
->                                            "DesMem=3D%" PRIu64 ","
->                                            "DesProcs=3D%d,"
+Thanks,
+
+Peter
+
 
 
