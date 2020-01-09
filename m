@@ -2,56 +2,122 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 694C7C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE75EC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:13:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DAED2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:12:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DAED2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 794E32072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 13:13:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dISMdcGX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 794E32072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60169 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipXbs-0001AK-24
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:12:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36580)
+	id 1ipXcq-0002Rg-6q
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 08:13:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50943)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQd-0003KH-Ig
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:53 -0500
+ (envelope-from <rkagan@virtuozzo.com>) id 1ipXTo-0007Dg-S0
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1ipXQb-0003BW-8N
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:47 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:42185 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1ipXQa-00036w-Ep
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:00:44 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 5E55B1A2136;
- Thu,  9 Jan 2020 13:59:34 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 406A71A2151;
- Thu,  9 Jan 2020 13:59:34 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 11/12] linux-user: Add support for getting/setting selected
- alsa timer parameters using ioctls
-Date: Thu,  9 Jan 2020 13:59:22 +0100
-Message-Id: <1578574763-8327-12-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (envelope-from <rkagan@virtuozzo.com>) id 1ipXTn-0005O0-BH
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:04:04 -0500
+Received: from mail-ve1eur04hn2042.outbound.protection.outlook.com
+ ([52.101.139.42]:45126 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1ipXTm-0005Gy-Mh
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 08:04:03 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WUEj2c7gcHbaX9OkSEec17KenCSJvAe7pOg079oN59NIgn7iK+zC1Y6/qbjXUcE6IAKQHw/WnQ8do24tv+DesAyBnN/5AdAxViRfPs3TExpDuSQIe0k0fQr8jpAzbUjKNtrQBTxbBi4Gzzs8SDf7GTQP4ZSfPmyDOxa5FMArNVF6X3xKgLTNljuifQESs7jK9EZhtPYXs3BIQNIwh/TRnP49bjiS3iXPgZ2XKdW1MOK28Ff7nxY5ya0xaB38TsCY+c/Y/DJE0dYJInOgXMlTbRikwIQpTKq/NPAlAX4DLhEaK2hivhYYCZ3KxITyBTqdFvudZUp8STKzN1MtcOEvaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+9IvMKyxqppI58OExwY+Nat7uxQmB1yvFSk3C9m4QkM=;
+ b=ad7qm7Qid6n0W5HIN8D3I3GUq8b5jqC7Qf10QOOBxdTTXdKNWCTjL1veml2LA3/l3rRbTLfBfQEJJSFK3/aNT0CUkw03bCv5eUXTco1BVap/QJFyZwWe9o53iF8sBQb1BhlYWWvt+QJmpLlFVrAwwIFJocBtX4U8xi2izqSU/Rxjz+SdanMQ2Kzhiaki4YaG/kYAj1p/j0I+xeW9tFBz6r/bvJr0P4yuohj/oP1yPLQ4pXtjZROQgsGoEiMo5BURCijNI2etyDW9BjpFSRtTDmcetVaQYbO+NhfBVIcvQCu7hntrJBDMF6LrGxyLZR7/tRWUkaPiF1Nk3TuR3fysjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+9IvMKyxqppI58OExwY+Nat7uxQmB1yvFSk3C9m4QkM=;
+ b=dISMdcGXtZDQP03wWr9Bml1MSrtLELl3Ape4Kky+nHMeYHCyjG0c/Cr92B+SJT36uIRy6b3yyc8yIrtH/3p8RQMv8Ny7DoYpHsJBLy/S+emdrAYipXOG8F3b5TPubpQetEZr5fYWurQcHxUn+DVHoQNODI9SPPvBTe/BTCXtv24=
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
+ VI1PR08MB4000.eurprd08.prod.outlook.com (20.178.125.94) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9; Thu, 9 Jan 2020 13:03:52 +0000
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::acb0:a61d:f08a:1c12]) by VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::acb0:a61d:f08a:1c12%7]) with mapi id 15.20.2602.018; Thu, 9 Jan 2020
+ 13:03:52 +0000
+Received: from rkaganb.sw.ru (185.231.240.5) by
+ HE1PR07CA0047.eurprd07.prod.outlook.com (2603:10a6:7:66::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.5 via Frontend Transport; Thu, 9 Jan 2020 13:03:51 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH 2/2] hyperv/synic: Allocate as ram_device
+Thread-Topic: [PATCH 2/2] hyperv/synic: Allocate as ram_device
+Thread-Index: AQHVxityEM59bZyv8EecProoJvSi/6fiTh8A
+Date: Thu, 9 Jan 2020 13:03:52 +0000
+Message-ID: <20200109130348.GC3147@rkaganb.sw.ru>
+References: <20200108135353.75471-1-dgilbert@redhat.com>
+ <20200108135353.75471-3-dgilbert@redhat.com>
+In-Reply-To: <20200108135353.75471-3-dgilbert@redhat.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>, "Dr. David Alan Gilbert
+ (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
+ vkuznets@redhat.com, mst@redhat.com,	jasowang@redhat.com
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR07CA0047.eurprd07.prod.outlook.com
+ (2603:10a6:7:66::33) To VI1PR08MB4608.eurprd08.prod.outlook.com
+ (2603:10a6:803:c0::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c6fda76b-418f-4872-8380-08d795046005
+x-ms-traffictypediagnostic: VI1PR08MB4000:|VI1PR08MB4000:|VI1PR08MB4000:
+x-microsoft-antispam-prvs: <VI1PR08MB4000F9D04DB4E8A7F3CE0E95C9390@VI1PR08MB4000.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2958;
+x-forefront-prvs: 02778BF158
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(39840400004)(396003)(376002)(366004)(346002)(136003)(199004)(189003)(52116002)(7696005)(55016002)(54906003)(316002)(81166006)(81156014)(33656002)(2906002)(1076003)(5660300002)(4326008)(86362001)(71200400001)(36756003)(6506007)(186003)(16526019)(26005)(8676002)(66946007)(8936002)(64756008)(66476007)(66556008)(66446008)(6916009)(956004)(9686003)(478600001)(30126003);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB4000;
+ H:VI1PR08MB4608.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; CAT:OSPM; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kW1UDNPl2er95LMmYrC0scmre4oPUHiaN7kc08wJXu6FZUop4m3blBGOjXmbo7zWfJjJZOtyn5mBYn9isjK+dx79seU6WlaAFUuNiRoBKOHTEBrbE7/j10nMypkhL9cW39BfF2Y55KytFosL5/OK2nlNpDKv0kQ+XpFiTZPoIAVP6dZg9M9Ay9iMDPeIkhaE/7d7KCr1Q4bVLv9aoRmNabgIsdXXACcLRty/fW7u2ioNVtL50R9jBBSjGso53u8F4o8h6BN7geXqX7Y0A/M27gwGahZPU13Vzrl++pNRJZmf+evdfZaKEFOe15UvyuJ8BZAfafg0RfBmg4frpHSpbBbzcAN2QmWhZZMgx2IvaF94c0OXyj1ckBmJI+ECrpUga3cQBa1XJbOoDf0hHDV9lmEuE6OYm112rdgcufw5nVT9N73WJohEsd97l5dDcgZJUroHHvqwpwQtKSpgCMwvYYh5ynARlrViQC0VXmE9HauHS2EIRXKf+5soiz+KIpeCL5BvsPYQ2RXntW5IFhXbtCHt304E0QF55YupQvzn6PWKQ7fm0xyYIKgp/LSGkR5nO2Ni5wOlBMdYr0cqvS/f3Vsnp2INdSJh+M/xX1dp9tkQFT5T5dmaefK92xJOwPdE0leKjyxo0+1mWNpbdQyeTWKpDfhXgZt5k53oeMkE0SiYFLMOK26jq/DXfpP6dIB0NDGhLpsB70jvBFUvQQzat6lQfGxDCD+WutCcbF7yZWxFSedPBK32ISkpbe6E5GTNMGE2AmpyxlLK0bdlYoDh7Q==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <8D201965007F074E8AA1622DA8B7ADAB@eurprd08.prod.outlook.com>
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6fda76b-418f-4872-8380-08d795046005
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2020 13:03:52.1295 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eO9i8l/9R4e4WnhWvWhHo3qCejEMmmZQixq66q1y72orf3fcdsCPIKccKOpLmaUmuNJJf/EuTXw0nftcY4sLgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB4000
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.139.42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,195 +129,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu
+Cc: "jasowang@redhat.com" <jasowang@redhat.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionalities of following ioctls:
+On Wed, Jan 08, 2020 at 01:53:53PM +0000, Dr. David Alan Gilbert (git) wrote:
+> Mark the synic pages as ram_device so that they won't be visible
+> to vhost.
 
-SNDRV_TIMER_IOCTL_INFO - Getting information about selected timer
+Unless I'm misreading the code this also makes them invisible to
+migration.
 
-    Read information about the selected timer. The information is returned in
-    the following structure:
+I need some more reading on the ram_device region behavior to better
+understand other potential consequences.
 
-    struct snd_timer_info {
-        unsigned int flags;         /* timer flags - SNDRV_TIMER_FLG_* */
-        int card;                   /* card number */
-        unsigned char id[64];       /* timer identificator */
-        unsigned char name[80];     /* timer name */
-        unsigned long reserved0;    /* reserved for future use */
-        unsigned long resolution;   /* average period resolution in ns */
-        unsigned char reserved[64]; /* reserved for future use */
-    };
+Thanks,
+Roman.
 
-    A pointer to this structure should be passed as the third ioctl's argument.
-    Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT" should be
-    called first to select the timer which information is to be obtained. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape") is
-    returned.
-
-SNDRV_TIMER_IOCTL_PARAMS - Setting parameters for selected timer
-
-    Sets parameters for the selected timer. The paramaters are set in the
-    following structure:
-
-    struct snd_timer_params {
-        unsigned int flags;         /* flags - SNDRV_TIMER_PSFLG_* */
-        unsigned int ticks;         /* requested resolution in ticks */
-        unsigned int queue_size;    /* total size of queue (32-1024) */
-        unsigned int reserved0;     /* reserved, was: failure locations */
-        unsigned int filter;        /* event filter */
-        unsigned char reserved[60]; /* reserved */
-    };
-
-    A pointer to this structure should be passed as the third ioctl's argument.
-    Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT" should be
-    called first to select the timer which parameters are to be set. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape") is
-    returned.
-
-SNDRV_TIMER_IOCTL_STATUS - Getting status of selected timer
-
-    Read status of the selected timer. The status of the timer is returned in
-    the following structure:
-
-    struct snd_timer_status {
-        struct timespec tstamp;     /* Timestamp - last update */
-        unsigned int resolution;    /* current period resolution in ns */
-        unsigned int lost;          /* counter of master tick lost */
-        unsigned int overrun;       /* count of read queue overruns */
-        unsigned int queue;         /* used queue size */
-        unsigned char reserved[64]; /* reserved */
-    };
-
-    A pointer to this structure should be passed as the third ioctl's argument.
-    Before calling this ioctl, the ioctl "SNDRV_TIMER_IOCTL_SELECT" should be
-    called first to select the timer which status is to be obtained. If no
-    timer is selected, the error EBADFD ("File descriptor in bad shape") is
-    returned.
-
-Implementation notes:
-
-    All ioctls in this patch have pointer to some kind of a structure
-    as their third argument. That is the reason why corresponding
-    definitions were added in 'linux-user/syscall_types.h'. Structure
-    'snd_timer_status' has field of type 'struct timespec' which is why
-    a corresponding definition of that structure was also added in
-    'linux-user/syscall_types.h'. All of these strucutures have some
-    fields that are of type 'unsigned long'. That is the reason why
-    separate target structures were defined in 'linux-user/syscall_defs.h'.
-    Structure 'struct timespec' already had a separate target definition
-    so that definition was used to define a target structure for
-    'snd_timer_status'. The rest of the implementation was straightforward.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
----
- linux-user/ioctls.h        |  5 +++++
- linux-user/syscall_defs.h  | 25 +++++++++++++++++++++++++
- linux-user/syscall_types.h | 29 +++++++++++++++++++++++++++++
- 3 files changed, 59 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 7652117..43e7e5d 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -461,6 +461,11 @@
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_gstatus)))
-   IOCTL(SNDRV_TIMER_IOCTL_SELECT, IOC_W,
-         MK_PTR(MK_STRUCT(STRUCT_snd_timer_select)))
-+  IOCTL(SNDRV_TIMER_IOCTL_INFO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_snd_timer_info)))
-+  IOCTL(SNDRV_TIMER_IOCTL_PARAMS, IOC_W,
-+        MK_PTR(MK_STRUCT(STRUCT_snd_timer_params)))
-+  IOCTL(SNDRV_TIMER_IOCTL_STATUS, IOC_R,
-+        MK_PTR(MK_STRUCT(STRUCT_snd_timer_status)))
- 
-   IOCTL(HDIO_GETGEO, IOC_R, MK_PTR(MK_STRUCT(STRUCT_hd_geometry)))
-   IOCTL(HDIO_GET_UNMASKINTR, IOC_R, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 9a33b71..d76124d 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2467,6 +2467,25 @@ struct target_snd_timer_select {
-     unsigned char reserved[32];
- };
- 
-+struct target_snd_timer_info {
-+    unsigned int flags;
-+    int card;
-+    unsigned char id[64];
-+    unsigned char name[80];
-+    abi_ulong reserved0;
-+    abi_ulong resolution;
-+    unsigned char reserved[64];
-+};
-+
-+struct target_snd_timer_status {
-+    struct target_timespec tstamp;
-+    unsigned int resolution;
-+    unsigned int lost;
-+    unsigned int overrun;
-+    unsigned int queue;
-+    unsigned char reserved[64];
-+};
-+
- /* alsa timer ioctls */
- #define TARGET_SNDRV_TIMER_IOCTL_PVERSION     TARGET_IOR('T', 0x00, int)
- #define TARGET_SNDRV_TIMER_IOCTL_NEXT_DEVICE  TARGET_IOWR('T', 0x01,                     \
-@@ -2480,6 +2499,12 @@ struct target_snd_timer_select {
-                                                           struct target_snd_timer_gstatus)
- #define TARGET_SNDRV_TIMER_IOCTL_SELECT       TARGET_IOW('T', 0x10,                      \
-                                                          struct target_snd_timer_select)
-+#define TARGET_SNDRV_TIMER_IOCTL_INFO         TARGET_IOR('T', 0x11,                      \
-+                                                         struct target_snd_timer_info)
-+#define TARGET_SNDRV_TIMER_IOCTL_PARAMS       TARGET_IOW('T', 0x12,                      \
-+                                                         struct snd_timer_params)
-+#define TARGET_SNDRV_TIMER_IOCTL_STATUS       TARGET_IOR('T', 0x14,                      \
-+                                                         struct target_snd_timer_status)
- 
- /* vfat ioctls */
- #define TARGET_VFAT_IOCTL_READDIR_BOTH    TARGET_IORU('r', 1)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 767632d..fbc4be7 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -120,6 +120,35 @@ STRUCT(snd_timer_select,
-        MK_STRUCT(STRUCT_snd_timer_id), /* id */
-        MK_ARRAY(TYPE_CHAR, 32)) /* reserved */
- 
-+STRUCT(snd_timer_info,
-+       TYPE_INT, /* flags */
-+       TYPE_INT, /* card */
-+       MK_ARRAY(TYPE_CHAR, 64), /* id */
-+       MK_ARRAY(TYPE_CHAR, 80), /* name */
-+       TYPE_ULONG, /* reserved0 */
-+       TYPE_ULONG, /* resolution */
-+       MK_ARRAY(TYPE_CHAR, 64)) /* reserved */
-+
-+STRUCT(snd_timer_params,
-+       TYPE_INT, /* flags */
-+       TYPE_INT, /* ticks */
-+       TYPE_INT, /* queue_size */
-+       TYPE_INT, /* reserved0 */
-+       TYPE_INT, /* filter */
-+       MK_ARRAY(TYPE_CHAR, 60)) /* reserved */
-+
-+STRUCT(timespec,
-+       TYPE_LONG, /* tv_sec */
-+       TYPE_LONG) /* tv_nsec */
-+
-+STRUCT(snd_timer_status,
-+       MK_STRUCT(STRUCT_timespec), /* tstamp */
-+       TYPE_INT, /* resolution */
-+       TYPE_INT, /* lost */
-+       TYPE_INT, /* overrun */
-+       TYPE_INT, /* queue */
-+       MK_ARRAY(TYPE_CHAR, 64)) /* reserved */
-+
- /* loop device ioctls */
- STRUCT(loop_info,
-        TYPE_INT,                 /* lo_number */
--- 
-2.7.4
-
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/hyperv/hyperv.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+> index da8ce82725..4de3ec411d 100644
+> --- a/hw/hyperv/hyperv.c
+> +++ b/hw/hyperv/hyperv.c
+> @@ -95,12 +95,14 @@ static void synic_realize(DeviceState *dev, Error **errp)
+>      msgp_name = g_strdup_printf("synic-%u-msg-page", vp_index);
+>      eventp_name = g_strdup_printf("synic-%u-event-page", vp_index);
+>  
+> -    memory_region_init_ram(&synic->msg_page_mr, obj, msgp_name,
+> -                           sizeof(*synic->msg_page), &error_abort);
+> -    memory_region_init_ram(&synic->event_page_mr, obj, eventp_name,
+> -                           sizeof(*synic->event_page), &error_abort);
+> -    synic->msg_page = memory_region_get_ram_ptr(&synic->msg_page_mr);
+> -    synic->event_page = memory_region_get_ram_ptr(&synic->event_page_mr);
+> +    synic->msg_page = qemu_memalign(qemu_real_host_page_size,
+> +                                    sizeof(*synic->msg_page));
+> +    synic->event_page = qemu_memalign(qemu_real_host_page_size,
+> +                                      sizeof(*synic->event_page));
+> +    memory_region_init_ram_device_ptr(&synic->msg_page_mr, obj, msgp_name,
+> +                           sizeof(*synic->msg_page), synic->msg_page);
+> +    memory_region_init_ram_device_ptr(&synic->event_page_mr, obj, eventp_name,
+> +                           sizeof(*synic->event_page), synic->event_page);
+>  
+>      g_free(msgp_name);
+>      g_free(eventp_name);
+> -- 
+> 2.24.1
+> 
+> 
 
