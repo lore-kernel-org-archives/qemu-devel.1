@@ -2,92 +2,96 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F83C32771
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C84C32771
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A69772053B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E0432067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 11:23:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pYv/C8ik"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A69772053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVkWgheo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E0432067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipVoW-0005Yo-RU
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 06:17:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57897)
+	id 1ipVup-00083x-7z
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 06:23:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jean-philippe@linaro.org>) id 1ipVn8-0004sf-Je
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:15:56 -0500
+ (envelope-from <philmd@redhat.com>) id 1ipVu8-0007cZ-Vv
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:23:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jean-philippe@linaro.org>) id 1ipVn7-0000UV-6p
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:15:54 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50660)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jean-philippe@linaro.org>)
- id 1ipVn6-0000P9-QA
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:15:53 -0500
-Received: by mail-wm1-x344.google.com with SMTP id a5so2480966wmb.0
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 03:15:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=pLeVCokKW+fOVWTgJDpb3D6qGp4EKoRi3k3tmToSbwc=;
- b=pYv/C8ikX34mJ+fA20ULSoqiTmuTQ4UaooXny4FGJQWvuY+zQPelkOalCkKH0Cu1rP
- uuYiomAPIe5z+RIhbeeSvhkzTiL1MIcGcD9ik2gtsV8R/Ou0WNEsatNhwhHGYA8Z1a3z
- fKkVnw9CTQlRFTOoSGpaMX4L4L3tozYVMG8AAFrz6tvNNCliqWMDBgy2lekxO8xNY5/A
- jp5CU8jsXIqXF/LpJt4bNkkCuOtOAJ6pW2WM31Vpr9lwa/0aPqynWGCvL3pPORGpwQxX
- 4eUWBduxX5nKQKVmPAVZQluMDHHgVAg1trMH08X/gg38DWEh3d4LFSu2gnsamsC502i0
- JwTA==
+ (envelope-from <philmd@redhat.com>) id 1ipVu7-0002Vw-AO
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:23:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57747
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipVu7-0002RL-3J
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 06:23:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578568986;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=RugsgcqjIYRnH+b6ThL+qQ32ykdd1eVPfufXoKIdGvY=;
+ b=XVkWgheov8nCVhagW9YGnbM5rIvwps3YYenKBE2Blcg2VcPdXbeh0DV0dJkctSoeTy99LX
+ dxfruDjpT7aMQZbxDdkMtQZc7fZ3t7hm2hA5U9r+FTeBW0XeKPq//38wUAwZB9XasuNBXs
+ SZjDrNa20lXBorcIf3omV7io3lE2vv4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-347-giAV-4YDMoe0Q9dfzsjiNA-1; Thu, 09 Jan 2020 06:23:04 -0500
+Received: by mail-wr1-f69.google.com with SMTP id c6so2744467wrm.18
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 03:23:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=pLeVCokKW+fOVWTgJDpb3D6qGp4EKoRi3k3tmToSbwc=;
- b=UnWUAcYqX2NHjYsYpC0mj6xYbE4cdAXTZSkVpEcf/3a2uZ0HP8jqvhn41skGO9V91p
- b/sdFao3gYM3xsRc7IqMn9LN1sAfQ3iU6fRly3+7Dz6bqBBQ2PmborndxHIFxHZntbuv
- 6qjrozB5Z1JLmnqbxxDggrgPVzSQjLn6WyKyhqlbpLkpYE9W2bn+N/uj4iMfiIl4yiA2
- Rr5yAWFtwEPkunTogM0wSh8Nj0I3qPEOrQlKJNO+/MfNKO0ICUYsX8MqSZ8NX54hHTDJ
- YUc9eDtxOGySBn7wrqK/qMp0I8u/yk3fD42SGVtGBaDNCMh1GDhujkujQxPRzXCYvTYS
- Hr0w==
-X-Gm-Message-State: APjAAAUupkm8zXjoDXchwT/Xv/H6U3HNC33QOEYr1iaC7EKEguOO5uCN
- uB5vtOWoZBIWpIH4WhY1QVe1zQ==
-X-Google-Smtp-Source: APXvYqzyzJMtOTnQSYBiWajR1phOzqARaEyzsFzZk7eB4ZUutLu44F8U/9NSsNcqLggMkgw839h6bA==
-X-Received: by 2002:a05:600c:2503:: with SMTP id
- d3mr4110182wma.84.1578568551518; 
- Thu, 09 Jan 2020 03:15:51 -0800 (PST)
-Received: from myrica (adsl-84-227-176-239.adslplus.ch. [84.227.176.239])
- by smtp.gmail.com with ESMTPSA id v83sm2561889wmg.16.2020.01.09.03.15.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Jan 2020 03:15:50 -0800 (PST)
-Date: Thu, 9 Jan 2020 12:15:44 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH for-5.0 v11 08/20] virtio-iommu: Implement translate
-Message-ID: <20200109111544.GA940335@myrica>
-References: <20191220162642.GA2626852@myrica> <20191220165100.GA3780@xz-x1>
- <20200106170634.GF2062@myrica> <20200106175850.GC219677@xz-x1>
- <20200107101024.GB832497@myrica>
- <aa5fa9e6-6efd-e1a3-96c6-d02ba8eab4c8@redhat.com>
- <20200109084700.GA934975@myrica>
- <0beb9d61-05b8-3152-e967-64413def6ab7@redhat.com>
- <20200109104032.GA937123@myrica>
- <bcb585ef-f617-e870-72a2-f4028682547b@redhat.com>
+ h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+ :mime-version:content-language:content-transfer-encoding;
+ bh=RugsgcqjIYRnH+b6ThL+qQ32ykdd1eVPfufXoKIdGvY=;
+ b=Q8UxiY0p79vIJIj5do6jvsnu+djdS5OweqRBYgC2WNzimJKHVhlqzv2CF8bbv633xh
+ FtG+a6BXrLueUHuPNCQotnuQoLJXUY8HCrq87N8t5kOS1W9rutJhUE0vkXi2Q2Epu2bW
+ g+rfI6dKgkGX1DirV76N3n27s6EsdNzE3Z+m4pUecAMe1wC6lNADidGx+O6coDzKLhl1
+ 9RhCu90gngcqbknfNTJ1gqvvFFKJSMPH9mliLq7xf5MH1/rFr9YYeVoDHKyuw86WIzdq
+ J2GlVwJ8feoXvW487OtnF8ONlyQ4u2JRIaPePFdHBv+3Fw67U9sNyhd0eAnvxGP+IBLE
+ a7yA==
+X-Gm-Message-State: APjAAAVtfevYlGfvRJkdPXhsi70TzDq9ifH22ZzAgvbftm6C/c6FprgR
+ YYzuPWsMf6wQvA6M2L62osm4zP1a1zQSsgRcKPXQmjNROkhczXRz13r1IdwXCBVJWbs84yPOseK
+ 9XtdoGWc43otCa/k=
+X-Received: by 2002:a05:600c:218b:: with SMTP id
+ e11mr3974180wme.121.1578568983161; 
+ Thu, 09 Jan 2020 03:23:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzoMuCzM7spdPQ8PHawfkIvykqpMN/SqrcROPRtqIymNkHddIg7jA33lkY39bGUD5qlrk6YhA==
+X-Received: by 2002:a05:600c:218b:: with SMTP id
+ e11mr3974146wme.121.1578568982888; 
+ Thu, 09 Jan 2020 03:23:02 -0800 (PST)
+Received: from [192.168.1.35] (113.red-83-57-172.dynamicip.rima-tde.net.
+ [83.57.172.113])
+ by smtp.gmail.com with ESMTPSA id x16sm2516644wmk.35.2020.01.09.03.23.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Jan 2020 03:23:02 -0800 (PST)
+To: qemu-devel <qemu-devel@nongnu.org>, Like Xu <like.xu@linux.intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Subject: Difference between 'current_machine' vs MACHINE(qdev_get_machine())
+Message-ID: <a88f7647-c061-bf3f-a272-72700078ef26@redhat.com>
+Date: Thu, 9 Jan 2020 12:23:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bcb585ef-f617-e870-72a2-f4028682547b@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Content-Language: en-US
+X-MC-Unique: giAV-4YDMoe0Q9dfzsjiNA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,55 +103,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
- quintela@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- armbru@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- dgilbert@redhat.com, eric.auger.pro@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Igor Mammedov <imammedo@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 09, 2020 at 12:01:26PM +0100, Auger Eric wrote:
-> Hi,
-> 
-> On 1/9/20 11:40 AM, Jean-Philippe Brucker wrote:
-> > On Thu, Jan 09, 2020 at 09:58:49AM +0100, Auger Eric wrote:
-> >>>> I share Peter's concern about having a different default policy than x86.
-> >>>
-> >>> Yes I'd say just align with whatever policy is already in place. Do you
-> >>> think we could add a command-line option to let people disable
-> >>> default-bypass, though?  That would be a convenient way to make the IOMMU
-> >>> protection airtight for those who need it.
-> >> Yes I could easily add a device option to disable the default bypass.
-> >>
-> >> Shall we change the meaning of the F_BYPASS feature then? If exposed by
-> >> the device, the device does bypass by default, otherwise it doesn't.
-> >> This would be controlled by the device option.
-> > 
-> > For a device that doesn't do bypass by default, the driver wouldn't have
-> > the ability to enable bypass (feature bit not offered, not negotiable).
-> > 
-> >> The driver then could have means to overwrite this behavior once loaded?
-> > 
-> > Let's keep the bypass feature bit for this. If the bit is offered, the
-> > driver chooses to enable or disable it. If the bit is not offered or not
-> > negotiated, then the behavior is deny. If the bit is offered and
-> > negotiated then the behavior is allow.
-> > 
-> > We can say that before features negotiation (latched at features register
-> > write, I think, in practice?) the behavior is platform dependent. The
-> > current wording about bypass intends to discourage unsafe choices but
-> > makes a strong statement only about the device behavior after features
-> > negotiation. 
-> OK. May be worth adding in the spec later.
-> 
-> By the way what is the plan for the vote?
+Hi,
 
-The ballot closed and the spec is accepted for virtio-v1.2-cs01, with the
-condition that the stale statement about padding is removed
-(https://lists.oasis-open.org/archives/virtio-dev/201911/msg00083.html)
+"hw/boards.h" declare current_machine, and vl.c defines it:
+
+     current_machine = 
+MACHINE(object_new_with_class(OBJECT_CLASS(machine_class)));
+     object_property_add_child(object_get_root(), "machine",
+                               OBJECT(current_machine), &error_abort);
+
+The bigger user of 'current_machine' is the accel/KVM code.
+
+Recently in a0628599f..cc7d44c2e0 "Replace global smp variables with 
+machine smp properties" we started to use MACHINE(qdev_get_machine()).
+
+qdev_get_machine() resolves the machine in the QOM composition tree.
+I am confused by this comment:
+
+   /* qdev_get_machine() can return something that's not TYPE_MACHINE
+    * if this is one of the user-only emulators; in that case there's
+    * no need to check the ignore_memory_transaction_failures board flag.
+    */
+
+Following a0628599f..cc7d44c2e0, a5e0b33119 use 'current_machine' again.
+
+What are the differences between both form, when should we use one or 
+another (or can we use a single one?). Can this break user-only mode?
 
 Thanks,
-Jean
+
+Phil.
+
 
