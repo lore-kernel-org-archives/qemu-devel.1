@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 267A5C33CA1
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B21C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:22:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA22F2053B
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FA7420656
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 14:22:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oR8N34j8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA22F2053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rp7ewkOr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA7420656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipYg1-0002ad-OW
-	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 09:20:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58852)
+	id 1ipYhc-0005CI-My
+	for qemu-devel@archiver.kernel.org; Thu, 09 Jan 2020 09:22:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59123)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ipYeP-000110-Ki
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:19:06 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ipYeR-00011p-Mo
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:19:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ipYeN-0005UE-NG
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:19:04 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:44543)
+ (envelope-from <alex.bennee@linaro.org>) id 1ipYeQ-0005i0-L1
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:19:07 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:40446)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ipYeN-0005MB-Bc
- for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:19:03 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id q10so7534673wrm.11
- for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 06:19:02 -0800 (PST)
+ id 1ipYeQ-0005dY-By
+ for qemu-devel@nongnu.org; Thu, 09 Jan 2020 09:19:06 -0500
+Received: by mail-wr1-x431.google.com with SMTP id c14so7559817wrn.7
+ for <qemu-devel@nongnu.org>; Thu, 09 Jan 2020 06:19:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=AeKWqQhPlzaWtXuwJ6mJcGzp66I0kbIvzpPBZPsWdUA=;
- b=oR8N34j842rt7k326qfgLtXb5GUAAgq6fMOj77oq/i9VYaO988l1ePPXx6f2WKEz48
- LZT4uZOGzE2HIVmVPaANbXLHMS0NootkolD63qdDFTHooNlxHSbwg+xnDw2DczhnTw11
- +zhSAqXzZ3jOsE/liQYdwpd3ZNTecLRBmKe827bF8gkL3l7YcrmavHk2BCXm22MEGYQG
- aZXQHDH+38gJxJDKEy48R+EPY222NUlsnC4uoCWUIgJbt5pP08AUIFu0fYxuH70sSeHU
- eXnlOKac1GYcALUia/Qi6UKw/vwqhrq3DOEdFoih9VY+z0ZxNBdS/hEWSDnh7Mevggzq
- BaRA==
+ bh=GqdtWUWeRXAcQ+LI4RjLPvjzKZrpMw/yfqPf+ltlCJw=;
+ b=rp7ewkOrR3LWfintaRTrm9deDs3J+mKVD9mGg9Jc+wytz8lwOpGng6arUxWL+V3xBf
+ TMoDBvrWxq2nVlyIiVuAgtMRMaLz6c7y3ATiwZA364KGOyPt4pLtuK6c+SW6BW0519Tg
+ Dz9ml+Aj/5k7vYcRqGjxQTn6qzxTc/3DvfBk5R5FUX7Rpw0tsQbjR17PZ0WJAeClQuuF
+ T7fDxmbzAQI9OPEqvO0T1oaaUi3qEJWghY6tkma44/nRs0Y+26Y3/3ZLKF9steru1vLS
+ M2f3oboQjAOLjRtB2hgFtW4I4KEBlR5mOXoICM7bwCV9qsHGS7YqV+IOwKrJHunrRSrL
+ Sdfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AeKWqQhPlzaWtXuwJ6mJcGzp66I0kbIvzpPBZPsWdUA=;
- b=saCom8+9npCYnZKAQV7Xxc0hlWxn6biCqHDb66JXVbdBOyuadAgeczw248cH3Ribmp
- nEd1WOcxDrRXdT3MhrzUqLZWeJ7oYNbWWumw67+Oc35M0zXdV36A+No5wlGq7y+5BYz6
- FVoi9JJYwojr1GaZmuRJCDTwcCL56+VJEsWIcSDPW1HOHzUyKbBXv0Ah0GPprRt0cvfM
- +XEu9KxKEuyJxKs/IXC1M/25Xi+g1rMP2kTtg3Cqi2wSqp7MknMwOek8dXd72jpmQdBy
- cxUKOTvQptwgoWwd72iLDucBy2sGhwVbVNZ75555zI7wGt2tNHY119wYji2GKtSS1ooW
- G/3g==
-X-Gm-Message-State: APjAAAX1jyr8fv2Z7PJjBTIll103GaUf8GEiMaJXw3EaXpCyWa+Xch2g
- H64c3CAu9YQ33FA7VBpual18bQ==
-X-Google-Smtp-Source: APXvYqyoxVwYmBCSZFrxvDYU2KhKmeANua4dMO+T/UGB6ErKNHWp0Y381Kv5gzN89GN8WE8wFjihTg==
-X-Received: by 2002:adf:ce87:: with SMTP id r7mr10892246wrn.245.1578579541667; 
- Thu, 09 Jan 2020 06:19:01 -0800 (PST)
+ bh=GqdtWUWeRXAcQ+LI4RjLPvjzKZrpMw/yfqPf+ltlCJw=;
+ b=YxmG9zMffHdpg+s4qXkQjMnLbBOYDKlNhYlIIRC8Dm9sT6nHESRNPKqkwqglZ8BbUb
+ Qkj6ubvXQh2HkZ8BqPWdfdNa7FuT9FwWfIwilaCdG6v/ibneTXw3VrfiwNtmfWFmRBNX
+ 1J96C3ZIxOfudvXPWjM/Xj0//WpiVWGoDCP0SzcluaLJ+//yeIkWrB24xg9MPxZyQSni
+ 3PqTn9RIxVCTa5itq1VAOKuNGo5ydP12BdEpWGmx2Vg/J2yuZcv4/5jx0r0AlSxz25pM
+ BwH7dtmW6gB0t9WaSWPJOD/g6UHIwo3BIP8lAy07ELL7FZP7fjflRCOa4QVaR16b78J9
+ AtHQ==
+X-Gm-Message-State: APjAAAWY4oxMjpmh3ieyBEXdHJZpcO/VOziSwqcu8oVEFFLVdqYiENXs
+ HE0F2UezlOdB4+JE4tQLpZGKwg==
+X-Google-Smtp-Source: APXvYqy8AAiODGNXANmni/6xr6FAoFmKQxSKFRpCVIkbqKU81NtXovT4kZEdEKp8rLXe4qSDR4Cqaw==
+X-Received: by 2002:a5d:494b:: with SMTP id r11mr11331391wrs.184.1578579544586; 
+ Thu, 09 Jan 2020 06:19:04 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g2sm8139970wrw.76.2020.01.09.06.18.59
+ by smtp.gmail.com with ESMTPSA id f1sm8888304wrp.93.2020.01.09.06.18.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Thu, 09 Jan 2020 06:18:59 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0E1F21FF8C;
+ by zen.linaroharston (Postfix) with ESMTP id 365441FF90;
  Thu,  9 Jan 2020 14:18:59 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL v2 01/14] hw/i386/x86-iommu: Add missing stubs
-Date: Thu,  9 Jan 2020 14:18:45 +0000
-Message-Id: <20200109141858.14376-2-alex.bennee@linaro.org>
+Subject: [PULL v2 03/14] freebsd: use python37
+Date: Thu,  9 Jan 2020 14:18:47 +0000
+Message-Id: <20200109141858.14376-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200109141858.14376-1-alex.bennee@linaro.org>
 References: <20200109141858.14376-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,47 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-In commit 6c730e4af9 we introduced a stub to build the MicroVM
-machine without Intel IOMMU. This stub is incomplete for the
-other PC machines. Add the missing stubs.
+FreeBSD seems to use python37 by default now, which breaks the build
+script.  Add python to the package list, to explicitly pick the version,
+and also adapt the configure command line.
 
-Fixes: 6c730e4af9
-Reported-by: Travis-CI
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20191220154225.25879-1-philmd@redhat.com>
+Message-Id: <20200106123746.18201-1-kraxel@redhat.com>
 
-diff --git a/hw/i386/x86-iommu-stub.c b/hw/i386/x86-iommu-stub.c
-index 03576cdccb4..c5ba077f9d1 100644
---- a/hw/i386/x86-iommu-stub.c
-+++ b/hw/i386/x86-iommu-stub.c
-@@ -32,3 +32,12 @@ X86IOMMUState *x86_iommu_get_default(void)
-     return NULL;
- }
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index 1825cc58218..33a736298a9 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -32,6 +32,7 @@ class FreeBSDVM(basevm.BaseVM):
+         "git",
+         "pkgconf",
+         "bzip2",
++        "python37",
  
-+bool x86_iommu_ir_supported(X86IOMMUState *s)
-+{
-+    return false;
-+}
-+
-+IommuType x86_iommu_get_type(void)
-+{
-+    abort();
-+}
+         # gnu tools
+         "bash",
+@@ -63,7 +64,7 @@ class FreeBSDVM(basevm.BaseVM):
+         mkdir src build; cd src;
+         tar -xf /dev/vtbd1;
+         cd ../build
+-        ../src/configure --python=python3.6 {configure_opts};
++        ../src/configure --python=python3.7 {configure_opts};
+         gmake --output-sync -j{jobs} {target} {verbose};
+     """
+ 
 -- 
 2.20.1
 
