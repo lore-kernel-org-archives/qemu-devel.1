@@ -2,67 +2,90 @@ Return-Path: <SRS0=I8Mx=26=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD406C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 01:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CB9C33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:02:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 776BC206ED
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 01:55:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E61EA206ED
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 02:02:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mTb60/+J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 776BC206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JsNE4ZeV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E61EA206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipN2L-0007CC-LK
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 20:55:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43856)
+	id 1ipN9c-0002Iz-UF
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 21:02:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ipMzE-0004bH-9f
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:51:53 -0500
+ (envelope-from <palmerdabbelt@google.com>) id 1ipN8b-0001h4-S9
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:01:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ipMzA-0000mz-2I
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 20:51:48 -0500
-Received: from ozlabs.org ([203.11.71.1]:58327)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ipMz8-0000b2-T1; Wed, 08 Jan 2020 20:51:43 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47tTcV3HKfz9sRl; Thu,  9 Jan 2020 12:51:38 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578534698;
- bh=AcerTNXaFSKPN5OSm2F72MecNYL1/X0SKLJ4tLwLGZs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=mTb60/+JOCWbPC3dvI5pukMIlMAWKCF9wBqxhq+PYKib7/eoR9BzHqdNSRVUkawxp
- 79gx/SKcuaLDbt82muhGOBO0sDNea6i6soevGWnuPUwVNu89Ugw1PuudgqoJQUXLUM
- swde3dkgjq0zZtTguegOUYRF8B0zYlH7uJ25JXcA=
-Date: Thu, 9 Jan 2020 12:37:00 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Ganesh <ganeshgr@linux.ibm.com>
-Subject: Re: [PATCH v18 5/7] ppc: spapr: Handle "ibm,nmi-register" and
- "ibm,nmi-interlock" RTAS calls
-Message-ID: <20200109013700.GI8586@umbus.fritz.box>
-References: <20200102075111.25308-1-ganeshgr@linux.ibm.com>
- <20200102075111.25308-6-ganeshgr@linux.ibm.com>
- <20200103021959.GR2098@umbus>
- <279e921a-7540-d543-ba16-7fca55aff056@linux.ibm.com>
- <20200108010450.GH2137@umbus.fritz.box>
- <c6c3f717-2122-e2fe-f1b7-d7c7e4db79dc@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="9dgjiU4MmWPVapMU"
-Content-Disposition: inline
-In-Reply-To: <c6c3f717-2122-e2fe-f1b7-d7c7e4db79dc@linux.ibm.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+ (envelope-from <palmerdabbelt@google.com>) id 1ipN8Y-0002pA-5U
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:01:29 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40528)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
+ id 1ipN8X-0002el-Gm
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 21:01:25 -0500
+Received: by mail-pl1-x644.google.com with SMTP id s21so1876940plr.7
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 18:01:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:subject:cc:to:in-reply-to:references:message-id
+ :mime-version:content-transfer-encoding;
+ bh=IP0neH8dc4ycnxW+MO7dFXfxdneeYWShlkCN/+oKbjU=;
+ b=JsNE4ZeVnbfeeEVU4UUvKhAS/c2jgo2rIfUTUP+R9UewurMM3g9U/RuptIHJKVlsjd
+ sdhSb604WBYNXR3Y2LKOClwsqUnZBFVxWJLaY+gt3OtnvLd0XQi5bO1WwnGsN3Q1McHo
+ swtcfchXUoY1ttt0Pvq1QQQr8HmltV4hyKGM1JTGS/TGPU5sj5kjMPKyFUlC9gNv/6Gt
+ I+MCcTqPCBVcK5NrILzrzVJ2kcMe6WlNMYFpNYWOfX26LiTh3VW8ddCfecNVK/mBbIAN
+ yLjSucBPWbnYNyqTxR1S157fnWdMFOC/g64Eruwz/9AC5Hrg+NFCv4ivbW+yyIWXlO2p
+ nNyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
+ :message-id:mime-version:content-transfer-encoding;
+ bh=IP0neH8dc4ycnxW+MO7dFXfxdneeYWShlkCN/+oKbjU=;
+ b=hbCosk+vG9d0+OAdeM9Pkn7H0KwE2F2d7SdI/dauwWPJ+162vzV0bA9SrKvSrUgWex
+ o1uZccakzFEPZOHK1WgwQ1EQLsReLilvc+X3oWrH97qjPMDCe0EHWPRWaVhtoXLneGp6
+ vsvL3Lxhz9W0BVg5v2fEH37LIPWOuGL1A92TOEyRrUQfId4oRDuCKKzsUFeXDjeWnAjn
+ 81J01cmNM4MyL8O/kjWfsdHLwlIoEF1D8GMPnJu5OrbyldGYpWnHgNAl682BycXb4Rmn
+ awZk43MAjwCrMM799U+qzesoENX3wBCh3xAkM17PMTLxMznvIDW92ZTcM7No8gW1A0WQ
+ /fcA==
+X-Gm-Message-State: APjAAAXNrcXkHj42HII3tkdSJLomFs/tYctvuO6cD0hKYSoc5A+SsXpE
+ O3ml3I2TAaf1nsZ4yL94heWRhJHmqDI=
+X-Google-Smtp-Source: APXvYqyYbNJblKfAToTzV6E5dA7RLkb5AvovXIYcBvPc62m7dVt+H9lNEjxsV4ips48dfvEDRwWPGg==
+X-Received: by 2002:a17:902:7602:: with SMTP id
+ k2mr8941532pll.34.1578535276912; 
+ Wed, 08 Jan 2020 18:01:16 -0800 (PST)
+Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
+ by smtp.gmail.com with ESMTPSA id j94sm578602pje.8.2020.01.08.18.01.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Jan 2020 18:01:16 -0800 (PST)
+Date: Wed, 08 Jan 2020 18:01:16 -0800 (PST)
+X-Google-Original-Date: Wed, 08 Jan 2020 18:01:10 PST (-0800)
+From: Palmer Dabbelt <palmerdabbelt@google.com>
+X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
+Subject: Re: [PATCH v1 31/36] target/riscv: Implement second stage MMU
+CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+To: Alistair Francis <Alistair.Francis@wdc.com>
+In-Reply-To: <a40c558e15a57e8d4a15fe7ef3860018d0b8ab11.1575914822.git.alistair.francis@wdc.com>
+References: <a40c558e15a57e8d4a15fe7ef3860018d0b8ab11.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
+Message-ID: <mhng-91300844-abd3-4b6c-be7c-2bbb8fc06e98@palmerdabbelt-glaptop>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,275 +97,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aravinda Prasad <arawinda.p@gmail.com>, aik@ozlabs.ru,
- qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 09 Dec 2019 10:12:01 PST (-0800), Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/cpu.h        |   1 +
+>  target/riscv/cpu_helper.c | 193 ++++++++++++++++++++++++++++++++++----
+>  2 files changed, 175 insertions(+), 19 deletions(-)
+>
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index eb089fbdb6..b411a1f900 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -104,6 +104,7 @@ struct CPURISCVState {
+>      target_ulong frm;
+>
+>      target_ulong badaddr;
+> +    target_ulong guest_phys_fault_addr;
+>
+>      target_ulong priv_ver;
+>      target_ulong misa;
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index 8b234790a7..8667e5ffce 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -287,11 +287,12 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+>   * @mmu_idx: Indicates current privilege level
+>   * @first_stage: Are we in first stage translation?
+>   *               Second stage is used for hypervisor guest translation
+> + * @two_stage: Are we going to perform two stage translation
+>   */
+>  static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>                                  int *prot, target_ulong addr,
+>                                  int access_type, int mmu_idx,
+> -                                bool first_stage)
+> +                                bool first_stage, bool two_stage)
+>  {
+>      /* NOTE: the env->pc value visible here will not be
+>       * correct, but the value visible to the exception handler
+> @@ -299,13 +300,40 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>      MemTxResult res;
+>      MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
+>      int mode = mmu_idx;
+> +    bool use_background = false;
+>
+> +    /*
+> +     * Check if we should use the background registers for the two
+> +     * stage translation. We don't need to check if we actually need
+> +     * two stage translation as that happened before this function
+> +     * was called. Background registers will be used if the guest has
+> +     * forced a two stage translation to be on (in HS or M mode).
+> +     */
+>      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+>          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
+>              mode = get_field(*env->mstatus, MSTATUS_MPP);
+> +
+> +            if (riscv_has_ext(env, RVH) &&
+> +                get_field(*env->mstatus, MSTATUS_MPV)) {
+> +                use_background = true;
+> +            }
+> +        }
+> +    }
+> +
+> +    if (mode == PRV_S && access_type != MMU_INST_FETCH &&
+> +        riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
+> +        if (get_field(env->hstatus, HSTATUS_SPRV)) {
+> +            mode = get_field(*env->mstatus, SSTATUS_SPP);
+> +            use_background = true;
+>          }
+>      }
+>
+> +    if (first_stage == false) {
+> +        /* We are in stage 2 translation, this is similar to stage 1. */
+> +        /* Stage 2 is always taken as U-mode */
+> +        mode = PRV_U;
+> +    }
+> +
+>      if (mode == PRV_M || !riscv_feature(env, RISCV_FEATURE_MMU)) {
+>          *physical = addr;
+>          *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+> @@ -315,13 +343,30 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>      *prot = 0;
+>
+>      hwaddr base;
+> -    int levels, ptidxbits, ptesize, vm, sum;
+> -    int mxr = get_field(*env->mstatus, MSTATUS_MXR);
+> +    int levels, ptidxbits, ptesize, vm, sum, mxr, widened;
+> +
+> +    if (first_stage == true) {
+> +        mxr = get_field(*env->mstatus, MSTATUS_MXR);
+> +    } else {
+> +        mxr = get_field(env->vsstatus, MSTATUS_MXR);
+> +    }
+>
+>      if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> -        base = (hwaddr)get_field(env->satp, SATP_PPN) << PGSHIFT;
+> +        if (first_stage == true) {
+> +            if (use_background) {
+> +                base = (hwaddr)get_field(env->vsatp, SATP_PPN) << PGSHIFT;
+> +                vm = get_field(env->vsatp, SATP_MODE);
+> +            } else {
+> +                base = (hwaddr)get_field(env->satp, SATP_PPN) << PGSHIFT;
+> +                vm = get_field(env->satp, SATP_MODE);
+> +            }
+> +            widened = 0;
+> +        } else {
+> +            base = (hwaddr)get_field(env->hgatp, HGATP_PPN) << PGSHIFT;
+> +            vm = get_field(env->hgatp, HGATP_MODE);
+> +            widened = 2;
+> +        }
+>          sum = get_field(*env->mstatus, MSTATUS_SUM);
+> -        vm = get_field(env->satp, SATP_MODE);
+>          switch (vm) {
+>          case VM_1_10_SV32:
+>            levels = 2; ptidxbits = 10; ptesize = 4; break;
+> @@ -339,6 +384,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>            g_assert_not_reached();
+>          }
+>      } else {
+> +        widened = 0;
+>          base = (hwaddr)(env->sptbr) << PGSHIFT;
+>          sum = !get_field(*env->mstatus, MSTATUS_PUM);
+>          vm = get_field(*env->mstatus, MSTATUS_VM);
+> @@ -359,9 +405,16 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>      }
+>
+>      CPUState *cs = env_cpu(env);
+> -    int va_bits = PGSHIFT + levels * ptidxbits;
+> -    target_ulong mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
+> -    target_ulong masked_msbs = (addr >> (va_bits - 1)) & mask;
+> +    int va_bits = PGSHIFT + levels * ptidxbits + widened;
+> +    target_ulong mask, masked_msbs;
+> +
+> +    if (TARGET_LONG_BITS > (va_bits - 1)) {
+> +        mask = (1L << (TARGET_LONG_BITS - (va_bits - 1))) - 1;
+> +    } else {
+> +        mask = 0;
+> +    }
+> +    masked_msbs = (addr >> (va_bits - 1)) & mask;
+> +
+>      if (masked_msbs != 0 && masked_msbs != mask) {
+>          return TRANSLATE_FAIL;
+>      }
+> @@ -373,11 +426,29 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+>  restart:
+>  #endif
+>      for (i = 0; i < levels; i++, ptshift -= ptidxbits) {
+> -        target_ulong idx = (addr >> (PGSHIFT + ptshift)) &
+> +        target_ulong idx;
+> +        if (i == 0) {
+> +            idx = (addr >> (PGSHIFT + ptshift)) &
+> +                           ((1 << (ptidxbits + widened)) - 1);
+> +        } else {
+> +            idx = (addr >> (PGSHIFT + ptshift)) &
+>                             ((1 << ptidxbits) - 1);
+> +        }
+>
+>          /* check that physical address of PTE is legal */
+> -        hwaddr pte_addr = base + idx * ptesize;
+> +        hwaddr pte_addr;
+> +
+> +        if (two_stage && first_stage) {
+> +            hwaddr vbase;
+> +
+> +            /* Do the second stage translation on the base PTE address. */
+> +            get_physical_address(env, &vbase, prot, base, access_type,
+> +                                 mmu_idx, false, true);
+> +
+> +            pte_addr = vbase + idx * ptesize;
+> +        } else {
+> +            pte_addr = base + idx * ptesize;
+> +        }
+>
+>          if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+>              !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
+> @@ -474,7 +545,12 @@ restart:
+>              /* for superpage mappings, make a fake leaf PTE for the TLB's
+>                 benefit. */
+>              target_ulong vpn = addr >> PGSHIFT;
+> -            *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
+> +            if (i == 0) {
+> +                *physical = (ppn | (vpn & ((1L << (ptshift + widened)) - 1))) <<
+> +                             PGSHIFT;
+> +            } else {
+> +                *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
+> +            }
+>
+>              /* set permissions on the TLB entry */
+>              if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
+> @@ -533,14 +609,23 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+>  hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+>  {
+>      RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
+>      hwaddr phys_addr;
+>      int prot;
+>      int mmu_idx = cpu_mmu_index(&cpu->env, false);
+>
+> -    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
+> -                             true)) {
+> +    if (get_physical_address(env, &phys_addr, &prot, addr, 0, mmu_idx,
+> +                             true, riscv_cpu_virt_enabled(env))) {
+>          return -1;
+>      }
+> +
+> +    if (riscv_cpu_virt_enabled(env)) {
+> +        if (get_physical_address(env, &phys_addr, &prot, phys_addr,
+> +                                 0, mmu_idx, false, true)) {
+> +            return -1;
+> +        }
+> +    }
+> +
+>      return phys_addr;
+>  }
+>
+> @@ -594,17 +679,37 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+>      RISCVCPU *cpu = RISCV_CPU(cs);
+>      CPURISCVState *env = &cpu->env;
+>  #ifndef CONFIG_USER_ONLY
+> +    vaddr im_address;
+>      hwaddr pa = 0;
+>      int prot;
+>      bool pmp_violation = false;
+> +    bool m_mode_two_stage = false;
+> +    bool hs_mode_two_stage = false;
+> +    bool first_stage_error = true;
+>      int ret = TRANSLATE_FAIL;
+>      int mode = mmu_idx;
+>
+> +    env->guest_phys_fault_addr = 0;
+> +
+>      qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+>                    __func__, address, access_type, mmu_idx);
+>
+> -    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
+> -                               true);
+> +    /*
+> +     * Determine if we are in M mode and MPRV is set or in HS mode and SPRV is
+> +     * set and we want to access a virtulisation address.
+> +     */
+> +    if (riscv_has_ext(env, RVH)) {
+> +        m_mode_two_stage = env->priv == PRV_M &&
+> +                           access_type != MMU_INST_FETCH &&
+> +                           get_field(*env->mstatus, MSTATUS_MPRV) &&
+> +                           get_field(*env->mstatus, MSTATUS_MPV);
+> +
+> +        hs_mode_two_stage = env->priv == PRV_S &&
+> +                            !riscv_cpu_virt_enabled(env) &&
+> +                            access_type != MMU_INST_FETCH &&
+> +                            get_field(env->hstatus, HSTATUS_SPRV) &&
+> +                            get_field(env->hstatus, HSTATUS_SPV);
+> +    }
+>
+>      if (mode == PRV_M && access_type != MMU_INST_FETCH) {
+>          if (get_field(*env->mstatus, MSTATUS_MPRV)) {
+> @@ -612,9 +717,55 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+>          }
+>      }
+>
+> -    qemu_log_mask(CPU_LOG_MMU,
+> -                  "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
+> -                  " prot %d\n", __func__, address, ret, pa, prot);
+> +    if (riscv_cpu_virt_enabled(env) || m_mode_two_stage || hs_mode_two_stage) {
+> +        /* Two stage lookup */
+> +        ret = get_physical_address(env, &pa, &prot, address, access_type,
+> +                                   mmu_idx, true, true);
+> +
+> +        qemu_log_mask(CPU_LOG_MMU,
+> +                      "%s 1st-stage address=%" VADDR_PRIx " ret %d physical "
+> +                      TARGET_FMT_plx " prot %d\n",
+> +                      __func__, address, ret, pa, prot);
+> +
+> +        if (ret != TRANSLATE_FAIL) {
+> +            /* Second stage lookup */
+> +            im_address = pa;
+> +
+> +            ret = get_physical_address(env, &pa, &prot, im_address,
+> +                                       access_type, mmu_idx, false, true);
+> +
+> +            qemu_log_mask(CPU_LOG_MMU,
+> +                    "%s 2nd-stage address=%" VADDR_PRIx " ret %d physical "
+> +                    TARGET_FMT_plx " prot %d\n",
+> +                    __func__, im_address, ret, pa, prot);
+> +
+> +            if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+> +                (ret == TRANSLATE_SUCCESS) &&
+> +                !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
+> +                ret = TRANSLATE_PMP_FAIL;
+> +            }
+> +
+> +            if (ret != TRANSLATE_SUCCESS) {
+> +                /*
+> +                 * Guest physical address translation failed, this is a HS
+> +                 * level exception
+> +                 */
+> +                first_stage_error = false;
+> +                env->guest_phys_fault_addr = (im_address |
+> +                                              (address &
+> +                                               (TARGET_PAGE_SIZE - 1))) >> 2;
+> +            }
+> +        }
+> +    } else {
+> +        /* Single stage lookup */
+> +        ret = get_physical_address(env, &pa, &prot, address, access_type,
+> +                                   mmu_idx, true, false);
+> +
+> +        qemu_log_mask(CPU_LOG_MMU,
+> +                      "%s address=%" VADDR_PRIx " ret %d physical "
+> +                      TARGET_FMT_plx " prot %d\n",
+> +                      __func__, address, ret, pa, prot);
+> +    }
+>
+>      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+>          (ret == TRANSLATE_SUCCESS) &&
+> @@ -624,6 +775,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+>      if (ret == TRANSLATE_PMP_FAIL) {
+>          pmp_violation = true;
+>      }
+> +
+>      if (ret == TRANSLATE_SUCCESS) {
+>          tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
+>                       prot, mmu_idx, TARGET_PAGE_SIZE);
+> @@ -631,9 +783,12 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+>      } else if (probe) {
+>          return false;
+>      } else {
+> -        raise_mmu_exception(env, address, access_type, pmp_violation, true);
+> +        raise_mmu_exception(env, address, access_type, pmp_violation, first_stage_error);
+>          riscv_raise_exception(env, cs->exception_index, retaddr);
+>      }
+> +
+> +    return true;
+> +
+>  #else
+>      switch (access_type) {
+>      case MMU_INST_FETCH:
 
---9dgjiU4MmWPVapMU
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 09, 2020 at 12:19:12AM +0530, Ganesh wrote:
->=20
->=20
-> On 1/8/20 6:34 AM, David Gibson wrote:
-> > On Tue, Jan 07, 2020 at 11:57:08AM +0530, Ganesh wrote:
-> > > On 1/3/20 7:49 AM, David Gibson wrote:
-> > > > On Thu, Jan 02, 2020 at 01:21:09PM +0530, Ganesh Goudar wrote:
-> > > > > From: Aravinda Prasad <arawinda.p@gmail.com>
-> > > > >=20
-> > > > > This patch adds support in QEMU to handle "ibm,nmi-register"
-> > > > > and "ibm,nmi-interlock" RTAS calls.
-> > > > >=20
-> > > > > The machine check notification address is saved when the
-> > > > > OS issues "ibm,nmi-register" RTAS call.
-> > > > >=20
-> > > > > This patch also handles the case when multiple processors
-> > > > > experience machine check at or about the same time by
-> > > > > handling "ibm,nmi-interlock" call. In such cases, as per
-> > > > > PAPR, subsequent processors serialize waiting for the first
-> > > > > processor to issue the "ibm,nmi-interlock" call. The second
-> > > > > processor that also received a machine check error waits
-> > > > > till the first processor is done reading the error log.
-> > > > > The first processor issues "ibm,nmi-interlock" call
-> > > > > when the error log is consumed.
-> > > > >=20
-> > > > > [Move fwnmi registration to .apply hook]
-> > > > > Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
-> > > > > Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
-> > > > > ---
-> > > > >    hw/ppc/spapr_caps.c    |  6 +++++
-> > > > >    hw/ppc/spapr_rtas.c    | 58 ++++++++++++++++++++++++++++++++++=
-++++++++
-> > > > >    include/hw/ppc/spapr.h |  7 ++++-
-> > > > >    3 files changed, 70 insertions(+), 1 deletion(-)
-> > > > >=20
-> > > > > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > > > > index 3001098601..e922419cfb 100644
-> > > > > --- a/hw/ppc/spapr_caps.c
-> > > > > +++ b/hw/ppc/spapr_caps.c
-> > > > > @@ -502,6 +502,12 @@ static void cap_fwnmi_mce_apply(SpaprMachine=
-State *spapr, uint8_t val,
-> > > > >        if (!val) {
-> > > > >            return; /* Disabled by default */
-> > > > >        }
-> > > > > +
-> > > > > +    if (!spapr->fwnmi_calls_registered && !kvmppc_set_fwnmi()) {
-> > > > So, we definitely need the kvmppc_set_fwnmi() call here.  But in the
-> > > > case where we *do* have KVM, but the call fails, we should fail the
-> > > > .apply hook, rather than ignoring it silently.
-> > > >=20
-> > > > As we've discussed although TCG behaviour with fwnmi isn't 100%
-> > > > correct, it's close enough to pass for most purposes - so it's
-> > > > reasonable to continue if the cap is selected.  But if the cap is
-> > > > selected and we're running with KVM we *must* enable the capability=
- in
-> > > > KVM or we're not providing the environment the user requested.
-> > > >=20
-> > > > > +        /* Register ibm,nmi-register and ibm,nmi-interlock RTAS =
-calls */
-> > > > > +        spapr_fwnmi_register();
-> > > > We discussed registering the hypercalls here, but I thought after t=
-hat
-> > > > I suggested just always registering them, and having them bail out
-> > > > when called if the cap is not set.  I see that you've implemented t=
-hat
-> > > > bailout for register, though not for interlock.  I think that's
-> > > > simpler than registering them here.
-> > > something like this?, with bailout in interlock as well.
-> > >=20
-> > > {
-> > >  =A0=A0=A0 if (!val) {
-> > >  =A0=A0=A0=A0=A0=A0=A0 return; /* Disabled by default */
-> > >  =A0=A0=A0 }
-> > >=20
-> > >  =A0=A0=A0 if (kvm_enabled()) {
-> > >  =A0=A0=A0=A0=A0=A0=A0 if (kvmppc_set_fwnmi() < 0) {
-> > >  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 error_report("Could not enable fwn=
-mi capability");
-> > >  =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 exit(1)
-> > >  =A0=A0=A0 }
-> > >=20
-> > >  =A0=A0=A0 if (!spapr->fwnmi_calls_registered) {
-> > >  =A0=A0=A0=A0=A0=A0=A0 /* Register ibm,nmi-register and ibm,nmi-inter=
-lock RTAS calls */
-> > >  =A0=A0=A0=A0=A0=A0=A0 spapr_fwnmi_register();
-> > >  =A0=A0=A0=A0=A0=A0=A0 spapr->fwnmi_calls_registered =3D true;
-> > >  =A0=A0=A0 }
-> > > }
-> > Uh.. no.. not really.  I was suggesting registering the calls
-> > unconditionally, but in each of the call implementations you have
-> Yes I got your point, here I am just trying to avoid registering the
-> calls more than once, otherwise we may hit an assert.
-
-Oh, right.  My point is that an advantage of registering them
-unconditionally is you can do it early with the rest of the statically
-registered calls, and so the problem of multiple registering them no
-longer arises.
-
-> >=20
-> >=20
-> >      if(!fwnmi_enabed)
-> >           return H_FUNCTION;
-> >=20
-> > or maybe H_NOT_AVAILABLE.
-> Sure, ill add this check in interlock call also.
-> >=20
-> > > > > +        spapr->fwnmi_calls_registered =3D true;
-> > > > > +    }
-> > > > >    }
-> > > > >    SpaprCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-> > > > > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > > > > index 2c066a372d..54b142f35b 100644
-> > > > > --- a/hw/ppc/spapr_rtas.c
-> > > > > +++ b/hw/ppc/spapr_rtas.c
-> > > > > @@ -400,6 +400,56 @@ static void rtas_get_power_level(PowerPCCPU =
-*cpu, SpaprMachineState *spapr,
-> > > > >        rtas_st(rets, 1, 100);
-> > > > >    }
-> > > > > +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
-> > > > > +                                  SpaprMachineState *spapr,
-> > > > > +                                  uint32_t token, uint32_t nargs,
-> > > > > +                                  target_ulong args,
-> > > > > +                                  uint32_t nret, target_ulong re=
-ts)
-> > > > > +{
-> > > > > +    hwaddr rtas_addr;
-> > > > > +
-> > > > > +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) =3D=3D SPAPR_C=
-AP_OFF) {
-> > > > > +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    rtas_addr =3D spapr_get_rtas_addr();
-> > > > > +    if (!rtas_addr) {
-> > > > > +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    spapr->guest_machine_check_addr =3D rtas_ld(args, 1);
-> > > > > +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> > > > > +}
-> > > > > +
-> > > > > +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-> > > > > +                                   SpaprMachineState *spapr,
-> > > > > +                                   uint32_t token, uint32_t narg=
-s,
-> > > > > +                                   target_ulong args,
-> > > > > +                                   uint32_t nret, target_ulong r=
-ets)
-> > > > > +{
-> > > > > +    if (spapr->guest_machine_check_addr =3D=3D -1) {
-> > > > > +        /* NMI register not called */
-> > > > > +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (spapr->mc_status !=3D cpu->vcpu_id) {
-> > > > > +        /* The vCPU that hit the NMI should invoke "ibm,nmi-inte=
-rlock" */
-> > > > > +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
-> > > > > +        return;
-> > > > > +    }
-> > > > > +
-> > > > > +    /*
-> > > > > +     * vCPU issuing "ibm,nmi-interlock" is done with NMI handlin=
-g,
-> > > > > +     * hence unset mc_status.
-> > > > > +     */
-> > > > > +    spapr->mc_status =3D -1;
-> > > > > +    qemu_cond_signal(&spapr->mc_delivery_cond);
-> > > > > +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> > > > > +}
-> > > > > +
-> > > > >    static struct rtas_call {
-> > > > >        const char *name;
-> > > > >        spapr_rtas_fn fn;
-> > > > > @@ -503,6 +553,14 @@ hwaddr spapr_get_rtas_addr(void)
-> > > > >        return (hwaddr)fdt32_to_cpu(*rtas_data);
-> > > > >    }
-> > > > > +void spapr_fwnmi_register(void)
-> > > > > +{
-> > > > > +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register=
-",
-> > > > > +                        rtas_ibm_nmi_register);
-> > > > > +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlo=
-ck",
-> > > > > +                        rtas_ibm_nmi_interlock);
-> > > > > +}
-> > > > > +
-> > > > >    static void core_rtas_register_types(void)
-> > > > >    {
-> > > > >        spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-chara=
-cter",
-> > > > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > > > index 652a5514e8..a90e677cc3 100644
-> > > > > --- a/include/hw/ppc/spapr.h
-> > > > > +++ b/include/hw/ppc/spapr.h
-> > > > > @@ -218,6 +218,8 @@ struct SpaprMachineState {
-> > > > >        unsigned gpu_numa_id;
-> > > > >        SpaprTpmProxy *tpm_proxy;
-> > > > > +
-> > > > > +    bool fwnmi_calls_registered;
-> > > > >    };
-> > > > >    #define H_SUCCESS         0
-> > > > > @@ -656,8 +658,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu=
-, target_ulong opcode,
-> > > > >    #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BA=
-SE + 0x28)
-> > > > >    #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BA=
-SE + 0x29)
-> > > > >    #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BA=
-SE + 0x2A)
-> > > > > +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE=
- + 0x2B)
-> > > > > +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE=
- + 0x2C)
-> > > > > -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE=
- + 0x2B)
-> > > > > +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE=
- + 0x2D)
-> > > > >    /* RTAS ibm,get-system-parameter token values */
-> > > > >    #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
-> > > > > @@ -908,4 +912,5 @@ void spapr_check_pagesize(SpaprMachineState *=
-spapr, hwaddr pagesize,
-> > > > >    void spapr_set_all_lpcrs(target_ulong value, target_ulong mask=
-);
-> > > > >    hwaddr spapr_get_rtas_addr(void);
-> > > > > +void spapr_fwnmi_register(void);
-> > > > >    #endif /* HW_SPAPR_H */
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9dgjiU4MmWPVapMU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4Wg7wACgkQbDjKyiDZ
-s5KZdxAAwuFEN7iPXIZQ7ViE6NagM+yUbECFxaBDQj6bCoU6QvLOBaWByAou3Gx9
-+xkAeqKFoOZx0NsCWLb2E+ey0/m78wlzcIq7HFkBtDiTiYHPI+xKdYFJVXyd3ofZ
-d2jOIibWcvEgHocqG/rt5vIfZxPrhGhY9n2yBi+7cmM7/++nJst3ujr243ER38PD
-UWtpVMr33HFoJbefKns/vvjludC+QSWTYvdkAqYpbqqxxvcBD6B0tJijE0GccDIN
-vpePRQKjFACrrNq9fyyNB53IOwRVGwbtDBvA14JOrFPVooBy6vsrN7MG5OcYCkJ3
-+KFFSgYIRdBApruhv+834yklSKLo9qlkf9wVjP2ZcbU1b9st6o6qdly4Y3G+1p3+
-B48LZtKxNrBIr90qiTgwdVUp9oVb/PLfXp6Ixrs961nUYWbpj4UqhO+yE59wNkGG
-aAFh7HEgHnCaUGMj7E2ikl1ivhkCNue5fv6eicBaJcIncHHQz2YagYn5X1rkvVJ7
-gPdlJHjd+AY2/GF6LABB9mFes8c/YZZvQ0wO+6Hu50FMjnoXTzN3HIx16wLoPFtQ
-oVq+OOJ8JGitORuc8cd7WZjEQcdZXW6E3P81mVFWa8f9AVfDk8RXi6DMctIkf66+
-8fkOc00+0lAgMJdACh41PkBqu/bq4XYxTrX3nZ68bUAUdSq1xEA=
-=XDiO
------END PGP SIGNATURE-----
-
---9dgjiU4MmWPVapMU--
+Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 
