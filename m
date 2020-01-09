@@ -7,85 +7,86 @@ X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92887C33C9E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8152FC33C9E
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:52:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 567902070E
-	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:50:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 471332067D
+	for <qemu-devel@archiver.kernel.org>; Thu,  9 Jan 2020 00:52:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NSct3BTV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 567902070E
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nkBNJ+gT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 471332067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipM22-0004JC-Aa
-	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 19:50:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56444)
+	id 1ipM3c-0006NX-8Z
+	for qemu-devel@archiver.kernel.org; Wed, 08 Jan 2020 19:52:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmerdabbelt@google.com>) id 1ipM0c-0002iy-93
+ (envelope-from <palmerdabbelt@google.com>) id 1ipM0b-0002iT-W9
  for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmerdabbelt@google.com>) id 1ipM0Y-00087j-5S
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:09 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39735)
+ (envelope-from <palmerdabbelt@google.com>) id 1ipM0V-00080i-H0
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:08 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:35125)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <palmerdabbelt@google.com>)
- id 1ipM0X-00085C-SR
- for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:05 -0500
-Received: by mail-pg1-x544.google.com with SMTP id b137so2357989pga.6
- for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 16:49:05 -0800 (PST)
+ id 1ipM0V-0007y4-9Q
+ for qemu-devel@nongnu.org; Wed, 08 Jan 2020 19:49:03 -0500
+Received: by mail-pl1-x644.google.com with SMTP id g6so1820036plt.2
+ for <qemu-devel@nongnu.org>; Wed, 08 Jan 2020 16:49:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:subject:cc:to:in-reply-to:references:message-id
  :mime-version:content-transfer-encoding;
- bh=KQfEp3p4VDk1zl6NMFLBM7nYydr2cpxfeNHo46j1imQ=;
- b=NSct3BTVlZw87sPjRg3gcYeUL/bKHx7xEpHMxeZbTfQyLrWLGKcOnUw7sKc98wRPmS
- 9xKkpvGHZFLno+SkXVU2neudyWHCgEeAOGtUqn6k4fDERIpj9XfxZ/nglj5NbM7uR8Tc
- LlQVAi82Jts1YrOZHnQznpR8XQpn+kAJ/AumAqQxXL2SmXny1Ua4yIiqEPPbTKODiW3c
- hpitBNOxBIBCJHY8ebX8kie2k9oK9YVOGZ4OV1Srl3/94KH0OyhzYOJ9CuFMxTPHtVpd
- oZqabKOX5BcTUwG16DFjdCRHxPGV4ajplLS4LeEmayeuSOKvdWVV9seTQmVGiki/MrW9
- kijA==
+ bh=oxaYPFpeBulaqXEI8e0zvCoQvUmXj9BsGZbI3S9AAPs=;
+ b=nkBNJ+gTd8TFhEZGeXvAhmb3pYpL/KVs8I7Ll0TdBovsXPpv8syPKMpVdE/iLvJ4uX
+ WhAQlZGJUWMX4NHeo+/1Tjbzo3G/nbanH2qbJEj/mEq+TsjtbapakzX3ogb4gKy0dKRe
+ QJ9NmNtft7veyc95li3xo8mpeqRYxBFfVWHnKmxcgEx4yiZv0Ak45yiwjXHOsO5kNQfE
+ JHoef3ZolmCHbGOJDpEgzZSKl/S3dt5Rw2sH95Z+KW76KaLwvHJNKNL61yDZaqjfH+sY
+ qj7YV+eM7DHHNaPvi2pGhdkOapeCTr6ma63o7WEOjDT2qIc6noE7zXiyT6Y10PSXDZHg
+ s1mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:subject:cc:to:in-reply-to:references
  :message-id:mime-version:content-transfer-encoding;
- bh=KQfEp3p4VDk1zl6NMFLBM7nYydr2cpxfeNHo46j1imQ=;
- b=V5csrykrOtPhhdL9GqY2mDP75nXq66LjVlbK5qlOLXw5htm3NxpPAsl8pwKpQnkUND
- x2ShksHw12j3luTsKX619I4xhyYd5ErIrq78OL9g7U04wDOyx2wdpzKoZ+3Qy5Df6QKU
- +0h5RStk0nv2rruW3TF3Bya2LgqrJjhXw1lVV+hPAUXHiU754GizRDJD0L2O+Hkv5KgI
- 4b3za9iMKlccNrf8lcPFMUPCAOgWwaZnWk+vpCVWPwHKOCVvpRWMQ1QU3kizPeLgg3+e
- +bjRvxEc7323nvJWLYO0ndfRK9P3vqAs2N3WRnwrLpMplUEigy5dMhbJavD7R3HatLPv
- YEhQ==
-X-Gm-Message-State: APjAAAXiooq+VkQFdwRveUBlLHnLj/YUSJl/vgSl//Prk5YGWjJ4boyT
- ygSksZV8u0Alk35lpPY/CNNUNw5yej0=
-X-Google-Smtp-Source: APXvYqzhndEtEvRI3a7LIipHv22w+jhMBvDuQwRJ3OwlqGswzepvtxGh6kNurd42JjqAhztGkXgSmw==
-X-Received: by 2002:a62:7883:: with SMTP id t125mr8447867pfc.141.1578530944521; 
- Wed, 08 Jan 2020 16:49:04 -0800 (PST)
+ bh=oxaYPFpeBulaqXEI8e0zvCoQvUmXj9BsGZbI3S9AAPs=;
+ b=jzMMnXdzC3aQ5ew8X1GILtWvdNfa201tcDqYhZNVtCknUD9KJ7j+iLWMQ/udmwRBnK
+ n8SpO+3Df/rhJ3g2IYnlGpHuHM10NVvOsm4GMYUMlfMz8bkChrG9wv4rhfsTveXhaURx
+ zoTYUxGo8qAHwg9sJpSimpRWGcdVaXPcIQPFFJd6jCRYSar+H9hUYhuYnbTDKkSuPGlA
+ 8kU3SM9ayJdPBvKeyYQq9nRaw9ADciv7leJMz1/XOYcOmmg3T1D0AHancRtH+tzc0A0h
+ kHYDWBn6QcQbV8UZ8Io7/0x9g7s+B5uP9tgoPesKRqe39lNNNz7hdercrFX9Y92FiwaD
+ UBow==
+X-Gm-Message-State: APjAAAUTWcD86igPM2V5YIpskqc107AFhQfZ+u09xWob2k1QeOPaVA+S
+ Pm36+iGhv0HsRsctBpkWhQqr6yNR1IQ=
+X-Google-Smtp-Source: APXvYqxtbOAz2lj1ecTrwijbnMiRA6uUhDyK2H/O8kDV8Edf+yj07PhtKh5x2enJPb5STdwsU55V+g==
+X-Received: by 2002:a17:902:34d:: with SMTP id
+ 71mr8391407pld.140.1578530941637; 
+ Wed, 08 Jan 2020 16:49:01 -0800 (PST)
 Received: from localhost ([2620:0:1000:2514:7f69:cd98:a2a2:a03d])
- by smtp.gmail.com with ESMTPSA id bo19sm455227pjb.25.2020.01.08.16.49.03
+ by smtp.gmail.com with ESMTPSA id w7sm451134pjb.31.2020.01.08.16.49.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Jan 2020 16:49:03 -0800 (PST)
-Date: Wed, 08 Jan 2020 16:49:03 -0800 (PST)
-X-Google-Original-Date: Wed, 08 Jan 2020 16:29:07 PST (-0800)
+ Wed, 08 Jan 2020 16:49:00 -0800 (PST)
+Date: Wed, 08 Jan 2020 16:49:00 -0800 (PST)
+X-Google-Original-Date: Wed, 08 Jan 2020 14:40:34 PST (-0800)
 From: Palmer Dabbelt <palmerdabbelt@google.com>
 X-Google-Original-From: Palmer Dabbelt <palmer@dabbelt.com>
-Subject: Re: [PATCH v1 20/36] target/riscv: Add support for virtual interrupt
- setting
+Subject: Re: [PATCH v1 19/36] target/riscv: Extend the SIP CSR to support
+ virtulisation
 CC: qemu-devel@nongnu.org, qemu-riscv@nongnu.org,
  Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
 To: Alistair Francis <Alistair.Francis@wdc.com>
-In-Reply-To: <2389483485d4642a6e5670e2546c62e493e91fd6.1575914822.git.alistair.francis@wdc.com>
-References: <2389483485d4642a6e5670e2546c62e493e91fd6.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
-Message-ID: <mhng-6814f8b9-d54a-4663-900c-83023307a658@palmerdabbelt-glaptop>
+In-Reply-To: <eecc3f2848d9afa8e640f608bd13112868ca2e5f.1575914822.git.alistair.francis@wdc.com>
+References: <eecc3f2848d9afa8e640f608bd13112868ca2e5f.1575914822.git.alistair.francis@wdc.com><cover.1575914822.git.alistair.francis@wdc.com>
+Message-ID: <mhng-d8e48454-f32d-4bff-8601-38ad43e83134@palmerdabbelt-glaptop>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,62 +102,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 09 Dec 2019 10:11:32 PST (-0800), Alistair Francis wrote:
+On Mon, 09 Dec 2019 10:11:30 PST (-0800), Alistair Francis wrote:
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  target/riscv/cpu_helper.c | 33 ++++++++++++++++++++++++++++-----
->  1 file changed, 28 insertions(+), 5 deletions(-)
+>  target/riscv/csr.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 >
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 63439c9370..85eed5d885 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -37,13 +37,36 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
->  #ifndef CONFIG_USER_ONLY
->  static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 54edfb280e..d028dfb60b 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -744,8 +744,19 @@ static int write_sbadaddr(CPURISCVState *env, int csrno, target_ulong val)
+>  static int rmw_sip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>                     target_ulong new_value, target_ulong write_mask)
 >  {
-> +    target_ulong irqs;
-> +
->      target_ulong mstatus_mie = get_field(*env->mstatus, MSTATUS_MIE);
->      target_ulong mstatus_sie = get_field(*env->mstatus, MSTATUS_SIE);
-> -    target_ulong pending = env->mip & env->mie;
-> -    target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
-> -    target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
-> -    target_ulong irqs = (pending & ~env->mideleg & -mie) |
-> -                        (pending &  env->mideleg & -sie);
-> +    target_ulong hs_mstatus_sie = get_field(env->mstatus_novirt, MSTATUS_SIE);
-> +
-> +    target_ulong pending = env->mip & env->mie &
-> +                               ~(MIP_VSSIP | MIP_VSTIP | MIP_VSEIP);
-> +    target_ulong vspending = (env->mip & env->mie &
-> +                              (MIP_VSSIP | MIP_VSTIP | MIP_VSEIP)) >> 1;
-> +
-> +    target_ulong mie    = env->priv < PRV_M ||
-> +                          (env->priv == PRV_M && mstatus_mie);
-> +    target_ulong sie    = env->priv < PRV_S ||
-> +                          (env->priv == PRV_S && mstatus_sie);
-> +    target_ulong hs_sie = env->priv < PRV_S ||
-> +                          (env->priv == PRV_S && hs_mstatus_sie);
+> -    int ret = rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+> +    int ret;
 > +
 > +    if (riscv_cpu_virt_enabled(env)) {
-> +        target_ulong pending_hs_irq = pending & -hs_sie;
-> +
-> +        if (pending_hs_irq) {
-> +            riscv_cpu_set_force_hs_excep(env, FORCE_HS_EXCEP);
-> +            return ctz64(pending_hs_irq);
-> +        }
-> +
-> +        pending = vspending;
+> +        /* Shift the new values to line up with the VS bits */
+> +        ret = rmw_mip(env, CSR_MSTATUS, ret_value, new_value << 1,
+> +                      (write_mask & sip_writable_mask) << 1 & env->mideleg);
+> +        ret &= vsip_writable_mask;
+> +        ret >>= 1;
+> +    } else {
+> +        ret = rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+>                        write_mask & env->mideleg & sip_writable_mask);
 > +    }
 > +
-> +    irqs = (pending & ~env->mideleg & -mie) | (pending &  env->mideleg & -sie);
-
-Isn't "-unsigned" implementation defined?  I can't get GCC to throw a warning
-and it was already there, so maybe I'm just wrong?
-
->
->      if (irqs) {
->          return ctz64(irqs); /* since non-zero */
+>      *ret_value &= env->mideleg;
+>      return ret;
+>  }
 
 Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
 
