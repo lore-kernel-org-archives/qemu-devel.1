@@ -2,87 +2,75 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63E7C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 21:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 704FDC282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 23:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACEF72082E
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 21:29:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oUzRlCcp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACEF72082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43B01206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 23:02:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43B01206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq1qk-0008NL-RC
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 16:29:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47145)
+	id 1iq3I5-0006tj-Bu
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 18:02:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shorne@gmail.com>) id 1iq1q1-0007vl-3p
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 16:29:02 -0500
+ (envelope-from <bounces@canonical.com>) id 1iq3Gl-0006R4-Oe
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 18:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shorne@gmail.com>) id 1iq1q0-0002iO-7H
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 16:29:01 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:32778)
+ (envelope-from <bounces@canonical.com>) id 1iq3Gk-00024t-Ak
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 18:00:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41460)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <shorne@gmail.com>) id 1iq1q0-0002eB-0x
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 16:29:00 -0500
-Received: by mail-pg1-x543.google.com with SMTP id 6so1589369pgk.0
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 13:28:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8AYg1chBm/3+FdlYUxpXHIjfTe3u4FtxJXy2WDGRSv0=;
- b=oUzRlCcp9bapiiBOvv8ocnZ7YGsSBlylxyyJlqWy1HsDqNyZikoLtMlcC7NFaskXRj
- knq0IiYuXVie7+effr89POiismv9xYptzvDwiDQCqVXiy9M+J/kuz9A0VL42nNtjbWuy
- gBdHXMFOyYiTUMXnaOE5AbAwbRshwSsPxJPJ3SouKfvWJnl4Ch6t2pXDQONiaDK2Tz39
- W8yWFA5qPUC3Pxtuba4t02szOGqBlJmE6k4bMmt05J8rXwo5oRb/u0dWVpFEwvWxijw7
- jVqyiEj5DIqMmpxzWnm62mIGAgBaciI8W1Uma3Mp0StjS8s4AhWfZBBffH2CBgqm4B/L
- AtSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=8AYg1chBm/3+FdlYUxpXHIjfTe3u4FtxJXy2WDGRSv0=;
- b=f/LYWHDnAuzMwqGldZJ7gCMUFApWJEovN3aMOBDOvMlmJIE4VFzj2VD9Z+xtVsGfse
- vRymisVkD8coQgzDbId0k5tnDQJgaOuKRgYq8oLOAkvfqL69Mjm6Rh72lg297yOGC5za
- aL8ymfpVqf8g2tEk0zSnIYuvJYRBtiYHNQ/n0tgOsK5NCm+ywrmvOIwStEbhGT7XWYmH
- aHBFkwS2K9+gbUhPA9rne2G/Pogk9T63av7JNeh30WhDM3pNWZAg9iv/ecbotUW9+GoE
- xU3Miv/USZbsn6kXu6vOYlMnBkmdpaMOgmL4/kkv67T4v7QWDS25EjMskLAcPaRYB3tv
- nONw==
-X-Gm-Message-State: APjAAAUj06KDK98T+jCpOzx1UbTGDUMKJdy45AjujicWBrNB2XQeQCdm
- 6GINHArGcgRIYR3cU/6DQo0=
-X-Google-Smtp-Source: APXvYqzsmjduJWm5gR220qr+f42GOU9/Q7VRiDq1q8hwPme4QfIqP9EsSg9E5kIyu0XllZpLC1aU0A==
-X-Received: by 2002:a63:4b52:: with SMTP id k18mr6659855pgl.371.1578691736954; 
- Fri, 10 Jan 2020 13:28:56 -0800 (PST)
-Received: from localhost (g52.222-224-164.ppp.wakwak.ne.jp. [222.224.164.52])
- by smtp.gmail.com with ESMTPSA id
- u1sm3844581pfn.133.2020.01.10.13.28.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Jan 2020 13:28:56 -0800 (PST)
-From: Stafford Horne <shorne@gmail.com>
-To: shorne@gmail.com
-Subject: [PATCH] target/openrisc: Fix FPCSR mask to allow setting DZF
-Date: Sat, 11 Jan 2020 06:28:43 +0900
-Message-Id: <20200110212843.27335-1-shorne@gmail.com>
-X-Mailer: git-send-email 2.21.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iq3Gk-0001yG-3Q
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 18:00:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iq3Gi-0006FK-3d
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 23:00:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C09C42E80C8
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 23:00:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Jan 2020 22:53:27 -0000
+From: ecsdn <1856834@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
+X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
+X-Launchpad-Bug-Modifier: ecsdn (ecsdn)
+References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
+Message-Id: <157869680729.5587.5210771039615077297.malone@gac.canonical.com>
+Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
+ versions
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ba2fb0f49547378b0549b17de77e7fb1659e5cf0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,38 +79,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Openrisc <openrisc@lists.librecores.org>,
- QEMU Development <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The mask used when setting FPCSR allows setting bits 10 to 1.  However,
-OpenRISC has flags and config bits in 11 to 1, 11 being Divide by Zero
-Flag (DZF).  This seems like an off-by-one bug.
+Sorry for the delay, I have sent you a private message/email with the
+actual kernel image. thx!
 
-This was found when testing the GLIBC test suite which has test cases to
-set and clear all bits.
+-- =
 
-Signed-off-by: Stafford Horne <shorne@gmail.com>
----
- target/openrisc/fpu_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856834
 
-diff --git a/target/openrisc/fpu_helper.c b/target/openrisc/fpu_helper.c
-index 59e1413279..6f75ea0505 100644
---- a/target/openrisc/fpu_helper.c
-+++ b/target/openrisc/fpu_helper.c
-@@ -70,7 +70,7 @@ void cpu_set_fpcsr(CPUOpenRISCState *env, uint32_t val)
-         float_round_down
-     };
- 
--    env->fpcsr = val & 0x7ff;
-+    env->fpcsr = val & 0xfff;
-     set_float_rounding_mode(rm_to_sf[extract32(val, 1, 2)], &env->fp_status);
- }
- 
--- 
-2.21.0
+Title:
+  Virtio broken in qemu ppc in 4.2.0 and other versions
 
+Status in QEMU:
+  New
+
+Bug description:
+  The same qemu -M mpc... command that works on qemu-system-ppc version
+  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
+  version 4.2.0release and 4.19dirtygit:
+
+  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
+ccel kvm is set.
+  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
+e (slower).
+
+  ends/freezes at:
+  nbd: registered device at major 43
+  =C2=A0vda:
+
+  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
+  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
+  with 2.8.0 official release from git/github that I compiled/built
+  myself. But both of the newer releases fail on the same exact machine
+  same config.
+
+  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
+ed weren't, ie gave
+  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
+bus=3D0,unit=3D0
+  (but I removed -drive if=3Dmtd since wasn't using it anyway)
+
+  I also tried on windows but I think virtio doesn't work on windows
+  hosts at all? On windows host it fails the same way, even version 2.12
+  as well as 4.1.10...
+
+  used:
+  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
+
+  (basically all steps the same on same exact system same config, yet
+  2.8.0 works fine whether apt-get installed or built from source while
+  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
+
+  In case newer qemu versions act weird on various kernels, I did try with =
+both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
+ compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
+_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
+ich is why I can't use -M ppce500 instead..)
+  tx
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
