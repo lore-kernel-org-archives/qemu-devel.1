@@ -2,84 +2,100 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D534C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A794C33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:35:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15DC820721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C480120721
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:35:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzU5zP+X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15DC820721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRfX0JoE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C480120721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipqdV-0006et-4p
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 04:31:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40812)
+	id 1ipqhN-0002c0-Ty
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 04:35:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ipqcV-0005zw-Em
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:30:21 -0500
+ (envelope-from <philmd@redhat.com>) id 1ipqgQ-0001Sr-Fz
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:34:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ipqcR-0002RV-LU
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:30:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45548
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ipqgP-0000CX-83
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:34:22 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33756
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ipqcR-0002MJ-78
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:30:15 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ipqgP-00008M-4I
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:34:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578648614;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1578648860;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WaMD6NyDwQ5Yb+FqlXoIzVL7wK8YRC2cTZn6U6QC7HQ=;
- b=bzU5zP+XDrjQs443BlIJT8TYHxEFLbVakaD60kMzLv0Nf6COaU3BVFiZD14TPNSWBidfOY
- KZT1FbYIZeay40kW7kyArUORcqGkMKkN4ahRBHWBr6aWC+NI+Q9CEP7TfQvTqVYq2SNfF/
- 9rX6CLFpdzcep+nV1VXBqllIwwD6gqQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-DjoSFZ1MNs-n0nWA9c1hRw-1; Fri, 10 Jan 2020 04:30:12 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E81CB800D53
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 09:30:11 +0000 (UTC)
-Received: from redhat.com (ovpn-112-65.ams2.redhat.com [10.36.112.65])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE749277B9;
- Fri, 10 Jan 2020 09:30:07 +0000 (UTC)
-Date: Fri, 10 Jan 2020 09:30:04 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 092/104] virtiofsd: add man page
-Message-ID: <20200110093004.GB3423494@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-93-dgilbert@redhat.com>
- <20200107121328.GD3368802@redhat.com>
- <20200109200213.GT6795@work-vm>
+ bh=9lo5GOumNC3bhWoq4aYS5JXPKfb57srj1k4SZXdFFkk=;
+ b=gRfX0JoE/k8atlGSokr0MuacpQ/sTh81FA/vq/vQX7zTwKptpicSzb6LFqifjbrlv1abk0
+ uF/n07Bxo0cmim2u5j8IVLCSKZa7ItxOl0O3IW7wjioidQuHT8z8+/2UnygX5boZFyPyXA
+ FmzVD7xovonTeRHy5DkPdnLDvDZevkw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-339-k51Yc4dlNkGSP6e28jZXlw-1; Fri, 10 Jan 2020 04:34:16 -0500
+Received: by mail-wr1-f70.google.com with SMTP id j4so644935wrs.13
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 01:34:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ukap/D6uM+tm5XLlP0CcTaHbFa/qulLkLeaGy/Fleuc=;
+ b=DWnabvDO16QalwNOrXiHzgXzr+Uz7YeklYnA1kqV0sXbhVe41i9yTTDabmaFtU50zj
+ NtthbZWZ45Lw96ZicBlBodfOADOtIry/0zzx+6kLmF7ayHGgclJGZ8k/BikZ8TAuPdig
+ nAjUdgEUQpV2ebTn8b4ZUh7zj6r4Zr9vxZZDu2gS899xAmbY6CosFsiGKkkXfqw1M4Xd
+ 2a2/XdsDpUWOYZfS7bytoflZhKH1ee1LBwfm8lgqcjIoQFzE7rwCcANGC58VF2QhH838
+ LAA9KTWRfi9eTG5ugH+NbqhK1lYff/P/yPVPJtWYgO5KH7yAvOwkz8HecNR0aLozCCOA
+ NqdQ==
+X-Gm-Message-State: APjAAAU2w/Yh2zE7IZyHNukDR9EPa37b7crV3nH0i6zKOB8dFyONlD4L
+ qRGfNpnJGu1XmEIISZ5HfEh4tNfJXAhjFJ2SxT8LCovWwEJwtKW02I+4P/Q5TxCRAf0fy5ceLcr
+ b1TWTTz2jEdAS5sQ=
+X-Received: by 2002:adf:f789:: with SMTP id q9mr2461820wrp.103.1578648855163; 
+ Fri, 10 Jan 2020 01:34:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw60eNDeSeLZaK+zXZdsmOGqFEjjGKDrKCuXrKR/uyM92hpU/dvYO081Du7NvMHfdLGnlYFEA==
+X-Received: by 2002:adf:f789:: with SMTP id q9mr2461773wrp.103.1578648854833; 
+ Fri, 10 Jan 2020 01:34:14 -0800 (PST)
+Received: from [10.101.1.81] ([176.12.107.132])
+ by smtp.gmail.com with ESMTPSA id v3sm1510233wru.32.2020.01.10.01.34.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Jan 2020 01:34:14 -0800 (PST)
+Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
+ single switch case
+To: Greg Kurz <groug@kaod.org>
+References: <20200109152133.23649-1-philmd@redhat.com>
+ <20200109152133.23649-5-philmd@redhat.com>
+ <20200109184349.1aefa074@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <9870f8ed-3fa0-1deb-860d-7481cb3db556@redhat.com>
+Date: Fri, 10 Jan 2020 10:34:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20200109200213.GT6795@work-vm>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: DjoSFZ1MNs-n0nWA9c1hRw-1
+In-Reply-To: <20200109184349.1aefa074@bahia.lan>
+Content-Language: en-US
+X-MC-Unique: k51Yc4dlNkGSP6e28jZXlw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,212 +107,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 09, 2020 at 08:02:13PM +0000, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Thu, Dec 12, 2019 at 04:38:52PM +0000, Dr. David Alan Gilbert (git) =
-wrote:
-> > > From: Stefan Hajnoczi <stefanha@redhat.com>
-> > >=20
-> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > > ---
-> > >  Makefile                       |  7 +++
-> > >  tools/virtiofsd/virtiofsd.texi | 85 ++++++++++++++++++++++++++++++++=
-++
-> > >  2 files changed, 92 insertions(+)
-> > >  create mode 100644 tools/virtiofsd/virtiofsd.texi
-> >=20
-> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 1/9/20 6:43 PM, Greg Kurz wrote:
+> On Thu,  9 Jan 2020 16:21:22 +0100
+> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 >=20
-> Thanks.
+>> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
+>> case, restrict their scope to avoid unnecessary initialization.
+>>
 >=20
-> > with some notes at the very end
->=20
-> <snip>
->=20
-> > > +@c man begin DESCRIPTION
-> > > +
-> > > +Share a host directory tree with a guest through a virtio-fs device.=
-  This
-> > > +program is a vhost-user backend that implements the virtio-fs device=
-.  Each
-> > > +virtio-fs device instance requires its own virtiofsd process.
-> > > +
-> > > +This program is designed to work with QEMU's @code{--device vhost-us=
-er-fs-pci}
-> > > +but should work with any virtual machine monitor (VMM) that supports
-> > > +vhost-user.  See the EXAMPLES section below.
-> > > +
-> > > +This program must be run as the root user.
-> >=20
-> > So there's no way for an unprivileged user to do file sharing like they
-> > can with 9p right now ?
->=20
-> Correct.
->=20
-> (Which also makes it a pain for using in a make check)
->=20
-> > >                                              Upon startup the program=
- will
-> > > +switch into a new file system namespace with the shared directory tr=
-ee as its
-> > > +root.  This prevents "file system escapes" due to symlinks and other=
- file
-> > > +system objects that might lead to files outside the shared directory=
-.  The
-> > > +program also sandboxes itself using seccomp(2) to prevent ptrace(2) =
-and other
-> > > +vectors that could allow an attacker to compromise the system after =
-gaining
-> > > +control of the virtiofsd process.
-> > > +
-> > > +@c man end
-> > > +
-> > > +@c man begin OPTIONS
-> > > +@table @option
-> > > +@item -h, --help
-> > > +Print help.
-> > > +@item -V, --version
-> > > +Print version.
-> > > +@item -d, -o debug
-> > > +Enable debug output.
-> > > +@item --syslog
-> > > +Print log messages to syslog instead of stderr.
-> > > +@item -o log_level=3D@var{level}
-> > > +Print only log messages matching @var{level} or more severe.  @var{l=
-evel} is
-> > > +one of @code{err}, @code{warn}, @code{info}, or @code{debug}.  The d=
-efault is
-> > > +@var{info}.
-> > > +@item -o source=3D@var{path}
-> > > +Share host directory tree located at @var{path}.  This option is req=
-uired.
-> > > +@item --socket-path=3D@var{path}, -o vhost_user_socket=3D@var{path}
-> > > +Listen on vhost-user UNIX domain socket at @var{path}.
-> > > +@item --fd=3D@var{fdnum}
-> > > +Accept connections from vhost-user UNIX domain socket file descripto=
-r @var{fdnum}.  The file descriptor must already be listening for connectio=
-ns.
-> > > +@item --thread-pool-size=3D@var{num}
-> > > +Restrict the number of worker threads per request queue to @var{num}=
-.  The default is 64.
-> > > +@item --cache=3D@code{none}|@code{auto}|@code{always}
-> > > +Select the desired trade-off between coherency and performance.  @co=
-de{none}
-> > > +forbids the FUSE client from caching to achieve best coherency at th=
-e cost of
-> > > +performance.  @code{auto} acts similar to NFS with a 1 second metada=
-ta cache
-> > > +timeout.  @code{always} sets a long cache lifetime at the expense of=
- coherency.
-> > > +@item --writeback
-> > > +Enable writeback cache, allowing the FUSE client to buffer and merge=
- write requests.
-> > > +@end table
-> > > +@c man end
-> > > +
-> > > +@c man begin EXAMPLES
-> > > +Export @code{/var/lib/fs/vm001/} on vhost-user UNIX domain socket @c=
-ode{/var/run/vm001-vhost-fs.sock}:
-> > > +
-> > > +@example
-> > > +host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o sour=
-ce=3D/var/lib/fs/vm001
-> > > +host# qemu-system-x86_64 \
-> > > +    -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
-> > > +    -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
-> > > +    -object memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/s=
-hm,share=3Don \
-> > > +    -numa node,memdev=3Dmem \
-> > > +    ...
-> > > +guest# mount -t virtio_fs \
-> > > +    -o default_permissions,allow_other,user_id=3D0,group_id=3D0,root=
-mode=3D040000,dax \
-> > > +    myfs /mnt
-> > > +@end example
-> > > +@c man end
-> > > +
-> > > +@ignore
-> > > +@setfilename virtiofsd
-> > > +@settitle QEMU virtio-fs shared file system daemon
-> > > +
-> > > +@c man begin AUTHOR
-> >=20
-> > s/AUTHOR/COPYRIGHT/
->=20
-> OK
->=20
-> > since this isn't providing any author information.
-> >=20
-> > > +Copyright (C) 2019 Red Hat, Inc.
-> >=20
-> > 2019-2020 !
->=20
-> Time flies...
->=20
-> > And now insert
-> >=20
-> >  @c man end
-> >  @c man begin LICENSE
-> >=20
-> > > +This is free software; see the source for copying conditions.  There=
- is NO
-> > > +warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR P=
-URPOSE.
-> > > +@c man end
-> > > +@end ignore
->=20
-> Hmm, so it ends up like:
->=20
->=20
-> @c man end
->=20
-> @ignore
-> @setfilename virtiofsd
-> @settitle QEMU virtio-fs shared file system daemon
->=20
-> @c man begin COPYRIGHT
-> Copyright (C) 2019-2020 Red Hat, Inc.
-> @c man end
-> @c man begin LICENSE
-> This is free software; see the source for copying conditions.  There is N=
-O
-> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-> @c man end
-> @end ignore
->=20
->=20
-> That results in:
->=20
-> COPYRIGHT
->        Copyright (C) 2019-2020 Red Hat, Inc.
->=20
-> but with no license printed.
-> That's from after a make doing a   nroff -man ./tools/virtiofsd/virtiofsd=
-.1 |more
->=20
-> is that what's expected?  I'd expected to see the license somewhere.
+> I guess a decent compiler can be smart enough detect that the initializat=
+ion
+> isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branch...
+> Anyway, reducing scope isn't bad. The only hitch I could see is that some
+> people do prefer to have all variables declared upfront, but there's a ne=
+sted
+> param_val variable already so I guess it's okay.
 
-No, that's not expected :-(  It seems my good intentions were killed by
-texi2pod.pl which whitelists the permitted section names, and does not
-allow "LICENSE" as one of them. Either ignore my suggestion, given that
-this bug is pre-existing in all QEMU man pages, or fix texi2pod.pl to
-allow LICENSE.
+I don't want to outsmart compilers :)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+The MACHINE() macro is not a simple cast, it does object introspection=20
+with OBJECT_CHECK(), thus is not free. Since=20
+object_dynamic_cast_assert() argument is not const, I'm not sure the=20
+compiler can remove the call.
+
+Richard, Eric, do you know?
+
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>   hw/ppc/spapr_rtas.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index 6f06e9d7fe..7237e5ebf2 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -267,8 +267,6 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU=
+ *cpu,
+>>                                             uint32_t nret, target_ulong =
+rets)
+>>   {
+>>       PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>> -    MachineState *ms =3D MACHINE(spapr);
+>> -    unsigned int max_cpus =3D ms->smp.max_cpus;
+>>       target_ulong parameter =3D rtas_ld(args, 0);
+>>       target_ulong buffer =3D rtas_ld(args, 1);
+>>       target_ulong length =3D rtas_ld(args, 2);
+>> @@ -276,6 +274,8 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU=
+ *cpu,
+>>  =20
+>>       switch (parameter) {
+>>       case RTAS_SYSPARM_SPLPAR_CHARACTERISTICS: {
+>> +        MachineState *ms =3D MACHINE(spapr);
+>> +        unsigned int max_cpus =3D ms->smp.max_cpus;
+>=20
+> The max_cpus variable used to be a global. Now that it got moved
+> below ms->smp, I'm not sure it's worth keeping it IMHO. What about
+> dropping it completely and do:
+>=20
+>          char *param_val =3D g_strdup_printf("MaxEntCap=3D%d,"
+>                                            "DesMem=3D%" PRIu64 ","
+>                                            "DesProcs=3D%d,"
+>                                            "MaxPlatProcs=3D%d",
+>                                            ms->smp.max_cpus,
+>                                            current_machine->ram_size / Mi=
+B,
+>                                            ms->smp.cpus,
+>                                            ms->smp.max_cpus);
+
+OK, good idea.
+
+> And maybe insert an empty line between the declaration of param_val
+> and the code for a better readability ?
+>=20
+>>           char *param_val =3D g_strdup_printf("MaxEntCap=3D%d,"
+>>                                             "DesMem=3D%" PRIu64 ","
+>>                                             "DesProcs=3D%d,"
+>=20
 
 
