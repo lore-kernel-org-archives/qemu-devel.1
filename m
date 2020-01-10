@@ -2,81 +2,84 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F00C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D534C33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF2DD20721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15DC820721
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:31:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="EFjv9OHy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF2DD20721
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzU5zP+X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15DC820721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipqW1-0001YU-0E
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 04:23:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52709)
+	id 1ipqdV-0006et-4p
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 04:31:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shihpo.hung@sifive.com>) id 1ipqFR-0004wX-33
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:06:30 -0500
+ (envelope-from <berrange@redhat.com>) id 1ipqcV-0005zw-Em
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:30:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shihpo.hung@sifive.com>) id 1ipqFP-0006Ra-HL
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:06:29 -0500
-Received: from mail-pj1-x1036.google.com ([2607:f8b0:4864:20::1036]:55203)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <shihpo.hung@sifive.com>)
- id 1ipqFP-0006MW-Al
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:06:27 -0500
-Received: by mail-pj1-x1036.google.com with SMTP id kx11so700207pjb.4
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 01:06:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=WNQK8xx9OatJlEQCfvIXjtQBv2x8XXmBGEeoU6AnPS8=;
- b=EFjv9OHyELGhF5BYK6P212Lz3lrwN8WTQyhklTCR/UOxDKIed3KT4Jvjg0XTtuSOPC
- vIWZj2KKeW37Ed62auDdYVmP9G14xg/NKbV4csjczVZRDLxd/rUlanAAViDVqo5dsUg6
- fYs+T7Yvl+at+qxeia8/HmN+Vo7XupVJPPqFDjFVBA7KEj5pqi29ycSYLZHQWuGFIBEO
- Gf/GQQWBqdhpZK85oP+r5f93t0c+qNJsVDx0tPojXs/QGqTbiz1OvV2JlS7nt6fJLbVh
- ReVtISALg7gnYuUEo8qSm/wKR/HWY7bO28IaHONE1JjVVjy6V30xCAhmY/02q9q8nTC7
- StfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=WNQK8xx9OatJlEQCfvIXjtQBv2x8XXmBGEeoU6AnPS8=;
- b=GAO6m3MHb+loUqz1tuQJIj3IDCilEpeo8QsFPpukUNwypIH5oDjUwKXPRdpybMlvlx
- 0j7qus+zDteG5PXuc3Ubl0L+FOyTZUO+J5Hr3F7RidzaqX4/OYq+wKP17FeRiptVnt2Y
- zyDHELevqE0AE/siAGYldkbQ6nunyYJ+Mv3pKWN8PEX9N+fi8oAlizY/woLjEgvxjSVS
- 9dctuydiCSiThset28WQ9Ss4TfnzeggG2L0UCB+ZWvdWDK8j3JBto7YGeeoAYh8RC6zk
- Lne42zAwfpLOarAXCIcT0strwVG1htZXXh1Sxk8T2YFQ1A7fTcK6uJb9wOgyKDCYcZvS
- bKag==
-X-Gm-Message-State: APjAAAXWc4K11TdbwWEoNLVXFM1IKeE4ebJKokVPuDf8sAqHUiMstKOF
- 2Oy7d4qSj7aCAcOvUP3NYJiMbR7LnzFnD7wX
-X-Google-Smtp-Source: APXvYqzDvfvy07yaQ1SP7kTpRz/RUZGOqz4fO5g1VM37G/Xg9lfewIi2rsya9s2pzVe6UycGl7EjGw==
-X-Received: by 2002:a17:90a:ba07:: with SMTP id
- s7mr3399547pjr.75.1578647185671; 
- Fri, 10 Jan 2020 01:06:25 -0800 (PST)
-Received: from gamma05.internal.sifive.com ([64.62.193.194])
- by smtp.gmail.com with ESMTPSA id h126sm2123220pfe.19.2020.01.10.01.06.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Fri, 10 Jan 2020 01:06:25 -0800 (PST)
-From: shihpo.hung@sifive.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/riscv: Set mstatus.DS & FS correctly
-Date: Fri, 10 Jan 2020 01:05:34 -0800
-Message-Id: <1578647134-13216-1-git-send-email-shihpo.hung@sifive.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1036
-X-Mailman-Approved-At: Fri, 10 Jan 2020 04:20:35 -0500
+ (envelope-from <berrange@redhat.com>) id 1ipqcR-0002RV-LU
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:30:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45548
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ipqcR-0002MJ-78
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:30:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578648614;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WaMD6NyDwQ5Yb+FqlXoIzVL7wK8YRC2cTZn6U6QC7HQ=;
+ b=bzU5zP+XDrjQs443BlIJT8TYHxEFLbVakaD60kMzLv0Nf6COaU3BVFiZD14TPNSWBidfOY
+ KZT1FbYIZeay40kW7kyArUORcqGkMKkN4ahRBHWBr6aWC+NI+Q9CEP7TfQvTqVYq2SNfF/
+ 9rX6CLFpdzcep+nV1VXBqllIwwD6gqQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-DjoSFZ1MNs-n0nWA9c1hRw-1; Fri, 10 Jan 2020 04:30:12 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E81CB800D53
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 09:30:11 +0000 (UTC)
+Received: from redhat.com (ovpn-112-65.ams2.redhat.com [10.36.112.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DE749277B9;
+ Fri, 10 Jan 2020 09:30:07 +0000 (UTC)
+Date: Fri, 10 Jan 2020 09:30:04 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 092/104] virtiofsd: add man page
+Message-ID: <20200110093004.GB3423494@redhat.com>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-93-dgilbert@redhat.com>
+ <20200107121328.GD3368802@redhat.com>
+ <20200109200213.GT6795@work-vm>
+MIME-Version: 1.0
+In-Reply-To: <20200109200213.GT6795@work-vm>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: DjoSFZ1MNs-n0nWA9c1hRw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,95 +91,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- ShihPo Hung <shihpo.hung@sifive.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It was found that running libquantum on riscv-linux qemu produced an
-incorrect result. After investigation, FP registers are not saved
-during context switch due to incorrect mstatus.FS.
+On Thu, Jan 09, 2020 at 08:02:13PM +0000, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > On Thu, Dec 12, 2019 at 04:38:52PM +0000, Dr. David Alan Gilbert (git) =
+wrote:
+> > > From: Stefan Hajnoczi <stefanha@redhat.com>
+> > >=20
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > ---
+> > >  Makefile                       |  7 +++
+> > >  tools/virtiofsd/virtiofsd.texi | 85 ++++++++++++++++++++++++++++++++=
+++
+> > >  2 files changed, 92 insertions(+)
+> > >  create mode 100644 tools/virtiofsd/virtiofsd.texi
+> >=20
+> > Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>=20
+> Thanks.
+>=20
+> > with some notes at the very end
+>=20
+> <snip>
+>=20
+> > > +@c man begin DESCRIPTION
+> > > +
+> > > +Share a host directory tree with a guest through a virtio-fs device.=
+  This
+> > > +program is a vhost-user backend that implements the virtio-fs device=
+.  Each
+> > > +virtio-fs device instance requires its own virtiofsd process.
+> > > +
+> > > +This program is designed to work with QEMU's @code{--device vhost-us=
+er-fs-pci}
+> > > +but should work with any virtual machine monitor (VMM) that supports
+> > > +vhost-user.  See the EXAMPLES section below.
+> > > +
+> > > +This program must be run as the root user.
+> >=20
+> > So there's no way for an unprivileged user to do file sharing like they
+> > can with 9p right now ?
+>=20
+> Correct.
+>=20
+> (Which also makes it a pain for using in a make check)
+>=20
+> > >                                              Upon startup the program=
+ will
+> > > +switch into a new file system namespace with the shared directory tr=
+ee as its
+> > > +root.  This prevents "file system escapes" due to symlinks and other=
+ file
+> > > +system objects that might lead to files outside the shared directory=
+.  The
+> > > +program also sandboxes itself using seccomp(2) to prevent ptrace(2) =
+and other
+> > > +vectors that could allow an attacker to compromise the system after =
+gaining
+> > > +control of the virtiofsd process.
+> > > +
+> > > +@c man end
+> > > +
+> > > +@c man begin OPTIONS
+> > > +@table @option
+> > > +@item -h, --help
+> > > +Print help.
+> > > +@item -V, --version
+> > > +Print version.
+> > > +@item -d, -o debug
+> > > +Enable debug output.
+> > > +@item --syslog
+> > > +Print log messages to syslog instead of stderr.
+> > > +@item -o log_level=3D@var{level}
+> > > +Print only log messages matching @var{level} or more severe.  @var{l=
+evel} is
+> > > +one of @code{err}, @code{warn}, @code{info}, or @code{debug}.  The d=
+efault is
+> > > +@var{info}.
+> > > +@item -o source=3D@var{path}
+> > > +Share host directory tree located at @var{path}.  This option is req=
+uired.
+> > > +@item --socket-path=3D@var{path}, -o vhost_user_socket=3D@var{path}
+> > > +Listen on vhost-user UNIX domain socket at @var{path}.
+> > > +@item --fd=3D@var{fdnum}
+> > > +Accept connections from vhost-user UNIX domain socket file descripto=
+r @var{fdnum}.  The file descriptor must already be listening for connectio=
+ns.
+> > > +@item --thread-pool-size=3D@var{num}
+> > > +Restrict the number of worker threads per request queue to @var{num}=
+.  The default is 64.
+> > > +@item --cache=3D@code{none}|@code{auto}|@code{always}
+> > > +Select the desired trade-off between coherency and performance.  @co=
+de{none}
+> > > +forbids the FUSE client from caching to achieve best coherency at th=
+e cost of
+> > > +performance.  @code{auto} acts similar to NFS with a 1 second metada=
+ta cache
+> > > +timeout.  @code{always} sets a long cache lifetime at the expense of=
+ coherency.
+> > > +@item --writeback
+> > > +Enable writeback cache, allowing the FUSE client to buffer and merge=
+ write requests.
+> > > +@end table
+> > > +@c man end
+> > > +
+> > > +@c man begin EXAMPLES
+> > > +Export @code{/var/lib/fs/vm001/} on vhost-user UNIX domain socket @c=
+ode{/var/run/vm001-vhost-fs.sock}:
+> > > +
+> > > +@example
+> > > +host# virtiofsd --socket-path=3D/var/run/vm001-vhost-fs.sock -o sour=
+ce=3D/var/lib/fs/vm001
+> > > +host# qemu-system-x86_64 \
+> > > +    -chardev socket,id=3Dchar0,path=3D/var/run/vm001-vhost-fs.sock \
+> > > +    -device vhost-user-fs-pci,chardev=3Dchar0,tag=3Dmyfs \
+> > > +    -object memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/s=
+hm,share=3Don \
+> > > +    -numa node,memdev=3Dmem \
+> > > +    ...
+> > > +guest# mount -t virtio_fs \
+> > > +    -o default_permissions,allow_other,user_id=3D0,group_id=3D0,root=
+mode=3D040000,dax \
+> > > +    myfs /mnt
+> > > +@end example
+> > > +@c man end
+> > > +
+> > > +@ignore
+> > > +@setfilename virtiofsd
+> > > +@settitle QEMU virtio-fs shared file system daemon
+> > > +
+> > > +@c man begin AUTHOR
+> >=20
+> > s/AUTHOR/COPYRIGHT/
+>=20
+> OK
+>=20
+> > since this isn't providing any author information.
+> >=20
+> > > +Copyright (C) 2019 Red Hat, Inc.
+> >=20
+> > 2019-2020 !
+>=20
+> Time flies...
+>=20
+> > And now insert
+> >=20
+> >  @c man end
+> >  @c man begin LICENSE
+> >=20
+> > > +This is free software; see the source for copying conditions.  There=
+ is NO
+> > > +warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR P=
+URPOSE.
+> > > +@c man end
+> > > +@end ignore
+>=20
+> Hmm, so it ends up like:
+>=20
+>=20
+> @c man end
+>=20
+> @ignore
+> @setfilename virtiofsd
+> @settitle QEMU virtio-fs shared file system daemon
+>=20
+> @c man begin COPYRIGHT
+> Copyright (C) 2019-2020 Red Hat, Inc.
+> @c man end
+> @c man begin LICENSE
+> This is free software; see the source for copying conditions.  There is N=
+O
+> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+> @c man end
+> @end ignore
+>=20
+>=20
+> That results in:
+>=20
+> COPYRIGHT
+>        Copyright (C) 2019-2020 Red Hat, Inc.
+>=20
+> but with no license printed.
+> That's from after a make doing a   nroff -man ./tools/virtiofsd/virtiofsd=
+.1 |more
+>=20
+> is that what's expected?  I'd expected to see the license somewhere.
 
-Because ctx->mstatus_fs changes dynamically during runtime, we should
-remove the mstatus_fs check at the translation stage.
+No, that's not expected :-(  It seems my good intentions were killed by
+texi2pod.pl which whitelists the permitted section names, and does not
+allow "LICENSE" as one of them. Either ignore my suggestion, given that
+this bug is pre-existing in all QEMU man pages, or fix texi2pod.pl to
+allow LICENSE.
 
-Signed-off-by: ShihPo Hung <shihpo.hung@sifive.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: qemu-riscv@nongnu.org
----
- target/riscv/csr.c                      | 3 +--
- target/riscv/insn_trans/trans_rvd.inc.c | 1 -
- target/riscv/insn_trans/trans_rvf.inc.c | 1 -
- target/riscv/translate.c                | 6 +-----
- 4 files changed, 2 insertions(+), 9 deletions(-)
-
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index da02f9f..0e34c29 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -341,8 +341,7 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
- 
-     mstatus = (mstatus & ~mask) | (val & mask);
- 
--    dirty = (riscv_cpu_fp_enabled(env) &&
--             ((mstatus & MSTATUS_FS) == MSTATUS_FS)) |
-+    dirty = ((mstatus & MSTATUS_FS) == MSTATUS_FS) |
-             ((mstatus & MSTATUS_XS) == MSTATUS_XS);
-     mstatus = set_field(mstatus, MSTATUS_SD, dirty);
-     env->mstatus = mstatus;
-diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
-index 393fa02..ea1044f 100644
---- a/target/riscv/insn_trans/trans_rvd.inc.c
-+++ b/target/riscv/insn_trans/trans_rvd.inc.c
-@@ -43,7 +43,6 @@ static bool trans_fsd(DisasContext *ctx, arg_fsd *a)
- 
-     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEQ);
- 
--    mark_fs_dirty(ctx);
-     tcg_temp_free(t0);
-     return true;
- }
-diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-index 172dbfa..e23cd63 100644
---- a/target/riscv/insn_trans/trans_rvf.inc.c
-+++ b/target/riscv/insn_trans/trans_rvf.inc.c
-@@ -52,7 +52,6 @@ static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
-     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
- 
-     tcg_temp_free(t0);
--    mark_fs_dirty(ctx);
-     return true;
- }
- 
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index ab6a891..4ef7300 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -386,15 +386,11 @@ static void gen_store_c(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
- static void mark_fs_dirty(DisasContext *ctx)
- {
-     TCGv tmp;
--    if (ctx->mstatus_fs == MSTATUS_FS) {
--        return;
--    }
--    /* Remember the state change for the rest of the TB.  */
--    ctx->mstatus_fs = MSTATUS_FS;
- 
-     tmp = tcg_temp_new();
-     tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
-     tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS);
-+    tcg_gen_ori_tl(tmp, tmp, MSTATUS_SD);
-     tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
-     tcg_temp_free(tmp);
- }
--- 
-2.7.4
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
