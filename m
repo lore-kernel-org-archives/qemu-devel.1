@@ -2,81 +2,81 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D9AC33C99
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 06:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C194C33C99
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 07:33:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A63FD20673
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 06:55:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5947B2072E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 07:33:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJX5vQeo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A63FD20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CaY9NgW3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5947B2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipoCE-0001rs-OS
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 01:55:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43842)
+	id 1ipona-0000by-Dw
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 02:33:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52605)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1ipoBd-0001Qt-H4
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 01:54:26 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ipomo-0008Jo-Jv
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 02:32:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1ipoBa-0003VB-GE
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 01:54:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33282
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ipoBZ-0003Mn-TD
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 01:54:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578639260;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=R38BXOVaAEhOgu+o4PqIc1O4CDfT01MGqjdZ1FUaPi8=;
- b=UJX5vQeoeERzrrE7DRZkLe1yP0yN1vb/p/BPSJvoPscRku2zfsDkBP7OxxjM+25UGTyUrO
- qZPCyjei8bxmFhlzCBZeqpor9QYaoC8JYhMNpFu+uqkzX0VZXkgz3/nlWxxzSWRqMDAORc
- LvIF092s1WManu1EdXMZI+w8sEPSemA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-3D6qQULoOFuUGXAg2Xe_-w-1; Fri, 10 Jan 2020 01:54:17 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E65210054E3;
- Fri, 10 Jan 2020 06:54:16 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-98.ams2.redhat.com
- [10.36.116.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 301125C1D4;
- Fri, 10 Jan 2020 06:54:16 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6397D31F62; Fri, 10 Jan 2020 07:54:15 +0100 (CET)
-Date: Fri, 10 Jan 2020 07:54:15 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: padmashree mandri <padmashree9107@gmail.com>
-Subject: Re: Audio pace issue with qemu4.2
-Message-ID: <20200110065415.xpdxjzhsgorsastq@sirius.home.kraxel.org>
-References: <CANT-jrJ=oiO23sB9fL86Kowt0rBWijvGBars1euVJQRqJ+72iA@mail.gmail.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ipomn-0006cm-IV
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 02:32:50 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37953)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1ipoml-0006Kc-3S; Fri, 10 Jan 2020 02:32:47 -0500
+Received: by mail-wm1-x344.google.com with SMTP id u2so844837wmc.3;
+ Thu, 09 Jan 2020 23:32:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ZzKvdGhJFsMeICXr3VtgCwst4arqpQnw5AaFK1rrQFo=;
+ b=CaY9NgW3UER3bu3dElS8wzjdwHr00UPBlWVFoS0DJ1oq402wId9NpLSh31wdtTMSho
+ F3IaMgTAcayqRB1xtgID2xTfNNu0BeqSW89AATaZnxqv0N2XNYZOO+1HPd9rrpMhr+LK
+ lKmZrN8Hk9vLR+ChCdSaCPECbf6THHRhsb+N6tvZcaslkvcA/zGvZQ2htIHiqOioCiqI
+ iVCveIKT6TH2UwSOxHvEOOEMzS38MBKTlcOned6fUhRRtRfVIXbU2KYneBr+ZPuIStAY
+ g1nCVLapmEUmw+g9Ao7+ccRTasuASH0DbrEfrJFT+k5m173JYNsethuyB5xk0Oo20iRe
+ PJkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ZzKvdGhJFsMeICXr3VtgCwst4arqpQnw5AaFK1rrQFo=;
+ b=JFhaLF8DBB3BTW44rGVoCBw6IcIeHPy1CCc78XMNbWEwgRVUtX3wzjJWiIhilSX8Ax
+ vuAUxs1dZctyaJsxJQjBzq6+htKRDu7Ienlnn2PuZg+vlAmmd8A+5aC5KqOkJmKjdyVt
+ c/r2ZdVUhMjpTv0MGMx5Xowuew3lcRyQkpAWzHVEYjIR4EtXJNKAFwsIKamBVskTTZbb
+ +Xd4ZYtKwm4F9fSPTrXetItFXWTQ++8RAJmtduXFwFGx5Q5yabsUwcNmX+1xwCUS3JY2
+ obZzFpZ3NVe+Fw6LuSerDEjxkJJAdhQxiDXIukNd2t6YhoAB2YpDloEx2DXxlSrlkmv1
+ qWPw==
+X-Gm-Message-State: APjAAAXI4yD/LoBNk8Ud97m7zP/IODqY3CQ8CLMzWf9QVOZv7s8l54p5
+ zBIflHRREqp0OrqRE+I5rF9gteFLYROCf07TzTk=
+X-Google-Smtp-Source: APXvYqyPwr7jXwt56oDnbUds9OMqDPAyge3mbJIWb6fqMeXvmIxTRpYtauusGl0pUKooZ1Cm4+YYDKr7YvPr5Anu5OQ=
+X-Received: by 2002:a05:600c:2059:: with SMTP id
+ p25mr2465485wmg.161.1578641565696; 
+ Thu, 09 Jan 2020 23:32:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CANT-jrJ=oiO23sB9fL86Kowt0rBWijvGBars1euVJQRqJ+72iA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 3D6qQULoOFuUGXAg2Xe_-w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+References: <20200110031618.23332-1-pannengyuan@huawei.com>
+In-Reply-To: <20200110031618.23332-1-pannengyuan@huawei.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 10 Jan 2020 11:32:32 +0400
+Message-ID: <CAJ+F1CJtpu4ac-v-pTkm3Wc95juicCNsPA5sy6+YyCBgEfc7Qg@mail.gmail.com>
+Subject: Re: [PATCH] vl: Don't mismatch g_strsplit()/g_free()
+To: pannengyuan@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,21 +88,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu trival <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>, QEMU <qemu-devel@nongnu.org>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 10, 2020 at 11:30:24AM +0530, padmashree mandri wrote:
-> Hi all,
->=20
->     I am trying to run qemu4.2 with ALSA. Playback pace is fast. Where ca=
-n
-> i set sampling rate and all parameters related to audio in qemu?
+Hi
 
-https://www.kraxel.org/blog/2020/01/qemu-sound-audiodev/
+On Fri, Jan 10, 2020 at 7:17 AM <pannengyuan@huawei.com> wrote:
+>
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+>
+> It's a mismatch between g_strsplit and g_free, it will cause a memory lea=
+k as follow:
+>
+> [root@localhost]# ./aarch64-softmmu/qemu-system-aarch64 -accel help
+> Accelerators supported in QEMU binary:
+> tcg
+> kvm
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> =3D=3D1207900=3D=3DERROR: LeakSanitizer: detected memory leaks
+>
+> Direct leak of 8 byte(s) in 2 object(s) allocated from:
+>     #0 0xfffd700231cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31c=
+b)
+>     #1 0xfffd6ec57163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+>     #2 0xfffd6ec724d7 in g_strndup (/lib64/libglib-2.0.so.0+0x724d7)
+>     #3 0xfffd6ec73d3f in g_strsplit (/lib64/libglib-2.0.so.0+0x73d3f)
+>     #4 0xaaab66be5077 in main /mnt/sdc/qemu-master/qemu-4.2.0-rc0/vl.c:35=
+17
+>     #5 0xfffd6e140b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+>     #6 0xaaab66bf0f53  (./build/aarch64-softmmu/qemu-system-aarch64+0x8a0=
+f53)
+>
+> Direct leak of 2 byte(s) in 2 object(s) allocated from:
+>     #0 0xfffd700231cb in __interceptor_malloc (/lib64/libasan.so.4+0xd31c=
+b)
+>     #1 0xfffd6ec57163 in g_malloc (/lib64/libglib-2.0.so.0+0x57163)
+>     #2 0xfffd6ec7243b in g_strdup (/lib64/libglib-2.0.so.0+0x7243b)
+>     #3 0xfffd6ec73e6f in g_strsplit (/lib64/libglib-2.0.so.0+0x73e6f)
+>     #4 0xaaab66be5077 in main /mnt/sdc/qemu-master/qemu-4.2.0-rc0/vl.c:35=
+17
+>     #5 0xfffd6e140b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+>     #6 0xaaab66bf0f53  (./build/aarch64-softmmu/qemu-system-aarch64+0x8a0=
+f53)
+>
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 
-HTH,
-  Gerd
+Fixes: cbe6d6365a48bce4526c664170cda6fe738484f8
 
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+> ---
+>  vl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/vl.c b/vl.c
+> index 86474a55c9..2fa5cb3b9a 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3476,7 +3476,7 @@ int main(int argc, char **argv, char **envp)
+>                              gchar **optname =3D g_strsplit(typename,
+>                                                           ACCEL_CLASS_SUF=
+FIX, 0);
+>                              printf("%s\n", optname[0]);
+> -                            g_free(optname);
+> +                            g_strfreev(optname);
+>                          }
+>                          g_free(typename);
+>                      }
+> --
+> 2.21.0.windows.1
+>
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
