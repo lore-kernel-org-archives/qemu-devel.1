@@ -2,79 +2,75 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 905C7C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BBFC33CA4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5963520721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:56:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 506F22072E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:56:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkPJEeaV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5963520721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXT8FW7W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506F22072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipviE-0005yx-3v
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:56:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51775)
+	id 1ipviH-00062d-Ld
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:56:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ipvgN-0003oP-V5
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:41 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipvgF-0003XG-C4
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ipvgM-0004uN-LN
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35006
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ipvgB-0004Ec-Gt
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:30 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31957
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ipvgM-0004rz-Ft
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:38 -0500
+ id 1ipvgB-00048y-5k
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578668078;
+ s=mimecast20190719; t=1578668065;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wIBn80+V74amPBupfe+F9anDq8XfKyQu39ZmejTiR10=;
- b=SkPJEeaVpuM9KafeQH5UEFp02+cn6PF5jLOb6pLIExlqrBT7y+uGAdv9FTks3bYgdJlylV
- vgoQz7YKLiaFHdqDHBZZ2dtmWrD1c/4NDrnZ//XSTnYoME9vrmcT5ceiOwnzMtI3dCenhC
- ALll3Liz/uAHYONxmEjDdguPqbLfQgA=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=VexdPnxBGtP4m5sD088Fr2Z7oIrl6ON5vXnTAqxCkko=;
+ b=bXT8FW7W23colUYzK3Tk5jCRYh4JV1zdnZ+HhZb6aK0AlOczWAO2p4qJQKg0SJw5yJIsVi
+ iiFMcbAOoRArQVfDLz1T00WAPxI1c/lq+8zS9shc01xiV4+rYI22wvWxtBk0q0ah8Zi/p8
+ UnWTpvsVSAJGuEzClHeCLmMIFxvPeQs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-dD7pm_VSNa65W5p0dmyYfQ-1; Fri, 10 Jan 2020 09:54:37 -0500
-X-MC-Unique: dD7pm_VSNa65W5p0dmyYfQ-1
+ us-mta-139-R0oieHwYPCy7edteuUVVHg-1; Fri, 10 Jan 2020 09:54:22 -0500
+X-MC-Unique: R0oieHwYPCy7edteuUVVHg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 705A818B9FF3;
- Fri, 10 Jan 2020 14:54:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A7EA801B3A;
+ Fri, 10 Jan 2020 14:54:20 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 89C577BA5F;
- Fri, 10 Jan 2020 14:54:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A869082475;
+ Fri, 10 Jan 2020 14:54:14 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v2 03/16] arm/arm64: gic: Introduce setup_irq()
- helper
-Date: Fri, 10 Jan 2020 15:53:59 +0100
-Message-Id: <20200110145412.14937-4-eric.auger@redhat.com>
-In-Reply-To: <20200110145412.14937-1-eric.auger@redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 00/16] arm/arm64: Add ITS tests
+Date: Fri, 10 Jan 2020 15:53:56 +0100
+Message-Id: <20200110145412.14937-1-eric.auger@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,102 +88,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ipi_enable() code would be reusable for other interrupts
-than IPI. Let's rename it setup_irq() and pass an interrupt
-handler pointer. We also export it to use it in other tests
-such as the PMU's one.
+This series is a revival of an RFC series sent in Dec 2016 [1].
+Given the amount of code and the lack of traction at that time,
+I haven't respinned until now. However a recent bug found related
+to the ITS migration convinced me that this work may deserve to be
+respinned and enhanced.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/gic.c         | 24 +++---------------------
- lib/arm/asm/gic.h |  3 +++
- lib/arm/gic.c     | 11 +++++++++++
- 3 files changed, 17 insertions(+), 21 deletions(-)
+Tests exercise main ITS commands and also test migration.
+With the migration framework, we are able to trigger the
+migration from guest and that is very practical actually.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index fcf4c1f..ba43ae5 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -215,20 +215,9 @@ static void ipi_test_smp(void)
- 	report_prefix_pop();
- }
-=20
--static void ipi_enable(void)
--{
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_handler);
--#else
--	install_irq_handler(EL1H_IRQ, ipi_handler);
--#endif
--	local_irq_enable();
--}
--
- static void ipi_send(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	wait_on_ready();
- 	ipi_test_self();
- 	ipi_test_smp();
-@@ -238,7 +227,7 @@ static void ipi_send(void)
-=20
- static void ipi_recv(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	cpumask_set_cpu(smp_processor_id(), &ready);
- 	while (1)
- 		wfi();
-@@ -295,14 +284,7 @@ static void ipi_clear_active_handler(struct pt_regs =
-*regs __unused)
- static void run_active_clear_test(void)
- {
- 	report_prefix_push("active");
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
--#else
--	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
--#endif
--	local_irq_enable();
--
-+	setup_irq(ipi_clear_active_handler);
- 	ipi_test_self();
- 	report_prefix_pop();
- }
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 21cdb58..55dd84b 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -82,5 +82,8 @@ void gic_set_irq_target(int irq, int cpu);
- void gic_set_irq_group(int irq, int group);
- int gic_get_irq_group(int irq);
-=20
-+typedef void (*handler_t)(struct pt_regs *regs __unused);
-+extern void setup_irq(handler_t handler);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index aa9cb86..8416dde 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -236,3 +236,14 @@ int gic_get_irq_group(int irq)
- {
- 	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
- }
-+
-+void setup_irq(handler_t handler)
-+{
-+	gic_enable_defaults();
-+#ifdef __arm__
-+	install_exception_handler(EXCPTN_IRQ, handler);
-+#else
-+	install_irq_handler(EL1H_IRQ, handler);
-+#endif
-+	local_irq_enable();
-+}
+What is particular with the ITS programming is that most of
+the commands are passed through queues and there is real error
+handling. Invalid commands are just ignored and that is not
+really tester friendly.
+
+This series includes Andre's patch: "arm: gic: Provide
+per-IRQ helper functions" [2]
+
+test_migrate_unmapped_collection is currently failing with
+upstream kernel. See [3].
+
+The series can be fount at:
+https://github.com/eauger/kut/tree/its-v2
+
+Best Regards
+
+Eric
+
+History:
+v1 -> v2:
+- took into account Zenghui's comments
+- collect R-b's from Thomas
+
+References:
+[1] [kvm-unit-tests RFC 00/15] arm/arm64: add ITS framework
+    https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00575.html
+
+[2] [kvm-unit-tests PATCH 00/17] arm: gic: Test SPIs and interrupt groups
+    https://patchwork.kernel.org/cover/11234975/
+
+[3] [PATCH] KVM: arm/arm64: vgic-its: Fix restoration of unmappedxi
+    collections (https://lkml.org/lkml/2019/12/13/205)
+
+Execution:
+x For ITS migration testing use:
+  ./run_tests.sh -g migration (blocks on TCG)
+
+x For other ITS tests:
+  ./run_tests.sh -g its
+
+x non migration tests can be launched invidually. For instance:
+  ./arm-run arm/gic.flat -smp 8 -append 'its-trigger'
+
+Andre Przywara (1):
+  arm: gic: Provide per-IRQ helper functions
+
+Eric Auger (15):
+  libcflat: Add other size defines
+  arm/arm64: gic: Introduce setup_irq() helper
+  arm/arm64: gicv3: Add some re-distributor defines
+  arm/arm64: ITS: Introspection tests
+  arm/arm64: ITS: Test BASER
+  arm/arm64: ITS: Set the LPI config and pending tables
+  arm/arm64: ITS: Init the command queue
+  arm/arm64: ITS: Enable/Disable LPIs at re-distributor level
+  arm/arm64: ITS: its_enable_defaults
+  arm/arm64: ITS: Device and collection Initialization
+  arm/arm64: ITS: commands
+  arm/arm64: ITS: INT functional tests
+  arm/run: Allow Migration tests
+  arm/arm64: ITS: migration tests
+  arm/arm64: ITS: pending table migration test
+
+ arm/Makefile.common        |   3 +-
+ arm/gic.c                  | 446 ++++++++++++++++++++++++++++++++++--
+ arm/run                    |   2 +-
+ arm/unittests.cfg          |  39 ++++
+ lib/arm/asm/gic-v3-its.h   | 177 +++++++++++++++
+ lib/arm/asm/gic-v3.h       |  20 ++
+ lib/arm/asm/gic.h          |  12 +
+ lib/arm/gic-v3-its-cmd.c   | 453 +++++++++++++++++++++++++++++++++++++
+ lib/arm/gic-v3-its.c       | 327 ++++++++++++++++++++++++++
+ lib/arm/gic.c              | 132 ++++++++++-
+ lib/arm/io.c               |  13 ++
+ lib/arm64/asm/gic-v3-its.h |   1 +
+ lib/libcflat.h             |   3 +
+ 13 files changed, 1600 insertions(+), 28 deletions(-)
+ create mode 100644 lib/arm/asm/gic-v3-its.h
+ create mode 100644 lib/arm/gic-v3-its-cmd.c
+ create mode 100644 lib/arm/gic-v3-its.c
+ create mode 100644 lib/arm64/asm/gic-v3-its.h
+
 --=20
 2.20.1
 
