@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C02C282DD
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 808B9C33CA4
 	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1037D20842
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1037D20842
+	by mail.kernel.org (Postfix) with ESMTPS id 5812020842
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5812020842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq0CS-0003bZ-L4
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:44:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44326)
+	id 1iq0CT-0003bS-0F
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:44:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Al-0001gs-On
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Al-0001gt-Ol
  for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ad-0004dA-E1
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ad-0004dh-G6
  for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:15 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53908)
+Received: from relay.sw.ru ([185.231.240.75]:53922)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0Ad-0004Ou-3G
+ id 1iq0Ad-0004Re-3z
  for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:11 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0AV-0008Ob-2m; Fri, 10 Jan 2020 22:42:03 +0300
+ id 1iq0AV-0008Ob-Ai; Fri, 10 Jan 2020 22:42:03 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 04/11] hw/sd/ssi-sd: fix error handling in ssi_sd_realize
-Date: Fri, 10 Jan 2020 22:41:51 +0300
-Message-Id: <20200110194158.14190-5-vsementsov@virtuozzo.com>
+Subject: [PATCH v6 05/11] SD (Secure Card): introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 10 Jan 2020 22:41:52 +0300
+Message-Id: <20200110194158.14190-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200110194158.14190-1-vsementsov@virtuozzo.com>
 References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -60,72 +61,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's wrong to use same err object as errp parameter for several
-function calls without intermediate checking for error: we'll crash if
-try to set err object twice.
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &error_fatal
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
 
-Fix that, using new ERRP_AUTO_PROPAGATE macro.
+If we want to check error after errp-function call, we need to
+introduce local_err and then propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatal, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
 
+This commit is generated by command
+
+    sed -n '/^SD (Secure Card)$/,/^$/{s/^F: //p}' \
+        MAINTAINERS | \
+    xargs git ls-files | grep '\.[hc]$' | \
+    xargs spatch \
+        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+        --macro-file scripts/cocci-macro-file.h \
+        --in-place --no-show-diff --max-width 80
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/sd/ssi-sd.c | 26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+ hw/sd/sdhci-pci.c |  7 +++----
+ hw/sd/sdhci.c     | 21 +++++++++------------
+ 2 files changed, 12 insertions(+), 16 deletions(-)
 
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index 91db069212..bc44e1a0f5 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -241,10 +241,10 @@ static const VMStateDescription vmstate_ssi_sd = {
+diff --git a/hw/sd/sdhci-pci.c b/hw/sd/sdhci-pci.c
+index 2c8d8f59b5..b1448cf22e 100644
+--- a/hw/sd/sdhci-pci.c
++++ b/hw/sd/sdhci-pci.c
+@@ -29,13 +29,12 @@ static Property sdhci_pci_properties[] = {
  
- static void ssi_sd_realize(SSISlave *d, Error **errp)
+ static void sdhci_pci_realize(PCIDevice *dev, Error **errp)
  {
 +    ERRP_AUTO_PROPAGATE();
-     ssi_sd_state *s = FROM_SSI_SLAVE(ssi_sd_state, d);
-     DeviceState *carddev;
-     DriveInfo *dinfo;
--    Error *err = NULL;
+     SDHCIState *s = PCI_SDHCI(dev);
+-    Error *local_err = NULL;
  
-     qbus_create_inplace(&s->sdbus, sizeof(s->sdbus), TYPE_SD_BUS,
-                         DEVICE(d), "sd-bus");
-@@ -254,14 +254,26 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
-     dinfo = drive_get_next(IF_SD);
-     carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
-     if (dinfo) {
--        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
-+        qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), errp);
-+        if (*errp) {
-+            goto fail;
-+        }
-+    }
-+
-+    object_property_set_bool(OBJECT(carddev), true, "spi", errp);
+     sdhci_initfn(s);
+-    sdhci_common_realize(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_common_realize(s, errp);
 +    if (*errp) {
-+        goto fail;
+         return;
      }
--    object_property_set_bool(OBJECT(carddev), true, "spi", &err);
--    object_property_set_bool(OBJECT(carddev), true, "realized", &err);
--    if (err) {
--        error_setg(errp, "failed to init SD card: %s", error_get_pretty(err));
--        return;
-+
-+    object_property_set_bool(OBJECT(carddev), true, "realized", errp);
+ 
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 18c0c052ce..ca258572b3 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1293,7 +1293,7 @@ static const MemoryRegionOps sdhci_mmio_ops = {
+ 
+ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+     switch (s->sd_spec_version) {
+     case 2 ... 3:
+@@ -1304,9 +1304,8 @@ static void sdhci_init_readonly_registers(SDHCIState *s, Error **errp)
+     }
+     s->version = (SDHC_HCVER_VENDOR << 8) | (s->sd_spec_version - 1);
+ 
+-    sdhci_check_capareg(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_check_capareg(s, errp);
 +    if (*errp) {
-+        goto fail;
+         return;
      }
-+
-+    return;
-+
-+fail:
-+    error_prepend(errp, "failed to init SD card: ");
  }
+@@ -1337,11 +1336,10 @@ void sdhci_uninitfn(SDHCIState *s)
  
- static void ssi_sd_reset(DeviceState *dev)
+ void sdhci_common_realize(SDHCIState *s, Error **errp)
+ {
+-    Error *local_err = NULL;
++    ERRP_AUTO_PROPAGATE();
+ 
+-    sdhci_init_readonly_registers(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_init_readonly_registers(s, errp);
++    if (*errp) {
+         return;
+     }
+     s->buf_maxsz = sdhci_get_fifolen(s);
+@@ -1461,13 +1459,12 @@ static void sdhci_sysbus_finalize(Object *obj)
+ 
+ static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     SDHCIState *s = SYSBUS_SDHCI(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+-    Error *local_err = NULL;
+ 
+-    sdhci_common_realize(s, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
++    sdhci_common_realize(s, errp);
++    if (*errp) {
+         return;
+     }
+ 
 -- 
 2.21.0
 
