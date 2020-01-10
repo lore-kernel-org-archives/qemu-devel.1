@@ -2,82 +2,117 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F31C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02694C33CA5
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D104F2072E
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:55:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YACHpBGi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D104F2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D096820838
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:04:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D096820838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipukx-0007kt-SR
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 08:55:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43062)
+	id 1iputs-0002pz-Vd
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:04:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34867)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipukD-0007Bz-TM
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:54:35 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iput4-00022L-B2
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:03:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipukC-0004xv-VD
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:54:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27788
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipukC-0004t7-QW
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:54:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578664471;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bMc8I8r5BwW1B2K1nT58Yep2cvdobamuQW2KAMUTiLc=;
- b=YACHpBGiX34YvVUnhq+ks61r57WDHcCnmtfu0xaexOckJvLZy+az2lXKkCBWXcfZq+aJjE
- +Pv6zlhDimYYCc7sNQqQbBVPTmDvfvKI/kMFBm7jrd/Ax22b8FZ3pRrkoW8gVjDHscO1x1
- 7KQnvECbkDIjS1Az0Ax/M2OrDo/Xw1g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-68-nWkFgTKGN4KWlgtUwOlHJw-1; Fri, 10 Jan 2020 08:54:30 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E3C5801F91;
- Fri, 10 Jan 2020 13:54:29 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.118.34])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A00B5C1D4;
- Fri, 10 Jan 2020 13:54:28 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: - - <nevilad@yahoo.com>
-Subject: Re: [PATCH] Bug #1829242 correction
-In-Reply-To: <694638341.1321046.1573223493407@mail.yahoo.com>
- (nevilad@yahoo.com's message of "Fri, 8 Nov 2019 14:31:33 +0000
- (UTC)")
-References: <694638341.1321046.1573223493407.ref@mail.yahoo.com>
- <694638341.1321046.1573223493407@mail.yahoo.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Fri, 10 Jan 2020 14:54:27 +0100
-Message-ID: <87sgknxvqk.fsf@secure.laptop>
+ (envelope-from <laurent@vivier.eu>) id 1iput3-0001Ew-63
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:03:42 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:49577)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iput2-00017b-Sr
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:03:41 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MOi1H-1j2vza2E99-00Q8bj; Fri, 10 Jan 2020 15:03:29 +0100
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200109153939.27173-1-philmd@redhat.com>
+ <d94666ae-df03-0162-e3d0-e0038b68da83@vivier.eu>
+ <CAAdtpL69XLuoZNEank0dC9M-tWCKhJqFKO46u5jjeLpf4TF=Pg@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH 0/4] buildsys: Build quicker (mostly tools and linux-user)
+Message-ID: <d7e57fe9-9c0f-10bf-dfd2-c1832d34cada@vivier.eu>
+Date: Fri, 10 Jan 2020 15:03:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: nWkFgTKGN4KWlgtUwOlHJw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAAdtpL69XLuoZNEank0dC9M-tWCKhJqFKO46u5jjeLpf4TF=Pg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:vpEqSR9f0OaquC9SxnvnlsRKwyZ7m3uolLFS7tLMJwa74aPR/Ki
+ OTmfOECHQ05phtR0ojkt6KH7XrV24QduVCn6sbxRXUaKrFk1DWnwLSLgaB1ZLpuadq9jRfD
+ mfC4cq6sCClZ1I8ZMQJ+Lz+Y1KmXl/OEHTaB9Gg/wROLoqwxTv3Wurg07v3o880QpEG9k4i
+ f/H5Ex42a4dbmYERTtGgA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gspSleCXpP4=:janECLProsXwGGvAs2sIk+
+ 82C/xSCpD7JSfWzqC6otmm6T3YfqQ3A51iLf1hxl0cuee40j9cEl2bD6nvOcPdwzAJtF4g6VW
+ cGoStlTwkpgPywITuTrCpIIh+AzgnRLgDk9HyYqUkLlsH4wF9CnTXPwjdcQbThZZu29Cy7F4G
+ TDXtmK4wSxEQRjxi09lpSweanh9QMsfRU4UCNXXpzbXjutMktFXgBpVFIwm8u5ajFPRm8k29V
+ bVHEqd5hDtUCYXsICufDHWlt+VhuKuTfRjz+Kz8EtN9IjthL5s2qNFRjVncmCbE/bd04ccw55
+ K7TZaycAdBNZYfdx+VSRdgfayNKSmG9qdi+xCYzNp2TEMF/a0YYBWw576Zvs7DOGmnJvv6rsH
+ SQ5FF85Rb/gQ/2hpVXK+fDX1cwobUAhlMMxPQWAnnA/ZXv5h3+jj7chGUC9j7/EhFdSjf4wR+
+ oz4g+BMg8K3KZQN+mUIqA8eNFTkDW/zscBv853ND9xIqYQewEsB9drmwgl+9PWoyJCzuRYyep
+ ArTLl/GIHIsRMzNKz8EwiJPgD0zn3HyW53fWDax+nrkInD1HEgIYtRzb2PvlopoB4b3AxhPqj
+ JlLj+JytYCubJClW34HjHmkn9ViN2KuJFpUshAuHIzbjY/sCHTnPOzhLnOez2kiNEeBmCwoLi
+ P8s9zci8DEeRDoEjMox/riCpkFkfyKSriHaJQIQniojlai9kBttutfk77hjrSRADOl+bVFxjw
+ ECEf8FRwJs+dL867uO2OsxeAAeE+OsQm0Qh3dsrIGQ4f8pNGVyh9y7QVqgOCzAVwYY8n2XUM0
+ W5rP52zR03dDruebAv4jITmgZMhrP5KTAtH0a72nv9eiZNgvtTHApFK0i46l2/qx9jedWZhNP
+ mWGDo/sX7JDSln8zt4RRCP+LPVNJheUfCJ4LaR+NI=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,27 +124,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- - <nevilad@yahoo.com> wrote:
-> Bug #1829242 correction. Added type conversions to ram_addr_t
-> before all left shifts of page indexes to TARGET_PAGE_BITS, to correct
-> overflows when the page address was 4Gb and more.
->
-> Signed-off-by: Alexey Romko <nevilad@yahoo.com>
+Le 10/01/2020 à 10:17, Philippe Mathieu-Daudé a écrit :
+> Le ven. 10 janv. 2020 09:36, Laurent Vivier <laurent@vivier.eu
+> <mailto:laurent@vivier.eu>> a écrit :
+> 
+>     Le 09/01/2020 à 16:39, Philippe Mathieu-Daudé a écrit :
+>     > In some configuration (linux-user, tools) we can ignore building
+>     > various objects (and the libfdt).
+>     >
+>     > Philippe Mathieu-Daudé (4):
+>     >   configure: Do not build libfdt is not required
+>     >   Makefile: Clarify all the codebase requires qom/ objects
+>     >   Makefile: Restrict system emulation and tools objects
+>     >   Makefile: Remove unhelpful comment
+>     >
+>     >  configure     |  2 ++
+>     >  Makefile.objs | 31 ++++++++++---------------------
+>     >  2 files changed, 12 insertions(+), 21 deletions(-)
+>     >
+> 
+>     Did you test this with all the combinations of --[enable|disable]-tools,
+>     --[enable|disable]-user and --[enable|disable]-system
+> 
+> 
+> I tested 12 of 27 because I thought some sets might overlap but I might
+> have missed something, what combination is giving you problem? 
+> 
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I didn't test your series, but I did this kind of change in the past and
+sometime enabling tools without enabling softmmu can show missing
+objects at build time, or you can also see if tools are built with
+softmmu while tools are disabled.
 
-I have to "redo" the patch, as it is very mangled.  I think I put the
-author/text/changes correctly O:-)
+I used to test with something like
 
-Queued.
+for user in enable disable; do
+    for tools in enable disable; do
+        for system in enable disable; do
+            rm -fr build
+            mkdir build && \
+            (cd build && \
+             ../configure --$user-user \
+                          --$system-system \
+                          --$tools-tools && \
+             make || exit)
+        done
+    done
+done
 
-Thanks, Juan.
-
+Thanks,
+Laurent
 
