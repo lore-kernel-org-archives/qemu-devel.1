@@ -2,89 +2,85 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04148C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95E9C33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2F4620721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B603F2072A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:06:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qM05hBK0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2F4620721
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWz+R90z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B603F2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipthU-0004yo-RW
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 07:47:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55536)
+	id 1iptzK-0003K9-S8
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 08:06:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1iptgr-0004Lt-It
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:47:02 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iptyX-0002hu-RJ
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1iptgq-0003P2-FQ
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:47:01 -0500
-Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:34527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1iptgq-0003J8-8N
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:47:00 -0500
-Received: by mail-pg1-x531.google.com with SMTP id r11so982114pgf.1
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 04:46:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=WdHnzZO32ty3v+k78hcRl2oqOefzkslYRsYqFmopqDY=;
- b=qM05hBK0Y6Os3wpIt+uOzEf+OhcYbmrdsyXu50wDLFs88Gf68o2Hul5IT3wfctZx5D
- D2WWvT75wHeJtrOT/Da5rY/ekVqiEG5MyCifT38Q0tUDFyXkVF2CCrTOaxe7KZUhYCWU
- rSnaSSnnlaeiFtKk8lBec81nzfMggtj4d7K5joGpde/X/gpFlvVZ4ND3Sxwn+t6cv1RP
- RU4Orump1O8VYPSwNAHXkmTZWFFM4G9BZwfc59cg2YltUayuSxTTxNc12+yVUUQTofHw
- cx6VhyvfeSvkcbcvs5OCFZxLvHlv61NCK39EFTutsoysaal86xlCPFBogpAvMvVjXGGq
- IZdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WdHnzZO32ty3v+k78hcRl2oqOefzkslYRsYqFmopqDY=;
- b=CWNsGKAuO0sAo1fPKITRlnfePSzHV54C+L3S7wxJIWv/VyOHzywHIn20F+xKna4DJT
- ZZ5AApYC/s7HrD8gXcbhby7+EcWaQCL+FuuNNa805SM5ITo8EAGzdh8jc4D7c/vsZ1SS
- c5cXJDp8edidqnam8EnRI7escGUZJ3XosyES/9KDl1PqO/jZosql94tFAPEdNTzkyENs
- JINj+DueQLcfaNlmxSr5zfBQO+lDXRXHHWP7k4I71mNRHNZY4vibzRFhqcUZ2L3Y4+45
- 6pR3n2bYGP5TRb8Yw49cl8hzWu42nlQZcIxqNG173mREfZEno0mVBPY9Kf0/JCnpseEE
- r2Jw==
-X-Gm-Message-State: APjAAAWkWXFKsEO6xMtV3iowgj6OYe29GEEzkFk2hqF0LStf0X/8Xw2A
- V2EmFFogMO0G0kGQRkkfZdzNLDny
-X-Google-Smtp-Source: APXvYqwyLvsNzfGW6hxKhFggqFcuoj4qMkJ5E9T/ErmGkWpcZutXsQqi5mTck7F1e/qpyOFmHMR9UQ==
-X-Received: by 2002:aa7:86c3:: with SMTP id h3mr3974980pfo.225.1578660418405; 
- Fri, 10 Jan 2020 04:46:58 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id
- a28sm2980941pfh.119.2020.01.10.04.46.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Jan 2020 04:46:57 -0800 (PST)
-Subject: Re: How to tell DMA controller in qemu to terminate transfer ?
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200108183553.GA5608@roeck-us.net>
- <CAFEAcA9t4X5Xnk0aS4C-vhKX2c3GA9XQ3zZRGYVGLEQsG=EgeQ@mail.gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <ece7c830-0561-2a4b-dc25-847a454b2fd6@roeck-us.net>
-Date: Fri, 10 Jan 2020 04:46:56 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <dgilbert@redhat.com>) id 1iptyU-00036e-S0
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:05:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41509
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iptyU-00030f-Mq
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:05:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578661513;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kgrEt+FvBB/6+IO3osBNiD9sUA4+YSQqtZ9DHhl2xWI=;
+ b=BWz+R90z9bSSi93e7rxuWn7LdTbL3vnghRpsyEHGVu6HvA7veLMtO94yinG4rYNA9gFwxK
+ ldDVADvaRnhj3f83+V7VNWDXAOPkSaloA0IfoRRqkf89kwxHlBAFe6v/YotWf1vp//G11V
+ F1JDRIsq50RASUTaYolynOfyIFLvxv4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-6azGhjCINbqh8cUKLEtj1g-1; Fri, 10 Jan 2020 08:05:12 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F008DB23
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 13:05:11 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.36])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90C6F5C1D4;
+ Fri, 10 Jan 2020 13:05:02 +0000 (UTC)
+Date: Fri, 10 Jan 2020 13:05:00 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH 032/104] virtiofsd: passthrough_ll: create new files in
+ caller's context
+Message-ID: <20200110130500.GE3901@work-vm>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-33-dgilbert@redhat.com>
+ <20200106143011.GK2930416@redhat.com>
+ <20200106190041.GO2798@work-vm> <20200106190843.GP2798@work-vm>
+ <20200107092231.GA3368802@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9t4X5Xnk0aS4C-vhKX2c3GA9XQ3zZRGYVGLEQsG=EgeQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::531
+In-Reply-To: <20200107092231.GA3368802@redhat.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 6azGhjCINbqh8cUKLEtj1g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,48 +92,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+* Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> On Mon, Jan 06, 2020 at 07:08:43PM +0000, Dr. David Alan Gilbert wrote:
+> > * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > > > On Thu, Dec 12, 2019 at 04:37:52PM +0000, Dr. David Alan Gilbert (g=
+it) wrote:
+> > > > > From: Vivek Goyal <vgoyal@redhat.com>
+> > > > >=20
+> > > > > We need to create files in the caller's context. Otherwise after
+> > > > > creating a file, the caller might not be able to do file operatio=
+ns on
+> > > > > that file.
+> > > > >=20
+> > > > > Changed effective uid/gid to caller's uid/gid, create file and th=
+en
+> > > > > switch back to uid/gid 0.
+> > > > >=20
+> > > > > Use syscall(setresuid, ...) otherwise glibc does some magic to ch=
+ange EUID
+> > > > > in all threads, which is not what we want.
+> > > > >=20
+> > > > > Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> > > > > Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+> > > > > ---
+> > > > >  tools/virtiofsd/passthrough_ll.c | 79 ++++++++++++++++++++++++++=
+++++--
+> > > > >  1 file changed, 74 insertions(+), 5 deletions(-)
+> > > > >=20
+> > > > > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/p=
+assthrough_ll.c
+> > > > > index 68bacb6fc5..0188cd9ad6 100644
+> > > > > --- a/tools/virtiofsd/passthrough_ll.c
+> > > > > +++ b/tools/virtiofsd/passthrough_ll.c
+> > > >=20
+> > > >=20
+> > > > > +static int lo_change_cred(fuse_req_t req, struct lo_cred *old)
+> > > > > +{
+> > > > > +    int res;
+> > > > > +
+> > > > > +    old->euid =3D geteuid();
+> > > > > +    old->egid =3D getegid();
+> > > > > +
+> > > > > +    res =3D syscall(SYS_setresgid, -1, fuse_req_ctx(req)->gid, -=
+1);
+> > > >=20
+> > > > Do we need to be using  SYS_setres[u,g]id32 instead...
+> > > >=20
+> > > > [quote setresgid(2)]
+> > > >        The original Linux setresuid() and setresgid() system  calls
+> > > >        supported  only  16-bit  user  and group IDs.  Subsequently,
+> > > >        Linux 2.4 added setresuid32() and setresgid32(),  supporting
+> > > >        32-bit  IDs.   The glibc setresuid() and setresgid() wrapper
+> > > >        functions transparently deal with the variations across ker=
+=E2=80=90
+> > > >        nel versions.
+> > > > [/quote]
+> > >=20
+> > > OK, updated.
+> >=20
+> > Hmm hang on; this is messy.  x86-64 only seems to have setresuid
+> > where as some architectures have both;  If I'm reading this right, all
+> > 64 bit machines have setresuid/gid calling the code that takes the
+> > 32bit ID; some have compat entries for 32bit syscalls.
+>=20
+> Oh yuk.
+>=20
+> > I think it's probably more correct to call setresuid here; except
+> > for 32 bit platforms - but how do we tell?
+>=20
+> Is it possible to just do an #ifdef SYS_setresgid32 check to see
+> if the wider variant exists ?
 
-On 1/10/20 2:36 AM, Peter Maydell wrote:
-> On Wed, 8 Jan 2020 at 18:36, Guenter Roeck <linux@roeck-us.net> wrote:
->>
->> Hi,
->>
->> I am trying to fix DMA support with Exynos4210. The original commit
->> 59520dc65e ("hw/arm/exynos4210: Add DMA support for the Exynos4210") doesn't
->> really work, primarily because it assigns wrong interrupt lines (no idea
->> how I thought I tested that).
->>
->> Problem I have right now is that the pl330 peripheral DMA in Exynos4210
->> depends on a signal from the peripheral device (here: serial ports)
->> to end a DMA transfer. To make this work, I need a signal from
->> exynos4210_uart.c to pl330.c to terminate the DMA after the receive
->> buffer is empty.
->>
->> How can I implement this in qemu ?
-> 
-> That depends. How does the UART signal the DMA controller
-> in real hardware? If there's a signal line of some kind,
+I've ended up with:
 
-Yes, that is my understanding.
++/*
++ * On some archs, setres*id is limited to 2^16 but they
++ * provide setres*id32 variants that allow 2^32.
++ * Others just let setres*id do 2^32 anyway.
++ */
++#ifdef SYS_setresgid32
++#define OURSYS_setresgid SYS_setresgid32
++#else
++#define OURSYS_setresgid SYS_setresgid
++#endif
++
++#ifdef SYS_setresuid32
++#define OURSYS_setresuid SYS_setresuid32
++#else
++#define OURSYS_setresuid SYS_setresuid
++#endif
++
++/*
++ * Change to uid/gid of caller so that file is created with
++ * ownership of caller.
++ * TODO: What about selinux context?
++ */
++static int lo_change_cred(fuse_req_t req, struct lo_cred *old)
++{
++    int res;
++
++    old->euid =3D geteuid();
++    old->egid =3D getegid();
++
++    res =3D syscall(OURSYS_setresgid, -1, fuse_req_ctx(req)->gid, -1);
++    if (res =3D=3D -1) {
++        return errno;
++    }
++
++    res =3D syscall(OURSYS_setresuid, -1, fuse_req_ctx(req)->uid, -1);
++    if (res =3D=3D -1) {
++        int errno_save =3D errno;
++
++        syscall(OURSYS_setresgid, -1, old->egid, -1);
++        return errno_save;
++    }
 
-> then you can model that with a qemu_irq line which the UART
-> exposes and raises/lowers at the right time, that's then
-> plumbed through by the SoC to the DMA controller.
-> 
+and in the seccomp:
 
-Makes sense. Can you give me some hints on how to do that, or point me
-to an example ?
+#ifdef __NR_setresgid32
+    SCMP_SYS(setresgid32),
+#endif
+#ifdef __NR_setresuid32
+    SCMP_SYS(setresuid32),
+#endif
 
-The pl330 dma code registers a set of gpio pins tied to pl330_dma_stop_irq().
-I suspect that is what I am looking for, I just have no idea how to tie
-it to the serial driver code.
+Dave
 
-Thanks,
-Guenter
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
