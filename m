@@ -2,64 +2,63 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DA8C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3017C33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:11:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A0D72080D
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:04:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C28D2072A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:11:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="aoXxu3LY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0D72080D
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="rd4Ba57h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C28D2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipt1q-0002ij-43
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 07:04:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38088)
+	id 1ipt8B-0006Av-Hr
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 07:11:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54489)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ipt1E-0001mx-SH
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:04:02 -0500
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ipt7U-0005l5-GX
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:10:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ipt1D-0004v8-D6
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:04:00 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:47295)
+ (envelope-from <qemu_oss@crudebyte.com>) id 1ipt7T-0000bm-6i
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:10:28 -0500
+Received: from kylie.crudebyte.com ([5.189.157.229]:52071)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1ipt1C-0004mG-S0
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:03:59 -0500
+ id 1ipt7S-0000VO-Oy
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:10:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
  MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
  Content-ID:Content-Description;
- bh=9yD9cuYrn/JPlIAthCBrj95w+fWeDqCuLDxxJdzaGw8=; b=aoXxu3LY2Kcq1ZHgPWLIVgf23E
- Ji3tkPWMkXdvKQQwNR17IMYp6c8ZDDrODxddW0aQ+Ebk1j/dmkf7bibNa0wwS1+08IR7AXs2kCDiN
- SNJ4LzWpDC88+NYqBdSJhTC4aw/LBciEikxYxIEve6p911oy7iZSODv8VGo0Ste1cgCiflaRPaQOR
- prF9MwRPMvArbAtQP1YZSuBJYF/GCAsiE1i89oypHhXk0F4yS9cdzlFPTI4sy8+2Dh/AI5IHFv8rp
- fobL1vLqVdqAJpe48IrHbNXTzezEerxgr1txpnQNxriLuM2fB3VnDFStE35bN1lfY/Fzjhmj5KTLY
- zjX7KpoSEzK2Y1U976FNfCmthBH8vN9r9VUOm5BsiRUYKHUTbTt3oxICTzvxS4Ay56jLEcFN4j68X
- pk1bHCE64aFat9xHDO2vVCf4mZ3LOXBw2SU0R5ckV0xxFmaSuFEt6e8U9ACOE7nLJ+eubtg3qgyXJ
- wQ4W91nHXwQEoq6Z5Npx1GAiNVJIL0agv3uT/KZvJaklb2S27zs0ezWaE/N6V19NoDCyxmMqy8o8k
- n1A2mjVsQuE0AcMchU0Zs4iRdsyAo6qn8DdW+Y2leRxuMQvkxz3ZcIE/kS+DKn583K8wBEZHXeXJj
- jGZgUjdjA+vQuhK+JYQ4gQow4W6bN2Kg+wBcLOORE=;
+ bh=wqB7tILbLgoaMMJBnr4IsbGkg5KXzzC8Vi4Zx4vGr4o=; b=rd4Ba57h+w5EoZfvVHTr3QL0KT
+ 07ua1Q2vaRZDsQC+UPPxvaEkSGStSbYPG8euQ4Ikug/TftLxwT5H4RADOuBYgqMAyfTra/4YLKJU2
+ fdFAEJYTsT9cElrpn1ttORtUpUGc8RfelR+HtoOyB8Odjl6Jzc12p/omskue9RKBbikEbhwsm7rHX
+ TPBwVyx38t/fwf/RlgvtZdGSZzxIaGyAsJ17EgcnlszshETww1OOdfoOT2/po4W8uMoecSGzAVW16
+ ZfZlDhvlVwIPkCrqfqjC6fEKJUUCZfiS3NVVS8bTS52WCoe9ZbqdirF/9g7RjOeBG/s4mZSME9NLB
+ Ks4B6oFSzWqcBUxvLxNO1HGNiu0EXqSnX10aJr9euZdA5J2wikQX8wcjg+tcygKygdSorHFueNomw
+ 8pMZ+C5rC50ZL9r4o5CzuOcl6xA+ilyAOeduWV//KFLtX8reCiBP5AMLSARhelbMe6zbIeOQ52Xtl
+ Zqv/aJpbwrH2KUjw4NMshBZwZmp9diVAHGZ7lGCatVkSm/TEyqaxwjqlz9zJGh+rlYpwKvrArd8h6
+ 7SOW1O9MK9p/avuKbsafoeyJZlDWkz7DH/kNiCGvRqzTW1HpA+rFkajnYoX0Ms4APf484hhCde9WA
+ RgVzZGuCtckXkj7FtjrGSWxpJ4o2X0+Q0s4JSQMG0=;
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>,
- anthony.perard@citrix.com, Stefano Stabellini <sstabellini@kernel.org>,
- Stefano Stabellini <stefano.stabellini@xilinx.com>
-Subject: Re: [PATCH v2 2/9] 9pfs: validate count sent by client with T_readdir
-Date: Fri, 10 Jan 2020 13:03:55 +0100
-Message-ID: <1919937.aoWvVaMKoZ@silver>
-In-Reply-To: <20200109005335.4b6214a5@bahia.lan>
+Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v2 4/9] tests/virtio-9p: added readdir test
+Date: Fri, 10 Jan 2020 13:10:24 +0100
+Message-ID: <13849642.UhcBSJl6WW@silver>
+In-Reply-To: <20200109005545.5b24236b@bahia.lan>
 References: <cover.1576678644.git.qemu_oss@crudebyte.com>
- <6289486.8nMSniMWIK@silver> <20200109005335.4b6214a5@bahia.lan>
+ <a8d6dab2625554d425bd44a4d54d84459f083b18.1576678644.git.qemu_oss@crudebyte.com>
+ <20200109005545.5b24236b@bahia.lan>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -81,98 +80,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 9. Januar 2020 00:53:35 CET Greg Kurz wrote:
-> > My idea was to "handle it as an error" immediately when server receives a
-> > T_version request with a "msize" argument transmitted by client that would
-> > be way too small for anything.
+On Donnerstag, 9. Januar 2020 00:55:45 CET Greg Kurz wrote:
+> > diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
+> > index 06263edb53..48c0eca292 100644
+> > --- a/tests/virtio-9p-test.c
+> > +++ b/tests/virtio-9p-test.c
+> > @@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t
+> > len)> 
+> >      req->r_off += len;
+> >  
+> >  }
 > > 
-> > Because if client sends T_version with msize < P9_IOHDRSZ then it is
-> > obvious that this msize would be way too small for handling any
-> > subsequent 9p request at all.
-> 
-> P9_IOHDRSZ is 24 bytes, it is definitely not enough to accommodate an
-> R_getattr message (153 bytes and heavily used by the linux client) for
-> example, so we would likely need a higher minimum as you're suggesting
-> later in this mail.
-[snip]
-> > 1. What is the minimum msize to be allowed with T_version?
+> > +static void v9fs_uint8_read(P9Req *req, uint8_t *val)
+> > +{
+> > +    v9fs_memread(req, val, 1);
+> > +}
+> > +
 > > 
-> >    P9_IOHDRSZ would be IMO too small, because P9_IOHDRSZ is the size of
-> >    the
-> >    common header portion of all IO requests. So it would rather make sense
-> >    IMO
-> >    reviewing the protocol and pick the largest header size among all
-> >    possible
-> 
-> Not the largest header size, rather the size of the largest message,
-> otherwise we may still disconnect. Some response messages contain a
-> variable size string that the 9p spec forbids to truncate. In the case
-> of R_readlink for example, this could go up to the largest target size
-> supported by the host filesystem for symbolic links... ie. likely PATH_MAX.
-
-Good point.
-
-> >    requests supported by 9pfs server ATM. The advantage of this approach
-> >    would
-> >    be that overall code would be easier too maintain, since we don't have
-> >    to
-> >    add minimum msize checks in any (or even all) individual request type
-> >    handlers. T_version handler of server would already enforce a minimum
-> >    msize
-> >    and prevent the session if msize too small, and that's it.
-> 
-> Makes sense. Since the linux client already requires msize to be at
-> least 4096, this could be a reasonable choice: it doesn't break any
-> existing setups and it allows fairly large strings in messages.
-
-4096 as min. msize is fine with me.
-
-In practice people should use a *much* higher msize for performance reasons 
-anyway. And I planned to make this circumstance more clear in the docs.
-
-> > 2. How to handle that error with T_version exactly?
+> >  static void v9fs_uint16_write(P9Req *req, uint16_t val)
+> >  {
+> >  
+> >      uint16_t le_val = cpu_to_le16(val);
 > > 
-> >    As far as I can see it, it was originally not considered that T_version
-> >    might react with an error response at all. The specs are ambiguous
-> >    about
-> >    this topic. All you can find is that if the transmitted protocol
-> >    version
-> >    is not supported by server, then server should respond with "unknown"
-> >    with
-> >    its R_version response, but should not respond with R_error in that
-> >    case.
-> >    
-> >    The specs do not prohibit R_error for T_version in general, but I could
-> >    imagine that some clients might not expect if we would send R_error. On
-> >    the
-> >    other hand responding with R_version "unknown" would not be appropriate
-> >    for
-> >    this msize error either, because that would mean to the client that the
-> >    protocol version was not supported, which is not the case. So it would
-> >    leave client uninformed about the actual reason/cause of the error.
+> > @@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t
+> > *val)> 
+> >      le32_to_cpus(val);
+> >  
+> >  }
+> > 
+> > +static void v9fs_uint64_read(P9Req *req, uint64_t *val)
+> > +{
+> > +    v9fs_memread(req, val, 8);
+> > +    le64_to_cpus(val);
+> > +}
+> > +
+> > 
+> >  /* len[2] string[len] */
+> >  static uint16_t v9fs_string_size(const char *string)
+> >  {
+> > 
+> > @@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
+> > 
+> >          id == P9_RLOPEN ? "RLOPEN" :
+> >          id == P9_RWRITE ? "RWRITE" :
+> > 
+> >          id == P9_RFLUSH ? "RFLUSH" :
+> > +        id == P9_RREADDIR ? "READDIR" :
+> >          "<unknown>";
+> >  
+> >  }
+> > 
+> > @@ -348,6 +360,79 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid,
+> > v9fs_qid **wqid)> 
+> >      v9fs_req_free(req);
+> >  
+> >  }
+> > 
+> > +/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
+> > +static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t
+> > offset,
+> > +                            uint32_t count, uint16_t tag)
+> > +{
+> > +    P9Req *req;
+> > +
+> > +    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
+> > +    v9fs_uint32_write(req, fid);
+> > +    v9fs_uint64_write(req, offset);
+> > +    v9fs_uint32_write(req, count);
+> > +    v9fs_req_send(req);
+> > +    return req;
+> > +}
+> > +
+> > +struct v9fs_dirent {
+> > +    v9fs_qid qid;
+> > +    uint64_t offset;
+> > +    uint8_t type;
+> > +    char *name;
+> > +    struct v9fs_dirent *next;
+> > +};
+> > +
+> > +/* size[4] Rreaddir tag[2] count[4] data[count] */
+> > +static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t
+> > *nentries,
+> > +                          struct v9fs_dirent **entries)
+> > +{
+> > +    uint32_t sz;
 > 
-> Other 9p implementations have minimal msize checks and return an error
-> message. We could go that way too. The only fishy thing I see, and that
-> the other implementations seem to ignore, is that the error message format
-> depends on the protocol version. It is R_error for older 9p2000 and
-> 9p2000.u, while 9p2000.L uses R_lerror.
+> Even if this is a size indeed, the 9p spec uses the wording "count" and
+> so does the function signature. Please rename this variable to local_count.
+> Some other functions that return server originated data already use this
+> naming scheme.
 
-Ok, noted.
+I know, I did that intentionally. But I don't care for such code style details 
+enough to start argueing, so I'll change it.
 
-> If the client doesn't understand
-> any of these protocols, which is very unlikely, it seems reasonable to
-> interrupt the server.
+> 
+> > +    struct v9fs_dirent *e = NULL;
+> > +    uint16_t slen;
+> > +    uint32_t n = 0;
+> > +
+> > +    v9fs_req_recv(req, P9_RREADDIR);
+> > +    v9fs_uint32_read(req, &sz);
+> > +
+> > +    if (count) {
+> > +        *count = sz;
+> > +    }
+> > +
+> > +    for (int32_t togo = (int32_t)sz;
+> > +         togo >= 13 + 8 + 1 + 2;
+> > +         togo -= 13 + 8 + 1 + 2 + slen, ++n)
+> > +    {
+> > +        if (!e) {
+> > +            e = g_malloc(sizeof(struct v9fs_dirent));
+> > +            if (entries)
+> 
+> ERROR: braces {} are necessary for all arms of this statement
+> #98: FILE: tests/virtio-9p-test.c:407:
+> +            if (entries)
+> [...]
 
-No need. If it is neither 9P2000.u nor 9P2000.L then the appropriate reply of 
-server was and still is:
-
-R_version "unknown"
-
-Since the unsupported protocol version still weights higher than the 
-unsupported msize. If you are very, very picky, you might want to distinguish 
-in this particular case from the case where msize is even too small for 
-R_version "unknown", but personally I don't care since the latter would be an 
-extreme exotic and broken client.
+Right, sorry I missed that for some reason.
 
 Best regards,
 Christian Schoenebeck
