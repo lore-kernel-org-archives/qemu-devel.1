@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A11C2C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24E7C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:46:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77BE320842
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77BE320842
+	by mail.kernel.org (Postfix) with ESMTPS id 77642205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:46:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77642205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq0CV-0003gD-Sr
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:44:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44564)
+	id 1iq0F2-0007S2-2H
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:46:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ao-0001mG-9Q
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:26 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Al-0001gu-P7
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Am-0004y0-H0
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:22 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53970)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ad-0004dH-Dt
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:15 -0500
+Received: from relay.sw.ru ([185.231.240.75]:53924)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0Am-0004mZ-80; Fri, 10 Jan 2020 14:42:20 -0500
+ id 1iq0Ad-0004Rf-3P
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:11 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0AT-0008Ob-Ta; Fri, 10 Jan 2020 22:42:02 +0300
+ id 1iq0AW-0008Ob-7B; Fri, 10 Jan 2020 22:42:04 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 01/11] qapi/error: add (Error **errp) cleaning APIs
-Date: Fri, 10 Jan 2020 22:41:48 +0300
-Message-Id: <20200110194158.14190-2-vsementsov@virtuozzo.com>
+Subject: [PATCH v6 08/11] virtio-9p: introduce ERRP_AUTO_PROPAGATE
+Date: Fri, 10 Jan 2020 22:41:55 +0300
+Message-Id: <20200110194158.14190-9-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200110194158.14190-1-vsementsov@virtuozzo.com>
 References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -62,80 +62,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
- Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If we want to add some info to errp (by error_prepend() or
+error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+Otherwise, this info will not be added when errp == &error_fatal
+(the program will exit prior to the error_append_hint() or
+error_prepend() call).  Fix such cases.
+
+If we want to check error after errp-function call, we need to
+introduce local_err and then propagate it to errp. Instead, use
+ERRP_AUTO_PROPAGATE macro, benefits are:
+1. No need of explicit error_propagate call
+2. No need of explicit local_err variable: use errp directly
+3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+   &error_fatal, this means that we don't break error_abort
+   (we'll abort on error_set, not on error_propagate)
+
+This commit is generated by command
+
+    sed -n '/^virtio-9p$/,/^$/{s/^F: //p}' MAINTAINERS | \
+    xargs git ls-files | grep '\.[hc]$' | \
+    xargs spatch \
+        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+        --macro-file scripts/cocci-macro-file.h \
+        --in-place --no-show-diff --max-width 80
+
+Reported-by: Kevin Wolf <kwolf@redhat.com>
+Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
+ hw/9pfs/9p-local.c | 12 +++++-------
+ hw/9pfs/9p.c       |  1 +
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
-CC: Cornelia Huck <cohuck@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Greg Kurz <groug@kaod.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony Perard <anthony.perard@citrix.com>
-CC: Paul Durrant <paul@xen.org>
-CC: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-CC: Laszlo Ersek <lersek@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Stefan Berger <stefanb@linux.ibm.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-CC: qemu-block@nongnu.org
-CC: xen-devel@lists.xenproject.org
-
- include/qapi/error.h | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index ad5b6e896d..fa8d51fd6d 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -309,6 +309,32 @@ void warn_reportf_err(Error *err, const char *fmt, ...)
- void error_reportf_err(Error *err, const char *fmt, ...)
-     GCC_FMT_ATTR(2, 3);
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index ca641390fb..253814ef2c 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -1481,10 +1481,10 @@ static void error_append_security_model_hint(Error *const *errp)
  
-+/*
-+ * Functions to clean Error **errp: call corresponding Error *err cleaning
-+ * function an set pointer to NULL
-+ */
-+static inline void error_free_errp(Error **errp)
-+{
-+    assert(errp && *errp);
-+    error_free(*errp);
-+    *errp = NULL;
-+}
-+
-+static inline void error_report_errp(Error **errp)
-+{
-+    assert(errp && *errp);
-+    error_report_err(*errp);
-+    *errp = NULL;
-+}
-+
-+static inline void warn_report_errp(Error **errp)
-+{
-+    assert(errp && *errp);
-+    warn_report_err(*errp);
-+    *errp = NULL;
-+}
-+
-+
- /*
-  * Just like error_setg(), except you get to specify the error class.
-  * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is
+ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     const char *sec_model = qemu_opt_get(opts, "security_model");
+     const char *path = qemu_opt_get(opts, "path");
+     const char *multidevs = qemu_opt_get(opts, "multidevs");
+-    Error *local_err = NULL;
+ 
+     if (!sec_model) {
+         error_setg(errp, "security_model property not set");
+@@ -1518,11 +1518,10 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+             fse->export_flags &= ~V9FS_FORBID_MULTIDEVS;
+             fse->export_flags &= ~V9FS_REMAP_INODES;
+         } else {
+-            error_setg(&local_err, "invalid multidevs property '%s'",
++            error_setg(errp, "invalid multidevs property '%s'",
+                        multidevs);
+-            error_append_hint(&local_err, "Valid options are: multidevs="
++            error_append_hint(errp, "Valid options are: multidevs="
+                               "[remap|forbid|warn]\n");
+-            error_propagate(errp, local_err);
+             return -1;
+         }
+     }
+@@ -1532,9 +1531,8 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+         return -1;
+     }
+ 
+-    if (fsdev_throttle_parse_opts(opts, &fse->fst, &local_err)) {
+-        error_propagate_prepend(errp, local_err,
+-                                "invalid throttle configuration: ");
++    if (fsdev_throttle_parse_opts(opts, &fse->fst, errp)) {
++        error_prepend(errp, "invalid throttle configuration: ");
+         return -1;
+     }
+ 
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 520177f40c..4200c3416b 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3994,6 +3994,7 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
+ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
+                                Error **errp)
+ {
++    ERRP_AUTO_PROPAGATE();
+     int i, len;
+     struct stat stat;
+     FsDriverEntry *fse;
 -- 
 2.21.0
 
