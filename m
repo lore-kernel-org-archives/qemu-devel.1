@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00389C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8FCC33CA4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:52:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB52B2072E
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:52:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A7FF2080D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:52:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9Mdwn4n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB52B2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0WR2aWp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A7FF2080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipySa-0004M2-Kt
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:52:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52786)
+	id 1ipySb-0004MD-7u
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:52:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipyCT-0007MP-Iq
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:58 -0500
+ (envelope-from <quintela@redhat.com>) id 1ipyCf-0007eH-5p
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:36:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipyCS-0007xG-7m
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:57 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43584
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1ipyCd-0008Ux-Ru
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:36:09 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26981
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyCS-0007vm-2L
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:56 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyCd-0008Th-MW
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:36:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578677755;
+ s=mimecast20190719; t=1578677767;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dbZzHITBVOqnVDLD4TmM+9ycTwCTtYfRJUwroSled+g=;
- b=J9Mdwn4nqwakSGd2VKh8KzPlutxRdqsVM7fal+JxsD1Bs+fFr+7qWwqpPDP2nIuuEOiVIz
- /GHTxaEOmf0Tx2DO/5n/rcPQhqr9i+cfcJIyUvcUd0jVCy5LwhrQ4xSs/ZZZanMLSNlC5T
- eZLarmXDSpCf1ulc9r9T4XetEmIhBus=
+ bh=PXB++T9ALYs5r1QNRbd/pIVxGJNn5bO7prB3hJ/SS6U=;
+ b=W0WR2aWpGUQ1CShweSExjhcR4mdnHcHdgK1DDzZjwuuI753TmRGQFnppdBAWcxCUC28NXL
+ M/wR3vIxdHGBhQLS/vAzx9KmtDRY7MtKaExAU8Cbyh1VayBTL4Oakt5M7GOUDtnjFuXngT
+ 4/ZerBW3pfjMCoo5ANRBLyx0e/13BSw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-kJCXF1M2NOeo3MGVOwTh-w-1; Fri, 10 Jan 2020 12:35:53 -0500
+ us-mta-255-slps1OqRNFm3Awf5pRu_eA-1; Fri, 10 Jan 2020 12:36:06 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7714800EBF;
- Fri, 10 Jan 2020 17:35:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F189910054E3;
+ Fri, 10 Jan 2020 17:36:03 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-240.ams2.redhat.com [10.36.116.240])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA2FC272D3;
- Fri, 10 Jan 2020 17:35:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2FA5619C58;
+ Fri, 10 Jan 2020 17:35:57 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/28] migration/multifd: fix nullptr access in terminating
- multifd threads
-Date: Fri, 10 Jan 2020 18:32:10 +0100
-Message-Id: <20200110173215.3865-24-quintela@redhat.com>
+Subject: [PULL 25/28] Bug #1829242 correction.
+Date: Fri, 10 Jan 2020 18:32:12 +0100
+Message-Id: <20200110173215.3865-26-quintela@redhat.com>
 In-Reply-To: <20200110173215.3865-1-quintela@redhat.com>
 References: <20200110173215.3865-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: kJCXF1M2NOeo3MGVOwTh-w-1
+X-MC-Unique: slps1OqRNFm3Awf5pRu_eA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,86 +84,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Jiahui Cen <cenjiahui@huawei.com>, Juan Quintela <quintela@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Ying Fang <fangying1@huawei.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-arm@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Alexey Romko <nevilad@yahoo.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jiahui Cen <cenjiahui@huawei.com>
+From: Alexey Romko <nevilad@yahoo.com>
 
-One multifd channel will shutdown all the other multifd's IOChannel when it
-fails to receive an IOChannel. In this senario, if some multifds had not
-received its IOChannel yet, it would try to shutdown its IOChannel which co=
-uld
-cause nullptr access at qio_channel_shutdown.
+Added type conversions to ram_addr_t before all left shifts of page
+indexes to TARGET_PAGE_BITS, to correct overflows when the page
+address was 4Gb and more.
 
-Here is the coredump stack:
-    #0  object_get_class (obj=3Dobj@entry=3D0x0) at qom/object.c:908
-    #1  0x00005563fdbb8f4a in qio_channel_shutdown (ioc=3D0x0, how=3DQIO_CH=
-ANNEL_SHUTDOWN_BOTH, errp=3D0x0) at io/channel.c:355
-    #2  0x00005563fd7b4c5f in multifd_recv_terminate_threads (err=3D<optimi=
-zed out>) at migration/ram.c:1280
-    #3  0x00005563fd7bc019 in multifd_recv_new_channel (ioc=3Dioc@entry=3D0=
-x556400255610, errp=3Derrp@entry=3D0x7ffec07dce00) at migration/ram.c:1478
-    #4  0x00005563fda82177 in migration_ioc_process_incoming (ioc=3Dioc@ent=
-ry=3D0x556400255610, errp=3Derrp@entry=3D0x7ffec07dce30) at migration/migra=
-tion.c:605
-    #5  0x00005563fda8567d in migration_channel_process_incoming (ioc=3D0x5=
-56400255610) at migration/channel.c:44
-    #6  0x00005563fda83ee0 in socket_accept_incoming_migration (listener=3D=
-0x5563fff6b920, cioc=3D0x556400255610, opaque=3D<optimized out>) at migrati=
-on/socket.c:166
-    #7  0x00005563fdbc25cd in qio_net_listener_channel_func (ioc=3D<optimiz=
-ed out>, condition=3D<optimized out>, opaque=3D<optimized out>) at io/net-l=
-istener.c:54
-    #8  0x00007f895b6fe9a9 in g_main_context_dispatch () from /usr/lib64/li=
-bglib-2.0.so.0
-    #9  0x00005563fdc18136 in glib_pollfds_poll () at util/main-loop.c:218
-    #10 0x00005563fdc181b5 in os_host_main_loop_wait (timeout=3D1000000000)=
- at util/main-loop.c:241
-    #11 0x00005563fdc183a2 in main_loop_wait (nonblocking=3Dnonblocking@ent=
-ry=3D0) at util/main-loop.c:517
-    #12 0x00005563fd8edb37 in main_loop () at vl.c:1791
-    #13 0x00005563fd74fd45 in main (argc=3D<optimized out>, argv=3D<optimiz=
-ed out>, envp=3D<optimized out>) at vl.c:4473
-
-To fix it up, let's check p->c before calling qio_channel_shutdown.
-
-Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
+Signed-off-by: Alexey Romko <nevilad@yahoo.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ migration/ram.c | 29 ++++++++++++++++++-----------
+ 1 file changed, 18 insertions(+), 11 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 4ba9037e78..5da3a47ffc 100644
+index 67a24bf217..e711f9003b 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -1308,7 +1308,9 @@ static void multifd_recv_terminate_threads(Error *err=
-)
-            - normal quit, i.e. everything went fine, just finished
-            - error quit: We close the channels so the channel threads
-              finish the qio_channel_read_all_eof() */
--        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+        if (p->c) {
-+            qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-+        }
-         qemu_mutex_unlock(&p->mutex);
+@@ -1768,7 +1768,7 @@ static inline bool migration_bitmap_clear_dirty(RAMSt=
+ate *rs,
+     if (rb->clear_bmap && clear_bmap_test_and_clear(rb, page)) {
+         uint8_t shift =3D rb->clear_bmap_shift;
+         hwaddr size =3D 1ULL << (TARGET_PAGE_BITS + shift);
+-        hwaddr start =3D (page << TARGET_PAGE_BITS) & (-size);
++        hwaddr start =3D (((ram_addr_t)page) << TARGET_PAGE_BITS) & (-size=
+);
+=20
+         /*
+          * CLEAR_BITMAP_SHIFT_MIN should always guarantee this... this
+@@ -2005,7 +2005,7 @@ static void ram_release_pages(const char *rbname, uin=
+t64_t offset, int pages)
+         return;
      }
+=20
+-    ram_discard_range(rbname, offset, pages << TARGET_PAGE_BITS);
++    ram_discard_range(rbname, offset, ((ram_addr_t)pages) << TARGET_PAGE_B=
+ITS);
  }
+=20
+ /*
+@@ -2093,7 +2093,7 @@ static int ram_save_page(RAMState *rs, PageSearchStat=
+us *pss, bool last_stage)
+     uint8_t *p;
+     bool send_async =3D true;
+     RAMBlock *block =3D pss->block;
+-    ram_addr_t offset =3D pss->page << TARGET_PAGE_BITS;
++    ram_addr_t offset =3D ((ram_addr_t)pss->page) << TARGET_PAGE_BITS;
+     ram_addr_t current_addr =3D block->offset + offset;
+=20
+     p =3D block->host + offset;
+@@ -2280,7 +2280,8 @@ static bool find_dirty_block(RAMState *rs, PageSearch=
+Status *pss, bool *again)
+         *again =3D false;
+         return false;
+     }
+-    if ((pss->page << TARGET_PAGE_BITS) >=3D pss->block->used_length) {
++    if ((((ram_addr_t)pss->page) << TARGET_PAGE_BITS)
++        >=3D pss->block->used_length) {
+         /* Didn't find anything in this RAM Block */
+         pss->page =3D 0;
+         pss->block =3D QLIST_NEXT_RCU(pss->block, next);
+@@ -2571,7 +2572,7 @@ static int ram_save_target_page(RAMState *rs, PageSea=
+rchStatus *pss,
+                                 bool last_stage)
+ {
+     RAMBlock *block =3D pss->block;
+-    ram_addr_t offset =3D pss->page << TARGET_PAGE_BITS;
++    ram_addr_t offset =3D ((ram_addr_t)pss->page) << TARGET_PAGE_BITS;
+     int res;
+=20
+     if (control_save_page(rs, block, offset, &res)) {
+@@ -2657,7 +2658,8 @@ static int ram_save_host_page(RAMState *rs, PageSearc=
+hStatus *pss,
+         /* Allow rate limiting to happen in the middle of huge pages */
+         migration_rate_limit();
+     } while ((pss->page & (pagesize_bits - 1)) &&
+-             offset_in_ramblock(pss->block, pss->page << TARGET_PAGE_BITS)=
+);
++             offset_in_ramblock(pss->block,
++                                ((ram_addr_t)pss->page) << TARGET_PAGE_BIT=
+S));
+=20
+     /* The offset we leave with is the last one we looked at */
+     pss->page--;
+@@ -2874,8 +2876,10 @@ void ram_postcopy_migrated_memory_release(MigrationS=
+tate *ms)
+=20
+         while (run_start < range) {
+             unsigned long run_end =3D find_next_bit(bitmap, range, run_sta=
+rt + 1);
+-            ram_discard_range(block->idstr, run_start << TARGET_PAGE_BITS,
+-                              (run_end - run_start) << TARGET_PAGE_BITS);
++            ram_discard_range(block->idstr,
++                              ((ram_addr_t)run_start) << TARGET_PAGE_BITS,
++                              ((ram_addr_t)(run_end - run_start))
++                                << TARGET_PAGE_BITS);
+             run_start =3D find_next_zero_bit(bitmap, range, run_end + 1);
+         }
+     }
+@@ -4273,13 +4277,16 @@ static void colo_flush_ram_cache(void)
+         while (block) {
+             offset =3D migration_bitmap_find_dirty(ram_state, block, offse=
+t);
+=20
+-            if (offset << TARGET_PAGE_BITS >=3D block->used_length) {
++            if (((ram_addr_t)offset) << TARGET_PAGE_BITS
++                >=3D block->used_length) {
+                 offset =3D 0;
+                 block =3D QLIST_NEXT_RCU(block, next);
+             } else {
+                 migration_bitmap_clear_dirty(ram_state, block, offset);
+-                dst_host =3D block->host + (offset << TARGET_PAGE_BITS);
+-                src_host =3D block->colo_cache + (offset << TARGET_PAGE_BI=
+TS);
++                dst_host =3D block->host
++                         + (((ram_addr_t)offset) << TARGET_PAGE_BITS);
++                src_host =3D block->colo_cache
++                         + (((ram_addr_t)offset) << TARGET_PAGE_BITS);
+                 memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
+             }
+         }
 --=20
 2.24.1
 
