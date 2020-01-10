@@ -2,86 +2,74 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263C4C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DFAC33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4CDB20721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:54:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLB47DLq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4CDB20721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EF90D20721
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 09:54:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF90D20721
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipqze-00015A-Mn
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 04:54:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49061)
+	id 1ipqzi-0001Vy-Ua
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 04:54:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ipqy7-0007pJ-NF
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:52:40 -0500
+ (envelope-from <bounces@canonical.com>) id 1ipqwK-00058E-M0
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ipqy5-00052l-OC
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:52:38 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45010
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ipqy5-0004yx-Hl
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:52:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578649956;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+UWPpEck3ZmDBtj2ZpZeyCti65+1QI3VhxHLYW9D4B0=;
- b=BLB47DLqVvKpqdKaYz110GmzNszmp716FCDtH0QDDEEo3rXtcBgbo/cvmsxUMkxKPQzdod
- umNhKnU7iBHeMi/nqycHPniGhoQbsVD7x9IakRI6MxXTOBgchT/QDLX+s63nAbMyWj+NhT
- 3+LdkrhD1pHEP9FqXRxCpHvVh5NsPPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-9VsIyrhpM4C2c2MDyby0Mw-1; Fri, 10 Jan 2020 04:52:35 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96E5A1883536
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 09:52:34 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.36])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA6541001B03;
- Fri, 10 Jan 2020 09:52:30 +0000 (UTC)
-Date: Fri, 10 Jan 2020 09:52:28 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- mszeredi@redhat.com
-Subject: Re: [PATCH 066/104] virtiofsd: passthrough_ll: add renameat2 support
-Message-ID: <20200110095228.GC3901@work-vm>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-67-dgilbert@redhat.com>
- <20200107112143.GJ3368802@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1ipqwJ-0005zz-DH
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:50:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39158)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ipqwJ-0005tp-6E
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 04:50:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ipqwG-0002Cu-0d
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 09:50:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 275B92E810A
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 09:50:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200107112143.GJ3368802@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 9VsIyrhpM4C2c2MDyby0Mw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Fri, 10 Jan 2020 09:38:28 -0000
+From: Thomas Huth <1656927@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jom-3 th-huth
+X-Launchpad-Bug-Reporter: Joan Moreau (jom-3)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20170116193627.27340.49782.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157864910854.27216.9999501496435605365.malone@chaenomeles.canonical.com>
+Subject: [Bug 1656927] Re: Network (TCP) access regression
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: cfba6205f892b77a2c74bf426bbfeec374ca6b9e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,68 +78,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Reply-To: Bug 1656927 <1656927@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Thu, Dec 12, 2019 at 04:38:26PM +0000, Dr. David Alan Gilbert (git) wr=
-ote:
-> > From: Miklos Szeredi <mszeredi@redhat.com>
-> >=20
-> > No glibc support yet, so use syscall().
->=20
-> It exists in glibc in my Fedora 31 install.
->=20
-> Presumably this is related to an older version
->=20
-> > Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-> > ---
-> >  tools/virtiofsd/passthrough_ll.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >=20
-> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthr=
-ough_ll.c
-> > index 91d3120033..bed2270141 100644
-> > --- a/tools/virtiofsd/passthrough_ll.c
-> > +++ b/tools/virtiofsd/passthrough_ll.c
-> > @@ -1083,7 +1083,17 @@ static void lo_rename(fuse_req_t req, fuse_ino_t=
- parent, const char *name,
-> >      }
-> > =20
-> >      if (flags) {
-> > +#ifndef SYS_renameat2
-> >          fuse_reply_err(req, EINVAL);
-> > +#else
-> > +        res =3D syscall(SYS_renameat2, lo_fd(req, parent), name,
-> > +                      lo_fd(req, newparent), newname, flags);
-> > +        if (res =3D=3D -1 && errno =3D=3D ENOSYS) {
-> > +            fuse_reply_err(req, EINVAL);
-> > +        } else {
-> > +            fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-> > +        }
-> > +#endif
->=20
-> We should use the formal API if available as first choice
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
-OK, done - I've kept the 'ifndef SYS_renameat2' that drops back to an
-error for truly ancient cases; although I doubt everything else will
-build on something that old.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Dave
+-- =
 
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1656927
 
+Title:
+  Network (TCP) access regression
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Starting a VM with
+
+  /usr/bin/qemu-system-x86_64 -machine pc-i440fx-1.7,accel=3Dkvm -usb -usbd=
+evice tablet -usbdevice keyboard -enable-kvm -cpu core2duo -smp 2 -drive fi=
+le=3Dwinp
+  ro.qcow,index=3D0,media=3Ddisk,format=3Dqcow2 -m 4096 -vga vmware -vnc :3=
+ -k en-us -device rtl8139,netdev=3Dnic1 -netdev user,id=3Dnic1,smb=3D/data/=
+vps/files/,hostfw
+  d=3Dtcp::10053-:10053,hostfwd=3Dtcp::3387-:3389 -rtc base=3Dutc,clock=3Dh=
+ost -daemonize
+
+  in 2.5.1, all works fine
+
+  in any version after 2.5.1.1, the network terminate TCP connections
+  after a certain period .
+
+  To reproduce, starts an app that use always connected TCP sockets (I
+  am using Metatrader 4), let it run a an hour, the app does not realize
+  the TCP is out of order but the TCP connection is closed by QEMU
+
+  in 2.5.1.x, Metatrader works perfectly
+
+  Thank you for your help
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1656927/+subscriptions
 
