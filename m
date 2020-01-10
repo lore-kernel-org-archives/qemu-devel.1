@@ -2,82 +2,82 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F846C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D43C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:13:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A94420721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6CDA20721
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:13:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MBlnNjMQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A94420721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cb1C+uG8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6CDA20721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipuxX-0005Zk-Cq
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:08:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45335)
+	id 1ipv2P-0008QD-Pb
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:13:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ipuwn-0004qS-Vq
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:07:34 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ipv1e-0007xe-Bs
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:12:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ipuwl-0007KY-Gz
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:07:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29929
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ipuwl-0007Hc-Bx
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:07:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578665250;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=dceowFlW4KsMiLnA087lp5b5jQych2KtMl/5lGk8pyI=;
- b=MBlnNjMQmlLDsDYRZvXhAoJcYikG066qUYJWB/jDz34c7tRF5F3H8+1CzpNAVo5c07Uon5
- P2WGqKOgns8yPd2Gd9rAzo8kkvuI7coR25RpbYUUG5WHc0zpDnRQCsJKm3V/3U3lfVgLb5
- F4sz8ENX1kvKxJqOE3erDxxWZoFGqo8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-_KiygZNfM6KZZQBkM2L7WQ-1; Fri, 10 Jan 2020 09:07:27 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14AE410829D5;
- Fri, 10 Jan 2020 14:07:26 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-154.ams2.redhat.com [10.36.116.154])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C736678E77;
- Fri, 10 Jan 2020 14:07:24 +0000 (UTC)
-Subject: Re: [PATCH V2] vhost-user-test: fix a memory leak
-To: pannengyuan@huawei.com, lvivier@redhat.com, pbonzini@redhat.com
-References: <1576805214-2508-1-git-send-email-pannengyuan@huawei.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <072970b5-b7cc-ad71-d3e4-933e888b7093@redhat.com>
-Date: Fri, 10 Jan 2020 15:07:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1ipv1c-0006Py-U7
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:12:34 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:37988)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ipv1c-0006ND-NG
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:12:32 -0500
+Received: by mail-ot1-x334.google.com with SMTP id d7so2060850otf.5
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 06:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=mkmGIi/HuHPvk5eDn3All8LMfFLJPGi2E0wyo4wf/4Y=;
+ b=Cb1C+uG8pamOt+hF5qfsgcPNo8o0fz3/j099/0svGc8cam/7mpvd/sN9KeSbqxs2WL
+ +DnW0Lwgv9I2N/ug0EzVpSnWTXNTPUoWa1UMMpfpsY3zhpbva0c0TkL0cjwI9o/9Ft9z
+ /+fpaw0riRjgh75EBDZvIXt71jD0quHD7tKxuci5r90/17SDHwB/4JFjy5ajh23ikQjY
+ 8CFvnd+PbtgqwTYwLq537f7/LQEBK9U+WIGK7cEDNvrwC0wPNDHOUXAGzHyFUBZ3oom5
+ GZHP9vcB/U6Ps/L0WYuBd7Ug7uCjq2nmErPC9UO1jvGOLu4Do269jIfuJeYtQRnx3+yU
+ VnuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=mkmGIi/HuHPvk5eDn3All8LMfFLJPGi2E0wyo4wf/4Y=;
+ b=icT6mr1KF8eY3XwbcXGm+aWbrwu4BYywa7GMuYHBk7iSXM6tpZwHZpIeCXc4kjiQWN
+ qmuV0pObdqhQtgZBnEsZJgsR5hj28zmjq9Z8RFTP88C7CQMVm4OiCVyMcHyMPX7OTwBg
+ ijW9hGrNtDoQzVZ73bJ2zR83iIgQB7mR1a+wDO/N9HNhS9vaQ2VqhmaX5tSFRCD2Kt5O
+ 5I++JQHQ37eAlp5mwY6qEGXgI3m+g2SGL4szpj26q30Fj2lEtPMdPuHFj7GRnM74LZIH
+ 2ZoYN4d3uHkExmo8bziTtSqkgHugqUeUPF3H1xPIA68ECuLCUzlv2Fiiaz2oyu7iT473
+ xAVw==
+X-Gm-Message-State: APjAAAWV5Ksjr2tVjvur3/puJZ5B1ehOwW2+vlcBDU2e93jwChMbWZQe
+ rwCq39Rnz8S725w6Np0ssGf9NEAIK3uO7AKWt6oL1A==
+X-Google-Smtp-Source: APXvYqwgqKaGhGbETEbYLtx+Rarrsg884cZYty9No5HY4rHE1pxn93uB2icd8yW9b6ckTNiNoUW9R7rEWtCgKfMDwwg=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr2792897otd.91.1578665551584; 
+ Fri, 10 Jan 2020 06:12:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1576805214-2508-1-git-send-email-pannengyuan@huawei.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: _KiygZNfM6KZZQBkM2L7WQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20200109141858.14376-1-alex.bennee@linaro.org>
+In-Reply-To: <20200109141858.14376-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Jan 2020 14:12:20 +0000
+Message-ID: <CAFEAcA_-06wBANpGdvgfDJLRyWYmGjLqJMqD-1mhXWGs3xz1yg@mail.gmail.com>
+Subject: Re: [PULL v2 00/14] testing fixes and semihosting console support
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,55 +89,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/12/2019 02.26, pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
-> 
-> Spotted by ASAN.
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> ---
-> Changes V2 to V1:
-> - use a "goto cleanup", instead of duplicating the "free" functions.
-> - free "dest_cmdline" at the end.
-> ---
->  tests/vhost-user-test.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-> index 91ea373..dcb8617 100644
-> --- a/tests/vhost-user-test.c
-> +++ b/tests/vhost-user-test.c
-> @@ -717,7 +717,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
->      guint64 size;
->  
->      if (!wait_for_fds(s)) {
-> -        return;
-> +        goto cleanup;
->      }
->  
->      size = get_log_size(s);
-> @@ -776,8 +776,11 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
->      g_source_unref(source);
->  
->      qtest_quit(to);
-> +
-> + cleanup:
->      test_server_free(dest);
->      g_free(uri);
-> +    g_string_free(dest_cmdline, true);
->  }
->  
->  static void wait_for_rings_started(TestServer *s, size_t count)
-> 
+On Thu, 9 Jan 2020 at 14:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+>
+> The following changes since commit 035eed4c0d257c905a556fa0f4865a0c077b4e=
+7f:
+>
+>   Merge remote-tracking branch 'remotes/vivier/tags/q800-for-5.0-pull-req=
+uest' into staging (2020-01-07 17:08:21 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-testing-and-semihosting-0=
+90120-2
+>
+> for you to fetch changes up to 486e58b188c1b093a8f64d4b5cd11ff5c3514cb2:
+>
+>   tests/tcg: add user version of dumb-as-bricks semiconsole test (2020-01=
+-09 11:41:29 +0000)
+>
+> ----------------------------------------------------------------
+> Testing fixes and semiconsole support:
+>
+>   - build fix (missing x86-iommu stubs)
+>   - python fixes for freebsd and OSX
+>   - nicer reporting of acceptance failures
+>   - fix build nesting of fp-test (breaks bsds)
+>   - semihosting clean-ups
+>   - support for blocking semihosting console
+>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-... and picked up to my qtest-next tree.
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
+
+-- PMM
 
