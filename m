@@ -2,83 +2,82 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF74C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2626FC33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:20:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2857220838
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:16:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3A5B2072E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 13:20:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CT7bOWF1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2857220838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Csk1bf2A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3A5B2072E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipu9X-0007UQ-W1
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 08:16:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38069)
+	id 1ipuCw-0002LD-Fl
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 08:20:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ipu8D-0006aE-1l
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:15:18 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ipuCE-0001ur-K2
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:19:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ipu8B-0000Ab-HB
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:15:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48475
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ipu8B-000092-Aq
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:15:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578662114;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3Hn+MxLDUNfuH9pjzjB8E7QU87i7NfMLknolHa1WD1I=;
- b=CT7bOWF1V5Xv29dyLHoSPUpXCe0yJADwmVg/ANmg8N9ilpfCXOKeuxr5+HGbZjXzcD/pYq
- F3oL55JAgpvmDWKzB2ud9gOvrbHy82AZJ+MT13+Wdj2O6RfaxJhItA8UUj6Bg9mhyxKi2W
- EX/A9INQ3jh4sWVKpP/jikDXOTMWBRE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-LlpjPbfZPc-llf4vmrzNQg-1; Fri, 10 Jan 2020 08:15:12 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98542189CD03
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 13:15:11 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.36])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 680A280628;
- Fri, 10 Jan 2020 13:15:07 +0000 (UTC)
-Date: Fri, 10 Jan 2020 13:15:04 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 099/104] virtiofsd: use fuse_buf_writev to replace
- fuse_buf_write for better performance
-Message-ID: <20200110131504.GF3901@work-vm>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
- <20191212163904.159893-100-dgilbert@redhat.com>
- <20200107122347.GI3368802@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1ipuCD-0006Q5-7c
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:19:26 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45713)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ipuCC-0006MG-UY
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 08:19:25 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 59so1867580otp.12
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 05:19:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=dXgZQlRBXdoPVaHCzFNqCY7Ia6IT0sg36Il/1y3LLgQ=;
+ b=Csk1bf2AEo0AfhQ+t0mHTujDKIrXtDZrXcAROP9dl6KiTQJZVpim/3NmKDomgPyi0Y
+ p788ex8vX8GNOE/4i7I1nh9A9hj1tNJaks6OAShqHIC0q3grVQm4E0ey5HqllL9OOFS9
+ cCryWovYTf58nkFL27PEYEb0Z3zTIQwQ6RHbtLPvrx1yDcayhgHWpgbXNdHbvX6DiYKo
+ Lyg3YuUCv2La7d65Gbvt/QQFiFzelXbm0lfnw4jQyiVc4ofr5rPOeScIys1OgPaoRbHW
+ 5SE7PtIkyBytAlzpNQCesp+EM40Wkh5iYZ/J/JAhBXTaY2ECPORNkIDCw+uUsaJM73bh
+ cIwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=dXgZQlRBXdoPVaHCzFNqCY7Ia6IT0sg36Il/1y3LLgQ=;
+ b=Z+/vpSgrnQJ8J679v42jIe1YnWNeBvUCNds7qlMSn9PxX86TYm9FzK3MUg5+rw09O0
+ pMet7kOqoOSa+jpxQYLDJunKVcBQeFTrpf1zvuMzjk8BRFLpmZQ7R8G8DTP+teXyMwT8
+ V0YYDrc+q6PgOcGuMeSiJTPZYk8Po6fyWRabCv8XWUxSmAAH0gcyvpDbUDtejMuI97lY
+ FCpwKW0T8jncmCriDXZvQRo/tIVtrcLi2ENAWLfMUxFoBA2Gt1aBzVDi4h2LGWCqbcYz
+ 0Oqr/Y4a7VMFnrAbh3jIN5A+rbXSNOhQqWtaRUR7CI2lqvA0P7ACJHQDW+hp/oCEcAqk
+ NMzw==
+X-Gm-Message-State: APjAAAUQa2omSzf3ptyIYrmZYrdAn/ONmnlv3zfDNDZEB9b4NhgJJ8XM
+ rtWRK38WtRi6yR2CCYdEIsd8Q5HwU1LflRfWjTlPag==
+X-Google-Smtp-Source: APXvYqxdqetZ5baW2ZC7giOEKyamP2yqF/s8JGUL3MBrlXAVqSmb20qou7wuBw3Ohv5wMqKAc+854322D2C3NZX2TzI=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr2583594otd.91.1578662364047; 
+ Fri, 10 Jan 2020 05:19:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20200107122347.GI3368802@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: LlpjPbfZPc-llf4vmrzNQg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
+References: <20200110112725.689401-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20200110112725.689401-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 10 Jan 2020 13:19:13 +0000
+Message-ID: <CAFEAcA9rrNPTTWRze34Wy+3zVgPrgM41qeSuamCF3_bKBLpAnQ@mail.gmail.com>
+Subject: Re: [PATCH] configure: check for gdbus-codegen presence
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,62 +89,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Thu, Dec 12, 2019 at 04:38:59PM +0000, Dr. David Alan Gilbert (git) wr=
-ote:
-> > From: piaojun <piaojun@huawei.com>
-> >=20
-> > fuse_buf_writev() only handles the normal write in which src is buffer
-> > and dest is fd. Specially if src buffer represents guest physical
-> > address that can't be mapped by the daemon process, IO must be bounced
-> > back to the VMM to do it by fuse_buf_copy().
-> >=20
-> > Signed-off-by: Jun Piao <piaojun@huawei.com>
-> > Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> >  tools/virtiofsd/buffer.c | 23 +++++++++++++++++++----
-> >  1 file changed, 19 insertions(+), 4 deletions(-)
->=20
-> Reviewed-by: Daniel P. Berrang=E9 <berrange@redhat.com>
->=20
-> >=20
-> > diff --git a/tools/virtiofsd/buffer.c b/tools/virtiofsd/buffer.c
-> > index ae420c70c4..4875473785 100644
-> > --- a/tools/virtiofsd/buffer.c
-> > +++ b/tools/virtiofsd/buffer.c
-> > @@ -33,9 +33,7 @@ size_t fuse_buf_size(const struct fuse_bufvec *bufv)
-> >      return size;
-> >  }
-> > =20
-> > -__attribute__((unused))
-> > -static ssize_t fuse_buf_writev(fuse_req_t req,
->=20
-> Lets cull the fuse_req_t param in the previous patch
+On Fri, 10 Jan 2020 at 11:27, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Some distros ship gdbus-codegen separately for gio headers/pc...
+>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  configure | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/configure b/configure
+> index 0ce2c0354a..28ee2a254f 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3702,6 +3702,9 @@ if $pkg_config --atleast-version=3D$glib_req_ver gi=
+o-2.0; then
+>      gio_cflags=3D$($pkg_config --cflags gio-2.0)
+>      gio_libs=3D$($pkg_config --libs gio-2.0)
+>      gdbus_codegen=3D$($pkg_config --variable=3Dgdbus_codegen gio-2.0)
+> +    if [ ! -x "$gdbus_codegen" ]; then
+> +        gdbus_codegen=3D
+> +    fi
+>  else
+>      gio=3Dno
+>  fi
+> --
+> 2.25.0.rc1.20.g2443f3f80d.dirty
 
-Done.
+Thanks; applied to master as a buildfix.
 
-> > -                               struct fuse_buf *out_buf,
-> > +static ssize_t fuse_buf_writev(struct fuse_buf *out_buf,
-> >                                 struct fuse_bufvec *in_buf)
-> >  {
-> >      ssize_t res, i, j;
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+-- PMM
 
