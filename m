@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A35C2C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F33C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:48:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D3BB20678
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:46:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E24D520678
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:48:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XMiaae0s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D3BB20678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBnaC2CX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24D520678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipyN5-00050C-RH
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:46:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50838)
+	id 1ipyOG-0006Ua-G8
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:48:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipyBq-0006bM-8E
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:20 -0500
+ (envelope-from <quintela@redhat.com>) id 1ipyAJ-0004FH-Ta
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:33:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipyBo-0006IJ-FO
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32701
+ (envelope-from <quintela@redhat.com>) id 1ipyAI-0002bg-GP
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:33:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24874
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyBo-0006Gt-7M
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:16 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyAI-0002aG-Bl
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:33:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578677715;
+ s=mimecast20190719; t=1578677621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EQALvcPXzFFV1dUEGEEm7mAMYA5rBk0OVau7kpARh/c=;
- b=XMiaae0s9M70Zm9M1h3YMyXOkPPqwQpGTwKBTJamtgA/FISSBwFok39JMi5MHJYDq+Puym
- VEDhegoI3bx6S9eF1k83m+7bKKOcooJMjvITvqny9+zKkP/OPEBT3mlYCJctlayYT0tkzK
- jsy5HqDHGiRDUB6WuHbpNLD9CaFR33I=
+ bh=YenyR+cDlGnKbLpY/elkWxAa8k3PezuARzjo1X24+Yw=;
+ b=YBnaC2CXPjlVuwkZ48aAbA2rqk+QNlyrs5sqxzdliQ5DZO0ev1R+jSjlDqqJt2N2oKUQm0
+ ec0uoDHU9/Canf0kBQsYjGsRlqRTWjJ72zCQCoygVA0l11kGQ3+itTudtV8NGDE2hEixqX
+ RUKtcHg3C1JgEpjJvT+ARK+oxMy5qtg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-YjNmZRo7NbOgheaYLYTEXQ-1; Fri, 10 Jan 2020 12:35:14 -0500
+ us-mta-330-Fm2T6eCWPFaTofxLe91aaQ-1; Fri, 10 Jan 2020 12:33:40 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 344A4100550E;
- Fri, 10 Jan 2020 17:35:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65FC6800D48;
+ Fri, 10 Jan 2020 17:33:38 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-240.ams2.redhat.com [10.36.116.240])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3A18519C4F;
- Fri, 10 Jan 2020 17:35:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DB9619C4F;
+ Fri, 10 Jan 2020 17:33:28 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/28] migration/postcopy: count target page number to decide
- the place_needed
-Date: Fri, 10 Jan 2020 18:32:04 +0100
-Message-Id: <20200110173215.3865-18-quintela@redhat.com>
+Subject: [PULL 09/28] migration: Fix incorrect integer->float conversion
+ caught by clang
+Date: Fri, 10 Jan 2020 18:31:56 +0100
+Message-Id: <20200110173215.3865-10-quintela@redhat.com>
 In-Reply-To: <20200110173215.3865-1-quintela@redhat.com>
 References: <20200110173215.3865-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: YjNmZRo7NbOgheaYLYTEXQ-1
+X-MC-Unique: Fm2T6eCWPFaTofxLe91aaQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,79 +85,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
- Richard Henderson <rth@twiddle.net>
+ Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Richard Henderson <richard.henderson@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Fangrui Song <i@maskray.me>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Fangrui Song <i@maskray.me>
 
-In postcopy, it requires to place whole host page instead of target
-page.
+Clang does not like qmp_migrate_set_downtime()'s code to clamp double
+@value to 0..INT64_MAX:
 
-Currently, it relies on the page offset to decide whether this is the
-last target page. We also can count the target page number during the
-iteration. When the number of target page equals
-(host page size / target page size), this means it is the last target
-page in the host page.
+    qemu/migration/migration.c:2038:24: error: implicit conversion from 'lo=
+ng' to 'double' changes value from 9223372036854775807 to 92233720368547758=
+08 [-Werror,-Wimplicit-int-float-conversion]
 
-This is a preparation for non-ordered target page transmission.
+The warning will be enabled by default in clang 10. It is not
+available for clang <=3D 9.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+The clamp is actually useless; @value is checked to be within
+0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
+
+While there, make the conversion from double to int64_t explicit.
+
+Signed-off-by: Fangrui Song <i@maskray.me>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+[Patch split, commit message improved]
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ migration/migration.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index f9e6f20024..f20dfc3b68 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -4052,6 +4052,7 @@ static int ram_load_postcopy(QEMUFile *f)
-     void *postcopy_host_page =3D mis->postcopy_tmp_page;
-     void *last_host =3D NULL;
-     bool all_zero =3D false;
-+    int target_pages =3D 0;
+diff --git a/migration/migration.c b/migration/migration.c
+index 27500d09a9..f79d0bf89a 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error *=
+*errp)
+     }
 =20
-     while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
-         ram_addr_t addr;
-@@ -4086,6 +4087,7 @@ static int ram_load_postcopy(QEMUFile *f)
-                 ret =3D -EINVAL;
-                 break;
-             }
-+            target_pages++;
-             matches_target_page_size =3D block->page_size =3D=3D TARGET_PA=
-GE_SIZE;
-             /*
-              * Postcopy requires that we place whole host pages atomically=
-;
-@@ -4117,8 +4119,10 @@ static int ram_load_postcopy(QEMUFile *f)
-              * If it's the last part of a host page then we place the host
-              * page
-              */
--            place_needed =3D (((uintptr_t)host + TARGET_PAGE_SIZE) &
--                                     (block->page_size - 1)) =3D=3D 0;
-+            if (target_pages =3D=3D (block->page_size / TARGET_PAGE_SIZE))=
- {
-+                place_needed =3D true;
-+                target_pages =3D 0;
-+            }
-             place_source =3D postcopy_host_page;
-         }
-         last_host =3D host;
+     value *=3D 1000; /* Convert to milliseconds */
+-    value =3D MAX(0, MIN(INT64_MAX, value));
+=20
+     MigrateSetParameters p =3D {
+         .has_downtime_limit =3D true,
+-        .downtime_limit =3D value,
++        .downtime_limit =3D (int64_t)value,
+     };
+=20
+     qmp_migrate_set_parameters(&p, errp);
 --=20
 2.24.1
 
