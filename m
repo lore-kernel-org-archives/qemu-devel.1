@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD865C33CA3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A11C2C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 966F420842
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 966F420842
+	by mail.kernel.org (Postfix) with ESMTPS id 77BE320842
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:44:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77BE320842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq0CT-0003b2-Bx
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:44:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44329)
+	id 1iq0CV-0003gD-Sr
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:44:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Al-0001gv-P3
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:20 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ao-0001mG-9Q
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ad-0004dn-Fw
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:15 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53912)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Am-0004y0-H0
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:22 -0500
+Received: from relay.sw.ru ([185.231.240.75]:53970)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0Ad-0004Ra-3U; Fri, 10 Jan 2020 14:42:11 -0500
+ id 1iq0Am-0004mZ-80; Fri, 10 Jan 2020 14:42:20 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0AV-0008Ob-Mk; Fri, 10 Jan 2020 22:42:03 +0300
+ id 1iq0AT-0008Ob-Ta; Fri, 10 Jan 2020 22:42:02 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 06/11] pflash: introduce ERRP_AUTO_PROPAGATE
-Date: Fri, 10 Jan 2020 22:41:53 +0300
-Message-Id: <20200110194158.14190-7-vsementsov@virtuozzo.com>
+Subject: [PATCH v6 01/11] qapi/error: add (Error **errp) cleaning APIs
+Date: Fri, 10 Jan 2020 22:41:48 +0300
+Message-Id: <20200110194158.14190-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200110194158.14190-1-vsementsov@virtuozzo.com>
 References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
@@ -61,104 +61,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- Greg Kurz <groug@kaod.org>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
+ Paul Durrant <paul@xen.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If we want to add some info to errp (by error_prepend() or
-error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-Otherwise, this info will not be added when errp == &error_fatal
-(the program will exit prior to the error_append_hint() or
-error_prepend() call).  Fix such cases.
-
-If we want to check error after errp-function call, we need to
-introduce local_err and then propagate it to errp. Instead, use
-ERRP_AUTO_PROPAGATE macro, benefits are:
-1. No need of explicit error_propagate call
-2. No need of explicit local_err variable: use errp directly
-3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
-   &error_fatal, this means that we don't break error_abort
-   (we'll abort on error_set, not on error_propagate)
-
-This commit is generated by command
-
-    sed -n '/^Parallel NOR Flash devices$/,/^$/{s/^F: //p}' \
-        MAINTAINERS | \
-    xargs git ls-files | grep '\.[hc]$' | \
-    xargs spatch \
-        --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-        --macro-file scripts/cocci-macro-file.h \
-        --in-place --no-show-diff --max-width 80
-
-Reported-by: Kevin Wolf <kwolf@redhat.com>
-Reported-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/block/pflash_cfi01.c | 7 +++----
- hw/block/pflash_cfi02.c | 7 +++----
- 2 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 54e6ebd385..9b12b04b65 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -700,12 +700,12 @@ static const MemoryRegionOps pflash_cfi01_ops = {
+CC: Cornelia Huck <cohuck@redhat.com>
+CC: Eric Blake <eblake@redhat.com>
+CC: Kevin Wolf <kwolf@redhat.com>
+CC: Max Reitz <mreitz@redhat.com>
+CC: Greg Kurz <groug@kaod.org>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Stefano Stabellini <sstabellini@kernel.org>
+CC: Anthony Perard <anthony.perard@citrix.com>
+CC: Paul Durrant <paul@xen.org>
+CC: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+CC: Laszlo Ersek <lersek@redhat.com>
+CC: Gerd Hoffmann <kraxel@redhat.com>
+CC: Stefan Berger <stefanb@linux.ibm.com>
+CC: Markus Armbruster <armbru@redhat.com>
+CC: Michael Roth <mdroth@linux.vnet.ibm.com>
+CC: qemu-block@nongnu.org
+CC: xen-devel@lists.xenproject.org
+
+ include/qapi/error.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index ad5b6e896d..fa8d51fd6d 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -309,6 +309,32 @@ void warn_reportf_err(Error *err, const char *fmt, ...)
+ void error_reportf_err(Error *err, const char *fmt, ...)
+     GCC_FMT_ATTR(2, 3);
  
- static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PFlashCFI01 *pfl = PFLASH_CFI01(dev);
-     uint64_t total_len;
-     int ret;
-     uint64_t blocks_per_device, sector_len_per_device, device_len;
-     int num_devices;
--    Error *local_err = NULL;
- 
-     if (pfl->sector_len == 0) {
-         error_setg(errp, "attribute \"sector-length\" not specified or zero.");
-@@ -739,9 +739,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-         &pfl->mem, OBJECT(dev),
-         &pflash_cfi01_ops,
-         pfl,
--        pfl->name, total_len, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+        pfl->name, total_len, errp);
-+    if (*errp) {
-         return;
-     }
- 
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index c7d92c3e79..7b33008fd5 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -719,9 +719,9 @@ static const MemoryRegionOps pflash_cfi02_ops = {
- 
- static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- {
-+    ERRP_AUTO_PROPAGATE();
-     PFlashCFI02 *pfl = PFLASH_CFI02(dev);
-     int ret;
--    Error *local_err = NULL;
- 
-     if (pfl->uniform_sector_len == 0 && pfl->sector_len[0] == 0) {
-         error_setg(errp, "attribute \"sector-length\" not specified or zero.");
-@@ -787,9 +787,8 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
- 
-     memory_region_init_rom_device(&pfl->orig_mem, OBJECT(pfl),
-                                   &pflash_cfi02_ops, pfl, pfl->name,
--                                  pfl->chip_len, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                  pfl->chip_len, errp);
-+    if (*errp) {
-         return;
-     }
- 
++/*
++ * Functions to clean Error **errp: call corresponding Error *err cleaning
++ * function an set pointer to NULL
++ */
++static inline void error_free_errp(Error **errp)
++{
++    assert(errp && *errp);
++    error_free(*errp);
++    *errp = NULL;
++}
++
++static inline void error_report_errp(Error **errp)
++{
++    assert(errp && *errp);
++    error_report_err(*errp);
++    *errp = NULL;
++}
++
++static inline void warn_report_errp(Error **errp)
++{
++    assert(errp && *errp);
++    warn_report_err(*errp);
++    *errp = NULL;
++}
++
++
+ /*
+  * Just like error_setg(), except you get to specify the error class.
+  * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is
 -- 
 2.21.0
 
