@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F33C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDF0C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:49:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E24D520678
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D19E20678
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:49:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YBnaC2CX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24D520678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bIgqLB3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D19E20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipyOG-0006Ua-G8
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:48:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46860)
+	id 1ipyPj-00009Y-RL
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:49:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipyAJ-0004FH-Ta
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:33:44 -0500
+ (envelope-from <quintela@redhat.com>) id 1ipyCB-00070i-Lg
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipyAI-0002bg-GP
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:33:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24874
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1ipyCA-00076H-4N
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:39 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58722
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyAI-0002aG-Bl
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:33:42 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyC9-00074o-UG
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578677621;
+ s=mimecast20190719; t=1578677737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YenyR+cDlGnKbLpY/elkWxAa8k3PezuARzjo1X24+Yw=;
- b=YBnaC2CXPjlVuwkZ48aAbA2rqk+QNlyrs5sqxzdliQ5DZO0ev1R+jSjlDqqJt2N2oKUQm0
- ec0uoDHU9/Canf0kBQsYjGsRlqRTWjJ72zCQCoygVA0l11kGQ3+itTudtV8NGDE2hEixqX
- RUKtcHg3C1JgEpjJvT+ARK+oxMy5qtg=
+ bh=SSqpK7OYRTRdYmsOlX0kj3gAK31HzZmc08e82895ib0=;
+ b=bIgqLB3/2s6DnlggCUPPPTAjIwAcTUGRGeZ3ARvSCO0x1MZJuTeQaNgpk3BcmyEt2S1eAb
+ I4lNSqFnSJt4IPQO5uclc2OEI/n31zLGCIopyUDetTNtxQtDJ+BlmBSi3RF+zxHIrVJsb1
+ 1RH5O28aCyhZvNmzkeyCQXorB2N8G2k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-Fm2T6eCWPFaTofxLe91aaQ-1; Fri, 10 Jan 2020 12:33:40 -0500
+ us-mta-125-wTIjINQJPFeIejiK3BSxzA-1; Fri, 10 Jan 2020 12:35:36 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65FC6800D48;
- Fri, 10 Jan 2020 17:33:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D70E107ACC5;
+ Fri, 10 Jan 2020 17:35:31 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-240.ams2.redhat.com [10.36.116.240])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3DB9619C4F;
- Fri, 10 Jan 2020 17:33:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E12419C4F;
+ Fri, 10 Jan 2020 17:35:24 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/28] migration: Fix incorrect integer->float conversion
- caught by clang
-Date: Fri, 10 Jan 2020 18:31:56 +0100
-Message-Id: <20200110173215.3865-10-quintela@redhat.com>
+Subject: [PULL 20/28] migration/postcopy: enable compress during postcopy
+Date: Fri, 10 Jan 2020 18:32:07 +0100
+Message-Id: <20200110173215.3865-21-quintela@redhat.com>
 In-Reply-To: <20200110173215.3865-1-quintela@redhat.com>
 References: <20200110173215.3865-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Fm2T6eCWPFaTofxLe91aaQ-1
+X-MC-Unique: wTIjINQJPFeIejiK3BSxzA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,71 +84,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Richard Henderson <richard.henderson@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ Thomas Huth <thuth@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Fangrui Song <i@maskray.me>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Fangrui Song <i@maskray.me>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Clang does not like qmp_migrate_set_downtime()'s code to clamp double
-@value to 0..INT64_MAX:
+postcopy requires to place a whole host page, while migration thread
+migrate memory in target page size. This makes postcopy need to collect
+all target pages in one host page before placing via userfaultfd.
 
-    qemu/migration/migration.c:2038:24: error: implicit conversion from 'lo=
-ng' to 'double' changes value from 9223372036854775807 to 92233720368547758=
-08 [-Werror,-Wimplicit-int-float-conversion]
+To enable compress during postcopy, there are two problems to solve:
 
-The warning will be enabled by default in clang 10. It is not
-available for clang <=3D 9.
+    1. Random order for target page arrival
+    2. Target pages in one host page arrives without interrupt by target
+       page from other host page
 
-The clamp is actually useless; @value is checked to be within
-0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
+The first one is handled by previous cleanup patch.
 
-While there, make the conversion from double to int64_t explicit.
+This patch handles the second one by:
 
-Signed-off-by: Fangrui Song <i@maskray.me>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+    1. Flush compress thread for each host page
+    2. Wait for decompress thread for before placing host page
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[Patch split, commit message improved]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/migration.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ migration/migration.c | 11 -----------
+ migration/ram.c       | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 27 insertions(+), 12 deletions(-)
 
 diff --git a/migration/migration.c b/migration/migration.c
-index 27500d09a9..f79d0bf89a 100644
+index e55edee606..990bff00c0 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error *=
-*errp)
-     }
+@@ -1005,17 +1005,6 @@ static bool migrate_caps_check(bool *cap_list,
+ #endif
 =20
-     value *=3D 1000; /* Convert to milliseconds */
--    value =3D MAX(0, MIN(INT64_MAX, value));
+     if (cap_list[MIGRATION_CAPABILITY_POSTCOPY_RAM]) {
+-        if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
+-            /* The decompression threads asynchronously write into RAM
+-             * rather than use the atomic copies needed to avoid
+-             * userfaulting.  It should be possible to fix the decompressi=
+on
+-             * threads for compatibility in future.
+-             */
+-            error_setg(errp, "Postcopy is not currently compatible "
+-                       "with compression");
+-            return false;
+-        }
+-
+         /* This check is reasonably expensive, so only when it's being
+          * set the first time, also it's only the destination that needs
+          * special support.
+diff --git a/migration/ram.c b/migration/ram.c
+index b5546940f9..b9eb08f549 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3469,6 +3469,14 @@ static int ram_save_iterate(QEMUFile *f, void *opaqu=
+e)
 =20
-     MigrateSetParameters p =3D {
-         .has_downtime_limit =3D true,
--        .downtime_limit =3D value,
-+        .downtime_limit =3D (int64_t)value,
-     };
+             rs->target_page_count +=3D pages;
 =20
-     qmp_migrate_set_parameters(&p, errp);
++            /*
++             * During postcopy, it is necessary to make sure one whole hos=
+t
++             * page is sent in one chunk.
++             */
++            if (migrate_postcopy_ram()) {
++                flush_compressed_data(rs);
++            }
++
+             /*
+              * we want to check in the 1st loop, just in case it was the 1=
+st
+              * time and we had to sync the dirty bitmap.
+@@ -4061,6 +4069,7 @@ static int ram_load_postcopy(QEMUFile *f)
+         void *place_source =3D NULL;
+         RAMBlock *block =3D NULL;
+         uint8_t ch;
++        int len;
+=20
+         addr =3D qemu_get_be64(f);
+=20
+@@ -4078,7 +4087,8 @@ static int ram_load_postcopy(QEMUFile *f)
+=20
+         trace_ram_load_postcopy_loop((uint64_t)addr, flags);
+         place_needed =3D false;
+-        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
++        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
++                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
+             block =3D ram_block_from_stream(f, flags);
+=20
+             host =3D host_from_ram_block_offset(block, addr);
+@@ -4161,6 +4171,17 @@ static int ram_load_postcopy(QEMUFile *f)
+                                          TARGET_PAGE_SIZE);
+             }
+             break;
++        case RAM_SAVE_FLAG_COMPRESS_PAGE:
++            all_zero =3D false;
++            len =3D qemu_get_be32(f);
++            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
++                error_report("Invalid compressed data length: %d", len);
++                ret =3D -EINVAL;
++                break;
++            }
++            decompress_data_with_multi_threads(f, page_buffer, len);
++            break;
++
+         case RAM_SAVE_FLAG_EOS:
+             /* normal exit */
+             multifd_recv_sync_main();
+@@ -4172,6 +4193,11 @@ static int ram_load_postcopy(QEMUFile *f)
+             break;
+         }
+=20
++        /* Got the whole host page, wait for decompress before placing. */
++        if (place_needed) {
++            ret |=3D wait_for_decompress_done();
++        }
++
+         /* Detect for any possible file errors */
+         if (!ret && qemu_file_get_error(f)) {
+             ret =3D qemu_file_get_error(f);
 --=20
 2.24.1
 
