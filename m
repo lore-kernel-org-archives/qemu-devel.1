@@ -2,69 +2,89 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3017C33CA2
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 623D1C33CA2
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:15:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C28D2072A
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E2F42072A
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 12:15:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="rd4Ba57h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C28D2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qWi9kdpg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E2F42072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipt8B-0006Av-Hr
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 07:11:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54489)
+	id 1iptCR-0008Tq-7n
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 07:15:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ipt7U-0005l5-GX
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:10:29 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iptBW-00077C-KO
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qemu_oss@crudebyte.com>) id 1ipt7T-0000bm-6i
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:10:28 -0500
-Received: from kylie.crudebyte.com ([5.189.157.229]:52071)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
- id 1ipt7S-0000VO-Oy
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:10:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=wqB7tILbLgoaMMJBnr4IsbGkg5KXzzC8Vi4Zx4vGr4o=; b=rd4Ba57h+w5EoZfvVHTr3QL0KT
- 07ua1Q2vaRZDsQC+UPPxvaEkSGStSbYPG8euQ4Ikug/TftLxwT5H4RADOuBYgqMAyfTra/4YLKJU2
- fdFAEJYTsT9cElrpn1ttORtUpUGc8RfelR+HtoOyB8Odjl6Jzc12p/omskue9RKBbikEbhwsm7rHX
- TPBwVyx38t/fwf/RlgvtZdGSZzxIaGyAsJ17EgcnlszshETww1OOdfoOT2/po4W8uMoecSGzAVW16
- ZfZlDhvlVwIPkCrqfqjC6fEKJUUCZfiS3NVVS8bTS52WCoe9ZbqdirF/9g7RjOeBG/s4mZSME9NLB
- Ks4B6oFSzWqcBUxvLxNO1HGNiu0EXqSnX10aJr9euZdA5J2wikQX8wcjg+tcygKygdSorHFueNomw
- 8pMZ+C5rC50ZL9r4o5CzuOcl6xA+ilyAOeduWV//KFLtX8reCiBP5AMLSARhelbMe6zbIeOQ52Xtl
- Zqv/aJpbwrH2KUjw4NMshBZwZmp9diVAHGZ7lGCatVkSm/TEyqaxwjqlz9zJGh+rlYpwKvrArd8h6
- 7SOW1O9MK9p/avuKbsafoeyJZlDWkz7DH/kNiCGvRqzTW1HpA+rFkajnYoX0Ms4APf484hhCde9WA
- RgVzZGuCtckXkj7FtjrGSWxpJ4o2X0+Q0s4JSQMG0=;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iptBV-00085B-9d
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:14:38 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:36223)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iptBV-0007wz-0S
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 07:14:37 -0500
+Received: by mail-wr1-x430.google.com with SMTP id z3so1608762wru.3
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 04:14:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=iVoWEeOPJYlBVs2PS/vrGYvRIj8LmXHd8VwGxf+PwbM=;
+ b=qWi9kdpgvXUY6VeIFgkpPCv+YYgYg/CWnQzsigPant4JGAzhmXTsYcO07lmx7HEhM9
+ vZ27JXbn+VJ3xd1WpAFwbGRIBpNL4faX3+Ao9wb+1BHf4orMlOCp1kQIeSHZ+JDNe4EO
+ buMlMfbzMXi1dRY8Kfvp+l5VWX41D0ucTfLnpMRBmj12eSNdXNqBsOROTX0uNTCATco9
+ qZCACTFOKcEvxVjn6598ytYsOLLn4a1RyeuW9uDSyapF+UtJkUksNHu0XguMOAoT+tBa
+ sadNzyxDY67HP68VBP2bzsLv2EBOqHLwvcC1V0iBExZ7JmrmJGpal/Ukl947cDHMRvgX
+ d18A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=iVoWEeOPJYlBVs2PS/vrGYvRIj8LmXHd8VwGxf+PwbM=;
+ b=sK8VwQbW9wUPKkmR49UzE9nj3LDn8W4Fs7Zt5v07srMp8hJWI14oXZcfMW+4XeOgmJ
+ +EoyChJMldheX2rk0XQWqDmmcbEwwGmXy5NJ4xt/5dXOfZLj9imS2mCvei6Faow6V+o+
+ rS1G6Rjn+jBltSEEENyKZ8gP85HIlT8Ng2sn6C1QXbc4IJA502+0DQ8w75rZNwc/gLSu
+ m0fNSAyvXrGI29xvG1ioZbmr4y1YFxXbIBv+3BIYaOXaE8ZDy9SWNw3hMnUnvvKjoakH
+ MsTktGmpKSQ6QAhW6fNAkFDBcKuzp6ADPQ9v+wK3ubFZmP7+Uku2UE8kJ8Ss9M2onyfe
+ 3sBg==
+X-Gm-Message-State: APjAAAWpprJY4t7DKtytOu+ZzU59QNLppZtsdXJBqiRM1MhSh3Pqgc73
+ jGV1lBfyS8T3B97n4xBzXm1syd2oX4Y=
+X-Google-Smtp-Source: APXvYqyKFT6aMa8wfeYT+ZQmygT1f8uuR6cO8+KEbvNOsPhG7wyLJq/YzX5Egm3618GVH57HNckXOA==
+X-Received: by 2002:adf:cd92:: with SMTP id q18mr3185106wrj.261.1578658474480; 
+ Fri, 10 Jan 2020 04:14:34 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c9sm1970706wmc.47.2020.01.10.04.14.32
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 10 Jan 2020 04:14:33 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5AB821FF87
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 12:14:32 +0000 (GMT)
+References: <MW2PR2101MB1035A21608E50D68EE1CF890D63C0@MW2PR2101MB1035.namprd21.prod.outlook.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 4/9] tests/virtio-9p: added readdir test
-Date: Fri, 10 Jan 2020 13:10:24 +0100
-Message-ID: <13849642.UhcBSJl6WW@silver>
-In-Reply-To: <20200109005545.5b24236b@bahia.lan>
-References: <cover.1576678644.git.qemu_oss@crudebyte.com>
- <a8d6dab2625554d425bd44a4d54d84459f083b18.1576678644.git.qemu_oss@crudebyte.com>
- <20200109005545.5b24236b@bahia.lan>
+Subject: Re: plugin order of registration and order of callback
+In-reply-to: <MW2PR2101MB1035A21608E50D68EE1CF890D63C0@MW2PR2101MB1035.namprd21.prod.outlook.com>
+Date: Fri, 10 Jan 2020 12:14:32 +0000
+Message-ID: <87eew7ik47.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.189.157.229
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,129 +100,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 9. Januar 2020 00:55:45 CET Greg Kurz wrote:
-> > diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-> > index 06263edb53..48c0eca292 100644
-> > --- a/tests/virtio-9p-test.c
-> > +++ b/tests/virtio-9p-test.c
-> > @@ -68,6 +68,11 @@ static void v9fs_memread(P9Req *req, void *addr, size_t
-> > len)> 
-> >      req->r_off += len;
-> >  
-> >  }
-> > 
-> > +static void v9fs_uint8_read(P9Req *req, uint8_t *val)
-> > +{
-> > +    v9fs_memread(req, val, 1);
-> > +}
-> > +
-> > 
-> >  static void v9fs_uint16_write(P9Req *req, uint16_t val)
-> >  {
-> >  
-> >      uint16_t le_val = cpu_to_le16(val);
-> > 
-> > @@ -101,6 +106,12 @@ static void v9fs_uint32_read(P9Req *req, uint32_t
-> > *val)> 
-> >      le32_to_cpus(val);
-> >  
-> >  }
-> > 
-> > +static void v9fs_uint64_read(P9Req *req, uint64_t *val)
-> > +{
-> > +    v9fs_memread(req, val, 8);
-> > +    le64_to_cpus(val);
-> > +}
-> > +
-> > 
-> >  /* len[2] string[len] */
-> >  static uint16_t v9fs_string_size(const char *string)
-> >  {
-> > 
-> > @@ -191,6 +202,7 @@ static const char *rmessage_name(uint8_t id)
-> > 
-> >          id == P9_RLOPEN ? "RLOPEN" :
-> >          id == P9_RWRITE ? "RWRITE" :
-> > 
-> >          id == P9_RFLUSH ? "RFLUSH" :
-> > +        id == P9_RREADDIR ? "READDIR" :
-> >          "<unknown>";
-> >  
-> >  }
-> > 
-> > @@ -348,6 +360,79 @@ static void v9fs_rwalk(P9Req *req, uint16_t *nwqid,
-> > v9fs_qid **wqid)> 
-> >      v9fs_req_free(req);
-> >  
-> >  }
-> > 
-> > +/* size[4] Treaddir tag[2] fid[4] offset[8] count[4] */
-> > +static P9Req *v9fs_treaddir(QVirtio9P *v9p, uint32_t fid, uint64_t
-> > offset,
-> > +                            uint32_t count, uint16_t tag)
-> > +{
-> > +    P9Req *req;
-> > +
-> > +    req = v9fs_req_init(v9p, 4 + 8 + 4, P9_TREADDIR, tag);
-> > +    v9fs_uint32_write(req, fid);
-> > +    v9fs_uint64_write(req, offset);
-> > +    v9fs_uint32_write(req, count);
-> > +    v9fs_req_send(req);
-> > +    return req;
-> > +}
-> > +
-> > +struct v9fs_dirent {
-> > +    v9fs_qid qid;
-> > +    uint64_t offset;
-> > +    uint8_t type;
-> > +    char *name;
-> > +    struct v9fs_dirent *next;
-> > +};
-> > +
-> > +/* size[4] Rreaddir tag[2] count[4] data[count] */
-> > +static void v9fs_rreaddir(P9Req *req, uint32_t *count, uint32_t
-> > *nentries,
-> > +                          struct v9fs_dirent **entries)
-> > +{
-> > +    uint32_t sz;
-> 
-> Even if this is a size indeed, the 9p spec uses the wording "count" and
-> so does the function signature. Please rename this variable to local_count.
-> Some other functions that return server originated data already use this
-> naming scheme.
 
-I know, I did that intentionally. But I don't care for such code style details 
-enough to start argueing, so I'll change it.
+Robert Henry <robhenry@microsoft.com> writes:
 
-> 
-> > +    struct v9fs_dirent *e = NULL;
-> > +    uint16_t slen;
-> > +    uint32_t n = 0;
-> > +
-> > +    v9fs_req_recv(req, P9_RREADDIR);
-> > +    v9fs_uint32_read(req, &sz);
-> > +
-> > +    if (count) {
-> > +        *count = sz;
-> > +    }
-> > +
-> > +    for (int32_t togo = (int32_t)sz;
-> > +         togo >= 13 + 8 + 1 + 2;
-> > +         togo -= 13 + 8 + 1 + 2 + slen, ++n)
-> > +    {
-> > +        if (!e) {
-> > +            e = g_malloc(sizeof(struct v9fs_dirent));
-> > +            if (entries)
-> 
-> ERROR: braces {} are necessary for all arms of this statement
-> #98: FILE: tests/virtio-9p-test.c:407:
-> +            if (entries)
-> [...]
+> The documentation on the new plugin capabilities of qemu is silent
+> about the order call back registration should be done, and is also
+> silent on the order in which call backs are fired.
 
-Right, sorry I missed that for some reason.
+Call-back order is based on the events themselves not the order of
+registration. The only real order constraint is instruction
+instrumentation has to be done from a translation call-back as that is
+the point you can query what instructions are being processed.
 
-Best regards,
-Christian Schoenebeck
+But you are right the documentation is silent on the details because you
+shouldn't need to know about the internals of TCG for the
+instrumentation to work. We can certainly make this clearer in the docs
+though.
 
+> Case in point: The callback registered by
+> qemu_plugin_register_vcpu_mem_cb is called after the call back
+> registered by qemu_plugin_register_vcpu_insn_exec_cb, regardless of
+> the order of registration.
 
+With that in mind we should say instruction callbacks are always before
+the instruction executes. The reason being is some instructions can
+fault and exit the run loop so any instrumentation inserted afterwards
+will never execute.
+
+Internally instruction instrumentation is done on instruction boundaries
+while memory instrumentation is done on individual TCG operations (of
+which several can be involved in an instruction). However plugins
+shouldn't rely on this knowledge as we want to be free to change TCG
+internals.
+
+> However, I'd like to have the insn_exec_cb called after the mem_cb so
+> that I can save the mem information to be consumed by the insn
+> callback.
+
+This is what udata is for. Create a shared structure for the instruction
+information and pass it to both the mem and insn callback functions.
+However not all instructions will generate mem callbacks and you will
+also want to ensure you track the cpu_index in -smp > 1 tests so you
+don't confuse data for the same instruction on multiple cores.
+
+You may not even need to install the callback for the instruction if you
+store the information you need at instrumentation time. It's hard to
+know without some more background on what you are trying to do.
+
+--=20
+Alex Benn=C3=A9e
 
