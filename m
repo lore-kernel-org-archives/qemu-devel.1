@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D90C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 660B6C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:05:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE74C2072E
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 347DE2072E
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:05:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8BdgWup"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE74C2072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BhUTnWx4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347DE2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipvqk-0000sn-B3
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 10:05:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53178)
+	id 1ipvqo-0000y6-P6
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 10:05:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54175)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ipvgl-0004Rm-Go
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:04 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipvh1-0004vJ-JM
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ipvgk-0006Je-9p
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30963
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ipvh0-0007SM-5M
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:19 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59510
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ipvgk-0006Hh-4r
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:02 -0500
+ id 1ipvh0-0007Pw-07
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578668101;
+ s=mimecast20190719; t=1578668117;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uDvgNibxatEEV/F+WDrLb9KYif/63RzRdW4qJaHm4B8=;
- b=K8BdgWuptBdYE63G3iqJD0xUVK+55fFiMNY3cb5QeXGzqdkHoCtTuOnMup+u/NfdX++aZ0
- 6BxadmuhF1hyPkRzRughHJguWLS2MMb5Sr3MWZZLj/AOaaUDP3CHeqvVVam+SgH8yDbiLZ
- 53cpcB3Zb7g6D/0UDY4+bekf/uzlqDc=
+ bh=X4Gf0sfl6C9fhnClEr3mTacurTeinVm4glIO0ZFtMoc=;
+ b=BhUTnWx4pBxsb4bKuYNPdj5C9WRq9Mexhs5DWARGd3U4cEY/NUvcHPb5NXI97NaQS+KYNS
+ npGxT5A2nVCoS2Dgto0/FMPrKRxU7+w+NbNNmRKU4CPrAi07orpe1fOXwx6VhICO9bNLFY
+ 4Q1F9NfXZrSZh8ZxLpq5F16diENgJ78=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-DYg8o0oeNLOx-mCafe7VpQ-1; Fri, 10 Jan 2020 09:55:00 -0500
-X-MC-Unique: DYg8o0oeNLOx-mCafe7VpQ-1
+ us-mta-350-vHCJMhfmO8mXr5V5KEzNWA-1; Fri, 10 Jan 2020 09:55:15 -0500
+X-MC-Unique: vHCJMhfmO8mXr5V5KEzNWA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 068151085984;
- Fri, 10 Jan 2020 14:54:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 272A380257A;
+ Fri, 10 Jan 2020 14:55:14 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 989097BA5F;
- Fri, 10 Jan 2020 14:54:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A9E07BA5F;
+ Fri, 10 Jan 2020 14:55:11 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v2 08/16] arm/arm64: ITS: Init the command queue
-Date: Fri, 10 Jan 2020 15:54:04 +0100
-Message-Id: <20200110145412.14937-9-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 11/16] arm/arm64: ITS: Device and collection
+ Initialization
+Date: Fri, 10 Jan 2020 15:54:07 +0100
+Message-Id: <20200110145412.14937-12-eric.auger@redhat.com>
 In-Reply-To: <20200110145412.14937-1-eric.auger@redhat.com>
 References: <20200110145412.14937-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -73,7 +74,7 @@ X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,73 +92,130 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allocate the command queue and initialize related registers:
-CBASER, CREADR, CWRITER.
+Introduce an helper functions to register
+- a new device, characterized by its device id and the
+  max number of event IDs that dimension its ITT (Interrupt
+  Translation Table).  The function allocates the ITT.
 
-The command queue is 64kB. This aims at not bothing with fullness.
+- a new collection, characterized by its ID and the
+  target processing engine (PE).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v2 -> v3:
-- removed readr
+- s/nb_/nr_
 ---
- lib/arm/asm/gic-v3-its.h |  6 ++++++
- lib/arm/gic-v3-its.c     | 22 ++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++
+ lib/arm/gic-v3-its.c     | 46 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 66 insertions(+)
 
 diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index 2f8b8f1..93814f7 100644
+index 0e31848..0497a78 100644
 --- a/lib/arm/asm/gic-v3-its.h
 +++ b/lib/arm/asm/gic-v3-its.h
-@@ -75,10 +75,16 @@ struct its_baser {
- 	int esz;
+@@ -55,6 +55,9 @@
+ #define GITS_BASER_TYPE_DEVICE		1
+ #define GITS_BASER_TYPE_COLLECTION	4
+=20
++#define GITS_MAX_DEVICES		8
++#define GITS_MAX_COLLECTIONS		8
++
+ struct its_typer {
+ 	unsigned int ite_size;
+ 	unsigned int eventid_bits;
+@@ -79,12 +82,27 @@ struct its_cmd_block {
+ 	u64     raw_cmd[4];
  };
 =20
-+struct its_cmd_block {
-+	u64     raw_cmd[4];
++struct its_device {
++	u32 device_id;	/* device ID */
++	u32 nr_ites;	/* Max Interrupt Translation Entries */
++	void *itt;	/* Interrupt Translation Table GPA */
++};
++
++struct its_collection {
++	u64 target_address;
++	u16 col_id;
 +};
 +
  struct its_data {
  	void *base;
  	struct its_typer typer;
  	struct its_baser baser[GITS_BASER_NR_REGS];
-+	struct its_cmd_block *cmd_base;
-+	struct its_cmd_block *cmd_write;
+ 	struct its_cmd_block *cmd_base;
+ 	struct its_cmd_block *cmd_write;
++	struct its_device devices[GITS_MAX_DEVICES];
++	u32 nr_devices;		/* Allocated Devices */
++	struct its_collection collections[GITS_MAX_COLLECTIONS];
++	u32 nr_collections;	/* Allocated Collections */
  };
 =20
  extern struct its_data its_data;
+@@ -101,6 +119,8 @@ extern u8 get_lpi_config(int n);
+ extern void set_pending_table_bit(int rdist, int n, bool set);
+ extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
+ extern void its_enable_defaults(void);
++extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
++extern struct its_collection *its_create_collection(u32 col_id, u32 targ=
+et_pe);
+=20
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_V3_ITS_H_ */
 diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 6c97569..3037c84 100644
+index f488cca..88c08ee 100644
 --- a/lib/arm/gic-v3-its.c
 +++ b/lib/arm/gic-v3-its.c
-@@ -177,3 +177,25 @@ void set_pending_table_bit(int rdist, int n, bool se=
-t)
- 		byte &=3D ~mask;
- 	*ptr =3D byte;
+@@ -257,3 +257,49 @@ void its_enable_defaults(void)
+=20
+ 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
  }
 +
-+/**
-+ * init_cmd_queue: Allocate the command queue and initialize
-+ * CBASER, CREADR, CWRITER
-+ */
-+void init_cmd_queue(void);
-+void init_cmd_queue(void)
++struct its_device *its_create_device(u32 device_id, int nr_ites)
 +{
-+	unsigned long n =3D SZ_64K >> PAGE_SHIFT;
-+	unsigned long order =3D fls(n);
-+	u64 cbaser;
++	struct its_baser *baser;
++	struct its_device *new;
++	unsigned long n, order;
 +
-+	its_data.cmd_base =3D (void *)virt_to_phys(alloc_pages(order));
++	if (its_data.nr_devices >=3D GITS_MAX_DEVICES)
++		report_abort("%s redimension GITS_MAX_DEVICES", __func__);
 +
-+	cbaser =3D ((u64)its_data.cmd_base | (SZ_64K / SZ_4K - 1)	|
-+			GITS_CBASER_VALID);
++	baser =3D its_lookup_baser(GITS_BASER_TYPE_DEVICE);
++	if (!baser)
++		return NULL;
 +
-+	writeq(cbaser, its_data.base + GITS_CBASER);
++	new =3D &its_data.devices[its_data.nr_devices];
 +
-+	its_data.cmd_write =3D its_data.cmd_base;
-+	writeq(0, its_data.base + GITS_CWRITER);
++	new->device_id =3D device_id;
++	new->nr_ites =3D nr_ites;
++
++	n =3D (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
++	order =3D is_power_of_2(n) ? fls(n) : fls(n) + 1;
++	new->itt =3D (void *)virt_to_phys(alloc_pages(order));
++
++	its_data.nr_devices++;
++	return new;
++}
++
++struct its_collection *its_create_collection(u32 col_id, u32 pe)
++{
++	struct its_collection *new;
++
++	if (its_data.nr_collections >=3D GITS_MAX_COLLECTIONS)
++		report_abort("%s redimension GITS_MAX_COLLECTIONS", __func__);
++
++	new =3D &its_data.collections[its_data.nr_collections];
++
++	new->col_id =3D col_id;
++
++	if (its_data.typer.pta)
++		new->target_address =3D (u64)gicv3_data.redist_base[pe];
++	else
++		new->target_address =3D pe << 16;
++
++	its_data.nr_collections++;
++	return new;
 +}
 --=20
 2.20.1
