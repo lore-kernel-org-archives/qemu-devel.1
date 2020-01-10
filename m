@@ -2,56 +2,91 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C65A3C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 20:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EFA8C33CA4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 20:32:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9ABAC205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 20:24:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ABAC205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C0C4205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 20:32:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ra/8oVos"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0C4205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq0q2-0003Da-Mv
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 15:24:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55420)
+	id 1iq0xI-00077K-JC
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 15:32:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43450)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iq0pT-0002mt-Pp
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 15:24:25 -0500
+ (envelope-from <danielhb413@gmail.com>) id 1iq0wU-0006ak-SD
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 15:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iq0pS-0004wa-5b
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 15:24:23 -0500
-Resent-Date: Fri, 10 Jan 2020 15:24:23 -0500
-Resent-Message-Id: <E1iq0pS-0004wa-5b@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21491)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iq0pR-0004nc-TU; Fri, 10 Jan 2020 15:24:22 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1578687751055446.33831207363085;
- Fri, 10 Jan 2020 12:22:31 -0800 (PST)
-In-Reply-To: <20200110194158.14190-1-vsementsov@virtuozzo.com>
-Subject: Re: [Xen-devel] [PATCH v6 00/11] error: auto propagated local_err
- part I
-Message-ID: <157868774947.15422.14658847667190512659@37313f22b938>
+ (envelope-from <danielhb413@gmail.com>) id 1iq0wT-00068P-G8
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 15:31:38 -0500
+Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:42075)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1iq0wP-0005o6-LL; Fri, 10 Jan 2020 15:31:33 -0500
+Received: by mail-qv1-xf44.google.com with SMTP id dc14so1360686qvb.9;
+ Fri, 10 Jan 2020 12:31:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=eGXCRTGnFL6fJsIyIFnWxZoErJiBbTfeTCFeN/GBl+I=;
+ b=Ra/8oVosrlfE8zeLDGPnLPfBJEbx+KYtzdgEwKfluOCI0bWPam3BiHMq8dn+MK0QQs
+ q1y1NwyzhMjp7xFyZ+EcsuZRzabMH+nvYIJrrIuMd0KiwWRi3tdOrvq7KfU/BKhyaqrE
+ WXxJZhF9hBwvvVrDqwc5odLwTJuQvokNPbVV28FLOy3YZ5o+hyZaIW0d0hO1jvnVDRaE
+ 5uh8u+eKPhbIXkXSBMVw3657cqBkmtKN8zk+/SM6Yq0pTv7ARwQF697EOGeXrjT02aZe
+ yuVjDzw4kZLM6sQakz56DXuw+TlaKhnMr95/YXEt5c3IULBZhhMgFKsk9/unJ4JRWUmo
+ IkZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eGXCRTGnFL6fJsIyIFnWxZoErJiBbTfeTCFeN/GBl+I=;
+ b=q90rScE2Hi28zb1trpxXSpmAIonucv6FzyjVuzsyI8dIW9BnaL7zfceeGlK/VDQ7BX
+ wTVkv2a0z5pmTCKZCFVELhB2tktkAZWxsj4WYNnNLv/JS+jcnJ2WmEyHeEb3CyJZE9DP
+ yEjE7rM++F2ujmqzrL+4RGXYa6k8FmB+V18J3Qp7DyGyPES+m/AlPrQXN/DIV//mEe06
+ 3F8IWLXVjhsbqb2kWMpfFR4P4o+gYbm4qS3djcwnf2jvLvAVKA4t4E5nfWiiURpsDrE5
+ bSxaAvhnAnzUF4lKcn/l2IUlEcbUCoiEH6Gzjt54+3PjMjDDEm2ezIq429k87j9TdG/P
+ JUUA==
+X-Gm-Message-State: APjAAAXunQ7MzSd8yrWPVImaGJxTqmE1CuUl0PPaw8CLke6xcm5TxF16
+ 674Pzi1WG8Vv83fhsx/Ipr4=
+X-Google-Smtp-Source: APXvYqxgioCBpSJitlqGj/1nG+qdppuowdM+kcCwvZIMHwsCOC7eoZ3C38IXWKfefJvzaTnVjtYeIA==
+X-Received: by 2002:a05:6214:1428:: with SMTP id
+ o8mr475631qvx.87.1578688292253; 
+ Fri, 10 Jan 2020 12:31:32 -0800 (PST)
+Received: from ?IPv6:2804:431:c7c7:541e:7a5e:37ad:989b:4530?
+ ([2804:431:c7c7:541e:7a5e:37ad:989b:4530])
+ by smtp.gmail.com with ESMTPSA id g53sm1563679qtk.76.2020.01.10.12.31.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Jan 2020 12:31:31 -0800 (PST)
+Subject: Re: [PATCH v1 00/59] trivial unneeded labels cleanup
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <15cc13a7-4061-b4e8-fc0a-c0c8386cf969@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <ac804a97-6494-fa73-8cff-1dc861b4b2cf@gmail.com>
+Date: Fri, 10 Jan 2020 17:31:24 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Fri, 10 Jan 2020 12:22:31 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+In-Reply-To: <15cc13a7-4061-b4e8-fc0a-c0c8386cf969@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f44
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,73 +98,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mdroth@linux.vnet.ibm.com,
- qemu-block@nongnu.org, paul@xen.org, philmd@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, groug@kaod.org, sstabellini@kernel.org,
- kraxel@redhat.com, stefanha@redhat.com, anthony.perard@citrix.com,
- xen-devel@lists.xenproject.org, mreitz@redhat.com, lersek@redhat.com,
- armbru@redhat.com, stefanb@linux.ibm.com
+Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDExMDE5NDE1OC4xNDE5
-MC0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1hlbi1kZXZlbF0gW1BBVENIIHY2IDAwLzExXSBl
-cnJvcjogYXV0byBwcm9wYWdhdGVkIGxvY2FsX2VyciBwYXJ0IEkKVHlwZTogc2VyaWVzCk1lc3Nh
-Z2UtaWQ6IDIwMjAwMTEwMTk0MTU4LjE0MTkwLTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
-IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0JwpmZWUwZGQyIHhlbjogaW50cm9kdWNlIEVSUlBfQVVUT19QUk9QQUdBVEUKOTA3
-NGI0NSBuYmQ6IGludHJvZHVjZSBFUlJQX0FVVE9fUFJPUEFHQVRFCjA1NjMyY2IgVFBNOiBpbnRy
-b2R1Y2UgRVJSUF9BVVRPX1BST1BBR0FURQoyYTAxOWNkIHZpcnRpby05cDogaW50cm9kdWNlIEVS
-UlBfQVVUT19QUk9QQUdBVEUKYjRlMDUyNSBmd19jZmc6IGludHJvZHVjZSBFUlJQX0FVVE9fUFJP
-UEFHQVRFCjNhNjk4MDAgcGZsYXNoOiBpbnRyb2R1Y2UgRVJSUF9BVVRPX1BST1BBR0FURQpmNGFj
-ODcwIFNEIChTZWN1cmUgQ2FyZCk6IGludHJvZHVjZSBFUlJQX0FVVE9fUFJPUEFHQVRFCjI5ZmJj
-MWQgaHcvc2Qvc3NpLXNkOiBmaXggZXJyb3IgaGFuZGxpbmcgaW4gc3NpX3NkX3JlYWxpemUKNmVi
-YzU3YSBzY3JpcHRzOiBhZGQgY29jY2luZWxsZSBzY3JpcHQgdG8gdXNlIGF1dG8gcHJvcGFnYXRl
-ZCBlcnJwCjQ3N2I5ZWMgZXJyb3I6IGF1dG8gcHJvcGFnYXRlZCBsb2NhbF9lcnIKMGMzODkxNCBx
-YXBpL2Vycm9yOiBhZGQgKEVycm9yICoqZXJycCkgY2xlYW5pbmcgQVBJcwoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KMS8xMSBDaGVja2luZyBjb21taXQgMGMzODkxNDc1OTFhIChxYXBpL2Vycm9yOiBh
-ZGQgKEVycm9yICoqZXJycCkgY2xlYW5pbmcgQVBJcykKMi8xMSBDaGVja2luZyBjb21taXQgNDc3
-YjllYzAzODk4IChlcnJvcjogYXV0byBwcm9wYWdhdGVkIGxvY2FsX2VycikKRVJST1I6IE1hY3Jv
-cyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3
-aGlsZSBsb29wCiMxMzg6IEZJTEU6IGluY2x1ZGUvcWFwaS9lcnJvci5oOjQyODoKKyNkZWZpbmUg
-RVJSUF9BVVRPX1BST1BBR0FURSgpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwK
-KyAgICBnX2F1dG8oRXJyb3JQcm9wYWdhdG9yKSBfYXV0b19lcnJwX3Byb3AgPSB7LmVycnAgPSBl
-cnJwfTsgIFwKKyAgICBlcnJwID0gKChlcnJwID09IE5VTEwgfHwgKmVycnAgPT0gZXJyb3JfZmF0
-YWwpICAgICAgICAgICAgIFwKKyAgICAgICAgICAgID8gJl9hdXRvX2VycnBfcHJvcC5sb2NhbF9l
-cnIgOiBlcnJwKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMDIgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMi8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8xMSBDaGVja2luZyBj
-b21taXQgNmViYzU3YTk0Y2YwIChzY3JpcHRzOiBhZGQgY29jY2luZWxsZSBzY3JpcHQgdG8gdXNl
-IGF1dG8gcHJvcGFnYXRlZCBlcnJwKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
-aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMyNTogCm5ldyBmaWxlIG1v
-ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0OCBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAzLzExIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQvMTEgQ2hlY2tpbmcgY29t
-bWl0IDI5ZmJjMWQ2MWViMSAoaHcvc2Qvc3NpLXNkOiBmaXggZXJyb3IgaGFuZGxpbmcgaW4gc3Np
-X3NkX3JlYWxpemUpCjUvMTEgQ2hlY2tpbmcgY29tbWl0IGY0YWM4NzA2NWYyYyAoU0QgKFNlY3Vy
-ZSBDYXJkKTogaW50cm9kdWNlIEVSUlBfQVVUT19QUk9QQUdBVEUpCjYvMTEgQ2hlY2tpbmcgY29t
-bWl0IDNhNjk4MDAzMzFhNCAocGZsYXNoOiBpbnRyb2R1Y2UgRVJSUF9BVVRPX1BST1BBR0FURSkK
-Ny8xMSBDaGVja2luZyBjb21taXQgYjRlMDUyNWQzZGNmIChmd19jZmc6IGludHJvZHVjZSBFUlJQ
-X0FVVE9fUFJPUEFHQVRFKQo4LzExIENoZWNraW5nIGNvbW1pdCAyYTAxOWNkMWY5OTIgKHZpcnRp
-by05cDogaW50cm9kdWNlIEVSUlBfQVVUT19QUk9QQUdBVEUpCjkvMTEgQ2hlY2tpbmcgY29tbWl0
-IDA1NjMyY2JlMmQzOSAoVFBNOiBpbnRyb2R1Y2UgRVJSUF9BVVRPX1BST1BBR0FURSkKMTAvMTEg
-Q2hlY2tpbmcgY29tbWl0IDkwNzRiNDUwY2IzNCAobmJkOiBpbnRyb2R1Y2UgRVJSUF9BVVRPX1BS
-T1BBR0FURSkKMTEvMTEgQ2hlY2tpbmcgY29tbWl0IGZlZTBkZDI2ZWEwYiAoeGVuOiBpbnRyb2R1
-Y2UgRVJSUF9BVVRPX1BST1BBR0FURSkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAyMDAxMTAxOTQxNTguMTQxOTAtMS12c2VtZW50c292QHZpcnR1
-b3p6by5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
+
+On 1/10/20 4:05 PM, Eric Blake wrote:
+> On 1/6/20 12:23 PM, Daniel Henrique Barboza wrote:
+>> Hello,
+>>
+>> This is the type of cleanup I've contributed to Libvirt
+>> during the last year. Figured QEMU also deserves the same
+>> care.
+>>
+>> The idea here is remove unneeded labels. By 'unneeded' I
+>> mean labels that does nothing but a 'return' call. One
+>> common case is something like this:
+>>
+>> if ()
+>>      goto cleanup;
+>> [...]
+>>   cleanup:
+>>      return 0;
+>>
+>> This code can be simplified to:
+>>
+>> if ()
+>>      return 0;
+>>
+>>
+> 
+> How much of this work is done manually, and how much via Coccinelle?
+
+
+I'm still getting along with Coccinelle. I'm able to do simple matches but
+couldn't make it work to match this scenario. I didn't invest too much
+time on it though.
+
+
+> 
+> 
+>>   qga/commands-win32.c          | 17 ++++---
+>>   target/mips/mips-semi.c       | 15 +++---
+>>   target/unicore32/softmmu.c    | 23 +++-------
+>>   util/aio-posix.c              |  3 +-
+>>   util/module.c                 | 11 ++---
+> 
+> Hmm, no change to scripts/coccinelle, so presumably all manual :(
+
+I used pcregrep:
+
+$ pcregrep --exclude-dir=build --exclude-dir=docs --exclude-dir=scripts -r -n -M ':\n*\s*return' . > clean_labels
+
+(note: there was a lot more of --exclude-dir in the original command, unfortunately I
+didn't record it)
+
+Then I filtered in the output file the cases where the regexp matched "switch"
+labels and any other false positives like strings in comments. It's not manual
+inspection, but it was crude indeed.
+
+
+
+> 
+> If we have a Coccinelle script that performs this transformation, we are more likely to be able to catch all places in the tree that would benefit (rather than relying on grep calls or other manual inspection), and more importantly, we can repeat the effort periodically to fix future additions that don't comply with the preferred style as well as backport the patch by rerunning the Coccinelle script with less worry of changed context.  Automated cleanups are always going to be easier to swallow (even if the diffstat is larger) than manual ad hoc cleanups.
+
+I am not aware of how QEMU handles Coccinelle, if it is imposed via
+./scripts/checkpatch.pl or something that it is ran from time to time to
+suggest changes. But if it's desirable, I can see if I can cook a Coccinelle
+script (or anything a bit more sophisticated than what I did)  to flag these
+cases I attempted to handle with this series.
+
+
+Thanks,
+
+
+DHB
+
+
+> 
 
