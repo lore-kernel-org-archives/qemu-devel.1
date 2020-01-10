@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC84AC282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B41C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:55:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5F0221744
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:55:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D19E24677
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 17:55:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQdvWmB7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F0221744
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QiUbWSYk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D19E24677
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipyVT-0000QL-AC
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:55:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54547)
+	id 1ipyVg-0000rk-7O
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 12:55:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1ipyD4-00084b-Ln
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:36:36 -0500
+ (envelope-from <quintela@redhat.com>) id 1ipyBy-0006ji-Ds
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1ipyCz-00013O-7c
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:36:34 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58625
+ (envelope-from <quintela@redhat.com>) id 1ipyBx-0006fg-8B
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:26 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39073
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyCx-00011k-W1
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:36:29 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ipyBx-0006eb-46
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 12:35:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578677787;
+ s=mimecast20190719; t=1578677724;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iIrj8LM+9IgudScxc6wwuzUYeG5oA8toxySeqRyiy8U=;
- b=jQdvWmB7VXtkNqNfn36NSHG8ohrAEfcT2WyJuj6IhyKwLjRDJD/lUOIJ3sL8mwmDrOUoZl
- QA8KNUsZpGl1GkR3j+XmeIkv6BvROzWNFU/Hw+AJOEsVfV5arr8nCWO/4XeaNcz9Pxl0Ch
- zbAl0GRF+QphdHUFLkKXM4tH/KQ9ulg=
+ bh=Oxe1AWGfIOdagHVu8yxuMNHyn0Md0ln06wq1254wDAI=;
+ b=QiUbWSYkuE/P1/e2LEgwCNrgobrpC6Y5+0CGhDMIUkIqA/XeNLuxr9WFroTmoDIpTcGgN3
+ hBCuqep3ydKXwLH2QxFvQpG3tvU4gZwEkMUUdX2Ne62X3rBPaaIYUS7xEphylkaMZKm/R8
+ rTwNcvzsyE7JUJ4EGgvwB3AwZ+nWCnc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-370-8pM9M99oNwuonlDl_8HZgg-1; Fri, 10 Jan 2020 12:36:24 -0500
+ us-mta-359-r1SJUby4MkiHT6NGyB29TQ-1; Fri, 10 Jan 2020 12:35:19 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A00A10054E3;
- Fri, 10 Jan 2020 17:36:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03505800D41;
+ Fri, 10 Jan 2020 17:35:17 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-240.ams2.redhat.com [10.36.116.240])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4861619C4F;
- Fri, 10 Jan 2020 17:36:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 894DF19C4F;
+ Fri, 10 Jan 2020 17:35:12 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/28] migration: Change SaveStateEntry.instance_id into
- uint32_t
-Date: Fri, 10 Jan 2020 18:32:14 +0100
-Message-Id: <20200110173215.3865-28-quintela@redhat.com>
+Subject: [PULL 18/28] migration/postcopy: set all_zero to true on the first
+ target page
+Date: Fri, 10 Jan 2020 18:32:05 +0100
+Message-Id: <20200110173215.3865-19-quintela@redhat.com>
 In-Reply-To: <20200110173215.3865-1-quintela@redhat.com>
 References: <20200110173215.3865-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 8pM9M99oNwuonlDl_8HZgg-1
+X-MC-Unique: r1SJUby4MkiHT6NGyB29TQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,9 +91,9 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
  Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>,
  Richard Henderson <rth@twiddle.net>
@@ -101,164 +101,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-It was always used as 32bit, so define it as used to be clear.
-Instead of using -1 as the auto-gen magic value, we switch to
-UINT32_MAX.  We also make sure that we don't auto-gen this value to
-avoid overflowed instance IDs without being noticed.
+For the first target page, all_zero is set to true for this round check.
 
-Suggested-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+After target_pages introduced, we could leverage this variable instead
+of checking the address offset.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/intc/apic_common.c        |  2 +-
- include/migration/register.h |  2 +-
- include/migration/vmstate.h  |  2 +-
- migration/savevm.c           | 18 ++++++++++--------
- stubs/vmstate.c              |  2 +-
- 5 files changed, 14 insertions(+), 12 deletions(-)
+ migration/ram.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index f2c3a7f309..54b8731fca 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -268,7 +268,7 @@ static void apic_common_realize(DeviceState *dev, Error=
- **errp)
-     APICCommonState *s =3D APIC_COMMON(dev);
-     APICCommonClass *info;
-     static DeviceState *vapic;
--    int instance_id =3D s->id;
-+    uint32_t instance_id =3D s->id;
-=20
-     info =3D APIC_COMMON_GET_CLASS(s);
-     info->realize(dev, errp);
-diff --git a/include/migration/register.h b/include/migration/register.h
-index 00c38ebe9f..c1dcff0f90 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -71,7 +71,7 @@ typedef struct SaveVMHandlers {
- } SaveVMHandlers;
-=20
- int register_savevm_live(const char *idstr,
--                         int instance_id,
-+                         uint32_t instance_id,
-                          int version_id,
-                          const SaveVMHandlers *ops,
-                          void *opaque);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index a33861e1d4..30667631bc 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1181,7 +1181,7 @@ bool vmstate_save_needed(const VMStateDescription *vm=
-sd, void *opaque);
- #define  VMSTATE_INSTANCE_ID_ANY  -1
-=20
- /* Returns: 0 on success, -1 on failure */
--int vmstate_register_with_alias_id(VMStateIf *obj, int instance_id,
-+int vmstate_register_with_alias_id(VMStateIf *obj, uint32_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *base, int alias_id,
-                                    int required_for_version,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8dab99efc4..adfdca26ac 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -233,7 +233,7 @@ typedef struct CompatEntry {
- typedef struct SaveStateEntry {
-     QTAILQ_ENTRY(SaveStateEntry) entry;
-     char idstr[256];
--    int instance_id;
-+    uint32_t instance_id;
-     int alias_id;
-     int version_id;
-     /* version id read from the stream */
-@@ -667,10 +667,10 @@ void dump_vmstate_json_to_file(FILE *out_file)
-     fclose(out_file);
- }
-=20
--static int calculate_new_instance_id(const char *idstr)
-+static uint32_t calculate_new_instance_id(const char *idstr)
- {
-     SaveStateEntry *se;
--    int instance_id =3D 0;
-+    uint32_t instance_id =3D 0;
-=20
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-         if (strcmp(idstr, se->idstr) =3D=3D 0
-@@ -678,6 +678,8 @@ static int calculate_new_instance_id(const char *idstr)
-             instance_id =3D se->instance_id + 1;
-         }
-     }
-+    /* Make sure we never loop over without being noticed */
-+    assert(instance_id !=3D VMSTATE_INSTANCE_ID_ANY);
-     return instance_id;
- }
-=20
-@@ -755,7 +757,7 @@ static void savevm_state_handler_remove(SaveStateEntry =
-*se)
-    Meanwhile pass -1 as instance_id if you do not already have a clearly
-    distinguishing id for all instances of your device class. */
- int register_savevm_live(const char *idstr,
--                         int instance_id,
-+                         uint32_t instance_id,
-                          int version_id,
-                          const SaveVMHandlers *ops,
-                          void *opaque)
-@@ -809,7 +811,7 @@ void unregister_savevm(VMStateIf *obj, const char *idst=
-r, void *opaque)
-     }
- }
-=20
--int vmstate_register_with_alias_id(VMStateIf *obj, int instance_id,
-+int vmstate_register_with_alias_id(VMStateIf *obj, uint32_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *opaque, int alias_id,
-                                    int required_for_version,
-@@ -1625,7 +1627,7 @@ int qemu_save_device_state(QEMUFile *f)
-     return qemu_file_get_error(f);
- }
-=20
--static SaveStateEntry *find_se(const char *idstr, int instance_id)
-+static SaveStateEntry *find_se(const char *idstr, uint32_t instance_id)
- {
-     SaveStateEntry *se;
-=20
-@@ -2292,7 +2294,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, Migration=
-IncomingState *mis)
-     /* Find savevm section */
-     se =3D find_se(idstr, instance_id);
-     if (se =3D=3D NULL) {
--        error_report("Unknown savevm section or instance '%s' %d. "
-+        error_report("Unknown savevm section or instance '%s' %"PRIu32". "
-                      "Make sure that your current VM setup matches your "
-                      "saved VM setup, including any hotplugged devices",
-                      idstr, instance_id);
-@@ -2316,7 +2318,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, Migration=
-IncomingState *mis)
-=20
-     ret =3D vmstate_load(f, se);
-     if (ret < 0) {
--        error_report("error while loading state for instance 0x%x of"
-+        error_report("error while loading state for instance 0x%"PRIx32" o=
-f"
-                      " device '%s'", instance_id, idstr);
-         return ret;
-     }
-diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-index 6951d9fdc5..cc4fe41dfc 100644
---- a/stubs/vmstate.c
-+++ b/stubs/vmstate.c
-@@ -4,7 +4,7 @@
- const VMStateDescription vmstate_dummy =3D {};
-=20
- int vmstate_register_with_alias_id(VMStateIf *obj,
--                                   int instance_id,
-+                                   uint32_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *base, int alias_id,
-                                    int required_for_version,
+diff --git a/migration/ram.c b/migration/ram.c
+index f20dfc3b68..f3889904b2 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -4102,7 +4102,7 @@ static int ram_load_postcopy(QEMUFile *f)
+             page_buffer =3D postcopy_host_page +
+                           ((uintptr_t)host & (block->page_size - 1));
+             /* If all TP are zero then we can optimise the place */
+-            if (!((uintptr_t)host & (block->page_size - 1))) {
++            if (target_pages =3D=3D 1) {
+                 all_zero =3D true;
+             } else {
+                 /* not the 1st TP within the HP */
 --=20
 2.24.1
 
