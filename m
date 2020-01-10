@@ -2,80 +2,94 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1C3C33CA3
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 16:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CBDC282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 16:04:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A31820848
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 16:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5EEB32084D
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 16:04:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fmtpvtPn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A31820848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VhLvzwTz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EEB32084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipwlC-0002iT-Lk
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 11:03:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59950)
+	id 1ipwmK-0003sr-Hw
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 11:04:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59283)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ipwa2-0008O2-MM
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 10:52:11 -0500
+ (envelope-from <mszeredi@redhat.com>) id 1ipwiS-000074-Vk
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 11:00:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ipwa1-0006GR-AD
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 10:52:10 -0500
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:39802)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ipwa1-0006Bn-0p
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 10:52:09 -0500
-Received: by mail-ot1-x329.google.com with SMTP id 77so2377580oty.6
- for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 07:52:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=K07ZzTAF68Y2I+3NIwyL6+gcFgb1Nh3c8Oexhix9uYw=;
- b=fmtpvtPnIwSF3dfnWAoJ+w3otGlFki1eTJcfb0AuEUoXwisiEOHcQb9VofaYnTtuYu
- zHRXACMmmH4N87YEoyS6HfW5ajEUcltdr/o1IhNH28cqQp5hEXD+rbBcce6+NqeJ1M1Z
- VnO/FB4SpfvEfMT/vr9Ik7RDwW0YTeQxYbjgrNYjJIFX/akAnhSbmU4+WR0hG27cYad8
- MgGVdD5c95+LbqhktDO3io1V82rGkkzhzZOgm4Nz8f6T/59vCwZlYiHJdjKoxQEKxxEh
- RczKdP6Vxh1/nD8/pPb+L1Ql6kZaBvVzEMA3MCa9xOZq3mJexky4TdYx/8kQx41SrNDT
- 29/Q==
+ (envelope-from <mszeredi@redhat.com>) id 1ipwiQ-0003U5-5H
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 11:00:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47391
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mszeredi@redhat.com>) id 1ipwiQ-0003QN-0o
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 11:00:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578672048;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=z9CvWAvOV23LADIsDc0mAhU0nx4Z0CbtTvdf6J+kNis=;
+ b=VhLvzwTzBGnWF9DoFaR3/POGodm+CIVp3pG+G77cDdpXf07WWWyQamvUvqcCCyhW4II+7j
+ jz+gzv8cK6wBv+x8AkvtgeJtuthmpjnQRF5RHPUG4FKgLpoRW8kMXnTNNKda1/puaKII81
+ UVdzipTAzNejCuAod02Yn6kSYIr+sPg=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-71-jOnPkHwlNqy4XE1CbICFLA-1; Fri, 10 Jan 2020 11:00:46 -0500
+Received: by mail-io1-f72.google.com with SMTP id 13so1782664iof.14
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 08:00:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K07ZzTAF68Y2I+3NIwyL6+gcFgb1Nh3c8Oexhix9uYw=;
- b=c/CoCtD3eCJzcOxYJtZHtmwDaT9+P92UydT8xK5o/UHCcZijSoh60m1AH736GPjl4C
- ITdoIGMy3WUdUX/ZnQutqec9j3gk5OwmJJaHsZwnxKo4bRhZkI2e+WyJfxayB9soS8iN
- DVx8idR44Yzkn1HwARjvHTz2/UaMCrxMefmbREjLmy5uc9VAdcxu7Csul62QD29Ac9GM
- UnFoUaVXL3+1YgLhwpFQNmjzm4zV1CDeQx9oOmJngmvchuBafVVFW7zDCMQySueEhJ7b
- CFoKBZWxHq6496DNlg0usgVMNe3Cc2ov0prkIvuHLV3UzFRz9upRaTiYSp6XuEvMkSFp
- gkxQ==
-X-Gm-Message-State: APjAAAWwtjtiPQGsuwMpS0m50noN9xOxEYcnzMoxm9RFKzvDnUW4n7Kr
- RqnRzdhP/zqspXJAyhZrbj1j/xRTeely+t9nW8SH0VWIeWM=
-X-Google-Smtp-Source: APXvYqwmDdUUgeIx/hgno0phQDanWGTHvJubUF9EjYFkeUUlhMVqHcjyFz4LULfpBXylMHgtJPmVx2O7z3xn+pyjcsw=
-X-Received: by 2002:a05:6830:13d3:: with SMTP id
- e19mr3194240otq.135.1578671528019; 
- Fri, 10 Jan 2020 07:52:08 -0800 (PST)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=z9CvWAvOV23LADIsDc0mAhU0nx4Z0CbtTvdf6J+kNis=;
+ b=b1KiSOptQMnrfNg+fVdgcpfayuFXiDg7hzCwDr5hJlPQQGBtilDaTQYeObOPbPMzno
+ vL/OZRVxJKjHZgmtw2GW2IZva67hafNkO9TgHa4Mu92Hop62lw84Gsj5Px36v9wk06zW
+ lyjcQmt9uZLSW+GNxcRN/qMS0BcJU7B7HfY71X9hoX8QzRzk143ixPMOhnKBN7nLMvvD
+ O4pNR2Iv3qqxU+BUyTkNdne77l46RQf4ezThhOZe2DqJzsGsx6yso1Y76Qgjm2O5FBEw
+ DliHdGkUO9WwYDGLDflUpadfuWHWmR2Q1SrRrGGAonBH46XMDITH/QkVaK+soXUYSzaE
+ FoRQ==
+X-Gm-Message-State: APjAAAVDi2iYWcpqPTsNQ5Sv0ZkCLuDv30B+t4EMPKPgWxux3VwAHAaL
+ 2OwHaF9BsT2ayqdAWt2PjzBvssqX4bA3A1sA2YXtlgPanmSGAz6cqtjn1NZlsnQP0ep2P/Aymvc
+ mnIVP12YTIpjr61Eiww7kna0WZGrG2WE=
+X-Received: by 2002:a92:9c04:: with SMTP id h4mr3375324ili.6.1578672044878;
+ Fri, 10 Jan 2020 08:00:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyvjZ77PT1S9mGgx9Aqra7xS1pvcTPOmC9SmqrOlLCH388nmlWiWthXpPmDx5F81NWik3NBGIWHBGihaZxyZUQ=
+X-Received: by 2002:a92:9c04:: with SMTP id h4mr3375218ili.6.1578672043861;
+ Fri, 10 Jan 2020 08:00:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20200108034523.17349-1-richard.henderson@linaro.org>
-In-Reply-To: <20200108034523.17349-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 10 Jan 2020 15:51:57 +0000
-Message-ID: <CAFEAcA9P_3enu_M-55aoqWScFFAhw=Jfs92+vCc+yY-2nXUehA@mail.gmail.com>
-Subject: Re: [PULL 00/41] tcg patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-69-dgilbert@redhat.com>
+ <20200107112316.GL3368802@redhat.com> <20200110150447.GH3901@work-vm>
+ <CAOssrKdRn9NGV9TuvCkRRXEwZep6B-R2598iYLY4-9d6zkPUXg@mail.gmail.com>
+ <20200110151808.GT3423494@redhat.com>
+ <CAOssrKf0ohB66yUpH38jH-dvOCs1zS5zfa5KL9g+0ZCAcMXs4w@mail.gmail.com>
+ <20200110154037.GC28043@redhat.com>
+In-Reply-To: <20200110154037.GC28043@redhat.com>
+From: Miklos Szeredi <mszeredi@redhat.com>
+Date: Fri, 10 Jan 2020 17:00:32 +0100
+Message-ID: <CAOssrKdqkX8=WkdtJMsF8ajPJYY6ymxqbw6gupg6ONzJnqCEDg@mail.gmail.com>
+Subject: Re: [PATCH 068/104] virtiofsd: passthrough_ll: control readdirplus
+To: Vivek Goyal <vgoyal@redhat.com>
+X-MC-Unique: jOnPkHwlNqy4XE1CbICFLA-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,43 +101,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 at 03:45, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Fri, Jan 10, 2020 at 4:40 PM Vivek Goyal <vgoyal@redhat.com> wrote:
 >
-> The following changes since commit 035eed4c0d257c905a556fa0f4865a0c077b4e7f:
+> On Fri, Jan 10, 2020 at 04:30:01PM +0100, Miklos Szeredi wrote:
+> > On Fri, Jan 10, 2020 at 4:18 PM Daniel P. Berrang=C3=A9 <berrange@redha=
+t.com> wrote:
+> > >
+> > > On Fri, Jan 10, 2020 at 04:13:08PM +0100, Miklos Szeredi wrote:
+> > > > On Fri, Jan 10, 2020 at 4:04 PM Dr. David Alan Gilbert
+> > > > <dgilbert@redhat.com> wrote:
+> > > > >
+> > > > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > > > > > On Thu, Dec 12, 2019 at 04:38:28PM +0000, Dr. David Alan Gilber=
+t (git) wrote:
+> > > > > > > From: Miklos Szeredi <mszeredi@redhat.com>
+> > > > > > >
+> > > > > >
+> > > > > > What is readdirplus and what do we need a command line option t=
+o
+> > > > > > control it ? What's the user benefit of changing the setting ?
+> > > > >
+> > > > > cc'ing Miklos who understands this better than me.
+> > > > >
+> > > > > My understanding is that readdirplus is a heuristic inherited fro=
+m NFS
+> > > > > where when you iterate over the directory you also pick up stat()=
+ data
+> > > > > for each entry in the directory.  You then cache that stat data
+> > > > > somewhere.
+> > > > > The Plus-ness is that a lot of directory operations involve you s=
+tating
+> > > > > each entry (e.g. to figure out if you can access it etc) so rolli=
+ng it
+> > > > > into one op avoids the separate stat.  The unplus-ness is that it=
+'s an
+> > > > > overhead and I think changes some of the caching behaviour.
+> > > >
+> > > > Yeah, so either may give better performance and it's hard to pick a
+> > > > clear winner.  NFS also has an option to control this.
+> > >
+> > > IIUC from the man page, the NFS option for controlling this is a clie=
+nt
+> > > side mount option. This makes sense as only the client really has kno=
+wledge
+> > > of whether its workload will benefit.
+> > >
+> > > With this in mind, should the readdirplus control for virtio-fs also =
+be a
+> > > guest mount option instead of a host virtiofsd CLI option ? The guest=
+ admin
+> > > seems best placed to know whether their workload will benefit or not.
+> >
+> > Definitely.   In fact other options, e.g. ones that control caching,
+> > should probably also be client side (cache=3DXXX, writeback,
+> > timeout=3DXXX, etc).
 >
->   Merge remote-tracking branch 'remotes/vivier/tags/q800-for-5.0-pull-request' into staging (2020-01-07 17:08:21 +0000)
+> I am not sure about cache options. So if we want to share a directory
+> between multiple guests with stronger coherency (cache=3Dnone), then admi=
+n
+> should decide that cache=3Dalways/auto is not supported on this export.
 >
-> are available in the Git repository at:
+> Also, how will one client know whether there are other clients same
+> directory with strong coherency requirements and it should use cache=3Dno=
+ne
+> instead of cache=3Dalways/auto.
 >
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20200108
+> Having said that, it also makes sense that client knows its workoad
+> and can decide if cache=3Dauto works best for it and use that instead.
 >
-> for you to fetch changes up to 5e7ef51cbe47e726f76bfbc208e167085cf398c4:
+> May be we need both client and server side options. Client will request
+> certain cache=3Dxxx options and server can deny these if admin decides
+> not to enable that option for that particular mount.
 >
->   MAINTAINERS: Replace Claudio Fontana for tcg/aarch64 (2020-01-08 11:54:12 +1100)
->
-> ----------------------------------------------------------------
-> Improve -static and -pie linking
-> Add cpu_{ld,st}*_mmuidx_ra
-> Remove MMU_MODE*_SUFFIX
-> Move tcg headers under include/
+> For example, if admin decides that we can only support cache=3Dnone on
+> this particular dir due to other guest sharing it, then daemon should
+> be able to deny cache=3Dauto/always requests from client.
 
-This makes the x86-64 'ls' binary in the linux-user-tests
-tarball segfault:
+Makes sense.  The server dictates policy, the client just passes the
+options onto the server.
 
-/home/petmay01/linaro/qemu-for-merges/build/all-linux-static/x86_64-linux-user/qemu-x86_64
--L ./gnemul/qemu-x86_64 x86_64/ls -l dummyfile
-qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Thanks,
+Miklos
 
-(probably
-http://people.linaro.org/~peter.maydell/linux-user-test-modified-pmm.tgz
-if you don't have a copy to hand)
-
-thanks
--- PMM
 
