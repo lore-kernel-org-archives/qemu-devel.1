@@ -2,95 +2,86 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21536C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 087C3C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:34:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDA7F2077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:22:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2BB92077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 14:34:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UpAtD92W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDA7F2077C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RiRwhglw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2BB92077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipvB2-000663-3Q
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:22:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50531)
+	id 1ipvMW-0002wC-Sy
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 09:34:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ipvAP-0005Tm-KD
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:21:38 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipvKs-0001ZD-1u
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:32:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ipvAO-0000Xz-Ba
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:21:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57137
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ipvKp-0000B5-Td
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:32:25 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29254
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ipvAO-0000W4-6E
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:21:36 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1ipvKp-00009l-Cg
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:32:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578666095;
+ s=mimecast20190719; t=1578666742;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XGXWI3monwW6hEW9z+N5Xg8fGIxYQC8MXY9UwxRNWf8=;
- b=UpAtD92WAvoyCIPlIyE3FVwtwQHeVxB2K7WmdN6dP1HPbee3OWuJHS14aD8qAVgq+l59zB
- YHAa54lSDHTEUYeXfk56YyNJ34GDGiRCJq5xZ9G/UAnb7Xn3RTt6o0MAqbuJoTrIb1TFjd
- CyM4lfWELi2drK0XkBpCHH3N7+zKblo=
+ bh=719g42u2rz+9V3916YPTM/uativVLpzDKDsVaRSjTdU=;
+ b=RiRwhglwFGTTdlxPSULn9qLANtJULMkSAgM9QQXVIUCVrvyVjH1CNuBFcZFxTAPXusEbm/
+ s3K3QVEgTWzNhF5WRqn0GEx4ykq3ppM2jzqwfSgch2r00xL19Z6zw9VLt6ynwy/ou6vdl+
+ wggQBO3uQk6Vhb9+DO6Ff8PBGMELBjA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-3p3V5eZ6M_yHk9YIo3GFMg-1; Fri, 10 Jan 2020 09:21:22 -0500
-X-MC-Unique: 3p3V5eZ6M_yHk9YIo3GFMg-1
+ us-mta-42-abbg4ELiP0qL4yvf3JxD8w-1; Fri, 10 Jan 2020 09:32:19 -0500
+X-MC-Unique: abbg4ELiP0qL4yvf3JxD8w-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FDD218C35BC;
- Fri, 10 Jan 2020 14:21:20 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C70EE87EC0;
- Fri, 10 Jan 2020 14:21:13 +0000 (UTC)
-Date: Fri, 10 Jan 2020 15:21:11 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v10 Kernel 1/5] vfio: KABI for migration interface for
- device state
-Message-ID: <20200110152111.74c87595.cohuck@redhat.com>
-In-Reply-To: <20200108154428.02bb312d@w520.home>
-References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
- <1576527700-21805-2-git-send-email-kwankhede@nvidia.com>
- <20191216154406.023f912b@x1.home>
- <f773a92a-acbd-874d-34ba-36c1e9ffe442@nvidia.com>
- <20191217114357.6496f748@x1.home>
- <3527321f-e310-8324-632c-339b22f15de5@nvidia.com>
- <20191219102706.0a316707@x1.home>
- <928e41b5-c3fd-ed75-abd6-ada05cda91c9@nvidia.com>
- <20191219140929.09fa24da@x1.home> <20200102182537.GK2927@work-vm>
- <20200106161851.07871e28@w520.home>
- <ce132929-64a7-9a5b-81ff-38616202b757@nvidia.com>
- <20200107100923.2f7b5597@w520.home>
- <08b7f953-6ac5-cd79-b1ff-54338da32d1e@nvidia.com>
- <20200107115602.25156c41@w520.home>
- <20200108155955.78e908c1.cohuck@redhat.com>
- <20200108113134.05c08470@w520.home>
- <46ac2d9e-4f4e-27d5-2a96-932c444e3461@nvidia.com>
- <20200108154428.02bb312d@w520.home>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF3698C507A;
+ Fri, 10 Jan 2020 14:32:16 +0000 (UTC)
+Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F4FF87ED7;
+ Fri, 10 Jan 2020 14:32:12 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH 11/16] arm/arm64: ITS: Device and
+ collection Initialization
+To: Zenghui Yu <yuzenghui@huawei.com>, eric.auger.pro@gmail.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20191216140235.10751-1-eric.auger@redhat.com>
+ <20191216140235.10751-12-eric.auger@redhat.com>
+ <1f170d74-0ee5-6415-d84e-cd7de4d0f071@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <bb18550e-e9e5-f6ba-a5ff-8dc16cec866a@redhat.com>
+Date: Fri, 10 Jan 2020 15:32:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1f170d74-0ee5-6415-d84e-cd7de4d0f071@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,114 +93,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
- kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, Zhengxiao.zx@alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- zhi.a.wang@intel.com, mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: andre.przywara@arm.com, drjones@redhat.com, alexandru.elisei@arm.com,
+ thuth@redhat.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 8 Jan 2020 15:44:28 -0700
-Alex Williamson <alex.williamson@redhat.com> wrote:
+Hi Zenghui,
 
-> On Thu, 9 Jan 2020 02:11:11 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
-> > On 1/9/2020 12:01 AM, Alex Williamson wrote:  
-> > > On Wed, 8 Jan 2020 15:59:55 +0100
-> > > Cornelia Huck <cohuck@redhat.com> wrote:
+On 12/20/19 8:25 AM, Zenghui Yu wrote:
+> Hi Eric,
+>=20
+> On 2019/12/16 22:02, Eric Auger wrote:
+>> Introduce an helper functions to register
+>> - a new device, characterized by its device id and the
+>> =C2=A0=C2=A0 max number of event IDs that dimension its ITT (Interrupt
+>> =C2=A0=C2=A0 Translation Table).=C2=A0 The function allocates the ITT.
+>>
+>> - a new collection, characterized by its ID and the
+>> =C2=A0=C2=A0 target processing engine (PE).
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>> ---
+>> =C2=A0 lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++
+>> =C2=A0 lib/arm/gic-v3-its.c=C2=A0=C2=A0=C2=A0=C2=A0 | 46 +++++++++++++=
++++++++++++++++++++++++++++
+>> =C2=A0 2 files changed, 66 insertions(+)
+>>
+>> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+>> index ab639c5..245ef61 100644
+>> --- a/lib/arm/asm/gic-v3-its.h
+>> +++ b/lib/arm/asm/gic-v3-its.h
+>> @@ -87,6 +87,9 @@
+>> =C2=A0 =C2=A0 #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1ULL << 0)
+>> =C2=A0 +#define GITS_MAX_DEVICES=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 8
+>> +#define GITS_MAX_COLLECTIONS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 8
+>> +
+>> =C2=A0 struct its_typer {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int ite_size;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unsigned int eventid_bits;
+>> @@ -117,6 +120,17 @@ struct its_cmd_block {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u64=C2=A0=C2=A0=C2=A0=C2=A0 raw_cmd[4];
+>> =C2=A0 };
+>> =C2=A0 +struct its_device {
+>> +=C2=A0=C2=A0=C2=A0 u32 device_id;=C2=A0=C2=A0=C2=A0 /* device ID */
+>> +=C2=A0=C2=A0=C2=A0 u32 nr_ites;=C2=A0=C2=A0=C2=A0 /* Max Interrupt Tr=
+anslation Entries */
+>> +=C2=A0=C2=A0=C2=A0 void *itt;=C2=A0=C2=A0=C2=A0 /* Interrupt Translat=
+ion Table GPA */
+>> +};
+>> +
+>> +struct its_collection {
+>> +=C2=A0=C2=A0=C2=A0 u64 target_address;
+>> +=C2=A0=C2=A0=C2=A0 u16 col_id;
+>> +};
+>> +
+>> =C2=A0 struct its_data {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *base;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_typer typer;
+>> @@ -124,6 +138,10 @@ struct its_data {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd_base;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd_write;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct its_cmd_block *cmd_readr;
+>> +=C2=A0=C2=A0=C2=A0 struct its_device devices[GITS_MAX_DEVICES];
+>> +=C2=A0=C2=A0=C2=A0 u32 nb_devices;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 /* Allocated Devices */
+>> +=C2=A0=C2=A0=C2=A0 struct its_collection collections[GITS_MAX_COLLECT=
+IONS];
+>> +=C2=A0=C2=A0=C2=A0 u32 nb_collections;=C2=A0=C2=A0=C2=A0 /* Allocated=
+ Collections */
+>=20
+> ('nr_*' may be the more widely used one.)
+>=20
+>> =C2=A0 };
+>> =C2=A0 =C2=A0 extern struct its_data its_data;
+>> @@ -140,6 +158,8 @@ extern u8 get_lpi_config(int n);
+>> =C2=A0 extern void set_pending_table_bit(int rdist, int n, bool set);
+>> =C2=A0 extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
+>> =C2=A0 extern void its_enable_defaults(void);
+>> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+>> +extern struct its_collection *its_create_collection(u32 col_id, u32
+>> target_pe);
+>> =C2=A0 =C2=A0 #endif /* !__ASSEMBLY__ */
+>> =C2=A0 #endif /* _ASMARM_GIC_V3_ITS_H_ */
+>> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+>> index 9a51ef4..9906428 100644
+>> --- a/lib/arm/gic-v3-its.c
+>> +++ b/lib/arm/gic-v3-its.c
+>> @@ -284,3 +284,49 @@ void its_enable_defaults(void)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 writel(GITS_CTLR_ENABLE, its_dat=
+a.base + GITS_CTLR);
+>> =C2=A0 }
+>> +
+>> +struct its_device *its_create_device(u32 device_id, int nr_ites)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 struct its_baser *baser;
+>> +=C2=A0=C2=A0=C2=A0 struct its_device *new;
+>> +=C2=A0=C2=A0=C2=A0 unsigned long n, order;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (its_data.nb_devices >=3D GITS_MAX_DEVICES)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 report_abort("%s redimensi=
+on GITS_MAX_DEVICES", __func__);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 baser =3D its_lookup_baser(GITS_BASER_TYPE_DEVICE)=
+;
+>> +=C2=A0=C2=A0=C2=A0 if (!baser)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 new =3D &its_data.devices[its_data.nb_devices];
+>> +
+>> +=C2=A0=C2=A0=C2=A0 new->device_id =3D device_id;
+>> +=C2=A0=C2=A0=C2=A0 new->nr_ites =3D nr_ites;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 n =3D (baser->esz * nr_ites) >> PAGE_SHIFT;
+>=20
+> baser->esz is GITS_BASER.Entry_Size, which indicates the size of
+> Device Table entry.
+> We're allocating ITT for this device now, shouldn't we use
+> its_data.typer.esz?
 
-> > >> I think one thing we could do is start to tie the meaning more to the
-> > >> actual state (bit combination) and less to the individual bits. I.e.
-> > >>
-> > >> - bit 0 indicates 'running',
-> > >> - bit 1 indicates 'saving',
-> > >> - bit 2 indicates 'resuming',
-> > >> - bits 3-31 are reserved. [Aside: reserved-and-ignored or
-> > >>    reserved-and-must-be-zero?]    
-> > > 
-> > > This version specified them as:
-> > > 
-> > > 	Bits 3 - 31 are reserved for future use. User should perform
-> > > 	read-modify-write operation on this field.
-> > > 
-> > > The intention is that the user should not make any assumptions about
-> > > the state of the reserved bits, but should preserve them when changing
-> > > known bits.  Therefore I think it's ignored but preserved.  If we
-> > > specify them as zero, then I think we lose any chance to define them
-> > > later.
+Yes you're definitively right. I should use its_data.typer.ite_size.
 
-Nod. What about extending the description to:
+Thank you!
 
-"Bits 3-31 are reserved for future use. In order to preserve them, a
-read-modify-write operation on this field should be used when modifying
-the specified bits."
-
-?
-
-> > >     
-> > >> [Note that I don't specify what happens when a bit is set or unset.]
-> > >>
-> > >> States are then defined as:
-> > >> 000b => stopped state (not saving or resuming)
-> > >> 001b => running state (not saving or resuming)
-> > >> 010b => stop-and-copy state
-> > >> 011b => pre-copy state
-> > >> 100b => resuming state
-> > >>
-> > >> [Transitions between these states defined, as before.]
-> > >>
-> > >> 101b => reserved [for post-copy; no transitions defined]
-> > >> 111b => reserved [state does not make sense; no transitions defined]
-> > >> 110b => error state [state does not make sense per se, but it does not
-> > >>          indicate running; transitions into this state *are* possible]
-> > >>
-> > >> To a 'reserved' state, we can later assign a different meaning (we
-> > >> could even re-use 111b for a different error state, if needed); while
-> > >> the error state must always stay the error state.
-> > >>
-> > >> We should probably use some kind of feature indication to signify
-> > >> whether a 'reserved' state actually has a meaning. Also, maybe we also
-> > >> should designate the states > 111b as 'reserved'.
-> > >>
-> > >> Does that make sense?    
-> > > 
-> > > It seems you have an opinion to restrict this particular error state to
-> > > 110b rather than 11Xb, reserving 111b for some future error condition.
-> > > That's fine and I think we agree that using the state with _RUNNING set
-> > > to zero is more logical as we expect the device to be non-operational
-> > > in this state.
-
-Good.
-
-> > > 
-> > > I'm also thinking more of these as states, but at the same time we're
-> > > not doing away with the bit definitions.  I think the states are much
-> > > easier to decode and use if we think about the function of each bit,
-> > > which leads to the logical incongruity that the 11Xb states are
-> > > impossible and therefore must be error states.
-
-Yes, that's fine.
-
-> > >     
-> > 
-> > I agree on bit definition is better.
-> > 
-> > Ok. Should there be a defined value for error, which can be used by 
-> > vendor driver for error state?
-> > 
-> > #define VFIO_DEVICE_STATE_ERROR			\
-> > 		(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING)  
-> 
-> Seems like a good idea for consistency.  Thanks,
-> 
-> Alex
-
-Agreed, I like that as well.
+Eric
+>=20
+>=20
+> Thanks,
+> Zenghui
+>=20
+>> +=C2=A0=C2=A0=C2=A0 order =3D is_power_of_2(n) ? fls(n) : fls(n) + 1;
+>> +=C2=A0=C2=A0=C2=A0 new->itt =3D (void *)virt_to_phys(alloc_pages(orde=
+r));
+>> +
+>> +=C2=A0=C2=A0=C2=A0 its_data.nb_devices++;
+>> +=C2=A0=C2=A0=C2=A0 return new;
+>> +}
+>> +
+>> +struct its_collection *its_create_collection(u32 col_id, u32 pe)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 struct its_collection *new;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (its_data.nb_collections >=3D GITS_MAX_COLLECTI=
+ONS)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 report_abort("%s redimensi=
+on GITS_MAX_COLLECTIONS", __func__);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 new =3D &its_data.collections[its_data.nb_collecti=
+ons];
+>> +
+>> +=C2=A0=C2=A0=C2=A0 new->col_id =3D col_id;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 if (its_data.typer.pta)
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 new->target_address =3D (u=
+64)gicv3_data.redist_base[pe];
+>> +=C2=A0=C2=A0=C2=A0 else
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 new->target_address =3D pe=
+ << 16;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 its_data.nb_collections++;
+>> +=C2=A0=C2=A0=C2=A0 return new;
+>> +}
+>>
+>=20
 
 
