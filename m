@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DD6C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:02:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92777C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C004B20721
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:02:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D36520721
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 15:03:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dTiq6sRM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C004B20721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hErHDI8p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D36520721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ipvnc-00054M-0s
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 10:02:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52988)
+	id 1ipvpH-0007BS-Lq
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 10:03:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54713)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ipvgg-0004Lx-Jq
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:01 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ipvhM-0005GJ-Ki
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ipvgf-00068M-5k
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:58 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21182
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1ipvhI-0008DZ-Ow
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34839
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ipvge-00067H-VS
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:54:57 -0500
+ id 1ipvhE-0008A5-V4
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 09:55:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578668096;
+ s=mimecast20190719; t=1578668132;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hnzALuqyh0uZ601oQnRmWo1hHMGDJqgYfkqYRybw578=;
- b=dTiq6sRM+EpnTaav4mR8F2LEqwoi2QL60RXCksdtSroJEsVcnqc/cl/rE5vME8147whV3y
- jfgURfQ/NB3VcnaJot8RBYXDhXYALs6fP3iVb6xQdGNSCn9ArqUPv9XaVhkNyXUDTW1VEx
- 2/5svbpNJJo99585GmFnNlSSI7RR81E=
+ bh=pcJ+wB7cNlY38bik4p3wpP3qiRSX7Sl8ZObmSchT014=;
+ b=hErHDI8p1vmIeePu1MR0ZO3FjZZqfwOsBiostWoG9pn3Kiq83MZ7x4vL7xqUN0Qvme2LbY
+ gAz8lWjdimhQdUbX0D644/otdXHyWss+76RRnQBB12gdJff6eGnuewMUsR0HxnAlGyoarz
+ ChqgMa+nZEnd6RYLr5oufKkaY1rDWqw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-L6q4vxrGMBe3EPeq3xolFw-1; Fri, 10 Jan 2020 09:54:55 -0500
-X-MC-Unique: L6q4vxrGMBe3EPeq3xolFw-1
+ us-mta-95-deHWbyOWMj6ZZi6hu3Q_TA-1; Fri, 10 Jan 2020 09:55:31 -0500
+X-MC-Unique: deHWbyOWMj6ZZi6hu3Q_TA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 408CE2F63;
- Fri, 10 Jan 2020 14:54:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C366B10883B3;
+ Fri, 10 Jan 2020 14:55:28 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 520987BA5F;
- Fri, 10 Jan 2020 14:54:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 391467BA5F;
+ Fri, 10 Jan 2020 14:55:23 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH v2 07/16] arm/arm64: ITS: Set the LPI config
- and pending tables
-Date: Fri, 10 Jan 2020 15:54:03 +0100
-Message-Id: <20200110145412.14937-8-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH v2 14/16] arm/run: Allow Migration tests
+Date: Fri, 10 Jan 2020 15:54:10 +0100
+Message-Id: <20200110145412.14937-15-eric.auger@redhat.com>
 In-Reply-To: <20200110145412.14937-1-eric.auger@redhat.com>
 References: <20200110145412.14937-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -74,7 +73,7 @@ X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,138 +91,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allocate the LPI configuration and per re-distributor pending table.
-Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
-by default in the config table.
+Let's link getchar.o to use puts and getchar from the
+tests.
 
-Also introduce a helper routine that allows to set the pending table
-bit for a given LPI.
+Then allow tests belonging to the migration group to
+trigger the migration from the test code by putting
+"migrate" into the uart. Then the code can wait for the
+migration completion by using getchar().
+
+The __getchar implement is minimalist as it just reads the
+data register. It is just meant to read the single character
+emitted at the end of the migration by the runner script.
+
+It is not meant to read more data (FIFOs are not enabled).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
+ arm/Makefile.common |  2 +-
+ arm/run             |  2 +-
+ lib/arm/io.c        | 13 +++++++++++++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-v1 -> v2:
-- remove memory attributes
----
- lib/arm/asm/gic-v3-its.h |  3 ++
- lib/arm/asm/gic-v3.h     | 12 ++++++++
- lib/arm/gic-v3-its.c     | 60 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 75 insertions(+)
-
-diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index 5a4dfe9..2f8b8f1 100644
---- a/lib/arm/asm/gic-v3-its.h
-+++ b/lib/arm/asm/gic-v3-its.h
-@@ -90,6 +90,9 @@ extern void its_init(void);
- extern int its_parse_baser(int i, struct its_baser *baser);
- extern void its_setup_baser(int i, struct its_baser *baser);
- extern struct its_baser *its_lookup_baser(int type);
-+extern void set_lpi_config(int n, u8 val);
-+extern u8 get_lpi_config(int n);
-+extern void set_pending_table_bit(int rdist, int n, bool set);
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 7cc0f04..327f112 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -32,7 +32,7 @@ CFLAGS +=3D -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I=
+ lib
+ asm-offsets =3D lib/$(ARCH)/asm-offsets.h
+ include $(SRCDIR)/scripts/asm-offsets.mak
 =20
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_V3_ITS_H_ */
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index ffb2e26..90a7304 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -48,6 +48,16 @@
- #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
- 	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level=
- ## _SHIFT)
+-cflatobjs +=3D lib/util.o
++cflatobjs +=3D lib/util.o lib/getchar.o
+ cflatobjs +=3D lib/alloc_phys.o
+ cflatobjs +=3D lib/alloc_page.o
+ cflatobjs +=3D lib/vmalloc.o
+diff --git a/arm/run b/arm/run
+index 277db9b..a390ca5 100755
+--- a/arm/run
++++ b/arm/run
+@@ -61,6 +61,6 @@ fi
+ M+=3D",accel=3D$ACCEL"
+ command=3D"$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testde=
+v"
+ command+=3D" -display none -serial stdio -kernel"
+-command=3D"$(timeout_cmd) $command"
++command=3D"$(migration_cmd) $(timeout_cmd) $command"
 =20
-+#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
-+
-+#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
-+
-+#define LPI_PROP_GROUP1		(1 << 1)
-+#define LPI_PROP_ENABLED	(1 << 0)
-+#define LPI_PROP_DEFAULT_PRIO   0xa0
-+#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
-+				 LPI_PROP_ENABLED)
-+
- #include <asm/arch_gicv3.h>
-=20
- #ifndef __ASSEMBLY__
-@@ -64,6 +74,8 @@ struct gicv3_data {
- 	void *dist_base;
- 	void *redist_bases[GICV3_NR_REDISTS];
- 	void *redist_base[NR_CPUS];
-+	void *lpi_prop;
-+	void *lpi_pend[NR_CPUS];
- 	unsigned int irq_nr;
- };
- extern struct gicv3_data gicv3_data;
-diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 79946c3..6c97569 100644
---- a/lib/arm/gic-v3-its.c
-+++ b/lib/arm/gic-v3-its.c
-@@ -117,3 +117,63 @@ void its_setup_baser(int i, struct its_baser *baser)
- 	writeq(val, gicv3_its_base() + GITS_BASER + i * 8);
+ run_qemu $command "$@"
+diff --git a/lib/arm/io.c b/lib/arm/io.c
+index 99fd315..ed89e19 100644
+--- a/lib/arm/io.c
++++ b/lib/arm/io.c
+@@ -87,6 +87,19 @@ void puts(const char *s)
+ 	spin_unlock(&uart_lock);
  }
 =20
-+inline void set_lpi_config(int n, u8 value)
++/*
++ * Minimalist implementation for migration completion detection.
++ * Needs to be improved for more advanced Rx cases
++ */
++int __getchar(void)
 +{
-+	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-+	*entry =3D value;
++	int ret;
++
++	ret =3D readb(uart0_base);
++	if (!ret)
++		return -1;
++	return ret;
 +}
-+
-+inline u8 get_lpi_config(int n)
-+{
-+	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-+	return *entry;
-+}
-+
-+/* alloc_lpi_tables: Allocate LPI config and pending tables */
-+void alloc_lpi_tables(void);
-+void alloc_lpi_tables(void)
-+{
-+	unsigned long n =3D SZ_64K >> PAGE_SHIFT;
-+	unsigned long order =3D fls(n);
-+	u64 prop_val;
-+	int cpu;
-+
-+	gicv3_data.lpi_prop =3D (void *)virt_to_phys(alloc_pages(order));
-+
-+	/* ID bits =3D 13, ie. up to 14b LPI INTID */
-+	prop_val =3D (u64)gicv3_data.lpi_prop | 13;
-+
-+	/*
-+	 * Allocate pending tables for each redistributor
-+	 * and set PROPBASER and PENDBASER
-+	 */
-+	for_each_present_cpu(cpu) {
-+		u64 pend_val;
-+		void *ptr;
-+
-+		ptr =3D gicv3_data.redist_base[cpu];
-+
-+		writeq(prop_val, ptr + GICR_PROPBASER);
-+
-+		gicv3_data.lpi_pend[cpu] =3D
-+			(void *)virt_to_phys(alloc_pages(order));
-+
-+		pend_val =3D (u64)gicv3_data.lpi_pend[cpu];
-+
-+		writeq(pend_val, ptr + GICR_PENDBASER);
-+	}
-+}
-+
-+void set_pending_table_bit(int rdist, int n, bool set)
-+{
-+	u8 *ptr =3D phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
-+	u8 mask =3D 1 << (n % 8), byte;
-+
-+	ptr +=3D (n / 8);
-+	byte =3D *ptr;
-+	if (set)
-+		byte |=3D  mask;
-+	else
-+		byte &=3D ~mask;
-+	*ptr =3D byte;
-+}
+=20
+ /*
+  * Defining halt to take 'code' as an argument guarantees that it will
 --=20
 2.20.1
 
