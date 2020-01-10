@@ -2,54 +2,86 @@ Return-Path: <SRS0=GavZ=27=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29A8C282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F61FC282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86305206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:52:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86305206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id C137A206ED
+	for <qemu-devel@archiver.kernel.org>; Fri, 10 Jan 2020 19:57:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8+KDmP1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C137A206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq0Kz-0007RN-Kc
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:52:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44604)
+	id 1iq0P3-0001Qh-TD
+	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 14:57:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Ao-0001nN-WA
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:26 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iq0OP-0000Zt-Bd
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:56:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iq0Am-0004xY-Eb
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:42:22 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53980)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0Am-0004md-3o; Fri, 10 Jan 2020 14:42:20 -0500
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iq0AU-0008Ob-NH; Fri, 10 Jan 2020 22:42:02 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 03/11] scripts: add coccinelle script to use auto
- propagated errp
-Date: Fri, 10 Jan 2020 22:41:50 +0300
-Message-Id: <20200110194158.14190-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200110194158.14190-1-vsementsov@virtuozzo.com>
-References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iq0OO-0006Vk-8g
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:56:25 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:42785)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iq0OO-0006Rt-25
+ for qemu-devel@nongnu.org; Fri, 10 Jan 2020 14:56:24 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id 66so3105966otd.9
+ for <qemu-devel@nongnu.org>; Fri, 10 Jan 2020 11:56:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=a+E//MlcJw7X7i6kiN0VA1+qmTJPw7LyaSR1hwCzQQw=;
+ b=h8+KDmP1F6EUZiQYF8wJtE3+MUF3gQLn5coMPlxbqk4//u42htUtrG4GSXQqdrzdUd
+ lbUjLvCLXZB0roX42sY3a8mPDngRYO+rTZXtnlCH0eoUa8iYfxoG9wn28rdm0O1s+GSa
+ uqROzVDVBImOAVPMUDj9RqhwiFjy0BnO9ZP91n8LpZX0xJXYNEaBsu2yv0lDrmzNYPAp
+ hq+8AfPt9G6FWs1oSiOxS8X5acU9B01iC+lIDCBwCeLcPtTSyV7+xzx/4xCwKkOYU7ZN
+ tclvXUMC4hNyEvUNm3st3PwSGPU1KOsDbXjX4+Lsg28DytK0dEm7N9Gl0vLyyAvJFoh5
+ yGRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=a+E//MlcJw7X7i6kiN0VA1+qmTJPw7LyaSR1hwCzQQw=;
+ b=PR3tZlkJiSryygY6kFhnL5HMMBt6T/G4Yo4IEItbrTfmeRmpqsRUTBHG7mHfdV+OE7
+ /1IAAG9GECmDP4REjKTJg4d/he3sxoGBRTF0TmOYRjh7fv4iVTDCpjHPvNqXvVh2oLXX
+ a+Z7NRMKGR6YdICQFBhaMTbvnJc/Fb+Iy+EMPqWbEnPNOoxeu4bvtKDq3uCXXlygW6iT
+ lhFkd+SiI8e+LTolGVfSUe/C4r0K2p2DJP8cHraARH8+8skdlhE8rBT2zefN7e29shvW
+ KX25QXyuVAu2NikV0bg3DhggMWmbfcREkdgvYsW2Pe4UVbLECx57GVUIOmuFQ1HTttVF
+ vjQw==
+X-Gm-Message-State: APjAAAWwk0jORNhfUR6tERbVPK2Sz5XegApsgZ5qh0lhRKWOV3D8z9N/
+ emUzc2Q/OymcVdG1woRzFLvIGX3dHaEGT87JfGk=
+X-Google-Smtp-Source: APXvYqyIFyVIMf+RuS0fsMqMcwRa/NBpPdpscwIg1yGEFG5YBP5QVBasBq4XJVz07iRY0Fvd9EUIk/8QN0V1u3P+fXA=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr3814333otk.64.1578686183433;
+ Fri, 10 Jan 2020 11:56:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+References: <20190319144013.26584-1-pbonzini@redhat.com>
+ <alpine.BSF.2.21.9999.1903192350550.11467@zero.eik.bme.hu>
+ <87imwe847x.fsf_-_@dusky.pond.sub.org>
+ <CAAdtpL5Z1OXqZ_zzA0RLq9soydNtTFt2oCOEfui1rq19bLKUgA@mail.gmail.com>
+ <d9d5ac96-c0f5-dd83-d305-10e20c745dd1@redhat.com>
+ <9b92b3c4-c5d5-9a51-7b96-50dcf113ee5a@redhat.com>
+ <20200106064526.zh6rt4wbibfjrscu@sirius.home.kraxel.org>
+ <CAL1e-=iD+o7-MOuOAjtp0oEWA6ep9nXQuT0jeR7aOnuN1M6fqw@mail.gmail.com>
+In-Reply-To: <CAL1e-=iD+o7-MOuOAjtp0oEWA6ep9nXQuT0jeR7aOnuN1M6fqw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 10 Jan 2020 20:56:00 +0100
+Message-ID: <CAL1e-=iB7hXKbMZiPthxrA_3OVEL7GXhp-NQ4E3w9g04FEPCaQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] What should a virtual board emulate?
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000002ceac2059bce857c"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,207 +93,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
- Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
+--0000000000002ceac2059bce857c
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-CC: Cornelia Huck <cohuck@redhat.com>
-CC: Eric Blake <eblake@redhat.com>
-CC: Kevin Wolf <kwolf@redhat.com>
-CC: Max Reitz <mreitz@redhat.com>
-CC: Greg Kurz <groug@kaod.org>
-CC: Stefan Hajnoczi <stefanha@redhat.com>
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Anthony Perard <anthony.perard@citrix.com>
-CC: Paul Durrant <paul@xen.org>
-CC: "Philippe Mathieu-Daudé" <philmd@redhat.com>
-CC: Laszlo Ersek <lersek@redhat.com>
-CC: Gerd Hoffmann <kraxel@redhat.com>
-CC: Stefan Berger <stefanb@linux.ibm.com>
-CC: Markus Armbruster <armbru@redhat.com>
-CC: Michael Roth <mdroth@linux.vnet.ibm.com>
-CC: qemu-block@nongnu.org
-CC: xen-devel@lists.xenproject.org
+8:42 PM Pet, 10.01.2020. Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+=D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> 7:45 AM Pon, 06.01.2020. Gerd Hoffmann <kraxel@redhat.com> =D1=98=D0=B5 =
+=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+> >
+> >   Hi,
+> >
+> > > 78c37d88f1b8b0b3ebcc632c458f0c3779fe2951 is the first bad commit
+> > > commit 78c37d88f1b8b0b3ebcc632c458f0c3779fe2951
+> > > Author: Paolo Bonzini <pbonzini@redhat.com>
+> > > Date:   Tue Mar 19 15:37:19 2019 +0100
+> > >
+> > >     mips-fulong2e: obey -vga none
+> > >
+> > >     Do not create an ATI VGA if "-vga none" was passed on the command
+line.
+> >
+> > > 1/ the Radeon chip is soldered on the motherboard,
+> > >
+> > > 2/ the default BIOS expects the Radeon chip to be
+> > >    unconditionally present,
+> > >
+> > > I insist this patch is incorrect for the particular case of the
+Fuloong2e
+> > > board. I plan to revert it when I post the test.
+> >
+> > Yep.  IMHO devices which you can't unplug on the physical board should
+> > be present even with "qemu -nodefaults".
+> >
+>
+> I have to agree with Philippe's approach. That is not to say that
+Zoltan's efforts are not appreciated.
 
- include/qapi/error.h                          |   3 +
- scripts/coccinelle/auto-propagated-errp.cocci | 139 ++++++++++++++++++
- 2 files changed, 142 insertions(+)
- create mode 100644 scripts/coccinelle/auto-propagated-errp.cocci
+I meant to say also Paolo's. But, I didn't mean to fingerpoint. It is quite
+normal that from time to time, a well-intended change may actually produce
+unexpected breaking. All is well, no bad feelings at all.
 
-diff --git a/include/qapi/error.h b/include/qapi/error.h
-index 532b9afb9e..dcfb77e107 100644
---- a/include/qapi/error.h
-+++ b/include/qapi/error.h
-@@ -141,6 +141,9 @@
-  *         ...
-  *     }
-  *
-+ * For mass conversion use script
-+ *   scripts/coccinelle/auto-propagated-errp.cocci
-+ *
-  *
-  * Receive and accumulate multiple errors (first one wins):
-  *     Error *err = NULL, *local_err = NULL;
-diff --git a/scripts/coccinelle/auto-propagated-errp.cocci b/scripts/coccinelle/auto-propagated-errp.cocci
-new file mode 100644
-index 0000000000..6c72a5049f
---- /dev/null
-+++ b/scripts/coccinelle/auto-propagated-errp.cocci
-@@ -0,0 +1,139 @@
-+// Use ERRP_AUTO_PROPAGATE (see include/qapi/error.h)
-+//
-+// Copyright (c) 2020 Virtuozzo International GmbH.
-+//
-+// This program is free software; you can redistribute it and/or modify
-+// it under the terms of the GNU General Public License as published by
-+// the Free Software Foundation; either version 2 of the License, or
-+// (at your option) any later version.
-+//
-+// This program is distributed in the hope that it will be useful,
-+// but WITHOUT ANY WARRANTY; without even the implied warranty of
-+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+// GNU General Public License for more details.
-+//
-+// You should have received a copy of the GNU General Public License
-+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+//
-+// Usage example:
-+// spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
-+//  --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff \
-+//  blockdev-nbd.c qemu-nbd.c {block/nbd*,nbd/*,include/block/nbd*}.[hc]
-+
-+@@
-+// Add invocation to errp-functions where necessary
-+// We should skip functions with "Error *const *errp"
-+// parameter, but how to do it with coccinelle?
-+// I don't know, so, I skip them by function name regex.
-+// It's safe: if we not skip some functions with
-+// "Error *const *errp", ERRP_AUTO_PROPAGATE invocation
-+// will fail to compile, because of const violation.
-+identifier fn !~ "error_append_.*_hint";
-+identifier local_err, errp;
-+@@
-+
-+ fn(..., Error **errp, ...)
-+ {
-++   ERRP_AUTO_PROPAGATE();
-+    <+...
-+        when != ERRP_AUTO_PROPAGATE();
-+(
-+    error_append_hint(errp, ...);
-+|
-+    error_prepend(errp, ...);
-+|
-+    Error *local_err = NULL;
-+)
-+    ...+>
-+ }
-+
-+@rule1@
-+// We do not inherit from previous rule, as we want to match
-+// also functions, which already had ERRP_AUTO_PROPAGATE
-+// invocation.
-+identifier fn !~ "error_append_.*_hint";
-+identifier local_err, errp;
-+@@
-+
-+ fn(..., Error **errp, ...)
-+ {
-+     <...
-+-    Error *local_err = NULL;
-+     ...>
-+ }
-+
-+@@
-+// Handle pattern with goto, otherwise we'll finish up
-+// with labels at function end which will not compile.
-+identifier rule1.fn, rule1.local_err, rule1.errp;
-+identifier OUT;
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+-    goto OUT;
-++    return;
-+     ...>
-+- OUT:
-+-    error_propagate(errp, local_err);
-+ }
-+
-+@@
-+identifier rule1.fn, rule1.local_err, rule1.errp;
-+expression list args; // to reindent error_propagate_prepend
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+(
-+-    error_free(local_err);
-+-    local_err = NULL;
-++    error_free_errp(errp);
-+|
-+-    error_free(local_err);
-++    error_free_errp(errp);
-+|
-+-    error_report_err(local_err);
-++    error_report_errp(errp);
-+|
-+-    warn_report_err(local_err);
-++    warn_report_errp(errp);
-+|
-+-    error_propagate_prepend(errp, local_err, args);
-++    error_prepend(errp, args);
-+|
-+-    error_propagate(errp, local_err);
-+)
-+     ...>
-+ }
-+
-+@@
-+identifier rule1.fn, rule1.local_err, rule1.errp;
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+(
-+-    &local_err
-++    errp
-+|
-+-    local_err
-++    *errp
-+)
-+     ...>
-+ }
-+
-+@@
-+identifier rule1.fn, rule1.errp;
-+@@
-+
-+ fn(...)
-+ {
-+     <...
-+- *errp != NULL
-++ *errp
-+     ...>
-+ }
--- 
-2.21.0
+Yours,
+Aleksandar
 
+Just that the patch in question that broke Foolong scenario didn't fit
+quite well, however some other its reincarnation may have better destiny.
+>
+> Sincerely,
+> Aleksandar
+>
+> > cheers,
+> >   Gerd
+> >
+> >
+
+--0000000000002ceac2059bce857c
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<p dir=3D"ltr"></p>
+<p dir=3D"ltr">8:42 PM Pet, 10.01.2020. Aleksandar Markovic &lt;<a href=3D"=
+mailto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; =D1=
+=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt;<br>
+&gt; 7:45 AM Pon, 06.01.2020. Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@re=
+dhat.com">kraxel@redhat.com</a>&gt; =D1=98=D0=B5 =D0=BD=D0=B0=D0=BF=D0=B8=
+=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:<br>
+&gt; &gt;<br>
+&gt; &gt; =C2=A0 Hi,<br>
+&gt; &gt;<br>
+&gt; &gt; &gt; 78c37d88f1b8b0b3ebcc632c458f0c3779fe2951 is the first bad co=
+mmit<br>
+&gt; &gt; &gt; commit 78c37d88f1b8b0b3ebcc632c458f0c3779fe2951<br>
+&gt; &gt; &gt; Author: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.=
+com">pbonzini@redhat.com</a>&gt;<br>
+&gt; &gt; &gt; Date:=C2=A0 =C2=A0Tue Mar 19 15:37:19 2019 +0100<br>
+&gt; &gt; &gt; <br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0mips-fulong2e: obey -vga none<br>
+&gt; &gt; &gt; <br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0Do not create an ATI VGA if &quot;-vga no=
+ne&quot; was passed on the command line.<br>
+&gt; &gt;<br>
+&gt; &gt; &gt; 1/ the Radeon chip is soldered on the motherboard,<br>
+&gt; &gt; &gt; <br>
+&gt; &gt; &gt; 2/ the default BIOS expects the Radeon chip to be<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 unconditionally present,<br>
+&gt; &gt; &gt; <br>
+&gt; &gt; &gt; I insist this patch is incorrect for the particular case of =
+the Fuloong2e<br>
+&gt; &gt; &gt; board. I plan to revert it when I post the test.<br>
+&gt; &gt;<br>
+&gt; &gt; Yep.=C2=A0 IMHO devices which you can&#39;t unplug on the physica=
+l board should<br>
+&gt; &gt; be present even with &quot;qemu -nodefaults&quot;.<br>
+&gt; &gt;<br>
+&gt;<br>
+&gt; I have to agree with Philippe&#39;s approach. That is not to say that =
+Zoltan&#39;s efforts are not appreciated.</p>
+<p dir=3D"ltr">I meant to say also Paolo&#39;s. But, I didn&#39;t mean to f=
+ingerpoint. It is quite normal that from time to time, a well-intended chan=
+ge may actually produce unexpected breaking. All is well, no bad feelings a=
+t all.</p>
+<p dir=3D"ltr">Yours,<br>
+Aleksandar</p>
+<p dir=3D"ltr"> Just that the patch in question that broke Foolong scenario=
+ didn&#39;t fit quite well, however some other its reincarnation may have b=
+etter destiny.<br>
+&gt;<br>
+&gt; Sincerely,<br>
+&gt; Aleksandar<br>
+&gt;<br>
+&gt; &gt; cheers,<br>
+&gt; &gt; =C2=A0 Gerd<br>
+&gt; &gt;<br>
+&gt; &gt;<br>
+</p>
+
+--0000000000002ceac2059bce857c--
 
