@@ -2,75 +2,56 @@ Return-Path: <SRS0=vKWr=3A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6780C33C9E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 11:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F94C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA4942082E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 11:51:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA4942082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 26C04206ED
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:43:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C04206ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqFIu-0005ch-Qj
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 06:51:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39961)
+	id 1iqIvQ-0004Tq-PF
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:43:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iqFHq-0004aX-Ci
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 06:50:39 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqItr-0002Fj-SN
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iqFHo-0006BH-VQ
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 06:50:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57620)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iqFHo-000689-OY
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 06:50:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iqFHn-0005UO-QQ
- for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 11:50:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C5E072E807B
- for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 11:50:35 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 11 Jan 2020 11:39:12 -0000
-From: Laurent Vivier <Laurent@vivier.eu>
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqItq-0002Dg-CH
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:07 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:45070 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1iqItq-000873-1K
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:06 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 8BDE91A1EAC;
+ Sat, 11 Jan 2020 16:41:00 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 6D8E21A1187;
+ Sat, 11 Jan 2020 16:41:00 +0100 (CET)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <157874275242.3198.10529721400120606674.malone@soybean.canonical.com>
-Subject: [Bug 1856834] Re: PCI broken in qemu ppc e500 in v2.12.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7aff54e86491c70fe588660e2e7978d9274754be
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v4 00/19] linux-user: Misc patches for 5.0 
+Date: Sat, 11 Jan 2020 16:40:22 +0100
+Message-Id: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,70 +60,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: laurent@vivier.eu, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If I revert 67113c03423a on top of master, vda is correctly detected.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
--- =
+This series is a collection of linux-user patches I recently
+accumulated. The summary of patches is as follows:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
+Patch 1: Fix for some issues in termbits.h files.
+Patches 2-6: Updating syscall numbers
+Patch 7: A minor xtensa cleanup
+Patches 8-13: Adding support for some filesystem-related ioctls
+Patches 14-16: Adding support for some floppy-drive-related ioctls
+Patches 17-19: Adding support for kcov-related ioctls
 
-Title:
-  PCI broken in qemu ppc e500 in v2.12.0 and other versions
+History of the series:
 
-Status in QEMU:
-  New
+v3->v4:
 
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
+  - added support for three filesystem-related ioctls
+  - added syscall number update for m68k, microblaze, x86_64 and xtensa
+  - fixed some issues related to unused ranges of syscall numbers for
+    mips o32
+  - several minor corrections
 
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
+v2->v3:
 
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
+  - added support for seven floppy-drive-related ioctls
+  - added support for three kcov-related ioctls
 
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
+v1->v2:
 
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
+  - fixed a constant in xtensa's termbits.h that was missed in v1
+  - redid syscall numbers for mips o32
+  - minor formatting and wording changes
 
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
+Aleksandar Markovic (19):
+  linux-user: Fix some constants in termbits.h
+  linux-user: m68k: Update syscall numbers to kernel 5.5 rc3 level
+  linux-user: microblaze: Update syscall numbers to kernel 5.5 rc3 level
+  linux-user: mips: Update syscall numbers to kernel 5.5 rc3 level
+  linux-user: x86_64: Update syscall numbers to kernel 5.5 rc3 level
+  linux-user: xtensa: Update syscall numbers to kernel 5.5 rc3 level
+  linux-user: xtensa: Remove unused constant TARGET_NR_syscall_count
+  linux-user: Add support for FS_IOC_<GET|SET>VERSION ioctls
+  linux-user: Add support for FS_IOC32_<GET|SET>FLAGS ioctls
+  linux-user: Add support for FS_IOC32_<GET|SET>VERSION ioctls
+  linux-user: Add support for FS_IOC_FS<GET|SET>XATTR ioctls
+  linux-user: Add support for FITRIM ioctl
+  linux-user: Add support for FIFREEZE and FITHAW ioctls
+  linux-user: Add support for FD<SETEMSGTRESH|SETMAXERRS|GETMAXERRS>
+    ioctls
+  linux-user: Add support for FDFMT<BEG|TRK|END> ioctls
+  linux-user: Add support for FDGETFDCSTAT ioctl
+  configure: Detect kcov support and introduce CONFIG_KCOV
+  linux-user: Add support for KCOV_<ENABLE|DISABLE> ioctls
+  linux-user: Add support for KCOV_INIT_TRACE ioctl
 
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
+ configure                          |  21 +++++
+ linux-user/aarch64/termbits.h      |   4 +-
+ linux-user/alpha/termbits.h        |  10 +--
+ linux-user/arm/termbits.h          |   4 +-
+ linux-user/cris/termbits.h         |   4 +-
+ linux-user/hppa/termbits.h         |   4 +-
+ linux-user/i386/termbits.h         |   4 +-
+ linux-user/ioctls.h                |  36 +++++++++
+ linux-user/m68k/syscall_nr.h       |  50 +++++++++++-
+ linux-user/m68k/termbits.h         |   4 +-
+ linux-user/microblaze/syscall_nr.h |  45 +++++++++++
+ linux-user/microblaze/termbits.h   |   4 +-
+ linux-user/mips/cpu_loop.c         |  78 ++++++++++++++++++-
+ linux-user/mips/syscall_nr.h       |  45 +++++++++++
+ linux-user/mips/termbits.h         |   4 +-
+ linux-user/mips64/syscall_nr.h     |  13 ++++
+ linux-user/nios2/termbits.h        |   4 +-
+ linux-user/openrisc/termbits.h     |   6 +-
+ linux-user/ppc/termbits.h          |   4 +-
+ linux-user/riscv/termbits.h        |   4 +-
+ linux-user/s390x/termbits.h        |  26 ++++---
+ linux-user/sh4/termbits.h          |   4 +-
+ linux-user/sparc/termbits.h        |   4 +-
+ linux-user/sparc64/termbits.h      |   4 +-
+ linux-user/syscall.c               |   3 +
+ linux-user/syscall_defs.h          |  46 ++++++++++-
+ linux-user/syscall_types.h         |  24 ++++++
+ linux-user/x86_64/syscall_nr.h     |  24 ++++++
+ linux-user/x86_64/termbits.h       |   6 +-
+ linux-user/xtensa/syscall_nr.h     |  36 ++++++++-
+ linux-user/xtensa/termbits.h       | 156 +++++++++++++++++++++----------------
+ 31 files changed, 555 insertions(+), 126 deletions(-)
 
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
+-- 
+2.7.4
 
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
