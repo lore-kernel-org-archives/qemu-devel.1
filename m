@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 660DCC282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8E6C3F68F
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B7D9206ED
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:49:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B7D9206ED
+	by mail.kernel.org (Postfix) with ESMTPS id C3176206ED
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:51:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3176206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqJ17-0004Dy-1i
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:49:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57459)
+	id 1iqJ30-0006sz-Do
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:51:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIwe-0006ps-00
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:45:00 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIyP-0000jG-52
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:46:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIwc-0004UH-U7
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:44:59 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:48571 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIyN-0001yW-UN
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:46:49 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:48737 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iqIwc-0004Or-MT
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:44:58 -0500
+ id 1iqIyN-0001re-Io
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:46:47 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 8B0E91A1FDD;
- Sat, 11 Jan 2020 16:44:56 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id E41E61A1FDA;
+ Sat, 11 Jan 2020 16:46:44 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 748F21A1187;
- Sat, 11 Jan 2020 16:44:56 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id CA9DF1A1187;
+ Sat, 11 Jan 2020 16:46:44 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/19] linux-user: Add support for
- FS_IOC32_<GET|SET>VERSION ioctls
-Date: Sat, 11 Jan 2020 16:40:32 +0100
-Message-Id: <1578757241-29583-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v4 14/19] linux-user: Add support for
+ FD<SETEMSGTRESH|SETMAXERRS|GETMAXERRS> ioctls
+Date: Sat, 11 Jan 2020 16:40:36 +0100
+Message-Id: <1578757241-29583-15-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -70,43 +70,89 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-These FS_IOC32_<GET|SET>VERSION ioctls are identical to
-FS_IOC_<GET|SET>VERSION ioctls, but without the anomaly of their
-number defined as if their third argument is of type long, while
-it is treated internally in kernel as is of type int.
+FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
+for controlling error reporting of a floppy drive.
+
+FDSETEMSGTRESH's third agrument is a pointer to the structure:
+
+struct floppy_max_errors {
+    unsigned int
+      abort,      /* number of errors to be reached before aborting */
+      read_track, /* maximal number of errors permitted to read an
+                   * entire track at once */
+      reset,      /* maximal number of errors before a reset is tried */
+      recal,      /* maximal number of errors before a recalibrate is
+                   * tried */
+      /*
+       * Threshold for reporting FDC errors to the console.
+       * Setting this to zero may flood your screen when using
+       * ultra cheap floppies ;-)
+       */
+      reporting;
+};
+
+defined in Linux kernel header <linux/fd.h>.
+
+Since all fields of the structure are of type 'unsigned int', there is
+no need to define "target_floppy_max_errors".
+
+FDSETMAXERRS and FDGETMAXERRS ioctls do not use the third argument.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/ioctls.h        | 3 +++
+ linux-user/syscall_defs.h  | 3 +++
+ linux-user/syscall_types.h | 7 +++++++
+ 3 files changed, 13 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 4fd6939..3affd88 100644
+index 66f8c4e..9e3ca90 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -142,6 +142,8 @@
-      IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
+@@ -114,7 +114,10 @@
  
- #ifdef CONFIG_USBFS
-   /* USB ioctls */
+      IOCTL(FDMSGON, 0, TYPE_NULL)
+      IOCTL(FDMSGOFF, 0, TYPE_NULL)
++     IOCTL(FDSETEMSGTRESH, 0, TYPE_NULL)
+      IOCTL(FDFLUSH, 0, TYPE_NULL)
++     IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
++     IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
+      IOCTL(FDRESET, 0, TYPE_NULL)
+      IOCTL(FDRAWCMD, 0, TYPE_NULL)
+      IOCTL(FDTWADDLE, 0, TYPE_NULL)
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 964b2b4..a73cc3d 100644
+index 6b88030..efe3860 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -922,6 +922,8 @@ struct target_pollfd {
- #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
- #define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
- #define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
-+#define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
-+#define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
+@@ -899,7 +899,10 @@ struct target_pollfd {
  
- /* usb ioctls */
- #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
+ #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
+ #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
++#define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
+ #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
++#define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c, struct floppy_max_errors)
++#define TARGET_FDGETMAXERRS  TARGET_IOR(2, 0x0e, struct floppy_max_errors)
+ #define TARGET_FDRESET        TARGET_IO(2, 0x54)
+ #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
+ #define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4e36983..e4e0429 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -261,6 +261,13 @@ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* datalen */
+        TYPE_PTRVOID) /* data */
+ 
++STRUCT(floppy_max_errors,
++       TYPE_INT, /* abort */
++       TYPE_INT, /* read_track */
++       TYPE_INT, /* reset */
++       TYPE_INT, /* recal */
++       TYPE_INT) /* reporting */
++
+ #if defined(CONFIG_USBFS)
+ /* usb device ioctls */
+ STRUCT(usbdevfs_ctrltransfer,
 -- 
 2.7.4
 
