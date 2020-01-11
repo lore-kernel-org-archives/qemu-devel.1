@@ -2,51 +2,54 @@ Return-Path: <SRS0=vKWr=3A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F94C282DD
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D467FC33CA4
 	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26C04206ED
+	by mail.kernel.org (Postfix) with ESMTPS id ADF3A206ED
 	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:43:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C04206ED
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF3A206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqIvQ-0004Tq-PF
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:43:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50530)
+	id 1iqIvR-0004VL-Ix
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:43:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqItr-0002Fj-SN
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:09 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIu3-0002Ws-6H
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqItq-0002Dg-CH
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:07 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:45070 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqItx-0002SJ-0B
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:17 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:46799 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iqItq-000873-1K
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:06 -0500
+ id 1iqItw-0002O1-EU
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:42:12 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 8BDE91A1EAC;
- Sat, 11 Jan 2020 16:41:00 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 7669C1A1EAC;
+ Sat, 11 Jan 2020 16:42:08 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 6D8E21A1187;
- Sat, 11 Jan 2020 16:41:00 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 5C68B1A1187;
+ Sat, 11 Jan 2020 16:42:08 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 00/19] linux-user: Misc patches for 5.0 
-Date: Sat, 11 Jan 2020 16:40:22 +0100
-Message-Id: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v4 02/19] linux-user: m68k: Update syscall numbers to kernel
+ 5.5 rc3 level
+Date: Sat, 11 Jan 2020 16:40:24 +0100
+Message-Id: <1578757241-29583-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,92 +70,77 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This series is a collection of linux-user patches I recently
-accumulated. The summary of patches is as follows:
+Update m68k syscall numbers based on Linux kernel tag v5.5-rc3
+(commit 46cf053e).
 
-Patch 1: Fix for some issues in termbits.h files.
-Patches 2-6: Updating syscall numbers
-Patch 7: A minor xtensa cleanup
-Patches 8-13: Adding support for some filesystem-related ioctls
-Patches 14-16: Adding support for some floppy-drive-related ioctls
-Patches 17-19: Adding support for kcov-related ioctls
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-History of the series:
+---
 
-v3->v4:
+cc: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/m68k/syscall_nr.h | 50 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
 
-  - added support for three filesystem-related ioctls
-  - added syscall number update for m68k, microblaze, x86_64 and xtensa
-  - fixed some issues related to unused ranges of syscall numbers for
-    mips o32
-  - several minor corrections
-
-v2->v3:
-
-  - added support for seven floppy-drive-related ioctls
-  - added support for three kcov-related ioctls
-
-v1->v2:
-
-  - fixed a constant in xtensa's termbits.h that was missed in v1
-  - redid syscall numbers for mips o32
-  - minor formatting and wording changes
-
-Aleksandar Markovic (19):
-  linux-user: Fix some constants in termbits.h
-  linux-user: m68k: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: microblaze: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: mips: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: x86_64: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: xtensa: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: xtensa: Remove unused constant TARGET_NR_syscall_count
-  linux-user: Add support for FS_IOC_<GET|SET>VERSION ioctls
-  linux-user: Add support for FS_IOC32_<GET|SET>FLAGS ioctls
-  linux-user: Add support for FS_IOC32_<GET|SET>VERSION ioctls
-  linux-user: Add support for FS_IOC_FS<GET|SET>XATTR ioctls
-  linux-user: Add support for FITRIM ioctl
-  linux-user: Add support for FIFREEZE and FITHAW ioctls
-  linux-user: Add support for FD<SETEMSGTRESH|SETMAXERRS|GETMAXERRS>
-    ioctls
-  linux-user: Add support for FDFMT<BEG|TRK|END> ioctls
-  linux-user: Add support for FDGETFDCSTAT ioctl
-  configure: Detect kcov support and introduce CONFIG_KCOV
-  linux-user: Add support for KCOV_<ENABLE|DISABLE> ioctls
-  linux-user: Add support for KCOV_INIT_TRACE ioctl
-
- configure                          |  21 +++++
- linux-user/aarch64/termbits.h      |   4 +-
- linux-user/alpha/termbits.h        |  10 +--
- linux-user/arm/termbits.h          |   4 +-
- linux-user/cris/termbits.h         |   4 +-
- linux-user/hppa/termbits.h         |   4 +-
- linux-user/i386/termbits.h         |   4 +-
- linux-user/ioctls.h                |  36 +++++++++
- linux-user/m68k/syscall_nr.h       |  50 +++++++++++-
- linux-user/m68k/termbits.h         |   4 +-
- linux-user/microblaze/syscall_nr.h |  45 +++++++++++
- linux-user/microblaze/termbits.h   |   4 +-
- linux-user/mips/cpu_loop.c         |  78 ++++++++++++++++++-
- linux-user/mips/syscall_nr.h       |  45 +++++++++++
- linux-user/mips/termbits.h         |   4 +-
- linux-user/mips64/syscall_nr.h     |  13 ++++
- linux-user/nios2/termbits.h        |   4 +-
- linux-user/openrisc/termbits.h     |   6 +-
- linux-user/ppc/termbits.h          |   4 +-
- linux-user/riscv/termbits.h        |   4 +-
- linux-user/s390x/termbits.h        |  26 ++++---
- linux-user/sh4/termbits.h          |   4 +-
- linux-user/sparc/termbits.h        |   4 +-
- linux-user/sparc64/termbits.h      |   4 +-
- linux-user/syscall.c               |   3 +
- linux-user/syscall_defs.h          |  46 ++++++++++-
- linux-user/syscall_types.h         |  24 ++++++
- linux-user/x86_64/syscall_nr.h     |  24 ++++++
- linux-user/x86_64/termbits.h       |   6 +-
- linux-user/xtensa/syscall_nr.h     |  36 ++++++++-
- linux-user/xtensa/termbits.h       | 156 +++++++++++++++++++++----------------
- 31 files changed, 555 insertions(+), 126 deletions(-)
-
+diff --git a/linux-user/m68k/syscall_nr.h b/linux-user/m68k/syscall_nr.h
+index d33d8e9..01aee34 100644
+--- a/linux-user/m68k/syscall_nr.h
++++ b/linux-user/m68k/syscall_nr.h
+@@ -382,5 +382,53 @@
+ #define TARGET_NR_copy_file_range       376
+ #define TARGET_NR_preadv2               377
+ #define TARGET_NR_pwritev2              378
+-
++#define TARGET_NR_statx                 379
++#define TARGET_NR_seccomp               380
++#define TARGET_NR_pkey_mprotect         381
++#define TARGET_NR_pkey_alloc            382
++#define TARGET_NR_pkey_free             383
++#define TARGET_NR_rseq                  384
++/* room for arch specific calls */
++#define TARGET_NR_semget                393
++#define TARGET_NR_semctl                394
++#define TARGET_NR_shmget                395
++#define TARGET_NR_shmctl                396
++#define TARGET_NR_shmat                 397
++#define TARGET_NR_shmdt                 398
++#define TARGET_NR_msgget                399
++#define TARGET_NR_msgsnd                400
++#define TARGET_NR_msgrcv                401
++#define TARGET_NR_msgctl                402
++#define TARGET_NR_clock_gettime64       403
++#define TARGET_NR_clock_settime64       404
++#define TARGET_NR_clock_adjtime64       405
++#define TARGET_NR_clock_getres_time64   406
++#define TARGET_NR_clock_nanosleep_time64 407
++#define TARGET_NR_timer_gettime64       408
++#define TARGET_NR_timer_settime64       409
++#define TARGET_NR_timerfd_gettime64     410
++#define TARGET_NR_timerfd_settime64     411
++#define TARGET_NR_utimensat_time64      412
++#define TARGET_NR_pselect6_time64       413
++#define TARGET_NR_ppoll_time64          414
++#define TARGET_NR_io_pgetevents_time64  416
++#define TARGET_NR_recvmmsg_time64       417
++#define TARGET_NR_mq_timedsend_time64   418
++#define TARGET_NR_mq_timedreceive_time64 419
++#define TARGET_NR_semtimedop_time64     420
++#define TARGET_NR_rt_sigtimedwait_time64 421
++#define TARGET_NR_futex_time64          422
++#define TARGET_NR_sched_rr_get_interval_time64 423
++#define TARGET_NR_pidfd_send_signal     424
++#define TARGET_NR_io_uring_setup        425
++#define TARGET_NR_io_uring_enter        426
++#define TARGET_NR_io_uring_register     427
++#define TARGET_NR_open_tree             428
++#define TARGET_NR_move_mount            429
++#define TARGET_NR_fsopen                430
++#define TARGET_NR_fsconfig              431
++#define TARGET_NR_fsmount               432
++#define TARGET_NR_fspick                433
++#define TARGET_NR_pidfd_open            434
++/* 435 reserved for clone3 */
+ #endif
 -- 
 2.7.4
 
