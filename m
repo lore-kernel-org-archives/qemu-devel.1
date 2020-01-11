@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7941C282DD
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCC1C282DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:51:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1399206ED
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:51:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1399206ED
+	by mail.kernel.org (Postfix) with ESMTPS id E4509206ED
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 15:51:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4509206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqJ33-00073P-Bl
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:51:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59696)
+	id 1iqJ38-0007AX-Ha
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 10:51:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIxc-0007zm-M0
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:46:01 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIwc-0006nb-EL
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:44:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIxb-0007rD-Em
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:46:00 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:48660 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iqIwb-0004LW-9L
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:44:58 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:48564 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iqIxZ-0007lV-OY
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:45:59 -0500
+ id 1iqIwb-0004Fu-1C
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 10:44:57 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id DBA3D1A1DA1;
- Sat, 11 Jan 2020 16:45:49 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id E310C1A1FDA;
+ Sat, 11 Jan 2020 16:44:54 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id C51F81A1187;
- Sat, 11 Jan 2020 16:45:49 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id CB2E41A1187;
+ Sat, 11 Jan 2020 16:44:54 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 13/19] linux-user: Add support for FIFREEZE and FITHAW
+Subject: [PATCH v4 09/19] linux-user: Add support for FS_IOC32_<GET|SET>FLAGS
  ioctls
-Date: Sat, 11 Jan 2020 16:40:35 +0100
-Message-Id: <1578757241-29583-14-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sat, 11 Jan 2020 16:40:31 +0100
+Message-Id: <1578757241-29583-10-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1578757241-29583-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -70,50 +70,43 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Both FIFREEZE and FITHAW ioctls accept an integer as their third
-argument.
-
-All ioctls in this group (FI* ioctl) are guarded with "#ifdef", so the
-guards are used in this implementation too for consistency (however,
-many of ioctls in FI* group became old enough that their #ifdef guards
-could be removed, bit this is out of the scope of this patch).
+These FS_IOC32_<GET|SET>FLAGS ioctls are identical to
+FS_IOC_<GET|SET>FLAGS ioctls, but without the anomaly of their
+number defined as if their third argument is of type long, while
+it is treated internally in kernel as is of type int.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 6 ++++++
+ linux-user/ioctls.h       | 2 ++
  linux-user/syscall_defs.h | 2 ++
- 2 files changed, 8 insertions(+)
+ 2 files changed, 4 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index e4f0a04..66f8c4e 100644
+index c44f42e..4fd6939 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -123,6 +123,12 @@
- #ifdef FIBMAP
-      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
- #endif
-+#ifdef FIFREEZE
-+     IOCTL(FIFREEZE, IOC_W | IOC_R, TYPE_INT)
-+#endif
-+#ifdef FITHAW
-+     IOCTL(FITHAW, IOC_W | IOC_R, TYPE_INT)
-+#endif
- #ifdef FITRIM
-      IOCTL(FITRIM, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_fstrim_range)))
- #endif
+@@ -140,6 +140,8 @@
+      IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+ 
+ #ifdef CONFIG_USBFS
+   /* USB ioctls */
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 40851e9..6b88030 100644
+index f68a8b6..964b2b4 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -908,6 +908,8 @@ struct target_pollfd {
- #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
- #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
+@@ -920,6 +920,8 @@ struct target_pollfd {
+ #define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
+ #define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+ #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
++#define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
++#define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
  
-+#define TARGET_FIFREEZE   TARGET_IOWR('X', 119, int)    /* Freeze */
-+#define TARGET_FITHAW     TARGET_IOWR('X', 120, int)    /* Thaw */
- #define TARGET_FITRIM     TARGET_IOWR('X', 121, struct fstrim_range)
- #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
- #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
+ /* usb ioctls */
+ #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
 -- 
 2.7.4
 
