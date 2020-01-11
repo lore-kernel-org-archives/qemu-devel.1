@@ -2,69 +2,70 @@ Return-Path: <SRS0=vKWr=3A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E0AC33C9E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 09:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 001CBC33C9E
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 11:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6B132082E
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 09:21:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6B132082E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C355F2082E
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 11:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C355F2082E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqCxP-0000lb-RS
-	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 04:21:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40521)
+	id 1iqFIm-0005Yg-3r
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 06:51:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iqCwj-0000M5-UV
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 04:20:42 -0500
+ (envelope-from <bounces@canonical.com>) id 1iqFHq-0004aY-Ep
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 06:50:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iqCwi-0008GK-Mw
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 04:20:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51158)
+ (envelope-from <bounces@canonical.com>) id 1iqFHp-0006BV-15
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 06:50:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:57610)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iqCwi-0008Bp-Et
- for qemu-devel@nongnu.org; Sat, 11 Jan 2020 04:20:40 -0500
+ id 1iqFHo-00067S-OZ
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 06:50:36 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iqCwh-0006Um-2j
- for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 09:20:39 +0000
+ id 1iqFHn-0005UW-9c
+ for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 11:50:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F2F352E807C
- for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 09:20:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 479D62E8079
+ for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 11:50:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 11 Jan 2020 09:12:52 -0000
-From: Thomas Huth <1653577@bugs.launchpad.net>
+Date: Sat, 11 Jan 2020 11:35:12 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Wishlist;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gkurz nathan-renniewaldock
-X-Launchpad-Bug-Reporter: Nathan Rennie-Waldock (nathan-renniewaldock)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20170103031332.1493.46452.malonedeb@soybean.canonical.com>
-Message-Id: <157873397315.5281.3816510941973918137.launchpad@gac.canonical.com>
-Subject: [Bug 1653577] Re: Ability to set umask for 9pfs
+X-Launchpad-Bug-Commenters: ecsdn laurent-vivier
+X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
+Message-Id: <157874251257.14296.5831142209187883337.malone@wampee.canonical.com>
+Subject: [Bug 1856834] Re: Virtio broken in qemu ppc in 4.2.0 and other
+ versions
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6fcfc07ad60e922085360eb9cbddb648fdaa8281
+X-Launchpad-Hash: bba0d7017276b36f05a8d34f7739e1901f46420f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -78,32 +79,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1653577 <1653577@bugs.launchpad.net>
+Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+This is broken by:
+
+commit 67113c03423a23e60915574275aed7d60e9f85e1
+Author: Michael Davidsaver <mdavidsaver@gmail.com>
+Date:   Sun Nov 26 15:59:05 2017 -0600
+
+    e500: fix pci host bridge class/type
+    =
+
+    Correct some confusion wrt. the PCI facing
+    side of the PCI host bridge (not PCIe root complex).
+    The ref. manual for the mpc8533 (as well as
+    mpc8540 and mpc8540) give the class code as
+    PCI_CLASS_PROCESSOR_POWERPC.
+    While the PCI_HEADER_TYPE field is oddly omitted,
+    the tables in the "PCI Configuration Header"
+    section shows a type 0 layout using all 6 BAR
+    registers (as 2x 32, and 2x 64 bit regions)
+    =
+
+    So 997505065dc92e533debf5cb23012ba4e673d387
+    seems to be in error.  Although there was
+    perhaps some confusion as the mpc8533
+    has a separate PCIe root complex.
+    With PCIe, a root complex has PCI_HEADER_TYPE=3D1.
+    =
+
+    Neither the PCI host bridge, nor the PCIe
+    root complex advertise class PCI_CLASS_BRIDGE_PCI.
+    =
+
+    This was confusing Linux guests, which try
+    to interpret the host bridge as a pci-pci
+    bridge, but get confused and re-enumerate
+    the bus when the primary/secondary/subordinate
+    bus registers don't have valid values.
+    =
+
+    Signed-off-by: Michael Davidsaver <mdavidsaver@gmail.com>
+    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+
+** Summary changed:
+
+- Virtio broken in qemu ppc in 4.2.0 and other versions
++ PCI broken in qemu ppc e500 in v2.12.0 and other versions
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653577
+https://bugs.launchpad.net/bugs/1856834
 
 Title:
-  Ability to set umask for 9pfs
+  PCI broken in qemu ppc e500 in v2.12.0 and other versions
 
 Status in QEMU:
-  Incomplete
+  New
 
 Bug description:
-  We should be able to specify the umask for 9pfs so that files created
-  by the guest can be accessed by other users on the host. Currently
-  they're only accessible by the user running qemu (and of course,
-  root).
+  The same qemu -M mpc... command that works on qemu-system-ppc version
+  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
+  version 4.2.0release and 4.19dirtygit:
+
+  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
+ccel kvm is set.
+  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
+e (slower).
+
+  ends/freezes at:
+  nbd: registered device at major 43
+  =C2=A0vda:
+
+  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
+  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
+  with 2.8.0 official release from git/github that I compiled/built
+  myself. But both of the newer releases fail on the same exact machine
+  same config.
+
+  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
+ed weren't, ie gave
+  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
+bus=3D0,unit=3D0
+  (but I removed -drive if=3Dmtd since wasn't using it anyway)
+
+  I also tried on windows but I think virtio doesn't work on windows
+  hosts at all? On windows host it fails the same way, even version 2.12
+  as well as 4.1.10...
+
+  used:
+  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
+
+  (basically all steps the same on same exact system same config, yet
+  2.8.0 works fine whether apt-get installed or built from source while
+  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
+
+  In case newer qemu versions act weird on various kernels, I did try with =
+both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
+ compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
+_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
+ich is why I can't use -M ppce500 instead..)
+  tx
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653577/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
