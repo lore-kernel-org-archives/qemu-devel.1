@@ -2,71 +2,86 @@ Return-Path: <SRS0=vKWr=3A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246A0C33CA2
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 02:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBB50C33C9E
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 08:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E67C0206ED
-	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 02:17:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E67C0206ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 814C72077C
+	for <qemu-devel@archiver.kernel.org>; Sat, 11 Jan 2020 08:57:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XBCW55pY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 814C72077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iq6Ko-00038m-15
-	for qemu-devel@archiver.kernel.org; Fri, 10 Jan 2020 21:17:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54981)
+	id 1iqCaU-0002Ms-Jh
+	for qemu-devel@archiver.kernel.org; Sat, 11 Jan 2020 03:57:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1iq6Jg-0002Zm-Hh
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 21:15:57 -0500
+ (envelope-from <thuth@redhat.com>) id 1iqCZn-0001wt-0J
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 03:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kuhn.chenqun@huawei.com>) id 1iq6Jf-0000PJ-6j
- for qemu-devel@nongnu.org; Fri, 10 Jan 2020 21:15:56 -0500
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2051 helo=huawei.com)
+ (envelope-from <thuth@redhat.com>) id 1iqCZk-0006Fr-9N
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 03:56:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32995
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1iq6Je-0008Uq-R5; Fri, 10 Jan 2020 21:15:55 -0500
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id D0A4697E424D2ABCA5EC;
- Sat, 11 Jan 2020 10:15:49 +0800 (CST)
-Received: from DGGEMM423-HUB.china.huawei.com (10.1.198.40) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 11 Jan 2020 10:15:49 +0800
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.215]) by
- dggemm423-hub.china.huawei.com ([10.1.198.40]) with mapi id 14.03.0439.000;
- Sat, 11 Jan 2020 10:15:41 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kraxel@redhat.com"
- <kraxel@redhat.com>
-Subject: RE: [PATCH] xhci: Fix memory leak in xhci_kick_epctx when poweroff
- GuestOS
-Thread-Topic: [PATCH] xhci: Fix memory leak in xhci_kick_epctx when poweroff
- GuestOS
-Thread-Index: AQHVx6T71tCpOn/wSkGorEYKOY6OCKfjWkgAgAFXCmA=
-Date: Sat, 11 Jan 2020 02:15:40 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B0E37A2@dggemm531-mbx.china.huawei.com>
-References: <20200110105855.81144-1-kuhn.chenqun@huawei.com>
- <d5e369c6-b1c2-2b64-97a5-d9b2fc443842@redhat.com>
-In-Reply-To: <d5e369c6-b1c2-2b64-97a5-d9b2fc443842@redhat.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.205.93]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iqCZj-00069k-OO
+ for qemu-devel@nongnu.org; Sat, 11 Jan 2020 03:56:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578733014;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=NKccIZg3YFAbW+Mf/uOLAt4+HOxTtpv+pg9kNYIB1S8=;
+ b=XBCW55pYa56Ynp3iQ+uUedn/mXAtwIC6CaxEhqrQL8FTXx+L8AmgOFxI3FWY/oFSOok60V
+ iKunHoZv5fbXfZgips5KhTTgTmvE+vzXvnwJU+nVlAOZ5qGvbqafpxZzLNgc6NYeKW9vuK
+ y7LLSWC+a4S9OGFQxFQE2wOAJbJoDS4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-JKrMqt4COcGlpHCsc0kHQQ-1; Sat, 11 Jan 2020 03:56:53 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D6DC63CC1
+ for <qemu-devel@nongnu.org>; Sat, 11 Jan 2020 08:56:52 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-21.ams2.redhat.com [10.36.116.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4ACC59A84;
+ Sat, 11 Jan 2020 08:56:46 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] tests/acceptance: avocado_qemu: Introduce the
+ 'accel' test parameter
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20191218170003.31356-1-wainersm@redhat.com>
+ <20191218170003.31356-2-wainersm@redhat.com>
+ <a95fe33b-2767-4e43-0a0e-424b90446623@redhat.com>
+ <bbfb286a-87b1-f985-7239-d2d5f236d536@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <7f28281a-ef68-dddf-1347-0e1f7a13c244@redhat.com>
+Date: Sat, 11 Jan 2020 09:56:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <bbfb286a-87b1-f985-7239-d2d5f236d536@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: JKrMqt4COcGlpHCsc0kHQQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.189
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,71 +93,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
- Pannengyuan <pannengyuan@huawei.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: philmd@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4tLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPkZyb206IFBoaWxpcHBlIE1hdGhpZXUt
-RGF1ZMOpIFttYWlsdG86cGhpbG1kQHJlZGhhdC5jb21dDQo+U2VudDogRnJpZGF5LCBKYW51YXJ5
-IDEwLCAyMDIwIDk6MTQgUE0NCj5UbzogQ2hlbnF1biAoa3VobikgPGt1aG4uY2hlbnF1bkBodWF3
-ZWkuY29tPjsgcWVtdS0NCj5kZXZlbEBub25nbnUub3JnOyBrcmF4ZWxAcmVkaGF0LmNvbQ0KPkNj
-OiBxZW11LXRyaXZpYWxAbm9uZ251Lm9yZzsgUGFubmVuZ3l1YW4gPHBhbm5lbmd5dWFuQGh1YXdl
-aS5jb20+Ow0KPlpoYW5naGFpbGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT4N
-Cj5TdWJqZWN0OiBSZTogW1BBVENIXSB4aGNpOiBGaXggbWVtb3J5IGxlYWsgaW4geGhjaV9raWNr
-X2VwY3R4IHdoZW4gcG93ZXJvZmYNCj5HdWVzdE9TDQo+DQo+T24gMS8xMC8yMCAxMTo1OCBBTSwg
-a3Vobi5jaGVucXVuQGh1YXdlaS5jb20gd3JvdGU6DQo+PiBGcm9tOiBDaGVuIFF1biA8a3Vobi5j
-aGVucXVuQGh1YXdlaS5jb20+DQo+Pg0KPj4gc3RhcnQgdm0gd2l0aCBsaWJ2aXJ0LCB3aGVuIEd1
-ZXN0T1MgcnVubmluZywgZW50ZXIgcG93ZXJvZmYgY29tbWFuZA0KPj4gdXNpbmcgdGhlIHhoY2kg
-a2V5Ym9hcmQsIHRoZW4gQVNBTiBzaG93cyBtZW1vcnkgbGVhayBzdGFja++8mg0KPj4NCj4+IERp
-cmVjdCBsZWFrIG9mIDgwIGJ5dGUocykgaW4gNSBvYmplY3QocykgYWxsb2NhdGVkIGZyb206DQo+
-PiAgICAgICMwIDB4ZmZmZDFlNjQzMWNiIGluIF9faW50ZXJjZXB0b3JfbWFsbG9jICgvbGliNjQv
-bGliYXNhbi5zby40KzB4ZDMxY2IpDQo+PiAgICAgICMxIDB4ZmZmZDFlMTA3MTYzIGluIGdfbWFs
-bG9jICgvbGliNjQvbGliZ2xpYi0yLjAuc28uMCsweDU3MTYzKQ0KPj4gICAgICAjMiAweGFhYWQz
-OTA1MTM2NyBpbiBxZW11X3NnbGlzdF9pbml0IC9xZW11L2RtYS1oZWxwZXJzLmM6NDMNCj4+ICAg
-ICAgIzMgMHhhYWFkMzk0N2M0MDcgaW4gcGNpX2RtYV9zZ2xpc3RfaW5pdA0KPi9xZW11L2luY2x1
-ZGUvaHcvcGNpL3BjaS5oOjg0Mg0KPj4gICAgICAjNCAweGFhYWQzOTQ3YzQwNyBpbiB4aGNpX3hm
-ZXJfY3JlYXRlX3NnbCAvcWVtdS9ody91c2IvaGNkLQ0KPnhoY2kuYzoxNDQ2DQo+PiAgICAgICM1
-IDB4YWFhZDM5NDdjNDA3IGluIHhoY2lfc2V0dXBfcGFja2V0IC9xZW11L2h3L3VzYi9oY2QteGhj
-aS5jOjE2MTgNCj4+ICAgICAgIzYgMHhhYWFkMzk0ODYyNWYgaW4geGhjaV9zdWJtaXQgL3FlbXUv
-aHcvdXNiL2hjZC14aGNpLmM6MTgyNw0KPj4gICAgICAjNyAweGFhYWQzOTQ4NjI1ZiBpbiB4aGNp
-X2ZpcmVfdHJhbnNmZXIgL3FlbXUvaHcvdXNiL2hjZC14aGNpLmM6MTgzOQ0KPj4gICAgICAjOCAw
-eGFhYWQzOTQ4NjI1ZiBpbiB4aGNpX2tpY2tfZXBjdHggL3FlbXUvaHcvdXNiL2hjZC14aGNpLmM6
-MTk5MQ0KPj4gICAgICAjOSAweGFhYWQzOTQ4ZjUzNyBpbiB4aGNpX2Rvb3JiZWxsX3dyaXRlIC9x
-ZW11L2h3L3VzYi9oY2QtDQo+eGhjaS5jOjMxNTgNCj4+ICAgICAgIzEwIDB4YWFhZDM4YmNiZmM3
-IGluIG1lbW9yeV9yZWdpb25fd3JpdGVfYWNjZXNzb3INCj4vcWVtdS9tZW1vcnkuYzo0ODMNCj4+
-ICAgICAgIzExIDB4YWFhZDM4YmM2NTRmIGluIGFjY2Vzc193aXRoX2FkanVzdGVkX3NpemUgL3Fl
-bXUvbWVtb3J5LmM6NTQ0DQo+PiAgICAgICMxMiAweGFhYWQzOGJkMTg3NyBpbiBtZW1vcnlfcmVn
-aW9uX2Rpc3BhdGNoX3dyaXRlDQo+L3FlbXUvbWVtb3J5LmM6MTQ4Mg0KPj4gICAgICAjMTMgMHhh
-YWFkMzhiMWM3N2YgaW4gZmxhdHZpZXdfd3JpdGVfY29udGludWUgL3FlbXUvZXhlYy5jOjMxNjcN
-Cj4+ICAgICAgIzE0IDB4YWFhZDM4YjFjYTgzIGluIGZsYXR2aWV3X3dyaXRlIC9xZW11L2V4ZWMu
-YzozMjA3DQo+PiAgICAgICMxNSAweGFhYWQzOGIyNjhkYiBpbiBhZGRyZXNzX3NwYWNlX3dyaXRl
-IC9xZW11L2V4ZWMuYzozMjk3DQo+PiAgICAgICMxNiAweGFhYWQzOGJmOTA5YiBpbiBrdm1fY3B1
-X2V4ZWMgL3FlbXUvYWNjZWwva3ZtL2t2bS1hbGwuYzoyMzgzDQo+PiAgICAgICMxNyAweGFhYWQz
-OGJiMDYzZiBpbiBxZW11X2t2bV9jcHVfdGhyZWFkX2ZuIC9xZW11L2NwdXMuYzoxMjQ2DQo+PiAg
-ICAgICMxOCAweGFhYWQzOTgyMWM5MyBpbiBxZW11X3RocmVhZF9zdGFydCAvcWVtdS91dGlsL3Fl
-bXUtdGhyZWFkLQ0KPnBvc2l4LmM6NTE5DQo+PiAgICAgICMxOSAweGZmZmQxYzgzNzhiYiAgKC9s
-aWI2NC9saWJwdGhyZWFkLnNvLjArMHg3OGJiKQ0KPj4gICAgICAjMjAgMHhmZmZkMWM3NzYxNmIg
-ICgvbGliNjQvbGliYy5zby42KzB4ZDYxNmIpDQo+Pg0KPj4gUmVwb3J0ZWQtYnk6IEV1bGVyIFJv
-Ym90IDxldWxlci5yb2JvdEBodWF3ZWkuY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQ2hlbiBRdW4g
-PGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPj4gLS0tDQo+PiAgIGh3L3VzYi9oY2QteGhjaS5j
-IHwgMSArDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQ0KPj4NCj4+IGRpZmYg
-LS1naXQgYS9ody91c2IvaGNkLXhoY2kuYyBiL2h3L3VzYi9oY2QteGhjaS5jIGluZGV4DQo+PiA4
-MDk4OGJiMzA1Li4wZDNkOTZkMDVhIDEwMDY0NA0KPj4gLS0tIGEvaHcvdXNiL2hjZC14aGNpLmMN
-Cj4+ICsrKyBiL2h3L3VzYi9oY2QteGhjaS5jDQo+PiBAQCAtMjAwMCw2ICsyMDAwLDcgQEAgc3Rh
-dGljIHZvaWQgeGhjaV9raWNrX2VwY3R4KFhIQ0lFUENvbnRleHQgKmVwY3R4LA0KPnVuc2lnbmVk
-IGludCBzdHJlYW1pZCkNCj4+ICAgICAgICAgICBpZiAoeGZlciAhPSBOVUxMICYmIHhmZXItPnJ1
-bm5pbmdfcmV0cnkpIHsNCj4+ICAgICAgICAgICAgICAgRFBSSU5URigieGhjaTogeGZlciBuYWNr
-ZWQsIHN0b3BwaW5nIHNjaGVkdWxlXG4iKTsNCj4+ICAgICAgICAgICAgICAgZXBjdHgtPnJldHJ5
-ID0geGZlcjsNCj4+ICsgICAgICAgICAgICB4aGNpX3hmZXJfdW5tYXAoeGZlcik7DQo+DQo+U2hv
-dWxkbid0IHdlIHVzZSB4aGNpX2VwX2ZyZWVfeGZlcigpIGluc3RlYWQ/DQo+QWxzbywgaXQgd291
-bGQgYmUgY2xlYW5lciBpZiB5b3Ugc2V0IGl0IHRvIE5VTEwuDQo+DQpIaSAgUGhpbGlwcGUsDQpU
-aGFua3MgZm9yIHlvdXIgcmVwbHkhICANCkJ1dCwgIEl0ICBpcyBqdXN0IGEgc2dsaXN0IGxlYWsu
-ICB4aGNpX3hmZXJfdW5tYXAoKSBjYW4gZnJlZSBhbmQgc2V0ICBpdCB0byBOVUxMLg0KVGhlICB4
-aGNpX2VwX2ZyZWVfeGZlcigpIGRpZCd0IGZyZWUgYSBzZ2xpc3QuICANCg0KQnkgdGhlIHdheSwg
-eGZlciBzaG91bGQgYmUgdXNlIGZvciBlcGN0eC0+cmV0cnksIHdlIGNhbid0IGZyZWUgaXQuDQoN
-ClRoYW5rcy4NCj4+ICAgICAgICAgICAgICAgYnJlYWs7DQo+PiAgICAgICAgICAgfQ0KPj4gICAg
-ICAgICAgIGlmIChjb3VudCsrID4gVFJBTlNGRVJfTElNSVQpIHsNCj4+DQoNCg==
+On 10/01/2020 21.02, Wainer dos Santos Moschetta wrote:
+> Hi Thomas,
+>=20
+> On 12/18/19 4:48 PM, Thomas Huth wrote:
+>> On 18/12/2019 18.00, Wainer dos Santos Moschetta wrote:
+>>> The test case may need to boot the VM with an accelerator that
+>>> isn't actually enabled on the QEMU binary and/or present in the host. I=
+n
+>>> this case the test behavior is undefined, and the best course of
+>>> action is to skip its execution.
+>>>
+>>> This change introduced the 'accel' parameter (and the handler of
+>>> tag with same name) used to indicate the test case requires a
+>>> given accelerator available. It was implemented a mechanism to
+>>> skip the test case if the accelerator is not available. Moreover,
+>>> =C2=A0 the QEMU --accel argument is set automatically to any VM
+>>> launched if the parameter is present.
+>>>
+>>> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+>>> ---
+>>> =C2=A0 docs/devel/testing.rst=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
+16 ++++++++++++++++
+>>> =C2=A0 tests/acceptance/avocado_qemu/__init__.py | 23 +++++++++++++++++=
+++++++
+>>> =C2=A0 2 files changed, 39 insertions(+)
+>>>
+>>> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+>>> index 27f286858a..6c2e0718e1 100644
+>>> --- a/docs/devel/testing.rst
+>>> +++ b/docs/devel/testing.rst
+>>> @@ -757,6 +757,17 @@ name.=C2=A0 If one is not given explicitly, it wil=
+l
+>>> either be set to
+>>> =C2=A0 ``None``, or, if the test is tagged with one (and only one)
+>>> =C2=A0 ``:avocado: tags=3Dmachine:VALUE`` tag, it will be set to ``VALU=
+E``.
+>>> =C2=A0 +accel
+>>> +~~~~~
+>>> +The accelerator that will be set to all QEMUMachine instances created
+>>> +by the test.
+>>> +
+>>> +The ``accel`` attribute will be set to the test parameter of the same
+>>> +name.=C2=A0 If one is not given explicitly, it will either be set to
+>>> +``None``, or, if the test is tagged with one (and only one)
+>>> +``:avocado: tags=3Daccel:VALUE`` tag, it will be set to ``VALUE``.
+>>> Currently
+>>> +``VALUE`` should be either ``kvm`` or ``tcg``.
+>>> +
+>>> =C2=A0 qemu_bin
+>>> =C2=A0 ~~~~~~~~
+>>> =C2=A0 @@ -798,6 +809,11 @@ machine
+>>> =C2=A0 The machine type that will be set to all QEMUMachine instances c=
+reated
+>>> =C2=A0 by the test.
+>>> =C2=A0 +accel
+>>> +~~~~~
+>>> +The accelerator that will be set to all QEMUMachine instances created
+>>> +by the test. In case the accelerator is not available (both QEMU
+>>> +binary and the host system are checked) then the test is canceled.
+>>> =C2=A0 =C2=A0 qemu_bin
+>>> =C2=A0 ~~~~~~~~
+>>> diff --git a/tests/acceptance/avocado_qemu/__init__.py
+>>> b/tests/acceptance/avocado_qemu/__init__.py
+>>> index 6618ea67c1..aff32668d9 100644
+>>> --- a/tests/acceptance/avocado_qemu/__init__.py
+>>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>>> @@ -20,6 +20,7 @@ SRC_ROOT_DIR =3D
+>>> os.path.join(os.path.dirname(__file__), '..', '..', '..')
+>>> =C2=A0 sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+>>> =C2=A0 =C2=A0 from qemu.machine import QEMUMachine
+>>> +from qemu.accel import kvm_available, tcg_available
+>>> =C2=A0 =C2=A0 def is_readable_executable_file(path):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return os.path.isfile(path) and os.acces=
+s(path, os.R_OK | os.X_OK)
+>>> @@ -111,6 +112,8 @@ class Test(avocado.Test):
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 def setUp(self):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._vms =3D {}
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # VM argumments that are ma=
+pped from parameters
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._param_to_vm_args =3D =
+[]
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.arch=
+ =3D self.params.get('arch',
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0
+>>> default=3Dself._get_unique_tag_val('arch'))
+>>> @@ -124,10 +127,30 @@ class Test(avocado.Test):
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.qemu_bin=
+ is None:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 self.cancel("No QEMU binary defined or found in the
+>>> source tree")
+>>> =C2=A0 +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self.accel =3D self.=
+params.get('accel',
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+>>> default=3Dself._get_unique_tag_val('accel'))
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if self.accel:
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ava=
+il =3D False
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+self.accel =3D=3D 'kvm':
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if kvm_available(self.arch, self.qemu_bin):
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self._param_to_vm_args.append=
+('-enable-kvm')
+>> Could you please use "-accel kvm" instead? "-accel" is now our official
+>> way to configure an accelerator ... so we should not use the old
+>> wrappers in new code anymore if possible.
+> Sure, I am going to adjust that on v3.
+>>
+>> =C2=A0 Thanks,
+>> =C2=A0=C2=A0 Thomas
+>>
+>>
+>> PS: Travis supports KVM now, too (with some tweaking of the permissions)
+>> ... maybe we should now try to get some QEMU tests running with KVM
+>> there, too...
+>=20
+> I heard that but I failed miserably to enable nested virt on Travis.
+> Actually I was expecting it enabled by default but not the case. I did
+> not find documentation so I tried some tweaks like setting
+> 'sudo:required' and using bionic but none of that worked out.
+>=20
+> Do you know what needs to be done?
+
+Yes, I recently enabled it for the kvm-unit-tests ... and yes, it's a
+bit ugly: The user has to be in the "kvm" group which is not the case
+for the user that runs the travis scripts. Tweaking the access rights of
+/dev/kvm unfortunately does not work (at least not directly via chmod
+o+rwx /dev/kvm ... but maybe there is a way via udev or something
+similar?), so I ended up with:
+
+      sudo chgrp kvm /usr/bin/qemu-system-*
+      sudo chmod g+s /usr/bin/qemu-system-*
+
+With that, the kvm-unit-tests are running now fine with KVM on Travis.
+
+ Thomas
+
 
