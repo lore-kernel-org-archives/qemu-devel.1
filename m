@@ -2,82 +2,83 @@ Return-Path: <SRS0=tUBQ=3B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DAE7C32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 09:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64120C32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 10:40:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 173C122314
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 09:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E8CE21744
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 10:40:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpWz+GXZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173C122314
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SS583huR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8CE21744
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqZsw-0007bY-9i
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 04:50:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37166)
+	id 1iqafm-0003Vu-4G
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 05:40:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iqZs9-0006gK-Me
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 04:49:30 -0500
+ (envelope-from <thuth@redhat.com>) id 1iqaf4-0002zu-JX
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 05:40:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iqZs8-0004xQ-Nq
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 04:49:29 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38768)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iqZs8-0004qM-E5; Sun, 12 Jan 2020 04:49:28 -0500
-Received: by mail-lf1-x144.google.com with SMTP id r14so4728379lfm.5;
- Sun, 12 Jan 2020 01:49:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=gFJu0ECQYPDpnOY6gf8MGQ1UvMvuAoTJib9HaOc9GXQ=;
- b=cpWz+GXZHIjC9AHIUR8spRUWa7LF2oEfJYja5QUKfDA21ScagU0gJWDXznfVZiwP6Z
- i6d7yYztKEm5VOY1zAobQ2PJP4wiIWY1CEej3HOp4jix6w1pSFWEGv0BuKmh4r2NssGI
- PtDNX3+KJ4aEG90UZ69Hnzs4K0UCR8MfW1mdhTYX1zYEJxcK6q/xcbAwWtd/zP4Q0yIq
- cv6Pxh1fbV6rOykH8J9ojGIERfWXdSBdwL32gKpqz5as5oBdrkTeGwwaIjinXMp4bPPC
- sdjqrdakNAec54187FCuKHuAOlQeghe2sbhPFS0d/7U717ljqVO9coZMakqNPQlycQ2f
- IEGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=gFJu0ECQYPDpnOY6gf8MGQ1UvMvuAoTJib9HaOc9GXQ=;
- b=rx64k5mqK4dCz5hY8Uym2lVUQQf/QrM0fUOvAwJGkz0xUru4dTrbYiMfsg9npMXVz0
- ezPfnVIEVrRaYFG2+Eveu39lNPKrPJIAADhUUUNdE8d0GZx/JnIlYczbphJ4L1MzU+R7
- LqOu0CKu2lubXa24qrszvP6gTHUbzLhkQZ3c421/RNn0xN5ssDTtLaLaBmIIX5e1eHOT
- kdLR8Y3ECWa/jfYntxoYyDqpZhLL0U6CnFb6xDR63ZOcFBVwQKmUiPBD00X/SnKwt5iq
- oLmnWoBkky037LYkO90nyJF8QrIFypitWEy3T7qPrlLTAKKZxJOUuEq+egR9AtKsBT+G
- ClnQ==
-X-Gm-Message-State: APjAAAUUwFAKlizglxNptVRrkpSx6YEmAenlHQpsyKW5Wp8lvAVFFqr7
- QEaUl9HmmBrVMAT6/jIPGx9Pukm3pKMgj8jHKCw=
-X-Google-Smtp-Source: APXvYqyfFmBy6C5PIruqGp+b0n1EEL++TBcSqCFsy3+IrY7TEH59DfehfRjU5O3OcAzZPQfAAn/XJlYZmr09b0FcjY4=
-X-Received: by 2002:ac2:4834:: with SMTP id 20mr6382556lft.166.1578822566702; 
- Sun, 12 Jan 2020 01:49:26 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1iqaf1-00079I-DL
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 05:40:00 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31973
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iqaf1-00071w-4g
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 05:39:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578825597;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=w9lbNcTZo+TYs3ubmDHLFtITOcTMBr4WFC6v/7hM16A=;
+ b=SS583huR2UwlT/JV/QR+vnkQMaAq/cW13qVXbepPT4YOWTETtqVbpgnOm+ONXMhu2lXyVF
+ S7jbR6tlVVKMjE7qEYPWYUUqPTWbpeW123gg+jaxTvFfediaBCJ5wsuRX20gWjP9vS+z/Y
+ jUUeLRNeq2tVa5XWRviYgEOFZEqOwEU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-L8ncB9uTNxm3qzQMTJodhw-1; Sun, 12 Jan 2020 05:39:56 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FB5ADB60;
+ Sun, 12 Jan 2020 10:39:55 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA0D76A846;
+ Sun, 12 Jan 2020 10:39:53 +0000 (UTC)
+Subject: Re: [PATCH V2] vhost-user-test: fix a memory leak
+From: Thomas Huth <thuth@redhat.com>
+To: pannengyuan@huawei.com, lvivier@redhat.com, pbonzini@redhat.com
+References: <1576805214-2508-1-git-send-email-pannengyuan@huawei.com>
+ <072970b5-b7cc-ad71-d3e4-933e888b7093@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3312978e-2bff-091a-b618-d9183b8c7252@redhat.com>
+Date: Sun, 12 Jan 2020 11:39:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-11-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-11-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Sun, 12 Jan 2020 17:48:58 +0800
-Message-ID: <CAKmqyKNrgTbiipNK1wrwCMqk_=7cJmc4rBwO1zxjFiVV+TRSgQ@mail.gmail.com>
-Subject: Re: [PATCH 10/15] memory: Replace current_machine by
- qdev_get_machine()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
+In-Reply-To: <072970b5-b7cc-ad71-d3e4-933e888b7093@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: L8ncB9uTNxm3qzQMTJodhw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,73 +90,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "open list:Overall" <kvm@vger.kernel.org>, Juan Quintela <quintela@redhat.com>,
- Marcelo Tosatti <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- "open list:New World" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 9, 2020 at 11:29 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> As we want to remove the global current_machine,
-> replace 'current_machine' by MACHINE(qdev_get_machine()).
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  memory.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/memory.c b/memory.c
-> index d7b9bb6951..57e38b1f50 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -3004,6 +3004,7 @@ static void mtree_print_flatview(gpointer key, gpoi=
-nter value,
->      int n =3D view->nr;
->      int i;
->      AddressSpace *as;
-> +    MachineState *ms;
->
->      qemu_printf("FlatView #%d\n", fvi->counter);
->      ++fvi->counter;
-> @@ -3026,6 +3027,7 @@ static void mtree_print_flatview(gpointer key, gpoi=
-nter value,
->          return;
->      }
->
-> +    ms =3D MACHINE(qdev_get_machine());
+On 10/01/2020 15.07, Thomas Huth wrote:
+> On 20/12/2019 02.26, pannengyuan@huawei.com wrote:
+>> From: Pan Nengyuan <pannengyuan@huawei.com>
+>>
+>> Spotted by ASAN.
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>> Changes V2 to V1:
+>> - use a "goto cleanup", instead of duplicating the "free" functions.
+>> - free "dest_cmdline" at the end.
+>> ---
+>>  tests/vhost-user-test.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+>> index 91ea373..dcb8617 100644
+>> --- a/tests/vhost-user-test.c
+>> +++ b/tests/vhost-user-test.c
+>> @@ -717,7 +717,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+>>      guint64 size;
+>>  
+>>      if (!wait_for_fds(s)) {
+>> -        return;
+>> +        goto cleanup;
+>>      }
+>>  
+>>      size = get_log_size(s);
+>> @@ -776,8 +776,11 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+>>      g_source_unref(source);
+>>  
+>>      qtest_quit(to);
+>> +
+>> + cleanup:
+>>      test_server_free(dest);
+>>      g_free(uri);
+>> +    g_string_free(dest_cmdline, true);
+>>  }
+>>  
+>>  static void wait_for_rings_started(TestServer *s, size_t count)
+>>
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> ... and picked up to my qtest-next tree.
 
-Why not set this at the top?
+... and now I had to unqueue the patch again. It is reproducibly causing
+one of the gitlab CI pipelines to fail with a timeout, e.g.:
 
-Alistair
+ https://gitlab.com/huth/qemu/-/jobs/400101552
 
->      while (n--) {
->          mr =3D range->mr;
->          if (range->offset_in_region) {
-> @@ -3057,7 +3059,7 @@ static void mtree_print_flatview(gpointer key, gpoi=
-nter value,
->          if (fvi->ac) {
->              for (i =3D 0; i < fv_address_spaces->len; ++i) {
->                  as =3D g_array_index(fv_address_spaces, AddressSpace*, i=
-);
-> -                if (fvi->ac->has_memory(current_machine, as,
-> +                if (fvi->ac->has_memory(ms, as,
->                                          int128_get64(range->addr.start),
->                                          MR_SIZE(range->addr.size) + 1)) =
-{
->                      qemu_printf(" %s", fvi->ac->name);
-> --
-> 2.21.1
->
->
+Not sure what is going on here, though, there is no obvious error
+message in the output... this needs some more investigation... do you
+have a gitlab account and could have a look?
+
+ Thomas
+
 
