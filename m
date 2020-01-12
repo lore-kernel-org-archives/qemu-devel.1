@@ -2,78 +2,78 @@ Return-Path: <SRS0=tUBQ=3B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 719C4C32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 11:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F06C32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 11:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D195222D9
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 11:30:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BB9B21744
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 11:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wi6IqMXR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D195222D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DcqaOokW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BB9B21744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqbRw-0008He-T4
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 06:30:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43476)
+	id 1iqbTm-0001td-6G
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 06:32:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iqbQP-0006Zv-Mj
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:29:03 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iqbQJ-0000Ow-3x
+ (envelope-from <thuth@redhat.com>) id 1iqbQL-0006T2-5t
  for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:28:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40650
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <thuth@redhat.com>) id 1iqbQH-0000GP-5p
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:28:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38243
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iqbQI-0000Gv-S7
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:28:51 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iqbQH-0000Dv-0G
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:28:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578828529;
+ s=mimecast20190719; t=1578828528;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AuLG3pMoamoF5K/Qym9Ua5PeHlmpOlu7rczSaoJppe4=;
- b=Wi6IqMXRQJk/fc3EatmL12ra44wdBDrliKEj3qWu7mGJkY1GBksOncirND6Mzemv0tdbrm
- fkrYhvOoTcFUfpV6qV3swOU49sF4B6xi2sbKO0JRGOnp6XUiyaMtg7Eztc0RVWa3lKcijN
- UGvXXjd67kou1laSn7DllXPOqmK3rRM=
+ bh=9FaomDScvjIUiNzda8qqtM0z4tolgLwOSvY1XoYwel8=;
+ b=DcqaOokWjnn/GLR6WiVZblpK5FxfQnBFujr0yND9z8DLrG6tCSFa7lhSj/QbjsozWCOUF/
+ CuXdwdGQXYSkhx5K5abvd2E227Ku7yHkfWJSth9xq+x7Jbef0hNwK94JrqGP7+TBxVS1fL
+ AVGp/9LghxVAMKCGEi5RYkolxyU0SzI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-l0RQCEFUMWy0vDOEzEWjRA-1; Sun, 12 Jan 2020 06:28:44 -0500
+ us-mta-259-SxOUq_MPMLqm5wvQyaLpWw-1; Sun, 12 Jan 2020 06:28:46 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9564A10054E3;
- Sun, 12 Jan 2020 11:28:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B41A800D41;
+ Sun, 12 Jan 2020 11:28:45 +0000 (UTC)
 Received: from thuth.com (ovpn-116-70.ams2.redhat.com [10.36.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 246138177F;
- Sun, 12 Jan 2020 11:28:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F13C187EDF;
+ Sun, 12 Jan 2020 11:28:43 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v2 5/8] test: Move qtests to a separate directory
-Date: Sun, 12 Jan 2020 12:28:31 +0100
-Message-Id: <20200112112832.9450-3-thuth@redhat.com>
+Subject: [PULL v2 6/8] tests/Makefile: Move qtest-related settings to a
+ separate Makefile.include
+Date: Sun, 12 Jan 2020 12:28:32 +0100
+Message-Id: <20200112112832.9450-4-thuth@redhat.com>
 In-Reply-To: <20200112112832.9450-1-thuth@redhat.com>
 References: <20200112112832.9450-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: l0RQCEFUMWy0vDOEzEWjRA-1
+X-MC-Unique: SxOUq_MPMLqm5wvQyaLpWw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,699 +91,628 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The tests directory itself is pretty overcrowded, and it's hard to
-see which test belongs to which test subsystem (unit, qtest, ...).
-Let's move the qtests to a separate folder for more clarity.
+tests/Makefile.include is pretty much overcrowded. Now that we have a
+dedicated folder for the qtests, let's move the related settings
+to a Makefile.include file in that directory instead.
 
-Message-Id: <20191218103059.11729-6-thuth@redhat.com>
+Message-Id: <20191218103059.11729-7-thuth@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .gitlab-ci.yml                                |  11 +-
- MAINTAINERS                                   |  79 +++----
- configure                                     |   4 +-
- tests/Makefile.include                        | 221 +++++++++---------
- tests/{ =3D> qtest}/ac97-test.c                 |   0
- tests/{ =3D> qtest}/acpi-utils.c                |   0
- tests/{ =3D> qtest}/acpi-utils.h                |   0
- tests/{ =3D> qtest}/ahci-test.c                 |   0
- tests/{ =3D> qtest}/arm-cpu-features.c          |   0
- .../bios-tables-test-allowed-diff.h           |   0
- tests/{ =3D> qtest}/bios-tables-test.c          |   0
- tests/{ =3D> qtest}/boot-order-test.c           |   0
- tests/{ =3D> qtest}/boot-sector.c               |   0
- tests/{ =3D> qtest}/boot-sector.h               |   0
- tests/{ =3D> qtest}/boot-serial-test.c          |   0
- tests/{ =3D> qtest}/cdrom-test.c                |   0
- tests/{ =3D> qtest}/cpu-plug-test.c             |   0
- tests/{ =3D> qtest}/dbus-vmstate-test.c         |   0
- tests/{ =3D> qtest}/dbus-vmstate1.xml           |   0
- tests/{ =3D> qtest}/device-introspect-test.c    |   0
- tests/{ =3D> qtest}/device-plug-test.c          |   0
- tests/{ =3D> qtest}/display-vga-test.c          |   0
- tests/{ =3D> qtest}/drive_del-test.c            |   0
- tests/{ =3D> qtest}/ds1338-test.c               |   0
- tests/{ =3D> qtest}/e1000-test.c                |   0
- tests/{ =3D> qtest}/e1000e-test.c               |   0
- tests/{ =3D> qtest}/eepro100-test.c             |   0
- tests/{ =3D> qtest}/endianness-test.c           |   0
- tests/{ =3D> qtest}/es1370-test.c               |   0
- tests/{ =3D> qtest}/fdc-test.c                  |   0
- tests/{ =3D> qtest}/fw_cfg-test.c               |   0
- tests/{ =3D> qtest}/hd-geo-test.c               |   0
- tests/{ =3D> qtest}/hexloader-test.c            |   0
- tests/{ =3D> qtest}/i440fx-test.c               |   0
- tests/{ =3D> qtest}/i82801b11-test.c            |   0
- tests/{ =3D> qtest}/ide-test.c                  |   0
- tests/{ =3D> qtest}/intel-hda-test.c            |   0
- tests/{ =3D> qtest}/ioh3420-test.c              |   0
- tests/{ =3D> qtest}/ipmi-bt-test.c              |   0
- tests/{ =3D> qtest}/ipmi-kcs-test.c             |   0
- tests/{ =3D> qtest}/ipoctal232-test.c           |   0
- tests/{ =3D> qtest}/ivshmem-test.c              |   0
- tests/{ =3D> qtest}/libqtest-single.h           |   0
- tests/{ =3D> qtest}/libqtest.c                  |   0
- tests/{ =3D> qtest}/libqtest.h                  |   0
- tests/{ =3D> qtest}/m25p80-test.c               |   0
- tests/{ =3D> qtest}/m48t59-test.c               |   0
- tests/{ =3D> qtest}/machine-none-test.c         |   0
- tests/{ =3D> qtest}/megasas-test.c              |   0
- tests/{ =3D> qtest}/microbit-test.c             |   0
- tests/{ =3D> qtest}/migration-helpers.c         |   0
- tests/{ =3D> qtest}/migration-helpers.h         |   0
- tests/{ =3D> qtest}/migration-test.c            |   0
- tests/{ =3D> qtest}/modules-test.c              |   0
- tests/{ =3D> qtest}/ne2000-test.c               |   0
- tests/{ =3D> qtest}/numa-test.c                 |   0
- tests/{ =3D> qtest}/nvme-test.c                 |   0
- tests/{ =3D> qtest}/pca9552-test.c              |   0
- tests/{ =3D> qtest}/pci-test.c                  |   0
- tests/{ =3D> qtest}/pcnet-test.c                |   0
- tests/{ =3D> qtest}/pflash-cfi02-test.c         |   0
- tests/{ =3D> qtest}/pnv-xscom-test.c            |   0
- tests/{ =3D> qtest}/prom-env-test.c             |   0
- tests/{ =3D> qtest}/pvpanic-test.c              |   0
- tests/{ =3D> qtest}/pxe-test.c                  |   0
- tests/{ =3D> qtest}/q35-test.c                  |   0
- tests/{ =3D> qtest}/qmp-cmd-test.c              |   0
- tests/{ =3D> qtest}/qmp-test.c                  |   0
- tests/{ =3D> qtest}/qom-test.c                  |   0
- tests/{ =3D> qtest}/qos-test.c                  |   0
- tests/{ =3D> qtest}/rtas-test.c                 |   0
- tests/{ =3D> qtest}/rtc-test.c                  |   0
- tests/{ =3D> qtest}/rtl8139-test.c              |   0
- tests/{ =3D> qtest}/sdhci-test.c                |   0
- tests/{ =3D> qtest}/spapr-phb-test.c            |   0
- tests/{ =3D> qtest}/tco-test.c                  |   0
- tests/{ =3D> qtest}/test-arm-mptimer.c          |   0
- tests/{ =3D> qtest}/test-filter-mirror.c        |   0
- tests/{ =3D> qtest}/test-filter-redirector.c    |   0
- tests/{ =3D> qtest}/test-hmp.c                  |   0
- tests/{ =3D> qtest}/test-netfilter.c            |   0
- tests/{ =3D> qtest}/test-x86-cpuid-compat.c     |   0
- tests/{ =3D> qtest}/tmp105-test.c               |   0
- tests/{ =3D> qtest}/tpm-crb-swtpm-test.c        |   0
- tests/{ =3D> qtest}/tpm-crb-test.c              |   0
- tests/{ =3D> qtest}/tpm-emu.c                   |   0
- tests/{ =3D> qtest}/tpm-emu.h                   |   0
- tests/{ =3D> qtest}/tpm-tests.c                 |   0
- tests/{ =3D> qtest}/tpm-tests.h                 |   0
- tests/{ =3D> qtest}/tpm-tis-swtpm-test.c        |   0
- tests/{ =3D> qtest}/tpm-tis-test.c              |   0
- tests/{ =3D> qtest}/tpm-util.c                  |   0
- tests/{ =3D> qtest}/tpm-util.h                  |   0
- tests/{ =3D> qtest}/usb-hcd-ehci-test.c         |   0
- tests/{ =3D> qtest}/usb-hcd-ohci-test.c         |   0
- tests/{ =3D> qtest}/usb-hcd-uhci-test.c         |   0
- tests/{ =3D> qtest}/usb-hcd-xhci-test.c         |   0
- tests/{ =3D> qtest}/vhost-user-test.c           |   0
- tests/{ =3D> qtest}/virtio-9p-test.c            |   0
- tests/{ =3D> qtest}/virtio-blk-test.c           |   0
- tests/{ =3D> qtest}/virtio-ccw-test.c           |   0
- tests/{ =3D> qtest}/virtio-net-test.c           |   0
- tests/{ =3D> qtest}/virtio-rng-test.c           |   0
- tests/{ =3D> qtest}/virtio-scsi-test.c          |   0
- tests/{ =3D> qtest}/virtio-serial-test.c        |   0
- tests/{ =3D> qtest}/virtio-test.c               |   0
- tests/{ =3D> qtest}/vmgenid-test.c              |   0
- tests/{ =3D> qtest}/vmxnet3-test.c              |   0
- tests/{ =3D> qtest}/wdt_ib700-test.c            |   0
- 109 files changed, 157 insertions(+), 158 deletions(-)
- rename tests/{ =3D> qtest}/ac97-test.c (100%)
- rename tests/{ =3D> qtest}/acpi-utils.c (100%)
- rename tests/{ =3D> qtest}/acpi-utils.h (100%)
- rename tests/{ =3D> qtest}/ahci-test.c (100%)
- rename tests/{ =3D> qtest}/arm-cpu-features.c (100%)
- rename tests/{ =3D> qtest}/bios-tables-test-allowed-diff.h (100%)
- rename tests/{ =3D> qtest}/bios-tables-test.c (100%)
- rename tests/{ =3D> qtest}/boot-order-test.c (100%)
- rename tests/{ =3D> qtest}/boot-sector.c (100%)
- rename tests/{ =3D> qtest}/boot-sector.h (100%)
- rename tests/{ =3D> qtest}/boot-serial-test.c (100%)
- rename tests/{ =3D> qtest}/cdrom-test.c (100%)
- rename tests/{ =3D> qtest}/cpu-plug-test.c (100%)
- rename tests/{ =3D> qtest}/dbus-vmstate-test.c (100%)
- rename tests/{ =3D> qtest}/dbus-vmstate1.xml (100%)
- rename tests/{ =3D> qtest}/device-introspect-test.c (100%)
- rename tests/{ =3D> qtest}/device-plug-test.c (100%)
- rename tests/{ =3D> qtest}/display-vga-test.c (100%)
- rename tests/{ =3D> qtest}/drive_del-test.c (100%)
- rename tests/{ =3D> qtest}/ds1338-test.c (100%)
- rename tests/{ =3D> qtest}/e1000-test.c (100%)
- rename tests/{ =3D> qtest}/e1000e-test.c (100%)
- rename tests/{ =3D> qtest}/eepro100-test.c (100%)
- rename tests/{ =3D> qtest}/endianness-test.c (100%)
- rename tests/{ =3D> qtest}/es1370-test.c (100%)
- rename tests/{ =3D> qtest}/fdc-test.c (100%)
- rename tests/{ =3D> qtest}/fw_cfg-test.c (100%)
- rename tests/{ =3D> qtest}/hd-geo-test.c (100%)
- rename tests/{ =3D> qtest}/hexloader-test.c (100%)
- rename tests/{ =3D> qtest}/i440fx-test.c (100%)
- rename tests/{ =3D> qtest}/i82801b11-test.c (100%)
- rename tests/{ =3D> qtest}/ide-test.c (100%)
- rename tests/{ =3D> qtest}/intel-hda-test.c (100%)
- rename tests/{ =3D> qtest}/ioh3420-test.c (100%)
- rename tests/{ =3D> qtest}/ipmi-bt-test.c (100%)
- rename tests/{ =3D> qtest}/ipmi-kcs-test.c (100%)
- rename tests/{ =3D> qtest}/ipoctal232-test.c (100%)
- rename tests/{ =3D> qtest}/ivshmem-test.c (100%)
- rename tests/{ =3D> qtest}/libqtest-single.h (100%)
- rename tests/{ =3D> qtest}/libqtest.c (100%)
- rename tests/{ =3D> qtest}/libqtest.h (100%)
- rename tests/{ =3D> qtest}/m25p80-test.c (100%)
- rename tests/{ =3D> qtest}/m48t59-test.c (100%)
- rename tests/{ =3D> qtest}/machine-none-test.c (100%)
- rename tests/{ =3D> qtest}/megasas-test.c (100%)
- rename tests/{ =3D> qtest}/microbit-test.c (100%)
- rename tests/{ =3D> qtest}/migration-helpers.c (100%)
- rename tests/{ =3D> qtest}/migration-helpers.h (100%)
- rename tests/{ =3D> qtest}/migration-test.c (100%)
- rename tests/{ =3D> qtest}/modules-test.c (100%)
- rename tests/{ =3D> qtest}/ne2000-test.c (100%)
- rename tests/{ =3D> qtest}/numa-test.c (100%)
- rename tests/{ =3D> qtest}/nvme-test.c (100%)
- rename tests/{ =3D> qtest}/pca9552-test.c (100%)
- rename tests/{ =3D> qtest}/pci-test.c (100%)
- rename tests/{ =3D> qtest}/pcnet-test.c (100%)
- rename tests/{ =3D> qtest}/pflash-cfi02-test.c (100%)
- rename tests/{ =3D> qtest}/pnv-xscom-test.c (100%)
- rename tests/{ =3D> qtest}/prom-env-test.c (100%)
- rename tests/{ =3D> qtest}/pvpanic-test.c (100%)
- rename tests/{ =3D> qtest}/pxe-test.c (100%)
- rename tests/{ =3D> qtest}/q35-test.c (100%)
- rename tests/{ =3D> qtest}/qmp-cmd-test.c (100%)
- rename tests/{ =3D> qtest}/qmp-test.c (100%)
- rename tests/{ =3D> qtest}/qom-test.c (100%)
- rename tests/{ =3D> qtest}/qos-test.c (100%)
- rename tests/{ =3D> qtest}/rtas-test.c (100%)
- rename tests/{ =3D> qtest}/rtc-test.c (100%)
- rename tests/{ =3D> qtest}/rtl8139-test.c (100%)
- rename tests/{ =3D> qtest}/sdhci-test.c (100%)
- rename tests/{ =3D> qtest}/spapr-phb-test.c (100%)
- rename tests/{ =3D> qtest}/tco-test.c (100%)
- rename tests/{ =3D> qtest}/test-arm-mptimer.c (100%)
- rename tests/{ =3D> qtest}/test-filter-mirror.c (100%)
- rename tests/{ =3D> qtest}/test-filter-redirector.c (100%)
- rename tests/{ =3D> qtest}/test-hmp.c (100%)
- rename tests/{ =3D> qtest}/test-netfilter.c (100%)
- rename tests/{ =3D> qtest}/test-x86-cpuid-compat.c (100%)
- rename tests/{ =3D> qtest}/tmp105-test.c (100%)
- rename tests/{ =3D> qtest}/tpm-crb-swtpm-test.c (100%)
- rename tests/{ =3D> qtest}/tpm-crb-test.c (100%)
- rename tests/{ =3D> qtest}/tpm-emu.c (100%)
- rename tests/{ =3D> qtest}/tpm-emu.h (100%)
- rename tests/{ =3D> qtest}/tpm-tests.c (100%)
- rename tests/{ =3D> qtest}/tpm-tests.h (100%)
- rename tests/{ =3D> qtest}/tpm-tis-swtpm-test.c (100%)
- rename tests/{ =3D> qtest}/tpm-tis-test.c (100%)
- rename tests/{ =3D> qtest}/tpm-util.c (100%)
- rename tests/{ =3D> qtest}/tpm-util.h (100%)
- rename tests/{ =3D> qtest}/usb-hcd-ehci-test.c (100%)
- rename tests/{ =3D> qtest}/usb-hcd-ohci-test.c (100%)
- rename tests/{ =3D> qtest}/usb-hcd-uhci-test.c (100%)
- rename tests/{ =3D> qtest}/usb-hcd-xhci-test.c (100%)
- rename tests/{ =3D> qtest}/vhost-user-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-9p-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-blk-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-ccw-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-net-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-rng-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-scsi-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-serial-test.c (100%)
- rename tests/{ =3D> qtest}/virtio-test.c (100%)
- rename tests/{ =3D> qtest}/vmgenid-test.c (100%)
- rename tests/{ =3D> qtest}/vmxnet3-test.c (100%)
- rename tests/{ =3D> qtest}/wdt_ib700-test.c (100%)
+ tests/Makefile.include       | 319 +----------------------------------
+ tests/qtest/Makefile.include | 318 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 319 insertions(+), 318 deletions(-)
+ create mode 100644 tests/qtest/Makefile.include
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ebcef0ebe9..dce8f2d3f5 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -87,11 +87,12 @@ build-tci:
-  - ../configure --enable-tcg-interpreter
-       --target-list=3D"$(for tg in $TARGETS; do echo -n ${tg}'-softmmu '; =
-done)"
-  - make -j2
-- - make tests/boot-serial-test tests/cdrom-test tests/pxe-test
-+ - make tests/qtest/boot-serial-test tests/qtest/cdrom-test tests/qtest/px=
-e-test
-  - for tg in $TARGETS ; do
-      export QTEST_QEMU_BINARY=3D"${tg}-softmmu/qemu-system-${tg}" ;
--     ./tests/boot-serial-test || exit 1 ;
--     ./tests/cdrom-test || exit 1 ;
-+     ./tests/qtest/boot-serial-test || exit 1 ;
-+     ./tests/qtest/cdrom-test || exit 1 ;
-    done
-- - QTEST_QEMU_BINARY=3D"x86_64-softmmu/qemu-system-x86_64" ./tests/pxe-tes=
-t
-- - QTEST_QEMU_BINARY=3D"s390x-softmmu/qemu-system-s390x" ./tests/pxe-test =
--m slow
-+ - QTEST_QEMU_BINARY=3D"x86_64-softmmu/qemu-system-x86_64" ./tests/qtest/p=
-xe-test
-+ - QTEST_QEMU_BINARY=3D"s390x-softmmu/qemu-system-s390x"
-+   ./tests/qtest/pxe-test -m slow
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cd2dc137a3..02eab66b02 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -533,7 +533,7 @@ F: include/hw/misc/arm11scu.h
- F: include/hw/timer/a9gtimer.h
- F: include/hw/timer/arm_mptimer.h
- F: include/hw/timer/armv7m_systick.h
--F: tests/test-arm-mptimer.c
-+F: tests/qtest/test-arm-mptimer.c
-=20
- Exynos
- M: Igor Mitsyanko <i.mitsyanko@gmail.com>
-@@ -864,7 +864,7 @@ F: hw/*/nrf51*.c
- F: hw/*/microbit*.c
- F: include/hw/*/nrf51*.h
- F: include/hw/*/microbit*.h
--F: tests/microbit-test.c
-+F: tests/qtest/microbit-test.c
-=20
- CRIS Machines
- -------------
-@@ -1101,9 +1101,9 @@ F: include/hw/*/xics*
- F: pc-bios/slof.bin
- F: docs/specs/ppc-spapr-hcalls.txt
- F: docs/specs/ppc-spapr-hotplug.txt
--F: tests/spapr*
-+F: tests/qtest/spapr*
- F: tests/libqos/*spapr*
--F: tests/rtas*
-+F: tests/qtest/rtas*
- F: tests/libqos/rtas*
-=20
- PowerNV (Non-Virtualized)
-@@ -1116,7 +1116,7 @@ F: hw/intc/pnv*
- F: hw/intc/xics_pnv.c
- F: include/hw/ppc/pnv*
- F: pc-bios/skiboot.lid
--F: tests/pnv*
-+F: tests/qtest/pnv*
-=20
- virtex_ml507
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-@@ -1264,7 +1264,7 @@ F: hw/misc/sga.c
- F: hw/isa/apm.c
- F: include/hw/isa/apm.h
- F: tests/test-x86-cpuid.c
--F: tests/test-x86-cpuid-compat.c
-+F: tests/qtest/test-x86-cpuid-compat.c
-=20
- PC Chipset
- M: Michael S. Tsirkin <mst@redhat.com>
-@@ -1360,9 +1360,9 @@ F: hw/ide/
- F: hw/block/block.c
- F: hw/block/cdrom.c
- F: hw/block/hd-geometry.c
--F: tests/ide-test.c
--F: tests/ahci-test.c
--F: tests/cdrom-test.c
-+F: tests/qtest/ide-test.c
-+F: tests/qtest/ahci-test.c
-+F: tests/qtest/cdrom-test.c
- F: tests/libqos/ahci*
- T: git https://github.com/jnsnow/qemu.git ide
-=20
-@@ -1372,7 +1372,7 @@ S: Maintained
- F: include/hw/ipmi/*
- F: hw/ipmi/*
- F: hw/smbios/smbios_type_38.c
--F: tests/ipmi*
-+F: tests/qtest/ipmi*
- T: git https://github.com/cminyard/qemu.git master-ipmi-rebase
-=20
- Floppy
-@@ -1381,7 +1381,7 @@ L: qemu-block@nongnu.org
- S: Supported
- F: hw/block/fdc.c
- F: include/hw/block/fdc.h
--F: tests/fdc-test.c
-+F: tests/qtest/fdc-test.c
- T: git https://github.com/jnsnow/qemu.git ide
-=20
- OMAP
-@@ -1419,8 +1419,8 @@ F: hw/acpi/*
- F: hw/smbios/*
- F: hw/i386/acpi-build.[hc]
- F: hw/arm/virt-acpi-build.c
--F: tests/bios-tables-test.c
--F: tests/acpi-utils.[hc]
-+F: tests/qtest/bios-tables-test.c
-+F: tests/qtest/acpi-utils.[hc]
- F: tests/data/acpi/
-=20
- ppc4xx
-@@ -1443,7 +1443,7 @@ M: Jason Wang <jasowang@redhat.com>
- S: Odd Fixes
- F: hw/net/
- F: include/hw/net/
--F: tests/virtio-net-test.c
-+F: tests/qtest/virtio-net-test.c
- F: docs/virtio-net-failover.rst
- T: git https://github.com/jasowang/qemu.git net
-=20
-@@ -1460,7 +1460,7 @@ R: Fam Zheng <fam@euphon.net>
- S: Supported
- F: include/hw/scsi/*
- F: hw/scsi/*
--F: tests/virtio-scsi-test.c
-+F: tests/qtest/virtio-scsi-test.c
- T: git https://github.com/bonzini/qemu.git scsi-next
-=20
- SSI
-@@ -1470,7 +1470,7 @@ F: hw/ssi/*
- F: hw/block/m25p80.c
- F: include/hw/ssi/ssi.h
- X: hw/ssi/xilinx_*
--F: tests/m25p80-test.c
-+F: tests/qtest/m25p80-test.c
-=20
- Xilinx SPI
- M: Alistair Francis <alistair@alistair23.me>
-@@ -1484,13 +1484,13 @@ F: include/hw/sd/sd*
- F: hw/sd/core.c
- F: hw/sd/sd*
- F: hw/sd/ssi-sd.c
--F: tests/sd*
-+F: tests/qtest/sd*
-=20
- USB
- M: Gerd Hoffmann <kraxel@redhat.com>
- S: Maintained
- F: hw/usb/*
--F: tests/usb-*-test.c
-+F: tests/qtest/usb-*-test.c
- F: docs/usb2.txt
- F: docs/usb-storage.txt
- F: include/hw/usb.h
-@@ -1552,7 +1552,6 @@ F: hw/virtio/Makefile.objs
- F: hw/virtio/trace-events
- F: net/vhost-user.c
- F: include/hw/virtio/
--F: tests/virtio-balloon-test.c
-=20
- virtio-9p
- M: Greg Kurz <groug@kaod.org>
-@@ -1560,7 +1559,7 @@ S: Odd Fixes
- F: hw/9pfs/
- X: hw/9pfs/xen-9p*
- F: fsdev/
--F: tests/virtio-9p-test.c
-+F: tests/qtest/virtio-9p-test.c
- T: git https://github.com/gkurz/qemu.git 9p-next
-=20
- virtio-blk
-@@ -1569,7 +1568,7 @@ L: qemu-block@nongnu.org
- S: Supported
- F: hw/block/virtio-blk.c
- F: hw/block/dataplane/*
--F: tests/virtio-blk-test.c
-+F: tests/qtest/virtio-blk-test.c
- T: git https://github.com/stefanha/qemu.git block
-=20
- virtio-ccw
-@@ -1597,8 +1596,7 @@ S: Supported
- F: hw/char/virtio-serial-bus.c
- F: hw/char/virtio-console.c
- F: include/hw/virtio/virtio-serial.h
--F: tests/virtio-console-test.c
--F: tests/virtio-serial-test.c
-+F: tests/qtest/virtio-serial-test.c
-=20
- virtio-rng
- M: Laurent Vivier <lvivier@redhat.com>
-@@ -1608,7 +1606,7 @@ F: hw/virtio/virtio-rng.c
- F: include/hw/virtio/virtio-rng.h
- F: include/sysemu/rng*.h
- F: backends/rng*.c
--F: tests/virtio-rng-test.c
-+F: tests/qtest/virtio-rng-test.c
-=20
- virtio-crypto
- M: Gonglei <arei.gonglei@huawei.com>
-@@ -1622,7 +1620,7 @@ M: Keith Busch <keith.busch@intel.com>
- L: qemu-block@nongnu.org
- S: Supported
- F: hw/block/nvme*
--F: tests/nvme-test.c
-+F: tests/qtest/nvme-test.c
-=20
- megasas
- M: Hannes Reinecke <hare@suse.com>
-@@ -1630,7 +1628,7 @@ L: qemu-block@nongnu.org
- S: Supported
- F: hw/scsi/megasas.c
- F: hw/scsi/mfi.h
--F: tests/megasas-test.c
-+F: tests/qtest/megasas-test.c
-=20
- Network packet abstractions
- M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
-@@ -1645,7 +1643,7 @@ M: Dmitry Fleytman <dmitry.fleytman@gmail.com>
- S: Maintained
- F: hw/net/vmxnet*
- F: hw/scsi/vmw_pvscsi*
--F: tests/vmxnet3-test.c
-+F: tests/qtest/vmxnet3-test.c
-=20
- Rocker
- M: Jiri Pirko <jiri@resnulli.us>
-@@ -1693,7 +1691,7 @@ F: docs/generic-loader.txt
- Intel Hexadecimal Object File Loader
- M: Su Hang <suhang16@mails.ucas.ac.cn>
- S: Maintained
--F: tests/hexloader-test.c
-+F: tests/qtest/hexloader-test.c
- F: tests/data/hex-loader/test.hex
-=20
- CHRP NVRAM
-@@ -1701,7 +1699,7 @@ M: Thomas Huth <thuth@redhat.com>
- S: Maintained
- F: hw/nvram/chrp_nvram.c
- F: include/hw/nvram/chrp_nvram.h
--F: tests/prom-env-test.c
-+F: tests/qtest/prom-env-test.c
-=20
- VM Generation ID
- M: Ben Warren <ben@skyportsystems.com>
-@@ -1709,7 +1707,7 @@ S: Maintained
- F: hw/acpi/vmgenid.c
- F: include/hw/acpi/vmgenid.h
- F: docs/specs/vmgenid.txt
--F: tests/vmgenid-test.c
-+F: tests/qtest/vmgenid-test.c
- F: stubs/vmgenid.c
-=20
- Unimplemented device
-@@ -1779,7 +1777,7 @@ F: stubs/fw_cfg.c
- F: include/hw/nvram/fw_cfg.h
- F: include/standard-headers/linux/qemu_fw_cfg.h
- F: tests/libqos/fw_cfg.c
--F: tests/fw_cfg-test.c
-+F: tests/qtest/fw_cfg-test.c
- T: git https://github.com/philmd/qemu.git fw_cfg-next
-=20
- XIVE
-@@ -1799,9 +1797,9 @@ S: Maintained
- F: audio/
- F: hw/audio/
- F: include/hw/audio/
--F: tests/ac97-test.c
--F: tests/es1370-test.c
--F: tests/intel-hda-test.c
-+F: tests/qtest/ac97-test.c
-+F: tests/qtest/es1370-test.c
-+F: tests/qtest/intel-hda-test.c
-=20
- Block layer core
- M: Kevin Wolf <kwolf@redhat.com>
-@@ -2002,7 +2000,7 @@ F: monitor/hmp*
- F: hmp.h
- F: hmp-commands*.hx
- F: include/monitor/hmp-target.h
--F: tests/test-hmp.c
-+F: tests/qtest/test-hmp.c
- F: include/qemu/qemu-print.h
- F: util/qemu-print.c
-=20
-@@ -2128,8 +2126,8 @@ F: qapi/error.json
- F: docs/devel/*qmp-*
- F: docs/interop/*qmp-*
- F: scripts/qmp/
--F: tests/qmp-test.c
--F: tests/qmp-cmd-test.c
-+F: tests/qtest/qmp-test.c
-+F: tests/qtest/qmp-cmd-test.c
- T: git https://repo.or.cz/qemu/armbru.git qapi-next
-=20
- qtest
-@@ -2139,9 +2137,8 @@ R: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
- F: qtest.c
- F: accel/qtest.c
--F: tests/libqtest*
- F: tests/libqos/
--F: tests/*-test.c
-+F: tests/qtest/
-=20
- Register API
- M: Alistair Francis <alistair@alistair23.me>
-@@ -2185,7 +2182,7 @@ F: include/hw/acpi/tpm.h
- F: include/sysemu/tpm*
- F: qapi/tpm.json
- F: backends/tpm.c
--F: tests/*tpm*
-+F: tests/qtest/*tpm*
- T: git https://github.com/stefanberger/qemu-tpm.git tpm-next
-=20
- Checkpatch
-@@ -2202,7 +2199,7 @@ F: include/migration/
- F: migration/
- F: scripts/vmstate-static-checker.py
- F: tests/vmstate-static-checker-data/
--F: tests/migration-test.c
-+F: tests/qtest/migration-test.c
- F: docs/devel/migration.rst
- F: qapi/migration.json
-=20
-diff --git a/configure b/configure
-index 28ee2a254f..1b8796fc21 100755
---- a/configure
-+++ b/configure
-@@ -7963,8 +7963,8 @@ fi
- # so the build tree will be missing the link back to the new file, and
- # tests might fail. Prefer to keep the relevant files in their own
- # directory and symlink the directory instead.
--DIRS=3D"tests tests/tcg tests/tcg/lm32 tests/libqos tests/qapi-schema test=
-s/qemu-iotests tests/vm"
--DIRS=3D"$DIRS tests/fp tests/qgraph"
-+DIRS=3D"tests tests/tcg tests/tcg/lm32 tests/libqos tests/qapi-schema test=
-s/qtest"
-+DIRS=3D"$DIRS tests/qemu-iotests tests/vm tests/fp tests/qgraph"
- DIRS=3D"$DIRS docs docs/interop fsdev scsi"
- DIRS=3D"$DIRS pc-bios/optionrom pc-bios/s390-ccw"
- DIRS=3D"$DIRS roms/seabios roms/vgabios"
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 6bacf14d3f..bd2bcd6f1b 100644
+index bd2bcd6f1b..065fd09964 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -515,7 +515,7 @@ generated-files-y +=3D tests/include/test-qapi-events-s=
-ub-module.h
- generated-files-y +=3D tests/test-qapi-events-sub-sub-module.h
- generated-files-y +=3D tests/test-qapi-introspect.h
+@@ -149,164 +149,6 @@ check-unit-y +=3D tests/test-qapi-util$(EXESUF)
 =20
--QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
-+QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+ check-block-$(call land,$(CONFIG_POSIX),$(CONFIG_SOFTMMU)) +=3D tests/chec=
+k-block.sh
 =20
-=20
- # Deps that are common to various different sets of tests below
-@@ -648,18 +648,18 @@ tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tes=
-ts/qapi-schema/doc-good.jso
- =09@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
- =09@rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/doc-goo=
-d-qmp-*.[ch]
-=20
--tests/dbus-vmstate1.h tests/dbus-vmstate1.c: tests/dbus-vmstate1-gen-times=
-tamp ;
--tests/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/dbus-vmstate1.xml
-+tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-=
-vmstate1-gen-timestamp ;
-+tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmst=
-ate1.xml
- =09$(call quiet-command,$(GDBUS_CODEGEN) $< \
--=09=09--interface-prefix org.qemu --generate-c-code tests/dbus-vmstate1, \
-+=09=09--interface-prefix org.qemu --generate-c-code tests/qtest/dbus-vmsta=
-te1, \
- =09=09"GEN","$(@:%-timestamp=3D%)")
- =09@>$@
-=20
--tests/dbus-vmstate-test.o-cflags :=3D -DSRCDIR=3D"$(SRC_PATH)"
--tests/dbus-vmstate1.o-cflags :=3D $(GIO_CFLAGS)
--tests/dbus-vmstate1.o-libs :=3D $(GIO_LIBS)
-+tests/qtest/dbus-vmstate-test.o-cflags :=3D -DSRCDIR=3D"$(SRC_PATH)"
-+tests/qtest/dbus-vmstate1.o-cflags :=3D $(GIO_CFLAGS)
-+tests/qtest/dbus-vmstate1.o-libs :=3D $(GIO_LIBS)
-=20
--tests/dbus-vmstate-test.o: tests/dbus-vmstate1.h
-+tests/qtest/dbus-vmstate-test.o: tests/qtest/dbus-vmstate1.h
-=20
- tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visito=
-r.o $(test-qapi-obj-y)
- tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.=
-o $(test-qapi-obj-y)
-@@ -708,12 +708,12 @@ tests/test-authz-pam$(EXESUF): tests/test-authz-pam.o=
- $(test-authz-obj-y)
+-# All QTests for now are POSIX-only, but the dependencies are
+-# really in libqtest, not in the testcases themselves.
+-
+-check-qtest-generic-y +=3D qmp-test
+-check-qtest-generic-y +=3D qmp-cmd-test
+-check-qtest-generic-$(CONFIG_MODULES) +=3D modules-test
+-
+-check-qtest-generic-y +=3D device-introspect-test
+-check-qtest-generic-y +=3D cdrom-test
+-
+-DBUS_DAEMON :=3D $(shell which dbus-daemon 2>/dev/null)
+-ifneq ($(GDBUS_CODEGEN),)
+-ifneq ($(DBUS_DAEMON),)
+-check-qtest-pci-$(CONFIG_GIO) +=3D dbus-vmstate-test
+-endif
+-endif
+-
+-check-qtest-pci-$(CONFIG_RTL8139_PCI) +=3D rtl8139-test
+-check-qtest-pci-$(CONFIG_VGA) +=3D display-vga-test
+-check-qtest-pci-$(CONFIG_HDA) +=3D intel-hda-test
+-check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem-test
+-
+-check-qtest-i386-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-check-qtest-i386-y +=3D fdc-test
+-check-qtest-i386-y +=3D ide-test
+-check-qtest-i386-$(CONFIG_TOOLS) +=3D ahci-test
+-check-qtest-i386-y +=3D hd-geo-test
+-check-qtest-i386-y +=3D boot-order-test
+-check-qtest-i386-y +=3D bios-tables-test
+-check-qtest-i386-$(CONFIG_SGA) +=3D boot-serial-test
+-check-qtest-i386-$(CONFIG_SLIRP) +=3D pxe-test
+-check-qtest-i386-y +=3D rtc-test
+-check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) +=3D ipmi-kcs-test
+-ifdef CONFIG_LINUX
+-check-qtest-i386-$(CONFIG_ISA_IPMI_BT) +=3D ipmi-bt-test
+-endif
+-check-qtest-i386-y +=3D i440fx-test
+-check-qtest-i386-y +=3D fw_cfg-test
+-check-qtest-i386-y +=3D device-plug-test
+-check-qtest-i386-y +=3D drive_del-test
+-check-qtest-i386-$(CONFIG_WDT_IB700) +=3D wdt_ib700-test
+-check-qtest-i386-y +=3D tco-test
+-check-qtest-i386-y +=3D $(check-qtest-pci-y)
+-check-qtest-i386-$(CONFIG_PVPANIC) +=3D pvpanic-test
+-check-qtest-i386-$(CONFIG_I82801B11) +=3D i82801b11-test
+-check-qtest-i386-$(CONFIG_IOH3420) +=3D ioh3420-test
+-check-qtest-i386-$(CONFIG_USB_UHCI) +=3D usb-hcd-uhci-test
+-check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) +=3D u=
+sb-hcd-ehci-test
+-check-qtest-i386-$(CONFIG_USB_XHCI_NEC) +=3D usb-hcd-xhci-test
+-check-qtest-i386-y +=3D cpu-plug-test
+-check-qtest-i386-y +=3D q35-test
+-check-qtest-i386-y +=3D vmgenid-test
+-check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tpm-crb-swtpm-test
+-check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tpm-crb-test
+-check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tpm-tis-swtpm-test
+-check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tpm-tis-test
+-check-qtest-i386-$(CONFIG_SLIRP) +=3D test-netfilter
+-check-qtest-i386-$(CONFIG_POSIX) +=3D test-filter-mirror
+-check-qtest-i386-$(CONFIG_RTL8139_PCI) +=3D test-filter-redirector
+-check-qtest-i386-y +=3D migration-test
+-check-qtest-i386-y +=3D test-x86-cpuid-compat
+-check-qtest-i386-y +=3D numa-test
+-
+-check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
+-
+-check-qtest-alpha-y +=3D boot-serial-test
+-check-qtest-alpha-$(CONFIG_VGA) +=3D display-vga-test
+-
+-check-qtest-hppa-y +=3D boot-serial-test
+-check-qtest-hppa-$(CONFIG_VGA) +=3D display-vga-test
+-
+-check-qtest-m68k-y =3D boot-serial-test
+-
+-check-qtest-microblaze-y +=3D boot-serial-test
+-
+-check-qtest-mips-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-check-qtest-mips-$(CONFIG_VGA) +=3D display-vga-test
+-
+-check-qtest-mips64-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-check-qtest-mips64-$(CONFIG_VGA) +=3D display-vga-test
+-
+-check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-check-qtest-mips64el-$(CONFIG_VGA) +=3D display-vga-test
+-
+-check-qtest-moxie-y +=3D boot-serial-test
+-
+-check-qtest-ppc-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-check-qtest-ppc-y +=3D boot-order-test
+-check-qtest-ppc-y +=3D prom-env-test
+-check-qtest-ppc-y +=3D drive_del-test
+-check-qtest-ppc-y +=3D boot-serial-test
+-check-qtest-ppc-$(CONFIG_M48T59) +=3D m48t59-test
+-
+-check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
+-check-qtest-ppc64-$(CONFIG_PSERIES) +=3D device-plug-test
+-check-qtest-ppc64-$(CONFIG_POWERNV) +=3D pnv-xscom-test
+-check-qtest-ppc64-y +=3D migration-test
+-check-qtest-ppc64-$(CONFIG_PSERIES) +=3D rtas-test
+-check-qtest-ppc64-$(CONFIG_SLIRP) +=3D pxe-test
+-check-qtest-ppc64-$(CONFIG_USB_UHCI) +=3D usb-hcd-uhci-test
+-check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) +=3D usb-hcd-xhci-test
+-check-qtest-ppc64-$(CONFIG_SLIRP) +=3D test-netfilter
+-check-qtest-ppc64-$(CONFIG_POSIX) +=3D test-filter-mirror
+-check-qtest-ppc64-$(CONFIG_RTL8139_PCI) +=3D test-filter-redirector
+-check-qtest-ppc64-$(CONFIG_VGA) +=3D display-vga-test
+-check-qtest-ppc64-y +=3D numa-test
+-check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem-test
+-check-qtest-ppc64-y +=3D cpu-plug-test
+-
+-check-qtest-sh4-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-
+-check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-
+-check-qtest-sparc-y +=3D prom-env-test
+-check-qtest-sparc-y +=3D m48t59-test
+-check-qtest-sparc-y +=3D boot-serial-test
+-
+-check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D endianness-test
+-check-qtest-sparc64-y +=3D prom-env-test
+-check-qtest-sparc64-y +=3D boot-serial-test
+-
+-check-qtest-arm-y +=3D arm-cpu-features
+-check-qtest-arm-y +=3D microbit-test
+-check-qtest-arm-y +=3D m25p80-test
+-check-qtest-arm-y +=3D test-arm-mptimer
+-check-qtest-arm-y +=3D boot-serial-test
+-check-qtest-arm-y +=3D hexloader-test
+-check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D pflash-cfi02-test
+-
+-check-qtest-aarch64-y +=3D arm-cpu-features
+-check-qtest-aarch64-y +=3D numa-test
+-check-qtest-aarch64-y +=3D boot-serial-test
+-check-qtest-aarch64-y +=3D migration-test
+-
+-# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditio=
+nal
+-ifneq ($(ARCH),arm)
+-check-qtest-aarch64-y +=3D bios-tables-test
+-endif
+-
+-check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
+-
+-check-qtest-xtensaeb-y +=3D $(check-qtest-xtensa-y)
+-
+-check-qtest-s390x-y =3D boot-serial-test
+-check-qtest-s390x-$(CONFIG_SLIRP) +=3D pxe-test
+-check-qtest-s390x-$(CONFIG_SLIRP) +=3D test-netfilter
+-check-qtest-s390x-$(CONFIG_POSIX) +=3D test-filter-mirror
+-check-qtest-s390x-$(CONFIG_POSIX) +=3D test-filter-redirector
+-check-qtest-s390x-y +=3D drive_del-test
+-check-qtest-s390x-y +=3D device-plug-test
+-check-qtest-s390x-y +=3D virtio-ccw-test
+-check-qtest-s390x-y +=3D cpu-plug-test
+-check-qtest-s390x-y +=3D migration-test
+-
+-check-qtest-generic-y +=3D machine-none-test
+-check-qtest-generic-y +=3D qom-test
+-check-qtest-generic-y +=3D test-hmp
+-
+ qapi-schema +=3D alternate-any.json
+ qapi-schema +=3D alternate-array.json
+ qapi-schema +=3D alternate-base.json
+@@ -708,12 +550,6 @@ tests/test-authz-pam$(EXESUF): tests/test-authz-pam.o =
+$(test-authz-obj-y)
  tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
  tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
          tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-y)
--tests/tpm-crb-swtpm-test$(EXESUF): tests/tpm-crb-swtpm-test.o tests/tpm-em=
-u.o \
--=09tests/tpm-util.o tests/tpm-tests.o $(test-io-obj-y)
--tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test-i=
-o-obj-y)
--tests/tpm-tis-swtpm-test$(EXESUF): tests/tpm-tis-swtpm-test.o tests/tpm-em=
-u.o \
--=09tests/tpm-util.o tests/tpm-tests.o $(test-io-obj-y)
--tests/tpm-tis-test$(EXESUF): tests/tpm-tis-test.o tests/tpm-emu.o $(test-i=
-o-obj-y)
-+tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest/tpm-crb-swtpm-test.o =
+-tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest/tpm-crb-swtpm-test.o =
 tests/qtest/tpm-emu.o \
-+=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
-+tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtest/=
+-=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+-tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtest/=
 tpm-emu.o $(test-io-obj-y)
-+tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.o =
+-tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.o =
 tests/qtest/tpm-emu.o \
-+=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
-+tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtest/=
+-=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+-tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtest/=
 tpm-emu.o $(test-io-obj-y)
  tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
          tests/io-channel-helpers.o $(test-io-obj-y)
  tests/test-io-channel-tls$(EXESUF): tests/test-io-channel-tls.o \
-@@ -743,7 +743,7 @@ libqos-pc-obj-y +=3D tests/libqos/ahci.o
- libqos-usb-obj-y =3D $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos=
+@@ -728,147 +564,6 @@ tests/test-crypto-ivgen$(EXESUF): tests/test-crypto-i=
+vgen.o $(test-crypto-obj-y)
+ tests/test-crypto-afsplit$(EXESUF): tests/test-crypto-afsplit.o $(test-cry=
+pto-obj-y)
+ tests/test-crypto-block$(EXESUF): tests/test-crypto-block.o $(test-crypto-=
+obj-y)
+=20
+-libqgraph-obj-y =3D tests/libqos/qgraph.o
+-
+-libqos-obj-y =3D $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg=
+.o
+-libqos-obj-y +=3D tests/libqos/malloc.o
+-libqos-obj-y +=3D tests/libqos/libqos.o
+-libqos-spapr-obj-y =3D $(libqos-obj-y) tests/libqos/malloc-spapr.o
+-libqos-spapr-obj-y +=3D tests/libqos/libqos-spapr.o
+-libqos-spapr-obj-y +=3D tests/libqos/rtas.o
+-libqos-spapr-obj-y +=3D tests/libqos/pci-spapr.o
+-libqos-pc-obj-y =3D $(libqos-obj-y) tests/libqos/pci-pc.o
+-libqos-pc-obj-y +=3D tests/libqos/malloc-pc.o tests/libqos/libqos-pc.o
+-libqos-pc-obj-y +=3D tests/libqos/ahci.o
+-libqos-usb-obj-y =3D $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos=
 /usb.o
+-
+-# Devices
+-qos-test-obj-y =3D tests/qtest/qos-test.o $(libqgraph-obj-y)
+-qos-test-obj-y +=3D $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+-qos-test-obj-y +=3D tests/libqos/e1000e.o
+-qos-test-obj-y +=3D tests/libqos/i2c.o
+-qos-test-obj-y +=3D tests/libqos/i2c-imx.o
+-qos-test-obj-y +=3D tests/libqos/i2c-omap.o
+-qos-test-obj-y +=3D tests/libqos/sdhci.o
+-qos-test-obj-y +=3D tests/libqos/tpci200.o
+-qos-test-obj-y +=3D tests/libqos/virtio.o
+-qos-test-obj-$(CONFIG_VIRTFS) +=3D tests/libqos/virtio-9p.o
+-qos-test-obj-y +=3D tests/libqos/virtio-balloon.o
+-qos-test-obj-y +=3D tests/libqos/virtio-blk.o
+-qos-test-obj-y +=3D tests/libqos/virtio-mmio.o
+-qos-test-obj-y +=3D tests/libqos/virtio-net.o
+-qos-test-obj-y +=3D tests/libqos/virtio-pci.o
+-qos-test-obj-y +=3D tests/libqos/virtio-pci-modern.o
+-qos-test-obj-y +=3D tests/libqos/virtio-rng.o
+-qos-test-obj-y +=3D tests/libqos/virtio-scsi.o
+-qos-test-obj-y +=3D tests/libqos/virtio-serial.o
+-
+-# Machines
+-qos-test-obj-y +=3D tests/libqos/aarch64-xlnx-zcu102-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-imx25-pdk-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-n800-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-raspi2-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-sabrelite-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-smdkc210-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-virt-machine.o
+-qos-test-obj-y +=3D tests/libqos/arm-xilinx-zynq-a9-machine.o
+-qos-test-obj-y +=3D tests/libqos/ppc64_pseries-machine.o
+-qos-test-obj-y +=3D tests/libqos/x86_64_pc-machine.o
+-
+-# Tests
+-qos-test-obj-y +=3D tests/qtest/ac97-test.o
+-qos-test-obj-y +=3D tests/qtest/ds1338-test.o
+-qos-test-obj-y +=3D tests/qtest/e1000-test.o
+-qos-test-obj-y +=3D tests/qtest/e1000e-test.o
+-qos-test-obj-y +=3D tests/qtest/eepro100-test.o
+-qos-test-obj-y +=3D tests/qtest/es1370-test.o
+-qos-test-obj-y +=3D tests/qtest/ipoctal232-test.o
+-qos-test-obj-y +=3D tests/qtest/megasas-test.o
+-qos-test-obj-y +=3D tests/qtest/ne2000-test.o
+-qos-test-obj-y +=3D tests/qtest/nvme-test.o
+-qos-test-obj-y +=3D tests/qtest/pca9552-test.o
+-qos-test-obj-y +=3D tests/qtest/pci-test.o
+-qos-test-obj-y +=3D tests/qtest/pcnet-test.o
+-qos-test-obj-y +=3D tests/qtest/sdhci-test.o
+-qos-test-obj-y +=3D tests/qtest/spapr-phb-test.o
+-qos-test-obj-y +=3D tests/qtest/tmp105-test.o
+-qos-test-obj-y +=3D tests/qtest/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
+-qos-test-obj-$(CONFIG_VHOST_NET_USER) +=3D tests/qtest/vhost-user-test.o $=
+(chardev-obj-y) $(test-io-obj-y)
+-qos-test-obj-y +=3D tests/qtest/virtio-test.o
+-qos-test-obj-$(CONFIG_VIRTFS) +=3D tests/qtest/virtio-9p-test.o
+-qos-test-obj-y +=3D tests/qtest/virtio-blk-test.o
+-qos-test-obj-y +=3D tests/qtest/virtio-net-test.o
+-qos-test-obj-y +=3D tests/qtest/virtio-rng-test.o
+-qos-test-obj-y +=3D tests/qtest/virtio-scsi-test.o
+-qos-test-obj-y +=3D tests/qtest/virtio-serial-test.o
+-qos-test-obj-y +=3D tests/qtest/vmxnet3-test.o
+-
+-check-unit-y +=3D tests/test-qgraph$(EXESUF)
+-tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
+-
+-check-qtest-generic-y +=3D qos-test
+-tests/qtest/qos-test$(EXESUF): $(qos-test-obj-y)
+-
+-tests/qtest/qmp-test$(EXESUF): tests/qtest/qmp-test.o
+-tests/qtest/qmp-cmd-test$(EXESUF): tests/qtest/qmp-cmd-test.o
+-tests/qtest/device-introspect-test$(EXESUF): tests/qtest/device-introspect=
+-test.o
+-tests/qtest/rtc-test$(EXESUF): tests/qtest/rtc-test.o
+-tests/qtest/m48t59-test$(EXESUF): tests/qtest/m48t59-test.o
+-tests/qtest/hexloader-test$(EXESUF): tests/qtest/hexloader-test.o
+-tests/qtest/pflash-cfi02$(EXESUF): tests/qtest/pflash-cfi02-test.o
+-tests/qtest/endianness-test$(EXESUF): tests/qtest/endianness-test.o
+-tests/qtest/prom-env-test$(EXESUF): tests/qtest/prom-env-test.o $(libqos-o=
+bj-y)
+-tests/qtest/rtas-test$(EXESUF): tests/qtest/rtas-test.o $(libqos-spapr-obj=
+-y)
+-tests/qtest/fdc-test$(EXESUF): tests/qtest/fdc-test.o
+-tests/qtest/ide-test$(EXESUF): tests/qtest/ide-test.o $(libqos-pc-obj-y)
+-tests/qtest/ahci-test$(EXESUF): tests/qtest/ahci-test.o $(libqos-pc-obj-y)=
+ qemu-img$(EXESUF)
+-tests/qtest/ipmi-kcs-test$(EXESUF): tests/qtest/ipmi-kcs-test.o
+-tests/qtest/ipmi-bt-test$(EXESUF): tests/qtest/ipmi-bt-test.o
+-tests/qtest/hd-geo-test$(EXESUF): tests/qtest/hd-geo-test.o $(libqos-obj-y=
+)
+-tests/qtest/boot-order-test$(EXESUF): tests/qtest/boot-order-test.o $(libq=
+os-obj-y)
+-tests/qtest/boot-serial-test$(EXESUF): tests/qtest/boot-serial-test.o $(li=
+bqos-obj-y)
+-tests/qtest/bios-tables-test$(EXESUF): tests/qtest/bios-tables-test.o \
+-=09tests/qtest/boot-sector.o tests/qtest/acpi-utils.o $(libqos-obj-y)
+-tests/qtest/pxe-test$(EXESUF): tests/qtest/pxe-test.o tests/qtest/boot-sec=
+tor.o $(libqos-obj-y)
+-tests/qtest/microbit-test$(EXESUF): tests/qtest/microbit-test.o
+-tests/qtest/m25p80-test$(EXESUF): tests/qtest/m25p80-test.o
+-tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o $(libqos-pc-ob=
+j-y)
+-tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-y)
+-tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o $(libqos-pc-ob=
+j-y)
+-tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o $(libqos-pc-=
+obj-y)
+-tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.o
+-tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.o
+-tests/qtest/tco-test$(EXESUF): tests/qtest/tco-test.o $(libqos-pc-obj-y)
+-tests/qtest/virtio-ccw-test$(EXESUF): tests/qtest/virtio-ccw-test.o
+-tests/qtest/display-vga-test$(EXESUF): tests/qtest/display-vga-test.o
+-tests/qtest/qom-test$(EXESUF): tests/qtest/qom-test.o
+-tests/qtest/test-hmp$(EXESUF): tests/qtest/test-hmp.o
+-tests/qtest/machine-none-test$(EXESUF): tests/qtest/machine-none-test.o
+-tests/qtest/device-plug-test$(EXESUF): tests/qtest/device-plug-test.o
+-tests/qtest/drive_del-test$(EXESUF): tests/qtest/drive_del-test.o
+-tests/qtest/pvpanic-test$(EXESUF): tests/qtest/pvpanic-test.o
+-tests/qtest/i82801b11-test$(EXESUF): tests/qtest/i82801b11-test.o
+-tests/qtest/intel-hda-test$(EXESUF): tests/qtest/intel-hda-test.o
+-tests/qtest/ioh3420-test$(EXESUF): tests/qtest/ioh3420-test.o
+-tests/qtest/usb-hcd-uhci-test$(EXESUF): tests/qtest/usb-hcd-uhci-test.o $(=
+libqos-usb-obj-y)
+-tests/qtest/usb-hcd-ehci-test$(EXESUF): tests/qtest/usb-hcd-ehci-test.o $(=
+libqos-usb-obj-y)
+-tests/qtest/usb-hcd-xhci-test$(EXESUF): tests/qtest/usb-hcd-xhci-test.o $(=
+libqos-usb-obj-y)
+-tests/qtest/cpu-plug-test$(EXESUF): tests/qtest/cpu-plug-test.o
+-tests/qtest/migration-test$(EXESUF): tests/qtest/migration-test.o tests/qt=
+est/migration-helpers.o
+-tests/qtest/qemu-iotests/qtest/socket_scm_helper$(EXESUF): tests/qtest/qem=
+u-iotests/qtest/socket_scm_helper.o
+-tests/qtest/test-netfilter$(EXESUF): tests/qtest/test-netfilter.o $(qtest-=
+obj-y)
+-tests/qtest/test-filter-mirror$(EXESUF): tests/qtest/test-filter-mirror.o =
+$(qtest-obj-y)
+-tests/qtest/test-filter-redirector$(EXESUF): tests/qtest/test-filter-redir=
+ector.o $(qtest-obj-y)
+-tests/qtest/test-x86-cpuid-compat$(EXESUF): tests/qtest/test-x86-cpuid-com=
+pat.o $(qtest-obj-y)
+-tests/qtest/ivshmem-test$(EXESUF): tests/qtest/ivshmem-test.o contrib/ivsh=
+mem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+-tests/qtest/dbus-vmstate-test$(EXESUF): tests/qtest/dbus-vmstate-test.o te=
+sts/qtest/migration-helpers.o tests/qtest/dbus-vmstate1.o $(libqos-pc-obj-y=
+) $(libqos-spapr-obj-y)
+-tests/qtest/vhost-user-bridge$(EXESUF): tests/qtest/vhost-user-bridge.o $(=
+test-util-obj-y) libvhost-user.a
+-tests/qtest/test-arm-mptimer$(EXESUF): tests/qtest/test-arm-mptimer.o
+-tests/qtest/numa-test$(EXESUF): tests/qtest/numa-test.o
+-tests/qtest/vmgenid-test$(EXESUF): tests/qtest/vmgenid-test.o tests/qtest/=
+boot-sector.o tests/qtest/acpi-utils.o
+-tests/qtest/cdrom-test$(EXESUF): tests/qtest/cdrom-test.o tests/qtest/boot=
+-sector.o $(libqos-obj-y)
+-tests/qtest/arm-cpu-features$(EXESUF): tests/qtest/arm-cpu-features.o
+-
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ =09$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
+"LINK","$(TARGET_DIR)$@")
 =20
- # Devices
--qos-test-obj-y =3D tests/qos-test.o $(libqgraph-obj-y)
+@@ -881,19 +576,7 @@ tests/migration/initrd-stress.img: tests/migration/str=
+ess$(EXESUF)
+ =09rm $(INITRD_WORK_DIR)/init
+ =09rmdir $(INITRD_WORK_DIR)
+=20
+-# QTest rules
+-
+-TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+-ifeq ($(CONFIG_POSIX),y)
+-QTEST_TARGETS =3D $(TARGETS)
+-check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=
+=3Dtests/qtest/%$(EXESUF)))
+-check-qtest-y +=3D $(check-qtest-generic-y:%=3Dtests/qtest/%$(EXESUF))
+-else
+-QTEST_TARGETS =3D
+-endif
+-
+-qtest-obj-y =3D tests/qtest/libqtest.o $(test-util-obj-y)
+-$(check-qtest-y): $(qtest-obj-y)
++include $(SRC_PATH)/tests/qtest/Makefile.include
+=20
+ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
+ tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+new file mode 100644
+index 0000000000..816d0d90ea
+--- /dev/null
++++ b/tests/qtest/Makefile.include
+@@ -0,0 +1,318 @@
++# All QTests for now are POSIX-only, but the dependencies are
++# really in libqtest, not in the testcases themselves.
++
++check-qtest-generic-y +=3D cdrom-test
++check-qtest-generic-y +=3D device-introspect-test
++check-qtest-generic-y +=3D machine-none-test
++check-qtest-generic-y +=3D qmp-test
++check-qtest-generic-y +=3D qmp-cmd-test
++check-qtest-generic-y +=3D qom-test
++check-qtest-generic-$(CONFIG_MODULES) +=3D modules-test
++check-qtest-generic-y +=3D test-hmp
++
++check-qtest-pci-$(CONFIG_RTL8139_PCI) +=3D rtl8139-test
++check-qtest-pci-$(CONFIG_VGA) +=3D display-vga-test
++check-qtest-pci-$(CONFIG_HDA) +=3D intel-hda-test
++check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem-test
++
++DBUS_DAEMON :=3D $(shell which dbus-daemon 2>/dev/null)
++ifneq ($(GDBUS_CODEGEN),)
++ifneq ($(DBUS_DAEMON),)
++check-qtest-pci-$(CONFIG_GIO) +=3D dbus-vmstate-test
++endif
++endif
++
++check-qtest-i386-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++check-qtest-i386-y +=3D fdc-test
++check-qtest-i386-y +=3D ide-test
++check-qtest-i386-$(CONFIG_TOOLS) +=3D ahci-test
++check-qtest-i386-y +=3D hd-geo-test
++check-qtest-i386-y +=3D boot-order-test
++check-qtest-i386-y +=3D bios-tables-test
++check-qtest-i386-$(CONFIG_SGA) +=3D boot-serial-test
++check-qtest-i386-$(CONFIG_SLIRP) +=3D pxe-test
++check-qtest-i386-y +=3D rtc-test
++check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) +=3D ipmi-kcs-test
++ifdef CONFIG_LINUX
++check-qtest-i386-$(CONFIG_ISA_IPMI_BT) +=3D ipmi-bt-test
++endif
++check-qtest-i386-y +=3D i440fx-test
++check-qtest-i386-y +=3D fw_cfg-test
++check-qtest-i386-y +=3D device-plug-test
++check-qtest-i386-y +=3D drive_del-test
++check-qtest-i386-$(CONFIG_WDT_IB700) +=3D wdt_ib700-test
++check-qtest-i386-y +=3D tco-test
++check-qtest-i386-y +=3D $(check-qtest-pci-y)
++check-qtest-i386-$(CONFIG_PVPANIC) +=3D pvpanic-test
++check-qtest-i386-$(CONFIG_I82801B11) +=3D i82801b11-test
++check-qtest-i386-$(CONFIG_IOH3420) +=3D ioh3420-test
++check-qtest-i386-$(CONFIG_USB_UHCI) +=3D usb-hcd-uhci-test
++check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) +=3D u=
+sb-hcd-ehci-test
++check-qtest-i386-$(CONFIG_USB_XHCI_NEC) +=3D usb-hcd-xhci-test
++check-qtest-i386-y +=3D cpu-plug-test
++check-qtest-i386-y +=3D q35-test
++check-qtest-i386-y +=3D vmgenid-test
++check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tpm-crb-swtpm-test
++check-qtest-i386-$(CONFIG_TPM_CRB) +=3D tpm-crb-test
++check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tpm-tis-swtpm-test
++check-qtest-i386-$(CONFIG_TPM_TIS) +=3D tpm-tis-test
++check-qtest-i386-$(CONFIG_SLIRP) +=3D test-netfilter
++check-qtest-i386-$(CONFIG_POSIX) +=3D test-filter-mirror
++check-qtest-i386-$(CONFIG_RTL8139_PCI) +=3D test-filter-redirector
++check-qtest-i386-y +=3D migration-test
++check-qtest-i386-y +=3D test-x86-cpuid-compat
++check-qtest-i386-y +=3D numa-test
++
++check-qtest-x86_64-y +=3D $(check-qtest-i386-y)
++
++check-qtest-alpha-y +=3D boot-serial-test
++check-qtest-alpha-$(CONFIG_VGA) +=3D display-vga-test
++
++check-qtest-hppa-y +=3D boot-serial-test
++check-qtest-hppa-$(CONFIG_VGA) +=3D display-vga-test
++
++check-qtest-m68k-y =3D boot-serial-test
++
++check-qtest-microblaze-y +=3D boot-serial-test
++
++check-qtest-mips-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++check-qtest-mips-$(CONFIG_VGA) +=3D display-vga-test
++
++check-qtest-mips64-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++check-qtest-mips64-$(CONFIG_VGA) +=3D display-vga-test
++
++check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++check-qtest-mips64el-$(CONFIG_VGA) +=3D display-vga-test
++
++check-qtest-moxie-y +=3D boot-serial-test
++
++check-qtest-ppc-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++check-qtest-ppc-y +=3D boot-order-test
++check-qtest-ppc-y +=3D prom-env-test
++check-qtest-ppc-y +=3D drive_del-test
++check-qtest-ppc-y +=3D boot-serial-test
++check-qtest-ppc-$(CONFIG_M48T59) +=3D m48t59-test
++
++check-qtest-ppc64-y +=3D $(check-qtest-ppc-y)
++check-qtest-ppc64-$(CONFIG_PSERIES) +=3D device-plug-test
++check-qtest-ppc64-$(CONFIG_POWERNV) +=3D pnv-xscom-test
++check-qtest-ppc64-y +=3D migration-test
++check-qtest-ppc64-$(CONFIG_PSERIES) +=3D rtas-test
++check-qtest-ppc64-$(CONFIG_SLIRP) +=3D pxe-test
++check-qtest-ppc64-$(CONFIG_USB_UHCI) +=3D usb-hcd-uhci-test
++check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) +=3D usb-hcd-xhci-test
++check-qtest-ppc64-$(CONFIG_SLIRP) +=3D test-netfilter
++check-qtest-ppc64-$(CONFIG_POSIX) +=3D test-filter-mirror
++check-qtest-ppc64-$(CONFIG_RTL8139_PCI) +=3D test-filter-redirector
++check-qtest-ppc64-$(CONFIG_VGA) +=3D display-vga-test
++check-qtest-ppc64-y +=3D numa-test
++check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) +=3D ivshmem-test
++check-qtest-ppc64-y +=3D cpu-plug-test
++
++check-qtest-sh4-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++
++check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++
++check-qtest-sparc-y +=3D prom-env-test
++check-qtest-sparc-y +=3D m48t59-test
++check-qtest-sparc-y +=3D boot-serial-test
++
++check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D endianness-test
++check-qtest-sparc64-y +=3D prom-env-test
++check-qtest-sparc64-y +=3D boot-serial-test
++
++check-qtest-arm-y +=3D arm-cpu-features
++check-qtest-arm-y +=3D microbit-test
++check-qtest-arm-y +=3D m25p80-test
++check-qtest-arm-y +=3D test-arm-mptimer
++check-qtest-arm-y +=3D boot-serial-test
++check-qtest-arm-y +=3D hexloader-test
++check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D pflash-cfi02-test
++
++check-qtest-aarch64-y +=3D arm-cpu-features
++check-qtest-aarch64-y +=3D numa-test
++check-qtest-aarch64-y +=3D boot-serial-test
++check-qtest-aarch64-y +=3D migration-test
++
++# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditio=
+nal
++ifneq ($(ARCH),arm)
++check-qtest-aarch64-y +=3D bios-tables-test
++endif
++
++check-qtest-microblazeel-y +=3D $(check-qtest-microblaze-y)
++
++check-qtest-xtensaeb-y +=3D $(check-qtest-xtensa-y)
++
++check-qtest-s390x-y =3D boot-serial-test
++check-qtest-s390x-$(CONFIG_SLIRP) +=3D pxe-test
++check-qtest-s390x-$(CONFIG_SLIRP) +=3D test-netfilter
++check-qtest-s390x-$(CONFIG_POSIX) +=3D test-filter-mirror
++check-qtest-s390x-$(CONFIG_POSIX) +=3D test-filter-redirector
++check-qtest-s390x-y +=3D drive_del-test
++check-qtest-s390x-y +=3D device-plug-test
++check-qtest-s390x-y +=3D virtio-ccw-test
++check-qtest-s390x-y +=3D cpu-plug-test
++check-qtest-s390x-y +=3D migration-test
++
++# libqos / qgraph :
++libqgraph-obj-y =3D tests/libqos/qgraph.o
++
++libqos-obj-y =3D $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg=
+.o
++libqos-obj-y +=3D tests/libqos/malloc.o
++libqos-obj-y +=3D tests/libqos/libqos.o
++libqos-spapr-obj-y =3D $(libqos-obj-y) tests/libqos/malloc-spapr.o
++libqos-spapr-obj-y +=3D tests/libqos/libqos-spapr.o
++libqos-spapr-obj-y +=3D tests/libqos/rtas.o
++libqos-spapr-obj-y +=3D tests/libqos/pci-spapr.o
++libqos-pc-obj-y =3D $(libqos-obj-y) tests/libqos/pci-pc.o
++libqos-pc-obj-y +=3D tests/libqos/malloc-pc.o tests/libqos/libqos-pc.o
++libqos-pc-obj-y +=3D tests/libqos/ahci.o
++libqos-usb-obj-y =3D $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos=
+/usb.o
++
++# qos devices:
 +qos-test-obj-y =3D tests/qtest/qos-test.o $(libqgraph-obj-y)
- qos-test-obj-y +=3D $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- qos-test-obj-y +=3D tests/libqos/e1000e.o
- qos-test-obj-y +=3D tests/libqos/i2c.o
-@@ -776,98 +776,98 @@ qos-test-obj-y +=3D tests/libqos/ppc64_pseries-machin=
-e.o
- qos-test-obj-y +=3D tests/libqos/x86_64_pc-machine.o
-=20
- # Tests
--qos-test-obj-y +=3D tests/ac97-test.o
--qos-test-obj-y +=3D tests/ds1338-test.o
--qos-test-obj-y +=3D tests/e1000-test.o
--qos-test-obj-y +=3D tests/e1000e-test.o
--qos-test-obj-y +=3D tests/eepro100-test.o
--qos-test-obj-y +=3D tests/es1370-test.o
--qos-test-obj-y +=3D tests/ipoctal232-test.o
--qos-test-obj-y +=3D tests/megasas-test.o
--qos-test-obj-y +=3D tests/ne2000-test.o
--qos-test-obj-y +=3D tests/nvme-test.o
--qos-test-obj-y +=3D tests/pca9552-test.o
--qos-test-obj-y +=3D tests/pci-test.o
--qos-test-obj-y +=3D tests/pcnet-test.o
--qos-test-obj-y +=3D tests/sdhci-test.o
--qos-test-obj-y +=3D tests/spapr-phb-test.o
--qos-test-obj-y +=3D tests/tmp105-test.o
--qos-test-obj-y +=3D tests/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
--qos-test-obj-$(CONFIG_VHOST_NET_USER) +=3D tests/vhost-user-test.o $(chard=
-ev-obj-y) $(test-io-obj-y)
--qos-test-obj-y +=3D tests/virtio-test.o
--qos-test-obj-$(CONFIG_VIRTFS) +=3D tests/virtio-9p-test.o
--qos-test-obj-y +=3D tests/virtio-blk-test.o
--qos-test-obj-y +=3D tests/virtio-net-test.o
--qos-test-obj-y +=3D tests/virtio-rng-test.o
--qos-test-obj-y +=3D tests/virtio-scsi-test.o
--qos-test-obj-y +=3D tests/virtio-serial-test.o
--qos-test-obj-y +=3D tests/vmxnet3-test.o
++qos-test-obj-y +=3D $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
++qos-test-obj-y +=3D tests/libqos/e1000e.o
++qos-test-obj-y +=3D tests/libqos/i2c.o
++qos-test-obj-y +=3D tests/libqos/i2c-imx.o
++qos-test-obj-y +=3D tests/libqos/i2c-omap.o
++qos-test-obj-y +=3D tests/libqos/sdhci.o
++qos-test-obj-y +=3D tests/libqos/tpci200.o
++qos-test-obj-y +=3D tests/libqos/virtio.o
++qos-test-obj-$(CONFIG_VIRTFS) +=3D tests/libqos/virtio-9p.o
++qos-test-obj-y +=3D tests/libqos/virtio-balloon.o
++qos-test-obj-y +=3D tests/libqos/virtio-blk.o
++qos-test-obj-y +=3D tests/libqos/virtio-mmio.o
++qos-test-obj-y +=3D tests/libqos/virtio-net.o
++qos-test-obj-y +=3D tests/libqos/virtio-pci.o
++qos-test-obj-y +=3D tests/libqos/virtio-pci-modern.o
++qos-test-obj-y +=3D tests/libqos/virtio-rng.o
++qos-test-obj-y +=3D tests/libqos/virtio-scsi.o
++qos-test-obj-y +=3D tests/libqos/virtio-serial.o
++
++# qos machines:
++qos-test-obj-y +=3D tests/libqos/aarch64-xlnx-zcu102-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-imx25-pdk-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-n800-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-raspi2-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-sabrelite-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-smdkc210-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-virt-machine.o
++qos-test-obj-y +=3D tests/libqos/arm-xilinx-zynq-a9-machine.o
++qos-test-obj-y +=3D tests/libqos/ppc64_pseries-machine.o
++qos-test-obj-y +=3D tests/libqos/x86_64_pc-machine.o
++
++# qos tests:
 +qos-test-obj-y +=3D tests/qtest/ac97-test.o
 +qos-test-obj-y +=3D tests/qtest/ds1338-test.o
 +qos-test-obj-y +=3D tests/qtest/e1000-test.o
@@ -811,89 +740,14 @@ ev-obj-y) $(test-io-obj-y)
 +qos-test-obj-y +=3D tests/qtest/virtio-scsi-test.o
 +qos-test-obj-y +=3D tests/qtest/virtio-serial-test.o
 +qos-test-obj-y +=3D tests/qtest/vmxnet3-test.o
-=20
- check-unit-y +=3D tests/test-qgraph$(EXESUF)
- tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
-=20
- check-qtest-generic-y +=3D qos-test
--tests/qos-test$(EXESUF): $(qos-test-obj-y)
--
--tests/qmp-test$(EXESUF): tests/qmp-test.o
--tests/qmp-cmd-test$(EXESUF): tests/qmp-cmd-test.o
--tests/device-introspect-test$(EXESUF): tests/device-introspect-test.o
--tests/rtc-test$(EXESUF): tests/rtc-test.o
--tests/m48t59-test$(EXESUF): tests/m48t59-test.o
--tests/hexloader-test$(EXESUF): tests/hexloader-test.o
--tests/pflash-cfi02$(EXESUF): tests/pflash-cfi02-test.o
--tests/endianness-test$(EXESUF): tests/endianness-test.o
--tests/prom-env-test$(EXESUF): tests/prom-env-test.o $(libqos-obj-y)
--tests/rtas-test$(EXESUF): tests/rtas-test.o $(libqos-spapr-obj-y)
--tests/fdc-test$(EXESUF): tests/fdc-test.o
--tests/ide-test$(EXESUF): tests/ide-test.o $(libqos-pc-obj-y)
--tests/ahci-test$(EXESUF): tests/ahci-test.o $(libqos-pc-obj-y) qemu-img$(E=
-XESUF)
--tests/ipmi-kcs-test$(EXESUF): tests/ipmi-kcs-test.o
--tests/ipmi-bt-test$(EXESUF): tests/ipmi-bt-test.o
--tests/hd-geo-test$(EXESUF): tests/hd-geo-test.o $(libqos-obj-y)
--tests/boot-order-test$(EXESUF): tests/boot-order-test.o $(libqos-obj-y)
--tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
--tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
--=09tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
--tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj=
--y)
--tests/microbit-test$(EXESUF): tests/microbit-test.o
--tests/m25p80-test$(EXESUF): tests/m25p80-test.o
--tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
--tests/q35-test$(EXESUF): tests/q35-test.o $(libqos-pc-obj-y)
--tests/fw_cfg-test$(EXESUF): tests/fw_cfg-test.o $(libqos-pc-obj-y)
--tests/rtl8139-test$(EXESUF): tests/rtl8139-test.o $(libqos-pc-obj-y)
--tests/pnv-xscom-test$(EXESUF): tests/pnv-xscom-test.o
--tests/wdt_ib700-test$(EXESUF): tests/wdt_ib700-test.o
--tests/tco-test$(EXESUF): tests/tco-test.o $(libqos-pc-obj-y)
--tests/virtio-ccw-test$(EXESUF): tests/virtio-ccw-test.o
--tests/display-vga-test$(EXESUF): tests/display-vga-test.o
--tests/qom-test$(EXESUF): tests/qom-test.o
--tests/test-hmp$(EXESUF): tests/test-hmp.o
--tests/machine-none-test$(EXESUF): tests/machine-none-test.o
--tests/device-plug-test$(EXESUF): tests/device-plug-test.o
--tests/drive_del-test$(EXESUF): tests/drive_del-test.o
--tests/pvpanic-test$(EXESUF): tests/pvpanic-test.o
--tests/i82801b11-test$(EXESUF): tests/i82801b11-test.o
--tests/intel-hda-test$(EXESUF): tests/intel-hda-test.o
--tests/ioh3420-test$(EXESUF): tests/ioh3420-test.o
--tests/usb-hcd-uhci-test$(EXESUF): tests/usb-hcd-uhci-test.o $(libqos-usb-o=
-bj-y)
--tests/usb-hcd-ehci-test$(EXESUF): tests/usb-hcd-ehci-test.o $(libqos-usb-o=
-bj-y)
--tests/usb-hcd-xhci-test$(EXESUF): tests/usb-hcd-xhci-test.o $(libqos-usb-o=
-bj-y)
--tests/cpu-plug-test$(EXESUF): tests/cpu-plug-test.o
--tests/migration-test$(EXESUF): tests/migration-test.o tests/migration-help=
-ers.o
--tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_s=
-cm_helper.o
--tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
--tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-=
-y)
--tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qt=
-est-obj-y)
--tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtes=
-t-obj-y)
--tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/i=
-vshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
--tests/dbus-vmstate-test$(EXESUF): tests/dbus-vmstate-test.o tests/migratio=
-n-helpers.o tests/dbus-vmstate1.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
--tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-ob=
-j-y) libvhost-user.a
--tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
--tests/numa-test$(EXESUF): tests/numa-test.o
--tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o test=
-s/acpi-utils.o
--tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos=
--obj-y)
--tests/arm-cpu-features$(EXESUF): tests/arm-cpu-features.o
++
++check-unit-y +=3D tests/test-qgraph$(EXESUF)
++tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
++
++check-qtest-generic-y +=3D qos-test
 +tests/qtest/qos-test$(EXESUF): $(qos-test-obj-y)
 +
++# QTest dependencies:
 +tests/qtest/qmp-test$(EXESUF): tests/qtest/qmp-test.o
 +tests/qtest/qmp-cmd-test$(EXESUF): tests/qtest/qmp-cmd-test.o
 +tests/qtest/device-introspect-test$(EXESUF): tests/qtest/device-introspect=
@@ -979,506 +833,31 @@ boot-sector.o tests/qtest/acpi-utils.o
 +tests/qtest/cdrom-test$(EXESUF): tests/qtest/cdrom-test.o tests/qtest/boot=
 -sector.o $(libqos-obj-y)
 +tests/qtest/arm-cpu-features$(EXESUF): tests/qtest/arm-cpu-features.o
-=20
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- =09$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
-"LINK","$(TARGET_DIR)$@")
-@@ -886,13 +886,13 @@ tests/migration/initrd-stress.img: tests/migration/st=
-ress$(EXESUF)
- TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
- ifeq ($(CONFIG_POSIX),y)
- QTEST_TARGETS =3D $(TARGETS)
--check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=
-=3Dtests/%$(EXESUF)))
--check-qtest-y +=3D $(check-qtest-generic-y:%=3Dtests/%$(EXESUF))
++tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest/tpm-crb-swtpm-test.o =
+tests/qtest/tpm-emu.o \
++=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
++tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtest/=
+tpm-emu.o $(test-io-obj-y)
++tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.o =
+tests/qtest/tpm-emu.o \
++=09tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
++tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtest/=
+tpm-emu.o $(test-io-obj-y)
++
++# QTest rules
++
++TARGETS=3D$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
++ifeq ($(CONFIG_POSIX),y)
++QTEST_TARGETS =3D $(TARGETS)
 +check-qtest-y=3D$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=
 =3Dtests/qtest/%$(EXESUF)))
 +check-qtest-y +=3D $(check-qtest-generic-y:%=3Dtests/qtest/%$(EXESUF))
- else
- QTEST_TARGETS =3D
- endif
-=20
--qtest-obj-y =3D tests/libqtest.o $(test-util-obj-y)
++else
++QTEST_TARGETS =3D
++endif
++
 +qtest-obj-y =3D tests/qtest/libqtest.o $(test-util-obj-y)
- $(check-qtest-y): $(qtest-obj-y)
-=20
- tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
-@@ -937,7 +937,7 @@ endef
-=20
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
- $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu/a=
-ll $(check-qtest-y)
--=09$(call do_test_human,$(check-qtest-$*-y:%=3Dtests/%$(EXESUF)) $(check-q=
-test-generic-y:%=3Dtests/%$(EXESUF)), \
-+=09$(call do_test_human,$(check-qtest-$*-y:%=3Dtests/qtest/%$(EXESUF)) $(c=
-heck-qtest-generic-y:%=3Dtests/qtest/%$(EXESUF)), \
- =09  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- =09  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-=20
-@@ -950,7 +950,7 @@ check-speed: $(check-speed-y)
- # gtester tests with TAP output
-=20
- $(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qt=
-est-%.tap: %-softmmu/all $(check-qtest-y)
--=09$(call do_test_tap, $(check-qtest-$*-y:%=3Dtests/%$(EXESUF)) $(check-qt=
-est-generic-y:%=3Dtests/%$(EXESUF)), \
-+=09$(call do_test_tap, $(check-qtest-$*-y:%=3Dtests/qtest/%$(EXESUF)) $(ch=
-eck-qtest-generic-y:%=3Dtests/qtest/%$(EXESUF)), \
- =09  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- =09  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-=20
-@@ -1215,10 +1215,10 @@ check-block: $(patsubst %,check-%, $(check-block-y)=
-)
- endif
- check: check-block check-qapi-schema check-unit check-softfloat check-qtes=
-t check-decodetree
- check-clean:
--=09rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
--=09rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
-arget)-y:%=3Dtests/%$(EXESUF))) $(check-qtest-generic-y:%=3Dtests/%$(EXESUF=
-)))
-+=09rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
-+=09rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
-arget)-y:%=3Dtests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=3Dtests/qte=
-st/%$(EXESUF)))
- =09rm -f tests/test-qapi-gen-timestamp
--=09rm -f tests/dbus-vmstate1-gen-timestamp
-+=09rm -f tests/qtest/dbus-vmstate1-gen-timestamp
- =09rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
-=20
- clean: check-clean
-@@ -1228,6 +1228,7 @@ clean: check-clean
- all: $(QEMU_IOTESTS_HELPERS-y)
-=20
- -include $(wildcard tests/*.d)
-+-include $(wildcard tests/qtest/*.d)
- -include $(wildcard tests/libqos/*.d)
-=20
- endif
-diff --git a/tests/ac97-test.c b/tests/qtest/ac97-test.c
-similarity index 100%
-rename from tests/ac97-test.c
-rename to tests/qtest/ac97-test.c
-diff --git a/tests/acpi-utils.c b/tests/qtest/acpi-utils.c
-similarity index 100%
-rename from tests/acpi-utils.c
-rename to tests/qtest/acpi-utils.c
-diff --git a/tests/acpi-utils.h b/tests/qtest/acpi-utils.h
-similarity index 100%
-rename from tests/acpi-utils.h
-rename to tests/qtest/acpi-utils.h
-diff --git a/tests/ahci-test.c b/tests/qtest/ahci-test.c
-similarity index 100%
-rename from tests/ahci-test.c
-rename to tests/qtest/ahci-test.c
-diff --git a/tests/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
-similarity index 100%
-rename from tests/arm-cpu-features.c
-rename to tests/qtest/arm-cpu-features.c
-diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/qtest/bios-table=
-s-test-allowed-diff.h
-similarity index 100%
-rename from tests/bios-tables-test-allowed-diff.h
-rename to tests/qtest/bios-tables-test-allowed-diff.h
-diff --git a/tests/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-similarity index 100%
-rename from tests/bios-tables-test.c
-rename to tests/qtest/bios-tables-test.c
-diff --git a/tests/boot-order-test.c b/tests/qtest/boot-order-test.c
-similarity index 100%
-rename from tests/boot-order-test.c
-rename to tests/qtest/boot-order-test.c
-diff --git a/tests/boot-sector.c b/tests/qtest/boot-sector.c
-similarity index 100%
-rename from tests/boot-sector.c
-rename to tests/qtest/boot-sector.c
-diff --git a/tests/boot-sector.h b/tests/qtest/boot-sector.h
-similarity index 100%
-rename from tests/boot-sector.h
-rename to tests/qtest/boot-sector.h
-diff --git a/tests/boot-serial-test.c b/tests/qtest/boot-serial-test.c
-similarity index 100%
-rename from tests/boot-serial-test.c
-rename to tests/qtest/boot-serial-test.c
-diff --git a/tests/cdrom-test.c b/tests/qtest/cdrom-test.c
-similarity index 100%
-rename from tests/cdrom-test.c
-rename to tests/qtest/cdrom-test.c
-diff --git a/tests/cpu-plug-test.c b/tests/qtest/cpu-plug-test.c
-similarity index 100%
-rename from tests/cpu-plug-test.c
-rename to tests/qtest/cpu-plug-test.c
-diff --git a/tests/dbus-vmstate-test.c b/tests/qtest/dbus-vmstate-test.c
-similarity index 100%
-rename from tests/dbus-vmstate-test.c
-rename to tests/qtest/dbus-vmstate-test.c
-diff --git a/tests/dbus-vmstate1.xml b/tests/qtest/dbus-vmstate1.xml
-similarity index 100%
-rename from tests/dbus-vmstate1.xml
-rename to tests/qtest/dbus-vmstate1.xml
-diff --git a/tests/device-introspect-test.c b/tests/qtest/device-introspect=
--test.c
-similarity index 100%
-rename from tests/device-introspect-test.c
-rename to tests/qtest/device-introspect-test.c
-diff --git a/tests/device-plug-test.c b/tests/qtest/device-plug-test.c
-similarity index 100%
-rename from tests/device-plug-test.c
-rename to tests/qtest/device-plug-test.c
-diff --git a/tests/display-vga-test.c b/tests/qtest/display-vga-test.c
-similarity index 100%
-rename from tests/display-vga-test.c
-rename to tests/qtest/display-vga-test.c
-diff --git a/tests/drive_del-test.c b/tests/qtest/drive_del-test.c
-similarity index 100%
-rename from tests/drive_del-test.c
-rename to tests/qtest/drive_del-test.c
-diff --git a/tests/ds1338-test.c b/tests/qtest/ds1338-test.c
-similarity index 100%
-rename from tests/ds1338-test.c
-rename to tests/qtest/ds1338-test.c
-diff --git a/tests/e1000-test.c b/tests/qtest/e1000-test.c
-similarity index 100%
-rename from tests/e1000-test.c
-rename to tests/qtest/e1000-test.c
-diff --git a/tests/e1000e-test.c b/tests/qtest/e1000e-test.c
-similarity index 100%
-rename from tests/e1000e-test.c
-rename to tests/qtest/e1000e-test.c
-diff --git a/tests/eepro100-test.c b/tests/qtest/eepro100-test.c
-similarity index 100%
-rename from tests/eepro100-test.c
-rename to tests/qtest/eepro100-test.c
-diff --git a/tests/endianness-test.c b/tests/qtest/endianness-test.c
-similarity index 100%
-rename from tests/endianness-test.c
-rename to tests/qtest/endianness-test.c
-diff --git a/tests/es1370-test.c b/tests/qtest/es1370-test.c
-similarity index 100%
-rename from tests/es1370-test.c
-rename to tests/qtest/es1370-test.c
-diff --git a/tests/fdc-test.c b/tests/qtest/fdc-test.c
-similarity index 100%
-rename from tests/fdc-test.c
-rename to tests/qtest/fdc-test.c
-diff --git a/tests/fw_cfg-test.c b/tests/qtest/fw_cfg-test.c
-similarity index 100%
-rename from tests/fw_cfg-test.c
-rename to tests/qtest/fw_cfg-test.c
-diff --git a/tests/hd-geo-test.c b/tests/qtest/hd-geo-test.c
-similarity index 100%
-rename from tests/hd-geo-test.c
-rename to tests/qtest/hd-geo-test.c
-diff --git a/tests/hexloader-test.c b/tests/qtest/hexloader-test.c
-similarity index 100%
-rename from tests/hexloader-test.c
-rename to tests/qtest/hexloader-test.c
-diff --git a/tests/i440fx-test.c b/tests/qtest/i440fx-test.c
-similarity index 100%
-rename from tests/i440fx-test.c
-rename to tests/qtest/i440fx-test.c
-diff --git a/tests/i82801b11-test.c b/tests/qtest/i82801b11-test.c
-similarity index 100%
-rename from tests/i82801b11-test.c
-rename to tests/qtest/i82801b11-test.c
-diff --git a/tests/ide-test.c b/tests/qtest/ide-test.c
-similarity index 100%
-rename from tests/ide-test.c
-rename to tests/qtest/ide-test.c
-diff --git a/tests/intel-hda-test.c b/tests/qtest/intel-hda-test.c
-similarity index 100%
-rename from tests/intel-hda-test.c
-rename to tests/qtest/intel-hda-test.c
-diff --git a/tests/ioh3420-test.c b/tests/qtest/ioh3420-test.c
-similarity index 100%
-rename from tests/ioh3420-test.c
-rename to tests/qtest/ioh3420-test.c
-diff --git a/tests/ipmi-bt-test.c b/tests/qtest/ipmi-bt-test.c
-similarity index 100%
-rename from tests/ipmi-bt-test.c
-rename to tests/qtest/ipmi-bt-test.c
-diff --git a/tests/ipmi-kcs-test.c b/tests/qtest/ipmi-kcs-test.c
-similarity index 100%
-rename from tests/ipmi-kcs-test.c
-rename to tests/qtest/ipmi-kcs-test.c
-diff --git a/tests/ipoctal232-test.c b/tests/qtest/ipoctal232-test.c
-similarity index 100%
-rename from tests/ipoctal232-test.c
-rename to tests/qtest/ipoctal232-test.c
-diff --git a/tests/ivshmem-test.c b/tests/qtest/ivshmem-test.c
-similarity index 100%
-rename from tests/ivshmem-test.c
-rename to tests/qtest/ivshmem-test.c
-diff --git a/tests/libqtest-single.h b/tests/qtest/libqtest-single.h
-similarity index 100%
-rename from tests/libqtest-single.h
-rename to tests/qtest/libqtest-single.h
-diff --git a/tests/libqtest.c b/tests/qtest/libqtest.c
-similarity index 100%
-rename from tests/libqtest.c
-rename to tests/qtest/libqtest.c
-diff --git a/tests/libqtest.h b/tests/qtest/libqtest.h
-similarity index 100%
-rename from tests/libqtest.h
-rename to tests/qtest/libqtest.h
-diff --git a/tests/m25p80-test.c b/tests/qtest/m25p80-test.c
-similarity index 100%
-rename from tests/m25p80-test.c
-rename to tests/qtest/m25p80-test.c
-diff --git a/tests/m48t59-test.c b/tests/qtest/m48t59-test.c
-similarity index 100%
-rename from tests/m48t59-test.c
-rename to tests/qtest/m48t59-test.c
-diff --git a/tests/machine-none-test.c b/tests/qtest/machine-none-test.c
-similarity index 100%
-rename from tests/machine-none-test.c
-rename to tests/qtest/machine-none-test.c
-diff --git a/tests/megasas-test.c b/tests/qtest/megasas-test.c
-similarity index 100%
-rename from tests/megasas-test.c
-rename to tests/qtest/megasas-test.c
-diff --git a/tests/microbit-test.c b/tests/qtest/microbit-test.c
-similarity index 100%
-rename from tests/microbit-test.c
-rename to tests/qtest/microbit-test.c
-diff --git a/tests/migration-helpers.c b/tests/qtest/migration-helpers.c
-similarity index 100%
-rename from tests/migration-helpers.c
-rename to tests/qtest/migration-helpers.c
-diff --git a/tests/migration-helpers.h b/tests/qtest/migration-helpers.h
-similarity index 100%
-rename from tests/migration-helpers.h
-rename to tests/qtest/migration-helpers.h
-diff --git a/tests/migration-test.c b/tests/qtest/migration-test.c
-similarity index 100%
-rename from tests/migration-test.c
-rename to tests/qtest/migration-test.c
-diff --git a/tests/modules-test.c b/tests/qtest/modules-test.c
-similarity index 100%
-rename from tests/modules-test.c
-rename to tests/qtest/modules-test.c
-diff --git a/tests/ne2000-test.c b/tests/qtest/ne2000-test.c
-similarity index 100%
-rename from tests/ne2000-test.c
-rename to tests/qtest/ne2000-test.c
-diff --git a/tests/numa-test.c b/tests/qtest/numa-test.c
-similarity index 100%
-rename from tests/numa-test.c
-rename to tests/qtest/numa-test.c
-diff --git a/tests/nvme-test.c b/tests/qtest/nvme-test.c
-similarity index 100%
-rename from tests/nvme-test.c
-rename to tests/qtest/nvme-test.c
-diff --git a/tests/pca9552-test.c b/tests/qtest/pca9552-test.c
-similarity index 100%
-rename from tests/pca9552-test.c
-rename to tests/qtest/pca9552-test.c
-diff --git a/tests/pci-test.c b/tests/qtest/pci-test.c
-similarity index 100%
-rename from tests/pci-test.c
-rename to tests/qtest/pci-test.c
-diff --git a/tests/pcnet-test.c b/tests/qtest/pcnet-test.c
-similarity index 100%
-rename from tests/pcnet-test.c
-rename to tests/qtest/pcnet-test.c
-diff --git a/tests/pflash-cfi02-test.c b/tests/qtest/pflash-cfi02-test.c
-similarity index 100%
-rename from tests/pflash-cfi02-test.c
-rename to tests/qtest/pflash-cfi02-test.c
-diff --git a/tests/pnv-xscom-test.c b/tests/qtest/pnv-xscom-test.c
-similarity index 100%
-rename from tests/pnv-xscom-test.c
-rename to tests/qtest/pnv-xscom-test.c
-diff --git a/tests/prom-env-test.c b/tests/qtest/prom-env-test.c
-similarity index 100%
-rename from tests/prom-env-test.c
-rename to tests/qtest/prom-env-test.c
-diff --git a/tests/pvpanic-test.c b/tests/qtest/pvpanic-test.c
-similarity index 100%
-rename from tests/pvpanic-test.c
-rename to tests/qtest/pvpanic-test.c
-diff --git a/tests/pxe-test.c b/tests/qtest/pxe-test.c
-similarity index 100%
-rename from tests/pxe-test.c
-rename to tests/qtest/pxe-test.c
-diff --git a/tests/q35-test.c b/tests/qtest/q35-test.c
-similarity index 100%
-rename from tests/q35-test.c
-rename to tests/qtest/q35-test.c
-diff --git a/tests/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-similarity index 100%
-rename from tests/qmp-cmd-test.c
-rename to tests/qtest/qmp-cmd-test.c
-diff --git a/tests/qmp-test.c b/tests/qtest/qmp-test.c
-similarity index 100%
-rename from tests/qmp-test.c
-rename to tests/qtest/qmp-test.c
-diff --git a/tests/qom-test.c b/tests/qtest/qom-test.c
-similarity index 100%
-rename from tests/qom-test.c
-rename to tests/qtest/qom-test.c
-diff --git a/tests/qos-test.c b/tests/qtest/qos-test.c
-similarity index 100%
-rename from tests/qos-test.c
-rename to tests/qtest/qos-test.c
-diff --git a/tests/rtas-test.c b/tests/qtest/rtas-test.c
-similarity index 100%
-rename from tests/rtas-test.c
-rename to tests/qtest/rtas-test.c
-diff --git a/tests/rtc-test.c b/tests/qtest/rtc-test.c
-similarity index 100%
-rename from tests/rtc-test.c
-rename to tests/qtest/rtc-test.c
-diff --git a/tests/rtl8139-test.c b/tests/qtest/rtl8139-test.c
-similarity index 100%
-rename from tests/rtl8139-test.c
-rename to tests/qtest/rtl8139-test.c
-diff --git a/tests/sdhci-test.c b/tests/qtest/sdhci-test.c
-similarity index 100%
-rename from tests/sdhci-test.c
-rename to tests/qtest/sdhci-test.c
-diff --git a/tests/spapr-phb-test.c b/tests/qtest/spapr-phb-test.c
-similarity index 100%
-rename from tests/spapr-phb-test.c
-rename to tests/qtest/spapr-phb-test.c
-diff --git a/tests/tco-test.c b/tests/qtest/tco-test.c
-similarity index 100%
-rename from tests/tco-test.c
-rename to tests/qtest/tco-test.c
-diff --git a/tests/test-arm-mptimer.c b/tests/qtest/test-arm-mptimer.c
-similarity index 100%
-rename from tests/test-arm-mptimer.c
-rename to tests/qtest/test-arm-mptimer.c
-diff --git a/tests/test-filter-mirror.c b/tests/qtest/test-filter-mirror.c
-similarity index 100%
-rename from tests/test-filter-mirror.c
-rename to tests/qtest/test-filter-mirror.c
-diff --git a/tests/test-filter-redirector.c b/tests/qtest/test-filter-redir=
-ector.c
-similarity index 100%
-rename from tests/test-filter-redirector.c
-rename to tests/qtest/test-filter-redirector.c
-diff --git a/tests/test-hmp.c b/tests/qtest/test-hmp.c
-similarity index 100%
-rename from tests/test-hmp.c
-rename to tests/qtest/test-hmp.c
-diff --git a/tests/test-netfilter.c b/tests/qtest/test-netfilter.c
-similarity index 100%
-rename from tests/test-netfilter.c
-rename to tests/qtest/test-netfilter.c
-diff --git a/tests/test-x86-cpuid-compat.c b/tests/qtest/test-x86-cpuid-com=
-pat.c
-similarity index 100%
-rename from tests/test-x86-cpuid-compat.c
-rename to tests/qtest/test-x86-cpuid-compat.c
-diff --git a/tests/tmp105-test.c b/tests/qtest/tmp105-test.c
-similarity index 100%
-rename from tests/tmp105-test.c
-rename to tests/qtest/tmp105-test.c
-diff --git a/tests/tpm-crb-swtpm-test.c b/tests/qtest/tpm-crb-swtpm-test.c
-similarity index 100%
-rename from tests/tpm-crb-swtpm-test.c
-rename to tests/qtest/tpm-crb-swtpm-test.c
-diff --git a/tests/tpm-crb-test.c b/tests/qtest/tpm-crb-test.c
-similarity index 100%
-rename from tests/tpm-crb-test.c
-rename to tests/qtest/tpm-crb-test.c
-diff --git a/tests/tpm-emu.c b/tests/qtest/tpm-emu.c
-similarity index 100%
-rename from tests/tpm-emu.c
-rename to tests/qtest/tpm-emu.c
-diff --git a/tests/tpm-emu.h b/tests/qtest/tpm-emu.h
-similarity index 100%
-rename from tests/tpm-emu.h
-rename to tests/qtest/tpm-emu.h
-diff --git a/tests/tpm-tests.c b/tests/qtest/tpm-tests.c
-similarity index 100%
-rename from tests/tpm-tests.c
-rename to tests/qtest/tpm-tests.c
-diff --git a/tests/tpm-tests.h b/tests/qtest/tpm-tests.h
-similarity index 100%
-rename from tests/tpm-tests.h
-rename to tests/qtest/tpm-tests.h
-diff --git a/tests/tpm-tis-swtpm-test.c b/tests/qtest/tpm-tis-swtpm-test.c
-similarity index 100%
-rename from tests/tpm-tis-swtpm-test.c
-rename to tests/qtest/tpm-tis-swtpm-test.c
-diff --git a/tests/tpm-tis-test.c b/tests/qtest/tpm-tis-test.c
-similarity index 100%
-rename from tests/tpm-tis-test.c
-rename to tests/qtest/tpm-tis-test.c
-diff --git a/tests/tpm-util.c b/tests/qtest/tpm-util.c
-similarity index 100%
-rename from tests/tpm-util.c
-rename to tests/qtest/tpm-util.c
-diff --git a/tests/tpm-util.h b/tests/qtest/tpm-util.h
-similarity index 100%
-rename from tests/tpm-util.h
-rename to tests/qtest/tpm-util.h
-diff --git a/tests/usb-hcd-ehci-test.c b/tests/qtest/usb-hcd-ehci-test.c
-similarity index 100%
-rename from tests/usb-hcd-ehci-test.c
-rename to tests/qtest/usb-hcd-ehci-test.c
-diff --git a/tests/usb-hcd-ohci-test.c b/tests/qtest/usb-hcd-ohci-test.c
-similarity index 100%
-rename from tests/usb-hcd-ohci-test.c
-rename to tests/qtest/usb-hcd-ohci-test.c
-diff --git a/tests/usb-hcd-uhci-test.c b/tests/qtest/usb-hcd-uhci-test.c
-similarity index 100%
-rename from tests/usb-hcd-uhci-test.c
-rename to tests/qtest/usb-hcd-uhci-test.c
-diff --git a/tests/usb-hcd-xhci-test.c b/tests/qtest/usb-hcd-xhci-test.c
-similarity index 100%
-rename from tests/usb-hcd-xhci-test.c
-rename to tests/qtest/usb-hcd-xhci-test.c
-diff --git a/tests/vhost-user-test.c b/tests/qtest/vhost-user-test.c
-similarity index 100%
-rename from tests/vhost-user-test.c
-rename to tests/qtest/vhost-user-test.c
-diff --git a/tests/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-similarity index 100%
-rename from tests/virtio-9p-test.c
-rename to tests/qtest/virtio-9p-test.c
-diff --git a/tests/virtio-blk-test.c b/tests/qtest/virtio-blk-test.c
-similarity index 100%
-rename from tests/virtio-blk-test.c
-rename to tests/qtest/virtio-blk-test.c
-diff --git a/tests/virtio-ccw-test.c b/tests/qtest/virtio-ccw-test.c
-similarity index 100%
-rename from tests/virtio-ccw-test.c
-rename to tests/qtest/virtio-ccw-test.c
-diff --git a/tests/virtio-net-test.c b/tests/qtest/virtio-net-test.c
-similarity index 100%
-rename from tests/virtio-net-test.c
-rename to tests/qtest/virtio-net-test.c
-diff --git a/tests/virtio-rng-test.c b/tests/qtest/virtio-rng-test.c
-similarity index 100%
-rename from tests/virtio-rng-test.c
-rename to tests/qtest/virtio-rng-test.c
-diff --git a/tests/virtio-scsi-test.c b/tests/qtest/virtio-scsi-test.c
-similarity index 100%
-rename from tests/virtio-scsi-test.c
-rename to tests/qtest/virtio-scsi-test.c
-diff --git a/tests/virtio-serial-test.c b/tests/qtest/virtio-serial-test.c
-similarity index 100%
-rename from tests/virtio-serial-test.c
-rename to tests/qtest/virtio-serial-test.c
-diff --git a/tests/virtio-test.c b/tests/qtest/virtio-test.c
-similarity index 100%
-rename from tests/virtio-test.c
-rename to tests/qtest/virtio-test.c
-diff --git a/tests/vmgenid-test.c b/tests/qtest/vmgenid-test.c
-similarity index 100%
-rename from tests/vmgenid-test.c
-rename to tests/qtest/vmgenid-test.c
-diff --git a/tests/vmxnet3-test.c b/tests/qtest/vmxnet3-test.c
-similarity index 100%
-rename from tests/vmxnet3-test.c
-rename to tests/qtest/vmxnet3-test.c
-diff --git a/tests/wdt_ib700-test.c b/tests/qtest/wdt_ib700-test.c
-similarity index 100%
-rename from tests/wdt_ib700-test.c
-rename to tests/qtest/wdt_ib700-test.c
++$(check-qtest-y): $(qtest-obj-y)
 --=20
 2.18.1
 
