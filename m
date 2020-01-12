@@ -2,83 +2,83 @@ Return-Path: <SRS0=tUBQ=3B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64120C32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 10:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51432C32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 11:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E8CE21744
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 10:40:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CC6C21744
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 11:22:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SS583huR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E8CE21744
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F0I985aZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC6C21744
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqafm-0003Vu-4G
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 05:40:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59136)
+	id 1iqbK2-0004M3-4m
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 06:22:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56770)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iqaf4-0002zu-JX
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 05:40:04 -0500
+ (envelope-from <thuth@redhat.com>) id 1iqbJC-0003i7-3Y
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iqaf1-00079I-DL
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 05:40:00 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31973
+ (envelope-from <thuth@redhat.com>) id 1iqbJ9-0008Ey-Mj
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:21:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38153
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iqaf1-00071w-4g
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 05:39:59 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iqbJ9-00086i-43
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 06:21:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578825597;
+ s=mimecast20190719; t=1578828085;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=w9lbNcTZo+TYs3ubmDHLFtITOcTMBr4WFC6v/7hM16A=;
- b=SS583huR2UwlT/JV/QR+vnkQMaAq/cW13qVXbepPT4YOWTETtqVbpgnOm+ONXMhu2lXyVF
- S7jbR6tlVVKMjE7qEYPWYUUqPTWbpeW123gg+jaxTvFfediaBCJ5wsuRX20gWjP9vS+z/Y
- jUUeLRNeq2tVa5XWRviYgEOFZEqOwEU=
+ bh=O0lAZXJdUs06SwuWLp8ryK0R7nRJNJIOX9/0trkcKL8=;
+ b=F0I985aZqs2ssKnAm8mI+BB0E9rXmllIwpeFePHIDoJrtmujJ2BdncrBz7Jh+F3NaK00Bn
+ pJrT+P/YCfzxuqBwlcVzY8LwWjlci73Ji/5Eh4MohrZ1HO6WbLyUjekXvoJ5JrYTiAkI3L
+ 4+VtArhNIyNy5g2Nu5e/4rKpXuBpe6E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-L8ncB9uTNxm3qzQMTJodhw-1; Sun, 12 Jan 2020 05:39:56 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-386-ar_TFxbhMt-vX_S5CBrGfw-1; Sun, 12 Jan 2020 06:21:22 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FB5ADB60;
- Sun, 12 Jan 2020 10:39:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38798107ACCA;
+ Sun, 12 Jan 2020 11:21:21 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-70.ams2.redhat.com [10.36.116.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA0D76A846;
- Sun, 12 Jan 2020 10:39:53 +0000 (UTC)
-Subject: Re: [PATCH V2] vhost-user-test: fix a memory leak
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C1DF5DA76;
+ Sun, 12 Jan 2020 11:21:17 +0000 (UTC)
+Subject: Re: [PULL 0/8] qtests and docs
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200107190802.2257-1-thuth@redhat.com>
+ <CAFEAcA8QODFux83esDryjEe9yYOejR4TA3UoD_vHURJx-REzAA@mail.gmail.com>
 From: Thomas Huth <thuth@redhat.com>
-To: pannengyuan@huawei.com, lvivier@redhat.com, pbonzini@redhat.com
-References: <1576805214-2508-1-git-send-email-pannengyuan@huawei.com>
- <072970b5-b7cc-ad71-d3e4-933e888b7093@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <3312978e-2bff-091a-b618-d9183b8c7252@redhat.com>
-Date: Sun, 12 Jan 2020 11:39:51 +0100
+Message-ID: <88e4cbc6-b1ee-c253-eff3-8452c843b645@redhat.com>
+Date: Sun, 12 Jan 2020 12:21:15 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <072970b5-b7cc-ad71-d3e4-933e888b7093@redhat.com>
+In-Reply-To: <CAFEAcA8QODFux83esDryjEe9yYOejR4TA3UoD_vHURJx-REzAA@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: L8ncB9uTNxm3qzQMTJodhw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: ar_TFxbhMt-vX_S5CBrGfw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,66 +90,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/01/2020 15.07, Thomas Huth wrote:
-> On 20/12/2019 02.26, pannengyuan@huawei.com wrote:
->> From: Pan Nengyuan <pannengyuan@huawei.com>
+On 10/01/2020 12.19, Peter Maydell wrote:
+> On Tue, 7 Jan 2020 at 19:08, Thomas Huth <thuth@redhat.com> wrote:
 >>
->> Spotted by ASAN.
+>>  Hi!
 >>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
->> ---
->> Changes V2 to V1:
->> - use a "goto cleanup", instead of duplicating the "free" functions.
->> - free "dest_cmdline" at the end.
->> ---
->>  tests/vhost-user-test.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
+>> The following changes since commit f4d8cf148e43d942ef1202071e0cd66ce40322e0:
 >>
->> diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
->> index 91ea373..dcb8617 100644
->> --- a/tests/vhost-user-test.c
->> +++ b/tests/vhost-user-test.c
->> @@ -717,7 +717,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
->>      guint64 size;
->>  
->>      if (!wait_for_fds(s)) {
->> -        return;
->> +        goto cleanup;
->>      }
->>  
->>      size = get_log_size(s);
->> @@ -776,8 +776,11 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
->>      g_source_unref(source);
->>  
->>      qtest_quit(to);
->> +
->> + cleanup:
->>      test_server_free(dest);
->>      g_free(uri);
->> +    g_string_free(dest_cmdline, true);
->>  }
->>  
->>  static void wait_for_rings_started(TestServer *s, size_t count)
+>>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-01-06' into staging (2020-01-06 17:44:22 +0000)
 >>
+>> are available in the Git repository at:
+>>
+>>   https://gitlab.com/huth/qemu.git tags/pull-request-2020-01-07
+>>
+>> for you to fetch changes up to 2cf30f8ecb8b64cc5ccaf77244570e7def8075a5:
+>>
+>>   docs: build an index page for the HTML docs (2020-01-07 19:48:30 +0100)
+>>
+>> ----------------------------------------------------------------
+>> * Move qtests into a separate directory
+>> * Build index.html for docs
+>> ----------------------------------------------------------------
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> ... and picked up to my qtest-next tree.
+> Conflict in tests/Makefile.include, too big for me to easily
+> see the right resolution. Can you fix up and resend, please?
 
-... and now I had to unqueue the patch again. It is reproducibly causing
-one of the gitlab CI pipelines to fail with a timeout, e.g.:
-
- https://gitlab.com/huth/qemu/-/jobs/400101552
-
-Not sure what is going on here, though, there is no obvious error
-message in the output... this needs some more investigation... do you
-have a gitlab account and could have a look?
+Sure, will do!
 
  Thomas
 
