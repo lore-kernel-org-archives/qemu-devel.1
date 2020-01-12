@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84EA5C32771
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 09:47:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B4DC32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 09:48:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47BC72187F
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 09:47:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E966E22314
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 09:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EsExOqT+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47BC72187F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mngArEu9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E966E22314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqZpn-0004Bs-FJ
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 04:47:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56560)
+	id 1iqZrQ-0005UV-0L
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 04:48:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iqZny-0002nL-Bb
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 04:45:11 -0500
+ (envelope-from <alistair23@gmail.com>) id 1iqZqJ-0004n7-MP
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 04:47:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iqZnx-0005GG-Cp
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 04:45:10 -0500
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:35182)
+ (envelope-from <alistair23@gmail.com>) id 1iqZqI-0006E8-NY
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 04:47:35 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:42434)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iqZnx-0005A1-4b; Sun, 12 Jan 2020 04:45:09 -0500
-Received: by mail-lf1-x143.google.com with SMTP id 15so4727461lfr.2;
- Sun, 12 Jan 2020 01:45:09 -0800 (PST)
+ id 1iqZqI-00068e-Ea; Sun, 12 Jan 2020 04:47:34 -0500
+Received: by mail-lj1-x242.google.com with SMTP id y4so6722908ljj.9;
+ Sun, 12 Jan 2020 01:47:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=mvEyv8WsHK+y4lyiLI8T8Cwz0UxNsAP1n8oZu5GDpas=;
- b=EsExOqT+WaKoepgqT7oBU0FbwwVcObGIbJj0xCQa354MC9I0rlak12h/IOaCdVNjOM
- TS9B4peK4Wy1n3LNE7VUeZeAiNxuJMTDtOlZkmLlTMxebjdYlkuArnnwDHlyNP/IgbIY
- NE+3m9HIEl6y3exSWSEKN+obmsDn4n6eauER6SWszp2tmiqxez40m7fCaai4EScYBfzI
- CzshAOOXWob9ahNuiw+zOgiUw5FULJnXuY+LvF6XF9nIkmJCenbXBL9D1p8t4YMmXDdC
- hm93ccuX8jC1DQoRT3nOGwRFAxnKTMb6OsT7WPYMCJ9Rrtsmll0xv1zh+fKXXf/vNghk
- 2iwg==
+ bh=RDLnJ4qJFqQy+U2F1GzxeKsnp0OT/5UfLwjGUAO8yps=;
+ b=mngArEu9hEfT+he2g+EY39i8voXyGMVQyKHnLGrN07fzeQ1oIjuJ/uT0rE67m9W0b5
+ 1B+ijvVUx/OhDdfb1W5aANqY0iG9CNXuRz5sR70kDZgbkmqHKEvaUX6gG7DOJe7HCqWk
+ EPl5PVbwgppO8o6+HhV+afhC2eeefiQdrYMxKIubn0AMyt94q4JklFzFY6iBJLZim+q+
+ lxQrbiWgNHaYT0sE8GOwUkn4je2IxgK4CHpN4LnMvnGDDZvsGKRwVruyume7Vt7D2r89
+ Tj9Cg4v2YHHE1KOUEZv6+irkvJCrwZwUBUmMEhDodr++MSsyQSgwpySIIGmBs5M8ZBjE
+ PtqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=mvEyv8WsHK+y4lyiLI8T8Cwz0UxNsAP1n8oZu5GDpas=;
- b=Xj/UNwCgAHzkf3UdHgMML2oSS18SHzMc/kPYuqQzUnB4kZebR9WXboCfpeQTaPTi70
- rgdelGppT/+xU7fpQhGuNOGq1j4pabmtW0vSBpIK4cDrJr0WwZAdNM9+eIwBBpHebeoL
- zXIfWNnTj8bNmTsXX2Fq8pv62P+JLp22MOuBehAE0vs14tgdVXHpi7XeSgCtUwG7XQrH
- jIz9SfnYfUMV/8WOIXijl1jpg/D9Kj4Iedgb0MdZEKsCxUKRyZCpRTsvTRCe4VThg38k
- Rzh2ph4Nmx2hMZ39mMf3IxgEmsbKwu8G6IM0r3XoeflUVpEF6P6zyFD+v7JwTIoSjqQF
- tMMQ==
-X-Gm-Message-State: APjAAAVSBr/jl0nrP4MCFHZwMzVjrvyL5tOj0cqR/ClRVetKd+2F43dh
- oHGcPgnQril0kh3vOREwTCi1VvJCufUTHILJmh4iJho6
-X-Google-Smtp-Source: APXvYqxBsmT3/S/ksEIf8xngcs0t6C+b9DJlHarA6JCrshF+M3Qvub4y4aPAefRQPsUZqr5EcjM401Rlfz38uhniS/w=
-X-Received: by 2002:ac2:5498:: with SMTP id t24mr7132155lfk.84.1578822307837; 
- Sun, 12 Jan 2020 01:45:07 -0800 (PST)
+ bh=RDLnJ4qJFqQy+U2F1GzxeKsnp0OT/5UfLwjGUAO8yps=;
+ b=h/MoUF/ror5RXuhv8vgjB8tBT4KGIhcEo5sZEZOuWCui71C4kWMXrkdD2MxwtyHRyW
+ BoRiKatzEJfB63rdRf+vEgFWW5+KDHcN1IA1y5CNMWnsAEbOHEIdYyRh2O9MXPKK+99U
+ vO9qJoq2zftknsUf8giUytkUk7a+NwRuhyb6FvulGGKSPdrLUDXu9TwkxDK/XAaPVVJ/
+ D1uxjDBeoEp0aX1d+VLXv8mAdE0KRQJn4DHbjRzqVld8ILX5hRfrL214tTVLPear8Q2N
+ 2Bj1JlZglB48NInnb3R63/hSGuh44qH8YtSbGoGxwCodufciIm0ByMtArW1R5fDDbqAA
+ e0LA==
+X-Gm-Message-State: APjAAAWAqpcbgcBvF5tqa8vyN+R0/WkwczBDiOg33Mvb6tNynSj/ToFk
+ 356RBweohijStgoAZGkNHKpZSd4lQryzjb7S+RCjJMr+
+X-Google-Smtp-Source: APXvYqzvRwD0wTNL3ge0fIaHzVy8ssKZyDWXWui59E3SmT+L+JPpV/KxHTsDtelWxlfc754pdzRavhGgWEDG2TwsVLU=
+X-Received: by 2002:a2e:9a51:: with SMTP id k17mr7529135ljj.206.1578822453192; 
+ Sun, 12 Jan 2020 01:47:33 -0800 (PST)
 MIME-Version: 1.0
 References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-8-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-8-philmd@redhat.com>
+ <20200109152133.23649-9-philmd@redhat.com>
+In-Reply-To: <20200109152133.23649-9-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Sun, 12 Jan 2020 17:44:40 +0800
-Message-ID: <CAKmqyKNbbkBeoVTfvyLt_krei-nCP_sGY_70GSiLFrQVOdd1Ag@mail.gmail.com>
-Subject: Re: [PATCH 07/15] hw/core/machine-qmp-cmds: Replace current_machine
- by qdev_get_machine()
+Date: Sun, 12 Jan 2020 17:47:04 +0800
+Message-ID: <CAKmqyKMbgEhs8teVezJRYRidC4oQ-Ucq7_PXqcf9nj0taxBPdA@mail.gmail.com>
+Subject: Re: [PATCH 08/15] target/arm/monitor: Replace current_machine by
+ qdev_get_machine()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::143
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,12 +104,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 9, 2020 at 11:30 PM Philippe Mathieu-Daud=C3=A9
+On Thu, Jan 9, 2020 at 11:23 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
 > As we want to remove the global current_machine,
-> replace MACHINE_GET_CLASS(current_machine) by
-> MACHINE_GET_CLASS(qdev_get_machine()).
+> replace 'current_machine' by MACHINE(qdev_get_machine()).
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -118,25 +117,24 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  hw/core/machine-qmp-cmds.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/arm/monitor.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-> index eed5aeb2f7..5a04d00e4f 100644
-> --- a/hw/core/machine-qmp-cmds.c
-> +++ b/hw/core/machine-qmp-cmds.c
-> @@ -280,9 +280,9 @@ void qmp_cpu_add(int64_t id, Error **errp)
->  {
->      MachineClass *mc;
->
-> -    mc =3D MACHINE_GET_CLASS(current_machine);
-> +    mc =3D MACHINE_GET_CLASS(qdev_get_machine());
->      if (mc->hot_add_cpu) {
-> -        mc->hot_add_cpu(current_machine, id, errp);
-> +        mc->hot_add_cpu(MACHINE(qdev_get_machine()), id, errp);
->      } else {
->          error_setg(errp, "Not supported");
+> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+> index fa054f8a36..bcbf69802d 100644
+> --- a/target/arm/monitor.c
+> +++ b/target/arm/monitor.c
+> @@ -136,7 +136,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(=
+CpuModelExpansionType type,
 >      }
+>
+>      if (kvm_enabled()) {
+> -        const char *cpu_type =3D current_machine->cpu_type;
+> +        MachineState *ms =3D MACHINE(qdev_get_machine());
+> +        const char *cpu_type =3D ms->cpu_type;
+>          int len =3D strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
+>          bool supported =3D false;
+>
 > --
 > 2.21.1
 >
