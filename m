@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F9E8C33CA9
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 12:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30AEAC32771
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 12:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69ADA21556
-	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 12:58:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69ADA21556
+	by mail.kernel.org (Postfix) with ESMTPS id 06DE621556
+	for <qemu-devel@archiver.kernel.org>; Sun, 12 Jan 2020 12:58:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DE621556
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqcpI-0005Mx-F7
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 07:58:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33072)
+	id 1iqcpN-0005W1-Oh
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 07:58:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33178)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iqcgJ-00043r-9Y
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 07:49:30 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iqcgM-00044O-Il
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 07:49:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iqcgG-000183-OP
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 07:49:27 -0500
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:58849)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iqcgH-0001CU-Ry
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 07:49:30 -0500
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:37326)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1iqcgG-0000xY-Bw
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 07:49:24 -0500
+ (envelope-from <ysato@users.sourceforge.jp>) id 1iqcgH-00019V-FA
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 07:49:25 -0500
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 5F115BA964;
- Sun, 12 Jan 2020 21:49:21 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id B358FB8397;
+ Sun, 12 Jan 2020 21:49:24 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 1C77A24008E;
- Sun, 12 Jan 2020 21:49:21 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 7BD1524008F;
+ Sun, 12 Jan 2020 21:49:24 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v28 08/22] target/rx: Disassemble rx_index_addr into a string
-Date: Sun, 12 Jan 2020 21:48:59 +0900
-Message-Id: <20200112124913.94959-9-ysato@users.sourceforge.jp>
+Subject: [PATCH v28 21/22] BootLinuxConsoleTest: Test the RX-Virt machine
+Date: Sun, 12 Jan 2020 21:49:12 +0900
+Message-Id: <20200112124913.94959-22-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200112124913.94959-1-ysato@users.sourceforge.jp>
 References: <20200112124913.94959-1-ysato@users.sourceforge.jp>
@@ -53,7 +53,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
+X-Received-From: 202.224.55.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,284 +65,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+Cc: richard.henderson@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-We were eliding all zero indexes.  It is only ld=3D=3D0 that does
-not have an index in the instruction.  This also allows us to
-avoid breaking the final print into multiple pieces.
+Add two tests for the rx-virt machine, based on the recommended test
+setup from Yoshinori Sato:
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
 
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+- U-Boot prompt
+- Linux kernel with Sash shell
+
+These are very quick tests:
+
+  $ avocado run -t arch:rx tests/acceptance/boot_linux_console.py
+  JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
+  JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a6ef=
+0/job.log
+   (1/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_rx_=
+uboot: PASS (0.11 s)
+   (2/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_rx_=
+linux: PASS (0.45 s)
+  RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 =
+| CANCEL 0
+
+Tests can also be run with:
+
+  $ avocado --show=3Dconsole run -t arch:rx tests/acceptance/boot_linux_c=
+onsole.py
+  console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 21:5=
+6:06 +0900)
+  console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc version =
+9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
+  console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
+  ...
+  console: SuperH (H)SCI(F) driver initialized
+  console: 88240.serial: ttySC0 at MMIO 0x88240 (irq =3D 215, base_baud =3D=
+ 0) is a sci
+  console: console [ttySC0] enabled
+  console: 88248.serial: ttySC1 at MMIO 0x88248 (irq =3D 219, base_baud =3D=
+ 0) is a sci
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Based-on: 20190517045136.3509-1-richard.henderson@linaro.org
+"RX architecture support"
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-Id: <20190607091116.49044-19-ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/rx/disas.c | 154 +++++++++++++++++-----------------------------
- 1 file changed, 55 insertions(+), 99 deletions(-)
+ tests/acceptance/boot_linux_console.py | 47 ++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 8cada4825d..64342537ee 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -107,49 +107,42 @@ static const char psw[] =3D {
-     'i', 'u', 0, 0, 0, 0, 0, 0,
- };
-=20
--static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
-+static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi=
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index 9c6aa2040a..9976227b21 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -483,3 +483,50 @@ class BootLinuxConsole(Test):
+         self.wait_for_console_pattern(console_pattern)
+         console_pattern =3D 'No filesystem could mount root'
+         self.wait_for_console_pattern(console_pattern)
++
++    def test_rx_uboot(self):
++        """
++        :avocado: tags=3Darch:rx
++        :avocado: tags=3Dmachine:rx-virt
++        :avocado: tags=3Dendian:little
++        """
++        uboot_url =3D ('https://acc.dl.osdn.jp/users/23/23888/u-boot.bin=
+.gz')
++        uboot_hash =3D '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
++        uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_ha=
+sh)
++        uboot_path =3D archive.uncompress(uboot_path, self.workdir)
++
++        self.vm.set_machine('rx-virt')
++        self.vm.set_console()
++        self.vm.add_args('-bios', uboot_path,
++                         '-no-reboot')
++        self.vm.launch()
++        uboot_version =3D 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty'
++        self.wait_for_console_pattern(uboot_version)
++        gcc_version =3D 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (expe=
+rimental)'
++        # FIXME limit baudrate on chardev, else we type too fast
++        #self.exec_command_and_wait_for_pattern('version', gcc_version)
++
++    def test_rx_linux(self):
++        """
++        :avocado: tags=3Darch:rx
++        :avocado: tags=3Dmachine:rx-virt
++        :avocado: tags=3Dendian:little
++        """
++        dtb_url =3D ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.dtb'=
 )
- {
--    bfd_byte buf[2];
-+    uint32_t addr =3D ctx->addr;
-+    uint8_t buf[2];
-+    uint16_t dsp;
++        dtb_hash =3D '7b4e4e2c71905da44e86ce47adee2210b026ac18'
++        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash)
++        kernel_url =3D ('http://acc.dl.osdn.jp/users/23/23845/zImage')
++        kernel_hash =3D '39a81067f8d72faad90866ddfefa19165d68fc99'
++        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
+_hash)
 +
-     switch (ld) {
-     case 0:
--        return 0;
-+        /* No index; return empty string.  */
-+        out[0] =3D '\0';
-+        return;
-     case 1:
--        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
-         ctx->addr +=3D 1;
--        return ((uint8_t)buf[0]) << size;
-+        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-+        dsp =3D buf[0];
-+        break;
-     case 2:
--        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
-         ctx->addr +=3D 2;
--        return lduw_le_p(buf) << size;
-+        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-+        dsp =3D lduw_le_p(buf);
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
--    g_assert_not_reached();
++        self.vm.set_machine('rx-virt')
++        self.vm.set_console()
++        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'early=
+con'
++        self.vm.add_args('-kernel', kernel_path,
++                         '-dtb', dtb_path,
++                         '-no-reboot')
++        self.vm.launch()
++        self.wait_for_console_pattern('Sash command shell (version 1.1.1=
+)')
++        self.exec_command_and_wait_for_pattern('printenv',
++                                               'TERM=3Dlinux')
 +
-+    sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
- }
-=20
- static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
- {
--    int dsp;
-     static const char sizes[][4] =3D {".b", ".w", ".l", ".uw", ".ub"};
-+    char dsp[8];
-+
-     if (ld < 3) {
--        switch (mi) {
--        case 4:
--            /* dsp[rs].ub */
--            dsp =3D rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
--            break;
--        case 3:
--            /* dsp[rs].uw */
--            dsp =3D rx_index_addr(ld, RX_MEMORY_WORD, ctx);
--            break;
--        default:
--            /* dsp[rs].b */
--            /* dsp[rs].w */
--            /* dsp[rs].l */
--            dsp =3D rx_index_addr(ld, mi, ctx);
--            break;
--        }
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]%s", rs, sizes[mi]);
-+        rx_index_addr(ctx, dsp, ld, mi);
-+        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
-     } else {
-         prt("r%d", rs);
-     }
-@@ -235,7 +228,7 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_r=
-a *a)
- /* mov.[bwl] rs,rd */
- static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
- {
--    int dsp;
-+    char dspd[8], dsps[8];
-=20
-     prt("mov.%c\t", size[a->sz]);
-     if (a->lds =3D=3D 3 && a->ldd =3D=3D 3) {
-@@ -244,29 +237,15 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV=
-_mm *a)
-         return true;
-     }
-     if (a->lds =3D=3D 3) {
--        prt("r%d, ", a->rd);
--        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rs);
-+        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-+        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
-     } else if (a->ldd =3D=3D 3) {
--        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d], r%d", a->rs, a->rd);
-+        rx_index_addr(ctx, dsps, a->lds, a->sz);
-+        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
-     } else {
--        dsp =3D rx_index_addr(a->lds, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d], ", a->rs);
--        dsp =3D rx_index_addr(a->ldd, a->sz, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rd);
-+        rx_index_addr(ctx, dsps, a->lds, a->sz);
-+        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-+        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
-     }
-     return true;
- }
-@@ -357,12 +336,10 @@ static bool trans_PUSH_r(DisasContext *ctx, arg_PUS=
-H_r *a)
- /* push dsp[rs] */
- static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
- {
--    prt("push\t");
--    int dsp =3D rx_index_addr(a->ld, a->sz, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d]", a->rs);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, a->sz);
-+    prt("push\t%s[r%d]", dsp, a->rs);
-     return true;
- }
-=20
-@@ -389,17 +366,13 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XC=
-HG_rr *a)
- /* xchg dsp[rs].<mi>,rd */
- static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
- {
--    int dsp;
-     static const char msize[][4] =3D {
-         "b", "w", "l", "ub", "uw",
-     };
-+    char dsp[8];
-=20
--    prt("xchg\t");
--    dsp =3D rx_index_addr(a->ld, a->mi, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
-+    rx_index_addr(ctx, dsp, a->ld, a->mi);
-+    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
-     return true;
- }
-=20
-@@ -552,13 +525,10 @@ static bool trans_ADC_rr(DisasContext *ctx, arg_ADC=
-_rr *a)
- /* adc dsp[rs], rd */
- static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
- {
--    int dsp;
--    prt("adc\t");
--    dsp =3D rx_index_addr(a->ld, 2, ctx);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[r%d], r%d", a->rs, a->rd);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, 2);
-+    prt("adc\t%s[r%d], r%d", dsp, a->rs, a->rd);
-     return true;
- }
-=20
-@@ -1217,25 +1187,17 @@ static bool trans_ITOF(DisasContext *ctx, arg_ITO=
-F *a)
-=20
- #define BOP_IM(name, reg)                                       \
-     do {                                                        \
--        int dsp;                                                \
--        prt("b%s\t#%d, ", #name, a->imm);                       \
--        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
--        if (dsp > 0) {                                          \
--            prt("%d", dsp);                                     \
--        }                                                       \
--        prt("[r%d]", reg);                                      \
-+        char dsp[8];                                            \
-+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-+        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg);      \
-         return true;                                            \
-     } while (0)
-=20
- #define BOP_RM(name)                                            \
-     do {                                                        \
--        int dsp;                                                \
--        prt("b%s\tr%d, ", #name, a->rd);                        \
--        dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
--        if (dsp > 0) {                                          \
--            prt("%d", dsp);                                     \
--        }                                                       \
--        prt("[r%d]", a->rs);                                    \
-+        char dsp[8];                                            \
-+        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-+        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs);     \
-         return true;                                            \
-     } while (0)
-=20
-@@ -1346,12 +1308,10 @@ static bool trans_BNOT_ir(DisasContext *ctx, arg_=
-BNOT_ir *a)
- /* bmcond #imm, dsp[rd] */
- static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
- {
--    int dsp =3D rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
--    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
--    if (dsp > 0) {
--        prt("%d", dsp);
--    }
--    prt("[%d]", a->rd);
-+    char dsp[8];
-+
-+    rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);
-+    prt("bm%s\t#%d, %s[r%d]", cond[a->cd], a->imm, dsp, a->rd);
-     return true;
- }
-=20
-@@ -1443,16 +1403,12 @@ static bool trans_WAIT(DisasContext *ctx, arg_WAI=
-T *a)
- /* sccnd.[bwl] dsp:[rd] */
- static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
- {
--    int dsp;
--    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
-     if (a->ld < 3) {
--        dsp =3D rx_index_addr(a->sz, a->ld, ctx);
--        if (dsp > 0) {
--            prt("%d", dsp);
--        }
--        prt("[r%d]", a->rd);
-+        char dsp[8];
-+        rx_index_addr(ctx, dsp, a->sz, a->ld);
-+        prt("sc%s.%c\t%s[r%d]", cond[a->cd], size[a->sz], dsp, a->rd);
-     } else {
--        prt("r%d", a->rd);
-+        prt("sc%s.%c\tr%d", cond[a->cd], size[a->sz], a->rd);
-     }
-     return true;
- }
 --=20
 2.20.1
 
