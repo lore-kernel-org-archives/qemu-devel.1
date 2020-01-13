@@ -2,96 +2,66 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CB4C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 19:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 089F7C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 19:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE7272080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 19:56:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+4VdLCB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7272080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D0CD82080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 19:58:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0CD82080D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir5pF-0003cm-UF
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 14:56:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43131)
+	id 1ir5qc-0004eW-2B
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 14:58:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1ir5ml-00084K-69
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 14:54:04 -0500
+ (envelope-from <groug@kaod.org>) id 1ir5pm-00047h-A7
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 14:57:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1ir5mk-0008Eo-1P
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 14:54:03 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25143
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ir5pk-0002TE-WF
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 14:57:10 -0500
+Received: from 14.mo1.mail-out.ovh.net ([178.32.97.215]:40185)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ir5mj-0008Ds-Pl
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 14:54:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578945241;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1j+mPe4cJIBJCBm9ZPogUyr+mteKp3lGBIfY0ZzH+Uk=;
- b=i+4VdLCBHo2NoZ2aH6MVAtXETqA+zMlFacPs7+5zsDjEZ4Bg3U9AHxtPBC9NTs9V6ucWbH
- OShsZuDNnmSzWGWA5XzxFR7VEaa+tgKxGGKosoybZPX9l7Zy4k7zFJUA5Xm307+e8qTcsA
- OolFDW1rtsW0Unwa9DqsL6SL2KIY79k=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-GSdYOkuwOUiGu1iKjDjgOQ-1; Mon, 13 Jan 2020 14:53:59 -0500
-Received: by mail-qk1-f198.google.com with SMTP id s9so6614952qkg.21
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 11:53:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=PoBP/FNDU8dSVutypfRBqxdZ4EzkLMcbKHU0J1nBkyM=;
- b=WW6DsIjKS6xJclYl7W0sU9qy+rAtTtnpThKR3rWpUev7AhShdTMoAKJ8CKKgH+bshr
- 9/TZtDNG6uIY9nBAAXyK3Mv8115xrLPb6bHk48oXmkkunTpm/cgCYbv6oKVsI1QKx4af
- +cVQO6szg0A61dtKnV80r2T/se6fa5+KD384pxXbDbstog5owVuZhWwpI0KFf4CmGmIB
- mxP1U+8ghuVWfZlwblKqjL513Aqqnf60mkdjxuxob23xPycnlpND+00wLWmtmM4Sz6up
- f0u7kum9kc2BLkbdvp7ckho+oiV08cku/FI5yMKdQ/giXrAlZqgKLtLBCeh7NDrlpOXD
- 8Tpw==
-X-Gm-Message-State: APjAAAWIZhf6blKIlbzkD0saoY1mOAh4PEXEumx57CwOamKpm73WHbKR
- RK3XIUOF/5VaYQAcYnLkZdsxq64NOdyktaBO1Tj5/ATZvQKuAa3LAcQUpSfarXXSd1xYP9tKBpm
- 0ncWGUmASyKpk1VI=
-X-Received: by 2002:a05:620a:1183:: with SMTP id
- b3mr17344630qkk.316.1578945239316; 
- Mon, 13 Jan 2020 11:53:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxNrdF/m6fliDIzCtLud96QunaVXiRHtXkR9SO9uW1PoFAmc8xlCyQoVbdifCgPjZFLdD4Sqg==
-X-Received: by 2002:a05:620a:1183:: with SMTP id
- b3mr17344610qkk.316.1578945239124; 
- Mon, 13 Jan 2020 11:53:59 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
- by smtp.gmail.com with ESMTPSA id d184sm5504762qkb.128.2020.01.13.11.53.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 11:53:58 -0800 (PST)
-Date: Mon, 13 Jan 2020 14:53:57 -0500
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH v12 02/13] virtio-iommu: Add skeleton
-Message-ID: <20200113195357.GB201624@xz-x1>
-References: <20200109144319.15912-1-eric.auger@redhat.com>
- <20200109144319.15912-3-eric.auger@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ir5pk-0002Rr-Q4
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 14:57:08 -0500
+Received: from player690.ha.ovh.net (unknown [10.109.143.209])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 844201A80DA
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 20:57:06 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player690.ha.ovh.net (Postfix) with ESMTPSA id 60868E0C300C;
+ Mon, 13 Jan 2020 19:57:00 +0000 (UTC)
+Date: Mon, 13 Jan 2020 20:56:58 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH v1 12/59] virtfs-proxy-helper.c: remove 'err_out' label
+ in setugid()
+Message-ID: <20200113205658.11fc5a78@bahia.lan>
+In-Reply-To: <c0bb2a92-7361-9ff3-42c2-022906b6dcad@vivier.eu>
+References: <20200106182425.20312-1-danielhb413@gmail.com>
+ <20200106182425.20312-13-danielhb413@gmail.com>
+ <20200107105113.7a443d51@bahia.lan>
+ <87wo9vxu9n.fsf@dusky.pond.sub.org>
+ <c0bb2a92-7361-9ff3-42c2-022906b6dcad@vivier.eu>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200109144319.15912-3-eric.auger@redhat.com>
-X-MC-Unique: GSdYOkuwOUiGu1iKjDjgOQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+X-Ovh-Tracer-Id: 14668786937680730584
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdejtddguddvlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 178.32.97.215
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,22 +73,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- jean-philippe@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- mst@redhat.com, eric.auger.pro@gmail.com
+Cc: qemu-trivial@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jan 09, 2020 at 03:43:08PM +0100, Eric Auger wrote:
-> This patchs adds the skeleton for the virtio-iommu device.
+On Mon, 13 Jan 2020 17:32:31 +0100
+Laurent Vivier <laurent@vivier.eu> wrote:
+
+> Le 13/01/2020 =C3=A0 16:15, Markus Armbruster a =C3=A9crit=C2=A0:
+> > Greg Kurz <groug@kaod.org> writes:
+> >=20
+> >> On Mon,  6 Jan 2020 15:23:38 -0300
+> >> Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
+> >>
+> >>> 'err_out' can be removed and be replaced by 'return -errno'
+> >>> in its only instance in the function.
+> >>>
+> >>> CC: Greg Kurz <groug@kaod.org>
+> >>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> >>> ---
+> >>
+> >> I don't really mind, but I confirm this doesn't change behavior.
+> >>
+> >> Acked-by: Greg Kurz <groug@kaod.org>
+> >>
+> >> What's the plan to get this and the other 9p related patches merged ?
+> >> Through the trivial tree or each subsystem tree ?
+> >=20
+> > I guess qemu-trivial will eventually pick up whatever hasn't been merged
+> > by maintainers.
+> >=20
+> > [...]
+> >=20
 >=20
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Yes, but the difficulty will be to sort which ones of the 59 patches
+> series to collect...
+>=20
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Ok, less work for you then. I've applied both 12/59 and 45/59 to 9p-next.
+I'm planning to send a PR later this week.
 
---=20
-Peter Xu
+> Thanks,
+> Laurent
+>=20
 
+Cheers,
+
+--
+Greg
 
