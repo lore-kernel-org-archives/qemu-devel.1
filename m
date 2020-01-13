@@ -2,75 +2,78 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3267FC33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F03C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:50:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 063AD207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:47:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063AD207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BB0A6207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:50:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ep8FlFS/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0A6207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir0zr-00086O-Rj
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 09:47:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43128)
+	id 1ir12a-0003dr-TB
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 09:50:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ir0yL-0007BB-DU
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:45:42 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ir11e-00034L-R2
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:49:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ir0yJ-0006Ht-V2
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:45:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37356)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ir0yJ-0006Gi-P7
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:45:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ir0yI-0007Op-F0
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:45:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6EEBC2E80C7
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:45:38 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 14:37:13 -0000
-From: Alex Longwall <1859384@bugs.launchpad.net>
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ir11c-0000Oy-GK
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:49:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22604
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1ir11c-0000Mq-9K
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:49:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578926943;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=z+3odn98lGZbn5vm1Ja+HRL/VbdKuBpWGFhaN0sKXIw=;
+ b=Ep8FlFS/aAxEZa/p3HH3kbB/uX/pIZpcT2sqKyapBqGv3PX0HJ9b0kmSsfZA5Spr+YqL67
+ LxSD1X5OwZBPxH7ieuEmGHA3JaqZM0GPn579LX/CQ2FqfDKi9XkE/VhJ/Pu4mbW58qiALm
+ AuvusD7xSa6pqvD4dK7vU/2WkcNODMQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-86u0fwzhNbaOw9NAA_AC0g-1; Mon, 13 Jan 2020 09:49:01 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F2FB10BFB67
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:49:00 +0000 (UTC)
+Received: from localhost (ovpn-112-66.ams2.redhat.com [10.36.112.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CD535DA70;
+ Mon, 13 Jan 2020 14:48:52 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gic
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
-X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
-References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-Message-Id: <157892623405.15184.16393008676700161325.malone@wampee.canonical.com>
-Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
- race condition in gic_acknowledge_irq
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: ce663be3410016848207cd42fac4899ee078dfcf
+Subject: [PATCH] console: make QMP screendump use coroutine
+Date: Mon, 13 Jan 2020 18:48:48 +0400
+Message-Id: <20200113144848.2168018-1-marcandre.lureau@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 86u0fwzhNbaOw9NAA_AC0g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,112 +82,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ armbru@redhat.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> about describing the expected versus actual behaviour you see.
+Thanks to the QMP coroutine support, the screendump handler can
+trigger a graphic_hw_update(), yield and let the main loop run until
+update is done. Then the handler is resumed, and the ppm_save() will
+write the screen image to disk in the coroutine context (thus
+non-blocking).
 
-Expected behavior:
+For now, HMP doesn't have coroutine support, so it remains potentially
+outdated or glitched.
 
-* core 0 (or 1) reads irqId (irqId becomes active/active-pending)
-* core 1 (or resp. 0) reads 1023
-* core 0 handles and deactivates the interrupt
+Fixes:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
 
-What I am getting instead:
+Based-on: <20200109183545.27452-2-kwolf@redhat.com>
 
-* core 0 reads irqId
-* core 1 also reads irqId
-* core 0 handles the interrupt, later deactivates it
-* core 1 attempts to handle the interrupt
+Cc: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qapi/ui.json    |  3 ++-
+ ui/console.c    | 35 +++++++++++++++++++++++++++--------
+ ui/trace-events |  2 +-
+ 3 files changed, 30 insertions(+), 10 deletions(-)
 
-In arm-gic.c, reads of GICC_IAR call gic_acknowledge_irq.
-gic_acknowledge_irq, in turn, calls gic_clear_pending (in
-gic_internal.h) which eventually evaluates GIC_DIST_TEST_MODEL, line 266
+diff --git a/qapi/ui.json b/qapi/ui.json
+index e04525d8b4..d941202f34 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -96,7 +96,8 @@
+ #
+ ##
+ { 'command': 'screendump',
+-  'data': {'filename': 'str', '*device': 'str', '*head': 'int'} }
++  'data': {'filename': 'str', '*device': 'str', '*head': 'int'},
++  'coroutine': true }
+=20
+ ##
+ # =3D=3D Spice
+diff --git a/ui/console.c b/ui/console.c
+index ac79d679f5..db184b473f 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -167,6 +167,7 @@ struct QemuConsole {
+     QEMUFIFO out_fifo;
+     uint8_t out_fifo_buf[16];
+     QEMUTimer *kbd_timer;
++    Coroutine *screendump_co;
+=20
+     QTAILQ_ENTRY(QemuConsole) next;
+ };
+@@ -194,7 +195,6 @@ static void dpy_refresh(DisplayState *s);
+ static DisplayState *get_alloc_displaystate(void);
+ static void text_console_update_cursor_timer(void);
+ static void text_console_update_cursor(void *opaque);
+-static bool ppm_save(int fd, DisplaySurface *ds, Error **errp);
+=20
+ static void gui_update(void *opaque)
+ {
+@@ -263,6 +263,9 @@ static void gui_setup_refresh(DisplayState *ds)
+=20
+ void graphic_hw_update_done(QemuConsole *con)
+ {
++    if (con && con->screendump_co) {
++        aio_co_wake(con->screendump_co);
++    }
+ }
+=20
+ void graphic_hw_update(QemuConsole *con)
+@@ -310,16 +313,16 @@ void graphic_hw_invalidate(QemuConsole *con)
+     }
+ }
+=20
+-static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
++static bool ppm_save(int fd, pixman_image_t *image, Error **errp)
+ {
+-    int width =3D pixman_image_get_width(ds->image);
+-    int height =3D pixman_image_get_height(ds->image);
++    int width =3D pixman_image_get_width(image);
++    int height =3D pixman_image_get_height(image);
+     g_autoptr(Object) ioc =3D OBJECT(qio_channel_file_new_fd(fd));
+     g_autofree char *header =3D NULL;
+     g_autoptr(pixman_image_t) linebuf =3D NULL;
+     int y;
+=20
+-    trace_ppm_save(fd, ds);
++    trace_ppm_save(fd, image);
+=20
+     header =3D g_strdup_printf("P6\n%d %d\n%d\n", width, height, 255);
+     if (qio_channel_write_all(QIO_CHANNEL(ioc),
+@@ -329,7 +332,7 @@ static bool ppm_save(int fd, DisplaySurface *ds, Error =
+**errp)
+=20
+     linebuf =3D qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, width);
+     for (y =3D 0; y < height; y++) {
+-        qemu_pixman_linebuf_fill(linebuf, ds->image, width, 0, y);
++        qemu_pixman_linebuf_fill(linebuf, image, width, 0, y);
+         if (qio_channel_write_all(QIO_CHANNEL(ioc),
+                                   (char *)pixman_image_get_data(linebuf),
+                                   pixman_image_get_stride(linebuf), errp) =
+< 0) {
+@@ -340,11 +343,18 @@ static bool ppm_save(int fd, DisplaySurface *ds, Erro=
+r **errp)
+     return true;
+ }
+=20
++static void graphic_hw_update_bh(void *con)
++{
++    graphic_hw_update(con);
++}
++
++/* may be called in coroutine context or not */
+ void qmp_screendump(const char *filename, bool has_device, const char *dev=
+ice,
+                     bool has_head, int64_t head, Error **errp)
+ {
+     QemuConsole *con;
+     DisplaySurface *surface;
++    g_autoptr(pixman_image_t) image =3D NULL;
+     int fd;
+=20
+     if (has_device) {
+@@ -365,7 +375,15 @@ void qmp_screendump(const char *filename, bool has_dev=
+ice, const char *device,
+         }
+     }
+=20
+-    graphic_hw_update(con);
++    if (qemu_in_coroutine()) {
++        assert(!con->screendump_co);
++        con->screendump_co =3D qemu_coroutine_self();
++        aio_bh_schedule_oneshot(qemu_get_aio_context(),
++                                graphic_hw_update_bh, con);
++        qemu_coroutine_yield();
++        con->screendump_co =3D NULL;
++    }
++
+     surface =3D qemu_console_surface(con);
+     if (!surface) {
+         error_setg(errp, "no surface");
+@@ -379,7 +397,8 @@ void qmp_screendump(const char *filename, bool has_devi=
+ce, const char *device,
+         return;
+     }
+=20
+-    if (!ppm_save(fd, surface, errp)) {
++    image =3D pixman_image_ref(surface->image);
++    if (!ppm_save(fd, image, errp)) {
+         qemu_unlink(filename);
+     }
+ }
+diff --git a/ui/trace-events b/ui/trace-events
+index 0dcda393c1..e8726fc969 100644
+--- a/ui/trace-events
++++ b/ui/trace-events
+@@ -15,7 +15,7 @@ displaysurface_create_pixman(void *display_surface) "surf=
+ace=3D%p"
+ displaysurface_free(void *display_surface) "surface=3D%p"
+ displaychangelistener_register(void *dcl, const char *name) "%p [ %s ]"
+ displaychangelistener_unregister(void *dcl, const char *name) "%p [ %s ]"
+-ppm_save(int fd, void *display_surface) "fd=3D%d surface=3D%p"
++ppm_save(int fd, void *image) "fd=3D%d image=3D%p"
+=20
+ # gtk.c
+ # gtk-gl-area.c
+--=20
+2.25.0.rc2.1.g09a9a1a997
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859384
-
-Title:
-  arm gic: interrupt model never 1 on non-mpcore and race condition in
-  gic_acknowledge_irq
-
-Status in QEMU:
-  New
-
-Bug description:
-  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
-  only one CPU can acknowledge the IRQ until it becomes inactive.
-
-  The TRM also mandates that SGIs and PPIs follow the N-N model and that
-  SPIs follow the 1-N model.
-
-  However this is not currently the case with QEMU. I have locally (no
-  minimal test case) seen e.g. uart interrupts being acknowledged twice
-  before having been deactivated (expected: irqId on one CPU and 1023 on
-  the other instead).
-
-  I have narrowed the issue down to the following:
-
-  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
-  means all IRQ will use the N-N model, and if s->revision !=3D
-  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
-
-  If ""fixed"" locally with a hackjob, I still have the following trace:
-
-  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
-  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
-=3D0xff
-  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
-  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
-  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
-  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
-  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
-  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
-  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
-  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
-=3D0xff
-  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
-  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
-  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
-  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
-21
-  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
-
-  This is because:
-
-  2) gic_acknowledge_irq calls gic_clear_pending which uses
-  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
-  sensitive interrupts.
-
-  With this often being a no-op (ie. assuming ispendr was not written
-  to), any 1-n level-sensitive interrupt is still improperly pending on
-  all the other cores.
-
-  (Also, I don't really know how the qemu thread model works, there
-  might be race conditions in the acknowledgment logic if
-  gic_acknowledge_irq is called by multiple threads, too.)
-
-  Option used:
-  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
--cpu cortex-a57 -smp 4 -m 1024
-  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
-get=3Dnative
-  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
-  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
-te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
-  -trace gic_set_irq
-
-  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
-  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
-  staging"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
 
