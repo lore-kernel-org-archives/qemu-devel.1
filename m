@@ -2,69 +2,69 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901F4C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 01:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E789C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 01:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CEFA2187F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 01:01:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CEFA2187F
+	by mail.kernel.org (Postfix) with ESMTPS id C5F7C2084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 01:56:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5F7C2084D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqo6r-0006Uo-HT
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 20:01:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41604)
+	id 1iqoxq-0007d0-RK
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 20:56:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iqo67-00064n-9j
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 20:00:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1iqoxC-00073E-Jl
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 20:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iqo64-0006D5-4W
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 20:00:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55990)
+ (envelope-from <bounces@canonical.com>) id 1iqoxA-0007f7-Bu
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 20:55:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60404)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iqo61-0005yt-6a
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 20:00:45 -0500
+ id 1iqox9-0007Qm-Ep
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 20:55:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iqo5x-0005QN-J5
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 01:00:41 +0000
+ id 1iqox6-0000Ln-6W
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 01:55:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 64B822E802B
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 01:00:41 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 2C9A12E80C0
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 01:55:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 00:48:47 -0000
-From: Benjamin David Lunt <1859378@bugs.launchpad.net>
+Date: Mon, 13 Jan 2020 01:42:18 -0000
+From: Alex Longwall <1859384@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm gic
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fysnet
-X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
-X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
-References: <157887453515.27484.18206056235819884101.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157887652722.5706.13027541162167379297.malone@gac.canonical.com>
-Subject: [Bug 1859378] Re: xhci Control Transfer requiring a Status TRB before
- starting transfer
+X-Launchpad-Bug-Commenters: alexlngw
+X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
+X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
+Message-Id: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
+Subject: [Bug 1859384] [NEW] arm gic: interrupt model never 1 on non-mpcore
+ and race condition in gic_acknowledge_irq
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: dcc1b2eeee7a1a8b9f824c66daa81d30281ac247
+X-Launchpad-Hash: 7f30d239642d87d7383baef69a0a76f7edfe9522
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -78,102 +78,334 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859378 <1859378@bugs.launchpad.net>
+Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just a little more information.
+Public bug reported:
 
-In section 4.11.2.2, page 159 of version 1.0 of the xHCI specification,
-it states:
+For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
+one CPU can acknowledge the IRQ until it becomes inactive.
 
-<start quote>
-=E2=80=A2 The xHC shall NOT check for the following Control transfer error =
-conditions.
-  =E2=80=A2 If a Data Stage TD follows a Setup Stage TD, where wLength =3D =
-=E2=80=980=E2=80=99.
-  =E2=80=A2 If a Status Stage TD does not follow a Setup Stage TD, where wL=
-ength =3D =E2=80=980=E2=80=99.
-  =E2=80=A2 If a Data Stage TD does not follow a Setup Stage TD, where wLen=
-gth > =E2=80=980=E2=80=9921.
-  =E2=80=A2 If the total size of the Data Stage TD is not equal to wLength.
-  =E2=80=A2 If the Data Stage TRB Direction (DIR) flag does not correspond =
-to the definition in Table 7.
-  =E2=80=A2 If the Status Stage TRB Direction (DIR) flag does not correspon=
-d to the definition in Table 7.
-=E2=80=A2 The xHC is NOT required to check for the following Control transf=
-er error conditions. =
+The TRM also mandates that SGIs and PPIs follow the N-N model and that
+SPIs follow the 1-N model.
 
-  If system software is properly designed these error conditions will never=
- occur. However =
+However this is not currently the case with QEMU. I have locally (no
+minimal test case) seen e.g. uart interrupts being acknowledged twice
+before having been deactivated (expected: irqId on one CPU and 1023 on
+the other instead).
 
-  if the xHC does check for these conditions it shall generate a Transfer E=
-vent for the TRB
-  that the error was detected on with the Completion Code set to TRB Error.
-  =E2=80=A2 If a Status Stage TD does not follow a Data Stage TD.
-  =E2=80=A2 If the Setup Stage TRB defines a Length not =3D 8.
-  =E2=80=A2 If the Status Stage TRB defines a Length > 0.
-<end quote>
+I have narrowed the issue down to the following:
 
-I take the first bullet in the second set as it is not required that the
-STATUS TRB be on the ring at this point in time.  However, if the
-controller (xHC) does check, it must place an event TRB on the Event
-ring indicating an error at the SETUP TRB.
+1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
+all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, then
+there's no way to set any interrupt to 1-N.
 
-Thank you for your time,
-Ben
+If ""fixed"" locally with a hackjob, I still have the following trace:
+
+pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x21
+pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+
+This is because:
+
+2) gic_acknowledge_irq calls gic_clear_pending which uses
+GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
+interrupts.
+
+With this often being a no-op (ie. assuming ispendr was not written to),
+any 1-n level-sensitive interrupt is still improperly pending on all the
+other cores.
+
+(Also, I don't really know how the qemu thread model works, there might
+be race conditions in the acknowledgment logic if gic_acknowledge_irq is
+called by multiple threads, too.)
+
+Option used:
+-nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 -c=
+pu cortex-a57 -smp 4 -m 1024
+-kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,targe=
+t=3Dnative
+-chardev stdio,id=3Duart -serial chardev:uart -monitor none
+-trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_state=
+ -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+-trace gic_set_irq
+
+Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+staging"
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: arm gic
+
+** Description changed:
+
+  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
+  one CPU can acknowledge the IRQ until it becomes inactive.
+  =
+
+  The TRM also mandates that SGIs and PPIs follow the N-N model and that
+  SPIs follow the 1-N model.
+  =
+
+  However this is not currently the case with QEMU. I have locally (no
+  minimal test case) seen e.g. uart interrupts being acknowledged twice
+  before having been deactivated (expected: irqId on one CPU and 1023 on
+  the other instead).
+  =
+
+  I have narrowed the issue down to the following:
+  =
+
+  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
+  all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, then
+  there's no way to set any interrupt to 1-N.
+  =
+
+  **If fixed locally** with a hackjob, I still have the following trace:
+  =
+
+  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+  =
+
+  This is because:
+  =
+
+  2) gic_acknowledge_irq calls gic_clear_pending which uses
+  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
+  interrupts.
+  =
+
+  With this often being a no-op (ie. assuming ispendr was not written to),
+  any 1-n level-sensitive interrupt is still improperly pending on all the
+  other cores.
+  =
+
+  (Also, I don't really know how the qemu thread model works, there might
+  be race conditions in the acknowledgment logic if gic_acknowledge_irq is
+  called by multiple threads, too.)
++ =
+
++ Option used:
++ -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
++ -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
++ -chardev stdio,id=3Duart -serial chardev:uart -monitor none
++ -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
++ -trace gic_set_irq
++ =
+
++ Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
++ tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
++ staging"
+
+** Description changed:
+
+  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
+  one CPU can acknowledge the IRQ until it becomes inactive.
+  =
+
+  The TRM also mandates that SGIs and PPIs follow the N-N model and that
+  SPIs follow the 1-N model.
+  =
+
+  However this is not currently the case with QEMU. I have locally (no
+  minimal test case) seen e.g. uart interrupts being acknowledged twice
+  before having been deactivated (expected: irqId on one CPU and 1023 on
+  the other instead).
+  =
+
+  I have narrowed the issue down to the following:
+  =
+
+  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
+  all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, then
+  there's no way to set any interrupt to 1-N.
+  =
+
+- **If fixed locally** with a hackjob, I still have the following trace:
++ If ""fixed"" locally with a hackjob, I still have the following trace:
+  =
+
+  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+  =
+
+  This is because:
+  =
+
+  2) gic_acknowledge_irq calls gic_clear_pending which uses
+  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
+  interrupts.
+  =
+
+  With this often being a no-op (ie. assuming ispendr was not written to),
+  any 1-n level-sensitive interrupt is still improperly pending on all the
+  other cores.
+  =
+
+  (Also, I don't really know how the qemu thread model works, there might
+  be race conditions in the acknowledgment logic if gic_acknowledge_irq is
+  called by multiple threads, too.)
+  =
+
+  Option used:
+  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
+  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
+  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+  -trace gic_set_irq
+  =
+
+  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+  staging"
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859378
+https://bugs.launchpad.net/bugs/1859384
 
 Title:
-  xhci Control Transfer requiring a Status TRB before starting transfer
+  arm gic: interrupt model never 1 on non-mpcore and race condition in
+  gic_acknowledge_irq
 
 Status in QEMU:
   New
 
 Bug description:
-  This may not necessarily be a bug, but more of a change.
+  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
+  only one CPU can acknowledge the IRQ until it becomes inactive.
 
-  A little background may need to be in order.
+  The TRM also mandates that SGIs and PPIs follow the N-N model and that
+  SPIs follow the 1-N model.
 
-  With all USB Control transfers, there is a SETUP transfer, zero or
-  more DATA transfers, and if successful, a STATUS transfer.  This
-  STATUS transfer is used to indicate to the recipient that the previous
-  transfers were successful.  For example, in a CONTROL IN transfer, the
-  host sends a SETUP packet to the device, receives zero or more DATA
-  packets, and then on successful transfer, the HOST sends the STATUS
-  packet indicating to the device that all was received.
+  However this is not currently the case with QEMU. I have locally (no
+  minimal test case) seen e.g. uart interrupts being acknowledged twice
+  before having been deactivated (expected: irqId on one CPU and 1023 on
+  the other instead).
 
-  If no DATA packets are received, the HOST is not to send a STATUS
-  packet.  This could be due to a STALL or other error.
+  I have narrowed the issue down to the following:
 
-  With this in mind, the STATUS transfer, in this case an xHCI STATUS
-  TRB, may not even be on the transfer ring yet.  The HOST software may
-  be waiting for a successful transfer before it submits the STATUS
-  transfer.
+  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
+  means all IRQ will use the N-N model, and if s->revision !=3D
+  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
 
-  However, if you look at the test at line 1701
-  (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-xhci.c#l1701),
-  the current code will not start the CONTROL transfer at all if it
-  doesn't see that STATUS TRB on the ring.
+  If ""fixed"" locally with a hackjob, I still have the following trace:
 
-  In my opinion, this is in error.  It is not required that a STATUS TRB
-  be on the ring to start the CONTROL transfer.  This STATUS TRB can be
-  placed on the ring after a successful SETUP and zero or more DATA
-  transfers followed by a ring to the door bell.  Then after a
-  successful transfer to this point, placing this STATUS TRB on the ring
-  and another ring to the door bell.
+  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
 
-  In my opinion, the check at line 1701 should be removed.
+  This is because:
 
-  Thank you,
-  Ben
+  2) gic_acknowledge_irq calls gic_clear_pending which uses
+  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
+  sensitive interrupts.
+
+  With this often being a no-op (ie. assuming ispendr was not written
+  to), any 1-n level-sensitive interrupt is still improperly pending on
+  all the other cores.
+
+  (Also, I don't really know how the qemu thread model works, there
+  might be race conditions in the acknowledgment logic if
+  gic_acknowledge_irq is called by multiple threads, too.)
+
+  Option used:
+  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
+  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
+  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+  -trace gic_set_irq
+
+  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+  staging"
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859378/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
 
