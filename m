@@ -2,89 +2,77 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,WEIRD_QUOTING autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE530C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B826C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:49:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9403F214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:45:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9A94214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:49:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oulD5rqT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9403F214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkFAX/dw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A94214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir020-0007Pi-LP
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:45:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52367)
+	id 1ir063-0001OC-OQ
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:49:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ir010-0006W0-8d
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:23 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ir05B-0000w1-BG
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:48:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ir00y-0005Rq-93
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:21 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52521)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ir00x-0005Nc-U3
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:20 -0500
-Received: by mail-wm1-x343.google.com with SMTP id p9so9734326wmc.2
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 05:44:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=FQFfo9viNmXyky02pGXY5z3GJAhI7QUcEauk9apOOf0=;
- b=oulD5rqTNKKNXk+Gzbe+tbK9C25oY4Njnrh55aqCn8ZEUm0L3Gp4X3rqdkCgQvVi7+
- qvOqpdDwoG0y8iW7Fq2CD7XauPP+W13dKnZVswAiRyHBBwH9j+SvTmtfv5TeHoUaSrS3
- nwFTYXv3TE79JXfen311yFWvsJqz4hZSKMpp4ofjHbq78M3FNgvi6Yeq5cSVML4gakz1
- KLdv481MTqpXHMOFpt7QLf54t+KjPwBenVUDsShXXxr11OrIPntqQofHHsKNReUVKPdm
- A5+Ve9x4ah87eH7OOIKYdVRQA2bQ5LW9vwZAogUTH/od1qDINZYDv3IZhquij7UAB0+G
- eHPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=FQFfo9viNmXyky02pGXY5z3GJAhI7QUcEauk9apOOf0=;
- b=c5Fow+jhFKbwwGHYwBHC/fEdtF+wnwKCfS4aI2YZ0I6Ah4JwCmQoch0z1vmFF2isZQ
- gnIqIDz4yhSQ184Wc/icK4ZrVfmoBpPNwbuupKaj5b4qmBaxlQzer0esRhDlq7zvR9Ek
- 5cuxnsUGv+MpQxYmsyIARMaoTg1DzURMYcETC+UqbOO+cb7MuRYh2eesLcNQFyvv407J
- tKhQoiHMIqXRjVeyqMO6o+1D4xUUJvV1Mkf+O3dcphWhX9ASj0T2YUvWdk2awDcwtXyC
- mS/IFKfOiOQg1cGMR6pgz7toTtMVsGAH7ke5XIc446/zP2/U3rJD7OJS1Li4NkpXTjxY
- 4MMQ==
-X-Gm-Message-State: APjAAAWGN4wnIXY5PsVDgedixryO3316M0nSxx9XIuSB976aaH46+qqY
- ghtKy5jEhmgIsHjMcxGH9kSkPg==
-X-Google-Smtp-Source: APXvYqzRtDk4v+xr15q6czX8tokDFwOQKncw6HJBcIzRfGezWNah7JynW/JZ5b6iWVzInGjplym83w==
-X-Received: by 2002:a1c:a584:: with SMTP id o126mr5928041wme.163.1578923058327; 
- Mon, 13 Jan 2020 05:44:18 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s16sm15144166wrn.78.2020.01.13.05.44.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 05:44:17 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 592CE1FF87;
- Mon, 13 Jan 2020 13:44:16 +0000 (GMT)
-References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Bug 1859384 <1859384@bugs.launchpad.net>
-Subject: Re: [Bug 1859384] [NEW] arm gic: interrupt model never 1 on
- non-mpcore and race condition in gic_acknowledge_irq
-In-reply-to: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-Date: Mon, 13 Jan 2020 13:44:16 +0000
-Message-ID: <87k15vo4i7.fsf@linaro.org>
+ (envelope-from <eric.auger@redhat.com>) id 1ir059-0004Jl-A2
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:48:41 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27933
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1ir059-0004Hq-5L
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:48:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578923318;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=2nLYxqRjAjhLdA0dSiWegmHjzWiG8+G3XINxJ6pfDmY=;
+ b=SkFAX/dwyk9WCA9Kpbvsy3W4TlYh0h6sqEP3KVPYYvsYayh6NlhxSasCnX6YZ/hK0RNVCW
+ wWfJyT0rLQ6guir2vgActMd9k0gpv6YM6sV5thOEDf8ut2hxzSopK4Orz7K2vIeYbnRL4t
+ hQfwX9XrwVmVk4JxVZTT9HAAp0igw50=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-1sSLB0PUOIOC-7CbAvUYpw-1; Mon, 13 Jan 2020 08:48:36 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1A84477;
+ Mon, 13 Jan 2020 13:48:35 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8D3F55DA76;
+ Mon, 13 Jan 2020 13:48:31 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ quintela@redhat.com
+Subject: [PATCH v7] migration: Support QLIST migration
+Date: Mon, 13 Jan 2020 14:48:23 +0100
+Message-Id: <20200113134823.29817-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 1sSLB0PUOIOC-7CbAvUYpw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,245 +84,471 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Support QLIST migration using the same principle as QTAILQ:
+94869d5c52 ("migration: migrate QTAILQ").
 
-Alex Longwall <1859384@bugs.launchpad.net> writes:
+The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
+The change mainly resides in QLIST RAW macros: QLIST_RAW_INSERT_HEAD
+and QLIST_RAW_REVERSE.
 
-> Public bug reported:
->
-> For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
-> one CPU can acknowledge the IRQ until it becomes inactive.
->
-> The TRM also mandates that SGIs and PPIs follow the N-N model and that
-> SPIs follow the 1-N model.
->
-> However this is not currently the case with QEMU. I have locally (no
-> minimal test case) seen e.g. uart interrupts being acknowledged twice
-> before having been deactivated (expected: irqId on one CPU and 1023 on
-> the other instead).
+Tests also are provided.
 
-You might find there is enough in kvm-unit-tests GIC tests already to
-build a test case for what you are seeing.
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
 
->
-> I have narrowed the issue down to the following:
->
-> 1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
-> all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, then
-> there's no way to set any interrupt to 1-N.
->
-> If ""fixed"" locally with a hackjob, I still have the following trace:
->
-> pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
-> gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
-=3D0xff
-> gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-> gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
-> gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
-> gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-> gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
-> gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
-> gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
-> pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
-> pl011_irq_state 2.000 pid=3D2424 level=3D0x0
-> gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
-=3D0xff
-> pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
-> pl011_irq_state 1.200 pid=3D2424 level=3D0x0
-> gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
-> gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
-21
-> pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
->
-> This is because:
->
-> 2) gic_acknowledge_irq calls gic_clear_pending which uses
-> GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
-> interrupts.
->
-> With this often being a no-op (ie. assuming ispendr was not written to),
-> any 1-n level-sensitive interrupt is still improperly pending on all the
-> other cores.
->
-> (Also, I don't really know how the qemu thread model works, there might
-> be race conditions in the acknowledgment logic if gic_acknowledge_irq is
-> called by multiple threads, too.)
+---
 
-All updates to the GIC internals should be protected by the BQL which
-applies to all mmio emulated devices.
+v6 -> v7:
+- initialize prev to avoid compile warning for the netbsd VM
+---
+ include/migration/vmstate.h |  21 +++++
+ include/qemu/queue.h        |  39 +++++++++
+ migration/trace-events      |   5 ++
+ migration/vmstate-types.c   |  70 +++++++++++++++
+ tests/test-vmstate.c        | 170 ++++++++++++++++++++++++++++++++++++
+ 5 files changed, 305 insertions(+)
 
->
-> Option used:
-> -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
--cpu cortex-a57 -smp 4 -m 1024
-> -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
-get=3Dnative
-> -chardev stdio,id=3Duart -serial chardev:uart -monitor none
-> -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
-te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
-> -trace gic_set_irq
->
-> Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
-> tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
-> staging"
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
->
-> ** Tags: arm gic
->
-> ** Description changed:
->
->   For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
->   one CPU can acknowledge the IRQ until it becomes inactive.
->=20=20=20
->   The TRM also mandates that SGIs and PPIs follow the N-N model and that
->   SPIs follow the 1-N model.
->=20=20=20
->   However this is not currently the case with QEMU. I have locally (no
->   minimal test case) seen e.g. uart interrupts being acknowledged twice
->   before having been deactivated (expected: irqId on one CPU and 1023 on
->   the other instead).
->=20=20=20
->   I have narrowed the issue down to the following:
->=20=20=20
->   1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
->   all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, t=
-hen
->   there's no way to set any interrupt to 1-N.
->=20=20=20
->   **If fixed locally** with a hackjob, I still have the following trace:
->=20=20=20
->   pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
->   gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff targ=
-et=3D0xff
->   gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
->   gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
->   gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
->   gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
->   gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
->   gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
->   gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
->   pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
->   pl011_irq_state 2.000 pid=3D2424 level=3D0x0
->   gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff targ=
-et=3D0xff
->   pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
->   pl011_irq_state 1.200 pid=3D2424 level=3D0x0
->   gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x=
-21
->   gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D=
-0x21
->   pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
->=20=20=20
->   This is because:
->=20=20=20
->   2) gic_acknowledge_irq calls gic_clear_pending which uses
->   GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
->   interrupts.
->=20=20=20
->   With this often being a no-op (ie. assuming ispendr was not written to),
->   any 1-n level-sensitive interrupt is still improperly pending on all the
->   other cores.
->=20=20=20
->   (Also, I don't really know how the qemu thread model works, there might
->   be race conditions in the acknowledgment logic if gic_acknowledge_irq is
->   called by multiple threads, too.)
-> +=20
-> + Option used:
-> + -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D=
-2 -cpu cortex-a57 -smp 4 -m 1024
-> + -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,t=
-arget=3Dnative
-> + -chardev stdio,id=3Duart -serial chardev:uart -monitor none
-> + -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_s=
-tate -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
-> + -trace gic_set_irq
-> +=20
-> + Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
-> + tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
-> + staging"
->
-> ** Description changed:
->
->   For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
->   one CPU can acknowledge the IRQ until it becomes inactive.
->=20=20=20
->   The TRM also mandates that SGIs and PPIs follow the N-N model and that
->   SPIs follow the 1-N model.
->=20=20=20
->   However this is not currently the case with QEMU. I have locally (no
->   minimal test case) seen e.g. uart interrupts being acknowledged twice
->   before having been deactivated (expected: irqId on one CPU and 1023 on
->   the other instead).
->=20=20=20
->   I have narrowed the issue down to the following:
->=20=20=20
->   1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
->   all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, t=
-hen
->   there's no way to set any interrupt to 1-N.
->=20=20=20
-> - **If fixed locally** with a hackjob, I still have the following trace:
-> + If ""fixed"" locally with a hackjob, I still have the following trace:
->=20=20=20
->   pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
->   gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff targ=
-et=3D0xff
->   gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
->   gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
->   gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
->   gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
->   gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
->   gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
->   gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
->   pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
->   pl011_irq_state 2.000 pid=3D2424 level=3D0x0
->   gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff targ=
-et=3D0xff
->   pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
->   pl011_irq_state 1.200 pid=3D2424 level=3D0x0
->   gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x=
-21
->   gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D=
-0x21
->   pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
->=20=20=20
->   This is because:
->=20=20=20
->   2) gic_acknowledge_irq calls gic_clear_pending which uses
->   GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
->   interrupts.
->=20=20=20
->   With this often being a no-op (ie. assuming ispendr was not written to),
->   any 1-n level-sensitive interrupt is still improperly pending on all the
->   other cores.
->=20=20=20
->   (Also, I don't really know how the qemu thread model works, there might
->   be race conditions in the acknowledgment logic if gic_acknowledge_irq is
->   called by multiple threads, too.)
->=20=20=20
->   Option used:
->   -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D=
-2 -cpu cortex-a57 -smp 4 -m 1024
->   -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,t=
-arget=3Dnative
->   -chardev stdio,id=3Duart -serial chardev:uart -monitor none
->   -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_s=
-tate -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
->   -trace gic_set_irq
->=20=20=20
->   Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
->   tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
->   staging"
-
-
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 4aef72c426..0dc04fc48e 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -229,6 +229,7 @@ extern const VMStateInfo vmstate_info_tmp;
+ extern const VMStateInfo vmstate_info_bitmap;
+ extern const VMStateInfo vmstate_info_qtailq;
+ extern const VMStateInfo vmstate_info_gtree;
++extern const VMStateInfo vmstate_info_qlist;
+=20
+ #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+ /*
+@@ -798,6 +799,26 @@ extern const VMStateInfo vmstate_info_gtree;
+     .offset       =3D offsetof(_state, _field),                           =
+       \
+ }
+=20
++/*
++ * For migrating a QLIST
++ * Target QLIST needs be properly initialized.
++ * _type: type of QLIST element
++ * _next: name of QLIST_ENTRY entry field in QLIST element
++ * _vmsd: VMSD for QLIST element
++ * size: size of QLIST element
++ * start: offset of QLIST_ENTRY in QTAILQ element
++ */
++#define VMSTATE_QLIST_V(_field, _state, _version, _vmsd, _type, _next)  \
++{                                                                        \
++    .name         =3D (stringify(_field)),                                =
+ \
++    .version_id   =3D (_version),                                         =
+ \
++    .vmsd         =3D &(_vmsd),                                           =
+ \
++    .size         =3D sizeof(_type),                                      =
+ \
++    .info         =3D &vmstate_info_qlist,                                =
+ \
++    .offset       =3D offsetof(_state, _field),                           =
+ \
++    .start        =3D offsetof(_type, _next),                             =
+ \
++}
++
+ /* _f : field name
+    _f_n : num of elements field_name
+    _n : num of elements
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 4764d93ea3..4d4554a7ce 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -501,4 +501,43 @@ union {                                               =
+                  \
+         QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm, e=
+ntry);  \
+ } while (/*CONSTCOND*/0)
+=20
++#define QLIST_RAW_FIRST(head)                                             =
+     \
++        field_at_offset(head, 0, void *)
++
++#define QLIST_RAW_NEXT(elm, entry)                                        =
+     \
++        field_at_offset(elm, entry, void *)
++
++#define QLIST_RAW_PREVIOUS(elm, entry)                                    =
+     \
++        field_at_offset(elm, entry + sizeof(void *), void *)
++
++#define QLIST_RAW_FOREACH(elm, head, entry)                               =
+     \
++        for ((elm) =3D *QLIST_RAW_FIRST(head);                            =
+       \
++             (elm);                                                       =
+     \
++             (elm) =3D *QLIST_RAW_NEXT(elm, entry))
++
++#define QLIST_RAW_INSERT_HEAD(head, elm, entry) do {                      =
+     \
++        void *first =3D *QLIST_RAW_FIRST(head);                           =
+       \
++        *QLIST_RAW_FIRST(head) =3D elm;                                   =
+       \
++        *QLIST_RAW_PREVIOUS(elm, entry) =3D QLIST_RAW_FIRST(head);        =
+       \
++        if (first) {                                                      =
+     \
++            *QLIST_RAW_NEXT(elm, entry) =3D first;                        =
+       \
++            *QLIST_RAW_PREVIOUS(first, entry) =3D QLIST_RAW_NEXT(elm, entr=
+y);    \
++        } else {                                                          =
+     \
++            *QLIST_RAW_NEXT(elm, entry) =3D NULL;                         =
+       \
++        }                                                                 =
+     \
++} while (0)
++
++#define QLIST_RAW_REVERSE(head, elm, entry) do {                          =
+     \
++        void *iter =3D *QLIST_RAW_FIRST(head), *prev =3D NULL, *next;     =
+         \
++        while (iter) {                                                    =
+     \
++            next =3D *QLIST_RAW_NEXT(iter, entry);                        =
+       \
++            *QLIST_RAW_PREVIOUS(iter, entry) =3D QLIST_RAW_NEXT(next, entr=
+y);    \
++            *QLIST_RAW_NEXT(iter, entry) =3D prev;                        =
+       \
++            prev =3D iter;                                                =
+       \
++            iter =3D next;                                                =
+       \
++        }                                                                 =
+     \
++        *QLIST_RAW_FIRST(head) =3D prev;                                  =
+       \
++        *QLIST_RAW_PREVIOUS(prev, entry) =3D QLIST_RAW_FIRST(head);       =
+       \
++} while (0)
++
+ #endif /* QEMU_SYS_QUEUE_H */
+diff --git a/migration/trace-events b/migration/trace-events
+index 6dee7b5389..e0a33cffca 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -76,6 +76,11 @@ get_gtree_end(const char *field_name, const char *key_vm=
+sd_name, const char *val
+ put_gtree(const char *field_name, const char *key_vmsd_name, const char *v=
+al_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=3D%d"
+ put_gtree_end(const char *field_name, const char *key_vmsd_name, const cha=
+r *val_vmsd_name, int ret) "%s(%s/%s) %d"
+=20
++get_qlist(const char *field_name, const char *vmsd_name, int version_id) "=
+%s(%s v%d)"
++get_qlist_end(const char *field_name, const char *vmsd_name) "%s(%s)"
++put_qlist(const char *field_name, const char *vmsd_name, int version_id) "=
+%s(%s v%d)"
++put_qlist_end(const char *field_name, const char *vmsd_name) "%s(%s)"
++
+ # qemu-file.c
+ qemu_file_fclose(void) ""
+=20
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index 7236cf92bc..1eee36773a 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -843,3 +843,73 @@ const VMStateInfo vmstate_info_gtree =3D {
+     .get  =3D get_gtree,
+     .put  =3D put_gtree,
+ };
++
++static int put_qlist(QEMUFile *f, void *pv, size_t unused_size,
++                     const VMStateField *field, QJSON *vmdesc)
++{
++    const VMStateDescription *vmsd =3D field->vmsd;
++    /* offset of the QTAILQ entry in a QTAILQ element*/
++    size_t entry_offset =3D field->start;
++    void *elm;
++    int ret;
++
++    trace_put_qlist(field->name, vmsd->name, vmsd->version_id);
++    QLIST_RAW_FOREACH(elm, pv, entry_offset) {
++        qemu_put_byte(f, true);
++        ret =3D vmstate_save_state(f, vmsd, elm, vmdesc);
++        if (ret) {
++            error_report("%s: failed to save %s (%d)", field->name,
++                         vmsd->name, ret);
++            return ret;
++        }
++    }
++    qemu_put_byte(f, false);
++    trace_put_qlist_end(field->name, vmsd->name);
++
++    return 0;
++}
++
++static int get_qlist(QEMUFile *f, void *pv, size_t unused_size,
++                     const VMStateField *field)
++{
++    int ret =3D 0;
++    const VMStateDescription *vmsd =3D field->vmsd;
++    /* size of a QLIST element */
++    size_t size =3D field->size;
++    /* offset of the QLIST entry in a QLIST element */
++    size_t entry_offset =3D field->start;
++    int version_id =3D field->version_id;
++    void *elm;
++
++    trace_get_qlist(field->name, vmsd->name, vmsd->version_id);
++    if (version_id > vmsd->version_id) {
++        error_report("%s %s",  vmsd->name, "too new");
++        return -EINVAL;
++    }
++    if (version_id < vmsd->minimum_version_id) {
++        error_report("%s %s",  vmsd->name, "too old");
++        return -EINVAL;
++    }
++
++    while (qemu_get_byte(f)) {
++        elm =3D g_malloc(size);
++        ret =3D vmstate_load_state(f, vmsd, elm, version_id);
++        if (ret) {
++            error_report("%s: failed to load %s (%d)", field->name,
++                         vmsd->name, ret);
++            g_free(elm);
++            return ret;
++        }
++        QLIST_RAW_INSERT_HEAD(pv, elm, entry_offset);
++    }
++    QLIST_RAW_REVERSE(pv, elm, entry_offset);
++    trace_get_qlist_end(field->name, vmsd->name);
++
++    return ret;
++}
++
++const VMStateInfo vmstate_info_qlist =3D {
++    .name =3D "qlist",
++    .get  =3D get_qlist,
++    .put  =3D put_qlist,
++};
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index 8f184f3556..cea363dd69 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -926,6 +926,28 @@ static const VMStateDescription vmstate_domain =3D {
+     }
+ };
+=20
++/* test QLIST Migration */
++
++typedef struct TestQListElement {
++    uint32_t  id;
++    QLIST_ENTRY(TestQListElement) next;
++} TestQListElement;
++
++typedef struct TestQListContainer {
++    uint32_t  id;
++    QLIST_HEAD(, TestQListElement) list;
++} TestQListContainer;
++
++static const VMStateDescription vmstate_qlist_element =3D {
++    .name =3D "test/queue list",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(id, TestQListElement),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_iommu =3D {
+     .name =3D "iommu",
+     .version_id =3D 1,
+@@ -939,6 +961,18 @@ static const VMStateDescription vmstate_iommu =3D {
+     }
+ };
+=20
++static const VMStateDescription vmstate_container =3D {
++    .name =3D "test/container/qlist",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(id, TestQListContainer),
++        VMSTATE_QLIST_V(list, TestQListContainer, 1, vmstate_qlist_element=
+,
++                        TestQListElement, next),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ uint8_t first_domain_dump[] =3D {
+     /* id */
+     0x00, 0x0, 0x0, 0x6,
+@@ -1229,6 +1263,140 @@ static void test_gtree_load_iommu(void)
+     qemu_fclose(fload);
+ }
+=20
++static uint8_t qlist_dump[] =3D {
++    0x00, 0x00, 0x00, 0x01, /* container id */
++    0x1, /* start of a */
++    0x00, 0x00, 0x00, 0x0a,
++    0x1, /* start of b */
++    0x00, 0x00, 0x0b, 0x00,
++    0x1, /* start of c */
++    0x00, 0x0c, 0x00, 0x00,
++    0x1, /* start of d */
++    0x0d, 0x00, 0x00, 0x00,
++    0x0, /* end of list */
++    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely *=
+/
++};
++
++static TestQListContainer *alloc_container(void)
++{
++    TestQListElement *a =3D g_malloc(sizeof(TestQListElement));
++    TestQListElement *b =3D g_malloc(sizeof(TestQListElement));
++    TestQListElement *c =3D g_malloc(sizeof(TestQListElement));
++    TestQListElement *d =3D g_malloc(sizeof(TestQListElement));
++    TestQListContainer *container =3D g_malloc(sizeof(TestQListContainer))=
+;
++
++    a->id =3D 0x0a;
++    b->id =3D 0x0b00;
++    c->id =3D 0xc0000;
++    d->id =3D 0xd000000;
++    container->id =3D 1;
++
++    QLIST_INIT(&container->list);
++    QLIST_INSERT_HEAD(&container->list, d, next);
++    QLIST_INSERT_HEAD(&container->list, c, next);
++    QLIST_INSERT_HEAD(&container->list, b, next);
++    QLIST_INSERT_HEAD(&container->list, a, next);
++    return container;
++}
++
++static void free_container(TestQListContainer *container)
++{
++    TestQListElement *iter, *tmp;
++
++    QLIST_FOREACH_SAFE(iter, &container->list, next, tmp) {
++        QLIST_REMOVE(iter, next);
++        g_free(iter);
++    }
++    g_free(container);
++}
++
++static void compare_containers(TestQListContainer *c1, TestQListContainer =
+*c2)
++{
++    TestQListElement *first_item_c1, *first_item_c2;
++
++    while (!QLIST_EMPTY(&c1->list)) {
++        first_item_c1 =3D QLIST_FIRST(&c1->list);
++        first_item_c2 =3D QLIST_FIRST(&c2->list);
++        assert(first_item_c2);
++        assert(first_item_c1->id =3D=3D first_item_c2->id);
++        QLIST_REMOVE(first_item_c1, next);
++        QLIST_REMOVE(first_item_c2, next);
++        g_free(first_item_c1);
++        g_free(first_item_c2);
++    }
++    assert(QLIST_EMPTY(&c2->list));
++}
++
++/*
++ * Check the prev & next fields are correct by doing list
++ * manipulations on the container. We will do that for both
++ * the source and the destination containers
++ */
++static void manipulate_container(TestQListContainer *c)
++{
++     TestQListElement *prev =3D NULL, *iter =3D QLIST_FIRST(&c->list);
++     TestQListElement *elem;
++
++     elem =3D g_malloc(sizeof(TestQListElement));
++     elem->id =3D 0x12;
++     QLIST_INSERT_AFTER(iter, elem, next);
++
++     elem =3D g_malloc(sizeof(TestQListElement));
++     elem->id =3D 0x13;
++     QLIST_INSERT_HEAD(&c->list, elem, next);
++
++     while (iter) {
++        prev =3D iter;
++        iter =3D QLIST_NEXT(iter, next);
++     }
++
++     elem =3D g_malloc(sizeof(TestQListElement));
++     elem->id =3D 0x14;
++     QLIST_INSERT_BEFORE(prev, elem, next);
++
++     elem =3D g_malloc(sizeof(TestQListElement));
++     elem->id =3D 0x15;
++     QLIST_INSERT_AFTER(prev, elem, next);
++
++     QLIST_REMOVE(prev, next);
++     g_free(prev);
++}
++
++static void test_save_qlist(void)
++{
++    TestQListContainer *container =3D alloc_container();
++
++    save_vmstate(&vmstate_container, container);
++    compare_vmstate(qlist_dump, sizeof(qlist_dump));
++    free_container(container);
++}
++
++static void test_load_qlist(void)
++{
++    QEMUFile *fsave, *fload;
++    TestQListContainer *orig_container =3D alloc_container();
++    TestQListContainer *dest_container =3D g_malloc0(sizeof(TestQListConta=
+iner));
++    char eof;
++
++    QLIST_INIT(&dest_container->list);
++
++    fsave =3D open_test_file(true);
++    qemu_put_buffer(fsave, qlist_dump, sizeof(qlist_dump));
++    g_assert(!qemu_file_get_error(fsave));
++    qemu_fclose(fsave);
++
++    fload =3D open_test_file(false);
++    vmstate_load_state(fload, &vmstate_container, dest_container, 1);
++    eof =3D qemu_get_byte(fload);
++    g_assert(!qemu_file_get_error(fload));
++    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
++    manipulate_container(orig_container);
++    manipulate_container(dest_container);
++    compare_containers(orig_container, dest_container);
++    free_container(orig_container);
++    free_container(dest_container);
++}
++
+ typedef struct TmpTestStruct {
+     TestStruct *parent;
+     int64_t diff;
+@@ -1353,6 +1521,8 @@ int main(int argc, char **argv)
+     g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_doma=
+in);
+     g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iommu=
+);
+     g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iommu=
+);
++    g_test_add_func("/vmstate/qlist/save/saveqlist", test_save_qlist);
++    g_test_add_func("/vmstate/qlist/load/loadqlist", test_load_qlist);
+     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
+     g_test_run();
+=20
 --=20
-Alex Benn=C3=A9e
+2.20.1
+
 
