@@ -2,81 +2,82 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38848C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FC2C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:28:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B28B214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:13:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B28B214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id E3D41207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:28:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZIPfbE3n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3D41207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqzWg-0002CE-5t
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:13:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44145)
+	id 1iqzlK-0008M5-U8
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:28:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46768)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iqzVl-0001dF-Ge
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:12:06 -0500
+ (envelope-from <berrange@redhat.com>) id 1iqzkA-0007gj-Mb
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:27:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iqzVj-0001nG-UY
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:12:05 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2059 helo=huawei.com)
+ (envelope-from <berrange@redhat.com>) id 1iqzk7-00052X-Uz
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:26:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58517
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1iqzVg-0001fF-Hb; Mon, 13 Jan 2020 08:12:00 -0500
-Received: from LHREML710-CAH.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id B463715E12985488EBCC;
- Mon, 13 Jan 2020 13:11:53 +0000 (GMT)
-Received: from lhreml707-chm.china.huawei.com (10.201.108.56) by
- LHREML710-CAH.china.huawei.com (10.201.108.33) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Mon, 13 Jan 2020 13:11:53 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml707-chm.china.huawei.com (10.201.108.56) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 13 Jan 2020 13:11:53 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Mon, 13 Jan 2020 13:11:53 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
-Thread-Topic: [PATCH 0/5] ARM virt: Add NVDIMM support
-Thread-Index: AQHVeswdQv2zL2ZjnU2+5S1CywnCCKdgnucAgAYn2ECANV3CUIAANK6AgAADjLCAARyUgIADW0wAgBGftACAAodbgIADcKzggCX7GsCABMMOAIAGBKlA
-Date: Mon, 13 Jan 2020 13:11:53 +0000
-Message-ID: <5db1e82970fc4e82a32e9ede4d8d40d0@huawei.com>
-References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
- <a133d4c4-3f60-2bb1-a7d7-35cdb06af265@redhat.com>
- <441c818f24084b4191315cf2a6267cef@huawei.com>
- <20191125164541.3f0a593f@redhat.com>
- <444efcb441fe42e5aff58b3af3ab14b4@huawei.com>
- <20191126095655.27227f59@redhat.com>
- <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
- <20191211085727.1ab9564e@redhat.com>
- <8562f82b7c0140d3ad0c7f6616cb6f28@huawei.com>
- <20200109181300.00238828@redhat.com>
-In-Reply-To: <20200109181300.00238828@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iqzk7-00051E-RC
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:26:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578922014;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=r/+G+4sctSzEM3QpekeTrS4Ek9B05Ijfx0vxZfjVpW4=;
+ b=ZIPfbE3n+LoSD7KXls0YoXG8csr+dVu+wrO/N6R3QqSCApNmvPcp35/2X3RQw7YwEQOHOR
+ 2sffcFWSRZNUMS5J94/+Q+NS5E1yFkWUnmBFW27zs/9ypLoGTphb+KjlTI74+CgCcFYJkv
+ wbnV5LEzX4nwTIqYJWdfeirfrBL6VcI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-qOSdPgHSMLWTs3RnSf8tWA-1; Mon, 13 Jan 2020 08:26:51 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D64A10054E3;
+ Mon, 13 Jan 2020 13:26:49 +0000 (UTC)
+Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0565B7E590;
+ Mon, 13 Jan 2020 13:26:34 +0000 (UTC)
+Date: Mon, 13 Jan 2020 13:26:32 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/28] Migration pull patches
+Message-ID: <20200113132632.GD4033206@redhat.com>
+References: <20200110173215.3865-1-quintela@redhat.com>
+ <CAFEAcA97ZqynDV6b6YUL_7iF=zsmB2Mwogi0k4ViAUAFTwsTnA@mail.gmail.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+In-Reply-To: <CAFEAcA97ZqynDV6b6YUL_7iF=zsmB2Mwogi0k4ViAUAFTwsTnA@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: qOSdPgHSMLWTs3RnSf8tWA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 185.176.76.210
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,103 +89,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "drjones@redhat.com" <drjones@redhat.com>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>, Auger Eric <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>, Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUWVtdS1kZXZlbA0KPiBb
-bWFpbHRvOnFlbXUtZGV2ZWwtYm91bmNlcytzaGFtZWVyYWxpLmtvbG90aHVtLnRob2RpPWh1YXdl
-aS5jb21Abm9uZ24NCj4gdS5vcmddIE9uIEJlaGFsZiBPZiBJZ29yIE1hbW1lZG92DQo+IFNlbnQ6
-IDA5IEphbnVhcnkgMjAyMCAxNzoxMw0KPiBUbzogU2hhbWVlcmFsaSBLb2xvdGh1bSBUaG9kaSA8
-c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29tPg0KPiBDYzogcGV0ZXIubWF5ZGVs
-bEBsaW5hcm8ub3JnOyBkcmpvbmVzQHJlZGhhdC5jb207DQo+IHhpYW9ndWFuZ3JvbmcuZXJpY0Bn
-bWFpbC5jb207IEF1Z2VyIEVyaWMgPGVyaWMuYXVnZXJAcmVkaGF0LmNvbT47DQo+IHFlbXUtZGV2
-ZWxAbm9uZ251Lm9yZzsgTGludXhhcm0gPGxpbnV4YXJtQGh1YXdlaS5jb20+Ow0KPiBzaGFubm9u
-LnpoYW9zbEBnbWFpbC5jb207IHFlbXUtYXJtQG5vbmdudS5vcmc7IHh1d2VpIChPKQ0KPiA8eHV3
-ZWk1QGh1YXdlaS5jb20+OyBKb25hdGhhbiBDYW1lcm9uDQo+IDxqb25hdGhhbi5jYW1lcm9uQGh1
-YXdlaS5jb20+OyBsZXJzZWtAcmVkaGF0LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDAvNV0g
-QVJNIHZpcnQ6IEFkZCBOVkRJTU0gc3VwcG9ydA0KPiANCj4gT24gTW9uLCA2IEphbiAyMDIwIDE3
-OjA2OjMyICswMDAwDQo+IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29s
-b3RodW0udGhvZGlAaHVhd2VpLmNvbT4gd3JvdGU6DQo+IA0KPiA+IEhpIElnb3IsDQoNClsuLi5d
-DQoNCj4gPiAoK0pvbmF0aGFuKQ0KPiA+DQo+ID4gVGhhbmtzIHRvIEpvbmF0aGFuIGZvciB0YWtp
-bmcgYSBmcmVzaCBsb29rIGF0IHRoaXMgaXNzdWUgYW5kIHNwb3R0aW5nIHRoaXMsDQo+ID4NCj4g
-aHR0cHM6Ly9lbGl4aXIuYm9vdGxpbi5jb20vbGludXgvdjUuNS1yYzUvc291cmNlL2RyaXZlcnMv
-YWNwaS9hY3BpY2EvdXRtaXNjLmMjTA0KPiAxMDkNCj4gPg0KPiA+IEFuZCwgZnJvbSBBQ1BJIDYu
-MywgdGFibGUgMTktNDE5DQo+ID4NCj4gPiAiSWYgdGhlIEJ1ZmZlciBGaWVsZCBpcyBzbWFsbGVy
-IHRoYW4gb3IgZXF1YWwgdG8gdGhlIHNpemUgb2YgYW4gSW50ZWdlciAoaW4gYml0cyksIGl0DQo+
-ID4gd2lsbCBiZSB0cmVhdGVkIGFzIGFuIEludGVnZXIuIE90aGVyd2lzZSwgaXQgd2lsbCBiZSB0
-cmVhdGVkIGFzIGEgQnVmZmVyLiBUaGUNCj4gc2l6ZQ0KPiA+IG9mIGFuIEludGVnZXIgaXMgaW5k
-aWNhdGVkIGJ5IHRoZSBEZWZpbml0aW9uIEJsb2NrIHRhYmxlIGhlYWRlcidzIFJldmlzaW9uIGZp
-ZWxkLg0KPiA+IEEgUmV2aXNpb24gZmllbGQgdmFsdWUgbGVzcyB0aGFuIDIgaW5kaWNhdGVzIHRo
-YXQgdGhlIHNpemUgb2YgYW4gSW50ZWdlciBpcyAzMg0KPiBiaXRzLg0KPiA+IEEgdmFsdWUgZ3Jl
-YXRlciB0aGFuIG9yIGVxdWFsIHRvIDIgc2lnbmlmaWVzIHRoYXQgdGhlIHNpemUgb2YgYW4gSW50
-ZWdlciBpcyA2NA0KPiBiaXRzLiINCj4gPg0KPiA+IEl0IGxvb2tzIGxpa2UgdGhlIG1haW4gcmVh
-c29uIGZvciB0aGUgZGlmZmVyZW5jZSBpbiBiZWhhdmlvciBvZiB0aGUgYnVmZmVyIG9iamVjdA0K
-PiA+IHNpemUgYmV0d2VlbiB4ODYgYW5kIEFSTS92aXJ0LCBpcyBiZWNhdXNlIG9mIHRoZSBSZXZp
-c2lvbiBudW1iZXIgdXNlZCBpbg0KPiB0aGUNCj4gPiBEU0RUIHRhYmxlLiBPbiB4ODYgaXQgaXMg
-MSBhbmQgQVJNL3ZpcnQgaXQgaXMgMi4NCj4gPg0KPiA+IFNvIG1vc3QgbGlrZWx5LA0KPiA+DQo+
-ID4gPiAgICAgQ3JlYXRlRmllbGQgKE9EQVQsIFplcm8sIExvY2FsMSwgT0JVRikNCj4gDQo+IFlv
-dSBhcmUgcmlnaHQsIHRoYXQncyB3aGVyZSBpdCBnb2VzIHdyb25nLCBzaW5jZSBPQlVGDQo+IGlz
-IGltcGxpY2l0bHkgY29udmVydGVkIHRvIGludGVnZXIgaWYgc2l6ZSBpcyBsZXNzIHRoYW4gNjRi
-aXRzLg0KPiANCj4gPiA+ICAgICBDb25jYXRlbmF0ZSAoQnVmZmVyIChaZXJvKXt9LCBPQlVGLCBM
-b2NhbDcpDQo+IA0KPiBzZWUgbW9yZSBiZWxvdw0KPiANCj4gWy4uLl0NCj4gDQo+ID4NCj4gPiBk
-aWZmIC0tZ2l0IGEvaHcvYWNwaS9udmRpbW0uYyBiL2h3L2FjcGkvbnZkaW1tLmMNCj4gPiBpbmRl
-eCA2NGVhY2ZhZDA4Li42MjFmOWZmZDQxIDEwMDY0NA0KPiA+IC0tLSBhL2h3L2FjcGkvbnZkaW1t
-LmMNCj4gPiArKysgYi9ody9hY3BpL252ZGltbS5jDQo+ID4gQEAgLTExOTIsMTUgKzExOTIsMTgg
-QEAgc3RhdGljIHZvaWQgbnZkaW1tX2J1aWxkX2ZpdChBbWwgKmRldikNCj4gPiDCoCDCoCDCoGFt
-bF9hcHBlbmQobWV0aG9kLCBpZmN0eCk7DQo+ID4NCj4gPiDCoCDCoCDCoGFtbF9hcHBlbmQobWV0
-aG9kLCBhbWxfc3RvcmUoYW1sX3NpemVvZihidWYpLCBidWZfc2l6ZSkpOw0KPiA+IC0gwqAgwqBh
-bWxfYXBwZW5kKG1ldGhvZCwgYW1sX3N1YnRyYWN0KGJ1Zl9zaXplLA0KPiA+IC0gwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqBhbWxfaW50KDQpIC8q
-IHRoZSBzaXplIG9mDQo+ICJTVEFVIiAqLywNCj4gPiAtIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgYnVmX3NpemUpKTsNCj4gPg0KPiA+IMKgIMKg
-IMKgLyogaWYgd2UgcmVhZCB0aGUgZW5kIG9mIGZpdC4gKi8NCj4gPiAtIMKgIMKgaWZjdHggPSBh
-bWxfaWYoYW1sX2VxdWFsKGJ1Zl9zaXplLCBhbWxfaW50KDApKSk7DQo+ID4gKyDCoCDCoGlmY3R4
-ID0gYW1sX2lmKGFtbF9lcXVhbChhbWxfc3VidHJhY3QoYnVmX3NpemUsDQo+ID4gKyDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBhbWxfc2l6ZW9mKGFtbF9pbnQoMCkp
-LCBOVUxMKSwNCj4gPiArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IGFtbF9pbnQoMCkpKTsNCj4gPiDCoCDCoCDCoGFtbF9hcHBlbmQoaWZjdHgsIGFtbF9yZXR1cm4o
-YW1sX2J1ZmZlcigwLCBOVUxMKSkpOw0KPiA+IMKgIMKgIMKgYW1sX2FwcGVuZChtZXRob2QsIGlm
-Y3R4KTsNCj4gPg0KPiA+ICsgwqAgwqBhbWxfYXBwZW5kKG1ldGhvZCwgYW1sX3N1YnRyYWN0KGJ1
-Zl9zaXplLA0KPiA+ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqBhbWxfaW50KDQpIC8qIHRoZSBzaXplIG9mDQo+ICJTVEFVIiAqLywNCj4gPiAr
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgYnVm
-X3NpemUpKTsNCj4gPiArDQo+ID4gwqAgwqAgwqBhbWxfYXBwZW5kKG1ldGhvZCwgYW1sX2NyZWF0
-ZV9maWVsZChidWYsDQo+ID4gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqBhbWxfaW50KDQgKiBCSVRTX1BFUl9CWVRFKSwgLyogb2Zmc2V0DQo+IGF0IGJ5dGUgNC4q
-Lw0KPiA+IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgYW1sX3No
-aWZ0bGVmdChidWZfc2l6ZSwgYW1sX2ludCgzKSksDQo+ICJCVUZGIikpOw0KPiANCj4gSW5zdGVh
-ZCBvZiBjb3ZlcmluZyB1cCBlcnJvciBpbiBOQ0FMLCBJJ2QgcHJlZmVyIG9yaWdpbmFsIGlzc3Vl
-IGZpeGVkLg0KPiBIb3cgYWJvdXQgc29tZXRoaW5nIGxpa2UgdGhpcyBwc2V1ZG9jb2RlOg0KPiAN
-Cj4gICAgICAgICAgICAgICAgIE5URkkgPSBMb2NhbDYNCj4gICAgICAgICAgICAgICAgIExvY2Fs
-MSA9IChSTEVOIC0gMHgwNCkNCj4gLSAgICAgICAgICAgICAgICBMb2NhbDEgPSAoTG9jYWwxIDw8
-IDB4MDMpDQo+IC0gICAgICAgICAgICAgICAgQ3JlYXRlRmllbGQgKE9EQVQsIFplcm8sIExvY2Fs
-MSwgT0JVRikNCj4gLSAgICAgICAgICAgICAgICBDb25jYXRlbmF0ZSAoQnVmZmVyIChaZXJvKSB7
-fSwgT0JVRiwgTG9jYWw3KQ0KPiANCj4gICAgICAgICAgICAgICAgIElmIChMb2NhbDEgPCBJbnRl
-Z2VyU2l6ZSkNCj4gICAgICAgICAgICAgICAgIHsNCj4gICAgICAgICAgICAgICAgICAgICBMb2Nh
-bDcgPSBCdWZmZXIoMCkgLy8gb3V0cHV0IGJ1ZmZlcg0KPiAgICAgICAgICAgICAgICAgICAgIExv
-Y2FsOCA9IDAgLy8gaW5kZXggZm9yIGJlaW5nIGNvcGllZCBieXRlDQo+ICAgICAgICAgICAgICAg
-ICAgICAgLy8gYnVpbGQgYnl0ZSBieSBieXRlIG91dHB1dCBidWZmZXINCj4gICAgICAgICAgICAg
-ICAgICAgICB3aGlsZSAoTG9jYWw4IDwgTG9jYWwxKSB7DQo+ICAgICAgICAgICAgICAgICAgICAg
-ICAgTG9jYWw5ID0gQnVmZmVyKDEpDQo+ICAgICAgICAgICAgICAgICAgICAgICAgLy8gY29weSAx
-IGJ5dGUgYXQgTG9jYWw4IG9mZnNldCBmcm9tIE9EQVQgdG8NCj4gdGVtcG9yYXJ5IGJ1ZmZlciBM
-b2NhbDkNCj4gICAgICAgICAgICAgICAgICAgICAgICBTdG9yZShEZVJlZihJbmRleChPREFULCBM
-b2NhbDgpKSwgSW5kZXgoTG9jYWw5LA0KPiAwKSkNCj4gICAgICAgICAgICAgICAgICAgICAgICBD
-b25jYXRlbmF0ZSAoTG9jYWw3LCBMb2NhbDksIExvY2FsNykNCj4gICAgICAgICAgICAgICAgICAg
-ICAgICBJbmNyZW1lbnQoTG9jYWw4KQ0KPiAgICAgICAgICAgICAgICAgICAgIH0NCj4gICAgICAg
-ICAgICAgICAgICAgICByZXR1cm4gTG9jYWw3DQo+ICAgICAgICAgICAgICAgICB9IGVsc2Ugew0K
-PiAgICAgICAgICAgICAgICAgICAgIENyZWF0ZUZpZWxkIChPREFULCBaZXJvLCBMb2NhbDEsIE9C
-VUYpDQo+ICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIE9CVUYNCj4gICAgICAgICAgICAgICAg
-IH0NCj4gDQoNCk9rLiBUaGlzIGxvb2tzIG11Y2ggYmV0dGVyLiBJIHdpbGwgdGVzdCB0aGlzIGFu
-ZCBzZW50IG91dCBhIHYyIHNvb24gYWRkcmVzc2luZyBvdGhlcg0KY29tbWVudHMgb24gdGhpcyBz
-ZXJpZXMgYXMgd2VsbC4NCg0KVGhhbmtzLA0KU2hhbWVlcg0K
+On Mon, Jan 13, 2020 at 01:05:22PM +0000, Peter Maydell wrote:
+> On Fri, 10 Jan 2020 at 17:32, Juan Quintela <quintela@redhat.com> wrote:
+> >
+> > The following changes since commit f38a71b01f839c7b65ea73ddd507903cb948=
+9ed6:
+> >
+> >   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-and-s=
+emihosting-090120-2' into staging (2020-01-10 13:19:34 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/juanquintela/qemu.git tags/migration-pull-pull-req=
+uest
+> >
+> > for you to fetch changes up to cc708d2411d3ed2ab4a428c996b778c7c7a47a04=
+:
+> >
+> >   apic: Use 32bit APIC ID for migration instance ID (2020-01-10 18:19:1=
+8 +0100)
+> >
+
+[snip]
+
+> I also saw this on aarch32 host (more precisely, on the
+> aarch32-environment-in-aarch64-chroot setup I use for aarch32 build
+> and test):
+>=20
+> malloc_consolidate(): invalid chunk size
+> Broken pipe
+> qemu-system-i386: check_section_footer: Read section footer failed: -5
+> qemu-system-i386: load of migration failed: Invalid argument
+> /home/peter.maydell/qemu/tests/libqtest.c:140: kill_qemu() tried to
+> terminate QEMU process but encountered exit status 1 (expected 0)
+> Aborted
+> ERROR - too few tests run (expected 14, got 13)
+>=20
+> The memory corruption is reproducible running just the
+> /x86_64/migration/multifd/tcp subtest:
+>=20
+> (armhf)pmaydell@mustang-maydell:~/qemu/build/all-a32$
+> QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64
+> tests/migration-test -p /x86_64/migration/multifd/tcp
+> /x86_64/migration/multifd/tcp: qemu-system-x86_64: -accel kvm: invalid
+> accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> qemu-system-x86_64: -accel kvm: invalid accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> qemu-system-x86_64: multifd_send_sync_main: multifd_send_pages fail
+> qemu-system-x86_64: failed to save SaveStateEntry with id(name): 3(ram)
+> double free or corruption (!prev)
+> Broken pipe
+> qemu-system-x86_64: Unknown combination of migration flags: 0
+> qemu-system-x86_64: error while loading state section id 3(ram)
+> qemu-system-x86_64: load of migration failed: Invalid argument
+> /home/peter.maydell/qemu/tests/libqtest.c:140: kill_qemu() tried to
+> terminate QEMU process but encountered exit status 1 (expected 0)
+> Aborted
+>=20
+> Here's what a valgrind run in that aarch32 setup produces:
+>=20
+> (armhf)pmaydell@mustang-maydell:~/qemu/build/all-a32$
+> QTEST_QEMU_BINARY=3D'valgrind --smc-check=3Dall-non-file
+> x86_64-softmmu/qemu-system-x86_64' tests/migration-test -p
+> /x86_64/migration/multifd/tcp
+> /x86_64/migration/multifd/tcp: =3D=3D12102=3D=3D Memcheck, a memory error=
+ detector
+> =3D=3D12102=3D=3D Copyright (C) 2002-2017, and GNU GPL'd, by Julian Sewar=
+d et al.
+> =3D=3D12102=3D=3D Using Valgrind-3.13.0 and LibVEX; rerun with -h for cop=
+yright info
+> =3D=3D12102=3D=3D Command: x86_64-softmmu/qemu-system-x86_64 -qtest
+> unix:/tmp/qtest-12100.sock -qtest-log /dev/null -chardev
+> socket,path=3D/tmp/qtest-12100.qmp,id=3Dchar0 -mon
+> chardev=3Dchar0,mode=3Dcontrol -display none -accel kvm -accel tcg -name
+> source,debug-threads=3Don -m 150M -serial
+> file:/tmp/migration-test-UlotFX/src_serial -drive
+> file=3D/tmp/migration-test-UlotFX/bootsect,format=3Draw -accel qtest
+> =3D=3D12102=3D=3D
+> qemu-system-x86_64: -accel kvm: invalid accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> =3D=3D12108=3D=3D Memcheck, a memory error detector
+> =3D=3D12108=3D=3D Copyright (C) 2002-2017, and GNU GPL'd, by Julian Sewar=
+d et al.
+> =3D=3D12108=3D=3D Using Valgrind-3.13.0 and LibVEX; rerun with -h for cop=
+yright info
+> =3D=3D12108=3D=3D Command: x86_64-softmmu/qemu-system-x86_64 -qtest
+> unix:/tmp/qtest-12100.sock -qtest-log /dev/null -chardev
+> socket,path=3D/tmp/qtest-12100.qmp,id=3Dchar0 -mon
+> chardev=3Dchar0,mode=3Dcontrol -display none -accel kvm -accel tcg -name
+> target,debug-threads=3Don -m 150M -serial
+> file:/tmp/migration-test-UlotFX/dest_serial -incoming defer -drive
+> file=3D/tmp/migration-test-UlotFX/bootsect,format=3Draw -accel qtest
+> =3D=3D12108=3D=3D
+> qemu-system-x86_64: -accel kvm: invalid accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> =3D=3D12102=3D=3D Thread 22 multifdsend_15:
+> =3D=3D12102=3D=3D Syscall param sendmsg(msg.msg_iov[0]) points to uniniti=
+alised byte(s)
+> =3D=3D12102=3D=3D    at 0x53C7F06: __libc_do_syscall (libc-do-syscall.S:4=
+7)
+> =3D=3D12102=3D=3D    by 0x53C6FCB: sendmsg (sendmsg.c:28)
+> =3D=3D12102=3D=3D    by 0x51B9A9: qio_channel_socket_writev (channel-sock=
+et.c:561)
+> =3D=3D12102=3D=3D    by 0x519FCD: qio_channel_writev (channel.c:207)
+> =3D=3D12102=3D=3D    by 0x519FCD: qio_channel_writev_all (channel.c:171)
+> =3D=3D12102=3D=3D    by 0x51A047: qio_channel_write_all (channel.c:257)
+> =3D=3D12102=3D=3D    by 0x25CB17: multifd_send_initial_packet (ram.c:714)
+> =3D=3D12102=3D=3D    by 0x25CB17: multifd_send_thread (ram.c:1136)
+> =3D=3D12102=3D=3D    by 0x557551: qemu_thread_start (qemu-thread-posix.c:=
+519)
+> =3D=3D12102=3D=3D    by 0x53BE613: start_thread (pthread_create.c:463)
+> =3D=3D12102=3D=3D    by 0x54767FB: ??? (clone.S:73)
+> =3D=3D12102=3D=3D  Address 0x262103fd is on thread 22's stack
+> =3D=3D12102=3D=3D  in frame #5, created by multifd_send_thread (ram.c:112=
+7)
+
+Missing initialization of     MultiFDInit_t msg; to all zeros
+
+> =3D=3D12102=3D=3D
+> =3D=3D12102=3D=3D Thread 6 multifdsend_1:
+> =3D=3D12102=3D=3D Invalid write of size 4
+> =3D=3D12102=3D=3D    at 0x25CC08: multifd_send_fill_packet (ram.c:806)
+> =3D=3D12102=3D=3D    by 0x25CC08: multifd_send_thread (ram.c:1157)
+> =3D=3D12102=3D=3D    by 0x557551: qemu_thread_start (qemu-thread-posix.c:=
+519)
+> =3D=3D12102=3D=3D    by 0x53BE613: start_thread (pthread_create.c:463)
+> =3D=3D12102=3D=3D    by 0x54767FB: ??? (clone.S:73)
+> =3D=3D12102=3D=3D  Address 0x1d89c470 is 0 bytes after a block of size 83=
+2 alloc'd
+> =3D=3D12102=3D=3D    at 0x4841BC4: calloc (vg_replace_malloc.c:711)
+> =3D=3D12102=3D=3D    by 0x49EE269: g_malloc0 (in
+> /usr/lib/arm-linux-gnueabihf/libglib-2.0.so.0.5600.4)
+
+This is the same issue that was reported last time this mulitfd unit
+test was proposed for merge. Back then I pointed out the likely cause.
+We were allocating  ram_addr_t sized quantity for an array which is
+uint64_t, and ram_addr_t is probably 32-bit on this particular build.
+
+  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03428.html
+
+That suggested fix doesn't seem to have been included
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
