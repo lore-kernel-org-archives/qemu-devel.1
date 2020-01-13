@@ -2,84 +2,56 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D2FC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5255AC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC449214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:07:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdcHOC0O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC449214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 25CF0214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:09:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25CF0214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir2Fe-0004wS-PR
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:07:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43273)
+	id 1ir2HX-0006Af-7P
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:09:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44189)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ir2EO-0003z3-TK
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:06:21 -0500
+ (envelope-from <no-reply@patchew.org>) id 1ir2Gr-0005eH-CL
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:08:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ir2EJ-00045w-Kl
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:06:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40516
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ir2EJ-00042u-GC
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:06:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578931574;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=DZrEM7aklK4LD47Ic4drvMCGLz421cRHJ4vCT0VgPSA=;
- b=ZdcHOC0OrA21mJw0VAOAJVPaKfOvL0EL1K/KrmFsfusr9AEO8UsxTcbcbeCoR4ff/fPD5R
- hmbASkz5sTr0yAPO0/l4Ij/SP6DBMOP0CzlzJH4E2uIG4Y9zbHtjB90QnJtepJeaI5HHDD
- GIr8njUOtG9dVBL7jONeE4JOym2jUR8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-afxEuU8DPUGa-UHkJou5cQ-1; Mon, 13 Jan 2020 11:06:13 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4185E10239A6;
- Mon, 13 Jan 2020 16:06:12 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-87.ams2.redhat.com [10.36.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8697E19756;
- Mon, 13 Jan 2020 16:06:11 +0000 (UTC)
-Subject: Re: [PATCH v1 41/59] intc/s390_flic_kvm.c: remove unneeded label in
- kvm_flic_load()
-To: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-42-danielhb413@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <960983b9-1719-7d07-96cb-9f4663a598e8@redhat.com>
-Date: Mon, 13 Jan 2020 17:06:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1ir2Gp-0000pD-I2
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:08:53 -0500
+Resent-Date: Mon, 13 Jan 2020 11:08:53 -0500
+Resent-Message-Id: <E1ir2Gp-0000pD-I2@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21124)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1ir2Gp-0000YY-8i
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:08:51 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1578931688170101.97653427304533;
+ Mon, 13 Jan 2020 08:08:08 -0800 (PST)
+In-Reply-To: <20200113144228.16660-1-minyard@acm.org>
+Subject: Re: [PATCH] i386:acpi: Remove _HID from the SMBus ACPI entry
+Message-ID: <157893168692.17824.3814038838172025698@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20200106182425.20312-42-danielhb413@gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: afxEuU8DPUGa-UHkJou5cQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: minyard@acm.org
+Date: Mon, 13 Jan 2020 08:08:08 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,63 +63,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, cminyard@mvista.com, mst@redhat.com,
+ qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, imammedo@redhat.com,
+ wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/01/2020 19.24, Daniel Henrique Barboza wrote:
-> 'out' label can be replaced by 'return' with the apropriate
-
-s/apropriate/appropriate/
-
-> value that is set by 'r' right before the jump.
-> 
-> Christian Borntraeger <borntraeger@de.ibm.com>
-
-Missing "Cc:" ? With this line and the typo removed/fixed:
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/intc/s390_flic_kvm.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-> index dddd33ea61..2e1e70c61d 100644
-> --- a/hw/intc/s390_flic_kvm.c
-> +++ b/hw/intc/s390_flic_kvm.c
-> @@ -439,17 +439,14 @@ static int kvm_flic_load(QEMUFile *f, void *opaque, size_t size,
->      count = qemu_get_be64(f);
->      len = count * sizeof(struct kvm_s390_irq);
->      if (count == FLIC_FAILED) {
-> -        r = -EINVAL;
-> -        goto out;
-> +        return -EINVAL;
->      }
->      if (count == 0) {
-> -        r = 0;
-> -        goto out;
-> +        return 0;
->      }
->      buf = g_try_malloc0(len);
->      if (!buf) {
-> -        r = -ENOMEM;
-> -        goto out;
-> +        return -ENOMEM;
->      }
->  
->      if (qemu_get_buffer(f, (uint8_t *) buf, len) != len) {
-> @@ -460,7 +457,6 @@ static int kvm_flic_load(QEMUFile *f, void *opaque, size_t size,
->  
->  out_free:
->      g_free(buf);
-> -out:
->      return r;
->  }
->  
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDExMzE0NDIyOC4xNjY2
+MC0xLW1pbnlhcmRAYWNtLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tl
+ci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1h
+bmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQs
+IHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdP
+Uks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVc2luZyBleHBlY3RlZCBmaWxlICd0
+ZXN0cy9kYXRhL2FjcGkvcTM1L0RTRFQuYWNwaWhtYXQnCmFjcGktdGVzdDogV2FybmluZyEgRFNE
+VCBiaW5hcnkgZmlsZSBtaXNtYXRjaC4gQWN0dWFsIFthbWw6L3RtcC9hbWwtUEpIR0UwXSwgRXhw
+ZWN0ZWQgW2FtbDp0ZXN0cy9kYXRhL2FjcGkvcTM1L0RTRFQuYWNwaWhtYXRdLgp0byBzZWUgQVNM
+IGRpZmYgYmV0d2VlbiBtaXNtYXRjaGVkIGZpbGVzIGluc3RhbGwgSUFTTCwgcmVidWlsZCBRRU1V
+IGZyb20gc2NyYXRjaCBhbmQgcmUtcnVuIHRlc3RzIHdpdGggVj0xIGVudmlyb25tZW50IHZhcmlh
+YmxlIHNldCoqCkVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9xdGVzdC9iaW9zLXRhYmxl
+cy10ZXN0LmM6NDc3OnRlc3RfYWNwaV9hc2w6IGFzc2VydGlvbiBmYWlsZWQ6IChhbGxfdGFibGVz
+X21hdGNoKQpFUlJPUiAtIEJhaWwgb3V0ISBFUlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMv
+cXRlc3QvYmlvcy10YWJsZXMtdGVzdC5jOjQ3Nzp0ZXN0X2FjcGlfYXNsOiBhc3NlcnRpb24gZmFp
+bGVkOiAoYWxsX3RhYmxlc19tYXRjaCkKICBURVNUICAgIGlvdGVzdC1xY293MjogMDM3Cm1ha2U6
+ICoqKiBbY2hlY2stcXRlc3QteDg2XzY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1
+bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAzOApxZW11LXN5c3Rl
+bS1hYXJjaDY0OiAtYWNjZWwga3ZtOiBpbnZhbGlkIGFjY2VsZXJhdG9yIGt2bQotLS0KICAgIHJh
+aXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJv
+Y2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxh
+YmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9M2M4NGZmMTIzMWU1NDZlM2JmMjFkYTY2NzRl
+ZjYyMjQnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmlu
+ZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJF
+X09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywg
+J1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAn
+L2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6
+JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC0xMWhqNl9pbC9zcmMvZG9ja2Vy
+LXNyYy4yMDIwLTAxLTEzLTEwLjU4LjQ2LjIzNDk3Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11
+OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBu
+b24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5z
+dGFuY2UudXVpZD0zYzg0ZmYxMjMxZTU0NmUzYmYyMWRhNjY3NGVmNjIyNAptYWtlWzFdOiAqKiog
+W2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1w
+L3BhdGNoZXctdGVzdGVyLXRtcC0xMWhqNl9pbC9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10
+ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgOW0yMC43NjVzCnVzZXIgICAgMG04
+Ljk4N3MKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMjAwMTEzMTQ0MjI4LjE2NjYwLTEtbWlueWFyZEBhY20ub3JnL3Rlc3RpbmcuZG9ja2Vy
+LXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
