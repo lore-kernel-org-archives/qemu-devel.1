@@ -2,75 +2,82 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2D5C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 12:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D700C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 12:38:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F7F2080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 12:17:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F7F2080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0771A20CC7
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 12:38:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8BO576I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0771A20CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqyeS-0000YD-Uy
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 07:17:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57903)
+	id 1iqyyv-0000S5-71
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 07:38:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iqyd9-0008RU-BW
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 07:15:40 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iqyy5-00080o-OQ
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 07:37:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iqyd7-00026f-Ub
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 07:15:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:56354)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iqyd7-00025u-PC
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 07:15:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iqyd6-0003iR-Gp
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 12:15:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 784DB2E80C0
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 12:15:36 +0000 (UTC)
+ (envelope-from <imammedo@redhat.com>) id 1iqyy3-0005P8-1N
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 07:37:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49988
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iqyy2-0005MJ-Fd
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 07:37:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578919033;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PPc1Xk2yvy7/cs1SbtCSLT4g2uYuUuhz/paLpBUWttM=;
+ b=U8BO576IzktRoak1AXNRY6UWoG18o6G7HK3SEGSUI2V+Culwrf6c17NJ+rbzBs/lku9icR
+ kazTXkCzHo8fSmI6cwQzkR0GTbeE34p+oyeVDI71mFtr/XPzvOI82L0uhF/tSBzCl8UbDd
+ ELxDLwJ+B6qAnZE+jmZprE6HZKvmCc0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-5wh9VXhqM22ttng1CfXbBQ-1; Mon, 13 Jan 2020 07:37:12 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EF6F2EE3;
+ Mon, 13 Jan 2020 12:37:11 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C1A4087EC6;
+ Mon, 13 Jan 2020 12:37:04 +0000 (UTC)
+Date: Mon, 13 Jan 2020 13:37:02 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [PATCH 1/2] arm/virt/acpi: remove meaningless sub device "PR0"
+ from PCI0
+Message-ID: <20200113133702.1dea867b@redhat.com>
+In-Reply-To: <20191219064759.35053-2-guoheyi@huawei.com>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-2-guoheyi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 12:05:59 -0000
-From: Gerd Hoffmann <1859378@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fysnet kraxel-redhat
-X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <157887453515.27484.18206056235819884101.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157891716000.2711.2802613564989556086.malone@soybean.canonical.com>
-Subject: [Bug 1859378] Re: xhci Control Transfer requiring a Status TRB before
- starting transfer
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f4a85b4105a8eed2e90f9a3236205d6090d07411
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 5wh9VXhqM22ttng1CfXbBQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,72 +86,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859378 <1859378@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Well, no.  Status TB not being present is an error.  The host adapter is
-not required to check for that error condition though.  If the host
-adapter checks for that error condition it should queue an transfer
-error.  So, yes, we could improve qemu a bit here, by throwing an error
-instead of silently waiting forever.  Note that current behavior doesn't
-violate the spec, the host adapter is not required to send an error
-event.
+On Thu, 19 Dec 2019 14:47:58 +0800
+Heyi Guo <guoheyi@huawei.com> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+> The sub device "PR0" under PCI0 in ACPI/DSDT does not make any sense,
+> so simply remote it.
+Could you make commit message more concrete so it would say
+why it doesn't make any sense.
 
--- =
+It seems to be there to describe root port,
+I'd rather have PCI folk ack if it's ok to remove it.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859378
+> 
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> 
+> ---
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/arm/virt-acpi-build.c          |   4 ----
+>  tests/data/acpi/virt/DSDT         | Bin 18462 -> 18449 bytes
+>  tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19786 bytes
+>  tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18449 bytes
+>  4 files changed, 4 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index bd5f771e9b..9f4c7d1889 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -317,10 +317,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      aml_append(method, aml_return(buf));
+>      aml_append(dev, method);
+>  
+> -    Aml *dev_rp0 = aml_device("%s", "RP0");
+> -    aml_append(dev_rp0, aml_name_decl("_ADR", aml_int(0)));
+> -    aml_append(dev, dev_rp0);
+> -
+>      Aml *dev_res0 = aml_device("%s", "RES0");
+>      aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+>      crs = aml_resource_template();
+> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
+> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3d32ec856feb388be4c 100644
+> GIT binary patch
+> delta 39
+> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)  
+> 
+> delta 50
+> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I  
+> G{V4!>hYx%J  
+> 
+> diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSDT.memhp
+> index 41ccc6431b917252bcbaac86c33b340c796be5ce..69ad844f65d047973a3e55198beecd45a35b8fce 100644
+> GIT binary patch
+> delta 40
+> wcmcaUi}BPfMlP3Nmk=*s1_q}3iCof5t(P{ccXBfI+}XT|v(|RAjk`1(02g)*ivR!s
+> 
+> delta 51
+> zcmX>#i}Cs_MlP3NmymE@1_mbiiCof5O_w*ScXBdy-rc;3v(}c2J1D>)o+IATC1|sb  
+> HyBr$;t7;Fc
+> 
+> diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/DSDT.numamem
+> index d0f3afeb134fdf1c11f64cd06dbcdd30be603b80..b5895cb22446860a0b9be3d32ec856feb388be4c 100644
+> GIT binary patch
+> delta 39
+> vcmbO?fpOvlMlP3Nmk>b@1_q`B6S<_Bdg?Z+cXBfI+}XT|v(|R9jr$`2@RSW)  
+> 
+> delta 50
+> zcmbO@fpOjhMlP3Nmk>D*1_q{tiCof5o%I{lJ2{y;?{412S!>J19TZ>?&k^tF5;R%I  
+> G{V4!>hYx%J  
+> 
 
-Title:
-  xhci Control Transfer requiring a Status TRB before starting transfer
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  This may not necessarily be a bug, but more of a change.
-
-  A little background may need to be in order.
-
-  With all USB Control transfers, there is a SETUP transfer, zero or
-  more DATA transfers, and if successful, a STATUS transfer.  This
-  STATUS transfer is used to indicate to the recipient that the previous
-  transfers were successful.  For example, in a CONTROL IN transfer, the
-  host sends a SETUP packet to the device, receives zero or more DATA
-  packets, and then on successful transfer, the HOST sends the STATUS
-  packet indicating to the device that all was received.
-
-  If no DATA packets are received, the HOST is not to send a STATUS
-  packet.  This could be due to a STALL or other error.
-
-  With this in mind, the STATUS transfer, in this case an xHCI STATUS
-  TRB, may not even be on the transfer ring yet.  The HOST software may
-  be waiting for a successful transfer before it submits the STATUS
-  transfer.
-
-  However, if you look at the test at line 1701
-  (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-xhci.c#l1701),
-  the current code will not start the CONTROL transfer at all if it
-  doesn't see that STATUS TRB on the ring.
-
-  In my opinion, this is in error.  It is not required that a STATUS TRB
-  be on the ring to start the CONTROL transfer.  This STATUS TRB can be
-  placed on the ring after a successful SETUP and zero or more DATA
-  transfers followed by a ring to the door bell.  Then after a
-  successful transfer to this point, placing this STATUS TRB on the ring
-  and another ring to the door bell.
-
-  In my opinion, the check at line 1701 should be removed.
-
-  Thank you,
-  Ben
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859378/+subscriptions
 
