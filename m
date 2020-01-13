@@ -2,51 +2,52 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3509EC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1743C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:41:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 081F321569
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:40:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081F321569
+	by mail.kernel.org (Postfix) with ESMTPS id A3CD321556
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:41:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3CD321556
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir6VN-0007V6-1d
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:40:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50966)
+	id 1ir6VJ-0007NZ-52
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:40:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50870)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6TT-00058K-Lh
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:12 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6SL-00031J-IS
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:37:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6TR-0006f6-Hf
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:10 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:47055 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6SK-0005WC-G6
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:37:01 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:46598 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ir6TR-0006dn-Ba
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:09 -0500
+ id 1ir6SK-0004Vb-9E
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:37:00 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 401661A1FB3;
- Mon, 13 Jan 2020 21:38:07 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 051C81A20B0;
+ Mon, 13 Jan 2020 21:35:56 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 28C901A1F9E;
- Mon, 13 Jan 2020 21:38:07 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id DE7571A2094;
+ Mon, 13 Jan 2020 21:35:55 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 09/20] linux-user: Add support for FS_IOC_<GET|SET>VERSION
- ioctls
-Date: Mon, 13 Jan 2020 21:34:32 +0100
-Message-Id: <1578947683-21011-10-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v5 02/20] linux-user: alpha: Update syscall numbers to kernel
+ 5.5 rc3 level
+Date: Mon, 13 Jan 2020 21:34:25 +0100
+Message-Id: <1578947683-21011-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -63,60 +64,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: laurent@vivier.eu, amarkovic@wavecomp.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-A very specific thing for these two ioctls is that their code
-implies that their third argument is of type 'long', but the
-kernel uses that argument as if it is of type 'int'. This anomaly
-is recognized also in commit 6080723 (linux-user: Implement
-FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
+Update alpha syscall numbers based on Linux kernel tag v5.5-rc3
+(commit 46cf053e).
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 8 +++++---
- 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index c6b9d6a..c44f42e 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -138,6 +138,8 @@
- 
-      IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
- 
- #ifdef CONFIG_USBFS
-   /* USB ioctls */
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 98c2119..f68a8b6 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -911,12 +911,14 @@ struct target_pollfd {
- #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
- #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
- 
--/* Note that the ioctl numbers claim type "long" but the actual type
-- * used by the kernel is "int".
+---
+
+cc: Richard Henderson <rth@twiddle.net>
+---
+ linux-user/alpha/syscall_nr.h | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
+index 2e5541b..c29fc17 100644
+--- a/linux-user/alpha/syscall_nr.h
++++ b/linux-user/alpha/syscall_nr.h
+@@ -453,5 +453,40 @@
+ #define TARGET_NR_getrandom                     511
+ #define TARGET_NR_memfd_create                  512
+ #define TARGET_NR_execveat                      513
++#define TARGET_NR_seccomp                       514
++#define TARGET_NR_bpf                           515
++#define TARGET_NR_userfaultfd                   516
++#define TARGET_NR_membarrier                    517
++#define TARGET_NR_mlock2                        518
++#define TARGET_NR_copy_file_range               519
++#define TARGET_NR_preadv2                       520
++#define TARGET_NR_pwritev2                      521
++#define TARGET_NR_statx                         522
++#define TARGET_NR_io_pgetevents                 523
++#define TARGET_NR_pkey_mprotect                 524
++#define TARGET_NR_pkey_alloc                    525
++#define TARGET_NR_pkey_free                     526
++#define TARGET_NR_rseq                          527
++#define TARGET_NR_statfs64                      528
++#define TARGET_NR_fstatfs64                     529
++#define TARGET_NR_getegid                       530
++#define TARGET_NR_geteuid                       531
++#define TARGET_NR_getppid                       532
 +/*
-+ * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
-+ * claim type "long" but the actual type used by the kernel is "int".
-  */
- #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
- #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
--
-+#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
-+#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
- #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
++ * all other architectures have common numbers for new syscall, alpha
++ * is the exception.
++ */
++#define TARGET_NR_pidfd_send_signal             534
++#define TARGET_NR_io_uring_setup                535
++#define TARGET_NR_io_uring_enter                536
++#define TARGET_NR_io_uring_register             537
++#define TARGET_NR_open_tree                     538
++#define TARGET_NR_move_mount                    539
++#define TARGET_NR_fsopen                        540
++#define TARGET_NR_fsconfig                      541
++#define TARGET_NR_fsmount                       542
++#define TARGET_NR_fspick                        543
++#define TARGET_NR_pidfd_open                    544
++/* 545 reserved for clone3 */
  
- /* usb ioctls */
+ #endif
 -- 
 2.7.4
 
