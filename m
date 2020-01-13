@@ -2,129 +2,120 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE27C33CA8
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 09:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CFDC33CA8
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 09:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08185207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 09:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21D502082E
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 09:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="dGYa5AH4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08185207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=samsung.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="c7HRECwb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D502082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47656 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqvwu-0007cH-3o
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 04:23:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57656)
+	id 1iqvzW-0001Zv-89
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 04:26:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <k.jensen@samsung.com>) id 1iqvwF-00077W-Sh
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 04:23:13 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iqvyj-0000H6-Ky
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 04:25:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <k.jensen@samsung.com>) id 1iqvwD-0000Ja-Eb
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 04:23:10 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:51646)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <k.jensen@samsung.com>)
- id 1iqvwC-0000Bb-O8
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 04:23:09 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
- by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
- 20200113092305euoutp02d701e9ac00fa423507a45ada81e4e977~pZ_a8oXhN1475014750euoutp02j
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:23:05 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
- 20200113092305euoutp02d701e9ac00fa423507a45ada81e4e977~pZ_a8oXhN1475014750euoutp02j
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
- s=mail20170921; t=1578907385;
- bh=dehaiTptkf4XyEB/o4U356fTwCZPLU45Z4piSJhXos0=;
- h=Date:From:To:CC:Subject:In-Reply-To:References:From;
- b=dGYa5AH4FXY7phmoZBgZ4TS+VHmyGcU9AjnBb5LJD7k0n76ke0kwYwUm/Dej17p3g
- uY9jqpRvejZ0pMoVTg1m66CTK0GFfEHF1ksp9HKySf4Vomz+3GHstRHZqmRJoLTvlC
- T/g3yMIeze5JBZlkNkgU/Z0YJVWWS6ZSLG4KSWns=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTP id
- 20200113092304eucas1p27b7bde7aa6f9f11843caf7572c073070~pZ_ayob7d3187231872eucas1p2G;
- Mon, 13 Jan 2020 09:23:04 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
- eusmges1new.samsung.com (EUCPMTA) with SMTP id D8.E6.61286.8F63C1E5; Mon, 13
- Jan 2020 09:23:04 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
- eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
- 20200113092304eucas1p2eebecc29a6ef499111921982b19f04b2~pZ_ag6own2323723237eucas1p2k;
- Mon, 13 Jan 2020 09:23:04 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
- eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
- 20200113092304eusmtrp285a6d9d2efb59d58e55d4f6aca30d66c~pZ_aftHoR0250202502eusmtrp2U;
- Mon, 13 Jan 2020 09:23:04 +0000 (GMT)
-X-AuditID: cbfec7f2-ef1ff7000001ef66-7d-5e1c36f829ff
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
- eusmgms2.samsung.com (EUCPMTA) with SMTP id 63.78.07950.8F63C1E5; Mon, 13
- Jan 2020 09:23:04 +0000 (GMT)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
- eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
- 20200113092304eusmtip241e80a6b46d51705a7b09377a75d9e21~pZ_aZft8B0041000410eusmtip2e;
- Mon, 13 Jan 2020 09:23:04 +0000 (GMT)
-Received: from CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) by
- CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) with Microsoft SMTP
- Server (TLS) id 15.0.1320.4; Mon, 13 Jan 2020 09:23:03 +0000
-Received: from apples.localdomain (106.110.32.41) by CAMSVWEXC01.scsc.local
- (106.1.227.71) with Microsoft SMTP Server (TLS) id 15.0.1320.4 via Frontend
- Transport; Mon, 13 Jan 2020 09:23:03 +0000
-Date: Mon, 13 Jan 2020 10:23:02 +0100
-From: Klaus Birkelund Jensen <k.jensen@samsung.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v4 17/24] nvme: allow multiple aios per command
-Message-ID: <20200113092302.rupgo5k7rnzaszqs@apples.localdomain>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iqvyi-0005OH-Hc
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 04:25:45 -0500
+Received: from mail-eopbgr80101.outbound.protection.outlook.com
+ ([40.107.8.101]:58855 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iqvye-0005D4-R3; Mon, 13 Jan 2020 04:25:41 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n4sjrPIdei3FyMoPA+bBVmPXKk10h1mTEV7sgrrX8B5J7ym5bNuDS2wbnTzRGeLmCu0S5JijJSajfB6L1EJCQcnoMy2usPx6YSPF4H3d1F28gAs7AYgd5MvGUH6bFPKIDfxmAjXYIEcONT+c8NAQjdAKNNfyLfCQAbNWN6RX7atE3Y13hr2hrXOuanxGcXMVz49E9FKeAEycNlelT5wcDOb7HgHvLrLeANjGCg3GB7af8Evc+M5voakPSpER1Mcbaz0jLnMDV2VjR/xCDbiMoVWM25cp+58d+f06RETAxrZPrZR0o1N4m8+Ijq926B0GHejklnr1lHYgKd4g+hVKtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BbzY4gvzUbPHPBLORohLPBV5D0PEI6+b7bEhYVwZRdE=;
+ b=K/G7JT9LV7r1Dw/gqabhk6+wZz0OxVPNbZySj8+K9QBUCm/QP/veGmWRKcwJncoZ50f6rNbLmkb7GFEW9/Q9247QGVMoPlhzCxrMdO05BHLNTGOfVabVefknzq1yB4QkztGd2VwgAwMvJeWrWyVw4XCxoElQy4V2Ilcnl9OrLCgbTaHHA+SlgXBGOyhXQAvaGyNAS0aCv+XnleniE6bUZbVtFhfyH+AX8Qwi52/5/ATWc50Qf6kRalm+Wlfttu0c2jEkDT/HjOdTMZqgIdD2L14yoQos0y3pCvBGl+MbgatJqgTIhm/iucbtkgzeTb/qHZl5ZCs+ER5m422UDIwvGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BbzY4gvzUbPHPBLORohLPBV5D0PEI6+b7bEhYVwZRdE=;
+ b=c7HRECwb4wCqed7g9Vyb3MFaUvxsu/NWulYhJbeS+4+nRAY0ZGyCxTzm3dRvDLKYvT7H7GZw4uDtpWww6x3uMSwSv88zNEmFKXdnEaBU8ZZoi7LIpr3BZ7l/8pQezhbiJSwycE8tojw0cw4K4m4NzPZOONE9+1ncPFCbnhrEJ2A=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB2984.eurprd08.prod.outlook.com (52.135.168.28) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.10; Mon, 13 Jan 2020 09:25:36 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2623.015; Mon, 13 Jan 2020
+ 09:25:36 +0000
+Received: from [172.16.24.200] (185.231.240.5) by
+ HE1PR05CA0242.eurprd05.prod.outlook.com (2603:10a6:3:fb::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2623.9 via Frontend Transport; Mon, 13 Jan 2020 09:25:35 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Paul Durrant <pdurrant@gmail.com>
+Subject: Re: [PATCH v6 02/11] error: auto propagated local_err
+Thread-Topic: [PATCH v6 02/11] error: auto propagated local_err
+Thread-Index: AQHVx+4Rt2lsJ4uM40eLuOqM7f0+qKfoTRGAgAAJ4oA=
+Date: Mon, 13 Jan 2020 09:25:36 +0000
+Message-ID: <0951e0af-b0f0-6631-8352-71b1f7e4539a@virtuozzo.com>
+References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
+ <20200110194158.14190-3-vsementsov@virtuozzo.com>
+ <CACCGGhD+v3cPdrU0ZCctO3SCpN7yHJcd9=J6AwTrrYWZdHrTZA@mail.gmail.com>
+In-Reply-To: <CACCGGhD+v3cPdrU0ZCctO3SCpN7yHJcd9=J6AwTrrYWZdHrTZA@mail.gmail.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0242.eurprd05.prod.outlook.com
+ (2603:10a6:3:fb::18) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20200113122533121
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 94109d84-0f0a-4475-ebe7-08d7980a8c10
+x-ms-traffictypediagnostic: AM6PR08MB2984:
+x-microsoft-antispam-prvs: <AM6PR08MB29841CE77CFC9A65078FE06FC1350@AM6PR08MB2984.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 028166BF91
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(136003)(366004)(396003)(39840400004)(189003)(199004)(956004)(2906002)(2616005)(86362001)(316002)(16576012)(6486002)(54906003)(4326008)(6916009)(31696002)(52116002)(5660300002)(16526019)(186003)(31686004)(8676002)(26005)(478600001)(8936002)(81156014)(81166006)(71200400001)(36756003)(66476007)(66946007)(66556008)(64756008)(7416002)(66446008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB2984;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: nyvo74reilrHG4NNY3NTNYncDMiKkElronZzT0fK3ec4od8/jGvRdeYNWJ15aq04qGknn5X58neIQR9hcfkxf70RlBbBWCfjgzC9hHseAIytUj98wqlOa5mGuH4mVTzhAxJwT8//LKf2tIccZlFx+QYSBn0VvSuvq8qFytoxMnrV64iyiheWDZ0yMt+cYFptFRkE89XOQzDH9Qye0wkbGNJI7No+UT9wvc+06JyahjMvAkcqtq2qqKj2xogNZmMN26sJqmcifDPBFSLt2DSJ6bRa+7UGvaxvGjEVT9vJzInsEY377xBP5xYadOuIUBGImn4g+wLmDz+NuQZkuuT+qVXwzfvoW3WihV0BtaMbFzrAcmq1h2BslFtWB74ntLtj5hqrmhvtT/zNf3LxWoaVAAle5aPAybdpMHD4xgifB1IgE7BgRpqFcv9kgRqz4qQG
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E21A3BFE6C332E42904491FDBEA8F741@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CADSWDztO1ffbXWnGAbaVLhXO4fYXsAbSUd-f7zQonDTRi8-n=A@mail.gmail.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMKsWRmVeSWpSXmKPExsWy7djP87o/zGTiDJo3Glts7m9ntNh/8Bur
- xaRD1xgtllxMtZh3S9li1rt2NovjvTtYHNg9zu04z+6xaVUnm8eda3vYPJ5c28zk8X7fVbYA
- 1igum5TUnMyy1CJ9uwSujOfT9jIXvBSvWPn2N0sD4ymhLkZODgkBE4mp5x8ydjFycQgJrGCU
- mH3lCTuE84VR4mLTKSjnM6PE7v4GFpiW6c3nWCASyxklVl3pYwVJgFV9PsIFkTjDKDHvXyMT
- ROIYo8SD96kgNouAqsTa1y3MIDabgLHEm67lYLaIgIHE5/PfwdYxC3xjlLgw4xUjSEJYwFmi
- e8oVsEG8Ag4Sr2e9Z4OwBSVOznwCdhKnQKDEyve9rCDNEgLr2CU2ff/DDHGri8TJ0x+g7haW
- eHV8CzuELSPxf+d8JoiGbkaJvg9fmSGcGYwS05d9B1rBAeRYS/SdyQExmQUyJVauVISIOkq0
- bcuGMPkkbrwVBJnIDGRO2jadGSLMK9HRBg1fNYkdTVsZIcIyEk/XKECEPSS+n2tim8CoOAvJ
- L7MQNs0Cm6kjsWD3JzaIsLTE8n8cEKamxPpd+gsYWVcxiqeWFuempxYb5qWW6xUn5haX5qXr
- JefnbmIEJqXT/45/2sH49VLSIUYBDkYlHt4DVdJxQqyJZcWVuYcYJTiYlUR4N52TihPiTUms
- rEotyo8vKs1JLT7EKM3BoiTOa7zoZayQQHpiSWp2ampBahFMlomDU6qBseT87KLw80ElS08E
- 1nBfCtPeOiWv783NWaLdO7X+y92WXLynNFi2sChzr/s9b7uyWu1Jyc2sl8WObJ6qJFV8ipnj
- q+jf/KwZUtkuKqvXHWi17eUsm3BzwufyjFxf8fJFxQoaAsez+G41MOVP19BdHTl72Yzds89r
- 3D4Zrf5mS/6RF3ePX85dpMRSnJFoqMVcVJwIAHtg4DlGAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrEIsWRmVeSWpSXmKPExsVy+t/xe7o/zGTiDD7dUbLY3N/OaLH/4DdW
- i0mHrjFaLLmYajHvlrLFrHftbBbHe3ewOLB7nNtxnt1j06pONo871/aweTy5tpnJ4/2+q2wB
- rFF6NkX5pSWpChn5xSW2StGGFkZ6hpYWekYmlnqGxuaxVkamSvp2NimpOZllqUX6dgl6GYv6
- H7MULBOt2NP7ibmBcYFAFyMnh4SAicT05nMsXYxcHEICSxklHnXvYYZIyEh8uvKRHcIWlvhz
- rYsNougjo0TjjPnsEM4ZRomtXz8xQjjHGCU27OgFa2cRUJVY+7oFzGYTMJZ407UczBYRMJD4
- fP47WDezwDdGiTmTQbo5OYQFnCW6p1xhArF5BRwkXs96D7WvnUni3/1/bBAJQYmTM5+wgNjM
- AjoSC3Z/AopzANnSEsv/cYCEOQUCJVa+72WdwCg0C0nHLCQdsxA6FjAyr2IUSS0tzk3PLTbS
- K07MLS7NS9dLzs/dxAiMr23Hfm7Zwdj1LvgQowAHoxIP74Eq6Tgh1sSy4srcQ4wSHMxKIryb
- zknFCfGmJFZWpRblxxeV5qQWH2I0BQbARGYp0eR8YOznlcQbmhqaW1gamhubG5tZKInzdggc
- jBESSE8sSc1OTS1ILYLpY+LglGpgnMl6K5J9nZiNxd+U94rpkQoRU5pPNmxZ8bc+nXvOTbED
- ftxWF7cwGc5a+km1YtvjTY+2HLv3Ott34kHTbtUbhtMrwzKeunSu1dpy9P/MLNPNjGccPrA0
- tVz/z7Nq0R/3nJxr/Nc7+LV/nWGZHzenr6I/4nBMQ0vv1f3z/1tySpQ8+hNT4sFwQYmlOCPR
- UIu5qDgRAJ93TZHFAgAA
-X-CMS-MailID: 20200113092304eucas1p2eebecc29a6ef499111921982b19f04b2
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
- boundary="----wuEC8jduJpGPgLKK9WIRscW_csS_daTJEwiPQviyXYkcG3WR=_1cc14e_"
-X-RootMTR: 20191219130945eucas1p1cfffc6af127586ee24746beccbe993fb
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20191219130945eucas1p1cfffc6af127586ee24746beccbe993fb
-References: <CGME20191219130945eucas1p1cfffc6af127586ee24746beccbe993fb@eucas1p1.samsung.com>
- <20191219130921.309264-1-k.jensen@samsung.com>
- <20191219130921.309264-18-k.jensen@samsung.com>
- <CADSWDztO1ffbXWnGAbaVLhXO4fYXsAbSUd-f7zQonDTRi8-n=A@mail.gmail.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 210.118.77.12
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94109d84-0f0a-4475-ebe7-08d7980a8c10
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2020 09:25:36.4807 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jwShqbSAedY+Y1Lz/KyhhKws07/nsoTpPSh9UabRqM7/LxY9Lr+tBHJRBfSfCGjQ+fcJQ9eSTFbM39+w9KZa08RL1CcYW7THBRYymvcl8CE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2984
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.101
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,95 +127,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
- Javier Gonzalez <javier.gonz@samsung.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Laszlo Ersek <lersek@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-------wuEC8jduJpGPgLKK9WIRscW_csS_daTJEwiPQviyXYkcG3WR=_1cc14e_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-
-On Jan  9 11:40, Beata Michalska wrote:
-> Hi Klaus,
-> 
-> On Thu, 19 Dec 2019 at 13:09, Klaus Jensen <k.jensen@samsung.com> wrote:
-> > +static NvmeAIO *nvme_aio_new(BlockBackend *blk, int64_t offset, size_t len,
-> > +    QEMUSGList *qsg, QEMUIOVector *iov, NvmeRequest *req,
-> > +    NvmeAIOCompletionFunc *cb)
-> 
-> Minor: The indentation here (and in a few other places across the patchset)
-> does not seem right . And maybe inline ?
-
-I tried to follow the style in CODING_STYLE.rst for "Multiline Indent",
-but how the style is for function definition is a bit underspecified.
-
-I can change it to align with the opening paranthesis. I just found the
-"one indent" more readable for these long function definitions.
-
-> Also : seems that there are cases when some of the parameters are
-> not required (NULL) , maybe having a simplified version for those cases
-> might be useful ?
-> 
-
-True. Actually - at this point in the series there are no users of the
-NvmeAIOCompletionFunc. It is preparatory for other patches I have in the
-pipeline. But I'll clean it up.
-
-> > +static void nvme_aio_cb(void *opaque, int ret)
-> > +{
-> > +    NvmeAIO *aio = opaque;
-> > +    NvmeRequest *req = aio->req;
-> > +
-> > +    BlockBackend *blk = aio->blk;
-> > +    BlockAcctCookie *acct = &aio->acct;
-> > +    BlockAcctStats *stats = blk_get_stats(blk);
-> > +
-> > +    Error *local_err = NULL;
-> > +
-> > +    trace_nvme_dev_aio_cb(nvme_cid(req), aio, blk_name(blk), aio->offset,
-> > +        nvme_aio_opc_str(aio), req);
-> > +
-> > +    if (req) {
-> > +        QTAILQ_REMOVE(&req->aio_tailq, aio, tailq_entry);
-> > +    }
-> > +
-> >      if (!ret) {
-> > -        block_acct_done(blk_get_stats(n->conf.blk), &req->acct);
-> > -        req->status = NVME_SUCCESS;
-> > +        block_acct_done(stats, acct);
-> > +
-> > +        if (aio->cb) {
-> > +            aio->cb(aio, aio->cb_arg);
-> 
-> We are dropping setting status to SUCCESS here,
-> is that expected ?
-
-Yes, that is on purpose. nvme_aio_cb is called for *each* issued AIO and
-we do not want to overwrite a previously set error status with a success
-(if one aio in the request fails even though others succeed, it should
-not go unnoticed). Note that NVME_SUCCESS is the default setting in the
-request, so if no one sets an error code we are still good.
-
-> Also the aio callback will not get
-> called case failure and it probably should ?
-> 
-
-I tried both but ended up with just not calling it on failure, but I
-think that in the future some AIO callbacks might want to take a
-different action if the request failed, so I'll add it back in an add
-the aio return value (ret) to the callback function definition.
-
-
-Thanks,
-Klaus
-
-------wuEC8jduJpGPgLKK9WIRscW_csS_daTJEwiPQviyXYkcG3WR=_1cc14e_
-Content-Type: text/plain; charset="utf-8"
-
-
-------wuEC8jduJpGPgLKK9WIRscW_csS_daTJEwiPQviyXYkcG3WR=_1cc14e_--
+MTMuMDEuMjAyMCAxMTo1MCwgUGF1bCBEdXJyYW50IHdyb3RlOg0KPiBPbiBGcmksIDEwIEphbiAy
+MDIwIGF0IDE5OjQyLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5DQo+IDx2c2VtZW50c292
+QHZpcnR1b3p6by5jb20+IHdyb3RlOg0KPiBbc25pcF0NCj4+ICsvKg0KPj4gKyAqIEVSUlBfQVVU
+T19QUk9QQUdBVEUNCj4+ICsgKg0KPj4gKyAqIFRoaXMgbWFjcm8gaXMgY3JlYXRlZCB0byBiZSB0
+aGUgZmlyc3QgbGluZSBvZiBhIGZ1bmN0aW9uIHdoaWNoIHVzZQ0KPj4gKyAqIEVycm9yICoqZXJy
+cCBwYXJhbWV0ZXIgdG8gcmVwb3J0IGVycm9yLiBJdCdzIG5lZWRlZCBvbmx5IGluIGNhc2VzIHdo
+ZXJlIHdlDQo+PiArICogd2FudCB0byB1c2UgZXJyb3JfcHJlcGVuZCwgZXJyb3JfYXBwZW5kX2hp
+bnQgb3IgZGVyZWZlcmVuY2UgKmVycnAuIEl0J3MNCj4+ICsgKiBzdGlsbCBzYWZlIChidXQgdXNl
+bGVzcykgaW4gb3RoZXIgY2FzZXMuDQo+PiArICoNCj4+ICsgKiBJZiBlcnJwIGlzIE5VTEwgb3Ig
+cG9pbnRzIHRvIGVycm9yX2ZhdGFsLCBpdCBpcyByZXdyaXR0ZW4gdG8gcG9pbnQgdG8gYQ0KPj4g
+KyAqIGxvY2FsIEVycm9yIG9iamVjdCwgd2hpY2ggd2lsbCBiZSBhdXRvbWF0aWNhbGx5IHByb3Bh
+Z2F0ZWQgdG8gdGhlIG9yaWdpbmFsDQo+PiArICogZXJycCBvbiBmdW5jdGlvbiBleGl0IChzZWUg
+ZXJyb3JfcHJvcGFnYXRvcl9jbGVhbnVwKS4NCj4+ICsgKg0KPj4gKyAqIEFmdGVyIGludm9jYXRp
+b24gb2YgdGhpcyBtYWNybyBpdCBpcyBhbHdheXMgc2FmZSB0byBkZXJlZmVyZW5jZSBlcnJwDQo+
+PiArICogKGFzIGl0J3Mgbm90IE5VTEwgYW55bW9yZSkgYW5kIHRvIGFkZCBpbmZvcm1hdGlvbiAo
+YnkgZXJyb3JfcHJlcGVuZCBvcg0KPj4gKyAqIGVycm9yX2FwcGVuZF9oaW50KQ0KPj4gKyAqIChh
+cywgaWYgaXQgd2FzIGVycm9yX2ZhdGFsLCB3ZSBzd2FwcGVkIGl0IHdpdGggYSBsb2NhbF9lcnJv
+ciB0byBiZQ0KPj4gKyAqIHByb3BhZ2F0ZWQgb24gY2xlYW51cCkuDQo+PiArICoNCj4+ICsgKiBO
+b3RlOiB3ZSBkb24ndCB3cmFwIHRoZSBlcnJvcl9hYm9ydCBjYXNlLCBhcyB3ZSB3YW50IHJlc3Vs
+dGluZyBjb3JlZHVtcA0KPj4gKyAqIHRvIHBvaW50IHRvIHRoZSBwbGFjZSB3aGVyZSB0aGUgZXJy
+b3IgaGFwcGVuZWQsIG5vdCB0byBlcnJvcl9wcm9wYWdhdGUuDQo+PiArICovDQo+PiArI2RlZmlu
+ZSBFUlJQX0FVVE9fUFJPUEFHQVRFKCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XA0KPj4gKyAgICBnX2F1dG8oRXJyb3JQcm9wYWdhdG9yKSBfYXV0b19lcnJwX3Byb3AgPSB7LmVy
+cnAgPSBlcnJwfTsgIFwNCj4+ICsgICAgZXJycCA9ICgoZXJycCA9PSBOVUxMIHx8ICplcnJwID09
+IGVycm9yX2ZhdGFsKSAgICAgICAgICAgICBcDQo+IA0KPiBQZXJoYXBzICFlcnJwIHJhdGhlciB0
+aGFuIGVycnAgPT0gTlVMTCwgZm9yIGJyZXZpdHkuDQo+IA0KDQpJIG1vc3RseSBwcmVmZXIgIXB0
+ciBub3RhdGlvbi4uIEJ1dCBtYXkgYmUgaGVyZSwgSSdkIGtlZXAgaXQgYXMgaXMsDQp0byBzdHJl
+c3Mgc3BlY2lhbC1jYXNpbmcgTlVMTCBpbiB0aGlzIG5vbi10cml2aWFsIHBsYWNlLi4gQW5kIGl0
+IGlzIGluIGdvb2QNCnJlbGF0aW9uIHdpdGggcGhyYXNpbmcgIklmIGVycnAgaXMgTlVMTCBvciBw
+b2ludHMgdG8gZXJyb3JfZmF0YWwiLg0KQnV0ICFlcnJwIGlzIE9LIGZvciBtZSB0by4gTGV0IGl0
+IGJlIGFzIE1hcmt1cyBwcmVmZXIsIGhlIGlzIG1haW50YWluZXIuDQoNCj4gDQo+PiArICAgICAg
+ICAgICAgPyAmX2F1dG9fZXJycF9wcm9wLmxvY2FsX2VyciA6IGVycnApDQo+PiArDQo+PiAgIC8q
+DQo+PiAgICAqIFNwZWNpYWwgZXJyb3IgZGVzdGluYXRpb24gdG8gYWJvcnQgb24gZXJyb3IuDQo+
+PiAgICAqIFNlZSBlcnJvcl9zZXRnKCkgYW5kIGVycm9yX3Byb3BhZ2F0ZSgpIGZvciBkZXRhaWxz
+Lg0KPj4gLS0NCj4+IDIuMjEuMA0KPj4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
+DQo=
 
