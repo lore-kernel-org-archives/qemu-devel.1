@@ -2,86 +2,101 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02149C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFA3C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:08:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C30292075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E57062084D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:08:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0LIKFbr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C30292075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DrFHhbyg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57062084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir32J-00065x-RQ
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:57:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59166)
+	id 1ir3Ce-0000yz-T7
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:08:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1ir31J-0005J8-N9
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:56:54 -0500
+ (envelope-from <philmd@redhat.com>) id 1ir39o-0004yW-SW
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:05:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1ir31I-0000aW-QM
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:56:53 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39931)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1ir31I-0000YV-HC; Mon, 13 Jan 2020 11:56:52 -0500
-Received: by mail-wm1-x341.google.com with SMTP id 20so10471969wmj.4;
- Mon, 13 Jan 2020 08:56:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=xQt6zAMuvdk7sMLxIUp2969LsipIUwQWGj5Gl+6ZVfw=;
- b=J0LIKFbrcwKV8Vnvd2/vWoP9x74iyFydCwPvvL4sBidKdwwzh+hEyqThLCvWZWSI+e
- 9yXgrDg7IhHS2XHnu5yzEGSxzeTuncHeuAhoKitWPWSZo9k7MTSXGPkxsILqTm4kuywC
- 9hmr5uPyVGv7AVWsTD1aIGcqUrXNOZ92qy8xclw3ERPlpp6/2t5YTA5PSup20uOK9SVq
- r7KoIufPM96qCrr3wzlSNu0T361Evp7gpUAWOvsWLR9egg8PHZI0uZy0hIWn9yxPMkA3
- iswflkXRC+1WUN1ktcTHdzcKLXI4aEToIyyNe7DbH00S9XNowO0+kS15iCvCIr+Q8q88
- av2w==
+ (envelope-from <philmd@redhat.com>) id 1ir39l-0004lr-Hs
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:05:38 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41188
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ir39l-0004jv-7W
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:05:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578935136;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8akm5y2JIK+SIsf38zIVKEGwGAeiQntPbaAnvyKf3TU=;
+ b=DrFHhbygzS0OCRSTDCEzkJvfDaOKL4UpHgnfZ8p6sEQr2A+SWRA/ItALTtxw3uXuoiKTcJ
+ 8wHWwLkzzd8Ahp4/Jptg+cszrOyRszAAhQW44lD+HxOEvAU1QrtzaK5QlHQf+rfX3+sw+v
+ P7j+COTchXvY9JUJpWWhLSXaqcBYYPI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-C3HcSvHDPxO3xxvuBWX8Ww-1; Mon, 13 Jan 2020 12:05:34 -0500
+Received: by mail-wm1-f72.google.com with SMTP id g26so1386388wmk.6
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:05:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=xQt6zAMuvdk7sMLxIUp2969LsipIUwQWGj5Gl+6ZVfw=;
- b=jRWBUrmzzPhlmwjYgQ8WCUi+JlZjsbS7pRpiquVgXgKCKrg9WMEGQDIAw/wxQXmGkr
- iQ15RvOTJR59FfyO9nvz92fOz4YNkOaWymWXLEt27+1+QfJEK/PS+t8snJoIMZsGtCUy
- QS58PmCPt/r/403u4cy0xrLrKTZYIQTiVS+SfnB1kEAnhowGPrbREsmseODFwCK2sCLm
- oFvA7VBLXBt3Q0+tIjg7e3WaYB4NZBeN/Zbp5+v0XQ07q8W4bNjvszRMT74yIYTmoKIY
- IQopv1yLiHZ1tXJErZoh6Xo46AH6/BcXmGGWwoKySwXYFo813rFde4VltOOKiW8yp2MV
- PAKw==
-X-Gm-Message-State: APjAAAUd6C1aTqo21pV7OmwVIFTb1wUK/JLTUGFU1UAv3Q95GIgLjyXn
- jg2wsBQLTOgzHB2Mxcc1mpM=
-X-Google-Smtp-Source: APXvYqxGcdgWVFqa/WsJs5WZO0FwoMpsX7hD16GxCqeojXI1Om9kM7tlG6FnGqn8hckz5O2mlPJr7w==
-X-Received: by 2002:a7b:c218:: with SMTP id x24mr21878174wmi.149.1578934611043; 
- Mon, 13 Jan 2020 08:56:51 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id b17sm16000351wrx.15.2020.01.13.08.56.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 08:56:49 -0800 (PST)
-Date: Mon, 13 Jan 2020 16:56:48 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 2/4] block: Mark 'block_resize' as coroutine
-Message-ID: <20200113165648.GD103384@stefanha-x1.localdomain>
-References: <20200109183545.27452-1-kwolf@redhat.com>
- <20200109183545.27452-3-kwolf@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3eLu5EnOB+WxW6gFtG3qisQpnTYPKy0enAl1ThZM8Wc=;
+ b=k8dPKC4VWaTyrFA5R+GAdt6KqL0CaUVyroc7HErKzLpoDiO6ctT9DJLAiQC91BtGX3
+ yzcbB1jbiLdHKxX2GR5dnfi5RNVZRNRh8SfyB1YExw3LUKjGSW5AZZY1M4H33+iIQhpU
+ EvNt6Mt1V4qM/gdSTFWk6wIa3YSGcXbAwCINr6esqdaeowfPj1kOw50AmjBj7YWVm1Z+
+ xAvgWwbsNgcKORPtDusSiP84cFPyFmJW5lG4KxgL3vNjAtpfSaYzpn3u3xFpRIQ6paQQ
+ 6bY6eM89wpT24yXqb4jrELcDqeFX8FzhsEfBjVJgL/oMfVoN23iwNGELoHtraYeB883z
+ pcrA==
+X-Gm-Message-State: APjAAAUqxfpM2QfUx2oTZP6zu3oBGJadi2gpJOas2MY8TA+fLRkr694F
+ 0VuHeH0YHaVBqiuO+UzAPHqi8D5r10YkGp5/8zM7OwFAGZGZ9jpfvuBD0EzLs20kOMQvt5F9fDC
+ YOZJvEypWKBlWRw0=
+X-Received: by 2002:a1c:7203:: with SMTP id n3mr20531533wmc.119.1578935133678; 
+ Mon, 13 Jan 2020 09:05:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxYMsarVlfIbB0za7AuFgeL+t2Vna2+WiFKEyyrZUPs0zlssOQLalmn50iARH8XI8jyd5eiFw==
+X-Received: by 2002:a1c:7203:: with SMTP id n3mr20531490wmc.119.1578935133375; 
+ Mon, 13 Jan 2020 09:05:33 -0800 (PST)
+Received: from [192.168.1.24] (lfbn-mon-1-1519-115.w92-167.abo.wanadoo.fr.
+ [92.167.83.115])
+ by smtp.gmail.com with ESMTPSA id h8sm16523814wrx.63.2020.01.13.09.05.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Jan 2020 09:05:32 -0800 (PST)
+Subject: Re: [PATCH] arm/gicv3: update virtual irq state after IAR register
+ read
+To: Jeff Kubascik <jeff.kubascik@dornerworks.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200113154607.97032-1-jeff.kubascik@dornerworks.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7260d4ef-7d51-44c3-95d0-2c88c6e2eb63@redhat.com>
+Date: Mon, 13 Jan 2020 18:05:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WChQLJJJfbwij+9x"
-Content-Disposition: inline
-In-Reply-To: <20200109183545.27452-3-kwolf@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+In-Reply-To: <20200113154607.97032-1-jeff.kubascik@dornerworks.com>
+Content-Language: en-US
+X-MC-Unique: C3HcSvHDPxO3xxvuBWX8Ww-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,59 +108,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- armbru@redhat.com
+Cc: Stewart Hildebrand <Stewart.Hildebrand@dornerworks.com>,
+ Jarvis Roach <Jarvis.Roach@dornerworks.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---WChQLJJJfbwij+9x
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jan 09, 2020 at 07:35:43PM +0100, Kevin Wolf wrote:
-> block_resize is safe to run in a coroutine, so use it as an example for
-> the new 'coroutine': true annotation in the QAPI schema.
+On 1/13/20 4:46 PM, Jeff Kubascik wrote:
+> The IAR0/IAR1 register is used to acknowledge an interrupt - a read of th=
+e
+> register activates the highest priority pending interrupt and provides it=
+s
+> interrupt ID. Activating an interrupt can change the CPU's virtual interr=
+upt
+> state - this change makes sure the virtual irq state is updated.
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Jeff Kubascik <jeff.kubascik@dornerworks.com>
 > ---
->  qapi/block-core.json | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Hello,
 >=20
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 7ff5e5edaf..1dbb2a9901 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1341,7 +1341,8 @@
->  { 'command': 'block_resize',
->    'data': { '*device': 'str',
->              '*node-name': 'str',
-> -            'size': 'int' } }
-> +            'size': 'int' },
-> +  'coroutine': true }
-> =20
->  ##
->  # @NewImageMode:
+> I am using the ARMv8 version of QEMU configured with the gicv3 interrupt
+> controller to run the Xen hypervisor with RTEMS as a guest VM (AArch32). =
+I
+> have noticed that when Xen injects a virtual irq to the guest VM, the gue=
+st
+> gets stuck in the interrupt handler.
+>=20
+> The guest's interrupt handler does the following in order:
+>    - Reads IAR1 to acknowledge the interrupt and get the INTID
+>    - Unmasks interrupts by clearing the I bit in the CPSR register
+>    - Dispatches the interrupt to the appropriate driver
+>    - Restores the I bit in the CPSR state
+>    - Writes the INTID to EOIR1 to drop priority and deactivate the interr=
+upt
+>=20
+> However, when the I bit was cleared, QEMU immediately raised the same
+> virtual interrupt again. This process repeated itself indefinitely.
+>=20
+> The read of the IAR1 register should activate the interrupt and prevent i=
+t
+> from firing again. However, the gicv3 device code wasn't updating the
+> irq_line_state, so the CPU_INTERRUPT_VIRQ flag remained set. Therefore, w=
+hen
+> I bit was cleared, the CPU immediately switched to the exception handler.
+>=20
+> I have tested this patch, and it works for Xen with both an AArch64 Linux
+> guest and an AArch32 RTEMS guest.
+>=20
+> Sincerely,
+> Jeff Kubascik
+> ---
+>   hw/intc/arm_gicv3_cpuif.c | 3 +++
+>   1 file changed, 3 insertions(+)
+>=20
+> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+> index a254b0ce87..08e000e33c 100644
+> --- a/hw/intc/arm_gicv3_cpuif.c
+> +++ b/hw/intc/arm_gicv3_cpuif.c
+> @@ -664,6 +664,9 @@ static uint64_t icv_iar_read(CPUARMState *env, const =
+ARMCPRegInfo *ri)
+>  =20
+>       trace_gicv3_icv_iar_read(ri->crm =3D=3D 8 ? 0 : 1,
+>                                gicv3_redist_affid(cs), intid);
+> +
+> +    gicv3_cpuif_virt_update(cs);
+> +
+>       return intid;
+>   }
+>  =20
+>=20
 
-coroutine_fn is missing on
-blockdev.c:void qmp_block_resize(bool has_device, const char *device,
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
---WChQLJJJfbwij+9x
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4coVAACgkQnKSrs4Gr
-c8iFCQgAjepGmABXqAnPfai65+/DSXXxqYJctav1yNd/FadfvJdETCUz8VHvqnTf
-GtIl6ZJhtNDp7l2Bn+SrWHlgafKcykRZUcdL060aXBHS5U0RlkaFT+N1cQ7kaPBd
-O+94zs6jtTPQeWZWh7FHVJJ/UH0JmWArZMuNZnKRtE63vQJndWg2zUmihZeDgKkv
-uN1KgZvY+l8t0f4yQulsGe7CR3RDBCvJ02o1RSPg3peCQq5Z0e7gcZHA9mJcMldw
-RqH7zy3jkgjAceMFiCIaw0QHCUgiDmrCB/i5rkACjstn9WWz+9/kzbuxC0fX2K+g
-n92Ql4F8R8iFj3/T4Way7XSccjrf/A==
-=r4rf
------END PGP SIGNATURE-----
-
---WChQLJJJfbwij+9x--
 
