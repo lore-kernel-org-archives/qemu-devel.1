@@ -6,99 +6,92 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB40DC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD06AC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:26:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93B76207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A336207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:26:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTycK41H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B76207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f3BJSaEy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A336207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir2VO-0002wC-NI
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:23:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48634)
+	id 1ir2Xb-0004c7-Gk
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:26:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ir2Um-0002ML-AG
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:23:17 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ir2Wc-0003or-8L
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:25:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ir2Ul-0006dZ-CY
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:23:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30968
+ (envelope-from <pbonzini@redhat.com>) id 1ir2Wb-0000Pk-9f
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:25:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30813
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ir2Ul-0006bP-9M
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:23:15 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ir2Wb-0000P7-5B
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:25:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578932594;
+ s=mimecast20190719; t=1578932708;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xAun/K1lyiRfKGi+1Rk6IAYFzdY3My2Yc1Te6+XXjWY=;
- b=WTycK41HHB6CVKniYSHH0WSoyFDXypJoODJCjXYJ3jZS58lXNyCIT9TLurai0G/IaTixGq
- 4sacwHZkjaW6HZ4ONbpLcMT8FjTzzikalDDKjfTZd3vT4bb55te4oRgo7QQN+6EAAUwcBT
- QvWKwoec+3GCebbi75IB7OkUzcZqCh8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-ga-B2Z0zOPetwBmLqSUpTw-1; Mon, 13 Jan 2020 11:23:11 -0500
-Received: by mail-wr1-f71.google.com with SMTP id t3so5161581wrm.23
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 08:23:11 -0800 (PST)
+ bh=8tJeKRarH0GSgKHbReVkjmi9dH+l8TsJfxihOE0pOes=;
+ b=f3BJSaEy7Nw9NkXyT7p0Va+kaIazomkjPsnKYyz8nrXUxZS8sFehhnsHIZqqY5zGz7900P
+ 8ZzQ93DkIlU1Jb3xmV3eCTBh3z95y2TfZ9qBD1Vs6cKqiCo3O6R+1yFiM0n/GdX7vqNBxC
+ SyCyqNWGLcnZHoXF1QlroXPiyeYmdKg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-2czXqXKlPLqWM738F8dA6w-1; Mon, 13 Jan 2020 11:25:07 -0500
+Received: by mail-wr1-f69.google.com with SMTP id f15so5263951wrr.2
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 08:25:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=xAun/K1lyiRfKGi+1Rk6IAYFzdY3My2Yc1Te6+XXjWY=;
- b=q+n0t7eaJe67/CNaExHW+5vyGUgXvRATHwDq40gD6UqGtx0X7TpZVGr5HQ+AFYOMJ3
- KilrO96QGMGjE9orf2fZatZcXUne7YatOAdSwBHXHgmaBd00/IO3iDy8infmdytT0vaw
- V8VnHUgkv4tpCwuB3C4pF+YsZ+0yRiUsiyk6wcCHiLPES7et6r3a81fk5ZMbqAb/r7IQ
- CM8PkdC20QKXt9u3bbZEl2l7fLB1MHzVrFR4t42lLtbHOTYg107S7Du2pUqyMuTotTpq
- +Qq/VaFlJSGsRAyZ2bJP/v/wFQzi0CNztapSFmDYEX7aMPwsTq/zwIhx5B/AFCtJ/OBq
- nvSA==
-X-Gm-Message-State: APjAAAXKdPhAG68tcPOYl3/r2KHX8vzW4E9CgGtDA6MqUqWLkA251PeC
- bAt8KhdRr+QovZJf1bKNHwhDdX8tZYDVSfykCgzTUmQi7u87v1fBVBWTpY7gvv4z+OZp+fLsI4m
- m7nvyErpEWbXE/8M=
-X-Received: by 2002:adf:e5ca:: with SMTP id a10mr19245148wrn.347.1578932590098; 
- Mon, 13 Jan 2020 08:23:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyHZoOOqKWinpNZcHGTkeeUgzb8lmZOSSI9d4L5aq12yEh4+uQTdBpioAPk1z3pJjRZNOXFNQ==
-X-Received: by 2002:adf:e5ca:: with SMTP id a10mr19245119wrn.347.1578932589890; 
- Mon, 13 Jan 2020 08:23:09 -0800 (PST)
+ bh=8tJeKRarH0GSgKHbReVkjmi9dH+l8TsJfxihOE0pOes=;
+ b=DAqYDokJs6Vw1UXvdShUS68V6C+BM4bE3aFcWSjyonbIEel0ToNg7qMNGaYau3OHnh
+ NAvc7zOQIdxoDENEz9KLDNqNohI5vxYtoj/V8kWo062WjrhYR4YJt+Srj7pGLkPo1stW
+ GrVF+j8HHIOkwicDfxTMFpi+36WbU49vpSouYFKb39ImPjObnkEEe0PF3Vgr6UvCTKZQ
+ Syj6a5jqd6NDn2X0OY4NTDATG18bcvYJx3i/Q35nmhG35MOehC2++k4oyxv0FCLm/gai
+ Ku/hNbctKD7dR01lqPOsf9bZvVktWmRhIqr2iguyCXnE2I73LltGc2GN6jER26O7uqp2
+ 5ioQ==
+X-Gm-Message-State: APjAAAVzO9PIikKLFvrA7PdBXqlEQAY+8K/pVQ1TJ168bU+SJsIpBdoh
+ 4Ct0e23ksmRRUQstlUaD8Ubg7LthPXS+bS6zU0KemgXW+nCozzbImygPjdpZN6JzPk+/BYzYkE6
+ cHXi5Rz3KMTNm0T4=
+X-Received: by 2002:a5d:5345:: with SMTP id t5mr20359646wrv.0.1578932706005;
+ Mon, 13 Jan 2020 08:25:06 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxFeRGj8MQxm2h68HEtaKWB6m0FBGajtklvVGaEdkdUeG3sX4bNd5affyJxFJK9VrWjqbOzIA==
+X-Received: by 2002:a5d:5345:: with SMTP id t5mr20359621wrv.0.1578932705773;
+ Mon, 13 Jan 2020 08:25:05 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:1475:5c37:e2e2:68ea?
  ([2001:b07:6468:f312:1475:5c37:e2e2:68ea])
- by smtp.gmail.com with ESMTPSA id f1sm15950713wru.6.2020.01.13.08.23.09
+ by smtp.gmail.com with ESMTPSA id y7sm320244wmd.1.2020.01.13.08.25.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 13 Jan 2020 08:23:09 -0800 (PST)
+ Mon, 13 Jan 2020 08:25:05 -0800 (PST)
 Subject: Re: Priority of -accel
-To: Christophe de Dinechin <dinechin@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
 References: <20200106130951.29873-1-philmd@redhat.com>
  <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
  <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
- <58eb34db-7d32-8b0e-d9ef-98648209486b@redhat.com>
- <656169fc-1abe-b521-20a3-e7041739b914@redhat.com>
- <20200107125451.GL3368802@redhat.com>
- <3241dff4-6223-404f-55d4-846991763046@redhat.com>
- <2ae2dee3-cd16-a247-971b-4b3482e596a5@redhat.com>
- <20200107142735.GC3368802@redhat.com>
- <fb83df0a-da82-f981-fbda-d5c74e87cf5c@redhat.com>
- <871rs3zaih.fsf@dusky.pond.sub.org>
- <752BE521-649F-418F-BD09-DDC7708F4FF2@redhat.com>
+ <1A5859EA-4403-4921-B527-DFD07C59C702@redhat.com>
+ <360fa010-ba80-b02b-3a35-19c2b48a462d@redhat.com>
+ <87d0bnwct1.fsf@dusky.pond.sub.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f217e141-3da6-26ff-a174-487f41722989@redhat.com>
-Date: Mon, 13 Jan 2020 17:23:08 +0100
+Message-ID: <ff78d961-9432-c84d-4bba-6df14b1a5a79@redhat.com>
+Date: Mon, 13 Jan 2020 17:25:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <752BE521-649F-418F-BD09-DDC7708F4FF2@redhat.com>
+In-Reply-To: <87d0bnwct1.fsf@dusky.pond.sub.org>
 Content-Language: en-US
-X-MC-Unique: ga-B2Z0zOPetwBmLqSUpTw-1
+X-MC-Unique: 2czXqXKlPLqWM738F8dA6w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -117,21 +110,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
+ Daniel Berrange <berrange@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Christophe de Dinechin <dinechin@redhat.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/01/20 17:14, Christophe de Dinechin wrote:
-> % ./x86_64-softmmu/qemu-system-x86_64   
-> qemu-system-x86_64: invalid accelerator kvm
-> qemu-system-x86_64: falling back to tcg
+On 13/01/20 17:17, Markus Armbruster wrote:
+> Perfect opportunity to change the default to something more useful.
 
-That is a bug, Richard Henderson has posted patches to fix it.
+I am not sure acutally if it's that more useful, now that we have
+sanctioned qemu-kvm as the fast alternative.
+
+Particularly it would be confusing for qemu-system-x86_64 to use
+hardware virtualization on Linux, but not on other operating systems
+where the accelerators are not stable enough.
 
 Paolo
 
