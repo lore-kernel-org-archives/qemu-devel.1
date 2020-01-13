@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E177C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:54:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31BD1C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:54:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D9AB2187F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:54:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D9AB2187F
+	by mail.kernel.org (Postfix) with ESMTPS id 0555D2187F
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:54:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0555D2187F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir6hk-0007hx-DP
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:52:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51089)
+	id 1ir6jU-0001pU-IR
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:54:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51143)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6Tm-0005W5-PA
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:33 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6Tp-0005ZF-N5
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6Tl-00073M-FF
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:30 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:47233 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6To-00077T-JQ
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:33 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:47681 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ir6Tl-0006zv-8g
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:29 -0500
+ id 1ir6To-00074F-Ac
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:32 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 8B82A1A1FB3;
- Mon, 13 Jan 2020 21:38:26 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id AF1761A20B0;
+ Mon, 13 Jan 2020 21:38:28 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 727AB1A1F9E;
- Mon, 13 Jan 2020 21:38:26 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 94F391A1DF2;
+ Mon, 13 Jan 2020 21:38:28 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 16/20] linux-user: Add support for FDFMT<BEG|TRK|END> ioctls
-Date: Mon, 13 Jan 2020 21:34:39 +0100
-Message-Id: <1578947683-21011-17-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v5 18/20] configure: Detect kcov support and introduce
+ CONFIG_KCOV
+Date: Mon, 13 Jan 2020 21:34:41 +0100
+Message-Id: <1578947683-21011-19-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -69,73 +70,58 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls provide means for controlling
-formatting of a floppy drive.
+kcov is kernel code coverage tracing tool. It requires kernel 4.4+
+compiled with certain kernel options. Its interface consists of
+three ioctls.
 
-FDFMTTRK's third agrument is a pointer to the structure:
-
-struct format_descr {
-    unsigned int device,head,track;
-};
-
-defined in Linux kernel header <linux/fd.h>.
-
-Since all fields of the structure are of type 'unsigned int', there is
-no need to define "target_format_descr".
-
-FDFMTBEG and FDFMTEND ioctls do not use the third argument.
+This patch checks if kcov support is present on build machine, and
+stores the result in variable CONFIG_KCOV, meant to be used in
+linux-user code related to the support for above mentioned ioctls.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h        | 3 +++
- linux-user/syscall_defs.h  | 3 +++
- linux-user/syscall_types.h | 5 +++++
- 3 files changed, 11 insertions(+)
+ configure | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 9e3ca90..e754a6b 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -115,6 +115,9 @@
-      IOCTL(FDMSGON, 0, TYPE_NULL)
-      IOCTL(FDMSGOFF, 0, TYPE_NULL)
-      IOCTL(FDSETEMSGTRESH, 0, TYPE_NULL)
-+     IOCTL(FDFMTBEG, 0, TYPE_NULL)
-+     IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
-+     IOCTL(FDFMTEND, 0, TYPE_NULL)
-      IOCTL(FDFLUSH, 0, TYPE_NULL)
-      IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-      IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index efe3860..d85ab46 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -899,6 +899,9 @@ struct target_pollfd {
+diff --git a/configure b/configure
+index 940bf9e..dbdba8f 100755
+--- a/configure
++++ b/configure
+@@ -4752,6 +4752,24 @@ if compile_prog "" "" ; then
+   syncfs=yes
+ fi
  
- #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
- #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
-+#define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
-+#define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct format_descr)
-+#define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
- #define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
- #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
- #define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c, struct floppy_max_errors)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index e4e0429..8ff78a6 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -261,6 +261,11 @@ STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* datalen */
-        TYPE_PTRVOID) /* data */
- 
-+STRUCT(format_descr,
-+       TYPE_INT,     /* device */
-+       TYPE_INT,     /* head */
-+       TYPE_INT)     /* track */
++# check for kcov support (kernel must be 4.4+, compiled with certain options)
++kcov=no
++cat > $TMPC << EOF
++#include <sys/kcov.h>
 +
- STRUCT(floppy_max_errors,
-        TYPE_INT, /* abort */
-        TYPE_INT, /* read_track */
++int main(void)
++{
++    ioctl(-1, KCOV_ENABLE, NULL);
++    ioctl(-1, KCOV_DISABLE, NULL);
++    ioctl(-1, KCOV_INIT_TRACE, NULL);
++
++    return 0;
++}
++EOF
++if compile_prog "" "" ; then
++  kcov=yes
++fi
++
+ # Check we have a new enough version of sphinx-build
+ has_sphinx_build() {
+     # This is a bit awkward but works: create a trivial document and
+@@ -6874,6 +6892,9 @@ fi
+ if test "$syncfs" = "yes" ; then
+   echo "CONFIG_SYNCFS=y" >> $config_host_mak
+ fi
++if test "$kcov" = "yes" ; then
++  echo "CONFIG_KCOV=y" >> $config_host_mak
++fi
+ if test "$inotify" = "yes" ; then
+   echo "CONFIG_INOTIFY=y" >> $config_host_mak
+ fi
 -- 
 2.7.4
 
