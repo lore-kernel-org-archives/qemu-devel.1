@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7527DC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2985C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:55:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46CE82187F
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:54:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CE82187F
+	by mail.kernel.org (Postfix) with ESMTPS id 9685620661
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:55:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9685620661
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir6hP-0007DX-Do
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:52:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51211)
+	id 1ir6kX-0003W8-Ey
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:55:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50930)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6Tz-0005qG-Ra
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:44 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6T8-0004bL-88
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:37:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6Ty-0007MG-U7
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:43 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:48082 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6T7-0006JF-Ai
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:37:50 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:46992 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ir6Ty-00076X-NL
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:42 -0500
+ id 1ir6T7-0006Ho-4G
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:37:49 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 948481A1F9E;
- Mon, 13 Jan 2020 21:38:30 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id E54991A1FB3;
+ Mon, 13 Jan 2020 21:37:46 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 782521A1DF2;
- Mon, 13 Jan 2020 21:38:30 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id CE5771A1F9E;
+ Mon, 13 Jan 2020 21:37:46 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 20/20] linux-user: Add support for KCOV_INIT_TRACE ioctl
-Date: Mon, 13 Jan 2020 21:34:43 +0100
-Message-Id: <1578947683-21011-21-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v5 08/20] linux-user: xtensa: Remove unused constant
+ TARGET_NR_syscall_count
+Date: Mon, 13 Jan 2020 21:34:31 +0100
+Message-Id: <1578947683-21011-9-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -62,45 +63,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: Max Filippov <jcmvbkbc@gmail.com>, laurent@vivier.eu,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-KCOV_INIT_TRACE ioctl plays the role in kernel coverage tracing.
-This ioctl's third argument is of type 'unsigned long', and the
-implementation in QEMU is straightforward.
+Currently, there is no usage of TARGET_NR_syscall_count for target
+xtensa, and there is no obvious indication if there is some planned
+usage in future.
 
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/ioctls.h       | 1 +
- linux-user/syscall_defs.h | 1 +
- 2 files changed, 2 insertions(+)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 39b3825..1da71dd 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -556,4 +556,5 @@
- #ifdef CONFIG_KCOV
-   IOCTL(KCOV_ENABLE, 0, TYPE_NULL)
-   IOCTL(KCOV_DISABLE, 0, TYPE_NULL)
-+  IOCTL(KCOV_INIT_TRACE, IOC_R, TYPE_ULONG)
- #endif
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 87e390d..209c138 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -2460,6 +2460,7 @@ struct target_mtpos {
- /* kcov ioctls */
- #define TARGET_KCOV_ENABLE     TARGET_IO('c', 100)
- #define TARGET_KCOV_DISABLE    TARGET_IO('c', 101)
-+#define TARGET_KCOV_INIT_TRACE TARGET_IOR('c', 1, abi_ulong)
+---
+
+cc: Max Filippov <jcmvbkbc@gmail.com>
+---
+ linux-user/xtensa/syscall_nr.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/linux-user/xtensa/syscall_nr.h b/linux-user/xtensa/syscall_nr.h
+index 3d19d0c..39bff65 100644
+--- a/linux-user/xtensa/syscall_nr.h
++++ b/linux-user/xtensa/syscall_nr.h
+@@ -466,6 +466,4 @@
+ #define TARGET_NR_pidfd_open                         434
+ #define TARGET_NR_clone3                             435
  
- struct target_sysinfo {
-     abi_long uptime;                /* Seconds since boot */
+-#define TARGET_NR_syscall_count                      436
+-
+ #endif /* XTENSA_SYSCALL_NR_H */
 -- 
 2.7.4
 
