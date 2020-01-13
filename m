@@ -2,70 +2,70 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DF3DC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 15:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1CEC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 15:46:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 336E72081E
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 15:41:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 336E72081E
+	by mail.kernel.org (Postfix) with ESMTPS id ACF17207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 15:46:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF17207FD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir1qN-0006lh-9r
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 10:41:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34362)
+	id 1ir1vT-0001R2-LS
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 10:46:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ir1pi-0006EA-UK
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 10:40:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1ir1uO-0000YJ-EV
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 10:45:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ir1ph-0003xk-G0
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 10:40:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55620)
+ (envelope-from <bounces@canonical.com>) id 1ir1uM-0000qz-Su
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 10:45:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:56866)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ir1ph-0003wX-AL
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 10:40:49 -0500
+ id 1ir1uM-0000pO-Mi
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 10:45:38 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ir1pf-0000IW-QZ
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 15:40:47 +0000
+ id 1ir1uL-0000zf-Iz
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 15:45:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C7EAC2E80C7
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 15:40:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 86AE52E80C0
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 15:45:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 15:33:57 -0000
-From: Alex Longwall <1859384@bugs.launchpad.net>
+Date: Mon, 13 Jan 2020 15:35:23 -0000
+From: Yonggang Luo <1622582@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gic
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=jsnow@redhat.com; 
+X-Launchpad-Bug-Tags: q35 sata windows
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
-X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
-References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-Message-Id: <157892963723.14604.17030054826288911696.malone@wampee.canonical.com>
-Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
- race condition in gic_acknowledge_irq
+X-Launchpad-Bug-Commenters: 4o-ubrgtu-59 jnsnow luoyonggang
+X-Launchpad-Bug-Reporter: Dennis (4o-ubrgtu-59)
+X-Launchpad-Bug-Modifier: Yonggang Luo (luoyonggang)
+References: <20160912115104.2358.5193.malonedeb@wampee.canonical.com>
+Message-Id: <157892972315.27324.12009981949838206410.malone@chaenomeles.canonical.com>
+Subject: [Bug 1622582] Re: Can't install Windows 7 with q35 (SATA)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: e049baf8359f7fbc9859e9108d4021175463a238
+X-Launchpad-Hash: e9bf8ea9a7b2ab29c3d8cee95daa32545e552394
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,96 +79,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
+Reply-To: Bug 1622582 <1622582@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Err, I meant 3.2 subitem 5 "Note" "In a multiprocessor implementation,
-the GIC handles(...)" too, sorry
+I also face this problem, any idea to resolve.
+I am using qemeu 4.2 + whpx support but failed to install
+
+./qemu-system-x86_64 -m 4096 \
+-vga vmware \
+-machine q35 \
+-accel whpx \
+-usb -device usb-kbd \
+-device usb-mouse -device usb-audio -boot c \
+-netdev tap,id=3Dmynet0,ifname=3Dtap0,script=3Dno,downscript=3Dno \
+-device e1000,netdev=3Dmynet0,mac=3D52:55:00:d1:55:01 \
+ -smp 4  \
+-cdrom /e/Software/OS/WIN7/en_windows_7_ultimate_with_sp1_x64_dvd_u_677332.=
+iso
+
+
+But when using -accel tcg, it's insalled fine.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859384
+https://bugs.launchpad.net/bugs/1622582
 
 Title:
-  arm gic: interrupt model never 1 on non-mpcore and race condition in
-  gic_acknowledge_irq
+  Can't install Windows 7 with q35 (SATA)
 
 Status in QEMU:
-  New
+  Confirmed
 
 Bug description:
-  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
-  only one CPU can acknowledge the IRQ until it becomes inactive.
+  I'm trying to install Windows 7 on a q35 machine on a "SATA disk". If
+  I use q35 the installation is extremely slow. With extremely slow I
+  mean, that the first few minutes (10-15 minutes) on the second
+  installation step (copying files to disk) nothing happens. Than there
+  is some progress, maybe until 9% and than there is "silence" for
+  another 10 minutes or so. Therefore I used iotop (with --only option)
+  in order to see, if there are any disk operations. But as I mentioned,
+  only a few times qemu writes something to disk (with about < 1M/s).
+  But most of the time there is nothing from qemu. Therefore the
+  installation lasts over an hour. But even worse, after installation I
+  can't boot Windows. Windows-Start-Manager tells me, that windows
+  couldn't be loaded because the kernel is missing or corrupt (Status
+  0xc0000221, File: \Windows\system32\ntoskrnl.exe). If I use IDE on q35
+  or pc-i440fx-2.6 everything works fine. There is a continuous
+  installation progress and iotop shows continuous disk writes with max
+  30M/s (but also 5M/s and other values...).
 
-  The TRM also mandates that SGIs and PPIs follow the N-N model and that
-  SPIs follow the 1-N model.
+  I've tried qemu 2.6.0, 2.6.1 and 2.7.0 (all versions from git).
 
-  However this is not currently the case with QEMU. I have locally (no
-  minimal test case) seen e.g. uart interrupts being acknowledged twice
-  before having been deactivated (expected: irqId on one CPU and 1023 on
-  the other instead).
+  My host machine: =
 
-  I have narrowed the issue down to the following:
+  Ubuntu 14.04.5 LTS
+  3.13.0-95-generic #142-Ubuntu SMP Fri Aug 12 17:00:09 UTC 2016 x86_64 x86=
+_64 x86_64 GNU/Linux
+  Intel(R) Core(TM) i5-3470 CPU
+  16 GB RAM
 
-  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
-  means all IRQ will use the N-N model, and if s->revision !=3D
-  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
+  =
 
-  If ""fixed"" locally with a hackjob, I still have the following trace:
+  I used the following commands:
 
-  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
-  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
-=3D0xff
-  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
-  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
-  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
-  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
-  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
-  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
-  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
-  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
-=3D0xff
-  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
-  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
-  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
-  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
-21
-  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+  "Standard" command
+  qemu-system-x86_64 -m 2048 -machine q35,accel=3Dkvm -cpu host,kvm=3Doff -=
+smp 1,sockets=3D1,cores=3D1,threads=3D1 -enable-kvm -hda win7_qemu_standard=
+_q35.qcow2 -cdrom win7proX64.iso -boot order=3Dd
 
-  This is because:
+  I think by using -hda sata will be used?!?
 
-  2) gic_acknowledge_irq calls gic_clear_pending which uses
-  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
-  sensitive interrupts.
+  With explicit ahci:
+  qemu-system-x86_64 -m 2048 -machine q35,accel=3Dkvm -cpu host,kvm=3Doff -=
+smp 1,sockets=3D1,cores=3D1,threads=3D1 -enable-kvm -drive file=3Dwin7_qemu=
+_standard_q35.qcow2,media=3Ddisk,if=3Dnone,id=3Dsata-disk -device ich9-ahci=
+,id=3Dahci -device ide-drive,drive=3Dsata-disk,bus=3Dahci.0 -drive file=3Dw=
+in7proX64.iso,media=3Dcdrom,if=3Dnone,id=3Dsata-cdrom -device ide-cd,drive=
+=3Dsata-cdrom,bus=3Dahci.1 -boot order=3Dd
 
-  With this often being a no-op (ie. assuming ispendr was not written
-  to), any 1-n level-sensitive interrupt is still improperly pending on
-  all the other cores.
+  I don't know if this is totally correct, because it's a little bit
+  weird that I have to use ide-drive on a ich9 bus.
 
-  (Also, I don't really know how the qemu thread model works, there
-  might be race conditions in the acknowledgment logic if
-  gic_acknowledge_irq is called by multiple threads, too.)
+  Without kvm there is a continious disk write with 100 K/s - 5 M/s (works =
+only with qemu 2.7.0, otherwise I get a 0x000000D1 bluescreen on the setup =
+start screen):
+  qemu-system-x86_64 -m 2048 -machine q35 -cpu IvyBridge -hda win7_qemu_sta=
+ndard_q35.qcow2 -cdrom win7proX64.iso -boot order=3Dd
 
-  Option used:
-  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
--cpu cortex-a57 -smp 4 -m 1024
-  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
-get=3Dnative
-  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
-  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
-te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
-  -trace gic_set_irq
+  But with all three commands the installed Windows is not working,
+  because always the same error occurs: windows couldn't be loaded
+  because kernel is missing or corrupt
 
-  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
-  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
-  staging"
+  Interestingly both commands ("standard" command and with explicit
+  ahci) works very well with a Windows 10 installation.
+
+  In my opinion it's a "SATA problem", because if I use e.g. piix4-ide inst=
+ead of ich9-ahci it works:
+  qemu-system-x86_64 -m 2048 -machine q35,accel=3Dkvm -cpu host,kvm=3Doff -=
+smp 1,sockets=3D1,cores=3D1,threads=3D1 -enable-kvm -drive file=3Dwin7_qemu=
+_standard_q35.qcow2,media=3Ddisk,if=3Dnone,id=3Dide-disk -device piix4-ide,=
+id=3Dide -device ide-drive,drive=3Dide-disk,bus=3Dide.0 -drive file=3Dwin7p=
+roX64.iso,media=3Dcdrom,if=3Dnone,id=3Dide-cdrom -device ide-cd,drive=3Dide=
+-cdrom,bus=3Dide.1 -boot order=3Dd
+
+  With this command there is a continuous disk write and the
+  installation is bootable.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1622582/+subscriptions
 
