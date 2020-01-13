@@ -2,62 +2,82 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7313BC33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DF0C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:47:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 473D220661
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:41:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 473D220661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E87A20661
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:47:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J2YSPvW4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E87A20661
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqxA8-0002pz-AT
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 05:41:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56898)
+	id 1iqxFw-0005F2-QS
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 05:47:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58637)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iqx9V-0002PQ-Kr
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:40:58 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iqxFH-0004ny-RM
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:46:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iqx9U-0003tl-9F
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:40:57 -0500
-Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:51893)
+ (envelope-from <kwolf@redhat.com>) id 1iqxFF-00014v-GC
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:46:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44903
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iqx9U-0003kB-2Y
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:40:56 -0500
-Received: from player696.ha.ovh.net (unknown [10.108.16.184])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2C24414B49A
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 11:40:45 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player696.ha.ovh.net (Postfix) with ESMTPSA id 31414E3135C8;
- Mon, 13 Jan 2020 10:40:43 +0000 (UTC)
-Date: Mon, 13 Jan 2020 11:40:41 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v6 08/11] virtio-9p: introduce ERRP_AUTO_PROPAGATE
-Message-ID: <20200113114041.01cddb87@bahia.lan>
-In-Reply-To: <20200110194158.14190-9-vsementsov@virtuozzo.com>
-References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
- <20200110194158.14190-9-vsementsov@virtuozzo.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iqxFF-00013O-0K
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:46:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578912411;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ucOMsypwDg5H3XYYfZIDXqal+gTOGJv14zU4zenaHgo=;
+ b=J2YSPvW4av9+8IQRKF8UKzalrbyBYv9TbWoHyb3pI41byYoqjkogDYCzL6d8k64mo0MjKQ
+ 0Sc3pw69w0H6VMb6XMfermGJ19b5CKFr3xCdk8N8eWkXJ8oa0Bml0son0nwNhFx2i8cC9+
+ Og3sXdMn+4cH64hVFJ2RWLEL6quD31I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-wb_fZN1GMuyKNHp6yNk17A-1; Mon, 13 Jan 2020 05:46:48 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 846FA107ACE8;
+ Mon, 13 Jan 2020 10:46:47 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-192.ams2.redhat.com [10.36.117.192])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EB7819C6A;
+ Mon, 13 Jan 2020 10:46:46 +0000 (UTC)
+Date: Mon, 13 Jan 2020 11:46:44 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 1/4] qapi: Add a 'coroutine' flag for commands
+Message-ID: <20200113104644.GD5549@linux.fritz.box>
+References: <20200109183545.27452-1-kwolf@redhat.com>
+ <20200109183545.27452-2-kwolf@redhat.com>
+ <947485af-1862-2834-7a0f-f8db811268d5@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 5272870739592649043
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdejtddgudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+In-Reply-To: <947485af-1862-2834-7a0f-f8db811268d5@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: wb_fZN1GMuyKNHp6yNk17A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.251.19
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,102 +89,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 10 Jan 2020 22:41:55 +0300
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
+Am 10.01.2020 um 20:00 hat Eric Blake geschrieben:
+> On 1/9/20 12:35 PM, Kevin Wolf wrote:
+> > This patch adds a new 'coroutine' flag to QMP command definitions that
+> > tells the QMP dispatcher than the command handler is safe to be run in =
+a
+>=20
+> s/than/that/
 
-> If we want to add some info to errp (by error_prepend() or
-> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-> Otherwise, this info will not be added when errp == &error_fatal
-> (the program will exit prior to the error_append_hint() or
-> error_prepend() call).  Fix such cases.
-> 
-> If we want to check error after errp-function call, we need to
-> introduce local_err and then propagate it to errp. Instead, use
-> ERRP_AUTO_PROPAGATE macro, benefits are:
-> 1. No need of explicit error_propagate call
-> 2. No need of explicit local_err variable: use errp directly
-> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->    &error_fatal, this means that we don't break error_abort
->    (we'll abort on error_set, not on error_propagate)
-> 
-> This commit is generated by command
-> 
->     sed -n '/^virtio-9p$/,/^$/{s/^F: //p}' MAINTAINERS | \
->     xargs git ls-files | grep '\.[hc]$' | \
->     xargs spatch \
->         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->         --macro-file scripts/cocci-macro-file.h \
->         --in-place --no-show-diff --max-width 80
-> 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
+Thanks. If this remains the only change, I hope Markus can fix it while
+applying the patch.
 
-Acked-by: Greg Kurz <groug@kaod.org>
+> > coroutine.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   tests/qapi-schema/qapi-schema-test.json |  1 +
+> >   docs/devel/qapi-code-gen.txt            |  4 ++++
+> >   include/qapi/qmp/dispatch.h             |  1 +
+> >   tests/test-qmp-cmds.c                   |  4 ++++
+> >   scripts/qapi/commands.py                | 17 +++++++++++------
+> >   scripts/qapi/doc.py                     |  2 +-
+> >   scripts/qapi/expr.py                    |  4 ++--
+> >   scripts/qapi/introspect.py              |  2 +-
+> >   scripts/qapi/schema.py                  |  9 ++++++---
+> >   tests/qapi-schema/qapi-schema-test.out  |  2 ++
+> >   tests/qapi-schema/test-qapi.py          |  7 ++++---
+> >   11 files changed, 37 insertions(+), 16 deletions(-)
+> >=20
+> > diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schem=
+a/qapi-schema-test.json
+> > index 9abf175fe0..55f596dbaa 100644
+> > --- a/tests/qapi-schema/qapi-schema-test.json
+> > +++ b/tests/qapi-schema/qapi-schema-test.json
+> > @@ -147,6 +147,7 @@
+> >     'returns': 'UserDefTwo' }
+> >   { 'command': 'cmd-success-response', 'data': {}, 'success-response': =
+false }
+> > +{ 'command': 'coroutine_cmd', 'data': {}, 'coroutine': true }
+>=20
+> Not user-visible (it's the testsuite), but why not follow our naming
+> convention of 'coroutine-cmd'?
 
->  hw/9pfs/9p-local.c | 12 +++++-------
->  hw/9pfs/9p.c       |  1 +
->  2 files changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index ca641390fb..253814ef2c 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -1481,10 +1481,10 @@ static void error_append_security_model_hint(Error *const *errp)
->  
->  static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
->  {
-> +    ERRP_AUTO_PROPAGATE();
->      const char *sec_model = qemu_opt_get(opts, "security_model");
->      const char *path = qemu_opt_get(opts, "path");
->      const char *multidevs = qemu_opt_get(opts, "multidevs");
-> -    Error *local_err = NULL;
->  
->      if (!sec_model) {
->          error_setg(errp, "security_model property not set");
-> @@ -1518,11 +1518,10 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
->              fse->export_flags &= ~V9FS_FORBID_MULTIDEVS;
->              fse->export_flags &= ~V9FS_REMAP_INODES;
->          } else {
-> -            error_setg(&local_err, "invalid multidevs property '%s'",
-> +            error_setg(errp, "invalid multidevs property '%s'",
->                         multidevs);
-> -            error_append_hint(&local_err, "Valid options are: multidevs="
-> +            error_append_hint(errp, "Valid options are: multidevs="
->                                "[remap|forbid|warn]\n");
-> -            error_propagate(errp, local_err);
->              return -1;
->          }
->      }
-> @@ -1532,9 +1531,8 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
->          return -1;
->      }
->  
-> -    if (fsdev_throttle_parse_opts(opts, &fse->fst, &local_err)) {
-> -        error_propagate_prepend(errp, local_err,
-> -                                "invalid throttle configuration: ");
-> +    if (fsdev_throttle_parse_opts(opts, &fse->fst, errp)) {
-> +        error_prepend(errp, "invalid throttle configuration: ");
->          return -1;
->      }
->  
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 520177f40c..4200c3416b 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -3994,6 +3994,7 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
->  int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
->                                 Error **errp)
->  {
-> +    ERRP_AUTO_PROPAGATE();
->      int i, len;
->      struct stat stat;
->      FsDriverEntry *fse;
+I just copied and modified the simplest example from a few lines above:
+
+    { 'command': 'user_def_cmd', 'data': {} }
+
+The command names in the test schema seem to follow no particular style,
+there are even some CamelCaseCommands. But if I have to respin, I can
+change it.
+
+> > +++ b/docs/devel/qapi-code-gen.txt
+> > @@ -457,6 +457,7 @@ Syntax:
+> >                   '*gen': false,
+> >                   '*allow-oob': true,
+> >                   '*allow-preconfig': true,
+> > +                '*coroutine': true,
+> >                   '*if': COND,
+> >                   '*features': FEATURES }
+> > @@ -581,6 +582,9 @@ before the machine is built.  It defaults to false.=
+  For example:
+> >   QMP is available before the machine is built only when QEMU was
+> >   started with --preconfig.
+> > +Member 'coroutine' tells the QMP dispatcher whether the command handle=
+r
+> > +is safe to be run in a coroutine. It defaults to false.
+> > +
+> >   The optional 'if' member specifies a conditional.  See "Configuring
+>=20
+> Maybe "The optional 'coroutine' member tells..." for symmetry with the ne=
+xt
+> paragraph.
+
+Starting with 'Member ...' seems to be what is done for most other
+options. I phrased it this way specifically for consistency.
+
+> > +++ b/scripts/qapi/commands.py
+> > @@ -15,6 +15,7 @@ See the COPYING file in the top-level directory.
+> >   from qapi.common import *
+> >   from qapi.gen import QAPIGenCCode, QAPISchemaModularCVisitor, ifconte=
+xt
+> > +from typing import List
+> >   def gen_command_decl(name, arg_type, boxed, ret_type):
+> > @@ -194,8 +195,9 @@ out:
+> >       return ret
+> > -def gen_register_command(name, success_response, allow_oob, allow_prec=
+onfig):
+> > -    options =3D []
+> > +def gen_register_command(name: str, success_response: bool, allow_oob:=
+ bool,
+> > +                         allow_preconfig: bool, coroutine: bool) -> st=
+r:
+> > +    options =3D [] # type: List[str]
+>=20
+> Aha - now that we require python 3, you're going to exploit it ;)
+
+Of course. :-)
+
+I was hoping that I could get the type checker to tell me if I forgot to
+change one of the callers, but that doesn't really work until we add
+type annotations to the callers as well. I'm going to send a separate
+series to do a little more about type checking.
+
+> > +++ b/scripts/qapi/introspect.py
+> > @@ -212,7 +212,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+> >       def visit_command(self, name, info, ifcond, arg_type, ret_type, g=
+en,
+> >                         success_response, boxed, allow_oob, allow_preco=
+nfig,
+> > -                      features):
+> > +                      coroutine, features):
+> >           arg_type =3D arg_type or self._schema.the_empty_object_type
+> >           ret_type =3D ret_type or self._schema.the_empty_object_type
+> >           obj =3D {'arg-type': self._use_type(arg_type),
+>=20
+> I'm assuming the new flag is internal only, and doesn't affect behavior s=
+een
+> by the user, and thus nothing to change in the introspection output.
+
+Yes. The result would hopefully be visible to the user (the guest
+doesn't hang any more where it used to hang), but that's just a bug fix
+and nothing that would require a change in the way a client uses QMP.
+
+Kevin
 
 
