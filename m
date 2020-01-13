@@ -2,101 +2,81 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96568C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB576C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:18:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B7A92080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:16:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8B822080D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:18:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+pgAW92"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B7A92080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MBs7I6+2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B822080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir2Ns-0003mJ-8f
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:16:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46436)
+	id 1ir2Pf-0005qI-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:17:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dinechin@redhat.com>) id 1ir2Mj-0002h1-01
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:14:57 -0500
+ (envelope-from <eblake@redhat.com>) id 1ir2O7-0004Ud-HD
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:16:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1ir2Mg-0004BC-M5
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:14:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24284
+ (envelope-from <eblake@redhat.com>) id 1ir2O6-0006II-9b
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:16:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40788
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>) id 1ir2Mg-00048i-A0
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:14:54 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ir2O6-0006Hu-5U
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:16:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578932093;
+ s=mimecast20190719; t=1578932181;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QGsP8GKEgRUUqq2gfeDxiGtVaLBs8N4bvgoe1+zaWbQ=;
- b=d+pgAW92Jx/GgPqZBSZJuC7GdNSwYoKqSIIzF2f6z4wjG/XOHxgjyD0UGPUBK3BqYjC5kG
- OURfNaHrdNOiglGbCK2CHIC+BSlVYxPNjO9G21NHQpzDKhjFLyDSKwdNrWsOTkGypyuzOg
- wyAFoZ2mISbqgtZYwylpe+dx4mSB3Wc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-6COnVfXbP8CcESpH7J0pIw-1; Mon, 13 Jan 2020 11:14:51 -0500
-Received: by mail-wr1-f71.google.com with SMTP id o6so5170639wrp.8
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 08:14:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=iw21gEE6xY3lfhfqMa681jgo83m9ADLcvBXs22rXYwA=;
- b=DURRLTLPMJlmGLC4P6lA9qB5MCRxNssfGmgmbkIkuwk/M7fNxjcaO5JdK+K1857N+o
- ULZaLErGtV4snq7ROURFizBEEs6skg1m4vXGMmluroHX4dRExreXLCfM1Itbyz0Gj9to
- laG/ieAR0M5g2ehrxp6FLvFrGAc1UQuyNaXGlG7dpgOXCYaE7P7MDH/E31LdR1WI94vB
- ZXX0Rs+VAM3uDQ04/DITY2oji94sY8OME6fN+xrQYL9i1eeYRyd3U463s3UkoOCO4FRw
- GqSPca8R4CkHsDhX/ohM49BLRStmeUUh058Fr3mbqh+5xqzwZVRWwugZLBXcXeI4ZX4m
- HBaQ==
-X-Gm-Message-State: APjAAAVl0lKg6sFgFwUJPGASQrVLlQsYy/8/Ay3eqYvzgTI+DF79zgqh
- EWtN5KSyc4vPVAet2GlxLHRsmgnmbFItFmNbtvFfDI6m3vtxhfxzLtYoMVVU358HJtycE3/szcR
- BbuxS50pToDN/c4I=
-X-Received: by 2002:a5d:4e0a:: with SMTP id p10mr19346434wrt.229.1578932090855; 
- Mon, 13 Jan 2020 08:14:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxZUWsWJKQldISus9o/x5AXtTEMUnntZG2iZT2erxpCR+T37EUuzTgrTeTYytI3hlycu1ox+g==
-X-Received: by 2002:a5d:4e0a:: with SMTP id p10mr19346397wrt.229.1578932090604; 
- Mon, 13 Jan 2020 08:14:50 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:466:71c0:8098:c6b2:68a9:51e5?
- ([2a01:e0a:466:71c0:8098:c6b2:68a9:51e5])
- by smtp.gmail.com with ESMTPSA id h17sm16080838wrs.18.2020.01.13.08.14.49
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 13 Jan 2020 08:14:50 -0800 (PST)
-Mime-Version: 1.0 (Mac OS X Mail 13.0 \(3608.40.2.2.4\))
-Subject: Re: Priority of -accel
-From: Christophe de Dinechin <dinechin@redhat.com>
-In-Reply-To: <871rs3zaih.fsf@dusky.pond.sub.org>
-Date: Mon, 13 Jan 2020 17:14:49 +0100
-Message-Id: <752BE521-649F-418F-BD09-DDC7708F4FF2@redhat.com>
-References: <20200106130951.29873-1-philmd@redhat.com>
- <c493e693-13a7-7dc4-eb2d-5dbc7b3053f1@redhat.com>
- <12334054-4ae7-e580-9727-2d322bfa2bda@redhat.com>
- <58eb34db-7d32-8b0e-d9ef-98648209486b@redhat.com>
- <656169fc-1abe-b521-20a3-e7041739b914@redhat.com>
- <20200107125451.GL3368802@redhat.com>
- <3241dff4-6223-404f-55d4-846991763046@redhat.com>
- <2ae2dee3-cd16-a247-971b-4b3482e596a5@redhat.com>
- <20200107142735.GC3368802@redhat.com>
- <fb83df0a-da82-f981-fbda-d5c74e87cf5c@redhat.com>
- <871rs3zaih.fsf@dusky.pond.sub.org>
-To: Markus Armbruster <armbru@redhat.com>
-X-Mailer: Apple Mail (2.3608.40.2.2.4)
-X-MC-Unique: 6COnVfXbP8CcESpH7J0pIw-1
+ bh=HDhmRhuHSjR4XtIp/pjF91sCXnqbXFLjZvhBGAcYOZg=;
+ b=MBs7I6+2insvZGIrgd00ydnu4z14F1EAarOP8tyXNtpSlmp11Jh6MsUrFmbqZh2uaK8QQg
+ B/R3PwpbUJhr2JitVxhIAz3h0OKv7igSEQ3KccZQw8Tt8iNzlenu2/4M3IQNMpnFd1+w0i
+ 8KZ4b+agayQKGCbTvdKmQ8vOEasthH0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-317-3tTUtMlhOwuP0L9yXFj__g-1; Mon, 13 Jan 2020 11:16:17 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6C2264A7E;
+ Mon, 13 Jan 2020 16:16:15 +0000 (UTC)
+Received: from [10.3.117.16] (ovpn-117-16.phx2.redhat.com [10.3.117.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C5CEE77E8E;
+ Mon, 13 Jan 2020 16:16:14 +0000 (UTC)
+Subject: Re: [PATCH 2/2] qcow2: dump QCOW2 metadata
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1577447039-400109-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1577447039-400109-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <d87d183d-cd69-1994-11d0-5767ec72589e@redhat.com>
+ <be0bf681-5551-c5ec-e7b3-3589fb230176@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <cedf0e08-8994-a892-85dc-bf0dea221163@redhat.com>
+Date: Mon, 13 Jan 2020 10:16:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
+MIME-Version: 1.0
+In-Reply-To: <be0bf681-5551-c5ec-e7b3-3589fb230176@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 3tTUtMlhOwuP0L9yXFj__g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain;
-	charset=us-ascii
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -112,45 +92,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 1/13/20 4:30 AM, Andrey Shinkevich wrote:
 
-
-> On 13 Jan 2020, at 15:39, Markus Armbruster <armbru@redhat.com> wrote:
+>>> -=A0=A0=A0=A0=A0=A0=A0 c =3D getopt_long(argc, argv, ":hf:r:T:qU",
+>>> +=A0=A0=A0=A0=A0=A0=A0 c =3D getopt_long(argc, argv, ":hf:r:T:qU:M",
+>>
+>> We are already inconsistent, but I tend to add options in alphabetical
+>> order, both here...
+>>
 >=20
-> Thomas Huth <thuth@redhat.com> writes:
->>>>=20
->>>> 'any' is a russian roulette, you don't want it to return 'qtest' ;)
->>>=20
->>> We could make it return "qtest" only on April 1st ;-P
->>=20
->> ... or we finally dare to let QEMU chose the "best" accelerator by
->> default if no "-accel" option has been specified...
+> If I merely move 'M' forward like ':hf:M:r:T:qU', will it be OK?
 >=20
-> Changing a default that has ceased to make sense a decade ago?  Are you
-> out of your mind?
+
+If you don't mind writing a pre-requisite patch that sorts the existing=20
+options, then the patch adding your option in sorted order is easy. But=20
+that's asking you to do extra work, which I'm not going to insist on, so=20
+I can also live with your patch being in any order as it is no worse=20
+than existing code and anyone that wants to do a cleanup patch to sort=20
+things has roughly the same level of effort whether or not your patch=20
+without sorting lands in the meantime.
+
+
+>>> +=A0=A0=A0 if ((fix & BDRV_DUMP_META) && output_format !=3D OFORMAT_JSO=
+N) {
+>>> +=A0=A0=A0=A0=A0=A0=A0 error_report("Metadata output in JSON format onl=
+y");
+>>> +=A0=A0=A0=A0=A0=A0=A0 return 1;
+>>
+>> Why this restriction?
+>>
 >=20
-> ;-P
+> This is to remind a user that '-M' can be effective with the option
+> '--output=3Djson' only. Do you think that a comment in the qemu-img.texi
+> would be enough and the restriction should be omitted here?
 
-Well, it makes perfect sense, since we select kvm first on macOS and, I gue=
-ss,
-all non-Linux platforms ;-)
+Rather, why can't we come up with some sort of sane human output, so=20
+that we don't have to limit the flag to just --output=3Djson?
 
-% ./x86_64-softmmu/qemu-system-x86_64  =20
-qemu-system-x86_64: invalid accelerator kvm
-qemu-system-x86_64: falling back to tcg
+>>> +++ b/qemu-img.texi
+>>> @@ -230,7 +230,7 @@ specified as well.
+>>>  =A0 For write tests, by default a buffer filled with zeros is written.
+>>> This can be
+>>>  =A0 overridden with a pattern byte specified by @var{pattern}.
+>>> -@item check [--object @var{objectdef}] [--image-opts] [-q] [-f
+>>> @var{fmt}] [--output=3D@var{ofmt}] [-r [leaks | all]] [-T
+>>> @var{src_cache}] [-U] @var{filename}
+>>> +@item check [--object @var{objectdef}] [--image-opts] [-M] [-q] [-f
+>>> @var{fmt}] [--output=3D@var{ofmt}] [-r [leaks | all]] [-T
+>>> @var{src_cache}] [-U] @var{filename}
+>>
+>> This mentions that -M is valid, but has no further documentation on what
+>> -M means.=A0 Without that, it's anyone's guess.
+>>
+>=20
+> Thank you Eric, I really missed to supply a comment for the new option
+> here and am going to put it below. Should I mention that option in
+> qapi/block-core.json file also with this patch of the series?
 
-(Fixing that knowing that CONFIG_KVM is poisoned in vl.c is left as an
-exercise for the reader)
+Mentioning that the qapi type exists to facilitate a qemu-img option=20
+might not hurt. But more important is that the qemu-img documentation=20
+mentions what -M does; that documentation can point to the qapi docs for=20
+how the output will be structured when --output=3Djson is in effect.
 
-Christophe
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
