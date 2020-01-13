@@ -2,81 +2,91 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1403C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CEF3C33CAE
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:12:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE3812075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE0EF2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:12:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YIghEjTs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE3812075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LDKumHN6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE0EF2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3FM-0005Ko-Px
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:11:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34022)
+	id 1ir3Ga-00079x-26
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:12:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34219)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ir3EK-0003dR-S8
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:10:21 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ir3F9-0005Gi-2A
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:11:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ir3EI-0002SK-GJ
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:10:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56103
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ir3EI-0002R6-D4
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:10:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578935417;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=C/ni6dCfjSn31sYgnStARHuOnOCsB/uTL6pO7qpmluQ=;
- b=YIghEjTsv/fKDEMTDSWU4nhFoVlyqjoHNpXGbEIW0UrnVuBnbT8eW1FUwImSwK7AbCI+L/
- 6BHje1V8QZkQ0vX1sidVsnIJFgFYtUsm6M7AwF9FV/e2GYqX2b/aSXbR0YlrcJYzA1okH9
- OXIt4lgsSx5t4qWwyzCBpcUMUghy20g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-mLbzeYNkPouqFEodvQ2O8Q-1; Mon, 13 Jan 2020 12:10:13 -0500
-X-MC-Unique: mLbzeYNkPouqFEodvQ2O8Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 383DF1800D78;
- Mon, 13 Jan 2020 17:10:12 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-192.ams2.redhat.com [10.36.117.192])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 12A0A5D9CA;
- Mon, 13 Jan 2020 17:10:10 +0000 (UTC)
-Date: Mon, 13 Jan 2020 18:10:09 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [PATCH 2/4] block: Mark 'block_resize' as coroutine
-Message-ID: <20200113171009.GH5549@linux.fritz.box>
-References: <20200109183545.27452-1-kwolf@redhat.com>
- <20200109183545.27452-3-kwolf@redhat.com>
- <20200113165648.GD103384@stefanha-x1.localdomain>
+ (envelope-from <alex.bennee@linaro.org>) id 1ir3F7-0003GE-HF
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:11:10 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44353)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ir3F7-0003Ex-8a
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:11:09 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q10so9400090wrm.11
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:11:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=LIieePK8Rp4gOfbOThvtrc9z57kZvlxPFu5ZiFQaxTE=;
+ b=LDKumHN6PKpvpYDJtYmcGa3t8U/7GYwLvX2jD5nlTllZ6ESou53gouQS1E83wOpv2J
+ 7ENt/uXDrQ9LucaDzJQBgXDXfbAQNiG3SW7r6gb+NninqQ94AgRMoQASLZLnvq8/mD45
+ nQffRBhdFEL7X7SSuMFRoLaRxI/xZgTDejNmEOd3clE3v6sbRsoIz6hPRW+x6JpGMtF/
+ /GKHT8Uunx6/bJlal7XhO8CWfeyHMN2dwhVaMS5Txl6s68+AhYt9S6cSyjwkpaClNdUq
+ 0Erk5BaUInHEfImDqO4Dok6ntYAvXxtliWaHI+kP4vu+r5zthZwLGGtRQdj/9GFL9Ade
+ /NQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=LIieePK8Rp4gOfbOThvtrc9z57kZvlxPFu5ZiFQaxTE=;
+ b=jpzUmtZCHwegXumLVON26WKhK4oE+yxfUMv5Dn8d8cDPU0quz9GafS+CSj8TnzgpKs
+ G/8ZCM82POnV7RJ4y1goUKsg+UIXvoBky7u/NJa/8VqL99s4vZov1FnwBLirurO8dHxT
+ 8GQjua6obATr1JUQOlAa4Vxlk7vwMEU0QGU6HkA1iTaGHhbLOIY3rlMvNpZ4IqQCwgiu
+ Ty0tPV+V6Waq2a7tSD9FkVxfHMpAT3SEBTqMw3TcSkP70LDwEijDvlcvFSfkl78+ygc1
+ xQpWjKlmPedbg6N4CopIjGRT6HdM5PDa3G7Scqkc7jDtx4ADSBodAPQZMOLa1+DN8VC9
+ frFg==
+X-Gm-Message-State: APjAAAWRJ3yXgKpBPzisTIpioEb/uQtAqs4Gb2WiIMTD0tDSaY6ZcuB3
+ jHqhOSchV7n8N2RS0KwYDR8/Uw==
+X-Google-Smtp-Source: APXvYqxZkLHwWI5se9nT4mWfKh8piwgInlCji20CXwSiOzAuPzOYohKGwwwoRh04y0PLzddnrclnfg==
+X-Received: by 2002:a5d:6a0f:: with SMTP id m15mr19773503wru.40.1578935467350; 
+ Mon, 13 Jan 2020 09:11:07 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x7sm15360468wrq.41.2020.01.13.09.11.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jan 2020 09:11:06 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 564171FF87;
+ Mon, 13 Jan 2020 17:11:05 +0000 (GMT)
+References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
+ <157709442133.12933.4291167191595240519.stgit@pasha-Precision-3630-Tower>
+ <20200109115918.GC9504@linux.fritz.box>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [for-5.0 PATCH 03/11] migration: introduce icount field for
+ snapshots
+In-reply-to: <20200109115918.GC9504@linux.fritz.box>
+Date: Mon, 13 Jan 2020 17:11:05 +0000
+Message-ID: <878smbnuxi.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200113165648.GD103384@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="+pHx0qQiF2pBVqBT"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,70 +98,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- armbru@redhat.com
+Cc: peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com,
+ crosthwaite.peter@gmail.com, ciro.santilli@gmail.com, jasowang@redhat.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>, maria.klimushenkova@ispras.ru,
+ mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
+ thomas.dullien@googlemail.com, dovgaluk@ispras.ru, mreitz@redhat.com,
+ artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---+pHx0qQiF2pBVqBT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Am 13.01.2020 um 17:56 hat Stefan Hajnoczi geschrieben:
-> On Thu, Jan 09, 2020 at 07:35:43PM +0100, Kevin Wolf wrote:
-> > block_resize is safe to run in a coroutine, so use it as an example for
-> > the new 'coroutine': true annotation in the QAPI schema.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block-core.json | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 7ff5e5edaf..1dbb2a9901 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -1341,7 +1341,8 @@
-> >  { 'command': 'block_resize',
-> >    'data': { '*device': 'str',
-> >              '*node-name': 'str',
-> > -            'size': 'int' } }
-> > +            'size': 'int' },
-> > +  'coroutine': true }
-> > =20
-> >  ##
-> >  # @NewImageMode:
->=20
-> coroutine_fn is missing on
-> blockdev.c:void qmp_block_resize(bool has_device, const char *device,
+Kevin Wolf <kwolf@redhat.com> writes:
 
-It wouldn't even be true until after patch 4. Should I reorder the
-patches so I can add coroutine_fn?
+> Am 23.12.2019 um 10:47 hat Pavel Dovgalyuk geschrieben:
+>> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>>=20
+>> Saving icount as a parameters of the snapshot allows navigation between
+>> them in the execution replay scenario.
+>> This information can be used for finding a specific snapshot for proceed=
+ing
+>> the recorded execution to the specific moment of the time.
+>> E.g., 'reverse step' action (introduced in one of the following patches)
+>> needs to load the nearest snapshot which is prior to the current moment
+>> of time.
+>>=20
+>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>
+> Acked-by: Kevin Wolf <kwolf@redhat.com>
 
-Kevin
+Apologies my mailer ignored my replay-all:=20
 
---+pHx0qQiF2pBVqBT
-Content-Type: application/pgp-signature; name="signature.asc"
+This commit breaks when of the iotests for me:
 
------BEGIN PGP SIGNATURE-----
+ git bisect run /bin/sh -c "cd builds/all && make -j4 \
+     && cd tests/qemu-iotests && ./check -qcow2 267"
+=20
 
-iQIcBAEBAgAGBQJeHKRxAAoJEH8JsnLIjy/WHOAP/iywQ9vkk4ndP6TtjB4hHZCh
-lPZ3TAsBlaXWyFI8NbkVLMhvnskjrg3bsWOmNn2Ee1C5b6vV50lE3+TyXXr7/7f9
-s1r2pyoQU+iLTQa99slgPQQQT5P1nG4xfrvuRVGZEUAbpe3/GNW7718250hJG51f
-1x7cPGQYIe2dnvwkyKhbZuvjX7pKnlEoft3f/PZivADqslvbe0mJSkhNCFZcEYCa
-XnImXwvY/40RGOchdWGnNHK91oSgDahVnH/xcEpW91eqoEwPCSQTJnmJ8JZXQ0/w
-m0H/X5YOS34dZQAnv2c4Lxg9AzH5z7tsF0jUGl+j52RqR2d9+mauzueidDhVW9eZ
-pTdpCZMyzkPr4WcbHmsXPd5Ld+mEIczuxYB1r+fT2tbwKQKa2y39/jGo4gT/Rm1S
-Rgab/smREV36las5wO/6BNFC+BDL355uRDrcxieshm3NALyH+9jr6Qj2p7aZl+9q
-Oh5IxdQt6OlKFR2TcErlq9mv5KHzLlsb+/Bvbu+hWVPAuwJZaHiqlk1TXAm69ztg
-fdyS+VbfKu+CBSrKmzBJIh8h/+iuW+YrmNQ06jO0/e8uUtghc1zi4iHc1+N1K9iG
-eOTAwUIgmmpcnLFzZsPiMeVccf7IaMZiREhJDUz7KEFU5VRz81ckQqfW8RBF05B9
-9isEfCNlR0KT4Xvi1Fqd
-=vk3k
------END PGP SIGNATURE-----
+Gives:
 
---+pHx0qQiF2pBVqBT--
+  make[1]: Entering directory '/home/alex.bennee/lsrc/qemu.git/slirp'
+  make[1]: Nothing to be done for 'all'.
+  make[1]: Leaving directory '/home/alex.bennee/lsrc/qemu.git/slirp'
+  QEMU          -- "/home/alex.bennee/lsrc/qemu.git/builds/all/tests/qemu-i=
+otests/../../x86_64-softmmu/qemu-system-x86_64" -nodefaults -display none -=
+accel qtest
+  QEMU_IMG      -- "/home/alex.bennee/lsrc/qemu.git/builds/all/tests/qemu-i=
+otests/../../qemu-img"
+  QEMU_IO       -- "/home/alex.bennee/lsrc/qemu.git/builds/all/tests/qemu-i=
+otests/../../qemu-io"  --cache writeback -f qcow2
+  QEMU_NBD      -- "/home/alex.bennee/lsrc/qemu.git/builds/all/tests/qemu-i=
+otests/../../qemu-nbd"
+  IMGFMT        -- qcow2 (compat=3D1.1)
+  IMGPROTO      -- file
+  PLATFORM      -- Linux/x86_64 hackbox2 4.15.0-66-generic
+  TEST_DIR      -- /home/alex.bennee/lsrc/qemu.git/builds/all/tests/qemu-io=
+tests/scratch
+  SOCK_DIR      -- /tmp/tmp.NV0n5HqCUs
+  SOCKET_SCM_HELPER -- /home/alex.bennee/lsrc/qemu.git/builds/all/tests/qem=
+u-iotests/socket_scm_helper
 
+  267      fail       [12:17:36] [12:17:38]      (last: 1s)    output misma=
+tch (see 267.out.bad)
+  --- /home/alex.bennee/lsrc/qemu.git/tests/qemu-iotests/267.out  2019-10-3=
+1 10:46:30.559805129 +0000
+  +++ /home/alex.bennee/lsrc/qemu.git/builds/all/tests/qemu-iotests/267.out=
+.bad   2020-01-13 12:17:38.096181947 +0000
+  @@ -33,7 +33,7 @@
+   (qemu) savevm snap0
+   (qemu) info snapshots
+   List of snapshots present on all disks:
+  -ID        TAG                 VM SIZE                DATE       VM CLOCK
+  +ID        TAG               VM SIZE                DATE     VM CLOCK    =
+ ICOUNT
+   --        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.000
+   (qemu) loadvm snap0
+   (qemu) quit
+  @@ -44,7 +44,7 @@
+   (qemu) savevm snap0
+   (qemu) info snapshots
+   List of snapshots present on all disks:
+  -ID        TAG                 VM SIZE                DATE       VM CLOCK
+  +ID        TAG               VM SIZE                DATE     VM CLOCK    =
+ ICOUNT
+
+But I've also seen:
+
+  ERROR:/home/.../qemu.git/replay/replay-events.c:80:replay_flush_events:
+     assertion failed: (replay_mutex_locked())
+
+--=20
+Alex Benn=C3=A9e
 
