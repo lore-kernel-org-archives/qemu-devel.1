@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69276C32771
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 03:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74CF7C32771
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 03:26:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35255206D6
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 03:25:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40408206D6
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 03:26:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kqX/uxq7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35255206D6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hr6m8MgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40408206D6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqqLe-0008AK-Cj
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 22:25:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33628)
+	id 1iqqNQ-0001iH-GM
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 22:26:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33631)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iqqKp-0007IJ-Ui
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 22:24:12 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iqqKq-0007IL-1N
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 22:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iqqKo-0003IQ-Rq
+ (envelope-from <dgibson@ozlabs.org>) id 1iqqKp-0003If-0r
  for qemu-devel@nongnu.org; Sun, 12 Jan 2020 22:24:11 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:46221)
+Received: from ozlabs.org ([2401:3900:2:1::2]:60869)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iqqKl-00036u-2e; Sun, 12 Jan 2020 22:24:07 -0500
+ id 1iqqKk-000375-Gq; Sun, 12 Jan 2020 22:24:07 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47wzTB5Mnvz9sP3; Mon, 13 Jan 2020 14:23:58 +1100 (AEDT)
+ id 47wzTB6nylz9s4Y; Mon, 13 Jan 2020 14:23:58 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1578885838;
- bh=GSzB1/RoqRWSpXQnvdZLFlk4mB9lNaa5NXZOktq/Pdg=;
+ bh=VP7yNU/KIZVHXNs4kkGriW1bjHfnY45nlkhaEeGBXB4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=kqX/uxq7YKvFvznFeTSk2Z1zXdJ5jVrQcZGikvBIAJnmZCH6fSYKG83W0Wsa9xoy4
- AXBbAaSyDXA9Nufd3jE7gMp7PYrdO2OOS+ECa9IeMgOd24wso2X1IBzZitintMzx27
- 2oIBwq3YGF/dpFVzhqmFMCRiLIn/JK1gCYbOJxVY=
-Date: Mon, 13 Jan 2020 11:11:05 +1000
+ b=hr6m8MgXuoEXCF8Nsw8V+sFalz3dFQPYhMJ1Ziw2/2EWkg61D5mxEOfjiLpHmeH9b
+ 1L/8K2Oz7yx07GGdBRhgxckptYNjfumL/Vpfe+oN2rXw6nSdZGR4tJMJGpXC+pAIZz
+ vUD+G5Z77HEVwMxwfpy6rgBwvFpmMVy+qXF/YYDg=
+Date: Mon, 13 Jan 2020 11:11:29 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 02/15] hw/ppc/spapr_rtas: Use local MachineState variable
-Message-ID: <20200113011105.GA7045@umbus>
+Subject: Re: [PATCH 03/15] hw/ppc/spapr_rtas: Access MachineState via
+ SpaprMachineState argument
+Message-ID: <20200113011129.GB7045@umbus>
 References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-3-philmd@redhat.com>
+ <20200109152133.23649-4-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
+ protocol="application/pgp-signature"; boundary="+g7M9IMkV8truYOl"
 Content-Disposition: inline
-In-Reply-To: <20200109152133.23649-3-philmd@redhat.com>
+In-Reply-To: <20200109152133.23649-4-philmd@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
@@ -81,14 +82,14 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---pf9I7BMVVzbSWLtt
+--+g7M9IMkV8truYOl
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 09, 2020 at 04:21:20PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Since we have the MachineState already available locally,
-> ues it instead of the global current_machine.
+On Thu, Jan 09, 2020 at 04:21:21PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> We received a SpaprMachineState argument. Since SpaprMachineState
+> inherits of MachineState, use it instead of calling qdev_get_machine.
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
@@ -99,20 +100,20 @@ Acked-by: David Gibson <david@gibson.dropbear.id.au>
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
 > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> index 8d8d8cdfcb..e88bb1930e 100644
+> index e88bb1930e..6f06e9d7fe 100644
 > --- a/hw/ppc/spapr_rtas.c
 > +++ b/hw/ppc/spapr_rtas.c
-> @@ -281,7 +281,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
+> @@ -267,7 +267,7 @@ static void rtas_ibm_get_system_parameter(PowerPCCPU =
 *cpu,
->                                            "DesProcs=3D%d,"
->                                            "MaxPlatProcs=3D%d",
->                                            max_cpus,
-> -                                          current_machine->ram_size / Mi=
-B,
-> +                                          ms->ram_size / MiB,
->                                            ms->smp.cpus,
->                                            max_cpus);
->          if (pcc->n_host_threads > 0) {
+>                                            uint32_t nret, target_ulong re=
+ts)
+>  {
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> -    MachineState *ms =3D MACHINE(qdev_get_machine());
+> +    MachineState *ms =3D MACHINE(spapr);
+>      unsigned int max_cpus =3D ms->smp.max_cpus;
+>      target_ulong parameter =3D rtas_ld(args, 0);
+>      target_ulong buffer =3D rtas_ld(args, 1);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -120,25 +121,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---pf9I7BMVVzbSWLtt
+--+g7M9IMkV8truYOl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4bw6MACgkQbDjKyiDZ
-s5J3Rg/+PcAF6N1hOCWdn3fjZ7uZ8Dc6XsXHNfrNBUKNNZR5evR3f/Uw91FbBnWU
-93bkX39mSNqucWhzHGS3AH0bryt5f//anWrTpzbBE+yYT2Zw1I9u355c5/FzJlVW
-5qfcth5UPcqmQ0QJwtq46xpwMoOi7lH8mXsM8/LTBdRqgy9jMnW+tjuUOoC9vP+2
-+55HExP5h03MBB3kKMxCGPogC8wzdo6PLueDD8TSm9OXSEQGrQKmG/0kXRjVxpRb
-YUlT6u7R9P/pN+sVZ/+denw7CBYqMjrAhnu8tHP9PdGT7uRadR8VbfoUe9QEREwd
-kd7BHhyN9RtspDMwx5vUDuICtjoFZW9gsVYzo80XCgVHMHqazBtcjIJMoyCP4u0d
-jMDRCeKMX7/iXjjZ0BK4bAol/TbT/luZF+aQQRTT4uhK4H3aeQdheOanj3nsWB1t
-kMbGTwUAKvLDFRPfUnUfDGyf1QxsO31izD2XRqHUiu1kbFHn3c83zBf5IOOXE1qP
-IoD1ldQ5SMQ/anRHbvDyhhQyLHBNJlua2/baqj5U9a3J/nNKlrl1mrYCHMsShqUO
-/QymmpNf/uwMtJoInAUeCPe5m+SfZmPewDawfebcSljiNPL2JFK2ixXXSlFDNQpp
-uMusEfKsDPY8r/42sDhIerUu/TulgIa0YrDi0gf31NwV3sHaIRo=
-=tUZF
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4bw8EACgkQbDjKyiDZ
+s5Ka5BAAhSNLPIhoInFnP9CxnaJbV9mhIjn8pnrM7awPSiWiWJauBXV8BcC7QTL/
+Myc6yEf55vjg+kA3Lt+Z4Q4zk17tSNa777IsYB+Yqi1ZELp2Y1/dLV0uH9qvFZHo
+o3GfEylWJ6s9S2NVrgF6xllliJpnR1yescXMIpU9ecj04rfaJAmkBzW6NqSLAzSN
+YsJHTDebT6ZYG9wyj/BKIup+k/e/wfbKjs+So5lLEN5TasHuyTJjapLxq/g9A0lE
+KLYbBxrHtZt/B3Bmajytcp7zIUvwQUECX10l3PGlitZigvrGQ42Wj/Y8w+8tEmoa
+A6mY/PNqhjP/Lb/fMIWoIq/SiL23B17Y3OjdPUdgYrwRSBkzOd6njW4GDfAkdh/z
+zOAyIrZY0DekDb3lh9NUmOqeUFQ7egRURG/yijA54Fq/t2poieCxqPiNmwhPor/E
+P74T+n7s8FlsYaUoz10jxmCJqHgQYNh6Vr2gET2D7L2U9rf8837nV6pw4FcBScWL
+TzvKCxWSRkP+sXROtw8+AjrUlIxp4q7t4g2Iun2dCQjGQ4A8VbYtsMzKr2Qd7fes
+ReM413SdHXxqpPSlo8u922bU3bArJr3Ljv82/RK+rm4lTiCzRc7khG/eOX+j40pm
+w5nsxgCEZNc+4SdIJFWDhQawZjSpl/0yugafNR8Dq5h+NsL5pxY=
+=Asp2
 -----END PGP SIGNATURE-----
 
---pf9I7BMVVzbSWLtt--
+--+g7M9IMkV8truYOl--
 
