@@ -2,74 +2,81 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B826C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C226FC33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:52:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9A94214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:49:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C79E207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SkFAX/dw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A94214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFJuLMBw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C79E207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir063-0001OC-OQ
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:49:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54029)
+	id 1ir08P-0004Us-Du
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:52:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54764)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ir05B-0000w1-BG
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:48:43 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1ir06u-00036f-05
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:50:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ir059-0004Jl-A2
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:48:41 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27933
+ (envelope-from <eric.auger@redhat.com>) id 1ir06r-0006w1-Tf
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:50:27 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43647
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ir059-0004Hq-5L
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:48:39 -0500
+ id 1ir06r-0006vD-Nq
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:50:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578923318;
+ s=mimecast20190719; t=1578923425;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=2nLYxqRjAjhLdA0dSiWegmHjzWiG8+G3XINxJ6pfDmY=;
- b=SkFAX/dwyk9WCA9Kpbvsy3W4TlYh0h6sqEP3KVPYYvsYayh6NlhxSasCnX6YZ/hK0RNVCW
- wWfJyT0rLQ6guir2vgActMd9k0gpv6YM6sV5thOEDf8ut2hxzSopK4Orz7K2vIeYbnRL4t
- hQfwX9XrwVmVk4JxVZTT9HAAp0igw50=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QKWrZYleSpPbUqphBE/CvQjtT991xYaEo3+lzuwI3gc=;
+ b=fFJuLMBwGN+m95rFrba8UdLUernUomja08YZsOU8s26aKNNyZ7J1DDU6i6ls4B9qq7QdE9
+ uFuX5WujSVhz4nbKFBONhPcOwbXFdEa98nJ6yXyF95x/c34SRV11omt/eITGoKVrdNIYMl
+ VZYB6HjVZim8EYgvgbEe3Ei9x4BUa/E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-1sSLB0PUOIOC-7CbAvUYpw-1; Mon, 13 Jan 2020 08:48:36 -0500
+ us-mta-142-Zex7t8eCO1KlMWYHDueeAw-1; Mon, 13 Jan 2020 08:50:23 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1A84477;
- Mon, 13 Jan 2020 13:48:35 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D3F55DA76;
- Mon, 13 Jan 2020 13:48:31 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
- quintela@redhat.com
-Subject: [PATCH v7] migration: Support QLIST migration
-Date: Mon, 13 Jan 2020 14:48:23 +0100
-Message-Id: <20200113134823.29817-1-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0CE0100550E;
+ Mon, 13 Jan 2020 13:50:20 +0000 (UTC)
+Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CBBCC5DA70;
+ Mon, 13 Jan 2020 13:50:11 +0000 (UTC)
+Subject: Re: [PULL 00/28] Migration pull patches
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Juan Quintela <quintela@redhat.com>
+References: <20200110173215.3865-1-quintela@redhat.com>
+ <CAFEAcA97ZqynDV6b6YUL_7iF=zsmB2Mwogi0k4ViAUAFTwsTnA@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <c4c373b7-ba6b-b81c-0f3b-163047c4e52f@redhat.com>
+Date: Mon, 13 Jan 2020 14:50:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA97ZqynDV6b6YUL_7iF=zsmB2Mwogi0k4ViAUAFTwsTnA@mail.gmail.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 1sSLB0PUOIOC-7CbAvUYpw-1
+X-MC-Unique: Zex7t8eCO1KlMWYHDueeAw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -84,471 +91,257 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, dgilbert@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>, Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Support QLIST migration using the same principle as QTAILQ:
-94869d5c52 ("migration: migrate QTAILQ").
+Hi Juan, Peter,
 
-The VMSTATE_QLIST_V macro has the same proto as VMSTATE_QTAILQ_V.
-The change mainly resides in QLIST RAW macros: QLIST_RAW_INSERT_HEAD
-and QLIST_RAW_REVERSE.
+On 1/13/20 2:05 PM, Peter Maydell wrote:
+> On Fri, 10 Jan 2020 at 17:32, Juan Quintela <quintela@redhat.com> wrote:
+>>
+>> The following changes since commit f38a71b01f839c7b65ea73ddd507903cb9489ed6:
+>>
+>>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-and-semihosting-090120-2' into staging (2020-01-10 13:19:34 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/juanquintela/qemu.git tags/migration-pull-pull-request
+>>
+>> for you to fetch changes up to cc708d2411d3ed2ab4a428c996b778c7c7a47a04:
+>>
+>>   apic: Use 32bit APIC ID for migration instance ID (2020-01-10 18:19:18 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Migration pull request
+>>
+>> - several multifd mixes (jiahui, me)
+>> - rate limit host pages (david)
+>> - remove unneeded labels (daniel)
+>> - several multifd fixes (wei)
+>> - improve handler insert (scott)
+>> - qlist migration (eric)
+>> - power fixes (laurent)
+>> - migration improvemests (yury)
+>> - lots of fixes (wei)
+> 
+> Hi. This causes a new compile warning for the netbsd VM:
+> 
+> In file included from
+> /home/qemu/qemu-test.tqjNTZ/src/include/hw/qdev-core.h:4:0,
+>                  from
+> /home/qemu/qemu-test.tqjNTZ/src/tests/../migration/migration.h:18,
+>                  from /home/qemu/qemu-test.tqjNTZ/src/tests/test-vmstate.c:27:
+> /home/qemu/qemu-test.tqjNTZ/src/tests/test-vmstate.c: In function
+> 'manipulate_container':
+> /home/qemu/qemu-test.tqjNTZ/src/include/qemu/queue.h:130:34: warning:
+> 'prev' may be used uninitialized in this function
+> [-Wmaybe-uninitialized]
+>          (listelm)->field.le_prev = &(elm)->field.le_next;               \
+>                                   ^
+> /home/qemu/qemu-test.tqjNTZ/src/tests/test-vmstate.c:1337:24: note:
+> 'prev' was declared here
+>       TestQListElement *prev, *iter = QLIST_FIRST(&c->list);>                         ^
+I just sent "[PATCH v7] migration: Support QLIST migration"
+It should fix that warning.
 
-Tests also are provided.
+Sorry for the inconvenience.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
+Thanks
 
----
-
-v6 -> v7:
-- initialize prev to avoid compile warning for the netbsd VM
----
- include/migration/vmstate.h |  21 +++++
- include/qemu/queue.h        |  39 +++++++++
- migration/trace-events      |   5 ++
- migration/vmstate-types.c   |  70 +++++++++++++++
- tests/test-vmstate.c        | 170 ++++++++++++++++++++++++++++++++++++
- 5 files changed, 305 insertions(+)
-
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 4aef72c426..0dc04fc48e 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -229,6 +229,7 @@ extern const VMStateInfo vmstate_info_tmp;
- extern const VMStateInfo vmstate_info_bitmap;
- extern const VMStateInfo vmstate_info_qtailq;
- extern const VMStateInfo vmstate_info_gtree;
-+extern const VMStateInfo vmstate_info_qlist;
-=20
- #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
- /*
-@@ -798,6 +799,26 @@ extern const VMStateInfo vmstate_info_gtree;
-     .offset       =3D offsetof(_state, _field),                           =
-       \
- }
-=20
-+/*
-+ * For migrating a QLIST
-+ * Target QLIST needs be properly initialized.
-+ * _type: type of QLIST element
-+ * _next: name of QLIST_ENTRY entry field in QLIST element
-+ * _vmsd: VMSD for QLIST element
-+ * size: size of QLIST element
-+ * start: offset of QLIST_ENTRY in QTAILQ element
-+ */
-+#define VMSTATE_QLIST_V(_field, _state, _version, _vmsd, _type, _next)  \
-+{                                                                        \
-+    .name         =3D (stringify(_field)),                                =
- \
-+    .version_id   =3D (_version),                                         =
- \
-+    .vmsd         =3D &(_vmsd),                                           =
- \
-+    .size         =3D sizeof(_type),                                      =
- \
-+    .info         =3D &vmstate_info_qlist,                                =
- \
-+    .offset       =3D offsetof(_state, _field),                           =
- \
-+    .start        =3D offsetof(_type, _next),                             =
- \
-+}
-+
- /* _f : field name
-    _f_n : num of elements field_name
-    _n : num of elements
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 4764d93ea3..4d4554a7ce 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -501,4 +501,43 @@ union {                                               =
-                  \
-         QTAILQ_RAW_TQH_CIRC(head)->tql_prev =3D QTAILQ_RAW_TQE_CIRC(elm, e=
-ntry);  \
- } while (/*CONSTCOND*/0)
-=20
-+#define QLIST_RAW_FIRST(head)                                             =
-     \
-+        field_at_offset(head, 0, void *)
-+
-+#define QLIST_RAW_NEXT(elm, entry)                                        =
-     \
-+        field_at_offset(elm, entry, void *)
-+
-+#define QLIST_RAW_PREVIOUS(elm, entry)                                    =
-     \
-+        field_at_offset(elm, entry + sizeof(void *), void *)
-+
-+#define QLIST_RAW_FOREACH(elm, head, entry)                               =
-     \
-+        for ((elm) =3D *QLIST_RAW_FIRST(head);                            =
-       \
-+             (elm);                                                       =
-     \
-+             (elm) =3D *QLIST_RAW_NEXT(elm, entry))
-+
-+#define QLIST_RAW_INSERT_HEAD(head, elm, entry) do {                      =
-     \
-+        void *first =3D *QLIST_RAW_FIRST(head);                           =
-       \
-+        *QLIST_RAW_FIRST(head) =3D elm;                                   =
-       \
-+        *QLIST_RAW_PREVIOUS(elm, entry) =3D QLIST_RAW_FIRST(head);        =
-       \
-+        if (first) {                                                      =
-     \
-+            *QLIST_RAW_NEXT(elm, entry) =3D first;                        =
-       \
-+            *QLIST_RAW_PREVIOUS(first, entry) =3D QLIST_RAW_NEXT(elm, entr=
-y);    \
-+        } else {                                                          =
-     \
-+            *QLIST_RAW_NEXT(elm, entry) =3D NULL;                         =
-       \
-+        }                                                                 =
-     \
-+} while (0)
-+
-+#define QLIST_RAW_REVERSE(head, elm, entry) do {                          =
-     \
-+        void *iter =3D *QLIST_RAW_FIRST(head), *prev =3D NULL, *next;     =
-         \
-+        while (iter) {                                                    =
-     \
-+            next =3D *QLIST_RAW_NEXT(iter, entry);                        =
-       \
-+            *QLIST_RAW_PREVIOUS(iter, entry) =3D QLIST_RAW_NEXT(next, entr=
-y);    \
-+            *QLIST_RAW_NEXT(iter, entry) =3D prev;                        =
-       \
-+            prev =3D iter;                                                =
-       \
-+            iter =3D next;                                                =
-       \
-+        }                                                                 =
-     \
-+        *QLIST_RAW_FIRST(head) =3D prev;                                  =
-       \
-+        *QLIST_RAW_PREVIOUS(prev, entry) =3D QLIST_RAW_FIRST(head);       =
-       \
-+} while (0)
-+
- #endif /* QEMU_SYS_QUEUE_H */
-diff --git a/migration/trace-events b/migration/trace-events
-index 6dee7b5389..e0a33cffca 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -76,6 +76,11 @@ get_gtree_end(const char *field_name, const char *key_vm=
-sd_name, const char *val
- put_gtree(const char *field_name, const char *key_vmsd_name, const char *v=
-al_vmsd_name, uint32_t nnodes) "%s(%s/%s) nnodes=3D%d"
- put_gtree_end(const char *field_name, const char *key_vmsd_name, const cha=
-r *val_vmsd_name, int ret) "%s(%s/%s) %d"
-=20
-+get_qlist(const char *field_name, const char *vmsd_name, int version_id) "=
-%s(%s v%d)"
-+get_qlist_end(const char *field_name, const char *vmsd_name) "%s(%s)"
-+put_qlist(const char *field_name, const char *vmsd_name, int version_id) "=
-%s(%s v%d)"
-+put_qlist_end(const char *field_name, const char *vmsd_name) "%s(%s)"
-+
- # qemu-file.c
- qemu_file_fclose(void) ""
-=20
-diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-index 7236cf92bc..1eee36773a 100644
---- a/migration/vmstate-types.c
-+++ b/migration/vmstate-types.c
-@@ -843,3 +843,73 @@ const VMStateInfo vmstate_info_gtree =3D {
-     .get  =3D get_gtree,
-     .put  =3D put_gtree,
- };
-+
-+static int put_qlist(QEMUFile *f, void *pv, size_t unused_size,
-+                     const VMStateField *field, QJSON *vmdesc)
-+{
-+    const VMStateDescription *vmsd =3D field->vmsd;
-+    /* offset of the QTAILQ entry in a QTAILQ element*/
-+    size_t entry_offset =3D field->start;
-+    void *elm;
-+    int ret;
-+
-+    trace_put_qlist(field->name, vmsd->name, vmsd->version_id);
-+    QLIST_RAW_FOREACH(elm, pv, entry_offset) {
-+        qemu_put_byte(f, true);
-+        ret =3D vmstate_save_state(f, vmsd, elm, vmdesc);
-+        if (ret) {
-+            error_report("%s: failed to save %s (%d)", field->name,
-+                         vmsd->name, ret);
-+            return ret;
-+        }
-+    }
-+    qemu_put_byte(f, false);
-+    trace_put_qlist_end(field->name, vmsd->name);
-+
-+    return 0;
-+}
-+
-+static int get_qlist(QEMUFile *f, void *pv, size_t unused_size,
-+                     const VMStateField *field)
-+{
-+    int ret =3D 0;
-+    const VMStateDescription *vmsd =3D field->vmsd;
-+    /* size of a QLIST element */
-+    size_t size =3D field->size;
-+    /* offset of the QLIST entry in a QLIST element */
-+    size_t entry_offset =3D field->start;
-+    int version_id =3D field->version_id;
-+    void *elm;
-+
-+    trace_get_qlist(field->name, vmsd->name, vmsd->version_id);
-+    if (version_id > vmsd->version_id) {
-+        error_report("%s %s",  vmsd->name, "too new");
-+        return -EINVAL;
-+    }
-+    if (version_id < vmsd->minimum_version_id) {
-+        error_report("%s %s",  vmsd->name, "too old");
-+        return -EINVAL;
-+    }
-+
-+    while (qemu_get_byte(f)) {
-+        elm =3D g_malloc(size);
-+        ret =3D vmstate_load_state(f, vmsd, elm, version_id);
-+        if (ret) {
-+            error_report("%s: failed to load %s (%d)", field->name,
-+                         vmsd->name, ret);
-+            g_free(elm);
-+            return ret;
-+        }
-+        QLIST_RAW_INSERT_HEAD(pv, elm, entry_offset);
-+    }
-+    QLIST_RAW_REVERSE(pv, elm, entry_offset);
-+    trace_get_qlist_end(field->name, vmsd->name);
-+
-+    return ret;
-+}
-+
-+const VMStateInfo vmstate_info_qlist =3D {
-+    .name =3D "qlist",
-+    .get  =3D get_qlist,
-+    .put  =3D put_qlist,
-+};
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index 8f184f3556..cea363dd69 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -926,6 +926,28 @@ static const VMStateDescription vmstate_domain =3D {
-     }
- };
-=20
-+/* test QLIST Migration */
-+
-+typedef struct TestQListElement {
-+    uint32_t  id;
-+    QLIST_ENTRY(TestQListElement) next;
-+} TestQListElement;
-+
-+typedef struct TestQListContainer {
-+    uint32_t  id;
-+    QLIST_HEAD(, TestQListElement) list;
-+} TestQListContainer;
-+
-+static const VMStateDescription vmstate_qlist_element =3D {
-+    .name =3D "test/queue list",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, TestQListElement),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_iommu =3D {
-     .name =3D "iommu",
-     .version_id =3D 1,
-@@ -939,6 +961,18 @@ static const VMStateDescription vmstate_iommu =3D {
-     }
- };
-=20
-+static const VMStateDescription vmstate_container =3D {
-+    .name =3D "test/container/qlist",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(id, TestQListContainer),
-+        VMSTATE_QLIST_V(list, TestQListContainer, 1, vmstate_qlist_element=
-,
-+                        TestQListElement, next),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- uint8_t first_domain_dump[] =3D {
-     /* id */
-     0x00, 0x0, 0x0, 0x6,
-@@ -1229,6 +1263,140 @@ static void test_gtree_load_iommu(void)
-     qemu_fclose(fload);
- }
-=20
-+static uint8_t qlist_dump[] =3D {
-+    0x00, 0x00, 0x00, 0x01, /* container id */
-+    0x1, /* start of a */
-+    0x00, 0x00, 0x00, 0x0a,
-+    0x1, /* start of b */
-+    0x00, 0x00, 0x0b, 0x00,
-+    0x1, /* start of c */
-+    0x00, 0x0c, 0x00, 0x00,
-+    0x1, /* start of d */
-+    0x0d, 0x00, 0x00, 0x00,
-+    0x0, /* end of list */
-+    QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely *=
-/
-+};
-+
-+static TestQListContainer *alloc_container(void)
-+{
-+    TestQListElement *a =3D g_malloc(sizeof(TestQListElement));
-+    TestQListElement *b =3D g_malloc(sizeof(TestQListElement));
-+    TestQListElement *c =3D g_malloc(sizeof(TestQListElement));
-+    TestQListElement *d =3D g_malloc(sizeof(TestQListElement));
-+    TestQListContainer *container =3D g_malloc(sizeof(TestQListContainer))=
-;
-+
-+    a->id =3D 0x0a;
-+    b->id =3D 0x0b00;
-+    c->id =3D 0xc0000;
-+    d->id =3D 0xd000000;
-+    container->id =3D 1;
-+
-+    QLIST_INIT(&container->list);
-+    QLIST_INSERT_HEAD(&container->list, d, next);
-+    QLIST_INSERT_HEAD(&container->list, c, next);
-+    QLIST_INSERT_HEAD(&container->list, b, next);
-+    QLIST_INSERT_HEAD(&container->list, a, next);
-+    return container;
-+}
-+
-+static void free_container(TestQListContainer *container)
-+{
-+    TestQListElement *iter, *tmp;
-+
-+    QLIST_FOREACH_SAFE(iter, &container->list, next, tmp) {
-+        QLIST_REMOVE(iter, next);
-+        g_free(iter);
-+    }
-+    g_free(container);
-+}
-+
-+static void compare_containers(TestQListContainer *c1, TestQListContainer =
-*c2)
-+{
-+    TestQListElement *first_item_c1, *first_item_c2;
-+
-+    while (!QLIST_EMPTY(&c1->list)) {
-+        first_item_c1 =3D QLIST_FIRST(&c1->list);
-+        first_item_c2 =3D QLIST_FIRST(&c2->list);
-+        assert(first_item_c2);
-+        assert(first_item_c1->id =3D=3D first_item_c2->id);
-+        QLIST_REMOVE(first_item_c1, next);
-+        QLIST_REMOVE(first_item_c2, next);
-+        g_free(first_item_c1);
-+        g_free(first_item_c2);
-+    }
-+    assert(QLIST_EMPTY(&c2->list));
-+}
-+
-+/*
-+ * Check the prev & next fields are correct by doing list
-+ * manipulations on the container. We will do that for both
-+ * the source and the destination containers
-+ */
-+static void manipulate_container(TestQListContainer *c)
-+{
-+     TestQListElement *prev =3D NULL, *iter =3D QLIST_FIRST(&c->list);
-+     TestQListElement *elem;
-+
-+     elem =3D g_malloc(sizeof(TestQListElement));
-+     elem->id =3D 0x12;
-+     QLIST_INSERT_AFTER(iter, elem, next);
-+
-+     elem =3D g_malloc(sizeof(TestQListElement));
-+     elem->id =3D 0x13;
-+     QLIST_INSERT_HEAD(&c->list, elem, next);
-+
-+     while (iter) {
-+        prev =3D iter;
-+        iter =3D QLIST_NEXT(iter, next);
-+     }
-+
-+     elem =3D g_malloc(sizeof(TestQListElement));
-+     elem->id =3D 0x14;
-+     QLIST_INSERT_BEFORE(prev, elem, next);
-+
-+     elem =3D g_malloc(sizeof(TestQListElement));
-+     elem->id =3D 0x15;
-+     QLIST_INSERT_AFTER(prev, elem, next);
-+
-+     QLIST_REMOVE(prev, next);
-+     g_free(prev);
-+}
-+
-+static void test_save_qlist(void)
-+{
-+    TestQListContainer *container =3D alloc_container();
-+
-+    save_vmstate(&vmstate_container, container);
-+    compare_vmstate(qlist_dump, sizeof(qlist_dump));
-+    free_container(container);
-+}
-+
-+static void test_load_qlist(void)
-+{
-+    QEMUFile *fsave, *fload;
-+    TestQListContainer *orig_container =3D alloc_container();
-+    TestQListContainer *dest_container =3D g_malloc0(sizeof(TestQListConta=
-iner));
-+    char eof;
-+
-+    QLIST_INIT(&dest_container->list);
-+
-+    fsave =3D open_test_file(true);
-+    qemu_put_buffer(fsave, qlist_dump, sizeof(qlist_dump));
-+    g_assert(!qemu_file_get_error(fsave));
-+    qemu_fclose(fsave);
-+
-+    fload =3D open_test_file(false);
-+    vmstate_load_state(fload, &vmstate_container, dest_container, 1);
-+    eof =3D qemu_get_byte(fload);
-+    g_assert(!qemu_file_get_error(fload));
-+    g_assert_cmpint(eof, =3D=3D, QEMU_VM_EOF);
-+    manipulate_container(orig_container);
-+    manipulate_container(dest_container);
-+    compare_containers(orig_container, dest_container);
-+    free_container(orig_container);
-+    free_container(dest_container);
-+}
-+
- typedef struct TmpTestStruct {
-     TestStruct *parent;
-     int64_t diff;
-@@ -1353,6 +1521,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/vmstate/gtree/load/loaddomain", test_gtree_load_doma=
-in);
-     g_test_add_func("/vmstate/gtree/save/saveiommu", test_gtree_save_iommu=
-);
-     g_test_add_func("/vmstate/gtree/load/loadiommu", test_gtree_load_iommu=
-);
-+    g_test_add_func("/vmstate/qlist/save/saveqlist", test_save_qlist);
-+    g_test_add_func("/vmstate/qlist/load/loadqlist", test_load_qlist);
-     g_test_add_func("/vmstate/tmp_struct", test_tmp_struct);
-     g_test_run();
-=20
---=20
-2.20.1
+Eric
+> 
+> 
+> I also saw this on aarch32 host (more precisely, on the
+> aarch32-environment-in-aarch64-chroot setup I use for aarch32 build
+> and test):
+> 
+> malloc_consolidate(): invalid chunk size
+> Broken pipe
+> qemu-system-i386: check_section_footer: Read section footer failed: -5
+> qemu-system-i386: load of migration failed: Invalid argument
+> /home/peter.maydell/qemu/tests/libqtest.c:140: kill_qemu() tried to
+> terminate QEMU process but encountered exit status 1 (expected 0)
+> Aborted
+> ERROR - too few tests run (expected 14, got 13)
+> 
+> The memory corruption is reproducible running just the
+> /x86_64/migration/multifd/tcp subtest:
+> 
+> (armhf)pmaydell@mustang-maydell:~/qemu/build/all-a32$
+> QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
+> tests/migration-test -p /x86_64/migration/multifd/tcp
+> /x86_64/migration/multifd/tcp: qemu-system-x86_64: -accel kvm: invalid
+> accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> qemu-system-x86_64: -accel kvm: invalid accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> qemu-system-x86_64: multifd_send_sync_main: multifd_send_pages fail
+> qemu-system-x86_64: failed to save SaveStateEntry with id(name): 3(ram)
+> double free or corruption (!prev)
+> Broken pipe
+> qemu-system-x86_64: Unknown combination of migration flags: 0
+> qemu-system-x86_64: error while loading state section id 3(ram)
+> qemu-system-x86_64: load of migration failed: Invalid argument
+> /home/peter.maydell/qemu/tests/libqtest.c:140: kill_qemu() tried to
+> terminate QEMU process but encountered exit status 1 (expected 0)
+> Aborted
+> 
+> Here's what a valgrind run in that aarch32 setup produces:
+> 
+> (armhf)pmaydell@mustang-maydell:~/qemu/build/all-a32$
+> QTEST_QEMU_BINARY='valgrind --smc-check=all-non-file
+> x86_64-softmmu/qemu-system-x86_64' tests/migration-test -p
+> /x86_64/migration/multifd/tcp
+> /x86_64/migration/multifd/tcp: ==12102== Memcheck, a memory error detector
+> ==12102== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+> ==12102== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+> ==12102== Command: x86_64-softmmu/qemu-system-x86_64 -qtest
+> unix:/tmp/qtest-12100.sock -qtest-log /dev/null -chardev
+> socket,path=/tmp/qtest-12100.qmp,id=char0 -mon
+> chardev=char0,mode=control -display none -accel kvm -accel tcg -name
+> source,debug-threads=on -m 150M -serial
+> file:/tmp/migration-test-UlotFX/src_serial -drive
+> file=/tmp/migration-test-UlotFX/bootsect,format=raw -accel qtest
+> ==12102==
+> qemu-system-x86_64: -accel kvm: invalid accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> ==12108== Memcheck, a memory error detector
+> ==12108== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+> ==12108== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+> ==12108== Command: x86_64-softmmu/qemu-system-x86_64 -qtest
+> unix:/tmp/qtest-12100.sock -qtest-log /dev/null -chardev
+> socket,path=/tmp/qtest-12100.qmp,id=char0 -mon
+> chardev=char0,mode=control -display none -accel kvm -accel tcg -name
+> target,debug-threads=on -m 150M -serial
+> file:/tmp/migration-test-UlotFX/dest_serial -incoming defer -drive
+> file=/tmp/migration-test-UlotFX/bootsect,format=raw -accel qtest
+> ==12108==
+> qemu-system-x86_64: -accel kvm: invalid accelerator kvm
+> qemu-system-x86_64: falling back to tcg
+> ==12102== Thread 22 multifdsend_15:
+> ==12102== Syscall param sendmsg(msg.msg_iov[0]) points to uninitialised byte(s)
+> ==12102==    at 0x53C7F06: __libc_do_syscall (libc-do-syscall.S:47)
+> ==12102==    by 0x53C6FCB: sendmsg (sendmsg.c:28)
+> ==12102==    by 0x51B9A9: qio_channel_socket_writev (channel-socket.c:561)
+> ==12102==    by 0x519FCD: qio_channel_writev (channel.c:207)
+> ==12102==    by 0x519FCD: qio_channel_writev_all (channel.c:171)
+> ==12102==    by 0x51A047: qio_channel_write_all (channel.c:257)
+> ==12102==    by 0x25CB17: multifd_send_initial_packet (ram.c:714)
+> ==12102==    by 0x25CB17: multifd_send_thread (ram.c:1136)
+> ==12102==    by 0x557551: qemu_thread_start (qemu-thread-posix.c:519)
+> ==12102==    by 0x53BE613: start_thread (pthread_create.c:463)
+> ==12102==    by 0x54767FB: ??? (clone.S:73)
+> ==12102==  Address 0x262103fd is on thread 22's stack
+> ==12102==  in frame #5, created by multifd_send_thread (ram.c:1127)
+> ==12102==
+> ==12102== Thread 6 multifdsend_1:
+> ==12102== Invalid write of size 4
+> ==12102==    at 0x25CC08: multifd_send_fill_packet (ram.c:806)
+> ==12102==    by 0x25CC08: multifd_send_thread (ram.c:1157)
+> ==12102==    by 0x557551: qemu_thread_start (qemu-thread-posix.c:519)
+> ==12102==    by 0x53BE613: start_thread (pthread_create.c:463)
+> ==12102==    by 0x54767FB: ??? (clone.S:73)
+> ==12102==  Address 0x1d89c470 is 0 bytes after a block of size 832 alloc'd
+> ==12102==    at 0x4841BC4: calloc (vg_replace_malloc.c:711)
+> ==12102==    by 0x49EE269: g_malloc0 (in
+> /usr/lib/arm-linux-gnueabihf/libglib-2.0.so.0.5600.4)
+> ==12102==
+> ==12102== Invalid write of size 4
+> ==12102==    at 0x25CC0E: multifd_send_fill_packet (ram.c:806)
+> ==12102==    by 0x25CC0E: multifd_send_thread (ram.c:1157)
+> ==12102==    by 0x557551: qemu_thread_start (qemu-thread-posix.c:519)
+> ==12102==    by 0x53BE613: start_thread (pthread_create.c:463)
+> ==12102==    by 0x54767FB: ??? (clone.S:73)
+> ==12102==  Address 0x1d89c474 is 4 bytes after a block of size 832 alloc'd
+> ==12102==    at 0x4841BC4: calloc (vg_replace_malloc.c:711)
+> ==12102==    by 0x49EE269: g_malloc0 (in
+> /usr/lib/arm-linux-gnueabihf/libglib-2.0.so.0.5600.4)
+> ==12102==
+> ==12102== Invalid read of size 4
+> ==12102==    at 0x519812: qio_channel_writev_full (channel.c:86)
+> ==12102==    by 0x519FCD: qio_channel_writev (channel.c:207)
+> ==12102==    by 0x519FCD: qio_channel_writev_all (channel.c:171)
+> ==12102==    by 0x51A047: qio_channel_write_all (channel.c:257)
+> ==12102==    by 0x25CC6D: multifd_send_thread (ram.c:1168)
+> ==12102==    by 0x557551: qemu_thread_start (qemu-thread-posix.c:519)
+> ==12102==    by 0x53BE613: start_thread (pthread_create.c:463)
+> ==12102==    by 0x54767FB: ??? (clone.S:73)
+> ==12102==  Address 0x30 is not stack'd, malloc'd or (recently) free'd
+> ==12102==
+> ==12102==
+> ==12102== Process terminating with default action of signal 11 (SIGSEGV)
+> ==12102==  Access not within mapped region at address 0x30
+> ==12102==    at 0x519812: qio_channel_writev_full (channel.c:86)
+> ==12102==    by 0x519FCD: qio_channel_writev (channel.c:207)
+> ==12102==    by 0x519FCD: qio_channel_writev_all (channel.c:171)
+> ==12102==    by 0x51A047: qio_channel_write_all (channel.c:257)
+> ==12102==    by 0x25CC6D: multifd_send_thread (ram.c:1168)
+> ==12102==    by 0x557551: qemu_thread_start (qemu-thread-posix.c:519)
+> ==12102==    by 0x53BE613: start_thread (pthread_create.c:463)
+> ==12102==    by 0x54767FB: ??? (clone.S:73)
+> ==12102==  If you believe this happened as a result of a stack
+> ==12102==  overflow in your program's main thread (unlikely but
+> ==12102==  possible), you can try to increase the size of the
+> ==12102==  main thread stack using the --main-stacksize= flag.
+> ==12102==  The main thread stack size used in this run was 8388608.
+> ==12102==
+> ==12102== HEAP SUMMARY:
+> ==12102==     in use at exit: 7,159,914 bytes in 28,035 blocks
+> ==12102==   total heap usage: 370,889 allocs, 342,854 frees,
+> 34,875,720 bytes allocated
+> ==12102==
+> ==12102== LEAK SUMMARY:
+> ==12102==    definitely lost: 56 bytes in 1 blocks
+> ==12102==    indirectly lost: 64 bytes in 2 blocks
+> ==12102==      possibly lost: 5,916 bytes in 58 blocks
+> ==12102==    still reachable: 7,153,878 bytes in 27,974 blocks
+> ==12102==                       of which reachable via heuristic:
+> ==12102==                         newarray           : 832 bytes in 16 blocks
+> ==12102==         suppressed: 0 bytes in 0 blocks
+> ==12102== Rerun with --leak-check=full to see details of leaked memory
+> ==12102==
+> ==12102== For counts of detected and suppressed errors, rerun with: -v
+> ==12102== Use --track-origins=yes to see where uninitialised values come from
+> ==12102== ERROR SUMMARY: 80 errors from 4 contexts (suppressed: 6 from 3)
+> Broken pipe
+> qemu-system-x86_64: load of migration failed: Input/output error
+> ==12108==
+> ==12108== HEAP SUMMARY:
+> ==12108==     in use at exit: 6,321,388 bytes in 21,290 blocks
+> ==12108==   total heap usage: 59,082 allocs, 37,792 frees, 23,874,965
+> bytes allocated
+> ==12108==
+> ==12108== LEAK SUMMARY:
+> ==12108==    definitely lost: 0 bytes in 0 blocks
+> ==12108==    indirectly lost: 0 bytes in 0 blocks
+> ==12108==      possibly lost: 5,440 bytes in 37 blocks
+> ==12108==    still reachable: 6,315,948 bytes in 21,253 blocks
+> ==12108==                       of which reachable via heuristic:
+> ==12108==                         newarray           : 832 bytes in 16 blocks
+> ==12108==         suppressed: 0 bytes in 0 blocks
+> ==12108== Rerun with --leak-check=full to see details of leaked memory
+> ==12108==
+> ==12108== For counts of detected and suppressed errors, rerun with: -v
+> ==12108== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 6 from 3)
+> /home/peter.maydell/qemu/tests/libqtest.c:140: kill_qemu() tried to
+> terminate QEMU process but encountered exit status 1 (expected 0)
+> Aborted
+> 
+> 
+> thanks
+> -- PMM
+> 
 
 
