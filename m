@@ -2,51 +2,54 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF99FC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3509EC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:40:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C303F21556
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:38:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C303F21556
+	by mail.kernel.org (Postfix) with ESMTPS id 081F321569
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 20:40:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 081F321569
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir6T3-0003Ze-KB
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:37:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50664)
+	id 1ir6VN-0007V6-1d
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 15:40:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6RP-0001VP-TE
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:36:05 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6TT-00058K-Lh
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6RO-0004a7-7P
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:36:03 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:41925 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1ir6TR-0006f6-Hf
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:10 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:47055 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1ir6RN-0003T3-SB
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:36:02 -0500
+ id 1ir6TR-0006dn-Ba
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 15:38:09 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 70CB81A1F9E;
- Mon, 13 Jan 2020 21:34:56 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 401661A1FB3;
+ Mon, 13 Jan 2020 21:38:07 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4D71C1A1E5E;
- Mon, 13 Jan 2020 21:34:56 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 28C901A1F9E;
+ Mon, 13 Jan 2020 21:38:07 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/20] linux-user: Misc patches for 5.0 
-Date: Mon, 13 Jan 2020 21:34:23 +0100
-Message-Id: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH v5 09/20] linux-user: Add support for FS_IOC_<GET|SET>VERSION
+ ioctls
+Date: Mon, 13 Jan 2020 21:34:32 +0100
+Message-Id: <1578947683-21011-10-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,101 +70,53 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This series is a collection of linux-user patches I recently
-accumulated.
+A very specific thing for these two ioctls is that their code
+implies that their third argument is of type 'long', but the
+kernel uses that argument as if it is of type 'int'. This anomaly
+is recognized also in commit 6080723 (linux-user: Implement
+FS_IOC_GETFLAGS and FS_IOC_SETFLAGS ioctls).
 
-The summary of the patches is as follows:
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 8 +++++---
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-Patch 1: Fix for some issues in termbits.h files.
-Patches 2-7: Updating syscall numbers
-Patch 8: A minor xtensa cleanup
-Patches 9-14: Adding support for some filesystem-related ioctls
-Patches 15-17: Adding support for some floppy-drive-related ioctls
-Patches 18-20: Adding support for kcov-related ioctls
-
-History of the series:
-
-v4->v5:
-
-  - fixed some minor issues in commit messages
-  - added syscall number update for alpha
-
-v3->v4:
-
-  - added support for three filesystem-related ioctls
-  - added syscall number update for m68k, microblaze, x86_64 and xtensa
-  - fixed some issues related to unused ranges of syscall numbers for
-    mips o32
-  - several minor corrections
-
-v2->v3:
-
-  - added support for seven floppy-drive-related ioctls
-  - added support for three kcov-related ioctls
-
-v1->v2:
-
-  - fixed a constant in xtensa's termbits.h that was missed in v1
-  - redid syscall numbers for mips o32
-  - minor formatting and wording changes
-
-Aleksandar Markovic (20):
-  linux-user: Fix some constants in termbits.h
-  linux-user: alpha: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: m68k: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: microblaze: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: mips: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: x86_64: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: xtensa: Update syscall numbers to kernel 5.5 rc3 level
-  linux-user: xtensa: Remove unused constant TARGET_NR_syscall_count
-  linux-user: Add support for FS_IOC_<GET|SET>VERSION ioctls
-  linux-user: Add support for FS_IOC32_<GET|SET>FLAGS ioctls
-  linux-user: Add support for FS_IOC32_<GET|SET>VERSION ioctls
-  linux-user: Add support for FS_IOC_FS<GET|SET>XATTR ioctls
-  linux-user: Add support for FITRIM ioctl
-  linux-user: Add support for FIFREEZE and FITHAW ioctls
-  linux-user: Add support for FD<SETEMSGTRESH|SETMAXERRS|GETMAXERRS>
-    ioctls
-  linux-user: Add support for FDFMT<BEG|TRK|END> ioctls
-  linux-user: Add support for FDGETFDCSTAT ioctl
-  configure: Detect kcov support and introduce CONFIG_KCOV
-  linux-user: Add support for KCOV_<ENABLE|DISABLE> ioctls
-  linux-user: Add support for KCOV_INIT_TRACE ioctl
-
- configure                          |  21 +++++
- linux-user/aarch64/termbits.h      |   4 +-
- linux-user/alpha/syscall_nr.h      |  35 +++++++++
- linux-user/alpha/termbits.h        |  10 +--
- linux-user/arm/termbits.h          |   4 +-
- linux-user/cris/termbits.h         |   4 +-
- linux-user/hppa/termbits.h         |   4 +-
- linux-user/i386/termbits.h         |   4 +-
- linux-user/ioctls.h                |  36 +++++++++
- linux-user/m68k/syscall_nr.h       |  50 +++++++++++-
- linux-user/m68k/termbits.h         |   4 +-
- linux-user/microblaze/syscall_nr.h |  45 +++++++++++
- linux-user/microblaze/termbits.h   |   4 +-
- linux-user/mips/cpu_loop.c         |  78 ++++++++++++++++++-
- linux-user/mips/syscall_nr.h       |  45 +++++++++++
- linux-user/mips/termbits.h         |   4 +-
- linux-user/mips64/syscall_nr.h     |  13 ++++
- linux-user/nios2/termbits.h        |   4 +-
- linux-user/openrisc/termbits.h     |   6 +-
- linux-user/ppc/termbits.h          |   4 +-
- linux-user/riscv/termbits.h        |   4 +-
- linux-user/s390x/termbits.h        |  26 ++++---
- linux-user/sh4/termbits.h          |   4 +-
- linux-user/sparc/termbits.h        |   4 +-
- linux-user/sparc64/termbits.h      |   4 +-
- linux-user/syscall.c               |   3 +
- linux-user/syscall_defs.h          |  46 ++++++++++-
- linux-user/syscall_types.h         |  24 ++++++
- linux-user/x86_64/syscall_nr.h     |  24 ++++++
- linux-user/x86_64/termbits.h       |   6 +-
- linux-user/xtensa/syscall_nr.h     |  36 ++++++++-
- linux-user/xtensa/termbits.h       | 156 +++++++++++++++++++++----------------
- 32 files changed, 590 insertions(+), 126 deletions(-)
-
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index c6b9d6a..c44f42e 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -138,6 +138,8 @@
+ 
+      IOCTL(FS_IOC_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
++     IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
+ 
+ #ifdef CONFIG_USBFS
+   /* USB ioctls */
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 98c2119..f68a8b6 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -911,12 +911,14 @@ struct target_pollfd {
+ #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
+ #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
+ 
+-/* Note that the ioctl numbers claim type "long" but the actual type
+- * used by the kernel is "int".
++/*
++ * Note that the ioctl numbers for FS_IOC_<GET|SET><FLAGS|VERSION>
++ * claim type "long" but the actual type used by the kernel is "int".
+  */
+ #define TARGET_FS_IOC_GETFLAGS TARGET_IOR('f', 1, abi_long)
+ #define TARGET_FS_IOC_SETFLAGS TARGET_IOW('f', 2, abi_long)
+-
++#define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
++#define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+ #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
+ 
+ /* usb ioctls */
 -- 
 2.7.4
 
