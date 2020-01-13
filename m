@@ -2,79 +2,77 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E92C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87892C33CAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:39:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89FD8207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55C05207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:39:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AM+K9xFU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89FD8207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J8pbuSBp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C05207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3fb-0008Ub-6U
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:38:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42267)
+	id 1ir3gi-0002N2-85
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:39:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ir3eA-0006ah-S1
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:37:03 -0500
+ (envelope-from <drjones@redhat.com>) id 1ir3fC-0008OF-Ph
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:38:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ir3e9-00026M-TS
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:37:02 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24704
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <drjones@redhat.com>) id 1ir3fB-00036Y-Ns
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:38:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47935
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ir3e9-00025p-QA
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:37:01 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir3fB-000365-Hg
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:38:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578937021;
+ s=mimecast20190719; t=1578937085;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=97O01buc7glABGMtRrqiEagdNJtM8sbG5AB6H/GxU3s=;
- b=AM+K9xFUcz9dDpbarJ2rurAqnA6UglP1H2hUiJ4cRMVRMV8g0wXXavHcWPOlsnECTIxqyh
- x/zzOctWhY7/c0guqxShY7V75O0U3hHszqJcGG4E/OxBA6OMRA/NEG4jte6Pos0vgLGqUl
- HlrcxiwMS9qIMquXtimdc7uL+5UZSJ0=
+ bh=uceV03oHRXx1E3vMv+AQpLYa8pUwxWrhcTUjGT9wAgg=;
+ b=J8pbuSBpre48bblyCitvXaNDA6I/kPUiSQgicqCwyO4iYfxKftXEwgz/xDC+JdjB1trmT8
+ y9/rv2DTUwsj0tmbF20ohfVHQ98+Tzp3us76zjkbNJ7HG+Fv11lVDNoqVpbEHJc8bom2ca
+ wURys69TEQnEfe8uwbpNXUOyB83PlD4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-SpHKGEKVOluJW7gPNqhoUQ-1; Mon, 13 Jan 2020 12:36:58 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-287-e3PBCRvpP2ix9wg3H9ZurA-1; Mon, 13 Jan 2020 12:38:01 -0500
+X-MC-Unique: e3PBCRvpP2ix9wg3H9ZurA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5067210054E3
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 17:36:57 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 282515C1B0;
- Mon, 13 Jan 2020 17:36:55 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, vkuznets@redhat.com, mst@redhat.com,
- jasowang@redhat.com, pbonzini@redhat.com
-Subject: [PATCH v2 3/3] hyperv/synic: Mark regions as no vhost
-Date: Mon, 13 Jan 2020 17:36:47 +0000
-Message-Id: <20200113173647.84842-4-dgilbert@redhat.com>
-In-Reply-To: <20200113173647.84842-1-dgilbert@redhat.com>
-References: <20200113173647.84842-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED7FA107ACC4;
+ Mon, 13 Jan 2020 17:37:58 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 83C367E58B;
+ Mon, 13 Jan 2020 17:37:53 +0000 (UTC)
+Date: Mon, 13 Jan 2020 18:37:51 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 08/16] arm/arm64: ITS: Init the command
+ queue
+Message-ID: <20200113173751.q344krmw7bdhrrtg@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-9-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: SpHKGEKVOluJW7gPNqhoUQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200110145412.14937-9-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,42 +84,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, Jan 10, 2020 at 03:54:04PM +0100, Eric Auger wrote:
+> Allocate the command queue and initialize related registers:
+> CBASER, CREADR, CWRITER.
+> 
+> The command queue is 64kB. This aims at not bothing with fullness.
 
-Mark synic regions as novhost; they are splitting huge page memory
-and breaking vhost region joining.
+I think these means that the goal isn't completeness? If so, please
+write "minimal implementation" or nothing, as all of kvm-unit-tests
+is a minimal implementation.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/hyperv/hyperv.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v2 -> v3:
+> - removed readr
+> ---
+>  lib/arm/asm/gic-v3-its.h |  6 ++++++
+>  lib/arm/gic-v3-its.c     | 22 ++++++++++++++++++++++
+>  2 files changed, 28 insertions(+)
+> 
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 2f8b8f1..93814f7 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -75,10 +75,16 @@ struct its_baser {
+>  	int esz;
+>  };
+>  
+> +struct its_cmd_block {
+> +	u64     raw_cmd[4];
 
-diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-index da8ce82725..5dbbb14fdd 100644
---- a/hw/hyperv/hyperv.c
-+++ b/hw/hyperv/hyperv.c
-@@ -99,6 +99,14 @@ static void synic_realize(DeviceState *dev, Error **errp=
-)
-                            sizeof(*synic->msg_page), &error_abort);
-     memory_region_init_ram(&synic->event_page_mr, obj, eventp_name,
-                            sizeof(*synic->event_page), &error_abort);
-+    /*
-+     * The guest can put the synic pages anywhere, including
-+     * fragmenting something the host might want to keep as a huge
-+     * page.
-+     */
-+    memory_region_set_no_vhost(&synic->msg_page_mr, true);
-+    memory_region_set_no_vhost(&synic->event_page_mr, true);
-+
-     synic->msg_page =3D memory_region_get_ram_ptr(&synic->msg_page_mr);
-     synic->event_page =3D memory_region_get_ram_ptr(&synic->event_page_mr)=
-;
-=20
---=20
-2.24.1
+Do we need these spaces (not even a tab) after the u64?
+
+> +};
+> +
+>  struct its_data {
+>  	void *base;
+>  	struct its_typer typer;
+>  	struct its_baser baser[GITS_BASER_NR_REGS];
+> +	struct its_cmd_block *cmd_base;
+> +	struct its_cmd_block *cmd_write;
+>  };
+>  
+>  extern struct its_data its_data;
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> index 6c97569..3037c84 100644
+> --- a/lib/arm/gic-v3-its.c
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -177,3 +177,25 @@ void set_pending_table_bit(int rdist, int n, bool set)
+>  		byte &= ~mask;
+>  	*ptr = byte;
+>  }
+> +
+> +/**
+> + * init_cmd_queue: Allocate the command queue and initialize
+> + * CBASER, CREADR, CWRITER
+> + */
+> +void init_cmd_queue(void);
+> +void init_cmd_queue(void)
+
+its_cmd_queue_init
+
+> +{
+> +	unsigned long n = SZ_64K >> PAGE_SHIFT;
+> +	unsigned long order = fls(n);
+> +	u64 cbaser;
+> +
+> +	its_data.cmd_base = (void *)virt_to_phys(alloc_pages(order));
+> +
+> +	cbaser = ((u64)its_data.cmd_base | (SZ_64K / SZ_4K - 1)	|
+> +			GITS_CBASER_VALID);
+
+120 chars
+
+> +
+> +	writeq(cbaser, its_data.base + GITS_CBASER);
+> +
+> +	its_data.cmd_write = its_data.cmd_base;
+> +	writeq(0, its_data.base + GITS_CWRITER);
+> +}
+> -- 
+> 2.20.1
+>
+
+Thanks,
+drew 
 
 
