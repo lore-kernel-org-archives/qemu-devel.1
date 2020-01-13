@@ -2,88 +2,75 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD25BC33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:44:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6C4C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:47:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8844E20678
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:44:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hdi3fy85"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8844E20678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8395F207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:47:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8395F207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir0wn-0006Zp-Kd
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 09:44:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42572)
+	id 1ir0zn-00083I-DC
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 09:47:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tcminyard@gmail.com>) id 1ir0vk-0005qP-Q8
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:43:02 -0500
+ (envelope-from <bounces@canonical.com>) id 1ir0yL-0007BA-Af
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:45:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tcminyard@gmail.com>) id 1ir0vi-0004PJ-NV
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:43:00 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40323)
+ (envelope-from <bounces@canonical.com>) id 1ir0yJ-0006Ho-V3
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:45:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37348)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1ir0vi-0004OK-IZ
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:42:58 -0500
-Received: by mail-ot1-x341.google.com with SMTP id w21so9111880otj.7
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 06:42:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=NgG8/oXKPfzZ5PXrBgXiek8H6KwYdNE5o1J3M+0kzq0=;
- b=Hdi3fy85Ly7Lhzq9j5HeO/JwhxCvodSJy89N7xYog1oiGIrFQUh860PqrE2NIt/UdX
- qhZk6u4TDiAuYfsgCjv4YH5kwc5VXAzg0xRE9DF3f5KxTNKpu2XSJs5kJufAm8UZqHko
- rpXZouVXak4EhIVF+F1NAQ4ToKYZaJaL+KA135VARli9haBybTsR+vpAgJdFKoW3E7ew
- /sDrmZmVbrK5Ud9EBk9+vTx/NAgy7hQFLBpztL+kcFIt6+g+ehxMNjBuQqDk9rh9r+4Y
- mzIP2LkyQY7ghK7ahOcToP06Gyi2RoZ9TcMsYwPsIxuMsIP+F/p2ijWK/fupa/UYchcr
- Cq1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=NgG8/oXKPfzZ5PXrBgXiek8H6KwYdNE5o1J3M+0kzq0=;
- b=tnFMJRMW5LoLTqpnF5DurwlaHS+wX+iFFUv3eqN8si4rwAN5qYP9SQHsfjG2dHCIOh
- JHxbJ8fz7BPYzAKfipiby9+BSKCoREDdbAiW8FAaAVtCvulEOSdTPbkDHIuy2/0RvGFf
- TBscoXW5ooB+PDCOCRj42CnaZ8NrcEpM03seuh+NaVd32w6hxfQOoH5qwbwkVhZ9WlpP
- /F6Y50dXitVjXisjC14QDck0hk+dFV8Z3pHNkE5QEC6jHzZDtRCwFVG9qR+2Kw347AW0
- 8SEqs61zK1C1j8xVSbUG6xEVgPw7243YjqvxGBJ5Z8lSvX+FRyub9wHlLfLShLsoI6St
- eUag==
-X-Gm-Message-State: APjAAAX852U8MwIi4wBjZN55IidbnA2PqLBhfjk7goAEiQShYHQYaRNA
- NDqpelDB6Sn0svQgZl1JiA==
-X-Google-Smtp-Source: APXvYqxc4UHFxt6FEXP+gId/gIkg4P+7lWnjkfQ1QA4bPixa0E0iQbTiNEc5mO/B9j4/IYJAuogF+w==
-X-Received: by 2002:a9d:7ac9:: with SMTP id m9mr12491963otn.80.1578926577057; 
- Mon, 13 Jan 2020 06:42:57 -0800 (PST)
-Received: from serve.minyard.net ([47.184.136.59])
- by smtp.gmail.com with ESMTPSA id j10sm4183075otr.64.2020.01.13.06.42.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 06:42:56 -0800 (PST)
-Received: from t560.minyard.net (unknown
- [IPv6:2001:470:b8f6:1b:d74:b0ed:d755:2da5])
- by serve.minyard.net (Postfix) with ESMTPA id B5B15180050;
- Mon, 13 Jan 2020 14:42:55 +0000 (UTC)
-From: minyard@acm.org
-To: "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [PATCH] i386:acpi: Remove _HID from the SMBus ACPI entry
-Date: Mon, 13 Jan 2020 08:42:28 -0600
-Message-Id: <20200113144228.16660-1-minyard@acm.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200113090515-mutt-send-email-mst@kernel.org>
-References: <20200113090515-mutt-send-email-mst@kernel.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ir0yJ-0006Ge-P1
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:45:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ir0yI-0007P2-5i
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:45:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E30022E8042
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:45:37 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Jan 2020 14:36:47 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm gic
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
+X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
+Message-Id: <157892620732.14410.9250586282956495645.malone@wampee.canonical.com>
+Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
+ race condition in gic_acknowledge_irq
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: eca705151610b72f76b4d788e3285be8780be7f1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,131 +79,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <cminyard@mvista.com>, qemu-devel@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, wanghaibin.wang@huawei.com,
- Igor Mammedov <imammedo@redhat.com>
+Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+Oops, yes, missed that use of GIC_DIST_TEST_MODEL because it was in the
+header file...
 
-Per the ACPI spec (version 6.1, section 6.1.5 _HID) it is not required
-on enumerated buses (like PCI in this case), _ADR is required (and is
-already there).  And the _HID value is wrong.  Linux appears to ignore
-the _HID entry, but Windows 10 detects it as 'Unknown Device' and there
-is no driver available.  See https://bugs.launchpad.net/qemu/+bug/1856724
+-- =
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- hw/i386/acpi-build.c             |   1 -
- tests/data/acpi/q35/DSDT         | Bin 7879 -> 7869 bytes
- tests/data/acpi/q35/DSDT.bridge  | Bin 7896 -> 7886 bytes
- tests/data/acpi/q35/DSDT.cphp    | Bin 8342 -> 8332 bytes
- tests/data/acpi/q35/DSDT.dimmpxm | Bin 9532 -> 9522 bytes
- tests/data/acpi/q35/DSDT.ipmibt  | Bin 7954 -> 7944 bytes
- tests/data/acpi/q35/DSDT.memhp   | Bin 9238 -> 9228 bytes
- tests/data/acpi/q35/DSDT.mmio64  | Bin 9009 -> 8999 bytes
- tests/data/acpi/q35/DSDT.numamem | Bin 7885 -> 7875 bytes
- 9 files changed, 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859384
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7b8da62d41..ab73a8f4c8 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1815,7 +1815,6 @@ static void build_smb0(Aml *table, I2CBus *smbus, int devnr, int func)
-     Aml *scope = aml_scope("_SB.PCI0");
-     Aml *dev = aml_device("SMB0");
- 
--    aml_append(dev, aml_name_decl("_HID", aml_eisaid("APP0005")));
-     aml_append(dev, aml_name_decl("_ADR", aml_int(devnr << 16 | func)));
-     build_acpi_ipmi_devices(dev, BUS(smbus), "\\_SB.PCI0.SMB0");
-     aml_append(scope, dev);
-diff --git a/tests/data/acpi/q35/DSDT b/tests/data/acpi/q35/DSDT
-index 77ea60ffed421c566138fe6341421f579129a582..1f91888d7a485850cf27f152e247a90b208003dc 100644
-GIT binary patch
-delta 42
-xcmX?ZyVsV>CD<iouN(sdBf~~6V@W}2z4&0K_yA{5gXkvyU|%PL%@LCMtN{E}3u*uW
+Title:
+  arm gic: interrupt model never 1 on non-mpcore and race condition in
+  gic_acknowledge_irq
 
-delta 52
-zcmdmMd)$`GCD<k8xEuomWBo=hV@YXMz4&0K_yA{5gXkv7U|%N#j(87G7aleN2G-4f
-HlKHFvhbs+g
+Status in QEMU:
+  New
 
-diff --git a/tests/data/acpi/q35/DSDT.bridge b/tests/data/acpi/q35/DSDT.bridge
-index fbc2d40000428b402586ea9302b5ccf36ef8de1e..eae3a2a8657e9986d8ac592958503c0b516faaef 100644
-GIT binary patch
-delta 42
-xcmca%d(M{2CD<k8oE!rK<ARM`#*%{4dhx+d@d3`B2GLFY!M;ugn<FF}SOFEN3{C(5
+Bug description:
+  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
+  only one CPU can acknowledge the IRQ until it becomes inactive.
 
-delta 52
-zcmX?Sd&8E?CD<k8h8zO}qx?oLV@YXMz4&0K_yA{5gXkv7U|%N#j(87G7aleN2G-4f
-Hk`1f?g02lt
+  The TRM also mandates that SGIs and PPIs follow the N-N model and that
+  SPIs follow the 1-N model.
 
-diff --git a/tests/data/acpi/q35/DSDT.cphp b/tests/data/acpi/q35/DSDT.cphp
-index 6a896cb2142feadbcabc6276b59c138a7e93f540..53d735a4de25c4d8e23eed102fcd01376168c5b3 100644
-GIT binary patch
-delta 42
-xcmbQ{*yG6M66_MvqrkwxSh<nQSW-}0FFx2QKET=2Ai9Y^*w@KmbA+TFI{@^p3o8Hs
+  However this is not currently the case with QEMU. I have locally (no
+  minimal test case) seen e.g. uart interrupts being acknowledged twice
+  before having been deactivated (expected: irqId on one CPU and 1023 on
+  the other instead).
 
-delta 52
-zcmeBioaV^o66_K(O@V=d@yA9kV@YXMz4&0K_yA{5gXkv7U|%N#j(87G7aleN2G-4f
-Hl6LF>e&h`+
+  I have narrowed the issue down to the following:
 
-diff --git a/tests/data/acpi/q35/DSDT.dimmpxm b/tests/data/acpi/q35/DSDT.dimmpxm
-index 23fdf5e60a5069f60d6c680ac9c68c4a8a81318e..02ccdd5f38d5b2356dcca89398c41dcf2595dfff 100644
-GIT binary patch
-delta 42
-xcmdnvwaJUiCD<jzNR@$s(P<->v8151UVN}qe1Nm3L39&;u&<NB<_O6r+yL|Y3#R}8
+  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
+  means all IRQ will use the N-N model, and if s->revision !=3D
+  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
 
-delta 52
-zcmdnwwa1IgCD<jzMwNkq@!&=-V@YXMz4&0K_yA{5gXkv7U|%N#j(87G7aleN2G-4f
-Hl25n+d}a-&
+  If ""fixed"" locally with a hackjob, I still have the following trace:
 
-diff --git a/tests/data/acpi/q35/DSDT.ipmibt b/tests/data/acpi/q35/DSDT.ipmibt
-index c3fca0a71efa7b55c958a49f305389426fbe7922..9e2d4f785c54629d233924a503cfe81199e22aa0 100644
-GIT binary patch
-delta 42
-xcmbPa*I~!y66_MfA<w|TsIrl(PEt@>FFx2QKET=2Ai9Y^*w@Km^J2+-Rsi7S3kU!J
+  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
 
-delta 52
-zcmeCMn`Fo366_KpB+tOWxOgL1ouss?UVN}qe1Nm3L3ER3u&<K=N4$rp3lEzB1MB9Q
-HlKHFvWcdvU
+  This is because:
 
-diff --git a/tests/data/acpi/q35/DSDT.memhp b/tests/data/acpi/q35/DSDT.memhp
-index 2abd0e36cd1344cbca3fa4ab59c5db2ea326d125..baefa611acadce4c6da5babdaafad533d19358e6 100644
-GIT binary patch
-delta 42
-xcmbQ{(c{7866_Mfqr$+z_;Dkbv8151UVN}qe1Nm3L39&;u&<NB<_O7sTmba|3%CFP
+  2) gic_acknowledge_irq calls gic_clear_pending which uses
+  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
+  sensitive interrupts.
 
-delta 52
-zcmeD2nC8Ld66_KprozC$Sg?`HSW;S5FFx2QKET=2Ai7C1*w@K`Bi_T)g@;XmfpxQ=
-H<UTF{S(^;F
+  With this often being a no-op (ie. assuming ispendr was not written
+  to), any 1-n level-sensitive interrupt is still improperly pending on
+  all the other cores.
 
-diff --git a/tests/data/acpi/q35/DSDT.mmio64 b/tests/data/acpi/q35/DSDT.mmio64
-index b32034a11c1f8a0a156df3765df44b14a88dbb4d..aae0ea2110a54b02f772d99e66df0730d74b43d9 100644
-GIT binary patch
-delta 42
-xcmdn!w%m=&CD<iIU73M_aqUJfV@W}2z4&0K_yA{5gXkvyU|%PL%@L9}IRW`53)%nx
+  (Also, I don't really know how the qemu thread model works, there
+  might be race conditions in the acknowledgment logic if
+  gic_acknowledge_irq is called by multiple threads, too.)
 
-delta 52
-zcmZ4Pw$Y8tCD<jzP?>>&QD-BUv81%BUVN}qe1Nm3L3ER3u&<K=N4$rp3lEzB1M6l#
-H$(x)2UJ(r1
+  Option used:
+  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
+  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
+  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+  -trace gic_set_irq
 
-diff --git a/tests/data/acpi/q35/DSDT.numamem b/tests/data/acpi/q35/DSDT.numamem
-index d8b2b47f8b47067d375021a30086ca97d8aca43f..859a2e08710ba37f56c9c32b0235ff90cedb1905 100644
-GIT binary patch
-delta 42
-xcmX?Wd)SuCCD<k8up9#e<Eo8Z#*%{4dhx+d@d3`B2GLFY!M;ugn<FGkSpgBb3@iWu
+  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+  staging"
 
-delta 52
-zcmX?Xd)AiACD<k8tQ-Raqvl2~V@YXMz4&0K_yA{5gXkv7U|%N#j(87G7aleN2G-4f
-HlBKKwec25x
-
--- 
-2.17.1
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
 
