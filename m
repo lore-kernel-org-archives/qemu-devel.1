@@ -2,77 +2,79 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5FEFC33CAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB3D6C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:38:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 846092081E
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9832C207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:38:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpHyASH+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 846092081E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SEwDcn00"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9832C207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3bD-0004gK-HV
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:33:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41333)
+	id 1ir3fR-0008Cc-5m
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:38:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1ir3aU-00049P-WD
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:33:15 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ir3e5-0006Wf-Vx
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1ir3aU-0005lx-2n
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:33:14 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53472
+ (envelope-from <dgilbert@redhat.com>) id 1ir3e5-00020C-1u
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:36:57 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57581
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir3aT-0005lG-Ug
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:33:14 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ir3e4-0001zC-Ug
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:36:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578936793;
+ s=mimecast20190719; t=1578937016;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WYW22dyvB/rUGePxrtipcgCoGo1xD+N9jtUO/xfVRRE=;
- b=GpHyASH+Qfhg6iADGBJwmti2+7rYNFackB0DK/2n0Nk6MiE7egT0A4fBjsb4g0Ex13xf7g
- 2GU36PVwyf2cpq/4TwalexZxaPwDJTBYuHxHPthd9cZVEclkXqfW3/M9WuJ7BfEFVZkGmz
- UOqnfP8wOYfPVMDpM6AgJ0B+b9HSkgs=
+ bh=WNez6IxU3/7Q9hEtGYz6qTWwUPHKrvmn+EW+Tm1OE9s=;
+ b=SEwDcn008NnNG4m5iKEABWtZ3SITHL+DUYTlOO8ZUBXBxw2j3b7Lw8PkluY82kMZk0wc4z
+ oXnPSUvXlUC3cKpeEehSvEqvAQ8esqwIYiwT+un+j4hj6bA0jMvxFTwj6kVd1yrY3BwesC
+ tlkqH0IZ5iq2mNxIuP+Y6ZLDk8JrJ4c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-SHvAVZ53PRaXf6vVpaSz8Q-1; Mon, 13 Jan 2020 12:33:09 -0500
-X-MC-Unique: SHvAVZ53PRaXf6vVpaSz8Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-236-wuh5-3Z2MXyhowKFmj048w-1; Mon, 13 Jan 2020 12:36:55 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07B0C107ACC4;
- Mon, 13 Jan 2020 17:33:08 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 690C181E31;
- Mon, 13 Jan 2020 17:33:02 +0000 (UTC)
-Date: Mon, 13 Jan 2020 18:33:00 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 05/16] arm/arm64: ITS: Introspection
- tests
-Message-ID: <20200113173300.vhycoije77ouk4ls@kamzik.brq.redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
- <20200110145412.14937-6-eric.auger@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BA2C801E72
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 17:36:54 +0000 (UTC)
+Received: from dgilbert-t580.localhost (unknown [10.36.118.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3345D5C1B0;
+ Mon, 13 Jan 2020 17:36:53 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, vkuznets@redhat.com, mst@redhat.com,
+ jasowang@redhat.com, pbonzini@redhat.com
+Subject: [PATCH v2 1/3] vhost: Add names to section rounded warning
+Date: Mon, 13 Jan 2020 17:36:45 +0000
+Message-Id: <20200113173647.84842-2-dgilbert@redhat.com>
+In-Reply-To: <20200113173647.84842-1-dgilbert@redhat.com>
+References: <20200113173647.84842-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200110145412.14937-6-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: wuh5-3Z2MXyhowKFmj048w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,40 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 10, 2020 at 03:54:01PM +0100, Eric Auger wrote:
-...
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 8416dde..f9a6f57 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -6,6 +6,7 @@
->  #include <devicetree.h>
->  #include <asm/gic.h>
->  #include <asm/io.h>
-> +#include <asm/gic-v3-its.h>
->  
->  struct gicv2_data gicv2_data;
->  struct gicv3_data gicv3_data;
-> @@ -44,12 +45,14 @@ static const struct gic_common_ops gicv3_common_ops = {
->   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
->   */
->  static bool
-> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-> +gic_get_dt_bases(const char *compatible, void **base1, void **base2,
-> +		 void **base3)
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Here's another place that I would prefer using our 120 chars. No need to
-put base3 on a new line.
+Add the memory region names to section rounding/alignment
+warnings.
 
-Thanks,
-drew
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/virtio/vhost.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 4da0d5a6c5..774d87d98e 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -590,9 +590,10 @@ static void vhost_region_add_section(struct vhost_dev =
+*dev,
+              * match up in the same RAMBlock if they do.
+              */
+             if (mrs_gpa < prev_gpa_start) {
+-                error_report("%s:Section rounded to %"PRIx64
+-                             " prior to previous %"PRIx64,
+-                             __func__, mrs_gpa, prev_gpa_start);
++                error_report("%s:Section '%s' rounded to %"PRIx64
++                             " prior to previous '%s' %"PRIx64,
++                             __func__, section->mr->name, mrs_gpa,
++                             prev_sec->mr->name, prev_gpa_start);
+                 /* A way to cleanly fail here would be better */
+                 return;
+             }
+--=20
+2.24.1
 
 
