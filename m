@@ -2,58 +2,81 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF02C33CAE
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 06:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 801C2C33CAE
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 07:01:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2455214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 06:21:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2455214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 349C12053B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 07:01:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IWq4ex13"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349C12053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqt6f-0007xS-OS
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 01:21:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34008)
+	id 1iqtjY-0000E0-7K
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 02:01:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42060)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1iqt5q-0007XJ-HF
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 01:20:55 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iqtiR-00089O-VR
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 02:00:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1iqt5p-0005bE-3z
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 01:20:54 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2676 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1iqt5o-0005VS-PT
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 01:20:53 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 7F032E3B261F83C05358;
- Mon, 13 Jan 2020 14:20:44 +0800 (CST)
-Received: from DESKTOP-9NTIQGG.china.huawei.com (10.173.221.136) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 13 Jan 2020 14:20:34 +0800
-From: <pannengyuan@huawei.com>
-To: <pbonzini@redhat.com>, <fam@euphon.net>
-Subject: [PATCH] scsi-disk: define props in scsi_block_disk to avoid memleaks
-Date: Mon, 13 Jan 2020 14:20:30 +0800
-Message-ID: <20200113062030.56020-1-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iqtiQ-00068d-PV
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 02:00:47 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54457)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iqtiQ-00067T-HO; Mon, 13 Jan 2020 02:00:46 -0500
+Received: by mail-wm1-x342.google.com with SMTP id b19so8330880wmj.4;
+ Sun, 12 Jan 2020 23:00:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=6J+DdGBuWcJeBJcYnh+Ki5EMu0UqVMnEud7p4f5KBuk=;
+ b=IWq4ex13s1akSf766wCKf02k8wPd7Z8q4Mhc6JIzfWUKOWVPxSxKN+kaMsBa60p8j8
+ z/Zip/3HjpLmX5C7tDc2msXv97Flo78j/jyakUFjI5yytGhGfyGvNffmycb4kaUo4oLW
+ iEKVhABPgU3Stt8AL+JWMJlSERyiu8May9Z3603u5JydO2XhkaNNEmySCcna+J18KOlv
+ IB1iU544Mqr/2T9spjimUKqUwexrGkXASm+k08HSF2xiV9IQx7lNxRXCWUxGk6eSbPhm
+ 0Hn1rooWc32vFqtHu+kIQsGUZtmkLkv9DTTIuPMLjptIUFnSpUSxNABYWrKhrawQALFI
+ TZkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=6J+DdGBuWcJeBJcYnh+Ki5EMu0UqVMnEud7p4f5KBuk=;
+ b=UX9H1JhNz1a/PkWc4DASiP6XhJfJi6C8Ey6Z/vwnh8sr9ha9qksiGQM2IOPBNsvAjT
+ lubOFNZAmn7X/gY6v5bMv7DAb2wjDluS8ntDrW09281Iydrd7SmbizcaRhnjBDZMM9Zb
+ n9HwJdTr4leNw/gYZ1rv0YTKNPGDDNO8lOAVKLTecpgDhw+llAKylO8yNlWLRnfFGK8O
+ EluyixaGUoTef+6x4lrZP/d19ffQLkDXFCCFboZAchOgOdrwMih0bJ9lOjbp5jmRyxkq
+ iKLBfpo9SE3Pqi7ie+PGxGZi3psLhM3YWjL+2/RsV9bHbqXPvPDvDSNaq1graYIhKn5w
+ zNyw==
+X-Gm-Message-State: APjAAAWp9QqwU6LK2atH80qVMIVHQi4YuTbc0zchjkLZCxMZcEHCX4qp
+ WYtXFST2kKR6tPiEWIzoBaTeK95Vmta5ihpCyrI=
+X-Google-Smtp-Source: APXvYqyTcvoTQod57GH2zAUc0QvD8ns0fH8nMnYSZEdNM6MFAUzD095635ybAZrHkhqL6CrBf9hxSgNiqMVXsQY3sok=
+X-Received: by 2002:a05:600c:228f:: with SMTP id
+ 15mr18669777wmf.56.1578898844645; 
+ Sun, 12 Jan 2020 23:00:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.221.136]
-X-CFilter-Loop: Reflected
+References: <20200109183545.27452-1-kwolf@redhat.com>
+In-Reply-To: <20200109183545.27452-1-kwolf@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 13 Jan 2020 11:00:32 +0400
+Message-ID: <CAJ+F1CJ6+v7eKiOfFE1r+kVZ-pObJEjjrhPJ4XKVq=e9WG0pUA@mail.gmail.com>
+Subject: Re: [PATCH 0/4] qmp: Optionally run handlers in coroutines
+To: Kevin Wolf <kwolf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,127 +88,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Euler Robot <euler.robot@huawei.com>, Pan Nengyuan <pannengyuan@huawei.com>,
- qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
+Cc: QEMU <qemu-devel@nongnu.org>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+Hi
 
-scsi_block_realize() use scsi_realize() to init some props, but
-these props is not defined in scsi_block_disk_properties, so they will
-not be freed.
+On Thu, Jan 9, 2020 at 10:36 PM Kevin Wolf <kwolf@redhat.com> wrote:
+>
+> Some QMP command handlers can block the main loop for a relatively long
+> time, for example because they perform some I/O. This is quite nasty.
+> Allowing such handlers to run in a coroutine where they can yield (and
+> therefore release the BQL) while waiting for an event such as I/O
+> completion solves the problem.
+>
+> This series adds the infrastructure to allow this and switches
+> block_resize to run in a coroutine as a first example.
+>
+> This is an alternative solution to Marc-Andr=C3=A9's "monitor: add
+> asynchronous command type" series.
+>
+> Kevin Wolf (4):
+>   qapi: Add a 'coroutine' flag for commands
+>   block: Mark 'block_resize' as coroutine
+>   vl: Initialise main loop earlier
+>   qmp: Move dispatcher to a coroutine
+>
+>  qapi/block-core.json                    |  3 +-
+>  tests/qapi-schema/qapi-schema-test.json |  1 +
+>  docs/devel/qapi-code-gen.txt            |  4 ++
+>  include/qapi/qmp/dispatch.h             |  3 +
+>  monitor/monitor-internal.h              |  5 +-
+>  monitor/monitor.c                       | 24 ++++---
+>  monitor/qmp.c                           | 83 ++++++++++++++++---------
+>  qapi/qmp-dispatch.c                     | 38 ++++++++++-
+>  tests/test-qmp-cmds.c                   |  4 ++
+>  vl.c                                    | 10 +--
+>  scripts/qapi/commands.py                | 17 +++--
+>  scripts/qapi/doc.py                     |  2 +-
+>  scripts/qapi/expr.py                    |  4 +-
+>  scripts/qapi/introspect.py              |  2 +-
+>  scripts/qapi/schema.py                  |  9 ++-
+>  tests/qapi-schema/qapi-schema-test.out  |  2 +
+>  tests/qapi-schema/test-qapi.py          |  7 ++-
+>  17 files changed, 155 insertions(+), 63 deletions(-)
 
-This patch defines these prop in scsi_block_disk_properties and aslo
-calls scsi_unrealize to avoid memleaks, the leak stack as
-follow(it's easy to reproduce by attaching/detaching scsi-block-disks):
+Series:
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-=3D=3Dqemu-system-x86_64=3D=3D32195=3D=3DERROR: LeakSanitizer: detected m=
-emory leaks
 
-Direct leak of 57 byte(s) in 3 object(s) allocated from:
-  #0 0x7f19f8bed768 (/lib64/libasan.so.5+0xef768)  ??:?
-  #1 0x7f19f64d9445 (/lib64/libglib-2.0.so.0+0x52445)  ??:?
-  #2 0x7f19f64f2d92 (/lib64/libglib-2.0.so.0+0x6bd92)  ??:?
-  #3 0x55975366e596 (qemu-system-x86_64+0x35c0596)  /mnt/sdb/qemu/hw/scsi=
-/scsi-disk.c:2399
-  #4 0x559753671201 (emu-system-x86_64+0x35c3201)  /mnt/sdb/qemu/hw/scsi/=
-scsi-disk.c:2681
-  #5 0x559753687e3e (qemu-system-x86_64+0x35d9e3e)  /mnt/sdb/qemu/hw/scsi=
-/scsi-bus.c:58
-  #6 0x55975368ac44 (qemu-system-x86_64+0x35dcc44)  /mnt/sdb/qemu/hw/scsi=
-/scsi-bus.c:216
-  #7 0x5597532a7840 (qemu-system-x86_64+0x31f9840)  /mnt/sdb/qemu/hw/core=
-/qdev.c:876
 
-Direct leak of 15 byte(s) in 3 object(s) allocated from:
-  #0 0x7f19f8bed768 (/lib64/libasan.so.5+0xef768)  ??:?
-  #1 0x7f19f64d9445 (/lib64/libglib-2.0.so.0+0x52445)  ??:?
-  #2 0x7f19f64f2d92 (/lib64/libglib-2.0.so.0+0x6bd92)  ??:?
-  #3 0x55975366e06f (qemu-system-x86_64+0x35c006f)  /mnt/sdb/qemu/hw/scsi=
-/scsi-disk.c:2388
-  #4 0x559753671201 (qemu-system-x86_64+0x35c3201)  /mnt/sdb/qemu/hw/scsi=
-/scsi-disk.c:2681
-  #5 0x559753687e3e (qemu-system-x86_64+0x35d9e3e)  /mnt/sdb/qemu/hw/scsi=
-/scsi-bus.c:58
-  #6 0x55975368ac44 (qemu-system-x86_64+0x35dcc44)  /mnt/sdb/qemu/hw/scsi=
-/scsi-bus.c:216
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
----
- hw/scsi/scsi-disk.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index e44c61eeb4..caec99ae20 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2981,7 +2981,6 @@ static const TypeInfo scsi_disk_base_info =3D {
- };
-=20
- #define DEFINE_SCSI_DISK_PROPERTIES()                                   =
-\
--    DEFINE_PROP_DRIVE_IOTHREAD("drive", SCSIDiskState, qdev.conf.blk),  =
-\
-     DEFINE_BLOCK_PROPERTIES_BASE(SCSIDiskState, qdev.conf),             =
-\
-     DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),            =
-\
-     DEFINE_PROP_STRING("ver", SCSIDiskState, version),                  =
-\
-@@ -2993,6 +2992,7 @@ static const TypeInfo scsi_disk_base_info =3D {
-=20
- static Property scsi_hd_properties[] =3D {
-     DEFINE_SCSI_DISK_PROPERTIES(),
-+    DEFINE_PROP_DRIVE_IOTHREAD("drive", SCSIDiskState, qdev.conf.blk),
-     DEFINE_PROP_BIT("removable", SCSIDiskState, features,
-                     SCSI_DISK_F_REMOVABLE, false),
-     DEFINE_PROP_BIT("dpofua", SCSIDiskState, features,
-@@ -3048,6 +3048,7 @@ static const TypeInfo scsi_hd_info =3D {
-=20
- static Property scsi_cd_properties[] =3D {
-     DEFINE_SCSI_DISK_PROPERTIES(),
-+    DEFINE_PROP_DRIVE_IOTHREAD("drive", SCSIDiskState, qdev.conf.blk),
-     DEFINE_PROP_UINT64("wwn", SCSIDiskState, qdev.wwn, 0),
-     DEFINE_PROP_UINT64("port_wwn", SCSIDiskState, qdev.port_wwn, 0),
-     DEFINE_PROP_UINT16("port_index", SCSIDiskState, port_index, 0),
-@@ -3079,9 +3080,8 @@ static const TypeInfo scsi_cd_info =3D {
-=20
- #ifdef __linux__
- static Property scsi_block_properties[] =3D {
--    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
-+    DEFINE_SCSI_DISK_PROPERTIES(),
-     DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
--    DEFINE_PROP_BOOL("share-rw", SCSIDiskState, qdev.conf.share_rw, fals=
-e),
-     DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, 0)=
-,
-     DEFINE_PROP_UINT64("max_unmap_size", SCSIDiskState, max_unmap_size,
-                        DEFAULT_MAX_UNMAP_SIZE),
-@@ -3099,6 +3099,7 @@ static void scsi_block_class_initfn(ObjectClass *kl=
-ass, void *data)
-     SCSIDiskClass *sdc =3D SCSI_DISK_BASE_CLASS(klass);
-=20
-     sc->realize      =3D scsi_block_realize;
-+    sc->unrealize    =3D scsi_unrealize;
-     sc->alloc_req    =3D scsi_block_new_request;
-     sc->parse_cdb    =3D scsi_block_parse_cdb;
-     sdc->dma_readv   =3D scsi_block_dma_readv;
-@@ -3119,6 +3120,7 @@ static const TypeInfo scsi_block_info =3D {
-=20
- static Property scsi_disk_properties[] =3D {
-     DEFINE_SCSI_DISK_PROPERTIES(),
-+    DEFINE_PROP_DRIVE_IOTHREAD("drive", SCSIDiskState, qdev.conf.blk),
-     DEFINE_PROP_BIT("removable", SCSIDiskState, features,
-                     SCSI_DISK_F_REMOVABLE, false),
-     DEFINE_PROP_BIT("dpofua", SCSIDiskState, features,
 --=20
-2.21.0.windows.1
-
-
+Marc-Andr=C3=A9 Lureau
 
