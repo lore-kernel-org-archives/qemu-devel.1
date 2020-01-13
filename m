@@ -2,75 +2,80 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 442A0C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4B4C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:32:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19F27206DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:31:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F27206DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 080E4206DA
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:32:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGegURhW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 080E4206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3Z6-00024H-Rt
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:31:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40581)
+	id 1ir3a3-0003Ts-7J
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:32:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ir3Y4-0001Ti-L0
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:30:45 -0500
+ (envelope-from <drjones@redhat.com>) id 1ir3Yr-00028r-29
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:31:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ir3Y3-0002TL-4N
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:30:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37190)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ir3Y1-0002Pk-Hn
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:30:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ir3Y0-00047V-28
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 17:30:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 065472E80C8
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 17:30:40 +0000 (UTC)
+ (envelope-from <drjones@redhat.com>) id 1ir3Yp-0003bz-Kc
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:31:32 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34866
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir3Yn-0003Wj-Ct
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:31:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578936688;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=GEBUDqgM3gGBMdV6rvvSSOuZuUWDxugabavxa54G2Vg=;
+ b=NGegURhWWn0YD9lif458ntfbu3ZcyeOFy8exy7jaxapiwg8POa6uoi5z/ds/1tzz8ZQIGM
+ 1hVZbkFQ9wY2KrgR+eNOk5CbIn+Vtx0MBKA6//vNlwniWx5JGmytuNieyn6hxYwCwlpMm6
+ i1pI5n8z9G3qDI6BRdyKZDFpwoEYbhI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-1XCR-LcoPaekVf8yIqT8Lw-1; Mon, 13 Jan 2020 12:31:24 -0500
+X-MC-Unique: 1XCR-LcoPaekVf8yIqT8Lw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 520648024CC;
+ Mon, 13 Jan 2020 17:31:21 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0332C10841ED;
+ Mon, 13 Jan 2020 17:31:16 +0000 (UTC)
+Date: Mon, 13 Jan 2020 18:31:14 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 07/16] arm/arm64: ITS: Set the LPI
+ config and pending tables
+Message-ID: <20200113173114.4cjfqebzrfb7iepg@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-8-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 17:22:49 -0000
-From: Alex Longwall <1859384@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gic
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
-X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
-References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-Message-Id: <157893616964.5587.16812408550431347772.malone@gac.canonical.com>
-Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
- race condition in gic_acknowledge_irq
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b4286985957455ce0041d431bdf1e775efecac23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200110145412.14937-8-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,101 +84,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Please find attached a test case reproducing this issue. (this is a
-variant of https://github.com/rhdrjones/kvm-unit-
-tests/blob/master/arm/pl031.c but for multiple CPUs)
+On Fri, Jan 10, 2020 at 03:54:03PM +0100, Eric Auger wrote:
+> Allocate the LPI configuration and per re-distributor pending table.
+> Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
+> by default in the config table.
+> 
+> Also introduce a helper routine that allows to set the pending table
+> bit for a given LPI.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - remove memory attributes
+> ---
+>  lib/arm/asm/gic-v3-its.h |  3 ++
+>  lib/arm/asm/gic-v3.h     | 12 ++++++++
+>  lib/arm/gic-v3-its.c     | 60 ++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 75 insertions(+)
+> 
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 5a4dfe9..2f8b8f1 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -90,6 +90,9 @@ extern void its_init(void);
+>  extern int its_parse_baser(int i, struct its_baser *baser);
+>  extern void its_setup_baser(int i, struct its_baser *baser);
+>  extern struct its_baser *its_lookup_baser(int type);
+> +extern void set_lpi_config(int n, u8 val);
+> +extern u8 get_lpi_config(int n);
+> +extern void set_pending_table_bit(int rdist, int n, bool set);
 
-** Attachment added: "Test case (kvm-unit-tests)"
-   https://bugs.launchpad.net/qemu/+bug/1859384/+attachment/5319887/+files/=
-pl031_smp.c
+Please prefix with 'its' or at least swap the 'lpi' and verb. E.g.
+lpi_set_config, its_set_pending_table_bit.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859384
+>  
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+> index ffb2e26..90a7304 100644
+> --- a/lib/arm/asm/gic-v3.h
+> +++ b/lib/arm/asm/gic-v3.h
+> @@ -48,6 +48,16 @@
+>  #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+>  	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
+>  
+> +#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
+> +
+> +#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
+> +
+> +#define LPI_PROP_GROUP1		(1 << 1)
+> +#define LPI_PROP_ENABLED	(1 << 0)
+> +#define LPI_PROP_DEFAULT_PRIO   0xa0
+> +#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | \
+> +				 LPI_PROP_ENABLED)
+> +
+>  #include <asm/arch_gicv3.h>
+>  
+>  #ifndef __ASSEMBLY__
+> @@ -64,6 +74,8 @@ struct gicv3_data {
+>  	void *dist_base;
+>  	void *redist_bases[GICV3_NR_REDISTS];
+>  	void *redist_base[NR_CPUS];
+> +	void *lpi_prop;
+> +	void *lpi_pend[NR_CPUS];
+>  	unsigned int irq_nr;
+>  };
+>  extern struct gicv3_data gicv3_data;
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> index 79946c3..6c97569 100644
+> --- a/lib/arm/gic-v3-its.c
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -117,3 +117,63 @@ void its_setup_baser(int i, struct its_baser *baser)
+>  	writeq(val, gicv3_its_base() + GITS_BASER + i * 8);
+>  }
+>  
+> +inline void set_lpi_config(int n, u8 value)
+> +{
+> +	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
+> +	*entry = value;
+> +}
+> +
+> +inline u8 get_lpi_config(int n)
+> +{
+> +	u8 *entry = (u8 *)(gicv3_data.lpi_prop + (n - 8192));
+> +	return *entry;
+> +}
 
-Title:
-  arm gic: interrupt model never 1 on non-mpcore and race condition in
-  gic_acknowledge_irq
+Probably don't need the 'inline', but ok.
 
-Status in QEMU:
-  New
+> +
+> +/* alloc_lpi_tables: Allocate LPI config and pending tables */
+> +void alloc_lpi_tables(void);
+> +void alloc_lpi_tables(void)
 
-Bug description:
-  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
-  only one CPU can acknowledge the IRQ until it becomes inactive.
+Why not add this to the header (renamed to lpi_alloc_tables)? Or should
+this function be static?
 
-  The TRM also mandates that SGIs and PPIs follow the N-N model and that
-  SPIs follow the 1-N model.
+> +{
+> +	unsigned long n = SZ_64K >> PAGE_SHIFT;
+> +	unsigned long order = fls(n);
+> +	u64 prop_val;
+> +	int cpu;
+> +
+> +	gicv3_data.lpi_prop = (void *)virt_to_phys(alloc_pages(order));
+> +
+> +	/* ID bits = 13, ie. up to 14b LPI INTID */
+> +	prop_val = (u64)gicv3_data.lpi_prop | 13;
+> +
+> +	/*
+> +	 * Allocate pending tables for each redistributor
+> +	 * and set PROPBASER and PENDBASER
+> +	 */
+> +	for_each_present_cpu(cpu) {
+> +		u64 pend_val;
+> +		void *ptr;
+> +
+> +		ptr = gicv3_data.redist_base[cpu];
+> +
+> +		writeq(prop_val, ptr + GICR_PROPBASER);
+> +
+> +		gicv3_data.lpi_pend[cpu] =
+> +			(void *)virt_to_phys(alloc_pages(order));
 
-  However this is not currently the case with QEMU. I have locally (no
-  minimal test case) seen e.g. uart interrupts being acknowledged twice
-  before having been deactivated (expected: irqId on one CPU and 1023 on
-  the other instead).
+nit: I think these line brakes on = or worse than going over 80 chars.
+And, you don't need to worry about 80 chars anyway. See the README, we
+allow 120.
 
-  I have narrowed the issue down to the following:
+> +
+> +		pend_val = (u64)gicv3_data.lpi_pend[cpu];
+> +
+> +		writeq(pend_val, ptr + GICR_PENDBASER);
+> +	}
+> +}
+> +
+> +void set_pending_table_bit(int rdist, int n, bool set)
+> +{
+> +	u8 *ptr = phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
+> +	u8 mask = 1 << (n % 8), byte;
+> +
+> +	ptr += (n / 8);
+> +	byte = *ptr;
+> +	if (set)
+> +		byte |=  mask;
+> +	else
+> +		byte &= ~mask;
+> +	*ptr = byte;
+> +}
+> -- 
+> 2.20.1
+> 
 
-  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
-  means all IRQ will use the N-N model, and if s->revision !=3D
-  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
+Thanks,
+drew
 
-  If ""fixed"" locally with a hackjob, I still have the following trace:
-
-  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
-  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
-=3D0xff
-  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
-  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
-  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
-  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
-  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
-  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
-  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
-  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
-=3D0xff
-  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
-  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
-  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
-  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
-21
-  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
-
-  This is because:
-
-  2) gic_acknowledge_irq calls gic_clear_pending which uses
-  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
-  sensitive interrupts.
-
-  With this often being a no-op (ie. assuming ispendr was not written
-  to), any 1-n level-sensitive interrupt is still improperly pending on
-  all the other cores.
-
-  (Also, I don't really know how the qemu thread model works, there
-  might be race conditions in the acknowledgment logic if
-  gic_acknowledge_irq is called by multiple threads, too.)
-
-  Option used:
-  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
--cpu cortex-a57 -smp 4 -m 1024
-  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
-get=3Dnative
-  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
-  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
-te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
-  -trace gic_set_irq
-
-  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
-  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
-  staging"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
 
