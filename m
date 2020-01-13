@@ -2,75 +2,87 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14865C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D22DC33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D40E6207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:31:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 225DE2081E
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:36:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PODRSRfe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D40E6207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tXw94Lp0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225DE2081E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqx0d-00058Z-L5
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 05:31:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52844)
+	id 1iqx5P-0000Rs-8A
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 05:36:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iqwzU-0004EQ-O8
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:30:37 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iqx4l-00080T-69
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:36:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iqwzP-00032i-VF
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:30:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45357
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iqwzP-00031P-RF
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:30:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578911430;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=hHZiJnRMy5ceQptrEW1It4IcHAXnhUmAagh3qezZqHk=;
- b=PODRSRfeBYCRhSUvyecQRvE9vydX0d6+FjpAn23rDJy8VLVeeQBau0+x/VKN07IHSH8UaO
- dzH3EPVN4uJ+KW0oqBKJPRFmTCxE780RB3X+mDXYtFdTxpMReLeh0y1OT+BgRX4cnKzzIK
- y3cjho9pmImz52sRICaVgA42HgxoZ1k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-xvqSux5GPPi3wFa0YNrIqQ-1; Mon, 13 Jan 2020 05:30:28 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95D63800D4E
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 10:30:27 +0000 (UTC)
-Received: from localhost (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C834100EBAF;
- Mon, 13 Jan 2020 10:30:27 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iqx4j-00008V-Iv
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:36:02 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37126)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iqx4j-00006q-Av
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:36:01 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f129so9015779wmf.2
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 02:36:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KvwlEriwCS4WKo1aBJVweTtOEMd67yx3axHOa2dEAWg=;
+ b=tXw94Lp0smHY/YMRA5gZlobVVDpXosuPHn0qzjqbUNqbSoDZQk19GGpxdtRbdudQXy
+ MM52WCsYeskR5VxkJ34prDM+NMsgnQUC6c5f///pG7NWrMipK+3PdV8R8e6B7LZpAzx6
+ oGxEp8pzhlYP3WtTvhdh8wEZcaXJAI9H75AaNMFMaSFe+PoHW1mz8LPZjrEDY02KHySN
+ yLoT9r2v9DZoDane2ocEs4UM65FHeuXQGHrBfWy7w7y4ByNWRzXcy/7FuVu/LmJId5ED
+ FdIozh5XCFCq93ND2TadpQyAv6+DpAXu0LZZ108NBWp/+KupXH4SEENbNB7lHrzTwQyO
+ FgAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KvwlEriwCS4WKo1aBJVweTtOEMd67yx3axHOa2dEAWg=;
+ b=k9IAgMk3nkYaQSW4Js/6kBjOUxH+gRNaij62ooC5PR/SXiGQgyjCv4xtyqpNAsrYf4
+ 28v97bVz/EnOYWtxZ/6MovMuXDMBzMDDeWhQb5hB2MlP9k6pFlNPm6PHFddyLSD/bL4/
+ 0KyqEjqI6bHfJYk1CAIXMCzALynKyjQddl8Wzbmu3xzzKKygNVCHX1e3htdTlXdQz5HU
+ M+Wp9EJxIyYm5UonUMwLRJnS3hscetSpDiM7A80kMgDO9uPThIhC0qVVLv9/gjVznF4i
+ wI0Fkyrx9h6QJSJ94IwMiDmA+iuDiv0eAO5Y4bRpI+Wn+xwIMc+rBuZvZAJ3gIS+a0iI
+ ud1Q==
+X-Gm-Message-State: APjAAAUxK/U3AXcaUdCWUnj4VfXSR4/+RGwk6lybHc2KZ/dwxdkGRDJL
+ OIjhJxp1yiB/bR3yPHuUGxExbA==
+X-Google-Smtp-Source: APXvYqyLeU6VPFLN65qMVYaXmIqDRVZ4Sp1+71v4TLxxGxD/6bHZyieMp4A3F6iB4JTluEswBuKo/g==
+X-Received: by 2002:a7b:c935:: with SMTP id h21mr18807239wml.173.1578911759563; 
+ Mon, 13 Jan 2020 02:35:59 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q3sm15054788wrn.33.2020.01.13.02.35.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jan 2020 02:35:58 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AF95D1FF87;
+ Mon, 13 Jan 2020 10:35:57 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] docs/devel: fix stable process doc formatting
-Date: Mon, 13 Jan 2020 11:30:23 +0100
-Message-Id: <20200113103023.31255-1-cohuck@redhat.com>
+Subject: [qemu-web PATCH] documentation: update links to readthedocs
+Date: Mon, 13 Jan 2020 10:35:50 +0000
+Message-Id: <20200113103550.1133-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: xvqSux5GPPi3wFa0YNrIqQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,36 +94,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: pbonzini@redhat.com, thuth@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enumeration of stable criteria needs proper bullet points.
+..and extemporise a little about their state.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- docs/devel/stable-process.rst | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ documentation.md | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/docs/devel/stable-process.rst b/docs/devel/stable-process.rst
-index 98736a9ea487..e541b983fac7 100644
---- a/docs/devel/stable-process.rst
-+++ b/docs/devel/stable-process.rst
-@@ -18,8 +18,10 @@ What should go into a stable release?
- -------------------------------------
-=20
- Generally, the following patches are considered stable material:
--- Patches that fix severe issues, like fixes for CVEs
--- Patches that fix regressions
-+
-+* Patches that fix severe issues, like fixes for CVEs
-+
-+* Patches that fix regressions
-=20
- If you think the patch would be important for users of the current release
- (or for a distribution picking fixes), it is usually a good candidate
---=20
-2.21.1
+diff --git a/documentation.md b/documentation.md
+index f4ef9f4..55d5db6 100644
+--- a/documentation.md
++++ b/documentation.md
+@@ -3,9 +3,12 @@ title: QEMU documentation
+ permalink: /documentation/
+ ---
+ 
+-The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be read online, courtesy of Stefan Weil.
+-More documentation is found in the <a href="https://git.qemu.org/?p=qemu.git;a=tree;f=docs;hb=master">`docs`</a>
+-directory of the QEMU git tree.
++The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be
++read online, courtesy of Stefan Weil. There is a partial set of
++[developer documentation](https://qemu.readthedocs.io/en/latest/)
++which is generated from the QEMU git tree. The process of converting
++the rest of the [`docs`](https://git.qemu.org/?p=qemu.git;a=tree;f=docs;hb=master)
++directory is ongoing.
+ 
+ The [QEMU wiki](https://wiki.qemu.org) contains more
+ [user documentation](https://wiki.qemu.org/Category:User_documentation) and
+-- 
+2.20.1
 
 
