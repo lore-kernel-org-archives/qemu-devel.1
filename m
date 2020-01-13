@@ -8,72 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E631EC33CAE
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 04:59:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEA9C33CAB
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 05:01:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2C3721556
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 04:59:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03E4621556
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 05:01:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I0UZFnJq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C3721556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h37HcGKp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E4621556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqrp8-00019k-EV
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 23:59:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42176)
+	id 1iqrr8-0003RL-6B
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 00:01:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1iqrnY-0007XG-Vv
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:58 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1iqrng-0007o2-D8
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1iqrnX-0006sN-82
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:56 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34029)
+ (envelope-from <coiby.xu@gmail.com>) id 1iqrnf-0007AQ-4C
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:58:04 -0500
+Received: from mail-pg1-x535.google.com ([2607:f8b0:4864:20::535]:41011)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1iqrnX-0006qs-05
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:55 -0500
-Received: by mail-pf1-x444.google.com with SMTP id i6so4273058pfc.1
- for <qemu-devel@nongnu.org>; Sun, 12 Jan 2020 20:57:54 -0800 (PST)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1iqrne-00078G-TK
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:58:03 -0500
+Received: by mail-pg1-x535.google.com with SMTP id x8so4097279pgk.8
+ for <qemu-devel@nongnu.org>; Sun, 12 Jan 2020 20:58:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+o2xLjvifsgfa/4owhRKctXKFUi1fuVO/+UjjYkEsiY=;
- b=I0UZFnJqegXav2bnw9MIO4RW31ZzUBCjzh9aK4Rgr10kJKhqYqRLRRZDwRpNDdUj5g
- sJkC4xoCfWTfE03Or58bvIdPO8cc0s4SY9wzr2sKHq5lAZ9j2s3px4SkKrEbkdz9P9zJ
- zYMsw/t2plVoA8QOcurvNmZyIEFYQLltzXSh4/xS7+M0+fYLsoIqbLBoCGX/2NRApYjf
- w9cYwpOZZvwhahTnD5bRLXjm4WzGJbQBryNxrb5V4nfrtHx7dndrUEtshpIT4DFrybLZ
- fFS8ZR+WaEAP1i4b7UaHiuBpdvBptYjGpgrPYdUt3LgCsoCINjKP2COF1ZcFSOToBgkR
- YR0Q==
+ bh=EQMyzeRthVsHsvanx1IY5iAxlbRqxtmJUNUIngmWAlk=;
+ b=h37HcGKpWzAd4VTJVn7G3SKFYITfFU+wzluErHcVOtv1DXaXJw29GC/wJh8FUX8/U0
+ XaSbl46qJVl8JhU9gDuYm6Q9E1PDWsOPhUu1IqHYcOvn+rgZBGewZwoU+3st/Q3sPiUt
+ EyzZaKLO2lI250RUGR0j6HUw4YISye1thAPgnSvCd7DnmahEAB+GlzFdY0/9YvvjxcB2
+ ksecZ149Mezh7H8UjPYnaRtg2E560lSmPgEvCylVC4UxBwGTn/zDGlOZ3H2OLzrj1eNs
+ hwsx3S0oeXwsbaKzR/WV2NX9pKiHne40K44/WxerETgHx0U2YsR+ECnPKsLIPF4r2i6a
+ oTCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+o2xLjvifsgfa/4owhRKctXKFUi1fuVO/+UjjYkEsiY=;
- b=A7mC4xvYmTGQfIIAPdaEldiul0AV/Iejz13I9ZOrRrrJtleiseCIO5+FpvlPIqBa/R
- T/m8nLuIgjjlhlc6uy9Q2297yK7HjlShA+hgTsbPkwpT+zUA0MrueknRC0MEUmq/63pr
- R/lFolY2ePVNPHVdGzHTCjA+NA6VoAf8bE5Pd2ElJ8q6anur0jNFcCa4U/WAU36jO9Cg
- QqMlXX2E6udnHrJzREYQabSwe0woLo6u3mmqE+KJ+93leEraJO0Ek25DGyBLSZlOvNXf
- wjK65Law4DySKIBvxwwdFInROxitQRuDM6Rwq7mrcVOgoawWgi6pWHrtlzvIBloDo3FJ
- gptA==
-X-Gm-Message-State: APjAAAXXI8lD+rruCZ0XmSodmPqTCHwIkcC9esepp5m07L/LP2FBbpHO
- FeIIiOCOXw5MgBnWfhPybmbuNUhBR4TW+g==
-X-Google-Smtp-Source: APXvYqwkyoQMSCwLOPFFsJaqTEHD5/9txZbEFiyYeTUo3Jct3f7UAq9IMJppO/TmIkXmeTy9aQ7YEA==
-X-Received: by 2002:a62:14c4:: with SMTP id 187mr17652681pfu.96.1578891473600; 
- Sun, 12 Jan 2020 20:57:53 -0800 (PST)
+ bh=EQMyzeRthVsHsvanx1IY5iAxlbRqxtmJUNUIngmWAlk=;
+ b=h+cZgIr67QKfnUyEjzlNZ9qaebF9IOnKvAbNkFZ7rtDXP3ua3yoQppTfERm+aBZYxF
+ UVGHbxsKObEbu9DLtXIqTl26m5f2Qq5yNuhpVjfmj2kj4wJyKJrxdhSb2sj/0FT2Iy45
+ IbXdxUZfxz9PjTn58S9eOQDnn5p/8bghJD2nMNdyr6mr97p/acfZa90zsoKZV6dS+FcS
+ KKtu9LXG3fnMK939Pcni4quKsUBYl4yIW7nsjp/DLXpnswT5g4/GJn5icznJkExgg3JV
+ DOpeuHlsP42EHFIvvvGXKM0p4xubuP5NsCBfILOyz/wDQSwYp5gOA+CgONWbUvNKRJ0c
+ DR2Q==
+X-Gm-Message-State: APjAAAW+MOj+x0QqWQwSzXXleL8ajOEKx/8Pd510oNFjsCn6fQyoO6Vo
+ 5iqtu9xmpsO9MGGzlBRb05d7g7JcF6a0Zw==
+X-Google-Smtp-Source: APXvYqxcZ+1XV2qEA92vZkHoV47Ngmrj8t7C0v9bwb2JMF4IJUYUSwDwiXmpQi5lq1mPmSKsUxl/fA==
+X-Received: by 2002:a63:cd06:: with SMTP id i6mr19176519pgg.48.1578891481500; 
+ Sun, 12 Jan 2020 20:58:01 -0800 (PST)
 Received: from localhost.localdomain ([175.124.145.172])
- by smtp.googlemail.com with ESMTPSA id o19sm17590552pjr.2.2020.01.12.20.57.49
+ by smtp.googlemail.com with ESMTPSA id o19sm17590552pjr.2.2020.01.12.20.57.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Jan 2020 20:57:53 -0800 (PST)
+ Sun, 12 Jan 2020 20:58:00 -0800 (PST)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 3/5] a standone-alone tool to directly share disk image
- file via vhost-user protocol
-Date: Mon, 13 Jan 2020 12:57:02 +0800
-Message-Id: <20200113045704.12318-4-coiby.xu@gmail.com>
+Subject: [PATCH v1 5/5] building configuration files changes
+Date: Mon, 13 Jan 2020 12:57:04 +0800
+Message-Id: <20200113045704.12318-6-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200113045704.12318-1-coiby.xu@gmail.com>
 References: <20200113045704.12318-1-coiby.xu@gmail.com>
@@ -81,7 +80,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::535
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,284 +98,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vhost-user-blk can have played as vhost-user backend but it only supports raw file and don't support VIRTIO_BLK_T_DISCARD and VIRTIO_BLK_T_WRITE_ZEROES operations on raw file (ioctl(fd, BLKDISCARD) is only valid for real block device).
-
 Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
 ---
- qemu-vu.c | 264 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 264 insertions(+)
- create mode 100644 qemu-vu.c
+ Makefile               | 1 +
+ Makefile.objs          | 2 +-
+ Makefile.target        | 1 +
+ configure              | 2 +-
+ tests/Makefile.include | 5 ++++-
+ 5 files changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/qemu-vu.c b/qemu-vu.c
-new file mode 100644
-index 0000000000..25c32c2c6d
---- /dev/null
-+++ b/qemu-vu.c
-@@ -0,0 +1,264 @@
-+/*
-+ *  Copyright (C) 2020  Coiby Xu <coiby.xu@gmail.com>
-+ *
-+ *  Vhost-user-blk device backend
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; under version 2 of the License.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <getopt.h>
-+#include <libgen.h>
-+#include "block/vhost-user.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+#include "sysemu/block-backend.h"
-+#include "block/block_int.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/module.h"
-+#include "qemu/option.h"
-+#include "qemu/error-report.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qstring.h"
-+#include "qom/object_interfaces.h"
-+#include "io/net-listener.h"
-+#include "qemu-version.h"
-+
-+#define QEMU_VU_OPT_CACHE         256
-+
-+#define QEMU_VU_OPT_AIO           257
-+
-+static char *srcpath;
-+
-+static void usage(const char *name)
-+{
-+    (printf) (
-+"Usage: %s [OPTIONS] FILE\n"
-+"  or:  %s -L [OPTIONS]\n"
-+"QEMU Vhost-user Server Utility\n"
-+"\n"
-+"  -h, --help                display this help and exit\n"
-+"  -V, --version             output version information and exit\n"
-+"\n"
-+"Connection properties:\n"
-+"  -k, --socket=PATH         path to the unix socket\n"
-+"\n"
-+"General purpose options:\n"
-+"  -e, -- exit-panic         When the panic callback is called, the program\n"
-+"                            will exit. Useful for make check-qtest.\n"
-+"\n"
-+"Block device options:\n"
-+"  -f, --format=FORMAT       set image format (raw, qcow2, ...)\n"
-+"  -r, --read-only           export read-only\n"
-+"  -n, --nocache             disable host cache\n"
-+"      --cache=MODE          set cache mode (none, writeback, ...)\n"
-+"      --aio=MODE            set AIO mode (native or threads)\n"
-+"\n"
-+QEMU_HELP_BOTTOM "\n"
-+    , name, name);
-+}
-+
-+static void version(const char *name)
-+{
-+    printf(
-+"%s " QEMU_FULL_VERSION "\n"
-+"Written by Coiby Xu, based on qemu-nbd by Anthony Liguori\n"
-+"\n"
-+QEMU_COPYRIGHT "\n"
-+"This is free software; see the source for copying conditions.  There is NO\n"
-+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-+    , name);
-+}
-+
-+static VubDev *vub_device;
-+
-+static void vus_shutdown(void)
-+{
-+    job_cancel_sync_all();
-+    bdrv_close_all();
-+    vub_free(vub_device, false);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    BlockBackend *blk;
-+    BlockDriverState *bs;
-+    bool readonly = false;
-+    char *sockpath = NULL;
-+    int64_t fd_size;
-+    const char *sopt = "hVrnvek:f:";
-+    struct option lopt[] = {
-+        { "help", no_argument, NULL, 'h' },
-+        { "version", no_argument, NULL, 'V' },
-+        { "exit-panic", no_argument, NULL, 'e' },
-+        { "socket", required_argument, NULL, 'k' },
-+        { "read-only", no_argument, NULL, 'r' },
-+        { "nocache", no_argument, NULL, 'n' },
-+        { "cache", required_argument, NULL, QEMU_VU_OPT_CACHE },
-+        { "aio", required_argument, NULL, QEMU_VU_OPT_AIO },
-+        { "format", required_argument, NULL, 'f' },
-+        { NULL, 0, NULL, 0 }
-+    };
-+    int ch;
-+    int opt_ind = 0;
-+    int flags = BDRV_O_RDWR;
-+    bool seen_cache = false;
-+    bool seen_aio = false;
-+    const char *fmt = NULL;
-+    Error *local_err = NULL;
-+    QDict *options = NULL;
-+    bool writethrough = true;
-+    bool exit_panic = false;
-+
-+    error_init(argv[0]);
-+
-+    module_call_init(MODULE_INIT_QOM);
-+    qemu_init_exec_dir(argv[0]);
-+
-+    while ((ch = getopt_long(argc, argv, sopt, lopt, &opt_ind)) != -1) {
-+        switch (ch) {
-+        case 'e':
-+            exit_panic = true;
-+            break;
-+        case 'n':
-+            optarg = (char *) "none";
-+            /* fallthrough */
-+        case QEMU_VU_OPT_CACHE:
-+            if (seen_cache) {
-+                error_report("-n and --cache can only be specified once");
-+                exit(EXIT_FAILURE);
-+            }
-+            seen_cache = true;
-+            if (bdrv_parse_cache_mode(optarg, &flags, &writethrough) == -1) {
-+                error_report("Invalid cache mode `%s'", optarg);
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        case QEMU_VU_OPT_AIO:
-+            if (seen_aio) {
-+                error_report("--aio can only be specified once");
-+                exit(EXIT_FAILURE);
-+            }
-+            seen_aio = true;
-+            if (!strcmp(optarg, "native")) {
-+                flags |= BDRV_O_NATIVE_AIO;
-+            } else if (!strcmp(optarg, "threads")) {
-+                /* this is the default */
-+            } else {
-+               error_report("invalid aio mode `%s'", optarg);
-+               exit(EXIT_FAILURE);
-+            }
-+            break;
-+        case 'r':
-+            readonly = true;
-+            flags &= ~BDRV_O_RDWR;
-+            break;
-+        case 'k':
-+            sockpath = optarg;
-+            if (sockpath[0] != '/') {
-+                error_report("socket path must be absolute");
-+                exit(EXIT_FAILURE);
-+            }
-+            break;
-+        case 'f':
-+            fmt = optarg;
-+            break;
-+        case 'V':
-+            version(argv[0]);
-+            exit(0);
-+            break;
-+        case 'h':
-+            usage(argv[0]);
-+            exit(0);
-+            break;
-+        case '?':
-+            error_report("Try `%s --help' for more information.", argv[0]);
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    if ((argc - optind) != 1) {
-+        error_report("Invalid number of arguments");
-+        error_printf("Try `%s --help' for more information.\n", argv[0]);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (qemu_init_main_loop(&local_err)) {
-+        error_report_err(local_err);
-+        exit(EXIT_FAILURE);
-+    }
-+    bdrv_init();
-+
-+    srcpath = argv[optind];
-+    if (fmt) {
-+        options = qdict_new();
-+        qdict_put_str(options, "driver", fmt);
-+    }
-+    blk = blk_new_open(srcpath, NULL, options, flags, &local_err);
-+
-+    if (!blk) {
-+        error_reportf_err(local_err, "Failed to blk_new_open '%s': ",
-+                          argv[optind]);
-+        exit(EXIT_FAILURE);
-+    }
-+    bs = blk_bs(blk);
-+
-+    blk_set_enable_write_cache(blk, !writethrough);
-+
-+    fd_size = blk_getlength(blk);
-+    if (fd_size < 0) {
-+        error_report("Failed to determine the image length: %s",
-+                     strerror(-fd_size));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    AioContext *ctx = bdrv_get_aio_context(bs);
-+    bdrv_invalidate_cache(bs, NULL);
-+
-+    vub_device = g_new0(VubDev, 1);
-+    vub_device->unix_socket = g_strdup(sockpath);
-+    vub_device->writable = !readonly;
-+    vub_device->blkcfg.wce = !writethrough;
-+    vub_device->backend = blk;
-+    vub_device->ctx = ctx;
-+    vub_initialize_config(bs, &vub_device->blkcfg);
-+    vub_device->listener = qio_net_listener_new();
-+    vub_device->exit_panic = exit_panic;
-+
-+    qio_net_listener_set_name(vub_device->listener,
-+                              "vhost-user-backend-listener");
-+
-+    SocketAddress *addr = g_new0(SocketAddress, 1);
-+    addr->u.q_unix.path = (char *) sockpath;
-+    addr->type = SOCKET_ADDRESS_TYPE_UNIX;
-+    Error **errp = NULL;
-+    if (qio_net_listener_open_sync(vub_device->listener, addr, 1, errp) < 0) {
-+        goto error;
-+    }
-+
-+    qio_net_listener_set_client_func(vub_device->listener,
-+                                     vub_accept,
-+                                     vub_device,
-+                                     NULL);
-+
-+    QTAILQ_INIT(&vub_device->clients);
-+
-+    do {
-+        main_loop_wait(false);
-+    } while (!vub_device->exit_panic || !vub_device->close);
-+
-+ error:
-+    vus_shutdown();
-+    exit(EXIT_SUCCESS);
-+}
+diff --git a/Makefile b/Makefile
+index 6b5ad1121b..1b98201d29 100644
+--- a/Makefile
++++ b/Makefile
+@@ -558,6 +558,7 @@ qemu-img.o: qemu-img-cmds.h
+
+ qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++qemu-vu$(EXESUF): qemu-vu.o blockdev-vu.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS) libvhost-user.a
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+
+ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+diff --git a/Makefile.objs b/Makefile.objs
+index 7c1e50f9d6..f77b110fc9 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -42,7 +42,7 @@ io-obj-y = io/
+ # single QEMU executable should support all CPUs and machines.
+
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = blockdev.o blockdev-nbd.o block/
++common-obj-y = blockdev.o blockdev-nbd.o blockdev-vu.o block/
+ common-obj-y += bootdevice.o iothread.o
+ common-obj-y += dump/
+ common-obj-y += job-qmp.o
+diff --git a/Makefile.target b/Makefile.target
+index 6e61f607b1..51a9a9c349 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -159,6 +159,7 @@ obj-y += monitor/
+ obj-y += qapi/
+ obj-y += memory.o
+ obj-y += memory_mapping.o
++obj-y += ../contrib/libvhost-user/libvhost-user.o
+ obj-y += migration/ram.o
+ LIBS := $(libs_softmmu) $(LIBS)
+
+diff --git a/configure b/configure
+index 0ce2c0354a..b13d4a8da7 100755
+--- a/configure
++++ b/configure
+@@ -6165,7 +6165,7 @@ fi
+
+ tools=""
+ if test "$want_tools" = "yes" ; then
+-  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-edid\$(EXESUF) $tools"
++  tools="qemu-img\$(EXESUF) qemu-vu\$(EXESUF) qemu-io\$(EXESUF) qemu-edid\$(EXESUF) $tools"
+   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+     tools="qemu-nbd\$(EXESUF) $tools"
+   fi
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 49e3b0d319..7d7692734c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -746,6 +746,7 @@ qos-test-obj-y += tests/libqos/virtio.o
+ qos-test-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
+ qos-test-obj-y += tests/libqos/virtio-balloon.o
+ qos-test-obj-y += tests/libqos/virtio-blk.o
++qos-test-obj-y += tests/libqos/vhost-user-blk.o
+ qos-test-obj-y += tests/libqos/virtio-mmio.o
+ qos-test-obj-y += tests/libqos/virtio-net.o
+ qos-test-obj-y += tests/libqos/virtio-pci.o
+@@ -788,6 +789,7 @@ qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/vhost-user-test.o $(chardev-obj-y
+ qos-test-obj-y += tests/virtio-test.o
+ qos-test-obj-$(CONFIG_VIRTFS) += tests/virtio-9p-test.o
+ qos-test-obj-y += tests/virtio-blk-test.o
++qos-test-obj-y += tests/vhost-user-blk-test.o
+ qos-test-obj-y += tests/virtio-net-test.o
+ qos-test-obj-y += tests/virtio-rng-test.o
+ qos-test-obj-y += tests/virtio-scsi-test.o
+@@ -935,7 +937,8 @@ endef
+ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu/all $(check-qtest-y)
+ 	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
+ 	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+-	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
++	  QTEST_QEMU_IMG=./qemu-img$(EXESUF) \
++	  QTEST_QEMU_VU_BINARY=./qemu-vu$(EXESUF))
+
+ check-unit: $(check-unit-y)
+ 	$(call do_test_human, $^)
 --
 2.24.1
 
