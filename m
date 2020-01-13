@@ -2,78 +2,87 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E569DC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFD0C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC3E7207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:29:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97D08207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 16:31:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exhe6g68"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3E7207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vR3xuleB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97D08207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir2bC-0008RK-Rw
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:29:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49738)
+	id 1ir2dB-0001hj-Hx
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 11:31:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1ir2Zn-0007gd-Ne
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:28:28 -0500
+ (envelope-from <stefanha@gmail.com>) id 1ir2bq-0000lf-2x
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:30:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1ir2Zl-0004SZ-Cu
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:28:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33933
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1ir2Zl-0004RE-8d
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:28:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578932903;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Teu5pbkjdAz4BmeDIWf/6d/0o2Ectv5SGWU9UAtgFKg=;
- b=exhe6g68YQhn+q0cj0qB6cAnZkDJqKAyWgQqvI3UF3mtKOzYKJM+Zs5/XwqKSPKainVf2v
- vSrJwp1XmOYfZVopH1utuPv8Wgdit+xs54bYGbEVgl2XW0wDczUrYQvTOlEuP096yepQ/h
- iXUdxewYhHFLkwSd06MG4y02B/FTR4I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-vmwDEuy7PrKWjr8BesJP5w-1; Mon, 13 Jan 2020 11:28:22 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CB0C107AD88;
- Mon, 13 Jan 2020 16:28:21 +0000 (UTC)
-Received: from w520.home (ovpn-116-28.phx2.redhat.com [10.3.116.28])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22B9D50A8F;
- Mon, 13 Jan 2020 16:28:21 +0000 (UTC)
-Date: Mon, 13 Jan 2020 09:28:20 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: yurij <lnkgyv@gmail.com>
-Subject: Re: PCIe device paththrough via vfio issue
-Message-ID: <20200113092820.7af3b10c@w520.home>
-In-Reply-To: <9ebac151-0a9b-3f64-ccd8-0709088fa2b3@gmail.com>
-References: <9ebac151-0a9b-3f64-ccd8-0709088fa2b3@gmail.com>
+ (envelope-from <stefanha@gmail.com>) id 1ir2bo-0007Gt-SP
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:30:34 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:39248)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1ir2bo-0007Eh-Kt
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 11:30:32 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id 20so10374061wmj.4
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 08:30:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=D+Wx+HEwfg70nwq06ML8B9/UCg2j63W79fNEmZTpLB8=;
+ b=vR3xuleBy9cK83m/lGNO5YavgHgs6gXWQGm5hlF83jXLTQHmfReusCrBCDvvwPlH4V
+ 63qESAtwvBZIdrsw/plPJftiyg03jSTMB+DUhk3JXMLdObm47M5YSAMDmCRLZk55AlVp
+ PfjMu7Kp515XeJ8TQwB60XrkNObqPhANgi9d8H3y/wgdDYIaFyENUrLPMrG/iRwv10Nn
+ KkYBl5eEvrbAS85Sjy38jpsOYbTOs/3S/44Ml+ZEVK9LMOnypgqU9rbKV0TsZ1tfcZll
+ HVKF89LblhiLSBwyII7U5sFPLRxIqnW3JZ6zqPTlpFQ5U+KACawfzJskUGZDZfLnFHGk
+ hB9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=D+Wx+HEwfg70nwq06ML8B9/UCg2j63W79fNEmZTpLB8=;
+ b=L2oiyvEMFJkT9LCnsetOkDpC3wXOBPs5xpSciI9UEZ13m062M+VDTK+v0Kcxx1Z3pX
+ D+L/px0Jjtkvr0xmPAVlTLOodhRQAFCxzweQCaOjqZjIzwStk92D0W3EVquf6h+48v/D
+ VGZKj9n6IiMdf6ydXxCmHQjS30FgBa2lJazVn188HlOCv8agB9qseztYreXqS2gxlo7B
+ u9DcTxbFyDalvq3dVMzvEx9aAdS1UeAqHguFFXHyuL8m4nPX7rKLm2AV05iq9vLSZCZq
+ aNvNRNpcwEOSuG+R/Clc4no7BZGFl4DqR10lligi7HEOvzu+CIoLp3gQybMMOII7oA86
+ XL9g==
+X-Gm-Message-State: APjAAAX0O42VSnxyYOx0/FuNIHs4EHPZ3dCk2f4bw3sKNJE8YFBpKgCa
+ GAQaK4pQ0mKJEP6Sn1RjG9A=
+X-Google-Smtp-Source: APXvYqzb6VCd/hF8S6WXhVJ1exMtr0ZrAeEgIktg8svWVvFeN7yyXV99SKq2qpoMvf6IYxo73iSMxg==
+X-Received: by 2002:a05:600c:24ca:: with SMTP id
+ 10mr20426686wmu.4.1578933030750; 
+ Mon, 13 Jan 2020 08:30:30 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id n3sm14972881wrs.8.2020.01.13.08.30.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jan 2020 08:30:29 -0800 (PST)
+Date: Mon, 13 Jan 2020 16:30:28 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Christophe de Dinechin <dinechin@redhat.com>
+Subject: Re: Making QEMU easier for management tools and applications
+Message-ID: <20200113163028.GB103384@stefanha-x1.localdomain>
+References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
+ <1EFEF446-AFEA-429F-B6BA-3206A7C41836@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: vmwDEuy7PrKWjr8BesJP5w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+g7M9IMkV8truYOl"
+Content-Disposition: inline
+In-Reply-To: <1EFEF446-AFEA-429F-B6BA-3206A7C41836@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,133 +94,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 13 Jan 2020 18:49:21 +0300
-yurij <lnkgyv@gmail.com> wrote:
 
-> Hello everybody!
->=20
-> I have a specific PCIe device (sorry, but I can't tell about what is it=
-=20
-> and what it does) but PCI configuration space consists of 4 BARs (lspci=
-=20
-> output brief):
->=20
-> lspci -s 84:00.00 -vvv
->=20
-> . . .
-> Region 0: Memory at fa000000 (64-bit, non-prefetchable) [size=3D16M]
-> =09Region 2: Memory at fb001000 (32-bit, non-prefetchable) [size=3D4K]
-> =09Region 3: Memory at fb000000 (32-bit, non-prefetchable) [size=3D4K]
-> =09Region 4: Memory at f9000000 (64-bit, non-prefetchable) [size=3D16M]
-> . . .
-> Kernel driver in use: vfio-pci
-> . . .
->=20
-> BAR0 merged with BAR1, BAR4 merged with BAR5 so they are 64 bit width.
->=20
-> I put this PCIe device in virtual machine via vfio:
->=20
-> -device vfio-pci,host=3D84:00.0,id=3Dhostdev0,bus=3Dpci.6,addr=3D0x0
->=20
-> Virtual machine successfully boot. PCI configuration space in virtual=20
-> environment looks OK (lspci output brief):
->=20
-> lspci -s 06:00.0 -vvv
->=20
-> . . .
-> Region 0: Memory at f8000000 (64-bit, non-prefetchable) [size=3D16M]
-> =09Region 2: Memory at fa000000 (32-bit, non-prefetchable) [size=3D4K]
-> =09Region 3: Memory at fa001000 (32-bit, non-prefetchable) [size=3D4K]
-> =09Region 4: Memory at f9000000 (64-bit, non-prefetchable) [size=3D16M]
-> . . .
-> Kernel driver in use: custom_driver
->=20
-> BAR0 merged with BAR1 and BAR4 merged with BAR5 and so they are also 64=
-=20
-> bit width.
->=20
-> The main problem in 4K HOLE in REGION 0 in virtual environment. So some=
-=20
-> device features don't work.
->=20
-> I have enabled iommu trace in host system (trace_event=3Diommu) and=20
-> display all events (for i in $(find=20
-> /sys/kernel/debug/tracing/events/iommu/ -name enable);do echo 1 > $i;=20
-> done). I saw next events during virtual machine booting:
->=20
-> # cat /sys/kernel/debug/tracing/trace
-> . . .
->         CPU 0/KVM-3046  [051] .... 63113.338894: map: IOMMU:=20
-> iova=3D0x00000000f8000000 paddr=3D0x00000000fa000000 size=3D24576
->         CPU 0/KVM-3046  [051] .... 63113.339177: map: IOMMU:=20
-> iova=3D0x00000000f8007000 paddr=3D0x00000000fa007000 size=3D16748544
->         CPU 0/KVM-3046  [051] .... 63113.339444: map: IOMMU:=20
-> iova=3D0x00000000fa000000 paddr=3D0x00000000fb001000 size=3D4096
->         CPU 0/KVM-3046  [051] .... 63113.339697: map: IOMMU:=20
-> iova=3D0x00000000fa001000 paddr=3D0x00000000fb000000 size=3D4096
->         CPU 0/KVM-3046  [051] .... 63113.340209: map: IOMMU:=20
-> iova=3D0x00000000f9000000 paddr=3D0x00000000f9000000 size=3D16777216
-> . . .
->=20
-> I have enabled qemu trace(-trace events=3D/root/qemu/trace_events). Trace=
-=20
-> file consists of the falling functions:
-> vfio_region_mmap
-> vfio_get_dev_region
-> vfio_pci_size_rom
-> vfio_pci_read_config
-> vfio_pci_write_config
-> vfio_iommu_map_notify
-> vfio_listener_region_add_iommu
-> vfio_listener_region_add_ram
->=20
-> Some important brief from qemu trace:
-> . . .
-> =D1=8F=D0=BD=D0=B2 13 18:17:24 VM qemu-system-x86_64[7131]: vfio_region_m=
-map Region=20
-> 0000:84:00.0 BAR 0 mmaps[0] [0x0 - 0xffffff]
-> =D1=8F=D0=BD=D0=B2 13 18:17:24 VM qemu-system-x86_64[7131]: vfio_region_m=
-map Region=20
-> 0000:84:00.0 BAR 2 mmaps[0] [0x0 - 0xfff]
-> =D1=8F=D0=BD=D0=B2 13 18:17:24 VM qemu-system-x86_64[7131]: vfio_region_m=
-map Region=20
-> 0000:84:00.0 BAR 3 mmaps[0] [0x0 - 0xfff]
-> =D1=8F=D0=BD=D0=B2 13 18:17:24 VM qemu-system-x86_64[7131]: vfio_region_m=
-map Region=20
-> 0000:84:00.0 BAR 4 mmaps[0] [0x0 - 0xffffff]
-> . . .
-> =D1=8F=D0=BD=D0=B2 13 18:17:37 VM qemu-system-x86_64[7131]:=20
-> vfio_listener_region_add_ram region_add [ram] 0xf8000000 - 0xf8005fff=20
-> [0x7f691e800000]
-> =D1=8F=D0=BD=D0=B2 13 18:17:37 VM qemu-system-x86_64[7131]:=20
-> vfio_listener_region_add_ram region_add [ram] 0xf8007000 - 0xf8ffffff=20
-> [0x7f691e807000]
-> =D1=8F=D0=BD=D0=B2 13 18:17:37 VM qemu-system-x86_64[7131]:=20
-> vfio_listener_region_add_ram region_add [ram] 0xfa000000 - 0xfa000fff=20
-> [0x7f6b5de37000]
-> =D1=8F=D0=BD=D0=B2 13 18:17:37 VM qemu-system-x86_64[7131]:=20
-> vfio_listener_region_add_ram region_add [ram] 0xfa001000 - 0xfa001fff=20
-> [0x7f6b58004000]
-> =D1=8F=D0=BD=D0=B2 13 18:17:37 VM qemu-system-x86_64[7131]:=20
-> vfio_listener_region_add_ram region_add [ram] 0xf9000000 - 0xf9ffffff=20
-> [0x7f691d800000]
->=20
-> I use qemu 4.0.0 which I rebuild for tracing support=20
-> (--enable-trace-backends=3Dsyslog).
->=20
-> Please, help me solve this issue. Thank you!
+--+g7M9IMkV8truYOl
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Something has probably created a QEMU MemoryRegion overlapping the BAR,
-we do this for quirks where we want to intercept a range of MMIO for
-emulation, but the offset 0x6000 on BAR0 doesn't sound familiar to me.
-Run the VM with a monitor and see if 'info mtree' provides any info on
-the handling of that overlap.  Thanks,
+On Tue, Jan 07, 2020 at 06:11:13PM +0100, Christophe de Dinechin wrote:
+> > On 20 Dec 2019, at 17:13, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> So I think that Daniel is right. We may need at some point to start
+> a NEMU-style offshoot that does not attempt to be compatible,
+> but explores describing an increasing surface of the API using a
+> new meta-language from which we can generate, in a consistent
+> way, at least:
+>=20
+> - C bindings
+> - Command-line options
+> - Shell bindings (or =E2=80=9CHMP=E2=80=9D)
+> - JSON schema or qom description
+> - Bindings in other languages (Rust, Go, Python)
+> - Networked versions of the API (socket, REST)
+> - Client-side code e.g. for libvirt.
+> - Serialization / deserialization, e.g. for configuration files
+> - Documentation, including man page and API docs
+> - Command-line help
+>=20
+> At the most fundamental level, I think we need to describe:
+>=20
+> - Values, e.g. how we represent names, sizes, paths, etc, possibly
+> with some user-friendly aspects, e.g. path shortcuts, memory units,
+> spelling shortcuts (e.g. being able to consistently say -blo for -blockdev
+> if that=E2=80=99s the shortest option that matches)
+> - Relations, e.g. how we represent =E2=80=9Ccontains=E2=80=9D, =E2=80=9Cd=
+erives from=E2=80=9D, =E2=80=9Cneeds=E2=80=9D,
+> =E2=80=9Cone of=E2=80=9D, =E2=80=9Cone or several=E2=80=9D, =E2=80=9Catta=
+ches to=E2=80=9D=E2=80=A6
+> - States, e.g. how do we represent the machine configuration,
+> or the desired new disk setting
+> - Verbs, e.g. how we represent =E2=80=9Cadd=E2=80=9D, =E2=80=9Cconnect=E2=
+=80=9D, =E2=80=9Cremove=E2=80=9D, =E2=80=9Cfind=E2=80=9D,
+> =E2=80=9Cstart=E2=80=9D, =E2=80=9Cnotify=E2=80=9D, etc. and how we descri=
+be the kind of input they need.
+> - Possibly more subtle things like support for transactions, commit/rollb=
+ack,
+> i.e. =E2=80=9CI want to add connect a virtual nic to some host vf, but if=
+ anything
+> along the way fails, I=E2=80=99d like all the cleanup to happen automatic=
+ally)
 
-Alex
+Extending QAPI to achieve these things is a possibility.
 
+If we afford ourselves the luxury of breaking backwards compatibility
+then I would instead use the opportunity to eliminate complexity:
+1. Get rid of the CLI
+2. Get rid of HMP
+3. No per-command C bindings, just a qmp_call() API
+4. No configuration file, just a sequence of QMP commands
+
+The new QEMU would be very different and solely focussed on QMP (or a
+standards-based RPC system).
+
+It's not very fun working on projects that have a lot of custom
+infrastructure.  Making a one-time change requires a lot of learning
+weird infrastructure that you won't use often.  We already have too much
+of this and it slows down QEMU development.
+
+Stefan
+
+--+g7M9IMkV8truYOl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4cmyMACgkQnKSrs4Gr
+c8jZvggAxszC6ihsD7RYHWKixDuMCch3SHn5dJu7h3Z5Mwvx23AXwBhA+PLLeXPN
+oNTIPkme4UQXO9k/8zNNoWS7Zzrr6v4g0qZpHysTJKJIQ1jUMoHMNOe7s48GW7rM
+Hk5MbxYCacpH1oScSKFu5WoPVPH1sXyePxnLbiKcm1p9QOtAvTE7ZzILYRODi+MG
+719PVDkT77Whgczka3zSdJD5iVZWVyvM/s6Cr79mdW0oQl2fgNfvUOr4xNT+CSpA
+8hRkSxpRkc7SnS5DV0z6/8mP7m998F7njrDpnbpbZHzCPReagUjUckqIMSiUhJ8a
+TuAapGHMflVejJWcwFjm62oP6XGRcg==
+=ExeP
+-----END PGP SIGNATURE-----
+
+--+g7M9IMkV8truYOl--
 
