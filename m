@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8452C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F300BC33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:31:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C1302073D
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:23:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1302073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B25782073D
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 14:31:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B25782073D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir0cQ-0000f8-Ja
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 09:23:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34801)
+	id 1ir0kj-0007B0-Q7
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 09:31:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ir0aE-0006yS-W8
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:20:48 -0500
+ (envelope-from <bounces@canonical.com>) id 1ir0jo-0006Vm-J6
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:30:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ir0aD-0007wH-E5
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:20:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57514)
+ (envelope-from <bounces@canonical.com>) id 1ir0jn-0003Au-3Z
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:30:40 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60524)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ir0aD-0007sb-84
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:20:45 -0500
+ id 1ir0jm-00038H-Tt
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 09:30:39 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ir0a8-00034b-Ez
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:20:40 +0000
+ id 1ir0jl-0004gM-2P
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:30:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 61C352E80C9
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:20:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0F0E22E80C0
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 14:30:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 14:14:28 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 13 Jan 2020 14:23:53 -0000
+From: Alex Longwall <1859384@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,9 +54,9 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
 X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
 References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-Message-Id: <157892486819.5393.7478344786160739975.malone@gac.canonical.com>
+Message-Id: <157892543346.15344.2203687213143908778.malone@wampee.canonical.com>
 Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
  race condition in gic_acknowledge_irq
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b0b877cc0bba208b0162ed6d8ee6072f9594bb5f
+X-Launchpad-Hash: 985ef24c87b0f028c330c12815ff2b0fba413572
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -84,24 +84,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It would probably help if you were a bit more specific about describing
-the expected versus actual behaviour you see. I think here that we're
-talking about the GICD_ICFGR registers and more specifically the bits
-[2F] that may indicate N-N vs 1-N model.
+> You might find there is enough in kvm-unit-tests GIC tests already to
+build a test case for what you are seeing.
 
-The GIC architecture specification says that these GICD_IFCGR bits are
-only relevant for "some early GIC implementations", which for QEMU means
-"only for the 11MPcore pre-GICv1 GIC". Our GICv2 implementation follows
-the architecture in having these bits be RAZ/WI (and we implement the
-behaviour of the 1-N-for-SPI vs N-N-for-SGI in code rather than by
-testing the 'model' flag, I think).
+Right, I will do so as soon as possible.
 
-For part (2), I think you're saying that we're missing the bit of
-functionality that in the arch spec section 3.2.3 is described as "when
-the GIC recognises an interrupt acknowledge from one of the target
-processors it clears the pending state on all the other targeted
-processors" ? Interestingly, this isn't documented in the section 3.2.4
-set of conditions where the pending state is removed...
+For bug 1) however, a simpler test can be made
+_start:
+    // x0=3Dgicd
+    mov     x0, #0x08000000
+    // Read icfgr[for irqid=3D32...]
+    ldr     w1, [x0, #(0xc00+32/4)]
+    // Try to write to icfgr
+    mov     w1, #3
+    str     w1, [x0, #(0xc00+32/4)]
+    // Read back
+    ldr     w1, [x0, #(0xc00+32/4)]
+    b .
+
+Running this code through the gdbstub, we can see that the model bits
+((2*id+0) mod 16) in icfgr are always 0, no matter what.
+
+However, even for the GICv2, GIC_DIST_TEST_MODEL is being used in qemu
+source code, meaning all interrupts, including SPIs, are wrongly treated
+as N-N.
+
+The initialization function of the GIC should (at least for GICv2
+devices) initialize these bits as 1 for all SPIs; this is currently not
+the case.
 
 -- =
 
