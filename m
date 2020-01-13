@@ -2,79 +2,77 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8ABC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C082C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:46:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ACD4207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:40:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36EA9207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:46:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dTYxVP3z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ACD4207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUz1zbml"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36EA9207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3hI-0003ot-83
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:40:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42242)
+	id 1ir3nT-00072i-3d
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:46:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ir3e7-0006Ws-T7
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:37:00 -0500
+ (envelope-from <drjones@redhat.com>) id 1ir3mC-00065B-Ic
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:45:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ir3e6-000228-On
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:36:59 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23324
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <drjones@redhat.com>) id 1ir3mB-0004MW-56
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:45:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43617
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ir3e6-00021e-LI
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:36:58 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir3mA-0004Km-VL
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:45:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578937018;
+ s=mimecast20190719; t=1578937517;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=n87xPZmTfhj/+IICBXdLr162eK27C7KrFSNvGBgnX6s=;
- b=dTYxVP3z85Sof99waEQhjZzfDdohwVX1KQs4N+MnUvPkllLP44gB5FPGJewpi2qLYX/ewt
- 6G5otvCj8t2KypLYBb4qG+W3NzEeaO8W+8MT9Eu7Ic71hytk0EVCPeLl2NvDhAsSlNdiQy
- PMJjzTfb24bFpeuMkwdLqIRmQpYfYJY=
+ bh=ZjupOVr34zDecwnMFqtNXPvApC4Q2OCWXOaNuSUosdM=;
+ b=OUz1zbmlFyfKsy8aq822AesXDhNIiPxfF1FYRsN4aVwyfhKj1G84GIIz/2GbKoQ/llDCDs
+ r4RXzfDvHX1TPgzdK5XUxyCPJSrzWbargUL4Azqsy8a8R1KP9nMFmaqWBA5fVBX1HCpKVR
+ eJfZhso//FywyCGUBQIHwbxVy5EgnLs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-JcY69k9SNxy8mydbfhAt0A-1; Mon, 13 Jan 2020 12:36:56 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-70-EQyERcpHO2KS3VKae6uwbg-1; Mon, 13 Jan 2020 12:45:14 -0500
+X-MC-Unique: EQyERcpHO2KS3VKae6uwbg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF932107ACC5
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 17:36:55 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.30])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A85745C1B0;
- Mon, 13 Jan 2020 17:36:54 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, vkuznets@redhat.com, mst@redhat.com,
- jasowang@redhat.com, pbonzini@redhat.com
-Subject: [PATCH v2 2/3] memory: Allow a MemoryRegion to be marked no_vhost
-Date: Mon, 13 Jan 2020 17:36:46 +0000
-Message-Id: <20200113173647.84842-3-dgilbert@redhat.com>
-In-Reply-To: <20200113173647.84842-1-dgilbert@redhat.com>
-References: <20200113173647.84842-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43FE018B9FC1;
+ Mon, 13 Jan 2020 17:45:10 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FB418886A;
+ Mon, 13 Jan 2020 17:44:59 +0000 (UTC)
+Date: Mon, 13 Jan 2020 18:44:57 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 09/16] arm/arm64: ITS: Enable/Disable
+ LPIs at re-distributor level
+Message-ID: <20200113174457.gg35yyeaftbadqki@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-10-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: JcY69k9SNxy8mydbfhAt0A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200110145412.14937-10-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,105 +84,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri, Jan 10, 2020 at 03:54:05PM +0100, Eric Auger wrote:
+> This helper function enables or disables the signaling of LPIs
+> at redistributor level.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  lib/arm/asm/gic-v3-its.h |  1 +
+>  lib/arm/gic-v3-its.c     | 18 ++++++++++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 93814f7..d2db292 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -99,6 +99,7 @@ extern struct its_baser *its_lookup_baser(int type);
+>  extern void set_lpi_config(int n, u8 val);
+>  extern u8 get_lpi_config(int n);
+>  extern void set_pending_table_bit(int rdist, int n, bool set);
+> +extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
+>  
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> index 3037c84..c7c6f80 100644
+> --- a/lib/arm/gic-v3-its.c
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -199,3 +199,21 @@ void init_cmd_queue(void)
+>  	its_data.cmd_write = its_data.cmd_base;
+>  	writeq(0, its_data.base + GITS_CWRITER);
+>  }
+> +
+> +void gicv3_rdist_ctrl_lpi(u32 redist, bool set)
+> +{
+> +	void *ptr;
+> +	u64 val;
+> +
+> +	if (redist >= nr_cpus)
+> +		report_abort("%s redist=%d >= cpu_count=%d\n",
+> +			     __func__, redist, nr_cpus);
 
-Allow a memory region to be marked as 'no_vhost' and
-exclude that region from vhost's list build.
+I'd use {} here because of the multiline call. But, we don't
+use the report API in common code. Well, apparently s390 has
+report calls in lib/s390x/interrupt.c, but I don't really
+agree with that. IMO, common code failures should always
+be unexpected and just assert/assert_msg.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/virtio/vhost.c     |  3 ++-
- include/exec/memory.h | 21 +++++++++++++++++++++
- memory.c              | 15 +++++++++++++++
- 3 files changed, 38 insertions(+), 1 deletion(-)
+> +
+> +	ptr = gicv3_data.redist_base[redist];
+> +	val = readl(ptr + GICR_CTLR);
+> +	if (set)
+> +		val |= GICR_CTLR_ENABLE_LPIS;
+> +	else
+> +		val &= ~GICR_CTLR_ENABLE_LPIS;
+> +	writel(val,  ptr + GICR_CTLR);
+> +}
+> -- 
+> 2.20.1
+> 
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 774d87d98e..462498bfe6 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -402,7 +402,8 @@ static bool vhost_section(struct vhost_dev *dev, Memory=
-RegionSection *section)
-     bool log_dirty =3D memory_region_get_dirty_log_mask(section->mr) &
-                      ~(1 << DIRTY_MEMORY_MIGRATION);
-     result =3D memory_region_is_ram(section->mr) &&
--        !memory_region_is_rom(section->mr);
-+             !memory_region_is_rom(section->mr) &&
-+             !memory_region_get_no_vhost(section->mr);
-=20
-     /* Vhost doesn't handle any block which is doing dirty-tracking other
-      * than migration; this typically fires on VGA areas.
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index aef8123d48..f475c06d63 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -394,6 +394,7 @@ struct MemoryRegion {
-     bool ram_device;
-     bool enabled;
-     bool warning_printed; /* For reservations */
-+    bool no_vhost;
-     uint8_t vga_logging_count;
-     MemoryRegion *alias;
-     hwaddr alias_offset;
-@@ -1625,6 +1626,26 @@ void memory_region_set_readonly(MemoryRegion *mr, bo=
-ol readonly);
-  */
- void memory_region_set_nonvolatile(MemoryRegion *mr, bool nonvolatile);
-=20
-+/**
-+ * memory_region_set_no_vhost: Make vhost ignore a memory region
-+ *
-+ * Makes vhost ignore a memory region, useful if it isn't real
-+ * DMAble memory and is at inconvenient addresses
-+ *
-+ * @mr: the region being updated.
-+ * @no_vhost: true to ignore
-+ */
-+void memory_region_set_no_vhost(MemoryRegion *mr, bool no_vhost);
-+
-+/**
-+ * memory_region_set_no_vhost: Test if memory region is marked no vhost
-+ *
-+ * Test if the no_vhost flag is set on the memory region
-+ *
-+ * @mr: the region being tested.
-+ */
-+bool memory_region_get_no_vhost(const MemoryRegion *mr);
-+
- /**
-  * memory_region_rom_device_set_romd: enable/disable ROMD mode
-  *
-diff --git a/memory.c b/memory.c
-index d7b9bb6951..9371998e30 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2136,6 +2136,21 @@ void memory_region_set_nonvolatile(MemoryRegion *mr,=
- bool nonvolatile)
-     }
- }
-=20
-+void memory_region_set_no_vhost(MemoryRegion *mr, bool no_vhost)
-+{
-+    if (mr->no_vhost !=3D no_vhost) {
-+        memory_region_transaction_begin();
-+        mr->no_vhost =3D no_vhost;
-+        memory_region_update_pending |=3D mr->enabled;
-+        memory_region_transaction_commit();
-+    }
-+}
-+
-+bool memory_region_get_no_vhost(const MemoryRegion *mr)
-+{
-+    return mr->no_vhost;
-+}
-+
- void memory_region_rom_device_set_romd(MemoryRegion *mr, bool romd_mode)
- {
-     if (mr->romd_mode !=3D romd_mode) {
---=20
-2.24.1
+Also, you can squash this patch into whatever is going to make use
+of this new helper.
+
+Thanks,
+drew
 
 
