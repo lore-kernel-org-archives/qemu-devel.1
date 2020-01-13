@@ -2,83 +2,89 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,WEIRD_QUOTING autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B640C33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE530C33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:45:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA7E421556
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:45:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9403F214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 13:45:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XbR8qUZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA7E421556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oulD5rqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9403F214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir01o-0007Ei-Qz
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:45:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52279)
+	id 1ir020-0007Pi-LP
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 08:45:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ir00v-0006U0-9v
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:18 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ir010-0006W0-8d
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ir00t-0005Gp-5C
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:16 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59152
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ir00t-0005EP-1K
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578923054;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2dN/yPyoFMeDL81OcuZj8le7+MM3kYXIME8a+Apfxzw=;
- b=XbR8qUZ6mx5w4K2GOdlHea2eb9RfW+iqg2zO3Hafn482aMvQNK/qCpNgBYRT9Y5Rpwcv4V
- XZPg5CMX4GKh6VW/y1TEEbdZvTfxgszOekoF93RZJBV+XLb1uraB7xuysXPbFQeGZctJPL
- BMi7VINlpcd0/KuazfO0pcl4GexNOI0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-UN7SW-qCPP2ZzZOmaR1P1A-1; Mon, 13 Jan 2020 08:44:10 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76993107B288;
- Mon, 13 Jan 2020 13:44:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F51419C6A;
- Mon, 13 Jan 2020 13:44:02 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 925691138600; Mon, 13 Jan 2020 14:44:00 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: Making QEMU easier for management tools and applications
-References: <CAJSP0QUk=4co-nqk8fv2n-T2_W40rE3r_5OMoxD7otAV993mCA@mail.gmail.com>
- <87h81unja8.fsf@dusky.pond.sub.org> <20200102150501.GA2973@work-vm>
-Date: Mon, 13 Jan 2020 14:44:00 +0100
-In-Reply-To: <20200102150501.GA2973@work-vm> (David Alan Gilbert's message of
- "Thu, 2 Jan 2020 15:05:01 +0000")
-Message-ID: <87blr7zd27.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1ir00y-0005Rq-93
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:21 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52521)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ir00x-0005Nc-U3
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 08:44:20 -0500
+Received: by mail-wm1-x343.google.com with SMTP id p9so9734326wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 05:44:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=FQFfo9viNmXyky02pGXY5z3GJAhI7QUcEauk9apOOf0=;
+ b=oulD5rqTNKKNXk+Gzbe+tbK9C25oY4Njnrh55aqCn8ZEUm0L3Gp4X3rqdkCgQvVi7+
+ qvOqpdDwoG0y8iW7Fq2CD7XauPP+W13dKnZVswAiRyHBBwH9j+SvTmtfv5TeHoUaSrS3
+ nwFTYXv3TE79JXfen311yFWvsJqz4hZSKMpp4ofjHbq78M3FNgvi6Yeq5cSVML4gakz1
+ KLdv481MTqpXHMOFpt7QLf54t+KjPwBenVUDsShXXxr11OrIPntqQofHHsKNReUVKPdm
+ A5+Ve9x4ah87eH7OOIKYdVRQA2bQ5LW9vwZAogUTH/od1qDINZYDv3IZhquij7UAB0+G
+ eHPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=FQFfo9viNmXyky02pGXY5z3GJAhI7QUcEauk9apOOf0=;
+ b=c5Fow+jhFKbwwGHYwBHC/fEdtF+wnwKCfS4aI2YZ0I6Ah4JwCmQoch0z1vmFF2isZQ
+ gnIqIDz4yhSQ184Wc/icK4ZrVfmoBpPNwbuupKaj5b4qmBaxlQzer0esRhDlq7zvR9Ek
+ 5cuxnsUGv+MpQxYmsyIARMaoTg1DzURMYcETC+UqbOO+cb7MuRYh2eesLcNQFyvv407J
+ tKhQoiHMIqXRjVeyqMO6o+1D4xUUJvV1Mkf+O3dcphWhX9ASj0T2YUvWdk2awDcwtXyC
+ mS/IFKfOiOQg1cGMR6pgz7toTtMVsGAH7ke5XIc446/zP2/U3rJD7OJS1Li4NkpXTjxY
+ 4MMQ==
+X-Gm-Message-State: APjAAAWGN4wnIXY5PsVDgedixryO3316M0nSxx9XIuSB976aaH46+qqY
+ ghtKy5jEhmgIsHjMcxGH9kSkPg==
+X-Google-Smtp-Source: APXvYqzRtDk4v+xr15q6czX8tokDFwOQKncw6HJBcIzRfGezWNah7JynW/JZ5b6iWVzInGjplym83w==
+X-Received: by 2002:a1c:a584:: with SMTP id o126mr5928041wme.163.1578923058327; 
+ Mon, 13 Jan 2020 05:44:18 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s16sm15144166wrn.78.2020.01.13.05.44.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jan 2020 05:44:17 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 592CE1FF87;
+ Mon, 13 Jan 2020 13:44:16 +0000 (GMT)
+References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bug 1859384 <1859384@bugs.launchpad.net>
+Subject: Re: [Bug 1859384] [NEW] arm gic: interrupt model never 1 on
+ non-mpcore and race condition in gic_acknowledge_irq
+In-reply-to: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
+Date: Mon, 13 Jan 2020 13:44:16 +0000
+Message-ID: <87k15vo4i7.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: UN7SW-qCPP2ZzZOmaR1P1A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,56 +96,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, Cleber Rosa <cleber@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- John Snow <jsnow@redhat.com>, Dominik Csapak <d.csapak@proxmox.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Stefan Hajnoczi <stefanha@gmail.com> writes:
->> > 4. Go and Rust bindings would also be useful.  There is
->> > https://github.com/intel/govmm but I think it makes sense to keep it
->> > in qemu.git and provide an interface similar to our Python modules.
->>=20
->> Mapping QAPI/QMP commands and events to function signatures isn't hard
->> (the QAPI code generator does).  Two problems (at least):
->>=20
->> 1. Leads to some pretty ridiculous functions.  Here's one:
->>=20
->>     void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
->>                              const char *device,
->>                              const char *target,
->>                              bool has_replaces, const char *replaces,
->>                              MirrorSyncMode sync,
->>                              bool has_speed, int64_t speed,
->>                              bool has_granularity, uint32_t granularity,
->>                              bool has_buf_size, int64_t buf_size,
->>                              bool has_on_source_error,
->>                              BlockdevOnError on_source_error,
->>                              bool has_on_target_error, BlockdevOnError o=
-n_target_error,
->>                              bool has_filter_node_name, const char *filt=
-er_node_name,
->>                              bool has_copy_mode, MirrorCopyMode copy_mod=
-e,=20
->>                              bool has_auto_finalize, bool auto_finalize,
->>                              bool has_auto_dismiss, bool auto_dismiss,
->>                              Error **errp);
+Alex Longwall <1859384@bugs.launchpad.net> writes:
+
+> Public bug reported:
 >
-> Those might not be as bad when mapped to other languages, all the
-> bool/value pairs would become Option<...>  so that removes that doubling.
-> The Error ** mechanism should somehow map onto functions returning a
-> normal Rust Result<> type.
+> For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
+> one CPU can acknowledge the IRQ until it becomes inactive.
+>
+> The TRM also mandates that SGIs and PPIs follow the N-N model and that
+> SPIs follow the 1-N model.
+>
+> However this is not currently the case with QEMU. I have locally (no
+> minimal test case) seen e.g. uart interrupts being acknowledged twice
+> before having been deactivated (expected: irqId on one CPU and 1023 on
+> the other instead).
 
-Fifteen parameters even with the has_FOO and the errp dropped.
-Still ridiculous enough for me.
+You might find there is enough in kvm-unit-tests GIC tests already to
+build a test case for what you are seeing.
 
+>
+> I have narrowed the issue down to the following:
+>
+> 1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
+> all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, then
+> there's no way to set any interrupt to 1-N.
+>
+> If ""fixed"" locally with a hackjob, I still have the following trace:
+>
+> pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+> gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+> gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+> gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+> gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+> gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+> gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+> gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+> gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+> pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+> pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+> gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+> pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+> pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+> gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+> gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+> pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+>
+> This is because:
+>
+> 2) gic_acknowledge_irq calls gic_clear_pending which uses
+> GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
+> interrupts.
+>
+> With this often being a no-op (ie. assuming ispendr was not written to),
+> any 1-n level-sensitive interrupt is still improperly pending on all the
+> other cores.
+>
+> (Also, I don't really know how the qemu thread model works, there might
+> be race conditions in the acknowledgment logic if gic_acknowledge_irq is
+> called by multiple threads, too.)
+
+All updates to the GIC internals should be protected by the BQL which
+applies to all mmio emulated devices.
+
+>
+> Option used:
+> -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
+> -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
+> -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+> -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+> -trace gic_set_irq
+>
+> Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+> tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+> staging"
+>
+> ** Affects: qemu
+>      Importance: Undecided
+>          Status: New
+>
+>
+> ** Tags: arm gic
+>
+> ** Description changed:
+>
+>   For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
+>   one CPU can acknowledge the IRQ until it becomes inactive.
+>=20=20=20
+>   The TRM also mandates that SGIs and PPIs follow the N-N model and that
+>   SPIs follow the 1-N model.
+>=20=20=20
+>   However this is not currently the case with QEMU. I have locally (no
+>   minimal test case) seen e.g. uart interrupts being acknowledged twice
+>   before having been deactivated (expected: irqId on one CPU and 1023 on
+>   the other instead).
+>=20=20=20
+>   I have narrowed the issue down to the following:
+>=20=20=20
+>   1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
+>   all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, t=
+hen
+>   there's no way to set any interrupt to 1-N.
+>=20=20=20
+>   **If fixed locally** with a hackjob, I still have the following trace:
+>=20=20=20
+>   pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+>   gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff targ=
+et=3D0xff
+>   gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+>   gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+>   gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+>   gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+>   gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+>   gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+>   gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+>   pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+>   pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+>   gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff targ=
+et=3D0xff
+>   pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+>   pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+>   gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x=
+21
+>   gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D=
+0x21
+>   pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+>=20=20=20
+>   This is because:
+>=20=20=20
+>   2) gic_acknowledge_irq calls gic_clear_pending which uses
+>   GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
+>   interrupts.
+>=20=20=20
+>   With this often being a no-op (ie. assuming ispendr was not written to),
+>   any 1-n level-sensitive interrupt is still improperly pending on all the
+>   other cores.
+>=20=20=20
+>   (Also, I don't really know how the qemu thread model works, there might
+>   be race conditions in the acknowledgment logic if gic_acknowledge_irq is
+>   called by multiple threads, too.)
+> +=20
+> + Option used:
+> + -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D=
+2 -cpu cortex-a57 -smp 4 -m 1024
+> + -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,t=
+arget=3Dnative
+> + -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+> + -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_s=
+tate -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+> + -trace gic_set_irq
+> +=20
+> + Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+> + tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+> + staging"
+>
+> ** Description changed:
+>
+>   For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM, only
+>   one CPU can acknowledge the IRQ until it becomes inactive.
+>=20=20=20
+>   The TRM also mandates that SGIs and PPIs follow the N-N model and that
+>   SPIs follow the 1-N model.
+>=20=20=20
+>   However this is not currently the case with QEMU. I have locally (no
+>   minimal test case) seen e.g. uart interrupts being acknowledged twice
+>   before having been deactivated (expected: irqId on one CPU and 1023 on
+>   the other instead).
+>=20=20=20
+>   I have narrowed the issue down to the following:
+>=20=20=20
+>   1) arm_gic_common_reset resets all irq_state[id] fields to 0. This means
+>   all IRQ will use the N-N model, and if s->revision !=3D REV_11MPCORE, t=
+hen
+>   there's no way to set any interrupt to 1-N.
+>=20=20=20
+> - **If fixed locally** with a hackjob, I still have the following trace:
+> + If ""fixed"" locally with a hackjob, I still have the following trace:
+>=20=20=20
+>   pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+>   gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff targ=
+et=3D0xff
+>   gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+>   gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+>   gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+>   gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+>   gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+>   gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+>   gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+>   pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+>   pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+>   gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff targ=
+et=3D0xff
+>   pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+>   pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+>   gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x=
+21
+>   gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D=
+0x21
+>   pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
+>=20=20=20
+>   This is because:
+>=20=20=20
+>   2) gic_acknowledge_irq calls gic_clear_pending which uses
+>   GIC_DIST_CLEAR_PENDING but this usually has no effect on level-sensitive
+>   interrupts.
+>=20=20=20
+>   With this often being a no-op (ie. assuming ispendr was not written to),
+>   any 1-n level-sensitive interrupt is still improperly pending on all the
+>   other cores.
+>=20=20=20
+>   (Also, I don't really know how the qemu thread model works, there might
+>   be race conditions in the acknowledgment logic if gic_acknowledge_irq is
+>   called by multiple threads, too.)
+>=20=20=20
+>   Option used:
+>   -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D=
+2 -cpu cortex-a57 -smp 4 -m 1024
+>   -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,t=
+arget=3Dnative
+>   -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+>   -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_s=
+tate -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+>   -trace gic_set_irq
+>=20=20=20
+>   Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+>   tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+>   staging"
+
+
+--=20
+Alex Benn=C3=A9e
 
