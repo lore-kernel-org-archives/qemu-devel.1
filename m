@@ -2,77 +2,92 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD0EC33CAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E57DC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32A82207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:50:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1891A214AF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFY7Qmbh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A82207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QcNra/WC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1891A214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3rM-0005mp-40
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:50:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44821)
+	id 1ir3wx-0001UP-8M
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:56:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46369)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1ir3pr-0002u4-Od
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:49:09 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ir3wH-0000mc-9B
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1ir3pq-0000iL-GN
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:49:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31071
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir3pq-0000hf-Bf
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:49:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578937745;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Krn8eTbGp+NAIkYd15sSRQJqhL1ATwvj/bxJG4KzDzo=;
- b=dFY7QmbhNoGiyv7sB9fo1po8kmMpCkqCMxwApv/GUElkJoEDmU9Qd6OX8l3LpHE6zzaan5
- 9ytq9fgJvq9a33vCjlEryWX28VPN10cFo9FdbS/wmOI4Muuc99b0H74/Zti/cTTJluoVm2
- KXwhOxd4c7zNqQ9j3p4VEkHy/mmDTY4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-E-JWcLG5Oiyb6WhIBil_SQ-1; Mon, 13 Jan 2020 12:49:02 -0500
-X-MC-Unique: E-JWcLG5Oiyb6WhIBil_SQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF8C5107BAA5;
- Mon, 13 Jan 2020 17:49:00 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BE8680890;
- Mon, 13 Jan 2020 17:48:55 +0000 (UTC)
-Date: Mon, 13 Jan 2020 18:48:53 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 11/16] arm/arm64: ITS: Device and
- collection Initialization
-Message-ID: <20200113174853.s23dwrpquqvqpxxi@kamzik.brq.redhat.com>
-References: <20200110145412.14937-1-eric.auger@redhat.com>
- <20200110145412.14937-12-eric.auger@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1ir3wF-0000SP-MI
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:55:45 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54724)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ir3wF-0000Qn-Eu
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:55:43 -0500
+Received: by mail-wm1-x344.google.com with SMTP id b19so10737991wmj.4
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:55:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ioY8W0qYvWStTxsIWopMiXVEBB+aQGN7aJKMG6c73pc=;
+ b=QcNra/WCbDFcurGPptkS5waBqOu+GbPKNE/PMeS6eBl6vZfUD3Z62iCitb88E/x0a4
+ oA/KJUj8uNBwZI8+MqFJFkeu2KviYSj6C7t5B6z4cy8p5jqq7828cEdZxqnEE1Qid77Y
+ 91PlT/uG5j8ZC8OghI69xwRMbzWZikJ7hYsjfQadqh3kA2NTmdAchYXLhGdwL9MIumKb
+ sUOnkeCaZjuQ+l+vAU2Z8tneMBS87hPnbdVHl0J7mwvn3T2B88ePO0PUeZIKHHsD153z
+ 9+WhOxrv62AAQVNrfghKJ3wLLenD4E2N3DIZZouXyhr4vQIoHLZSROtTth4PRQgto60y
+ B4Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ioY8W0qYvWStTxsIWopMiXVEBB+aQGN7aJKMG6c73pc=;
+ b=d7lgWkh6iUHQqks0kXoZB41sbMtKUxZa9fqGHfBWZyzYkNVNwqL8eWNiQccQ8pRMrM
+ V3Hpc5ZJLCAWEJcVRZorXxrBciPGWqn5gFNXImfXDB0uJDiu+/QdwwgGJ8Hj8UzBwPe0
+ eGX85KfKNUsSzS6y3Dm4iai6dxnd2ty49HL7ZzTRqHRiBw3R195wcFDtN/EcuwVjiVs6
+ PVKKUDOk77HcIzL7RvoxPXfdhSyIXkqwn/0hHCGMJeTQPoovhWf/q1nQZ7xtLU1DTGj+
+ Pq9V+f80GOOmBvuJsnJtp9nAi/DwnqwEh/AuhBauQPg+rfjsre2jKO+MVqbSXLi79WTf
+ T5kA==
+X-Gm-Message-State: APjAAAVciQprvWpSbd8dvP5yTIdjK8KWyqg6A3WEIDyQ833OlhdcGqnB
+ CC9OvEBcEBS6tr0uuh0E2hPT7A==
+X-Google-Smtp-Source: APXvYqxpJMwRvZNTqgwXh9zNzlnX02uSetL9AOsbONVBjKCvmrSwlSQ9e2V0XhWDRG8ZvSjDmAUETw==
+X-Received: by 2002:a05:600c:228f:: with SMTP id
+ 15mr22290951wmf.56.1578938141812; 
+ Mon, 13 Jan 2020 09:55:41 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z83sm15642685wmg.2.2020.01.13.09.55.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jan 2020 09:55:40 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CA97E1FF87;
+ Mon, 13 Jan 2020 17:55:39 +0000 (GMT)
+References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
+ <003a01d5c6b3$df62afd0$9e280f70$@ru>
+ <20200109120038.GD9504@linux.fritz.box>
+ <87k15v1z71.fsf@dusky.pond.sub.org> <000f01d5c9f4$cfbc1230$6f343690$@ru>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Subject: Re: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
+In-reply-to: <000f01d5c9f4$cfbc1230$6f343690$@ru>
+Date: Mon, 13 Jan 2020 17:55:39 +0000
+Message-ID: <87v9pfmeas.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200110145412.14937-12-eric.auger@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,146 +99,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
- maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+Cc: 'Kevin Wolf' <kwolf@redhat.com>, peter.maydell@linaro.org,
+ boost.lists@gmail.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com,
+ jasowang@redhat.com, quintela@redhat.com,
+ 'Markus Armbruster' <armbru@redhat.com>, qemu-devel@nongnu.org,
+ 'Pavel Dovgalyuk' <pavel.dovgaluk@gmail.com>, maria.klimushenkova@ispras.ru,
+ mst@redhat.com, kraxel@redhat.com, pavel.dovgaluk@ispras.ru,
+ thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com,
+ artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 10, 2020 at 03:54:07PM +0100, Eric Auger wrote:
-> Introduce an helper functions to register
-> - a new device, characterized by its device id and the
->   max number of event IDs that dimension its ITT (Interrupt
->   Translation Table).  The function allocates the ITT.
-> 
-> - a new collection, characterized by its ID and the
->   target processing engine (PE).
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v2 -> v3:
-> - s/nb_/nr_
-> ---
->  lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++
->  lib/arm/gic-v3-its.c     | 46 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 66 insertions(+)
-> 
-> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-> index 0e31848..0497a78 100644
-> --- a/lib/arm/asm/gic-v3-its.h
-> +++ b/lib/arm/asm/gic-v3-its.h
-> @@ -55,6 +55,9 @@
->  #define GITS_BASER_TYPE_DEVICE		1
->  #define GITS_BASER_TYPE_COLLECTION	4
->  
-> +#define GITS_MAX_DEVICES		8
-> +#define GITS_MAX_COLLECTIONS		8
-> +
->  struct its_typer {
->  	unsigned int ite_size;
->  	unsigned int eventid_bits;
-> @@ -79,12 +82,27 @@ struct its_cmd_block {
->  	u64     raw_cmd[4];
->  };
->  
-> +struct its_device {
-> +	u32 device_id;	/* device ID */
-> +	u32 nr_ites;	/* Max Interrupt Translation Entries */
-> +	void *itt;	/* Interrupt Translation Table GPA */
-> +};
-> +
-> +struct its_collection {
-> +	u64 target_address;
-> +	u16 col_id;
-> +};
-> +
->  struct its_data {
->  	void *base;
->  	struct its_typer typer;
->  	struct its_baser baser[GITS_BASER_NR_REGS];
->  	struct its_cmd_block *cmd_base;
->  	struct its_cmd_block *cmd_write;
-> +	struct its_device devices[GITS_MAX_DEVICES];
-> +	u32 nr_devices;		/* Allocated Devices */
-> +	struct its_collection collections[GITS_MAX_COLLECTIONS];
-> +	u32 nr_collections;	/* Allocated Collections */
->  };
->  
->  extern struct its_data its_data;
-> @@ -101,6 +119,8 @@ extern u8 get_lpi_config(int n);
->  extern void set_pending_table_bit(int rdist, int n, bool set);
->  extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
->  extern void its_enable_defaults(void);
-> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
-> +extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
->  
->  #endif /* !__ASSEMBLY__ */
->  #endif /* _ASMARM_GIC_V3_ITS_H_ */
-> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-> index f488cca..88c08ee 100644
-> --- a/lib/arm/gic-v3-its.c
-> +++ b/lib/arm/gic-v3-its.c
-> @@ -257,3 +257,49 @@ void its_enable_defaults(void)
->  
->  	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
->  }
-> +
-> +struct its_device *its_create_device(u32 device_id, int nr_ites)
-> +{
-> +	struct its_baser *baser;
-> +	struct its_device *new;
-> +	unsigned long n, order;
-> +
-> +	if (its_data.nr_devices >= GITS_MAX_DEVICES)
-> +		report_abort("%s redimension GITS_MAX_DEVICES", __func__);
-> +
-> +	baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
-> +	if (!baser)
-> +		return NULL;
-> +
-> +	new = &its_data.devices[its_data.nr_devices];
-> +
-> +	new->device_id = device_id;
-> +	new->nr_ites = nr_ites;
-> +
-> +	n = (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
-> +	order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
-> +	new->itt = (void *)virt_to_phys(alloc_pages(order));
-> +
-> +	its_data.nr_devices++;
-> +	return new;
-> +}
-> +
-> +struct its_collection *its_create_collection(u32 col_id, u32 pe)
-> +{
-> +	struct its_collection *new;
-> +
-> +	if (its_data.nr_collections >= GITS_MAX_COLLECTIONS)
-> +		report_abort("%s redimension GITS_MAX_COLLECTIONS", __func__);
-> +
-> +	new = &its_data.collections[its_data.nr_collections];
-> +
-> +	new->col_id = col_id;
-> +
-> +	if (its_data.typer.pta)
-> +		new->target_address = (u64)gicv3_data.redist_base[pe];
-> +	else
-> +		new->target_address = pe << 16;
-> +
-> +	its_data.nr_collections++;
-> +	return new;
-> +}
-> -- 
-> 2.20.1
+
+(looping the list back in)
+
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+
+>> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+>>=20
+>> >> From: Markus Armbruster [mailto:armbru@redhat.com]
+>> >> Kevin Wolf <kwolf@redhat.com> writes:
+>> >>
+>> >> > Am 09.01.2020 um 07:13 hat Pavel Dovgalyuk geschrieben:
+>> >> >> Ping.
+>> >> >
+>> >> > I think you have my Acked-by for the block-related patches in this
+>> >> > series now. If I missed something, please let me know.
+>> >>
+>> >> Pavel, whom are you nudging to do what?
+>> >
+>> > I'm not sure.
+>> > My prior patches for record/replay were pulled by Paolo.
+>> > But reverse debugging is more like a modification of things,
+>> > and not a completely new subsystem.
+>> > Everything but gdbstub was already acked by the maintainers.
+>>=20
+>> I'm having a look at the series now. What would help is if we can have
+>> some sort of test case to ensure expected behaviour is protected. We
+>> have a basic smoke test for record/replay and my gdbstub series:
+>>=20
+>>   https://github.com/stsquad/qemu/tree/gdbstub/sve-registers-v5
+>>=20
+>> introduces some infrastructure for testing thing via gdbstub. The main
+>> thing needed now is some sort of gdb capability test to ensure the gdb
+>> we are using supports whatever extensions it needs to work.
 >
+> The smoke test may be rather easy:
+> 1. Execute qemu record with qcow2 image and rrsnapshot
+> 2. Start qemu replay with -S
+> 3. Connect gdb to qemu
+> 4. stepi
+> 5. break $pc
+> 6. Save pc to X
+> 7. stepi 10
+> 8. Save pc to Y
+> 9. stepi
+> 10. reverse-stepi
+> 11. pc should be Y
+> 12. reverse-continue
+> 13. pc should be X
+>
+> Is it possible with your infrastructure?
 
-Please replace the if (cond) report_abort(...)'s with assert_msg(cond, ...)'s.
+I think so - even if the reverse step instructions are not in the python
+API the script can always do:
 
-Thanks,
-drew 
+ gdb.parse_and_eval("command")
 
+The main thing is ensuring probing the gdb for a version/feature first
+so we can safely exit and skip the test if the host gdb isn't capable.
+For the SVE testing I've had to use my own compiled version of GDB which
+is a little ugly:
+
+ ~/lsrc/qemu.git/tests/guest-debug/run-test.py \
+   --qemu ./aarch64-linux-user/qemu-aarch64 \
+   --qargs "-cpu max" \
+   --bin ./tests/tcg/aarch64-linux-user/sve-ioctls \
+   --test ~/lsrc/qemu.git/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py \
+   --gdb ~/src/tools/binutils-gdb.git/builds/all/install/bin/gdb
+
+We should probably wrap that up into the tests/tcg configure.sh code so
+the GDB used can persist with the build. Maybe via:
+
+  ./configure --with-gdb=3D~/src/tools/binutils-gdb.git/builds/all/install/=
+bin/gdb
+
+--=20
+Alex Benn=C3=A9e
 
