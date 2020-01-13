@@ -6,60 +6,62 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D4AC33CAE
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 07:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BE8C33CAE
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 07:18:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1ACA2075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 07:12:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A0A342075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 07:18:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ks3HBY5/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1ACA2075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="W71Totl/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0A342075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqttg-0003sQ-0D
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 02:12:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43191)
+	id 1iqtzD-0005wF-Lc
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 02:18:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iqtss-0003Ld-7Z
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 02:11:35 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iqtyZ-0005IC-U1
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 02:17:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iqtsq-00069c-HS
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 02:11:33 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:55123)
+ (envelope-from <dgibson@ozlabs.org>) id 1iqtyY-0002Lb-Oh
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 02:17:27 -0500
+Received: from ozlabs.org ([203.11.71.1]:54233)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iqtsp-00066O-Ot; Mon, 13 Jan 2020 02:11:32 -0500
+ id 1iqtyW-0002HD-2a; Mon, 13 Jan 2020 02:17:24 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47x4Wf64KYz9sP6; Mon, 13 Jan 2020 18:11:26 +1100 (AEDT)
+ id 47x4fS2FYbz9sPn; Mon, 13 Jan 2020 18:17:20 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578899486;
- bh=vGBO/AL1Y52EBxODY0t3OJNUEj3opc7xAFl1ISxXDiI=;
+ d=gibson.dropbear.id.au; s=201602; t=1578899840;
+ bh=aaWWOD+aHSxJEi2O2Vs9dFgm1buPigAQBFB1/1ut62Q=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Ks3HBY5/1tKp2OHRkLf0xGCK7tvQBJwIp8oCZiuy2WifJKSEX2lYYSLR4z5GmAT0J
- GPGVLaNQyptL0HqP3hZ2cMZ0oVSNjWMtUzu5jp5n6iGifUK0Nwi4t6Mi5h8m5kl9vb
- h+wSPoe8Ku7KarZsDGk92Swla0NwLWdn/crKdE6A=
-Date: Mon, 13 Jan 2020 17:05:00 +1000
+ b=W71Totl//cINFjtMhIVRW6WMNQdvRrfxqhdWTzrYsJxfbAzzNzvD4PvtMsoMFIKl/
+ MI9mVhwOiw3rboglPy3O6t/L/rI2O37XWGyvdWRH+bsw70W9/tM1Vlp/ancQQqskw+
+ CgBVkElofU9uX4u2vscodtQKhBozqp39VCk/tApg=
+Date: Mon, 13 Jan 2020 17:16:48 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: [PATCH qemu v4] spapr: Kill SLOF
-Message-ID: <20200113070500.GD19995@umbus>
-References: <20200108061856.4554-1-aik@ozlabs.ru>
- <b4011a6b-d502-b514-84ad-4e6a1580449d@ozlabs.ru>
- <75b2a298-b549-dcc9-519b-7bf7c388110b@ozlabs.ru>
- <684e7d31-04d0-3176-5de2-c817ce1aedf3@ozlabs.ru>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 04/15] hw/ppc/spapr_rtas: Restrict variables scope to
+ single switch case
+Message-ID: <20200113071648.GF19995@umbus>
+References: <20200109152133.23649-1-philmd@redhat.com>
+ <20200109152133.23649-5-philmd@redhat.com>
+ <20200109184349.1aefa074@bahia.lan>
+ <9870f8ed-3fa0-1deb-860d-7481cb3db556@redhat.com>
+ <20200110105055.3e72ddf4@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="llIrKcgUOe3dCx0c"
+ protocol="application/pgp-signature"; boundary="XIiC+We3v3zHqZ6Z"
 Content-Disposition: inline
-In-Reply-To: <684e7d31-04d0-3176-5de2-c817ce1aedf3@ozlabs.ru>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20200110105055.3e72ddf4@bahia.lan>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,89 +73,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Juan Quintela <quintela@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---llIrKcgUOe3dCx0c
-Content-Type: text/plain; charset=us-ascii
+--XIiC+We3v3zHqZ6Z
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 10, 2020 at 11:51:32AM +1100, Alexey Kardashevskiy wrote:
+On Fri, Jan 10, 2020 at 10:50:55AM +0100, Greg Kurz wrote:
+> On Fri, 10 Jan 2020 10:34:07 +0100
+> Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
 >=20
+> > On 1/9/20 6:43 PM, Greg Kurz wrote:
+> > > On Thu,  9 Jan 2020 16:21:22 +0100
+> > > Philippe Mathieu-Daud=E9 <philmd@redhat.com> wrote:
+> > >=20
+> > >> We only access these variables in RTAS_SYSPARM_SPLPAR_CHARACTERISTICS
+> > >> case, restrict their scope to avoid unnecessary initialization.
+> > >>
+> > >=20
+> > > I guess a decent compiler can be smart enough detect that the initial=
+ization
+> > > isn't needed outside of the RTAS_SYSPARM_SPLPAR_CHARACTERISTICS branc=
+h...
+> > > Anyway, reducing scope isn't bad. The only hitch I could see is that =
+some
+> > > people do prefer to have all variables declared upfront, but there's =
+a nested
+> > > param_val variable already so I guess it's okay.
+> >=20
+> > I don't want to outsmart compilers :)
+> >=20
+> > The MACHINE() macro is not a simple cast, it does object introspection=
+=20
+> > with OBJECT_CHECK(), thus is not free. Since=20
 >=20
-> On 10/01/2020 10:32, Alexey Kardashevskiy wrote:
-> >=20
-> >=20
-> > On 10/01/2020 10:05, Alexey Kardashevskiy wrote:
-> >>
-> >>
-> >> On 08/01/2020 17:18, Alexey Kardashevskiy wrote:
-> >>> The Petitboot bootloader is way more advanced than SLOF is ever going=
- to
-> >>> be as Petitboot comes with the full-featured Linux kernel with all
-> >>> the drivers, and initramdisk with quite user friendly interface.
-> >>> The problem with ditching SLOF is that an unmodified pseries kernel c=
-an
-> >>> either start via:
-> >>> 1. kexec, this requires presence of RTAS and skips
-> >>> ibm,client-architecture-support entirely;
-> >>> 2. normal boot, this heavily relies on the OF1275 client interface to
-> >>> fetch the device tree and do early setup (claim memory).
-> >>>
-> >>> This adds a new bios-less mode to the pseries machine: "bios=3Don|off=
-".
-> >>> When enabled, QEMU does not load SLOF and jumps to the kernel from
-> >>> "-kernel".
-> >>>
-> >>> The client interface is implemented exactly as RTAS - a 20 bytes blob,
-> >>> right next after the RTAS blob. The entry point is passed to the kern=
-el
-> >>> via GPR5.
-> >>>
-> >>> This implements a handful of client interface methods just to get goi=
-ng.
-> >>> In particular, this implements the device tree fetching,
-> >>> ibm,client-architecture-support and instantiate-rtas.
-> >>>
-> >>> This implements changing FDT properties for RTAS (for vmlinux and zIm=
-age)
-> >>> and initramdisk location (for zImage). To make this work, this skips
-> >>> fdt_pack() when bios=3Doff as not packing the blob leaves some room f=
-or
-> >>> appending.
-> >>>
-> >>> This assigns "phandles" to device tree nodes as there is no more SLOF
-> >>> and OF nodes addresses of which served as phandle values.
-> >>> This keeps predefined nodes (such as XICS/NVLINK/...) unchanged.
-> >>> phandles are regenerated at every FDT rebuild.
-> >>>
-> >>> This defines phandles for VIO devices to have phandle assigned to
-> >>> the default stdout device at the point when we write "/chosen/stdout"
-> >>> which an ihandle which the OS uses to write to the console.
-> >>
-> >>
-> >> And I do not really need to preallocate phandles for stdout as it is a
-> >> leftover from when I populated /chosen/stdout before populating VIO
-> >> nodes, now /chosen/stdout is added at the very end. Thanks,
-> >=20
-> >=20
-> > Ah noo, I do, to implement "write" to the selected stdout as I need to
-> > trace ihandle back to Object* and  object_resolve_path() does not know
-> > about FDT path, it is /machine/peripheral/svty0 in QOM. The commit log
-> > needs an update, or this needs a fix but I cannot think of a nicer one.
-> > Thanks,
+> Sure, I understand the motivation in avoiding an unneeded call
+> to calling object_dynamic_cast_assert().
 >=20
+> > object_dynamic_cast_assert() argument is not const, I'm not sure the=20
+> > compiler can remove the call.
+> >=20
 >=20
-> I just might extend instances to do real instances, i.e. associate
-> ihandle with phandle _and_ Object*, I just need a helper to find Object
-> which matches what qdev_get_fw_dev_path() returns. Fun :)
+> Not remove the call, but delay it to the branch that uses it,
+> ie. parameter =3D=3D RTAS_SYSPARM_SPLPAR_CHARACTERISTICS.
 
-If you only allow one instance per device, could you just make
-ihandles =3D=3D phandle | CONSTANT?
+I think any performance consideration here is a red herring.  This
+particular RTAS call is a handful-of-times-per-boot thing, and only
+AFAIK used by AIX guests.
+
+I'm in favour of the change on the grounds of code locality and
+readability.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -161,25 +142,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---llIrKcgUOe3dCx0c
+--XIiC+We3v3zHqZ6Z
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4cFpoACgkQbDjKyiDZ
-s5LYZA//Vl6zFQdCGS/RFyKwgqzd2p6GnU7swDFlzEWbKcTdvzOPExi0Gsq072A9
-ZPNQZFTiUn8MteAF5NpJ/m7GPWaSPkOYHMHaTm3SvI7Ov3Q7SzKD2T5Lck0Sv+B0
-ptcxV2R8XwvsiQ1cVBG45MmLvZa5YUFR3Vg/gHQvGQIDTLc2BLgE9GHecnYBWOek
-q3bN/5oXzT37/uchD3wn6BMJRRZ+Tg+Ejwm0C65W0GDRbdWKkEsKQIkykrK3MJ5n
-4UhndjJlm9FISgs5PAvsxuWpt+XGKgVeV/pwBb0tBOQfkJ5UVU8N2ARvW9pDl7dD
-G47aM+QFCB1Ul3RLbAu02n2iPuEBnWC4+NA9tVVUJP7iapXf8bWgvbE8SMTnTWdu
-fliMyJTKVRVQQMxd4OqEcNwZ2S+whcHW/kZ2WZJswmmxLe7mb+dsHJlcPhfo/AEe
-n85IufQnP4dKh4ldasEP1QOX5OCfw/D2B/8SCdcRmbzljm/2y6okzvOUnIsPKY79
-d13++CpAt+8Kc8lqHC3C7mnEybMFXKs+26b2jAzpDJ5jxQdcRPjaW9zpFQ9L55ab
-ZotWYP8VRlsOotN7sUUTRHKAxiuN//JH+GU/W3sgqIXDd0ZZewPQa0rCexXnfaiM
-MqAR7qnzrnu4BtWvvP0rltYWYz+/2F7KpLZMGYH17vfCeusGcok=
-=hkgK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4cGWAACgkQbDjKyiDZ
+s5IRhxAAgjwTfn6oDce64WmxrtSzdp5v8NnkSL1fO3d3+2xEQyjHrPoCNGPjgsqG
+s05hIyZ+0BwiAKsdwmFtqnxsMdtwpNWDgzESv9t7aY3qRy3hZWj7b12sVkhio7nv
+5LZ5VI0Brp0fGRv6Kw6/4KczI/rvWUKYYchMv027IyOdnK01hBLL0Le06RY4gUo4
+ouZOKyF3NolvtBSxotq72UDJzlUeCACieg/xQuYo3DB2KT3HeerdYv4ijsF/vXpe
+yHgxJleALbk8XXfVGM2iXODKOuhbPE0Q1xovdzLZtw8Gc6LyRHlqS0PB4QVqu2pN
+2W2ykFzPV52O5apL+Ythb03YgsbA15V02thgPWJgs8h3MEWaUOkkwuwmguJuZQnH
+4jYeXOIY58Lwksts5+N8TiyuSAuepQiFTXFvysM9GUjt7aSDqW05Gg0b+heDyzyJ
+C00cQD+AzUJzFeRR75A8/bBzoeA2xTG8N2+CH2uinY2H3CBMHfy9V2DnzJChDwEL
+zkPr/tk2KT00dioTwNJFTyVivvZOzTWR8GbHxsM6+uOBiF/UwvyOQiJEHYcj2g/4
+KFl9FaakjOqsjd3+tEOwyTmmIxlNNBBpphHYt+8ZKoYu344+Qp/E7brigCvhpC6+
+x/YqfPajq/dqVh2mWqGNfEZyepvxWhQO2OglVhpd5WdTGP1x99U=
+=x52C
 -----END PGP SIGNATURE-----
 
---llIrKcgUOe3dCx0c--
+--XIiC+We3v3zHqZ6Z--
 
