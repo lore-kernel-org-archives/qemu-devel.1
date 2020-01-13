@@ -8,72 +8,72 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39DA2C33CAB
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 04:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FC7C33CAB
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 04:59:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E46AC21556
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 04:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1F2B21556
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 04:59:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="puerb6KJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46AC21556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E59JNfhk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F2B21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqrow-0000tK-2T
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 23:59:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42111)
+	id 1iqrp1-0000zQ-9Q
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 23:59:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42138)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1iqrnR-0007F2-Bt
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:52 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1iqrnU-0007IM-1M
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1iqrnO-0006cD-2g
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:49 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54760)
+ (envelope-from <coiby.xu@gmail.com>) id 1iqrnS-0006kV-Er
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:51 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40943)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1iqrnN-0006aI-P4
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:46 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id kx11so3618499pjb.4
- for <qemu-devel@nongnu.org>; Sun, 12 Jan 2020 20:57:45 -0800 (PST)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1iqrnS-0006jA-5Y
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 23:57:50 -0500
+Received: by mail-pl1-x642.google.com with SMTP id s21so3339430plr.7
+ for <qemu-devel@nongnu.org>; Sun, 12 Jan 2020 20:57:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GXYOj+U3hSVlshxwvSlfIFI4FVfmQN4qlRQUjp4L3yQ=;
- b=puerb6KJcFk1aQ57eFjoQmj8tk492qOeKGOkVKgiEkf34O/P7fcw+B165J9wbpxwXi
- JB44ne4vFIsY6CGYQgKRaogaTOzp6yk/voOShpw8AV75hDvp3ta1XDiy6bR30D3n1KLB
- wgfI3LbJqM5ixRRkfUk6lD8TbSClJUu2gw2pWSlT6vmkv00iu7g9X8wtRb27xwMldlFa
- Hcl6BxDlkVrCAZZgL2j+oZa0Y/tbcRh/5trCguWPcFOpi1rVdD2BZsu/hEcxkj5WKJk8
- 65u+IDD0PHaBzhpa6jP1ivDXLHj+fmhomWcZdGruSAZadqJOqMEm4mGND9uitgXO8w+W
- GgNg==
+ bh=Smb5q2JKehl018b2NdA+yhR2A85PIPWYcZo1EvMvLD0=;
+ b=E59JNfhk/r1jKFVwN5hcOKWwgcBGyOBh8nrad17AWYEKK1WZvef1lljC74tdL1FbPX
+ He5tOyg87y998r8mxQHG3tkowQtFTfpkEt5Bxviz4fAhSTweEeu7rN2wpB5fDsE5Y/tR
+ viryg+4lWtiBjC+o0MqPX1AJ+E9n3QkvDqFSOArSyi5qrF2lBKTDjwef3P8KJaeaX9fD
+ 2hSDZ+UBvT0+aFaFwT5CB5vYrgh1ZRDoRH7RSrQRfQeLeFSOv6eYZ3cZ15uCQr8LR4qD
+ 4aILm/l6Y58iQV4oWEcnwx43uCCJFLc2zRRQZFLiPwednwrRnw8mx3fyZdXXvvE19opn
+ ay8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GXYOj+U3hSVlshxwvSlfIFI4FVfmQN4qlRQUjp4L3yQ=;
- b=GbG+/QPPFAY+ZigWZ049wFnaffiiBvKUgzTy7ATkDsBPLl1vl14W8fvvKvd+f1GDxv
- hEhaUktiJk1zbHRdBUJL5qeDtLHjy2pgrnwffwU4qiEx9M1O919eJRMKr5e+yjB8Y7st
- SGjq+i0AnjuxCVIcv0tY9ypfJzeskFYY9VcCgBDZKfrCCFwmjgpOJ12jfJ3NSiqZvbXa
- c84/kH5vsBbJGwP8CXiSpoR5cVh2XXYSZEoFyvww2JzKNbLTpayw83bWKAkx8qaDIHd7
- n0K06X2aszTh88Ejf9VeEUOT1k8JHFteDp0S3QcwNy9eSlPRcEfgnGcJQk16knoVFGrX
- FXfg==
-X-Gm-Message-State: APjAAAVJraY1ven5zi1pBgNT/pTsWZ8YBqwocF5bcZHb56L4fa1c6xk+
- dPfZ1pBj+stmA4431hp7GtPuOn+8oG3hdw==
-X-Google-Smtp-Source: APXvYqzG8Do/B3hUiHGX8PmNKY5iXwjrsvdPeonLnfZk6ZQfToXyiRfsQuKnPVaVD4Uj2AnD9zV/UA==
-X-Received: by 2002:a17:902:9048:: with SMTP id
- w8mr17952256plz.294.1578891463794; 
- Sun, 12 Jan 2020 20:57:43 -0800 (PST)
+ bh=Smb5q2JKehl018b2NdA+yhR2A85PIPWYcZo1EvMvLD0=;
+ b=LfQJ/4eftwd14Kwt+4FQLeledwavPj0Aic6zdytQPpD47+i61nxTXhatN/rUggpuKW
+ mhVy3gcexlkBDX4p1CPJSpfgEBhw8ccOXUNf7gGWsGrf6hmJ+12XJYoJwHcGqqPzZ94b
+ 08GLSSKv0wb6tOvrfuYabbN1pVSTumY/SYY5x6vZ1EC1xR9QVP1RMwE8PzoXB2XPTivy
+ eVVkenq3CjLsvkxZq4DoWvUkcBrJjUd3PzUjXDmiiC1qzQTZqXYxs7nvThGB3sL49VqC
+ EetUOFNFgTAdsCLFk66GEbHSllvgih8q8ePGlleZCirgez98FzevRC/Gqcxz3yWNhgB3
+ xmSA==
+X-Gm-Message-State: APjAAAX11VJ+5JrYvWb0XyycpJ5uo0ur94v3KByG+RSV79ASS/f1n3qK
+ aSk/cFApifn/IDkOXg7yEqFEwwtuKQCMlQ==
+X-Google-Smtp-Source: APXvYqzWi+DUv9cZ9OMFU0xHUHpQLlUIQPQApqXCo+Cgz2+1/BqmBqrBUL/PJBt2kPengmGXcA4t4w==
+X-Received: by 2002:a17:902:bd06:: with SMTP id
+ p6mr12487987pls.27.1578891468802; 
+ Sun, 12 Jan 2020 20:57:48 -0800 (PST)
 Received: from localhost.localdomain ([175.124.145.172])
- by smtp.googlemail.com with ESMTPSA id o19sm17590552pjr.2.2020.01.12.20.57.39
+ by smtp.googlemail.com with ESMTPSA id o19sm17590552pjr.2.2020.01.12.20.57.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 12 Jan 2020 20:57:43 -0800 (PST)
+ Sun, 12 Jan 2020 20:57:48 -0800 (PST)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/5] vhost-user block device backend
-Date: Mon, 13 Jan 2020 12:57:00 +0800
-Message-Id: <20200113045704.12318-2-coiby.xu@gmail.com>
+Subject: [PATCH v1 2/5] extend libvhost to support IOThread
+Date: Mon, 13 Jan 2020 12:57:01 +0800
+Message-Id: <20200113045704.12318-3-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200113045704.12318-1-coiby.xu@gmail.com>
 References: <20200113045704.12318-1-coiby.xu@gmail.com>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,1098 +99,252 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By making use of libvhost, multiple block device drives can be exported and each drive can serve multiple clients simultaneously. Since vhost-user-server needs a block drive to be created first, delay the creation of this object.
+Previously libvhost dispatch events in its own GMainContext. Now vhost-user client's kick event can be dispatched in block device drive's AioContext thus IOThread is supported.
 
 Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
 ---
- blockdev-vu.c              | 1008 ++++++++++++++++++++++++++++++++++++
- include/block/vhost-user.h |   46 ++
- vl.c                       |    4 +
- 3 files changed, 1058 insertions(+)
- create mode 100644 blockdev-vu.c
- create mode 100644 include/block/vhost-user.h
+ contrib/libvhost-user/libvhost-user.c | 64 ++++++++++++++++++++++-----
+ contrib/libvhost-user/libvhost-user.h | 36 ++++++++++++++-
+ 2 files changed, 87 insertions(+), 13 deletions(-)
 
-diff --git a/blockdev-vu.c b/blockdev-vu.c
-new file mode 100644
-index 0000000000..45f0bb43a7
---- /dev/null
-+++ b/blockdev-vu.c
-@@ -0,0 +1,1008 @@
-+#include "qemu/osdep.h"
-+#include "block/vhost-user.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-types-sockets.h"
-+#include "qapi/qapi-commands-block.h"
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index ec27b78ff1..cd328c1509 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -67,7 +67,6 @@
+ /* The version of inflight buffer */
+ #define INFLIGHT_VERSION 1
+
+-#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
+
+ /* The version of the protocol we support */
+ #define VHOST_USER_VERSION 1
+@@ -260,7 +259,7 @@ have_userfault(void)
+ }
+
+ static bool
+-vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
++vu_message_read_(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+ {
+     char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
+     struct iovec iov = {
+@@ -286,6 +285,8 @@ vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+         return false;
+     }
+
++    assert(rc == VHOST_USER_HDR_SIZE || rc == 0);
 +
-+#include "sysemu/block-backend.h"
-+#include "qemu/main-loop.h"
-+
-+#include "qemu/units.h"
-+
-+#include "block/block.h"
-+
-+#include "qom/object_interfaces.h"
-+
-+#include <sys/eventfd.h>
-+
-+#include "hw/qdev-properties.h"
-+enum {
-+    VHOST_USER_BLK_MAX_QUEUES = 8,
-+};
-+
-+struct virtio_blk_inhdr {
-+    unsigned char status;
-+};
-+
-+
-+static QTAILQ_HEAD(, VubDev) vub_devs = QTAILQ_HEAD_INITIALIZER(vub_devs);
-+
-+
-+typedef struct VubReq {
-+    VuVirtqElement *elem;
-+    int64_t sector_num;
-+    size_t size;
-+    struct virtio_blk_inhdr *in;
-+    struct virtio_blk_outhdr out;
-+    VuClient *client;
-+    struct VuVirtq *vq;
-+} VubReq;
-+
-+static void
-+remove_watch(VuDev *vu_dev, int fd)
+     vmsg->fd_num = 0;
+     for (cmsg = CMSG_FIRSTHDR(&msg);
+          cmsg != NULL;
+@@ -328,6 +329,17 @@ fail:
+     return false;
+ }
+
++static bool vu_message_read(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
 +{
-+    VuClient *client;
-+
-+    g_assert(vu_dev);
-+    g_assert(fd >= 0);
-+
-+    client = container_of(vu_dev, VuClient, parent);
-+    aio_set_fd_handler(client->blk->ctx, fd, false, NULL, NULL, NULL, NULL);
-+}
-+
-+static void close_client(VuClient *client)
-+{
-+    vu_deinit(&client->parent);
-+    /** g_source_destroy(vub_device->parent.src); */
-+    client->sioc = NULL;
-+    object_unref(OBJECT(client->ioc));
-+    client->closed = true;
-+
-+}
-+
-+static void vub_panic_cb(VuDev *vu_dev, const char *buf)
-+{
-+    if (buf) {
-+        g_warning("vu_panic: %s", buf);
-+    }
-+
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    if (client->blk->exit_panic) {
-+        client->blk->close = true;
-+    }
-+    if (!client->closed) {
-+        close_client(client);
-+    }
-+}
-+
-+
-+static void vub_req_complete(VubReq *req)
-+{
-+    VuDev *vu_dev = &req->client->parent;
-+
-+    /* IO size with 1 extra status byte */
-+    vu_queue_push(vu_dev, req->vq, req->elem,
-+                  req->size + 1);
-+    vu_queue_notify(vu_dev, req->vq);
-+
-+    if (req->elem) {
-+        free(req->elem);
-+    }
-+
-+    g_free(req);
-+}
-+
-+
-+
-+static int
-+vub_discard_write_zeroes(VubReq *req, struct iovec *iov, uint32_t iovcnt,
-+                         uint32_t type)
-+{
-+    struct virtio_blk_discard_write_zeroes *desc;
-+    ssize_t size;
-+    void *buf;
-+
-+    size = iov_size(iov, iovcnt);
-+    if (size != sizeof(*desc)) {
-+        fprintf(stderr, "Invalid size %ld, expect %ld\n", size, sizeof(*desc));
-+        return -1;
-+    }
-+    buf = g_new0(char, size);
-+
-+    iov_to_buf_full(iov, iovcnt, 0, buf, size);
-+
-+
-+    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
-+    VubDev *vdev_blk;
-+    VuClient *client = container_of(dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+    desc = (struct virtio_blk_discard_write_zeroes *)buf;
-+    uint64_t range[2] = { le64toh(desc->sector) << 9,
-+                          le32toh(desc->num_sectors) << 9 };
-+    if (type == VIRTIO_BLK_T_DISCARD) {
-+        if (blk_pdiscard(vdev_blk->blk, range[0], range[1]) == 0) {
-+            g_free(buf);
-+            return 0;
-+        }
-+    } else if (type == VIRTIO_BLK_T_WRITE_ZEROES) {
-+        if (blk_pwrite_zeroes(vdev_blk->blk, range[0], range[1]) == 0) {
-+            g_free(buf);
-+            return 0;
-+        }
-+    }
-+    #endif
-+
-+    g_free(buf);
-+    return -1;
-+}
-+
-+
-+static void
-+vub_flush(VubReq *req)
-+{
-+    VuClient *client = req->client;
-+    blk_co_flush(client->blk->backend);
-+}
-+
-+
-+#define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
-+typedef struct BlkRwCo {
-+    BlockBackend *blk;
-+    int64_t offset;
-+    void *iobuf;
-+    int ret;
-+    BdrvRequestFlags flags;
-+} BlkRwCo;
-+
-+static void blk_read_entry(void *opaque)
-+{
-+    BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
-+
-+    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
-+                              qiov, rwco->flags);
-+    aio_wait_kick();
-+}
-+
-+
-+static void blk_write_entry(void *opaque)
-+{
-+    BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
-+
-+    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
-+                              qiov, rwco->flags);
-+    aio_wait_kick();
-+}
-+
-+
-+static int blk_prw(BlockBackend *blk, QEMUIOVector *qiov, int64_t offset,
-+                   CoroutineEntry co_entry, BdrvRequestFlags flags)
-+{
-+
-+    BlkRwCo rwco = {
-+        .blk    = blk,
-+        .offset = offset,
-+        .iobuf  = qiov,
-+        .flags  = flags,
-+        .ret    = NOT_DONE,
-+    };
-+
-+    if (qemu_in_coroutine()) {
-+        /* Fast-path if already in coroutine context */
-+        co_entry(&rwco);
++    vu_read_msg_cb read_msg;
++    if (dev->iface->read_msg) {
++        read_msg = dev->iface->read_msg;
 +    } else {
-+        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
-+        bdrv_coroutine_enter(blk_bs(blk), co);
-+        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++        read_msg = vu_message_read_;
 +    }
-+
-+    return rwco.ret;
++    return read_msg(dev, conn_fd, vmsg);
 +}
 +
-+
-+static ssize_t
-+vub_rwv(VubReq *req, struct iovec *iov,
-+        uint32_t iovcnt,
-+        CoroutineEntry co_entry)
-+{
-+    VuClient *client = req->client;
-+    ssize_t rc;
-+
-+    if (!iovcnt) {
-+        fprintf(stderr, "Invalid Read/Write IOV count\n");
-+        return -1;
-+    }
-+
-+    int64_t offset = req->sector_num * 512;
-+    QEMUIOVector *qiov = g_new0(QEMUIOVector, 1);
-+    qemu_iovec_init_external(qiov, iov, iovcnt);
-+    rc = blk_prw(client->blk->backend, qiov, offset, co_entry, 0);
-+
-+    req->size = iov_size(iov, iovcnt);
-+    if (rc < 0) {
-+        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n",
-+                client->blk->name, req->sector_num, req->size,
-+                strerror(errno));
-+        return -1;
-+    }
-+
-+    return rc;
-+}
-+
-+static int vub_virtio_process_req(VuClient *client,
-+                                     VuVirtq *vq)
-+{
-+    VuDev *vu_dev = &client->parent;
-+    VuVirtqElement *elem;
-+    uint32_t type;
-+    VubReq *req;
-+
-+    elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement) + sizeof(VubReq));
-+    if (!elem) {
-+        return -1;
-+    }
-+
-+    struct iovec *in_iov = elem->in_sg;
-+    struct iovec *out_iov = elem->out_sg;
-+    unsigned in_num = elem->in_num;
-+    unsigned out_num = elem->out_num;
-+    /* refer to hw/block/virtio_blk.c */
-+    if (elem->out_num < 1 || elem->in_num < 1) {
-+        fprintf(stderr, "virtio-blk request missing headers\n");
-+        free(elem);
-+        return -1;
-+    }
-+
-+    req = g_new0(VubReq, 1);
-+    req->client = client;
-+    req->vq = vq;
-+    req->elem = elem;
-+
-+    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
-+                            sizeof(req->out)) != sizeof(req->out))) {
-+        fprintf(stderr, "virtio-blk request outhdr too short");
-+        goto err;
-+    }
-+
-+    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
-+
-+    if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
-+        fprintf(stderr, "virtio-blk request inhdr too short");
-+        goto err;
-+    }
-+
-+    /* We always touch the last byte, so just see how big in_iov is.  */
-+    req->in = (void *)in_iov[in_num - 1].iov_base
-+              + in_iov[in_num - 1].iov_len
-+              - sizeof(struct virtio_blk_inhdr);
-+    iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
-+
-+
-+    type = le32toh(req->out.type);
-+    switch (type & ~VIRTIO_BLK_T_BARRIER) {
-+    case VIRTIO_BLK_T_IN:
-+    case VIRTIO_BLK_T_OUT: {
-+        ssize_t ret = 0;
-+        bool is_write = type & VIRTIO_BLK_T_OUT;
-+        req->sector_num = le64toh(req->out.sector);
-+        if (is_write) {
-+            ret = vub_rwv(req, out_iov, out_num, blk_write_entry);
+ static bool
+ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+ {
+@@ -400,7 +412,6 @@ vu_process_message_reply(VuDev *dev, const VhostUserMsg *vmsg)
+     if ((vmsg->flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
+         return true;
+     }
+-
+     if (!vu_message_read(dev, dev->slave_fd, &msg_reply)) {
+         return false;
+     }
+@@ -644,7 +655,8 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+                     "%s: Failed to madvise(DONTNEED) region %d: %s\n",
+                     __func__, i, strerror(errno));
+         }
+-        /* Turn off transparent hugepages so we dont get lose wakeups
++        /*
++         * Turn off transparent hugepages so we don't get lose wakeups
+          * in neighbouring pages.
+          * TODO: Turn this backon later.
+          */
+@@ -1047,9 +1059,13 @@ vu_set_vring_kick_exec(VuDev *dev, VhostUserMsg *vmsg)
+     }
+
+     if (dev->vq[index].kick_fd != -1 && dev->vq[index].handler) {
+-        dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
+-                       vu_kick_cb, (void *)(long)index);
+-
++        if (dev->set_watch_packed_data) {
++            dev->set_watch_packed_data(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
++                           dev->iface->kick_callback, (void *)(long)index);
 +        } else {
-+            ret = vub_rwv(req, in_iov, in_num, blk_read_entry);
++            dev->set_watch(dev, dev->vq[index].kick_fd, VU_WATCH_IN,
++                           vu_kick_cb, (void *)(long)index);
 +        }
-+        if (ret >= 0) {
-+            req->in->status = VIRTIO_BLK_S_OK;
-+        } else {
-+            req->in->status = VIRTIO_BLK_S_IOERR;
-+        }
-+        vub_req_complete(req);
-+        break;
-+    }
-+    case VIRTIO_BLK_T_FLUSH:
-+        vub_flush(req);
-+        req->in->status = VIRTIO_BLK_S_OK;
-+        vub_req_complete(req);
-+        break;
-+    case VIRTIO_BLK_T_GET_ID: {
-+        size_t size = MIN(iov_size(&elem->in_sg[0], in_num),
-+                          VIRTIO_BLK_ID_BYTES);
-+        snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk");
-+        req->in->status = VIRTIO_BLK_S_OK;
-+        req->size = elem->in_sg[0].iov_len;
-+        vub_req_complete(req);
-+        break;
-+    }
-+    case VIRTIO_BLK_T_DISCARD:
-+    case VIRTIO_BLK_T_WRITE_ZEROES: {
-+        int rc;
-+        rc = vub_discard_write_zeroes(req, &elem->out_sg[1], out_num, type);
-+        if (rc == 0) {
-+            req->in->status = VIRTIO_BLK_S_OK;
-+        } else {
-+            req->in->status = VIRTIO_BLK_S_IOERR;
-+        }
-+        vub_req_complete(req);
-+        break;
-+    }
-+    default:
-+        req->in->status = VIRTIO_BLK_S_UNSUPP;
-+        vub_req_complete(req);
-+        break;
-+    }
-+
-+    return 0;
-+
-+err:
-+    free(elem);
-+    g_free(req);
-+    return -1;
-+}
-+
-+
-+static void vub_process_vq(VuDev *vu_dev, int idx)
+         DPRINT("Waiting for kicks on fd: %d for vq: %d\n",
+                dev->vq[index].kick_fd, index);
+     }
+@@ -1069,8 +1085,13 @@ void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
+     vq->handler = handler;
+     if (vq->kick_fd >= 0) {
+         if (handler) {
+-            dev->set_watch(dev, vq->kick_fd, VU_WATCH_IN,
+-                           vu_kick_cb, (void *)(long)qidx);
++            if (dev->set_watch_packed_data) {
++                dev->set_watch_packed_data(dev, vq->kick_fd, VU_WATCH_IN,
++                        dev->iface->kick_callback, (void *)(long)qidx);
++            } else {
++                dev->set_watch(dev, vq->kick_fd, VU_WATCH_IN,
++                        vu_kick_cb, (void *)(long)qidx);
++            }
+         } else {
+             dev->remove_watch(dev, vq->kick_fd);
+         }
+@@ -1596,6 +1617,12 @@ vu_deinit(VuDev *dev)
+         }
+
+         if (vq->kick_fd != -1) {
++            /* remove watch for kick_fd
++             * When client process is running in gdb and
++             * quit command is run in gdb, QEMU will still dispatch the event
++             * which will cause segment fault in the callback function
++             */
++            dev->remove_watch(dev, vq->kick_fd);
+             close(vq->kick_fd);
+             vq->kick_fd = -1;
+         }
+@@ -1647,10 +1674,9 @@ vu_init(VuDev *dev,
+         const VuDevIface *iface)
+ {
+     uint16_t i;
+-
+     assert(max_queues > 0);
+     assert(socket >= 0);
+-    assert(set_watch);
++    /* assert(set_watch); */
+     assert(remove_watch);
+     assert(iface);
+     assert(panic);
+@@ -1682,6 +1708,22 @@ vu_init(VuDev *dev,
+     return true;
+ }
+
++bool
++vu_init_packed_data(VuDev *dev,
++        uint16_t max_queues,
++        int socket,
++        vu_panic_cb panic,
++        vu_set_watch_cb_packed_data set_watch_packed_data,
++        vu_remove_watch_cb remove_watch,
++        const VuDevIface *iface)
 +{
-+    VuClient *client;
-+    VuVirtq *vq;
-+    int ret;
-+
-+    client = container_of(vu_dev, VuClient, parent);
-+    assert(client);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    assert(vq);
-+
-+    while (1) {
-+        ret = vub_virtio_process_req(client, vq);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+}
-+
-+
-+static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
-+{
-+    VuVirtq *vq;
-+
-+    assert(vu_dev);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
-+}
-+
-+static uint64_t
-+vub_get_features(VuDev *dev)
-+{
-+    uint64_t features;
-+    VubDev *vdev_blk;
-+
-+    VuClient *client = container_of(dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+
-+    features = 1ull << VIRTIO_BLK_F_SIZE_MAX |
-+               1ull << VIRTIO_BLK_F_SEG_MAX |
-+               1ull << VIRTIO_BLK_F_TOPOLOGY |
-+               1ull << VIRTIO_BLK_F_BLK_SIZE |
-+               1ull << VIRTIO_BLK_F_FLUSH |
-+               #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
-+               1ull << VIRTIO_BLK_F_DISCARD |
-+               1ull << VIRTIO_BLK_F_WRITE_ZEROES |
-+               #endif
-+               1ull << VIRTIO_BLK_F_CONFIG_WCE |
-+               1ull << VIRTIO_F_VERSION_1 |
-+               1ull << VIRTIO_RING_F_INDIRECT_DESC |
-+               1ull << VIRTIO_RING_F_EVENT_IDX |
-+               1ull << VHOST_USER_F_PROTOCOL_FEATURES;
-+
-+    if (!vdev_blk->writable) {
-+        features |= 1ull << VIRTIO_BLK_F_RO;
-+    }
-+
-+    return features;
-+}
-+
-+static uint64_t
-+vub_get_protocol_features(VuDev *dev)
-+{
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
-+           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
-+}
-+
-+static int
-+vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
-+{
-+    VubDev *vdev_blk;
-+
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+    memcpy(config, &vdev_blk->blkcfg, len);
-+
-+    return 0;
-+}
-+
-+static int
-+vub_set_config(VuDev *vu_dev, const uint8_t *data,
-+               uint32_t offset, uint32_t size, uint32_t flags)
-+{
-+    VubDev *vdev_blk;
-+
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+    uint8_t wce;
-+
-+    /* don't support live migration */
-+    if (flags != VHOST_SET_CONFIG_TYPE_MASTER) {
-+        return -1;
-+    }
-+
-+
-+    if (offset != offsetof(struct virtio_blk_config, wce) ||
-+        size != 1) {
-+        return -1;
-+    }
-+
-+    wce = *data;
-+    if (wce == vdev_blk->blkcfg.wce) {
-+        /* Do nothing as same with old configuration */
-+        return 0;
-+    }
-+
-+    vdev_blk->blkcfg.wce = wce;
-+    blk_set_enable_write_cache(vdev_blk->backend, true);
-+    return 0;
-+}
-+
-+
-+/*
-+ * When the client disconnects, it send a VHOST_USER_NONE request
-+ * and vu_process_message will simple call exit which cause the VM
-+ * to exit abruptly.
-+ * To avoid this issue,  process VHOST_USER_NONE request ahead
-+ * of vu_process_message.
-+ *
-+ */
-+static int vub_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_reply)
-+{
-+    if (vmsg->request == VHOST_USER_NONE) {
-+        dev->panic(dev, "disconnect");
++    if (vu_init(dev, max_queues, socket, panic, NULL, remove_watch, iface)) {
++        dev->set_watch_packed_data = set_watch_packed_data;
 +        return true;
 +    }
 +    return false;
 +}
 +
-+static void
-+vmsg_close_fds(VhostUserMsg *vmsg)
-+{
-+    int i;
-+    for (i = 0; i < vmsg->fd_num; i++) {
-+        close(vmsg->fds[i]);
-+    }
-+}
-+
-+static bool
-+vu_message_read_co(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
-+{
-+    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
-+    struct iovec iov = {
-+        .iov_base = (char *)vmsg,
-+        .iov_len = VHOST_USER_HDR_SIZE,
-+    };
-+    struct msghdr msg = {
-+        .msg_iov = &iov,
-+        .msg_iovlen = 1,
-+        .msg_control = control,
-+        .msg_controllen = sizeof(control),
-+    };
-+    size_t fd_size;
-+    struct cmsghdr *cmsg;
-+    int rc;
-+    char buffer[100];
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    QIOChannel *ioc = client->ioc;
-+    do {
-+        rc = recvmsg(conn_fd, &msg, 0);
-+        if (rc < 0) {
-+            if (errno == EAGAIN) {
-+                if (qemu_in_coroutine()) {
-+                    qio_channel_yield(ioc, G_IO_IN);
-+                } else {
-+                    qio_channel_wait(ioc, G_IO_IN);
-+                }
-+                continue;
-+            } else if (errno == EINTR) {
-+                continue;
-+            }
-+        }
-+        break;
-+    } while (true);
-+
-+    if (rc < 0) {
-+        sprintf(buffer, "Error while recvmsg: %s", strerror(errno));
-+        vub_panic_cb(vu_dev, buffer);
-+        return false;
-+    }
-+
-+    assert(rc == VHOST_USER_HDR_SIZE || rc == 0);
-+
-+    vmsg->fd_num = 0;
-+    for (cmsg = CMSG_FIRSTHDR(&msg);
-+         cmsg != NULL;
-+         cmsg = CMSG_NXTHDR(&msg, cmsg))
-+    {
-+        if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_RIGHTS) {
-+            fd_size = cmsg->cmsg_len - CMSG_LEN(0);
-+            vmsg->fd_num = fd_size / sizeof(int);
-+            memcpy(vmsg->fds, CMSG_DATA(cmsg), fd_size);
-+            break;
-+        }
-+    }
-+
-+    if (vmsg->size > sizeof(vmsg->payload)) {
-+        sprintf(buffer,
-+                "Error: too big message request: %d, size: vmsg->size: %u, "
-+                "while sizeof(vmsg->payload) = %zu\n",
-+                vmsg->request, vmsg->size, sizeof(vmsg->payload));
-+        vub_panic_cb(vu_dev, buffer);
-+        goto fail;
-+    }
-+
-+    if (vmsg->size) {
-+        do {
-+            rc = read(conn_fd, &vmsg->payload, vmsg->size);
-+            if (rc < 0) {
-+                if (errno == EAGAIN) {
-+                    if (qemu_in_coroutine()) {
-+                        qio_channel_yield(ioc, G_IO_IN);
-+                    } else {
-+                        qio_channel_wait(ioc, G_IO_IN);
-+                    }
-+                    continue;
-+                } else if (errno == EINTR) {
-+                    continue;
-+                }
-+            }
-+            break;
-+        } while (true);
-+
-+        if (rc <= 0) {
-+            sprintf(buffer, "Error while reading: %s", strerror(errno));
-+            vub_panic_cb(vu_dev, buffer);
-+            goto fail;
-+        }
-+
-+        assert(rc == vmsg->size);
-+    }
-+
-+    return true;
-+
-+fail:
-+    vmsg_close_fds(vmsg);
-+
-+    return false;
-+}
-+
-+static void vub_kick_cb(void *opaque)
-+{
-+    vu_watch_cb_data *data = (vu_watch_cb_data *) opaque;
-+    int index = data->index;
-+    VuDev *dev = data->vu_dev;
-+    VuVirtq *vq = &dev->vq[index];
-+    int sock = vq->kick_fd;
-+    eventfd_t kick_data;
-+    ssize_t rc;
-+
-+    rc = eventfd_read(sock, &kick_data);
-+    if (rc == -1) {
-+        char buffer[100];
-+        sprintf(buffer, "kick eventfd_read(): %s", strerror(errno));
-+        vub_panic_cb(dev, buffer);
-+        g_free(data);
-+        dev->remove_watch(dev, dev->vq[index].kick_fd);
-+    } else {
-+        if (vq->handler) {
-+            vq->handler(dev, index);
-+        }
-+    }
-+}
-+
-+static const VuDevIface vub_iface = {
-+    .get_features = vub_get_features,
-+    .queue_set_started = vub_queue_set_started,
-+    .get_protocol_features = vub_get_protocol_features,
-+    .get_config = vub_get_config,
-+    .set_config = vub_set_config,
-+    .process_msg = vub_process_msg,
-+    .read_msg = vu_message_read_co,
-+    .kick_callback = vub_kick_cb,
-+};
-+
-+
-+void vub_free(VubDev *vub_dev, bool called_by_QOM)
-+{
-+    if (!vub_dev) {
-+        return;
-+    }
-+
-+    blk_unref(vub_dev->backend);
-+    g_free(vub_dev->name);
-+    g_free(vub_dev->unix_socket);
-+
-+    if (vub_dev->next.tqe_circ.tql_prev) {
-+        /*
-+         * if vub_dev->next.tqe_circ.tql_prev = null,
-+         * vub_dev hasn't been inserted into the queue and
-+         * vub_free is called by obj->instance_finalize.
-+         */
-+        QTAILQ_REMOVE(&vub_devs, vub_dev, next);
-+    }
-+    /*
-+     * Needn't to free vub_dev if called by QOM
-+     * because QOM will do the clean-up work.
-+     */
-+    if (!called_by_QOM) {
-+        g_free(vub_dev);
-+    }
-+}
-+
-+static coroutine_fn void vu_client_trip(void *opaque)
-+{
-+    VuClient *client = opaque;
-+
-+    while (!client->closed) {
-+        vu_dispatch(&client->parent);
-+    }
-+
-+    QTAILQ_REMOVE(&client->blk->clients, client, next);
-+
-+}
-+
-+static void vu_client_start(VuClient *client)
-+{
-+    Coroutine *co = qemu_coroutine_create(vu_client_trip, client);
-+    qemu_coroutine_enter(co);
-+}
-+
-+
-+G_STATIC_ASSERT((int)G_IO_IN == (int)VU_WATCH_IN);
-+G_STATIC_ASSERT((int)G_IO_OUT == (int)VU_WATCH_OUT);
-+G_STATIC_ASSERT((int)G_IO_PRI == (int)VU_WATCH_PRI);
-+G_STATIC_ASSERT((int)G_IO_ERR == (int)VU_WATCH_ERR);
-+G_STATIC_ASSERT((int)G_IO_HUP == (int)VU_WATCH_HUP);
-+
-+static void
-+set_watch(VuDev *vu_dev, int fd, int vu_evt,
-+          vu_watch_cb_packed_data cb, void *pvt)
-+{
-+    /*
-+     * since aio_dispatch can only pass one user data pointer to the
-+     * callback function, pack VuDev, pvt into a struct
-+     */
-+    VuClient *client;
-+
-+    g_assert(vu_dev);
-+    g_assert(fd >= 0);
-+    g_assert(cb);
-+    client = container_of(vu_dev, VuClient, parent);
-+    vu_watch_cb_data *cb_data = g_new0(vu_watch_cb_data, 1);
-+    cb_data->index = (intptr_t) pvt;
-+    cb_data->vu_dev = vu_dev;
-+    aio_set_fd_handler(client->blk->ctx, fd, false, (void *) cb,
-+                       NULL, NULL, cb_data);
-+}
-+
-+
-+void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
-+                gpointer opaque)
-+{
-+    VuClient *client;
-+    VubDev *vub_device = opaque;
-+    client = g_new0(VuClient, 1);
-+
-+    if (!vu_init_packed_data(&client->parent, VHOST_USER_BLK_MAX_QUEUES,
-+                             sioc->fd, vub_panic_cb, set_watch,
-+                             remove_watch, &vub_iface)) {
-+        fprintf(stderr, "Failed to initialized libvhost-user\n");
-+        g_free(client);
-+        return;
-+    }
-+
-+    client->blk = vub_device;
-+    client->refcount = 1;
-+    client->sioc = sioc;
-+    /*
-+     * increase the object reference, so cioc will not freed by
-+     * qio_net_listener_channel_func which will call object_unref(OBJECT(sioc))
-+     */
-+    object_ref(OBJECT(client->sioc));
-+    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-user client");
-+    client->ioc = QIO_CHANNEL(sioc);
-+    object_ref(OBJECT(client->ioc));
-+    object_ref(OBJECT(sioc));
-+
-+    qio_channel_set_blocking(QIO_CHANNEL(client->sioc), false, NULL);
-+    client->closed = false;
-+    QTAILQ_INSERT_TAIL(&client->blk->clients, client, next);
-+    vu_client_start(client);
-+}
-+
-+
-+void
-+vub_initialize_config(BlockDriverState *bs, struct virtio_blk_config *config)
-+{
-+    config->capacity = bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
-+    config->blk_size = BDRV_SECTOR_SIZE;
-+    config->size_max = 65536;
-+    config->seg_max = 128 - 2;
-+    config->min_io_size = 1;
-+    config->opt_io_size = 1;
-+    config->num_queues = 1;
-+    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
-+    config->max_discard_sectors = 32768;
-+    config->max_discard_seg = 1;
-+    config->discard_sector_alignment = config->blk_size >> 9;
-+    config->max_write_zeroes_sectors = 32768;
-+    config->max_write_zeroes_seg = 1;
-+    #endif
-+}
-+
-+
-+static VubDev *vub_new(VubDev *vub_device, const char *name,
-+                       const char *unix_socket, bool writable, Error **errp)
-+{
-+
-+    BlockBackend *blk;
-+
-+    /*
-+     * Don't allow resize while the vhost user server is running,
-+     * otherwise we don't care what happens with the node.
-+     */
-+    uint64_t perm = BLK_PERM_CONSISTENT_READ;
-+    int ret;
-+
-+    AioContext *ctx;
-+
-+    BlockDriverState *bs = bdrv_lookup_bs(name,
-+                                          name,
-+                                          errp);
-+
-+    if (!bs) {
-+        error_setg(errp,
-+                   "No drive with name '%s'."
-+                   " Please find the list of names with "
-+                   "'info block'", name);
-+        return NULL;
-+    }
-+
-+    if (bdrv_is_read_only(bs)) {
-+        writable = false;
-+    }
-+
-+    if (writable) {
-+        perm |= BLK_PERM_WRITE;
-+    }
-+
-+    ctx = bdrv_get_aio_context(bs);
-+    aio_context_acquire(ctx);
-+    bdrv_invalidate_cache(bs, NULL);
-+    aio_context_release(ctx);
-+
-+    blk = blk_new(bdrv_get_aio_context(bs), perm,
-+                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                  BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
-+    ret = blk_insert_bs(blk, bs, errp);
-+
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+
-+    blk_set_enable_write_cache(blk, false);
-+
-+    blk_set_allow_aio_context_change(blk, true);
-+
-+
-+    vub_device->name = g_strdup(name);
-+    vub_device->unix_socket = g_strdup(unix_socket);
-+    vub_device->writable = writable;
-+    vub_device->blkcfg.wce = 0;
-+    vub_device->backend = blk;
-+    vub_device->ctx = ctx;
-+    vub_initialize_config(bs, &vub_device->blkcfg);
-+    return vub_device;
-+
-+fail:
-+    blk_unref(blk);
-+    return NULL;
-+}
-+
-+void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM)
-+{
-+    if (!vub_device) {
-+        return;
-+    }
-+
-+    VuClient *client, *next;
-+    QTAILQ_FOREACH_SAFE(client, &vub_device->clients, next, next) {
-+        if (!client->closed) {
-+            close_client(client);
-+        }
-+    }
-+
-+    if (vub_device->listener) {
-+        qio_net_listener_disconnect(vub_device->listener);
-+        object_unref(OBJECT(vub_device->listener));
-+    }
-+    vub_free(vub_device, called_by_QOM);
-+
-+}
-+
-+
-+VubDev *vub_dev_find(const char *name)
-+{
-+    VubDev *vub_device;
-+    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
-+        if (strcmp(name, vub_device->name) == 0) {
-+            return vub_device;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+
-+static VubDev *vub_dev_find_by_unix_socket(const char *unix_socket)
-+{
-+    VubDev *vub_device;
-+    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
-+        if (strcmp(unix_socket, vub_device->unix_socket) == 0) {
-+            return vub_device;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static void vhost_user_server_start(VubDev *vub_device, const char *unix_socket,
-+                                    const char *name, bool writable,
-+                                    Error **errp)
-+{
-+
-+    if (vub_dev_find(name) || vub_dev_find_by_unix_socket(unix_socket)) {
-+        error_setg(errp, "Vhost user server with name '%s' or "
-+                "with socket_path '%s' has already been started",
-+                name, unix_socket);
-+        return;
-+    }
-+
-+
-+    if (!vub_new(vub_device, name, unix_socket, writable, errp)) {
-+        return;
-+    }
-+
-+
-+    vub_device->listener = qio_net_listener_new();
-+
-+    qio_net_listener_set_name(vub_device->listener,
-+                              "vhost-user-backend-listener");
-+
-+    SocketAddress *addr = g_new0(SocketAddress, 1);
-+    addr->u.q_unix.path = (char *) unix_socket;
-+    addr->type = SOCKET_ADDRESS_TYPE_UNIX;
-+    if (qio_net_listener_open_sync(vub_device->listener, addr, 1, errp) < 0) {
-+        goto error;
-+    }
-+
-+
-+    QTAILQ_INSERT_TAIL(&vub_devs, vub_device, next);
-+    QTAILQ_INIT(&vub_device->clients);
-+
-+    qio_net_listener_set_client_func(vub_device->listener,
-+                                     vub_accept,
-+                                     vub_device,
-+                                     NULL);
-+
-+    return;
-+
-+ error:
-+    vub_free(vub_device, false);
-+}
-+
-+static void vu_set_block_name(Object *obj, const char *value,
-+                                           Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+
-+    if (vus->name) {
-+        error_setg(errp, "evdev property already set");
-+        return;
-+    }
-+
-+    vus->name = g_strdup(value);
-+}
-+
-+static char *vu_get_block_name(Object *obj, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);
-+    return g_strdup(vus->name);
-+}
-+
-+
-+static void vu_set_unix_socket(Object *obj, const char *value,
-+                                            Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+
-+    if (vus->unix_socket) {
-+        error_setg(errp, "unix_socket property already set");
-+        return;
-+    }
-+
-+    vus->unix_socket = g_strdup(value);
-+    vhost_user_server_start(vus, value, vus->name,
-+                            vus->writable, errp);
-+}
-+
-+static char *vu_get_unix_socket(Object *obj, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+    return g_strdup(vus->unix_socket);
-+}
-+
-+static bool vu_get_block_writable(Object *obj, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+    return vus->writable;
-+}
-+
-+static void vu_set_block_writable(Object *obj, bool value, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);
-+
-+    vus->writable = value;
-+}
-+
-+static void vhost_user_server_instance_init(Object *obj)
-+{
-+
-+    object_property_add_bool(obj, "writable",
-+                            vu_get_block_writable,
-+                            vu_set_block_writable, NULL);
-+
-+    object_property_add_str(obj, "name",
-+                            vu_get_block_name,
-+                            vu_set_block_name, NULL);
-+
-+    object_property_add_str(obj, "unix_socket",
-+                            vu_get_unix_socket,
-+                            vu_set_unix_socket, NULL);
-+
-+}
-+
-+static void vhost_user_server_instance_finalize(Object *obj)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);
-+    vhost_user_server_free(vus, true);
-+    /* object_del shouldn't free this object struct */
-+    obj->free = NULL;
-+}
-+
-+static const TypeInfo vhost_user_server_info = {
-+    .name = TYPE_VHOST_USER_SERVER,
-+    .parent = TYPE_OBJECT,
-+    .instance_size = sizeof(VuDev),
-+    .instance_init = vhost_user_server_instance_init,
-+    .instance_finalize = vhost_user_server_instance_finalize,
-+    .interfaces = (InterfaceInfo[]) {
-+        {TYPE_USER_CREATABLE},
-+        {}
-+    },
-+};
-+
-+static void vhost_user_server_register_types(void)
-+{
-+    type_register_static(&vhost_user_server_info);
-+}
-+
-+type_init(vhost_user_server_register_types)
-+
-diff --git a/include/block/vhost-user.h b/include/block/vhost-user.h
-new file mode 100644
-index 0000000000..ef6d695244
---- /dev/null
-+++ b/include/block/vhost-user.h
-@@ -0,0 +1,46 @@
-+#include "io/channel-socket.h"
-+#include "io/net-listener.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "standard-headers/linux/virtio_blk.h"
-+typedef struct VubDev VubDev;
-+typedef struct VuClient VuClient;
-+#define TYPE_VHOST_USER_SERVER "vhost-user-server"
-+
-+#define VHOST_USER_SERVER(obj) \
-+   OBJECT_CHECK(VubDev, obj, TYPE_VHOST_USER_SERVER)
-+/* vhost user block device */
-+struct VubDev {
-+    Object parent_obj;
-+    char *name;
-+    char *unix_socket;
-+    bool exit_panic;
-+    bool close;
-+    BlockBackend *backend;
-+    AioContext *ctx;
-+    QIONetListener *listener;
-+    QIOChannelSocket *sioc;
-+    QTAILQ_HEAD(, VuClient) clients;
-+    QTAILQ_ENTRY(VubDev) next;
-+    struct virtio_blk_config blkcfg;
-+    bool writable;
-+};
-+
-+struct VuClient {
-+    VuDev parent;
-+    int refcount;
-+    VubDev *blk;
-+    QIOChannelSocket *sioc; /* The underlying data channel */
-+    QIOChannel *ioc; /* The current I/O channel */
-+    QTAILQ_ENTRY(VuClient) next;
-+    bool closed;
-+};
-+VubDev *vub_dev_find(const char *name);
-+
-+void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM);
-+void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
-+                gpointer opaque);
-+
-+void vub_free(VubDev *vub_dev, bool called_by_QOM);
-+
-+void vub_initialize_config(BlockDriverState *bs,
-+                           struct virtio_blk_config *config);
-diff --git a/vl.c b/vl.c
-index 86474a55c9..72ac506342 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2553,6 +2553,10 @@ static bool object_create_initial(const char *type, QemuOpts *opts)
-     }
- #endif
+ VuVirtq *
+ vu_get_queue(VuDev *dev, int qidx)
+ {
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index 46b600799b..5230d55092 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -34,6 +34,9 @@ typedef enum VhostSetConfigType {
+     VHOST_SET_CONFIG_TYPE_MIGRATION = 1,
+ } VhostSetConfigType;
 
-+    /* Reason: vhost-user-server property "name" */
-+    if (g_str_equal(type, "vhost-user-server")) {
-+        return false;
-+    }
++
++#define VHOST_USER_HDR_SIZE offsetof(VhostUserMsg, payload.u64)
++
+ /*
+  * Maximum size of virtio device config space
+  */
+@@ -200,6 +203,7 @@ typedef uint64_t (*vu_get_features_cb) (VuDev *dev);
+ typedef void (*vu_set_features_cb) (VuDev *dev, uint64_t features);
+ typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg,
+                                   int *do_reply);
++typedef bool (*vu_read_msg_cb) (VuDev *dev, int sock, VhostUserMsg *vmsg);
+ typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool started);
+ typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx);
+ typedef int (*vu_get_config_cb) (VuDev *dev, uint8_t *config, uint32_t len);
+@@ -207,6 +211,15 @@ typedef int (*vu_set_config_cb) (VuDev *dev, const uint8_t *data,
+                                  uint32_t offset, uint32_t size,
+                                  uint32_t flags);
+
++typedef struct vu_watch_cb_data {
++   long index;
++   VuDev *vu_dev;
++} vu_watch_cb_data;
++typedef void (*vu_watch_cb_packed_data) (void *packed_data);
++
++typedef void (*vu_set_watch_cb_packed_data) (VuDev *dev, int fd, int condition,
++                                 vu_watch_cb_packed_data cb, void *data);
++
+ typedef struct VuDevIface {
+     /* called by VHOST_USER_GET_FEATURES to get the features bitmask */
+     vu_get_features_cb get_features;
+@@ -220,8 +233,11 @@ typedef struct VuDevIface {
+     /* process_msg is called for each vhost-user message received */
+     /* skip libvhost-user processing if return value != 0 */
+     vu_process_msg_cb process_msg;
++    vu_read_msg_cb read_msg;
++    vu_watch_cb_packed_data kick_callback;
+     /* tells when queues can be processed */
+     vu_queue_set_started_cb queue_set_started;
++
      /*
-      * Reason: filter-* property "netdev" etc.
-      */
+      * If the queue is processed in order, in which case it will be
+      * resumed to vring.used->idx. This can help to support resuming
+@@ -366,7 +382,8 @@ struct VuDev {
+     /* @set_watch: add or update the given fd to the watch set,
+      * call cb when condition is met */
+     vu_set_watch_cb set_watch;
+-
++    /* AIO dispatch will only one data pointer to callback function */
++    vu_set_watch_cb_packed_data set_watch_packed_data;
+     /* @remove_watch: remove the given fd from the watch set */
+     vu_remove_watch_cb remove_watch;
+
+@@ -398,7 +415,7 @@ typedef struct VuVirtqElement {
+  * @remove_watch: a remove_watch callback
+  * @iface: a VuDevIface structure with vhost-user device callbacks
+  *
+- * Intializes a VuDev vhost-user context.
++ * Initializes a VuDev vhost-user context.
+  *
+  * Returns: true on success, false on failure.
+  **/
+@@ -411,6 +428,21 @@ bool vu_init(VuDev *dev,
+              const VuDevIface *iface);
+
+
++/**
++ * vu_init_packed_data:
++ * Same as vu_init except for set_watch_packed_data which will pack
++ * two parameters into a struct thus QEMU aio_dispatch can pass the
++ * required data to callback function.
++ *
++ * Returns: true on success, false on failure.
++ **/
++bool vu_init_packed_data(VuDev *dev,
++             uint16_t max_queues,
++             int socket,
++             vu_panic_cb panic,
++             vu_set_watch_cb_packed_data set_watch_packed_data,
++             vu_remove_watch_cb remove_watch,
++             const VuDevIface *iface);
+ /**
+  * vu_deinit:
+  * @dev: a VuDev context
 --
 2.24.1
 
