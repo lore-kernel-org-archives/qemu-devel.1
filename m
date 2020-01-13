@@ -4,88 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32801C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD0EC33CAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F191A207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:49:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32A82207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:50:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tXDY+olw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F191A207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFY7Qmbh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A82207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3qg-00046h-LF
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:49:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44704)
+	id 1ir3rM-0005mp-40
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:50:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44821)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ir3pL-0001zo-Sc
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:48:36 -0500
+ (envelope-from <drjones@redhat.com>) id 1ir3pr-0002u4-Od
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ir3pK-0008UR-HU
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:48:35 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43237)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ir3pK-0008T3-A0
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:48:34 -0500
-Received: by mail-wr1-x441.google.com with SMTP id d16so9519093wre.10
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:48:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=4fHF5HpVc9enwxccEmFdnoK7Y79nJAeMYXHbgXFGnq4=;
- b=tXDY+olwtt+n/MmdWrd+ZgOriTWBi70ZujIXks5lR/wpr11tCpdZ+knQdeZFXrLIYg
- kWSG87WO6SfGb4kFWF+TeclhUa/ONF4qTS8I3xtyJCKYehaLSxiZymShLXQZKIEfmt3N
- 0OwkyXLW33IESnHZFhKQTx53IqfWnXsOBzzakOERhIPAB+DyMloImLN36KWNpdQy1vbh
- C3Fj/3GvHzBH3Y/gJl1LSAjHUcpIT4sl2Kmlgn73xpWsMV132UbwEs1Tq926zEac931X
- SCxxR5Nnfngz+MaL/Z0VsinbMK+49Eypf5Ki9MtPrIpNCauhjP1Rq0PpwZlC7KgWSxm4
- 1HFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=4fHF5HpVc9enwxccEmFdnoK7Y79nJAeMYXHbgXFGnq4=;
- b=fPQKh37m+IUm1Gvzd5A7T+Q+gtugSohlCLE/V3bKjk6VDazHpcE5pMfK5hdnDBJjPQ
- SduQLL7BZ7elHDhNxHOxSej6vp2Ock3C4AUz0JzVmtggC953A7xr7dwREZNBdAaxdNOe
- 4I/anofIOypNZRjXBBaWrda4CFCHM2d7BXifhS2+SGz6ac+S64MDFAyh89IZekRT3tnZ
- ldMR2IDKc/0wmKTxL1y2BvSN5qOp5IuT0+tNh/XtOxNGuep9ueVo9p3xxadE/LEzAzJo
- nLHingI59lQ8CDTPld0/OAsuuyDHHBc5LyfFb2Y5ZOgXoeua1rt0szaGV/gsuyHyENW2
- 7z9g==
-X-Gm-Message-State: APjAAAUT11lj1wijszR2lkKcct3O+TOXYIXVPzBALRa6e6wrgs0gBZwQ
- 0FjGl5Qf4IZ33Jr9hBbPdMHNng==
-X-Google-Smtp-Source: APXvYqzUcbcyl1omXfuMfpOZJJZVNCpQu2mEK8CFNmwPe2bRlSIkui1C/EKqjADvCqeugs223So+8Q==
-X-Received: by 2002:a5d:410e:: with SMTP id l14mr19363838wrp.238.1578937712996; 
- Mon, 13 Jan 2020 09:48:32 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id f207sm16458935wme.9.2020.01.13.09.48.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 09:48:31 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id F3E221FF87;
- Mon, 13 Jan 2020 17:48:30 +0000 (GMT)
-References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
- <157709448356.12933.1621745423878239085.stgit@pasha-Precision-3630-Tower>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-Subject: Re: [for-5.0 PATCH 08/11] replay: flush rr queue before loading the
- vmstate
-In-reply-to: <157709448356.12933.1621745423878239085.stgit@pasha-Precision-3630-Tower>
-Date: Mon, 13 Jan 2020 17:48:30 +0000
-Message-ID: <87y2ubmemp.fsf@linaro.org>
+ (envelope-from <drjones@redhat.com>) id 1ir3pq-0000iL-GN
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:49:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31071
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir3pq-0000hf-Bf
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:49:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578937745;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Krn8eTbGp+NAIkYd15sSRQJqhL1ATwvj/bxJG4KzDzo=;
+ b=dFY7QmbhNoGiyv7sB9fo1po8kmMpCkqCMxwApv/GUElkJoEDmU9Qd6OX8l3LpHE6zzaan5
+ 9ytq9fgJvq9a33vCjlEryWX28VPN10cFo9FdbS/wmOI4Muuc99b0H74/Zti/cTTJluoVm2
+ KXwhOxd4c7zNqQ9j3p4VEkHy/mmDTY4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-E-JWcLG5Oiyb6WhIBil_SQ-1; Mon, 13 Jan 2020 12:49:02 -0500
+X-MC-Unique: E-JWcLG5Oiyb6WhIBil_SQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF8C5107BAA5;
+ Mon, 13 Jan 2020 17:49:00 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BE8680890;
+ Mon, 13 Jan 2020 17:48:55 +0000 (UTC)
+Date: Mon, 13 Jan 2020 18:48:53 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 11/16] arm/arm64: ITS: Device and
+ collection Initialization
+Message-ID: <20200113174853.s23dwrpquqvqpxxi@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-12-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200110145412.14937-12-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,93 +84,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
- armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com,
- kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com,
- dovgaluk@ispras.ru, mreitz@redhat.com, artem.k.pisarenko@gmail.com,
- dgilbert@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Pavel Dovgalyuk <pavel.dovgaluk@gmail.com> writes:
-
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> Non-empty record/replay queue prevents saving and loading the VM state,
-> because it includes pending bottom halves and block coroutines.
-> But when the new VM state is loaded, we don't have to preserve the consis=
-tency
-> of the current state anymore. Therefore this patch just flushes the queue
-> allowing the coroutines to finish and removes checking for empty rr queue
-> for load_snapshot function.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Fri, Jan 10, 2020 at 03:54:07PM +0100, Eric Auger wrote:
+> Introduce an helper functions to register
+> - a new device, characterized by its device id and the
+>   max number of event IDs that dimension its ITT (Interrupt
+>   Translation Table).  The function allocates the ITT.
+> 
+> - a new collection, characterized by its ID and the
+>   target processing engine (PE).
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
->  include/sysemu/replay.h  |    2 ++
->  migration/savevm.c       |   12 ++++++------
->  replay/replay-internal.h |    2 --
->  3 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> index e00ed2f4a5..239c01e7df 100644
-> --- a/include/sysemu/replay.h
-> +++ b/include/sysemu/replay.h
-> @@ -149,6 +149,8 @@ void replay_disable_events(void);
->  void replay_enable_events(void);
->  /*! Returns true when saving events is enabled */
->  bool replay_events_enabled(void);
-> +/* Flushes events queue */
-> +void replay_flush_events(void);
->  /*! Adds bottom half event to the queue */
->  void replay_bh_schedule_event(QEMUBH *bh);
->  /* Adds oneshot bottom half event to the queue */
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index ae84bf6ab0..0c5cac372a 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -2834,12 +2834,6 @@ int load_snapshot(const char *name, Error **errp)
->      AioContext *aio_context;
->      MigrationIncomingState *mis =3D migration_incoming_get_current();
->=20=20
-> -    if (!replay_can_snapshot()) {
-> -        error_setg(errp, "Record/replay does not allow loading snapshot "
-> -                   "right now. Try once more later.");
-> -        return -EINVAL;
-> -    }
-> -
->      if (!bdrv_all_can_snapshot(&bs)) {
->          error_setg(errp,
->                     "Device '%s' is writable but does not support snapsho=
-ts",
-> @@ -2873,6 +2867,12 @@ int load_snapshot(const char *name, Error **errp)
->          return -EINVAL;
->      }
->=20=20
-> +    /*
-> +     * Flush the record/replay queue. Now the VM state is going
-> +     * to change. Therefore we don't need to preserve its consistency
-> +     */
-> +    replay_flush_events();
+> 
+> v2 -> v3:
+> - s/nb_/nr_
+> ---
+>  lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++
+>  lib/arm/gic-v3-its.c     | 46 ++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 66 insertions(+)
+> 
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 0e31848..0497a78 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -55,6 +55,9 @@
+>  #define GITS_BASER_TYPE_DEVICE		1
+>  #define GITS_BASER_TYPE_COLLECTION	4
+>  
+> +#define GITS_MAX_DEVICES		8
+> +#define GITS_MAX_COLLECTIONS		8
 > +
-<snip>
+>  struct its_typer {
+>  	unsigned int ite_size;
+>  	unsigned int eventid_bits;
+> @@ -79,12 +82,27 @@ struct its_cmd_block {
+>  	u64     raw_cmd[4];
+>  };
+>  
+> +struct its_device {
+> +	u32 device_id;	/* device ID */
+> +	u32 nr_ites;	/* Max Interrupt Translation Entries */
+> +	void *itt;	/* Interrupt Translation Table GPA */
+> +};
+> +
+> +struct its_collection {
+> +	u64 target_address;
+> +	u16 col_id;
+> +};
+> +
+>  struct its_data {
+>  	void *base;
+>  	struct its_typer typer;
+>  	struct its_baser baser[GITS_BASER_NR_REGS];
+>  	struct its_cmd_block *cmd_base;
+>  	struct its_cmd_block *cmd_write;
+> +	struct its_device devices[GITS_MAX_DEVICES];
+> +	u32 nr_devices;		/* Allocated Devices */
+> +	struct its_collection collections[GITS_MAX_COLLECTIONS];
+> +	u32 nr_collections;	/* Allocated Collections */
+>  };
+>  
+>  extern struct its_data its_data;
+> @@ -101,6 +119,8 @@ extern u8 get_lpi_config(int n);
+>  extern void set_pending_table_bit(int rdist, int n, bool set);
+>  extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
+>  extern void its_enable_defaults(void);
+> +extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+> +extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
+>  
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> index f488cca..88c08ee 100644
+> --- a/lib/arm/gic-v3-its.c
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -257,3 +257,49 @@ void its_enable_defaults(void)
+>  
+>  	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+>  }
+> +
+> +struct its_device *its_create_device(u32 device_id, int nr_ites)
+> +{
+> +	struct its_baser *baser;
+> +	struct its_device *new;
+> +	unsigned long n, order;
+> +
+> +	if (its_data.nr_devices >= GITS_MAX_DEVICES)
+> +		report_abort("%s redimension GITS_MAX_DEVICES", __func__);
+> +
+> +	baser = its_lookup_baser(GITS_BASER_TYPE_DEVICE);
+> +	if (!baser)
+> +		return NULL;
+> +
+> +	new = &its_data.devices[its_data.nr_devices];
+> +
+> +	new->device_id = device_id;
+> +	new->nr_ites = nr_ites;
+> +
+> +	n = (its_data.typer.ite_size * nr_ites) >> PAGE_SHIFT;
+> +	order = is_power_of_2(n) ? fls(n) : fls(n) + 1;
+> +	new->itt = (void *)virt_to_phys(alloc_pages(order));
+> +
+> +	its_data.nr_devices++;
+> +	return new;
+> +}
+> +
+> +struct its_collection *its_create_collection(u32 col_id, u32 pe)
+> +{
+> +	struct its_collection *new;
+> +
+> +	if (its_data.nr_collections >= GITS_MAX_COLLECTIONS)
+> +		report_abort("%s redimension GITS_MAX_COLLECTIONS", __func__);
+> +
+> +	new = &its_data.collections[its_data.nr_collections];
+> +
+> +	new->col_id = col_id;
+> +
+> +	if (its_data.typer.pta)
+> +		new->target_address = (u64)gicv3_data.redist_base[pe];
+> +	else
+> +		new->target_address = pe << 16;
+> +
+> +	its_data.nr_collections++;
+> +	return new;
+> +}
+> -- 
+> 2.20.1
+>
 
-This is the commit that introduces:
+Please replace the if (cond) report_abort(...)'s with assert_msg(cond, ...)'s.
 
-  ERROR:/home/alex.bennee/lsrc/qemu.git/replay/replay-events.c:80:replay_fl=
-ush_events:
-  assertion failed: (replay_mutex_locked())
+Thanks,
+drew 
 
-To the already failing:
-
-  /bin/sh -c "cd builds/all && make -j4 && cd tests/qemu-iotests && ./check=
- -qcow2 267"
-
-test case.
-
---=20
-Alex Benn=C3=A9e
 
