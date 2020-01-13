@@ -2,92 +2,76 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E57DC33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BEEC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 18:02:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1891A214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:56:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32AE620678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 18:02:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QcNra/WC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1891A214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PzOTK6Si"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32AE620678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3wx-0001UP-8M
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:56:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46369)
+	id 1ir42c-0006V2-9e
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 13:02:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ir3wH-0000mc-9B
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:55:46 -0500
+ (envelope-from <drjones@redhat.com>) id 1ir41O-0005nf-4d
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 13:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ir3wF-0000SP-MI
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:55:45 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54724)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ir3wF-0000Qn-Eu
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:55:43 -0500
-Received: by mail-wm1-x344.google.com with SMTP id b19so10737991wmj.4
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:55:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ioY8W0qYvWStTxsIWopMiXVEBB+aQGN7aJKMG6c73pc=;
- b=QcNra/WCbDFcurGPptkS5waBqOu+GbPKNE/PMeS6eBl6vZfUD3Z62iCitb88E/x0a4
- oA/KJUj8uNBwZI8+MqFJFkeu2KviYSj6C7t5B6z4cy8p5jqq7828cEdZxqnEE1Qid77Y
- 91PlT/uG5j8ZC8OghI69xwRMbzWZikJ7hYsjfQadqh3kA2NTmdAchYXLhGdwL9MIumKb
- sUOnkeCaZjuQ+l+vAU2Z8tneMBS87hPnbdVHl0J7mwvn3T2B88ePO0PUeZIKHHsD153z
- 9+WhOxrv62AAQVNrfghKJ3wLLenD4E2N3DIZZouXyhr4vQIoHLZSROtTth4PRQgto60y
- B4Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ioY8W0qYvWStTxsIWopMiXVEBB+aQGN7aJKMG6c73pc=;
- b=d7lgWkh6iUHQqks0kXoZB41sbMtKUxZa9fqGHfBWZyzYkNVNwqL8eWNiQccQ8pRMrM
- V3Hpc5ZJLCAWEJcVRZorXxrBciPGWqn5gFNXImfXDB0uJDiu+/QdwwgGJ8Hj8UzBwPe0
- eGX85KfKNUsSzS6y3Dm4iai6dxnd2ty49HL7ZzTRqHRiBw3R195wcFDtN/EcuwVjiVs6
- PVKKUDOk77HcIzL7RvoxPXfdhSyIXkqwn/0hHCGMJeTQPoovhWf/q1nQZ7xtLU1DTGj+
- Pq9V+f80GOOmBvuJsnJtp9nAi/DwnqwEh/AuhBauQPg+rfjsre2jKO+MVqbSXLi79WTf
- T5kA==
-X-Gm-Message-State: APjAAAVciQprvWpSbd8dvP5yTIdjK8KWyqg6A3WEIDyQ833OlhdcGqnB
- CC9OvEBcEBS6tr0uuh0E2hPT7A==
-X-Google-Smtp-Source: APXvYqxpJMwRvZNTqgwXh9zNzlnX02uSetL9AOsbONVBjKCvmrSwlSQ9e2V0XhWDRG8ZvSjDmAUETw==
-X-Received: by 2002:a05:600c:228f:: with SMTP id
- 15mr22290951wmf.56.1578938141812; 
- Mon, 13 Jan 2020 09:55:41 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z83sm15642685wmg.2.2020.01.13.09.55.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 09:55:40 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CA97E1FF87;
- Mon, 13 Jan 2020 17:55:39 +0000 (GMT)
-References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
- <003a01d5c6b3$df62afd0$9e280f70$@ru>
- <20200109120038.GD9504@linux.fritz.box>
- <87k15v1z71.fsf@dusky.pond.sub.org> <000f01d5c9f4$cfbc1230$6f343690$@ru>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Subject: Re: [for-5.0 PATCH 00/11] Support for reverse debugging with GDB
-In-reply-to: <000f01d5c9f4$cfbc1230$6f343690$@ru>
-Date: Mon, 13 Jan 2020 17:55:39 +0000
-Message-ID: <87v9pfmeas.fsf@linaro.org>
+ (envelope-from <drjones@redhat.com>) id 1ir41K-0006x2-Jn
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 13:01:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36662
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ir41J-0006vK-Pb
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 13:00:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578938456;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=JPRMEcKUD3pcM4flUSRiwUZ2m0BIQ5vP62fsD3i2enY=;
+ b=PzOTK6SiRDwWw9l0RqfblizhsV9F8/Ss30jX/yCB//B+udU6wv4Jk+u1pvR3z+lV9fleT0
+ OumVrB/z9xtsAVgQjdaPGFZOFYfQ+7p/70Ja5ops6EdCFls9JsLE5tgv3zc3Ux2tX32m2W
+ pTOBQspT64g3vqgk+Y/8jum02dALfDA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-v5RqMEhwOZ2ey7MF6qjkUQ-1; Mon, 13 Jan 2020 13:00:52 -0500
+X-MC-Unique: v5RqMEhwOZ2ey7MF6qjkUQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FC481856A8E;
+ Mon, 13 Jan 2020 18:00:50 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 719885DA70;
+ Mon, 13 Jan 2020 18:00:44 +0000 (UTC)
+Date: Mon, 13 Jan 2020 19:00:42 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 12/16] arm/arm64: ITS: commands
+Message-ID: <20200113180042.ud53um575jsra2uf@kamzik.brq.redhat.com>
+References: <20200110145412.14937-1-eric.auger@redhat.com>
+ <20200110145412.14937-13-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200110145412.14937-13-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,93 +83,577 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 'Kevin Wolf' <kwolf@redhat.com>, peter.maydell@linaro.org,
- boost.lists@gmail.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, quintela@redhat.com,
- 'Markus Armbruster' <armbru@redhat.com>, qemu-devel@nongnu.org,
- 'Pavel Dovgalyuk' <pavel.dovgaluk@gmail.com>, maria.klimushenkova@ispras.ru,
- mst@redhat.com, kraxel@redhat.com, pavel.dovgaluk@ispras.ru,
- thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com,
- artem.k.pisarenko@gmail.com, dgilbert@redhat.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, thuth@redhat.com, kvm@vger.kernel.org,
+ maz@kernel.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ andre.przywara@arm.com, yuzenghui@huawei.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Jan 10, 2020 at 03:54:08PM +0100, Eric Auger wrote:
+> Implement main ITS commands. The code is largely inherited from
+> the ITS driver.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - removed its_print_cmd_state
+> ---
+>  arm/Makefile.common      |   2 +-
+>  lib/arm/asm/gic-v3-its.h |  35 +++
+>  lib/arm/gic-v3-its-cmd.c | 453 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 489 insertions(+), 1 deletion(-)
+>  create mode 100644 lib/arm/gic-v3-its-cmd.c
+> 
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 1aae5a3..7cc0f04 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -52,7 +52,7 @@ cflatobjs += lib/arm/psci.o
+>  cflatobjs += lib/arm/smp.o
+>  cflatobjs += lib/arm/delay.o
+>  cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
+> -cflatobjs += lib/arm/gic-v3-its.o
+> +cflatobjs += lib/arm/gic-v3-its.o lib/arm/gic-v3-its-cmd.o
+>  
+>  OBJDIRS += lib/arm
+>  
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> index 0497a78..463174f 100644
+> --- a/lib/arm/asm/gic-v3-its.h
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -58,6 +58,24 @@
+>  #define GITS_MAX_DEVICES		8
+>  #define GITS_MAX_COLLECTIONS		8
+>  
+> +/*
+> + * ITS commands
+> + */
+> +#define GITS_CMD_MAPD                   0x08
+> +#define GITS_CMD_MAPC                   0x09
+> +#define GITS_CMD_MAPTI                  0x0a
+> +/* older GIC documentation used MAPVI for this command */
+> +#define GITS_CMD_MAPVI                  GITS_CMD_MAPTI
+> +#define GITS_CMD_MAPI                   0x0b
+> +#define GITS_CMD_MOVI                   0x01
+> +#define GITS_CMD_DISCARD                0x0f
+> +#define GITS_CMD_INV                    0x0c
+> +#define GITS_CMD_MOVALL                 0x0e
+> +#define GITS_CMD_INVALL                 0x0d
+> +#define GITS_CMD_INT                    0x03
+> +#define GITS_CMD_CLEAR                  0x04
+> +#define GITS_CMD_SYNC                   0x05
+> +
+>  struct its_typer {
+>  	unsigned int ite_size;
+>  	unsigned int eventid_bits;
+> @@ -122,5 +140,22 @@ extern void its_enable_defaults(void);
+>  extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+>  extern struct its_collection *its_create_collection(u32 col_id, u32 target_pe);
+>  
+> +extern void its_send_mapd(struct its_device *dev, int valid);
+> +extern void its_send_mapc(struct its_collection *col, int valid);
+> +extern void its_send_mapti(struct its_device *dev, u32 irq_id,
+> +			   u32 event_id, struct its_collection *col);
+> +extern void its_send_int(struct its_device *dev, u32 event_id);
+> +extern void its_send_inv(struct its_device *dev, u32 event_id);
+> +extern void its_send_discard(struct its_device *dev, u32 event_id);
+> +extern void its_send_clear(struct its_device *dev, u32 event_id);
+> +extern void its_send_invall(struct its_collection *col);
+> +extern void its_send_movi(struct its_device *dev,
+> +			  struct its_collection *col, u32 id);
+> +extern void its_send_sync(struct its_collection *col);
+> +
+> +#define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
+> +#define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
+> +#define ITS_FLAGS_WORKAROUND_CAVIUM_23144       (1ULL << 2)
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/gic-v3-its-cmd.c b/lib/arm/gic-v3-its-cmd.c
+> new file mode 100644
+> index 0000000..9c6cbc6
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its-cmd.c
+> @@ -0,0 +1,453 @@
+> +/*
+> + * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
 
-(looping the list back in)
+2016?
 
-Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+> + *
+> + * Most of the code is copy-pasted from:
+> + * drivers/irqchip/irq-gic-v3-its.c
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/io.h>
+> +#include <asm/gic.h>
+> +
+> +#define ITS_ITT_ALIGN           SZ_256
+> +
+> +static const char * const its_cmd_string[] = {
+> +	[GITS_CMD_MAPD]		= "MAPD",
+> +	[GITS_CMD_MAPC]		= "MAPC",
+> +	[GITS_CMD_MAPTI]	= "MAPTI",
+> +	[GITS_CMD_MAPI]		= "MAPI",
+> +	[GITS_CMD_MOVI]		= "MOVI",
+> +	[GITS_CMD_DISCARD]	= "DISCARD",
+> +	[GITS_CMD_INV]		= "INV",
+> +	[GITS_CMD_MOVALL]	= "MOVALL",
+> +	[GITS_CMD_INVALL]	= "INVALL",
+> +	[GITS_CMD_INT]		= "INT",
+> +	[GITS_CMD_CLEAR]	= "CLEAR",
+> +	[GITS_CMD_SYNC]		= "SYNC",
+> +};
+> +
+> +struct its_cmd_desc {
+> +	union {
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 event_id;
+> +		} its_inv_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 event_id;
+> +		} its_int_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			bool valid;
+> +		} its_mapd_cmd;
+> +
+> +		struct {
+> +			struct its_collection *col;
+> +			bool valid;
+> +		} its_mapc_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 phys_id;
+> +			u32 event_id;
+> +			u32 col_id;
+> +		} its_mapti_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			struct its_collection *col;
+> +			u32 event_id;
+> +		} its_movi_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 event_id;
+> +		} its_discard_cmd;
+> +
+> +		struct {
+> +			struct its_device *dev;
+> +			u32 event_id;
+> +		} its_clear_cmd;
+> +
+> +		struct {
+> +			struct its_collection *col;
+> +		} its_invall_cmd;
+> +
+> +		struct {
+> +			struct its_collection *col;
+> +		} its_sync_cmd;
+> +	};
+> +};
+> +
+> +typedef void (*its_cmd_builder_t)(struct its_cmd_block *,
+> +				  struct its_cmd_desc *);
+> +
+> +/* ITS COMMANDS */
+> +
+> +static void its_encode_cmd(struct its_cmd_block *cmd, u8 cmd_nr)
+> +{
+> +	cmd->raw_cmd[0] &= ~0xffUL;
+> +	cmd->raw_cmd[0] |= cmd_nr;
+> +}
+> +
+> +static void its_encode_devid(struct its_cmd_block *cmd, u32 devid)
+> +{
+> +	cmd->raw_cmd[0] &= BIT_ULL(32) - 1;
+> +	cmd->raw_cmd[0] |= ((u64)devid) << 32;
+> +}
+> +
+> +static void its_encode_event_id(struct its_cmd_block *cmd, u32 id)
+> +{
+> +	cmd->raw_cmd[1] &= ~0xffffffffUL;
+> +	cmd->raw_cmd[1] |= id;
+> +}
+> +
+> +static void its_encode_phys_id(struct its_cmd_block *cmd, u32 phys_id)
+> +{
+> +	cmd->raw_cmd[1] &= 0xffffffffUL;
+> +	cmd->raw_cmd[1] |= ((u64)phys_id) << 32;
+> +}
+> +
+> +static void its_encode_size(struct its_cmd_block *cmd, u8 size)
+> +{
+> +	cmd->raw_cmd[1] &= ~0x1fUL;
+> +	cmd->raw_cmd[1] |= size & 0x1f;
+> +}
+> +
+> +static void its_encode_itt(struct its_cmd_block *cmd, u64 itt_addr)
+> +{
+> +	cmd->raw_cmd[2] &= ~0xffffffffffffUL;
+> +	cmd->raw_cmd[2] |= itt_addr & 0xffffffffff00UL;
+> +}
+> +
+> +static void its_encode_valid(struct its_cmd_block *cmd, int valid)
+> +{
+> +	cmd->raw_cmd[2] &= ~(1UL << 63);
+> +	cmd->raw_cmd[2] |= ((u64)!!valid) << 63;
+> +}
+> +
+> +static void its_encode_target(struct its_cmd_block *cmd, u64 target_addr)
+> +{
+> +	cmd->raw_cmd[2] &= ~(0xfffffffffUL << 16);
+> +	cmd->raw_cmd[2] |= (target_addr & (0xffffffffUL << 16));
+> +}
 
->> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
->> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->>=20
->> >> From: Markus Armbruster [mailto:armbru@redhat.com]
->> >> Kevin Wolf <kwolf@redhat.com> writes:
->> >>
->> >> > Am 09.01.2020 um 07:13 hat Pavel Dovgalyuk geschrieben:
->> >> >> Ping.
->> >> >
->> >> > I think you have my Acked-by for the block-related patches in this
->> >> > series now. If I missed something, please let me know.
->> >>
->> >> Pavel, whom are you nudging to do what?
->> >
->> > I'm not sure.
->> > My prior patches for record/replay were pulled by Paolo.
->> > But reverse debugging is more like a modification of things,
->> > and not a completely new subsystem.
->> > Everything but gdbstub was already acked by the maintainers.
->>=20
->> I'm having a look at the series now. What would help is if we can have
->> some sort of test case to ensure expected behaviour is protected. We
->> have a basic smoke test for record/replay and my gdbstub series:
->>=20
->>   https://github.com/stsquad/qemu/tree/gdbstub/sve-registers-v5
->>=20
->> introduces some infrastructure for testing thing via gdbstub. The main
->> thing needed now is some sort of gdb capability test to ensure the gdb
->> we are using supports whatever extensions it needs to work.
+Did you trying compiling arm (as opposed to arm64)? I see this file and
+the other ITS files are added to arm/Makefile.common, but I'd expect this
+to be a problem here, since it's UL instead of ULL.
+
+> +
+> +static void its_encode_collection(struct its_cmd_block *cmd, u16 col)
+> +{
+> +	cmd->raw_cmd[2] &= ~0xffffUL;
+> +	cmd->raw_cmd[2] |= col;
+> +}
+> +
+> +static inline void its_fixup_cmd(struct its_cmd_block *cmd)
+> +{
+> +	/* Let's fixup BE commands */
+> +	cmd->raw_cmd[0] = cpu_to_le64(cmd->raw_cmd[0]);
+> +	cmd->raw_cmd[1] = cpu_to_le64(cmd->raw_cmd[1]);
+> +	cmd->raw_cmd[2] = cpu_to_le64(cmd->raw_cmd[2]);
+> +	cmd->raw_cmd[3] = cpu_to_le64(cmd->raw_cmd[3]);
+> +}
+> +
+> +static u64 its_cmd_ptr_to_offset(struct its_cmd_block *ptr)
+> +{
+> +	return (ptr - its_data.cmd_base) * sizeof(*ptr);
+> +}
+> +
+> +static struct its_cmd_block *its_post_commands(void)
+> +{
+> +	u64 wr = its_cmd_ptr_to_offset(its_data.cmd_write);
+> +
+> +	writeq(wr, its_data.base + GITS_CWRITER);
+> +	return its_data.cmd_write;
+> +}
+> +
+> +
+> +/* We just assume the queue is large enough */
+
+Assert when the assuming is wrong?
+
+> +static struct its_cmd_block *its_allocate_entry(void)
+> +{
+> +	struct its_cmd_block *cmd;
+> +
+> +	cmd = its_data.cmd_write++;
+> +	return cmd;
+> +}
+> +
+> +static void its_wait_for_range_completion(struct its_cmd_block *from,
+> +					  struct its_cmd_block *to)
+> +{
+> +	u64 rd_idx, from_idx, to_idx;
+> +	u32 count = 1000000;    /* 1s! */
+> +
+> +	from_idx = its_cmd_ptr_to_offset(from);
+> +	to_idx = its_cmd_ptr_to_offset(to);
+> +	while (1) {
+> +		rd_idx = readq(its_data.base + GITS_CREADR);
+> +		if (rd_idx >= to_idx || rd_idx < from_idx)
+> +			break;
+> +
+> +		count--;
+> +		if (!count) {
+> +			unsigned int cmd_id = from->raw_cmd[0] & 0xFF;
+> +
+> +			report(false, "%s timeout!",
+> +			       cmd_id <= 0xF ? its_cmd_string[cmd_id] :
+> +			       "Unexpected");
+
+assert_msg, not report
+
+> +			return;
+> +		}
+> +		cpu_relax();
+> +		udelay(1);
+> +	}
+> +}
+> +
+> +static void its_send_single_command(its_cmd_builder_t builder,
+> +				    struct its_cmd_desc *desc)
+> +{
+> +	struct its_cmd_block *cmd, *next_cmd;
+> +
+> +	cmd = its_allocate_entry();
+> +	builder(cmd, desc);
+> +	next_cmd = its_post_commands();
+> +
+> +	its_wait_for_range_completion(cmd, next_cmd);
+> +}
+> +
+> +
+> +static void its_build_mapd_cmd(struct its_cmd_block *cmd,
+> +			       struct its_cmd_desc *desc)
+> +{
+> +	unsigned long itt_addr;
+> +	u8 size = 12; //TODO ilog2(desc->its_mapd_cmd.dev->nr_ites);
+> +
+> +	itt_addr = (unsigned long)desc->its_mapd_cmd.dev->itt;
+> +	itt_addr = ALIGN(itt_addr, ITS_ITT_ALIGN);
+> +
+> +	its_encode_cmd(cmd, GITS_CMD_MAPD);
+> +	its_encode_devid(cmd, desc->its_mapd_cmd.dev->device_id);
+> +	its_encode_size(cmd, size - 1);
+> +	its_encode_itt(cmd, itt_addr);
+> +	its_encode_valid(cmd, desc->its_mapd_cmd.valid);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("MAPD devid=%d size = 0x%x itt=0x%lx valid=%d",
+> +		    desc->its_mapd_cmd.dev->device_id,
+> +		    size, itt_addr, desc->its_mapd_cmd.valid);
+
+printf("ITS: ...\n", ...), not report_info
+
+> +
+> +}
+> +
+> +static void its_build_mapc_cmd(struct its_cmd_block *cmd,
+> +			       struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_MAPC);
+> +	its_encode_collection(cmd, desc->its_mapc_cmd.col->col_id);
+> +	its_encode_target(cmd, desc->its_mapc_cmd.col->target_address);
+> +	its_encode_valid(cmd, desc->its_mapc_cmd.valid);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("MAPC col_id=%d target_addr = 0x%lx valid=%d",
+> +		    desc->its_mapc_cmd.col->col_id,
+> +		    desc->its_mapc_cmd.col->target_address,
+> +		    desc->its_mapc_cmd.valid);
+> +}
+> +
+> +static void its_build_mapti_cmd(struct its_cmd_block *cmd,
+> +				struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_MAPTI);
+> +	its_encode_devid(cmd, desc->its_mapti_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_mapti_cmd.event_id);
+> +	its_encode_phys_id(cmd, desc->its_mapti_cmd.phys_id);
+> +	its_encode_collection(cmd, desc->its_mapti_cmd.col_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("MAPTI dev_id=%d event_id=%d -> phys_id=%d, col_id=%d",
+> +		    desc->its_mapti_cmd.dev->device_id,
+> +		    desc->its_mapti_cmd.event_id,
+> +		    desc->its_mapti_cmd.phys_id,
+> +		    desc->its_mapti_cmd.col_id);
+> +}
+> +
+> +static void its_build_invall_cmd(struct its_cmd_block *cmd,
+> +			      struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_INVALL);
+> +	its_encode_collection(cmd, desc->its_invall_cmd.col->col_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("INVALL col_id=%d", desc->its_invall_cmd.col->col_id);
+> +}
+> +
+> +static void its_build_clear_cmd(struct its_cmd_block *cmd,
+> +				struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_CLEAR);
+> +	its_encode_devid(cmd, desc->its_clear_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_clear_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("CLEAR col_id=%d", desc->its_invall_cmd.col->col_id);
+> +}
+> +
+> +static void its_build_discard_cmd(struct its_cmd_block *cmd,
+> +				  struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_DISCARD);
+> +	its_encode_devid(cmd, desc->its_discard_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_discard_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("DISCARD col_id=%d", desc->its_invall_cmd.col->col_id);
+> +}
+> +
+> +static void its_build_inv_cmd(struct its_cmd_block *cmd,
+> +			      struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_INV);
+> +	its_encode_devid(cmd, desc->its_inv_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_inv_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("INV dev_id=%d event_id=%d",
+> +		    desc->its_inv_cmd.dev->device_id,
+> +		    desc->its_inv_cmd.event_id);
+> +}
+> +
+> +static void its_build_int_cmd(struct its_cmd_block *cmd,
+> +			      struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_INT);
+> +	its_encode_devid(cmd, desc->its_int_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_int_cmd.event_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("INT dev_id=%d event_id=%d",
+> +		    desc->its_int_cmd.dev->device_id,
+> +		    desc->its_int_cmd.event_id);
+> +}
+> +
+> +static void its_build_sync_cmd(struct its_cmd_block *cmd,
+> +			       struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_SYNC);
+> +	its_encode_target(cmd, desc->its_sync_cmd.col->target_address);
+> +	its_fixup_cmd(cmd);
+> +	report_info("SYNC target_addr = 0x%lx",
+> +		    desc->its_sync_cmd.col->target_address);
+> +}
+> +
+> +static void its_build_movi_cmd(struct its_cmd_block *cmd,
+> +			       struct its_cmd_desc *desc)
+> +{
+> +	its_encode_cmd(cmd, GITS_CMD_MOVI);
+> +	its_encode_devid(cmd, desc->its_movi_cmd.dev->device_id);
+> +	its_encode_event_id(cmd, desc->its_movi_cmd.event_id);
+> +	its_encode_collection(cmd, desc->its_movi_cmd.col->col_id);
+> +
+> +	its_fixup_cmd(cmd);
+> +	report_info("MOVI dev_id=%d event_id = %d col_id=%d",
+> +		    desc->its_movi_cmd.dev->device_id,
+> +		    desc->its_movi_cmd.event_id,
+> +		    desc->its_movi_cmd.col->col_id);
+> +}
+> +
+> +void its_send_mapd(struct its_device *dev, int valid)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_mapd_cmd.dev = dev;
+> +	desc.its_mapd_cmd.valid = !!valid;
+> +
+> +	its_send_single_command(its_build_mapd_cmd, &desc);
+> +}
+> +
+> +void its_send_mapc(struct its_collection *col, int valid)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_mapc_cmd.col = col;
+> +	desc.its_mapc_cmd.valid = !!valid;
+> +
+> +	its_send_single_command(its_build_mapc_cmd, &desc);
+> +}
+> +
+> +void its_send_mapti(struct its_device *dev, u32 irq_id,
+> +		    u32 event_id, struct its_collection *col)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_mapti_cmd.dev = dev;
+> +	desc.its_mapti_cmd.phys_id = irq_id;
+> +	desc.its_mapti_cmd.event_id = event_id;
+> +	desc.its_mapti_cmd.col_id = col->col_id;
+> +
+> +	its_send_single_command(its_build_mapti_cmd, &desc);
+> +}
+> +
+> +void its_send_int(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_int_cmd.dev = dev;
+> +	desc.its_int_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(its_build_int_cmd, &desc);
+> +}
+> +
+> +void its_send_movi(struct its_device *dev,
+> +		   struct its_collection *col, u32 id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_movi_cmd.dev = dev;
+> +	desc.its_movi_cmd.col = col;
+> +	desc.its_movi_cmd.event_id = id;
+> +
+> +	its_send_single_command(its_build_movi_cmd, &desc);
+> +}
+> +
+> +void its_send_invall(struct its_collection *col)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_invall_cmd.col = col;
+> +
+> +	its_send_single_command(its_build_invall_cmd, &desc);
+> +}
+> +
+> +void its_send_inv(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_inv_cmd.dev = dev;
+> +	desc.its_inv_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(its_build_inv_cmd, &desc);
+> +}
+> +
+> +void its_send_discard(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_discard_cmd.dev = dev;
+> +	desc.its_discard_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(its_build_discard_cmd, &desc);
+> +}
+> +
+> +void its_send_clear(struct its_device *dev, u32 event_id)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_clear_cmd.dev = dev;
+> +	desc.its_clear_cmd.event_id = event_id;
+> +
+> +	its_send_single_command(its_build_clear_cmd, &desc);
+> +}
+> +
+> +void its_send_sync(struct its_collection *col)
+> +{
+> +	struct its_cmd_desc desc;
+> +
+> +	desc.its_sync_cmd.col = col;
+> +
+> +	its_send_single_command(its_build_sync_cmd, &desc);
+> +}
+> +
+> -- 
+> 2.20.1
 >
-> The smoke test may be rather easy:
-> 1. Execute qemu record with qcow2 image and rrsnapshot
-> 2. Start qemu replay with -S
-> 3. Connect gdb to qemu
-> 4. stepi
-> 5. break $pc
-> 6. Save pc to X
-> 7. stepi 10
-> 8. Save pc to Y
-> 9. stepi
-> 10. reverse-stepi
-> 11. pc should be Y
-> 12. reverse-continue
-> 13. pc should be X
->
-> Is it possible with your infrastructure?
 
-I think so - even if the reverse step instructions are not in the python
-API the script can always do:
+Thanks,
+drew 
 
- gdb.parse_and_eval("command")
-
-The main thing is ensuring probing the gdb for a version/feature first
-so we can safely exit and skip the test if the host gdb isn't capable.
-For the SVE testing I've had to use my own compiled version of GDB which
-is a little ugly:
-
- ~/lsrc/qemu.git/tests/guest-debug/run-test.py \
-   --qemu ./aarch64-linux-user/qemu-aarch64 \
-   --qargs "-cpu max" \
-   --bin ./tests/tcg/aarch64-linux-user/sve-ioctls \
-   --test ~/lsrc/qemu.git/tests/tcg/aarch64/gdbstub/test-sve-ioctl.py \
-   --gdb ~/src/tools/binutils-gdb.git/builds/all/install/bin/gdb
-
-We should probably wrap that up into the tests/tcg configure.sh code so
-the GDB used can persist with the build. Maybe via:
-
-  ./configure --with-gdb=3D~/src/tools/binutils-gdb.git/builds/all/install/=
-bin/gdb
-
---=20
-Alex Benn=C3=A9e
 
