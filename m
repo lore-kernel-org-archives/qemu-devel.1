@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ED9C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 00:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E44ECC33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 00:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7E0721556
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 00:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E0721556
+	by mail.kernel.org (Postfix) with ESMTPS id AC9B122314
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 00:36:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9B122314
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqnYm-0005VP-W4
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 19:26:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37069)
+	id 1iqniP-0008Lr-R5
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 19:36:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iqnY3-0004dQ-Ny
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 19:25:41 -0500
+ (envelope-from <bounces@canonical.com>) id 1iqnhd-0007dx-M5
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 19:35:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iqnY2-00064C-6x
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 19:25:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51514)
+ (envelope-from <bounces@canonical.com>) id 1iqnhc-0005dS-GA
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 19:35:33 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52218)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iqnY2-00060x-1Q
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 19:25:38 -0500
+ id 1iqnhc-0005bu-AF
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 19:35:32 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iqnY0-0002bR-GH
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 00:25:36 +0000
+ id 1iqnhb-00036J-Az
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 00:35:31 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 784CB2E80C0
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 00:25:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4E0352E8048
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 00:35:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 00:15:34 -0000
+Date: Mon, 13 Jan 2020 00:30:07 -0000
 From: Benjamin David Lunt <1859378@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,16 +54,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: fysnet
 X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
 X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
-Message-Id: <157887453515.27484.18206056235819884101.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1859378] [NEW] xhci Control Transfer requiring a Status TRB
- before starting transfer
+References: <157887453515.27484.18206056235819884101.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157887540723.27735.8742764027341861965.malone@chaenomeles.canonical.com>
+Subject: [Bug 1859378] Re: xhci Control Transfer requiring a Status TRB before
+ starting transfer
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a4f323dc915c2378cae7db3d85813514df792804
+X-Launchpad-Hash: f74b57fd213a5d9147edc68ccfcd2ef0467891e8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -82,48 +83,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Removing this check will indeed require a bit of a re-write.  The way
+the code is now, the transfer expects a SETUP packet to be first.  If
+you remove the check I ask about above, will the next transfer show that
+it is the STATUS packet?  If so, then the check at line 1696 will indeed
+catch and not allow the STATUS packet to be accepted.
 
-This may not necessarily be a bug, but more of a change.
+A little more work might need to be done to remove this check.
 
-A little background may need to be in order.
-
-With all USB Control transfers, there is a SETUP transfer, zero or more
-DATA transfers, and if successful, a STATUS transfer.  This STATUS
-transfer is used to indicate to the recipient that the previous
-transfers were successful.  For example, in a CONTROL IN transfer, the
-host sends a SETUP packet to the device, receives zero or more DATA
-packets, and then on successful transfer, the HOST sends the STATUS
-packet indicating to the device that all was received.
-
-If no DATA packets are received, the HOST is not to send a STATUS
-packet.  This could be due to a STALL or other error.
-
-With this in mind, the STATUS transfer, in this case an xHCI STATUS TRB,
-may not even be on the transfer ring yet.  The HOST software may be
-waiting for a successful transfer before it submits the STATUS transfer.
-
-However, if you look at the test at line 1701
-(https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-xhci.c#l1701), =
-the
-current code will not start the CONTROL transfer at all if it doesn't
-see that STATUS TRB on the ring.
-
-In my opinion, this is in error.  It is not required that a STATUS TRB
-be on the ring to start the CONTROL transfer.  This STATUS TRB can be
-placed on the ring after a successful SETUP and zero or more DATA
-transfers followed by a ring to the door bell.  Then after a successful
-transfer to this point, placing this STATUS TRB on the ring and another
-ring to the door bell.
-
-In my opinion, the check at line 1701 should be removed.
+It is just a request.
 
 Thank you,
 Ben
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
 
 -- =
 
