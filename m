@@ -2,87 +2,62 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D22DC33CAD
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7313BC33CAD
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 225DE2081E
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:36:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tXw94Lp0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225DE2081E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 473D220661
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 10:41:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 473D220661
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqx5P-0000Rs-8A
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 05:36:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55804)
+	id 1iqxA8-0002pz-AT
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 05:41:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iqx4l-00080T-69
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:36:04 -0500
+ (envelope-from <groug@kaod.org>) id 1iqx9V-0002PQ-Kr
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iqx4j-00008V-Iv
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:36:02 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37126)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iqx4j-00006q-Av
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:36:01 -0500
-Received: by mail-wm1-x341.google.com with SMTP id f129so9015779wmf.2
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 02:36:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KvwlEriwCS4WKo1aBJVweTtOEMd67yx3axHOa2dEAWg=;
- b=tXw94Lp0smHY/YMRA5gZlobVVDpXosuPHn0qzjqbUNqbSoDZQk19GGpxdtRbdudQXy
- MM52WCsYeskR5VxkJ34prDM+NMsgnQUC6c5f///pG7NWrMipK+3PdV8R8e6B7LZpAzx6
- oGxEp8pzhlYP3WtTvhdh8wEZcaXJAI9H75AaNMFMaSFe+PoHW1mz8LPZjrEDY02KHySN
- yLoT9r2v9DZoDane2ocEs4UM65FHeuXQGHrBfWy7w7y4ByNWRzXcy/7FuVu/LmJId5ED
- FdIozh5XCFCq93ND2TadpQyAv6+DpAXu0LZZ108NBWp/+KupXH4SEENbNB7lHrzTwQyO
- FgAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KvwlEriwCS4WKo1aBJVweTtOEMd67yx3axHOa2dEAWg=;
- b=k9IAgMk3nkYaQSW4Js/6kBjOUxH+gRNaij62ooC5PR/SXiGQgyjCv4xtyqpNAsrYf4
- 28v97bVz/EnOYWtxZ/6MovMuXDMBzMDDeWhQb5hB2MlP9k6pFlNPm6PHFddyLSD/bL4/
- 0KyqEjqI6bHfJYk1CAIXMCzALynKyjQddl8Wzbmu3xzzKKygNVCHX1e3htdTlXdQz5HU
- M+Wp9EJxIyYm5UonUMwLRJnS3hscetSpDiM7A80kMgDO9uPThIhC0qVVLv9/gjVznF4i
- wI0Fkyrx9h6QJSJ94IwMiDmA+iuDiv0eAO5Y4bRpI+Wn+xwIMc+rBuZvZAJ3gIS+a0iI
- ud1Q==
-X-Gm-Message-State: APjAAAUxK/U3AXcaUdCWUnj4VfXSR4/+RGwk6lybHc2KZ/dwxdkGRDJL
- OIjhJxp1yiB/bR3yPHuUGxExbA==
-X-Google-Smtp-Source: APXvYqyLeU6VPFLN65qMVYaXmIqDRVZ4Sp1+71v4TLxxGxD/6bHZyieMp4A3F6iB4JTluEswBuKo/g==
-X-Received: by 2002:a7b:c935:: with SMTP id h21mr18807239wml.173.1578911759563; 
- Mon, 13 Jan 2020 02:35:59 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q3sm15054788wrn.33.2020.01.13.02.35.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 02:35:58 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AF95D1FF87;
- Mon, 13 Jan 2020 10:35:57 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [qemu-web PATCH] documentation: update links to readthedocs
-Date: Mon, 13 Jan 2020 10:35:50 +0000
-Message-Id: <20200113103550.1133-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <groug@kaod.org>) id 1iqx9U-0003tl-9F
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:40:57 -0500
+Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:51893)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iqx9U-0003kB-2Y
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 05:40:56 -0500
+Received: from player696.ha.ovh.net (unknown [10.108.16.184])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2C24414B49A
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 11:40:45 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player696.ha.ovh.net (Postfix) with ESMTPSA id 31414E3135C8;
+ Mon, 13 Jan 2020 10:40:43 +0000 (UTC)
+Date: Mon, 13 Jan 2020 11:40:41 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v6 08/11] virtio-9p: introduce ERRP_AUTO_PROPAGATE
+Message-ID: <20200113114041.01cddb87@bahia.lan>
+In-Reply-To: <20200110194158.14190-9-vsementsov@virtuozzo.com>
+References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
+ <20200110194158.14190-9-vsementsov@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 5272870739592649043
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdejtddgudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 178.33.251.19
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,40 +69,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, thuth@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-..and extemporise a little about their state.
+On Fri, 10 Jan 2020 22:41:55 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- documentation.md | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+> If we want to add some info to errp (by error_prepend() or
+> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+> Otherwise, this info will not be added when errp == &error_fatal
+> (the program will exit prior to the error_append_hint() or
+> error_prepend() call).  Fix such cases.
+> 
+> If we want to check error after errp-function call, we need to
+> introduce local_err and then propagate it to errp. Instead, use
+> ERRP_AUTO_PROPAGATE macro, benefits are:
+> 1. No need of explicit error_propagate call
+> 2. No need of explicit local_err variable: use errp directly
+> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+>    &error_fatal, this means that we don't break error_abort
+>    (we'll abort on error_set, not on error_propagate)
+> 
+> This commit is generated by command
+> 
+>     sed -n '/^virtio-9p$/,/^$/{s/^F: //p}' MAINTAINERS | \
+>     xargs git ls-files | grep '\.[hc]$' | \
+>     xargs spatch \
+>         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>         --macro-file scripts/cocci-macro-file.h \
+>         --in-place --no-show-diff --max-width 80
+> 
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-diff --git a/documentation.md b/documentation.md
-index f4ef9f4..55d5db6 100644
---- a/documentation.md
-+++ b/documentation.md
-@@ -3,9 +3,12 @@ title: QEMU documentation
- permalink: /documentation/
- ---
- 
--The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be read online, courtesy of Stefan Weil.
--More documentation is found in the <a href="https://git.qemu.org/?p=qemu.git;a=tree;f=docs;hb=master">`docs`</a>
--directory of the QEMU git tree.
-+The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be
-+read online, courtesy of Stefan Weil. There is a partial set of
-+[developer documentation](https://qemu.readthedocs.io/en/latest/)
-+which is generated from the QEMU git tree. The process of converting
-+the rest of the [`docs`](https://git.qemu.org/?p=qemu.git;a=tree;f=docs;hb=master)
-+directory is ongoing.
- 
- The [QEMU wiki](https://wiki.qemu.org) contains more
- [user documentation](https://wiki.qemu.org/Category:User_documentation) and
--- 
-2.20.1
+Acked-by: Greg Kurz <groug@kaod.org>
+
+>  hw/9pfs/9p-local.c | 12 +++++-------
+>  hw/9pfs/9p.c       |  1 +
+>  2 files changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index ca641390fb..253814ef2c 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1481,10 +1481,10 @@ static void error_append_security_model_hint(Error *const *errp)
+>  
+>  static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      const char *sec_model = qemu_opt_get(opts, "security_model");
+>      const char *path = qemu_opt_get(opts, "path");
+>      const char *multidevs = qemu_opt_get(opts, "multidevs");
+> -    Error *local_err = NULL;
+>  
+>      if (!sec_model) {
+>          error_setg(errp, "security_model property not set");
+> @@ -1518,11 +1518,10 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+>              fse->export_flags &= ~V9FS_FORBID_MULTIDEVS;
+>              fse->export_flags &= ~V9FS_REMAP_INODES;
+>          } else {
+> -            error_setg(&local_err, "invalid multidevs property '%s'",
+> +            error_setg(errp, "invalid multidevs property '%s'",
+>                         multidevs);
+> -            error_append_hint(&local_err, "Valid options are: multidevs="
+> +            error_append_hint(errp, "Valid options are: multidevs="
+>                                "[remap|forbid|warn]\n");
+> -            error_propagate(errp, local_err);
+>              return -1;
+>          }
+>      }
+> @@ -1532,9 +1531,8 @@ static int local_parse_opts(QemuOpts *opts, FsDriverEntry *fse, Error **errp)
+>          return -1;
+>      }
+>  
+> -    if (fsdev_throttle_parse_opts(opts, &fse->fst, &local_err)) {
+> -        error_propagate_prepend(errp, local_err,
+> -                                "invalid throttle configuration: ");
+> +    if (fsdev_throttle_parse_opts(opts, &fse->fst, errp)) {
+> +        error_prepend(errp, "invalid throttle configuration: ");
+>          return -1;
+>      }
+>  
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 520177f40c..4200c3416b 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -3994,6 +3994,7 @@ void pdu_submit(V9fsPDU *pdu, P9MsgHeader *hdr)
+>  int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
+>                                 Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      int i, len;
+>      struct stat stat;
+>      FsDriverEntry *fse;
 
 
