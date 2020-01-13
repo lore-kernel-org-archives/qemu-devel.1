@@ -2,75 +2,64 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E223C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 02:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77250C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 02:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEC5B21744
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 02:01:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC5B21744
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 4BBB821556
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 02:23:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BBB821556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqp33-0000n6-4N
-	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 21:01:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50231)
+	id 1iqpO1-0006nz-H2
+	for qemu-devel@archiver.kernel.org; Sun, 12 Jan 2020 21:23:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39186)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iqp24-0000Mk-Vk
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 21:00:46 -0500
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iqpNP-0006Fw-Be
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 21:22:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iqp23-00010f-CA
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 21:00:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60518)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iqp23-0000yU-6D
- for qemu-devel@nongnu.org; Sun, 12 Jan 2020 21:00:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iqp22-0000Vx-68
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 02:00:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 10CBB2E80C8
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 02:00:42 +0000 (UTC)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iqpNN-0001LF-TS
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 21:22:47 -0500
+Received: from mga17.intel.com ([192.55.52.151]:6741)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iqpNN-0001E9-L1
+ for qemu-devel@nongnu.org; Sun, 12 Jan 2020 21:22:45 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 12 Jan 2020 18:22:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,427,1571727600"; d="scan'208";a="272913293"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by FMSMGA003.fm.intel.com with ESMTP; 12 Jan 2020 18:22:38 -0800
+Date: Mon, 13 Jan 2020 10:22:31 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH] migration/postcopy: not necessary to discard all RAM at
+ the beginning
+Message-ID: <20200113022231.GA14173@richard>
+References: <20191007091008.9435-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jan 2020 01:55:08 -0000
-From: Alex Longwall <1859384@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm gic
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alexlngw
-X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
-X-Launchpad-Bug-Modifier: Alex Longwall (alexlngw)
-References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
-Message-Id: <157888050906.23699.14396668155933796668.launchpad@wampee.canonical.com>
-Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
- race condition in gic_acknowledge_irq
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7ae8646e591cac2b57301a0774b5544df2628d7d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191007091008.9435-1-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,104 +68,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Summary changed:
 
-- arm gicv2: interrupt model never 1 on non-mpcore and race condition in gi=
-c_acknowledge_irq =
+Oops, this one seems to be missed.
 
-+ arm gic: interrupt model never 1 on non-mpcore and race condition in gic_=
-acknowledge_irq
+On Mon, Oct 07, 2019 at 05:10:08PM +0800, Wei Yang wrote:
+>ram_discard_range() unmap page for specific range. To be specific, this
+>clears related page table entries so that userfault would be triggered.
+>But this step is not necessary at the very beginning.
+>
+>ram_postcopy_incoming_init() is called when destination gets ADVISE
+>command. ADVISE command is sent when migration thread just starts, which
+>implies destination is not running yet. This means no page fault
+>happened and memory region's page tables entries are empty.
+>
+>This patch removes the discard at the beginning.
+>
+>Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>---
+> migration/postcopy-ram.c | 46 ----------------------------------------
+> migration/postcopy-ram.h |  7 ------
+> migration/ram.c          | 16 --------------
+> migration/ram.h          |  1 -
+> migration/savevm.c       |  4 ----
+> 5 files changed, 74 deletions(-)
+>
+>diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>index 5da6de8c8b..459be8e780 100644
+>--- a/migration/postcopy-ram.c
+>+++ b/migration/postcopy-ram.c
+>@@ -443,32 +443,6 @@ out:
+>     return ret;
+> }
+> 
+>-/*
+>- * Setup an area of RAM so that it *can* be used for postcopy later; this
+>- * must be done right at the start prior to pre-copy.
+>- * opaque should be the MIS.
+>- */
+>-static int init_range(RAMBlock *rb, void *opaque)
+>-{
+>-    const char *block_name = qemu_ram_get_idstr(rb);
+>-    void *host_addr = qemu_ram_get_host_addr(rb);
+>-    ram_addr_t offset = qemu_ram_get_offset(rb);
+>-    ram_addr_t length = qemu_ram_get_used_length(rb);
+>-    trace_postcopy_init_range(block_name, host_addr, offset, length);
+>-
+>-    /*
+>-     * We need the whole of RAM to be truly empty for postcopy, so things
+>-     * like ROMs and any data tables built during init must be zero'd
+>-     * - we're going to get the copy from the source anyway.
+>-     * (Precopy will just overwrite this data, so doesn't need the discard)
+>-     */
+>-    if (ram_discard_range(block_name, 0, length)) {
+>-        return -1;
+>-    }
+>-
+>-    return 0;
+>-}
+>-
+> /*
+>  * At the end of migration, undo the effects of init_range
+>  * opaque should be the MIS.
+>@@ -506,20 +480,6 @@ static int cleanup_range(RAMBlock *rb, void *opaque)
+>     return 0;
+> }
+> 
+>-/*
+>- * Initialise postcopy-ram, setting the RAM to a state where we can go into
+>- * postcopy later; must be called prior to any precopy.
+>- * called from arch_init's similarly named ram_postcopy_incoming_init
+>- */
+>-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+>-{
+>-    if (foreach_not_ignored_block(init_range, NULL)) {
+>-        return -1;
+>-    }
+>-
+>-    return 0;
+>-}
+>-
+> /*
+>  * Manage a single vote to the QEMU balloon inhibitor for all postcopy usage,
+>  * last caller wins.
+>@@ -1282,12 +1242,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>     return false;
+> }
+> 
+>-int postcopy_ram_incoming_init(MigrationIncomingState *mis)
+>-{
+>-    error_report("postcopy_ram_incoming_init: No OS support");
+>-    return -1;
+>-}
+>-
+> int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+> {
+>     assert(0);
+>diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+>index c0ccf64a96..1c79c6e51f 100644
+>--- a/migration/postcopy-ram.h
+>+++ b/migration/postcopy-ram.h
+>@@ -22,13 +22,6 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
+>  */
+> int postcopy_ram_incoming_setup(MigrationIncomingState *mis);
+> 
+>-/*
+>- * Initialise postcopy-ram, setting the RAM to a state where we can go into
+>- * postcopy later; must be called prior to any precopy.
+>- * called from ram.c's similarly named ram_postcopy_incoming_init
+>- */
+>-int postcopy_ram_incoming_init(MigrationIncomingState *mis);
+>-
+> /*
+>  * At the end of a migration where postcopy_ram_incoming_init was called.
+>  */
+>diff --git a/migration/ram.c b/migration/ram.c
+>index dfc50d57d5..9a853703d8 100644
+>--- a/migration/ram.c
+>+++ b/migration/ram.c
+>@@ -4015,22 +4015,6 @@ static int ram_load_cleanup(void *opaque)
+>     return 0;
+> }
+> 
+>-/**
+>- * ram_postcopy_incoming_init: allocate postcopy data structures
+>- *
+>- * Returns 0 for success and negative if there was one error
+>- *
+>- * @mis: current migration incoming state
+>- *
+>- * Allocate data structures etc needed by incoming migration with
+>- * postcopy-ram. postcopy-ram's similarly names
+>- * postcopy_ram_incoming_init does the work.
+>- */
+>-int ram_postcopy_incoming_init(MigrationIncomingState *mis)
+>-{
+>-    return postcopy_ram_incoming_init(mis);
+>-}
+>-
+> /**
+>  * ram_load_postcopy: load a page in postcopy case
+>  *
+>diff --git a/migration/ram.h b/migration/ram.h
+>index 44fe4753ad..66cbff1d52 100644
+>--- a/migration/ram.h
+>+++ b/migration/ram.h
+>@@ -58,7 +58,6 @@ void ram_postcopy_migrated_memory_release(MigrationState *ms);
+> int ram_postcopy_send_discard_bitmap(MigrationState *ms);
+> /* For incoming postcopy discard */
+> int ram_discard_range(const char *block_name, uint64_t start, size_t length);
+>-int ram_postcopy_incoming_init(MigrationIncomingState *mis);
+> bool postcopy_is_running(void);
+> 
+> void ram_handle_compressed(void *host, uint8_t ch, uint64_t size);
+>diff --git a/migration/savevm.c b/migration/savevm.c
+>index 9dc191e0a0..d2a427a3bf 100644
+>--- a/migration/savevm.c
+>+++ b/migration/savevm.c
+>@@ -1674,10 +1674,6 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis,
+>         return -1;
+>     }
+> 
+>-    if (ram_postcopy_incoming_init(mis)) {
+>-        return -1;
+>-    }
+>-
+>     return 0;
+> }
+> 
+>-- 
+>2.17.1
 
-** Tags removed: gicv2
-** Tags added: gic
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859384
-
-Title:
-  arm gic: interrupt model never 1 on non-mpcore and race condition in
-  gic_acknowledge_irq
-
-Status in QEMU:
-  New
-
-Bug description:
-  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
-  only one CPU can acknowledge the IRQ until it becomes inactive.
-
-  The TRM also mandates that SGIs and PPIs follow the N-N model and that
-  SPIs follow the 1-N model.
-
-  However this is not currently the case with QEMU. I have locally (no
-  minimal test case) seen e.g. uart interrupts being acknowledged twice
-  before having been deactivated (expected: irqId on one CPU and 1023 on
-  the other instead).
-
-  I have narrowed the issue down to the following:
-
-  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
-  means all IRQ will use the N-N model, and if s->revision !=3D
-  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
-
-  If ""fixed"" locally with a hackjob, I still have the following trace:
-
-  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
-  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
-=3D0xff
-  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
-  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
-  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
-  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
-  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
-  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
-  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
-  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
-  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
-=3D0xff
-  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
-  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
-  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
-  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
-21
-  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
-
-  This is because:
-
-  2) gic_acknowledge_irq calls gic_clear_pending which uses
-  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
-  sensitive interrupts.
-
-  With this often being a no-op (ie. assuming ispendr was not written
-  to), any 1-n level-sensitive interrupt is still improperly pending on
-  all the other cores.
-
-  (Also, I don't really know how the qemu thread model works, there
-  might be race conditions in the acknowledgment logic if
-  gic_acknowledge_irq is called by multiple threads, too.)
-
-  Option used:
-  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
--cpu cortex-a57 -smp 4 -m 1024
-  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
-get=3Dnative
-  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
-  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
-te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
-  -trace gic_set_irq
-
-  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
-  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
-  staging"
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
+-- 
+Wei Yang
+Help you, Help me
 
