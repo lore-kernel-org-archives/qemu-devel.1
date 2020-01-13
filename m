@@ -2,72 +2,90 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC11C33CA9
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32801C33CA9
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 085C9207FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F191A207FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 17:49:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="iYoidXjw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085C9207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tXDY+olw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F191A207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ir3ot-0000tr-7u
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:48:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44383)
+	id 1ir3qg-00046h-LF
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 12:49:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <olaf@aepfle.de>) id 1ir3nx-0008S8-Di
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:47:10 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ir3pL-0001zo-Sc
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:48:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <olaf@aepfle.de>) id 1ir3nw-0006dF-DI
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:47:09 -0500
-Received: from mo6-p01-ob.smtp.rzone.de ([2a01:238:20a:202:5301::11]:29498)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <olaf@aepfle.de>) id 1ir3nw-0006b9-6Q
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:47:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1578937626;
- s=strato-dkim-0002; d=aepfle.de;
- h=References:In-Reply-To:Message-ID:Subject:To:From:Date:
- X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
- bh=5osv5Z8x/E4h/Zk/q9Gps0qjPjy2cinqRfpLKcoRHqM=;
- b=iYoidXjw81zXPChC5wgiaiQymDlxSldvFYoU/I3fTCkXrm1fTgEkd97JPG8LQe+WUI
- lre7uyBhT48eHo6WPUYAgpQ9t1dItUsN8jihf7H63Zx6ihpdqmHii5vmMDTlgh/0JOTH
- 6jdZlwOFEvYwqgvmu6Mx+++qJANqJKyeRjZbX9KVeUDnhBjDf1f5eTz+gKO9dNRBWEO+
- 9cTpskAj0K5YTb1Jggm3nvT6kXNSwq9nPzRRtDA3CoJisG9hHxRK/JloYqGa2ihgDwIy
- v0IOUGqj7TWArcSKKhyeGLoztSwh2RxWlZPGgm6sps90HHLsj23jWplUN5NzWEr9L6Qe
- 8Awg==
-X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QED/SSGq+wjGiUC4AUztn93FPS2dyuY8phYg=="
-X-RZG-CLASS-ID: mo00
-Received: from sender by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
- with ESMTPSA id j08473w0DHl6HAq
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
- (Client did not present a certificate);
- Mon, 13 Jan 2020 18:47:06 +0100 (CET)
-Date: Mon, 13 Jan 2020 18:46:59 +0100
-From: Olaf Hering <olaf@aepfle.de>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson
- <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- qemu-devel@nongnu.org (open list:All patches CC here)
-Subject: Re: [PATCH v1] hw/i386: disable smbus migration for xenfv
-Message-ID: <20200113184659.38ee5ff1.olaf@aepfle.de>
-In-Reply-To: <20200113174521.3336-1-olaf@aepfle.de>
-References: <20200113174521.3336-1-olaf@aepfle.de>
-X-Mailer: Claws Mail 2019.12.31 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
+ (envelope-from <alex.bennee@linaro.org>) id 1ir3pK-0008UR-HU
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:48:35 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43237)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ir3pK-0008T3-A0
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 12:48:34 -0500
+Received: by mail-wr1-x441.google.com with SMTP id d16so9519093wre.10
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 09:48:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=4fHF5HpVc9enwxccEmFdnoK7Y79nJAeMYXHbgXFGnq4=;
+ b=tXDY+olwtt+n/MmdWrd+ZgOriTWBi70ZujIXks5lR/wpr11tCpdZ+knQdeZFXrLIYg
+ kWSG87WO6SfGb4kFWF+TeclhUa/ONF4qTS8I3xtyJCKYehaLSxiZymShLXQZKIEfmt3N
+ 0OwkyXLW33IESnHZFhKQTx53IqfWnXsOBzzakOERhIPAB+DyMloImLN36KWNpdQy1vbh
+ C3Fj/3GvHzBH3Y/gJl1LSAjHUcpIT4sl2Kmlgn73xpWsMV132UbwEs1Tq926zEac931X
+ SCxxR5Nnfngz+MaL/Z0VsinbMK+49Eypf5Ki9MtPrIpNCauhjP1Rq0PpwZlC7KgWSxm4
+ 1HFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=4fHF5HpVc9enwxccEmFdnoK7Y79nJAeMYXHbgXFGnq4=;
+ b=fPQKh37m+IUm1Gvzd5A7T+Q+gtugSohlCLE/V3bKjk6VDazHpcE5pMfK5hdnDBJjPQ
+ SduQLL7BZ7elHDhNxHOxSej6vp2Ock3C4AUz0JzVmtggC953A7xr7dwREZNBdAaxdNOe
+ 4I/anofIOypNZRjXBBaWrda4CFCHM2d7BXifhS2+SGz6ac+S64MDFAyh89IZekRT3tnZ
+ ldMR2IDKc/0wmKTxL1y2BvSN5qOp5IuT0+tNh/XtOxNGuep9ueVo9p3xxadE/LEzAzJo
+ nLHingI59lQ8CDTPld0/OAsuuyDHHBc5LyfFb2Y5ZOgXoeua1rt0szaGV/gsuyHyENW2
+ 7z9g==
+X-Gm-Message-State: APjAAAUT11lj1wijszR2lkKcct3O+TOXYIXVPzBALRa6e6wrgs0gBZwQ
+ 0FjGl5Qf4IZ33Jr9hBbPdMHNng==
+X-Google-Smtp-Source: APXvYqzUcbcyl1omXfuMfpOZJJZVNCpQu2mEK8CFNmwPe2bRlSIkui1C/EKqjADvCqeugs223So+8Q==
+X-Received: by 2002:a5d:410e:: with SMTP id l14mr19363838wrp.238.1578937712996; 
+ Mon, 13 Jan 2020 09:48:32 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f207sm16458935wme.9.2020.01.13.09.48.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 13 Jan 2020 09:48:31 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F3E221FF87;
+ Mon, 13 Jan 2020 17:48:30 +0000 (GMT)
+References: <157709434917.12933.4351155074716553976.stgit@pasha-Precision-3630-Tower>
+ <157709448356.12933.1621745423878239085.stgit@pasha-Precision-3630-Tower>
+User-agent: mu4e 1.3.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+Subject: Re: [for-5.0 PATCH 08/11] replay: flush rr queue before loading the
+ vmstate
+In-reply-to: <157709448356.12933.1621745423878239085.stgit@pasha-Precision-3630-Tower>
+Date: Mon, 13 Jan 2020 17:48:30 +0000
+Message-ID: <87y2ubmemp.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/k3Z4JWlanmuko1U0+YPR42y"; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 2a01:238:20a:202:5301::11
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,43 +97,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
+ pbonzini@redhat.com, crosthwaite.peter@gmail.com, ciro.santilli@gmail.com,
+ jasowang@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, maria.klimushenkova@ispras.ru, mst@redhat.com,
+ kraxel@redhat.com, boost.lists@gmail.com, thomas.dullien@googlemail.com,
+ dovgaluk@ispras.ru, mreitz@redhat.com, artem.k.pisarenko@gmail.com,
+ dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/k3Z4JWlanmuko1U0+YPR42y
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Am Mon, 13 Jan 2020 18:45:21 +0100
-schrieb Olaf Hering <olaf@aepfle.de>:
+Pavel Dovgalyuk <pavel.dovgaluk@gmail.com> writes:
 
-> commit 7fccf2a06890e3bc3b30e29827ad3fb93fe88fea forgot to handle xenpv
+> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>
+> Non-empty record/replay queue prevents saving and loading the VM state,
+> because it includes pending bottom halves and block coroutines.
+> But when the new VM state is loaded, we don't have to preserve the consis=
+tency
+> of the current state anymore. Therefore this patch just flushes the queue
+> allowing the coroutines to finish and removes checking for empty rr queue
+> for load_snapshot function.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> ---
+>  include/sysemu/replay.h  |    2 ++
+>  migration/savevm.c       |   12 ++++++------
+>  replay/replay-internal.h |    2 --
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+> index e00ed2f4a5..239c01e7df 100644
+> --- a/include/sysemu/replay.h
+> +++ b/include/sysemu/replay.h
+> @@ -149,6 +149,8 @@ void replay_disable_events(void);
+>  void replay_enable_events(void);
+>  /*! Returns true when saving events is enabled */
+>  bool replay_events_enabled(void);
+> +/* Flushes events queue */
+> +void replay_flush_events(void);
+>  /*! Adds bottom half event to the queue */
+>  void replay_bh_schedule_event(QEMUBH *bh);
+>  /* Adds oneshot bottom half event to the queue */
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index ae84bf6ab0..0c5cac372a 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2834,12 +2834,6 @@ int load_snapshot(const char *name, Error **errp)
+>      AioContext *aio_context;
+>      MigrationIncomingState *mis =3D migration_incoming_get_current();
+>=20=20
+> -    if (!replay_can_snapshot()) {
+> -        error_setg(errp, "Record/replay does not allow loading snapshot "
+> -                   "right now. Try once more later.");
+> -        return -EINVAL;
+> -    }
+> -
+>      if (!bdrv_all_can_snapshot(&bs)) {
+>          error_setg(errp,
+>                     "Device '%s' is writable but does not support snapsho=
+ts",
+> @@ -2873,6 +2867,12 @@ int load_snapshot(const char *name, Error **errp)
+>          return -EINVAL;
+>      }
+>=20=20
+> +    /*
+> +     * Flush the record/replay queue. Now the VM state is going
+> +     * to change. Therefore we don't need to preserve its consistency
+> +     */
+> +    replay_flush_events();
+> +
+<snip>
 
-Actually it is xenFv, but you get the idea.
+This is the commit that introduces:
 
-Olaf
+  ERROR:/home/alex.bennee/lsrc/qemu.git/replay/replay-events.c:80:replay_fl=
+ush_events:
+  assertion failed: (replay_mutex_locked())
 
---Sig_/k3Z4JWlanmuko1U0+YPR42y
-Content-Type: application/pgp-signature
-Content-Description: Digitale Signatur von OpenPGP
+To the already failing:
 
------BEGIN PGP SIGNATURE-----
+  /bin/sh -c "cd builds/all && make -j4 && cd tests/qemu-iotests && ./check=
+ -qcow2 267"
 
-iQIzBAEBCAAdFiEE97o7Um30LT3B+5b/86SN7mm1DoAFAl4crRMACgkQ86SN7mm1
-DoDfUg/8DEF2ZqL+AaCkfanVYurJDqTLbShJxlVRFLdXho+s2tJ1XyUG3BNqcVZS
-BywQwP9LnxV36187RReWTpP6dKfwS+rzsIU5eFnGfNw0LGohZvv4AIipiKMf1Dit
-0H+ciUqH9vlCzKhB/hl2ate+Bxg+NzZl7r2e4hXhgESsy9GM2v+7J3rYdBuFJuXN
-fQ2i2Qp7tUF++Ni59CdnPxp5pRczNQGLhZ6Q/m+Ic0AENjx0VYJXux9L6MIaUawq
-nh3EUV5lEOfNlpCy/56dZ33NrfhCgEUD8VoODpC4ZizM+78cF3fB5emYMmLj2Xuc
-uhbNapLblt/NN/i+1jO7XklxgKbSye0GreF5Qa3FLWw5ZPOCohFA8VeesBKu/3p1
-ZryGviNwjYrWTCgNY2egracifvHz++YfeGPxRdVMg+ZrC7V4Oo+RI6GgJsebn1GA
-2Y1LoABOkmP+8bA4zaSEyBrXSs/hq1Y657MTXPlNvW/vCEwSQ1gVcUqd+xgNairl
-BRYAFwYCTwMzMDV8kTxiKu2o09yeak3twyGXswDv2Pt+xKSmjJ+5a3xe2V9USkDO
-h1A5d4vFKlimYIyClyNXIW/wjmVz/pFkx8kOOE0/c5UxJ3Rj7Ffr13vQBNVcT4f/
-potvxbnL/CeuNzeJ6B6vPhbOYs68L9ImsXF7Tb+ulBSpOw7UST0=
-=YjJp
------END PGP SIGNATURE-----
+test case.
 
---Sig_/k3Z4JWlanmuko1U0+YPR42y--
+--=20
+Alex Benn=C3=A9e
 
