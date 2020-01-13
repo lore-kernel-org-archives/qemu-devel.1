@@ -2,80 +2,79 @@ Return-Path: <SRS0=PCRa=3C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B57C33CA8
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 08:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E013C33CA8
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 08:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D76B620678
-	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 08:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4980020678
+	for <qemu-devel@archiver.kernel.org>; Mon, 13 Jan 2020 08:57:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjyNLkR7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D76B620678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MAwoyYFk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4980020678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47321 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iqvRf-0002Zz-Vt
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 03:51:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43392)
+	id 1iqvXo-0004kZ-EK
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 03:57:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pdurrant@gmail.com>) id 1iqvQZ-0001hp-O6
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 03:50:28 -0500
+ (envelope-from <pdurrant@gmail.com>) id 1iqvXB-0004GW-1L
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 03:57:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pdurrant@gmail.com>) id 1iqvQY-0004kN-GZ
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 03:50:27 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45768)
+ (envelope-from <pdurrant@gmail.com>) id 1iqvX9-0005c4-Ul
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 03:57:16 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:32949)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <pdurrant@gmail.com>)
- id 1iqvQY-0004fW-9t; Mon, 13 Jan 2020 03:50:26 -0500
-Received: by mail-pl1-x644.google.com with SMTP id b22so3549662pls.12;
- Mon, 13 Jan 2020 00:50:23 -0800 (PST)
+ id 1iqvX9-0005aV-NT; Mon, 13 Jan 2020 03:57:15 -0500
+Received: by mail-pg1-x543.google.com with SMTP id 6so4401560pgk.0;
+ Mon, 13 Jan 2020 00:57:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=L1SKSUAyoD/bHOLJkon4lyQ5GdcL2lV4qAInB435n8c=;
- b=LjyNLkR7Qv+wJCQHCAT43JYwfTl+f9ihM3ALPFf56ZmfzCTarCGdSkSHe5sAeG4xT2
- 8Ijp7HtX716s/+Gd8IGnxg1850eDaOvH2kuiBErWUvZ8NL9EBuRx5hK7rj+MXdUkQBPA
- chEz0/IyaBkHeo62pPI5Xi8K0HfCgeCX0GJVHUPQBcNdIuWRUKfzOXnZjbgRm035bGYZ
- hfXkNQ1SpljfObfN+lis+8uk3KsRO3OA9IX85t8OTlarfABlnPKozde9N2Wwtq7xolid
- 5Q623h7Njc+42wrHFnDq85r4e79QQ2bcw9YtNLeaEpwifS9Bf6Jb37KMzD0J9V+uJtxB
- hNgw==
+ :cc; bh=IEIZnTuW8clF6RD08mgp42pBTUtM58PRkfUOgRWL1zo=;
+ b=MAwoyYFkYHarEBVWbgItJtmHobiSNg2kU3HDC8JaQkwa72f7q5OTKh3xuBfGFjXaOY
+ gljLSbgWqSUAWoeeusiBcp3OKcZKo/DztS4IAXmW/RCCl4zjvymU9quzuXQHadS6rehm
+ pnkysXv6jzdj3qlv1N4cJE2VTUusHarSUFp6bdlbg7DB+vuj37AM9bBG5JliI0yh0t3L
+ aFxj9qTMAR6UTfKESWpXF4p+ErMpXNg6uDDAp0d4o9wYHfPrqzuwxez3rXDd62FOyuVp
+ XBU51pvBiNXgYtV7Lksh28ibaiXGQNC6pLAVP9kJGdQhLQmwXBwhCiQ6SNZZNWsNMXDG
+ bp6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=L1SKSUAyoD/bHOLJkon4lyQ5GdcL2lV4qAInB435n8c=;
- b=SeBqM54L8DOGMylzEY6G4soLNpU47RLkNoY9GJRjq2xC9ze/nG2HhMJvYWoRHiR8oP
- +b2bRMcQxC5WmZDGqcLfbarUmjcywqqPk+HY9Q+Ls7DLIRoaHh6zrjMATB9pO6/N6BV7
- qWB34RyB+LmFdKIE5/k9gTFyZJqGhC5frczRELHMMMpguQgmQq5IvqQk0QUrKCSpNiRU
- v4vjuSWDCEz8/EGTL7p7JWuw0PhDhT78iJebg7eqWUUi/qY2tVKwjR6pBrPwP+8qjZKr
- O9bsDwS8zJ98hNDuSOSWiWkDdVUbu18Y21oxep/HUYk5m/rqVVIZ6jidriKfduJwD6xu
- wIOw==
-X-Gm-Message-State: APjAAAVeZEjxg5VxP9YvW61bGYSGB2KkpBVNdm+Mm5ohSiaVGIKIP/YK
- TeSVPNrZKuDmU3r+gqwPfzU7t5+IoYH7pKByVco=
-X-Google-Smtp-Source: APXvYqy6W8yd0QUxnJYi/zVBl+awg1E5YRwX4vixK8CCy4auxM5lf9WVJcShGpD8J0a35k8jH6CrhDCKhcsd+ZBTixk=
-X-Received: by 2002:a17:902:be0c:: with SMTP id
- r12mr19207296pls.148.1578905422751; 
- Mon, 13 Jan 2020 00:50:22 -0800 (PST)
+ bh=IEIZnTuW8clF6RD08mgp42pBTUtM58PRkfUOgRWL1zo=;
+ b=qmotIPmov4CPyjLOPqefusNcdxDO/44mBA8wspOcBw3/Lnd/Nnw8UoVFemsBCJjexq
+ yLoIW5yXSZBBZFhTRgnz+b1aDJHgK06NlFqUC7sqsa3/RDo5L0aKBtu4WU6IDL0mxaU+
+ ewW5hjsgfwBeUVTIcjAzw07ZORrTUqXWpwKMNWQKhib3aUPoDbCeUiGJYVAuipg8regV
+ zvzHcLYI1a5rdSmlejTrQnMthcmChXCaM3/o4d9BCoPCQnZEolVwO7zo1roKxP9pIpQZ
+ L4ZC5nPfbPrTtyG32IQnzFBHL/iqelCLF+pDMEVbE4DgyjNpZ0QU+NvBaqsbzvXnaDbR
+ B37Q==
+X-Gm-Message-State: APjAAAXTR/Dh4J+iiitnvUplDW33OlZCy/BPVyovezPSYIzwf2k8hcgF
+ JeBpSGHd7bU2HqOpWThZeC3/GxbENCCzkR0RTjA=
+X-Google-Smtp-Source: APXvYqycorsm/yA2OqspdZCTdPrvz2wmqVS8037juslfs38oUSoLXQdSzBJX38dVrQY8BTs7z62X6zDN4wnntI85UDA=
+X-Received: by 2002:a63:220b:: with SMTP id i11mr19393702pgi.50.1578905834622; 
+ Mon, 13 Jan 2020 00:57:14 -0800 (PST)
 MIME-Version: 1.0
 References: <20200110194158.14190-1-vsementsov@virtuozzo.com>
- <20200110194158.14190-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20200110194158.14190-3-vsementsov@virtuozzo.com>
+ <20200110194158.14190-12-vsementsov@virtuozzo.com>
+In-Reply-To: <20200110194158.14190-12-vsementsov@virtuozzo.com>
 From: Paul Durrant <pdurrant@gmail.com>
-Date: Mon, 13 Jan 2020 08:50:11 +0000
-Message-ID: <CACCGGhD+v3cPdrU0ZCctO3SCpN7yHJcd9=J6AwTrrYWZdHrTZA@mail.gmail.com>
-Subject: Re: [PATCH v6 02/11] error: auto propagated local_err
+Date: Mon, 13 Jan 2020 08:57:03 +0000
+Message-ID: <CACCGGhA78D7TVQdj-wrr=hWmFN+kefS_7zLm4UHBkx0ZHh8maA@mail.gmail.com>
+Subject: Re: [PATCH v6 11/11] xen: introduce ERRP_AUTO_PROPAGATE
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,57 +87,44 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Laszlo Ersek <lersek@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Greg Kurz <groug@kaod.org>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>,
  Stefan Hajnoczi <stefanha@redhat.com>,
  Anthony Perard <anthony.perard@citrix.com>,
- xen-devel <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+ xen-devel <xen-devel@lists.xenproject.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Fri, 10 Jan 2020 at 19:42, Vladimir Sementsov-Ogievskiy
 <vsementsov@virtuozzo.com> wrote:
-[snip]
-> +/*
-> + * ERRP_AUTO_PROPAGATE
-> + *
-> + * This macro is created to be the first line of a function which use
-> + * Error **errp parameter to report error. It's needed only in cases where we
-> + * want to use error_prepend, error_append_hint or dereference *errp. It's
-> + * still safe (but useless) in other cases.
-> + *
-> + * If errp is NULL or points to error_fatal, it is rewritten to point to a
-> + * local Error object, which will be automatically propagated to the original
-> + * errp on function exit (see error_propagator_cleanup).
-> + *
-> + * After invocation of this macro it is always safe to dereference errp
-> + * (as it's not NULL anymore) and to add information (by error_prepend or
-> + * error_append_hint)
-> + * (as, if it was error_fatal, we swapped it with a local_error to be
-> + * propagated on cleanup).
-> + *
-> + * Note: we don't wrap the error_abort case, as we want resulting coredump
-> + * to point to the place where the error happened, not to error_propagate.
-> + */
-> +#define ERRP_AUTO_PROPAGATE()                                  \
-> +    g_auto(ErrorPropagator) _auto_errp_prop = {.errp = errp};  \
-> +    errp = ((errp == NULL || *errp == error_fatal)             \
-
-Perhaps !errp rather than errp == NULL, for brevity.
-
-  Paul
-
-> +            ? &_auto_errp_prop.local_err : errp)
-> +
->  /*
->   * Special error destination to abort on error.
->   * See error_setg() and error_propagate() for details.
-> --
-> 2.21.0
 >
+> If we want to add some info to errp (by error_prepend() or
+> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+> Otherwise, this info will not be added when errp == &error_fatal
+> (the program will exit prior to the error_append_hint() or
+> error_prepend() call).  Fix such cases.
+>
+> If we want to check error after errp-function call, we need to
+> introduce local_err and then propagate it to errp. Instead, use
+> ERRP_AUTO_PROPAGATE macro, benefits are:
+> 1. No need of explicit error_propagate call
+> 2. No need of explicit local_err variable: use errp directly
+> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+>    &error_fatal, this means that we don't break error_abort
+>    (we'll abort on error_set, not on error_propagate)
+>
+> This commit is generated by command
+>
+>     sed -n '/^X86 Xen CPUs$/,/^$/{s/^F: //p}' MAINTAINERS | \
+>     xargs git ls-files | grep '\.[hc]$' | \
+>     xargs spatch \
+>         --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>         --macro-file scripts/cocci-macro-file.h \
+>         --in-place --no-show-diff --max-width 80
+>
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Acked-by: Paul Durrant <paul@xen.org>
 
