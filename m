@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC955C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E01ACC33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86059207E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:15:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADC8C24681
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:16:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kr2JJZ5Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86059207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K4bGHv/x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC8C24681
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNuy-0003xV-5c
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:15:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37805)
+	id 1irNw8-0005KS-09
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:16:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1irNpY-00059B-L7
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:09 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1irNpk-0005SF-Ni
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1irNpT-0007QS-JT
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:08 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39654)
+ (envelope-from <alex.bennee@linaro.org>) id 1irNpj-0007go-AA
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:20 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45515)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1irNpT-0007PJ-DZ
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:03 -0500
-Received: by mail-wm1-x343.google.com with SMTP id 20so14121583wmj.4
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:10:03 -0800 (PST)
+ id 1irNpj-0007Yx-15
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:19 -0500
+Received: by mail-wr1-x443.google.com with SMTP id j42so12479288wrj.12
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:10:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rUFyb2y1MbKjceLsHfsc5550yIlmEuHV9I8+VOakZH4=;
- b=kr2JJZ5Qc/xyq/YPtiB+ZBtcQxsje3d4twQIAGLq5Rk8tGDIKL1FM63Udn9wyiOn8L
- Z1JeJI1RI3VvBnLqxEe1Q12x0ecy2I43g5CX+G1/HBHW44UdK24Vl3R0OfR0m5PWEOMn
- 9THLulA3wKpM2rB7b4F5FBpNlK1v6LuY9Dzj9VZ52w/vqTM+TBDV+Hsn4WJBueNldBNh
- yAigllRSru74vr7drS4T+V9j7MgFP1nbrPCw4Z3nI26zLpmuQXFDUdwAlWfC6dbeixPa
- TeEv/H55uPLEpiWUBsMYBmsZM9RUZp0moXFhU86bQ5aSKQD6DZlI40eamUj2PQTDJRdd
- 2c6g==
+ bh=anlfnB/asVkTJ6RtskIPp90azP/8H+sHTGGY0UbzreY=;
+ b=K4bGHv/xQxqrTpz/FO5r/p0qqat5XJ9cHKNgajOby8XNuyQzd3zh1/L4BaTd+6FA6d
+ BxCqzaIoJ9CYKDl12zIL8Odvi7Apzf4oPLoBTRMmqwiOwDv+PKNtAtdfm2vdScNUngmm
+ Q2tg2G/MlG0ZAXugONgei1cQWDlWd/Epzr53yWMKshfhbpIXeYO/w63axPK9JnQpI6q9
+ /X56kCn/mL0UvgEj37O6Oki8Ro2KLJOebwsAS8aL/hO7c8m2FJoFlIYwPCBuXiGrtNjh
+ StldL2VahypN3idKTPoLJCHhhPrYxFIGH59YgelDmZZqU8IWulR+uYIj6RVGXhIA+p5g
+ YJ9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rUFyb2y1MbKjceLsHfsc5550yIlmEuHV9I8+VOakZH4=;
- b=jq2u5L63WVJXkiza652nAwwkaVcn7My0w7c80QcTNuPzUC0dJSNKUnjR+PGIjbPqZf
- Jvd3XJQHIq5l/L1XFY6DLPGw0ba2j+Ch/7O0EqHCmAM6pQRy4nAX8hTljAQEsKB+5BwL
- PMBaN9gIwA6pCyUVGeRwmTlZ7RpdCbScSd6QY9oHxJSZxjQTtvaOq+KcbudK8RE7+PfX
- cu25nLrPLjQJ2fBDJazFtM1Z9AyD+pDta0sUD8qYMYnEevHbR3GJywqxVrXVlxoUOe2Y
- yYQW3dN5SIaCb/dZvnUZi+HW1EGGzVK2h/FRuX01DCtmTDqCuJpwV0gydIz0GU0qCVcJ
- tavw==
-X-Gm-Message-State: APjAAAUErNW8EBgFeEC6kec8lK9YafDKP7xhIyowHUT/VqgwUZ3hJKof
- /yW2KvF/NmUMminyshWPjw9/4g==
-X-Google-Smtp-Source: APXvYqyPPfMAK9p2BejuSWjVCkJpSTki8a4BTvUOAtL6SX42UlCZfgSKQvtmJEMtmKmoCy7UNxkDxw==
-X-Received: by 2002:a7b:c084:: with SMTP id r4mr26314704wmh.99.1579014602497; 
- Tue, 14 Jan 2020 07:10:02 -0800 (PST)
+ bh=anlfnB/asVkTJ6RtskIPp90azP/8H+sHTGGY0UbzreY=;
+ b=e2Cii8XCtSrUEZk3em5QLUcqjWPFitbKaBvskTTz/ynUrAi4f64uuHC38uuWMAAbCZ
+ lcEd88lVLl7A5g7MxAwBFV8X6pbmYWX/OjWUIChrvL/217AahyY8cSJel116vyfR4V9G
+ SoR1JHUvC0MbFPaNBW3F4UIdbeShnEb59tREILau/xdwOuqFlrilOGClr48/Bjmn8UPj
+ /UlfyUgwzSZBzhSUjukOKLYOgEe3CsZTmqeMI2CXgAts1KM1gnjkGygo8z1mdcH4/MxM
+ YVBT0sUscLGn+1bp7Tf1u4zJQG7045CYe5DfNMjPCmp2P71BD3XwBlOMC6HAjJQO8ZmK
+ 4Znw==
+X-Gm-Message-State: APjAAAXOsKQ71s75pNVIWacdlcLDbez4vX5bpk1M/qUIUokSJx2xokt0
+ vQfntuEG+PR4DAAyCXUIQCtuGA==
+X-Google-Smtp-Source: APXvYqx8aPeZAa5gP1bUwmmzsgi2v1cxVe4V+wRbiSJlTrpHfOFGT8ui4x/nRkgJMeERruuPaV6+ig==
+X-Received: by 2002:a5d:6408:: with SMTP id z8mr25868916wru.122.1579014610055; 
+ Tue, 14 Jan 2020 07:10:10 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n10sm19824230wrt.14.2020.01.14.07.09.56
+ by smtp.gmail.com with ESMTPSA id t81sm18850690wmg.6.2020.01.14.07.10.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 07:09:58 -0800 (PST)
+ Tue, 14 Jan 2020 07:10:05 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 640CB1FF92;
- Tue, 14 Jan 2020 15:09:54 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 7D5B71FF9D;
+ Tue, 14 Jan 2020 15:09:56 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v5 05/22] gdbstub: add helper for 128 bit registers
-Date: Tue, 14 Jan 2020 15:09:36 +0000
-Message-Id: <20200114150953.27659-6-alex.bennee@linaro.org>
+Subject: [PATCH v5 14/22] target/arm: don't bother with id_aa64pfr0_read for
+ USER_ONLY
+Date: Tue, 14 Jan 2020 15:09:45 +0000
+Message-Id: <20200114150953.27659-15-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200114150953.27659-1-alex.bennee@linaro.org>
 References: <20200114150953.27659-1-alex.bennee@linaro.org>
@@ -84,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,47 +97,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For system emulation we need to check the state of the GIC before we
+report the value. However this isn't relevant to exporting of the
+value to linux-user and indeed breaks the exported value as set by
+modify_arm_cp_regs.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
 ---
 v2
-  - take care of endianess of the whole 128 bit word
+  - extend the ifdef and make type CONST with no accessfn
 ---
- include/exec/gdbstub.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ target/arm/helper.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-index 08363969c1..59e366ba3a 100644
---- a/include/exec/gdbstub.h
-+++ b/include/exec/gdbstub.h
-@@ -102,6 +102,19 @@ static inline int gdb_get_reg64(uint8_t *mem_buf, uint64_t val)
-     return 8;
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 7dae067b3d..79cad7aad1 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5924,6 +5924,7 @@ static uint64_t id_pfr1_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     return pfr1;
  }
  
-+static inline int gdb_get_reg128(uint8_t *mem_buf, uint64_t val_hi,
-+                                 uint64_t val_lo)
-+{
-+#ifdef TARGET_WORDS_BIGENDIAN
-+    stq_p(mem_buf, val_hi);
-+    stq_p(mem_buf + 8, val_lo);
-+#else
-+    stq_p(mem_buf, val_lo);
-+    stq_p(mem_buf + 8, val_hi);
++#ifndef CONFIG_USER_ONLY
+ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     ARMCPU *cpu = env_archcpu(env);
+@@ -5934,6 +5935,7 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     }
+     return pfr0;
+ }
 +#endif
-+    return 16;
-+}
-+
- #if TARGET_LONG_BITS == 64
- #define gdb_get_regl(buf, val) gdb_get_reg64(buf, val)
- #define ldtul_p(addr) ldq_p(addr)
+ 
+ /* Shared logic between LORID and the rest of the LOR* registers.
+  * Secure state has already been delt with.
+@@ -6426,16 +6428,24 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+          * define new registers here.
+          */
+         ARMCPRegInfo v8_idregs[] = {
+-            /* ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST because we don't
+-             * know the right value for the GIC field until after we
+-             * define these regs.
++            /*
++             * ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST in system
++             * emulation because we don't know the right value for the
++             * GIC field until after we define these regs.
+              */
+             { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
+-              .access = PL1_R, .type = ARM_CP_NO_RAW,
++              .access = PL1_R,
++#ifdef CONFIG_USER_ONLY
++              .type = ARM_CP_CONST,
++              .resetvalue = cpu->isar.id_aa64pfr0
++#else
++              .type = ARM_CP_NO_RAW,
+               .accessfn = access_aa64_tid3,
+               .readfn = id_aa64pfr0_read,
+-              .writefn = arm_cp_write_ignore },
++              .writefn = arm_cp_write_ignore
++#endif
++            },
+             { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
+               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
+               .access = PL1_R, .type = ARM_CP_CONST,
 -- 
 2.20.1
 
