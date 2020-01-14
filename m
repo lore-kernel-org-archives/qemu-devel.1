@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2FBBC33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22841C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:49:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D5724680
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:43:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D5724680
+	by mail.kernel.org (Postfix) with ESMTPS id E82E32072B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:49:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E82E32072B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNQ1-0002Tp-P5
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:43:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33132)
+	id 1irNVS-0005Vm-VL
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:49:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNOh-0001Ms-Rs
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:42:24 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irNUm-00053y-3v
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:48:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNOe-0003BO-6a
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:42:23 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:56623)
+ (envelope-from <laurent@vivier.eu>) id 1irNUi-0004Nw-Dc
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:48:39 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:44385)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNOd-00039u-UN
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:42:20 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNUi-0004Ni-4R
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:48:36 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MYvoW-1jDK711ruK-00Unts; Tue, 14 Jan 2020 15:42:03 +0100
-Subject: Re: [PATCH v5 17/20] linux-user: Add support for FDGETFDCSTAT ioctl
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MHX3R-1ivWLK19bV-00DXGr; Tue, 14 Jan 2020 15:48:19 +0100
+Subject: Re: [PATCH v5 18/20] configure: Detect kcov support and introduce
+ CONFIG_KCOV
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-18-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1578947683-21011-19-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <6752dfe8-00b7-838a-0b1b-39f4a3970951@vivier.eu>
-Date: Tue, 14 Jan 2020 15:42:02 +0100
+Message-ID: <aafe279b-769b-aaaa-7ec5-a8035b743acd@vivier.eu>
+Date: Tue, 14 Jan 2020 15:48:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-18-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1578947683-21011-19-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:heLaHCjlddbaIS6rOyNqMffiMGgD7pJmICW/M9Dt8yCmHE4oT3V
- ZM++UFUC5i+TuZz5gONxAhAPmGXNLvIHPVjqc6UIldymLYl7jMwOo4LXmSSAEN5/3nFTEJO
- dL4VXX2ciZOVOVlW8DnP+GpWnr03ywsXTTgE5gbhywi3PK0hbQSclPh3pUnk89CS8NVr6C2
- TEV1oWvXBcxiRjGT5Gm5w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:PlOR1ZMCD+w=:NdoAq87qWa+YrnudWUDY6/
- +WfzTygoA08llUwHOKsgMXwKiZl5JuLQNw1TbU0QTJQJ39nkW8KoZ6O49U9OBgZc05nrnxOwy
- 7s7TE3OCXFFH5IOfi0oQPu5ud9zMiaNqeJBaf6kTR/8Ie8rvMsDSEiaSJmQUbEqGM7fMTikmq
- zJMI7bl9CaWhW7ykZqUzw7mo5wgIBIah1GGbEtY7RpZcbvPDmfucYsEpUko9W+PfstE7fb+bk
- TMJGGVdkPNPjxhrUqeo9YXS2iOcmIjTqhHf4POS5b50sJq7K2ZcwmgXXZIp64elnJzyx4GeIS
- RhD00+fIGXik1pfPktD0Yb+0YxL0lY4janwCA7fPTFgGTQZwssFQJawiCLwEVtGZ0iuAfHM9T
- Md0rxTTHtRsJv+z4rP8UF12FXbxXWFA5g3/TqrIMwA4mw/7Xdikg1U9XCbnaGkdL+xoL0dn53
- oKpTx8rZ5lWy47Fck0ow9UuUA/vPfZ1p5korhVahKo9jlVRV98sJfQVpRpW+TnDLHNdKAihCt
- GdJBraQQGQ6P+SQfXJLZFD8bW93lnNNWoQNKzcBNtiKhmXnEy5TIGovb7pL5aeohuLmh3ktMk
- dafY0reEC5JH71KLGciokdp8e7ibqoo8Kk/br3T3b+j4SVc4J4cLJn/x98IUmlaQ72YM/Dv/Q
- YWPjw1Vl5iDzeBrCuRY1M8W211MSuVHUwNQylzNuUF9KJ3nT/CJujeKWz3Ekbc2CvL00DxbSu
- 9iLUr8tYqjsBZLsoumdnH7fcGqXxINwmYdNQf7ZeL7DguXs7B471js2iWv2OalN9cKaGRUpI+
- 1HOg1eGIKykDPnrLelGLnbOt7GM0pJWFCvN8y7LXu4yRY9K6UtDe8RHvvNkO02prV0ta+SYDv
- aONXlrcZVqhxPmngzTpXD0kbW+m4AcoQ/gqldq1PI=
+X-Provags-ID: V03:K1:2GkKkqoCzyI74ILno45mnI8vuS6iz6VVKTBqRVu55lrjEKz+YSe
+ 4poOzBTftsOBpyHyaZAvtjYEKvtY27DSeGAGQIIGV+DrGknDCQw2qlLkK85O2tnXK1FecUm
+ oWG5Hdx/89EVPZUF2RVBWT676U3yrNiLw3Qg8+EqfQsp/plnHEbY1W6S3HrqAkt1gGKzLfa
+ SJLkYgLc7huNAB3FyQsOg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9GiAqqQHFbs=:nfiRxDpRtRvKhlT9MjgVNE
+ f9Xe0sGoAFrOSGWeLvA5pyjqk7Vw1gNP6VDENIyCXKdXG+P5LK1BptkpIF8w+59kBQEd8lavC
+ e71+m4Kx0BuDNu+jCqktZwCiS2CiOSTYaOd9jcHs0NQPR8FNPwKbRYE5yK/Dv8mCJJgjPCiOZ
+ M0ljKcZ4EJn0UCOblcMz8He9M+U8Kbn94jszk4co8iOdPRBj2C0vBd3OHlPWopwz8InK0pYtg
+ /CVWpT1wQKnHPMCDonE7tYpuscoEXo2w/VfD2Ohyg5WhQvTYcwLg39xs/sTw0nmQ/5T3hd6Sv
+ RsguMBz53gsy55GSzL8x5yxzHIkCF/Z2DgyhaDwNSnm1DQ5+zH3Lmb6hV3rr6Cw1gR+dzVxbZ
+ cHgYVXvRyO4V2HZXfkwzM71lmdAE/3+3FpQ1gyDONAtyQcQrmf1UBTl7xmzzwRh/XySQjKGrM
+ ZiPuHwdwHX8D+RRBun7HqZC4+15rfO/JN/mJSjG2WMH9gbrD1Cd0weL8+LPIfAlo3AMD5JsDE
+ onYWovcGjpGSffmo01qZLpP2sT3DAL6eX6n7ugq1TRuddPl2O7eZ/LuwyFCTI8DHq95Ve8Xs8
+ ljU33Csitst7/CBZLxdgHL/fxrjCkTR5AFwsd8Bl6Pmwk+H6Jx1eMcyYLnEHt/gkyEGHQ4FBw
+ 8G5Zy0jof+Enu4iTomtRJTT1n4u6OKIaAViRHqHc92sba9BhlNG+O36Inz/8ol1/f2MeESHSM
+ 2Qxqq4Gdb7GxuNFNALcR5IyiV9nqkMGnQW6WMd60MmDSQXMJ+YN5bp99FFo3J7fJ6x41kHxKn
+ PaA/xUopmm63C3YtiSzAwdz2veq3p3aO4Kh2RpIIHZ+mW/kVopubEhA5IAWywwSiwuCLQJosE
+ iNdWKC1V7dZOK39HMSVg==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,68 +132,48 @@ Sender: "Qemu-devel"
 Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> FDGETFDCSTAT's third agrument is a pointer to the structure:
+> kcov is kernel code coverage tracing tool. It requires kernel 4.4+
+> compiled with certain kernel options. Its interface consists of
+> three ioctls.
 > 
-> struct floppy_fdc_state {
->     int spec1;
->     int spec2;
->     int dtr;
->     unsigned char version;
->     unsigned char dor;
->     unsigned long address;
->     unsigned int rawcmd:2;
->     unsigned int reset:1;
->     unsigned int need_configure:1;
->     unsigned int perp_mode:2;
->     unsigned int has_fifo:1;
->     unsigned int driver_version;
->     unsigned char track[4];
-> };
-> 
-> defined in Linux kernel header <linux/fd.h>.
-> 
-> Since there is a fields of the structure of type 'unsigned long', there is
-> a need to define "target_format_descr". Also, five fields rawcmd, reset,
-> need_configure, perp_mode, and has_fifo are all just bitfields and are
-> part od a single 'unsigned int' field.
+> This patch checks if kcov support is present on build machine, and
+> stores the result in variable CONFIG_KCOV, meant to be used in
+> linux-user code related to the support for above mentioned ioctls.
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  linux-user/ioctls.h        |  2 ++
->  linux-user/syscall_defs.h  | 18 ++++++++++++++++++
->  linux-user/syscall_types.h | 12 ++++++++++++
->  3 files changed, 32 insertions(+)
+>  configure | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index e754a6b..d72cd76 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -122,6 +122,8 @@
->       IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
->       IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
->       IOCTL(FDRESET, 0, TYPE_NULL)
-> +     IOCTL(FDGETFDCSTAT, IOC_R,
-> +           MK_PTR(MK_STRUCT(STRUCT_target_floppy_fdc_state)))
->       IOCTL(FDRAWCMD, 0, TYPE_NULL)
->       IOCTL(FDTWADDLE, 0, TYPE_NULL)
->       IOCTL(FDEJECT, 0, TYPE_NULL)
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index d85ab46..225dcfb 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -897,6 +897,23 @@ struct target_pollfd {
+> diff --git a/configure b/configure
+> index 940bf9e..dbdba8f 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4752,6 +4752,24 @@ if compile_prog "" "" ; then
+>    syncfs=yes
+>  fi
 >  
->  /* From <linux/fd.h> */
->  
-> +struct target_floppy_fdc_state {
-> +    int spec1;      /* spec1 value last used */
-> +    int spec2;      /* spec2 value last used */
-> +    int dtr;
-> +    unsigned char version;  /* FDC version code */
-> +    unsigned char dor;
-> +    abi_long address;  /* io address */
+> +# check for kcov support (kernel must be 4.4+, compiled with certain options)
+> +kcov=no
+> +cat > $TMPC << EOF
+> +#include <sys/kcov.h>
+> +
+> +int main(void)
+> +{
+> +    ioctl(-1, KCOV_ENABLE, NULL);
+> +    ioctl(-1, KCOV_DISABLE, NULL);
+> +    ioctl(-1, KCOV_INIT_TRACE, NULL);
+> +
+> +    return 0;
+> +}
+> +EOF
+> +if compile_prog "" "" ; then
+> +  kcov=yes
+> +fi
 
-s/abi_long/abi_ulong/
+Perhaps a 'check_include sys/kcov.h' is enough?
+
+All these defines are present since the first release of the file.
 
 Thanks,
 Laurent
