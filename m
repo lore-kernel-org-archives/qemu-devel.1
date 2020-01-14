@@ -2,82 +2,85 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D227DC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A21C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DE3024672
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54F4824680
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r8GZRRFe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE3024672
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7mjmYva"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F4824680
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irMtA-0003ga-7M
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:09:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54668)
+	id 1irMty-0004p2-6D
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:10:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1irMsH-0002iS-VD
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:08:55 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1irMsb-0003D9-Ae
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1irMsG-0007od-M6
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:08:53 -0500
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37946)
+ (envelope-from <coiby.xu@gmail.com>) id 1irMsY-00085c-8Z
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:13 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39237)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1irMsG-0007nI-GH
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:08:52 -0500
-Received: by mail-pg1-x541.google.com with SMTP id a33so6444350pgm.5
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 06:08:51 -0800 (PST)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1irMsY-00084y-06
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:10 -0500
+Received: by mail-pf1-x444.google.com with SMTP id q10so6638894pfs.6
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 06:09:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=eqpHpcBHEyjdo/6G7dO0iakVYP03mTE30OY47PRFuaw=;
- b=r8GZRRFeMC1PGSmggHdcECJhk4UAVeRdMySbq74E0jIJGAZt92BlnK2IwUTy2WS7A9
- VWyrCWuKPgT1YZ2u0oDCPCgurMea3wU+hszc7d/ohQMCnytcNXGcdECF33b55vV4Kp9V
- tp8JFCNetdHByAJXiXYLabiD9KOTyVvwicr5PSubiirGAkfffF0qwkSCW3l1WGfjbwpU
- mng7kzTo1ge5h8XkAA2ezIMSnbm7qtTfsnBaKu3+y1b32LuApl77AL9FHLby7/VFcoXc
- Gf4OvhpUgE4bNE1xBWhcFwr3HMVBtwXZg83wMkXAjDYcydAF5fo1g5jejigagq30d8Xp
- JY+Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=GXYOj+U3hSVlshxwvSlfIFI4FVfmQN4qlRQUjp4L3yQ=;
+ b=Y7mjmYva97pXNuTf+yaTXaat2icHcRUdnG5peuHL8sMssp0J9tlMDIm67TywwqxwV8
+ 0O2p8wP0ictJPuMLwMms1MSl8p287s3uRfqzVsU7ve26132w6Sij/eIbEZJAfpH7/EtZ
+ s28jpKo4TqNjrEfZom+4eVqhpQh3BQhnvbmy9qSJhClNejzOO2+QloXlZYCQlT69kf9K
+ nKlr5wI6paMSs1am8d6gFa1eqIMXl0Tt6Pnb4tuBzShr8jdRnkjkrfuziYng5owWMjgR
+ CXfvJZxvhl2FXpn8c/fTBb0d8p4OkURggVwMBuU/0GuiSHbyRzWSEZ/y4nz6Ijcs9h8f
+ L5DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=eqpHpcBHEyjdo/6G7dO0iakVYP03mTE30OY47PRFuaw=;
- b=PpzvXpP07GeDuy0WIAtlAGuNcfN0/nlBjxqmaNE3YCioQtKYnvngU+UpxhOqW+C0BN
- DTH80ledy2QVwEBTk2LxWa8Tx4z6QVOr/DGuGajogFjCRfOgDep+DeUr2BjnWthWHZ0i
- PPwAgxx+REUtfYu+roxudbsugQQ6Rp9srs8Bq+C5E/AbsBrAQ1ftj1KbQifn9xbjmPLL
- Ms+usNqrZqlCqIudRjcPd3WHVrjQyvV6oxjnoY/VMHkfJCxdrK45iFKfhOZ/b+Suuu7n
- nJuXW+PWfVrMyGAXlMvDRf+sHUXG58h/I+n5qxjUq4PpZMWd14HqGtNUz8fwkGcm8G25
- V+Hg==
-X-Gm-Message-State: APjAAAWR5OwtVeD9Ja9NLg0FPL6SZEG/AspK/NdFklSgrqVevodHrdYU
- S6M+vVtFRL5ik+gp/oixGCST2UUY8a4Jng==
-X-Google-Smtp-Source: APXvYqzcASPZrXMUfutlKAAtUON3/pnua1JB27hfFGlCuQD5OPhvWXX8BPdHcO3PYBGzASaJzRE6EQ==
-X-Received: by 2002:aa7:98d0:: with SMTP id e16mr24723326pfm.77.1579010930361; 
- Tue, 14 Jan 2020 06:08:50 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=GXYOj+U3hSVlshxwvSlfIFI4FVfmQN4qlRQUjp4L3yQ=;
+ b=MzcRpi5gRpylAZNnHet62ZEnix7CzNXii4gCQ7Ziv/5qv90mfWvSMeTujHeKzym8ic
+ RnLm0UFSiIbloqcxivaEDXynk0PPYari4LWEL2P+t4Uh7NYNliRR58KJToYS4Ssvoqyp
+ c3WLm+zjetvwgPfvV7HmJTOT9RVCPefek4jTLQmTb3YVeiUv2UDJ16eo69AP2RVYOwt9
+ Dd4+1DS5m7pbozJ2xin9llcm2FAfAGBUylupp4t+ut2qkznnHG6ZBuPuxXYDGdsgJGwC
+ TFF9NtMmhegbzMCD3e7nrcMbNicD94oaQgeAgBS8PCiO3N9Vc7I3nfpw/l7kk5b3ALS5
+ r9Wg==
+X-Gm-Message-State: APjAAAWewQwfjQLrCe91owaS32DVL5d1+xeCHuHkKeXBY8lrAvT/jYKn
+ RsM7i67+fRd4STgI5+yU8U4PXLMtvbiE/g==
+X-Google-Smtp-Source: APXvYqx+zGkNgcb//AYNJDZVrxOc7j3KZldu0mGO2x+AApqeamjgBXdP5CJcOwlZVhy9WJkx0/e9IQ==
+X-Received: by 2002:aa7:98ca:: with SMTP id e10mr25754714pfm.24.1579010948233; 
+ Tue, 14 Jan 2020 06:09:08 -0800 (PST)
 Received: from localhost.localdomain ([175.124.145.172])
- by smtp.googlemail.com with ESMTPSA id a17sm17264773pjv.6.2020.01.14.06.08.46
+ by smtp.googlemail.com with ESMTPSA id a17sm17264773pjv.6.2020.01.14.06.09.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 06:08:49 -0800 (PST)
+ Tue, 14 Jan 2020 06:09:07 -0800 (PST)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/5] vhost-user block device backend implementation
-Date: Tue, 14 Jan 2020 22:06:15 +0800
-Message-Id: <20200114140620.10385-1-coiby.xu@gmail.com>
+Subject: [PATCH v2 1/5] vhost-user block device backend
+Date: Tue, 14 Jan 2020 22:06:16 +0800
+Message-Id: <20200114140620.10385-2-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200114140620.10385-1-coiby.xu@gmail.com>
+References: <20200114140620.10385-1-coiby.xu@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,58 +98,1098 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
- * Only enable this feauture for Linux for eventfd is a Linux-specific
-   feature
+By making use of libvhost, multiple block device drives can be exported and each drive can serve multiple clients simultaneously. Since vhost-user-server needs a block drive to be created first, delay the creation of this object.
 
-This patch series is an implementation of vhost-user-backend server, thanks to Stefan's guidance after reviewing the draft version and the instructions on https://wiki.qemu.org/Google_Summer_of_Code_2019#vhost-user-blk_device_backend,
-
-Vhost-user-backend server is a UserCreatable object and can be started using object_add,
-
- (qemu) object_add vhost-user-server,id=ID,unix_socket=/tmp/vhost-user-blk_vhost.socket,name=DRIVE_NAME,writable=off
- (qemu) object_del ID
-
-or appending the "-object" option when starting QEMU,
-
-  $ -object vhost-user-server,id=disk,unix_socket=/tmp/vhost-user-blk_vhost.socket,name=disk,writable=off
-
-Then vhost-user client can connect to the server backend. For example, QEMU could act as a client,
-  $ -m 256 -object memory-backend-memfd,id=mem,size=256M,share=on -numa node,memdev=mem -chardev socket,id=char1,path=/tmp/vhost-user-blk_vhost.socket -device vhost-user-blk-pci,id=blk0,chardev=char1
-
-And guest OS could access this vhost-user block device after mouting it.
-
-patches are against commit 035eed4c0d257c905a556fa0f4865a0c077b4e7f.
-
-Coiby Xu (5):
-  vhost-user block device backend
-  extend libvhost to support IOThread
-  a standone-alone tool to directly share disk image file via vhost-user
-    protocol
-  new qTest case for the vhost-user-blk device backend
-  building configuration files changes
-
- Makefile                              |    1 +
- Makefile.objs                         |    2 +-
- Makefile.target                       |    1 +
- blockdev-vu.c                         | 1008 +++++++++++++++++++++++++
- configure                             |    2 +-
- contrib/libvhost-user/libvhost-user.c |   64 +-
- contrib/libvhost-user/libvhost-user.h |   36 +-
- include/block/vhost-user.h            |   46 ++
- qemu-vu.c                             |  264 +++++++
- tests/Makefile.include                |    5 +-
- tests/libqos/vhost-user-blk.c         |  125 +++
- tests/libqos/vhost-user-blk.h         |   44 ++
- tests/vhost-user-blk-test.c           |  691 +++++++++++++++++
- vl.c                                  |    4 +
- 14 files changed, 2277 insertions(+), 16 deletions(-)
+Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
+---
+ blockdev-vu.c              | 1008 ++++++++++++++++++++++++++++++++++++
+ include/block/vhost-user.h |   46 ++
+ vl.c                       |    4 +
+ 3 files changed, 1058 insertions(+)
  create mode 100644 blockdev-vu.c
  create mode 100644 include/block/vhost-user.h
- create mode 100644 qemu-vu.c
- create mode 100644 tests/libqos/vhost-user-blk.c
- create mode 100644 tests/libqos/vhost-user-blk.h
- create mode 100644 tests/vhost-user-blk-test.c
 
+diff --git a/blockdev-vu.c b/blockdev-vu.c
+new file mode 100644
+index 0000000000..45f0bb43a7
+--- /dev/null
++++ b/blockdev-vu.c
+@@ -0,0 +1,1008 @@
++#include "qemu/osdep.h"
++#include "block/vhost-user.h"
++#include "qapi/error.h"
++#include "qapi/qapi-types-sockets.h"
++#include "qapi/qapi-commands-block.h"
++
++#include "sysemu/block-backend.h"
++#include "qemu/main-loop.h"
++
++#include "qemu/units.h"
++
++#include "block/block.h"
++
++#include "qom/object_interfaces.h"
++
++#include <sys/eventfd.h>
++
++#include "hw/qdev-properties.h"
++enum {
++    VHOST_USER_BLK_MAX_QUEUES = 8,
++};
++
++struct virtio_blk_inhdr {
++    unsigned char status;
++};
++
++
++static QTAILQ_HEAD(, VubDev) vub_devs = QTAILQ_HEAD_INITIALIZER(vub_devs);
++
++
++typedef struct VubReq {
++    VuVirtqElement *elem;
++    int64_t sector_num;
++    size_t size;
++    struct virtio_blk_inhdr *in;
++    struct virtio_blk_outhdr out;
++    VuClient *client;
++    struct VuVirtq *vq;
++} VubReq;
++
++static void
++remove_watch(VuDev *vu_dev, int fd)
++{
++    VuClient *client;
++
++    g_assert(vu_dev);
++    g_assert(fd >= 0);
++
++    client = container_of(vu_dev, VuClient, parent);
++    aio_set_fd_handler(client->blk->ctx, fd, false, NULL, NULL, NULL, NULL);
++}
++
++static void close_client(VuClient *client)
++{
++    vu_deinit(&client->parent);
++    /** g_source_destroy(vub_device->parent.src); */
++    client->sioc = NULL;
++    object_unref(OBJECT(client->ioc));
++    client->closed = true;
++
++}
++
++static void vub_panic_cb(VuDev *vu_dev, const char *buf)
++{
++    if (buf) {
++        g_warning("vu_panic: %s", buf);
++    }
++
++    VuClient *client = container_of(vu_dev, VuClient, parent);
++    if (client->blk->exit_panic) {
++        client->blk->close = true;
++    }
++    if (!client->closed) {
++        close_client(client);
++    }
++}
++
++
++static void vub_req_complete(VubReq *req)
++{
++    VuDev *vu_dev = &req->client->parent;
++
++    /* IO size with 1 extra status byte */
++    vu_queue_push(vu_dev, req->vq, req->elem,
++                  req->size + 1);
++    vu_queue_notify(vu_dev, req->vq);
++
++    if (req->elem) {
++        free(req->elem);
++    }
++
++    g_free(req);
++}
++
++
++
++static int
++vub_discard_write_zeroes(VubReq *req, struct iovec *iov, uint32_t iovcnt,
++                         uint32_t type)
++{
++    struct virtio_blk_discard_write_zeroes *desc;
++    ssize_t size;
++    void *buf;
++
++    size = iov_size(iov, iovcnt);
++    if (size != sizeof(*desc)) {
++        fprintf(stderr, "Invalid size %ld, expect %ld\n", size, sizeof(*desc));
++        return -1;
++    }
++    buf = g_new0(char, size);
++
++    iov_to_buf_full(iov, iovcnt, 0, buf, size);
++
++
++    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
++    VubDev *vdev_blk;
++    VuClient *client = container_of(dev, VuClient, parent);
++    vdev_blk = client->blk;
++    desc = (struct virtio_blk_discard_write_zeroes *)buf;
++    uint64_t range[2] = { le64toh(desc->sector) << 9,
++                          le32toh(desc->num_sectors) << 9 };
++    if (type == VIRTIO_BLK_T_DISCARD) {
++        if (blk_pdiscard(vdev_blk->blk, range[0], range[1]) == 0) {
++            g_free(buf);
++            return 0;
++        }
++    } else if (type == VIRTIO_BLK_T_WRITE_ZEROES) {
++        if (blk_pwrite_zeroes(vdev_blk->blk, range[0], range[1]) == 0) {
++            g_free(buf);
++            return 0;
++        }
++    }
++    #endif
++
++    g_free(buf);
++    return -1;
++}
++
++
++static void
++vub_flush(VubReq *req)
++{
++    VuClient *client = req->client;
++    blk_co_flush(client->blk->backend);
++}
++
++
++#define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
++typedef struct BlkRwCo {
++    BlockBackend *blk;
++    int64_t offset;
++    void *iobuf;
++    int ret;
++    BdrvRequestFlags flags;
++} BlkRwCo;
++
++static void blk_read_entry(void *opaque)
++{
++    BlkRwCo *rwco = opaque;
++    QEMUIOVector *qiov = rwco->iobuf;
++
++    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
++                              qiov, rwco->flags);
++    aio_wait_kick();
++}
++
++
++static void blk_write_entry(void *opaque)
++{
++    BlkRwCo *rwco = opaque;
++    QEMUIOVector *qiov = rwco->iobuf;
++
++    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
++                              qiov, rwco->flags);
++    aio_wait_kick();
++}
++
++
++static int blk_prw(BlockBackend *blk, QEMUIOVector *qiov, int64_t offset,
++                   CoroutineEntry co_entry, BdrvRequestFlags flags)
++{
++
++    BlkRwCo rwco = {
++        .blk    = blk,
++        .offset = offset,
++        .iobuf  = qiov,
++        .flags  = flags,
++        .ret    = NOT_DONE,
++    };
++
++    if (qemu_in_coroutine()) {
++        /* Fast-path if already in coroutine context */
++        co_entry(&rwco);
++    } else {
++        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
++        bdrv_coroutine_enter(blk_bs(blk), co);
++        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
++    }
++
++    return rwco.ret;
++}
++
++
++static ssize_t
++vub_rwv(VubReq *req, struct iovec *iov,
++        uint32_t iovcnt,
++        CoroutineEntry co_entry)
++{
++    VuClient *client = req->client;
++    ssize_t rc;
++
++    if (!iovcnt) {
++        fprintf(stderr, "Invalid Read/Write IOV count\n");
++        return -1;
++    }
++
++    int64_t offset = req->sector_num * 512;
++    QEMUIOVector *qiov = g_new0(QEMUIOVector, 1);
++    qemu_iovec_init_external(qiov, iov, iovcnt);
++    rc = blk_prw(client->blk->backend, qiov, offset, co_entry, 0);
++
++    req->size = iov_size(iov, iovcnt);
++    if (rc < 0) {
++        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n",
++                client->blk->name, req->sector_num, req->size,
++                strerror(errno));
++        return -1;
++    }
++
++    return rc;
++}
++
++static int vub_virtio_process_req(VuClient *client,
++                                     VuVirtq *vq)
++{
++    VuDev *vu_dev = &client->parent;
++    VuVirtqElement *elem;
++    uint32_t type;
++    VubReq *req;
++
++    elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement) + sizeof(VubReq));
++    if (!elem) {
++        return -1;
++    }
++
++    struct iovec *in_iov = elem->in_sg;
++    struct iovec *out_iov = elem->out_sg;
++    unsigned in_num = elem->in_num;
++    unsigned out_num = elem->out_num;
++    /* refer to hw/block/virtio_blk.c */
++    if (elem->out_num < 1 || elem->in_num < 1) {
++        fprintf(stderr, "virtio-blk request missing headers\n");
++        free(elem);
++        return -1;
++    }
++
++    req = g_new0(VubReq, 1);
++    req->client = client;
++    req->vq = vq;
++    req->elem = elem;
++
++    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
++                            sizeof(req->out)) != sizeof(req->out))) {
++        fprintf(stderr, "virtio-blk request outhdr too short");
++        goto err;
++    }
++
++    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
++
++    if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
++        fprintf(stderr, "virtio-blk request inhdr too short");
++        goto err;
++    }
++
++    /* We always touch the last byte, so just see how big in_iov is.  */
++    req->in = (void *)in_iov[in_num - 1].iov_base
++              + in_iov[in_num - 1].iov_len
++              - sizeof(struct virtio_blk_inhdr);
++    iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
++
++
++    type = le32toh(req->out.type);
++    switch (type & ~VIRTIO_BLK_T_BARRIER) {
++    case VIRTIO_BLK_T_IN:
++    case VIRTIO_BLK_T_OUT: {
++        ssize_t ret = 0;
++        bool is_write = type & VIRTIO_BLK_T_OUT;
++        req->sector_num = le64toh(req->out.sector);
++        if (is_write) {
++            ret = vub_rwv(req, out_iov, out_num, blk_write_entry);
++        } else {
++            ret = vub_rwv(req, in_iov, in_num, blk_read_entry);
++        }
++        if (ret >= 0) {
++            req->in->status = VIRTIO_BLK_S_OK;
++        } else {
++            req->in->status = VIRTIO_BLK_S_IOERR;
++        }
++        vub_req_complete(req);
++        break;
++    }
++    case VIRTIO_BLK_T_FLUSH:
++        vub_flush(req);
++        req->in->status = VIRTIO_BLK_S_OK;
++        vub_req_complete(req);
++        break;
++    case VIRTIO_BLK_T_GET_ID: {
++        size_t size = MIN(iov_size(&elem->in_sg[0], in_num),
++                          VIRTIO_BLK_ID_BYTES);
++        snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk");
++        req->in->status = VIRTIO_BLK_S_OK;
++        req->size = elem->in_sg[0].iov_len;
++        vub_req_complete(req);
++        break;
++    }
++    case VIRTIO_BLK_T_DISCARD:
++    case VIRTIO_BLK_T_WRITE_ZEROES: {
++        int rc;
++        rc = vub_discard_write_zeroes(req, &elem->out_sg[1], out_num, type);
++        if (rc == 0) {
++            req->in->status = VIRTIO_BLK_S_OK;
++        } else {
++            req->in->status = VIRTIO_BLK_S_IOERR;
++        }
++        vub_req_complete(req);
++        break;
++    }
++    default:
++        req->in->status = VIRTIO_BLK_S_UNSUPP;
++        vub_req_complete(req);
++        break;
++    }
++
++    return 0;
++
++err:
++    free(elem);
++    g_free(req);
++    return -1;
++}
++
++
++static void vub_process_vq(VuDev *vu_dev, int idx)
++{
++    VuClient *client;
++    VuVirtq *vq;
++    int ret;
++
++    client = container_of(vu_dev, VuClient, parent);
++    assert(client);
++
++    vq = vu_get_queue(vu_dev, idx);
++    assert(vq);
++
++    while (1) {
++        ret = vub_virtio_process_req(client, vq);
++        if (ret) {
++            break;
++        }
++    }
++}
++
++
++static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
++{
++    VuVirtq *vq;
++
++    assert(vu_dev);
++
++    vq = vu_get_queue(vu_dev, idx);
++    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
++}
++
++static uint64_t
++vub_get_features(VuDev *dev)
++{
++    uint64_t features;
++    VubDev *vdev_blk;
++
++    VuClient *client = container_of(dev, VuClient, parent);
++    vdev_blk = client->blk;
++
++    features = 1ull << VIRTIO_BLK_F_SIZE_MAX |
++               1ull << VIRTIO_BLK_F_SEG_MAX |
++               1ull << VIRTIO_BLK_F_TOPOLOGY |
++               1ull << VIRTIO_BLK_F_BLK_SIZE |
++               1ull << VIRTIO_BLK_F_FLUSH |
++               #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
++               1ull << VIRTIO_BLK_F_DISCARD |
++               1ull << VIRTIO_BLK_F_WRITE_ZEROES |
++               #endif
++               1ull << VIRTIO_BLK_F_CONFIG_WCE |
++               1ull << VIRTIO_F_VERSION_1 |
++               1ull << VIRTIO_RING_F_INDIRECT_DESC |
++               1ull << VIRTIO_RING_F_EVENT_IDX |
++               1ull << VHOST_USER_F_PROTOCOL_FEATURES;
++
++    if (!vdev_blk->writable) {
++        features |= 1ull << VIRTIO_BLK_F_RO;
++    }
++
++    return features;
++}
++
++static uint64_t
++vub_get_protocol_features(VuDev *dev)
++{
++    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
++           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
++}
++
++static int
++vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
++{
++    VubDev *vdev_blk;
++
++    VuClient *client = container_of(vu_dev, VuClient, parent);
++    vdev_blk = client->blk;
++    memcpy(config, &vdev_blk->blkcfg, len);
++
++    return 0;
++}
++
++static int
++vub_set_config(VuDev *vu_dev, const uint8_t *data,
++               uint32_t offset, uint32_t size, uint32_t flags)
++{
++    VubDev *vdev_blk;
++
++    VuClient *client = container_of(vu_dev, VuClient, parent);
++    vdev_blk = client->blk;
++    uint8_t wce;
++
++    /* don't support live migration */
++    if (flags != VHOST_SET_CONFIG_TYPE_MASTER) {
++        return -1;
++    }
++
++
++    if (offset != offsetof(struct virtio_blk_config, wce) ||
++        size != 1) {
++        return -1;
++    }
++
++    wce = *data;
++    if (wce == vdev_blk->blkcfg.wce) {
++        /* Do nothing as same with old configuration */
++        return 0;
++    }
++
++    vdev_blk->blkcfg.wce = wce;
++    blk_set_enable_write_cache(vdev_blk->backend, true);
++    return 0;
++}
++
++
++/*
++ * When the client disconnects, it send a VHOST_USER_NONE request
++ * and vu_process_message will simple call exit which cause the VM
++ * to exit abruptly.
++ * To avoid this issue,  process VHOST_USER_NONE request ahead
++ * of vu_process_message.
++ *
++ */
++static int vub_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_reply)
++{
++    if (vmsg->request == VHOST_USER_NONE) {
++        dev->panic(dev, "disconnect");
++        return true;
++    }
++    return false;
++}
++
++static void
++vmsg_close_fds(VhostUserMsg *vmsg)
++{
++    int i;
++    for (i = 0; i < vmsg->fd_num; i++) {
++        close(vmsg->fds[i]);
++    }
++}
++
++static bool
++vu_message_read_co(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
++{
++    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
++    struct iovec iov = {
++        .iov_base = (char *)vmsg,
++        .iov_len = VHOST_USER_HDR_SIZE,
++    };
++    struct msghdr msg = {
++        .msg_iov = &iov,
++        .msg_iovlen = 1,
++        .msg_control = control,
++        .msg_controllen = sizeof(control),
++    };
++    size_t fd_size;
++    struct cmsghdr *cmsg;
++    int rc;
++    char buffer[100];
++    VuClient *client = container_of(vu_dev, VuClient, parent);
++    QIOChannel *ioc = client->ioc;
++    do {
++        rc = recvmsg(conn_fd, &msg, 0);
++        if (rc < 0) {
++            if (errno == EAGAIN) {
++                if (qemu_in_coroutine()) {
++                    qio_channel_yield(ioc, G_IO_IN);
++                } else {
++                    qio_channel_wait(ioc, G_IO_IN);
++                }
++                continue;
++            } else if (errno == EINTR) {
++                continue;
++            }
++        }
++        break;
++    } while (true);
++
++    if (rc < 0) {
++        sprintf(buffer, "Error while recvmsg: %s", strerror(errno));
++        vub_panic_cb(vu_dev, buffer);
++        return false;
++    }
++
++    assert(rc == VHOST_USER_HDR_SIZE || rc == 0);
++
++    vmsg->fd_num = 0;
++    for (cmsg = CMSG_FIRSTHDR(&msg);
++         cmsg != NULL;
++         cmsg = CMSG_NXTHDR(&msg, cmsg))
++    {
++        if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_RIGHTS) {
++            fd_size = cmsg->cmsg_len - CMSG_LEN(0);
++            vmsg->fd_num = fd_size / sizeof(int);
++            memcpy(vmsg->fds, CMSG_DATA(cmsg), fd_size);
++            break;
++        }
++    }
++
++    if (vmsg->size > sizeof(vmsg->payload)) {
++        sprintf(buffer,
++                "Error: too big message request: %d, size: vmsg->size: %u, "
++                "while sizeof(vmsg->payload) = %zu\n",
++                vmsg->request, vmsg->size, sizeof(vmsg->payload));
++        vub_panic_cb(vu_dev, buffer);
++        goto fail;
++    }
++
++    if (vmsg->size) {
++        do {
++            rc = read(conn_fd, &vmsg->payload, vmsg->size);
++            if (rc < 0) {
++                if (errno == EAGAIN) {
++                    if (qemu_in_coroutine()) {
++                        qio_channel_yield(ioc, G_IO_IN);
++                    } else {
++                        qio_channel_wait(ioc, G_IO_IN);
++                    }
++                    continue;
++                } else if (errno == EINTR) {
++                    continue;
++                }
++            }
++            break;
++        } while (true);
++
++        if (rc <= 0) {
++            sprintf(buffer, "Error while reading: %s", strerror(errno));
++            vub_panic_cb(vu_dev, buffer);
++            goto fail;
++        }
++
++        assert(rc == vmsg->size);
++    }
++
++    return true;
++
++fail:
++    vmsg_close_fds(vmsg);
++
++    return false;
++}
++
++static void vub_kick_cb(void *opaque)
++{
++    vu_watch_cb_data *data = (vu_watch_cb_data *) opaque;
++    int index = data->index;
++    VuDev *dev = data->vu_dev;
++    VuVirtq *vq = &dev->vq[index];
++    int sock = vq->kick_fd;
++    eventfd_t kick_data;
++    ssize_t rc;
++
++    rc = eventfd_read(sock, &kick_data);
++    if (rc == -1) {
++        char buffer[100];
++        sprintf(buffer, "kick eventfd_read(): %s", strerror(errno));
++        vub_panic_cb(dev, buffer);
++        g_free(data);
++        dev->remove_watch(dev, dev->vq[index].kick_fd);
++    } else {
++        if (vq->handler) {
++            vq->handler(dev, index);
++        }
++    }
++}
++
++static const VuDevIface vub_iface = {
++    .get_features = vub_get_features,
++    .queue_set_started = vub_queue_set_started,
++    .get_protocol_features = vub_get_protocol_features,
++    .get_config = vub_get_config,
++    .set_config = vub_set_config,
++    .process_msg = vub_process_msg,
++    .read_msg = vu_message_read_co,
++    .kick_callback = vub_kick_cb,
++};
++
++
++void vub_free(VubDev *vub_dev, bool called_by_QOM)
++{
++    if (!vub_dev) {
++        return;
++    }
++
++    blk_unref(vub_dev->backend);
++    g_free(vub_dev->name);
++    g_free(vub_dev->unix_socket);
++
++    if (vub_dev->next.tqe_circ.tql_prev) {
++        /*
++         * if vub_dev->next.tqe_circ.tql_prev = null,
++         * vub_dev hasn't been inserted into the queue and
++         * vub_free is called by obj->instance_finalize.
++         */
++        QTAILQ_REMOVE(&vub_devs, vub_dev, next);
++    }
++    /*
++     * Needn't to free vub_dev if called by QOM
++     * because QOM will do the clean-up work.
++     */
++    if (!called_by_QOM) {
++        g_free(vub_dev);
++    }
++}
++
++static coroutine_fn void vu_client_trip(void *opaque)
++{
++    VuClient *client = opaque;
++
++    while (!client->closed) {
++        vu_dispatch(&client->parent);
++    }
++
++    QTAILQ_REMOVE(&client->blk->clients, client, next);
++
++}
++
++static void vu_client_start(VuClient *client)
++{
++    Coroutine *co = qemu_coroutine_create(vu_client_trip, client);
++    qemu_coroutine_enter(co);
++}
++
++
++G_STATIC_ASSERT((int)G_IO_IN == (int)VU_WATCH_IN);
++G_STATIC_ASSERT((int)G_IO_OUT == (int)VU_WATCH_OUT);
++G_STATIC_ASSERT((int)G_IO_PRI == (int)VU_WATCH_PRI);
++G_STATIC_ASSERT((int)G_IO_ERR == (int)VU_WATCH_ERR);
++G_STATIC_ASSERT((int)G_IO_HUP == (int)VU_WATCH_HUP);
++
++static void
++set_watch(VuDev *vu_dev, int fd, int vu_evt,
++          vu_watch_cb_packed_data cb, void *pvt)
++{
++    /*
++     * since aio_dispatch can only pass one user data pointer to the
++     * callback function, pack VuDev, pvt into a struct
++     */
++    VuClient *client;
++
++    g_assert(vu_dev);
++    g_assert(fd >= 0);
++    g_assert(cb);
++    client = container_of(vu_dev, VuClient, parent);
++    vu_watch_cb_data *cb_data = g_new0(vu_watch_cb_data, 1);
++    cb_data->index = (intptr_t) pvt;
++    cb_data->vu_dev = vu_dev;
++    aio_set_fd_handler(client->blk->ctx, fd, false, (void *) cb,
++                       NULL, NULL, cb_data);
++}
++
++
++void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
++                gpointer opaque)
++{
++    VuClient *client;
++    VubDev *vub_device = opaque;
++    client = g_new0(VuClient, 1);
++
++    if (!vu_init_packed_data(&client->parent, VHOST_USER_BLK_MAX_QUEUES,
++                             sioc->fd, vub_panic_cb, set_watch,
++                             remove_watch, &vub_iface)) {
++        fprintf(stderr, "Failed to initialized libvhost-user\n");
++        g_free(client);
++        return;
++    }
++
++    client->blk = vub_device;
++    client->refcount = 1;
++    client->sioc = sioc;
++    /*
++     * increase the object reference, so cioc will not freed by
++     * qio_net_listener_channel_func which will call object_unref(OBJECT(sioc))
++     */
++    object_ref(OBJECT(client->sioc));
++    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-user client");
++    client->ioc = QIO_CHANNEL(sioc);
++    object_ref(OBJECT(client->ioc));
++    object_ref(OBJECT(sioc));
++
++    qio_channel_set_blocking(QIO_CHANNEL(client->sioc), false, NULL);
++    client->closed = false;
++    QTAILQ_INSERT_TAIL(&client->blk->clients, client, next);
++    vu_client_start(client);
++}
++
++
++void
++vub_initialize_config(BlockDriverState *bs, struct virtio_blk_config *config)
++{
++    config->capacity = bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
++    config->blk_size = BDRV_SECTOR_SIZE;
++    config->size_max = 65536;
++    config->seg_max = 128 - 2;
++    config->min_io_size = 1;
++    config->opt_io_size = 1;
++    config->num_queues = 1;
++    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
++    config->max_discard_sectors = 32768;
++    config->max_discard_seg = 1;
++    config->discard_sector_alignment = config->blk_size >> 9;
++    config->max_write_zeroes_sectors = 32768;
++    config->max_write_zeroes_seg = 1;
++    #endif
++}
++
++
++static VubDev *vub_new(VubDev *vub_device, const char *name,
++                       const char *unix_socket, bool writable, Error **errp)
++{
++
++    BlockBackend *blk;
++
++    /*
++     * Don't allow resize while the vhost user server is running,
++     * otherwise we don't care what happens with the node.
++     */
++    uint64_t perm = BLK_PERM_CONSISTENT_READ;
++    int ret;
++
++    AioContext *ctx;
++
++    BlockDriverState *bs = bdrv_lookup_bs(name,
++                                          name,
++                                          errp);
++
++    if (!bs) {
++        error_setg(errp,
++                   "No drive with name '%s'."
++                   " Please find the list of names with "
++                   "'info block'", name);
++        return NULL;
++    }
++
++    if (bdrv_is_read_only(bs)) {
++        writable = false;
++    }
++
++    if (writable) {
++        perm |= BLK_PERM_WRITE;
++    }
++
++    ctx = bdrv_get_aio_context(bs);
++    aio_context_acquire(ctx);
++    bdrv_invalidate_cache(bs, NULL);
++    aio_context_release(ctx);
++
++    blk = blk_new(bdrv_get_aio_context(bs), perm,
++                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
++                  BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
++    ret = blk_insert_bs(blk, bs, errp);
++
++    if (ret < 0) {
++        goto fail;
++    }
++
++
++    blk_set_enable_write_cache(blk, false);
++
++    blk_set_allow_aio_context_change(blk, true);
++
++
++    vub_device->name = g_strdup(name);
++    vub_device->unix_socket = g_strdup(unix_socket);
++    vub_device->writable = writable;
++    vub_device->blkcfg.wce = 0;
++    vub_device->backend = blk;
++    vub_device->ctx = ctx;
++    vub_initialize_config(bs, &vub_device->blkcfg);
++    return vub_device;
++
++fail:
++    blk_unref(blk);
++    return NULL;
++}
++
++void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM)
++{
++    if (!vub_device) {
++        return;
++    }
++
++    VuClient *client, *next;
++    QTAILQ_FOREACH_SAFE(client, &vub_device->clients, next, next) {
++        if (!client->closed) {
++            close_client(client);
++        }
++    }
++
++    if (vub_device->listener) {
++        qio_net_listener_disconnect(vub_device->listener);
++        object_unref(OBJECT(vub_device->listener));
++    }
++    vub_free(vub_device, called_by_QOM);
++
++}
++
++
++VubDev *vub_dev_find(const char *name)
++{
++    VubDev *vub_device;
++    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
++        if (strcmp(name, vub_device->name) == 0) {
++            return vub_device;
++        }
++    }
++
++    return NULL;
++}
++
++
++static VubDev *vub_dev_find_by_unix_socket(const char *unix_socket)
++{
++    VubDev *vub_device;
++    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
++        if (strcmp(unix_socket, vub_device->unix_socket) == 0) {
++            return vub_device;
++        }
++    }
++
++    return NULL;
++}
++
++static void vhost_user_server_start(VubDev *vub_device, const char *unix_socket,
++                                    const char *name, bool writable,
++                                    Error **errp)
++{
++
++    if (vub_dev_find(name) || vub_dev_find_by_unix_socket(unix_socket)) {
++        error_setg(errp, "Vhost user server with name '%s' or "
++                "with socket_path '%s' has already been started",
++                name, unix_socket);
++        return;
++    }
++
++
++    if (!vub_new(vub_device, name, unix_socket, writable, errp)) {
++        return;
++    }
++
++
++    vub_device->listener = qio_net_listener_new();
++
++    qio_net_listener_set_name(vub_device->listener,
++                              "vhost-user-backend-listener");
++
++    SocketAddress *addr = g_new0(SocketAddress, 1);
++    addr->u.q_unix.path = (char *) unix_socket;
++    addr->type = SOCKET_ADDRESS_TYPE_UNIX;
++    if (qio_net_listener_open_sync(vub_device->listener, addr, 1, errp) < 0) {
++        goto error;
++    }
++
++
++    QTAILQ_INSERT_TAIL(&vub_devs, vub_device, next);
++    QTAILQ_INIT(&vub_device->clients);
++
++    qio_net_listener_set_client_func(vub_device->listener,
++                                     vub_accept,
++                                     vub_device,
++                                     NULL);
++
++    return;
++
++ error:
++    vub_free(vub_device, false);
++}
++
++static void vu_set_block_name(Object *obj, const char *value,
++                                           Error **errp)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);;
++
++    if (vus->name) {
++        error_setg(errp, "evdev property already set");
++        return;
++    }
++
++    vus->name = g_strdup(value);
++}
++
++static char *vu_get_block_name(Object *obj, Error **errp)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);
++    return g_strdup(vus->name);
++}
++
++
++static void vu_set_unix_socket(Object *obj, const char *value,
++                                            Error **errp)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);;
++
++    if (vus->unix_socket) {
++        error_setg(errp, "unix_socket property already set");
++        return;
++    }
++
++    vus->unix_socket = g_strdup(value);
++    vhost_user_server_start(vus, value, vus->name,
++                            vus->writable, errp);
++}
++
++static char *vu_get_unix_socket(Object *obj, Error **errp)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);;
++    return g_strdup(vus->unix_socket);
++}
++
++static bool vu_get_block_writable(Object *obj, Error **errp)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);;
++    return vus->writable;
++}
++
++static void vu_set_block_writable(Object *obj, bool value, Error **errp)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);
++
++    vus->writable = value;
++}
++
++static void vhost_user_server_instance_init(Object *obj)
++{
++
++    object_property_add_bool(obj, "writable",
++                            vu_get_block_writable,
++                            vu_set_block_writable, NULL);
++
++    object_property_add_str(obj, "name",
++                            vu_get_block_name,
++                            vu_set_block_name, NULL);
++
++    object_property_add_str(obj, "unix_socket",
++                            vu_get_unix_socket,
++                            vu_set_unix_socket, NULL);
++
++}
++
++static void vhost_user_server_instance_finalize(Object *obj)
++{
++    VubDev *vus = VHOST_USER_SERVER(obj);
++    vhost_user_server_free(vus, true);
++    /* object_del shouldn't free this object struct */
++    obj->free = NULL;
++}
++
++static const TypeInfo vhost_user_server_info = {
++    .name = TYPE_VHOST_USER_SERVER,
++    .parent = TYPE_OBJECT,
++    .instance_size = sizeof(VuDev),
++    .instance_init = vhost_user_server_instance_init,
++    .instance_finalize = vhost_user_server_instance_finalize,
++    .interfaces = (InterfaceInfo[]) {
++        {TYPE_USER_CREATABLE},
++        {}
++    },
++};
++
++static void vhost_user_server_register_types(void)
++{
++    type_register_static(&vhost_user_server_info);
++}
++
++type_init(vhost_user_server_register_types)
++
+diff --git a/include/block/vhost-user.h b/include/block/vhost-user.h
+new file mode 100644
+index 0000000000..ef6d695244
+--- /dev/null
++++ b/include/block/vhost-user.h
+@@ -0,0 +1,46 @@
++#include "io/channel-socket.h"
++#include "io/net-listener.h"
++#include "contrib/libvhost-user/libvhost-user.h"
++#include "standard-headers/linux/virtio_blk.h"
++typedef struct VubDev VubDev;
++typedef struct VuClient VuClient;
++#define TYPE_VHOST_USER_SERVER "vhost-user-server"
++
++#define VHOST_USER_SERVER(obj) \
++   OBJECT_CHECK(VubDev, obj, TYPE_VHOST_USER_SERVER)
++/* vhost user block device */
++struct VubDev {
++    Object parent_obj;
++    char *name;
++    char *unix_socket;
++    bool exit_panic;
++    bool close;
++    BlockBackend *backend;
++    AioContext *ctx;
++    QIONetListener *listener;
++    QIOChannelSocket *sioc;
++    QTAILQ_HEAD(, VuClient) clients;
++    QTAILQ_ENTRY(VubDev) next;
++    struct virtio_blk_config blkcfg;
++    bool writable;
++};
++
++struct VuClient {
++    VuDev parent;
++    int refcount;
++    VubDev *blk;
++    QIOChannelSocket *sioc; /* The underlying data channel */
++    QIOChannel *ioc; /* The current I/O channel */
++    QTAILQ_ENTRY(VuClient) next;
++    bool closed;
++};
++VubDev *vub_dev_find(const char *name);
++
++void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM);
++void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
++                gpointer opaque);
++
++void vub_free(VubDev *vub_dev, bool called_by_QOM);
++
++void vub_initialize_config(BlockDriverState *bs,
++                           struct virtio_blk_config *config);
+diff --git a/vl.c b/vl.c
+index 86474a55c9..72ac506342 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2553,6 +2553,10 @@ static bool object_create_initial(const char *type, QemuOpts *opts)
+     }
+ #endif
+
++    /* Reason: vhost-user-server property "name" */
++    if (g_str_equal(type, "vhost-user-server")) {
++        return false;
++    }
+     /*
+      * Reason: filter-* property "netdev" etc.
+      */
 --
 2.24.1
 
