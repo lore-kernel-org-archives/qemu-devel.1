@@ -2,117 +2,90 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06881C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E07C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:30:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4CD52467D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:29:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4CD52467D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id D56A52467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:30:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="emYzfYx1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D56A52467D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irO8h-0005fG-8z
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:29:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38611)
+	id 1irO94-00067l-AV
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:30:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39893)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNsf-0001Ls-HK
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:13:24 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1irNy4-00008n-K3
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:19:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNsb-0002QV-RQ
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:13:21 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:45641)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNsb-0002PG-IH
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:13:17 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N4eOd-1jpzEY1wvv-011fsw; Tue, 14 Jan 2020 16:12:53 +0100
-Subject: Re: [PATCH v5 02/20] linux-user: alpha: Update syscall numbers to
- kernel 5.5 rc3 level
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-3-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <36e5c46b-e38e-5440-5536-fc049cc880a4@vivier.eu>
-Date: Tue, 14 Jan 2020 16:12:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <alex.bennee@linaro.org>) id 1irNy3-0008I1-7l
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:18:56 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:37766)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1irNy3-0008Gw-1X
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:18:55 -0500
+Received: by mail-wm1-x336.google.com with SMTP id f129so14183226wmf.2
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:18:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=RS8nsqaOjTUj87+40p6EqU+Bu6aWQBCN9gEX2YyFJYE=;
+ b=emYzfYx1qwLcpZDbe525DuLuOB+WHytphlRLtN8uyca0lSjjLDPNM0hOxTMtdYioQi
+ embBcDoahMzv8lY/iSNPoh91tljlVog6kj2155i35lms89eADr9HHxy2LAycLLnnjQe1
+ YUQ8L9vJvnjwrf4wKxTtoYyyxauB3Mp+3jtAztV64Ez4v2ejWka9uMkn6twlp2htgRXi
+ BHmZVZZb0YM+8XaF3PbPVwjj5C9vT8HoB+d9IuhY3cVYfYpw4eyHTcjapqRnUXG40eZA
+ cy4KrUQtp+j7YyTokBbV02RElVsQ4r8J2OtRVQsUDmYYuQB6I3d8h2qvRFCrjTyC9JtB
+ 9BOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=RS8nsqaOjTUj87+40p6EqU+Bu6aWQBCN9gEX2YyFJYE=;
+ b=CLiIj4TQKOPRm+L+oB7hbVqmRWMdXEZHQb4Go2n7RFjQER8z2XlNXEZy0LJyzGWHXl
+ gTOg07xJ5vieQ59p0XTv5Ua3yi0Nr6LothzeVLNWDgk1y/H1IoSE7zICZpaSyXPXG1Pe
+ pqRBYuHh0wff0sjfpZ6j8ZrjySF50CTpQiSpyEogVmxu0xx4nR3CynPpGRUF0s72j5kM
+ dFGFnG8U89N6Ls5w/z7ig1dmXxUoTSCP5ZrctaA7tr2nQXWHYqcpWhToZm62XXhlt/RV
+ v3JbKfPr68h70MbCKvyTo/+2AaYcweA9XMFpOEGcHqTGgyMkCIaC3e62yG+kkSBRggU7
+ DSbQ==
+X-Gm-Message-State: APjAAAXcrxB0oa69+nGXmyP6y7TKg92oU4M/O5ceL62hQezUuNe1d8OQ
+ gdwtYzAnH5Kuf1kCZk19luWkKQ==
+X-Google-Smtp-Source: APXvYqxIYH1YAJJ4aCbxBaYcwxpe05Lp8AeU408aavH37IaE15F9LQFYq7Du957vlD+jB2SeQlgGqA==
+X-Received: by 2002:a1c:9849:: with SMTP id a70mr26009288wme.76.1579015134028; 
+ Tue, 14 Jan 2020 07:18:54 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id g7sm20007100wrq.21.2020.01.14.07.18.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jan 2020 07:18:52 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2773C1FFA3;
+ Tue, 14 Jan 2020 15:09:57 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 18/22] tests/tcg/aarch64: add a gdbstub testcase for SVE
+ registers
+Date: Tue, 14 Jan 2020 15:09:49 +0000
+Message-Id: <20200114150953.27659-19-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200114150953.27659-1-alex.bennee@linaro.org>
+References: <20200114150953.27659-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-3-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:r3z7Wg36sfG6G5D0xqDBPPPTHiy9M5qgSuUhYbZndVK/fWFBqDf
- wo1GsVni3Q3cMvTirusbyYXoGDq0AmU0LsiZKr0HY1eIBqOSZHKv5BgE2VYpbUgvw8lqqbt
- 0KiRlYNE2rTVQ22ZPYBOpbjo2Qe/SHy4L6RITFFokrFh2tYJ8BWdg9ElpEGKo8kYwGG/SwG
- 4LuvbcNMrBGAxAZH8C/Fg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JclYUtLTjUM=:6Bw0vk3keDuTh8iPdxk/0Z
- 6RQ5v2bRYqgErH7PXnXDidcIGzfUEUN7+Qhp3MvmJtdl31djBt5OezojD7av3soug9EZyiJU9
- L/wvN9vKocFXfoiKmuGD9rkDCEv00wZYLs7l0pneOH9BKQ7zDRvdzX9/I/WRKoe5OyC0e13Xu
- mdHV1FMzeRh4CMgTC2EZF7TcXcy9kQXY9FJBox9tM/jXgwOcoM0sfm8Za5Gi5vaa9F3hcYwIh
- VsAAKfS6W8DSGQU8YydqsKpUjwiVacL/MuRN1hmJOgMSSb8gJxNhA1ZBZy0hWqRS4s9bMfvH0
- P9y6dkmbWqKooeGTv9f2qTHf0JQbFbgeRPoj0NQQfJT0B3IrI3YTWXQQCoEEO/BIXE3ogdC4l
- sCeL+CczNwORM+2Y2vdGpO3aru70RnM7PFm+zdk7y1GqRDkiwXDy0GV1HO3P7omPSH0GkI+9K
- fO71wPs0LxJ0PTW3n31QduN9cB6jktfZ8AFuXL8MwmjIl8fu9wfZxiA0GzfO32uigohH2OGpd
- 5hRrS/qplvsCi4RAmYkkeJ8/upfsAhaoSIUEthpPZ8B4M2hVkCM5ZpfMTa0heiayl3qmV70Wz
- FMJ348u57R3PNHNG7/wIJYWYIqKsK2ZMM5xNZ0x/uNa4NTjEaaEvpi5jMSJyCUB96DELmJvvd
- 06VgSvnz7WSk9qNIrbf1pgS7WEzh38gzqhULf0lR0ggtT69+ZpVpMPePCu/fycPx/ksoBxoAA
- b9MaKkwX3R1o3U0wGhB96yt8tIu5aQHcMRc9If1pll9HShv1Zzz1eVzB4NlrVNJqff5B/cDwJ
- 3ZokeTHn947qwPefK41WtFRCTzsbvpxu2nwbgup7aGRAf/H1p4VUPeCIzo+wtREIi8561Hkgr
- f4exGfQrd5QtNvsjl0mbvteRapqyNVys4/S6Raj4E=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.126.131
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,72 +97,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> Update alpha syscall numbers based on Linux kernel tag v5.5-rc3
-> (commit 46cf053e).
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> ---
-> 
-> cc: Richard Henderson <rth@twiddle.net>
-> ---
->  linux-user/alpha/syscall_nr.h | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
-> index 2e5541b..c29fc17 100644
-> --- a/linux-user/alpha/syscall_nr.h
-> +++ b/linux-user/alpha/syscall_nr.h
-> @@ -453,5 +453,40 @@
->  #define TARGET_NR_getrandom                     511
->  #define TARGET_NR_memfd_create                  512
->  #define TARGET_NR_execveat                      513
-> +#define TARGET_NR_seccomp                       514
-> +#define TARGET_NR_bpf                           515
-> +#define TARGET_NR_userfaultfd                   516
-> +#define TARGET_NR_membarrier                    517
-> +#define TARGET_NR_mlock2                        518
-> +#define TARGET_NR_copy_file_range               519
-> +#define TARGET_NR_preadv2                       520
-> +#define TARGET_NR_pwritev2                      521
-> +#define TARGET_NR_statx                         522
-> +#define TARGET_NR_io_pgetevents                 523
-> +#define TARGET_NR_pkey_mprotect                 524
-> +#define TARGET_NR_pkey_alloc                    525
-> +#define TARGET_NR_pkey_free                     526
-> +#define TARGET_NR_rseq                          527
-> +#define TARGET_NR_statfs64                      528
-> +#define TARGET_NR_fstatfs64                     529
-> +#define TARGET_NR_getegid                       530
-> +#define TARGET_NR_geteuid                       531
-> +#define TARGET_NR_getppid                       532
-> +/*
-> + * all other architectures have common numbers for new syscall, alpha
-> + * is the exception.
-> + */
-> +#define TARGET_NR_pidfd_send_signal             534
-> +#define TARGET_NR_io_uring_setup                535
-> +#define TARGET_NR_io_uring_enter                536
-> +#define TARGET_NR_io_uring_register             537
-> +#define TARGET_NR_open_tree                     538
-> +#define TARGET_NR_move_mount                    539
-> +#define TARGET_NR_fsopen                        540
-> +#define TARGET_NR_fsconfig                      541
-> +#define TARGET_NR_fsmount                       542
-> +#define TARGET_NR_fspick                        543
-> +#define TARGET_NR_pidfd_open                    544
-> +/* 545 reserved for clone3 */
->  
->  #endif
-> 
+A very simple test case which sets and reads SVE registers while
+running a test case. We don't really need to compile a SVE binary for
+this case but we will later so keep it simple for now.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+---
+v5
+  - properly plumb in
+  - skip if fails to connect
+---
+ tests/.gitignore                      |  1 +
+ tests/tcg/aarch64/Makefile.target     | 15 +++++
+ tests/tcg/aarch64/gdbstub/test-sve.py | 81 +++++++++++++++++++++++++++
+ 3 files changed, 97 insertions(+)
+ create mode 100644 tests/tcg/aarch64/gdbstub/test-sve.py
+
+diff --git a/tests/.gitignore b/tests/.gitignore
+index f9c0170881..8cc428b58b 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -10,6 +10,7 @@ qht-bench
+ rcutorture
+ test-*
+ !test-*.c
++!test-*.py
+ !docker/test-*
+ test-qapi-commands.[ch]
+ include/test-qapi-commands-sub-module.[ch]
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index afcbd06467..aba17881e9 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -43,6 +43,21 @@ ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_SVE),)
+ # System Registers Tests
+ AARCH64_TESTS += sysregs
+ sysregs: CFLAGS+=-march=armv8.1-a+sve
++
++ifneq ($(HAVE_GDB_BIN),)
++GDB_SCRIPT=$(SRC_PATH)/tests/guest-debug/run-test.py
++
++AARCH64_TESTS += gdbstub-sysregs
++
++.PHONY: gdbstub-sysregs
++run-gdbstub-sysregs: sysregs
++	$(call run-test, $@, $(GDB_SCRIPT) \
++		--gdb $(HAVE_GDB_BIN) \
++		--qemu $(QEMU) --qargs "$(QEMU_OPTS)" \
++		--bin $< --test $(AARCH64_SRC)/gdbstub/test-sve.py, \
++	"basic gdbstub SVE support")
++endif
++
+ endif
+ 
+ TESTS += $(AARCH64_TESTS)
+diff --git a/tests/tcg/aarch64/gdbstub/test-sve.py b/tests/tcg/aarch64/gdbstub/test-sve.py
+new file mode 100644
+index 0000000000..90201d8009
+--- /dev/null
++++ b/tests/tcg/aarch64/gdbstub/test-sve.py
+@@ -0,0 +1,81 @@
++from __future__ import print_function
++#
++# Test the SVE registers are visable and changeable via gdbstub
++#
++# This is launched via tests/guest-debug/run-test.py
++#
++
++import gdb
++import sys
++
++MAGIC = 0xDEADBEEF
++
++failcount = 0
++
++def report(cond, msg):
++    "Report success/fail of test"
++    if cond:
++        print ("PASS: %s" % (msg))
++    else:
++        print ("FAIL: %s" % (msg))
++        global failcount
++        failcount += 1
++
++def run_test():
++    "Run through the tests one by one"
++
++    gdb.execute("info registers")
++    report(True, "info registers")
++
++    gdb.execute("info registers vector")
++    report(True, "info registers vector")
++
++    # Now all the zregs
++    frame = gdb.selected_frame()
++    for i in range(0, 32):
++        rname = "z%d" % (i)
++        zreg = frame.read_register(rname)
++        report(True, "Reading %s" % rname)
++        for j in range(0, 4):
++            cmd = "set $%s.q.u[%d] = 0x%x" % (rname, j, MAGIC)
++            gdb.execute(cmd)
++            report(True, "%s" % cmd)
++        for j in range(0, 4):
++            reg = "$%s.q.u[%d]" % (rname, j)
++            v = gdb.parse_and_eval(reg)
++            report(str(v.type) == "uint128_t", "size of %s" % (reg))
++        for j in range(0, 8):
++            cmd = "set $%s.d.u[%d] = 0x%x" % (rname, j, MAGIC)
++            gdb.execute(cmd)
++            report(True, "%s" % cmd)
++        for j in range(0, 8):
++            reg = "$%s.d.u[%d]" % (rname, j)
++            v = gdb.parse_and_eval(reg)
++            report(str(v.type) == "uint64_t", "size of %s" % (reg))
++            report(int(v) == MAGIC, "%s is 0x%x" % (reg, MAGIC))
++
++#
++# This runs as the script it sourced (via -x, via run-test.py)
++#
++try:
++    inferior = gdb.selected_inferior()
++    arch = inferior.architecture()
++    report(arch.name() == "aarch64", "connected to aarch64")
++except (gdb.error, AttributeError):
++    print("SKIPPING (not connected)", file=sys.stderr)
++    exit(0)
++
++try:
++    # These are not very useful in scripts
++    gdb.execute("set pagination off")
++    gdb.execute("set confirm off")
++
++    # Run the actual tests
++    run_test()
++except:
++    print ("GDB Exception: %s" % (sys.exc_info()[0]))
++    failcount += 1
++
++print("All tests complete: %d failures" % failcount)
++
++exit(failcount)
+-- 
+2.20.1
+
 
