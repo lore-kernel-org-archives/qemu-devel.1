@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E4BC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A5AC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:38:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 498D82084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C98372084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GFh/uk01"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 498D82084D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eOFciKy5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C98372084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIea-0002xZ-UG
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:38:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57366)
+	id 1irIek-0003H7-LO
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:38:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irITb-0005SM-C8
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:08 -0500
+ (envelope-from <quintela@redhat.com>) id 1irIUb-0006qM-2F
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irITa-0006RS-1B
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:07 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57746
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1irIUZ-0006ek-Ry
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55454
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irITZ-0006R1-U4
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:05 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIUZ-0006eS-Ni
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578994025;
+ s=mimecast20190719; t=1578994087;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1X5yO7SYwJyW5YJ1Ti/f3xeheBlw3XFdVPw3SMbN8dw=;
- b=GFh/uk01OY5cb4cPbThB9Xyywf84WcGlJUI1tr9c2qbA/8p7XUDAmsITgTWkXJ3LH0Yysn
- BfeSHqR6u7rauGyKou7BLt1D2oD/MqcC/YGcxFuVJgR0cW7pshA5IKn94rEYQUpqNvz/X2
- plicxTsXKP7hiC/bE9rwUTTNUQFjrIM=
+ bh=ynLvDJfV4kUr7Pu6PZ24xc1KIuICA5kAdzwdWYoRAQo=;
+ b=eOFciKy5T9cQaVKD0x4SyvYAWpW3qB1Gteah84ZUksWf6/UpsXuyyKxXr80EeqpKLoKZ/c
+ X90+vFAZk+z9KE37WB3l1RsyCMWX402R7rxnH5V4MYL4kMmaBd3WCEMXg5hqKr472lKeKS
+ 7XgL99eOBWbYatH0L7lBhGulvY1k+g8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-L3ND0_gYOp6ftbKX6R9esg-1; Tue, 14 Jan 2020 04:27:03 -0500
+ us-mta-350-N1f5REKCMNKMnrWrZ18yCg-1; Tue, 14 Jan 2020 04:28:04 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05055800A02;
- Tue, 14 Jan 2020 09:27:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63E3F1800D78;
+ Tue, 14 Jan 2020 09:28:02 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DB29384;
- Tue, 14 Jan 2020 09:26:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 453B9384;
+ Tue, 14 Jan 2020 09:27:53 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/29] ram.c: remove unneeded labels
-Date: Tue, 14 Jan 2020 10:25:44 +0100
-Message-Id: <20200114092606.1761-8-quintela@redhat.com>
+Subject: [PULL 14/29] migration/ram: Yield periodically to the main loop
+Date: Tue, 14 Jan 2020 10:25:51 +0100
+Message-Id: <20200114092606.1761-15-quintela@redhat.com>
 In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
 References: <20200114092606.1761-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: L3ND0_gYOp6ftbKX6R9esg-1
+X-MC-Unique: N1f5REKCMNKMnrWrZ18yCg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,12 +86,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
  Thomas Huth <thuth@redhat.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
  Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Yury Kotov <yury-kotov@yandex-team.ru>, qemu-arm@nongnu.org,
  qemu-ppc@nongnu.org,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
@@ -101,104 +101,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+From: Yury Kotov <yury-kotov@yandex-team.ru>
 
-ram_save_queue_pages() has an 'err' label that can be replaced by
-'return -1' instead.
+Usually, incoming migration coroutine yields to the main loop
+while its IO-channel is waiting for data to receive. But there is a case
+when RAM migration and data receive have the same speed: VM with huge
+zeroed RAM. In this case, IO-channel won't read and thus the main loop
+is stuck and for instance, it doesn't respond to QMP commands.
 
-Same thing with ram_discard_range(), and in this case we can also
-get rid of the 'ret' variable and return either '-1' on error
-or the result of ram_block_discard_range().
+For this case, yield periodically, but not too often, so as not to
+affect the speed of migration.
 
-CC: Juan Quintela <quintela@redhat.com>
-CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ migration/ram.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index f946282adb..17cd8d524b 100644
+index 1ec5c10561..5cd066467c 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2459,7 +2459,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr=
-_t start, ram_addr_t len)
-              * it's the 1st request.
-              */
-             error_report("ram_save_queue_pages no previous block");
--            goto err;
-+            return -1;
-         }
-     } else {
-         ramblock =3D qemu_ram_block_by_name(rbname);
-@@ -2467,7 +2467,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr=
-_t start, ram_addr_t len)
-         if (!ramblock) {
-             /* We shouldn't be asked for a non-existent RAMBlock */
-             error_report("ram_save_queue_pages no block '%s'", rbname);
--            goto err;
-+            return -1;
-         }
-         rs->last_req_rb =3D ramblock;
-     }
-@@ -2476,7 +2476,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr=
-_t start, ram_addr_t len)
-         error_report("%s request overrun start=3D" RAM_ADDR_FMT " len=3D"
-                      RAM_ADDR_FMT " blocklen=3D" RAM_ADDR_FMT,
-                      __func__, start, len, ramblock->used_length);
--        goto err;
-+        return -1;
-     }
-=20
-     struct RAMSrcPageRequest *new_entry =3D
-@@ -2492,9 +2492,6 @@ int ram_save_queue_pages(const char *rbname, ram_addr=
-_t start, ram_addr_t len)
-     qemu_mutex_unlock(&rs->src_page_req_mutex);
-=20
-     return 0;
--
--err:
--    return -1;
- }
-=20
- static bool save_page_use_compression(RAMState *rs)
-@@ -3097,8 +3094,6 @@ int ram_postcopy_send_discard_bitmap(MigrationState *=
-ms)
+@@ -4246,7 +4246,7 @@ static void colo_flush_ram_cache(void)
   */
- int ram_discard_range(const char *rbname, uint64_t start, size_t length)
+ static int ram_load_precopy(QEMUFile *f)
  {
--    int ret =3D -1;
--
-     trace_ram_discard_range(rbname, start, length);
+-    int flags =3D 0, ret =3D 0, invalid_flags =3D 0, len =3D 0;
++    int flags =3D 0, ret =3D 0, invalid_flags =3D 0, len =3D 0, i =3D 0;
+     /* ADVISE is earlier, it shows the source has the postcopy capability =
+on */
+     bool postcopy_advised =3D postcopy_is_advised();
+     if (!migrate_use_compression()) {
+@@ -4258,6 +4258,17 @@ static int ram_load_precopy(QEMUFile *f)
+         void *host =3D NULL;
+         uint8_t ch;
 =20
-     RCU_READ_LOCK_GUARD();
-@@ -3106,7 +3101,7 @@ int ram_discard_range(const char *rbname, uint64_t st=
-art, size_t length)
-=20
-     if (!rb) {
-         error_report("ram_discard_range: Failed to find block '%s'", rbnam=
-e);
--        goto err;
-+        return -1;
-     }
-=20
-     /*
-@@ -3118,10 +3113,7 @@ int ram_discard_range(const char *rbname, uint64_t s=
-tart, size_t length)
-                      length >> qemu_target_page_bits());
-     }
-=20
--    ret =3D ram_block_discard_range(rb, start, length);
--
--err:
--    return ret;
-+    return ram_block_discard_range(rb, start, length);
- }
-=20
- /*
++        /*
++         * Yield periodically to let main loop run, but an iteration of
++         * the main loop is expensive, so do it each some iterations
++         */
++        if ((i & 32767) =3D=3D 0 && qemu_in_coroutine()) {
++            aio_co_schedule(qemu_get_current_aio_context(),
++                            qemu_coroutine_self());
++            qemu_coroutine_yield();
++        }
++        i++;
++
+         addr =3D qemu_get_be64(f);
+         flags =3D addr & ~TARGET_PAGE_MASK;
+         addr &=3D TARGET_PAGE_MASK;
 --=20
 2.24.1
 
