@@ -2,117 +2,98 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B1FC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5905C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B7E624679
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:39:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7E624679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id A3B532072B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:40:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O0F0JVxO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3B532072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irLTa-0005P8-9W
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 07:39:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37567)
+	id 1irLVC-0006nE-Na
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 07:40:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irLSm-0004dQ-48
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:38:31 -0500
+ (envelope-from <philmd@redhat.com>) id 1irLU1-0005sY-E1
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:39:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irLSi-00051q-Jh
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:38:28 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:46473)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irLSi-00051c-Ao
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:38:24 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N6sSV-1jjOsQ0Z5z-018Nss; Tue, 14 Jan 2020 13:38:01 +0100
-Subject: Re: [PATCH 04/12] linux-user: Add support for getting/setting RTC
- wakeup alarm using ioctls
+ (envelope-from <philmd@redhat.com>) id 1irLTw-0005Lq-9k
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:39:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51661
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1irLTv-0005LR-MP
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:39:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579005578;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WHxsSZ7FPz3Cp10bTW+jzFzXUqkgWE3Dz8eyyBWHPg8=;
+ b=O0F0JVxOqsGBDjrHZW4/NkenebZZXVtNgnp3uUq5WaUGH1XhbHgDKTNXoGOCP6PEhGMXG0
+ R//ycj9kNayJkfQn3XS/X/d1K+egKSCwQ52IORz4f2OeJddK8RBXBGSeuMq0+g550YaFa9
+ y3hQyGvwgddPFXRun0rO2hKTJjuy5NY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-relHUCy-PV2R6tNgk4HXEg-1; Tue, 14 Jan 2020 07:39:37 -0500
+Received: by mail-wr1-f72.google.com with SMTP id y7so6452389wrm.3
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 04:39:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WHxsSZ7FPz3Cp10bTW+jzFzXUqkgWE3Dz8eyyBWHPg8=;
+ b=CbNCXPmpvKf3idof883e22sjBRnRdVjMVv0mAktXnB5MueJljGBlAqa9cctpf2GR2t
+ RzoaXGBXKuugOdfZ2BwDAeGigsEhfTUR1hiC+IRpmbgYolJ2ws2HyaI5F2G8i5qayo+X
+ TGmJXiiQwRCU02Nty/FAXGGjS4kDwZf9mPDQMWmiK6fsgL5Tkj9wDQ+ur/4K3TfuvMvD
+ 2JLBHAH99PxvTX03+vSmIaqlr/XP2ORPKCdYP3wbQz6+knQqrFg9gCrmAzr5Dcgl9JLG
+ Qtkzh6orqoCBh3uVGWu0OUPZkrQkDR395G4UGzHSKU3hsb/yVyOqgVW8+4Q3DzEiZNE+
+ 2Gwg==
+X-Gm-Message-State: APjAAAXFZDpuyBR8J1gE9RMj1ItSUZTjmVY+ySRWGNPk78wUrr+1VyBe
+ 24mpoAJ2LYa4IWklbQyhWnYTLmaCCvWN8WzWkuH+WpRUumUuFzEwg/Dtl4hh8ziKWuTs22kyFhX
+ fGDy45S3mfm6yiYI=
+X-Received: by 2002:adf:fac1:: with SMTP id a1mr24054414wrs.376.1579005575645; 
+ Tue, 14 Jan 2020 04:39:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzje165lC6AIzDNSjUyzfre24VskqFQfrJ1bzkMc/VjMS7Q8FIMAkAR5AwSAz/tyrCrNdmH6g==
+X-Received: by 2002:adf:fac1:: with SMTP id a1mr24054386wrs.376.1579005575234; 
+ Tue, 14 Jan 2020 04:39:35 -0800 (PST)
+Received: from [10.0.1.197] (lfbn-mon-1-1103-34.w90-48.abo.wanadoo.fr.
+ [90.48.206.34])
+ by smtp.gmail.com with ESMTPSA id l6sm19252494wmf.21.2020.01.14.04.39.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Jan 2020 04:39:34 -0800 (PST)
+Subject: Re: [PATCH 00/12] linux-user: Add support for real time clock and
 To: Filip Bozuta <Filip.Bozuta@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
- <1578574763-8327-5-git-send-email-Filip.Bozuta@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <49d61933-60d5-535d-5ccb-b31a0a2be594@vivier.eu>
-Date: Tue, 14 Jan 2020 13:37:59 +0100
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <399810c6-e1a8-463b-b762-afc8837517d4@redhat.com>
+Date: Tue, 14 Jan 2020 13:39:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1578574763-8327-5-git-send-email-Filip.Bozuta@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:RmcAUmxHJRwDlghB0vJoFd3CHCgNAA2gLqPQhMVd6HFDqT+iAR6
- F2glotW4D9ZoD9J+KxgyWgbiB1MfINvXHZ7kITrQmo2+i9c4abeeqhIv5owAVW22AF3MgHZ
- S0zT/m/aNVhnADx1P14QxWESTlx+ZXpT0nizmEt2vWvuJcS08WElxgN3Pvg0AzxVN/tq2Ms
- Nvbe1YwkHQkefYKD/1x9g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:E80EoNefGI4=:hA+0zQoKLlf+BQD9ZkueYL
- OwOcjoVWLLcyGHkRealuVJDeUlOqpJwTPMf2cXw2S+SI/F7cibAvfC8cmDsIocaoh2SH5wHSq
- 7666XsEGHZxyJvPfP/2ZO81H2sxK5tgys1XuRURo3HHCrPKxBJlAtUn9D34cV+Z5rzs57xCuz
- VfXY4zoa/SZBk9N/6sXj+u8cg9K6tkq54z9Guhz+M1fcvmLmkRWglyZSZxzr7MsRfIp178uTS
- p5FOJ3WYo3YwfxskuRoFca1TKA8ugPfbG95h3+EHgl3/3+oHMvgYwwSayoH2DcfFt72k5nXY1
- M5QeNIPinGW/LHqXipt8f1MP9yzIBUZpV9p9QHFp8+EQT6F/iv3gZO94JrOjmrKrvMhy5y2ip
- GuKfbkITmnNeXMiky9prRN0BfBoE9dwYQYmbEs53MWi2ge3l1gV3x1u2QhPJjWHxO442l420d
- xgfUjhZbMVMx7tzMOd+GfvLU7UKqFL1Jegi7BoGNd+pUeKSOekm5eZlJ8HbG+ZI40RMP1gEBc
- 3brqNgzXnxn7sXlDjG5FMRbqFtv2BamsppP+9Aqn6dEFwNx738NZNIq0KmF7IEb37iVDxFuGb
- sGjTuP378FZkAieCGoMt/e8VcHFGWywIbsBalI7ZCx81Ap/GQjvAHfTkMyZgFtmZ7E0EKjShK
- tckhSHuJ4Qnhy3QbHXUYXXCXdVt106w/eJG1jMEBVbJ0Msy3PcFYbNa21JTFX3V8Hs6aWytIX
- sstb/76FQDkk/XN02iQOWrNPGbGFYHXveg+DEjXkKrxy3ocmvbjwWFbm4vsj/Yp/h6miPRyLR
- pBeBQVUZ6K1J2uQ1XTNp4AJa6VujG3HB+7dvFMT0kM0VdPTtH8CVcvkdfyCYzGdjKJQyw4P5W
- 5a/a6obq4q1zslVEiQuA==
+In-Reply-To: <1578574763-8327-1-git-send-email-Filip.Bozuta@rt-rk.com>
+Content-Language: en-US
+X-MC-Unique: relHUCy-PV2R6tNgk4HXEg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,96 +105,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi
+Cc: riku.voipio@iki.fi, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 09/01/2020 à 13:59, Filip Bozuta a écrit :
-> This patch implements functionalities of following ioctls:
+Hi Filip,
+
+This is v5.
+
+On 1/9/20 1:59 PM, Filip Bozuta wrote:
+> MIME-Version: 1.0
+> Content-Type: text/plain; charset=UTF-8
+> Content-Transfer-Encoding: 8bit
 > 
-> RTC_WKALM_SET, RTC_WKALM_GET - Getting/Setting wakeup alarm
+> This series covers following RTC and sound timer ioctls:
 > 
->     Some RTCs support a more powerful alarm interface, using these
->     ioctls to read or write the RTC's alarm time (respectively)
->     with this structure:
+>    RTC ioctls(22):
 > 
->         struct rtc_wkalrm {
->             unsigned char enabled;
->             unsigned char pending;
->             struct rtc_time time;
->         };
+>      * RTC_AIE_ON          * RTC_ALM_SET         * RTC_WKALM_SET
+>      * RTC_AIE_OFF         * RTC_ALM_READ        * RTC_WKALM_RD
+>      * RTC_UIE_ON          * RTC_RD_TIME         * RTC_PLL_GET
+>      * RTC_UIE_OFF         * RTC_SET_TIME        * RTC_PLL_SET
+>      * RTC_PIE_ON          * RTC_IRQP_READ       * RTC_VL_READ
+>      * RTC_PIE_OFF         * RTC_IRQP_SET        * RTC_VL_CLR
+>      * RTC_WIE_ON          * RTC_EPOCH_READ
+>      * RTC_WIE_OFF         * RTC_EPOCH_SET
 > 
->     The enabled flag is used to enable or disable the alarm
->     interrupt, or to read its current status; when using these
->     calls, RTC_AIE_ON and RTC_AIE_OFF are not used. The pending
->     flag is used by RTC_WKALM_RD to report a pending interrupt
->     (so it's mostly useless on Linux, except when talking to the
->     RTC managed by EFI firmware). The time field is as used with
->     RTC_ALM_READ and RTC_ALM_SET except that the tm_mday, tm_mon,
->     and tm_year fields are also valid. A pointer to this structure
->     should be passed as the third ioctl's argument.
+>    Sound timer ioctls(14):
 > 
-> Implementation notes:
+>      * SNDRV_TIMER_IOCTL_PVERSION          * SNDRV_TIMER_IOCTL_INFO
+>      * SNDRV_TIMER_IOCTL_NEXT_DEVICE       * SNDRV_TIMER_IOCTL_PARAMS
+>      * SNDRV_TIMER_IOCTL_TREAD             * SNDRV_TIMER_IOCTL_STATUS
+>      * SNDRV_TIMER_IOCTL_GINFO             * SNDRV_TIMER_IOCTL_START
+>      * SNDRV_TIMER_IOCTL_GPARAMS           * SNDRV_TIMER_IOCTL_STOP
+>      * SNDRV_TIMER_IOCTL_GSTATUS           * SNDRV_TIMER_IOCTL_CONTINUE
+>      * SNDRV_TIMER_IOCTL_SELECT            * SNDRV_TIMER_IOCTL_PAUSE
 > 
->     All ioctls in this patch have a pointer to a structure
->     rtc_wkalrm as their third argument. That is the reason why
->     corresponding definition is added in linux-user/syscall_types.h.
->     Since all  elements of this structure are either of type
->     'unsigned char' or 'struct rtc_time' (that was covered in one
->     of previous patches), the rest of the implementation is
->     straightforward.
+> The functionalities of individual ioctls were described in this series
+> patch commit messages.
 > 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-> ---
->  linux-user/ioctls.h        | 2 ++
->  linux-user/syscall_defs.h  | 2 ++
->  linux-user/syscall_types.h | 5 +++++
->  3 files changed, 9 insertions(+)
+> Testing method for RTC ioctls:
 > 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index accbdee..b09396e 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -85,6 +85,8 @@
->       IOCTL(RTC_IRQP_SET, IOC_W, TYPE_ULONG)
->       IOCTL(RTC_EPOCH_READ, IOC_R, MK_PTR(TYPE_ULONG))
->       IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
-> +     IOCTL(RTC_WKALM_RD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
-> +     IOCTL(RTC_WKALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
->  
->       IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
->       IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index bbfa935..37504a2 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -780,6 +780,8 @@ struct target_pollfd {
->  #define TARGET_RTC_IRQP_SET         TARGET_IOW('p', 0x0c, abi_ulong)
->  #define TARGET_RTC_EPOCH_READ       TARGET_IOR('p', 0x0d, abi_ulong)
->  #define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
-> +#define TARGET_RTC_WKALM_RD         TARGET_IOR('p', 0x10, struct rtc_wkalrm)
-> +#define TARGET_RTC_WKALM_SET        TARGET_IOW('p', 0x0f, struct rtc_wkalrm)
->  
->  #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
->         defined(TARGET_XTENSA)
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index a35072a..820bc8e 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -266,6 +266,11 @@ STRUCT(rtc_time,
->         TYPE_INT, /* tm_yday */
->         TYPE_INT) /* tm_isdst */
->  
-> +STRUCT(rtc_wkalrm,
-> +       TYPE_CHAR, /* enabled */
-> +       TYPE_CHAR, /* pending */
-> +       MK_STRUCT(STRUCT_rtc_time)) /* time */
-> +
->  STRUCT(blkpg_ioctl_arg,
->         TYPE_INT, /* op */
->         TYPE_INT, /* flags */
+>      Mini test programs were written for each ioctl. Those programs were
+>      compiled (sometimes using cross-compilers) for the following
+>      architectures:
+> 
+>          * Intel 64-bit (little endian)
+>          * Power pc 32-bit (big endian)
+>          * Power pc 64-bit (big endian)
+> 
+>      The corresponding native programs were executed without using
+>      QEMU on following hosts:
+> 
+>          * Intel Core i7-4790K (x86_64 host)
+>          * Power 7447A (ppc32 host)
+> 
+>      All applicable compiled programs were in turn executed through QEMU
+>      and the results obtained were the same ones gotten for native
+>      execution.
+> 
+>      Example of a test program:
+> 
+>          For ioctl RTC_RD_TIME the following test program was used:
+> 
+>          #include <stdio.h>
+>          #include <stdlib.h>
+>          #include <linux/rtc.h>
+>          #include <fcntl.h>
+>          #include <linux/input.h>
+>          #include <sys/types.h>
+>          #include <unistd.h>
+> 
+>          #define ERROR -1
+> 
+>          int main()
+>          {
+> 
+>              int fd = open("/dev/rtc", O_RDWR | O_NONBLOCK);
+> 
+>              if(fd == ERROR)
+>              {
+>                  perror("open");
+>                  return -1;
+>              }
+> 
+>              struct rtc_time cur_time;
+> 
+>              if(ioctl(fd, RTC_RD_TIME, &cur_time) < 0)
+>              {
+>                  perror("ioctl");
+>                  return -1;
+>              }
+> 
+>              printf("Second: %d, Minute: %d, Hour: %d, Day: %d, Month: %d, Year: %d,",
+>                  cur_time.tm_sec, cur_time.tm_min, cur_time.tm_hour,
+>                  cur_time.tm_mday, cur_time.tm_mon, cur_time.tm_year);
+> 
+>              return 0;
+>          }
+> 
+>      Limitations of testing:
+> 
+>          The test host pc that was used for testing (intel pc) has RTC
+>          that doesn't support all RTC features that are accessible
+>          through ioctls. This means that testing can't discover
+>          functionality errors related to the third argument of ioctls
+>          that are used for features which are not supported. For example,
+>          running the test program for ioctl RTC_EPOCH_READ gives
+>          the error output: inappropriate ioctl for device. As expected,
+>          the same output was obtained through QEMU which means that this
+>          ioctl is recognized in QEMU but doesn't really do anything
+>          because it is not supported in the host computer's RTC.
+> 
+>          Conclusion: Some RTC ioctls need to be tested on computers
+>          that support their functionalities so that it can be inferred
+>          that they are really supported in QEMU. In absence of such
+>          test hosts, the specifications of those ioctls need to be
+>          carefully checked manually and the implementations should be
+>          updated accordingly.
+
+We should be able to check if the host supports these features and run 
+your different tests.
+Can you add them in the repository? Maybe under tests/tcg/multiarch/.
+
+> Testing method for sound timer ioctls:
+> 
+>      The alsa ioctl test suite, that can be found on github
+>      ("https://github.com/alsa-project/alsa-utils"), was used the test
+>      the implemented ioctls. The file "timer.c", located in this test
+>      suite, contains test functions that are used to test alsa timer
+>      ioctls. This file was compiled (sometimes using cross-compilers)
+>      for the following architectures:
+> 
+>          * Intel 64-bit (little endian)
+>          * Power pc 32-bit (big endian)
+>          * Power pc 64-bit (big endian)
+> 
+>      The corresponding compiled test files were executed without using
+>      QEMU on following hosts:
+> 
+>          * Intel Core i7-4790K (x86_64 host)
+>          * Power 7447A (ppc32 host)
+> 
+>      The corresponding native compiled test files were executed without using
+>      QEMU on following hosts:
+> 
+>          * Intel Core i7-4790K (x86_64 host)
+>          * Power 7447A (ppc32 host)
+> 
+>      All compiled test files were in turn executed through QEMU
+>      and the results obtained were the same ones gotten for native
+>      execution.
+> 
+>      Also, mini test programs were written to test further functionalities
+>      of individual ioctls. Those programs were, like the file "timer.c",
+>      compiled for different architectures and were executed both natively
+>      and thgrough QEMU to compare the results.
+> 
+>      Example of a test program:
+> 
+>          For ioctl SNDRV_TIMER_IOCTL_GINFO the following test program was used:
+> 
+>          #include <stdio.h>
+>          #include <stdlib.h>
+>          #include <sys/types.h>
+>          #include <fcntl.h>
+>          #include <sys/ioctl.h>
+>          #include <sound/asound.h>
+> 
+>          #define ERROR -1
+> 
+>          int main()
+>          {
+>              int fd = open("/dev/snd/timer", O_RDWR);
+> 
+>              if(fd == ERROR)
+>              {
+>                  perror("open");
+>                  return -1;
+>              }
+> 
+>              struct snd_timer_id id = {SNDRV_TIMER_CLASS_GLOBAL,
+>                                        SNDRV_TIMER_SCLASS_NONE, -1,
+>                                        SNDRV_TIMER_GLOBAL_SYSTEM, 0};
+> 
+>              struct snd_timer_ginfo ginfo;
+>              ginfo.tid = id;
+> 
+>              if(ioctl(fd, SNDRV_TIMER_IOCTL_GINFO, &ginfo) == ERROR)
+>              {
+>                  perror("ioctl");
+>                  return -1;
+>              }
+> 
+>              printf("flags: %u\n", ginfo.flags);
+>              printf("card: %d\n", ginfo.card);
+>              printf("id: %s\n", ginfo.id);
+>              printf("name: %s\n", ginfo.name);
+>              printf("reserved0: %lu\n", ginfo.reserved0);
+>              printf("resolution: %lu\n", ginfo.resolution);
+>              printf("resolution_min: %lu\n", ginfo.resolution_min);
+>              printf("reolution_max: %lu\n", ginfo.resolution_max);
+>              printf("clients: %u\n", ginfo.clients);
+>              printf("reserved: %s\n", ginfo.reserved);
+> 
+>              return 0;
+>          }
+> 
+> v5:
+> 
+>      * added support for alsa sound timer ioctls
+> 
+> v4:
+> 
+>      * changed patch descriptions so that they are better
+>        formatted and more cemprehensible
+> 
+> v3:
+> 
+>      * changed two instances of MK_PTR(TYPE_ULONG) to TYPE_ULONG
+> 
+> v2:
+> 
+>      * added description of each ioctl in patches
+>      * wrote a more detailed cover letter with description of testing
+>      * changed one instance of TYPE_INT to MK_PTR(TYPE_INT)
+> 
+> 
+> Filip Bozuta (12):
+>    linux-user: Add support for enabling/disabling RTC features using
+>      ioctls
+>    linux-user: Add support for getting/setting RTC time and alarm using
+>      ioctls
+>    linux-user: Add support for getting/setting RTC periodic interrupt and
+>      epoch using ioctls
+>    linux-user: Add support for getting/setting RTC wakeup alarm using
+>      ioctls
+>    linux-user: Add support for getting/setting RTC PLL correction using
+>      ioctls
+>    linux-user: Add support for read/clear RTC voltage low detector using
+>      ioctls
+>    linux-user: Add support for getting alsa timer version and id
+>    linux-user: Add support for setting alsa timer enhanced read using
+>      ioctl
+>    linux-user: Add support for getting/setting specified alsa timer
+>      parameters using ioctls
+>    linux-user: Add support for selecting alsa timer using ioctl
+>    linux-user: Add support for getting/setting selected alsa timer
+>      parameters using ioctls
+>    linux-user: Add support for selected alsa timer instructions using
+>      ioctls
+> 
+>   linux-user/ioctls.h        |  45 +++++++++++++++++
+>   linux-user/syscall.c       |   2 +
+>   linux-user/syscall_defs.h  | 121 +++++++++++++++++++++++++++++++++++++++++++++
+>   linux-user/syscall_types.h |  91 ++++++++++++++++++++++++++++++++++
+>   4 files changed, 259 insertions(+)
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
