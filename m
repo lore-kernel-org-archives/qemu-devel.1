@@ -6,67 +6,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2AEC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE750C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58F702084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:41:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A85BF2084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:41:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="URtAKKJV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58F702084D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dc1HxBcD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A85BF2084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIhI-0007CJ-Rk
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:41:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57618)
+	id 1irIhf-0007pD-Vi
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:41:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irIUL-0006Qs-9K
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:54 -0500
+ (envelope-from <quintela@redhat.com>) id 1irIUz-0007V9-Vl
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irIUK-0006a4-6f
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47916
+ (envelope-from <quintela@redhat.com>) id 1irIUy-0006kE-NK
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56544
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIUK-0006Zn-26
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:52 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIUy-0006js-KF
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578994071;
+ s=mimecast20190719; t=1578994112;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8PL3njRMZwxs9uKSpCL5NJoIzl7l80qAcMLLGRwuXdY=;
- b=URtAKKJVfwjAFr7BcsB7aHHdbrqLEZlOrs/QKl/Xa6m71H1UFQrrDAk2b9yJNLeezPg2ce
- 8c7PncoLg6zSgIrEeePfLB9+01kAwvNlsC6tl33FpYLm48q3VbO+clR09UentYG90kAH6K
- 4vIsBuLKBq/4IN+gvwaMCcEOZcyORpM=
+ bh=vDvHDxz9hAL4AO2gd4dbSYpFgNTjSG2GxTAeEZIJRq0=;
+ b=Dc1HxBcDij8ZBt1KPHARIyfX4jjS46I9CS60gKbF6+nBVh+6/QBoZpqn3BqopmkNRvPd6K
+ LsrVuVhYF/f+wrHDU48vlz5W1Ka/Jguu0tQQ+2G5bjP1ZLidSAKrr26E/uA/Ay23Mk2ITB
+ ba1KPOEVNw+xEIUbCMZ55mI4pxiCc1s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-V8m4RVr7NXyD9i9prgXVDg-1; Tue, 14 Jan 2020 04:27:50 -0500
+ us-mta-371-kGEM5DgNNVuxl78Qq2SNEw-1; Tue, 14 Jan 2020 04:28:25 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14E55801E6C;
- Tue, 14 Jan 2020 09:27:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0586B1951260;
+ Tue, 14 Jan 2020 09:28:24 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E4B3384;
- Tue, 14 Jan 2020 09:27:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D1BC726182;
+ Tue, 14 Jan 2020 09:28:14 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/29] migration: add savevm_state_handler_remove()
-Date: Tue, 14 Jan 2020 10:25:49 +0100
-Message-Id: <20200114092606.1761-13-quintela@redhat.com>
+Subject: [PULL 17/29] migration/postcopy: count target page number to decide
+ the place_needed
+Date: Tue, 14 Jan 2020 10:25:54 +0100
+Message-Id: <20200114092606.1761-18-quintela@redhat.com>
 In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
 References: <20200114092606.1761-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: V8m4RVr7NXyD9i9prgXVDg-1
+X-MC-Unique: kGEM5DgNNVuxl78Qq2SNEw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -91,7 +92,7 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
  Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
  Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Scott Cheloha <cheloha@linux.vnet.ibm.com>,
+ qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>,
@@ -100,59 +101,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Scott Cheloha <cheloha@linux.vnet.ibm.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Create a function to abstract common logic needed when removing a
-SaveStateEntry element from the savevm_state.handlers queue.
+In postcopy, it requires to place whole host page instead of target
+page.
 
-For now we just remove the element.  Soon it will involve additional
-cleanup.
+Currently, it relies on the page offset to decide whether this is the
+last target page. We also can count the target page number during the
+iteration. When the number of target page equals
+(host page size / target page size), this means it is the last target
+page in the host page.
 
-Signed-off-by: Scott Cheloha <cheloha@linux.vnet.ibm.com>
+This is a preparation for non-ordered target page transmission.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/savevm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ migration/ram.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 59efc1981d..30d980caa2 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -725,6 +725,11 @@ static void savevm_state_handler_insert(SaveStateEntry=
- *nse)
-     }
- }
+diff --git a/migration/ram.c b/migration/ram.c
+index c13b44b4d9..8ebaea255e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -4052,6 +4052,7 @@ static int ram_load_postcopy(QEMUFile *f)
+     void *postcopy_host_page =3D mis->postcopy_tmp_page;
+     void *last_host =3D NULL;
+     bool all_zero =3D false;
++    int target_pages =3D 0;
 =20
-+static void savevm_state_handler_remove(SaveStateEntry *se)
-+{
-+    QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-+}
-+
- /* TODO: Individual devices generally have very little idea about the rest
-    of the system, so instance_id should be removed/replaced.
-    Meanwhile pass -1 as instance_id if you do not already have a clearly
-@@ -777,7 +782,7 @@ void unregister_savevm(VMStateIf *obj, const char *idst=
-r, void *opaque)
-=20
-     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
-         if (strcmp(se->idstr, id) =3D=3D 0 && se->opaque =3D=3D opaque) {
--            QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-+            savevm_state_handler_remove(se);
-             g_free(se->compat);
-             g_free(se);
+     while (!ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+         ram_addr_t addr;
+@@ -4086,6 +4087,7 @@ static int ram_load_postcopy(QEMUFile *f)
+                 ret =3D -EINVAL;
+                 break;
+             }
++            target_pages++;
+             matches_target_page_size =3D block->page_size =3D=3D TARGET_PA=
+GE_SIZE;
+             /*
+              * Postcopy requires that we place whole host pages atomically=
+;
+@@ -4117,8 +4119,10 @@ static int ram_load_postcopy(QEMUFile *f)
+              * If it's the last part of a host page then we place the host
+              * page
+              */
+-            place_needed =3D (((uintptr_t)host + TARGET_PAGE_SIZE) &
+-                                     (block->page_size - 1)) =3D=3D 0;
++            if (target_pages =3D=3D (block->page_size / TARGET_PAGE_SIZE))=
+ {
++                place_needed =3D true;
++                target_pages =3D 0;
++            }
+             place_source =3D postcopy_host_page;
          }
-@@ -841,7 +846,7 @@ void vmstate_unregister(VMStateIf *obj, const VMStateDe=
-scription *vmsd,
-=20
-     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
-         if (se->vmsd =3D=3D vmsd && se->opaque =3D=3D opaque) {
--            QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
-+            savevm_state_handler_remove(se);
-             g_free(se->compat);
-             g_free(se);
-         }
+         last_host =3D host;
 --=20
 2.24.1
 
