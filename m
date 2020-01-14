@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D42CCC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1F2C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:04:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D88224672
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:03:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A737724679
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 12:04:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FyeLFEon"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D88224672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSjbeN6i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A737724679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKuj-0007wF-9c
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 07:03:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56346)
+	id 1irKw2-00015A-GP
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 07:04:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irKaX-0007vN-5W
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:28 -0500
+ (envelope-from <quintela@redhat.com>) id 1irKaj-0008NE-8E
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irKaT-0003fi-DR
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:24 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40602
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1irKad-0003iK-Ut
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44596
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKaT-0003fP-93
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:21 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKad-0003hv-Qt
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579002140;
+ s=mimecast20190719; t=1579002151;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iprvAOa2cyTKcfIq8nOi5Ry3fqn5kNfZVkcEZq0n1vM=;
- b=FyeLFEonRqP3WnhWoLqw4/PTTWciLlM14RDh0mo9lZfHDAEWUV+mUGgqHKV3DoUvlFi4nM
- vr4WfJLycGV6rg8zHK4YPfxHTfv8aIPOOddeqED6glhQ2vx/KgqnQ8mHMo/0rEqzBGD+tt
- izqsUMuoKbIpGwd0+T8e3bYem0aIICQ=
+ bh=sF9PT3VudShxE0wmWXTxFC1tzz8+9eCtUOBba9umQls=;
+ b=dSjbeN6iHFJ54rYvZ8O2tBVVivVGcaesAKzEhZ5UIPHRfU+/p94V7GN+8knRK+kKzwtTpw
+ CrOSDodQmt4RBeRlI8MMlTXMEKTrdAN1A/WGpaHPmkKYDDWG/9Dp9XdGyG1PwvONdj9IxD
+ xG0fFO91ejyBWxuwq/qGxC76sDi8KJs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-211--LqWf3sYMiq1Di-ceF2-zA-1; Tue, 14 Jan 2020 06:42:19 -0500
+ us-mta-241-MID95cAlNzCqRU41hmnghQ-1; Tue, 14 Jan 2020 06:42:30 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9689F800D48;
- Tue, 14 Jan 2020 11:42:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3EFA800A02;
+ Tue, 14 Jan 2020 11:42:27 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A155D5DA70;
- Tue, 14 Jan 2020 11:42:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EDCD55DA70;
+ Tue, 14 Jan 2020 11:42:22 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 22/30] migration/multifd: not use multifd during postcopy
-Date: Tue, 14 Jan 2020 12:39:18 +0100
-Message-Id: <20200114113926.3556-23-quintela@redhat.com>
+Subject: [PULL 24/30] migration/multifd: fix destroyed mutex access in
+ terminating multifd threads
+Date: Tue, 14 Jan 2020 12:39:20 +0100
+Message-Id: <20200114113926.3556-25-quintela@redhat.com>
 In-Reply-To: <20200114113926.3556-1-quintela@redhat.com>
 References: <20200114113926.3556-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: -LqWf3sYMiq1Di-ceF2-zA-1
+X-MC-Unique: MID95cAlNzCqRU41hmnghQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,60 +85,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Corey Minyard <cminyard@mvista.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Jason Wang <jasowang@redhat.com>,
+ Jiahui Cen <cenjiahui@huawei.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Ying Fang <fangying1@huawei.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Jiahui Cen <cenjiahui@huawei.com>
 
-We don't support multifd during postcopy, but user still could enable
-both multifd and postcopy. This leads to migration failure.
+One multifd will lock all the other multifds' IOChannel mutex to inform the=
+m
+to quit by setting p->quit or shutting down p->c. In this senario, if some
+multifds had already been terminated and multifd_load_cleanup/multifd_save_=
+cleanup
+had destroyed their mutex, it could cause destroyed mutex access when tryin=
+g
+lock their mutex.
 
-Skip multifd during postcopy.
+Here is the coredump stack:
+    #0  0x00007f81a2794437 in raise () from /usr/lib64/libc.so.6
+    #1  0x00007f81a2795b28 in abort () from /usr/lib64/libc.so.6
+    #2  0x00007f81a278d1b6 in __assert_fail_base () from /usr/lib64/libc.so=
+.6
+    #3  0x00007f81a278d262 in __assert_fail () from /usr/lib64/libc.so.6
+    #4  0x000055eb1bfadbd3 in qemu_mutex_lock_impl (mutex=3D0x55eb1e2d1988,=
+ file=3D<optimized out>, line=3D<optimized out>) at util/qemu-thread-posix.=
+c:64
+    #5  0x000055eb1bb4564a in multifd_send_terminate_threads (err=3D<optimi=
+zed out>) at migration/ram.c:1015
+    #6  0x000055eb1bb4bb7f in multifd_send_thread (opaque=3D0x55eb1e2d19f8)=
+ at migration/ram.c:1171
+    #7  0x000055eb1bfad628 in qemu_thread_start (args=3D0x55eb1e170450) at =
+util/qemu-thread-posix.c:502
+    #8  0x00007f81a2b36df5 in start_thread () from /usr/lib64/libpthread.so=
+.0
+    #9  0x00007f81a286048d in clone () from /usr/lib64/libc.so.6
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+To fix it up, let's destroy the mutex after all the other multifd threads h=
+ad
+been terminated.
+
+Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ migration/ram.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index a05448c0c9..d4f33a4f2f 100644
+index 278b2ff87a..7221f54139 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2587,10 +2587,13 @@ static int ram_save_target_page(RAMState *rs, PageS=
-earchStatus *pss,
-     }
-=20
-     /*
--     * do not use multifd for compression as the first page in the new
--     * block should be posted out before sending the compressed page
-+     * Do not use multifd for:
-+     * 1. Compression as the first page in the new block should be posted =
-out
-+     *    before sending the compressed page
-+     * 2. In postcopy as one whole host page should be placed
-      */
--    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
-+    if (!save_page_use_compression(rs) && migrate_use_multifd()
-+        && !migration_in_postcopy()) {
-         return ram_save_multifd_page(rs, block, offset);
-     }
-=20
+@@ -1053,6 +1053,10 @@ void multifd_save_cleanup(void)
+         if (p->running) {
+             qemu_thread_join(&p->thread);
+         }
++    }
++    for (i =3D 0; i < migrate_multifd_channels(); i++) {
++        MultiFDSendParams *p =3D &multifd_send_state->params[i];
++
+         socket_send_channel_destroy(p->c);
+         p->c =3D NULL;
+         qemu_mutex_destroy(&p->mutex);
+@@ -1336,6 +1340,10 @@ int multifd_load_cleanup(Error **errp)
+             qemu_sem_post(&p->sem_sync);
+             qemu_thread_join(&p->thread);
+         }
++    }
++    for (i =3D 0; i < migrate_multifd_channels(); i++) {
++        MultiFDRecvParams *p =3D &multifd_recv_state->params[i];
++
+         object_unref(OBJECT(p->c));
+         p->c =3D NULL;
+         qemu_mutex_destroy(&p->mutex);
 --=20
 2.24.1
 
