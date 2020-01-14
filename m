@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23111C33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B07C33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:01:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1B7720CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE97F20CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:01:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EBP5+WN8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B7720CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="usT/kVCS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE97F20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irBTj-0000se-1W
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 20:58:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46537)
+	id 1irBWc-0003wT-BO
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 21:01:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46945)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1irBT1-0008NX-SO
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:58:04 -0500
+ (envelope-from <alistair23@gmail.com>) id 1irBU9-0001Un-Kx
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:59:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1irBT0-00076c-N1
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:58:03 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:37785)
+ (envelope-from <alistair23@gmail.com>) id 1irBU8-000050-Bm
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:59:13 -0500
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:38787)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1irBT0-00073v-Cv; Mon, 13 Jan 2020 20:58:02 -0500
-Received: by mail-lf1-x142.google.com with SMTP id b15so8473535lfc.4;
- Mon, 13 Jan 2020 17:58:01 -0800 (PST)
+ id 1irBU8-0008Ty-40; Mon, 13 Jan 2020 20:59:12 -0500
+Received: by mail-lf1-x143.google.com with SMTP id r14so8483311lfm.5;
+ Mon, 13 Jan 2020 17:59:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=+BvT8R5z7QIhrFmhGPb8TBCNGrSfs2ldB6iaTKYVjHc=;
- b=EBP5+WN8/2VsJ10DZxxFxknAhWyLbx3HEMx49tfS6QX8qty8R7NI/Yj5q6He498vMn
- T2ttZiy10+007RwIm16xxI5Xn67nx2VvyTExubCbPG0fQ0lSZPO4bLJW+EGY6QIvtSxG
- aUevSfGOsvm4wqI/QcARFnNkzJzDXJSFsisWoC2JmLj1yJGpdnonOVusuqG7u/JxUIFu
- UV2xdml55hlUAjG5ZUybQvVKGpnczZEj55+nwgTSJpUqlUu0q76sasimU7IW1cnt8qX3
- im+x0PIrhhzeIi3mgvaWmsoJc8pRu6JSJiUADU9LO7HCVpYCEHE5otRSrr487EdHJ91l
- xoyw==
+ bh=G2QO+CSZjAl2honZM+PyUNevyOI6yY7VpogO/MBbalQ=;
+ b=usT/kVCSExlmyNayfhnZNh7UGeTN5yPzMauPArjgNBy8lEn5OCcgmURhvQHpa3z2Lw
+ PYZs4+CNpGKRRYg3XyiBLZfpmmQhhRl5zlfAvs2zqhOLQQXq+9BIeqbPIrvmUitT+Oo0
+ XJSvvFmKvnuiHhZjCMzh9VrZ/zPxJGwjwmbIC/62TZveVFJAH1ChQyJy3T6QZVswdRaZ
+ 2SkJGTf9Z3AHXUj80Huqke95TdoD6FXSHoX8ILFX8WpOtMk8Y20rBiH7qJgxDchGe7Ky
+ hjmdW8Uztw5PMjOnW5yLaxvgClrt5Hd37DqV+xuFDKeX7SLUJsw7IfQGO8t99d0/42J1
+ xISA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=+BvT8R5z7QIhrFmhGPb8TBCNGrSfs2ldB6iaTKYVjHc=;
- b=iHCaMdoA8tge8Kf0CFiOxE/bEhn3jW/swvLfKtPsX4Wu+o7YBQgGIz1i6PUv4FE7FR
- FUs6En+q/AyKG7kONslOiZQlRZotXb2Ty+ICc5fw98ZUBGweA7TdLa1CBUqQf77HEBq+
- H2SymM4OMiozwsIpbZCGGPHWevBxG6ZTvjeNrnkruALYZSpIFTkcuICNvpAxMVzUFKY6
- zRVSakAyWpGqY5sgKJ+Fr5edbzAWjeJpIEfOC3yQZh8wZKosoBou5T07Irz98KTvVynx
- ysldLOBRGx/dSGuZe2vChVfUoRV0xjIFnOUQc7BMNv03ai/F2BgZk11wtaBUrfoLXfsa
- qYFg==
-X-Gm-Message-State: APjAAAUgwU6JNKxgCmbOosu0iPNfp5YKuLMBjRURBkxfRBpTvYxPnEF+
- sxvYcJ0C3YNPWx82z+TtLztNe7Mgcs9ONGRhWbU=
-X-Google-Smtp-Source: APXvYqyJ3IXJ369ksZZpQW9lyHreYL8LIgayTmgwMEpTltOXClRRkES7MpVvmtp9/V1X4hTi3i3/BpeYaVFWohKROtQ=
-X-Received: by 2002:a19:4ac2:: with SMTP id x185mr210632lfa.131.1578967080317; 
- Mon, 13 Jan 2020 17:58:00 -0800 (PST)
+ bh=G2QO+CSZjAl2honZM+PyUNevyOI6yY7VpogO/MBbalQ=;
+ b=k/hsVXm0DeREXNvZ9klT5Sr8JBJBDW6aEllKNGcTrD537NfATdIEA0aqbUOiaYl+ia
+ HykDoRG6QVEvZh1Pr6MXIhrwdQtR+yvgTJE9IsQIk36Ax9lMN1FWuRZOO6GM15dS00PI
+ vSvnbtOd22HXkw7xI929ftBjvdV796EJx0IHqutCIHQ8+DDysXts+Z6xuYYC8N73mVjR
+ A6S8rPFE92zWLI1lX8+u74a0vPVVZ6qDZc9Ht1E/JEwyxLMfUVHFv3iLGp3jo1MqQVpW
+ DEY3HxZLGbkFzAmxGBtoxpm4IkiNCnSvjU8GygdJXcCzRDQahuQR8tYcjuyH4/V9UvNm
+ pxaw==
+X-Gm-Message-State: APjAAAULg5rW8Kzy4d77Wqzn/t/xYgZCFEsvmB/5zsyFV/w4C+Ax/jy+
+ R1Vm9A4TKI2FCEeipX+k8prq+oLImGsDx1vlCDM=
+X-Google-Smtp-Source: APXvYqyMolQ56ECk030qpcJ/Xxdzh/HLaowZNX6TD9VxXE+Er2v4KavgYxo6zpWl1cEbUIC1zNZmMfu1nMvoWuL8tsU=
+X-Received: by 2002:a19:e30b:: with SMTP id a11mr243834lfh.48.1578967150070;
+ Mon, 13 Jan 2020 17:59:10 -0800 (PST)
 MIME-Version: 1.0
 References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-12-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-12-philmd@redhat.com>
+ <20200109152133.23649-14-philmd@redhat.com>
+In-Reply-To: <20200109152133.23649-14-philmd@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 14 Jan 2020 11:57:33 +1000
-Message-ID: <CAKmqyKO8mKt=ZDVNO6bEfGi5QTCeLbYZum_-6V4yPpmf-XH1DA@mail.gmail.com>
-Subject: Re: [PATCH 11/15] exec: Replace current_machine by qdev_get_machine()
+Date: Tue, 14 Jan 2020 11:58:43 +1000
+Message-ID: <CAKmqyKNQbbuxz9jnwa5A8FiXofU9jSwMSHp1LpXmrrAQyM_ddA@mail.gmail.com>
+Subject: Re: [PATCH 13/15] accel: Replace current_machine->accelerator by
+ current_accel() method
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-Received-From: 2a00:1450:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,11 +104,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 10, 2020 at 1:37 AM Philippe Mathieu-Daud=C3=A9
+On Fri, Jan 10, 2020 at 1:38 AM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
 > As we want to remove the global current_machine,
-> replace 'current_machine' by MACHINE(qdev_get_machine()).
+> replace 'current_machine->accelerator' by current_accel().
 >
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
@@ -116,40 +117,130 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  exec.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  accel/kvm/kvm-all.c | 4 ++--
+>  accel/tcg/tcg-all.c | 2 +-
+>  memory.c            | 2 +-
+>  target/arm/kvm64.c  | 4 ++--
+>  target/i386/kvm.c   | 2 +-
+>  target/ppc/kvm.c    | 2 +-
+>  vl.c                | 2 +-
+>  7 files changed, 9 insertions(+), 9 deletions(-)
 >
-> diff --git a/exec.c b/exec.c
-> index d4b769d0d4..98f5b049ca 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1984,11 +1984,11 @@ static unsigned long last_ram_page(void)
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index b2f1a5bcb5..be1980f250 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -164,7 +164,7 @@ static NotifierList kvm_irqchip_change_notifiers =3D
 >
->  static void qemu_ram_setup_dump(void *addr, ram_addr_t size)
+>  int kvm_get_max_memslots(void)
 >  {
-> -    int ret;
-> +    MachineState *ms =3D MACHINE(qdev_get_machine());
+> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    KVMState *s =3D KVM_STATE(current_accel());
 >
->      /* Use MADV_DONTDUMP, if user doesn't want the guest memory in the c=
-ore */
-> -    if (!machine_dump_guest_core(current_machine)) {
-> -        ret =3D qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
-> +    if (!machine_dump_guest_core(ms)) {
-> +        int ret =3D qemu_madvise(addr, size, QEMU_MADV_DONTDUMP);
->          if (ret) {
->              perror("qemu_madvise");
->              fprintf(stderr, "madvise doesn't support MADV_DONTDUMP, "
-> @@ -2108,7 +2108,9 @@ size_t qemu_ram_pagesize_largest(void)
+>      return s->nr_slots;
+>  }
+> @@ -1847,7 +1847,7 @@ static int kvm_max_vcpu_id(KVMState *s)
 >
->  static int memory_try_enable_merging(void *addr, size_t len)
+>  bool kvm_vcpu_id_is_valid(int vcpu_id)
 >  {
-> -    if (!machine_mem_merge(current_machine)) {
-> +    MachineState *ms =3D MACHINE(qdev_get_machine());
-> +
-> +    if (!machine_mem_merge(ms)) {
->          /* disabled by the user */
->          return 0;
+> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    KVMState *s =3D KVM_STATE(current_accel());
+>      return vcpu_id >=3D 0 && vcpu_id < kvm_max_vcpu_id(s);
+>  }
+>
+> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+> index 1dc384c8d2..1802ce02f6 100644
+> --- a/accel/tcg/tcg-all.c
+> +++ b/accel/tcg/tcg-all.c
+> @@ -124,7 +124,7 @@ static void tcg_accel_instance_init(Object *obj)
+>
+>  static int tcg_init(MachineState *ms)
+>  {
+> -    TCGState *s =3D TCG_STATE(current_machine->accelerator);
+> +    TCGState *s =3D TCG_STATE(current_accel());
+>
+>      tcg_exec_init(s->tb_size * 1024 * 1024);
+>      cpu_interrupt_handler =3D tcg_handle_interrupt;
+> diff --git a/memory.c b/memory.c
+> index 57e38b1f50..60e8993499 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -3106,7 +3106,7 @@ void mtree_info(bool flatview, bool dispatch_tree, =
+bool owner)
+>          };
+>          GArray *fv_address_spaces;
+>          GHashTable *views =3D g_hash_table_new(g_direct_hash, g_direct_e=
+qual);
+> -        AccelClass *ac =3D ACCEL_GET_CLASS(current_machine->accelerator)=
+;
+> +        AccelClass *ac =3D ACCEL_GET_CLASS(current_accel());
+>
+>          if (ac->has_memory) {
+>              fvi.ac =3D ac;
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 876184b8fe..f677877a1e 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -613,14 +613,14 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatur=
+es *ahcf)
+>
+>  bool kvm_arm_aarch32_supported(CPUState *cpu)
+>  {
+> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    KVMState *s =3D KVM_STATE(current_accel());
+>
+>      return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
+>  }
+>
+>  bool kvm_arm_sve_supported(CPUState *cpu)
+>  {
+> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    KVMState *s =3D KVM_STATE(current_accel());
+>
+>      return kvm_check_extension(s, KVM_CAP_ARM_SVE);
+>  }
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 0b511906e3..2ed15814dc 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -147,7 +147,7 @@ bool kvm_allows_irq0_override(void)
+>
+>  static bool kvm_x2apic_api_set_flags(uint64_t flags)
+>  {
+> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    KVMState *s =3D KVM_STATE(current_accel());
+>
+>      return !kvm_vm_enable_cap(s, KVM_CAP_X2APIC_API, 0, flags);
+>  }
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index d1c334f0e3..2d011308e0 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -258,7 +258,7 @@ static void kvm_get_smmu_info(struct kvm_ppc_smmu_inf=
+o *info, Error **errp)
+>
+>  struct ppc_radix_page_info *kvm_get_radix_page_info(void)
+>  {
+> -    KVMState *s =3D KVM_STATE(current_machine->accelerator);
+> +    KVMState *s =3D KVM_STATE(current_accel());
+>      struct ppc_radix_page_info *radix_page_info;
+>      struct kvm_ppc_rmmu_info rmmu_info;
+>      int i;
+> diff --git a/vl.c b/vl.c
+> index 86474a55c9..3ff3548183 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2804,7 +2804,7 @@ static void configure_accelerators(const char *prog=
+name)
 >      }
+>
+>      if (init_failed) {
+> -        AccelClass *ac =3D ACCEL_GET_CLASS(current_machine->accelerator)=
+;
+> +        AccelClass *ac =3D ACCEL_GET_CLASS(current_accel());
+>          error_report("falling back to %s", ac->name);
+>      }
+>
 > --
 > 2.21.1
 >
