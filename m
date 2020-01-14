@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E01ACC33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8CFC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADC8C24681
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3987924682
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:18:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K4bGHv/x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC8C24681
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CwIVcRn5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3987924682
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNw8-0005KS-09
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:16:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37962)
+	id 1irNxT-0006u5-Du
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:18:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37751)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1irNpk-0005SF-Ni
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:23 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1irNpW-00054G-53
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1irNpj-0007go-AA
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:20 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45515)
+ (envelope-from <alex.bennee@linaro.org>) id 1irNpU-0007Rt-EQ
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:05 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38584)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1irNpj-0007Yx-15
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:19 -0500
-Received: by mail-wr1-x443.google.com with SMTP id j42so12479288wrj.12
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:10:11 -0800 (PST)
+ id 1irNpU-0007Qd-6Q
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:04 -0500
+Received: by mail-wm1-x343.google.com with SMTP id u2so14116046wmc.3
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:10:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=anlfnB/asVkTJ6RtskIPp90azP/8H+sHTGGY0UbzreY=;
- b=K4bGHv/xQxqrTpz/FO5r/p0qqat5XJ9cHKNgajOby8XNuyQzd3zh1/L4BaTd+6FA6d
- BxCqzaIoJ9CYKDl12zIL8Odvi7Apzf4oPLoBTRMmqwiOwDv+PKNtAtdfm2vdScNUngmm
- Q2tg2G/MlG0ZAXugONgei1cQWDlWd/Epzr53yWMKshfhbpIXeYO/w63axPK9JnQpI6q9
- /X56kCn/mL0UvgEj37O6Oki8Ro2KLJOebwsAS8aL/hO7c8m2FJoFlIYwPCBuXiGrtNjh
- StldL2VahypN3idKTPoLJCHhhPrYxFIGH59YgelDmZZqU8IWulR+uYIj6RVGXhIA+p5g
- YJ9g==
+ bh=Ch6DCpi+AeeZAWG9eKFNVIGrenNGJRRQr50yqM/8GMU=;
+ b=CwIVcRn573eAnoApvsDSsnJt30RTfzfZnor/0Yy/FMTF6ABQbfUcv3jpt5IZz0VPRr
+ GK92vPk5F1nScR+d7PG7jlykhk0bFTB024tChMknkYq7TTxt2TZ7NdMQElCVpJoz0dTG
+ xYLmMqpwf4I2EnTYdWaIWUT4qp6Ho/TaGmyYnST0UE1BiTg8yR9gmt/s+ldNg97xx69s
+ OBdUFnwZdLNR+gYaRo2D+apAKsmxfYL2dmZ6EDhf625OqzNBTMe3LETDUcsm541pjJ3j
+ xPFb4la6XsWW7ACA4FBVI34NerECG7kYwd1CHaBIeNamX+CJFZLAreoKwpMnqImaJwc5
+ a8mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=anlfnB/asVkTJ6RtskIPp90azP/8H+sHTGGY0UbzreY=;
- b=e2Cii8XCtSrUEZk3em5QLUcqjWPFitbKaBvskTTz/ynUrAi4f64uuHC38uuWMAAbCZ
- lcEd88lVLl7A5g7MxAwBFV8X6pbmYWX/OjWUIChrvL/217AahyY8cSJel116vyfR4V9G
- SoR1JHUvC0MbFPaNBW3F4UIdbeShnEb59tREILau/xdwOuqFlrilOGClr48/Bjmn8UPj
- /UlfyUgwzSZBzhSUjukOKLYOgEe3CsZTmqeMI2CXgAts1KM1gnjkGygo8z1mdcH4/MxM
- YVBT0sUscLGn+1bp7Tf1u4zJQG7045CYe5DfNMjPCmp2P71BD3XwBlOMC6HAjJQO8ZmK
- 4Znw==
-X-Gm-Message-State: APjAAAXOsKQ71s75pNVIWacdlcLDbez4vX5bpk1M/qUIUokSJx2xokt0
- vQfntuEG+PR4DAAyCXUIQCtuGA==
-X-Google-Smtp-Source: APXvYqx8aPeZAa5gP1bUwmmzsgi2v1cxVe4V+wRbiSJlTrpHfOFGT8ui4x/nRkgJMeERruuPaV6+ig==
-X-Received: by 2002:a5d:6408:: with SMTP id z8mr25868916wru.122.1579014610055; 
- Tue, 14 Jan 2020 07:10:10 -0800 (PST)
+ bh=Ch6DCpi+AeeZAWG9eKFNVIGrenNGJRRQr50yqM/8GMU=;
+ b=Uuyg09ITXlsBx882uJbzmH5ua6eLbEl8ZVNAD87bbPQ3daFrtHO293vnKmvEr7l+ze
+ CohxyiSn8AlP2sRAhOZomvdCpVK5LtKGtb9/+NSI1NsoNinlwWrKiDzYwzfpVopWbVUS
+ 0dwieaMQbihvMXgzm4vsvjFpHdmLjl1/M8m1tqyzjMy9Yw3z99BT1H1u9bFc/cDYcZqo
+ qGtACLa1SzZaTu4zsr3Z2a2SkVTNYdcqn4bHaimGP7AIByhNQhtiQQqzbhgDGXhkQbPE
+ tFhUpBk9Ykkc4CnPzHLnDoAAZo2mPopA3fb6qFn9f/8Q7tGeQh3O0SVj3NUXmpY+6pEd
+ EMew==
+X-Gm-Message-State: APjAAAXWc+QKE6CciJ9sFk3MWwHONfh4kF6NHhXK4LatatLi3MNn3daZ
+ L+rbG35houdGX2nYqG7EV17oVg==
+X-Google-Smtp-Source: APXvYqxP0u0rJIt74SxgwunBNt02dysrtLxSgJ2ydF/WGeILGFZVKXRpUqHv/72rjAJVKT6lJl1CNg==
+X-Received: by 2002:a05:600c:298:: with SMTP id
+ 24mr26779366wmk.141.1579014603261; 
+ Tue, 14 Jan 2020 07:10:03 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t81sm18850690wmg.6.2020.01.14.07.10.00
+ by smtp.gmail.com with ESMTPSA id y17sm19082401wma.36.2020.01.14.07.09.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 07:10:05 -0800 (PST)
+ Tue, 14 Jan 2020 07:10:02 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7D5B71FF9D;
- Tue, 14 Jan 2020 15:09:56 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id B51061FF87;
+ Tue, 14 Jan 2020 15:09:55 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 14/22] target/arm: don't bother with id_aa64pfr0_read for
- USER_ONLY
-Date: Tue, 14 Jan 2020 15:09:45 +0000
-Message-Id: <20200114150953.27659-15-alex.bennee@linaro.org>
+Subject: [PATCH  v5 09/22] target/arm: prepare for multiple dynamic XMLs
+Date: Tue, 14 Jan 2020 15:09:40 +0000
+Message-Id: <20200114150953.27659-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200114150953.27659-1-alex.bennee@linaro.org>
 References: <20200114150953.27659-1-alex.bennee@linaro.org>
@@ -85,7 +85,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,78 +97,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For system emulation we need to check the state of the GIC before we
-report the value. However this isn't relevant to exporting of the
-value to linux-user and indeed breaks the exported value as set by
-modify_arm_cp_regs.
+We will want to generate similar dynamic XML for gdbstub support of
+SVE registers (the upstream doesn't use XML). To that end lightly
+rename a few things to make the distinction.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v2
-  - extend the ifdef and make type CONST with no accessfn
----
- target/arm/helper.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ target/arm/cpu.h     | 20 +++++++++++++-------
+ target/arm/gdbstub.c | 30 +++++++++++++++---------------
+ target/arm/helper.c  |  4 ++--
+ 3 files changed, 30 insertions(+), 24 deletions(-)
 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index d44d8282a2..bd15587305 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -128,14 +128,20 @@ enum {
+ /**
+  * DynamicGDBXMLInfo:
+  * @desc: Contains the XML descriptions.
+- * @num_cpregs: Number of the Coprocessor registers seen by GDB.
+- * @cpregs_keys: Array that contains the corresponding Key of
+- * a given cpreg with the same order of the cpreg in the XML description.
++ * @num: Number of the registers in this XML seen by GDB.
++ * @data: A union with data specific to the set of registers
++ *    @cpregs_keys: Array that contains the corresponding Key of
++ *                  a given cpreg with the same order of the cpreg
++ *                  in the XML description.
+  */
+ typedef struct DynamicGDBXMLInfo {
+     char *desc;
+-    int num_cpregs;
+-    uint32_t *cpregs_keys;
++    int num;
++    union {
++        struct {
++            uint32_t *keys;
++        } cpregs;
++    } data;
+ } DynamicGDBXMLInfo;
+ 
+ /* CPU state for each instance of a generic timer (in cp15 c14) */
+@@ -748,7 +754,7 @@ struct ARMCPU {
+     uint64_t *cpreg_vmstate_values;
+     int32_t cpreg_vmstate_array_len;
+ 
+-    DynamicGDBXMLInfo dyn_xml;
++    DynamicGDBXMLInfo dyn_sysreg_xml;
+ 
+     /* Timers used by the generic (architected) timer */
+     QEMUTimer *gt_timer[NUM_GTIMERS];
+@@ -960,7 +966,7 @@ int arm_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ /* Dynamically generates for gdb stub an XML description of the sysregs from
+  * the cp_regs hashtable. Returns the registered sysregs number.
+  */
+-int arm_gen_dynamic_xml(CPUState *cpu);
++int arm_gen_dynamic_sysreg_xml(CPUState *cpu);
+ 
+ /* Returns the dynamically generated XML for the gdb stub.
+  * Returns a pointer to the XML contents for the specified XML file or NULL
+diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+index 4557775d24..1f68ab98c3 100644
+--- a/target/arm/gdbstub.c
++++ b/target/arm/gdbstub.c
+@@ -106,15 +106,15 @@ int arm_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     return 0;
+ }
+ 
+-static void arm_gen_one_xml_reg_tag(GString *s, DynamicGDBXMLInfo *dyn_xml,
+-                                    ARMCPRegInfo *ri, uint32_t ri_key,
+-                                    int bitsize)
++static void arm_gen_one_xml_sysreg_tag(GString *s, DynamicGDBXMLInfo *dyn_xml,
++                                       ARMCPRegInfo *ri, uint32_t ri_key,
++                                       int bitsize)
+ {
+     g_string_append_printf(s, "<reg name=\"%s\"", ri->name);
+     g_string_append_printf(s, " bitsize=\"%d\"", bitsize);
+     g_string_append_printf(s, " group=\"cp_regs\"/>");
+-    dyn_xml->num_cpregs++;
+-    dyn_xml->cpregs_keys[dyn_xml->num_cpregs - 1] = ri_key;
++    dyn_xml->data.cpregs.keys[dyn_xml->num] = ri_key;
++    dyn_xml->num++;
+ }
+ 
+ static void arm_register_sysreg_for_xml(gpointer key, gpointer value,
+@@ -126,12 +126,12 @@ static void arm_register_sysreg_for_xml(gpointer key, gpointer value,
+     GString *s = param->s;
+     ARMCPU *cpu = ARM_CPU(param->cs);
+     CPUARMState *env = &cpu->env;
+-    DynamicGDBXMLInfo *dyn_xml = &cpu->dyn_xml;
++    DynamicGDBXMLInfo *dyn_xml = &cpu->dyn_sysreg_xml;
+ 
+     if (!(ri->type & (ARM_CP_NO_RAW | ARM_CP_NO_GDB))) {
+         if (arm_feature(env, ARM_FEATURE_AARCH64)) {
+             if (ri->state == ARM_CP_STATE_AA64) {
+-                arm_gen_one_xml_reg_tag(s , dyn_xml, ri, ri_key, 64);
++                arm_gen_one_xml_sysreg_tag(s , dyn_xml, ri, ri_key, 64);
+             }
+         } else {
+             if (ri->state == ARM_CP_STATE_AA32) {
+@@ -140,30 +140,30 @@ static void arm_register_sysreg_for_xml(gpointer key, gpointer value,
+                     return;
+                 }
+                 if (ri->type & ARM_CP_64BIT) {
+-                    arm_gen_one_xml_reg_tag(s , dyn_xml, ri, ri_key, 64);
++                    arm_gen_one_xml_sysreg_tag(s , dyn_xml, ri, ri_key, 64);
+                 } else {
+-                    arm_gen_one_xml_reg_tag(s , dyn_xml, ri, ri_key, 32);
++                    arm_gen_one_xml_sysreg_tag(s , dyn_xml, ri, ri_key, 32);
+                 }
+             }
+         }
+     }
+ }
+ 
+-int arm_gen_dynamic_xml(CPUState *cs)
++int arm_gen_dynamic_sysreg_xml(CPUState *cs)
+ {
+     ARMCPU *cpu = ARM_CPU(cs);
+     GString *s = g_string_new(NULL);
+     RegisterSysregXmlParam param = {cs, s};
+ 
+-    cpu->dyn_xml.num_cpregs = 0;
+-    cpu->dyn_xml.cpregs_keys = g_new(uint32_t, g_hash_table_size(cpu->cp_regs));
++    cpu->dyn_sysreg_xml.num = 0;
++    cpu->dyn_sysreg_xml.data.cpregs.keys = g_new(uint32_t, g_hash_table_size(cpu->cp_regs));
+     g_string_printf(s, "<?xml version=\"1.0\"?>");
+     g_string_append_printf(s, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
+     g_string_append_printf(s, "<feature name=\"org.qemu.gdb.arm.sys.regs\">");
+     g_hash_table_foreach(cpu->cp_regs, arm_register_sysreg_for_xml, &param);
+     g_string_append_printf(s, "</feature>");
+-    cpu->dyn_xml.desc = g_string_free(s, false);
+-    return cpu->dyn_xml.num_cpregs;
++    cpu->dyn_sysreg_xml.desc = g_string_free(s, false);
++    return cpu->dyn_sysreg_xml.num;
+ }
+ 
+ const char *arm_gdb_get_dynamic_xml(CPUState *cs, const char *xmlname)
+@@ -171,7 +171,7 @@ const char *arm_gdb_get_dynamic_xml(CPUState *cs, const char *xmlname)
+     ARMCPU *cpu = ARM_CPU(cs);
+ 
+     if (strcmp(xmlname, "system-registers.xml") == 0) {
+-        return cpu->dyn_xml.desc;
++        return cpu->dyn_sysreg_xml.desc;
+     }
+     return NULL;
+ }
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 7dae067b3d..79cad7aad1 100644
+index f6df3735e9..f05bd2fc76 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -5924,6 +5924,7 @@ static uint64_t id_pfr1_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     return pfr1;
- }
+@@ -207,7 +207,7 @@ static int arm_gdb_get_sysreg(CPUARMState *env, GByteArray *buf, int reg)
+     const ARMCPRegInfo *ri;
+     uint32_t key;
  
-+#ifndef CONFIG_USER_ONLY
- static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
-     ARMCPU *cpu = env_archcpu(env);
-@@ -5934,6 +5935,7 @@ static uint64_t id_aa64pfr0_read(CPUARMState *env, const ARMCPRegInfo *ri)
+-    key = cpu->dyn_xml.cpregs_keys[reg];
++    key = cpu->dyn_sysreg_xml.data.cpregs.keys[reg];
+     ri = get_arm_cp_reginfo(cpu->cp_regs, key);
+     if (ri) {
+         if (cpreg_field_is_64bit(ri)) {
+@@ -7141,7 +7141,7 @@ void arm_cpu_register_gdb_regs_for_features(ARMCPU *cpu)
+                                  19, "arm-vfp.xml", 0);
      }
-     return pfr0;
+     gdb_register_coprocessor(cs, arm_gdb_get_sysreg, arm_gdb_set_sysreg,
+-                             arm_gen_dynamic_xml(cs),
++                             arm_gen_dynamic_sysreg_xml(cs),
+                              "system-registers.xml", 0);
  }
-+#endif
  
- /* Shared logic between LORID and the rest of the LOR* registers.
-  * Secure state has already been delt with.
-@@ -6426,16 +6428,24 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-          * define new registers here.
-          */
-         ARMCPRegInfo v8_idregs[] = {
--            /* ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST because we don't
--             * know the right value for the GIC field until after we
--             * define these regs.
-+            /*
-+             * ID_AA64PFR0_EL1 is not a plain ARM_CP_CONST in system
-+             * emulation because we don't know the right value for the
-+             * GIC field until after we define these regs.
-              */
-             { .name = "ID_AA64PFR0_EL1", .state = ARM_CP_STATE_AA64,
-               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 0,
--              .access = PL1_R, .type = ARM_CP_NO_RAW,
-+              .access = PL1_R,
-+#ifdef CONFIG_USER_ONLY
-+              .type = ARM_CP_CONST,
-+              .resetvalue = cpu->isar.id_aa64pfr0
-+#else
-+              .type = ARM_CP_NO_RAW,
-               .accessfn = access_aa64_tid3,
-               .readfn = id_aa64pfr0_read,
--              .writefn = arm_cp_write_ignore },
-+              .writefn = arm_cp_write_ignore
-+#endif
-+            },
-             { .name = "ID_AA64PFR1_EL1", .state = ARM_CP_STATE_AA64,
-               .opc0 = 3, .opc1 = 0, .crn = 0, .crm = 4, .opc2 = 1,
-               .access = PL1_R, .type = ARM_CP_CONST,
 -- 
 2.20.1
 
