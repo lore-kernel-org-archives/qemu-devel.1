@@ -2,86 +2,88 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5C5C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A198C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25A6C24656
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B9124656
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:32:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAM3GoJq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25A6C24656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9DXvFuY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B9124656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irP5d-0003gA-3K
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 11:30:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58007)
+	id 1irP6l-0005XH-AU
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 11:31:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58169)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1irP3v-0002j7-9c
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:29:05 -0500
+ (envelope-from <stefanha@gmail.com>) id 1irP4w-0003jS-0C
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1irP3u-0005H1-3u
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:29:03 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39573)
+ (envelope-from <stefanha@gmail.com>) id 1irP4u-0006Z3-Vv
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:30:05 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36212)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1irP3t-0005Fl-T1; Tue, 14 Jan 2020 11:29:02 -0500
-Received: by mail-wr1-x443.google.com with SMTP id y11so12809835wrt.6;
- Tue, 14 Jan 2020 08:29:01 -0800 (PST)
+ id 1irP4u-0006Xi-OH; Tue, 14 Jan 2020 11:30:04 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p17so14483124wma.1;
+ Tue, 14 Jan 2020 08:30:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=hZ0dAu06YTeL4GnA5ycIpjXaPaGVq2wKErkJX2gIqmI=;
- b=eAM3GoJqT22bB/Gb9F/rUHKv3RVdHK8aPhlXxeDF/9tbZSObzrWlBU8tJxN6siV4Jq
- 5ZR13OBu/1dXd6vN5ce6gSqrHGL/Uv+w/gtxWpXlk6S+2JEggkbjHPLDDbYheQGeFZBZ
- n7EUImAHlPsETrjwLKBFNdYp58Q+El5vU15aIenAfm869XLNZLtVi1XHlQdiYZ8NKk/8
- K/mHceb0i7ZY7hgQO4cRjV91M6ufrTIcdTa4hb/ZrlCKtjQ6Ah0Jg0hMAVOnJaVnpk+W
- 0zuBH4G9MrkLJMpgLLANNWj1ydibtzaojcqnvZ9ZDSDWtI/dxCRDecCXSbGaOSk0vcCe
- MZ3g==
+ bh=VAWUf470votaGlO3dpWxsjkTNozhmpJDGFqMebMYQ+0=;
+ b=W9DXvFuYrSiE+qtSeSsdcpLJRkNJIoJPyXa8Azj87Mir2u9lF4EJXuRvyK0xyEypJ0
+ dcS2nvr5ni5UrIb5ya8Utr7uist6/8P58jOvq9bsyz0ktOiucD5mQkWpuWFk0DO3m4zv
+ 3NbWpSHDxx65kciql+WUIuJkrCwsqiSQPE5lNsoe1q+uVe35fETAlJbKmlwQYPnr9K5E
+ WtDy+lgCL7vtXea62fA5niQJNqZ0dbCq6mDwlguPQlCin4hNbEEB2/8k5O3/7TI2dfWV
+ 1gCQhZNKftcj296MpWF+dNOC/lcMvz5WpM5POjr2Pgm09/076Ax3inyW+wXGYKFFMSdD
+ xF1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=hZ0dAu06YTeL4GnA5ycIpjXaPaGVq2wKErkJX2gIqmI=;
- b=t5Kx7FlSZss0ang+xPMOXqyidscc8GP3JC0IAAeD14J1/5xreto7zS1o/YsqxBDi9g
- D90QMWgEYzDhIwecK74K4J262vXDkf8DdCB5rKX6AMhEo3nzDOwLZNpPI5bzbB/aQhCP
- SGhDd4cJJnCzMBMEs9/IYU0IBuSrnLxSw6P/0naumGqUDZ9xNDzJxvepRy6Tn16vYL8j
- srd9lKfA11PhQiXl6GfM432GMfI9bXZtLoWGHsjVAsIo+6+zg4JmqjpQ0fWk6LC4Z79V
- ABnK5ewlZBkSp4M5rgTmEH9IzS/QjWThFxlKUn2CVlNAaBeXphQG6k+TTW9thpQBzXnM
- 5FFw==
-X-Gm-Message-State: APjAAAUp5ldhcwfj4sZTZSqOxNtYHjLZ00vHackOyrwo4XU5+AWiSwvy
- ZDKYYTz6cQp6K2ToWj1Ra1o=
-X-Google-Smtp-Source: APXvYqyPIp/g5lhe0KJGIut7cCNrL9Y23lmH/GFBhTKzJ3kDJGUP4UO854K/cvp2L79Tj3G+5VgZWQ==
-X-Received: by 2002:adf:82a7:: with SMTP id 36mr27153354wrc.203.1579019340783; 
- Tue, 14 Jan 2020 08:29:00 -0800 (PST)
+ bh=VAWUf470votaGlO3dpWxsjkTNozhmpJDGFqMebMYQ+0=;
+ b=PixRNPe1o8Ywba/wOzh1+nvq4Gb5U21ZbNNursoin4L70il+Tb7oKE/TvsHfZmMS4P
+ AR5Ck1JsDgwNLx5Q/4rHQQ/DbLMzh/waM13fsnOWZAsLFt7k8oH9pffVTYQjJCtQEZca
+ teZIMWRShuK/5HntHHdH/N0jR3JyP+f6uXLhI/KGZMP0LvypsDmZ03lR+jxT0jUO8F7M
+ zIrgrWK1uqtxnlSKcm4dVgEVZCogCzSepNmu5DBl98XVYnM996eLbn0nGlWEJBc3PBw5
+ 8OQQytTRpaiEkJAWYI8R0KZcNICpp7CWap8DunndpVDQTaKPlne71L2bsur2qu9hwoQT
+ weJQ==
+X-Gm-Message-State: APjAAAXx3tUR4Gdgw+k2h/S+txz9vRqyvcKTQh0kYxRT2YbOgi+xUOtM
+ q8XUTMUw8VG+WbNlCuVufWY=
+X-Google-Smtp-Source: APXvYqzOl3OY3LrH59MuAN5EM+iRiSzrT01WtxWdm789Zqr01da2ITBLSYVd/0geSCkJjUP1CyAk1Q==
+X-Received: by 2002:a1c:6a12:: with SMTP id f18mr2277844wmc.29.1579019403584; 
+ Tue, 14 Jan 2020 08:30:03 -0800 (PST)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v62sm20072355wmg.3.2020.01.14.08.28.59
+ by smtp.gmail.com with ESMTPSA id y20sm18785599wmi.25.2020.01.14.08.30.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 08:28:59 -0800 (PST)
-Date: Tue, 14 Jan 2020 16:28:58 +0000
+ Tue, 14 Jan 2020 08:30:02 -0800 (PST)
+Date: Tue, 14 Jan 2020 16:30:00 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 0/3] block/io: serialising request clean up and
- locking fix
-Message-ID: <20200114162858.GD132666@stefanha-x1.localdomain>
-References: <1578495356-46219-1-git-send-email-pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 2/4] block: Mark 'block_resize' as coroutine
+Message-ID: <20200114163000.GE132666@stefanha-x1.localdomain>
+References: <20200109183545.27452-1-kwolf@redhat.com>
+ <20200109183545.27452-3-kwolf@redhat.com>
+ <20200113165648.GD103384@stefanha-x1.localdomain>
+ <20200113171009.GH5549@linux.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="C+ts3FVlLX8+P6JN"
+ protocol="application/pgp-signature"; boundary="xJK8B5Wah2CMJs8h"
 Content-Disposition: inline
-In-Reply-To: <1578495356-46219-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <20200113171009.GH5549@linux.fritz.box>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,60 +95,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---C+ts3FVlLX8+P6JN
+--xJK8B5Wah2CMJs8h
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 08, 2020 at 03:55:53PM +0100, Paolo Bonzini wrote:
-> Peter Lieven noticed that reqs->overlap_offset and reqs->overlap_bytes
-> are written outside bs->reqs_lock.  Patch 3 fixes it, while patches 1
-> and 2 are preparatory cleanups.
+On Mon, Jan 13, 2020 at 06:10:09PM +0100, Kevin Wolf wrote:
+> Am 13.01.2020 um 17:56 hat Stefan Hajnoczi geschrieben:
+> > On Thu, Jan 09, 2020 at 07:35:43PM +0100, Kevin Wolf wrote:
+> > > block_resize is safe to run in a coroutine, so use it as an example f=
+or
+> > > the new 'coroutine': true annotation in the QAPI schema.
+> > >=20
+> > > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > > ---
+> > >  qapi/block-core.json | 3 ++-
+> > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > > index 7ff5e5edaf..1dbb2a9901 100644
+> > > --- a/qapi/block-core.json
+> > > +++ b/qapi/block-core.json
+> > > @@ -1341,7 +1341,8 @@
+> > >  { 'command': 'block_resize',
+> > >    'data': { '*device': 'str',
+> > >              '*node-name': 'str',
+> > > -            'size': 'int' } }
+> > > +            'size': 'int' },
+> > > +  'coroutine': true }
+> > > =20
+> > >  ##
+> > >  # @NewImageMode:
+> >=20
+> > coroutine_fn is missing on
+> > blockdev.c:void qmp_block_resize(bool has_device, const char *device,
 >=20
-> v1->v2: fix comment in patch 2, commit message in patch 3 [Kevin]
->=20
-> Paolo Bonzini (3):
->   block: eliminate BDRV_REQ_NO_SERIALISING
->   block/io: wait for serialising requests when a request becomes
->     serialising
->   block/io: take bs->reqs_lock in bdrv_mark_request_serialising
->=20
->  block/file-posix.c        |   1 -
->  block/io.c                | 162 +++++++++++++++++++++++-----------------=
-------
->  include/block/block.h     |  12 ----
->  include/block/block_int.h |   3 +-
->  4 files changed, 81 insertions(+), 97 deletions(-)
+> It wouldn't even be true until after patch 4. Should I reorder the
+> patches so I can add coroutine_fn?
 
-Is it possible to trigger the bug somehow?
-
-Can you implement a test case?
-
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Yes, please.
 
 Stefan
 
---C+ts3FVlLX8+P6JN
+--xJK8B5Wah2CMJs8h
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4d7EoACgkQnKSrs4Gr
-c8igAwgAklnpKn98NM21A3i3LWV2wW6t3p5NptA1aPRzIIEK22L4tvD1XvQ71adV
-2hWERCBM+SMHNR4Uz/Cz0OCxdFp9bCsxHasVVkDjtZVadyI3TfHkdLP5DsGo5Iu9
-qpMDksaMEz8CsFzBAnlLXl8GVvChM2/vQcH3/wvgqIoIfmBNGJUMSLBYsMhjq10i
-e9TiuCMt0Q/vd3MRSAhkrVtxgbKcBwQ6W3P5FQs79NUeCMYda7l+Fvg8EYNyA6bq
-S/kRUwHxSBoOWIwevwUG6I6K+DLTWdTu6F2XzJQqpmXjVM0TVJOo1waTM41Asj63
-RMHOB1CEXMeBV1aVsGVhO/Gr8/acsg==
-=n1TU
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4d7IgACgkQnKSrs4Gr
+c8iHAAgAw/lZ5s8tb8P/cbOQ+WtDUxip00NpCShEyUgS29+oSh4Z1N3BmkUEvg45
+Oj3+vUqr9AKo4fPZtyU78NLOKwLLO+T7kU3WF7G75q2PxZVqN8Bmi5AYWRWdVaBT
+RBd1Gmi2QAlCWqTiEv4HN/Zg9jQEH4Ze9XD9wyr86CvxksGZ6vaY06PgfwWqUNmM
+HLAfTrKwwEx828Omnki+d5YqHO5OZMZVPujNirMdCtO3AIOmz0RBzN3G+cpK4PNe
+EqQANlzr+VRSVp+sqeqJyEV3aNksJkAyA3d2w2EiVn6DSBAV5iPLYFMm24QCrakU
+G1xwhj8Nl4J5UWKbC/59l1al7PbLnQ==
+=V4UJ
 -----END PGP SIGNATURE-----
 
---C+ts3FVlLX8+P6JN--
+--xJK8B5Wah2CMJs8h--
 
