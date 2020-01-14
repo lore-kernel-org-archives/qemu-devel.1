@@ -6,39 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E97A6C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C115C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:36:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDE592467D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:34:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE592467D
+	by mail.kernel.org (Postfix) with ESMTPS id 1047720678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:36:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1047720678
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNGc-0000EU-UW
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:34:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59580)
+	id 1irNIa-0002vk-Pq
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:36:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNFJ-0007nS-2X
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:32:45 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irNH7-0001CB-R9
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:34:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNFF-0000p1-CC
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:32:40 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:36151)
+ (envelope-from <laurent@vivier.eu>) id 1irNH6-0001Jz-Ls
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:34:33 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:57773)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNFF-0000os-2x
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:32:37 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNH6-0001JV-D1
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:34:32 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MlsWZ-1jZXsc1SgF-00j27z; Tue, 14 Jan 2020 15:32:21 +0100
-Subject: Re: [PATCH v5 13/20] linux-user: Add support for FITRIM ioctl
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MfHQp-1jK6S32qOB-00gmGW; Tue, 14 Jan 2020 15:34:16 +0100
+Subject: Re: [PATCH v5 14/20] linux-user: Add support for FIFREEZE and FITHAW
+ ioctls
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-14-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1578947683-21011-15-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <d0019bc9-7003-af76-949b-77867a80504a@vivier.eu>
-Date: Tue, 14 Jan 2020 15:32:20 +0100
+Message-ID: <b0b5e141-f03e-2087-5a38-00291dc63cab@vivier.eu>
+Date: Tue, 14 Jan 2020 15:34:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-14-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1578947683-21011-15-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SKFjUdQ2SVX3fIIBVoI8wwsL84dW9lWjtj9GntoFnADfZdhB0Fc
- V09Hz50rAHcnQfcPksE4sle6qjWjqBpe7QkZCkcBm2g+QfLSJ8JeMoA+KAo9hysTA7cWrJ2
- 4D4zF0ildEyQ9HoZvMVzw8ARDiqT9T8KWtum6zgwW604+unJK6O4QPrc8LyAmyY9jNPllc9
- ackrPQhEo4Ls+6Md/VtYg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9skTf99oBEs=:UQjPDKGdEyU2MzuUe7aRLB
- 2DnceD/mpu+Lxn+zdct3KpNGax8SoLaZM3NAP96XkO8uXjzhkTBtylXMHF5jKybTevLRXagQY
- ha8MG00IgLffjcL/2hsCMlGgpkfkygV/E63uQSnO/RA0HMIrRDkk1eioELw6mIUZaSinRE6b6
- nco/6ef+0QYYqVjaLxpUL0ZmBjS1PLPqomi7RlmzXVyOhwM4MoxOFucSijFViRZRS3RqJA6UN
- Tvl+7iSfxVREuhHMd7YEcf9aLFG7E5Xc+6VH4Zj3VvvP2dmKnxKsU2Aw+8thHBVVjFEKD3YLi
- UQAi2Hjle057/IAtdMK1Q3UQG5fQYgInAXdeNmKMDutJKTdSlmJTEPc6JiDfup4ml7vN3hUd1
- BWuonA8f/XdwTWR2XIGzox9CNsdA8ExnAFyRdwH71fTkZ85mkd+SbNn0fqY4oja/LI3Pm5RoZ
- SZBf+E0+asFbecEtZANERT7jgVoNlh36YSIYeGQVcKNstVdc6Nejgm5CaqVqKamT7rBmWh4/k
- Ws6BcaFbwWVZjueM6jJ9f1AqOyYVveNyYGkijN+BF3X54pv0+Bj1n8fHcaShKcKzPV9cNnhPN
- yha/Ei0vzcRtt2N8abZQKF0VfMlLaWVbSQxHgoPO4HA1dqJK1dZmLJ0ZeccaH/zvVR0Uk7O0S
- hnZVkeW/CsDaFEfJP8iQs5jXr7SP+0kplMMhxyOJ0rU7YhpKpvb/rEe+tIHYnBOedRcZe2gbT
- M/wZKd+/VzU8g/7Wjpk2+hZ/nApsGkocbJ8H+EDqU95oBU2aurcau0kWim0670K8mK/9VniJo
- bE9XTUIZoXHUUQ97iM6z2oR8PjZksLvN6FAgb58IHjU/FiOUFEM/dIjatqprwRAAXyHJZ6Nq5
- sR1YY6KbA74ewwBucQ/TijzQnw6D3u+KoJcKfZ43A=
+X-Provags-ID: V03:K1:UjelC94KkvhBVSm903ptLjKE+zBGFMNVR4xm3YHl3+gJthFigF9
+ VVUpNUR5pI2DUON7Tit590cMdPLO49QZygjd4KRv4oWLe0MEU+VNY7eHcRu70tl2T0sXkVW
+ WM0m3o7Ax/lHrTJgbWKPr266prlMHPC4uVZgSSNPTIl7wW+5/sjXIJAujH0uqQ9pwi4G9io
+ mwsqUxGJuYc14YBKd/zwg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:UspM2g34orE=:3qGm5F4of6rqEGkT0wOV+P
+ MzbnnUAwSzu6BdiZUNlkTx+SEvoxgPzm7/J9Bq58Kj2vw34J2Fh+PXverEB5zY1R8QCXBuE6f
+ sRCqDOpKXDJO0z+TMlu0m+hBd0jBr8MbeFT3kQvume7lRUwnQnEUDwTFLUEFTTNsdBwZdfwDI
+ RY5grLJCPmJDAtJbxZMFe6CjnPTmkch/l3dYmWsbV5fOp6Er7GiJn1X190evCZ/vF4ylVEz7X
+ PJUdqOBgKfGVlIGeVV1bbUvGl3sEIFnklpHU1EB2KZT1LuHlQDHplGxpNBmiov6ModcV1kvXb
+ ijOlis0KRl25wvPLhqKLVTuVOJ/ZAgOQ5bWnl4qXAuqPNpwD8F7lIN9d+/7d7nkSUnaIbnL1t
+ M0Te1vZAzTdZwBAGePCyopZt6Eun6HbjlP/+qYGxf5BYsh7pSZKZW5mfFT8AeTUT8R7MtnnIK
+ jiGOMlYUurNThuqt5Fp6jf/x3w46oiRfMULL1agAw3IkGGl3zCwGoUyujNE+9YyE4D14Y4L1C
+ U6VejqY1XWV0w4XGcLJO9v0jOFxIdeacM0UggTFmrpC8Keulgy5uJvkj21UgKP0RVYmV/9yHE
+ 9z+NDxVDhAeay5YXQ8P4cBa8EohNa8609xmOAvM901mPIybwv5Xmql4VzineuK3tjSfhu7WRY
+ rDCTONUXRu70H2Xc66FwRRly9s8FCqIwUy8IsO16KgHgBynjB1OtTNjsTmkY6d1S8Wc0CPPDY
+ IJwHrpiiM5hw/w/0AUzUijd+HjN62U08ylbh3uFe4lllJLGB5O7JVWSUj2njShHWK/7/mEB0E
+ X2sO/dCUDUOFa5kE2JWfrAfpq2FgICCmC6KwSpPo/ZNDiCo20K4D8cPaQziulf0m7BLQavCPq
+ KjA0t75JMEX6bSglS4+A==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.134
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,15 +132,8 @@ Sender: "Qemu-devel"
 Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> FITRIM ioctl accepts a pointer to the structure
-> 
-> struct fstrim_range {
-> 	__u64 start;
-> 	__u64 len;
-> 	__u64 minlen;
-> };
-> 
-> as its third argument.
+> Both FIFREEZE and FITHAW ioctls accept an integer as their third
+> argument.
 > 
 > All ioctls in this group (FI* ioctl) are guarded with "#ifdef", so the
 > guards are used in this implementation too for consistency (however,
@@ -148,44 +142,41 @@ Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  linux-user/ioctls.h       | 3 +++
->  linux-user/syscall_defs.h | 1 +
->  2 files changed, 4 insertions(+)
+>  linux-user/ioctls.h       | 6 ++++++
+>  linux-user/syscall_defs.h | 2 ++
+>  2 files changed, 8 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index e1b89a7..e4f0a04 100644
+> index e4f0a04..66f8c4e 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -123,6 +123,9 @@
+> @@ -123,6 +123,12 @@
 >  #ifdef FIBMAP
 >       IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
 >  #endif
-> +#ifdef FITRIM
-> +     IOCTL(FITRIM, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_fstrim_range)))
-
-It seems STRUCT_fstrim_range is not defined.
-
+> +#ifdef FIFREEZE
+> +     IOCTL(FIFREEZE, IOC_W | IOC_R, TYPE_INT)
 > +#endif
->  #ifdef FICLONE
->       IOCTL(FICLONE, IOC_W, TYPE_INT)
->       IOCTL(FICLONERANGE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_file_clone_range)))
+> +#ifdef FITHAW
+> +     IOCTL(FITHAW, IOC_W | IOC_R, TYPE_INT)
+> +#endif
+>  #ifdef FITRIM
+>       IOCTL(FITRIM, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_fstrim_range)))
+>  #endif
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 12cd3de..40851e9 100644
+> index 40851e9..6b88030 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -908,6 +908,7 @@ struct target_pollfd {
+> @@ -908,6 +908,8 @@ struct target_pollfd {
 >  #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
 >  #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
 >  
-> +#define TARGET_FITRIM     TARGET_IOWR('X', 121, struct fstrim_range)
-
-I think you need a "#ifdef" here too.
-
+> +#define TARGET_FIFREEZE   TARGET_IOWR('X', 119, int)    /* Freeze */
+> +#define TARGET_FITHAW     TARGET_IOWR('X', 120, int)    /* Thaw */
+>  #define TARGET_FITRIM     TARGET_IOWR('X', 121, struct fstrim_range)
 >  #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
 >  #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
->  
 > 
 
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
