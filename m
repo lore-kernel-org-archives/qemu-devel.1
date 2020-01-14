@@ -2,77 +2,55 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F477C33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92EDC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:19:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F2B324672
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:17:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G9l6UfCR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2B324672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B4E924672
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:19:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B4E924672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKCj-0003Pt-1A
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:17:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48076)
+	id 1irKET-0005RF-CT
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:19:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1irJx3-0000mm-SU
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:41 -0500
+ (envelope-from <no-reply@patchew.org>) id 1irKDG-0004Ih-UD
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1irJwz-0007GX-M4
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:37 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40656
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJwz-0007GH-Hj
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578999693;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WcH3RXRGRKFiCBMnnixiIb++0iWQnkZHIkxeSouGeeo=;
- b=G9l6UfCRKyusm5puLDCTMevb0EWH2cDg5mnzZ6m65r5FtLVmkmAMp0fePel0kMxg0gqArT
- poIQ8/DrTExOzGHISnH/t7j6B94UcgHg0WwBkpMEw8FEN+9YJvjPi2LpYtSbhqdm0DFks2
- Agi/hpp4fjRLGbrfkXMqUsF7VcmIFQE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-4Mk6xUycNH2mabT5AQ1B-Q-1; Tue, 14 Jan 2020 06:01:31 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCB1C10054E3;
- Tue, 14 Jan 2020 11:01:29 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 78EF281777;
- Tue, 14 Jan 2020 11:01:22 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 14/15] tests/qemu-iotests: enable testing with aio options
-Date: Tue, 14 Jan 2020 10:59:20 +0000
-Message-Id: <20200114105921.131880-15-stefanha@redhat.com>
-In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
-References: <20200114105921.131880-1-stefanha@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1irKDE-0004PR-VV
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:18:22 -0500
+Resent-Date: Tue, 14 Jan 2020 06:18:22 -0500
+Resent-Message-Id: <E1irKDE-0004PR-VV@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21111)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1irKDE-0004P0-Nn; Tue, 14 Jan 2020 06:18:20 -0500
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1579000609985470.20307218251764;
+ Tue, 14 Jan 2020 03:16:49 -0800 (PST)
+In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
+Subject: Re: [PULL 00/29] Migration pull patches (second try)
+Message-ID: <157900060806.1076.17102990904117679715@37313f22b938>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 4Mk6xUycNH2mabT5AQ1B-Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: quintela@redhat.com
+Date: Tue, 14 Jan 2020 03:16:49 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,169 +62,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, oleksandr@redhat.com,
- Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, cminyard@mvista.com, thuth@redhat.com,
+ berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+ peter.maydell@linaro.org, sw@weilnetz.de, jasowang@redhat.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
+ marcandre.lureau@redhat.com, stefanb@linux.ibm.com, rth@twiddle.net,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
-
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/check      | 15 ++++++++++++++-
- tests/qemu-iotests/common.rc  | 14 ++++++++++++++
- tests/qemu-iotests/iotests.py | 12 ++++++++++--
- 3 files changed, 38 insertions(+), 3 deletions(-)
-
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 2890785a10..39ed5bc1be 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -137,6 +137,7 @@ sortme=3Dfalse
- expunge=3Dtrue
- have_test_arg=3Dfalse
- cachemode=3Dfalse
-+aiomode=3Dfalse
-=20
- tmp=3D"${TEST_DIR}"/$$
- rm -f $tmp.list $tmp.tmp $tmp.sed
-@@ -146,6 +147,7 @@ export IMGFMT_GENERIC=3Dtrue
- export IMGPROTO=3Dfile
- export IMGOPTS=3D""
- export CACHEMODE=3D"writeback"
-+export AIOMODE=3D"threads"
- export QEMU_IO_OPTIONS=3D""
- export QEMU_IO_OPTIONS_NO_FMT=3D""
- export CACHEMODE_IS_DEFAULT=3Dtrue
-@@ -230,6 +232,11 @@ s/ .*//p
-         CACHEMODE_IS_DEFAULT=3Dfalse
-         cachemode=3Dfalse
-         continue
-+    elif $aiomode
-+    then
-+        AIOMODE=3D"$r"
-+        aiomode=3Dfalse
-+        continue
-     fi
-=20
-     xpand=3Dtrue
-@@ -274,6 +281,7 @@ other options
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
-     -c mode             cache mode
-+    -i mode             AIO mode
-     -makecheck          pretty print output for make check
-=20
- testlist options
-@@ -438,10 +446,13 @@ testlist options
-             cachemode=3Dtrue
-             xpand=3Dfalse
-             ;;
-+        -i)
-+            aiomode=3Dtrue
-+            xpand=3Dfalse
-+            ;;
-         -T)        # deprecated timestamp option
-             xpand=3Dfalse
-             ;;
--
-         -v)
-             verbose=3Dtrue
-             xpand=3Dfalse
-@@ -520,6 +531,8 @@ done
-=20
- # Set qemu-io cache mode with $CACHEMODE we have
- QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+# Set qemu-io aio mode with $AIOMODE we have
-+QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --aio $AIOMODE"
-=20
- QEMU_IO_OPTIONS_NO_FMT=3D"$QEMU_IO_OPTIONS"
- if [ "$IMGOPTSSYNTAX" !=3D "true" ]; then
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index d088392ab6..9ccde32634 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -645,6 +645,20 @@ _default_cache_mode()
-         return
-     fi
- }
-+_supported_aio_modes()
-+{
-+    for mode; do
-+        if [ "$mode" =3D "$AIOMODE" ]; then
-+            return
-+        fi
-+    done
-+    _notrun "not suitable for aio mode: $AIOMODE"
-+}
-+_default_aio_mode()
-+{
-+    AIOMODE=3D"$1"
-+    QEMU_IO=3D"$QEMU_IO --aio $1"
-+}
-=20
- _unsupported_imgopts()
- {
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 13fd8b5cd2..60e9eefe94 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -65,6 +65,7 @@ test_dir =3D os.environ.get('TEST_DIR')
- sock_dir =3D os.environ.get('SOCK_DIR')
- output_dir =3D os.environ.get('OUTPUT_DIR', '.')
- cachemode =3D os.environ.get('CACHEMODE')
-+aiomode =3D os.environ.get('AIOMODE')
- qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
-=20
- socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_help=
-er')
-@@ -495,6 +496,7 @@ class VM(qtest.QEMUQtestMachine):
-             options.append('file=3D%s' % path)
-             options.append('format=3D%s' % format)
-             options.append('cache=3D%s' % cachemode)
-+            options.append('aio=3D%s' % aiomode)
-=20
-         if opts:
-             options.append(opts)
-@@ -933,6 +935,10 @@ def verify_cache_mode(supported_cache_modes=3D[]):
-     if supported_cache_modes and (cachemode not in supported_cache_modes):
-         notrun('not suitable for this cache mode: %s' % cachemode)
-=20
-+def verify_aio_mode(supported_aio_modes=3D[]):
-+    if supported_aio_modes and (aiomode not in supported_aio_modes):
-+        notrun('not suitable for this aio mode: %s' % aiomode)
-+
- def supports_quorum():
-     return 'quorum' in qemu_img_pipe('--help')
-=20
-@@ -1019,8 +1025,9 @@ def execute_unittest(output, verbosity, debug):
-=20
- def execute_test(test_function=3DNone,
-                  supported_fmts=3D[], supported_oses=3D['linux'],
--                 supported_cache_modes=3D[], unsupported_fmts=3D[],
--                 supported_protocols=3D[], unsupported_protocols=3D[]):
-+                 supported_cache_modes=3D[], supported_aio_modes=3D{},
-+                 unsupported_fmts=3D[], supported_protocols=3D[],
-+                 unsupported_protocols=3D[]):
-     """Run either unittest or script-style tests."""
-=20
-     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
-@@ -1037,6 +1044,7 @@ def execute_test(test_function=3DNone,
-     verify_protocol(supported_protocols, unsupported_protocols)
-     verify_platform(supported_oses)
-     verify_cache_mode(supported_cache_modes)
-+    verify_aio_mode(supported_aio_modes)
-=20
-     if debug:
-         output =3D sys.stdout
---=20
-2.24.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDExNDA5MjYwNi4xNzYx
+LTEtcXVpbnRlbGFAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMjldIE1pZ3JhdGlvbiBwdWxsIHBhdGNoZXMg
+KHNlY29uZCB0cnkpClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDExNDA5MjYwNi4xNzYx
+LTEtcXVpbnRlbGFAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9
+PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGMzMzk0YiBtaWdyYXRpb246IFN1
+cHBvcnQgUUxJU1QgbWlncmF0aW9uCjlmODQzM2UgYXBpYzogVXNlIDMyYml0IEFQSUMgSUQgZm9y
+IG1pZ3JhdGlvbiBpbnN0YW5jZSBJRApiMjljODQzIG1pZ3JhdGlvbjogQ2hhbmdlIFNhdmVTdGF0
+ZUVudHJ5Lmluc3RhbmNlX2lkIGludG8gdWludDMyX3QKZWZkMDBmYSBtaWdyYXRpb246IERlZmlu
+ZSBWTVNUQVRFX0lOU1RBTkNFX0lEX0FOWQpjOWU2MTVmIEJ1ZyAjMTgyOTI0MiBjb3JyZWN0aW9u
+Lgo5MGUxN2FmIG1pZ3JhdGlvbi9tdWx0aWZkOiBmaXggZGVzdHJveWVkIG11dGV4IGFjY2VzcyBp
+biB0ZXJtaW5hdGluZyBtdWx0aWZkIHRocmVhZHMKNDBkODk2MiBtaWdyYXRpb24vbXVsdGlmZDog
+Zml4IG51bGxwdHIgYWNjZXNzIGluIHRlcm1pbmF0aW5nIG11bHRpZmQgdGhyZWFkcwozMjkxZDkz
+IG1pZ3JhdGlvbi9tdWx0aWZkOiBub3QgdXNlIG11bHRpZmQgZHVyaW5nIHBvc3Rjb3B5CmFjNWYw
+ZTUgbWlncmF0aW9uL211bHRpZmQ6IGNsZWFuIHBhZ2VzIGFmdGVyIGZpbGxpbmcgcGFja2V0CjNm
+OWYzZTAgbWlncmF0aW9uL3Bvc3Rjb3B5OiBlbmFibGUgY29tcHJlc3MgZHVyaW5nIHBvc3Rjb3B5
+CmI1MzNmZDYgbWlncmF0aW9uL3Bvc3Rjb3B5OiBlbmFibGUgcmFuZG9tIG9yZGVyIHRhcmdldCBw
+YWdlIGFycml2YWwKNTFhOTEyZCBtaWdyYXRpb24vcG9zdGNvcHk6IHNldCBhbGxfemVybyB0byB0
+cnVlIG9uIHRoZSBmaXJzdCB0YXJnZXQgcGFnZQoxZDc5NjQwIG1pZ3JhdGlvbi9wb3N0Y29weTog
+Y291bnQgdGFyZ2V0IHBhZ2UgbnVtYmVyIHRvIGRlY2lkZSB0aGUgcGxhY2VfbmVlZGVkCjFiYjA2
+NjAgbWlncmF0aW9uL3Bvc3Rjb3B5OiB3YWl0IGZvciBkZWNvbXByZXNzIHRocmVhZCBpbiBwcmVj
+b3B5CjJkOWVlNzMgbWlncmF0aW9uL3Bvc3Rjb3B5OiByZWR1Y2UgbWVtc2V0IHdoZW4gaXQgaXMg
+emVybyBwYWdlIGFuZCBtYXRjaGVzX3RhcmdldF9wYWdlX3NpemUKMTY1NjEyOSBtaWdyYXRpb24v
+cmFtOiBZaWVsZCBwZXJpb2RpY2FsbHkgdG8gdGhlIG1haW4gbG9vcAozNGU5YTI3IG1pZ3JhdGlv
+bjogc2F2ZXZtX3N0YXRlX2hhbmRsZXJfaW5zZXJ0OiBjb25zdGFudC10aW1lIGVsZW1lbnQgaW5z
+ZXJ0aW9uCmVlY2M0ZmIgbWlncmF0aW9uOiBhZGQgc2F2ZXZtX3N0YXRlX2hhbmRsZXJfcmVtb3Zl
+KCkKNWVhZjgwMyBtaXNjOiB1c2UgUUVNVV9JU19BTElHTkVECjEyNjJkOWQgbWlncmF0aW9uOiBG
+aXggdGhlIHJlLXJ1biBjaGVjayBvZiB0aGUgbWlncmF0ZS1pbmNvbWluZyBjb21tYW5kCmJkYTkw
+NjQgbWlncmF0aW9uOiBGaXggaW5jb3JyZWN0IGludGVnZXItPmZsb2F0IGNvbnZlcnNpb24gY2F1
+Z2h0IGJ5IGNsYW5nCmFmMzY2ZDggbWlncmF0aW9uOiBSYXRlIGxpbWl0IGluc2lkZSBob3N0IHBh
+Z2VzCmI3MGYzMjYgcmFtLmM6IHJlbW92ZSB1bm5lZWRlZCBsYWJlbHMKMDc2ZmE3YyBydW5zdGF0
+ZTogaWdub3JlIGZpbmlzaG1pZ3JhdGUgLT4gcHJlbGF1bmNoIHRyYW5zaXRpb24KMTM5YjIxNyBt
+aWdyYXRpb24tdGVzdDogcHBjNjQ6IGZpeCBGT1JUSCB0ZXN0IHByb2dyYW0KZjgyMTA0OSBtaWdy
+YXRpb24tdGVzdDogaW50cm9kdWNlIGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRl
+cnMKNzBkZTEzMyBtaWdyYXRpb246IE1ha2Ugc3VyZSB0aGF0IHdlIGRvbid0IGNhbGwgd3JpdGUo
+KSBpbiBjYXNlIG9mIGVycm9yCjM5N2NhZWMgbWlncmF0aW9uLXRlc3Q6IEFkZCBtaWdyYXRpb24g
+bXVsdGlmZCB0ZXN0CjlhODk4ZWYgbXVsdGlmZDogSW5pdGlhbGl6ZSBsb2NhbCB2YXJpYWJsZQoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yOSBDaGVja2luZyBjb21taXQgOWE4OThlZmE4Y2RkICht
+dWx0aWZkOiBJbml0aWFsaXplIGxvY2FsIHZhcmlhYmxlKQpFUlJPUjogTWlzc2luZyBTaWduZWQt
+b2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hl
+Y2tlZAoKUGF0Y2ggMS8yOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
+bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
+IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8yOSBDaGVja2lu
+ZyBjb21taXQgMzk3Y2FlYzI1YzZkIChtaWdyYXRpb24tdGVzdDogQWRkIG1pZ3JhdGlvbiBtdWx0
+aWZkIHRlc3QpCjMvMjkgQ2hlY2tpbmcgY29tbWl0IDcwZGUxMzM1NGNmNyAobWlncmF0aW9uOiBN
+YWtlIHN1cmUgdGhhdCB3ZSBkb24ndCBjYWxsIHdyaXRlKCkgaW4gY2FzZSBvZiBlcnJvcikKNC8y
+OSBDaGVja2luZyBjb21taXQgZjgyMTA0OTZiYTc2IChtaWdyYXRpb24tdGVzdDogaW50cm9kdWNl
+IGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRlcnMpCjUvMjkgQ2hlY2tpbmcgY29t
+bWl0IDEzOWIyMTc5NjBlZiAobWlncmF0aW9uLXRlc3Q6IHBwYzY0OiBmaXggRk9SVEggdGVzdCBw
+cm9ncmFtKQo2LzI5IENoZWNraW5nIGNvbW1pdCAwNzZmYTdjYzc2N2UgKHJ1bnN0YXRlOiBpZ25v
+cmUgZmluaXNobWlncmF0ZSAtPiBwcmVsYXVuY2ggdHJhbnNpdGlvbikKNy8yOSBDaGVja2luZyBj
+b21taXQgYjcwZjMyNmNhZDNlIChyYW0uYzogcmVtb3ZlIHVubmVlZGVkIGxhYmVscykKOC8yOSBD
+aGVja2luZyBjb21taXQgYWYzNjZkOGQ0YWEzIChtaWdyYXRpb246IFJhdGUgbGltaXQgaW5zaWRl
+IGhvc3QgcGFnZXMpCjkvMjkgQ2hlY2tpbmcgY29tbWl0IGJkYTkwNjQxOGQ5NCAobWlncmF0aW9u
+OiBGaXggaW5jb3JyZWN0IGludGVnZXItPmZsb2F0IGNvbnZlcnNpb24gY2F1Z2h0IGJ5IGNsYW5n
+KQoxMC8yOSBDaGVja2luZyBjb21taXQgMTI2MmQ5ZGY2YWY3IChtaWdyYXRpb246IEZpeCB0aGUg
+cmUtcnVuIGNoZWNrIG9mIHRoZSBtaWdyYXRlLWluY29taW5nIGNvbW1hbmQpCjExLzI5IENoZWNr
+aW5nIGNvbW1pdCA1ZWFmODAzNGUxOGUgKG1pc2M6IHVzZSBRRU1VX0lTX0FMSUdORUQpCjEyLzI5
+IENoZWNraW5nIGNvbW1pdCBlZWNjNGZiMTJmZTQgKG1pZ3JhdGlvbjogYWRkIHNhdmV2bV9zdGF0
+ZV9oYW5kbGVyX3JlbW92ZSgpKQoxMy8yOSBDaGVja2luZyBjb21taXQgMzRlOWEyN2M1MzUyICht
+aWdyYXRpb246IHNhdmV2bV9zdGF0ZV9oYW5kbGVyX2luc2VydDogY29uc3RhbnQtdGltZSBlbGVt
+ZW50IGluc2VydGlvbikKMTQvMjkgQ2hlY2tpbmcgY29tbWl0IDE2NTYxMjkzM2E4YSAobWlncmF0
+aW9uL3JhbTogWWllbGQgcGVyaW9kaWNhbGx5IHRvIHRoZSBtYWluIGxvb3ApCjE1LzI5IENoZWNr
+aW5nIGNvbW1pdCAyZDllZTczZGMxMjAgKG1pZ3JhdGlvbi9wb3N0Y29weTogcmVkdWNlIG1lbXNl
+dCB3aGVuIGl0IGlzIHplcm8gcGFnZSBhbmQgbWF0Y2hlc190YXJnZXRfcGFnZV9zaXplKQoxNi8y
+OSBDaGVja2luZyBjb21taXQgMWJiMDY2MDhiZTUwIChtaWdyYXRpb24vcG9zdGNvcHk6IHdhaXQg
+Zm9yIGRlY29tcHJlc3MgdGhyZWFkIGluIHByZWNvcHkpCjE3LzI5IENoZWNraW5nIGNvbW1pdCAx
+ZDc5NjQwMDFlNDMgKG1pZ3JhdGlvbi9wb3N0Y29weTogY291bnQgdGFyZ2V0IHBhZ2UgbnVtYmVy
+IHRvIGRlY2lkZSB0aGUgcGxhY2VfbmVlZGVkKQoxOC8yOSBDaGVja2luZyBjb21taXQgNTFhOTEy
+ZDE0Mjk2IChtaWdyYXRpb24vcG9zdGNvcHk6IHNldCBhbGxfemVybyB0byB0cnVlIG9uIHRoZSBm
+aXJzdCB0YXJnZXQgcGFnZSkKMTkvMjkgQ2hlY2tpbmcgY29tbWl0IGI1MzNmZDYyYzRmMiAobWln
+cmF0aW9uL3Bvc3Rjb3B5OiBlbmFibGUgcmFuZG9tIG9yZGVyIHRhcmdldCBwYWdlIGFycml2YWwp
+CjIwLzI5IENoZWNraW5nIGNvbW1pdCAzZjlmM2UwMTBmYzAgKG1pZ3JhdGlvbi9wb3N0Y29weTog
+ZW5hYmxlIGNvbXByZXNzIGR1cmluZyBwb3N0Y29weSkKMjEvMjkgQ2hlY2tpbmcgY29tbWl0IGFj
+NWYwZTViNDIxNiAobWlncmF0aW9uL211bHRpZmQ6IGNsZWFuIHBhZ2VzIGFmdGVyIGZpbGxpbmcg
+cGFja2V0KQoyMi8yOSBDaGVja2luZyBjb21taXQgMzI5MWQ5MzlhY2NmIChtaWdyYXRpb24vbXVs
+dGlmZDogbm90IHVzZSBtdWx0aWZkIGR1cmluZyBwb3N0Y29weSkKMjMvMjkgQ2hlY2tpbmcgY29t
+bWl0IDQwZDg5NjJjNTMzOSAobWlncmF0aW9uL211bHRpZmQ6IGZpeCBudWxscHRyIGFjY2VzcyBp
+biB0ZXJtaW5hdGluZyBtdWx0aWZkIHRocmVhZHMpCjI0LzI5IENoZWNraW5nIGNvbW1pdCA5MGUx
+N2FmZjY1ZTIgKG1pZ3JhdGlvbi9tdWx0aWZkOiBmaXggZGVzdHJveWVkIG11dGV4IGFjY2VzcyBp
+biB0ZXJtaW5hdGluZyBtdWx0aWZkIHRocmVhZHMpCjI1LzI5IENoZWNraW5nIGNvbW1pdCBjOWU2
+MTVmNjAzYzkgKEJ1ZyAjMTgyOTI0MiBjb3JyZWN0aW9uLikKMjYvMjkgQ2hlY2tpbmcgY29tbWl0
+IGVmZDAwZmFjZTFlOCAobWlncmF0aW9uOiBEZWZpbmUgVk1TVEFURV9JTlNUQU5DRV9JRF9BTlkp
+CjI3LzI5IENoZWNraW5nIGNvbW1pdCBiMjljODQzMjJhY2MgKG1pZ3JhdGlvbjogQ2hhbmdlIFNh
+dmVTdGF0ZUVudHJ5Lmluc3RhbmNlX2lkIGludG8gdWludDMyX3QpCjI4LzI5IENoZWNraW5nIGNv
+bW1pdCA5Zjg0MzNlNzQ2MjggKGFwaWM6IFVzZSAzMmJpdCBBUElDIElEIGZvciBtaWdyYXRpb24g
+aW5zdGFuY2UgSUQpCjI5LzI5IENoZWNraW5nIGNvbW1pdCAwYzMzOTRiMDgzNjUgKG1pZ3JhdGlv
+bjogU3VwcG9ydCBRTElTVCBtaWdyYXRpb24pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMTE0MDkyNjA2LjE3NjEtMS1xdWludGVsYUByZWRo
+YXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
