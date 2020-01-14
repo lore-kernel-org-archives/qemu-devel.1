@@ -2,55 +2,77 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A92EDC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B29C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:20:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B4E924672
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:19:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B4E924672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id AB73724672
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:20:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VxI/gDcB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB73724672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKET-0005RF-CT
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:19:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51231)
+	id 1irKFA-0005ur-ND
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:20:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48099)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1irKDG-0004Ih-UD
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:18:25 -0500
+ (envelope-from <stefanha@redhat.com>) id 1irJx9-0000sb-UD
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1irKDE-0004PR-VV
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:18:22 -0500
-Resent-Date: Tue, 14 Jan 2020 06:18:22 -0500
-Resent-Message-Id: <E1irKDE-0004PR-VV@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21111)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1irKDE-0004P0-Nn; Tue, 14 Jan 2020 06:18:20 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1579000609985470.20307218251764;
- Tue, 14 Jan 2020 03:16:49 -0800 (PST)
-In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
-Subject: Re: [PULL 00/29] Migration pull patches (second try)
-Message-ID: <157900060806.1076.17102990904117679715@37313f22b938>
+ (envelope-from <stefanha@redhat.com>) id 1irJx8-0007J3-2C
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34963
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJx7-0007Ip-Rk
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578999701;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+OjuZypm3LRYxn1m95spjvCXH2PkItLGI6LRseTKAF0=;
+ b=VxI/gDcBsRDuh3k23LhtW1e5r1avt0TaHfArVb1NpGBliRyixbo+iBOzccG64e3zLW2Oiq
+ woBfP5GN0jW5oyRlnGbPLNcs1hVh4ht6zJ5qjhy0v72TQfM3I3qk5xk57PJw8pB5UeMhy2
+ kOol3GLpJ1I9AP1uNADRm7oIoQUG21k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-424-w458GQM8MGyd3_l43cK4FQ-1; Tue, 14 Jan 2020 06:01:40 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3247801E72;
+ Tue, 14 Jan 2020 11:01:38 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A0E010841A9;
+ Tue, 14 Jan 2020 11:01:31 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 15/15] tests/qemu-iotests: use AIOMODE with various tests
+Date: Tue, 14 Jan 2020 10:59:21 +0000
+Message-Id: <20200114105921.131880-16-stefanha@redhat.com>
+In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
+References: <20200114105921.131880-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: quintela@redhat.com
-Date: Tue, 14 Jan 2020 03:16:49 -0800 (PST)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: w458GQM8MGyd3_l43cK4FQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,115 +84,322 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, cminyard@mvista.com, thuth@redhat.com,
- berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- peter.maydell@linaro.org, sw@weilnetz.de, jasowang@redhat.com,
- quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, pbonzini@redhat.com,
- marcandre.lureau@redhat.com, stefanb@linux.ibm.com, rth@twiddle.net,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, oleksandr@redhat.com,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDExNDA5MjYwNi4xNzYx
-LTEtcXVpbnRlbGFAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMjldIE1pZ3JhdGlvbiBwdWxsIHBhdGNoZXMg
-KHNlY29uZCB0cnkpClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDExNDA5MjYwNi4xNzYx
-LTEtcXVpbnRlbGFAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMGMzMzk0YiBtaWdyYXRpb246IFN1
-cHBvcnQgUUxJU1QgbWlncmF0aW9uCjlmODQzM2UgYXBpYzogVXNlIDMyYml0IEFQSUMgSUQgZm9y
-IG1pZ3JhdGlvbiBpbnN0YW5jZSBJRApiMjljODQzIG1pZ3JhdGlvbjogQ2hhbmdlIFNhdmVTdGF0
-ZUVudHJ5Lmluc3RhbmNlX2lkIGludG8gdWludDMyX3QKZWZkMDBmYSBtaWdyYXRpb246IERlZmlu
-ZSBWTVNUQVRFX0lOU1RBTkNFX0lEX0FOWQpjOWU2MTVmIEJ1ZyAjMTgyOTI0MiBjb3JyZWN0aW9u
-Lgo5MGUxN2FmIG1pZ3JhdGlvbi9tdWx0aWZkOiBmaXggZGVzdHJveWVkIG11dGV4IGFjY2VzcyBp
-biB0ZXJtaW5hdGluZyBtdWx0aWZkIHRocmVhZHMKNDBkODk2MiBtaWdyYXRpb24vbXVsdGlmZDog
-Zml4IG51bGxwdHIgYWNjZXNzIGluIHRlcm1pbmF0aW5nIG11bHRpZmQgdGhyZWFkcwozMjkxZDkz
-IG1pZ3JhdGlvbi9tdWx0aWZkOiBub3QgdXNlIG11bHRpZmQgZHVyaW5nIHBvc3Rjb3B5CmFjNWYw
-ZTUgbWlncmF0aW9uL211bHRpZmQ6IGNsZWFuIHBhZ2VzIGFmdGVyIGZpbGxpbmcgcGFja2V0CjNm
-OWYzZTAgbWlncmF0aW9uL3Bvc3Rjb3B5OiBlbmFibGUgY29tcHJlc3MgZHVyaW5nIHBvc3Rjb3B5
-CmI1MzNmZDYgbWlncmF0aW9uL3Bvc3Rjb3B5OiBlbmFibGUgcmFuZG9tIG9yZGVyIHRhcmdldCBw
-YWdlIGFycml2YWwKNTFhOTEyZCBtaWdyYXRpb24vcG9zdGNvcHk6IHNldCBhbGxfemVybyB0byB0
-cnVlIG9uIHRoZSBmaXJzdCB0YXJnZXQgcGFnZQoxZDc5NjQwIG1pZ3JhdGlvbi9wb3N0Y29weTog
-Y291bnQgdGFyZ2V0IHBhZ2UgbnVtYmVyIHRvIGRlY2lkZSB0aGUgcGxhY2VfbmVlZGVkCjFiYjA2
-NjAgbWlncmF0aW9uL3Bvc3Rjb3B5OiB3YWl0IGZvciBkZWNvbXByZXNzIHRocmVhZCBpbiBwcmVj
-b3B5CjJkOWVlNzMgbWlncmF0aW9uL3Bvc3Rjb3B5OiByZWR1Y2UgbWVtc2V0IHdoZW4gaXQgaXMg
-emVybyBwYWdlIGFuZCBtYXRjaGVzX3RhcmdldF9wYWdlX3NpemUKMTY1NjEyOSBtaWdyYXRpb24v
-cmFtOiBZaWVsZCBwZXJpb2RpY2FsbHkgdG8gdGhlIG1haW4gbG9vcAozNGU5YTI3IG1pZ3JhdGlv
-bjogc2F2ZXZtX3N0YXRlX2hhbmRsZXJfaW5zZXJ0OiBjb25zdGFudC10aW1lIGVsZW1lbnQgaW5z
-ZXJ0aW9uCmVlY2M0ZmIgbWlncmF0aW9uOiBhZGQgc2F2ZXZtX3N0YXRlX2hhbmRsZXJfcmVtb3Zl
-KCkKNWVhZjgwMyBtaXNjOiB1c2UgUUVNVV9JU19BTElHTkVECjEyNjJkOWQgbWlncmF0aW9uOiBG
-aXggdGhlIHJlLXJ1biBjaGVjayBvZiB0aGUgbWlncmF0ZS1pbmNvbWluZyBjb21tYW5kCmJkYTkw
-NjQgbWlncmF0aW9uOiBGaXggaW5jb3JyZWN0IGludGVnZXItPmZsb2F0IGNvbnZlcnNpb24gY2F1
-Z2h0IGJ5IGNsYW5nCmFmMzY2ZDggbWlncmF0aW9uOiBSYXRlIGxpbWl0IGluc2lkZSBob3N0IHBh
-Z2VzCmI3MGYzMjYgcmFtLmM6IHJlbW92ZSB1bm5lZWRlZCBsYWJlbHMKMDc2ZmE3YyBydW5zdGF0
-ZTogaWdub3JlIGZpbmlzaG1pZ3JhdGUgLT4gcHJlbGF1bmNoIHRyYW5zaXRpb24KMTM5YjIxNyBt
-aWdyYXRpb24tdGVzdDogcHBjNjQ6IGZpeCBGT1JUSCB0ZXN0IHByb2dyYW0KZjgyMTA0OSBtaWdy
-YXRpb24tdGVzdDogaW50cm9kdWNlIGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRl
-cnMKNzBkZTEzMyBtaWdyYXRpb246IE1ha2Ugc3VyZSB0aGF0IHdlIGRvbid0IGNhbGwgd3JpdGUo
-KSBpbiBjYXNlIG9mIGVycm9yCjM5N2NhZWMgbWlncmF0aW9uLXRlc3Q6IEFkZCBtaWdyYXRpb24g
-bXVsdGlmZCB0ZXN0CjlhODk4ZWYgbXVsdGlmZDogSW5pdGlhbGl6ZSBsb2NhbCB2YXJpYWJsZQoK
-PT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yOSBDaGVja2luZyBjb21taXQgOWE4OThlZmE4Y2RkICht
-dWx0aWZkOiBJbml0aWFsaXplIGxvY2FsIHZhcmlhYmxlKQpFUlJPUjogTWlzc2luZyBTaWduZWQt
-b2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hl
-Y2tlZAoKUGF0Y2ggMS8yOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8yOSBDaGVja2lu
-ZyBjb21taXQgMzk3Y2FlYzI1YzZkIChtaWdyYXRpb24tdGVzdDogQWRkIG1pZ3JhdGlvbiBtdWx0
-aWZkIHRlc3QpCjMvMjkgQ2hlY2tpbmcgY29tbWl0IDcwZGUxMzM1NGNmNyAobWlncmF0aW9uOiBN
-YWtlIHN1cmUgdGhhdCB3ZSBkb24ndCBjYWxsIHdyaXRlKCkgaW4gY2FzZSBvZiBlcnJvcikKNC8y
-OSBDaGVja2luZyBjb21taXQgZjgyMTA0OTZiYTc2IChtaWdyYXRpb24tdGVzdDogaW50cm9kdWNl
-IGZ1bmN0aW9ucyB0byBoYW5kbGUgc3RyaW5nIHBhcmFtZXRlcnMpCjUvMjkgQ2hlY2tpbmcgY29t
-bWl0IDEzOWIyMTc5NjBlZiAobWlncmF0aW9uLXRlc3Q6IHBwYzY0OiBmaXggRk9SVEggdGVzdCBw
-cm9ncmFtKQo2LzI5IENoZWNraW5nIGNvbW1pdCAwNzZmYTdjYzc2N2UgKHJ1bnN0YXRlOiBpZ25v
-cmUgZmluaXNobWlncmF0ZSAtPiBwcmVsYXVuY2ggdHJhbnNpdGlvbikKNy8yOSBDaGVja2luZyBj
-b21taXQgYjcwZjMyNmNhZDNlIChyYW0uYzogcmVtb3ZlIHVubmVlZGVkIGxhYmVscykKOC8yOSBD
-aGVja2luZyBjb21taXQgYWYzNjZkOGQ0YWEzIChtaWdyYXRpb246IFJhdGUgbGltaXQgaW5zaWRl
-IGhvc3QgcGFnZXMpCjkvMjkgQ2hlY2tpbmcgY29tbWl0IGJkYTkwNjQxOGQ5NCAobWlncmF0aW9u
-OiBGaXggaW5jb3JyZWN0IGludGVnZXItPmZsb2F0IGNvbnZlcnNpb24gY2F1Z2h0IGJ5IGNsYW5n
-KQoxMC8yOSBDaGVja2luZyBjb21taXQgMTI2MmQ5ZGY2YWY3IChtaWdyYXRpb246IEZpeCB0aGUg
-cmUtcnVuIGNoZWNrIG9mIHRoZSBtaWdyYXRlLWluY29taW5nIGNvbW1hbmQpCjExLzI5IENoZWNr
-aW5nIGNvbW1pdCA1ZWFmODAzNGUxOGUgKG1pc2M6IHVzZSBRRU1VX0lTX0FMSUdORUQpCjEyLzI5
-IENoZWNraW5nIGNvbW1pdCBlZWNjNGZiMTJmZTQgKG1pZ3JhdGlvbjogYWRkIHNhdmV2bV9zdGF0
-ZV9oYW5kbGVyX3JlbW92ZSgpKQoxMy8yOSBDaGVja2luZyBjb21taXQgMzRlOWEyN2M1MzUyICht
-aWdyYXRpb246IHNhdmV2bV9zdGF0ZV9oYW5kbGVyX2luc2VydDogY29uc3RhbnQtdGltZSBlbGVt
-ZW50IGluc2VydGlvbikKMTQvMjkgQ2hlY2tpbmcgY29tbWl0IDE2NTYxMjkzM2E4YSAobWlncmF0
-aW9uL3JhbTogWWllbGQgcGVyaW9kaWNhbGx5IHRvIHRoZSBtYWluIGxvb3ApCjE1LzI5IENoZWNr
-aW5nIGNvbW1pdCAyZDllZTczZGMxMjAgKG1pZ3JhdGlvbi9wb3N0Y29weTogcmVkdWNlIG1lbXNl
-dCB3aGVuIGl0IGlzIHplcm8gcGFnZSBhbmQgbWF0Y2hlc190YXJnZXRfcGFnZV9zaXplKQoxNi8y
-OSBDaGVja2luZyBjb21taXQgMWJiMDY2MDhiZTUwIChtaWdyYXRpb24vcG9zdGNvcHk6IHdhaXQg
-Zm9yIGRlY29tcHJlc3MgdGhyZWFkIGluIHByZWNvcHkpCjE3LzI5IENoZWNraW5nIGNvbW1pdCAx
-ZDc5NjQwMDFlNDMgKG1pZ3JhdGlvbi9wb3N0Y29weTogY291bnQgdGFyZ2V0IHBhZ2UgbnVtYmVy
-IHRvIGRlY2lkZSB0aGUgcGxhY2VfbmVlZGVkKQoxOC8yOSBDaGVja2luZyBjb21taXQgNTFhOTEy
-ZDE0Mjk2IChtaWdyYXRpb24vcG9zdGNvcHk6IHNldCBhbGxfemVybyB0byB0cnVlIG9uIHRoZSBm
-aXJzdCB0YXJnZXQgcGFnZSkKMTkvMjkgQ2hlY2tpbmcgY29tbWl0IGI1MzNmZDYyYzRmMiAobWln
-cmF0aW9uL3Bvc3Rjb3B5OiBlbmFibGUgcmFuZG9tIG9yZGVyIHRhcmdldCBwYWdlIGFycml2YWwp
-CjIwLzI5IENoZWNraW5nIGNvbW1pdCAzZjlmM2UwMTBmYzAgKG1pZ3JhdGlvbi9wb3N0Y29weTog
-ZW5hYmxlIGNvbXByZXNzIGR1cmluZyBwb3N0Y29weSkKMjEvMjkgQ2hlY2tpbmcgY29tbWl0IGFj
-NWYwZTViNDIxNiAobWlncmF0aW9uL211bHRpZmQ6IGNsZWFuIHBhZ2VzIGFmdGVyIGZpbGxpbmcg
-cGFja2V0KQoyMi8yOSBDaGVja2luZyBjb21taXQgMzI5MWQ5MzlhY2NmIChtaWdyYXRpb24vbXVs
-dGlmZDogbm90IHVzZSBtdWx0aWZkIGR1cmluZyBwb3N0Y29weSkKMjMvMjkgQ2hlY2tpbmcgY29t
-bWl0IDQwZDg5NjJjNTMzOSAobWlncmF0aW9uL211bHRpZmQ6IGZpeCBudWxscHRyIGFjY2VzcyBp
-biB0ZXJtaW5hdGluZyBtdWx0aWZkIHRocmVhZHMpCjI0LzI5IENoZWNraW5nIGNvbW1pdCA5MGUx
-N2FmZjY1ZTIgKG1pZ3JhdGlvbi9tdWx0aWZkOiBmaXggZGVzdHJveWVkIG11dGV4IGFjY2VzcyBp
-biB0ZXJtaW5hdGluZyBtdWx0aWZkIHRocmVhZHMpCjI1LzI5IENoZWNraW5nIGNvbW1pdCBjOWU2
-MTVmNjAzYzkgKEJ1ZyAjMTgyOTI0MiBjb3JyZWN0aW9uLikKMjYvMjkgQ2hlY2tpbmcgY29tbWl0
-IGVmZDAwZmFjZTFlOCAobWlncmF0aW9uOiBEZWZpbmUgVk1TVEFURV9JTlNUQU5DRV9JRF9BTlkp
-CjI3LzI5IENoZWNraW5nIGNvbW1pdCBiMjljODQzMjJhY2MgKG1pZ3JhdGlvbjogQ2hhbmdlIFNh
-dmVTdGF0ZUVudHJ5Lmluc3RhbmNlX2lkIGludG8gdWludDMyX3QpCjI4LzI5IENoZWNraW5nIGNv
-bW1pdCA5Zjg0MzNlNzQ2MjggKGFwaWM6IFVzZSAzMmJpdCBBUElDIElEIGZvciBtaWdyYXRpb24g
-aW5zdGFuY2UgSUQpCjI5LzI5IENoZWNraW5nIGNvbW1pdCAwYzMzOTRiMDgzNjUgKG1pZ3JhdGlv
-bjogU3VwcG9ydCBRTElTVCBtaWdyYXRpb24pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwMTE0MDkyNjA2LjE3NjEtMS1xdWludGVsYUByZWRo
-YXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+v11:
+ * Drop line-wrapping changes that accidentally broke qemu-iotests
+---
+ tests/qemu-iotests/028 |  2 +-
+ tests/qemu-iotests/058 |  2 +-
+ tests/qemu-iotests/089 |  4 ++--
+ tests/qemu-iotests/091 |  4 ++--
+ tests/qemu-iotests/109 |  2 +-
+ tests/qemu-iotests/147 |  5 +++--
+ tests/qemu-iotests/181 |  8 ++++----
+ tests/qemu-iotests/183 |  4 ++--
+ tests/qemu-iotests/185 | 10 +++++-----
+ tests/qemu-iotests/200 |  2 +-
+ tests/qemu-iotests/201 |  8 ++++----
+ 11 files changed, 26 insertions(+), 25 deletions(-)
+
+diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
+index e2556d8e57..797dae5350 100755
+--- a/tests/qemu-iotests/028
++++ b/tests/qemu-iotests/028
+@@ -108,7 +108,7 @@ echo block-backup
+ echo
+=20
+ qemu_comm_method=3D"monitor"
+-_launch_qemu -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
++_launch_qemu -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D${AIOM=
+ODE},id=3Ddisk
+ h=3D$QEMU_HANDLE
+ if [ "${VALGRIND_QEMU}" =3D=3D "y" ]; then
+     QEMU_COMM_TIMEOUT=3D7
+diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
+index d5304bb404..d84740ed9f 100755
+--- a/tests/qemu-iotests/058
++++ b/tests/qemu-iotests/058
+@@ -65,7 +65,7 @@ nbd_snapshot_img=3D"nbd:unix:$nbd_unix_socket"
+ converted_image=3D$TEST_IMG.converted
+=20
+ # Use -f raw instead of -f $IMGFMT for the NBD connection
+-QEMU_IO_NBD=3D"$QEMU_IO -f raw --cache=3D$CACHEMODE"
++QEMU_IO_NBD=3D"$QEMU_IO -f raw --cache=3D$CACHEMODE --aio=3D$AIOMODE"
+=20
+ echo
+ echo "=3D=3D preparing image =3D=3D"
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index ad029f1f09..059ad75e28 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -64,7 +64,7 @@ $QEMU_IO -c 'write -P 42 0 512' -c 'write -P 23 512 512' =
+\
+=20
+ $QEMU_IMG convert -f raw -O $IMGFMT "$TEST_IMG.base" "$TEST_IMG"
+=20
+-$QEMU_IO_PROG --cache $CACHEMODE \
++$QEMU_IO_PROG --cache $CACHEMODE --aio $AIOMODE \
+          -c 'read -P 42 0 512' -c 'read -P 23 512 512' \
+          -c 'read -P 66 1024 512' "json:{
+     \"driver\": \"$IMGFMT\",
+@@ -111,7 +111,7 @@ $QEMU_IO -c 'write -P 42 0x38000 512' "$TEST_IMG" | _fi=
+lter_qemu_io
+=20
+ # The "image.filename" part tests whether "a": { "b": "c" } and "a.b": "c"=
+ do
+ # the same (which they should).
+-$QEMU_IO_PROG --cache $CACHEMODE \
++$QEMU_IO_PROG --cache $CACHEMODE --aio $AIOMODE  \
+      -c 'read -P 42 0x38000 512' "json:{
+     \"driver\": \"$IMGFMT\",
+     \"file\": {
+diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+index 0874fa84c8..d2a2aca347 100755
+--- a/tests/qemu-iotests/091
++++ b/tests/qemu-iotests/091
+@@ -60,13 +60,13 @@ echo =3D=3D=3D Starting QEMU VM1 =3D=3D=3D
+ echo
+=20
+ qemu_comm_method=3D"monitor"
+-_launch_qemu -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
++_launch_qemu -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D${AIOM=
+ODE},id=3Ddisk
+ h1=3D$QEMU_HANDLE
+=20
+ echo
+ echo =3D=3D=3D Starting QEMU VM2 =3D=3D=3D
+ echo
+-_launch_qemu -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk \
++_launch_qemu -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D${AIOM=
+ODE},id=3Ddisk \
+              -incoming "exec: cat '${MIG_FIFO}'"
+ h2=3D$QEMU_HANDLE
+=20
+diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
+index ba638db11f..a51dd84b3d 100755
+--- a/tests/qemu-iotests/109
++++ b/tests/qemu-iotests/109
+@@ -52,7 +52,7 @@ run_qemu()
+     local qmp_format=3D"$3"
+     local qmp_event=3D"$4"
+=20
+-    _launch_qemu -drive file=3D"${source_img}",format=3Draw,cache=3D${CACH=
+EMODE},id=3Dsrc
++    _launch_qemu -drive file=3D"${source_img}",format=3Draw,cache=3D${CACH=
+EMODE},aio=3D${AIOMODE},id=3Dsrc
+     _send_qemu_cmd $QEMU_HANDLE "{ 'execute': 'qmp_capabilities' }" "retur=
+n"
+=20
+     _send_qemu_cmd $QEMU_HANDLE \
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 03fc2fabcf..2b6f859a09 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -24,7 +24,7 @@ import socket
+ import stat
+ import time
+ import iotests
+-from iotests import cachemode, imgfmt, qemu_img, qemu_nbd, qemu_nbd_early_=
+pipe
++from iotests import cachemode, aiomode, imgfmt, qemu_img, qemu_nbd, qemu_n=
+bd_early_pipe
+=20
+ NBD_PORT_START      =3D 32768
+ NBD_PORT_END        =3D NBD_PORT_START + 1024
+@@ -134,7 +134,8 @@ class BuiltinNBD(NBDBlockdevAddBase):
+         self.server.add_drive_raw('if=3Dnone,id=3Dnbd-export,' +
+                                   'file=3D%s,' % test_img +
+                                   'format=3D%s,' % imgfmt +
+-                                  'cache=3D%s' % cachemode)
++                                  'cache=3D%s' % cachemode +
++                                  'aio=3D%s' % aiomode)
+         self.server.launch()
+=20
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index 378c2899d1..438c2dcd80 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -58,20 +58,20 @@ qemu_comm_method=3D"monitor"
+=20
+ if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+     _launch_qemu \
+-        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
++        -drive "${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,id=3Ddisk
+ else
+     _launch_qemu \
+-        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMGFMT,=
+id=3Ddisk
++        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,dr=
+iver=3D$IMGFMT,id=3Ddisk
+ fi
+ src=3D$QEMU_HANDLE
+=20
+ if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+     _launch_qemu \
+-        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk \
++        -drive "${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,id=3Ddisk=
+ \
+         -incoming "unix:${MIG_SOCKET}"
+ else
+     _launch_qemu \
+-        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMGFMT,=
+id=3Ddisk \
++        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,dr=
+iver=3D$IMGFMT,id=3Ddisk \
+         -incoming "unix:${MIG_SOCKET}"
+ fi
+ dest=3D$QEMU_HANDLE
+diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
+index 3f74b9f62d..64621617f5 100755
+--- a/tests/qemu-iotests/183
++++ b/tests/qemu-iotests/183
+@@ -56,12 +56,12 @@ echo
+ qemu_comm_method=3D"qmp"
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,driver=3D$IMGFMT,id=3Dd=
+isk
++    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,aio=3D$AIOMODE,driver=
+=3D$IMGFMT,id=3Ddisk
+ src=3D$QEMU_HANDLE
+ _send_qemu_cmd $src "{ 'execute': 'qmp_capabilities' }" 'return'
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}.dest",cache=3D$CACHEMODE,driver=3D$IMGFMT,i=
+d=3Ddisk \
++    -drive file=3D"${TEST_IMG}.dest",cache=3D$CACHEMODE,aio=3D$AIOMODE,dri=
+ver=3D$IMGFMT,id=3Ddisk \
+     -incoming "unix:${MIG_SOCKET}"
+ dest=3D$QEMU_HANDLE
+ _send_qemu_cmd $dest "{ 'execute': 'qmp_capabilities' }" 'return'
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index e50f19ebf0..fd5e6ebe11 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -54,7 +54,7 @@ echo
+ qemu_comm_method=3D"qmp"
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}.base",cache=3D$CACHEMODE,driver=3D$IMGFMT,i=
+d=3Ddisk
++    -drive file=3D"${TEST_IMG}.base",cache=3D$CACHEMODE,aio=3D$AIOMODE,dri=
+ver=3D$IMGFMT,id=3Ddisk
+ h=3D$QEMU_HANDLE
+ _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
+=20
+@@ -125,7 +125,7 @@ echo =3D=3D=3D Start active commit job and exit qemu =
+=3D=3D=3D
+ echo
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,driver=3D$IMGFMT,id=3Dd=
+isk
++    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,aio=3D$AIOMODE,driver=
+=3D$IMGFMT,id=3Ddisk
+ h=3D$QEMU_HANDLE
+ _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
+=20
+@@ -147,7 +147,7 @@ echo =3D=3D=3D Start mirror job and exit qemu =3D=3D=3D
+ echo
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,driver=3D$IMGFMT,id=3Dd=
+isk
++    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,aio=3D$AIOMODE,driver=
+=3D$IMGFMT,id=3Ddisk
+ h=3D$QEMU_HANDLE
+ _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
+=20
+@@ -172,7 +172,7 @@ echo =3D=3D=3D Start backup job and exit qemu =3D=3D=3D
+ echo
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,driver=3D$IMGFMT,id=3Dd=
+isk
++    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,aio=3D$AIOMODE,driver=
+=3D$IMGFMT,id=3Ddisk
+ h=3D$QEMU_HANDLE
+ _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
+=20
+@@ -196,7 +196,7 @@ echo =3D=3D=3D Start streaming job and exit qemu =3D=3D=
+=3D
+ echo
+=20
+ _launch_qemu \
+-    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,driver=3D$IMGFMT,id=3Dd=
+isk
++    -drive file=3D"${TEST_IMG}",cache=3D$CACHEMODE,aio=3D$AIOMODE,driver=
+=3D$IMGFMT,id=3Ddisk
+ h=3D$QEMU_HANDLE
+ _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
+=20
+diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
+index a2cdd7f83d..59f7854b9f 100755
+--- a/tests/qemu-iotests/200
++++ b/tests/qemu-iotests/200
+@@ -67,7 +67,7 @@ echo =3D=3D=3D Starting QEMU VM =3D=3D=3D
+ echo
+ qemu_comm_method=3D"qmp"
+ _launch_qemu -object iothread,id=3Diothread0 $virtio_scsi \
+-             -drive file=3D"${TEST_IMG}",media=3Ddisk,if=3Dnone,cache=3D$C=
+ACHEMODE,id=3Ddrive_sysdisk,format=3D$IMGFMT \
++             -drive file=3D"${TEST_IMG}",media=3Ddisk,if=3Dnone,cache=3D$C=
+ACHEMODE,aio=3D$AIOMODE,id=3Ddrive_sysdisk,format=3D$IMGFMT \
+              -device scsi-hd,drive=3Ddrive_sysdisk,bus=3Dscsi0.0,id=3Dsysd=
+isk,bootindex=3D0
+ h1=3D$QEMU_HANDLE
+=20
+diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
+index 133ba9f03e..483eb189c5 100755
+--- a/tests/qemu-iotests/201
++++ b/tests/qemu-iotests/201
+@@ -58,20 +58,20 @@ qemu_comm_method=3D"monitor"
+=20
+ if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+     _launch_qemu \
+-        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk
++        -drive "${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,id=3Ddisk
+ else
+     _launch_qemu \
+-        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMGFMT,=
+id=3Ddisk
++        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,dr=
+iver=3D$IMGFMT,id=3Ddisk
+ fi
+ src=3D$QEMU_HANDLE
+=20
+ if [ "$IMGOPTSSYNTAX" =3D "true" ]; then
+     _launch_qemu \
+-        -drive "${TEST_IMG}",cache=3D${CACHEMODE},id=3Ddisk \
++        -drive "${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,id=3Ddisk=
+ \
+         -incoming "unix:${MIG_SOCKET}"
+ else
+     _launch_qemu \
+-        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},driver=3D$IMGFMT,=
+id=3Ddisk \
++        -drive file=3D"${TEST_IMG}",cache=3D${CACHEMODE},aio=3D$AIOMODE,dr=
+iver=3D$IMGFMT,id=3Ddisk \
+         -incoming "unix:${MIG_SOCKET}"
+ fi
+ dest=3D$QEMU_HANDLE
+--=20
+2.24.1
 
 
