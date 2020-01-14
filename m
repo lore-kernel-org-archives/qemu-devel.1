@@ -6,55 +6,69 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30EA7C33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 21:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A8BC33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 21:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC76424658
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 21:19:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC76424658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4D02824670
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 21:32:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D02824670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irTaX-000343-1m
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 16:19:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43783)
+	id 1irTnH-0000HY-G5
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 16:32:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1irTZB-0001FA-LT
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 16:17:39 -0500
+ (envelope-from <bounces@canonical.com>) id 1irTgz-0005PK-VA
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 16:25:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1irTZ9-0007DE-36
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 16:17:37 -0500
-Resent-Date: Tue, 14 Jan 2020 16:17:36 -0500
-Resent-Message-Id: <E1irTZ9-0007DE-36@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21166)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1irTZ8-0007Bc-D7; Tue, 14 Jan 2020 16:17:34 -0500
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157903664482265.89474840931348;
- Tue, 14 Jan 2020 13:17:24 -0800 (PST)
-In-Reply-To: <20200114193350.10830-1-mlevitsk@redhat.com>
-Subject: Re: [PATCH 00/13] LUKS: encryption slot management using amend
- interface
-Message-ID: <157903664410.1076.15150459157549852147@37313f22b938>
+ (envelope-from <bounces@canonical.com>) id 1irTgw-0001QD-Bd
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 16:25:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36380)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1irTgw-0001PH-5D
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 16:25:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1irTgu-0001AV-Kw
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 21:25:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 987492E80C8
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 21:25:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mlevitsk@redhat.com
-Date: Tue, 14 Jan 2020 13:17:24 -0800 (PST)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Jan 2020 21:19:46 -0000
+From: Adrien Grassein <1859713@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: grassead
+X-Launchpad-Bug-Reporter: Adrien Grassein (grassead)
+X-Launchpad-Bug-Modifier: Adrien Grassein (grassead)
+Message-Id: <157903678645.2454.11578772527064917210.malonedeb@soybean.canonical.com>
+Subject: [Bug 1859713] [NEW] ARM v8.3a pauth not working
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 479ebeca36b97e47bebbc0b5c8cc3843a186ea63
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -63,194 +77,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berrange@redhat.com, qemu-block@nongnu.org,
- armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- mlevitsk@redhat.com, jsnow@redhat.com
+Reply-To: Bug 1859713 <1859713@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDExNDE5MzM1MC4xMDgz
-MC0xLW1sZXZpdHNrQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
-ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
-bmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwMC8xM10gTFVLUzogZW5jcnlwdGlvbiBzbG90
-IG1hbmFnZW1lbnQgdXNpbmcgYW1lbmQgaW50ZXJmYWNlClR5cGU6IHNlcmllcwpNZXNzYWdlLWlk
-OiAyMDIwMDExNDE5MzM1MC4xMDgzMC0xLW1sZXZpdHNrQHJlZGhhdC5jb20KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CmM5N2UwMGYgaW90ZXN0czogYWRkIHRlc3RzIGZvciBibG9ja2Rldi1hbWVuZAowMDVmN2Q4IGJs
-b2NrL3Fjb3cyOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1lbmQKZmNmYWFhYSBibG9jay9jcnlwdG86
-IGltcGxlbWVudCBibG9ja2Rldi1hbWVuZAo5NzYxMGI1IGJsb2NrOiBhZGQgZ2VuZXJpYyBpbmZy
-YXN0cnVjdHVyZSBmb3IgeC1ibG9ja2Rldi1hbWVuZCBxbXAgY29tbWFuZApiOTNlNzc1IHFlbXUt
-aW90ZXN0czogcWVtdS1pbWcgdGVzdHMgZm9yIGx1a3Mga2V5IG1hbmFnZW1lbnQKOTczMDY4NCBp
-b3Rlc3RzOiBmaWx0ZXIgZmV3IG1vcmUgbHVrcyBzcGVjaWZpYyBjcmVhdGUgb3B0aW9ucwpmOThj
-MTQ1IHFjb3cyOiBleHRlbmQgcWVtdS1pbWcgYW1lbmQgaW50ZXJmYWNlIHdpdGggY3J5cHRvIG9w
-dGlvbnMKZGQ1YmMxYyBibG9jay9jcnlwdG86IGltcGxlbWVudCB0aGUgZW5jcnlwdGlvbiBrZXkg
-bWFuYWdlbWVudAphZDI0NjM2IGJsb2NrL2NyeXB0bzogcmVuYW1lIHR3byBmdW5jdGlvbnMKODhm
-MzcyYiBibG9jazogYW1lbmQ6IHNlcGFyYXRlIGFtZW5kIGFuZCBjcmVhdGUgb3B0aW9ucyBmb3Ig
-cWVtdS1pbWcKZTk3MjBmMyBibG9jazogYW1lbmQ6IGFkZCAnZm9yY2UnIG9wdGlvbgpkOTZjNjY2
-IHFjcnlwdG8tbHVrczogaW1wbGVtZW50IGVuY3J5cHRpb24ga2V5IG1hbmFnZW1lbnQKYzQxZmJh
-MyBxY3J5cHRvOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgY3J5cHRvIG9wdGlvbnMg
-YW1lbmRtZW50Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEzIENoZWNraW5nIGNvbW1pdCBjNDFm
-YmEzYjgzYTEgKHFjcnlwdG86IGFkZCBnZW5lcmljIGluZnJhc3RydWN0dXJlIGZvciBjcnlwdG8g
-b3B0aW9ucyBhbWVuZG1lbnQpCjIvMTMgQ2hlY2tpbmcgY29tbWl0IGQ5NmM2NjYzZTM5ZCAocWNy
-eXB0by1sdWtzOiBpbXBsZW1lbnQgZW5jcnlwdGlvbiBrZXkgbWFuYWdlbWVudCkKMy8xMyBDaGVj
-a2luZyBjb21taXQgZTk3MjBmMzgwMDM4IChibG9jazogYW1lbmQ6IGFkZCAnZm9yY2UnIG9wdGlv
-bikKNC8xMyBDaGVja2luZyBjb21taXQgODhmMzcyYjIzOGZjIChibG9jazogYW1lbmQ6IHNlcGFy
-YXRlIGFtZW5kIGFuZCBjcmVhdGUgb3B0aW9ucyBmb3IgcWVtdS1pbWcpCkVSUk9SOiBNYWNyb3Mg
-d2l0aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hp
-bGUgbG9vcAojMzA6IEZJTEU6IGJsb2NrL3Fjb3cyLmM6NTQ0ODoKKyNkZWZpbmUgUUNPV19DT01N
-T05fT1BUSU9OUyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
-IHsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBcCisgICAgICAgIC5uYW1lID0gQkxPQ0tfT1BUX1NJWkUsICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TSVpFLCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJW
-aXJ0dWFsIGRpc2sgc2l6ZSIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
-fSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9DT01QQVRf
-TEVWRUwsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVN
-VV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAg
-ICAgLmhlbHAgPSAiQ29tcGF0aWJpbGl0eSBsZXZlbCAodjIgWzAuMTBdIG9yIHYzIFsxLjFdKSIg
-ICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9D
-S19PUFRfQkFDS0lOR19GSUxFLCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAg
-ICAudHlwZSA9IFFFTVVfT1BUX1NUUklORywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCisgICAgICAgIC5oZWxwID0gIkZpbGUgbmFtZSBvZiBhIGJhc2UgaW1hZ2UiICAgICAg
-ICAgICAgICAgICAgICAgICAgIFwKKyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIHsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAg
-IC5uYW1lID0gQkxPQ0tfT1BUX0JBQ0tJTkdfRk1ULCAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKyAgICAgICAgLnR5cGUgPSBRRU1VX09QVF9TVFJJTkcsICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXAorICAgICAgICAuaGVscCA9ICJJbWFnZSBmb3JtYXQgb2YgdGhl
-IGJhc2UgaW1hZ2UiICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9EQVRBX0ZJTEUsICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiRmlsZSBu
-YW1lIG9mIGFuIGV4dGVybmFsIGRhdGEgZmlsZSIgICAgICAgICAgICAgICAgXAorICAgIH0sICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfREFUQV9GSUxFX1JB
-VywgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BU
-X0JPT0wsICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5o
-ZWxwID0gIlRoZSBleHRlcm5hbCBkYXRhIGZpbGUgbXVzdCBzdGF5IHZhbGlkICIgICAgICAgICAg
-IFwKKyAgICAgICAgICAgICAgICAiYXMgYSByYXcgaW1hZ2UiICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgXAorICAgIH0sICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgeyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLm5h
-bWUgPSBCTE9DS19PUFRfRU5DUllQVCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX0JPT0wsICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxwID0gIkVuY3J5cHQgdGhlIGltYWdlIHdpdGgg
-Zm9ybWF0ICdhZXMnLiAoRGVwcmVjYXRlZCAiIFwKKyAgICAgICAgICAgICAgICAiaW4gZmF2b3Ig
-b2YgIiBCTE9DS19PUFRfRU5DUllQVF9GT1JNQVQgIj1hZXMpIiwgICAgXAorICAgIH0sICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBc
-CisgICAgeyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIFwKKyAgICAgICAgLm5hbWUgPSBCTE9DS19PUFRfRU5DUllQVF9GT1JNQVQs
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAudHlwZSA9IFFFTVVfT1BUX1NU
-UklORywgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC5oZWxw
-ID0gIkVuY3J5cHQgdGhlIGltYWdlLCBmb3JtYXQgY2hvaWNlczogJ2FlcycsICdsdWtzJyIsIFwK
-KyAgICB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0tFWV9TRUNSRVQoImVuY3J5
-cHQuIiwgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgICJJRCBvZiBzZWNyZXQgcHJvdmlk
-aW5nIHFjb3cgQUVTIGtleSBvciBMVUtTIHBhc3NwaHJhc2UiKSwgIFwKKyAgICBCTE9DS19DUllQ
-VE9fT1BUX0RFRl9MVUtTX0NJUEhFUl9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICAgICAgXAor
-ICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfQ0lQSEVSX01PREUoImVuY3J5cHQuIiksICAg
-ICAgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19JVkdFTl9BTEcoImVu
-Y3J5cHQuIiksICAgICAgICAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtT
-X0lWR0VOX0hBU0hfQUxHKCJlbmNyeXB0LiIpLCAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBU
-T19PUFRfREVGX0xVS1NfSEFTSF9BTEcoImVuY3J5cHQuIiksICAgICAgICAgICAgICAgICBcCisg
-ICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19JVEVSX1RJTUUoImVuY3J5cHQuIiksICAgICAg
-ICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9DTFVT
-VEVSX1NJWkUsICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0g
-UUVNVV9PUFRfU0laRSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAg
-ICAgICAgLmhlbHAgPSAicWNvdzIgY2x1c3RlciBzaXplIiwgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9IHN0cmluZ2lmeShERUZBVUxUX0NM
-VVNURVJfU0laRSkgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAg
-ICAgICAubmFtZSA9IEJMT0NLX09QVF9QUkVBTExPQywgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfU1RSSU5HLCAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiUHJlYWxsb2NhdGlvbiBt
-b2RlIChhbGxvd2VkIHZhbHVlczogb2ZmLCAiICAgICAgICAgXAorICAgICAgICAgICAgICAgICJt
-ZXRhZGF0YSwgZmFsbG9jLCBmdWxsKSIgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
-fSwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXAorICAgICAgICAubmFtZSA9IEJMT0NLX09QVF9MQVpZX1JF
-RkNPVU5UUywgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIC50eXBlID0gUUVN
-VV9PUFRfQk9PTCwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAg
-ICAgLmhlbHAgPSAiUG9zdHBvbmUgcmVmY291bnQgdXBkYXRlcyIsICAgICAgICAgICAgICAgICAg
-ICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0ciA9ICJvZmYiICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBcCisgICAgfSwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICB7ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgICAg
-ICAubmFtZSA9IEJMT0NLX09QVF9SRUZDT1VOVF9CSVRTLCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcCisgICAgICAgIC50eXBlID0gUUVNVV9PUFRfTlVNQkVSLCAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgLmhlbHAgPSAiV2lkdGggb2YgYSByZWZlcmVu
-Y2UgY291bnQgZW50cnkgaW4gYml0cyIsICAgICAgICAgXAorICAgICAgICAuZGVmX3ZhbHVlX3N0
-ciA9ICIxNiIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgfSAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIFwKKwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMzEgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggNC8xMyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKNS8xMyBDaGVja2luZyBjb21t
-aXQgYWQyNDYzNmFjZGM1IChibG9jay9jcnlwdG86IHJlbmFtZSB0d28gZnVuY3Rpb25zKQo2LzEz
-IENoZWNraW5nIGNvbW1pdCBkZDViYzFjYzBiZTUgKGJsb2NrL2NyeXB0bzogaW1wbGVtZW50IHRo
-ZSBlbmNyeXB0aW9uIGtleSBtYW5hZ2VtZW50KQpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2
-YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMyNTM6IEZJTEU6IGJsb2Nr
-L2NyeXB0by5oOjExNjoKKyNkZWZpbmUgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19LRVlTTE9U
-X1VQREFURShwcmVmaXgpICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZfTFVLU19LRVlTTE9U
-KHByZWZpeCksICAgICAgICAgICAgXAorICAgIEJMT0NLX0NSWVBUT19PUFRfREVGX0xVS1NfT0xE
-X1NFQ1JFVChwcmVmaXgpLCAgICAgICAgIFwKKyAgICBCTE9DS19DUllQVE9fT1BUX0RFRl9MVUtT
-X05FV19TRUNSRVQocHJlZml4KSwgICAgICAgICBcCisgICAgQkxPQ0tfQ1JZUFRPX09QVF9ERUZf
-TFVLU19JVEVSX1RJTUUocHJlZml4KSAgICAgICAgICAgXAorCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDIxMyBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzEzIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgo3LzEzIENoZWNraW5nIGNvbW1pdCBmOThjMTQ1YzBlYmMgKHFjb3cyOiBleHRl
-bmQgcWVtdS1pbWcgYW1lbmQgaW50ZXJmYWNlIHdpdGggY3J5cHRvIG9wdGlvbnMpCkVSUk9SOiAi
-Zm9vKiBiYXIiIHNob3VsZCBiZSAiZm9vICpiYXIiCiM0NDogRklMRTogYmxvY2svcWNvdzIuYzo0
-NjQ4OgorICAgIFFEaWN0KiBjcnlwdG9fb3B0c19kaWN0OwoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAxNjUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMyBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKOC8xMyBDaGVja2luZyBjb21taXQgOTczMDY4NDVmM2ZiIChpb3Rlc3RzOiBmaWx0
-ZXIgZmV3IG1vcmUgbHVrcyBzcGVjaWZpYyBjcmVhdGUgb3B0aW9ucykKOS8xMyBDaGVja2luZyBj
-b21taXQgYjkzZTc3NTI0MTgwIChxZW11LWlvdGVzdHM6IHFlbXUtaW1nIHRlc3RzIGZvciBsdWtz
-IGtleSBtYW5hZ2VtZW50KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
-LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNDogCm5ldyBmaWxlIG1vZGUgMTAw
-NzU1Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQzMiBsaW5lcyBjaGVja2VkCgpQYXRj
-aCA5LzEzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEwLzEzIENoZWNraW5nIGNvbW1pdCA5
-NzYxMGI1NDZmZWEgKGJsb2NrOiBhZGQgZ2VuZXJpYyBpbmZyYXN0cnVjdHVyZSBmb3IgeC1ibG9j
-a2Rldi1hbWVuZCBxbXAgY29tbWFuZCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzA6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTUgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTAvMTMgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTEvMTMgQ2hlY2tpbmcg
-Y29tbWl0IGZjZmFhYWE4ODU4NSAoYmxvY2svY3J5cHRvOiBpbXBsZW1lbnQgYmxvY2tkZXYtYW1l
-bmQpCjEyLzEzIENoZWNraW5nIGNvbW1pdCAwMDVmN2Q4M2YwNTIgKGJsb2NrL3Fjb3cyOiBpbXBs
-ZW1lbnQgYmxvY2tkZXYtYW1lbmQpCjEzLzEzIENoZWNraW5nIGNvbW1pdCBjOTdlMDBmNjA3OGIg
-KGlvdGVzdHM6IGFkZCB0ZXN0cyBmb3IgYmxvY2tkZXYtYW1lbmQpCldBUk5JTkc6IGFkZGVkLCBt
-b3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8K
-IzE0OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-NTk4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEzLzEzIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAw
-MTE0MTkzMzUwLjEwODMwLTEtbWxldml0c2tAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Public bug reported:
 
+Host: Ubuntu 19.10 - x86_64 machine
+QEMU version: 3a63b24a1bbf166e6f455fe43a6bbd8dea413d92 (master)
+
+ARMV8.3 pauth is not working well.
+
+With a test code containing two pauth instructions:
+    - paciasp that sign LR with A key and sp as context;
+    - autiasp that verify the signature.
+
+Test:
+    - Run the program and corrupt LR just before autiasp (ex 0x3e0000040066=
+0 instead of 0x3e000000400664)
+
+Expected:
+    - autiasp places an invalid pointer in LR
+
+Result:
+    - autiasp successfully auth the pointer and places 0x0400660 in LR.
+
+Further explanations:
+    Adding traces in qemu code shows that "pauth_computepac" is not robust =
+enough against truncating.
+    With 0x31000000400664 as input of pauth_auth, we obtain "0x55b1d65b2c13=
+8e14" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
+    With 0x310040008743ec as input of pauth (with same key), we obtain "0x5=
+5b1d65b2c138ef4" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
+    Values of top_bit and bottom_bit are strictly the same and it should no=
+t.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: arm
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859713
+
+Title:
+  ARM v8.3a pauth not working
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host: Ubuntu 19.10 - x86_64 machine
+  QEMU version: 3a63b24a1bbf166e6f455fe43a6bbd8dea413d92 (master)
+
+  ARMV8.3 pauth is not working well.
+
+  With a test code containing two pauth instructions:
+      - paciasp that sign LR with A key and sp as context;
+      - autiasp that verify the signature.
+
+  Test:
+      - Run the program and corrupt LR just before autiasp (ex 0x3e00000400=
+660 instead of 0x3e000000400664)
+
+  Expected:
+      - autiasp places an invalid pointer in LR
+
+  Result:
+      - autiasp successfully auth the pointer and places 0x0400660 in LR.
+
+  Further explanations:
+      Adding traces in qemu code shows that "pauth_computepac" is not robus=
+t enough against truncating.
+      With 0x31000000400664 as input of pauth_auth, we obtain "0x55b1d65b2c=
+138e14" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
+      With 0x310040008743ec as input of pauth (with same key), we obtain "0=
+x55b1d65b2c138ef4" for PAC, "0x30" for bot_bit and "0x38" for top_bit.
+      Values of top_bit and bottom_bit are strictly the same and it should =
+not.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859713/+subscriptions
 
