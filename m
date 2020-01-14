@@ -2,79 +2,75 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C93C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A43C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:27:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EED6207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:24:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A372D207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:27:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="aQOD5X1p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EED6207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eudWhbYC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A372D207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIQg-0003KN-QR
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:24:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56698)
+	id 1irIUL-0005si-9w
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:27:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shihpo.hung@sifive.com>) id 1irIPt-0002to-Hg
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:23:18 -0500
+ (envelope-from <quintela@redhat.com>) id 1irISt-0004Gq-VW
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shihpo.hung@sifive.com>) id 1irIPs-0005Rb-5E
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:23:17 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51573)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <shihpo.hung@sifive.com>)
- id 1irIPr-0005RG-Q9
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:23:16 -0500
-Received: by mail-wm1-x344.google.com with SMTP id d73so12869380wmd.1
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 01:23:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iPeDJfmX+J9JbWkJuINWmfwIPDEVf2XLnDWb9B1TWPg=;
- b=aQOD5X1peBcWxJLpQxo32r2MHu9a2ry77QKtnoMspmRDkFOHAUFjsqO2GOctZi15Rp
- ROOOBqsT9s0M+QPy9PpNBRtxBApbNGI5QsE8kyhwn7/t8j0RJFowXnYkRNOK9JQLETQG
- mggoMrYyHPrDS06CqHIeQDYcUyfppI+lGDX++5zhMqcJD4ejW4ig38wdJZ6d7hXnYC2M
- 1EmpnfsbAr88beMycoeaETM6Y2dsprE06o8ZNn9jOt9qSctyRaUbk9Zfkjk3I3uYTlDP
- 2l/khFhTboDz0vOblCFY98F+UeVxX9ruBPXxe0dO9xGbOHvsmu83tw/QLI4UbhQsTd8X
- 9nIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iPeDJfmX+J9JbWkJuINWmfwIPDEVf2XLnDWb9B1TWPg=;
- b=JZjuwP+KksPliG87Yw0xkdJkSozSukQtFgw7ZPAEdZy4As8AndJji7Fb+/M/80FMKU
- ibUbEUNndDKqLO9Mzwbmy3V0YhCYo66VSnZFLbA6pyMb0idpChQasvGyR6b+KGIfa38S
- P1m9IW2dMq0e+GyIrTDpQy4OZgUbR4eTCcIQ1cG7q372q5/OeectSB1vmxVPPepMUtNb
- /E/vxiogNSFMUQxQZ8oEcClUfEWx8iHpcIX5RgoeJ9UsFC57+fcgQ5rk+wHkH/ycdMSt
- zw7AJLbZrO/S8beoMWQ1jPxL6Wg5nL2A2v62W/o6lvueen9GEPdmeQWRvL7O8R9oRb37
- MPIw==
-X-Gm-Message-State: APjAAAWAu1n0sqZQk+66c8jc7QCyXXHsWdw+G3T+oyaLlypLLEcViiGi
- OCDKSm0aXdsrBV00eNbcVA4TcMUdvNKDq/d5HPNPUA==
-X-Google-Smtp-Source: APXvYqxVfzDei3APqPZld6ioOps6RTUSFSmjqqzznkLEOIyiiG5jYt0f/VNTvSorLmscKBuH+kZvqeu7zrLSv1Yd6F8=
-X-Received: by 2002:a7b:cf2d:: with SMTP id m13mr25901438wmg.163.1578993794085; 
- Tue, 14 Jan 2020 01:23:14 -0800 (PST)
+ (envelope-from <quintela@redhat.com>) id 1irISs-0006G1-1A
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51425
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irISr-0006Fg-TR
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578993981;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=mJKKWE1UzMu4GfpEm/19JU/n+PvAuNFbFMEj8jZ27+g=;
+ b=eudWhbYCkD752Kf1/U7jmjNd43dnug7INX/8P3oZLTfWayyjU6A17wTOHuycg6E9dZ7K0q
+ I9eeAKnneUv7lcxdbhDZgVBlNDieAPKzHP2tP+PR4Mf1y7r3lQcomiUtw6PsNaMzMa5kzh
+ FlaWi7R/oH9h5G5UN7oznhaSLdfBNmE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-7-9kiTu082ND2g28L8kecVEg-1; Tue, 14 Jan 2020 04:26:19 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2104D1800D78;
+ Tue, 14 Jan 2020 09:26:17 +0000 (UTC)
+Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C6DCD19756;
+ Tue, 14 Jan 2020 09:26:07 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/29] Migration pull patches (second try)
+Date: Tue, 14 Jan 2020 10:25:37 +0100
+Message-Id: <20200114092606.1761-1-quintela@redhat.com>
 MIME-Version: 1.0
-References: <1578647134-13216-1-git-send-email-shihpo.hung@sifive.com>
- <19df333a-9a93-d3af-e7ab-fce212bb4978@linaro.org>
-In-Reply-To: <19df333a-9a93-d3af-e7ab-fce212bb4978@linaro.org>
-From: ShihPo Hung <shihpo.hung@sifive.com>
-Date: Tue, 14 Jan 2020 17:23:02 +0800
-Message-ID: <CALoQrweYaT27OPbF9yC=3JmxnGom=mg1kJdW5XFBpkM_Q4aKww@mail.gmail.com>
-Subject: Re: [PATCH] target/riscv: Set mstatus.DS & FS correctly
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000330d37059c1624d3"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 9kiTu082ND2g28L8kecVEg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,64 +82,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
+ Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000330d37059c1624d3
-Content-Type: text/plain; charset="UTF-8"
+The following changes since commit 3c8a6575985b1652b45bfa670b5e1907d642cfa0=
+:
 
-On Tue, Jan 14, 2020 at 10:32 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200113-pull-reque=
+st' into staging (2020-01-13 14:19:57 +0000)
 
-> On 1/9/20 11:05 PM, shihpo.hung@sifive.com wrote:
-> > Because ctx->mstatus_fs changes dynamically during runtime, we should
-> > remove the mstatus_fs check at the translation stage.
->
-> This change is incorrect.
->
-> The actual bug is in cpu_get_tb_cpu_state(), as I just noticed during
-> review:
->
-> "[PATCH 2/3] RISC-V: use FIELD macro to define tb flags"
-> https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg02455.html
+are available in the Git repository at:
 
+  https://github.com/juanquintela/qemu.git tags/migration-pull-pull-request
 
-I didn't understand the purpose of mstatus_fs, but now I get it.
-Thanks for pointing me to.
-I will resend my patches.
+for you to fetch changes up to 4eafab585c091050b5ae63130f46fe46ac919c3a:
 
---000000000000330d37059c1624d3
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+  migration: Support QLIST migration (2020-01-14 10:17:12 +0100)
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Jan 14, 2020 at 10:32 AM Rich=
-ard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.h=
-enderson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
-;padding-left:1ex">On 1/9/20 11:05 PM, <a href=3D"mailto:shihpo.hung@sifive=
-.com" target=3D"_blank">shihpo.hung@sifive.com</a> wrote:<br>
-&gt; Because ctx-&gt;mstatus_fs changes dynamically during runtime, we shou=
-ld<br>
-&gt; remove the mstatus_fs check at the translation stage.<br>
-<br>
-This change is incorrect.<br>
-<br>
-The actual bug is in cpu_get_tb_cpu_state(), as I just noticed during revie=
-w:<br>
-<br>
-&quot;[PATCH 2/3] RISC-V: use FIELD macro to define tb flags&quot;<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-01/msg02455.h=
-tml" rel=3D"noreferrer" target=3D"_blank">https://lists.gnu.org/archive/htm=
-l/qemu-devel/2020-01/msg02455.html</a></blockquote><div><br></div><div>I di=
-dn&#39;t understand the purpose of mstatus_fs, but now I get it.</div><div>=
-Thanks for pointing me to.</div><div>I will resend my patches.</div></div><=
-/div>
+----------------------------------------------------------------
+Migration pull request
+- updated QList patch
+- initialize local msg variable
 
---000000000000330d37059c1624d3--
+----------------------------------------------------------------
+
+Alexey Romko (1):
+  Bug #1829242 correction.
+
+Daniel Henrique Barboza (1):
+  ram.c: remove unneeded labels
+
+Dr. David Alan Gilbert (1):
+  migration: Rate limit inside host pages
+
+Eric Auger (1):
+  migration: Support QLIST migration
+
+Fangrui Song (1):
+  migration: Fix incorrect integer->float conversion caught by clang
+
+Jiahui Cen (2):
+  migration/multifd: fix nullptr access in terminating multifd threads
+  migration/multifd: fix destroyed mutex access in terminating multifd
+    threads
+
+Juan Quintela (4):
+  multifd: Initialize local variable
+  migration-test: Add migration multifd test
+  migration: Make sure that we don't call write() in case of error
+  migration-test: introduce functions to handle string parameters
+
+Laurent Vivier (2):
+  migration-test: ppc64: fix FORTH test program
+  runstate: ignore finishmigrate -> prelaunch transition
+
+Marc-Andr=C3=A9 Lureau (1):
+  misc: use QEMU_IS_ALIGNED
+
+Peter Xu (3):
+  migration: Define VMSTATE_INSTANCE_ID_ANY
+  migration: Change SaveStateEntry.instance_id into uint32_t
+  apic: Use 32bit APIC ID for migration instance ID
+
+Scott Cheloha (2):
+  migration: add savevm_state_handler_remove()
+  migration: savevm_state_handler_insert: constant-time element
+    insertion
+
+Wei Yang (8):
+  migration/postcopy: reduce memset when it is zero page and
+    matches_target_page_size
+  migration/postcopy: wait for decompress thread in precopy
+  migration/postcopy: count target page number to decide the
+    place_needed
+  migration/postcopy: set all_zero to true on the first target page
+  migration/postcopy: enable random order target page arrival
+  migration/postcopy: enable compress during postcopy
+  migration/multifd: clean pages after filling packet
+  migration/multifd: not use multifd during postcopy
+
+Yury Kotov (2):
+  migration: Fix the re-run check of the migrate-incoming command
+  migration/ram: Yield periodically to the main loop
+
+ backends/dbus-vmstate.c      |   3 +-
+ exec.c                       |   4 +-
+ hw/arm/stellaris.c           |   2 +-
+ hw/core/qdev.c               |   3 +-
+ hw/display/ads7846.c         |   2 +-
+ hw/i2c/core.c                |   2 +-
+ hw/input/stellaris_input.c   |   3 +-
+ hw/intc/apic_common.c        |   7 +-
+ hw/misc/max111x.c            |   3 +-
+ hw/net/eepro100.c            |   3 +-
+ hw/pci/pci.c                 |   2 +-
+ hw/ppc/spapr.c               |   2 +-
+ hw/timer/arm_timer.c         |   2 +-
+ hw/tpm/tpm_emulator.c        |   3 +-
+ include/migration/register.h |   2 +-
+ include/migration/vmstate.h  |  25 ++++-
+ include/qemu/queue.h         |  39 ++++++++
+ migration/migration.c        |  72 +++++++-------
+ migration/migration.h        |   1 +
+ migration/ram.c              | 183 ++++++++++++++++++++++++++---------
+ migration/savevm.c           |  61 ++++++++----
+ migration/trace-events       |   9 +-
+ migration/vmstate-types.c    |  70 ++++++++++++++
+ stubs/vmstate.c              |   2 +-
+ tests/qtest/migration-test.c |  97 ++++++++++++++++++-
+ tests/test-vmstate.c         | 170 ++++++++++++++++++++++++++++++++
+ vl.c                         |  10 +-
+ 27 files changed, 653 insertions(+), 129 deletions(-)
+
+--=20
+2.24.1
+
 
