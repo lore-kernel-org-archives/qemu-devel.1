@@ -2,84 +2,70 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0B56C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE95DC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8EB924679
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:09:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DEA524679
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZziK3BtE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EB924679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="xCoIucWl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DEA524679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irJ8G-0001Sj-VV
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 05:09:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38086)
+	id 1irJ9M-0002nI-N3
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 05:10:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38196)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1irJ7c-0000lC-Om
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:08:32 -0500
+ (envelope-from <qemu_oss@crudebyte.com>) id 1irJ8H-0001eD-BE
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:09:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1irJ7Z-0001Ly-3f
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:08:28 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58283
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1irJ7Y-0001Lm-WA
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:08:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578996504;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=YsPOKO5VuHtfyeuY7VrvEY52mOoDlHbuoXh29lYX0Y8=;
- b=ZziK3BtE8CESuLVAFblcI/veW4WNeuF5X/kcxmeooHg+W7EshOG1qUwv5Y2tXSYNi1tfxf
- quXHuzzP6iqG5x2WIRB+EWT2tkiza6knoClP0ThC1zKbRGXGysN89ycfu8xymkzU7UO7ql
- aRtdgAMQXS3Qq0UqatqBa+D/XdpCHb8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-F-M_FDMiPqawW_D4SpaH8A-1; Tue, 14 Jan 2020 05:08:23 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06CE21007302;
- Tue, 14 Jan 2020 10:08:22 +0000 (UTC)
-Received: from thuth.remote.csb (unknown [10.36.118.98])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 96A6B5C1B0;
- Tue, 14 Jan 2020 10:08:18 +0000 (UTC)
-Subject: Re: [PATCH] qemu-deprecated: Remove text about Python 2
-To: John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200109095116.18201-1-thuth@redhat.com>
- <5883bc34-926e-70e3-6402-32dfb5d92ab2@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e1ae4e63-626c-cc6d-5117-4b4fbd1ad436@redhat.com>
-Date: Tue, 14 Jan 2020 11:08:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <qemu_oss@crudebyte.com>) id 1irJ8D-0001YF-R0
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:09:09 -0500
+Received: from kylie.crudebyte.com ([5.189.157.229]:46097)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1irJ8D-0001XS-AH
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:09:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=XoZ2Bi8Y0Yqwodn8o2cYyHv/SJWl3/61lC3OFas4Ca4=; b=xCoIucWloQDd/ry9qYoTALuE+Q
+ 2lUqpNH62QqabHZixRynBKImqkLeeWbj6lOfcyiEvjnTHkSQX3q9axwfY1/vjGupbpnFEjZkMaMf+
+ NfAYSSwXVEzpsbkxGMzXHaDqNyALRNepnxjmTcB8Rwi8+/IAY8TDki0lEbiOxM+LqoZG8BzPwlfqy
+ GDf5QQN/FBjdRcDIPkv+gYgz+Ra763kJP97LxuxZ78hzVW89DNyWF5V8JOFudRMS5Kek7iExoYaYu
+ hKXK4y+1/i1ZdSrmYZcR8fiWTgHSf3qV/jDSE2udj1oLHZym1Nc8/PTtrJd3NUDZ8M/vzOZ4J+86Y
+ /0ZJUyzu5/UwEIocFHQMHusEp8dxbiKRiwpUvU77ddHWVlOZ8Gv3NJralZHF2mzAY4+sXQ2MeCISF
+ eEe6TzYOxspc/1zrVfAWhIBiTSZSGFTzBA6SZnAGo5N3rI3a9TOIPXRt7LwNfEwA4mcyVAUuw+328
+ QiGf1Zf+ybL0ypk6B1egxT+MuozBCKza/X/xbcD/1SoSDPCyKKiFxnp557p0cJkn4ZAaaHU+o10uN
+ NMD8IA38HYvV1tSd98egFVsbjL8kbkaeRq6N2QpiB+K5nTyj+1eT7uckH97MBT0zAlFXK23vW5Hxx
+ iq/aMgK3Stn5ZPr4KG5u4pGdvIA0PEgjJ6DW9l7+g=;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: pannengyuan@huawei.com, mst@redhat.com, groug@kaod.org,
+ Euler Robot <euler.robot@huawei.com>, zhang.zhanghailiang@huawei.com
+Subject: Re: [PATCH] virtio-9p-device: fix memleak in
+ virtio_9p_device_unrealize
+Date: Tue, 14 Jan 2020 11:08:59 +0100
+Message-ID: <56394079.B7N9aGhjP3@silver>
+In-Reply-To: <20200114074020.54696-1-pannengyuan@huawei.com>
+References: <20200114074020.54696-1-pannengyuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <5883bc34-926e-70e3-6402-32dfb5d92ab2@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: F-M_FDMiPqawW_D4SpaH8A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 5.189.157.229
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,85 +77,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/01/2020 23.36, John Snow wrote:
->=20
->=20
-> On 1/9/20 4:51 AM, Thomas Huth wrote:
->> Python 2 support has been removed, so we should now also remove
->> the announcement text for the deprecation.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
->> ---
->>  qemu-deprecated.texi | 8 --------
->>  1 file changed, 8 deletions(-)
->>
->> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
->> index 7033e531de..8b23e98474 100644
->> --- a/qemu-deprecated.texi
->> +++ b/qemu-deprecated.texi
->> @@ -341,14 +341,6 @@ they have no effect when used with @option{-n} to s=
-kip image creation.
->>  Silently ignored options can be confusing, so this combination of
->>  options will be made an error in future versions.
->> =20
->> -@section Build system
->> -
->> -@subsection Python 2 support (since 4.1.0)
->> -
->> -In the future, QEMU will require Python 3 to be available at
->> -build time.  Support for Python 2 in scripts shipped with QEMU
->> -is deprecated.
->> -
->>  @section Backwards compatibility
->> =20
->>  @subsection Runnability guarantee of CPU models (since 4.1.0)
->>
->=20
-> Genuine question, I'm sorry:
->=20
-> Is it worth documenting things we recently removed?
+On Dienstag, 14. Januar 2020 08:40:20 CET pannengyuan@huawei.com wrote:
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+> 
+> v->vq forgot to cleanup in virtio_9p_device_unrealize, the memory leak
+> stack is as follow:
+> 
+> Direct leak of 14336 byte(s) in 2 object(s) allocated from:
+>   #0 0x7f819ae43970 (/lib64/libasan.so.5+0xef970)  ??:?
+>   #1 0x7f819872f49d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
+>   #2 0x55a3a58da624 (./x86_64-softmmu/qemu-system-x86_64+0x2c14624) 
+> /mnt/sdb/qemu/hw/virtio/virtio.c:2327 #3 0x55a3a571bac7
+> (./x86_64-softmmu/qemu-system-x86_64+0x2a55ac7) 
+> /mnt/sdb/qemu/hw/9pfs/virtio-9p-device.c:209 #4 0x55a3a58e7bc6
+> (./x86_64-softmmu/qemu-system-x86_64+0x2c21bc6) 
+> /mnt/sdb/qemu/hw/virtio/virtio.c:3504 #5 0x55a3a5ebfb37
+> (./x86_64-softmmu/qemu-system-x86_64+0x31f9b37) 
+> /mnt/sdb/qemu/hw/core/qdev.c:876
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+>  hw/9pfs/virtio-9p-device.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+> index b5a7c03f26..b146387ae2 100644
+> --- a/hw/9pfs/virtio-9p-device.c
+> +++ b/hw/9pfs/virtio-9p-device.c
+> @@ -215,6 +215,7 @@ static void virtio_9p_device_unrealize(DeviceState *dev,
+> Error **errp) V9fsVirtioState *v = VIRTIO_9P(dev);
+>      V9fsState *s = &v->state;
+> 
+> +    virtio_delete_queue(v->vq);
+>      virtio_cleanup(vdev);
+>      v9fs_device_unrealize_common(s, errp);
+>  }
 
-Basically yes. In case of Python 2, it's not a QEMU feature that we
-remove here, but a build requirement, and we tell the users that we need
-at least Python 3.5 when they run "configure", so I'm not sure whether
-that needs to be explicitely mentioned again the docs beside our ChangeLog?
+Looks like you are using an old interface. The new one is
 
-> Right now, we don't
-> really have these docs hosted in a searchable way online in a
-> per-version format. Once the notice is gone, it's gone from the mirror.
->=20
-> I removed some bitmap functionality not too long ago and I created a
-> "Recently Removed" section as a bit of a troubleshooting guide should it
-> be needed.
->=20
-> - Do we want this section?
-> - Should I remove it?
-> - Can we add historical docs to the website to see previous deprecated
-> docs in a searchable manner?
+	void virtio_del_queue(VirtIODevice *vdev, int n);
 
-I also once started a page in the Wiki here:
+Best regards,
+Christian Schoenebeck
 
- https://wiki.qemu.org/Features/RemovedFeatures
-
-... but apparently, it did not get enough attention yet, otherwise you
-would have noticed it before introducing the new chapter into the
-qemu-doc ...
-
-We definitely need one spot where we can document removed features. I
-don't mind which way we do it, either the qemu-doc or the wiki, but we
-should unify on one of the two. I guess the qemu-doc is the better place
-since we are tracking the deprecated features there already and one more
-or less just has to move the text to the other chapter when things get
-finally removed?
-
- Thomas
 
 
