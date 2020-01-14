@@ -6,40 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 066FEC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E97A6C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:34:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4D662465A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:30:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D662465A
+	by mail.kernel.org (Postfix) with ESMTPS id BDE592467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:34:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE592467D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNDK-0006Iz-Ul
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:30:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58972)
+	id 1irNGc-0000EU-UW
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:34:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59580)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNCY-0005T9-HY
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:29:54 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irNFJ-0007nS-2X
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:32:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNCU-0007g7-RY
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:29:50 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:42001)
+ (envelope-from <laurent@vivier.eu>) id 1irNFF-0000p1-CC
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:32:40 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:36151)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNCU-0007fn-H7
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:29:46 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNFF-0000os-2x
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:32:37 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mbkac-1jNhPL2S4s-00dIC3; Tue, 14 Jan 2020 15:29:29 +0100
-Subject: Re: [PATCH v5 12/20] linux-user: Add support for
- FS_IOC_FS<GET|SET>XATTR ioctls
+ 1MlsWZ-1jZXsc1SgF-00j27z; Tue, 14 Jan 2020 15:32:21 +0100
+Subject: Re: [PATCH v5 13/20] linux-user: Add support for FITRIM ioctl
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-13-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1578947683-21011-14-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +82,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <382edf5b-81ee-d971-9bb7-00cac9cb7c47@vivier.eu>
-Date: Tue, 14 Jan 2020 15:29:28 +0100
+Message-ID: <d0019bc9-7003-af76-949b-77867a80504a@vivier.eu>
+Date: Tue, 14 Jan 2020 15:32:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-13-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1578947683-21011-14-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:i5PLvFaThMvPsoOCTw8kUAMaY3jHRQGTcpUEgKpnYCZGK2tD65r
- Tm8PyBDH22YlS1mlzYc/uzX0TcP6EF8eAuTDqPAmeyMjjWO8E200Z/iHkR36+htOh5TFFqW
- NcNW1oAmveLflInY47abZ8FKkco2lI+qTrIbYqlQ7dSaBfbvpm83q+v/ziQVhr+ygn5wh3z
- j/kZBhSMHDP11E6SduQuA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:YbBfLjLFm3k=:SSssZ8oiRS4r6YXpBwpXMF
- odcyY/pzo1P03G2VVE7lvSMTWXKUa0qwLU9KLWw7lNWLcjUc39MD+Do7sthp9IvlWFe7f8UGS
- VO/a7gNzcy0017PXpXFLsXCMsWy87jWTwjAB6R/ye1OayIG9nR2kIBl2FaEdj48nkWKsidpLV
- X4LH9lYN423xx98quKKRj7wFcTv/ICHHUFdlNhceN3oiYsa4fuPwtAxiXn/WpG+dlRnr1oIDq
- nDYVdMPOpDqCmf/rZNtPNxPtzv7jhAzyDfHBlthWSG+yyiqxPFhT36te8fPKXFgvswi8iSVcL
- NrrKS9qiqidZ5b6g4DJd5CYzbtsiInAQvwzEBMdn/7CWe0H0/FpbmP4kcR5fpR4gj7XlzdHZC
- c2sHcMf4LpN+7WCjZne0GkB1wSKTf3nngGu/IpUvzN1WS4CtqFqgICMZ5/VoxVuPYHE2dgbNi
- Q+vieMGwioVKkKuMMIz6lVqruld+345WcIPpbPs1pvDoy5CX/MMtD8wN+YFoB5q1pg2SezYTa
- Ccy0XsfzhwZfD2WRUpW/URghfOqQNrydSiCNgAehHnfLfCxiOp+sR0ph3HokYk5WjH/ctaZ2s
- Z1AEPechIs3q2r1lhTGxcj3U9re6MfbJ+OhprnoaMpAc8V5leYjx38qT8Ps8pzIhbsW+G0EMl
- XhJXN8TfUujJ8Z69yQDZoWIICrCdOI4S270sRn53J4or/APTbuOeeveYD92fZ/6LfCXR6h5Vj
- iss9DYkATsXDK9PHLbjnduD/6f3+SVqx5d3Pvqj/v/xu5BJW8X/g+OK4/78rKVSNdS+s99chb
- ciuVwkQdvQGjCNVT5HaM1zzSStyfCcPTq56Pgz5AjtRT7iDEDYTnhBRXdSszaie2mUT+skPQ0
- UipUC1seZoPRJxGtVWhs2SIKKLfPsWAml5X2dmbIo=
+X-Provags-ID: V03:K1:SKFjUdQ2SVX3fIIBVoI8wwsL84dW9lWjtj9GntoFnADfZdhB0Fc
+ V09Hz50rAHcnQfcPksE4sle6qjWjqBpe7QkZCkcBm2g+QfLSJ8JeMoA+KAo9hysTA7cWrJ2
+ 4D4zF0ildEyQ9HoZvMVzw8ARDiqT9T8KWtum6zgwW604+unJK6O4QPrc8LyAmyY9jNPllc9
+ ackrPQhEo4Ls+6Md/VtYg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9skTf99oBEs=:UQjPDKGdEyU2MzuUe7aRLB
+ 2DnceD/mpu+Lxn+zdct3KpNGax8SoLaZM3NAP96XkO8uXjzhkTBtylXMHF5jKybTevLRXagQY
+ ha8MG00IgLffjcL/2hsCMlGgpkfkygV/E63uQSnO/RA0HMIrRDkk1eioELw6mIUZaSinRE6b6
+ nco/6ef+0QYYqVjaLxpUL0ZmBjS1PLPqomi7RlmzXVyOhwM4MoxOFucSijFViRZRS3RqJA6UN
+ Tvl+7iSfxVREuhHMd7YEcf9aLFG7E5Xc+6VH4Zj3VvvP2dmKnxKsU2Aw+8thHBVVjFEKD3YLi
+ UQAi2Hjle057/IAtdMK1Q3UQG5fQYgInAXdeNmKMDutJKTdSlmJTEPc6JiDfup4ml7vN3hUd1
+ BWuonA8f/XdwTWR2XIGzox9CNsdA8ExnAFyRdwH71fTkZ85mkd+SbNn0fqY4oja/LI3Pm5RoZ
+ SZBf+E0+asFbecEtZANERT7jgVoNlh36YSIYeGQVcKNstVdc6Nejgm5CaqVqKamT7rBmWh4/k
+ Ws6BcaFbwWVZjueM6jJ9f1AqOyYVveNyYGkijN+BF3X54pv0+Bj1n8fHcaShKcKzPV9cNnhPN
+ yha/Ei0vzcRtt2N8abZQKF0VfMlLaWVbSQxHgoPO4HA1dqJK1dZmLJ0ZeccaH/zvVR0Uk7O0S
+ hnZVkeW/CsDaFEfJP8iQs5jXr7SP+0kplMMhxyOJ0rU7YhpKpvb/rEe+tIHYnBOedRcZe2gbT
+ M/wZKd+/VzU8g/7Wjpk2+hZ/nApsGkocbJ8H+EDqU95oBU2aurcau0kWim0670K8mK/9VniJo
+ bE9XTUIZoXHUUQ97iM6z2oR8PjZksLvN6FAgb58IHjU/FiOUFEM/dIjatqprwRAAXyHJZ6Nq5
+ sR1YY6KbA74ewwBucQ/TijzQnw6D3u+KoJcKfZ43A=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,67 +131,59 @@ Sender: "Qemu-devel"
 Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Both FS_IOC_FSGETXATTR and FS_IOC_FSSETXATTR accept a pointer to
-> the structure
+> FITRIM ioctl accepts a pointer to the structure
 > 
-> struct file_clone_range {
-> 	__s64 src_fd;
-> 	__u64 src_offset;
-> 	__u64 src_length;
-> 	__u64 dest_offset;
+> struct fstrim_range {
+> 	__u64 start;
+> 	__u64 len;
+> 	__u64 minlen;
 > };
 > 
-> as their third argument.
-
-There is a mismatch somewhere: they take 'struct fsxattr'.
-
-'struct file_clone_range' is used by FICLONERANGE.
-
+> as its third argument.
 > 
-> These ioctls were relatively recently introduced, so the "#ifdef"
-> guards are used in this implementation.
+> All ioctls in this group (FI* ioctl) are guarded with "#ifdef", so the
+> guards are used in this implementation too for consistency (however,
+> many of ioctls in FI* group became old enough that their #ifdef guards
+> could be removed, bit this is out of the scope of this patch).
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
->  linux-user/ioctls.h       | 7 +++++++
->  linux-user/syscall_defs.h | 2 ++
->  2 files changed, 9 insertions(+)
+>  linux-user/ioctls.h       | 3 +++
+>  linux-user/syscall_defs.h | 1 +
+>  2 files changed, 4 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 3affd88..e1b89a7 100644
+> index e1b89a7..e4f0a04 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -144,6 +144,13 @@
->       IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
->       IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
->       IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
-> +#ifdef FS_IOC_FSGETXATTR
-> +     IOCTL(FS_IOC_FSGETXATTR, IOC_W, MK_PTR(MK_STRUCT(STRUCT_fsxattr)))
+> @@ -123,6 +123,9 @@
+>  #ifdef FIBMAP
+>       IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
+>  #endif
+> +#ifdef FITRIM
+> +     IOCTL(FITRIM, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_fstrim_range)))
+
+It seems STRUCT_fstrim_range is not defined.
+
 > +#endif
-> +#ifdef FS_IOC_FSSETXATTR
-> +     IOCTL(FS_IOC_FSSETXATTR, IOC_W, MK_PTR(MK_STRUCT(STRUCT_fsxattr)))
-> +#endif
-> +
->  
->  #ifdef CONFIG_USBFS
->    /* USB ioctls */
+>  #ifdef FICLONE
+>       IOCTL(FICLONE, IOC_W, TYPE_INT)
+>       IOCTL(FICLONERANGE, IOC_W, MK_PTR(MK_STRUCT(STRUCT_file_clone_range)))
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index a73cc3d..12cd3de 100644
+> index 12cd3de..40851e9 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -924,6 +924,8 @@ struct target_pollfd {
->  #define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
->  #define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
->  #define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
-> +#define TARGET_FS_IOC_FSGETXATTR TARGET_IOR('X', 31, struct file_clone_range)
-> +#define TARGET_FS_IOC_FSSETXATTR TARGET_IOR('X', 32, struct file_clone_range)
-
-Do you need also a "#if" around this?
-Because I think the structure is only defined if the IOCTL is defined.
-
+> @@ -908,6 +908,7 @@ struct target_pollfd {
+>  #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+>  #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
 >  
->  /* usb ioctls */
->  #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
+> +#define TARGET_FITRIM     TARGET_IOWR('X', 121, struct fstrim_range)
+
+I think you need a "#ifdef" here too.
+
+>  #define TARGET_FICLONE    TARGET_IOW(0x94, 9, int)
+>  #define TARGET_FICLONERANGE TARGET_IOW(0x94, 13, struct file_clone_range)
+>  
 > 
 
 Thanks,
