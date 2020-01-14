@@ -2,117 +2,91 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5641EC33CB7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64136C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:42:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C9CE2467D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:39:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C9CE2467D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 1DB142467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:42:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SlKgBPWb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB142467D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNM9-0007SN-8G
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:39:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60815)
+	id 1irNOy-0001UR-9Y
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:42:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNLN-0006jG-Ib
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:38:58 -0500
+ (envelope-from <jandryuk@gmail.com>) id 1irNOL-00010h-Cq
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:42:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNLL-0002QY-8e
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:38:56 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:33629)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNLK-0002Q8-Ma
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:38:54 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mdvyo-1jPt8q1c3y-00b03c; Tue, 14 Jan 2020 15:38:38 +0100
-Subject: Re: [PATCH v5 16/20] linux-user: Add support for FDFMT<BEG|TRK|END>
- ioctls
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-17-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e01d5e64-a6ac-bc34-864c-251cf18a77c6@vivier.eu>
-Date: Tue, 14 Jan 2020 15:38:37 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.1
+ (envelope-from <jandryuk@gmail.com>) id 1irNOJ-00034K-HT
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:42:01 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:41845)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jandryuk@gmail.com>) id 1irNOJ-00034C-7G
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:41:59 -0500
+Received: by mail-lj1-x242.google.com with SMTP id h23so14627645ljc.8
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 06:41:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=KScogeDftmvqWYIkPyyiPLur8lC1L/rXWGn83bgxhNc=;
+ b=SlKgBPWbPrrlTrsa5/1lSY7DUL3Lbqw9Zen97OZDuZeXiF7rZMySocuw++DXkmt7U7
+ fpFxhOiRO06nYoNIQ5GfpmcspAVOyDeYinNPKYj8e957EaCl2frLbUjWGNqGYMPVZZfN
+ WuHcga+2V9h0TYWINSPOCdF7eWntQeoN4KwRj02eo+N06j5E0oMxMiUZoBbjA67NiEL5
+ M/tjE09cl7mTThw5NLVVlvUheebRvR1Dm2kkWb3tYgdaq2w2/gqDU0FZ0TLDQCPDU5Mk
+ 1/9OcpHVytpW1qEHxnSs+o4Ww6sTdJTVi4jcbsNttCMv2dJxzZihLZLF3qxnzGiz7oCW
+ vfTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=KScogeDftmvqWYIkPyyiPLur8lC1L/rXWGn83bgxhNc=;
+ b=PQhWu5+0zcpaFDW0XkmDtu9jAAtu0czhWk3jhnFRAJxSoOx3NE5N+TUNRtmrDqG5YT
+ idyoYwDpsv7INiBGsfe4gTm4buqqDGjIlKg+Sza3bWiyeHx5twU2do7kRoHPx+6+EHZd
+ 6rvt3ShrtVf+VEz0Z+B0jrAEwerEPQM6qXi7PcJ/6B2NblyIcDJ2/JXZP3f7w+uApSd/
+ u1NEr3DtdYSGjHx6/PclJcuXOXSRfBNGBD8v1XPb+SX4p2H9PkvBXmtLyc+0+Y/FtWiA
+ ggt1d9O762nTRNxoEZzojsV/KOy9bH4ZEmdlgSdSBJcQG63lW00hGbIb5fwo/PktF50Y
+ jUYw==
+X-Gm-Message-State: APjAAAUI7JDkBniiEYzVLOVD7kx6rWZa3tdk5duFGop5++N801WeUkrh
+ v3Iz9rubRtJG1aVKqnUJTx++JhCKIiGbqPyj0B8=
+X-Google-Smtp-Source: APXvYqxUbN2OiIBkXqdcyM7277FQJ8KxNOBpAR3aYwqLyXQI3z3Sz6j68OqJwSxfcqAWVfqsAEzZLjO4nTpc6Qezwso=
+X-Received: by 2002:a2e:6f19:: with SMTP id k25mr14504839ljc.84.1579012917620; 
+ Tue, 14 Jan 2020 06:41:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-17-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:omWqa0I1rrjIoNduvPc6jTwACrGJ+B3rp3WNPZiVbu4eGQWcIcO
- 1sJ0YL9yk2BjnD2yWIdEkUojoYPFJgrz8mL7dTqjY1X5TcirA0FbBXalwjH45mbr8zrpfk6
- O9fyAnoqKMpeplRp7T44odCXwTPmbc5pE5K9EMshK0p6uq38G6EWF4D8uqfUP9M6x50UgOp
- Ix79QPiDEH81nyDxI9CIA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FEGcFtNr9go=:BQTS43FH+1PkBy3xew3vCd
- pGXG3vKGGbs948+5/d7Kt0ocQW998uBgK2DfwEQi2/IgX6l32qs/qHEkKX00D0/bp7G2+a5ED
- RDXDZtTP0anAa3cg6+lPNavMQXhVewjPtZ06Di2Yj4sltbQc7PjNiOvE9akwbcJ+yqxWuGKbq
- vSvG3qJaIM04kz7lVNBplyzXLAqLbRVnQzj2tAK+UWQ/V0cjaYcBv6OAXz/qZw9JsstuWkDkG
- M5+UTMaXdGsK3Xf+npkV7U4nlW4oWepupKcuryaiomUck/q/bkmT5f/k2DCvd3L+l1AG/FEjv
- zGuHBSvwHRWuXwpMgc1m+UdBwntNnF379tvNIrBihIUDj2RKYsTydI94WMky99v6a9dhlOF0N
- PS8/BCIWnwSRUHTwO9XW6EzoxtVYazfOVDJemWqfP/MM52wgSfqGPgXZb/Rg3uoWeXnq9F2to
- MysJRFoU+CmWnP7On6iuT/pv763t8r3hQFlq+i+wsz7FNQr5blFMv8XO11ZubglwhfHMa3fpk
- rDVaEpRJ0eFge3u7p5XNsWb+ocCp3jVHJHX4C04n7R/uIpc1jhnXIhW9PC1nV6XHhqmbbTu2t
- S2GInR8A0DWFGlOoXPvxQGxw0jCkyd/WJ5IJLd8dQkmjOQRge41R9q+xUl6IPi3YtbpEiBoYb
- guf4qiXefA43hAcMutPrCC/j24RuxokmUBupdIXD5yMXlf4giEwGNvvZKYIIEpWmD0tsoYuY2
- ujXdGhsDGgLXzzakSh3pF4kh8P0eK3K8aNu6MDtas7pR+47/5M+jYzKQTG4iuFkG8TS/B0GPB
- SlCUY0T7bMJVev/7l1t7gH3tuXNr6u29VWH29qgbzhb92jsgLHqij/2eAoAimh7DWD7anhQs4
- 5m9i4OwjyVpKD/Pw1WPtmnEUhMgUJlo2c1BUnLMoE=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.126.131
+References: <20190311180216.18811-1-jandryuk@gmail.com>
+ <20190311180216.18811-7-jandryuk@gmail.com>
+ <ee0da83d3f054e72ae450437c8834d04@AMSPEX02CL02.citrite.net>
+ <CAKf6xpujVs3RPJcb+2vqPZFcYwhdDcjbt=S_+awjPuPFpFHsPw@mail.gmail.com>
+ <57dc1083d20a469785f05a2e5250a820@AMSPEX02CL02.citrite.net>
+ <cd5f1ecc-576f-b7d0-3090-4f3e4faf6148@citrix.com>
+ <CAKf6xpt4XYXn2xHJoVY_ibcaHSw-ED10V7ZGNKuDdkiJ93RS0A@mail.gmail.com>
+ <20190322030936.fkiajz5ifgaejkd4@MacBook-Air-de-Roger.local>
+ <CAKf6xptP_b-+FuscjsTK9G7pMeVS8drvA_t+xb5bdF2zxxmWfA@mail.gmail.com>
+ <CAKf6xpscx9Yukphv7mfK2BPM8HoGW0ddt9zbOZxpV+9LzWxz4g@mail.gmail.com>
+ <20200114100406.GF11756@Air-de-Roger>
+In-Reply-To: <20200114100406.GF11756@Air-de-Roger>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Tue, 14 Jan 2020 09:41:46 -0500
+Message-ID: <CAKf6xpuDo=FGTOJ9ipmk7nY+qs+pKBWESqY0ah6B1vS3kZsT=A@mail.gmail.com>
+Subject: Re: [Xen-devel] [PATCH 6/6] xen-pt: Round pci regions sizes to
+ XEN_PAGE_SIZE
+To: =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,82 +98,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Andrew Cooper <andrew.cooper3@citrix.com>, Paul Durrant <pdurrant@amazon.com>,
+ "marmarek@invisiblethingslab.com" <marmarek@invisiblethingslab.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Simon Gaiser <simon@invisiblethingslab.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> 
-> FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls provide means for controlling
-> formatting of a floppy drive.
-> 
-> FDFMTTRK's third agrument is a pointer to the structure:
-> 
-> struct format_descr {
->     unsigned int device,head,track;
-> };
-> 
-> defined in Linux kernel header <linux/fd.h>.
-> 
-> Since all fields of the structure are of type 'unsigned int', there is
-> no need to define "target_format_descr".
-> 
-> FDFMTBEG and FDFMTEND ioctls do not use the third argument.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  linux-user/ioctls.h        | 3 +++
->  linux-user/syscall_defs.h  | 3 +++
->  linux-user/syscall_types.h | 5 +++++
->  3 files changed, 11 insertions(+)
-> 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 9e3ca90..e754a6b 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -115,6 +115,9 @@
->       IOCTL(FDMSGON, 0, TYPE_NULL)
->       IOCTL(FDMSGOFF, 0, TYPE_NULL)
->       IOCTL(FDSETEMSGTRESH, 0, TYPE_NULL)
-> +     IOCTL(FDFMTBEG, 0, TYPE_NULL)
-> +     IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
-> +     IOCTL(FDFMTEND, 0, TYPE_NULL)
->       IOCTL(FDFLUSH, 0, TYPE_NULL)
->       IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
->       IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index efe3860..d85ab46 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -899,6 +899,9 @@ struct target_pollfd {
->  
->  #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
->  #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
-> +#define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
-> +#define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct format_descr)
-> +#define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
->  #define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
->  #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
->  #define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c, struct floppy_max_errors)
-> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index e4e0429..8ff78a6 100644
-> --- a/linux-user/syscall_types.h
-> +++ b/linux-user/syscall_types.h
-> @@ -261,6 +261,11 @@ STRUCT(blkpg_ioctl_arg,
->         TYPE_INT, /* datalen */
->         TYPE_PTRVOID) /* data */
->  
-> +STRUCT(format_descr,
-> +       TYPE_INT,     /* device */
-> +       TYPE_INT,     /* head */
-> +       TYPE_INT)     /* track */
-> +
->  STRUCT(floppy_max_errors,
->         TYPE_INT, /* abort */
->         TYPE_INT, /* read_track */
-> 
+On Tue, Jan 14, 2020 at 5:04 AM Roger Pau Monn=C3=A9 <roger.pau@citrix.com>=
+ wrote:
+>
+> On Mon, Jan 13, 2020 at 02:01:47PM -0500, Jason Andryuk wrote:
+> > On Fri, Mar 22, 2019 at 3:43 PM Jason Andryuk <jandryuk@gmail.com> wrot=
+e:
+> > >
+> > > On Thu, Mar 21, 2019 at 11:09 PM Roger Pau Monn=C3=A9 <roger.pau@citr=
+ix.com> wrote:
+> > > >
+> > > > On Wed, Mar 20, 2019 at 01:28:47PM -0400, Jason Andryuk wrote:
+> > > > > On Fri, Mar 15, 2019 at 12:28 PM Andrew Cooper
+> > > > > <andrew.cooper3@citrix.com> wrote:
+> > > > > >
+> > > > > > On 15/03/2019 09:17, Paul Durrant wrote:
+> > > > > > >> -----Original Message-----
+> > > > > > >> From: Jason Andryuk [mailto:jandryuk@gmail.com]
+> > > > > > >> Sent: 14 March 2019 18:16
+> > > > > > >> To: Paul Durrant <Paul.Durrant@citrix.com>
+> > > > > > >> Cc: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org; m=
+armarek@invisiblethingslab.com; Simon
+> > > > > > >> Gaiser <simon@invisiblethingslab.com>; Stefano Stabellini <s=
+stabellini@kernel.org>; Anthony Perard
+> > > > > > >> <anthony.perard@citrix.com>
+> > > > > > >> Subject: Re: [PATCH 6/6] xen-pt: Round pci regions sizes to =
+XEN_PAGE_SIZE
+> > > > > > >>
+> > > > > > >> On Wed, Mar 13, 2019 at 11:09 AM Paul Durrant <Paul.Durrant@=
+citrix.com> wrote:
+> > > > > > >>>> -----Original Message-----
+> > > > > > >>>> From: Jason Andryuk [mailto:jandryuk@gmail.com]
+> > > > > > >>>> Sent: 11 March 2019 18:02
+> > > > > > >>>> To: qemu-devel@nongnu.org
+> > > > > > >>>> Cc: xen-devel@lists.xenproject.org; marmarek@invisiblethin=
+gslab.com; Simon Gaiser
+> > > > > > >>>> <simon@invisiblethingslab.com>; Jason Andryuk <jandryuk@gm=
+ail.com>; Stefano Stabellini
+> > > > > > >>>> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@c=
+itrix.com>; Paul Durrant
+> > > > > > >>>> <Paul.Durrant@citrix.com>
+> > > > > > >>>> Subject: [PATCH 6/6] xen-pt: Round pci regions sizes to XE=
+N_PAGE_SIZE
+> > > > > > >>>>
+> > > > > > >>>> From: Simon Gaiser <simon@invisiblethingslab.com>
+> > > > > > >>>>
+> > > > > > >>>> If a pci memory region has a size < XEN_PAGE_SIZE it can g=
+et located at
+> > > > > > >>>> an address which is not page aligned.
+> > > > > > >>> IIRC the PCI spec says that the minimum memory region size =
+should be at least 4k. Should we even be
+> > > > > > >> tolerating BARs smaller than that?
+> > > > > > >>>   Paul
+> > > > > > >>>
+> > > > > > >> Hi, Paul.
+> > > > > > >>
+> > > > > > >> Simon found this, so it affects a real device.  Simon, do yo=
+u recall
+> > > > > > >> which device was affected?
+> > > > > > >>
+> > > > > > >> I think BARs only need to be power-of-two size and aligned, =
+and 4k is
+> > > > > > >> not a minimum.  16bytes may be a minimum, but I don't know w=
+hat the
+> > > > > > >> spec says.
+> > > > > > >>
+> > > > > > >> On an Ivy Bridge system, here are some of the devices with B=
+ARs smaller than 4K:
+> > > > > > >> 00:16.0 Communication controller: Intel Corporation 7 Series=
+/C210
+> > > > > > >> Series Chipset Family MEI Controller #1 (rev 04)
+> > > > > > >>    Memory at d0735000 (64-bit, non-prefetchable) [disabled] =
+[size=3D16]
+> > > > > > >> 00:1d.0 USB controller: Intel Corporation 7 Series/C210 Seri=
+es Chipset
+> > > > > > >> Family USB Enhanced Host Controller #1 (rev 04) (prog-if 20 =
+[EHCI])
+> > > > > > >>    Memory at d0739000 (32-bit, non-prefetchable) [disabled] =
+[size=3D1K]
+> > > > > > >> 00:1f.3 SMBus: Intel Corporation 7 Series/C210 Series Chipse=
+t Family
+> > > > > > >> SMBus Controller (rev 04)
+> > > > > > >>    Memory at d0734000 (64-bit, non-prefetchable) [disabled] =
+[size=3D256]
+> > > > > > >> 02:00.0 System peripheral: JMicron Technology Corp. SD/MMC H=
+ost
+> > > > > > >> Controller (rev 30)
+> > > > > > >>    Memory at d0503000 (32-bit, non-prefetchable) [disabled] =
+[size=3D256]
+> > > > > > >>
+> > > > > > >> These examples are all 4K aligned, so this is not an issue o=
+n this machine.
+> > > > > > >>
+> > > > > > >> Reviewing the code, I'm now wondering if the following in
+> > > > > > >> hw/xen/xen_pt.c:xen_pt_region_update is wrong:        rc =3D
+> > > > > > >> xc_domain_memory_mapping(xen_xc, xen_domid,
+> > > > > > >>                                      XEN_PFN(guest_addr + XC=
+_PAGE_SIZE - 1),
+> > > > > > >>                                      XEN_PFN(machine_addr + =
+XC_PAGE_SIZE - 1),
+> > > > > > >>                                      XEN_PFN(size + XC_PAGE_=
+SIZE - 1),
+> > > > > > >>                                      op);
+> > > > > > >>
+> > > > > > >> If a bar of size 0x100 is at 0xd0500800, then the machine_ad=
+dr passed
+> > > > > > >> in would be 0xd0501000 which is past the actual location.  S=
+hould the
+> > > > > > >> call arguments just be XEN_PFN(guest_addr) & XEN_PFN(machine=
+_addr)?
+> > > > > > >>
+> > > > > > >> BARs smaller than a page would also be a problem if BARs for=
+ different
+> > > > > > >> devices shared the same page.
+> > > > > > > Exactly. We cannot pass them through with any degree of safet=
+y (not that passthrough of an arbitrary device is a particularly safe thing=
+ to do anyway). The xen-pt code would instead need to trap those BARs and p=
+erform the accesses to the real BAR itself. Ultimately though I think we sh=
+ould be retiring the xen-pt code in favour of a standalone emulator.
+> > > > > >
+> > > > > > It doesn't matter if the BAR is smaller than 4k, if there are h=
+oles next
+> > > > > > to it.
+> > > > > >
+> > > > > > Do we know what the case is in practice for these USB controlle=
+rs?
+> > > > > >
+> > > > > > If the worst comes to the worst, we can re-enumerate the PCI bu=
+s to
+> > > > > > ensure that all bars smaller than 4k still have 4k alignment be=
+tween
+> > > > > > them.  That way we can safely pass them through even when they =
+are smaller.
+> > > > >
+> > > > > Andrew, thanks for checking the spec on the minimum BAR size.
+> > > > >
+> > > > > Dropping the Round PCI region patch from QMEU, the guest HVM will=
+ have:
+> > > > >
+> > > > > 00:06.0 SD Host controller: Ricoh Co Ltd PCIe SDXC/MMC Host Contr=
+oller (rev 07)
+> > > > >     Memory at f2028800 (32-bit, non-prefetchable) [size=3D256]
+> > > > > 00:07.0 USB controller: NEC Corporation uPD720200 USB 3.0 Host
+> > > > > Controller (rev 04) (prog-if 30 [XHCI])
+> > > > >     Memory at f2024000 (64-bit, non-prefetchable) [size=3D8K]
+> > > > > 00:08.0 USB controller: Intel Corporation 6 Series/C200 Series Ch=
+ipset
+> > > > > Family USB Enhanced Host Controller #2 (rev 05) (prog-if 20 [EHCI=
+])
+> > > > >     Memory at f2028000 (32-bit, non-prefetchable) [size=3D1K]
+> > > > > 00:09.0 USB controller: Intel Corporation 6 Series/C200 Series Ch=
+ipset
+> > > > > Family USB Enhanced Host Controller #1 (rev 05) (prog-if 20 [EHCI=
+])
+> > > > >     Memory at f2028400 (32-bit, non-prefetchable) [size=3D1K]
+> > > > >
+> > > > > 00:09.0, 00:08.0 & 00:06.0 all share the same page.  Only 00:08.0=
+ is
+> > > > > working.  With some added debugging output, you'll see that the s=
+ame
+> > > > > page* is used for three of the BARs.
+> > > > >
+> > > > > [00:06.0] mapping guest_addr 0xf2028800 gfn 0xf2028 to maddr
+> > > > > 0xe1a30000 mfn 0xe1a30
+> > > > > [00:07.0] mapping guest_addr 0xf2024000 gfn 0xf2024 to maddr
+> > > > > 0xe0800000 mfn 0xe0800
+> > > > > [00:09.0] mapping guest_addr 0xf2028400 gfn 0xf2028 to maddr
+> > > > > 0xe1900000 mfn 0xe1900
+> > > > > [00:08.0] mapping guest_addr 0xf2028000 gfn 0xf2028 to maddr
+> > > > > 0xe1a2f000 mfn 0xe1a2f
+> > > >
+> > > > The patch below should prevent hvmloader from placing multiple BARs=
+ on
+> > > > the same page, could you give it a try?
+> > > >
+> > > > Note that this is not going to prevent the guest from moving those
+> > > > BARs around and place them in the same page, thus breaking the init=
+ial
+> > > > placement done by hvmloader.
+> > > >
+> > > > Thanks, Roger.
+> > >
+> > > Hi, Roger.
+> > >
+> > > I've minimally tested this.  Yes, this patch seems to place small BAR=
+s
+> > > into separate pages.  The linux stubdom and QEMU then use the spacing
+> > > as provided by hvmloader.
+> >
+> > Roger,
+> >
+> > Would you mind submitting this patch to Xen?
+>
+> Hm, I'm half minded regarding this patch. It feels more like a bandaid
+> than a proper solution. Mapping BARs not multiple of page-sizes is
+> dangerous because AFAIK there's no entity that asserts there isn't any
+> other BAR from a different device on the same page, and hence you
+> might end up mapping some MMIO region from another device
+> inadvertently.
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+We have the guest, linux stubdom with qemu, & dom0. Are you concerned
+that all of them need a minimum of page alignment?
+
+Linux PCI subsytem has an option resource_alignment that can be
+applied to either a single device or all devices.  Booting with
+pci=3Dresource_aligment=3D4096 will align each device to a page.  Do you
+think pciback should force resource_alignment=3D4096 for dom0?  Are
+there other MMIO ranges to be concerned about adjacent to BARs?
+
+On my one test machine with a BAR smaller than 4096, the firmware
+already sets an alignment of 4096.  Linux dom0 seems to keep the
+firmware BAR alignment by default.
+
+> Anyway, I can formally submit the patch since it's no worse than
+> what's currently done, but I would clearly state this is not safe in
+> it's current state.
+
+Regards,
+Jason
 
