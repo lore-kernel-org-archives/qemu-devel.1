@@ -2,78 +2,82 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED19C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:44:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D6BC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC4D224656
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 184CE2465B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hr0NR95d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC4D224656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T2576xKw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 184CE2465B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIke-0003AW-El
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:44:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57889)
+	id 1irIkk-0003MW-N1
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:44:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irIV0-0007W9-Ka
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:35 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1irIUV-0006gu-E1
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irIUz-0006kM-1g
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:34 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42788
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIUy-0006k1-UC
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578994112;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3VZqz3zUF2Y1jQsm5V0KLQ63Ic05gunHzewXnrdXRG4=;
- b=Hr0NR95df6VJHVktnLEFJtRPghEkVeT7oFaJmf2owuJjk8VjDJVvDRakEYbse9u6olR4Ki
- l6xtPa9G5qGoYuU8p3ggxOLOPe6LMRUTIgQbrrVZKNd4+126NOs+KBzGOO7Je9ivFexMEC
- rb1aPv1+6stv1A5dFf9whWhgNRocP1E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-xZY-SYq6MEeu_rXygy7ngw-1; Tue, 14 Jan 2020 04:28:30 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4F2910054E3;
- Tue, 14 Jan 2020 09:28:28 +0000 (UTC)
-Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 59E13384;
- Tue, 14 Jan 2020 09:28:24 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 18/29] migration/postcopy: set all_zero to true on the first
- target page
-Date: Tue, 14 Jan 2020 10:25:55 +0100
-Message-Id: <20200114092606.1761-19-quintela@redhat.com>
-In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
-References: <20200114092606.1761-1-quintela@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1irIUU-0006cR-0a
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:03 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46090)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1irIUT-0006bv-RT
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:01 -0500
+Received: by mail-ot1-x342.google.com with SMTP id r9so11945169otp.13
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 01:28:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9wpCJ9YS9yc+LZvuLAbXxF0LDX++c3pfGXGupXimEcY=;
+ b=T2576xKwARsjr4Ordlovn2lJ6+kZMxNSSXli2gcnkWibp83KEvkE09CM/WiCMMws4R
+ PP5Dorecv5ifojQuw/sTHXK0krOE19j5BbJGskxz/YpiYxGCqNlHtH14YiWOaL8olcwR
+ 2b2xF6sBOQCldUWlM0ntGgKAljhvQPPBDAH+4VhZ/Jc4XVQML3mGljH8W8pKWgRGeL9D
+ tamyF96wppb/HVBFnEg5uYWfswwCRv2EoDwCD2kZ/3zisdtsdNOLJeAJn4LOX/SqP5Bx
+ 5hVQM+Ux1/LJcvuMQBvf2NBsMaGHgjVNOBZ5n+n6ympWmv33gjAyN+fTfMC59hzRDj24
+ vQtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9wpCJ9YS9yc+LZvuLAbXxF0LDX++c3pfGXGupXimEcY=;
+ b=dSH9ViF2oW0ulH0ghgMQPrnPWzZ8wLegEliwkATdR6y+Pj8vJqg+GjgeCf90p1reQ9
+ 6iF56kUUE4pEmoFPBeVZy0GfXXedcZzZXOhxFzxu3lnv3dnoF0atuOVeqPOaRVOs7VYv
+ X1rVe2YCu5X/PTBgTpbrD5+3s48m+S2OMNAjfd8YeHRfQVy7a6FFWIhp/q4t1ly+8UpM
+ SCxgJT8dgiZsJ/jZHruXoLfdSt6QJ0GFcDne22A7Yqk5Mpj4YQNaTdPQhReEvWSMozdQ
+ dy22w4gBHxyrwn+ztjfgQ/JbAKdV05RHZPOPEl+3KHAuRX1g0Xa9+qcAJLfYgKBGVxzV
+ YUkg==
+X-Gm-Message-State: APjAAAWaoGGRWMeRZI2qMT/yrj3yE9ut3vtxrxBw0i8FSaVpAbRyYgUJ
+ 5pmAwSPqjR+WQOtWAfTdq37ltePy433ANtiL6PLOcA==
+X-Google-Smtp-Source: APXvYqyQN87bQ2hJ1djdfFH4st2/zzAFa5o/Lk6TdGsxmLqk4IB9L7o2akKijdL/eezL/UceEHh9m01+sWbcXP9QCfk=
+X-Received: by 2002:a05:6830:13da:: with SMTP id
+ e26mr15089065otq.97.1578994078719; 
+ Tue, 14 Jan 2020 01:27:58 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: xZY-SYq6MEeu_rXygy7ngw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20200108042338.9082-1-richard.henderson@linaro.org>
+ <CAFEAcA-AYKxnTW6w1xnbP0sbk-_8pV3UdfOotPmSHqNmj_Kjkg@mail.gmail.com>
+ <100c3aab-a198-f1fd-6ae2-7671c3039d8d@linaro.org>
+In-Reply-To: <100c3aab-a198-f1fd-6ae2-7671c3039d8d@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Jan 2020 09:27:47 +0000
+Message-ID: <CAFEAcA9dKPYASj+q52rYaziV9tT+KaMPsLZW-rrxsj0dyHppDQ@mail.gmail.com>
+Subject: Re: [PULL 0/3] capstone update
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,51 +89,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+On Mon, 13 Jan 2020 at 19:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 1/10/20 6:07 AM, Peter Maydell wrote:
+> > On Wed, 8 Jan 2020 at 04:23, Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> The following changes since commit 035eed4c0d257c905a556fa0f4865a0c077b4e7f:
+> >>
+> >>   Merge remote-tracking branch 'remotes/vivier/tags/q800-for-5.0-pull-request' into staging (2020-01-07 17:08:21 +0000)
+> >>
+> >> are available in the Git repository at:
+> >>
+> >>   https://github.com/rth7680/qemu.git tags/pull-cap-20200108
+> >>
+> >> for you to fetch changes up to 7cc3836eac04a3e358b2496fbca704b3ee5197ae:
+> >>
+> >>   capstone: Add skipdata hook for s390x (2020-01-08 14:53:54 +1100)
+> >>
+> >> ----------------------------------------------------------------
+> >> Update capstone to next
+> >>
+> >> ----------------------------------------------------------------
+> >> Richard Henderson (3):
+> >>       capstone: Update to next
+> >>       capstone: Enable disassembly for s390x
+> >>       capstone: Add skipdata hook for s390x
+> >
+> > Build failures:
+> >
+> >   CC      aarch64-linux-user/disas.o
+> > In file included from
+> > /home/ubuntu/qemu/capstone/include/capstone/capstone.h:302:0,
+> >                  from /home/ubuntu/qemu/include/disas/capstone.h:6,
+> >                  from /home/ubuntu/qemu/disas.c:9:
+> > /home/ubuntu/qemu/capstone/include/capstone/riscv.h:16:10: fatal
+> > error: capstone/platform.h: No such file or directory
+> >  #include "capstone/platform.h"
+> >           ^~~~~~~~~~~~~~~~~~~~~
+> > compilation terminated.
+> >
+> > (same on most hosts)
+>
+> This comes from not re-running configure, which changes the CFLAGS for the
+> build of capstone from git.  Given that the source tree for capstone got
+> rearranged between 3.x and 4.0, I don't see how I can avoid this.
 
-For the first target page, all_zero is set to true for this round check.
+Hmm, shouldn't the update to 'configure' in this merge cause Make
+to rerun configure, though ?
 
-After target_pages introduced, we could leverage this variable instead
-of checking the address offset.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 8ebaea255e..460abfa2c3 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -4102,7 +4102,7 @@ static int ram_load_postcopy(QEMUFile *f)
-             page_buffer =3D postcopy_host_page +
-                           ((uintptr_t)host & (block->page_size - 1));
-             /* If all TP are zero then we can optimise the place */
--            if (!((uintptr_t)host & (block->page_size - 1))) {
-+            if (target_pages =3D=3D 1) {
-                 all_zero =3D true;
-             } else {
-                 /* not the 1st TP within the HP */
---=20
-2.24.1
-
+thanks
+-- PMM
 
