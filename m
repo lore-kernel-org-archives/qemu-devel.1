@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC7AC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A6FC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:28:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 164DE207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:28:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30BD1207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:28:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/GHJbAj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164DE207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ub0aFWxp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BD1207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIUr-0006hn-Pb
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:28:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57138)
+	id 1irIUu-0006nj-MV
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:28:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irIT1-0004Pu-LW
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:32 -0500
+ (envelope-from <quintela@redhat.com>) id 1irITF-0004pX-4i
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irIT0-0006IW-Fm
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44615
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1irITD-0006L5-Vx
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:44 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57625
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIT0-0006IG-BU
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:30 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irITD-0006Kp-SI
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:26:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578993990;
+ s=mimecast20190719; t=1578994003;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OFbuBsfI2hdknoUqcqxf7Pz5nXpd3viWe9nVgMcqFyk=;
- b=K/GHJbAjuz9g2x2QQt3JXLJdT0CUqiDWamNpptoKJOY84xmeVLPlhmxKVVmjaMoOfJQiDy
- DxRNhD8rlJrn81z8gni3h+450IZtySveO3JKyTdxbc94CnrXX1KOdf4QL0Fwy8c1VXtjvn
- zcG9UMpoQwGRQZIjRmqhGonDKaykWNs=
+ bh=WncZoYQhc4fyVcSeQQg7aX50Ge+MvO1i8vxboNCbIRE=;
+ b=Ub0aFWxph5uoKrdzopxo/2JwHD3gQ0ZyA8th1lCjL0zoq6B7izt5dCQjfrjoJOQwLr80XO
+ OaiEe38KsxrhQ0UcO18AD+Pn0ZrOKktLUD/pnDG0t6EtQ0efB3BBoahRhT46Q/jXWAqmYg
+ xCiAjxhV0hmjcWxP8ZVwaWODEBJVbYQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-21RP2guBMx6Bwo4jE1J9gQ-1; Tue, 14 Jan 2020 04:26:28 -0500
+ us-mta-383-kJc9N6jzMM-kaKH_ipJuNg-1; Tue, 14 Jan 2020 04:26:42 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA768800D5A;
- Tue, 14 Jan 2020 09:26:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 951C8800D41;
+ Tue, 14 Jan 2020 09:26:40 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 28341384;
- Tue, 14 Jan 2020 09:26:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 49151384;
+ Tue, 14 Jan 2020 09:26:36 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/29] migration-test: Add migration multifd test
-Date: Tue, 14 Jan 2020 10:25:39 +0100
-Message-Id: <20200114092606.1761-3-quintela@redhat.com>
+Subject: [PULL 04/29] migration-test: introduce functions to handle string
+ parameters
+Date: Tue, 14 Jan 2020 10:25:41 +0100
+Message-Id: <20200114092606.1761-5-quintela@redhat.com>
 In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
 References: <20200114092606.1761-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 21RP2guBMx6Bwo4jE1J9gQ-1
+X-MC-Unique: kJc9N6jzMM-kaKH_ipJuNg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,7 +92,7 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
  Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
  Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ qemu-ppc@nongnu.org,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>,
@@ -100,92 +101,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We set multifd-channels.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Wei Yang <richardw.yang@linux.intel.com>
 ---
- tests/qtest/migration-test.c | 56 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ tests/qtest/migration-test.c | 37 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
-index 53afec4395..fb70214f44 100644
+index fb70214f44..b0580dd541 100644
 --- a/tests/qtest/migration-test.c
 +++ b/tests/qtest/migration-test.c
-@@ -1202,6 +1202,61 @@ static void test_migrate_auto_converge(void)
-     test_migrate_end(from, to, true);
+@@ -356,6 +356,43 @@ static void migrate_set_parameter_int(QTestState *who,=
+ const char *parameter,
+     migrate_check_parameter_int(who, parameter, value);
  }
 =20
-+static void test_multifd_tcp(void)
++static char *migrate_get_parameter_str(QTestState *who,
++                                       const char *parameter)
 +{
-+    MigrateStart *args =3D migrate_start_new();
-+    QTestState *from, *to;
 +    QDict *rsp;
-+    char *uri;
++    char *result;
 +
-+    if (test_migrate_start(&from, &to, "defer", args)) {
-+        return;
-+    }
-+
-+    /*
-+     * We want to pick a speed slow enough that the test completes
-+     * quickly, but that it doesn't complete precopy even on a slow
-+     * machine, so also set the downtime.
-+     */
-+    /* 1 ms should make it not converge*/
-+    migrate_set_parameter_int(from, "downtime-limit", 1);
-+    /* 1GB/s */
-+    migrate_set_parameter_int(from, "max-bandwidth", 1000000000);
-+
-+    migrate_set_parameter_int(from, "multifd-channels", 16);
-+    migrate_set_parameter_int(to, "multifd-channels", 16);
-+
-+    migrate_set_capability(from, "multifd", "true");
-+    migrate_set_capability(to, "multifd", "true");
-+
-+    /* Start incoming migration from the 1st socket */
-+    rsp =3D wait_command(to, "{ 'execute': 'migrate-incoming',"
-+                           "  'arguments': { 'uri': 'tcp:127.0.0.1:0' }}")=
++    rsp =3D wait_command(who, "{ 'execute': 'query-migrate-parameters' }")=
 ;
++    result =3D g_strdup(qdict_get_str(rsp, parameter));
 +    qobject_unref(rsp);
-+
-+    /* Wait for the first serial output from the source */
-+    wait_for_serial("src_serial");
-+
-+    uri =3D migrate_get_socket_address(to, "socket-address");
-+
-+    migrate_qmp(from, uri, "{}");
-+
-+    wait_for_migration_pass(from);
-+
-+    /* 300ms it should converge */
-+    migrate_set_parameter_int(from, "downtime-limit", 300);
-+
-+    if (!got_stop) {
-+        qtest_qmp_eventwait(from, "STOP");
-+    }
-+    qtest_qmp_eventwait(to, "RESUME");
-+
-+    wait_for_serial("dest_serial");
-+    wait_for_migration_complete(from);
-+    test_migrate_end(from, to, true);
-+    free(uri);
++    return result;
 +}
 +
- int main(int argc, char **argv)
++static void migrate_check_parameter_str(QTestState *who, const char *param=
+eter,
++                                        const char *value)
++{
++    char *result;
++
++    result =3D migrate_get_parameter_str(who, parameter);
++    g_assert_cmpstr(result, =3D=3D, value);
++    g_free(result);
++}
++
++__attribute__((unused))
++static void migrate_set_parameter_str(QTestState *who, const char *paramet=
+er,
++                                      const char *value)
++{
++    QDict *rsp;
++
++    rsp =3D qtest_qmp(who,
++                    "{ 'execute': 'migrate-set-parameters',"
++                    "'arguments': { %s: %s } }",
++                    parameter, value);
++    g_assert(qdict_haskey(rsp, "return"));
++    qobject_unref(rsp);
++    migrate_check_parameter_str(who, parameter, value);
++}
++
+ static void migrate_pause(QTestState *who)
  {
-     char template[] =3D "/tmp/migration-test-XXXXXX";
-@@ -1266,6 +1321,7 @@ int main(int argc, char **argv)
-                    test_validate_uuid_dst_not_set);
-=20
-     qtest_add_func("/migration/auto_converge", test_migrate_auto_converge)=
-;
-+    qtest_add_func("/migration/multifd/tcp", test_multifd_tcp);
-=20
-     ret =3D g_test_run();
-=20
+     QDict *rsp;
 --=20
 2.24.1
 
