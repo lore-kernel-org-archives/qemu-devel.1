@@ -2,66 +2,81 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659BAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09768C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:26:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E96EF207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:25:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E96EF207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B7899207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:26:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LljV/iSV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7899207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irJOK-0007oC-Fl
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 05:25:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41362)
+	id 1irJPO-0000t2-Ie
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 05:26:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1irJM6-00058v-Ii
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:23:29 -0500
+ (envelope-from <armbru@redhat.com>) id 1irJJn-0001nr-Vd
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:21:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1irJM2-0007iu-B0
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:23:25 -0500
-Received: from 16.mo6.mail-out.ovh.net ([87.98.139.208]:48161)
+ (envelope-from <armbru@redhat.com>) id 1irJJk-0006RH-6g
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:21:03 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43131
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1irJM2-0007co-1k
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:23:22 -0500
-Received: from player692.ha.ovh.net (unknown [10.109.146.1])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 296DF1F7B1B
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 11:23:12 +0100 (CET)
-Received: from kaod.org (82-64-250-170.subs.proxad.net [82.64.250.170])
- (Authenticated sender: clg@kaod.org)
- by player692.ha.ovh.net (Postfix) with ESMTPSA id 3E240E0EA69A;
- Tue, 14 Jan 2020 10:23:02 +0000 (UTC)
-Subject: Re: [PATCH v2 03/10] target/ppc: Correct handling of real mode
- accesses with vhyp on hash MMU
-To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org,
- groug@kaod.org, philmd@redhat.com
-References: <20200107044827.471355-1-david@gibson.dropbear.id.au>
- <20200107044827.471355-4-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <6452c163-b2e4-ab9f-3117-4a19aad3e04e@kaod.org>
-Date: Tue, 14 Jan 2020 11:22:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1irJJk-0006Qu-1m
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:21:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578997259;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7iotsYsQYNynPfiOcg9UUkzudsIsJyF9Azh+jxKs6Uk=;
+ b=LljV/iSVuLZ8dm1fN0akm4Ra1T7LoTXhfrgg0wvIKRkvlo3287i9PXvZrLJmEMfIpPwvyJ
+ ZzGK9StyIx4IvEyK/o1xWjan3EUWDzabC5hzU1J12DUApYWHIEwllfV6kBfTFSewLArinP
+ lOnuuid3+T8ZLjOLykk9i89ieBVZS4g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-TppVqWjPNKC3ffeR5tLB-g-1; Tue, 14 Jan 2020 05:20:58 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56CA51012ECC
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 10:20:57 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0172260BF4;
+ Tue, 14 Jan 2020 10:20:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6A65011384A8; Tue, 14 Jan 2020 11:20:55 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 3/6] qapi: Generate command registration stuff into separate
+ files
+Date: Tue, 14 Jan 2020 11:20:52 +0100
+Message-Id: <20200114102055.24058-4-armbru@redhat.com>
+In-Reply-To: <20200114102055.24058-1-armbru@redhat.com>
+References: <20200114102055.24058-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200107044827.471355-4-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 10849171504429828902
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvdejvddgudeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrdeigedrvdehtddrudejtdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: TppVqWjPNKC3ffeR5tLB-g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.139.208
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,160 +88,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-ppc@nongnu.org, lvivier@redhat.com, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 1/7/20 5:48 AM, David Gibson wrote:
-> On ppc we have the concept of virtual hypervisor ("vhyp") mode, where w=
-e
-> only model the non-hypervisor-privileged parts of the cpu.  Essentially=
- we
-> model the hypervisor's behaviour from the point of view of a guest OS, =
-but
-> we don't model the hypervisor's execution.
->=20
-> In particular, in this mode, qemu's notion of target physical address i=
-s
-> a guest physical address from the vcpu's point of view.  So accesses in
-> guest real mode don't require translation.  If we were modelling the
-> hypervisor mode, we'd need to translate the guest physical address into
-> a host physical address.
->=20
-> Currently, we handle this sloppily: we rely on setting up the virtual L=
-PCR
-> and RMOR registers so that GPAs are simply HPAs plus an offset, which w=
-e
-> set to zero.  This is already conceptually dubious, since the LPCR and =
-RMOR
-> registers don't exist in the non-hypervisor portion of the CPU.  It get=
-s
-> worse with POWER9, where RMOR and LPCR[VPM0] no longer exist at all.
->=20
-> Clean this up by explicitly handling the vhyp case.  While we're there,
-> remove some unnecessary nesting of if statements that made the logic to
-> select the correct real mode behaviour a bit less clear than it could b=
-e.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Having to include qapi-commands.h just for qmp_init_marshal() is
+suboptimal.  Generate it into separate files.  This lets
+monitor/misc.c, qga/main.c, and the generated qapi-commands-FOO.h
+include less.
 
-I went through the changes and they look correct to me.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20191120182551.23795-4-armbru@redhat.com>
+[Typos in docs/devel/qapi-code-gen.txt fixed]
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ docs/devel/qapi-code-gen.txt | 19 ++++++++++++++++---
+ Makefile                     |  4 +++-
+ monitor/misc.c               |  7 ++++++-
+ qga/main.c                   |  2 +-
+ tests/test-qmp-cmds.c        |  1 +
+ .gitignore                   |  1 +
+ qapi/Makefile.objs           |  1 +
+ qga/Makefile.objs            |  1 +
+ scripts/qapi/commands.py     | 15 +++++++++++----
+ tests/.gitignore             |  1 +
+ tests/Makefile.include       |  5 ++++-
+ 11 files changed, 46 insertions(+), 11 deletions(-)
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-C.
-
-> ---
->  target/ppc/mmu-hash64.c | 60 ++++++++++++++++++++++++-----------------
->  1 file changed, 35 insertions(+), 25 deletions(-)
->=20
-> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-> index a881876647..5fabd93c92 100644
-> --- a/target/ppc/mmu-hash64.c
-> +++ b/target/ppc/mmu-hash64.c
-> @@ -789,27 +789,30 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, =
-vaddr eaddr,
->           */
->          raddr =3D eaddr & 0x0FFFFFFFFFFFFFFFULL;
-> =20
-> -        /* In HV mode, add HRMOR if top EA bit is clear */
-> -        if (msr_hv || !env->has_hv_mode) {
-> +        if (cpu->vhyp) {
-> +            /*
-> +             * In virtual hypervisor mode, there's nothing to do:
-> +             *   EA =3D=3D GPA =3D=3D qemu guest address
-> +             */
-> +        } else if (msr_hv || !env->has_hv_mode) {
-> +            /* In HV mode, add HRMOR if top EA bit is clear */
->              if (!(eaddr >> 63)) {
->                  raddr |=3D env->spr[SPR_HRMOR];
->              }
-> -        } else {
-> -            /* Otherwise, check VPM for RMA vs VRMA */
-> -            if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> -                slb =3D &env->vrma_slb;
-> -                if (slb->sps) {
-> -                    goto skip_slb_search;
-> -                }
-> -                /* Not much else to do here */
-> +        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +            /* Emulated VRMA mode */
-> +            slb =3D &env->vrma_slb;
-> +            if (!slb->sps) {
-> +                /* Invalid VRMA setup, machine check */
->                  cs->exception_index =3D POWERPC_EXCP_MCHECK;
->                  env->error_code =3D 0;
->                  return 1;
-> -            } else if (raddr < env->rmls) {
-> -                /* RMA. Check bounds in RMLS */
-> -                raddr |=3D env->spr[SPR_RMOR];
-> -            } else {
-> -                /* The access failed, generate the approriate interrup=
-t */
-> +            }
-> +
-> +            goto skip_slb_search;
-> +        } else {
-> +            /* Emulated old-style RMO mode, bounds check against RMLS =
-*/
-> +            if (raddr >=3D env->rmls) {
->                  if (rwx =3D=3D 2) {
->                      ppc_hash64_set_isi(cs, SRR1_PROTFAULT);
->                  } else {
-> @@ -821,6 +824,8 @@ int ppc_hash64_handle_mmu_fault(PowerPCCPU *cpu, va=
-ddr eaddr,
->                  }
->                  return 1;
->              }
-> +
-> +            raddr |=3D env->spr[SPR_RMOR];
->          }
->          tlb_set_page(cs, eaddr & TARGET_PAGE_MASK, raddr & TARGET_PAGE=
-_MASK,
->                       PAGE_READ | PAGE_WRITE | PAGE_EXEC, mmu_idx,
-> @@ -953,22 +958,27 @@ hwaddr ppc_hash64_get_phys_page_debug(PowerPCCPU =
-*cpu, target_ulong addr)
->          /* In real mode the top 4 effective address bits are ignored *=
-/
->          raddr =3D addr & 0x0FFFFFFFFFFFFFFFULL;
-> =20
-> -        /* In HV mode, add HRMOR if top EA bit is clear */
-> -        if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-> +        if (cpu->vhyp) {
-> +            /*
-> +             * In virtual hypervisor mode, there's nothing to do:
-> +             *   EA =3D=3D GPA =3D=3D qemu guest address
-> +             */
-> +            return raddr;
-> +        } else if ((msr_hv || !env->has_hv_mode) && !(addr >> 63)) {
-> +            /* In HV mode, add HRMOR if top EA bit is clear */
->              return raddr | env->spr[SPR_HRMOR];
-> -        }
-> -
-> -        /* Otherwise, check VPM for RMA vs VRMA */
-> -        if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +        } else if (env->spr[SPR_LPCR] & LPCR_VPM0) {
-> +            /* Emulated VRMA mode */
->              slb =3D &env->vrma_slb;
->              if (!slb->sps) {
->                  return -1;
->              }
-> -        } else if (raddr < env->rmls) {
-> -            /* RMA. Check bounds in RMLS */
-> -            return raddr | env->spr[SPR_RMOR];
->          } else {
-> -            return -1;
-> +            /* Emulated old-style RMO mode, bounds check against RMLS =
-*/
-> +            if (raddr >=3D env->rmls) {
-> +                return -1;
-> +            }
-> +            return raddr | env->spr[SPR_RMOR];
->          }
->      } else {
->          slb =3D slb_lookup(cpu, addr);
->=20
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+index 45c93a43cc..59d6973e1e 100644
+--- a/docs/devel/qapi-code-gen.txt
++++ b/docs/devel/qapi-code-gen.txt
+@@ -1493,6 +1493,10 @@ $(prefix)qapi-commands.c: Command marshal/dispatch f=
+unctions for each
+ $(prefix)qapi-commands.h: Function prototypes for the QMP commands
+                           specified in the schema
+=20
++$(prefix)qapi-init-commands.h - Command initialization prototype
++
++$(prefix)qapi-init-commands.c - Command initialization code
++
+ Example:
+=20
+     $ cat qapi-generated/example-qapi-commands.h
+@@ -1502,11 +1506,9 @@ Example:
+     #define EXAMPLE_QAPI_COMMANDS_H
+=20
+     #include "example-qapi-types.h"
+-    #include "qapi/qmp/dispatch.h"
+=20
+     UserDefOne *qmp_my_command(UserDefOneList *arg1, Error **errp);
+     void qmp_marshal_my_command(QDict *args, QObject **ret, Error **errp);
+-    void example_qmp_init_marshal(QmpCommandList *cmds);
+=20
+     #endif /* EXAMPLE_QAPI_COMMANDS_H */
+     $ cat qapi-generated/example-qapi-commands.c
+@@ -1566,7 +1568,19 @@ Example:
+         visit_end_struct(v, NULL);
+         visit_free(v);
+     }
++[Uninteresting stuff omitted...]
++    $ cat qapi-generated/example-qapi-init-commands.h
++[Uninteresting stuff omitted...]
++    #ifndef EXAMPLE_QAPI_INIT_COMMANDS_H
++    #define EXAMPLE_QAPI_INIT_COMMANDS_H
+=20
++    #include "qapi/qmp/dispatch.h"
++
++    void example_qmp_init_marshal(QmpCommandList *cmds);
++
++    #endif /* EXAMPLE_QAPI_INIT_COMMANDS_H */
++    $ cat qapi-generated/example-qapi-init-commands.c
++[Uninteresting stuff omitted...]
+     void example_qmp_init_marshal(QmpCommandList *cmds)
+     {
+         QTAILQ_INIT(cmds);
+@@ -1574,7 +1588,6 @@ Example:
+         qmp_register_command(cmds, "my-command",
+                              qmp_marshal_my_command, QCO_NO_OPTIONS);
+     }
+-
+ [Uninteresting stuff omitted...]
+=20
+ For a modular QAPI schema (see section Include directives), code for
+diff --git a/Makefile b/Makefile
+index 6b5ad1121b..56ff731a53 100644
+--- a/Makefile
++++ b/Makefile
+@@ -117,6 +117,7 @@ GENERATED_QAPI_FILES +=3D qapi/qapi-builtin-visit.h qap=
+i/qapi-builtin-visit.c
+ GENERATED_QAPI_FILES +=3D qapi/qapi-visit.h qapi/qapi-visit.c
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-visit-%.h)
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-visit-%.c)
++GENERATED_QAPI_FILES +=3D qapi/qapi-init-commands.h qapi/qapi-init-command=
+s.c
+ GENERATED_QAPI_FILES +=3D qapi/qapi-commands.h qapi/qapi-commands.c
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.h)
+ GENERATED_QAPI_FILES +=3D $(QAPI_MODULES:%=3Dqapi/qapi-commands-%.c)
+@@ -601,6 +602,7 @@ $(SRC_PATH)/scripts/qapi-gen.py
+ qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
+ qga/qapi-generated/qga-qapi-visit.c qga/qapi-generated/qga-qapi-visit.h \
+ qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-command=
+s.c \
++qga/qapi-generated/qga-qapi-init-commands.h qga/qapi-generated/qga-qapi-in=
+it-commands.c \
+ qga/qapi-generated/qga-qapi-doc.texi: \
+ qga/qapi-generated/qapi-gen-timestamp ;
+ qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(=
+qapi-py)
+@@ -619,7 +621,7 @@ qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
+ =09=09"GEN","$(@:%-timestamp=3D%)")
+ =09@>$@
+=20
+-QGALIB_GEN=3D$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi-vi=
+sit.h qga-qapi-commands.h)
++QGALIB_GEN=3D$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi-vi=
+sit.h qga-qapi-commands.h qga-qapi-init-commands.h)
+ $(qga-obj-y): $(QGALIB_GEN)
+=20
+ qemu-ga$(EXESUF): $(qga-obj-y) $(COMMON_LDADDS)
+diff --git a/monitor/misc.c b/monitor/misc.c
+index a04d7edde0..de1ca4d114 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -66,8 +66,13 @@
+ #include "qemu/option.h"
+ #include "qemu/thread.h"
+ #include "block/qapi.h"
+-#include "qapi/qapi-commands.h"
++#include "qapi/qapi-commands-char.h"
++#include "qapi/qapi-commands-migration.h"
++#include "qapi/qapi-commands-misc.h"
++#include "qapi/qapi-commands-qom.h"
++#include "qapi/qapi-commands-trace.h"
+ #include "qapi/qapi-emit-events.h"
++#include "qapi/qapi-init-commands.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp-event.h"
+ #include "qapi/qapi-introspect.h"
+diff --git a/qga/main.c b/qga/main.c
+index c35c2a2120..e5c39c189a 100644
+--- a/qga/main.c
++++ b/qga/main.c
+@@ -24,7 +24,7 @@
+ #include "qapi/qmp/qjson.h"
+ #include "qapi/qmp/qstring.h"
+ #include "guest-agent-core.h"
+-#include "qga-qapi-commands.h"
++#include "qga-qapi-init-commands.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/error.h"
+ #include "channel.h"
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 27b0afe55a..79507d9e54 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -7,6 +7,7 @@
+ #include "tests/test-qapi-types.h"
+ #include "tests/test-qapi-visit.h"
+ #include "test-qapi-commands.h"
++#include "test-qapi-init-commands.h"
+=20
+ static QmpCommandList qmp_commands;
+=20
+diff --git a/.gitignore b/.gitignore
+index 7de868d1ea..efad605e1a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -37,6 +37,7 @@
+ /qapi/qapi-emit-events.[ch]
+ /qapi/qapi-events-*.[ch]
+ /qapi/qapi-events.[ch]
++/qapi/qapi-init-commands.[ch]
+ /qapi/qapi-introspect.[ch]
+ /qapi/qapi-types-*.[ch]
+ /qapi/qapi-types.[ch]
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index dd3f5e6f94..a8f1f4c35e 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -30,3 +30,4 @@ obj-y +=3D $(QAPI_TARGET_MODULES:%=3Dqapi-events-%.o)
+ obj-y +=3D qapi-events.o
+ obj-y +=3D $(QAPI_TARGET_MODULES:%=3Dqapi-commands-%.o)
+ obj-y +=3D qapi-commands.o
++obj-y +=3D qapi-init-commands.o
+diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+index 80e6bb3c2e..9c558ae51c 100644
+--- a/qga/Makefile.objs
++++ b/qga/Makefile.objs
+@@ -5,5 +5,6 @@ qga-obj-$(CONFIG_WIN32) +=3D commands-win32.o channel-win32=
+.o service-win32.o
+ qga-obj-$(CONFIG_WIN32) +=3D vss-win32.o
+ qga-obj-y +=3D qapi-generated/qga-qapi-types.o qapi-generated/qga-qapi-vis=
+it.o
+ qga-obj-y +=3D qapi-generated/qga-qapi-commands.o
++qga-obj-y +=3D qapi-generated/qga-qapi-init-commands.o
+=20
+ qga-vss-dll-obj-$(CONFIG_QGA_VSS) +=3D vss-win32/
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index ab98e504f3..47f4a18cfe 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -263,18 +263,25 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
+isitor):
+                              commands=3Dcommands, visit=3Dvisit))
+         self._genh.add(mcgen('''
+ #include "%(types)s.h"
+-#include "qapi/qmp/dispatch.h"
+=20
+ ''',
+                              types=3Dtypes))
+=20
+     def visit_end(self):
+-        (genc, genh) =3D self._module[self._main_module]
+-        genh.add(mcgen('''
++        self._add_system_module('init', ' * QAPI Commands initialization')
++        self._genh.add(mcgen('''
++#include "qapi/qmp/dispatch.h"
++
+ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+ ''',
+                        c_prefix=3Dc_name(self._prefix, protect=3DFalse)))
+-        genc.add(gen_registry(self._regy.get_content(), self._prefix))
++        self._genc.preamble_add(mcgen('''
++#include "qemu/osdep.h"
++#include "%(prefix)sqapi-commands.h"
++#include "%(prefix)sqapi-init-commands.h"
++''',
++                                      prefix=3Dself._prefix))
++        self._genc.add(gen_registry(self._regy.get_content(), self._prefix=
+))
+=20
+     def visit_command(self, name, info, ifcond, arg_type, ret_type, gen,
+                       success_response, boxed, allow_oob, allow_preconfig,
+diff --git a/tests/.gitignore b/tests/.gitignore
+index f9c0170881..7306866f21 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -12,6 +12,7 @@ test-*
+ !test-*.c
+ !docker/test-*
+ test-qapi-commands.[ch]
++test-qapi-init-commands.[ch]
+ include/test-qapi-commands-sub-module.[ch]
+ test-qapi-commands-sub-sub-module.[ch]
+ test-qapi-emit-events.[ch]
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index cd5e13f42f..c666448e03 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -504,6 +504,7 @@ generated-files-y +=3D tests/test-qapi-visit.h
+ generated-files-y +=3D tests/include/test-qapi-visit-sub-module.h
+ generated-files-y +=3D tests/test-qapi-visit-sub-sub-module.h
+ generated-files-y +=3D tests/test-qapi-commands.h
++generated-files-y +=3D tests/test-qapi-init-commands.h
+ generated-files-y +=3D tests/include/test-qapi-commands-sub-module.h
+ generated-files-y +=3D tests/test-qapi-commands-sub-sub-module.h
+ generated-files-y +=3D tests/test-qapi-emit-events.h
+@@ -617,6 +618,8 @@ tests/test-qapi-commands-sub-sub-module.h \
+ tests/test-qapi-commands-sub-sub-module.c \
+ tests/test-qapi-emit-events.c tests/test-qapi-emit-events.h \
+ tests/test-qapi-events.c tests/test-qapi-events.h \
++tests/test-qapi-init-commands.c \
++tests/test-qapi-init-commands.h \
+ tests/include/test-qapi-events-sub-module.c \
+ tests/include/test-qapi-events-sub-module.h \
+ tests/test-qapi-events-sub-sub-module.c \
+@@ -660,7 +663,7 @@ tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $=
+(test-qapi-obj-y) tests/t
+ tests/test-qobject-output-visitor$(EXESUF): tests/test-qobject-output-visi=
+tor.o $(test-qapi-obj-y)
+ tests/test-clone-visitor$(EXESUF): tests/test-clone-visitor.o $(test-qapi-=
+obj-y)
+ tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visito=
+r.o $(test-qapi-obj-y)
+-tests/test-qmp-cmds$(EXESUF): tests/test-qmp-cmds.o tests/test-qapi-comman=
+ds.o $(test-qapi-obj-y)
++tests/test-qmp-cmds$(EXESUF): tests/test-qmp-cmds.o tests/test-qapi-comman=
+ds.o tests/test-qapi-init-commands.o $(test-qapi-obj-y)
+ tests/test-visitor-serialization$(EXESUF): tests/test-visitor-serializatio=
+n.o $(test-qapi-obj-y)
+ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-ob=
+j-y)
+=20
+--=20
+2.21.1
 
 
