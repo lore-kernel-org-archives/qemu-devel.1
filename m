@@ -2,91 +2,75 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3853FC33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 18:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B913C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 18:21:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D888214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 18:09:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v7WN3UDN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D888214AF
+	by mail.kernel.org (Postfix) with ESMTPS id EAD0F2072B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 18:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD0F2072B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irQco-0006CR-91
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 13:09:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49986)
+	id 1irQop-0002Y8-2n
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 13:21:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52275)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1irQbp-0005EM-Lr
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 13:08:10 -0500
+ (envelope-from <bounces@canonical.com>) id 1irQny-0001l2-Il
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 13:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1irQbo-0000mB-A1
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 13:08:09 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42737)
+ (envelope-from <bounces@canonical.com>) id 1irQnu-0006HP-Ud
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 13:20:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52974)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1irQbo-0000kP-1q
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 13:08:08 -0500
-Received: by mail-wr1-x442.google.com with SMTP id q6so13095878wro.9
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 10:08:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=bfQXa+F+G5W4YkDVvqCaAu1rsWwqwH3QYGcrhX4a7CI=;
- b=v7WN3UDNMvsm697plR5QCt/zVRD1skO5t2d9cEuJQ99DIHROosnAUgy6ffHilau2KR
- Jpi3bh6EGEu/VlpcXWVKxAhUcyli7+Jyefh2DxjbUbsP53QVM8galBTZecKTIaCPU2yK
- ffNJDoMMMgHJrx9BWkK+MSeOJDkViP4EayjL8s7wdTTT6AVGdba1ezSdWd5wCdM1hUMW
- MGu95ugpokHG/mjKzQZZIbqcW9i3PxB6alBGCg8X3bx2eyBt1mnm2Ov/ZlMSc3f9rgvJ
- NE5l4ZUNvDKJ3KGv/aNYoLbvV35yKu4JWsFOrKtgeVNjh3BPj+hqRRhpaIIkhNi25LMg
- 4ZXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=bfQXa+F+G5W4YkDVvqCaAu1rsWwqwH3QYGcrhX4a7CI=;
- b=glhs164I5loOzuB10ZUZo15zVbP6L2aWKjpIcdmX48W4bIVH+9Cij9+0/OcCIb03sJ
- ahHDd7naqu49PqXxMVSfXis4MZyjqevCiQ5OFW+nwXlK0xu7Bbcwc0mLlNX/5nUrxx8u
- fgkCfEPW0tq3IQZg9Dkhz3smZsbLOTeI2tVMOGenzXzi2/CKr0XAjfqswIjpr0pA/H6V
- uSVHmBK5pnKeMMeeRAh/6p8VDx+ZKWCwRpj4hRV0z8Kcs52NrbhwYBdpXVlOtEpK+9dh
- IAKETPkMRg32oS56GteGmVWZJ+M/IHPa9gkAospg3prmPk2Jjv1U1jLTUDCXegApgA0V
- ViNA==
-X-Gm-Message-State: APjAAAXgOWsdBOwhrQZghIY8JusaaYc3jypfDbgNiOeATMskrYdwrkra
- QipHznRvCmgS22LNnTXlAPznnQ==
-X-Google-Smtp-Source: APXvYqx0/MmILonmGoP2ovBYi4abT6edY7Meji9+1GH8ff9j4rLyqZqWckYv4ZEitcoMv3Uh0LD2qQ==
-X-Received: by 2002:a5d:608a:: with SMTP id w10mr25007698wrt.136.1579025286599; 
- Tue, 14 Jan 2020 10:08:06 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t5sm20407418wrr.35.2020.01.14.10.08.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 10:08:05 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C615F1FF87;
- Tue, 14 Jan 2020 18:08:04 +0000 (GMT)
-References: <20200114145437.28382-1-berto@igalia.com>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Alberto Garcia <berto@igalia.com>
-Subject: Re: [PATCH] qcow2: Use a GString in report_unsupported_feature()
-In-reply-to: <20200114145437.28382-1-berto@igalia.com>
-Date: Tue, 14 Jan 2020 18:08:04 +0000
-Message-ID: <87blr5nc6z.fsf@linaro.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1irQnu-0006Er-Oe
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 13:20:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1irQns-0001c9-E6
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 18:20:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 43ACE2E8073
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 18:20:36 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+Date: Tue, 14 Jan 2020 18:14:22 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm gic testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee alexlngw pmaydell
+X-Launchpad-Bug-Reporter: Alex Longwall (alexlngw)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <157887973843.5281.117317310678495552.malonedeb@gac.canonical.com>
+Message-Id: <157902566249.5472.5097045457669411552.launchpad@gac.canonical.com>
+Subject: [Bug 1859384] Re: arm gic: interrupt model never 1 on non-mpcore and
+ race condition in gic_acknowledge_irq
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: f034878d72af4252e5703c47499b1c942fd3af19
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,99 +79,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1859384 <1859384@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Tags added: testcase
 
-Alberto Garcia <berto@igalia.com> writes:
+-- =
 
-> This is a bit more efficient than having to allocate and free memory
-> for each item.
->
-> The default size (60) is enough for all the existing incompatible
-> features.
->
-> Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index cef9d72b3a..ecf6827420 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -453,16 +453,15 @@ static void cleanup_unknown_header_ext(BlockDriverS=
-tate *bs)
->  static void report_unsupported_feature(Error **errp, Qcow2Feature *table,
->                                         uint64_t mask)
->  {
-> -    char *features =3D g_strdup("");
-> -    char *old;
-> +    GString *features =3D g_string_sized_new(60);
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859384
 
-       g_autoptr(GString) features =3D g_string_sized_new(60);
+Title:
+  arm gic: interrupt model never 1 on non-mpcore and race condition in
+  gic_acknowledge_irq
 
-will save you the clean-up later.
+Status in QEMU:
+  New
 
->=20=20
->      while (table && table->name[0] !=3D '\0') {
->          if (table->type =3D=3D QCOW2_FEAT_TYPE_INCOMPATIBLE) {
->              if (mask & (1ULL << table->bit)) {
-> -                old =3D features;
-> -                features =3D g_strdup_printf("%s%s%.46s", old, *old ? ",=
- " : "",
-> -                                           table->name);
-> -                g_free(old);
-> +                if (features->len > 0) {
-> +                    g_string_append(features, ", ");
-> +                }
-> +                g_string_append_printf(features, "%.46s",
->      table->name);
+Bug description:
+  For a 1-N interrupt (any SPI on the GICv2), as mandated by the TRM,
+  only one CPU can acknowledge the IRQ until it becomes inactive.
 
-We have a number of cases of this sort of idiom in the code base. I
-wonder if it calls for a utility function:
+  The TRM also mandates that SGIs and PPIs follow the N-N model and that
+  SPIs follow the 1-N model.
 
-       qemu_append_with_sep(features, ", ", "%.46s", table->name)
+  However this is not currently the case with QEMU. I have locally (no
+  minimal test case) seen e.g. uart interrupts being acknowledged twice
+  before having been deactivated (expected: irqId on one CPU and 1023 on
+  the other instead).
 
-Anyway not mandatory for this patch so with the autoptr fix:
+  I have narrowed the issue down to the following:
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+  1) arm_gic_common_reset resets all irq_state[id] fields to 0. This
+  means all IRQ will use the N-N model, and if s->revision !=3D
+  REV_11MPCORE, then there's no way to set any interrupt to 1-N.
 
->                  mask &=3D ~(1ULL << table->bit);
->              }
->          }
-> @@ -470,14 +469,15 @@ static void report_unsupported_feature(Error **errp=
-, Qcow2Feature *table,
->      }
->=20=20
->      if (mask) {
-> -        old =3D features;
-> -        features =3D g_strdup_printf("%s%sUnknown incompatible feature: =
-%" PRIx64,
-> -                                   old, *old ? ", " : "", mask);
-> -        g_free(old);
-> +        if (features->len > 0) {
-> +            g_string_append(features, ", ");
-> +        }
-> +        g_string_append_printf(features,
-> +                               "Unknown incompatible feature: %" PRIx64,=
- mask);
->      }
->=20=20
-> -    error_setg(errp, "Unsupported qcow2 feature(s): %s", features);
-> -    g_free(features);
-> +    error_setg(errp, "Unsupported qcow2 feature(s): %s", features->str);
-> +    g_string_free(features, TRUE);
->  }
->=20=20
->  /*
+  If ""fixed"" locally with a hackjob, I still have the following trace:
 
+  pl011_irq_state 534130.800 pid=3D2424 level=3D0x1
+  gic_set_irq 2.900 pid=3D2424 irq=3D0x21 level=3D0x1 cpumask=3D0xff target=
+=3D0xff
+  gic_update_set_irq 3.300 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_update_set_irq 4.200 pid=3D2424 cpu=3D0x1 name=3Dirq level=3D0x1
+  gic_acknowledge_irq 539.400 pid=3D2424 s=3Dcpu cpu=3D0x1 irq=3D0x21
+  gic_update_set_irq 269.800 pid=3D2424 cpu=3D0x0 name=3Dirq level=3D0x1
+  gic_cpu_read 4.100 pid=3D2424 s=3Dcpu cpu=3D0x1 addr=3D0xc val=3D0x21
+  gic_acknowledge_irq 15.600 pid=3D2424 s=3Dcpu cpu=3D0x0 irq=3D0x21
+  gic_cpu_read 265.000 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0xc val=3D0x21
+  pl011_write 1594.700 pid=3D2424 addr=3D0x44 value=3D0x50
+  pl011_irq_state 2.000 pid=3D2424 level=3D0x0
+  gic_set_irq 1.300 pid=3D2424 irq=3D0x21 level=3D0x0 cpumask=3D0xff target=
+=3D0xff
+  pl011_write 30.700 pid=3D2424 addr=3D0x38 value=3D0x0
+  pl011_irq_state 1.200 pid=3D2424 level=3D0x0
+  gic_cpu_write 110.600 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x10 val=3D0x21
+  gic_cpu_write 193.400 pid=3D2424 s=3Dcpu cpu=3D0x0 addr=3D0x1000 val=3D0x=
+21
+  pl011_irq_state 1169.500 pid=3D2424 level=3D0x0
 
---=20
-Alex Benn=C3=A9e
+  This is because:
+
+  2) gic_acknowledge_irq calls gic_clear_pending which uses
+  GIC_DIST_CLEAR_PENDING but this usually has no effect on level-
+  sensitive interrupts.
+
+  With this often being a no-op (ie. assuming ispendr was not written
+  to), any 1-n level-sensitive interrupt is still improperly pending on
+  all the other cores.
+
+  (Also, I don't really know how the qemu thread model works, there
+  might be race conditions in the acknowledgment logic if
+  gic_acknowledge_irq is called by multiple threads, too.)
+
+  Option used:
+  -nographic -machine virt,virtualization=3Don,accel=3Dtcg,gic-version=3D2 =
+-cpu cortex-a57 -smp 4 -m 1024
+  -kernel whatever.elf -d unimp,guest_errors -semihosting-config enable,tar=
+get=3Dnative
+  -chardev stdio,id=3Duart -serial chardev:uart -monitor none
+  -trace gic_update_set_irq -trace gic_acknowledge_irq -trace pl011_irq_sta=
+te -trace pl011_write -trace gic_cpu_read -trace gic_cpu_write
+  -trace gic_set_irq
+
+  Commit used: dc65a5bdc9fa543690a775b50d4ffbeb22c56d6d "Merge remote-
+  tracking branch 'remotes/dgibson/tags/ppc-for-5.0-20200108' into
+  staging"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859384/+subscriptions
 
