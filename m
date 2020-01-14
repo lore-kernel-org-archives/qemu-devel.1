@@ -2,76 +2,79 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E633DC33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 03:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EACC33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 03:03:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1C442084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 03:03:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B10D82084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 03:03:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TmbOHQ0v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C442084D
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tDCPG2VS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B10D82084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irCU2-0005Xz-NY
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 22:03:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54185)
+	id 1irCUO-0005wN-QG
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 22:03:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54220)
  by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <3NC8dXgMKCv0op4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
- id 1irCT9-0004e2-Ip
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:16 -0500
+ <3Qy8dXgMKCg4xyDu22uzs.q204s08-rs9sz121u18.25u@flex--jkz.bounces.google.com>)
+ id 1irCTO-0004ov-8Z
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from
- <3NC8dXgMKCv0op4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
- id 1irCT8-0000cm-DX
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:15 -0500
-Received: from mail-pl1-x649.google.com ([2607:f8b0:4864:20::649]:34481)
+ <3Qy8dXgMKCg4xyDu22uzs.q204s08-rs9sz121u18.25u@flex--jkz.bounces.google.com>)
+ id 1irCTM-0000wW-W6
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:30 -0500
+Received: from mail-pl1-x649.google.com ([2607:f8b0:4864:20::649]:42946)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from
- <3NC8dXgMKCv0op4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
- id 1irCT8-0000ad-3R
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:14 -0500
-Received: by mail-pl1-x649.google.com with SMTP id x22so4436446pll.1
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 19:02:13 -0800 (PST)
+ <3Qy8dXgMKCg4xyDu22uzs.q204s08-rs9sz121u18.25u@flex--jkz.bounces.google.com>)
+ id 1irCTM-0000vA-Qc
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:28 -0500
+Received: by mail-pl1-x649.google.com with SMTP id b4so4427492plr.9
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 19:02:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=9Hmtms0P+9luoB1mtfwHX3WqJGaMjNUhOqWgirrPBmQ=;
- b=TmbOHQ0v8/MNuuEgYEXOvBR1ZQqEL5vzym6AlYR8XEdM34wcz30RMmfIeJcNeIUZV/
- hYRMKHZBmczbp6tZcNlXMkt3AXO13KX2yO8AZcIBtH+ahkCnIzKiLGs6nbaKiHN8v0UB
- dKRCChaSd98YZEqfeiN3eC5KVLUF9m7MIHTAspakEajNiHvx0mv1/szuqonP2hkWrZX6
- yEs+giHNOYnKwP5cKUzBpxYp4kg3mwP10M21uzW8Upjut9XxhPjOz1iGg+Xnvb4Y7hop
- tlTkziAdqkmpBBxhX1wVjGGT9yjH94NenRNLKvS+TOye/uZ28kXSUPziTzbNL43kIPdm
- C2Jw==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=3/g1o8RhSPCGsbPDNuvg/1lJsdGuvn96YgC53DZHyWw=;
+ b=tDCPG2VSPNat9zq2qB50z6NSON2Z3KdStdEwMQypP/ijBHlHHC0e88njq8MimO9/fL
+ 3Gjll88y34y7IwtymYRWlqz87O5JOxKbjMztmYhbjNSjWq7vcxub5P6bQCaX+fGiO62H
+ 9FxgVh2aUl31RYVc+UWVc14fpaeRTHcE5369Jbx/9bEjzWodiGr/p6ekGrjMku/K8EvB
+ oUHfVrd2awptmcwp+TYQH4O8v+W4Q1duf8Nn3CwoIRI2IxAqWJiMWF4X4k4ezEkfCXJF
+ ZPdkD2sfODVCDe4zMGihhukb4coTkn0EnSSH6alXvBOO7qpDMrzKbVt1w3s8K/S4W+3j
+ 6I9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=9Hmtms0P+9luoB1mtfwHX3WqJGaMjNUhOqWgirrPBmQ=;
- b=kSsb4CFhnPATiJSOi1U9i3O6bzevCPgtb8SLoF5MnCsgn4vMavjv6Evp64cZbJWZyV
- zANdo2P9DtLqMj0624hcxD1strpI8Up6McFgb+pjkPA5IApftmrNUb4+AwjSUF0vpGM8
- R2DKR0pfZQWewM3fkFGICv5XvhlfP/057kgrnyCBbgKkWXqGYdaLl5Ern3VE9P3sro+Z
- N163LHD8rYSdZfXpPerf54g/HMiYnSUMsuLBC/InJEV7pMjNgWR0eCZjrjtGr43DX9cv
- hAVTqGbgPDXVTPd9bEKwLUszWxILwNUWva13obTEtN0+/jtrjqOJYuBb2OiZ0CaH+QZm
- DadQ==
-X-Gm-Message-State: APjAAAWzopna3qnXsKlL2xRLRLTGMrH/gdNUQ8yTCcW6DT34oHRvPgQJ
- ZorJ52cIOwd7H9z75pcjZkQqxNjFD0eYV9ggdZXWwdeA8PaPs5ygrHWyWpYrxJ4iAsVcbJ8TFVP
- rlrgcoPcStyRDgT7BwlrawMSR5KIzIVuY3+3kXKuCpxSnXiWqMSNu
-X-Google-Smtp-Source: APXvYqy700LnE5DfS9ajqqJbcQ279AT9/PohMna/ACxGJuOgVGndlmvaetx3El79d9uW2j4YExicuiY=
-X-Received: by 2002:a65:420d:: with SMTP id c13mr24993465pgq.101.1578970932340; 
- Mon, 13 Jan 2020 19:02:12 -0800 (PST)
-Date: Mon, 13 Jan 2020 19:01:34 -0800
-Message-Id: <20200114030138.260347-1-jkz@google.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=3/g1o8RhSPCGsbPDNuvg/1lJsdGuvn96YgC53DZHyWw=;
+ b=aX2gHUg20BBhc53HN6h1HGmEURByLkAkIqP9Dvm6EyfA70VWkiOqAdDYg1Dba8gi4i
+ nfUc8Li5Q7tEnwQjXuWRmVmVp3n/l/upXe1xacVCGlvi3o1vplym1PBdQ5AUd6/a3BLQ
+ GpULWyDz08HYDSkj5Kf3zdsdRplSgBxmqsLuQQTAhojVwYGYcMNqgMAFfr/TH/6s9tMZ
+ GZ8UrzkIBrVfT3mAwF5pnxf5PB93aHgHigNPnxbxIyxCA3+FbeqLt0qWzFEj3/NdC4qE
+ 73Bu5LjYKF4nxerUBSFOEuzWB58oa5WveNAl31WHJF0GSbnzGIGea9qdDP0nHlrrF50x
+ 6+HA==
+X-Gm-Message-State: APjAAAVV3Hbcrk7Y+/5R1x6ys0TmvlgX2OW6UXieSXB4DBLEVUER9DfE
+ cdts0FN+YvkRfkLVf/8kKoTVrueel+PIxWujGMGtVL7y7Laq2UkjzMAhwcAhZYjzuijtA7D4QRs
+ gp8F3OtWxBcbVFPVNaXX//xGJD2ksYXiOMFMuvxN/iEpo7MH3FY3K
+X-Google-Smtp-Source: APXvYqzXn3r9wSIe8/WzpbWxsCwxyjePh7iDQ2u4MHY8Uaj0PqA2azRJW5dzl9u+Y5B80aDUKSsoLKw=
+X-Received: by 2002:a63:1110:: with SMTP id g16mr23843048pgl.84.1578970947241; 
+ Mon, 13 Jan 2020 19:02:27 -0800 (PST)
+Date: Mon, 13 Jan 2020 19:01:37 -0800
+In-Reply-To: <20200114030138.260347-1-jkz@google.com>
+Message-Id: <20200114030138.260347-4-jkz@google.com>
 Mime-Version: 1.0
+References: <20200114030138.260347-1-jkz@google.com>
 X-Mailer: git-send-email 2.25.0.rc1.283.g88dfdc4193-goog
-Subject: [PATCH 0/4] migration: Replace gemu_log with qemu_log
+Subject: [PATCH 3/4] linux-user: remove gemu_log from the linux-user tree
 From: Josh Kunz <jkz@google.com>
 To: qemu-devel@nongnu.org
 Cc: riku.voipio@iki.fi, laurent@vivier.eu, alex.bennee@linaro.org, 
@@ -95,72 +98,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The linux-user and bsd-user trees both widely use a function called
-`gemu_log` (notice the 'g') for miscellaneous and strace logging. This
-function predates the newer `qemu_log` function, and has a few drawbacks
-compared to `qemu_log`:
+Now that all uses have been migrated to `qemu_log' it is no longer
+needed.
 
-  1. Always logs to `stderr`, no logging redirection.
-  2. "Miscellaneous" logging cannot be disabled, so it may mix with guest
-     logging.
-  3. Inconsistency with other parts of the QEMU codebase, and a
-     confusing name.
+Signed-off-by: Josh Kunz <jkz@google.com>
+---
+ linux-user/main.c | 9 ---------
+ linux-user/qemu.h | 1 -
+ 2 files changed, 10 deletions(-)
 
-The second issue is especially troubling because it can interfere with
-programs that expect to communicate via stderr.
-
-This change introduces two new logging masks to the `qemu_log` subsystem
-to support its use for user-mode logging. The `LOG_USER` mask, for
-miscellaneous logs, and the `LOG_STRACE` mask for strace-specific
-logging. Further, it replaces all existing uses of `gemu_log` with the
-appropriate `qemu_log_mask(LOG_{USER,STRACE}, ...)` based on the log
-message. To avoid potential backwards incompatibility, this patch series
-also introduces a new flag: `-no-force-user-mode-logging`. Since "user
-mode" logging was always enabled before this change, by-default the
-LOG_USER mask is always set. The flag is provided for users that want to
-disable LOG_USER. Hopefully, this flag can be removed, or turned into a
-no-op in the futre, and -d/QEMU_LOG can be used directly to enable
-user-mode logging if desired.
-
-Unfortunately, this change introduces one small backwards incompatibility
-for the linux-user tree: If an explicit `-D` option is provided, or the
-`QEMU_LOG_FILENAME`_ environment variable is set, strace and user-mode
-logging statements will log to the QEMU log file instead of stderr.
-
-Tested:
-  * Built with clang 9 and g++ 8.3
-  * `make check` run with clang 9 build 
-  * Verified:
-    * QEMU_STRACE/-strace still works for linux-user
-    * -no-force-user-mode-logging uses QEMU_LOG + `user_mode` or
-      `strace` can be set in QEMU_LOG to trigger the appropriate
-      logging.
-
-Not tested:
-  * Build/logging with bsd-user. I do not have easy access to a BSD system.
-
-Josh Kunz (4):
-  linux-user: Use `qemu_log' for non-strace logging
-  linux-user: Use `qemu_log' for strace
-  linux-user: remove gemu_log from the linux-user tree
-  bsd-user: Replace gemu_log with qemu_log
-
- bsd-user/main.c           |  13 +-
- bsd-user/qemu.h           |   2 -
- bsd-user/strace.c         |  32 ++-
- bsd-user/syscall.c        |  31 ++-
- include/qemu/log.h        |  15 ++
- linux-user/arm/cpu_loop.c |   5 +-
- linux-user/fd-trans.c     |  55 +++--
- linux-user/main.c         |  50 +++-
- linux-user/qemu.h         |   2 -
- linux-user/signal.c       |   3 +-
- linux-user/strace.c       | 479 +++++++++++++++++++-------------------
- linux-user/syscall.c      |  43 ++--
- linux-user/vm86.c         |   3 +-
- util/log.c                |   5 +
- 14 files changed, 404 insertions(+), 334 deletions(-)
-
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 0bf40c4d27..945b6adf3a 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -108,15 +108,6 @@ const char *qemu_uname_release;
+    by remapping the process stack directly at the right place */
+ unsigned long guest_stack_size = 8 * 1024 * 1024UL;
+ 
+-void gemu_log(const char *fmt, ...)
+-{
+-    va_list ap;
+-
+-    va_start(ap, fmt);
+-    vfprintf(stderr, fmt, ap);
+-    va_end(ap);
+-}
+-
+ #if defined(TARGET_I386)
+ int cpu_get_pic_interrupt(CPUX86State *env)
+ {
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 02c6890c8a..329b409e65 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -210,7 +210,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+                     abi_long arg2, abi_long arg3, abi_long arg4,
+                     abi_long arg5, abi_long arg6, abi_long arg7,
+                     abi_long arg8);
+-void gemu_log(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ extern __thread CPUState *thread_cpu;
+ void cpu_loop(CPUArchState *env);
+ const char *target_strerror(int err);
 -- 
 2.25.0.rc1.283.g88dfdc4193-goog
 
