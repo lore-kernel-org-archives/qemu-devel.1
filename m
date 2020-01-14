@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCA7C33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1E3C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:21:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BC8324670
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:20:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0676420678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:21:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KceVoNVE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BC8324670
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YomcFaLP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0676420678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irM7V-0001bz-3p
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:20:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41781)
+	id 1irM89-0002mq-27
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:21:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irLkT-0004Os-Jg
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:49 -0500
+ (envelope-from <quintela@redhat.com>) id 1irLjh-0003cV-3E
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irLkP-0002Jn-Iz
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57873
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1irLjd-00026A-BH
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:56 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48520
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLkP-0002JP-Eo
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:41 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLjd-00025h-83
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579006598;
+ s=mimecast20190719; t=1579006552;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pWrM4tTgAcr3IjSP+Dc3j+8p78JiYlrCeLYCKUIobhM=;
- b=KceVoNVEul9Brse1pcHtE2SimWRToWyFYd6qPXc5ctShyFonpdq0QO6LPpBCTDv8+aWMCz
- kYp5S9mKeb/nUrqhhyCrhcXvaMwJjcoTca2IY59UGIeKA+XyGtZ1fSmhw1TtqK/FmMBus1
- CDpjDmQW2YbjRMJG0tVUV5igOVDrTjA=
+ bh=ya1F0mvUWk8XyhM6v0oEY3/vFxdIpuuT2eEdeU07i9U=;
+ b=YomcFaLPNqTDgpjBK2KMmZbhvekGQxXI4rc/jUm4muArv3fptZlBDbCUaDxzqCWQlsr8PZ
+ N0xNLKrZy7SM/x5OuhuhpMpbLYzVQquP9P3LfnESo4R2qr39MfMOp44kBimMREavzX36uW
+ bzzuhXJXwEfJrK5e0nszKY8LFvLpmDs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-CR6ExrTCPHGusxRqTBDgxA-1; Tue, 14 Jan 2020 07:56:36 -0500
+ us-mta-31-ooXaJcDQNCKrHAhYZ5NwTw-1; Tue, 14 Jan 2020 07:55:51 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D27D800D41;
- Tue, 14 Jan 2020 12:56:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 575311800D78;
+ Tue, 14 Jan 2020 12:55:49 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6FD7C5D9E5;
- Tue, 14 Jan 2020 12:56:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2710B5D9E5;
+ Tue, 14 Jan 2020 12:55:42 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/30] Bug #1829242 correction.
-Date: Tue, 14 Jan 2020 13:52:50 +0100
-Message-Id: <20200114125254.4515-27-quintela@redhat.com>
+Subject: [PULL 20/30] migration/postcopy: enable random order target page
+ arrival
+Date: Tue, 14 Jan 2020 13:52:44 +0100
+Message-Id: <20200114125254.4515-21-quintela@redhat.com>
 In-Reply-To: <20200114125254.4515-1-quintela@redhat.com>
 References: <20200114125254.4515-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: CR6ExrTCPHGusxRqTBDgxA-1
+X-MC-Unique: ooXaJcDQNCKrHAhYZ5NwTw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,10 +91,10 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
  Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Alexey Romko <nevilad@yahoo.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Stefan Berger <stefanb@linux.ibm.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org,
+ qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  David Gibson <david@gibson.dropbear.id.au>
@@ -101,127 +102,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexey Romko <nevilad@yahoo.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Added type conversions to ram_addr_t before all left shifts of page
-indexes to TARGET_PAGE_BITS, to correct overflows when the page
-address was 4Gb and more.
+After using number of target page received to track one host page, we
+could have the capability to handle random order target page arrival in
+one host page.
 
-Signed-off-by: Alexey Romko <nevilad@yahoo.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+This is a preparation for enabling compress during postcopy.
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ migration/ram.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 0e1d95cd73..ba6e0eea15 100644
+index 40c3fdd766..cbf8ab6a51 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -1768,7 +1768,7 @@ static inline bool migration_bitmap_clear_dirty(RAMSt=
-ate *rs,
-     if (rb->clear_bmap && clear_bmap_test_and_clear(rb, page)) {
-         uint8_t shift =3D rb->clear_bmap_shift;
-         hwaddr size =3D 1ULL << (TARGET_PAGE_BITS + shift);
--        hwaddr start =3D (page << TARGET_PAGE_BITS) & (-size);
-+        hwaddr start =3D (((ram_addr_t)page) << TARGET_PAGE_BITS) & (-size=
-);
+@@ -4050,7 +4050,7 @@ static int ram_load_postcopy(QEMUFile *f)
+     MigrationIncomingState *mis =3D migration_incoming_get_current();
+     /* Temporary page that is later 'placed' */
+     void *postcopy_host_page =3D mis->postcopy_tmp_page;
+-    void *last_host =3D NULL;
++    void *this_host =3D NULL;
+     bool all_zero =3D false;
+     int target_pages =3D 0;
 =20
-         /*
-          * CLEAR_BITMAP_SHIFT_MIN should always guarantee this... this
-@@ -2005,7 +2005,7 @@ static void ram_release_pages(const char *rbname, uin=
-t64_t offset, int pages)
-         return;
-     }
-=20
--    ram_discard_range(rbname, offset, pages << TARGET_PAGE_BITS);
-+    ram_discard_range(rbname, offset, ((ram_addr_t)pages) << TARGET_PAGE_B=
-ITS);
- }
-=20
- /*
-@@ -2093,7 +2093,7 @@ static int ram_save_page(RAMState *rs, PageSearchStat=
-us *pss, bool last_stage)
-     uint8_t *p;
-     bool send_async =3D true;
-     RAMBlock *block =3D pss->block;
--    ram_addr_t offset =3D pss->page << TARGET_PAGE_BITS;
-+    ram_addr_t offset =3D ((ram_addr_t)pss->page) << TARGET_PAGE_BITS;
-     ram_addr_t current_addr =3D block->offset + offset;
-=20
-     p =3D block->host + offset;
-@@ -2280,7 +2280,8 @@ static bool find_dirty_block(RAMState *rs, PageSearch=
-Status *pss, bool *again)
-         *again =3D false;
-         return false;
-     }
--    if ((pss->page << TARGET_PAGE_BITS) >=3D pss->block->used_length) {
-+    if ((((ram_addr_t)pss->page) << TARGET_PAGE_BITS)
-+        >=3D pss->block->used_length) {
-         /* Didn't find anything in this RAM Block */
-         pss->page =3D 0;
-         pss->block =3D QLIST_NEXT_RCU(pss->block, next);
-@@ -2571,7 +2572,7 @@ static int ram_save_target_page(RAMState *rs, PageSea=
-rchStatus *pss,
-                                 bool last_stage)
- {
-     RAMBlock *block =3D pss->block;
--    ram_addr_t offset =3D pss->page << TARGET_PAGE_BITS;
-+    ram_addr_t offset =3D ((ram_addr_t)pss->page) << TARGET_PAGE_BITS;
-     int res;
-=20
-     if (control_save_page(rs, block, offset, &res)) {
-@@ -2657,7 +2658,8 @@ static int ram_save_host_page(RAMState *rs, PageSearc=
-hStatus *pss,
-         /* Allow rate limiting to happen in the middle of huge pages */
-         migration_rate_limit();
-     } while ((pss->page & (pagesize_bits - 1)) &&
--             offset_in_ramblock(pss->block, pss->page << TARGET_PAGE_BITS)=
-);
-+             offset_in_ramblock(pss->block,
-+                                ((ram_addr_t)pss->page) << TARGET_PAGE_BIT=
-S));
-=20
-     /* The offset we leave with is the last one we looked at */
-     pss->page--;
-@@ -2874,8 +2876,10 @@ void ram_postcopy_migrated_memory_release(MigrationS=
-tate *ms)
-=20
-         while (run_start < range) {
-             unsigned long run_end =3D find_next_bit(bitmap, range, run_sta=
-rt + 1);
--            ram_discard_range(block->idstr, run_start << TARGET_PAGE_BITS,
--                              (run_end - run_start) << TARGET_PAGE_BITS);
-+            ram_discard_range(block->idstr,
-+                              ((ram_addr_t)run_start) << TARGET_PAGE_BITS,
-+                              ((ram_addr_t)(run_end - run_start))
-+                                << TARGET_PAGE_BITS);
-             run_start =3D find_next_zero_bit(bitmap, range, run_end + 1);
-         }
-     }
-@@ -4273,13 +4277,16 @@ static void colo_flush_ram_cache(void)
-         while (block) {
-             offset =3D migration_bitmap_find_dirty(ram_state, block, offse=
-t);
-=20
--            if (offset << TARGET_PAGE_BITS >=3D block->used_length) {
-+            if (((ram_addr_t)offset) << TARGET_PAGE_BITS
-+                >=3D block->used_length) {
-                 offset =3D 0;
-                 block =3D QLIST_NEXT_RCU(block, next);
+@@ -4097,24 +4097,26 @@ static int ram_load_postcopy(QEMUFile *f)
+              * that's moved into place later.
+              * The migration protocol uses,  possibly smaller, target-page=
+s
+              * however the source ensures it always sends all the componen=
+ts
+-             * of a host page in order.
++             * of a host page in one chunk.
+              */
+             page_buffer =3D postcopy_host_page +
+                           ((uintptr_t)host & (block->page_size - 1));
+             /* If all TP are zero then we can optimise the place */
+             if (target_pages =3D=3D 1) {
+                 all_zero =3D true;
++                this_host =3D (void *)QEMU_ALIGN_DOWN((uintptr_t)host,
++                                                    block->page_size);
              } else {
-                 migration_bitmap_clear_dirty(ram_state, block, offset);
--                dst_host =3D block->host + (offset << TARGET_PAGE_BITS);
--                src_host =3D block->colo_cache + (offset << TARGET_PAGE_BI=
-TS);
-+                dst_host =3D block->host
-+                         + (((ram_addr_t)offset) << TARGET_PAGE_BITS);
-+                src_host =3D block->colo_cache
-+                         + (((ram_addr_t)offset) << TARGET_PAGE_BITS);
-                 memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
+                 /* not the 1st TP within the HP */
+-                if (host !=3D (last_host + TARGET_PAGE_SIZE)) {
+-                    error_report("Non-sequential target page %p/%p",
+-                                  host, last_host);
++                if (QEMU_ALIGN_DOWN((uintptr_t)host, block->page_size) !=
+=3D
++                    (uintptr_t)this_host) {
++                    error_report("Non-same host page %p/%p",
++                                  host, this_host);
+                     ret =3D -EINVAL;
+                     break;
+                 }
              }
+=20
+-
+             /*
+              * If it's the last part of a host page then we place the host
+              * page
+@@ -4125,7 +4127,6 @@ static int ram_load_postcopy(QEMUFile *f)
+             }
+             place_source =3D postcopy_host_page;
          }
+-        last_host =3D host;
+=20
+         switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
+         case RAM_SAVE_FLAG_ZERO:
+@@ -4178,7 +4179,8 @@ static int ram_load_postcopy(QEMUFile *f)
+=20
+         if (!ret && place_needed) {
+             /* This gets called at the last target page in the host page *=
+/
+-            void *place_dest =3D host + TARGET_PAGE_SIZE - block->page_siz=
+e;
++            void *place_dest =3D (void *)QEMU_ALIGN_DOWN((uintptr_t)host,
++                                                       block->page_size);
+=20
+             if (all_zero) {
+                 ret =3D postcopy_place_page_zero(mis, place_dest,
 --=20
 2.24.1
 
