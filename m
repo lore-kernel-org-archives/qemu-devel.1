@@ -2,73 +2,94 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D800C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 19:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B30F2C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 19:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D1DF24655
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 19:45:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8151624655
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 19:45:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXvQWM/s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D1DF24655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VB+5mjSc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8151624655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irS7r-00089P-1N
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 14:45:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38475)
+	id 1irS80-0008QG-Io
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 14:45:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39052)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1irRyQ-0003Kr-EO
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 14:35:37 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1irS2B-0000me-DR
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 14:39:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1irRyN-0007oj-Ja
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 14:35:34 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54627
+ (envelope-from <pbonzini@redhat.com>) id 1irS27-00043s-EQ
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 14:39:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58135
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1irRyN-0007mw-EI
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 14:35:31 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1irS27-00042V-9S
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 14:39:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579030531;
+ s=mimecast20190719; t=1579030762;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=gch5+sc9eY6JZ+iJ7mxHhvEpAtv4qlkZ2oT+zxEorkc=;
- b=CXvQWM/sZJL6AEecKqOXplj6u24Gdyr0SA95cRoOJZZvJWHmjp8Vj5j0cZl0qSnlr1kyGg
- F9LzZnJSSGV4SwtwSoQapj1wPUNAAJqb4LI01e/88PNVpEz6nxbcAfgV1bRmXHFaaSNPik
- BCI2fd4meFCzymg3YUw/6YSzHfR5EQQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-f4TjkFC4NJq_eVECZ3-VcQ-1; Tue, 14 Jan 2020 14:34:24 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA152DC22;
- Tue, 14 Jan 2020 19:34:23 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.41])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E02E87EFE;
- Tue, 14 Jan 2020 19:34:21 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 09/13] qemu-iotests: qemu-img tests for luks key management
-Date: Tue, 14 Jan 2020 21:33:46 +0200
-Message-Id: <20200114193350.10830-10-mlevitsk@redhat.com>
-In-Reply-To: <20200114193350.10830-1-mlevitsk@redhat.com>
-References: <20200114193350.10830-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: f4TjkFC4NJq_eVECZ3-VcQ-1
+ bh=93oFLu50vA9g7oaS1SWMjVtYpGQlFJgbDG0l71Lohp4=;
+ b=VB+5mjScmHqxnyfvbMOOKHDiXpk8Voen5SujrRfvfQBpKbYd6n1cHidLA9c+8wFlF6exQc
+ h0ofQo6w0AFDXkWwnNs9UzIUOvQBjqZID+royjZjucWqFqlrSfyFUY9VpwtdNAqRkHUXXc
+ 6Q7wgzvXBnKPmfkbbUuoN7oCq5TEaLM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-49-dhovSPblPcaWPFKQeC4hqA-1; Tue, 14 Jan 2020 14:39:21 -0500
+X-MC-Unique: dhovSPblPcaWPFKQeC4hqA-1
+Received: by mail-wr1-f71.google.com with SMTP id u18so6899499wrn.11
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 11:39:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=QiyHRnpeYMxI2KKDaieHZ4OUWt4InM/ROPSeYPrAKjA=;
+ b=Bp3/Uz1ItSWOR7GHizPugXZpJnmb304lfHm5DC8CUoQx7DvCKwaSNmaILjC6nwU+1K
+ mcklGWXOT0/ki0C/qxDSXwi9ttT2bkUeo51ZWK39Dqw8YknF1sPZJoHO/sDL6oi39WwF
+ JuXVKI3sSsg0TJvBTybdIMFOO2uoaaSQHOYFvXo9nHIHlf73rGpmKgwO1hT/Uei59BCv
+ s0+8LufrWGxgmM5NnEwwarptGY1Erk2MQW09Ear9DOBhY1eKzjSHQtFxJYrlPq4y9mX7
+ Yw9tLES7Dc64l0SCdYL7J3tOk5iTRywaVQjpTkP+mECbM5qEhZk5MkwOFbHa1PZvQcpj
+ O1AA==
+X-Gm-Message-State: APjAAAW54GX0M11pbedFzklxNH4vthWVTdIHCfBTyTu1qjEd8JglMAaP
+ COtohs6ThzpYmVAb0yOB3ubOLB9ZKbmJZrG1qutrvzW3W+C4s4Gs0o7YFUrMqbZsTzpsoRBmxX+
+ 5hUGz1xB80Fe5YhE=
+X-Received: by 2002:a1c:5945:: with SMTP id n66mr27404486wmb.98.1579030758978; 
+ Tue, 14 Jan 2020 11:39:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwwy4z9vbNkOOubcJrArxW6AxRqLNLmFpI8yDF+ryNFBddxAvNLlV+iSHJ9oVvugx3U/0YLVQ==
+X-Received: by 2002:a1c:5945:: with SMTP id n66mr27404467wmb.98.1579030758707; 
+ Tue, 14 Jan 2020 11:39:18 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:1475:5c37:e2e2:68ea?
+ ([2001:b07:6468:f312:1475:5c37:e2e2:68ea])
+ by smtp.gmail.com with ESMTPSA id s3sm20009550wmh.25.2020.01.14.11.39.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 14 Jan 2020 11:39:17 -0800 (PST)
+Subject: Re: [PATCH v2 0/3] block/io: serialising request clean up and locking
+ fix
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <1578495356-46219-1-git-send-email-pbonzini@redhat.com>
+ <20200114162858.GD132666@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bea6d0f3-ddca-66a1-de9f-2c11c44d251e@redhat.com>
+Date: Tue, 14 Jan 2020 20:39:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20200114162858.GD132666@stefanha-x1.localdomain>
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="OUHi7047uqrKEDITdBgEh3hIdVHevrofR"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -83,547 +104,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This commit adds two tests, which test the new amend interface
-of both luks raw images and qcow2 luks encrypted images.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--OUHi7047uqrKEDITdBgEh3hIdVHevrofR
+Content-Type: multipart/mixed; boundary="9S4A70bCKdStrFKpmkG8g1HCcU25bGZXQ"
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- tests/qemu-iotests/300     | 207 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/300.out |  99 ++++++++++++++++++
- tests/qemu-iotests/301     |  90 ++++++++++++++++
- tests/qemu-iotests/301.out |  30 ++++++
- tests/qemu-iotests/group   |   3 +
- 5 files changed, 429 insertions(+)
- create mode 100755 tests/qemu-iotests/300
- create mode 100644 tests/qemu-iotests/300.out
- create mode 100755 tests/qemu-iotests/301
- create mode 100644 tests/qemu-iotests/301.out
+--9S4A70bCKdStrFKpmkG8g1HCcU25bGZXQ
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
-new file mode 100755
-index 0000000000..b1a6b37772
---- /dev/null
-+++ b/tests/qemu-iotests/300
-@@ -0,0 +1,207 @@
-+#!/usr/bin/env bash
-+#
-+# Test encryption key management with luks
-+# Based on 134
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmlevitsk@redhat.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1=09# failure is the default!
-+
-+_cleanup()
-+{
-+=09_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2 luks
-+_supported_proto file #TODO
-+
-+QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
-+
-+if [ "$IMGFMT" =3D "qcow2" ] ; then
-+=09PR=3D"encrypt."
-+=09EXTRA_IMG_ARGS=3D"-o encrypt.format=3Dluks"
-+fi
-+
-+
-+# secrets: you are supposed to see the password as *******, see :-)
-+S0=3D"--object secret,id=3Dsec0,data=3Dhunter0"
-+S1=3D"--object secret,id=3Dsec1,data=3Dhunter1"
-+S2=3D"--object secret,id=3Dsec2,data=3Dhunter2"
-+S3=3D"--object secret,id=3Dsec3,data=3Dhunter3"
-+S4=3D"--object secret,id=3Dsec4,data=3Dhunter4"
-+SECRETS=3D"$S0 $S1 $S2 $S3 $S4"
-+
-+# image with given secret
-+IMGS0=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec0"
-+IMGS1=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec1"
-+IMGS2=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec2"
-+IMGS3=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec3"
-+IMGS4=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,${PR}key-=
-secret=3Dsec4"
-+
-+
-+echo "=3D=3D creating a test image =3D=3D"
-+_make_test_img $S0 $EXTRA_IMG_ARGS -o ${PR}key-secret=3Dsec0,${PR}iter-tim=
-e=3D10 32M
-+
-+echo
-+echo "=3D=3D test that key 0 opens the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D adding a password to slot 4 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}keys.0.new-secret=3Dsec4,${PR}keys=
-.0.iter-time=3D10,${PR}keys.0.keyslot=3D4
-+echo "=3D=3D adding a password to slot 1 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}keys.0.new-secret=3Dsec1,${PR}keys=
-.0.iter-time=3D10
-+echo "=3D=3D adding a password to slot 3 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3Dsec3,${PR}keys=
-.0.iter-time=3D10,${PR}keys.0.keyslot=3D3
-+
-+echo "=3D=3D adding a password to slot 2 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}keys.0.new-secret=3Dsec2,${PR}keys=
-.0.iter-time=3D10
-+
-+
-+echo "=3D=3D erase slot 4 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.keyslot=3D4 | _filter_img_create
-+
-+
-+echo
-+echo "=3D=3D all secrets should work =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+echo
-+echo "=3D=3D erase slot 0 and try it =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec0 | _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo
-+echo "=3D=3D erase slot 2 and try it =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.keyslot=3D2 | _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS2 | _filter_qemu_io | _filter_test=
-dir
-+
-+
-+# at this point slots 1 and 3 should be active
-+
-+echo
-+echo "=3D=3D filling  4 slots with secret 2 =3D=3D"
-+for i in $(seq 0 3) ; do
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}keys.0.new-secret=3Dsec2,${PR}k=
-eys.0.iter-time=3D10
-+done
-+
-+echo
-+echo "=3D=3D adding secret 0 =3D=3D"
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}keys.0.new-secret=3Dsec0,${PR}k=
-eys.0.iter-time=3D10
-+
-+echo
-+echo "=3D=3D adding secret 3 (last slot) =3D=3D"
-+=09$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}keys.0.new-secret=3Dsec3,${PR}k=
-eys.0.iter-time=3D10
-+
-+echo
-+echo "=3D=3D trying to add another slot (should fail) =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS2 -o ${PR}keys.0.new-secret=3Dsec3,${PR}keys=
-.0.iter-time=3D10
-+
-+echo
-+echo "=3D=3D all secrets should work again =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+
-+echo
-+
-+echo "=3D=3D erase all keys of secret 2=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec2
-+
-+echo "=3D=3D erase all keys of secret 1=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec1
-+
-+echo "=3D=3D erase all keys of secret 0=3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec0
-+
-+echo "=3D=3D erasing secret3 will fail now since it is the only secret (in=
- 3 slots) =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec3
-+
-+echo
-+echo "=3D=3D only secret3 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+echo
-+echo "=3D=3D add secret0  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS3 -o ${PR}keys.0.new-secret=3Dsec0,${PR}keys=
-.0.iter-time=3D10
-+
-+echo "=3D=3D erase secret3 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec3
-+
-+echo
-+echo "=3D=3D only secret0 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+echo
-+echo "=3D=3D replace secret0 with secret1 (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}keys.0.new-secret=3Dsec1,${PR}keys=
-.0.keyslot=3D0
-+
-+echo
-+echo "=3D=3D replace secret0 with secret1 with force (should work)  =3D=3D=
-"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o ${PR}keys.0.new-secret=3Dsec1,${PR}keys=
-.0.iter-time=3D10,${PR}keys.0.keyslot=3D0 --force
-+
-+echo
-+echo "=3D=3D only secret1 should work now  =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+
-+echo
-+echo "=3D=3D erase last secret (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.keyslot=3D0
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec1
-+
-+
-+echo "=3D=3D erase non existing secrets (should fail)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec5 --force
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.old-secret=3Dsec0 --force
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.keyslot=3D1 --force
-+
-+echo
-+echo "=3D=3D erase last secret with force by slot (should work)  =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o ${PR}keys.0.new-secret=3D"",${PR}keys.0=
-.keyslot=3D0 --force
-+
-+echo
-+echo "=3D=3D we have no secrets now, data is lost forever =3D=3D"
-+for IMG in "$IMGS0" "$IMGS1" "$IMGS2" "$IMGS3"; do
-+=09$QEMU_IO $SECRETS -c "read 0 4096" $IMG | _filter_qemu_io | _filter_tes=
-tdir
-+done
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-+
-diff --git a/tests/qemu-iotests/300.out b/tests/qemu-iotests/300.out
-new file mode 100644
-index 0000000000..7816c36044
---- /dev/null
-+++ b/tests/qemu-iotests/300.out
-@@ -0,0 +1,99 @@
-+QA output created by 300
-+=3D=3D creating a test image =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
-+
-+=3D=3D test that key 0 opens the image =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D adding a password to slot 4 =3D=3D
-+=3D=3D adding a password to slot 1 =3D=3D
-+=3D=3D adding a password to slot 3 =3D=3D
-+=3D=3D adding a password to slot 2 =3D=3D
-+=3D=3D erase slot 4 =3D=3D
-+
-+=3D=3D all secrets should work =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D erase slot 0 and try it =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D erase slot 2 and try it =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D filling  4 slots with secret 2 =3D=3D
-+
-+=3D=3D adding secret 0 =3D=3D
-+
-+=3D=3D adding secret 3 (last slot) =3D=3D
-+
-+=3D=3D trying to add another slot (should fail) =3D=3D
-+qemu-img: Can't add a keyslot - all key slots are in use
-+
-+=3D=3D all secrets should work again =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D erase all keys of secret 2=3D=3D
-+=3D=3D erase all keys of secret 1=3D=3D
-+=3D=3D erase all keys of secret 0=3D=3D
-+=3D=3D erasing secret3 will fail now since it is the only secret (in 3 slo=
-ts) =3D=3D
-+qemu-img: Requested operation would erase all active keyslots which will e=
-rase all the data in the image irreversibly - refusing operation
-+
-+=3D=3D only secret3 should work now  =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D add secret0  =3D=3D
-+=3D=3D erase secret3 =3D=3D
-+
-+=3D=3D only secret0 should work now  =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D replace secret0 with secret1 (should fail)  =3D=3D
-+qemu-img: Refusing to overwrite active slot 0 - please erase it first
-+
-+=3D=3D replace secret0 with secret1 with force (should work)  =3D=3D
-+
-+=3D=3D only secret1 should work now  =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D erase last secret (should fail)  =3D=3D
-+qemu-img: Requested operation would erase all active keyslots which will e=
-rase all the data in the image irreversibly - refusing operation
-+qemu-img: Requested operation would erase all active keyslots which will e=
-rase all the data in the image irreversibly - refusing operation
-+=3D=3D erase non existing secrets (should fail)  =3D=3D
-+qemu-img: No secret with id 'sec5'
-+qemu-img: Requested operation didn't match any slots
-+
-+=3D=3D erase last secret with force by slot (should work)  =3D=3D
-+
-+=3D=3D we have no secrets now, data is lost forever =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+*** done
-diff --git a/tests/qemu-iotests/301 b/tests/qemu-iotests/301
-new file mode 100755
-index 0000000000..56ac3d8ef2
---- /dev/null
-+++ b/tests/qemu-iotests/301
-@@ -0,0 +1,90 @@
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=3Dmlevitsk@redhat.com
-+
-+seq=3D`basename $0`
-+echo "QA output created by $seq"
-+
-+status=3D1=09# failure is the default!
-+
-+_cleanup()
-+{
-+=09_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt luks
-+_supported_proto file #TODO
-+
-+QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
-+
-+# you are supposed to see the password as *******, see :-)
-+S0=3D"--object secret,id=3Dsec0,data=3Dhunter0"
-+S1=3D"--object secret,id=3Dsec1,data=3Dhunter1"
-+SECRETS=3D"$S0 $S1"
-+
-+
-+IMGS0=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,key-secre=
-t=3Dsec0"
-+IMGS1=3D"--image-opts driver=3D$IMGFMT,file.filename=3D$TEST_IMG,key-secre=
-t=3Dsec1"
-+
-+echo "=3D=3D creating a test image =3D=3D"
-+_make_test_img $S0 -o "key-secret=3Dsec0,iter-time=3D10" 32M
-+
-+echo
-+echo "=3D=3D test that key 0 opens the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D adding a password to slot 1 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS0 -o keys.0.new-secret=3Dsec1,keys.0.keyslot=
-=3D1,keys.0.iter-time=3D10
-+
-+echo
-+echo "=3D=3D 'backup' the image header =3D=3D"
-+dd if=3D$TEST_IMG_FILE of=3D${TEST_IMG_FILE}.bk bs=3D4K skip=3D0 count=3D1
-+
-+echo
-+echo "=3D=3D erase slot 0 =3D=3D"
-+$QEMU_IMG amend $SECRETS $IMGS1 -o keys.0.new-secret=3D"",keys.0.keyslot=
-=3D0 | _filter_img_create
-+
-+echo
-+echo "=3D=3D test that key 0 doesn't open the image =3D=3D"
-+$QEMU_IO $S0 -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "=3D=3D 'restore' the image header =3D=3D"
-+dd if=3D${TEST_IMG_FILE}.bk of=3D${TEST_IMG_FILE} bs=3D4K skip=3D0 count=
-=3D1 conv=3Dnotrunc
-+
-+echo
-+echo "=3D=3D test that key 0 still doesn't open the image (key material is=
- erased) =3D=3D"
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS0 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo
-+echo "=3D=3D test that key 1 still works =3D=3D"
-+$QEMU_IO $SECRETS -c "read 0 4096" $IMGS1 | _filter_qemu_io | _filter_test=
-dir
-+
-+echo "*** done"
-+rm -f $seq.full
-+status=3D0
-+
-+
-+exit 0
-diff --git a/tests/qemu-iotests/301.out b/tests/qemu-iotests/301.out
-new file mode 100644
-index 0000000000..e653c30330
---- /dev/null
-+++ b/tests/qemu-iotests/301.out
-@@ -0,0 +1,30 @@
-+QA output created by 301
-+=3D=3D creating a test image =3D=3D
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D33554432
-+
-+=3D=3D test that key 0 opens the image =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D adding a password to slot 1 =3D=3D
-+
-+=3D=3D 'backup' the image header =3D=3D
-+1+0 records in
-+1+0 records out
-+
-+=3D=3D erase slot 0 =3D=3D
-+
-+=3D=3D test that key 0 doesn't open the image =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D 'restore' the image header =3D=3D
-+1+0 records in
-+1+0 records out
-+
-+=3D=3D test that key 0 still doesn't open the image (key material is erase=
-d) =3D=3D
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+=3D=3D test that key 1 still works =3D=3D
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index cb2b789e44..34e3139ad7 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -288,3 +288,6 @@
- 277 rw quick
- 279 rw backing quick
- 280 rw migration quick
-+
-+300 rw auto
-+301 rw auto quick
---=20
-2.17.2
+On 14/01/20 17:28, Stefan Hajnoczi wrote:
+> On Wed, Jan 08, 2020 at 03:55:53PM +0100, Paolo Bonzini wrote:
+>> Peter Lieven noticed that reqs->overlap_offset and reqs->overlap_bytes
+>> are written outside bs->reqs_lock.  Patch 3 fixes it, while patches 1
+>> and 2 are preparatory cleanups.
+>>
+>> v1->v2: fix comment in patch 2, commit message in patch 3 [Kevin]
+>>
+>> Paolo Bonzini (3):
+>>   block: eliminate BDRV_REQ_NO_SERIALISING
+>>   block/io: wait for serialising requests when a request becomes
+>>     serialising
+>>   block/io: take bs->reqs_lock in bdrv_mark_request_serialising
+>>
+>>  block/file-posix.c        |   1 -
+>>  block/io.c                | 162 +++++++++++++++++++++++----------------=
+-------
+>>  include/block/block.h     |  12 ----
+>>  include/block/block_int.h |   3 +-
+>>  4 files changed, 81 insertions(+), 97 deletions(-)
+> Is it possible to trigger the bug somehow?
+>=20
+> Can you implement a test case?
+
+No, it was found by inspection only, and it's actually protected by the
+AioContext lock for now.
+
+Paolo
+
+
+--9S4A70bCKdStrFKpmkG8g1HCcU25bGZXQ--
+
+--OUHi7047uqrKEDITdBgEh3hIdVHevrofR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl4eGOQACgkQv/vSX3jH
+roPN5Af/St35L9hQ5z8z8Qj15TlPwxZ9dQDlkyMFAM1lrynA0Hjz5PWDzoXFz8YB
+gkd+rssArFYFrxY150xffsZi3dv0cav0FedKZBgWL+3RStK+XSEbG/RufixL5bNU
+HGD4fjjLpWxV2KXkqcqVZtOjzF2lkOlhipCeuM3C68d6Jqg/dYXGuFbfDYCigaHI
+c63MTrFWaLMMsJAuhTTYgZvdikCe39FE4+4uzZNyIWe0kcy+hVV362n5Eq7E0yTk
+AxmklmM8GvZaHblmF6K2BgVgNSdNbY2rYE6xv5gNHHu/OY6uPSFwIgru6w8NVDFr
+cntQ1+KCjGHTCmkbbtR/s1pkbmmdKw==
+=YaDS
+-----END PGP SIGNATURE-----
+
+--OUHi7047uqrKEDITdBgEh3hIdVHevrofR--
 
 
