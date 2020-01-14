@@ -6,63 +6,105 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78CAC33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9961C33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A246D2080D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FA5620CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:57:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EYFpc68h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A246D2080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nrcM30Th"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FA5620CC7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irBJR-0003sR-Ky
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 20:48:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44238)
+	id 1irBSQ-0007an-LF
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 20:57:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46430)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1irBIM-00031e-TE
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:47:04 -0500
+ (envelope-from <john.g.johnson@oracle.com>) id 1irBRo-0007Ak-57
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:56:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1irBIL-0001bL-FB
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:47:02 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:47473)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1irBIK-0001WU-RT; Mon, 13 Jan 2020 20:47:01 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47xYGl6KZ9z9sPn; Tue, 14 Jan 2020 12:46:55 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1578966415;
- bh=bZ3ZjexFCfrKEORUsWBWtLyhJaXY3XwTe4TiiLXRj6Q=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=EYFpc68hjpol0bL9GMksyjXY+HR5s4VhA3NwqEVOAICnZ8wb++lT/zPkLcD0pgrOQ
- qOkgDANTXmtR7dBW3KTh1ySrXen0VG/LGE4y8R0baLGbYgWCpjKbAgfMit9L9FTd0l
- ILZJNCHDw+jAX15c6tFYVpDyMvd+KoFe2lNIHKbE=
-Date: Tue, 14 Jan 2020 10:48:00 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Andrea Bolognani <abologna@redhat.com>
-Subject: Re: [RFC PATCH qemu] spapr: Kill SLOF
-Message-ID: <20200114004800.GI19995@umbus>
-References: <20200103074404.30853-1-aik@ozlabs.ru>
- <3cf3e733-199a-61ba-7aaa-05e9546cd4d9@ozlabs.ru>
- <dd98618f-01c6-850f-ac00-454a2f798508@gmail.com>
- <81f1f752-3ada-2c8d-38b7-1344c7633e14@ozlabs.ru>
- <e3299f0688127627de96eb2db1f127bf94df9085.camel@redhat.com>
- <5ed92e2a-4b9f-8092-cb67-8d94c3891e20@ozlabs.ru>
- <1a8f9121a3cb85d415ff1c67a5379a717ad2b8e0.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ZPDwMsyfds7q4mrK"
-Content-Disposition: inline
-In-Reply-To: <1a8f9121a3cb85d415ff1c67a5379a717ad2b8e0.camel@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+ (envelope-from <john.g.johnson@oracle.com>) id 1irBRm-0005lX-8a
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:56:47 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:54026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <john.g.johnson@oracle.com>)
+ id 1irBRm-0005jd-0m
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:56:46 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00E1rddn125387;
+ Tue, 14 Jan 2020 01:56:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to;
+ s=corp-2019-08-05; bh=CVmPPKTD/WLZ9DN1mvqTo4fzHPaNOG+tC1SsXFP6wy4=;
+ b=nrcM30ThBfCkop7okO3CvZdZzrqL4r7Fy0gQnxKc95IYO9EqIb4eNy7C8GRYVYbVjLVm
+ /wGf8khyXOCLJlMVW1J3Cts02E9hm6nqxZboqQS7gYuyaBVYJC1aCSX3UUBF06/duuxZ
+ p1DSuEXpaBexFeHT0nRD93rLSZng0Xs713B4H9CyMyE/oFasP5MA/1/NZWofxcQj2Bwy
+ 8uW8oW9exKXKBGe/4wrFF3uyWYBIvZQ/OuFUUbwbcDKG5ubiSoqUIpG7DBeku2nuAn3L
+ 3DJrTGiu2wc/PaHUkwnolsF3ZFgo24LnqbfRrcaQxkelH1B6iAyHOcBxQ9wKywWlhk9L KA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2xf73tjtvb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 14 Jan 2020 01:56:33 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00E1n7Zv030433;
+ Tue, 14 Jan 2020 01:56:32 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3020.oracle.com with ESMTP id 2xfrgjq6a9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 14 Jan 2020 01:56:32 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 00E1uS8A031439;
+ Tue, 14 Jan 2020 01:56:29 GMT
+Received: from [192.168.10.3] (/24.5.35.151)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 13 Jan 2020 17:56:28 -0800
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
+ status update
+From: John G Johnson <john.g.johnson@oracle.com>
+In-Reply-To: <20200103155920.GB281236@stefanha-x1.localdomain>
+Date: Mon, 13 Jan 2020 17:56:25 -0800
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <39A027D6-21C3-484F-8F90-9F04DCB9E4CF@oracle.com>
+References: <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
+ <20191217163316.GB1333385@stefanha-x1.localdomain>
+ <DDE3DA62-31DD-437B-8392-CAD505253EED@nutanix.com>
+ <20191219115545.GD1624084@stefanha-x1.localdomain>
+ <772D9CF3-D15D-42D1-B9CF-1279619D7C20@nutanix.com>
+ <20191219125504.GI1190276@redhat.com>
+ <20191220094712.GA1635864@stefanha-x1.localdomain>
+ <20191220102237.GA1699760@redhat.com>
+ <20200102104255.GF121208@stefanha-x1.localdomain>
+ <C4F6A4B0-607A-4BEE-B722-8F5447F1ADB7@nutanix.com>
+ <20200103155920.GB281236@stefanha-x1.localdomain>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9499
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-2001140014
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9499
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-2001140015
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,105 +116,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jose Ricardo Ziviani <joserz@linux.ibm.com>,
- Fabiano Rosas <farosas@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Michael Ellerman <mpe@ellerman.id.au>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
- Nicholas Piggin <npiggin@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Paul Mackerras <paulus@ozlabs.org>, Sam Bobroff <sbobroff@linux.ibm.com>,
- qemu-ppc@nongnu.org,
- Leonardo Augusto =?iso-8859-1?Q?Guimar=E3es?= Garcia <lagarcia@br.ibm.com>,
- Leonardo Bras <leonardo@linux.ibm.com>
+Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
+ "fam@euphon.net" <fam@euphon.net>, Swapnil Ingle <swapnil.ingle@nutanix.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Walker,
+ Benjamin" <benjamin.walker@intel.com>, "kraxel@redhat.com" <kraxel@redhat.com>,
+ "jag.raman@oracle.com" <jag.raman@oracle.com>, "Harris,
+ James R" <james.r.harris@intel.com>,
+ "quintela@redhat.com" <quintela@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
+ Felipe Franciosi <felipe@nutanix.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "liran.alon@oracle.com" <liran.alon@oracle.com>,
+ Thanos Makatos <thanos.makatos@nutanix.com>,
+ "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
+ "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---ZPDwMsyfds7q4mrK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 13, 2020 at 10:13:27AM +0100, Andrea Bolognani wrote:
-> On Wed, 2020-01-08 at 13:34 +1100, Alexey Kardashevskiy wrote:
-> > On 07/01/2020 20:39, Andrea Bolognani wrote:
-> > > On Tue, 2020-01-07 at 12:55 +1100, Alexey Kardashevskiy wrote:
-> > > > Petitboot kernel+initramdisk almost replaces SLOF + GRUB.
-> > >=20
-> > > Is this necessarily a good thing?
-> >=20
-> > The bare metal host and the powernv machine in QEMU do not use grub,
-> > they use petitboot which parses all grub configs and supports quite a l=
-ot.
+> On Jan 3, 2020, at 7:59 AM, Stefan Hajnoczi <stefanha@gmail.com> =
+wrote:
 >=20
-> How well does the distro integration work? Eg. if I change something
-> in /etc/default/grub and then run grub2-mkconfig, can I expect my
-> changes to be picked up?
-
-Yes, in the most trivial possible way.  AIUI, grub needs to process
-some of the config file information into a form that the early boot
-stages can read before they can read a filesystem.  Petitboot has a
-full Linux kernel beneath it so it parses everything from the grub
-file at boot time, so if it's in the file it will pick it up.
-
-> In which scenarios will that *not* work?
-
-If you use some grub feature that petitboot doesn't understand /
-support.  I don't know off hand of such a feature, but there might be
-some.
-
-> > Using Linux for a boot loader is not powerpc-only thing really, some
-> > folks do this too (forgot who, just heard this at the KVM forum).
+> On Thu, Jan 02, 2020 at 11:03:22AM +0000, Felipe Franciosi wrote:
+>>> On Jan 2, 2020, at 10:42 AM, Stefan Hajnoczi <stefanha@gmail.com> =
+wrote:
+>>> On Fri, Dec 20, 2019 at 10:22:37AM +0000, Daniel P. Berrang=C3=A9 =
+wrote:
+>>>> On Fri, Dec 20, 2019 at 09:47:12AM +0000, Stefan Hajnoczi wrote:
+>>>>> On Thu, Dec 19, 2019 at 12:55:04PM +0000, Daniel P. Berrang=C3=A9 =
+wrote:
+>>>>>> On Thu, Dec 19, 2019 at 12:33:15PM +0000, Felipe Franciosi wrote:
+>>>>>>>> On Dec 19, 2019, at 11:55 AM, Stefan Hajnoczi =
+<stefanha@gmail.com> wrote:
+>>>>>>>> On Tue, Dec 17, 2019 at 10:57:17PM +0000, Felipe Franciosi =
+wrote:
+>>>>>>>>>> On Dec 17, 2019, at 5:33 PM, Stefan Hajnoczi =
+<stefanha@redhat.com> wrote:
+>>>>>>>>>> On Mon, Dec 16, 2019 at 07:57:32PM +0000, Felipe Franciosi =
+wrote:
+>>>>>>>>>>>> On 16 Dec 2019, at 20:47, Elena Ufimtseva =
+<elena.ufimtseva@oracle.com> wrote:
+>>>>>>>>>>>> =EF=BB=BFOn Fri, Dec 13, 2019 at 10:41:16AM +0000, Stefan =
+Hajnoczi wrote:
+>>>>>>> To be clear: I'm very happy to have a userspace-only option for =
+this,
+>>>>>>> I just don't want to ditch the kernel module (yet, anyway). :)
+>>>>>>=20
+>>>>>> If it doesn't create too large of a burden to support both, then =
+I think
+>>>>>> it is very desirable. IIUC, this is saying a kernel based =
+solution as the
+>>>>>> optimized/optimal solution, and userspace UNIX socket based =
+option as the
+>>>>>> generic "works everywhere" fallback solution.
+>>>>>=20
+>>>>> I'm slightly in favor of the kernel implementation because it =
+keeps us
+>>>>> better aligned with VFIO.  That means solving problems in one =
+place only
+>>>>> and less reinventing the wheel.
+>>>>>=20
+>>>>> Knowing that a userspace implementation is possible is a plus =
+though.
+>>>>> Maybe that option will become attractive in the future and someone =
+will
+>>>>> develop it.  In fact, a userspace implementation may be a cool =
+Google
+>>>>> Summer of Code project idea that I'd like to co-mentor.
+>>>>=20
+>>>> If it is technically viable as an approach, then I think  we should =
+be
+>>>> treating a fully unprivileged muser-over-UNIX socket as a higher =
+priority
+>>>> than just "maybe a GSoC student will want todo it".
+>>>>=20
+>>>> Libvirt is getting strong message from KubeVirt project that they =
+want to
+>>>> be running both libvirtd and QEMU fully unprivileged. This allows =
+their
+>>>> containers to be unprivileged. Anything that requires privileges =
+requires
+>>>> jumping through extra hoops writing custom code in KubeVirt to do =
+things
+>>>> outside libvirt in side loaded privileged containers and this =
+limits how
+>>>> where those features can be used.
+>>>=20
+>>> Okay this makes sense.
+>>>=20
+>>> There needs to be a consensus on whether to go with a =
+qdev-over-socket
+>>> approach that is QEMU-specific and strongly discourages third-party
+>>> device distribution or a muser-over-socket approach that offers a =
+stable
+>>> API for VMM interoperability and third-party device distribution.
+>>=20
+>> The reason I dislike yet another offloading protocol (ie. there is
+>> vhost, there is vfio, and then there would be qdev-over-socket) is
+>> that we keep reinventing the wheel. I very much prefer picking
+>> something solid (eg. VFIO) and keep investing on it.
 >=20
-> While other options are available and some architectures use
-> something else entirely, GRUB is the de-facto standard across most
-> of the non-obscure architectures.
->=20
-> I guess the question is whether it's more important to be consistent
-> within the architecture or across them. I think the latter might be
-> preferable, especially when we consider what I think is the most
-> common scenario, that is, someone who's used to having GRUB on their
-> x86 machine running a ppc64 guest on the cloud. The more skills they
-> can automatically transfer over, the better.
-
-Note that killing SLOF isn't necessarily incompatible with running
-(true) grub.  It is harder though, because we'd have to fake
-significantly more of the OF client interface in qemu to let grub load
-the kernel.
-
-> > > Personally I quite like the fact
-> > > that I can use the same bootloader across x86, ppc64 and aarch64.
-> >=20
-> > I am not suggesting removing SLOF soon
->=20
-> Perhaps the patch subject shouldn't be "kill SLOF" then? ;)
+> I like the idea of sticking close to VFIO too.  The first step is
+> figuring out whether VFIO can be mapped to a UNIX domain socket =
+protocol
+> and many non-VFIO protocol messages are required.  Hopefully that =
+extra
+> non-VFIO stuff isn't too large.
 >=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---ZPDwMsyfds7q4mrK
-Content-Type: application/pgp-signature; name="signature.asc"
+	I looked at this and think we could map VFIO commands over a
+UNIX socket without a lot of difficulty.  We'd have to use SCM
+messages to pass file descriptors from the QEMU process to the
+emulation process for certain operations, but that shouldn't be
+a big problem.  Here are the mission mode operations:
 
------BEGIN PGP SIGNATURE-----
+configuration
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl4dD74ACgkQbDjKyiDZ
-s5JuoBAAmxIfx3Sz1RRnijxtgKfHrNjnX6ieOO7gbmSkp2r9hJ3AR7Qo+uHMtoEs
-sH1oMJxhBXJVn7hiMPJZWu4lsY8SJdi6rq/Mrazf54rB0YzYDr7a9RJSBvNKbIcb
-ipmXqKQYJWnIAbE5A1izslFoNCwmyDqS6fHDKHLBQKoKmp9RkWz9H8dMxDZPMhK8
-wSBNCggUe7h4rzH+MbW+oBwW92errdJfqixB6fjcwAO7/7EQzW0AI6wmINmg2K5D
-uzTGAqgiW3IZXs4nhJT6Imd6L2k7wRHRFqyNL5YWISs7eOzuM8Xzrs+N3k7N7T76
-AbuHrdmEQY1MJ5SlC+L0uthLXIrlD6hVS+8+WONYF4z/fPW5amUCCIX7GZaiTKnf
-67aej58PPZXkdVblGqmxBF1futyBScttv4HI5QANAOI/sZh9WcNYRtcMR1wx7I2N
-enpx5gGCu9c9RZtKjWPdfSPT3nhvJqwIA9lvORVyXGLUsMsmA1oq1iXsbc+uKFWu
-ecQfrWjWf31ksTpXi1Qkj1PFDOkKOCLaTlS4UOg10oE+cAI2srpwXEuIerKSBrde
-JDn5viHX+geePsIYILySc1Yi40yXXFMGDv8WyOiz4c0SDBkkWcmQAxze5AY0UObv
-yNMeNl+bQUhgZjVHQOG5aYeR4jA/4QGAxGJgS2OT3LYpl8Moclw=
-=Hc2w
------END PGP SIGNATURE-----
+	VFIO defines a number of configuration ioctl()s that we could
+turn into messages, but if we make the protocol specific to PCI, then
+all of the information they transmit (e.g., device regions and
+interrupts) can be discovered by parsing the device's PCI config
+space.  A lot of the current VFIO code that parses config space could
+be re-used to do this.
 
---ZPDwMsyfds7q4mrK--
+MMIO
+
+	VFIO uses reads and writes on the VFIO file descriptor to
+perform MMIOs to the device.  The read/write offset encodes the VFIO
+region and offset of the MMIO. (the VFIO regions correspond to PCI
+BARs) These would have to be changed to send messages that include the
+VFIO region and offset (and data for writes) to the emulation process.
+
+interrupts
+
+	VFIO creates eventfds that are sent to the kernel driver so it
+can inject interrupts into a guest.  We would have to send these
+eventfds over the socket to the emulation process using SCM messages.
+The emulation process could then trigger interrupts by writing on the
+eventfd.
+
+DMA
+
+	This is one place where I might diverge from VFIO.  It uses an
+ioctl to tell the kernel driver what areas of guest memory the device
+can address.  The driver then pins that memory so it can be programmed
+into a HW IOMMU.  We could avoid pinning of guest memory by adopting
+the vhost-user idea of sending the file descriptors used by QEMU to
+create guest memory to the emulation process, and having it mmap() the
+guest itself.  IOMMUs are handled by having the emulation process
+request device DMA to guest PA translations from QEMU.
+
+
+
+> If implementations can use the kernel uapi vfio header files then =
+we're
+> on track for compatibility with VFIO.
+>=20
+>>> This is just a more elaborate explanation for the "the cat is out of =
+the
+>>> bag" comments that have already been made on licensing.  Does anyone
+>>> still disagree or want to discuss further?
+>>>=20
+>>> If there is agreement that a stable API is okay then I think the
+>>> practical way to do this is to first merge a cleaned-up version of
+>>> multi-process QEMU as an unstable experimental API.  Once it's being
+>>> tested and used we can write a protocol specification and publish it =
+as
+>>> a stable interface when the spec has addressed most use cases.
+>>>=20
+>>> Does this sound good?
+>>=20
+>> In that case, wouldn't it be preferable to revive our proposal from
+>> Edinburgh (KVM Forum 2018)? Our prototypes moved more of the Qemu =
+VFIO
+>> code to "common" and added a "user" backend underneath it, similar to
+>> how vhost-user-scsi moved some of vhost-scsi to vhost-scsi-common and
+>> added vhost-user-scsi. It was centric on PCI, but it doesn't have to
+>> be. The other side can be implemented in libmuser for facilitating =
+things.
+>=20
+> That sounds good.
+>=20
+
+       The emulation program API could be based on the current
+libmuser API or the libvfio-user API.  The protocol itself wouldn=E2=80=99=
+t
+care which is chosen.  Our multi-processQEMU project would have to
+change how devices are specified from the QEMU command line to the
+emulation process command line.
+
+							JJ
+
 
