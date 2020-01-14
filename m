@@ -2,79 +2,87 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8807BC33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A34A8C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:45:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53BAA2075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2356C2075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 16:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="urj9jvaH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53BAA2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYtGlfMF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2356C2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irPHb-0003SY-Fk
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 11:43:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60568)
+	id 1irPJp-0004mI-1Q
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 11:45:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1irPGs-00031J-IS
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:42:27 -0500
+ (envelope-from <stefanha@gmail.com>) id 1irPJ8-0004EJ-3W
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:44:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1irPGr-0005YL-3T
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:42:26 -0500
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:39579)
+ (envelope-from <stefanha@gmail.com>) id 1irPJ6-0008Ea-SS
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:44:45 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40272)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1irPGq-0005XB-Su
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:42:25 -0500
-Received: by mail-oi1-x233.google.com with SMTP id a67so12431090oib.6
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 08:42:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=J4vRYlVEcRGovgB5LsfAsx/bT6hwd3oLwR/GwmrNpVc=;
- b=urj9jvaHRaHBL0FmMkYpMz2FJhnQnCl4UxtO0eCoeJLQx0CtSfPOdODdaWbR4d8OVx
- t4zKai2gKRfqIlcssHQcddmcADMBqB3slxqqtzKkv8fidX+J2AhMrGvuPBFZo6Dyg7tb
- 1TDBOzj/xC45I7BxdAl+gJp/rp37uvN4wUeEE1HLpdJYznEvA4OqeoelqK8dDAL3pOlg
- NkpuBqtbYlzi3g3CIcQo+ZnBMcSTJH8zjTAuBkdjXJ91CxJMSaOlArpoLE+GfMj80dg3
- uy3ik3C4BN3K9QDOyWVpPJ26p9mbnFj85WzmT3o/NiAuP05vT4PQEW7TNo1QBanJfcAV
- HlsQ==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1irPJ6-0008D8-LR
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 11:44:44 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t14so14523868wmi.5
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 08:44:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=gHyLbuSDCVZIBmTc/h8VbWLhXLgvgw8UsErROSviADY=;
+ b=GYtGlfMFjcfXDFBaLIS1mdBlxOoMVBW22YIYwEPa27VQEFh2wSZXEBymRIJCGJrvT9
+ ZcnW1wGAFMThmUrnOT+6qh/TuvnJrIaKh6mVxS9OqjyatGygjhwTzmlwAYCjQr+8MgM+
+ UwjodRbGaMuC0Ir9KRriADRax84U5jyLZ+PEEi1pUhoMtzJfwAIL055n95k02WSRxDji
+ cSzo1IPlG4m1fJLJ+6d21JKfVwYUREkxLRAoGmbI11xFEnYLmos6dJkbx+ylMRUQvOmn
+ DfEpAErZFmB/coRis0YdPNXwHDGsfQqlaDv79I+kaflPz39RiYijbd73kIbWTwc5+D/B
+ YaqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=J4vRYlVEcRGovgB5LsfAsx/bT6hwd3oLwR/GwmrNpVc=;
- b=Vy+OHsOGwiZ9SlN5gEeHeZLHQFyKRxN5W3MiWrfBnlGjF1RX1kXjKISbyDptZpacEA
- hxuaJCgC2b28xTgkLbiUNISi3c/MBA3/fv3uulawo7LhHpRJPz1m313segSuPcqYfpqC
- V66Wpfy/N08DrMjTanIXe+mniubJ4NVOFYqeFb4rUFhY8qxp6/NTzWIWtI16ashnlD16
- 5T5tZqRRB+Y10oWpppZLDWikCWjf/VOHZi3hP7aVQdsig5t0+srxVczyJs16XYEPwgc9
- bwUZ327aNbah8/isQaB8sVe8woRw38u1ooJYuyHaQ9H3mGji1oP8V88xC38V+wwHqWD6
- McHw==
-X-Gm-Message-State: APjAAAVkjfrs3hwNPQjdZVllHp9eiUGOXWwccPrCSH+8NIe5oYlRh5HI
- P9ytWHAk3XjpoLw5XgBaurUfPtlfSdjS33doQ2kAng==
-X-Google-Smtp-Source: APXvYqx7xSEGhLeneFjOpoZam1Ke2gtVN8GcNbb1ISPAh5EhF2tLQLucKmmcwlIIJxdwKPNcSlwcW4sC9No9zR0PZxU=
-X-Received: by 2002:aca:570d:: with SMTP id l13mr16661058oib.146.1579020143870; 
- Tue, 14 Jan 2020 08:42:23 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=gHyLbuSDCVZIBmTc/h8VbWLhXLgvgw8UsErROSviADY=;
+ b=JMrhaIcJ+pfyvcMlfCa8CHoAJNiPr6mIMC1N2ZQmyOV6QP37gQxZNQ9bIwYlSJ2V+p
+ zRqDQoamYBgqqJoTJR8ytDtkaxtkekNNFoYbcQCv2VZf7N1jEZ9Vcdueq1iivhXufdWH
+ NlnVhlpTT81re+xoj6OINlAOxcBVDR5aMmhforVzxD1Zte8pD1c9dQZuHUvJmCK96nyC
+ s/Rr72al9rxZN9tyNrq+s7+ErikffweZoDUsTHIXxPqOu5bENbZCXBb9/Cawms8NIVw9
+ TzmfykuikU7hw5jjx3yHvqfsQ1g5SM6o3Qg9H9FpB9Pd5fqU4+3rS9VtokUzNs8xw9t4
+ MZTQ==
+X-Gm-Message-State: APjAAAW7PV5bLcC48WiijFzoalO7SBEoWer9EFnIaI3wONwwQri3HBN2
+ P2TB1J+7M8Ku3x5tF/wQyqE=
+X-Google-Smtp-Source: APXvYqw2hHX+F6bMpHwAjPFCaA6V1veUCxNSABiCxW7va73fGeCozkQ66vQuImBH9d8J/WoFiX2Cwg==
+X-Received: by 2002:a1c:7dc4:: with SMTP id
+ y187mr27523462wmc.161.1579020283274; 
+ Tue, 14 Jan 2020 08:44:43 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id b10sm20925549wrt.90.2020.01.14.08.44.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 14 Jan 2020 08:44:42 -0800 (PST)
+Date: Tue, 14 Jan 2020 16:44:41 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: pannengyuan@huawei.com
+Subject: Re: [PATCH] vhost-vsock: delete vqs in vhost_vsock_unrealize to
+ avoid memleaks
+Message-ID: <20200114164441.GG132666@stefanha-x1.localdomain>
+References: <20200114075229.40520-1-pannengyuan@huawei.com>
 MIME-Version: 1.0
-References: <20200114100125.31604-1-kraxel@redhat.com>
-In-Reply-To: <20200114100125.31604-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Jan 2020 16:42:12 +0000
-Message-ID: <CAFEAcA9vBqf0tyvL+Z5-siJskjU9vT9HP7xbeH7fFYJX9n+wAg@mail.gmail.com>
-Subject: Re: [PULL 0/2] Ui 20200114 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="0qt3EE9wi45a2ZFX"
+Content-Disposition: inline
+In-Reply-To: <20200114075229.40520-1-pannengyuan@huawei.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::233
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,42 +94,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>,
+ qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jan 2020 at 10:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 3c8a6575985b1652b45bfa670b5e1907d642cfa0:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200113-pull-request' into staging (2020-01-13 14:19:57 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/ui-20200114-pull-request
->
-> for you to fetch changes up to c4c00922cc948bb5e879bfae60764eba1f8745f3:
->
->   display/gtk: get proper refreshrate (2020-01-14 07:26:36 +0100)
->
-> ----------------------------------------------------------------
-> ui: add "-display help", gtk refresh rate.
->
-> ----------------------------------------------------------------
->
-> Nikola Pavlica (1):
->   display/gtk: get proper refreshrate
->
-> Thomas Huth (1):
->   ui: Print available display backends with '-display help'
 
+--0qt3EE9wi45a2ZFX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On Tue, Jan 14, 2020 at 03:52:29PM +0800, pannengyuan@huawei.com wrote:
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+>=20
+> Receive/transmit/event vqs forgot to cleanup in vhost_vsock_unrealize. Th=
+is
+> patch save receive/transmit vq pointer in realize() and cleanup vqs
+> through those vq pointers in unrealize(). The leak stack is as follow:
+>=20
+> Direct leak of 21504 byte(s) in 3 object(s) allocated from:
+>   #0 0x7f86a1356970 (/lib64/libasan.so.5+0xef970)  ??:?
+>   #1 0x7f86a09aa49d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
+>   #2 0x5604852f85ca (./x86_64-softmmu/qemu-system-x86_64+0x2c3e5ca)  /mnt=
+/sdb/qemu/hw/virtio/virtio.c:2333
+>   #3 0x560485356208 (./x86_64-softmmu/qemu-system-x86_64+0x2c9c208)  /mnt=
+/sdb/qemu/hw/virtio/vhost-vsock.c:339
+>   #4 0x560485305a17 (./x86_64-softmmu/qemu-system-x86_64+0x2c4ba17)  /mnt=
+/sdb/qemu/hw/virtio/virtio.c:3531
+>   #5 0x5604858e6b65 (./x86_64-softmmu/qemu-system-x86_64+0x322cb65)  /mnt=
+/sdb/qemu/hw/core/qdev.c:865
+>   #6 0x5604861e6c41 (./x86_64-softmmu/qemu-system-x86_64+0x3b2cc41)  /mnt=
+/sdb/qemu/qom/object.c:2102
+>=20
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+>  hw/virtio/vhost-vsock.c         | 9 +++++++--
+>  include/hw/virtio/vhost-vsock.h | 2 ++
+>  2 files changed, 9 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+> index f5744363a8..896c0174c1 100644
+> --- a/hw/virtio/vhost-vsock.c
+> +++ b/hw/virtio/vhost-vsock.c
+> @@ -335,8 +335,10 @@ static void vhost_vsock_device_realize(DeviceState *=
+dev, Error **errp)
+>                  sizeof(struct virtio_vsock_config));
+> =20
+>      /* Receive and transmit queues belong to vhost */
+> -    virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE, vhost_vsock_handle_ou=
+tput);
+> -    virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE, vhost_vsock_handle_ou=
+tput);
+> +    vsock->recv_vq =3D virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
+> +                                      vhost_vsock_handle_output);
+> +    vsock->trans_vq =3D virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
+> +                                       vhost_vsock_handle_output);
+> =20
+>      /* The event queue belongs to QEMU */
+>      vsock->event_vq =3D virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
+> @@ -378,6 +380,9 @@ static void vhost_vsock_device_unrealize(DeviceState =
+*dev, Error **errp)
+>      /* This will stop vhost backend if appropriate. */
+>      vhost_vsock_set_status(vdev, 0);
+> =20
+> +    virtio_delete_queue(vsock->recv_vq);
+> +    virtio_delete_queue(vsock->trans_vq);
+> +    virtio_delete_queue(vsock->event_vq);
+>      vhost_dev_cleanup(&vsock->vhost_dev);
+>      virtio_cleanup(vdev);
+>  }
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+Please delete the virtqueues after vhost cleanup (the reverse
+initialization order).  There is currently no reason why it has to be
+done in reverse initialization order, your patch should work too, but
+it's a good default for avoiding user-after-free bugs.
 
--- PMM
+Stefan
+
+--0qt3EE9wi45a2ZFX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4d7/kACgkQnKSrs4Gr
+c8gNGAf/UShWOJToCKCZXB9NjELJ+rLGJTEKqnV+07fZ9WyLiEJDoxEAj+plVY/Z
+KLPzTHFv5KpoNRcVKVCym/4jMXDaJO7fyyzfnESBHoV6blB83tFDFMewpAoPE0i4
+n3BU4wSbhdUnWtQO+XeqJLQgU7NDKhcboY0hruFbBXPbiZodMSx8xikGVZO2iqQP
+mtPHYuItwTKUrC73Yt0iIlhcFZZnqzVy7vgeVhjSFLHOHfDXQ2sFWCbLswEIfueY
+Ob5yrsipQ4E3cVccPkz9HxOwA7udVwGplomX7/GvXTLxjpBJL/3e+QZBsm/1GMdr
+XOF88fA6P16O8tpfY+B33gOY8dB1pQ==
+=zrh/
+-----END PGP SIGNATURE-----
+
+--0qt3EE9wi45a2ZFX--
 
