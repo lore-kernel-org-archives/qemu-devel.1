@@ -5,78 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3AE3C33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F85C33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B15A20CC7
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:04:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C52820CC7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:06:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/2EGDDC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B15A20CC7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0CWiR4R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C52820CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irBZ8-0006UU-Hx
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 21:04:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47349)
+	id 1irBap-0007lu-HA
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 21:06:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1irBVr-0003dA-1W
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:01:00 -0500
+ (envelope-from <alistair23@gmail.com>) id 1irBXM-0005DQ-Hc
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:02:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1irBVp-0002Pc-U3
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:00:58 -0500
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43799)
+ (envelope-from <alistair23@gmail.com>) id 1irBXL-0003vU-Ds
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:02:32 -0500
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:40980)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1irBVp-0002OX-Mi; Mon, 13 Jan 2020 21:00:57 -0500
-Received: by mail-lf1-x141.google.com with SMTP id 9so8471341lfq.10;
- Mon, 13 Jan 2020 18:00:57 -0800 (PST)
+ id 1irBXL-0003ue-6R; Mon, 13 Jan 2020 21:02:31 -0500
+Received: by mail-lf1-x144.google.com with SMTP id m30so8468065lfp.8;
+ Mon, 13 Jan 2020 18:02:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=jIOw/CbzXybkeMH1o84BTHPma96iahA5s5mXf7EbPk0=;
- b=F/2EGDDC2WMeINqtbvPOP6hek9GQs8wGt5hGy2hjzrUb+9ElYoc0NdDXkcStJx3NUM
- dY+yg5+BJY9/galzSJ6/BnzwwDlHVHm7vY+3lCjUlap+A/NRZyB8XrhB2CbucKLr2ICo
- NXi6qbwodf9FCH/h1Rgs5hAULbEk5h+wWwdJXAffR9ukxUykbQ0ClU687A0xvKGB0dxM
- 3GCEOgcMaPrcOjCyPGKR7kooF/lagCH882ycJtKvvAY2qhCQ1V9UdwNECGVZffPyZRqc
- XGxqgretv6V6c/cs1s/DYMUqTDmAyTXxO6CZvHp4yBtmdAThPBr7BjDDZBwAIrbjY8Ug
- XBNA==
+ bh=wUZSPSo0jt960buXgMC7KYm3AgJo4uzvA53Zew/Py5Q=;
+ b=J0CWiR4RfUBEtaiY+wnwC0FHHmZ47a8ntwx3gMaRqap2PHYZWw43nZ7+I2tAerRtM3
+ 6jeyoaZwoS7bsoBMuSOviZyLV/Jgja1civsWdB5w6EWruAONPpe2MZliTNTbJ/3J6pEa
+ ocvpegu6AGHuLT3pMi0K9m+OFtmJ6Wu9BP6cj+o9X7EiUJpBfNBzwJqivZsfCiSIAY34
+ zy7NygsFLlI9qmRFgQZSdcs/iFiKSPMLXJRMHX19jrRx4qKDeIF2prWW3p0M3dZKeQsV
+ qXFEf2CTXrX7J1LdEyiykv3IDQ8a+sh02m4PCxIkhnIVj+LLDeNLeS9DwYQWI5oPQ43n
+ yICw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=jIOw/CbzXybkeMH1o84BTHPma96iahA5s5mXf7EbPk0=;
- b=prkozXEH+rpH5+zOhyb4IIGGHKwQ0Iz4SN5eqOZB3q7cbkZihVJ8WjaYjGGJQ1GWPX
- fEXr+Ve1X6sojBVr0fX62MBc+C95u1wkeVgLl5AYPWGrPFIe42XcuvcByfV+GxdjGGJE
- 47LE/big+BVfi/WcFubxKpDBnnkfsqJxLV0vf1Q39LjQ9uKafmhw2GzGV8IDfzc/ZW8b
- Hp9ELR1O7gHHF+v1ujD0PjSuN5SD/DSeHpzjVHSeV1fp99fBA7bwR1zLtgHyoedkxJJI
- Lrv/L5v2tfXwiBtjwIW/EJ3zbRR42CnuZ1OkchOxHciAg4RuzATX3juG2/s2gp4WdUeC
- YoQw==
-X-Gm-Message-State: APjAAAUJ3L8Yc2kJpU6M5TbyDLXGCsZu8iV/ymk4eNe5/K5FLJ55Blvt
- cxWGE/4csc+fT/QO8mDT5oXr7Rl05RVkL1KmlQk=
-X-Google-Smtp-Source: APXvYqy0yOxpo2ZhrAVQmvYzqkDqXbC7rHMR28Xir3J+/oJ9W0WgJXcuHpsQDEKYMEI20F51m0GHIdp0kwKp1u+TE+I=
-X-Received: by 2002:a19:4ac2:: with SMTP id x185mr215459lfa.131.1578967256625; 
- Mon, 13 Jan 2020 18:00:56 -0800 (PST)
+ bh=wUZSPSo0jt960buXgMC7KYm3AgJo4uzvA53Zew/Py5Q=;
+ b=YjE/rHflea2DWemo9O8NJihDRUAKn7THzVJVRIKtK36BUYZM+gY0CflcBxHa8rCNST
+ c1jhPbJ6syyWwMgF1pnV9/TGB6thXGTyFIPQP2yBoL+PH6YXfHTxH+ElyeRbkE2xr8RN
+ TJ1M48Wy3Fr7VrKBzJO0KupM/5STUXyIeqwbtWGkfEckNL66ez7hQTNSAOup/ZIs+gKL
+ HM6yszCkANlCLTr0BvnyDomx1NITfHHiunoMH+8l8Ug7PU227nCq9DTIXm9WZ1C4Fya7
+ SvRde6LZw/idjHAkVYfaz8Ht0x594xTWmjDH+6lPvxj413GhZk7rRvfwaul1n1ry7zFf
+ P1zw==
+X-Gm-Message-State: APjAAAXLSLfTw1J6n2OgyXNiJBFqDREROrLCGjuWsl6IEmlOkHH+/761
+ j5rof96jtHvkFyf8XtUqamR3iIwaQLHXAdBK8Lo=
+X-Google-Smtp-Source: APXvYqyouBD1xiebvS2Zk4hXxg76VrTocGGq5YSmQpO/+jvM/ul9CzMiHyzODVOre5V8qAlauIiAdI9HwiaH0r7qC9o=
+X-Received: by 2002:a19:e30b:: with SMTP id a11mr249814lfh.48.1578967349135;
+ Mon, 13 Jan 2020 18:02:29 -0800 (PST)
 MIME-Version: 1.0
 References: <20200109152133.23649-1-philmd@redhat.com>
- <20200109152133.23649-16-philmd@redhat.com>
-In-Reply-To: <20200109152133.23649-16-philmd@redhat.com>
+ <20200109152133.23649-11-philmd@redhat.com>
+ <CAKmqyKNrgTbiipNK1wrwCMqk_=7cJmc4rBwO1zxjFiVV+TRSgQ@mail.gmail.com>
+ <f7e3539a-4506-0df1-ee66-f3d8a6aa8fce@redhat.com>
+In-Reply-To: <f7e3539a-4506-0df1-ee66-f3d8a6aa8fce@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 14 Jan 2020 12:00:30 +1000
-Message-ID: <CAKmqyKPZ-=Njnv9KhS7yN_UE_Cij_eD=uUxdKhB5r8+dddiCyg@mail.gmail.com>
-Subject: Re: [PATCH 15/15] vl: Make current_machine a local variable
+Date: Tue, 14 Jan 2020 12:02:02 +1000
+Message-ID: <CAKmqyKNxNE0nCODQp37T4eKcq+0cDTCpW9SJkbby+q6Q99vg7g@mail.gmail.com>
+Subject: Re: [PATCH 10/15] memory: Replace current_machine by
+ qdev_get_machine()
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::141
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,62 +106,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jan 10, 2020 at 1:34 AM Philippe Mathieu-Daud=C3=A9
+On Sun, Jan 12, 2020 at 11:45 PM Philippe Mathieu-Daud=C3=A9
 <philmd@redhat.com> wrote:
 >
-> Since we now only use current_machine in vl.c, stop exporting
-> it as a global variable in "hw/board.h", and make it static
-> to vl.c.
+> On 1/12/20 10:48 AM, Alistair Francis wrote:
+> > On Thu, Jan 9, 2020 at 11:29 PM Philippe Mathieu-Daud=C3=A9
+> > <philmd@redhat.com> wrote:
+> >>
+> >> As we want to remove the global current_machine,
+> >> replace 'current_machine' by MACHINE(qdev_get_machine()).
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >> ---
+> >>   memory.c | 4 +++-
+> >>   1 file changed, 3 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/memory.c b/memory.c
+> >> index d7b9bb6951..57e38b1f50 100644
+> >> --- a/memory.c
+> >> +++ b/memory.c
+> >> @@ -3004,6 +3004,7 @@ static void mtree_print_flatview(gpointer key, g=
+pointer value,
+> >>       int n =3D view->nr;
+> >>       int i;
+> >>       AddressSpace *as;
+> >> +    MachineState *ms;
+> >>
+> >>       qemu_printf("FlatView #%d\n", fvi->counter);
+> >>       ++fvi->counter;
+> >> @@ -3026,6 +3027,7 @@ static void mtree_print_flatview(gpointer key, g=
+pointer value,
+> >>           return;
+> >>       }
+> >>
+> >> +    ms =3D MACHINE(qdev_get_machine());
+> >
+> > Why not set this at the top?
 >
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Calling qdev_get_machine() is not free as it does some introspection
+> checks. Since we can return earlier if there are no rendered FlatView, I
+> placed the machinestate initialization just before it we need to access i=
+t.
+
+Works for me, maybe worth putting this in the commit?
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
-> ---
->  include/hw/boards.h | 2 --
->  vl.c                | 4 ++--
->  2 files changed, 2 insertions(+), 4 deletions(-)
 >
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 61f8bb8e5a..b0c0d4376d 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -59,8 +59,6 @@ void memory_region_allocate_system_memory(MemoryRegion =
-*mr, Object *owner,
->  #define MACHINE_CLASS(klass) \
->      OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)
->
-> -extern MachineState *current_machine;
-> -
->  void machine_run_board_init(MachineState *machine);
->  bool machine_usb(MachineState *machine);
->  int machine_phandle_start(MachineState *machine);
-> diff --git a/vl.c b/vl.c
-> index 3ff3548183..7a69af4bef 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -214,6 +214,8 @@ static int default_sdcard =3D 1;
->  static int default_vga =3D 1;
->  static int default_net =3D 1;
->
-> +static MachineState *current_machine;
-> +
->  static struct {
->      const char *driver;
->      int *flag;
-> @@ -1164,8 +1166,6 @@ static int usb_parse(const char *cmdline)
->  /***********************************************************/
->  /* machine registration */
->
-> -MachineState *current_machine;
-> -
->  static MachineClass *find_machine(const char *name, GSList *machines)
->  {
->      GSList *el;
-> --
-> 2.21.1
->
+> > Alistair
+> >
+> >>       while (n--) {
+> >>           mr =3D range->mr;
+> >>           if (range->offset_in_region) {
+> >> @@ -3057,7 +3059,7 @@ static void mtree_print_flatview(gpointer key, g=
+pointer value,
+> >>           if (fvi->ac) {
+> >>               for (i =3D 0; i < fv_address_spaces->len; ++i) {
+> >>                   as =3D g_array_index(fv_address_spaces, AddressSpace=
+*, i);
+> >> -                if (fvi->ac->has_memory(current_machine, as,
+> >> +                if (fvi->ac->has_memory(ms, as,
+> >>                                           int128_get64(range->addr.sta=
+rt),
+> >>                                           MR_SIZE(range->addr.size) + =
+1)) {
+> >>                       qemu_printf(" %s", fvi->ac->name);
+> >> --
+> >> 2.21.1
+> >>
+> >>
+> >
 >
 
