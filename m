@@ -2,79 +2,86 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A319CC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C98A8C33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:02:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 728D92465B
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9884B2465B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 10:02:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VbWdfXzW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 728D92465B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQdFD+uw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9884B2465B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irJ1i-00029P-6i
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 05:02:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36048)
+	id 1irJ1p-0002Lw-8W
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 05:02:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1irIyy-0007Qd-4F
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:59:33 -0500
+ (envelope-from <armbru@redhat.com>) id 1irIzq-0000J0-1G
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:00:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1irIyw-0007NR-OG
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:59:32 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41683)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1irIyw-0007NC-Gr
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:59:30 -0500
-Received: by mail-ot1-x344.google.com with SMTP id r27so12031063otc.8
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 01:59:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=b2DiuJpfAtGeAoUNzZ4klHYPKsCmGPyrHxskQkSSgUg=;
- b=VbWdfXzWosBz2rt7Q96OtBBGxyjJ23tVF22pL0vbVpHsN/sf6yyejPrAGzrRtedjuW
- ZQHqq2nT/tA64qyWt0KEVT0QgUHMSCiEi1G3yko153Uh8/nFZQdl2Uep832aroOMao2g
- BVGAUjG/viB/jNfQ8wcC/SodObiyxgQpfhUAQMZZRvdNZEp6RwqFtnL3Cc41Y1zmH3or
- A65ytUyeEXZ/2i8rlL9dgGLArVbDEVwIlFzEaQcL+sTwgPBZR5MrdyPshQTvWJQEQdak
- va3VuOc3ZyfPSqDt61Heu+Bw8KvD/rV9i0b8KzIXjuOBu/0X0smWgrOiHVfL8vqkypxa
- 29QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=b2DiuJpfAtGeAoUNzZ4klHYPKsCmGPyrHxskQkSSgUg=;
- b=C70qc5rJZu0wQO25+nUwjZQ9RYeSgTg7QqGKH8MAv0BLABXOthk9v8xaLYk2L2hNd6
- km5PElLkPEzdh9iw+1+M4UudP6N0aro+sEcNexRlZwiGVR88XCnGQkngO/aR41xHdX7O
- J7q0rsZLen1TeaHzQlH9/chq1IcGbJVaImRolgMnh9LekzAwJzHz9mSNMo/zq1rL4J+W
- /NnsIGc1gZr1zaWWIwVirO8sXGYw2xzvOjffeE763DB49Yc5ofvn0PNgcPRMxaVTh6io
- RWoezSrGuOU+cvbZnKOVgkX/FLTgP+it8sbon6Aojjk5qsZEou9R78hiaG/xdpHiJl2P
- y54Q==
-X-Gm-Message-State: APjAAAVheZ3MLiB5vTa0tpgZms3fmX7pvP0oKXj+atUjFtss+tyc/iKH
- qj+uSB+laGgsZ8oPoFyRQ1Cao+ul2850dgpLW6pp2ZkOg80=
-X-Google-Smtp-Source: APXvYqztqi7IYRauvmq7P68h1Pbh39F85X1I1e1h+naKZZKMOViZ/q4V76RDrMrKEJu7EOga9JMCLvnITBC03NhBqLE=
-X-Received: by 2002:a05:6830:184:: with SMTP id
- q4mr16615430ota.232.1578995969450; 
- Tue, 14 Jan 2020 01:59:29 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1irIzm-0007hE-OF
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:00:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26286
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1irIzm-0007gD-KO
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 05:00:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578996019;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AdW706mGMELjFKPefet8+wZuDp3fcXCwxLlEEhjT1T4=;
+ b=FQdFD+uwjI84rVYmRZP1XdEynqHmZ91UYyIaEw+ycDOZ0dAhZCpUJO46dW4uxrdErC0LQC
+ PV6XtXXFwMUwmI4GBe86SApqofGwEdQSTYqo+Jg6Q/FcZ+lMpeE4KDdvzz7f/HpioGD/Na
+ 0UCnbMVo6Ptjtksn/71gvOfJSo5JU28=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-j82rfiFJOuivhsrvKKVAWQ-1; Tue, 14 Jan 2020 05:00:16 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC9E110054E3;
+ Tue, 14 Jan 2020 10:00:15 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
+ [10.36.116.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 910ED843F4;
+ Tue, 14 Jan 2020 10:00:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1C0A61138600; Tue, 14 Jan 2020 11:00:14 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH v3 1/2] migration: Fix incorrect integer->float conversion
+ caught by clang
+References: <20191122080039.12771-1-armbru@redhat.com>
+ <20191122080039.12771-2-armbru@redhat.com> <87zhgoi93z.fsf@trasno.org>
+ <87r220qa5p.fsf@dusky.pond.sub.org>
+Date: Tue, 14 Jan 2020 11:00:14 +0100
+In-Reply-To: <87r220qa5p.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Fri, 22 Nov 2019 15:05:06 +0100")
+Message-ID: <874kwygxxt.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
-In-Reply-To: <11d88b2741eac3f634d5aed9e3355c974b533f7b.camel@kernel.crashing.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Jan 2020 09:59:18 +0000
-Message-ID: <CAFEAcA-A_caQgwi5DzExdZChoTg-Qa73hq7Ho7dPLiN633Yj1Q@mail.gmail.com>
-Subject: Re: Semihosting, arm, riscv, ppc and common code
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: j82rfiFJOuivhsrvKKVAWQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Keith Packard <keithp@keithp.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fangrui Song <i@maskray.me>, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 Jan 2020 at 06:29, Benjamin Herrenschmidt
-<benh@kernel.crashing.org> wrote:
->
-> Hi Folks !
->
-> So I started "porting" over (read: copying) the arm semihosting code to
-> ppc to mimmic what Keith did for risv (mostly for picolibc support).
->
-> I noticed that the bulk of arm-semi.c (or riscv-semi.c) is trivially
-> made completely generic by doing a couple of changes:
+Markus Armbruster <armbru@redhat.com> writes:
 
-Note that semihosting is not a "here's a handy QEMU feature"
-thing. It's an architecture-specific API and ABI, which should
-be defined somewhere in a standard external to QEMU.
-You need to start by having a definition for PPC of what
-semihosting is. If you're starting from scratch there, there
-are some important things you should do differently to Arm --
-there is no benefit to repeating the mistakes of API definition
-that we made! Most notably, you want to specify and require
-that any unrecognized semihosting call function fails in a
-clean and detectable way; you also should have a semihosting
-function for "ask for a feature bit mask" so you don't need
-the silly magic-filename approach Arm had to go for. You
-also want to standardize what the errno values are, which Arm
-forgot to do and which makes the errno handling in the spec
-pretty useless.
+> Juan Quintela <quintela@redhat.com> writes:
+>
+>> Markus Armbruster <armbru@redhat.com> wrote:
+>>> From: Fangrui Song <i@maskray.me>
+>>>
+>>> Clang does not like qmp_migrate_set_downtime()'s code to clamp double
+>>> @value to 0..INT64_MAX:
+>>>
+>>>     qemu/migration/migration.c:2038:24: error: implicit conversion from=
+ 'long' to 'double' changes value from 9223372036854775807 to 9223372036854=
+775808 [-Werror,-Wimplicit-int-float-conversion]
+>>>
+>>> The warning will be enabled by default in clang 10. It is not
+>>> available for clang <=3D 9.
+>>>
+>>> The clamp is actually useless; @value is checked to be within
+>>> 0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
+>>>
+>>> While there, make the conversion from double to int64_t explicit.
+>>>
+>>> Signed-off-by: Fangrui Song <i@maskray.me>
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>>> [Patch split, commit message improved]
+>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>
+>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>>
+>> Should I get this through migration tree, or are you going to pull it?
+>
+> Plase take this patch through the migration tree.
 
-TLDR: don't start by writing code, start by writing the *API/ABI spec*.
-I tried to push the RISCV folks in this direction as well.
+Ping...
 
-thanks
--- PMM
 
