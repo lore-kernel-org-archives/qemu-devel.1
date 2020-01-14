@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A11C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B66EC33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E12A8222C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:04:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E12A8222C4
+	by mail.kernel.org (Postfix) with ESMTPS id 23D0524684
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:07:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23D0524684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNkW-0000ds-27
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:04:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36701)
+	id 1irNmi-0002OP-6b
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:07:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37009)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNjl-0000Cc-7o
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:04:10 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irNm3-0001xz-RQ
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNjk-0001dE-4f
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:04:09 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:39467)
+ (envelope-from <laurent@vivier.eu>) id 1irNm2-0003ns-Kh
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:06:31 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:43079)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNjj-0001bq-Ro
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:04:08 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNm2-0003ml-Bu
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:06:30 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N0nzR-1jcBaU2pXR-00wkIE; Tue, 14 Jan 2020 16:03:51 +0100
-Subject: Re: [PATCH v5 03/20] linux-user: m68k: Update syscall numbers to
- kernel 5.5 rc3 level
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MYvse-1jDKTH326C-00UvUY; Tue, 14 Jan 2020 16:06:07 +0100
+Subject: Re: [PATCH v5 04/20] linux-user: microblaze: Update syscall numbers
+ to kernel 5.5 rc3 level
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-4-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1578947683-21011-5-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <74cadd2a-7c4b-ddf5-d30c-8d2ca2be04b3@vivier.eu>
-Date: Tue, 14 Jan 2020 16:03:50 +0100
+Message-ID: <9fdcf1ea-cfb7-2d59-0d38-03990425eadc@vivier.eu>
+Date: Tue, 14 Jan 2020 16:06:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-4-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1578947683-21011-5-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:m1LGiBCaeK1G4CQMMS+75dXiqHXrqR/FYBG6wk/JevdmufAh/+9
- 9Zh7tSUzvEWT2zYsMZaGG51NoWkQVMAGca9hiWkCqP1rlX8t96ZfTgnn+OuwyGFdZ08miUf
- oWoUvjtt9wtw6a5sr0y+vLxE2Mw7xjBlaVuK8ucZMa5N59GaBP5jFwAI7eCkds75V6lX5b3
- q59ed8x6MjQ7POodlkljg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QeI8j6o9++M=:/cTgqKdTYAhq1X+ynD3w3i
- RuHJnZOoPcYsBLnjphVAdSyscz70fINZWAulZQi320HrWtLRqQMszGb5do0icPUrvGl6WzWFl
- xNMnVsBDJOwgnqKPqmssqt9xelbM9U5STEXVroD6wZK0FHrTJsj8qFrqdPCoi8ve0fTC35dG9
- iW9rVmBU/7JHugLJoddFRRAH1KvIa6A9CCsMuFWoCTN5fzIi4fg/3EHBuQSSPC0cHM/mg3Lar
- Z4gHehsLhVhMXBBYOfsMQ3EyrKUPmC9yE54IESvYU5U1D2gOyhp1uGFrD6lP9Yuez0hWJZTTb
- F9h8mWLMv6J0zgD1sTUsbJDehx1mXIJ+/ZxuIJ9Y6jhke8Ud1V/xdJsQWv4Q8ISZj/rt4KCFK
- s2sL3F7c/KaZrXzNo4chHV5MhRlBGvxCXLZOwqVHBC/JPV0cUPG0VfLSgwO+Pbd+xWSDSBoXW
- 05AheQ6dHjoJ9wHREIHmhp/q/NB9OT2p8HTFWiPNEZj2Mh9H6GZAgLSV41sCAaXu3JILJj/Ge
- 9EJAn+QebFgS6ckOlTel6o4dAIS610YAbMcCGIs3S4RQBGbgEA7MUfWCoueLz4yo7bTQLFGBu
- VwVEyd12mYK/yXmyUOJLQ21EMjB5Vk8BZPwopZ9vKvQICKxVmkPCVe1z8g7wpXu/W5DaNuT8i
- cuaXWFQiYWhWpgg0GaydEMUIQOVRKhxp+ab9KgC7yzHTOk03Q6jVAsq7V1BcYTeIS7kD9thaV
- z8F7Nk/9HWM0yWTtdK5+KxNstWFb4XVN2Vq7mN8dIC89Qo433VXdMiHM1ZE0K1bOCyB2yyqNZ
- TZfAfThZ3lE4y6feXwQNJlY3c3MwtsdtyeDRt8+I+oy7nVZG0eqKexaZaNAsRMSOfnAdkAtF8
- fV9Ba/gS1VjEDU+P9M8D60U4AKPeaXilC7kuw97So=
+X-Provags-ID: V03:K1:TgI3BaslggXlWLOPOk98AcjRL3pSCtWKKry38uK2lko4SeFYanx
+ GHXI84Nh1J6Kt/7EDL9P7DMgw5xaI5w1emDjgPJ5Ib3R253gqldeZhhm66NRmv45gOTuecf
+ 2CkUKhskKVX1sNHBzzppYE5AloeYjTCOgQB6f1qXXhNx4hMV0XNLhDsB5x8eSWLBCaOug/v
+ fdmCZTPKxPvJ2WQCjJR2w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ti/oJl7Jyv0=:oUnDzRaZ/G92s4rw6XyOip
+ WzUhYNzZEVvbXuIeQAelIWqSJWNFOoCPcjAnunZYgvlnoGvvMJ02sSQ2YoY05ZSFldYRjLzzU
+ vVIF7yN27JFFtdyHmcr3c3ePpIrih9QgsSjFS4oYvAgqsVu3pKcj3VivoP317uGk50UvgLQgp
+ Ah8jzINQGvZb8j1GomuHh65PBt28g9/HXhhH+ilwMpojWxmbIFTPdyO2DO798gZ/+Q9/5FGv6
+ w1TPYtlfpoofg9caI4O6eNQqYYyqbIIMnvYllNRp/OkVMqUPfyfTD+ETclz+KSV2MiyHSt0C7
+ eAbU54QNfQmKmxKEn3nnr7NRFto6YWTXq+Dnfpw5BagXMw0YwTyO2RkaZBdtUFd79YfHwHIlU
+ 75BlVRkp7ffTVcAGaRXBzVSPpthvIMzi1v+RJVJOZXzSC1E9LizmnsiyhaW8Er+teKadzST1y
+ 6Cq4k4MaiGKstFA1657HGx0UeKNYGek+0peXFCKTvzgRlfzsLSJhEGz0cYd9ZQqBZUTtIGkXy
+ H71YrVNTPIQAUUTQhXyOCc8takwkaawQNiImQnLDCKspmzyK/xnvC/4ZR3UxGA1XzyB/12TRo
+ GBu7CHucARUbeJAMWVOBAu566lRIIDlPzK7MWXgav2w0CnWESNyu6LB4fTVv9gluTbQUiCmF6
+ ZJl0erFWmPoydKqZXlbNFhT5Q6XNs5jkI7iNJxZpS+P72pBxyfdY3X6TTh+xMBfrRiXPkdvks
+ ndX7JUrKL+Yc9oHnA4Y3e8sqRWYfCis42yWqC8n5876UpiNkBnFee5C3Nrqgrrh91HpCA75k7
+ iP3whpQ8IBJxsdpqvZlFmtV01cpan0H1ClEMVJJ/1DwvRqaSnpSOn1qlYzhYTHZKmzPJd15i2
+ 391R9AqPdbuNHbQCQ6/kojafO/4fFW4zLW/LGyBX4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,7 +124,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Cc: "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -132,44 +132,39 @@ Sender: "Qemu-devel"
 Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> Update m68k syscall numbers based on Linux kernel tag v5.5-rc3
+> Update microblaze syscall numbers based on Linux kernel tag v5.5-rc3
 > (commit 46cf053e).
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
 > ---
 > 
-> cc: Laurent Vivier <laurent@vivier.eu>
+> cc: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 > ---
->  linux-user/m68k/syscall_nr.h | 50 +++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 49 insertions(+), 1 deletion(-)
+>  linux-user/microblaze/syscall_nr.h | 45 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 45 insertions(+)
 > 
-> diff --git a/linux-user/m68k/syscall_nr.h b/linux-user/m68k/syscall_nr.h
-> index d33d8e9..01aee34 100644
-> --- a/linux-user/m68k/syscall_nr.h
-> +++ b/linux-user/m68k/syscall_nr.h
-> @@ -382,5 +382,53 @@
->  #define TARGET_NR_copy_file_range       376
->  #define TARGET_NR_preadv2               377
->  #define TARGET_NR_pwritev2              378
-> -
-> +#define TARGET_NR_statx                 379
-> +#define TARGET_NR_seccomp               380
-> +#define TARGET_NR_pkey_mprotect         381
-> +#define TARGET_NR_pkey_alloc            382
-> +#define TARGET_NR_pkey_free             383
-> +#define TARGET_NR_rseq                  384
-> +/* room for arch specific calls */
-> +#define TARGET_NR_semget                393
-> +#define TARGET_NR_semctl                394
-> +#define TARGET_NR_shmget                395
-> +#define TARGET_NR_shmctl                396
-> +#define TARGET_NR_shmat                 397
-> +#define TARGET_NR_shmdt                 398
-> +#define TARGET_NR_msgget                399
-> +#define TARGET_NR_msgsnd                400
-> +#define TARGET_NR_msgrcv                401
-> +#define TARGET_NR_msgctl                402
+> diff --git a/linux-user/microblaze/syscall_nr.h b/linux-user/microblaze/syscall_nr.h
+> index aa2eb93..ec1758e 100644
+> --- a/linux-user/microblaze/syscall_nr.h
+> +++ b/linux-user/microblaze/syscall_nr.h
+> @@ -393,5 +393,50 @@
+>  #define TARGET_NR_memfd_create          386
+>  #define TARGET_NR_bpf                   387
+>  #define TARGET_NR_execveat              388
+> +#define TARGET_NR_userfaultfd           389
+> +#define TARGET_NR_membarrier            390
+> +#define TARGET_NR_mlock2                391
+> +#define TARGET_NR_copy_file_range       392
+> +#define TARGET_NR_preadv2               393
+> +#define TARGET_NR_pwritev2              394
+> +#define TARGET_NR_pkey_mprotect         395
+> +#define TARGET_NR_pkey_alloc            396
+> +#define TARGET_NR_pkey_free             397
+> +#define TARGET_NR_statx                 398
+> +#define TARGET_NR_io_pgetevents         399
+> +#define TARGET_NR_rseq                  400
+> +/* 401 and 402 are unused */
 > +#define TARGET_NR_clock_gettime64       403
 > +#define TARGET_NR_clock_settime64       404
 > +#define TARGET_NR_clock_adjtime64       405
@@ -201,7 +196,8 @@ Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > +#define TARGET_NR_fsmount               432
 > +#define TARGET_NR_fspick                433
 > +#define TARGET_NR_pidfd_open            434
-> +/* 435 reserved for clone3 */
+> +#define TARGET_NR_clone3                435
+>  
 >  #endif
 > 
 
