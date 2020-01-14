@@ -2,81 +2,77 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E048EC33CB3
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E7C9C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:09:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF32324676
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A54F206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:08:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="dDOPSdNs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF32324676
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODHJ9oyA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A54F206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irK3f-0007PJ-4x
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:08:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47599)
+	id 1irK4A-0000bq-Qn
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:08:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clement.deschamps@greensocs.com>) id 1irJvn-00084n-En
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:20 -0500
+ (envelope-from <stefanha@redhat.com>) id 1irJw0-0008MN-KW
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clement.deschamps@greensocs.com>) id 1irJvl-0006Ug-5V
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:18 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:39838)
+ (envelope-from <stefanha@redhat.com>) id 1irJvw-0006eS-Ku
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:32 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23823
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clement.deschamps@greensocs.com>)
- id 1irJvZ-0006Ni-TQ; Tue, 14 Jan 2020 06:00:06 -0500
-Received: from chartreuse.bar.greensocs.com (chartreuse.bar.greensocs.com
- [172.16.11.101])
- by beetle.greensocs.com (Postfix) with ESMTPS id 4852196EF0;
- Tue, 14 Jan 2020 11:00:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1578999603;
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJvw-0006eB-Gs
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578999628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=cloNL1VrTlkhCC6UnZZJThf+E4DFKBoc5EfntjStdqo=;
- b=dDOPSdNsAQCjW9r/uyr8fBSQgpCH5gpLr1w3zT87aCHwbOmCVj2rNRvFTEGOWj2t9Q4gpp
- pV1LgwkoLNVMbfupY3sLs5Rcpf9N6JgHgxnF1EAqHMjV796GB8+/i8ZYyyKoLELeSKsJ+4
- DjcOtjTrn3byYdVWtzsxjZfJzAXCIjI=
-From: Clement Deschamps <clement.deschamps@greensocs.com>
-To: qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Subject: [PATCH] target/arm: add PMU feature to cortex-r5 and cortex-r5f
-Date: Tue, 14 Jan 2020 11:59:18 +0100
-Message-Id: <20200114105918.2366370-1-clement.deschamps@greensocs.com>
-X-Mailer: git-send-email 2.24.1
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=a3+DyTGEcN2TwzdQ2sDklxF9uNtETYiLnrP9Dbk3Nys=;
+ b=ODHJ9oyAu2kfNN6D4i40SqYEKDeBqPfQFT1SwX74TNNcL0fHFj26EeSE2/frsGvBrjG9Pk
+ FQ0vLn4KlbBWQqDkT2rxsbt7sgZD331w9zmS52QS/UzGf9NeE40lMR0CJTZItc8HZMSrFK
+ VXY5qOTOq84G4N6u1wyPJG1VtQOBS9E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-MR72rQuDPMqbh44TWf13aA-1; Tue, 14 Jan 2020 06:00:24 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55425DB34;
+ Tue, 14 Jan 2020 11:00:23 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E5E6126FB9;
+ Tue, 14 Jan 2020 11:00:14 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 06/15] util/async: add aio interfaces for io_uring
+Date: Tue, 14 Jan 2020 10:59:12 +0000
+Message-Id: <20200114105921.131880-7-stefanha@redhat.com>
+In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
+References: <20200114105921.131880-1-stefanha@redhat.com>
 MIME-Version: 1.0
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1578999603;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding;
- bh=cloNL1VrTlkhCC6UnZZJThf+E4DFKBoc5EfntjStdqo=;
- b=364B+66qvjcdhvbbo0/4rzpG43KCVxq/1nKMyoivs+98cp4HGUsqogsR2dl8yE/zMNs1J1
- 6suFj7wP+fkoauhNYUMaTDgyDRyZ5uS0id9ucDtQqqco5lOT7hwQAoHp3+ikkySgYp8h/4
- 68jZL4LqhWckL+YY0Pqlr+LsnZa2HsI=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1578999603; a=rsa-sha256; cv=none;
- b=0iUNkvtfSNeovBu0JCjXzcbB0dLQJiEO5/2oKJ/t0/aex51hViz4jH33wMncwuAxiVUifL
- MZteASG+s4VrB3sjkngS000mtxWFhG7TUeCkQ9R8eDXIurvbe+lxvDjSGTKE0EbCDfb9r9
- UZ1iLQpAQY9piNDbqRfhWvHZbZcqa2Q=
-ARC-Authentication-Results: i=1;
-	beetle.greensocs.com;
-	none
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: MR72rQuDPMqbh44TWf13aA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,33 +84,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Clement Deschamps <clement.deschamps@greensocs.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, oleksandr@redhat.com,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
----
-See cortex-r5 TRM - 1.3 Features
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
-PMU is not optional on cortex-r5 and cortex-r5f
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- target/arm/cpu.c | 1 +
- 1 file changed, 1 insertion(+)
+ util/async.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index d62fd5fdc6..64cd0a7d73 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2121,6 +2121,7 @@ static void cortex_r5_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V7);
-     set_feature(&cpu->env, ARM_FEATURE_V7MP);
-     set_feature(&cpu->env, ARM_FEATURE_PMSA);
-+    set_feature(&cpu->env, ARM_FEATURE_PMU);
-     cpu->midr =3D 0x411fc153; /* r1p3 */
-     cpu->id_pfr0 =3D 0x0131;
-     cpu->id_pfr1 =3D 0x001;
+diff --git a/util/async.c b/util/async.c
+index b1fa5319e5..c192a24a61 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -276,6 +276,14 @@ aio_ctx_finalize(GSource     *source)
+     }
+ #endif
+=20
++#ifdef CONFIG_LINUX_IO_URING
++    if (ctx->linux_io_uring) {
++        luring_detach_aio_context(ctx->linux_io_uring, ctx);
++        luring_cleanup(ctx->linux_io_uring);
++        ctx->linux_io_uring =3D NULL;
++    }
++#endif
++
+     assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
+     qemu_bh_delete(ctx->co_schedule_bh);
+=20
+@@ -340,6 +348,29 @@ LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+ }
+ #endif
+=20
++#ifdef CONFIG_LINUX_IO_URING
++LuringState *aio_setup_linux_io_uring(AioContext *ctx, Error **errp)
++{
++    if (ctx->linux_io_uring) {
++        return ctx->linux_io_uring;
++    }
++
++    ctx->linux_io_uring =3D luring_init(errp);
++    if (!ctx->linux_io_uring) {
++        return NULL;
++    }
++
++    luring_attach_aio_context(ctx->linux_io_uring, ctx);
++    return ctx->linux_io_uring;
++}
++
++LuringState *aio_get_linux_io_uring(AioContext *ctx)
++{
++    assert(ctx->linux_io_uring);
++    return ctx->linux_io_uring;
++}
++#endif
++
+ void aio_notify(AioContext *ctx)
+ {
+     /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
+@@ -434,6 +465,11 @@ AioContext *aio_context_new(Error **errp)
+ #ifdef CONFIG_LINUX_AIO
+     ctx->linux_aio =3D NULL;
+ #endif
++
++#ifdef CONFIG_LINUX_IO_URING
++    ctx->linux_io_uring =3D NULL;
++#endif
++
+     ctx->thread_pool =3D NULL;
+     qemu_rec_mutex_init(&ctx->lock);
+     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
 --=20
 2.24.1
 
