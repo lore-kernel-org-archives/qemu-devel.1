@@ -2,62 +2,84 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD0CC33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E633DC33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 03:03:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7B482084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 02:52:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7B482084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id B1C442084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 03:03:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TmbOHQ0v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1C442084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irCJR-0002Ni-U0
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 21:52:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53012)
- by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eguan@linux.alibaba.com>) id 1irCIm-0001sY-2z
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:51:34 -0500
+	id 1irCU2-0005Xz-NY
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 22:03:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54185)
+ by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
+ <3NC8dXgMKCv0op4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
+ id 1irCT9-0004e2-Ip
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eguan@linux.alibaba.com>) id 1irCId-0003Td-T0
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:51:25 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:53397)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eguan@linux.alibaba.com>)
- id 1irCId-0003K7-Ef
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 21:51:23 -0500
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R191e4; CH=green; DM=||false|;
- DS=||; FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01f04427; MF=eguan@linux.alibaba.com;
- NM=1; PH=DS; RN=5; SR=0; TI=SMTPD_---0TngY7F0_1578970258; 
-Received: from localhost(mailfrom:eguan@linux.alibaba.com
- fp:SMTPD_---0TngY7F0_1578970258) by smtp.aliyun-inc.com(127.0.0.1);
- Tue, 14 Jan 2020 10:50:58 +0800
-Date: Tue, 14 Jan 2020 10:50:58 +0800
-From: Eryu Guan <eguan@linux.alibaba.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [BUG qemu 4.0] segfault when unplugging virtio-blk-pci device
-Message-ID: <20200114025058.GA47669@e18g06458.et15sqa>
-References: <20191231103434.GA41863@e18g06458.et15sqa>
- <20191231115136.7b967604@Igors-MacBook-Pro>
- <20200102020850.GB41863@e18g06458.et15sqa>
- <20200107130649.GH41863@e18g06458.et15sqa>
- <CAMDeoFXdbJB_nn4MR4uZYTEE7N2BT05-Ucqnm9Hkj7=pMqOWwQ@mail.gmail.com>
- <20200109045806.GB79586@e18g06458.et15sqa>
- <20200113163855.GC103384@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200113163855.GC103384@stefanha-x1.localdomain>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 47.88.44.36
+ (envelope-from
+ <3NC8dXgMKCv0op4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
+ id 1irCT8-0000cm-DX
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:15 -0500
+Received: from mail-pl1-x649.google.com ([2607:f8b0:4864:20::649]:34481)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from
+ <3NC8dXgMKCv0op4lttlqj.htrvjrz-ij0jqstslsz.twl@flex--jkz.bounces.google.com>)
+ id 1irCT8-0000ad-3R
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 22:02:14 -0500
+Received: by mail-pl1-x649.google.com with SMTP id x22so4436446pll.1
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 19:02:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=9Hmtms0P+9luoB1mtfwHX3WqJGaMjNUhOqWgirrPBmQ=;
+ b=TmbOHQ0v8/MNuuEgYEXOvBR1ZQqEL5vzym6AlYR8XEdM34wcz30RMmfIeJcNeIUZV/
+ hYRMKHZBmczbp6tZcNlXMkt3AXO13KX2yO8AZcIBtH+ahkCnIzKiLGs6nbaKiHN8v0UB
+ dKRCChaSd98YZEqfeiN3eC5KVLUF9m7MIHTAspakEajNiHvx0mv1/szuqonP2hkWrZX6
+ yEs+giHNOYnKwP5cKUzBpxYp4kg3mwP10M21uzW8Upjut9XxhPjOz1iGg+Xnvb4Y7hop
+ tlTkziAdqkmpBBxhX1wVjGGT9yjH94NenRNLKvS+TOye/uZ28kXSUPziTzbNL43kIPdm
+ C2Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=9Hmtms0P+9luoB1mtfwHX3WqJGaMjNUhOqWgirrPBmQ=;
+ b=kSsb4CFhnPATiJSOi1U9i3O6bzevCPgtb8SLoF5MnCsgn4vMavjv6Evp64cZbJWZyV
+ zANdo2P9DtLqMj0624hcxD1strpI8Up6McFgb+pjkPA5IApftmrNUb4+AwjSUF0vpGM8
+ R2DKR0pfZQWewM3fkFGICv5XvhlfP/057kgrnyCBbgKkWXqGYdaLl5Ern3VE9P3sro+Z
+ N163LHD8rYSdZfXpPerf54g/HMiYnSUMsuLBC/InJEV7pMjNgWR0eCZjrjtGr43DX9cv
+ hAVTqGbgPDXVTPd9bEKwLUszWxILwNUWva13obTEtN0+/jtrjqOJYuBb2OiZ0CaH+QZm
+ DadQ==
+X-Gm-Message-State: APjAAAWzopna3qnXsKlL2xRLRLTGMrH/gdNUQ8yTCcW6DT34oHRvPgQJ
+ ZorJ52cIOwd7H9z75pcjZkQqxNjFD0eYV9ggdZXWwdeA8PaPs5ygrHWyWpYrxJ4iAsVcbJ8TFVP
+ rlrgcoPcStyRDgT7BwlrawMSR5KIzIVuY3+3kXKuCpxSnXiWqMSNu
+X-Google-Smtp-Source: APXvYqy700LnE5DfS9ajqqJbcQ279AT9/PohMna/ACxGJuOgVGndlmvaetx3El79d9uW2j4YExicuiY=
+X-Received: by 2002:a65:420d:: with SMTP id c13mr24993465pgq.101.1578970932340; 
+ Mon, 13 Jan 2020 19:02:12 -0800 (PST)
+Date: Mon, 13 Jan 2020 19:01:34 -0800
+Message-Id: <20200114030138.260347-1-jkz@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.25.0.rc1.283.g88dfdc4193-goog
+Subject: [PATCH 0/4] migration: Replace gemu_log with qemu_log
+From: Josh Kunz <jkz@google.com>
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, alex.bennee@linaro.org, 
+ armbru@redhat.com, Josh Kunz <jkz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::649
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,162 +91,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 13, 2020 at 04:38:55PM +0000, Stefan Hajnoczi wrote:
-> On Thu, Jan 09, 2020 at 12:58:06PM +0800, Eryu Guan wrote:
-> > On Tue, Jan 07, 2020 at 03:01:01PM +0100, Julia Suvorova wrote:
-> > > On Tue, Jan 7, 2020 at 2:06 PM Eryu Guan <eguan@linux.alibaba.com> wrote:
-> > > >
-> > > > On Thu, Jan 02, 2020 at 10:08:50AM +0800, Eryu Guan wrote:
-> > > > > On Tue, Dec 31, 2019 at 11:51:35AM +0100, Igor Mammedov wrote:
-> > > > > > On Tue, 31 Dec 2019 18:34:34 +0800
-> > > > > > Eryu Guan <eguan@linux.alibaba.com> wrote:
-> > > > > >
-> > > > > > > Hi,
-> > > > > > >
-> > > > > > > I'm using qemu 4.0 and hit segfault when tearing down kata sandbox, I
-> > > > > > > think it's because io completion hits use-after-free when device is
-> > > > > > > already gone. Is this a known bug that has been fixed? (I went through
-> > > > > > > the git log but didn't find anything obvious).
-> > > > > > >
-> > > > > > > gdb backtrace is:
-> > > > > > >
-> > > > > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-5b8df8c6c6901c3c0a9b02879be10fe8d69d6'.
-> > > > > > > Program terminated with signal 11, Segmentation fault.
-> > > > > > > #0 object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > > > > > 903        return obj->class;
-> > > > > > > (gdb) bt
-> > > > > > > #0  object_get_class (obj=obj@entry=0x0) at /usr/src/debug/qemu-4.0/qom/object.c:903
-> > > > > > > #1  0x0000558a2c009e9b in virtio_notify_vector (vdev=0x558a2e7751d0,
-> > > > > > >     vector=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio.c:1118
-> > > > > > > #2  0x0000558a2bfdcb1e in virtio_blk_discard_write_zeroes_complete (
-> > > > > > >     opaque=0x558a2f2fd420, ret=0)
-> > > > > > >     at /usr/src/debug/qemu-4.0/hw/block/virtio-blk.c:186
-> > > > > > > #3  0x0000558a2c261c7e in blk_aio_complete (acb=0x558a2eed7420)
-> > > > > > >     at /usr/src/debug/qemu-4.0/block/block-backend.c:1305
-> > > > > > > #4  0x0000558a2c3031db in coroutine_trampoline (i0=<optimized out>,
-> > > > > > >     i1=<optimized out>) at /usr/src/debug/qemu-4.0/util/coroutine-ucontext.c:116
-> > > > > > > #5  0x00007f45b2f8b080 in ?? () from /lib64/libc.so.6
-> > > > > > > #6  0x00007fff9ed75780 in ?? ()
-> > > > > > > #7  0x0000000000000000 in ?? ()
-> > > > > > >
-> > > > > > > It seems like qemu was completing a discard/write_zero request, but
-> > > > > > > parent BusState was already freed & set to NULL.
-> > > > > > >
-> > > > > > > Do we need to drain all pending request before unrealizing virtio-blk
-> > > > > > > device? Like the following patch proposed?
-> > > > > > >
-> > > > > > > https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg02945.html
-> > > > > > >
-> > > > > > > If more info is needed, please let me know.
-> > > > > >
-> > > > > > may be this will help: https://patchwork.kernel.org/patch/11213047/
-> > > > >
-> > > > > Yeah, this looks promising! I'll try it out (though it's a one-time
-> > > > > crash for me). Thanks!
-> > > >
-> > > > After applying this patch, I don't see the original segfaut and
-> > > > backtrace, but I see this crash
-> > > >
-> > > > [Thread debugging using libthread_db enabled]
-> > > > Using host libthread_db library "/lib64/libthread_db.so.1".
-> > > > Core was generated by `/usr/local/libexec/qemu-kvm -name sandbox-a2f34a11a7e1449496503bbc4050ae040c0d3'.
-> > > > Program terminated with signal 11, Segmentation fault.
-> > > > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-> > > > 1324        VirtIOPCIProxy *proxy = VIRTIO_PCI(DEVICE(vdev)->parent_bus->parent);
-> > > > Missing separate debuginfos, use: debuginfo-install glib2-2.42.2-5.1.alios7.x86_64 glibc-2.17-260.alios7.x86_64 libgcc-4.8.5-28.alios7.1.x86_64 libseccomp-2.3.1-3.alios7.x86_64 libstdc++-4.8.5-28.alios7.1.x86_64 numactl-libs-2.0.9-5.1.alios7.x86_64 pixman-0.32.6-3.1.alios7.x86_64 zlib-1.2.7-16.2.alios7.x86_64
-> > > > (gdb) bt
-> > > > #0  0x0000561216a57609 in virtio_pci_notify_write (opaque=0x5612184747e0, addr=0, val=<optimized out>, size=<optimized out>) at /usr/src/debug/qemu-4.0/hw/virtio/virtio-pci.c:1324
-> > > > #1  0x0000561216835b22 in memory_region_write_accessor (mr=<optimized out>, addr=<optimized out>, value=<optimized out>, size=<optimized out>, shift=<optimized out>, mask=<optimized out>, attrs=...) at /usr/src/debug/qemu-4.0/memory.c:502
-> > > > #2  0x0000561216833c5d in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7fcdeab1b8a8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=0x561216835ac0 <memory_region_write_accessor>, mr=0x56121846d340, attrs=...)
-> > > >     at /usr/src/debug/qemu-4.0/memory.c:568
-> > > > #3  0x0000561216837c66 in memory_region_dispatch_write (mr=mr@entry=0x56121846d340, addr=0, data=<optimized out>, size=2, attrs=attrs@entry=...) at /usr/src/debug/qemu-4.0/memory.c:1503
-> > > > #4  0x00005612167e036f in flatview_write_continue (fv=fv@entry=0x56121852edd0, addr=addr@entry=841813602304, attrs=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=len@entry=2, addr1=<optimized out>, l=<optimized out>, mr=0x56121846d340)
-> > > >     at /usr/src/debug/qemu-4.0/exec.c:3279
-> > > > #5  0x00005612167e0506 in flatview_write (fv=0x56121852edd0, addr=841813602304, attrs=..., buf=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=2) at /usr/src/debug/qemu-4.0/exec.c:3318
-> > > > #6  0x00005612167e4a1b in address_space_write (as=<optimized out>, addr=<optimized out>, attrs=..., buf=<optimized out>, len=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3408
-> > > > #7  0x00005612167e4aa5 in address_space_rw (as=<optimized out>, addr=<optimized out>, attrs=..., attrs@entry=..., buf=buf@entry=0x7fce7dd97028 <Address 0x7fce7dd97028 out of bounds>, len=<optimized out>, is_write=<optimized out>) at /usr/src/debug/qemu-4.0/exec.c:3419
-> > > > #8  0x0000561216849da1 in kvm_cpu_exec (cpu=cpu@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/accel/kvm/kvm-all.c:2034
-> > > > #9  0x000056121682255e in qemu_kvm_cpu_thread_fn (arg=arg@entry=0x56121849aa00) at /usr/src/debug/qemu-4.0/cpus.c:1281
-> > > > #10 0x0000561216b794d6 in qemu_thread_start (args=<optimized out>) at /usr/src/debug/qemu-4.0/util/qemu-thread-posix.c:502
-> > > > #11 0x00007fce7bef6e25 in start_thread () from /lib64/libpthread.so.0
-> > > > #12 0x00007fce7bc1ef1d in clone () from /lib64/libc.so.6
-> > > >
-> > > > And I searched and found
-> > > > https://bugzilla.redhat.com/show_bug.cgi?id=1706759 , which has the same
-> > > > backtrace as above, and it seems commit 7bfde688fb1b ("virtio-blk: Add
-> > > > blk_drain() to virtio_blk_device_unrealize()") is to fix this particular
-> > > > bug.
-> > > >
-> > > > But I can still hit the bug even after applying the commit. Do I miss
-> > > > anything?
-> > > 
-> > > Hi Eryu,
-> > > This backtrace seems to be caused by this bug (there were two bugs in
-> > > 1706759): https://bugzilla.redhat.com/show_bug.cgi?id=1708480
-> > > Although the solution hasn't been tested on virtio-blk yet, you may
-> > > want to apply this patch:
-> > >     https://lists.nongnu.org/archive/html/qemu-devel/2019-12/msg05197.html
-> > > Let me know if this works.
-> > 
-> > Unfortunately, I still see the same segfault & backtrace after applying
-> > commit 421afd2fe8dd ("virtio: reset region cache when on queue
-> > deletion")
-> > 
-> > Anything I can help to debug?
-> 
-> Please post the QEMU command-line and the QMP commands use to remove the
-> device.
+The linux-user and bsd-user trees both widely use a function called
+`gemu_log` (notice the 'g') for miscellaneous and strace logging. This
+function predates the newer `qemu_log` function, and has a few drawbacks
+compared to `qemu_log`:
 
-It's a normal kata instance using virtio-fs as rootfs.
+  1. Always logs to `stderr`, no logging redirection.
+  2. "Miscellaneous" logging cannot be disabled, so it may mix with guest
+     logging.
+  3. Inconsistency with other parts of the QEMU codebase, and a
+     confusing name.
 
-/usr/local/libexec/qemu-kvm -name sandbox-a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d \
- -uuid e03f6b6b-b80b-40c0-8d5b-0cbfed1305d2 -machine q35,accel=kvm,kernel_irqchip,nvdimm,nosmm,nosmbus,nosata,nopit \
- -cpu host -qmp unix:/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/qmp.sock,server,nowait \
- -qmp unix:/run/vc/vm/debug-a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/qmp.sock,server,nowait \
- -m 2048M,slots=10,maxmem=773893M -device pci-bridge,bus=pcie.0,id=pci-bridge-0,chassis_nr=1,shpc=on,addr=2,romfile= \
- -device virtio-serial-pci,disable-modern=false,id=serial0,romfile= -device virtconsole,chardev=charconsole0,id=console0 \
- -chardev socket,id=charconsole0,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/console.sock,server,nowait \
- -device virtserialport,chardev=metricagent,id=channel10,name=metric.agent.channel.10 \
- -chardev socket,id=metricagent,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/metric.agent.channel.sock,server,nowait \
- -device nvdimm,id=nv0,memdev=mem0 -object memory-backend-file,id=mem0,mem-path=/usr/local/share/containers-image-1.9.0.img,size=268435456 \
- -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng,rng=rng0,romfile= \
- -device virtserialport,chardev=charch0,id=channel0,name=agent.channel.0 \
- -chardev socket,id=charch0,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/kata.sock,server,nowait \
- -chardev socket,id=char-6fca044b801a78a1,path=/run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/vhost-fs.sock \
- -device vhost-user-fs-pci,chardev=char-6fca044b801a78a1,tag=kataShared,cache-size=8192M -netdev tap,id=network-0,vhost=on,vhostfds=3,fds=4 \
- -device driver=virtio-net-pci,netdev=network-0,mac=76:57:f1:ab:51:5c,disable-modern=false,mq=on,vectors=4,romfile= \
- -global kvm-pit.lost_tick_policy=discard -vga none -no-user-config -nodefaults -nographic -daemonize \
- -object memory-backend-file,id=dimm1,size=2048M,mem-path=/dev/shm,share=on -numa node,memdev=dimm1 -kernel /usr/local/share/kernel \
- -append tsc=reliable no_timer_check rcupdate.rcu_expedited=1 i8042.direct=1 i8042.dumbkbd=1 i8042.nopnp=1 i8042.noaux=1 noreplace-smp reboot=k console=hvc0 console=hvc1 iommu=off cryptomgr.notests net.ifnames=0 pci=lastbus=0 root=/dev/pmem0p1 rootflags=dax,data=ordered,errors=remount-ro ro rootfstype=ext4 quiet systemd.show_status=false panic=1 nr_cpus=96 agent.use_vsock=false init=/usr/lib/systemd/systemd systemd.unit=kata-containers.target systemd.mask=systemd-networkd.service systemd.mask=systemd-networkd.socket \
- -pidfile /run/vc/vm/a670786fcb1758d2348eb120939d90ffacf9f049f10b337284ad49bbcd60936d/pid \
- -smp 1,cores=1,threads=1,sockets=96,maxcpus=96
+The second issue is especially troubling because it can interfere with
+programs that expect to communicate via stderr.
 
-QMP command to delete device (the device id is just an example, not the
-one caused the crash):
+This change introduces two new logging masks to the `qemu_log` subsystem
+to support its use for user-mode logging. The `LOG_USER` mask, for
+miscellaneous logs, and the `LOG_STRACE` mask for strace-specific
+logging. Further, it replaces all existing uses of `gemu_log` with the
+appropriate `qemu_log_mask(LOG_{USER,STRACE}, ...)` based on the log
+message. To avoid potential backwards incompatibility, this patch series
+also introduces a new flag: `-no-force-user-mode-logging`. Since "user
+mode" logging was always enabled before this change, by-default the
+LOG_USER mask is always set. The flag is provided for users that want to
+disable LOG_USER. Hopefully, this flag can be removed, or turned into a
+no-op in the futre, and -d/QEMU_LOG can be used directly to enable
+user-mode logging if desired.
 
-"{\"arguments\":{\"id\":\"virtio-drive-5967abfb917c8da6\"},\"execute\":\"device_del\"}"
+Unfortunately, this change introduces one small backwards incompatibility
+for the linux-user tree: If an explicit `-D` option is provided, or the
+`QEMU_LOG_FILENAME`_ environment variable is set, strace and user-mode
+logging statements will log to the QEMU log file instead of stderr.
 
-which has been hot plugged by:
-"{\"arguments\":{\"cache\":{\"direct\":true,\"no-flush\":false},\"driver\":\"raw\",\"file\":{\"driver\":\"file\",\"filename\":\"/dev/dm-18\"},\"node-name\":\"drive-5967abfb917c8da6\"},\"execute\":\"blockdev-add\"}"
-"{\"return\": {}}"
-"{\"arguments\":{\"addr\":\"01\",\"bus\":\"pci-bridge-0\",\"drive\":\"drive-5967abfb917c8da6\",\"driver\":\"virtio-blk-pci\",\"id\":\"virtio-drive-5967abfb917c8da6\",\"romfile\":\"\",\"share-rw\":\"on\"},\"execute\":\"device_add\"}"
-"{\"return\": {}}"
+Tested:
+  * Built with clang 9 and g++ 8.3
+  * `make check` run with clang 9 build 
+  * Verified:
+    * QEMU_STRACE/-strace still works for linux-user
+    * -no-force-user-mode-logging uses QEMU_LOG + `user_mode` or
+      `strace` can be set in QEMU_LOG to trigger the appropriate
+      logging.
 
-> 
-> The backtrace shows a vcpu thread submitting a request.  The device
-> seems to be partially destroyed.  That's surprising because the monitor
-> and the vcpu thread should use the QEMU global mutex to avoid race
-> conditions.  Maybe seeing the QMP commands will make it clearer...
-> 
-> Stefan
+Not tested:
+  * Build/logging with bsd-user. I do not have easy access to a BSD system.
 
-Thanks!
+Josh Kunz (4):
+  linux-user: Use `qemu_log' for non-strace logging
+  linux-user: Use `qemu_log' for strace
+  linux-user: remove gemu_log from the linux-user tree
+  bsd-user: Replace gemu_log with qemu_log
 
-Eryu
+ bsd-user/main.c           |  13 +-
+ bsd-user/qemu.h           |   2 -
+ bsd-user/strace.c         |  32 ++-
+ bsd-user/syscall.c        |  31 ++-
+ include/qemu/log.h        |  15 ++
+ linux-user/arm/cpu_loop.c |   5 +-
+ linux-user/fd-trans.c     |  55 +++--
+ linux-user/main.c         |  50 +++-
+ linux-user/qemu.h         |   2 -
+ linux-user/signal.c       |   3 +-
+ linux-user/strace.c       | 479 +++++++++++++++++++-------------------
+ linux-user/syscall.c      |  43 ++--
+ linux-user/vm86.c         |   3 +-
+ util/log.c                |   5 +
+ 14 files changed, 404 insertions(+), 334 deletions(-)
+
+-- 
+2.25.0.rc1.283.g88dfdc4193-goog
+
 
