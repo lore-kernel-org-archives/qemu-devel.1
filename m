@@ -2,87 +2,50 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 783D1C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 07:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3936EC33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 08:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 419F3207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 07:56:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MU2TSBy7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 419F3207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C9942084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 08:23:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9942084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irH3t-0005qb-FP
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 02:56:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44739)
+	id 1irHUN-0003lZ-Rm
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 03:23:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1irH33-0005Bh-CE
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:55:38 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1irHT3-00023a-9o
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:22:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1irH31-0006Iq-35
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:55:36 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50050
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1irHT1-0006lt-PO
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:22:29 -0500
+Received: from relay.sw.ru ([185.231.240.75]:36844)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1irH30-0006IF-RI
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:55:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578988533;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4q90mFfpgBnql4cHvswY3fLuXnuX6PeM9otqNKL0iXQ=;
- b=MU2TSBy7QsItJflIhANrT3oQ+V9DWNg/8uINnA+WlViOQbpCvWdlmGFhSPC+Y+PacXReu6
- j1yk2vNRUeEupqDTM7oh8HEBCUC6hej1w1NaYwgKGkCqBPfajPpiHOKJDfQW6niWV1PYJi
- 1PZ1AxCliwnE6Y/Pialuwo9ZFs5xIxQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-218-EzU2WDySP7OehJaLvCVKpQ-1; Tue, 14 Jan 2020 02:55:30 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85CAF800D55;
- Tue, 14 Jan 2020 07:55:29 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-131.ams2.redhat.com
- [10.36.116.131])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 391CA80F63;
- Tue, 14 Jan 2020 07:55:29 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C2E261138600; Tue, 14 Jan 2020 08:55:27 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Laurent Vivier <laurent@vivier.eu>
-Subject: Re: [PATCH v1 12/59] virtfs-proxy-helper.c: remove 'err_out' label in
- setugid()
-References: <20200106182425.20312-1-danielhb413@gmail.com>
- <20200106182425.20312-13-danielhb413@gmail.com>
- <20200107105113.7a443d51@bahia.lan>
- <87wo9vxu9n.fsf@dusky.pond.sub.org>
- <c0bb2a92-7361-9ff3-42c2-022906b6dcad@vivier.eu>
-Date: Tue, 14 Jan 2020 08:55:27 +0100
-In-Reply-To: <c0bb2a92-7361-9ff3-42c2-022906b6dcad@vivier.eu> (Laurent
- Vivier's message of "Mon, 13 Jan 2020 17:32:31 +0100")
-Message-ID: <87pnfmlbf4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: EzU2WDySP7OehJaLvCVKpQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1irHSy-0006jo-Io; Tue, 14 Jan 2020 03:22:24 -0500
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1irHSr-0005Ix-RP; Tue, 14 Jan 2020 11:22:17 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v3 1/3] qcow2: introduce Qcow2Metadata structure
+Date: Tue, 14 Jan 2020 11:22:15 +0300
+Message-Id: <1578990137-308222-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1578990137-308222-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1578990137-308222-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,44 +57,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, andrey.shinkevich@virtuozzo.com, den@openvz.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laurent Vivier <laurent@vivier.eu> writes:
+The preliminary patch to provide an extendable structure for dumping
+QCOW2 metadata allocations in image. The command line optional key is
+introduced in the patch that follows.
 
-> Le 13/01/2020 =C3=A0 16:15, Markus Armbruster a =C3=A9crit=C2=A0:
->> Greg Kurz <groug@kaod.org> writes:
->>=20
->>> On Mon,  6 Jan 2020 15:23:38 -0300
->>> Daniel Henrique Barboza <danielhb413@gmail.com> wrote:
->>>
->>>> 'err_out' can be removed and be replaced by 'return -errno'
->>>> in its only instance in the function.
->>>>
->>>> CC: Greg Kurz <groug@kaod.org>
->>>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->>>> ---
->>>
->>> I don't really mind, but I confirm this doesn't change behavior.
->>>
->>> Acked-by: Greg Kurz <groug@kaod.org>
->>>
->>> What's the plan to get this and the other 9p related patches merged ?
->>> Through the trivial tree or each subsystem tree ?
->>=20
->> I guess qemu-trivial will eventually pick up whatever hasn't been merged
->> by maintainers.
->>=20
->> [...]
->>=20
->
-> Yes, but the difficulty will be to sort which ones of the 59 patches
-> series to collect...
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ qapi/block-core.json | 209 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 208 insertions(+), 1 deletion(-)
 
-Collect them all and let git figure out which ones have been applied
-already?
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 7ff5e5e..fab7435 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -176,6 +176,209 @@
+            '*backing-image': 'ImageInfo',
+            '*format-specific': 'ImageInfoSpecific' } }
+ 
++
++##
++# @Qcow2Metadata:
++#
++# Encapsulates QCOW2 metadata information
++#
++# @qcow2-header: QCOW2 header info
++#
++# @active-l1: L1 active table info
++#
++# @refcount-table: refcount table info
++#
++# @crypt-header: encryption header info
++#
++# @bitmaps: bitmap tables info
++#
++# @snapshot-table: snapshot tables info
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2Metadata',
++  'data': { 'qcow2-header': 'Qcow2Header',
++            'refcount-table': 'Qcow2RefcountTable',
++            'active-l1': 'Qcow2L1Table',
++            '*crypt-header': 'Qcow2EncryptionHeader',
++            '*bitmaps': 'Qcow2Bitmaps',
++            '*snapshot-table': 'Qcow2SnapshotsTable' } }
++
++##
++# @Qcow2Header:
++#
++# QCOW2 header information
++#
++# @version: version number
++#
++# @location: header offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2Header',
++  'data': {'version': 'int',
++           'location': 'Qcow2Allocation' } }
++
++##
++# @Qcow2EncryptionHeader:
++#
++# QCOW2 encryption header information
++#
++# @location: header offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2EncryptionHeader',
++  'data': {'location': 'Qcow2Allocation' } }
++
++##
++# @Qcow2RefcountTable:
++#
++# QCOW2 refcount table information
++#
++# @location: refcount table offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2RefcountTable',
++  'data': {'location': 'Qcow2Allocation' } }
++
++##
++# @Qcow2L1Table:
++#
++# L1 table information
++#
++# @l2-list: list of L2 table locations
++#
++# @location: L1 table offset and size in image
++#
++# @name: entity name the table relates to
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2L1Table',
++  'data': {'l2-list': ['Qcow2Allocation'],
++           'location': 'Qcow2Allocation',
++           'name': 'str'} }
++
++##
++# @Qcow2Allocation:
++#
++# QCOW2 data location in image
++#
++# @offset: data offset
++#
++# @size: data size
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2Allocation',
++  'data': {'offset': 'uint64', 'size': 'uint64' } }
++
++##
++# @Qcow2Bitmaps:
++#
++# QCOW2 bitmaps information
++#
++# @nb-bitmaps: the number of bitmaps contained in the image
++#
++# @bitmap-dir: bitmap directory information
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2Bitmaps',
++  'data': {'nb-bitmaps': 'int',
++           'bitmap-dir': 'Qcow2BitmapDir' } }
++
++##
++# @Qcow2BitmapDir:
++#
++# QCOW2 bitmap directory information
++#
++# @dir-entries: list of bitmap directory entries
++#
++# @location: bitmap directory offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2BitmapDir',
++  'data': {'dir-entries': ['Qcow2BitmapDirectoryEntry'],
++           'location': 'Qcow2Allocation' } }
++
++##
++# @Qcow2BitmapDirectoryEntry:
++#
++# QCOW2 bitmap directory entry information
++#
++# @bitmap-table: bitmap table offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2BitmapDirectoryEntry',
++  'data': {'bitmap-table': 'Qcow2BitmapTableInfo',
++           'bitmap-name': 'str' } }
++
++##
++# @Qcow2BitmapTableInfo:
++#
++# QCOW2 bitmap table information
++#
++# @table-entries: list of bitmap table entries
++#
++# @location: bitmap table offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2BitmapTableInfo',
++  'data': {'table-entries': ['Qcow2BitmapTableInfoEntry'],
++           'location': 'Qcow2Allocation' } }
++
++##
++# @Qcow2BitmapTableInfoEntry:
++#
++# QCOW2 bitmap table entry information
++#
++# @type: bitmap table entry type
++#
++# @cluster: bitmap table entry offset and size in image
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2BitmapTableInfoEntry',
++  'data': {'type': 'Qcow2BitmapTableInfoEntryType',
++           '*cluster': 'Qcow2Allocation' } }
++
++##
++# @Qcow2BitmapTableInfoEntryType:
++#
++# An enumeration of cluster types in bitmap table
++#
++# @all-zeroes: cluster should be read as all zeroes
++#
++# @all-ones: cluster should be read as all ones
++#
++# @serialized: cluster data are written on disk
++#
++# Since: 5.0
++##
++{ 'enum': 'Qcow2BitmapTableInfoEntryType',
++  'data': ['all-zeroes', 'all-ones', 'serialized'] }
++
++##
++# @Qcow2SnapshotsTable:
++#
++# Snapshots table location in image file.
++#
++# @location: offset and size of snapshot table
++#
++# @l1-list: list of snapshots L1 tables
++#
++# Since: 5.0
++##
++{ 'struct': 'Qcow2SnapshotsTable',
++  'data': {'location': 'Qcow2Allocation',
++           'l1-list': ['Qcow2L1Table'] } }
++
+ ##
+ # @ImageCheck:
+ #
+@@ -215,6 +418,9 @@
+ #                       field is present if the driver for the image format
+ #                       supports it
+ #
++# @metadata: encapsulates QCOW2 tables allocation information (default: none,
++#            turned on with the command line optional key; since 5.0)
++#
+ # Since: 1.4
+ #
+ ##
+@@ -223,7 +429,8 @@
+            '*image-end-offset': 'int', '*corruptions': 'int', '*leaks': 'int',
+            '*corruptions-fixed': 'int', '*leaks-fixed': 'int',
+            '*total-clusters': 'int', '*allocated-clusters': 'int',
+-           '*fragmented-clusters': 'int', '*compressed-clusters': 'int' } }
++           '*fragmented-clusters': 'int', '*compressed-clusters': 'int',
++           '*metadata': 'Qcow2Metadata' } }
+ 
+ ##
+ # @MapEntry:
+-- 
+1.8.3.1
 
 
