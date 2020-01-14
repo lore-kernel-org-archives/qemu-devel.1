@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC22C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 497A3C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:15:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEB9924670
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:14:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15FB224676
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:15:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGEh2MMG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB9924670
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhDBw/9F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15FB224676
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irM1i-0002In-8i
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:14:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41884)
+	id 1irM2v-0003m2-3O
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:15:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41696)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irLkg-0004h5-Kh
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:57:00 -0500
+ (envelope-from <quintela@redhat.com>) id 1irLkB-00041a-Vb
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irLkf-0002Pc-2g
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:58 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28256
+ (envelope-from <quintela@redhat.com>) id 1irLk5-0002FS-J9
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24398
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLke-0002PP-Vn
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:57 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLk5-0002FD-E1
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579006616;
+ s=mimecast20190719; t=1579006581;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dsd8GjCW5JufmDMdCUSgML54euu3q/B4ZPKHuX8cV3A=;
- b=jGEh2MMGk8jCWQVe3bLPtqVSlhZAU+yQ5kPQqp9C/n17xGUR4sMiYSEAqn+yJYBuKWCvcJ
- t6x4b89K2w6tMzxb5aw1jDXy5PPU78PKcKcoMpkitzbAHZL71Ik8uh46qEuBinZJgB0FKu
- D7k9OqZyZYe3ApkUcDopmJ9XT3bY0Ck=
+ bh=UCvNgXqg3YNciEEz4bwYVicJE+TkN+xTZTIh75LexRo=;
+ b=NhDBw/9FkzHVHOZllh9jPOAHOVXP2XLTBEglvmYYar+JJwBbnIYVNOUuGMcHcQdUiWlD7a
+ 1iV1CZo8iyGKBw4wGoTor/A8nWWKfLDJFM7dYOn6Vr/xt/HuxFFOC24MF89UnRnDhXmZc0
+ QD4ZSqWO/5ZAiAW46crrZL1gY6cWUKY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-UclLMH50NFKGIUnvUxD3Jg-1; Tue, 14 Jan 2020 07:56:55 -0500
+ us-mta-234-LgSCKFThNZqpzVtJSuMUPA-1; Tue, 14 Jan 2020 07:56:19 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36B801005502;
- Tue, 14 Jan 2020 12:56:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68A85801E72;
+ Tue, 14 Jan 2020 12:56:17 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BADDE5E240;
- Tue, 14 Jan 2020 12:56:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BFA415D9E5;
+ Tue, 14 Jan 2020 12:56:12 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/30] migration: Change SaveStateEntry.instance_id into
- uint32_t
-Date: Tue, 14 Jan 2020 13:52:52 +0100
-Message-Id: <20200114125254.4515-29-quintela@redhat.com>
+Subject: [PULL 24/30] migration/multifd: fix nullptr access in terminating
+ multifd threads
+Date: Tue, 14 Jan 2020 13:52:48 +0100
+Message-Id: <20200114125254.4515-25-quintela@redhat.com>
 In-Reply-To: <20200114125254.4515-1-quintela@redhat.com>
 References: <20200114125254.4515-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: UclLMH50NFKGIUnvUxD3Jg-1
+X-MC-Unique: LgSCKFThNZqpzVtJSuMUPA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,181 +85,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Corey Minyard <cminyard@mvista.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Corey Minyard <cminyard@mvista.com>, Jason Wang <jasowang@redhat.com>,
+ Jiahui Cen <cenjiahui@huawei.com>, Juan Quintela <quintela@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Ying Fang <fangying1@huawei.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+ David Gibson <david@gibson.dropbear.id.au>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Jiahui Cen <cenjiahui@huawei.com>
 
-It was always used as 32bit, so define it as used to be clear.
-Instead of using -1 as the auto-gen magic value, we switch to
-UINT32_MAX.  We also make sure that we don't auto-gen this value to
-avoid overflowed instance IDs without being noticed.
+One multifd channel will shutdown all the other multifd's IOChannel when it
+fails to receive an IOChannel. In this senario, if some multifds had not
+received its IOChannel yet, it would try to shutdown its IOChannel which co=
+uld
+cause nullptr access at qio_channel_shutdown.
 
-Suggested-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Here is the coredump stack:
+    #0  object_get_class (obj=3Dobj@entry=3D0x0) at qom/object.c:908
+    #1  0x00005563fdbb8f4a in qio_channel_shutdown (ioc=3D0x0, how=3DQIO_CH=
+ANNEL_SHUTDOWN_BOTH, errp=3D0x0) at io/channel.c:355
+    #2  0x00005563fd7b4c5f in multifd_recv_terminate_threads (err=3D<optimi=
+zed out>) at migration/ram.c:1280
+    #3  0x00005563fd7bc019 in multifd_recv_new_channel (ioc=3Dioc@entry=3D0=
+x556400255610, errp=3Derrp@entry=3D0x7ffec07dce00) at migration/ram.c:1478
+    #4  0x00005563fda82177 in migration_ioc_process_incoming (ioc=3Dioc@ent=
+ry=3D0x556400255610, errp=3Derrp@entry=3D0x7ffec07dce30) at migration/migra=
+tion.c:605
+    #5  0x00005563fda8567d in migration_channel_process_incoming (ioc=3D0x5=
+56400255610) at migration/channel.c:44
+    #6  0x00005563fda83ee0 in socket_accept_incoming_migration (listener=3D=
+0x5563fff6b920, cioc=3D0x556400255610, opaque=3D<optimized out>) at migrati=
+on/socket.c:166
+    #7  0x00005563fdbc25cd in qio_net_listener_channel_func (ioc=3D<optimiz=
+ed out>, condition=3D<optimized out>, opaque=3D<optimized out>) at io/net-l=
+istener.c:54
+    #8  0x00007f895b6fe9a9 in g_main_context_dispatch () from /usr/lib64/li=
+bglib-2.0.so.0
+    #9  0x00005563fdc18136 in glib_pollfds_poll () at util/main-loop.c:218
+    #10 0x00005563fdc181b5 in os_host_main_loop_wait (timeout=3D1000000000)=
+ at util/main-loop.c:241
+    #11 0x00005563fdc183a2 in main_loop_wait (nonblocking=3Dnonblocking@ent=
+ry=3D0) at util/main-loop.c:517
+    #12 0x00005563fd8edb37 in main_loop () at vl.c:1791
+    #13 0x00005563fd74fd45 in main (argc=3D<optimized out>, argv=3D<optimiz=
+ed out>, envp=3D<optimized out>) at vl.c:4473
+
+To fix it up, let's check p->c before calling qio_channel_shutdown.
+
+Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/intc/apic_common.c        |  2 +-
- include/migration/register.h |  2 +-
- include/migration/vmstate.h  |  2 +-
- migration/savevm.c           | 18 ++++++++++--------
- stubs/vmstate.c              |  2 +-
- 5 files changed, 14 insertions(+), 12 deletions(-)
+ migration/ram.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index f2c3a7f309..54b8731fca 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -268,7 +268,7 @@ static void apic_common_realize(DeviceState *dev, Error=
- **errp)
-     APICCommonState *s =3D APIC_COMMON(dev);
-     APICCommonClass *info;
-     static DeviceState *vapic;
--    int instance_id =3D s->id;
-+    uint32_t instance_id =3D s->id;
-=20
-     info =3D APIC_COMMON_GET_CLASS(s);
-     info->realize(dev, errp);
-diff --git a/include/migration/register.h b/include/migration/register.h
-index 00c38ebe9f..c1dcff0f90 100644
---- a/include/migration/register.h
-+++ b/include/migration/register.h
-@@ -71,7 +71,7 @@ typedef struct SaveVMHandlers {
- } SaveVMHandlers;
-=20
- int register_savevm_live(const char *idstr,
--                         int instance_id,
-+                         uint32_t instance_id,
-                          int version_id,
-                          const SaveVMHandlers *ops,
-                          void *opaque);
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index ed74dd5624..01790b8d9b 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -1160,7 +1160,7 @@ bool vmstate_save_needed(const VMStateDescription *vm=
-sd, void *opaque);
- #define  VMSTATE_INSTANCE_ID_ANY  -1
-=20
- /* Returns: 0 on success, -1 on failure */
--int vmstate_register_with_alias_id(VMStateIf *obj, int instance_id,
-+int vmstate_register_with_alias_id(VMStateIf *obj, uint32_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *base, int alias_id,
-                                    int required_for_version,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 8dab99efc4..adfdca26ac 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -233,7 +233,7 @@ typedef struct CompatEntry {
- typedef struct SaveStateEntry {
-     QTAILQ_ENTRY(SaveStateEntry) entry;
-     char idstr[256];
--    int instance_id;
-+    uint32_t instance_id;
-     int alias_id;
-     int version_id;
-     /* version id read from the stream */
-@@ -667,10 +667,10 @@ void dump_vmstate_json_to_file(FILE *out_file)
-     fclose(out_file);
- }
-=20
--static int calculate_new_instance_id(const char *idstr)
-+static uint32_t calculate_new_instance_id(const char *idstr)
- {
-     SaveStateEntry *se;
--    int instance_id =3D 0;
-+    uint32_t instance_id =3D 0;
-=20
-     QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-         if (strcmp(idstr, se->idstr) =3D=3D 0
-@@ -678,6 +678,8 @@ static int calculate_new_instance_id(const char *idstr)
-             instance_id =3D se->instance_id + 1;
-         }
-     }
-+    /* Make sure we never loop over without being noticed */
-+    assert(instance_id !=3D VMSTATE_INSTANCE_ID_ANY);
-     return instance_id;
- }
-=20
-@@ -755,7 +757,7 @@ static void savevm_state_handler_remove(SaveStateEntry =
-*se)
-    Meanwhile pass -1 as instance_id if you do not already have a clearly
-    distinguishing id for all instances of your device class. */
- int register_savevm_live(const char *idstr,
--                         int instance_id,
-+                         uint32_t instance_id,
-                          int version_id,
-                          const SaveVMHandlers *ops,
-                          void *opaque)
-@@ -809,7 +811,7 @@ void unregister_savevm(VMStateIf *obj, const char *idst=
-r, void *opaque)
+diff --git a/migration/ram.c b/migration/ram.c
+index aee057f7da..e7cd522173 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1308,7 +1308,9 @@ static void multifd_recv_terminate_threads(Error *err=
+)
+            - normal quit, i.e. everything went fine, just finished
+            - error quit: We close the channels so the channel threads
+              finish the qio_channel_read_all_eof() */
+-        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
++        if (p->c) {
++            qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
++        }
+         qemu_mutex_unlock(&p->mutex);
      }
  }
-=20
--int vmstate_register_with_alias_id(VMStateIf *obj, int instance_id,
-+int vmstate_register_with_alias_id(VMStateIf *obj, uint32_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *opaque, int alias_id,
-                                    int required_for_version,
-@@ -1625,7 +1627,7 @@ int qemu_save_device_state(QEMUFile *f)
-     return qemu_file_get_error(f);
- }
-=20
--static SaveStateEntry *find_se(const char *idstr, int instance_id)
-+static SaveStateEntry *find_se(const char *idstr, uint32_t instance_id)
- {
-     SaveStateEntry *se;
-=20
-@@ -2292,7 +2294,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, Migration=
-IncomingState *mis)
-     /* Find savevm section */
-     se =3D find_se(idstr, instance_id);
-     if (se =3D=3D NULL) {
--        error_report("Unknown savevm section or instance '%s' %d. "
-+        error_report("Unknown savevm section or instance '%s' %"PRIu32". "
-                      "Make sure that your current VM setup matches your "
-                      "saved VM setup, including any hotplugged devices",
-                      idstr, instance_id);
-@@ -2316,7 +2318,7 @@ qemu_loadvm_section_start_full(QEMUFile *f, Migration=
-IncomingState *mis)
-=20
-     ret =3D vmstate_load(f, se);
-     if (ret < 0) {
--        error_report("error while loading state for instance 0x%x of"
-+        error_report("error while loading state for instance 0x%"PRIx32" o=
-f"
-                      " device '%s'", instance_id, idstr);
-         return ret;
-     }
-diff --git a/stubs/vmstate.c b/stubs/vmstate.c
-index 6951d9fdc5..cc4fe41dfc 100644
---- a/stubs/vmstate.c
-+++ b/stubs/vmstate.c
-@@ -4,7 +4,7 @@
- const VMStateDescription vmstate_dummy =3D {};
-=20
- int vmstate_register_with_alias_id(VMStateIf *obj,
--                                   int instance_id,
-+                                   uint32_t instance_id,
-                                    const VMStateDescription *vmsd,
-                                    void *base, int alias_id,
-                                    int required_for_version,
 --=20
 2.24.1
 
