@@ -2,85 +2,77 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A36C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAC6C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:12:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E009F206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:12:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B888206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:12:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RhaUqoFG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E009F206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bc1bI/hp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B888206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irK7s-0005oC-Jg
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:12:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49821)
+	id 1irK7u-0005nL-1o
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:12:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irK4A-000187-O3
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:08:59 -0500
+ (envelope-from <stefanha@redhat.com>) id 1irJwe-0000Wy-PF
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irK46-0001l2-VV
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:08:58 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25372
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1irJwa-00078Q-25
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22059
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irK46-0001ku-Rr
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:08:54 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJwZ-000787-V1
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579000134;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1578999667;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=z/MpjnFQgqN6nzSfUgJEJmsHul7cU1/GPe4ID35gJBM=;
- b=RhaUqoFG9hVzh+yDv5U/5/oTuilubr6fDlNwp2c7X2BJ3THdefFuGGvZS7xQTrQfWCbHlk
- fXxGkw7N7+mg6vu3BTvgUG618RkAGoytHTK88jJ2CT4FP8DsKi/KFKFQrI+hKRWcTzYiOC
- Y/lgcmPFrJdw83M0H6ZT0G7f66+qAbQ=
+ bh=gjs/0jWG2isBDTQPRwDOdCNojZCmK0401SuUBwje5k8=;
+ b=Bc1bI/hpc1snPlpQMCJzxEEOleHoPWPUEddRxNdpSXaZjbGIrQ04fmy82X8RZV8js5iH9d
+ kH3s5AuYEiENip0MOfSMRK/GXaEvperz4O9iQZ9IqqrNmkyQMbZARuMj4Cc3gxymPP4pbg
+ +32lYUvKY4ntrQ1dzkf0tu/hb+OL9O8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-_wnIRf2WPTaq1cqzxlz35g-1; Tue, 14 Jan 2020 06:08:52 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-352-NKLf_0TiMM-fvsJTwybTvQ-1; Tue, 14 Jan 2020 06:01:03 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8C10DB20;
- Tue, 14 Jan 2020 11:08:51 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.118.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 577551036D02;
- Tue, 14 Jan 2020 11:08:51 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v3 1/2] migration: Fix incorrect integer->float conversion
- caught by clang
-In-Reply-To: <874kwygxxt.fsf@dusky.pond.sub.org> (Markus Armbruster's message
- of "Tue, 14 Jan 2020 11:00:14 +0100")
-References: <20191122080039.12771-1-armbru@redhat.com>
- <20191122080039.12771-2-armbru@redhat.com> <87zhgoi93z.fsf@trasno.org>
- <87r220qa5p.fsf@dusky.pond.sub.org>
- <874kwygxxt.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
-Date: Tue, 14 Jan 2020 12:08:49 +0100
-Message-ID: <87a76qwb0e.fsf@secure.laptop>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B373D1005502;
+ Tue, 14 Jan 2020 11:01:02 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 376E860BE2;
+ Tue, 14 Jan 2020 11:01:02 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 11/15] qemu-io: adds option to use aio engine
+Date: Tue, 14 Jan 2020 10:59:17 +0000
+Message-Id: <20200114105921.131880-12-stefanha@redhat.com>
+In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
+References: <20200114105921.131880-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: _wnIRf2WPTaq1cqzxlz35g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: NKLf_0TiMM-fvsJTwybTvQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,52 +84,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: Fangrui Song <i@maskray.me>, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, oleksandr@redhat.com,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Markus Armbruster <armbru@redhat.com> wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
->
->> Juan Quintela <quintela@redhat.com> writes:
->>
->>> Markus Armbruster <armbru@redhat.com> wrote:
->>>> From: Fangrui Song <i@maskray.me>
->>>>
->>>> Clang does not like qmp_migrate_set_downtime()'s code to clamp double
->>>> @value to 0..INT64_MAX:
->>>>
->>>>     qemu/migration/migration.c:2038:24: error: implicit conversion
->>>> from 'long' to 'double' changes value from 9223372036854775807 to
->>>> 9223372036854775808 [-Werror,-Wimplicit-int-float-conversion]
->>>>
->>>> The warning will be enabled by default in clang 10. It is not
->>>> available for clang <=3D 9.
->>>>
->>>> The clamp is actually useless; @value is checked to be within
->>>> 0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
->>>>
->>>> While there, make the conversion from double to int64_t explicit.
->>>>
->>>> Signed-off-by: Fangrui Song <i@maskray.me>
->>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->>>> [Patch split, commit message improved]
->>>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>>
->>> Reviewed-by: Juan Quintela <quintela@redhat.com>
->>>
->>> Should I get this through migration tree, or are you going to pull it?
->>
->> Plase take this patch through the migration tree.
->
-> Ping...
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
-It was on my last pull request (with didn't work due to ...)
-And it is on the pull request sent 30 mins ago O:-)
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ qemu-io.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
-Later, Juan.
+diff --git a/qemu-io.c b/qemu-io.c
+index 91e3276592..3adc5a7d0d 100644
+--- a/qemu-io.c
++++ b/qemu-io.c
+@@ -130,7 +130,8 @@ static void open_help(void)
+ " -C, -- use copy-on-read\n"
+ " -n, -- disable host cache, short for -t none\n"
+ " -U, -- force shared permissions\n"
+-" -k, -- use kernel AIO implementation (on Linux only)\n"
++" -k, -- use kernel AIO implementation (Linux only, prefer use of -i)\n"
++" -i, -- use AIO mode (threads, native or io_uring)\n"
+ " -t, -- use the given cache mode for the image\n"
+ " -d, -- use the given discard mode for the image\n"
+ " -o, -- options to be given to the block driver"
+@@ -172,7 +173,7 @@ static int open_f(BlockBackend *blk, int argc, char **a=
+rgv)
+     QDict *opts;
+     bool force_share =3D false;
+=20
+-    while ((c =3D getopt(argc, argv, "snCro:kt:d:U")) !=3D -1) {
++    while ((c =3D getopt(argc, argv, "snCro:ki:t:d:U")) !=3D -1) {
+         switch (c) {
+         case 's':
+             flags |=3D BDRV_O_SNAPSHOT;
+@@ -204,6 +205,13 @@ static int open_f(BlockBackend *blk, int argc, char **=
+argv)
+                 return -EINVAL;
+             }
+             break;
++        case 'i':
++            if (bdrv_parse_aio(optarg, &flags) < 0) {
++                error_report("Invalid aio option: %s", optarg);
++                qemu_opts_reset(&empty_opts);
++                return -EINVAL;
++            }
++            break;
+         case 'o':
+             if (imageOpts) {
+                 printf("--image-opts and 'open -o' are mutually exclusive\=
+n");
+@@ -291,7 +299,9 @@ static void usage(const char *name)
+ "  -n, --nocache        disable host cache, short for -t none\n"
+ "  -C, --copy-on-read   enable copy-on-read\n"
+ "  -m, --misalign       misalign allocations for O_DIRECT\n"
+-"  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"
++"  -k, --native-aio     use kernel AIO implementation\n"
++"                       (Linux only, prefer use of -i)\n"
++"  -i, --aio=3DMODE       use AIO mode (threads, native or io_uring)\n"
+ "  -t, --cache=3DMODE     use the given cache mode for the image\n"
+ "  -d, --discard=3DMODE   use the given discard mode for the image\n"
+ "  -T, --trace [[enable=3D]<pattern>][,events=3D<file>][,file=3D<file>]\n"
+@@ -496,7 +506,7 @@ static QemuOptsList file_opts =3D {
+ int main(int argc, char **argv)
+ {
+     int readonly =3D 0;
+-    const char *sopt =3D "hVc:d:f:rsnCmkt:T:U";
++    const char *sopt =3D "hVc:d:f:rsnCmki:t:T:U";
+     const struct option lopt[] =3D {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -508,6 +518,7 @@ int main(int argc, char **argv)
+         { "copy-on-read", no_argument, NULL, 'C' },
+         { "misalign", no_argument, NULL, 'm' },
+         { "native-aio", no_argument, NULL, 'k' },
++        { "aio", required_argument, NULL, 'i' },
+         { "discard", required_argument, NULL, 'd' },
+         { "cache", required_argument, NULL, 't' },
+         { "trace", required_argument, NULL, 'T' },
+@@ -575,6 +586,12 @@ int main(int argc, char **argv)
+         case 'k':
+             flags |=3D BDRV_O_NATIVE_AIO;
+             break;
++        case 'i':
++            if (bdrv_parse_aio(optarg, &flags) < 0) {
++                error_report("Invalid aio option: %s", optarg);
++                exit(1);
++            }
++            break;
+         case 't':
+             if (bdrv_parse_cache_mode(optarg, &flags, &writethrough) < 0) =
+{
+                 error_report("Invalid cache option: %s", optarg);
+--=20
+2.24.1
 
 
