@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C1BC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6519EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CE0B206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:14:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C83C206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:15:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IHdxpjK1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CE0B206D5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBuwZ3ln"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C83C206D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irK9Z-0008Ei-5m
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:14:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47918)
+	id 1irKAB-0000eM-1Y
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:15:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1irJwZ-0000Rz-Uw
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:11 -0500
+ (envelope-from <stefanha@redhat.com>) id 1irJwy-0000hj-S0
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1irJwW-000763-2v
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:07 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38676
+ (envelope-from <stefanha@redhat.com>) id 1irJwu-0007Ep-VU
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:32 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52603
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJwV-00075h-VE
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:04 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJwu-0007EX-S3
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578999663;
+ s=mimecast20190719; t=1578999688;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=o8BVFrFEfvciksl8D9jN4lPgkp/gkSTZlJEjXrcQiRE=;
- b=IHdxpjK1aMhuh3Ch4e2xBHswSXzmYRreLxXx1IgBzBAWbLlvbGcJh9Yvy8vdaivNd2ckoY
- Dgz0xN/5L4mR5+mNwE/KYtG2hHQ0YnetGSJEDc5RyoiIyqt5si3WW0yltgakSu9GTAtuDW
- FOJD8QZIsrqYPUjLU/vlJBT5jRrSI2A=
+ bh=zdhLobAo/41hJ/YPFITVtn/i3fzLbZiNJz/7duIUh3Q=;
+ b=DBuwZ3lni/PFXBpjkfXh0DEMVRjq2/c+a+3YKHq428vks/Bs2FeLKk/zQNbFZW+DYv7mwR
+ ms5BPjyDr/d2j29rSDMEiDPnPTqchaOSv++P+22ZPwK0F6Ib7zYmdqFyJp3sUSne8JGcDo
+ noNrlaaB+vGLM0MGAOLHtVFK6Wnn9s0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-qNFHU2B6Pum7r426jy3uZQ-1; Tue, 14 Jan 2020 06:01:02 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-275-4eZ4oBMyO9ynMmo_9fcQ1g-1; Tue, 14 Jan 2020 06:01:22 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEB4E10054DB;
- Tue, 14 Jan 2020 11:01:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D895110054E3;
+ Tue, 14 Jan 2020 11:01:20 +0000 (UTC)
 Received: from localhost (unknown [10.36.118.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0154360BE2;
- Tue, 14 Jan 2020 11:00:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 45485108419E;
+ Tue, 14 Jan 2020 11:01:13 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/15] block/io_uring: adds userspace completion polling
-Date: Tue, 14 Jan 2020 10:59:16 +0000
-Message-Id: <20200114105921.131880-11-stefanha@redhat.com>
+Subject: [PATCH v4 13/15] qemu-nbd: adds option for aio engines
+Date: Tue, 14 Jan 2020 10:59:19 +0000
+Message-Id: <20200114105921.131880-14-stefanha@redhat.com>
 In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
 References: <20200114105921.131880-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: qNFHU2B6Pum7r426jy3uZQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 4eZ4oBMyO9ynMmo_9fcQ1g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -97,50 +97,60 @@ Sender: "Qemu-devel"
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Eric Blake <eblake@redhat.com>
 Acked-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/io_uring.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ qemu-nbd.c    | 12 ++++--------
+ qemu-nbd.texi |  4 ++--
+ 2 files changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/block/io_uring.c b/block/io_uring.c
-index a5c0d16220..56892fd1ab 100644
---- a/block/io_uring.c
-+++ b/block/io_uring.c
-@@ -274,6 +274,21 @@ static void qemu_luring_completion_cb(void *opaque)
-     luring_process_completions_and_submit(s);
- }
-=20
-+static bool qemu_luring_poll_cb(void *opaque)
-+{
-+    LuringState *s =3D opaque;
-+    struct io_uring_cqe *cqes;
-+
-+    if (io_uring_peek_cqe(&s->ring, &cqes) =3D=3D 0) {
-+        if (cqes) {
-+            luring_process_completions_and_submit(s);
-+            return true;
-+        }
-+    }
-+
-+    return false;
-+}
-+
- static void ioq_init(LuringQueue *io_q)
- {
-     QSIMPLEQ_INIT(&io_q->submit_queue);
-@@ -387,7 +402,7 @@ void luring_attach_aio_context(LuringState *s, AioConte=
-xt *new_context)
-     s->aio_context =3D new_context;
-     s->completion_bh =3D aio_bh_new(new_context, qemu_luring_completion_bh=
-, s);
-     aio_set_fd_handler(s->aio_context, s->ring.ring_fd, false,
--                       qemu_luring_completion_cb, NULL, NULL, s);
-+                       qemu_luring_completion_cb, NULL, qemu_luring_poll_c=
-b, s);
- }
-=20
- LuringState *luring_init(Error **errp)
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 108a51f7eb..db29a0d0ed 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -135,7 +135,7 @@ static void usage(const char *name)
+ "                            '[ID_OR_NAME]'\n"
+ "  -n, --nocache             disable host cache\n"
+ "      --cache=3DMODE          set cache mode (none, writeback, ...)\n"
+-"      --aio=3DMODE            set AIO mode (native or threads)\n"
++"      --aio=3DMODE            set AIO mode (native, io_uring or threads)\=
+n"
+ "      --discard=3DMODE        set discard mode (ignore, unmap)\n"
+ "      --detect-zeroes=3DMODE  set detect-zeroes mode (off, on, unmap)\n"
+ "      --image-opts          treat FILE as a full set of image options\n"
+@@ -726,13 +726,9 @@ int main(int argc, char **argv)
+                 exit(EXIT_FAILURE);
+             }
+             seen_aio =3D true;
+-            if (!strcmp(optarg, "native")) {
+-                flags |=3D BDRV_O_NATIVE_AIO;
+-            } else if (!strcmp(optarg, "threads")) {
+-                /* this is the default */
+-            } else {
+-               error_report("invalid aio mode `%s'", optarg);
+-               exit(EXIT_FAILURE);
++            if (bdrv_parse_aio(optarg, &flags) < 0) {
++                error_report("Invalid aio mode '%s'", optarg);
++                exit(EXIT_FAILURE);
+             }
+             break;
+         case QEMU_NBD_OPT_DISCARD:
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 7f55657722..3ee3e4bdee 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -77,8 +77,8 @@ as an read-only device, @var{snapshot_param} format is
+ The cache mode to be used with the file.  See the documentation of
+ the emulator's @code{-drive cache=3D...} option for allowed values.
+ @item --aio=3D@var{aio}
+-Set the asynchronous I/O mode between @samp{threads} (the default)
+-and @samp{native} (Linux only).
++Set the asynchronous I/O mode between @samp{threads} (the default),
++@samp{native} (Linux only) and @samp{io_uring} (Linux 5.1+).
+ @item --discard=3D@var{discard}
+ Control whether @dfn{discard} (also known as @dfn{trim} or @dfn{unmap})
+ requests are ignored or passed to the filesystem.  @var{discard} is one of
 --=20
 2.24.1
 
