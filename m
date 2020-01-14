@@ -6,94 +6,83 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78034C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E098FC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:55:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBABD222C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4DB8222C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:55:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+x7y9K8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBABD222C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDkQc8Un"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4DB8222C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNaG-0000On-BY
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:54:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34698)
+	id 1irNbS-00028T-IW
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:55:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1irNYt-0007PX-De
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:52:58 -0500
+ (envelope-from <mrezanin@redhat.com>) id 1irNa2-0000VG-MV
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:54:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1irNYn-0005H9-OG
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:52:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58935
+ (envelope-from <mrezanin@redhat.com>) id 1irNZz-0005hh-3x
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:54:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28932
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1irNYn-0005Fe-4d
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:52:49 -0500
+ (Exim 4.71) (envelope-from <mrezanin@redhat.com>) id 1irNZy-0005fn-UV
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:54:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579013566;
+ s=mimecast20190719; t=1579013642;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OEary7P/WkRBDtPwQR3eQJ+Pp1FeZrzBCL6TjoaMgZA=;
- b=H+x7y9K8D5UQUdGttmp6p+bm9gWaYvmlitGPxkN6c4IjTcOpjG7Eode4JfdQoFjgS4RPlG
- LP61yKJ2Q5ydnjp/Q8Ju5lWwnf74DUH1p6/3qtRjGXWLmEqjddtCHZFfLJmy1b5QQks47M
- rhxL3atXkHz6qY6qQa70lynTVHTQ+Zc=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-250-7XQMCNJOMo-kznz4RlrjGw-1; Tue, 14 Jan 2020 09:52:43 -0500
-Received: by mail-qk1-f199.google.com with SMTP id k10so8457755qki.2
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 06:52:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=gR3etKuJ2vqWRuEB74XQmO80NvWb+FwaNSbI/Uhd9N0=;
- b=iQsg8s4KW1cZNOlBk1hWULErGtAZEeDkc4525cElnA93ZmQ6rJx9vuRU8jpH0rlZcH
- 2GuA6nAmnEyhqXq/nhS61BXzizxFnEXTH2Oy+X/OI68qSUfBs79Wb99dSToTwzhpPK0h
- cqQBLMwo51ms7eLT6B0Q2gLuD68uN3IKGWesemHhKbKwZPFmLTsrgkolueSyRKsDxZD+
- 3Gt8O6L0elS6rYWkVdmeSESypRM7s8d4CaLKx1ago0Kh/vUr/2DUIfFW6bkSz0zz/diu
- ACXukT4RaQZ0aG/w0s6ImbPMMrHINGuSWkGAHlUTJ816ZTnNnyQLOmNlPdX2OnMemEum
- L+AA==
-X-Gm-Message-State: APjAAAXmPSTd57CpLno2zvQR/VTtuQl4z17AvNW3PVxmW9W1/H4w6CdL
- UFoajook7GoFiTFZyDu+df70PfvfeGWxiI49+IzR4jF/LU4pXlICTShQ/4xezm369SMWtTbDucC
- HwVZkR6gXOzcXN24=
-X-Received: by 2002:a05:620a:4db:: with SMTP id
- 27mr22847274qks.146.1579013562872; 
- Tue, 14 Jan 2020 06:52:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwv9qI39/pkWgvG8gGb/e9GWYa5q3vFRLI03bJrhxYCYTpGl8/fdPYycGG0fev7ppWAlG5gyA==
-X-Received: by 2002:a05:620a:4db:: with SMTP id
- 27mr22847262qks.146.1579013562659; 
- Tue, 14 Jan 2020 06:52:42 -0800 (PST)
-Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id m68sm6718579qke.17.2020.01.14.06.52.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 06:52:41 -0800 (PST)
-Date: Tue, 14 Jan 2020 09:52:37 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 2/3] memory: Allow a MemoryRegion to be marked no_vhost
-Message-ID: <20200114095157-mutt-send-email-mst@kernel.org>
-References: <20200113173647.84842-1-dgilbert@redhat.com>
- <20200113173647.84842-3-dgilbert@redhat.com>
- <20200114021723-mutt-send-email-mst@kernel.org>
- <20200114112608.GF2812@work-vm>
+ bh=dKgigP54SL43CtyF/jAhJ4IH5ElgPPlLuQnne56miYk=;
+ b=FDkQc8UnmR2jVHyFj5oPgvZDG7peTjEOE3jrJM8TDRCFNlNwP5Vz91/WViZk2KDhnm5fUP
+ NfMt0aJYDugZM9HT1qiPjffWK4DKE2Z81xf+rlAgvXM7fJ6NQxvUEjWLZzPPdzDJ5jQsfM
+ wLdcLzUsOf+HvCcoAeU7aKiEgbq/vUo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-42--42MYvS5OHuC9gXXGJxkFw-1; Tue, 14 Jan 2020 09:52:43 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B3F67107ACFA;
+ Tue, 14 Jan 2020 14:52:41 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AAB6119756;
+ Tue, 14 Jan 2020 14:52:41 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com
+ (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 98CE9845C1;
+ Tue, 14 Jan 2020 14:52:41 +0000 (UTC)
+Date: Tue, 14 Jan 2020 09:52:41 -0500 (EST)
+From: Miroslav Rezanina <mrezanin@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <1592123957.1925031.1579013561355.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAFEAcA_Y83T1n6q6sJoc9JSDGGqtGbnaAJuavuBon5rTepxw=Q@mail.gmail.com>
+References: <20190828093447.12441-1-thuth@redhat.com>
+ <CAFEAcA_Y83T1n6q6sJoc9JSDGGqtGbnaAJuavuBon5rTepxw=Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Do not hard-code the name of the
+ QEMU binary
 MIME-Version: 1.0
-In-Reply-To: <20200114112608.GF2812@work-vm>
-X-MC-Unique: 7XQMCNJOMo-kznz4RlrjGw-1
+X-Originating-IP: [10.40.206.14, 10.4.195.28]
+Thread-Topic: qemu-doc: Do not hard-code the name of the QEMU binary
+Thread-Index: QTov8JH60cuqWORDfotTjj9Yqee8ew==
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: -42MYvS5OHuC9gXXGJxkFw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,133 +94,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jasowang@redhat.com, pbonzini@redhat.com, vkuznets@redhat.com,
- qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 14, 2020 at 11:26:08AM +0000, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Mon, Jan 13, 2020 at 05:36:46PM +0000, Dr. David Alan Gilbert (git) =
-wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > >=20
-> > > Allow a memory region to be marked as 'no_vhost' and
-> > > exclude that region from vhost's list build.
-> > >=20
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >=20
-> > I thought we agreed vfio needs this as well?
-> > I'd rather this had some meaning not just "no vhost" ...
-> > no_dma?
->=20
-> VFIO tends to be unplugged on migration anyway (at the moment);
 
-But it still should ignore synic, right?
 
-> but I'm happy to change the name if everyone is happy with the rest of
-> the series and we can agree on the new name,
->=20
-> Dave
->=20
-> > > ---
-> > >  hw/virtio/vhost.c     |  3 ++-
-> > >  include/exec/memory.h | 21 +++++++++++++++++++++
-> > >  memory.c              | 15 +++++++++++++++
-> > >  3 files changed, 38 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > > index 774d87d98e..462498bfe6 100644
-> > > --- a/hw/virtio/vhost.c
-> > > +++ b/hw/virtio/vhost.c
-> > > @@ -402,7 +402,8 @@ static bool vhost_section(struct vhost_dev *dev, =
-MemoryRegionSection *section)
-> > >      bool log_dirty =3D memory_region_get_dirty_log_mask(section->mr)=
- &
-> > >                       ~(1 << DIRTY_MEMORY_MIGRATION);
-> > >      result =3D memory_region_is_ram(section->mr) &&
-> > > -        !memory_region_is_rom(section->mr);
-> > > +             !memory_region_is_rom(section->mr) &&
-> > > +             !memory_region_get_no_vhost(section->mr);
-> > > =20
-> > >      /* Vhost doesn't handle any block which is doing dirty-tracking =
-other
-> > >       * than migration; this typically fires on VGA areas.
-> > > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> > > index aef8123d48..f475c06d63 100644
-> > > --- a/include/exec/memory.h
-> > > +++ b/include/exec/memory.h
-> > > @@ -394,6 +394,7 @@ struct MemoryRegion {
-> > >      bool ram_device;
-> > >      bool enabled;
-> > >      bool warning_printed; /* For reservations */
-> > > +    bool no_vhost;
-> > >      uint8_t vga_logging_count;
-> > >      MemoryRegion *alias;
-> > >      hwaddr alias_offset;
-> > > @@ -1625,6 +1626,26 @@ void memory_region_set_readonly(MemoryRegion *=
-mr, bool readonly);
-> > >   */
-> > >  void memory_region_set_nonvolatile(MemoryRegion *mr, bool nonvolatil=
-e);
-> > > =20
-> > > +/**
-> > > + * memory_region_set_no_vhost: Make vhost ignore a memory region
-> > > + *
-> > > + * Makes vhost ignore a memory region, useful if it isn't real
-> > > + * DMAble memory and is at inconvenient addresses
-> > > + *
-> > > + * @mr: the region being updated.
-> > > + * @no_vhost: true to ignore
-> > > + */
-> > > +void memory_region_set_no_vhost(MemoryRegion *mr, bool no_vhost);
-> > > +
-> > > +/**
-> > > + * memory_region_set_no_vhost: Test if memory region is marked no vh=
-ost
-> > > + *
-> > > + * Test if the no_vhost flag is set on the memory region
-> > > + *
-> > > + * @mr: the region being tested.
-> > > + */
-> > > +bool memory_region_get_no_vhost(const MemoryRegion *mr);
-> > > +
-> > >  /**
-> > >   * memory_region_rom_device_set_romd: enable/disable ROMD mode
-> > >   *
-> > > diff --git a/memory.c b/memory.c
-> > > index d7b9bb6951..9371998e30 100644
-> > > --- a/memory.c
-> > > +++ b/memory.c
-> > > @@ -2136,6 +2136,21 @@ void memory_region_set_nonvolatile(MemoryRegio=
-n *mr, bool nonvolatile)
-> > >      }
-> > >  }
-> > > =20
-> > > +void memory_region_set_no_vhost(MemoryRegion *mr, bool no_vhost)
-> > > +{
-> > > +    if (mr->no_vhost !=3D no_vhost) {
-> > > +        memory_region_transaction_begin();
-> > > +        mr->no_vhost =3D no_vhost;
-> > > +        memory_region_update_pending |=3D mr->enabled;
-> > > +        memory_region_transaction_commit();
-> > > +    }
-> > > +}
-> > > +
-> > > +bool memory_region_get_no_vhost(const MemoryRegion *mr)
-> > > +{
-> > > +    return mr->no_vhost;
-> > > +}
-> > > +
-> > >  void memory_region_rom_device_set_romd(MemoryRegion *mr, bool romd_m=
-ode)
-> > >  {
-> > >      if (mr->romd_mode !=3D romd_mode) {
-> > > --=20
-> > > 2.24.1
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+----- Original Message -----
+> From: "Peter Maydell" <peter.maydell@linaro.org>
+> To: "Thomas Huth" <thuth@redhat.com>
+> Cc: "QEMU Developers" <qemu-devel@nongnu.org>, "Paolo Bonzini" <pbonzini@redhat.com>, "QEMU Trivial"
+> <qemu-trivial@nongnu.org>, "Miroslav Rezanina" <mrezanin@redhat.com>, "Eduardo Habkost" <ehabkost@redhat.com>,
+> "Qemu-block" <qemu-block@nongnu.org>, "Richard Henderson" <rth@twiddle.net>
+> Sent: Tuesday, January 14, 2020 3:34:22 PM
+> Subject: Re: [Qemu-devel] [PATCH] qemu-doc: Do not hard-code the name of the QEMU binary
+> 
+> On Wed, 28 Aug 2019 at 10:37, Thomas Huth <thuth@redhat.com> wrote:
+> >
+> > In our documentation, we use a mix of "$QEMU", "qemu-system-i386" and
+> > "qemu-system-x86_64" when we give examples to the users how to run
+> > QEMU. Some more consistency would be good here. Also some distributions
+> > use different names for the QEMU binary (e.g. "qemu-kvm" in RHEL), so
+> > providing more flexibility here would also be good. Thus let's define
+> > some variables for the names of the QEMU command and use those in the
+> > documentation instead: @value{qemu_system} for generic examples, and
+> > @value{qemu_system_x86} for examples that only work with the x86
+> > binaries.
+> >
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  docs/qemu-block-drivers.texi |  72 ++++++++++----------
+> >  docs/qemu-cpu-models.texi    |  10 +--
+> >  qemu-doc.texi                |  81 +++++++++++-----------
+> >  qemu-options.hx              | 128 +++++++++++++++++------------------
+> >  4 files changed, 149 insertions(+), 142 deletions(-)
+> >
+> > diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+> > index c02547e28c..2c7ea49c32 100644
+> > --- a/docs/qemu-block-drivers.texi
+> > +++ b/docs/qemu-block-drivers.texi
+> > @@ -2,6 +2,8 @@
+> >  QEMU block driver reference manual
+> >  @c man end
+> >
+> > +@set qemu_system qemu-system-x86_64
+> > +
+> >  @c man begin DESCRIPTION
+> >
+> >  @node disk_images_formats
+> > @@ -405,7 +407,7 @@ QEMU can automatically create a virtual FAT disk image
+> > from a
+> >  directory tree. In order to use it, just type:
+> >
+> >  @example
+> > -qemu-system-i386 linux.img -hdb fat:/my_directory
+> > +@value{qemu_system} linux.img -hdb fat:/my_directory
+> >  @end example
+> 
+> Do you use the ability to change the text being substituted
+> here downstream ? If so, heads-up that I'm working on a
+> conversion of this texi file to rst. I'll put in a
+> similar rst substitution-reference, which will look like
+> this:
+> 
+> .. |qemu_system| replace:: qemu-system-x86_64
+> 
+> but you'll need to update your downstream processes if
+> you're changing the value in the texi currently.
+> 
+
+Yes we are using it and it make our changes much more simple.
+
+Mirek
+
+> thanks
+> -- PMM
+> 
+> 
+
+-- 
+Miroslav Rezanina
+Software Engineer - Virtualization Team Maintainer
 
 
