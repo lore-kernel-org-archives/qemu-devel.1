@@ -2,159 +2,80 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9E5C33C9E
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:54:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5C5C33C9E
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9686222C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:54:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6816222C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:59:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JLw5X6Be"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9686222C4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4qXgm5a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6816222C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irOW2-0006FQ-Rt
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:54:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46652)
+	id 1irObS-0001k4-T1
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:59:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1irOVH-0005jQ-0j
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:53:18 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irOai-00010h-ED
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:58:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1irOVD-0001wr-6R
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:53:14 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57042
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irOac-00008L-Nt
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:58:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55257
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1irOVD-0001wP-2M
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:53:11 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irOac-00005m-IB
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:58:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579017190;
+ s=mimecast20190719; t=1579017525;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=k6hnzXmev4HaCtRabod64vsTdhy7/wu7SLhAna0cmDs=;
- b=JLw5X6BeakvujZmexcjQ/2sQeA52h81V37QCfmi7HWVsRdJ7f/pHme6HdDQCf/cRCADc0c
- jIk2rjsPkQbRSL61nLhmsIOvGrs6xCueT+otbkjB2N/ba7HHhhs3z2rYOjA32a15fMSCAL
- sKiJgO/J92fwkHDM0D1FqJKS9PsNTaw=
+ in-reply-to:in-reply-to:references:references;
+ bh=QN2ULdGLTUMpIvwWzW/JD362rM8E9WdAp1x0UBLK51w=;
+ b=g4qXgm5aXAm5XVTzK2iqOH6MygtjY9rJtKOVuetf5zWqy1dtwAGPtszFWYf/RKM58qpqro
+ tmSRhKZOWN8k2DIz6Uz0esVnVYhL6flcy1iWlde7Jyx3fXI/hqiTf3PvxR4f8oaOQjnAGN
+ bkcF9xj/AYdYw8JcZzWJOeq8OkZSYVk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-P22592uBNwCRPqUevekGDQ-1; Tue, 14 Jan 2020 10:53:09 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-108-IkkHTO0WN7qPjBQO7zRwNA-1; Tue, 14 Jan 2020 10:58:40 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09B0D8005B2;
- Tue, 14 Jan 2020 15:53:08 +0000 (UTC)
-Received: from [10.10.125.91] (ovpn-125-91.rdu2.redhat.com [10.10.125.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 072AA10841A7;
- Tue, 14 Jan 2020 15:53:06 +0000 (UTC)
-Subject: Re: [PATCH] qemu-deprecated: Remove text about Python 2
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Thomas Huth <thuth@redhat.com>
-References: <20200109095116.18201-1-thuth@redhat.com>
- <5883bc34-926e-70e3-6402-32dfb5d92ab2@redhat.com>
- <e1ae4e63-626c-cc6d-5117-4b4fbd1ad436@redhat.com>
- <20200114102031.GE4071034@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f083e092-4e9f-bf0e-c824-6e2024047364@redhat.com>
-Date: Tue, 14 Jan 2020 10:53:06 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D78768D59B1;
+ Tue, 14 Jan 2020 15:58:39 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A262960BE0;
+ Tue, 14 Jan 2020 15:58:34 +0000 (UTC)
+Date: Tue, 14 Jan 2020 16:58:32 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Yoshinori Sato <ysato@users.sourceforge.jp>
+Subject: Re: [PATCH v28 17/22] hw/rx: RX Target hardware definition
+Message-ID: <20200114165832.27bbafc2@redhat.com>
+In-Reply-To: <87tv4yp581.wl-ysato@users.sourceforge.jp>
+References: <20200112124913.94959-1-ysato@users.sourceforge.jp>
+ <20200112124913.94959-18-ysato@users.sourceforge.jp>
+ <20200113101714.2ae82a0c@redhat.com>
+ <87tv4yp581.wl-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-In-Reply-To: <20200114102031.GE4071034@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: P22592uBNwCRPqUevekGDQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: IkkHTO0WN7qPjBQO7zRwNA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -166,129 +87,635 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-devel@nongnu.org
+Cc: richard.henderson@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 14 Jan 2020 21:55:42 +0900
+Yoshinori Sato <ysato@users.sourceforge.jp> wrote:
+
+> On Mon, 13 Jan 2020 18:17:14 +0900,
+> Igor Mammedov wrote:
+> >=20
+> > On Sun, 12 Jan 2020 21:49:08 +0900
+> > Yoshinori Sato <ysato@users.sourceforge.jp> wrote:
+> >  =20
+> > > rx62n - RX62N cpu.
+> > > rx-virt - RX QEMU virtual target.
+> > >=20
+> > > v23 changes.
+> > > Add missing includes.
+> > >=20
+> > > v21 changes.
+> > > rx_load_image move to rx-virt.c
+> > >=20
+> > > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > >=20
+> > > Message-Id: <20190616142836.10614-17-ysato@users.sourceforge.jp>
+> > > Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp>
+> > > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > > [PMD: Use TYPE_RX62N_CPU, use #define for RX62N_NR_TMR/CMT/SCI,
+> > >  renamed CPU -> MCU, device -> microcontroller]
+> > > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > ---
+> > > v19: Fixed typo (Peter Maydell)
+> > > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> > > ---
+> > >  include/hw/rx/rx.h    |   7 ++
+> > >  include/hw/rx/rx62n.h |  91 ++++++++++++++++
+> > >  hw/rx/rx-virt.c       | 127 ++++++++++++++++++++++
+> > >  hw/rx/rx62n.c         | 239 ++++++++++++++++++++++++++++++++++++++++=
+++
+> > >  hw/rx/Kconfig         |  14 +++
+> > >  hw/rx/Makefile.objs   |   2 +
+> > >  6 files changed, 480 insertions(+)
+> > >  create mode 100644 include/hw/rx/rx.h
+> > >  create mode 100644 include/hw/rx/rx62n.h
+> > >  create mode 100644 hw/rx/rx-virt.c
+> > >  create mode 100644 hw/rx/rx62n.c
+> > >  create mode 100644 hw/rx/Kconfig
+> > >  create mode 100644 hw/rx/Makefile.objs
+> > >=20
+> > > diff --git a/include/hw/rx/rx.h b/include/hw/rx/rx.h
+> > > new file mode 100644
+> > > index 0000000000..ff5924b81f
+> > > --- /dev/null
+> > > +++ b/include/hw/rx/rx.h
+> > > @@ -0,0 +1,7 @@
+> > > +#ifndef QEMU_RX_H
+> > > +#define QEMU_RX_H
+> > > +/* Definitions for RX board emulation.  */
+> > > +
+> > > +#include "target/rx/cpu-qom.h"
+> > > +
+> > > +#endif
+> > > diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
+> > > new file mode 100644
+> > > index 0000000000..97ea8ddb8e
+> > > --- /dev/null
+> > > +++ b/include/hw/rx/rx62n.h
+> > > @@ -0,0 +1,91 @@
+> > > +/*
+> > > + * RX62N MCU Object
+> > > + *
+> > > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> > > + * (Rev.1.40 R01UH0033EJ0140)
+> > > + *
+> > > + * Copyright (c) 2019 Yoshinori Sato
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or mod=
+ify it
+> > > + * under the terms and conditions of the GNU General Public License,
+> > > + * version 2 or later, as published by the Free Software Foundation.
+> > > + *
+> > > + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+> > > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+> > > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Lic=
+ense for
+> > > + * more details.
+> > > + *
+> > > + * You should have received a copy of the GNU General Public License=
+ along with
+> > > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > > + */
+> > > +
+> > > +#ifndef HW_RX_RX62N_H
+> > > +#define HW_RX_RX62N_H
+> > > +
+> > > +#include "hw/sysbus.h"
+> > > +#include "hw/intc/rx_icu.h"
+> > > +#include "hw/timer/renesas_tmr.h"
+> > > +#include "hw/timer/renesas_cmt.h"
+> > > +#include "hw/char/renesas_sci.h"
+> > > +#include "target/rx/cpu.h"
+> > > +#include "qemu/units.h"
+> > > +
+> > > +#define TYPE_RX62N "rx62n"
+> > > +#define RX62N(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N)
+> > > +
+> > > +#define RX62N_NR_TMR    2
+> > > +#define RX62N_NR_CMT    2
+> > > +#define RX62N_NR_SCI    6
+> > > +
+> > > +typedef struct RX62NState {
+> > > +    SysBusDevice parent_obj;
+> > > +
+> > > +    RXCPU cpu;
+> > > +    RXICUState icu;
+> > > +    RTMRState tmr[RX62N_NR_TMR];
+> > > +    RCMTState cmt[RX62N_NR_CMT];
+> > > +    RSCIState sci[RX62N_NR_SCI];
+> > > +
+> > > +    MemoryRegion *sysmem;
+> > > +    bool kernel;
+> > > +
+> > > +    MemoryRegion iram;
+> > > +    MemoryRegion iomem1;
+> > > +    MemoryRegion d_flash;
+> > > +    MemoryRegion iomem2;
+> > > +    MemoryRegion iomem3;
+> > > +    MemoryRegion c_flash;
+> > > +    qemu_irq irq[NR_IRQS];
+> > > +} RX62NState;
+> > > +
+> > > +/*
+> > > + * RX62N Peripheral Address
+> > > + * See users manual section 5
+> > > + */
+> > > +#define RX62N_ICUBASE 0x00087000
+> > > +#define RX62N_TMRBASE 0x00088200
+> > > +#define RX62N_CMTBASE 0x00088000
+> > > +#define RX62N_SCIBASE 0x00088240
+> > > +
+> > > +/*
+> > > + * RX62N Peripheral IRQ
+> > > + * See users manual section 11
+> > > + */
+> > > +#define RX62N_TMR_IRQBASE 174
+> > > +#define RX62N_CMT_IRQBASE 28
+> > > +#define RX62N_SCI_IRQBASE 214
+> > > +
+> > > +/*
+> > > + * RX62N Internal Memory
+> > > + * It is the value of R5F562N8.
+> > > + * Please change the size for R5F562N7.
+> > > + */
+> > > +#define RX62N_IRAM_BASE 0x00000000
+> > > +#define RX62N_IRAM_SIZE (96 * KiB)
+> > > +#define RX62N_DFLASH_BASE 0x00100000
+> > > +#define RX62N_DFLASH_SIZE (32 * KiB)
+> > > +#define RX62N_CFLASH_BASE 0xfff80000
+> > > +#define RX62N_CFLASH_SIZE (512 * KiB)
+> > > +
+> > > +#define RX62N_PCLK (48 * 1000 * 1000)
+> > > +#endif
+> > > diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+> > > new file mode 100644
+> > > index 0000000000..4cfe2e3123
+> > > --- /dev/null
+> > > +++ b/hw/rx/rx-virt.c
+> > > @@ -0,0 +1,127 @@
+> > > +/*
+> > > + * RX QEMU virtual platform
+> > > + *
+> > > + * Copyright (c) 2019 Yoshinori Sato
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or mod=
+ify it
+> > > + * under the terms and conditions of the GNU General Public License,
+> > > + * version 2 or later, as published by the Free Software Foundation.
+> > > + *
+> > > + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+> > > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+> > > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Lic=
+ense for
+> > > + * more details.
+> > > + *
+> > > + * You should have received a copy of the GNU General Public License=
+ along with
+> > > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > > + */
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include "qapi/error.h"
+> > > +#include "qemu-common.h"
+> > > +#include "cpu.h"
+> > > +#include "hw/hw.h"
+> > > +#include "hw/sysbus.h"
+> > > +#include "hw/loader.h"
+> > > +#include "hw/rx/rx62n.h"
+> > > +#include "sysemu/sysemu.h"
+> > > +#include "sysemu/qtest.h"
+> > > +#include "sysemu/device_tree.h"
+> > > +#include "hw/boards.h"
+> > > +
+> > > +/* Same address of GDB integrated simulator */
+> > > +#define SDRAM_BASE 0x01000000
+> > > +
+> > > +static void rx_load_image(RXCPU *cpu, const char *filename,
+> > > +                          uint32_t start, uint32_t size)
+> > > +{
+> > > +    static uint32_t extable[32];
+> > > +    long kernel_size;
+> > > +    int i;
+> > > +
+> > > +    kernel_size =3D load_image_targphys(filename, start, size);
+> > > +    if (kernel_size < 0) {
+> > > +        fprintf(stderr, "qemu: could not load kernel '%s'\n", filena=
+me);
+> > > +        exit(1);
+> > > +    }
+> > > +    cpu->env.pc =3D start;
+> > > +
+> > > +    /* setup exception trap trampoline */
+> > > +    /* linux kernel only works little-endian mode */
+> > > +    for (i =3D 0; i < ARRAY_SIZE(extable); i++) {
+> > > +        extable[i] =3D cpu_to_le32(0x10 + i * 4);
+> > > +    }
+> > > +    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff=
+80);
+> > > +}
+> > > +
+> > > +static void rxvirt_init(MachineState *machine)
+> > > +{
+> > > +    RX62NState *s =3D g_new(RX62NState, 1);
+> > > +    MemoryRegion *sysmem =3D get_system_memory();
+> > > +    MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
+> > > +    const char *kernel_filename =3D machine->kernel_filename;
+> > > +    const char *dtb_filename =3D machine->dtb;
+> > > +    void *dtb =3D NULL;
+> > > +    int dtb_size; =20
+> >=20
+> > this board doesn't really care about what RAM size user specified
+> > with -m, but since we don't have any generic way to describe that
+> > just add a check here in case user provided -m and it doesn't
+> > match expected size, like
+> >=20
+> >       if (machine->ram_size !=3D 16 * MiB)
+> >           error_report (invalid ram size, must be ...)
+> >           exit(ERROR_FATAL)
+> >       } =20
+>=20
+> OK.
+> This target has the same configuration as the gdb simulator,
+> so the RAM size is undefined.
+> I think that it is good to be able to set it to optional capacity by opti=
+on.
+
+If you need it configurable,
+it's probably better to use  memory_region_allocate_system_memory()
+to allocate RAM chunk, so I wouldn't miss this spot when refactoring memory=
+_region_allocate_system_memory()
+
+So I'd appreciate if size check were already in place,
+see for example on how to check size:
+  https://www.mail-archive.com/qemu-devel@nongnu.org/msg667690.html
 
 
-On 1/14/20 5:20 AM, Daniel P. Berrang=C3=A9 wrote:
-> On Tue, Jan 14, 2020 at 11:08:16AM +0100, Thomas Huth wrote:
->> On 13/01/2020 23.36, John Snow wrote:
->>>
->>>
->>> On 1/9/20 4:51 AM, Thomas Huth wrote:
->>>> Python 2 support has been removed, so we should now also remove
->>>> the announcement text for the deprecation.
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>
->>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>
->>>> ---
->>>>  qemu-deprecated.texi | 8 --------
->>>>  1 file changed, 8 deletions(-)
->>>>
->>>> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
->>>> index 7033e531de..8b23e98474 100644
->>>> --- a/qemu-deprecated.texi
->>>> +++ b/qemu-deprecated.texi
->>>> @@ -341,14 +341,6 @@ they have no effect when used with @option{-n} to=
- skip image creation.
->>>>  Silently ignored options can be confusing, so this combination of
->>>>  options will be made an error in future versions.
->>>> =20
->>>> -@section Build system
->>>> -
->>>> -@subsection Python 2 support (since 4.1.0)
->>>> -
->>>> -In the future, QEMU will require Python 3 to be available at
->>>> -build time.  Support for Python 2 in scripts shipped with QEMU
->>>> -is deprecated.
->>>> -
->>>>  @section Backwards compatibility
->>>> =20
->>>>  @subsection Runnability guarantee of CPU models (since 4.1.0)
->>>>
->>>
->>> Genuine question, I'm sorry:
->>>
->>> Is it worth documenting things we recently removed?
->>
->> Basically yes. In case of Python 2, it's not a QEMU feature that we
->> remove here, but a build requirement, and we tell the users that we need
->> at least Python 3.5 when they run "configure", so I'm not sure whether
->> that needs to be explicitely mentioned again the docs beside our ChangeL=
-og?
 >=20
-> In general changed build pre-requisites such as new minimum software
-> versions are documented in the release notes:
+> >  =20
+> > > +    /* Allocate memory space */
+> > > +    memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
+> > > +                           &error_fatal);
+> > > +    memory_region_add_subregion(sysmem, SDRAM_BASE, sdram);
+> > > +
+> > > +    /* Initialize MCU */
+> > > +    object_initialize_child(OBJECT(machine), "mcu", s,
+> > > +                            sizeof(RX62NState), TYPE_RX62N,
+> > > +                            &error_fatal, NULL);
+> > > +    object_property_set_link(OBJECT(s), OBJECT(get_system_memory()),
+> > > +                             "memory", &error_abort);
+> > > +    object_property_set_bool(OBJECT(s), kernel_filename !=3D NULL,
+> > > +                             "load-kernel", &error_abort);
+> > > +    object_property_set_bool(OBJECT(s), true, "realized", &error_abo=
+rt);
+> > > +
+> > > +    /* Load kernel and dtb */
+> > > +    if (kernel_filename) {
+> > > +        rx_load_image(RXCPU(first_cpu), kernel_filename,
+> > > +                      SDRAM_BASE + 8 * MiB, 8 * MiB);
+> > > +        if (dtb_filename) {
+> > > +            dtb =3D load_device_tree(dtb_filename, &dtb_size);
+> > > +            if (dtb =3D=3D NULL) {
+> > > +                fprintf(stderr, "Couldn't open dtb file %s\n", dtb_f=
+ilename);
+> > > +                exit(1);
+> > > +            }
+> > > +            if (machine->kernel_cmdline &&
+> > > +                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
+> > > +                                        machine->kernel_cmdline) < 0=
+) {
+> > > +                fprintf(stderr, "couldn't set /chosen/bootargs\n");
+> > > +                exit(1);
+> > > +            }
+> > > +            rom_add_blob_fixed("dtb", dtb, dtb_size,
+> > > +                               SDRAM_BASE + 16 * MiB - dtb_size);
+> > > +            /* Set dtb address to R1 */
+> > > +            RXCPU(first_cpu)->env.regs[1] =3D 0x02000000 - dtb_size;
+> > > +        }
+> > > +    }
+> > > +}
+> > > +
+> > > +static void rxvirt_class_init(ObjectClass *oc, void *data)
+> > > +{
+> > > +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> > > +
+> > > +    mc->desc =3D "RX QEMU Virtual Target";
+> > > +    mc->init =3D rxvirt_init;
+> > > +    mc->is_default =3D 1;
+> > > +    mc->default_cpu_type =3D TYPE_RX62N_CPU;
+> > > +}
+> > > +
+> > > +static const TypeInfo rxvirt_type =3D {
+> > > +    .name =3D MACHINE_TYPE_NAME("rx-virt"),
+> > > +    .parent =3D TYPE_MACHINE,
+> > > +    .class_init =3D rxvirt_class_init,
+> > > +};
+> > > +
+> > > +static void rxvirt_machine_init(void)
+> > > +{
+> > > +    type_register_static(&rxvirt_type);
+> > > +}
+> > > +
+> > > +type_init(rxvirt_machine_init)
+> > > diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+> > > new file mode 100644
+> > > index 0000000000..ac47f2a397
+> > > --- /dev/null
+> > > +++ b/hw/rx/rx62n.c
+> > > @@ -0,0 +1,239 @@
+> > > +/*
+> > > + * RX62N Microcontroller
+> > > + *
+> > > + * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> > > + * (Rev.1.40 R01UH0033EJ0140)
+> > > + *
+> > > + * Copyright (c) 2019 Yoshinori Sato
+> > > + *
+> > > + * This program is free software; you can redistribute it and/or mod=
+ify it
+> > > + * under the terms and conditions of the GNU General Public License,
+> > > + * version 2 or later, as published by the Free Software Foundation.
+> > > + *
+> > > + * This program is distributed in the hope it will be useful, but WI=
+THOUT
+> > > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
+Y or
+> > > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Lic=
+ense for
+> > > + * more details.
+> > > + *
+> > > + * You should have received a copy of the GNU General Public License=
+ along with
+> > > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > > + */
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include "qapi/error.h"
+> > > +#include "hw/hw.h"
+> > > +#include "hw/rx/rx62n.h"
+> > > +#include "hw/loader.h"
+> > > +#include "hw/sysbus.h"
+> > > +#include "hw/qdev-properties.h"
+> > > +#include "sysemu/sysemu.h"
+> > > +#include "cpu.h"
+> > > +
+> > > +/*
+> > > + * IRQ -> IPR mapping table
+> > > + * 0x00 - 0x91: IPR no (IPR00 to IPR91)
+> > > + * 0xff: IPR not assigned
+> > > + * See "11.3.1 Interrupt Vector Table" in hardware manual.
+> > > + */
+> > > +static const int ipr_table[NR_IRQS] =3D {
+> > > +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+> > > +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 15 */
+> > > +    0x00, 0xff, 0xff, 0xff, 0xff, 0x01, 0xff, 0x02,
+> > > +    0xff, 0xff, 0xff, 0x03, 0x04, 0x05, 0x06, 0x07, /* 31 */
+> > > +    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+> > > +    0x10, 0x11, 0x12, 0x13, 0x14, 0x14, 0x14, 0x14, /* 47 */
+> > > +    0x15, 0x15, 0x15, 0x15, 0xff, 0xff, 0xff, 0xff,
+> > > +    0x18, 0x18, 0x18, 0x18, 0x18, 0x1d, 0x1e, 0x1f, /* 63 */
+> > > +    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
+> > > +    0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, /* 79 */
+> > > +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+> > > +    0xff, 0xff, 0x3a, 0x3b, 0x3c, 0xff, 0xff, 0xff, /* 95 */
+> > > +    0x40, 0xff, 0x44, 0x45, 0xff, 0xff, 0x48, 0xff,
+> > > +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 111 */
+> > > +    0xff, 0xff, 0x51, 0x51, 0x51, 0x51, 0x52, 0x52,
+> > > +    0x52, 0x53, 0x53, 0x54, 0x54, 0x55, 0x55, 0x56, /* 127 */
+> > > +    0x56, 0x57, 0x57, 0x57, 0x57, 0x58, 0x59, 0x59,
+> > > +    0x59, 0x59, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5c, /* 143 */
+> > > +    0x5c, 0x5c, 0x5d, 0x5d, 0x5d, 0x5e, 0x5e, 0x5f,
+> > > +    0x5f, 0x60, 0x60, 0x61, 0x61, 0x62, 0x62, 0x62, /* 159 */
+> > > +    0x62, 0x63, 0x64, 0x64, 0x64, 0x64, 0x65, 0x66,
+> > > +    0x66, 0x66, 0x67, 0x67, 0x67, 0x67, 0x68, 0x68, /* 175 */
+> > > +    0x68, 0x69, 0x69, 0x69, 0x6a, 0x6a, 0x6a, 0x6b,
+> > > +    0x6b, 0x6b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 191 */
+> > > +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x70, 0x71,
+> > > +    0x72, 0x73, 0x74, 0x75, 0xff, 0xff, 0xff, 0xff, /* 207 */
+> > > +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80,
+> > > +    0x80, 0x80, 0x81, 0x81, 0x81, 0x81, 0x82, 0x82, /* 223 */
+> > > +    0x82, 0x82, 0x83, 0x83, 0x83, 0x83, 0xff, 0xff,
+> > > +    0xff, 0xff, 0x85, 0x85, 0x85, 0x85, 0x86, 0x86, /* 239 */
+> > > +    0x86, 0x86, 0xff, 0xff, 0xff, 0xff, 0x88, 0x89,
+> > > +    0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, /* 255 */
+> > > +};
+> > > +
+> > > +/*
+> > > + * Level triggerd IRQ list
+> > > + * Not listed IRQ is Edge trigger.
+> > > + * See "11.3.1 Interrupt Vector Table" in hardware manual.
+> > > + */
+> > > +static const uint32_t levelirq[] =3D {
+> > > +     16,  21,  32,  44,  47,  48,  51,  64,  65,  66,
+> > > +     67,  68,  69,  70,  71,  72,  73,  74,  75,  76,
+> > > +     77,  78,  79,  90,  91, 170, 171, 172, 173, 214,
+> > > +    217, 218, 221, 222, 225, 226, 229, 234, 237, 238,
+> > > +    241, 246, 249, 250, 253,
+> > > +};
+> > > +
+> > > +static void register_icu(RX62NState *s)
+> > > +{
+> > > +    int i;
+> > > +    SysBusDevice *icu;
+> > > +
+> > > +    object_initialize_child(OBJECT(s), "icu", &s->icu, sizeof(RXICUS=
+tate),
+> > > +                            TYPE_RXICU, &error_abort, NULL);
+> > > +
+> > > +    icu =3D SYS_BUS_DEVICE(&s->icu);
+> > > +    sysbus_mmio_map(SYS_BUS_DEVICE(icu), 0, RX62N_ICUBASE);
+> > > +    qdev_prop_set_uint32(DEVICE(icu), "len-ipr-map", NR_IRQS);
+> > > +    for (i =3D 0; i < NR_IRQS; i++) {
+> > > +        char propname[32];
+> > > +        snprintf(propname, sizeof(propname), "ipr-map[%d]", i);
+> > > +        qdev_prop_set_uint32(DEVICE(icu), propname, ipr_table[i]);
+> > > +    }
+> > > +    qdev_prop_set_uint32(DEVICE(icu), "len-trigger-level",
+> > > +                         ARRAY_SIZE(levelirq));
+> > > +    for (i =3D 0; i < ARRAY_SIZE(levelirq); i++) {
+> > > +        char propname[32];
+> > > +        snprintf(propname, sizeof(propname), "trigger-level[%d]", i)=
+;
+> > > +        qdev_prop_set_uint32(DEVICE(icu), propname, levelirq[i]);
+> > > +    }
+> > > +
+> > > +    for (i =3D 0; i < NR_IRQS; i++) {
+> > > +        s->irq[i] =3D qdev_get_gpio_in(DEVICE(icu), i);
+> > > +    }
+> > > +
+> > > +    qdev_init_nofail(DEVICE(icu));
+> > > +    sysbus_connect_irq(icu, 0, qdev_get_gpio_in(DEVICE(&s->cpu), RX_=
+CPU_IRQ));
+> > > +    sysbus_connect_irq(icu, 1, qdev_get_gpio_in(DEVICE(&s->cpu), RX_=
+CPU_FIR));
+> > > +    sysbus_connect_irq(icu, 2, s->irq[SWI]);
+> > > +
+> > > +}
+> > > +
+> > > +static void register_tmr(RX62NState *s, int unit)
+> > > +{
+> > > +    SysBusDevice *tmr;
+> > > +    int i, irqbase;
+> > > +
+> > > +    object_initialize_child(OBJECT(s), "tmr[*]", &s->tmr[unit],
+> > > +                            sizeof(RTMRState), TYPE_RENESAS_TMR,
+> > > +                            &error_abort, NULL);
+> > > +
+> > > +    tmr =3D SYS_BUS_DEVICE(&s->tmr[unit]);
+> > > +    sysbus_mmio_map(tmr, 0, RX62N_TMRBASE + unit * 0x10);
+> > > +    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
+> > > +
+> > > +    qdev_init_nofail(DEVICE(tmr));
+> > > +    irqbase =3D RX62N_TMR_IRQBASE + TMR_NR_IRQ * unit;
+> > > +    for (i =3D 0; i < TMR_NR_IRQ; i++) {
+> > > +        sysbus_connect_irq(tmr, i, s->irq[irqbase + i]);
+> > > +    }
+> > > +}
+> > > +
+> > > +static void register_cmt(RX62NState *s, int unit)
+> > > +{
+> > > +    SysBusDevice *cmt;
+> > > +    int i, irqbase;
+> > > +
+> > > +    object_initialize_child(OBJECT(s), "cmt[*]", &s->cmt[unit],
+> > > +                            sizeof(RCMTState), TYPE_RENESAS_CMT,
+> > > +                            &error_abort, NULL);
+> > > +
+> > > +    cmt =3D SYS_BUS_DEVICE(&s->cmt[unit]);
+> > > +    sysbus_mmio_map(cmt, 0, RX62N_CMTBASE + unit * 0x10);
+> > > +    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
+> > > +
+> > > +    qdev_init_nofail(DEVICE(cmt));
+> > > +    irqbase =3D RX62N_CMT_IRQBASE + CMT_NR_IRQ * unit;
+> > > +    for (i =3D 0; i < CMT_NR_IRQ; i++) {
+> > > +        sysbus_connect_irq(cmt, i, s->irq[irqbase + i]);
+> > > +    }
+> > > +}
+> > > +
+> > > +static void register_sci(RX62NState *s, int unit)
+> > > +{
+> > > +    SysBusDevice *sci;
+> > > +    int i, irqbase;
+> > > +
+> > > +    object_initialize_child(OBJECT(s), "sci[*]", &s->sci[unit],
+> > > +                            sizeof(RSCIState), TYPE_RENESAS_SCI,
+> > > +                            &error_abort, NULL);
+> > > +
+> > > +    sci =3D SYS_BUS_DEVICE(&s->sci[unit]);
+> > > +    sysbus_mmio_map(sci, 0, RX62N_SCIBASE + unit * 0x08);
+> > > +    qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
+> > > +    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
+> > > +
+> > > +    qdev_init_nofail(DEVICE(sci));
+> > > +    irqbase =3D RX62N_SCI_IRQBASE + SCI_NR_IRQ * unit;
+> > > +    for (i =3D 0; i < SCI_NR_IRQ; i++) {
+> > > +        sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
+> > > +    }
+> > > +}
+> > > +
+> > > +static void rx62n_realize(DeviceState *dev, Error **errp)
+> > > +{
+> > > +    RX62NState *s =3D RX62N(dev);
+> > > +
+> > > +    memory_region_init_ram(&s->iram, NULL, "iram", RX62N_IRAM_SIZE, =
+errp);
+> > > +    memory_region_add_subregion(s->sysmem, RX62N_IRAM_BASE, &s->iram=
+);
+> > > +    memory_region_init_rom(&s->d_flash, NULL, "dataflash",
+> > > +                           RX62N_DFLASH_SIZE, errp);
+> > > +    memory_region_add_subregion(s->sysmem, RX62N_DFLASH_BASE, &s->d_=
+flash);
+> > > +    memory_region_init_rom(&s->c_flash, NULL, "codeflash",
+> > > +                           RX62N_CFLASH_SIZE, errp);
+> > > +    memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_=
+flash);
+> > > +    if (!s->kernel) {
+> > > +        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
+> > > +    }
+> > > +
+> > > +    /* Initialize CPU */
+> > > +    object_initialize_child(OBJECT(s), "cpu", &s->cpu, sizeof(RXCPU)=
+,
+> > > +                            TYPE_RX62N_CPU, errp, NULL);
+> > > +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp=
+);
+> > > +
+> > > +    register_icu(s);
+> > > +    s->cpu.env.ack =3D qdev_get_gpio_in_named(DEVICE(&s->icu), "ack"=
+, 0);
+> > > +    register_tmr(s, 0);
+> > > +    register_tmr(s, 1);
+> > > +    register_cmt(s, 0);
+> > > +    register_cmt(s, 1);
+> > > +    register_sci(s, 0);
+> > > +}
+> > > +
+> > > +static Property rx62n_properties[] =3D {
+> > > +    DEFINE_PROP_LINK("memory", RX62NState, sysmem, TYPE_MEMORY_REGIO=
+N,
+> > > +                     MemoryRegion *),
+> > > +    DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
+> > > +    DEFINE_PROP_END_OF_LIST(),
+> > > +};
+> > > +
+> > > +static void rx62n_class_init(ObjectClass *klass, void *data)
+> > > +{
+> > > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > > +
+> > > +    dc->realize =3D rx62n_realize;
+> > > +    dc->props =3D rx62n_properties;
+> > > +}
+> > > +
+> > > +static const TypeInfo rx62n_info =3D {
+> > > +    .name =3D TYPE_RX62N,
+> > > +    .parent =3D TYPE_SYS_BUS_DEVICE,
+> > > +    .instance_size =3D sizeof(RX62NState),
+> > > +    .class_init =3D rx62n_class_init,
+> > > +};
+> > > +
+> > > +static void rx62n_register_types(void)
+> > > +{
+> > > +    type_register_static(&rx62n_info);
+> > > +}
+> > > +
+> > > +type_init(rx62n_register_types)
+> > > diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
+> > > new file mode 100644
+> > > index 0000000000..a07490a65e
+> > > --- /dev/null
+> > > +++ b/hw/rx/Kconfig
+> > > @@ -0,0 +1,14 @@
+> > > +config RX
+> > > +    bool
+> > > +
+> > > +config RX62N
+> > > +    bool
+> > > +    select RX
+> > > +    select RX_ICU
+> > > +    select RENESAS_TMR8
+> > > +    select RENESAS_CMT
+> > > +    select RENESAS_SCI
+> > > +
+> > > +config RX_VIRT
+> > > +    bool
+> > > +    select RX62N
+> > > diff --git a/hw/rx/Makefile.objs b/hw/rx/Makefile.objs
+> > > new file mode 100644
+> > > index 0000000000..63f8be0e82
+> > > --- /dev/null
+> > > +++ b/hw/rx/Makefile.objs
+> > > @@ -0,0 +1,2 @@
+> > > +obj-$(CONFIG_RX62N) +=3D rx62n.o
+> > > +obj-$(CONFIG_RX_VIRT) +=3D rx-virt.o =20
+> >  =20
 >=20
->    https://wiki.qemu.org/ChangeLog/5.0#Build_Information
->=20
-> We normally would not list build pre-requisites in the deprecation notes
-> at all, since they don't follow the deprecation process normally. We
-> just update minimum versions immediately that our supported OS build
-> platforms change due to an OS going end of life. So for example we
-> have in the past bumped gnutls, glib, nettle, gcc, etc min versions
-> with no warning.  So the fact that Python 2 was mentioned in the
-> deprecations at all was slightly unusual. This is mostly just to be
-> nice to users since the OS platforms here aren't going EOL and still
-> ship Python 2, we simply don't wish to support it any more, since
-> the distros also all have Py 3.
->=20
->=20
->>
->>> Right now, we don't
->>> really have these docs hosted in a searchable way online in a
->>> per-version format. Once the notice is gone, it's gone from the mirror.
->>>
->>> I removed some bitmap functionality not too long ago and I created a
->>> "Recently Removed" section as a bit of a troubleshooting guide should i=
-t
->>> be needed.
->>>
->>> - Do we want this section?
->>> - Should I remove it?
->>> - Can we add historical docs to the website to see previous deprecated
->>> docs in a searchable manner?
->>
->> I also once started a page in the Wiki here:
->>
->>  https://wiki.qemu.org/Features/RemovedFeatures
->>
->> ... but apparently, it did not get enough attention yet, otherwise you
->> would have noticed it before introducing the new chapter into the
->> qemu-doc ...
->>
->> We definitely need one spot where we can document removed features. I
->> don't mind which way we do it, either the qemu-doc or the wiki, but we
->> should unify on one of the two. I guess the qemu-doc is the better place
->> since we are tracking the deprecated features there already and one more
->> or less just has to move the text to the other chapter when things get
->> finally removed?
->=20
-> Yeah, I've said in the past that we should not be deleting deprecations
-> from the docs entirely.
->=20
-> If you look at GTK docs for example, you'll see they keep a record of
-> all incompatible or noteworth changes between release:
->=20
->   https://developer.gnome.org/gtk3/stable/gtk-migrating-3-x-to-y.html
->=20
-> IMHO, we should follow this and have an appendix of removed features,
-> with sub-sections per QEMU release listing each removed feature. Thus
-> deprecation docs just get moved to this appendix at the right time.
->=20
-> Regards,
-> Daniel
->=20
-
-Everything said makes sense to me. My review here stands, thanks! (Sorry
-for the derail.)
-
---js
 
 
