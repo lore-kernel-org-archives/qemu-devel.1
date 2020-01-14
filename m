@@ -2,79 +2,75 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 609EAC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259EFC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:41:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CEBE24673
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:36:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5B1924676
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:41:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NDYauaeg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CEBE24673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxzKwGAa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5B1924676
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKUQ-00030C-CI
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:36:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54548)
+	id 1irKZZ-0005nT-KN
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:41:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1irKTn-0002TE-E2
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:35:28 -0500
+ (envelope-from <quintela@redhat.com>) id 1irKXy-00040F-MY
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:39:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1irKTl-0001gT-U3
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:35:27 -0500
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:39387)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1irKTl-0001fa-No
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:35:25 -0500
-Received: by mail-oi1-x22a.google.com with SMTP id a67so11490234oib.6
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 03:35:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nIDZx/ICiufZa86DEDMRnf4j5HOKJfhnpO2Xtv7xT7Q=;
- b=NDYauaegRP7500sgBL4UIA5/tr345ThyjmP0EgKisd7wE2WqZ9UQV607LD85o1TQf9
- Z6iE1fFchaZcfV0URv8dzndKqZoFMHyVSAa6NPrTyADRp5mWslLU2sIupN07qxzjqFjv
- J9jq19537nTY9ZgaysI5LaQ7WyXOWDv1GGGZ6vC7x5DXIo6v05GloLKLT2+8ToR0CMaL
- Pllz3QlbfKqg7dfNjzz8FvIMtK2C76FcateCmWp61RxD4gDme6T/RsSNL8VFgTV//pLc
- lekSJek00xJ307XIIRaO4f3qigOfRIniD2jeRxS/Ue7+VRdAatee7FEM/60ddUEJ3OEc
- Vy3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nIDZx/ICiufZa86DEDMRnf4j5HOKJfhnpO2Xtv7xT7Q=;
- b=uQlYHDfjYzGy1LKCygtmuJPueyNXhghSIfoCnDByF/3OEVbJNF/tG6no0gycOD2ovn
- lNh5tpB3unq+TgAFo50c42c4mPSNMLoSqgXLuJXAhoBTp6MFWyvQ471yct9Lhrv7XWWz
- jqCDKKiv7KY3BHDZqer+d1NNJ+X65nFhrNh51/DAxyXFGAkB7ZXtb+CN2sctrKkMeCqI
- xIsRMELA6FjE3sZ+yZax9d9BSQJmCz4MpKYjxQNiLht4tPdsMmsP7Fbf53f8eERXNq5g
- 82n2z12+BYfwJw8OqVAr+glkvkWWNdPQBGrvjAWXqRynEwwVgyTQ6yzfzSjo6Mc0z6HQ
- +T7w==
-X-Gm-Message-State: APjAAAXi5BW8zoe4rgdNVRhH3lJNHw0MUdsuMz+HfaTfZULRRf73Fn4z
- M7FI9sUK3+GpbqoNXvo9OiilqrDw9vvF5wC0i+r51w==
-X-Google-Smtp-Source: APXvYqyoDeEPSMMR9XD5A7DpsHqVQLWsGoFtK4XtDmRulGIkC7D65fuqBZa1YekNo7HGVJSGwERrbdriQkXbhAJdiA0=
-X-Received: by 2002:aca:3d7:: with SMTP id 206mr16609419oid.98.1579001724598; 
- Tue, 14 Jan 2020 03:35:24 -0800 (PST)
+ (envelope-from <quintela@redhat.com>) id 1irKXt-0002jA-QQ
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:39:46 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20020
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKXt-0002iv-M8
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:39:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579001980;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=s8kSibyGHEuvaMxZof1NYWLNsdwJUdVoF7uKbNL5N60=;
+ b=WxzKwGAaPoDUj+tXut5EHe1nlPrsOx0ZYxsmnZMC0A0uKBh8YDiej1nZa+SPIa4oxxHYHZ
+ AtJoStcJGhZH/HENp/dwnhRqOLxrbQEtn08nYPngxSGoP2wbP/xp0fW/wYrO/XneqHxP6p
+ EDVpdsuhXZtKG+9S3bAIVwoCZ55u9is=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-3bRa8E_2PZiXq7t-_DdOkg-1; Tue, 14 Jan 2020 06:39:39 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2905800D4C;
+ Tue, 14 Jan 2020 11:39:37 +0000 (UTC)
+Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 07BB15DA32;
+ Tue, 14 Jan 2020 11:39:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/30] Migration pull patches (3rd try)
+Date: Tue, 14 Jan 2020 12:38:56 +0100
+Message-Id: <20200114113926.3556-1-quintela@redhat.com>
 MIME-Version: 1.0
-References: <CAFEAcA-dz7f_12QU1_YSkfuKKEk9YYcq8jwLRu90Z85UZ+YKRQ@mail.gmail.com>
- <CAJy5ezpLwSMFzzt-wBUak89RJWQYC-4yyKrADsp6y6Q6oSRsvA@mail.gmail.com>
-In-Reply-To: <CAJy5ezpLwSMFzzt-wBUak89RJWQYC-4yyKrADsp6y6Q6oSRsvA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 14 Jan 2020 11:35:13 +0000
-Message-ID: <CAFEAcA_ENpdUA+y0UV=JvJsa2xuk9JKQc=W1dHV1rigaTG-inQ@mail.gmail.com>
-Subject: Re: xlnx-zynqmp doesn't set psci-conduit on the R-cores
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22a
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 3bRa8E_2PZiXq7t-_DdOkg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,48 +82,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Corey Minyard <cminyard@mvista.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 11 Jan 2020 at 21:36, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
-> On Fri, 10 Jan. 2020, 08:42 Peter Maydell, <peter.maydell@linaro.org> wrote:
->> Hi; somebody pointed out to me that hw/arm/xlnx-zynqmp.c only
->> sets the psci-conduit on the A-profile cores, not the R. This
->> means you can't set the boot-cpu to an R-profile core and
->> use PSCI to wake up the other one. Is the omission deliberate?
-> I don't think this was given much thought.
->
-> AFAIK, we don't have any r5 software that implements PSCI (should that be done over svc? Hmm not sure if that's possible). The ATF port that runs on the a53s only handles the A cores IIRC.
->
-> I'll need to double check but in our sw stack the R5s are controlled via EEMI, a SoC specific smc interface that runs on the PMU (MicroBlaze).
->
-> Do you know how other SoCs with heterogeneous cores handle this?
+The following changes since commit 3c8a6575985b1652b45bfa670b5e1907d642cfa0=
+:
 
-I think usually in hardware they do some non-PSCI thing to
-wake up other cores (and probably implement PSCI themselves
-in the A-class firmware). PSCI itself doesn't really
-contemplate the idea of heterogenous cores. But for QEMU's
-xlnx-zynqmp model, every core except the 'boot_cpu' one
-is started in the powered-off state so presumably the
-only way to wake the other cores up is to use PSCI ?
-Unlike the 'virt' board, there doesn't seem to be any
-code to allow an "all CPUs start powered up and the
-firmware handles putting the secondaries in a pen" approach,
-and unlike the imx6 there's no model of a real-hardware
-power controller whose implementation calls arm_set_cpu_on().
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200113-pull-reque=
+st' into staging (2020-01-13 14:19:57 +0000)
 
-(The question came up because somebody was trying to do a
-quick hack test-case of "start on an R core and wake the
-A cores up later", but found they had to bodge several things
-(including adding the psci-conduit on the R cores) to be able
-to do this via PSCI. The use of the Xilinx board here is
-mostly just because it's the only one we have which has
-a separate R or M CPU as well as the main A-class cores.)
+are available in the Git repository at:
 
-thanks
--- PMM
+  https://github.com/juanquintela/qemu.git tags/migration-pull-pull-request
+
+for you to fetch changes up to c3ff7ba64b1bb484a0b6339165627a196045a8c1:
+
+  multifd: Allocate uint64_t instead of ram_addr_t (2020-01-14 12:28:07 +01=
+00)
+
+----------------------------------------------------------------
+Migration pull request (take 3)
+
+Fix (yet more) places where ram_addr_t is not 64 bits.
+
+----------------------------------------------------------------
+
+Alexey Romko (1):
+  Bug #1829242 correction.
+
+Daniel Henrique Barboza (1):
+  ram.c: remove unneeded labels
+
+Dr. David Alan Gilbert (1):
+  migration: Rate limit inside host pages
+
+Eric Auger (1):
+  migration: Support QLIST migration
+
+Fangrui Song (1):
+  migration: Fix incorrect integer->float conversion caught by clang
+
+Jiahui Cen (2):
+  migration/multifd: fix nullptr access in terminating multifd threads
+  migration/multifd: fix destroyed mutex access in terminating multifd
+    threads
+
+Juan Quintela (5):
+  multifd: Initialize local variable
+  migration-test: Add migration multifd test
+  migration: Make sure that we don't call write() in case of error
+  migration-test: introduce functions to handle string parameters
+  multifd: Allocate uint64_t instead of ram_addr_t
+
+Laurent Vivier (2):
+  migration-test: ppc64: fix FORTH test program
+  runstate: ignore finishmigrate -> prelaunch transition
+
+Marc-Andr=C3=A9 Lureau (1):
+  misc: use QEMU_IS_ALIGNED
+
+Peter Xu (3):
+  migration: Define VMSTATE_INSTANCE_ID_ANY
+  migration: Change SaveStateEntry.instance_id into uint32_t
+  apic: Use 32bit APIC ID for migration instance ID
+
+Scott Cheloha (2):
+  migration: add savevm_state_handler_remove()
+  migration: savevm_state_handler_insert: constant-time element
+    insertion
+
+Wei Yang (8):
+  migration/postcopy: reduce memset when it is zero page and
+    matches_target_page_size
+  migration/postcopy: wait for decompress thread in precopy
+  migration/postcopy: count target page number to decide the
+    place_needed
+  migration/postcopy: set all_zero to true on the first target page
+  migration/postcopy: enable random order target page arrival
+  migration/postcopy: enable compress during postcopy
+  migration/multifd: clean pages after filling packet
+  migration/multifd: not use multifd during postcopy
+
+Yury Kotov (2):
+  migration: Fix the re-run check of the migrate-incoming command
+  migration/ram: Yield periodically to the main loop
+
+ backends/dbus-vmstate.c      |   3 +-
+ exec.c                       |   4 +-
+ hw/arm/stellaris.c           |   2 +-
+ hw/core/qdev.c               |   3 +-
+ hw/display/ads7846.c         |   2 +-
+ hw/i2c/core.c                |   2 +-
+ hw/input/stellaris_input.c   |   3 +-
+ hw/intc/apic_common.c        |   7 +-
+ hw/misc/max111x.c            |   3 +-
+ hw/net/eepro100.c            |   3 +-
+ hw/pci/pci.c                 |   2 +-
+ hw/ppc/spapr.c               |   2 +-
+ hw/timer/arm_timer.c         |   2 +-
+ hw/tpm/tpm_emulator.c        |   3 +-
+ include/migration/register.h |   2 +-
+ include/migration/vmstate.h  |  25 ++++-
+ include/qemu/queue.h         |  39 ++++++++
+ migration/migration.c        |  72 +++++++-------
+ migration/migration.h        |   1 +
+ migration/ram.c              | 185 ++++++++++++++++++++++++++---------
+ migration/savevm.c           |  61 ++++++++----
+ migration/trace-events       |   9 +-
+ migration/vmstate-types.c    |  70 +++++++++++++
+ stubs/vmstate.c              |   2 +-
+ tests/qtest/migration-test.c |  97 +++++++++++++++++-
+ tests/test-vmstate.c         | 170 ++++++++++++++++++++++++++++++++
+ vl.c                         |  10 +-
+ 27 files changed, 654 insertions(+), 130 deletions(-)
+
+--=20
+2.24.1
+
 
