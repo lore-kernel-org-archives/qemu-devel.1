@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6901DC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 493D5C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:59:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3482624672
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:59:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F52A24672
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:59:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iEop8WqO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3482624672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a9ggM3+u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F52A24672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKqc-0003Zn-VS
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:59:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55987)
+	id 1irKrQ-0004d2-QM
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:59:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irKZc-0006RV-Se
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:41:32 -0500
+ (envelope-from <quintela@redhat.com>) id 1irKaH-0007U9-Vm
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irKZZ-0003Oj-5H
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:41:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50725
+ (envelope-from <quintela@redhat.com>) id 1irKaD-0003bh-O7
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54311
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKZZ-0003OJ-1j
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:41:25 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKaD-0003bG-Ks
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:42:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579002084;
+ s=mimecast20190719; t=1579002125;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ynLvDJfV4kUr7Pu6PZ24xc1KIuICA5kAdzwdWYoRAQo=;
- b=iEop8WqOx/33r+lo6NyYVKMfuEanLUv9R284UqhYPLQp4kbx25CiDQE013VhFL0u8oCmzM
- AMx0uDoM6GP63L93B3gkSwLfXEdfBVGqN7gikEBxgnd1ZfmJc17A3q1z2ni4aozp0Az7CY
- GeMa2IkZAqqiSGxmaPcNqiOcECkjZKs=
+ bh=Yr1WVaAouDj40R39IdfVYwIhtLx/Le0jqD+NYulh5As=;
+ b=a9ggM3+usCSaVNdTRf/LX9oK2LB2LJtg4XcSurexQimOQcxOO1OQYdG760pEelPHkR1dbw
+ e9PUgD7+4AWMrKepkwptly4pUuatohQTrn+QKzwnVOj7FHYn9XEpQVD1+NKDArB1nBHhHa
+ D7ne8lHMOwC5l41mHq7yUnFwoOElUnE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-FSkbqH-6OlWqOvzXcJrpdw-1; Tue, 14 Jan 2020 06:41:22 -0500
+ us-mta-215-5y4jJZAaM5uK8KsK5iYFzw-1; Tue, 14 Jan 2020 06:42:04 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1D55DB64;
- Tue, 14 Jan 2020 11:41:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2EC1801E7B;
+ Tue, 14 Jan 2020 11:42:01 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6C7E75DA7B;
- Tue, 14 Jan 2020 11:41:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 826995DA70;
+ Tue, 14 Jan 2020 11:41:57 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/30] migration/ram: Yield periodically to the main loop
-Date: Tue, 14 Jan 2020 12:39:10 +0100
-Message-Id: <20200114113926.3556-15-quintela@redhat.com>
+Subject: [PULL 20/30] migration/postcopy: enable compress during postcopy
+Date: Tue, 14 Jan 2020 12:39:16 +0100
+Message-Id: <20200114113926.3556-21-quintela@redhat.com>
 In-Reply-To: <20200114113926.3556-1-quintela@redhat.com>
 References: <20200114113926.3556-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: FSkbqH-6OlWqOvzXcJrpdw-1
+X-MC-Unique: 5y4jJZAaM5uK8KsK5iYFzw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,9 +91,8 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
  Stefan Weil <sw@weilnetz.de>, Richard Henderson <rth@twiddle.net>,
  "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Yury Kotov <yury-kotov@yandex-team.ru>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
  David Gibson <david@gibson.dropbear.id.au>, Jason Wang <jasowang@redhat.com>,
@@ -102,56 +101,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yury Kotov <yury-kotov@yandex-team.ru>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Usually, incoming migration coroutine yields to the main loop
-while its IO-channel is waiting for data to receive. But there is a case
-when RAM migration and data receive have the same speed: VM with huge
-zeroed RAM. In this case, IO-channel won't read and thus the main loop
-is stuck and for instance, it doesn't respond to QMP commands.
+postcopy requires to place a whole host page, while migration thread
+migrate memory in target page size. This makes postcopy need to collect
+all target pages in one host page before placing via userfaultfd.
 
-For this case, yield periodically, but not too often, so as not to
-affect the speed of migration.
+To enable compress during postcopy, there are two problems to solve:
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+    1. Random order for target page arrival
+    2. Target pages in one host page arrives without interrupt by target
+       page from other host page
+
+The first one is handled by previous cleanup patch.
+
+This patch handles the second one by:
+
+    1. Flush compress thread for each host page
+    2. Wait for decompress thread for before placing host page
+
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ migration/migration.c | 11 -----------
+ migration/ram.c       | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 27 insertions(+), 12 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index e55edee606..990bff00c0 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1005,17 +1005,6 @@ static bool migrate_caps_check(bool *cap_list,
+ #endif
+=20
+     if (cap_list[MIGRATION_CAPABILITY_POSTCOPY_RAM]) {
+-        if (cap_list[MIGRATION_CAPABILITY_COMPRESS]) {
+-            /* The decompression threads asynchronously write into RAM
+-             * rather than use the atomic copies needed to avoid
+-             * userfaulting.  It should be possible to fix the decompressi=
+on
+-             * threads for compatibility in future.
+-             */
+-            error_setg(errp, "Postcopy is not currently compatible "
+-                       "with compression");
+-            return false;
+-        }
+-
+         /* This check is reasonably expensive, so only when it's being
+          * set the first time, also it's only the destination that needs
+          * special support.
 diff --git a/migration/ram.c b/migration/ram.c
-index 1ec5c10561..5cd066467c 100644
+index a7414170e5..5f20c3d15d 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -4246,7 +4246,7 @@ static void colo_flush_ram_cache(void)
-  */
- static int ram_load_precopy(QEMUFile *f)
- {
--    int flags =3D 0, ret =3D 0, invalid_flags =3D 0, len =3D 0;
-+    int flags =3D 0, ret =3D 0, invalid_flags =3D 0, len =3D 0, i =3D 0;
-     /* ADVISE is earlier, it shows the source has the postcopy capability =
-on */
-     bool postcopy_advised =3D postcopy_is_advised();
-     if (!migrate_use_compression()) {
-@@ -4258,6 +4258,17 @@ static int ram_load_precopy(QEMUFile *f)
-         void *host =3D NULL;
-         uint8_t ch;
+@@ -3469,6 +3469,14 @@ static int ram_save_iterate(QEMUFile *f, void *opaqu=
+e)
 =20
-+        /*
-+         * Yield periodically to let main loop run, but an iteration of
-+         * the main loop is expensive, so do it each some iterations
-+         */
-+        if ((i & 32767) =3D=3D 0 && qemu_in_coroutine()) {
-+            aio_co_schedule(qemu_get_current_aio_context(),
-+                            qemu_coroutine_self());
-+            qemu_coroutine_yield();
-+        }
-+        i++;
+             rs->target_page_count +=3D pages;
+=20
++            /*
++             * During postcopy, it is necessary to make sure one whole hos=
+t
++             * page is sent in one chunk.
++             */
++            if (migrate_postcopy_ram()) {
++                flush_compressed_data(rs);
++            }
 +
+             /*
+              * we want to check in the 1st loop, just in case it was the 1=
+st
+              * time and we had to sync the dirty bitmap.
+@@ -4061,6 +4069,7 @@ static int ram_load_postcopy(QEMUFile *f)
+         void *place_source =3D NULL;
+         RAMBlock *block =3D NULL;
+         uint8_t ch;
++        int len;
+=20
          addr =3D qemu_get_be64(f);
-         flags =3D addr & ~TARGET_PAGE_MASK;
-         addr &=3D TARGET_PAGE_MASK;
+=20
+@@ -4078,7 +4087,8 @@ static int ram_load_postcopy(QEMUFile *f)
+=20
+         trace_ram_load_postcopy_loop((uint64_t)addr, flags);
+         place_needed =3D false;
+-        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
++        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
++                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
+             block =3D ram_block_from_stream(f, flags);
+=20
+             host =3D host_from_ram_block_offset(block, addr);
+@@ -4161,6 +4171,17 @@ static int ram_load_postcopy(QEMUFile *f)
+                                          TARGET_PAGE_SIZE);
+             }
+             break;
++        case RAM_SAVE_FLAG_COMPRESS_PAGE:
++            all_zero =3D false;
++            len =3D qemu_get_be32(f);
++            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
++                error_report("Invalid compressed data length: %d", len);
++                ret =3D -EINVAL;
++                break;
++            }
++            decompress_data_with_multi_threads(f, page_buffer, len);
++            break;
++
+         case RAM_SAVE_FLAG_EOS:
+             /* normal exit */
+             multifd_recv_sync_main();
+@@ -4172,6 +4193,11 @@ static int ram_load_postcopy(QEMUFile *f)
+             break;
+         }
+=20
++        /* Got the whole host page, wait for decompress before placing. */
++        if (place_needed) {
++            ret |=3D wait_for_decompress_done();
++        }
++
+         /* Detect for any possible file errors */
+         if (!ret && qemu_file_get_error(f)) {
+             ret =3D qemu_file_get_error(f);
 --=20
 2.24.1
 
