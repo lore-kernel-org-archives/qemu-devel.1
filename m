@@ -2,85 +2,77 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD313C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F477C33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:17:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9259A24672
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F2B324672
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itef3uUE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9259A24672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G9l6UfCR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2B324672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKC7-0002iU-Ge
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:17:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48671)
+	id 1irKCj-0003Pt-1A
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:17:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1irK07-0004Jn-6S
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:04:48 -0500
+ (envelope-from <stefanha@redhat.com>) id 1irJx3-0000mm-SU
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1irK06-0008D6-7A
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:04:47 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38407)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1irK05-0008CZ-8c
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:04:45 -0500
-Received: by mail-wm1-x343.google.com with SMTP id u2so13167463wmc.3
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 03:04:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=poI9+O4rWtN9dout6QdkM+i8vBow/GMm4TrdNefzrXI=;
- b=itef3uUEk3ASB3Our9ijcrb+ghMNTnmgzI19h7VC9JHRpC1w5gR9OO1VsZUlqu6H3L
- Gbmfv5ZQqI2y/jmHmVj7k4qlDMUS6pzqnjXk9i8Ok5SsLdmxlSLfiHE6Lv2HE4ujR+6a
- 7U1Yobh5cm++96BbsVYSinI1VOJorwJ/G41mJ6NHLmNNr1jnKvzVRAZSxP+f8gupbtkc
- swK8fWLRKRYmSXZweOEZiLr5UZclYxb8I29GJ1541JinvLn8Q9V4QsAs2w4NwW7xG5D5
- ptMp9TxNml6PzS+293DGPslO/CS06WALB0aRHNnu7D5Wh9g8+7db6fKuvJXZ7rdXQZS0
- BDUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=poI9+O4rWtN9dout6QdkM+i8vBow/GMm4TrdNefzrXI=;
- b=AVlgKDlSBt0KUuIyGi2STodGL/2fg1wZWZJRh+B5nbeRyJIuY1r3xDkbVDjSxhCX+A
- 1qRzdxfXZ7tYOr8EggUd6xgGOURw42od4vV+gnLbVgzUnof0a0RiLmUzFV83iR/b8iDq
- lvdP5F/Z038da19FqJ04MkULRHyAXVb8j9OWPzYj7YaFLMxHTImejiZ43zvqr9SPBYyE
- 27A/pJpfKwFD2el4c9bEJNvXLte6BT7m5xC5qvPE9AQUS89yvacn8lc13GmONUkRY/kT
- DCHKa+SvXu5gC+73yWg3DFy9mLhs0SoUBhlu4usVwi9RYCByjWNO81hqpIQp3hMNFs+M
- 94Jg==
-X-Gm-Message-State: APjAAAVTLMaY/ynrgZ+maJV9jmScz5lr1gKU23+PiQEYpLCz7wWZgWs1
- 0vHodFg89gDutJKJKYfB2LI=
-X-Google-Smtp-Source: APXvYqwoPpTQTK/+Lss7T2SlADtv2NOAn3uf2RmA7tGzbhcOZTlXL+nDoOYM412J5HPe5l1qltIq9w==
-X-Received: by 2002:a7b:cc97:: with SMTP id p23mr27420630wma.89.1578999884032; 
- Tue, 14 Jan 2020 03:04:44 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id z187sm18789152wme.16.2020.01.14.03.04.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 03:04:42 -0800 (PST)
-Date: Tue, 14 Jan 2020 11:04:41 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Subject: Re: [qemu-web PATCH] documentation: update links to readthedocs
-Message-ID: <20200114110441.GE118882@stefanha-x1.localdomain>
-References: <20200113103550.1133-1-alex.bennee@linaro.org>
+ (envelope-from <stefanha@redhat.com>) id 1irJwz-0007GX-M4
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:37 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40656
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJwz-0007GH-Hj
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:01:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578999693;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WcH3RXRGRKFiCBMnnixiIb++0iWQnkZHIkxeSouGeeo=;
+ b=G9l6UfCRKyusm5puLDCTMevb0EWH2cDg5mnzZ6m65r5FtLVmkmAMp0fePel0kMxg0gqArT
+ poIQ8/DrTExOzGHISnH/t7j6B94UcgHg0WwBkpMEw8FEN+9YJvjPi2LpYtSbhqdm0DFks2
+ Agi/hpp4fjRLGbrfkXMqUsF7VcmIFQE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-247-4Mk6xUycNH2mabT5AQ1B-Q-1; Tue, 14 Jan 2020 06:01:31 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCB1C10054E3;
+ Tue, 14 Jan 2020 11:01:29 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78EF281777;
+ Tue, 14 Jan 2020 11:01:22 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 14/15] tests/qemu-iotests: enable testing with aio options
+Date: Tue, 14 Jan 2020 10:59:20 +0000
+Message-Id: <20200114105921.131880-15-stefanha@redhat.com>
+In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
+References: <20200114105921.131880-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="MIdTMoZhcV1D07fI"
-Content-Disposition: inline
-In-Reply-To: <20200113103550.1133-1-alex.bennee@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 4Mk6xUycNH2mabT5AQ1B-Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,41 +84,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, oleksandr@redhat.com,
+ Julia Suvorova <jusual@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
---MIdTMoZhcV1D07fI
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ tests/qemu-iotests/check      | 15 ++++++++++++++-
+ tests/qemu-iotests/common.rc  | 14 ++++++++++++++
+ tests/qemu-iotests/iotests.py | 12 ++++++++++--
+ 3 files changed, 38 insertions(+), 3 deletions(-)
 
-On Mon, Jan 13, 2020 at 10:35:50AM +0000, Alex Benn=E9e wrote:
-> ..and extemporise a little about their state.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> ---
->  documentation.md | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 2890785a10..39ed5bc1be 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -137,6 +137,7 @@ sortme=3Dfalse
+ expunge=3Dtrue
+ have_test_arg=3Dfalse
+ cachemode=3Dfalse
++aiomode=3Dfalse
+=20
+ tmp=3D"${TEST_DIR}"/$$
+ rm -f $tmp.list $tmp.tmp $tmp.sed
+@@ -146,6 +147,7 @@ export IMGFMT_GENERIC=3Dtrue
+ export IMGPROTO=3Dfile
+ export IMGOPTS=3D""
+ export CACHEMODE=3D"writeback"
++export AIOMODE=3D"threads"
+ export QEMU_IO_OPTIONS=3D""
+ export QEMU_IO_OPTIONS_NO_FMT=3D""
+ export CACHEMODE_IS_DEFAULT=3Dtrue
+@@ -230,6 +232,11 @@ s/ .*//p
+         CACHEMODE_IS_DEFAULT=3Dfalse
+         cachemode=3Dfalse
+         continue
++    elif $aiomode
++    then
++        AIOMODE=3D"$r"
++        aiomode=3Dfalse
++        continue
+     fi
+=20
+     xpand=3Dtrue
+@@ -274,6 +281,7 @@ other options
+     -n                  show me, do not run tests
+     -o options          -o options to pass to qemu-img create/convert
+     -c mode             cache mode
++    -i mode             AIO mode
+     -makecheck          pretty print output for make check
+=20
+ testlist options
+@@ -438,10 +446,13 @@ testlist options
+             cachemode=3Dtrue
+             xpand=3Dfalse
+             ;;
++        -i)
++            aiomode=3Dtrue
++            xpand=3Dfalse
++            ;;
+         -T)        # deprecated timestamp option
+             xpand=3Dfalse
+             ;;
+-
+         -v)
+             verbose=3Dtrue
+             xpand=3Dfalse
+@@ -520,6 +531,8 @@ done
+=20
+ # Set qemu-io cache mode with $CACHEMODE we have
+ QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --cache $CACHEMODE"
++# Set qemu-io aio mode with $AIOMODE we have
++QEMU_IO_OPTIONS=3D"$QEMU_IO_OPTIONS --aio $AIOMODE"
+=20
+ QEMU_IO_OPTIONS_NO_FMT=3D"$QEMU_IO_OPTIONS"
+ if [ "$IMGOPTSSYNTAX" !=3D "true" ]; then
+diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+index d088392ab6..9ccde32634 100644
+--- a/tests/qemu-iotests/common.rc
++++ b/tests/qemu-iotests/common.rc
+@@ -645,6 +645,20 @@ _default_cache_mode()
+         return
+     fi
+ }
++_supported_aio_modes()
++{
++    for mode; do
++        if [ "$mode" =3D "$AIOMODE" ]; then
++            return
++        fi
++    done
++    _notrun "not suitable for aio mode: $AIOMODE"
++}
++_default_aio_mode()
++{
++    AIOMODE=3D"$1"
++    QEMU_IO=3D"$QEMU_IO --aio $1"
++}
+=20
+ _unsupported_imgopts()
+ {
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 13fd8b5cd2..60e9eefe94 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -65,6 +65,7 @@ test_dir =3D os.environ.get('TEST_DIR')
+ sock_dir =3D os.environ.get('SOCK_DIR')
+ output_dir =3D os.environ.get('OUTPUT_DIR', '.')
+ cachemode =3D os.environ.get('CACHEMODE')
++aiomode =3D os.environ.get('AIOMODE')
+ qemu_default_machine =3D os.environ.get('QEMU_DEFAULT_MACHINE')
+=20
+ socket_scm_helper =3D os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_help=
+er')
+@@ -495,6 +496,7 @@ class VM(qtest.QEMUQtestMachine):
+             options.append('file=3D%s' % path)
+             options.append('format=3D%s' % format)
+             options.append('cache=3D%s' % cachemode)
++            options.append('aio=3D%s' % aiomode)
+=20
+         if opts:
+             options.append(opts)
+@@ -933,6 +935,10 @@ def verify_cache_mode(supported_cache_modes=3D[]):
+     if supported_cache_modes and (cachemode not in supported_cache_modes):
+         notrun('not suitable for this cache mode: %s' % cachemode)
+=20
++def verify_aio_mode(supported_aio_modes=3D[]):
++    if supported_aio_modes and (aiomode not in supported_aio_modes):
++        notrun('not suitable for this aio mode: %s' % aiomode)
++
+ def supports_quorum():
+     return 'quorum' in qemu_img_pipe('--help')
+=20
+@@ -1019,8 +1025,9 @@ def execute_unittest(output, verbosity, debug):
+=20
+ def execute_test(test_function=3DNone,
+                  supported_fmts=3D[], supported_oses=3D['linux'],
+-                 supported_cache_modes=3D[], unsupported_fmts=3D[],
+-                 supported_protocols=3D[], unsupported_protocols=3D[]):
++                 supported_cache_modes=3D[], supported_aio_modes=3D{},
++                 unsupported_fmts=3D[], supported_protocols=3D[],
++                 unsupported_protocols=3D[]):
+     """Run either unittest or script-style tests."""
+=20
+     # We are using TEST_DIR and QEMU_DEFAULT_MACHINE as proxies to
+@@ -1037,6 +1044,7 @@ def execute_test(test_function=3DNone,
+     verify_protocol(supported_protocols, unsupported_protocols)
+     verify_platform(supported_oses)
+     verify_cache_mode(supported_cache_modes)
++    verify_aio_mode(supported_aio_modes)
+=20
+     if debug:
+         output =3D sys.stdout
+--=20
+2.24.1
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---MIdTMoZhcV1D07fI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl4doEkACgkQnKSrs4Gr
-c8ijRAf8Clw4fiQZAjfY8/tYIoVT4kv9V0zHiwkMJmIVHYPfLF5HOmJqTMIsj3BF
-52fDRy+9ADX41L9HR0UVBCo35uCBgHNXcBdg4zJXhsdT8sQ9o7RAWsTGe98FX7J/
-UeFXybsiny9WlK24+LrJfZKh8iN4dTCzuTAD23xUD/uTFI7y6iF3yVp/PBmEfqkx
-o53Vg0sR3o+fi1W8fs1KYK8CgKatd5/nYkPF58Pp2oirS0H/gOf1nBFqHLxgzmMj
-60606H/Rm3aD9ul7vFpjJBiKHXZi/eHGnfPFJjpuNbgVt3tYGXzXT9SI2MDdaKI4
-I81KT/eDPuOsAr09fdkK5948t6i/Bw==
-=gGO1
------END PGP SIGNATURE-----
-
---MIdTMoZhcV1D07fI--
 
