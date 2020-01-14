@@ -2,69 +2,105 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2E3C33CB2
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83506C33CB3
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D978B214AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D70124685
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="XBiJ5PtJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D978B214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBUktCt1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D70124685
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irMja-0001GL-Rl
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:59:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52509)
+	id 1irMjj-0001XY-9d
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:00:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1irMiI-00080g-GD
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 08:58:38 -0500
+ (envelope-from <mreitz@redhat.com>) id 1irMiN-00089P-Q5
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 08:58:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1irMiE-0001BV-6D
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 08:58:34 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:52889)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1irMiB-0001B0-UF; Tue, 14 Jan 2020 08:58:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=a9fjg3MM6VegbyHPvApFP0RNFDauRG63U8EPnn1FFiE=; 
- b=XBiJ5PtJH21NGBKQfvcs96WgTQcMDI1vgEn2m5taV3z4NqODP8+2ma+4JEj18IJxFfnbiAa0OFbYmfpPLzTFd7fuTQq4N9/Aheon2iNEqwxBH38CteZHFHgNUvJabNGev0REuJpwdbCVtNt4lQgfkxJBuwadJiF08uUd9q++WfOc0JHmgqL35tcZfYarVyuMMDAYloiLqoNvUCoUWpfvrT0hChTkcuoeVpiGKqdPwESFnhEzhJF9xefSmJG939V17uHmUXcg8UIvH3su0UMuzp+bclKZgj+Ii9vrSXcm3wVHcruszEUSvZvUjp8a6rveb0SIksGip9NyMXELuIQAvA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1irMi9-00046K-DO; Tue, 14 Jan 2020 14:58:25 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1irMi8-0000H9-V4; Tue, 14 Jan 2020 14:58:24 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 1/4] qcow2: Require that the virtual size is a multiple
- of the sector size
-In-Reply-To: <9f7ab60c-c9d4-527b-55dd-40f487a36895@redhat.com>
+ (envelope-from <mreitz@redhat.com>) id 1irMiJ-0001Cq-Ux
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 08:58:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22785
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1irMiJ-0001Ce-OY
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 08:58:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579010315;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GlTlkorgTyk3YhJhfUokjG4272cQwDrGTCgldOUYE8Y=;
+ b=CBUktCt1nLgnQ9XPmpqrerRkTEIyd/uMiyGNjs9xNCcJWOIKFEVgoSy4GK3s6SIvtsaa3f
+ Mg6D76JgBdFKw/zSRFYNqYWB+Om9v4Tty7g9JTcPJ46lYmy3jT9BOYwh5jgwCvORVQ8BqP
+ jE2b7r3rUcPId/vpI+6r+Jz0k4LpYLM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-eYXg-7D2OcGMWG_ZOMI4oQ-1; Tue, 14 Jan 2020 08:58:33 -0500
+X-MC-Unique: eYXg-7D2OcGMWG_ZOMI4oQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E20F0DBB2;
+ Tue, 14 Jan 2020 13:58:32 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A2795DA32;
+ Tue, 14 Jan 2020 13:58:31 +0000 (UTC)
+Subject: Re: [PATCH v2 3/4] qcow2: Tighten cluster_offset alignment assertions
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1578596897.git.berto@igalia.com>
- <6a1cfcbb533b487bac96e1d2282ebf210954d27a.1578596897.git.berto@igalia.com>
- <bd6ca991-c2f7-0e27-5bee-07a7c53f8a8e@redhat.com>
- <w51v9peb2dz.fsf@maestria.local.igalia.com>
- <9f7ab60c-c9d4-527b-55dd-40f487a36895@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Tue, 14 Jan 2020 14:58:24 +0100
-Message-ID: <w51sgkib0n3.fsf@maestria.local.igalia.com>
+ <fe47feb4fc96cf1242ba9e9431f910aef575cf16.1578596897.git.berto@igalia.com>
+ <w515zhjbj9m.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cd41db3d-24c1-daa1-1b0b-bbcaeda9f163@redhat.com>
+Date: Tue, 14 Jan 2020 14:58:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+In-Reply-To: <w515zhjbj9m.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="8S0xO94DFMJhHPDuveM2KurXs56vYuJQB"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,29 +118,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue 14 Jan 2020 02:47:53 PM CET, Max Reitz wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8S0xO94DFMJhHPDuveM2KurXs56vYuJQB
+Content-Type: multipart/mixed; boundary="iHsP45hjzL3TOCBNdHodgG5VvALX3eqPp"
 
->> Yes, but does it make sense to try to support images with unaligned
->> sizes if no one is going to create them ever and QEMU cannot even
->> generate them?
->
-> If nobody uses such images ever, isn=E2=80=99t the current code fine as-i=
-s?
+--iHsP45hjzL3TOCBNdHodgG5VvALX3eqPp
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I'll rephrase:
+On 10.01.20 13:14, Alberto Garcia wrote:
+> On Thu 09 Jan 2020 08:13:01 PM CET, Alberto Garcia wrote:
+>> -        assert((cluster_offset & 511) =3D=3D 0);
+>> +        assert(QEMU_IS_ALIGNED(cluster_offset, s->cluster_size));
+>=20
+> On second thoughts this patch could also use the (probably more
+> efficient) offset_into_cluster() call instead.
+>=20
+> I can resend it if you think it's a good idea.
+Either way works for me.  (I don=92t think it=92s going to make any
+difference in practice, but of course, why not.)
 
-1. It is possible to have a qcow2 image with a size of 1 GB + 13 bytes
-   (the size field in the qcow2 header allows it).
+Max
 
-2. qemu-img cannot currently produce such images.
 
-3. QEMU can open them but it gets the size wrong.
+--iHsP45hjzL3TOCBNdHodgG5VvALX3eqPp--
 
-4. Fixing this in QEMU involves non-trivial changes (at least at the
-   moment).
+--8S0xO94DFMJhHPDuveM2KurXs56vYuJQB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-5. I don't think there's any use case for such images so instead of
-   fixing QEMU I propose that we simply refuse to open them.
+-----BEGIN PGP SIGNATURE-----
 
-Berto
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl4dyQUACgkQ9AfbAGHV
+z0DzCQf+OtcYiujAKjXoWLgkHTvcu1aPCwRdCadi9meeYImTrDTpgrVxXYm1fPWi
+PCLZXrMk27f9f/NVcebOCLhVA76zMmIXhP2iYXrlohD+epFIs3MS+HAKPX2XE9Pl
+SztHYliHAHVUvXRGBty+8E541O95gy7CRnPeZZrIzWGlYUDd+I2CTUxhUzc57dn4
+FwNHdiT6gfbyGz/gignX4AsnpYE50FzTkACLKKrquzPooREhJTtRnc2KCrRaS55z
+QHiuE4Hqs4fbnQDRePwjB01nzX8MyGR1vI6953IPZs3QfFhie9knFZu1oNNoKQI0
+z1Sybt8aIDX5VT2BNaRKahwjInEkRQ==
+=sft1
+-----END PGP SIGNATURE-----
+
+--8S0xO94DFMJhHPDuveM2KurXs56vYuJQB--
+
 
