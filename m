@@ -2,88 +2,77 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD845C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79276C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:12:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2E5C206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 431A2206D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:12:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dT+CSyEy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E5C206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bl2OztJI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431A2206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irK71-0004Ri-3v
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:11:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48209)
+	id 1irK76-0004b1-LL
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:12:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47806)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1irJxf-0001cW-6V
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:02:16 -0500
+ (envelope-from <stefanha@redhat.com>) id 1irJwH-0000AR-T4
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1irJxe-0007U8-18
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:02:15 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56245)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1irJxd-0007Tt-Qm
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:02:13 -0500
-Received: by mail-wm1-x342.google.com with SMTP id q9so13224414wmj.5
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 03:02:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=xapXEXsQvmkLueFpCx1Od3KtZFUB49fuDfl8xft62VI=;
- b=dT+CSyEyHOS7ODvK2d9Q90Pj8QYbB0Ed6V+M9VCRUZl8gfAEusde/LVZcSxQ9WUHHO
- yw+0X5zButTipqEtoZ1Dm+YMKJAJzlq06BS2rT2aT8wSqyqSAQE+BhI97x3YPFYIa4ya
- uKpBWWIESb+cO+6ZD/dlLP9whuFhmSbTCF5gKsSqtbMt0P9chlhyO++4R1I9yrhrtVYB
- KTEyXUzxJPtsa0PHh+TRtDQ+KBAIWQDF6CdqGFAMFRgpFQ1sZ8KBTLEU7umiipNRntxC
- N7Hdo91p1YM5dYJ0IGiQYbkGZ47HZBmhfRa2x5nfnBehxSA8rkAH8bPTOX2W92Aj+POO
- jnag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=xapXEXsQvmkLueFpCx1Od3KtZFUB49fuDfl8xft62VI=;
- b=XcJgXed9Yl1dk3vTHeq6m13kemREgeagsWmrJj29ToUeiZ7RaEtIqBV14U3e02mODv
- vW0vzt0+CLAsDmWTiMGL7s0CwjXzyCwc3f/UoEhQ3THNKvIVLSJyHMABkS95H1LN3EBA
- Nas0MSjG3RjNm/BS3d/43NHMI56DyqfK6yh8EMk1u319A8hopYGX3qqIoPW2zkZQ8vqi
- LPXNGAy42qklkTLYyQWh+k3NDej3dpgCmGZ55v7PqQWfDdItH+rwRUWc/3iqQFMhAkjP
- 2KmbYWp7bJrwo1EBmcT53mbCCv853lIiNjXArzDjuOv25pRlnFFbejXHIaMPphN3rYxO
- hxdQ==
-X-Gm-Message-State: APjAAAUzQsbWYP6N3tdaPbhbnvzTHg5EbR3EA/7fWZrSRQL/z323atY+
- u75Z5j2I3zINn0rXGFphMt6ilw==
-X-Google-Smtp-Source: APXvYqw2Usg8XLdj/vpKesaneG+UHHzXD8MMTN/F6k3bw/Y8OIhss01YauIyuhYwy6Cx5n0Cb2suPA==
-X-Received: by 2002:a7b:c74c:: with SMTP id w12mr26247660wmk.1.1578999732275; 
- Tue, 14 Jan 2020 03:02:12 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d16sm20324146wrg.27.2020.01.14.03.02.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 03:02:11 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 616C31FF87;
- Tue, 14 Jan 2020 11:02:10 +0000 (GMT)
-References: <20200114030138.260347-1-jkz@google.com>
-User-agent: mu4e 1.3.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Josh Kunz <jkz@google.com>
-Subject: Re: [PATCH 0/4] migration: Replace gemu_log with qemu_log
-In-reply-to: <20200114030138.260347-1-jkz@google.com>
-Date: Tue, 14 Jan 2020 11:02:10 +0000
-Message-ID: <87h80ymhcd.fsf@linaro.org>
+ (envelope-from <stefanha@redhat.com>) id 1irJwG-0006wW-2U
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33742
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1irJwF-0006wC-Ro
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:00:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1578999647;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/XbJeHSvkhvJjBK4DWgXSbBZbUxFZbWaoPICn7se4X0=;
+ b=bl2OztJI9AMIiQbmcrA6TuahNVgxO+ttSMxAUCc8IpLUHs9379mh9kNhn3++WHF8a0dBGN
+ o/efZQOq3s1l74YQienqYVdlPaylQoDL7z7KSeIHgovLtBh2dflmbkmJlEhzgJFKeI8Bp4
+ srD8WsXSemtyfHwclHXIaGu+9IHvcu4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-1w9Yxvd_NoicyQOrTBA7JQ-1; Tue, 14 Jan 2020 06:00:43 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 316D6800D53;
+ Tue, 14 Jan 2020 11:00:42 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DCC51081318;
+ Tue, 14 Jan 2020 11:00:34 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 08/15] block/file-posix.c: extend to use io_uring
+Date: Tue, 14 Jan 2020 10:59:14 +0000
+Message-Id: <20200114105921.131880-9-stefanha@redhat.com>
+In-Reply-To: <20200114105921.131880-1-stefanha@redhat.com>
+References: <20200114105921.131880-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 1w9Yxvd_NoicyQOrTBA7JQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,28 +84,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, riku.voipio@iki.fi, qemu-devel@nongnu.org,
- laurent@vivier.eu
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Maxim Levitsky <maximlevitsky@gmail.com>, qemu-block@nongnu.org,
+ oleksandr@redhat.com, Julia Suvorova <jusual@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
 
-Josh Kunz <jkz@google.com> writes:
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Reviewed-by: Maxim Levitsky <maximlevitsky@gmail.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/file-posix.c | 85 +++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 69 insertions(+), 16 deletions(-)
 
-<snip>
->
-> Not tested:
->   * Build/logging with bsd-user. I do not have easy access to a BSD
-> system.
-
-If you have the time we have vm-build-netbsd:
-
-  make vm-build-netbsd EXTRA_CONFIGURE_OPTS=3D"--disable-system"
-=20=20
-Which will create a NetBSD image for you and run the build through it.
-Other images are available ;-)
-
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 1b805bd938..64c7cf0c31 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -156,6 +156,7 @@ typedef struct BDRVRawState {
+     bool has_write_zeroes:1;
+     bool discard_zeroes:1;
+     bool use_linux_aio:1;
++    bool use_linux_io_uring:1;
+     bool page_cache_inconsistent:1;
+     bool has_fallocate;
+     bool needs_alignment;
+@@ -444,7 +445,7 @@ static QemuOptsList raw_runtime_opts =3D {
+         {
+             .name =3D "aio",
+             .type =3D QEMU_OPT_STRING,
+-            .help =3D "host AIO implementation (threads, native)",
++            .help =3D "host AIO implementation (threads, native, io_uring)=
+",
+         },
+         {
+             .name =3D "locking",
+@@ -514,7 +515,11 @@ static int raw_open_common(BlockDriverState *bs, QDict=
+ *options,
+         ret =3D -EINVAL;
+         goto fail;
+     }
++
+     s->use_linux_aio =3D (aio =3D=3D BLOCKDEV_AIO_OPTIONS_NATIVE);
++#ifdef CONFIG_LINUX_IO_URING
++    s->use_linux_io_uring =3D (aio =3D=3D BLOCKDEV_AIO_OPTIONS_IO_URING);
++#endif
+=20
+     locking =3D qapi_enum_parse(&OnOffAuto_lookup,
+                               qemu_opt_get(opts, "locking"),
+@@ -600,6 +605,22 @@ static int raw_open_common(BlockDriverState *bs, QDict=
+ *options,
+     }
+ #endif /* !defined(CONFIG_LINUX_AIO) */
+=20
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        if (!aio_setup_linux_io_uring(bdrv_get_aio_context(bs), errp)) {
++            error_prepend(errp, "Unable to use io_uring: ");
++            goto fail;
++        }
++    }
++#else
++    if (s->use_linux_io_uring) {
++        error_setg(errp, "aio=3Dio_uring was specified, but is not support=
+ed "
++                         "in this build.");
++        ret =3D -EINVAL;
++        goto fail;
++    }
++#endif /* !defined(CONFIG_LINUX_IO_URING) */
++
+     s->has_discard =3D true;
+     s->has_write_zeroes =3D true;
+     if ((bs->open_flags & BDRV_O_NOCACHE) !=3D 0) {
+@@ -1877,21 +1898,25 @@ static int coroutine_fn raw_co_prw(BlockDriverState=
+ *bs, uint64_t offset,
+         return -EIO;
+=20
+     /*
+-     * Check if the underlying device requires requests to be aligned,
+-     * and if the request we are trying to submit is aligned or not.
+-     * If this is the case tell the low-level driver that it needs
+-     * to copy the buffer.
++     * When using O_DIRECT, the request must be aligned to be able to use
++     * either libaio or io_uring interface. If not fail back to regular th=
+read
++     * pool read/write code which emulates this for us if we
++     * set QEMU_AIO_MISALIGNED.
+      */
+-    if (s->needs_alignment) {
+-        if (!bdrv_qiov_is_aligned(bs, qiov)) {
+-            type |=3D QEMU_AIO_MISALIGNED;
++    if (s->needs_alignment && !bdrv_qiov_is_aligned(bs, qiov)) {
++        type |=3D QEMU_AIO_MISALIGNED;
++#ifdef CONFIG_LINUX_IO_URING
++    } else if (s->use_linux_io_uring) {
++        LuringState *aio =3D aio_get_linux_io_uring(bdrv_get_aio_context(b=
+s));
++        assert(qiov->size =3D=3D bytes);
++        return luring_co_submit(bs, aio, s->fd, offset, qiov, type);
++#endif
+ #ifdef CONFIG_LINUX_AIO
+-        } else if (s->use_linux_aio) {
+-            LinuxAioState *aio =3D aio_get_linux_aio(bdrv_get_aio_context(=
+bs));
+-            assert(qiov->size =3D=3D bytes);
+-            return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
++    } else if (s->use_linux_aio) {
++        LinuxAioState *aio =3D aio_get_linux_aio(bdrv_get_aio_context(bs))=
+;
++        assert(qiov->size =3D=3D bytes);
++        return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
+ #endif
+-        }
+     }
+=20
+     acb =3D (RawPosixAIOData) {
+@@ -1927,24 +1952,36 @@ static int coroutine_fn raw_co_pwritev(BlockDriverS=
+tate *bs, uint64_t offset,
+=20
+ static void raw_aio_plug(BlockDriverState *bs)
+ {
++    BDRVRawState __attribute__((unused)) *s =3D bs->opaque;
+ #ifdef CONFIG_LINUX_AIO
+-    BDRVRawState *s =3D bs->opaque;
+     if (s->use_linux_aio) {
+         LinuxAioState *aio =3D aio_get_linux_aio(bdrv_get_aio_context(bs))=
+;
+         laio_io_plug(bs, aio);
+     }
+ #endif
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        LuringState *aio =3D aio_get_linux_io_uring(bdrv_get_aio_context(b=
+s));
++        luring_io_plug(bs, aio);
++    }
++#endif
+ }
+=20
+ static void raw_aio_unplug(BlockDriverState *bs)
+ {
++    BDRVRawState __attribute__((unused)) *s =3D bs->opaque;
+ #ifdef CONFIG_LINUX_AIO
+-    BDRVRawState *s =3D bs->opaque;
+     if (s->use_linux_aio) {
+         LinuxAioState *aio =3D aio_get_linux_aio(bdrv_get_aio_context(bs))=
+;
+         laio_io_unplug(bs, aio);
+     }
+ #endif
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        LuringState *aio =3D aio_get_linux_io_uring(bdrv_get_aio_context(b=
+s));
++        luring_io_unplug(bs, aio);
++    }
++#endif
+ }
+=20
+ static int raw_co_flush_to_disk(BlockDriverState *bs)
+@@ -1964,14 +2001,20 @@ static int raw_co_flush_to_disk(BlockDriverState *b=
+s)
+         .aio_type       =3D QEMU_AIO_FLUSH,
+     };
+=20
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        LuringState *aio =3D aio_get_linux_io_uring(bdrv_get_aio_context(b=
+s));
++        return luring_co_submit(bs, aio, s->fd, 0, NULL, QEMU_AIO_FLUSH);
++    }
++#endif
+     return raw_thread_pool_submit(bs, handle_aiocb_flush, &acb);
+ }
+=20
+ static void raw_aio_attach_aio_context(BlockDriverState *bs,
+                                        AioContext *new_context)
+ {
++    BDRVRawState __attribute__((unused)) *s =3D bs->opaque;
+ #ifdef CONFIG_LINUX_AIO
+-    BDRVRawState *s =3D bs->opaque;
+     if (s->use_linux_aio) {
+         Error *local_err =3D NULL;
+         if (!aio_setup_linux_aio(new_context, &local_err)) {
+@@ -1981,6 +2024,16 @@ static void raw_aio_attach_aio_context(BlockDriverSt=
+ate *bs,
+         }
+     }
+ #endif
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        Error *local_err;
++        if (!aio_setup_linux_io_uring(new_context, &local_err)) {
++            error_reportf_err(local_err, "Unable to use linux io_uring, "
++                                         "falling back to thread pool: ");
++            s->use_linux_io_uring =3D false;
++        }
++    }
++#endif
+ }
+=20
+ static void raw_close(BlockDriverState *bs)
 --=20
-Alex Benn=C3=A9e
+2.24.1
+
 
