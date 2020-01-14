@@ -2,97 +2,94 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B657FC33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 07:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440CAC33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 07:20:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 826C9207FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 07:17:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BBD5207FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 07:20:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C8UXHuxJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826C9207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EgxO+yxc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBD5207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irGSb-0002aP-Nl
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 02:17:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40208)
+	id 1irGVC-0003gc-3I
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 02:20:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40597)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1irGRz-0002A0-B7
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:17:20 -0500
+ (envelope-from <mst@redhat.com>) id 1irGUV-0003GE-5T
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:19:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1irGRy-0004Qb-1p
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:17:19 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:59610
+ (envelope-from <mst@redhat.com>) id 1irGUT-0005eF-Ve
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:19:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45221
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1irGRx-0004QT-UL
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:17:18 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1irGUT-0005dz-Rx
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 02:19:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578986236;
+ s=mimecast20190719; t=1578986393;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ugr7GiJxAa1OEqHhWhrKNVRmemHBJhVqYOshSC0JjOg=;
- b=C8UXHuxJz6JtDRCP1WMKbh/b9MrzIqiaXHQzz6ScJMQHgijx+zaMzNlS3lIxUzDxd4bEEj
- ZDm+R2ukebFlReLNjfueqg5PHfYxWV/k/KL3G91583nuSDq4tlacInNr9+g0R9z+/F7V28
- AXByphP4dIqo18Zn7HXQWkaIElNo9Ps=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-96AYdTDQNP-AQexdsramKQ-1; Tue, 14 Jan 2020 02:17:13 -0500
-Received: by mail-qt1-f197.google.com with SMTP id 38so8317608qty.15
- for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 23:17:13 -0800 (PST)
+ bh=Z87fZtv9VeI4nGtXWUGemQVSnaNQe/Wx8eK0QKDLQUY=;
+ b=EgxO+yxcnf5dVv++nIqUtRAcDDOHRzkzwzNXALVmx908SUjL396aRQbR9FuI/sGfYLRAw8
+ 94JyLCSegfn8FnSTzPawB1hIdLjRBCeA5sHfOZ7y2tosmgvvFUNQlzEH28bP0Jod2W9TpI
+ /xFkKlgQ6tNgukn3IoFgdpl4EdVELwI=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-X5fdQi9kMNqBF_aV63-BTw-1; Tue, 14 Jan 2020 02:19:46 -0500
+Received: by mail-qk1-f200.google.com with SMTP id a73so7761094qkg.5
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 23:19:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ZJDXL4w70wapjhhDOKLmBhcW3H5a9nWHzAG5OSMaJqw=;
- b=jUnVLQlBhfYg2mzrndDgIRlJn47UeG1EQ6uY5eW/6ywvA8ysxuaU/DiaUs7PWnz8s7
- 4x6NqjkYTjOv9t1YbQ6wkBO/5YSZQvKS8w6vwmYQdLna2c9p3J12X0KymBROSwX2xTTh
- VnqQQ208+f7Fx7ptIuxdH7aNjcdbxcBNIrqxOiPL4WkqNx+evs7DZ702FF40yDvUgliW
- JkGcfAvZBUhyiNNuPY5CGKeJ4Fo/eHGxim16G/PisRRPe+2f7iuQp1FUmnxhK8dOF7Sg
- fcriiozYvOyMGPjxW73wj7n9RfkuyyUiDjYjf9EOoBpApajlLmD75/WXnuGy6s3MAm1U
- jbGw==
-X-Gm-Message-State: APjAAAVPtqVC8cDIBRSNPQOLiw99aL3qh4cBhEGs+d48Ai7/jMnniABw
- YuqoiEmRBdESdQTX9FbSgf89Y5ipy57e6oS9tTAZvXUfu63U5UoqY9B5Q0Nwr3pqNK2KgQKVe88
- zJqXrpLSG1gzH5Rc=
-X-Received: by 2002:a05:620a:1191:: with SMTP id
- b17mr14897241qkk.404.1578986232907; 
- Mon, 13 Jan 2020 23:17:12 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxTH00Fafo2KPZN7eRLTKywL/yKXR5vAYjadWT+xJJRokrcz5ngW0W2DYz3qWQq6wPZwdfh2A==
-X-Received: by 2002:a05:620a:1191:: with SMTP id
- b17mr14897227qkk.404.1578986232672; 
- Mon, 13 Jan 2020 23:17:12 -0800 (PST)
+ bh=zKXCCnO6gL7s1WlTskzFLCykvKdDzrhlts7P9f5bkIc=;
+ b=EHg2UNmknPnyFbOSBCpqMiO3kvHiMlSR/uq5xi6DUU6K9FSRWAGg6k6+4lYieRCZ1l
+ lPTmoGFN4kBzQWtt/IKBcnMAQ/uShxcN8csEopgZSJyauJHDIEnwLMY8qeVi2BT7/PK8
+ WuX+A39U8o/+RxxFw1W1KUOGz52splYgc3KgPg4ISR+gKdRbGZ7ksz3lCa6Y4S++T0D8
+ MQ/ZGwsZ4Nq/uWep0jZmLf8cs8yg2gFep2EDWhhJbsVJotMR2OWvpbdA8K1P47Lb9zb6
+ 88xknPH7faFlunHTcoW5uNkUH/e1Yn0mL5APsBHEAq2S3ZyueYWNBCIzfJyESRQ+aNDq
+ m3Pg==
+X-Gm-Message-State: APjAAAWYT6uTBk0eEciUvWMzfyOWziLFcZuwlOvHkMTUe+2PV+bkY93S
+ 57ZnTzw/E0pnh1cuSI8CoP5qXO/+EUNxUAIxqPvsnLiO9zIhsYGPtKuiTY6OmVY4xWubWkUdvU0
+ 5ZKloztmQOYi2+Ts=
+X-Received: by 2002:ac8:747:: with SMTP id k7mr2458661qth.120.1578986385949;
+ Mon, 13 Jan 2020 23:19:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw2pmcJoTdczkWGoOY9+oF36JJnuqrDbD9v4dSn4vHXkzKmp7LeirEt1DeoB6Zl4rg1XKQUCg==
+X-Received: by 2002:ac8:747:: with SMTP id k7mr2458631qth.120.1578986385260;
+ Mon, 13 Jan 2020 23:19:45 -0800 (PST)
 Received: from redhat.com (bzq-79-183-34-164.red.bezeqint.net. [79.183.34.164])
- by smtp.gmail.com with ESMTPSA id x126sm6250836qkc.42.2020.01.13.23.17.09
+ by smtp.gmail.com with ESMTPSA id a185sm6260559qkg.68.2020.01.13.23.19.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Jan 2020 23:17:11 -0800 (PST)
-Date: Tue, 14 Jan 2020 02:17:07 -0500
+ Mon, 13 Jan 2020 23:19:44 -0800 (PST)
+Date: Tue, 14 Jan 2020 02:19:39 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 0/3] exclude hyperv synic sections from vhost
-Message-ID: <20200114021633-mutt-send-email-mst@kernel.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH v2 2/3] memory: Allow a MemoryRegion to be marked no_vhost
+Message-ID: <20200114021723-mutt-send-email-mst@kernel.org>
 References: <20200113173647.84842-1-dgilbert@redhat.com>
- <1bab529a-8655-ee28-f137-0311fb7839ff@redhat.com>
- <20200113184931.GB3155@work-vm>
+ <20200113173647.84842-3-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200113184931.GB3155@work-vm>
-X-MC-Unique: 96AYdTDQNP-AQexdsramKQ-1
+In-Reply-To: <20200113173647.84842-3-dgilbert@redhat.com>
+X-MC-Unique: X5fdQi9kMNqBF_aV63-BTw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,69 +101,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jasowang@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- vkuznets@redhat.com, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, pbonzini@redhat.com, vkuznets@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jan 13, 2020 at 06:58:30PM +0000, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
-> > On 13/01/20 18:36, Dr. David Alan Gilbert (git) wrote:
-> > >=20
-> > > Hyperv's synic (that we emulate) is a feature that allows the guest
-> > > to place some magic (4k) pages of RAM anywhere it likes in GPA.
-> > > This confuses vhost's RAM section merging when these pages
-> > > land over the top of hugepages.
-> >=20
-> > Can you explain what is the confusion like?  The memory API should just
-> > tell vhost to treat it as three sections (RAM before synIC, synIC
-> > region, RAM after synIC) and it's not clear to me why postcopy breaks
-> > either.
+On Mon, Jan 13, 2020 at 05:36:46PM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >=20
-> There's two separate problems:
->   a) For vhost-user there's a limited size for the 'mem table' message
->      containing the number of regions to send; that's small - so an
->      attempt is made to coalesce regions that all refer to the same
->      underlying RAMblock.  If things split the region up you use more
->      slots. (it's why the coalescing code was originally there.)
+> Allow a memory region to be marked as 'no_vhost' and
+> exclude that region from vhost's list build.
 >=20
->   b) With postcopy + vhost-user life gets more complex because of
->      userfault.  We require that the vhost-user client can mmap the
->      memory areas on host page granularity (i.e. hugepage granularity
->      if it's hugepage backed).  To do that we tweak the aggregation code
->      to align the blocks to page size boundaries and then perform
->      aggregation - as long as nothing else important gets in the way
->      we're OK.
->      In this case the guest is programming synic to land at the 512k
->      boundary (in 16 separate 4k pages next to each other).  So we end
->      up with 0-512k (stretched to 0..2MB alignment) - then we see
->      synic (512k-+4k ...) then we see RAM at 640k - and when we try
->      to align that we error because we realise the synic mapping is in
->      the way and we can't merge the 640k ram chunk with the base 0-512k
->      aligned chunk.
->=20
-> Note the reported failure here is kernel vhost, not vhost-user;
-> so actually it probably doesn't need the alignment,
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Yea vhost in the kernel just does copy from/to user. No alignment
-requirements.
+I thought we agreed vfio needs this as well?
+I'd rather this had some meaning not just "no vhost" ...
+no_dma?
 
-> and vhost-user would
-> probably filter out the synic mappings anyway due to the fact they've
-> not got an fd ( vhost_user_mem_section_filter ).  But the alignment
-> code always runs.
+> ---
+>  hw/virtio/vhost.c     |  3 ++-
+>  include/exec/memory.h | 21 +++++++++++++++++++++
+>  memory.c              | 15 +++++++++++++++
+>  3 files changed, 38 insertions(+), 1 deletion(-)
 >=20
-> Dave
->=20
->=20
->=20
-> > Paolo
-> >=20
-> > > Since they're not normal RAM, and they shouldn't have vhost DMAing
-> > > into them, exclude them from the vhost set.
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 774d87d98e..462498bfe6 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -402,7 +402,8 @@ static bool vhost_section(struct vhost_dev *dev, Memo=
+ryRegionSection *section)
+>      bool log_dirty =3D memory_region_get_dirty_log_mask(section->mr) &
+>                       ~(1 << DIRTY_MEMORY_MIGRATION);
+>      result =3D memory_region_is_ram(section->mr) &&
+> -        !memory_region_is_rom(section->mr);
+> +             !memory_region_is_rom(section->mr) &&
+> +             !memory_region_get_no_vhost(section->mr);
+> =20
+>      /* Vhost doesn't handle any block which is doing dirty-tracking othe=
+r
+>       * than migration; this typically fires on VGA areas.
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index aef8123d48..f475c06d63 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -394,6 +394,7 @@ struct MemoryRegion {
+>      bool ram_device;
+>      bool enabled;
+>      bool warning_printed; /* For reservations */
+> +    bool no_vhost;
+>      uint8_t vga_logging_count;
+>      MemoryRegion *alias;
+>      hwaddr alias_offset;
+> @@ -1625,6 +1626,26 @@ void memory_region_set_readonly(MemoryRegion *mr, =
+bool readonly);
+>   */
+>  void memory_region_set_nonvolatile(MemoryRegion *mr, bool nonvolatile);
+> =20
+> +/**
+> + * memory_region_set_no_vhost: Make vhost ignore a memory region
+> + *
+> + * Makes vhost ignore a memory region, useful if it isn't real
+> + * DMAble memory and is at inconvenient addresses
+> + *
+> + * @mr: the region being updated.
+> + * @no_vhost: true to ignore
+> + */
+> +void memory_region_set_no_vhost(MemoryRegion *mr, bool no_vhost);
+> +
+> +/**
+> + * memory_region_set_no_vhost: Test if memory region is marked no vhost
+> + *
+> + * Test if the no_vhost flag is set on the memory region
+> + *
+> + * @mr: the region being tested.
+> + */
+> +bool memory_region_get_no_vhost(const MemoryRegion *mr);
+> +
+>  /**
+>   * memory_region_rom_device_set_romd: enable/disable ROMD mode
+>   *
+> diff --git a/memory.c b/memory.c
+> index d7b9bb6951..9371998e30 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2136,6 +2136,21 @@ void memory_region_set_nonvolatile(MemoryRegion *m=
+r, bool nonvolatile)
+>      }
+>  }
+> =20
+> +void memory_region_set_no_vhost(MemoryRegion *mr, bool no_vhost)
+> +{
+> +    if (mr->no_vhost !=3D no_vhost) {
+> +        memory_region_transaction_begin();
+> +        mr->no_vhost =3D no_vhost;
+> +        memory_region_update_pending |=3D mr->enabled;
+> +        memory_region_transaction_commit();
+> +    }
+> +}
+> +
+> +bool memory_region_get_no_vhost(const MemoryRegion *mr)
+> +{
+> +    return mr->no_vhost;
+> +}
+> +
+>  void memory_region_rom_device_set_romd(MemoryRegion *mr, bool romd_mode)
+>  {
+>      if (mr->romd_mode !=3D romd_mode) {
+> --=20
+> 2.24.1
 
 
