@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 658D4C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC950C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F18124658
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:24:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B65DA2465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:25:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIdMvT6x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F18124658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNsZVfsq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65DA2465A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irMBB-0006zg-5H
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:24:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41917)
+	id 1irMBu-0008O3-To
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:25:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irLkl-0004og-7U
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:57:04 -0500
+ (envelope-from <quintela@redhat.com>) id 1irLk3-0003vP-P8
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irLkk-0002RG-2Q
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:57:03 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48472
+ (envelope-from <quintela@redhat.com>) id 1irLk0-0002De-5v
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:19 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24491
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLkj-0002R0-Uw
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:57:02 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLk0-0002DL-24
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:56:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579006621;
+ s=mimecast20190719; t=1579006575;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/qRvnKikU/zZW4H4BQbW8b5TjzE8O1lK0e+sh7nSqVM=;
- b=OIdMvT6xYk5tbWo4o/BOAlaboDfZEQ3hXKJdaALZQ+i99dNSXwMDm2H98QdTu2xEZYSwnG
- 84/0P2xk/u8l4uYL6+6naZnRNFapbKgDu+QmJiXwAJ2nQQHuztxkSKvUQReH/Ole0kxcsJ
- fzxckVGyTZ6eQ+y7HF2za7zcTWz7UnI=
+ bh=XK5ACN6K3OKAgei9Uux+P4frL0jlH3g3VMOxRzWVmRg=;
+ b=UNsZVfsqMlOU3674GNO+Us9mg2K5056PQiYFz636HxLs9rXABsvaw9Ue5ccoiyMjzH8ZdR
+ Ogp5DLVYd7CILZ9bJadqdOuu7CCfWW03/Soh62dAIgaC733m21Mfbev2KZDYwqXZBR7jvd
+ Jmgh+p1oNhzpImGZmUE72UGYkINpHaY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-eu_y-ZhUOB6BQ1OrlV706Q-1; Tue, 14 Jan 2020 07:57:00 -0500
+ us-mta-117-V-4i7RvKOn6pcCaUYKAg_w-1; Tue, 14 Jan 2020 07:56:14 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 067A8801E72;
- Tue, 14 Jan 2020 12:56:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68817189DF40;
+ Tue, 14 Jan 2020 12:56:12 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A4555DA70;
- Tue, 14 Jan 2020 12:56:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F2D985D9E5;
+ Tue, 14 Jan 2020 12:56:07 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 29/30] apic: Use 32bit APIC ID for migration instance ID
-Date: Tue, 14 Jan 2020 13:52:53 +0100
-Message-Id: <20200114125254.4515-30-quintela@redhat.com>
+Subject: [PULL 23/30] migration/multifd: not use multifd during postcopy
+Date: Tue, 14 Jan 2020 13:52:47 +0100
+Message-Id: <20200114125254.4515-24-quintela@redhat.com>
 In-Reply-To: <20200114125254.4515-1-quintela@redhat.com>
 References: <20200114125254.4515-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: eu_y-ZhUOB6BQ1OrlV706Q-1
+X-MC-Unique: V-4i7RvKOn6pcCaUYKAg_w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,9 +91,9 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
  Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
  Stefan Berger <stefanb@linux.ibm.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org,
+ qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  David Gibson <david@gibson.dropbear.id.au>
@@ -101,51 +101,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-Migration is silently broken now with x2apic config like this:
+We don't support multifd during postcopy, but user still could enable
+both multifd and postcopy. This leads to migration failure.
 
-     -smp 200,maxcpus=3D288,sockets=3D2,cores=3D72,threads=3D2 \
-     -device intel-iommu,intremap=3Don,eim=3Don
+Skip multifd during postcopy.
 
-After migration, the guest kernel could hang at anything, due to
-x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
-any operations related to x2apic could be broken then (e.g., RDMSR on
-x2apic MSRs could fail because KVM would think that the vcpu hasn't
-enabled x2apic at all).
-
-The issue is that the x2apic bit was never applied correctly for vcpus
-whose ID > 255 when migrate completes, and that's because when we
-migrate APIC we use the APICCommonState.id as instance ID of the
-migration stream, while that's too short for x2apic.
-
-Let's use the newly introduced initial_apic_id for that.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/intc/apic_common.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ migration/ram.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index 54b8731fca..b5dbeb6206 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -268,7 +268,10 @@ static void apic_common_realize(DeviceState *dev, Erro=
-r **errp)
-     APICCommonState *s =3D APIC_COMMON(dev);
-     APICCommonClass *info;
-     static DeviceState *vapic;
--    uint32_t instance_id =3D s->id;
-+    uint32_t instance_id =3D s->initial_apic_id;
-+
-+    /* Normally initial APIC ID should be no more than hundreds */
-+    assert(instance_id !=3D VMSTATE_INSTANCE_ID_ANY);
+diff --git a/migration/ram.c b/migration/ram.c
+index 561961ef24..aee057f7da 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2587,10 +2587,13 @@ static int ram_save_target_page(RAMState *rs, PageS=
+earchStatus *pss,
+     }
 =20
-     info =3D APIC_COMMON_GET_CLASS(s);
-     info->realize(dev, errp);
+     /*
+-     * do not use multifd for compression as the first page in the new
+-     * block should be posted out before sending the compressed page
++     * Do not use multifd for:
++     * 1. Compression as the first page in the new block should be posted =
+out
++     *    before sending the compressed page
++     * 2. In postcopy as one whole host page should be placed
+      */
+-    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
++    if (!save_page_use_compression(rs) && migrate_use_multifd()
++        && !migration_in_postcopy()) {
+         return ram_save_multifd_page(rs, block, offset);
+     }
+=20
 --=20
 2.24.1
 
