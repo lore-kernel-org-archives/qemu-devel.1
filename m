@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AA2C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4629EC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:26:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC0312465A
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:25:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC0312465A
+	by mail.kernel.org (Postfix) with ESMTPS id 191CC2465A
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:26:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 191CC2465A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40745 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irN87-0003Xo-5G
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:25:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57771)
+	id 1irN99-0004Yf-9k
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:26:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57957)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irN7W-00034k-5C
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:24:39 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irN8A-0003lE-KE
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:25:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irN7R-0004tI-2l
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:24:37 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:49673)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irN7Q-0004sx-Op
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:24:33 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irN86-0005EJ-NK
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:25:18 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:37145)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irN86-0005DI-E3
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:25:14 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MC0HF-1iwcJW3Ib7-00CSD6; Tue, 14 Jan 2020 15:24:15 +0100
-Subject: Re: [PATCH v5 10/20] linux-user: Add support for
- FS_IOC32_<GET|SET>FLAGS ioctls
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MwwuJ-1jbdys2R23-00yP5s; Tue, 14 Jan 2020 15:24:57 +0100
+Subject: Re: [PATCH v5 11/20] linux-user: Add support for
+ FS_IOC32_<GET|SET>VERSION ioctls
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-11-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1578947683-21011-12-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <5eee60c1-783c-634a-996b-d9ab15941f1c@vivier.eu>
-Date: Tue, 14 Jan 2020 15:24:12 +0100
+Message-ID: <63383fe0-116d-743f-582d-955e31386c0e@vivier.eu>
+Date: Tue, 14 Jan 2020 15:24:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-11-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1578947683-21011-12-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/IVpjvBrbyf3Ms2JWLQHytGlK+RBgUwxfYq7xXOVNj65RplToq2
- phZOZgpCCSigYcfGiO1DNIAJW9ztlE9ctNL6CEhVlBfeRY0jpnaOy1ciV/PJOeK+iTEog8d
- esAl1G8xfx2MWTzcRKKGDFAMLAKsgr+zcDeQt/rIrEf4i1dfEvn9PbwXGawyk7R2zPNo/hI
- PC9M1Na83WBX5/rp/Wq5w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+uypP6qVH58=:DAdTW134e2hGCId8EZ9tbA
- 2e+JeHJl1FOqCxmhjoh7mKlsZUmaOBlzyVAng0twwH8EMOS3MmPxArcP6j8AwEF1b6oANzGX/
- rehgN2TEMgFjmJO1rTOnXXlsu6pdPywB3Rtz/buJr9GL3q32i8qtYtKzKRKiZjBIXehnGRGpm
- 6RNJaf4xUkfVDRKkEzr0Pno3WGlXJMMbGBC3O3/7bTt529KpURtHp/gNpS6qYEWEgz2CGS7cN
- aNUsJ3VYpzWcxm4G0aIX1ghKzVPnNo6L3+7Iw0uDiA/K6wyQPczGB4VMzDOZg9Guk2HNYpGHA
- BPnp6wxTKcmsy0dNMx6OeLJExREfaUc2kv7v3j1MKKXvmVwK2h/fXD8LFlChaeLLAYlWXpmvs
- Weg/FmdGobrOdcwIFF/PiIMepHec73EkKoAcHy0Ml0tN3lMuu2d/Owdp9H06bpqPm/VnR1r+7
- BpoQDBkWCMW0fWg17l5+U4bAM6Do3fj910rE5psBRj/XeA4fHJ+kJYi9gfGl+1KRLzayP6WxN
- HJkVhm3Hzf7Hqmhu/Ig+MearXzTvBxKKZe7BFwsUBAt+vvy+T+hT1iTFHvfLrGitUe9oDXCJO
- GDAPtjFgBWAmzNeym3Wxo8cCNdXFjOAFhTZHkfKZIeMEEjRZ7/n5kku0n/RlT6KPCU9G1yg8o
- 5+Wcc66G62rzX2oIPfWCaToyMOOxsYqDYnJJ6qIva1oV+Oe6tlerJK2pqbBK/G1wr3uN8r6gM
- LmGVd/IGZ0wOlQOAK/v037DfK7pQF4mHyf3DtXX1g7I4a1WU4Se5b7umGgfgMqIUigvavFKke
- 4G+UJ0IUcX0wkBJ/gCyWvhefMjSI2/RC5Xw8C540qD3BQetcHocttcoAyclLU7WVZanOtDNdX
- BASvOl/eWtBTXVMlc3ow==
+X-Provags-ID: V03:K1:IJvNbb9Y4W+yOfIAVcsQWtiHWIPV1umt63itY50wZaHvxD4DVYB
+ +1BPOpvb/9pxWFB8icfyWpIoi1IZB8vSBM5WevoB5nvaqu++NUC51O19kDhNPoXEs0OUk3o
+ mxCw2bqo2gwruUgKLImkWl1vaOjG6qfppaR3n0NRE8XTPydqVRwK/kTx34+Jg78wjLJtQET
+ CA0zJMgIEFWjG5RmBeuuw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:esP1oG6oVr0=:s99WQYBwFYNF1h2O3GQ1KT
+ ClDZxK+4/R5qiR7CbBCM5Mi9NAM5kEc4e3VWKym3XAM8dPdi2wBji+NRlb33l+7HiYlXHgRUJ
+ 8PEfEDhXWms7u5kUN7IDxZ3B/9tEss5iFROfqpYTL1hyzwsnxLRVVmW5xwuuylYtGdRgxfKkg
+ Ei929sOk3u+2+R6Id2qIgfmUZoMH7kFXr5X4EmrOv9/MhtZYEPAoqyeODGURparo4CZPYvqv2
+ OVqocVCJqW23PhCrhnk2vccfb1wKg03wQn6+GNV9T1QlNLZJLL9OIUm7z0dDYmXAGJLU3D+Gw
+ fxDr6Uuo/avAA/b3v3OZadbGX1oKF1oVyBjRZiS8T7AHUA0PJzHRoYvtkx7Lc3j+AQhLpkrX/
+ 24qcDTnaIU09zAC58xydyIXpM9bfGxRLr/slvWl5l9GSQSJz0+dIZ4fMmI/lxtIrMa70sn8NY
+ az/ygQHWbqzB/BzLSWex0Av8XGXDRccFquJdW2s8Wj3KfNIpDKEYZHGo+lihma938tuvooRkM
+ 97x9vWfM9wjxy4g2XUg+9FK8YX4xR4A/ZbKcAqTSc3BiVrSnaCuWWsRQaMpi+mW6lgaLREvV4
+ 8AnS5xG37rAL55As1a7mP1XFoBz/HVle2P6NvLYDzgjCltuGnVu4GBKeLcE7NG4Q0cldNDR3I
+ y75Oa4erCzqUVM+Udg/n0UxJGgclf6qxgBmu3huaDbxXpUpxLYFk7w2CuvlBMs7AtyDVmM0at
+ CzfaCrJZC6sene5tC4erQjEXlZ9BpypcKEYGBMv9H3KguNCXxvuN+EAslWDpMp3bHX6VIf+qL
+ I3sP9/zX8j7jdI00Fca1EJ75EJNZIr1hzVq7c4P5Qgv6tHG8VqD3bvfkBlFTseT8GCiOUw4Uh
+ 4jbdNM/s9uMJAU49v59CKtxZkQRgQTuLEgbRXDoB8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.130
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,8 +132,8 @@ Sender: "Qemu-devel"
 Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> These FS_IOC32_<GET|SET>FLAGS ioctls are identical to
-> FS_IOC_<GET|SET>FLAGS ioctls, but without the anomaly of their
+> These FS_IOC32_<GET|SET>VERSION ioctls are identical to
+> FS_IOC_<GET|SET>VERSION ioctls, but without the anomaly of their
 > number defined as if their third argument is of type long, while
 > it is treated internally in kernel as is of type int.
 > 
@@ -144,28 +144,28 @@ Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 >  2 files changed, 4 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index c44f42e..4fd6939 100644
+> index 4fd6939..3affd88 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -140,6 +140,8 @@
->       IOCTL(FS_IOC_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
->       IOCTL(FS_IOC_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+> @@ -142,6 +142,8 @@
 >       IOCTL(FS_IOC_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
-> +     IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
-> +     IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+>       IOCTL(FS_IOC32_GETFLAGS, IOC_R, MK_PTR(TYPE_INT))
+>       IOCTL(FS_IOC32_SETFLAGS, IOC_W, MK_PTR(TYPE_INT))
+> +     IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
+> +     IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
 >  
 >  #ifdef CONFIG_USBFS
 >    /* USB ioctls */
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index f68a8b6..964b2b4 100644
+> index 964b2b4..a73cc3d 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -920,6 +920,8 @@ struct target_pollfd {
->  #define TARGET_FS_IOC_GETVERSION TARGET_IOR('v', 1, abi_long)
->  #define TARGET_FS_IOC_SETVERSION TARGET_IOW('v', 2, abi_long)
+> @@ -922,6 +922,8 @@ struct target_pollfd {
 >  #define TARGET_FS_IOC_FIEMAP TARGET_IOWR('f',11,struct fiemap)
-> +#define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
-> +#define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
+>  #define TARGET_FS_IOC32_GETFLAGS TARGET_IOR('f', 1, int)
+>  #define TARGET_FS_IOC32_SETFLAGS TARGET_IOW('f', 2, int)
+> +#define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
+> +#define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
 >  
 >  /* usb ioctls */
 >  #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
