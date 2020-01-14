@@ -2,74 +2,97 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E66FFC33CA9
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 00:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAF6C33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:17:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFFB520678
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 00:51:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFFB520678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 59389207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 01:17:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XWo9ESRj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59389207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irAQc-0001FD-VB
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 19:51:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36546)
+	id 1irApj-0001nG-GF
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 20:17:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1irAPx-0000mb-6u
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:50:50 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1irAp3-0001KG-LP
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:16:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1irAPv-0004q5-NJ
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:50:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33744)
+ (envelope-from <richard.henderson@linaro.org>) id 1irAp2-0000HL-II
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:16:45 -0500
+Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:34181)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1irAPv-0004oo-H7
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:50:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1irAPt-0006Hu-9m
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 00:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 486542E80CC
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 00:50:45 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1irAp2-0000Fr-AG
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 20:16:44 -0500
+Received: by mail-pl1-x634.google.com with SMTP id g9so2325817plq.1
+ for <qemu-devel@nongnu.org>; Mon, 13 Jan 2020 17:16:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=l12jUgoZqAtvH/3+kJ8RPVsbu9MReQUH53PMXsDkoAs=;
+ b=XWo9ESRj3wIIGMA3gGWvK/NxC1tmLxoo3q64YsKz/cgLUIuY4oQoDoIB0vqTMH56bK
+ 8G4fJS4AzVcJY8HgbZ4hXLOLRGjjxNjVwrkiWnDOWMvHc9DWggzM4I+s2dVWpuTrlDmo
+ TUkj8LoUo+gD9S7p0j52Wrj6XM6Fdv7bEOEQE5o/1mDfeF+mcmEVseLl6Kg1weVf6AJz
+ fR2YE0xKLZo5yg0S+bRlOa57PJYs99AlbcPx8OLDULrQeMTOWUkJtpWs6RZ156SRaR+L
+ LQUV2SFoIcIVryqq4ztV0HZeBVr1fKA62cSQpj+ce5U7voAgEv3fVoUvDeJ2PxVInIhN
+ I6SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=l12jUgoZqAtvH/3+kJ8RPVsbu9MReQUH53PMXsDkoAs=;
+ b=s0CgeNVxWpZhc5yaqoC50/Egd1w4mHnimvYumH39LBEO3DKYfAtq1OoUTZFRwZasTM
+ MZEG9MTZQJ0jp/Lk3mreaXJ7WKI+IwOjkhhZnspcFb2LJ8IhVMZugxikemo5qrYkUgd3
+ zyXU5wDgAlzf2JupncwLs7Y7NLjmEIaMzuEhCh5Ndcbigl/MSO5lj/qWnIjI7Sejxkj6
+ 4a51n43eyRgq+DXCQoykIiiUN06IMtQnpqJrOI+62kII6qzNmnCxhC1CrXCLpTm193oC
+ CnravR80rtSZ0nvVUUZ0Dri2p12lN76AYEGWbstmvebnbo5OOkO22O+wxfsbTb2ZUKCS
+ lbZQ==
+X-Gm-Message-State: APjAAAXJ8pQzKKwh86AW3DJ8DLCmKTXYCyVg4X9AUsTJMaPyZkB3l1NB
+ WJRy+i58tEELFKONApDeBBz0MjPquHk=
+X-Google-Smtp-Source: APXvYqw/OY2vWItzVWSBAyyStFenj7IDR5MMoSK0uR2ULgAO4cJ58q5406mh35csp340NYR8dSYCsg==
+X-Received: by 2002:a17:90a:cb0f:: with SMTP id
+ z15mr26086992pjt.131.1578964602454; 
+ Mon, 13 Jan 2020 17:16:42 -0800 (PST)
+Received: from [192.168.3.43] (rrcs-66-91-136-155.west.biz.rr.com.
+ [66.91.136.155])
+ by smtp.gmail.com with ESMTPSA id 11sm15800108pfz.25.2020.01.13.17.16.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 13 Jan 2020 17:16:41 -0800 (PST)
+Subject: Re: [PULL 00/41] tcg patch queue
+From: Richard Henderson <richard.henderson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200108034523.17349-1-richard.henderson@linaro.org>
+ <CAFEAcA9P_3enu_M-55aoqWScFFAhw=Jfs92+vCc+yY-2nXUehA@mail.gmail.com>
+ <df405ec5-190e-946d-fc2f-b52c695a39d4@linaro.org>
+ <d115421a-497d-42d2-5dc5-6a3d4b19b0b0@linaro.org>
+ <67615704-a1e9-1d2f-752f-7ab84178e060@linaro.org>
+Message-ID: <7fe29487-f902-1879-2f18-83af30cd2eec@linaro.org>
+Date: Mon, 13 Jan 2020 15:16:38 -1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 14 Jan 2020 00:44:18 -0000
-From: Benjamin David Lunt <1859359@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fysnet kraxel-redhat marcan42
-X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
-X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
-References: <157885971279.5587.15888635675000659382.malonedeb@gac.canonical.com>
-Message-Id: <157896265892.2574.9234280502246838128.malone@soybean.canonical.com>
-Subject: [Bug 1859359] Re: xHCI and event ring handling
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: fababb5cc76c9c13c9349310cb909f4b5a6e4ffb
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+In-Reply-To: <67615704-a1e9-1d2f-752f-7ab84178e060@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::634
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,97 +101,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1859359 <1859359@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Hector, guys,
+On 1/13/20 12:06 PM, Richard Henderson wrote:
+> On 1/13/20 11:50 AM, Richard Henderson wrote:
+>> On 1/13/20 11:10 AM, Richard Henderson wrote:
+>>> Details of this test system?
+>>>
+>>> I suppose I'll grab your tarball just to see if the binaries are different...
+>>
+>> Ho hum.  Something is different.  I reproduce the problem with your tarball.
+> 
+> Well, yes and no.  Your tarball also fails for me with master, v4.2.0, and
+> v4.1.1, so I can't see how I can trust it at all.
 
-I think I have found my/the error:
+One final note for today -- your tarball works for me on all branches
+(tcg-next, master, v4.2.0) on Centos 7.
 
-xHCI, version 1.0, Page 136:
-"Note: The detection of a Cycle bit mismatch in an Event TRB processed =
+I was previously using my desktop, Ubuntu 19.10.
 
- by software indicates the location of the xHC Event Ring Enqueue Pointer =
+So, there's certainly something odd going on...
 
- and that the Event Ring is empty. Software shall write the ERDP with the
- address of this TRB to indicate that it has processed all Events in the
- ring."
 
-It does not state to advance the Consumer's internal Dequeue pointer.  =
-
-Just the register is mentioned.
-
-This is my error.  I thought that it implied to advance the Consumer's
-internal Dequeue Pointer as well.  (Implied being the big word here)
-
-Sorry for the bother.  It was my error.  It took me a bit of (re)reading
-and a little more work to find that it was/is indeed my error.
-
-Sorry and thank you for your time,
-Ben
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1859359
-
-Title:
-  xHCI and event ring handling
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I believe that the Event Ring handling in QEMU is not correct.  For
-  example, an Event Ring may have multiple segments.  However, the code
-  in xhci_write_event()
-  (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
-  xhci.c;hb=3DHEAD#l645), starting with line 668, seems to only support a
-  single segment.
-
-  Also, QEMU is sending a spurious interrupt after the Guest writes to
-  the ERDP register due to the fact that the address written does not
-  match the current index.  This is because the index is incremented
-  after sending the event.  The xHCI specification states in section
-  5.5.2.3.3 "When software finishes processing an Event TRB, it will
-  write the address of that Event TRB to the ERDP."
-
-  Since xhci_write_event() has already incremented the index pointer
-  (intr->er_ep_idx), the check at line 3098
-  (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
-  xhci.c;hb=3DHEAD#l3090) no longer is valid.
-
-  I have not studied QEMU's code enough yet to offer a patch.  However,
-  this should be a simple fix.
-
-  intr->er_ep_idx++;
-  if (intr->er_ep_idx >=3D intr->er_table[intr->er_segment].er_size) {
-    intr->er_ep_idx =3D 0;
-    intr->er_segment++;
-    if (intr->er_segment >=3D intr->er_table_size) {
-      intr->er_segment =3D 0;
-      intr->er_pcs =3D !intr->er_pcs;
-    }
-  }
-
-  Being sure to incorporate this new segment member into the above code
-  (possibly as shown) as well as change the lines at 665 to use the new
-  segment member of the structure, and of course in the initialization
-  portion of the event ring.
-
-  As for the spurious interrupt at line 3101, a new member will need to
-  be added to the code to keep track of the last inserted ED (TRB) into
-  the Event Ring and then of course checking against this new member,
-  not the now newly incremented member.
-
-  I have sent an email to the author listed at the top of the file as
-  well, not sure if this is proper bug reporting etiquette or not.
-
-  Thank you.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1859359/+subscriptions
+r~
 
