@@ -2,77 +2,79 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1387CC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F07C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:49:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38BA2467C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:48:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 563F024670
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:49:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0KYsakZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38BA2467C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QlHsOxKn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563F024670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIoL-00083K-GG
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:48:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58060)
+	id 1irIov-0000S3-UD
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:49:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59500)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irIVN-00089m-HU
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:58 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1irIcp-000144-38
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irIVM-0006pY-Ce
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52821
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIVM-0006p9-89
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:28:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578994135;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iprvAOa2cyTKcfIq8nOi5Ry3fqn5kNfZVkcEZq0n1vM=;
- b=X0KYsakZwchULPZue3jPz0elNa+HVVR68FOIcrOHRqMHx8xdIUVsrix/GvcPWBsMp6DHal
- H4ylBlAC8/2BIUezWr6bsiFIELtiGA5F+M2geJRZ4Ee3dx8+yWjVG/lH1aabIbvi4WtB7n
- 215x7oqgzGfjd79IHRBLUvnr4c0Vw48=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-I8sLKwc7PRq2V-ig7jqMFw-1; Tue, 14 Jan 2020 04:28:54 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDFE6800D41;
- Tue, 14 Jan 2020 09:28:52 +0000 (UTC)
-Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3EE2D384;
- Tue, 14 Jan 2020 09:28:48 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 22/29] migration/multifd: not use multifd during postcopy
-Date: Tue, 14 Jan 2020 10:25:59 +0100
-Message-Id: <20200114092606.1761-23-quintela@redhat.com>
-In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
-References: <20200114092606.1761-1-quintela@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1irIcn-0000b5-Fg
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:36:38 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45603)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1irIcn-0000ax-9g
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:36:37 -0500
+Received: by mail-oi1-x243.google.com with SMTP id n16so11160590oie.12
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 01:36:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=cvt4jvo7a8DHkDMPBVqfcYlqKedlVWPjH3H7nEygEQg=;
+ b=QlHsOxKnpytN2f609iypsIYGoj2i51avhPClN8CKyNlwMMXyqvqDz3AXy4jQBx3+tR
+ HMEMdvSlwJkRZMzgQi+x4VffRjmFe4dJzR1TX88R18bT9CYcwW837tJKSgnPRXHmxDAC
+ 3p+tEE9ZGdluXu4U6Sg/w0nAsmr6gUNEg5UB1Cb0KS205UH/xW+k1yhPAeRKbpyn8sh4
+ 8v1rNqkJefh0XJ6dEc+oaQr8ENtIcXOffkbTWjf1OvtXkLORdnr/n0RaEHKUrPI2Wtqu
+ 5GzFkxpDLNVisTTYmfQu7GGchZZfU5xKPFqU/vvsabeY3XmUZpVL1mcRVwtKxvl739Fc
+ cKJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cvt4jvo7a8DHkDMPBVqfcYlqKedlVWPjH3H7nEygEQg=;
+ b=uiVJVSCsWfKIazh0rnUkfNml/coYtNLX5qKrLlAlVv45Ffndgb3Ey/mortILjSeWbN
+ KLmZo5IQ24/xPWsKrcokl9iz70ITo8CjF0mA0Xz8gqo8jAud9H7m1zL4pEns+duiJkj6
+ lDvVoI57VrNGSopZZ2HxuZbr9EzI5gt+38MOjTt1KoNAu0vPu43x/s+9VqjS86MI0NAi
+ k7Ip5A0COMrTIUr1Wp/VOXOpde9HL7ZATvJiPruxZvkwSw7cDa8/AFl6gjXh97RVdCvM
+ 2DmTfTuvBlC68ojIXkIVN4Hrg/o1yqUgBqqXZ7I7qALWCpLVwTmocplH96/tTBPVCdAf
+ 7uKw==
+X-Gm-Message-State: APjAAAXAXqOAcprao+R86FG783Ik/hg+fud4EOa0rUR63hzDrN4OEfaW
+ rAtAglGHwOpIC49U+O1bprcrRMI46LNe6CeBNeWyrw==
+X-Google-Smtp-Source: APXvYqwliHzusqjQ1hHZDPkWaK878IQiozvXPsLzj1imfsBO4PEArdcOjnCywK0VUIJFGg7JqziMrt0vCVcnUAAIoJc=
+X-Received: by 2002:aca:3d7:: with SMTP id 206mr16286957oid.98.1578994596196; 
+ Tue, 14 Jan 2020 01:36:36 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: I8sLKwc7PRq2V-ig7jqMFw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20200113180812.3442-1-peter.maydell@linaro.org>
+ <2b20b548-fb1f-2663-3614-03306595e5d7@redhat.com>
+In-Reply-To: <2b20b548-fb1f-2663-3614-03306595e5d7@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 14 Jan 2020 09:36:25 +0000
+Message-ID: <CAFEAcA8==fs2CL9dm+m5m+w7xjSrT=g2Zqr0TAm+tHDAumZG6Q@mail.gmail.com>
+Subject: Re: [PATCH] qemu-nbd: Convert invocation documentation to rST
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,60 +86,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+On Mon, 13 Jan 2020 at 19:58, Eric Blake <eblake@redhat.com> wrote:
+>
+> On 1/13/20 12:08 PM, Peter Maydell wrote:
+> > The qemu-nbd documentation is currently in qemu-nbd.texi in Texinfo
+> > format, which we present to the user as:
+> >   * a qemu-nbd manpage
+> >   * a section of the main qemu-doc HTML documentation
+> >
+> > Convert the documentation to rST format, and present it to the user as:
+> >   * a qemu-nbd manpage
+> >   * part of the interop/ Sphinx manual
+> >
+> > This follows the same pattern as commit 27a296fce982 did for the
+> > qemu-ga manpage.
+> >
+>
+> I'm not an rST expert, but trust that you compared the resulting
+> renderings.  Is there a quick recipe for doing the build locally so I
+> can easily inspect local artifacts myself?
 
-We don't support multifd during postcopy, but user still could enable
-both multifd and postcopy. This leads to migration failure.
+Yep -- assuming you have the prerequisites installed to
+build the docs (should be just makeinfo, pod2man, sphinx),
+apply the patch and then 'make' will build the docs -- the new
+qemu-nbd.8 should be in docs/interop in the build tree,
+assuming you do builds not in the source tree. If you do
+builds in the source tree then the built artefacts
+are created under docs/built. The html that forms part of
+the interop manpage set is in docs/interop/qemu-nbd.html,
+also in the build tree.
 
-Skip multifd during postcopy.
+> > +++ b/Makefile
+> > @@ -338,7 +338,7 @@ MANUAL_BUILDDIR := docs
+> >   endif
+> >
+> >   ifdef BUILD_DOCS
+> > -DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 $(MANUAL_BUILDDIR)/interop/qemu-ga.8
+> > +DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 $(MANUAL_BUILDDIR)/interop/qemu-nbd.8 $(MANUAL_BUILDDIR)/interop/qemu-ga.8
+>
+> Worth splitting this long line, either with \-newline, or
+>
+> >   DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+> >   DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+>
+> with additional DOCS+= lines?
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- migration/ram.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+I think I prefer the latter.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index a05448c0c9..d4f33a4f2f 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2587,10 +2587,13 @@ static int ram_save_target_page(RAMState *rs, PageS=
-earchStatus *pss,
-     }
-=20
-     /*
--     * do not use multifd for compression as the first page in the new
--     * block should be posted out before sending the compressed page
-+     * Do not use multifd for:
-+     * 1. Compression as the first page in the new block should be posted =
-out
-+     *    before sending the compressed page
-+     * 2. In postcopy as one whole host page should be placed
-      */
--    if (!save_page_use_compression(rs) && migrate_use_multifd()) {
-+    if (!save_page_use_compression(rs) && migrate_use_multifd()
-+        && !migration_in_postcopy()) {
-         return ram_save_multifd_page(rs, block, offset);
-     }
-=20
---=20
-2.24.1
+> > +++ b/MAINTAINERS
+> > @@ -2503,6 +2503,7 @@ F: include/block/nbd*
+> >   F: qemu-nbd.*
+> >   F: blockdev-nbd.c
+> >   F: docs/interop/nbd.txt
+> > +F: docs/interop/qemu-nbd.rst
+> >   T: git https://repo.or.cz/qemu/ericb.git nbd
+>
+> Would I be taking this patch through my NBD tree, or would you be
+> bundling it with other doc patches?
 
+Either way would work for me, depends a bit whether I
+get round to trying to do another doc conversion
+and whether you had any other pending updates to the
+old texinfo doc.
+
+> > +++ b/docs/interop/qemu-nbd.rst
+> > @@ -0,0 +1,263 @@
+>
+> > +.. option:: -s, --snapshot
+> > +
+> > +  Use *filename* as an external snapshot, create a temporary
+> > +  file with ``backing_file=``\ *filename*, redirect the write to
+> > +  the temporary one.
+>
+> Pre-existing poor grammar. Better might be:
+>
+> Use *filename* as an external snapshot, by creating a temporary file
+> with ``backing_file=``\ *filename*, and redirecting writes to the
+> temporary file.
+>
+> But that could also be done as a separate patch, to keep this one as
+> mechanical as possible on the conversion.
+
+Yes. I noticed a few things I would consider docs nits
+which I deliberately didn't fix up in this conversion patch;
+I'd prefer those to be done separately afterwards.
+
+thanks
+-- PMM
 
