@@ -6,79 +6,80 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB9FC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 08:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46ACEC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 08:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A150207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 08:49:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B4C82075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 08:52:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BpZJa9qQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A150207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5HYTmDw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B4C82075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irHsx-0006T5-AZ
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 03:49:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51608)
+	id 1irHwY-0008O3-8e
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 03:52:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52337)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1irHsK-0005wr-7B
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:48:37 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1irHvu-0007pj-Ii
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:52:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1irHsJ-0003zk-6O
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:48:36 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22598
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1irHvt-0005Rk-L4
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:52:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25014
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1irHsJ-0003zW-3O
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:48:35 -0500
+ id 1irHvt-0005RV-I0
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 03:52:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578991714;
+ s=mimecast20190719; t=1578991936;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Xebxu3XvDhe0sUPwQUHc0rBV9/6bWbH4tEvUxnUtBlc=;
- b=BpZJa9qQVqWXMtfVX7TYs7ftgLKQCIppWxcNkH96IuRmwQwVrTRi4USTPD8paeVPlpeWLn
- FbvgNZqlP5lvrCSWhp4th8nndB2BLyC4FjUYP5TG7WxAzIE48X7TTUgCkgFlrq7PebtF47
- CG0x2uWud9CUF3fvuROMPDiO0HtyTCM=
+ bh=KW6j/7/p9d/wFy990yfIHpRABNEtMDRdHbaaA/FwA8A=;
+ b=E5HYTmDw0h1Xj2J1iWFihoIfBHjwO+bm5Pswhal9BHcMxUtJdU3q9riTRw5X57gTf3+pgE
+ ETuLL2FRVmpxTPuhS6KXz0zMPCX8akTyLKKkfAXYIPaTWNVkZDbRzQqQmgdnfLEv707EuW
+ cgNFlP3pcEKM9VNsN1kPzjxZOLxk+Ws=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-IVALv5cWOkS9MM6DZ0N--A-1; Tue, 14 Jan 2020 03:48:31 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-300-2nqhcLevOayN9BJ8Wrxxgw-1; Tue, 14 Jan 2020 03:52:09 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6703D184C734;
- Tue, 14 Jan 2020 08:48:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3232FDBA8;
+ Tue, 14 Jan 2020 08:52:08 +0000 (UTC)
 Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8796C675AF;
- Tue, 14 Jan 2020 08:48:21 +0000 (UTC)
-Subject: Re: [PATCH v12 04/13] virtio-iommu: Add the iommu regions
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B65C980F57;
+ Tue, 14 Jan 2020 08:52:00 +0000 (UTC)
+Subject: Re: [PATCH v12 05/13] virtio-iommu: Endpoint and domains structs and
+ helpers
 To: Peter Xu <peterx@redhat.com>
 References: <20200109144319.15912-1-eric.auger@redhat.com>
- <20200109144319.15912-5-eric.auger@redhat.com>
- <20200113200649.GC201624@xz-x1>
+ <20200109144319.15912-6-eric.auger@redhat.com>
+ <20200113202301.GD201624@xz-x1>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <638a595a-ff82-54f2-bc48-5750da3d38f8@redhat.com>
-Date: Tue, 14 Jan 2020 09:48:19 +0100
+Message-ID: <51267d84-c805-a4a1-8084-b278721a5b3f@redhat.com>
+Date: Tue, 14 Jan 2020 09:51:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20200113200649.GC201624@xz-x1>
+In-Reply-To: <20200113202301.GD201624@xz-x1>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: IVALv5cWOkS9MM6DZ0N--A-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 2nqhcLevOayN9BJ8Wrxxgw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,44 +101,53 @@ Sender: "Qemu-devel"
 
 Hi Peter,
 
-On 1/13/20 9:06 PM, Peter Xu wrote:
-> On Thu, Jan 09, 2020 at 03:43:10PM +0100, Eric Auger wrote:
->> +/**
->> + * The bus number is used for lookup when SID based operations occur.
->> + * In that case we lazily populate the IOMMUPciBus array from the bus hash
->> + * table. At the time the IOMMUPciBus is created (iommu_find_add_as), the bus
->> + * numbers may not be always initialized yet.
->> + */
->> +static IOMMUPciBus *iommu_find_iommu_pcibus(VirtIOIOMMU *s, uint8_t bus_num)
+On 1/13/20 9:23 PM, Peter Xu wrote:
+> On Thu, Jan 09, 2020 at 03:43:11PM +0100, Eric Auger wrote:
+> 
+> [...]
+> 
+>> +VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s, uint32_t ep_id);
+>> +VirtIOIOMMUEndpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s, uint32_t ep_id)
+> 
+> Is the extra definition trying to workaround the compiler
+> warning/error?
+
+yes it does
+> 
+> I'm not sure whether it's only me who prefer this, but again I'd
+> really perfer we move the function into the caller patch, add "static"
+> as needed altogether, even if that patch can be big.
+
+OK I will do that.
+> 
 >> +{
->> +    IOMMUPciBus *iommu_pci_bus = s->iommu_pcibus_by_bus_num[bus_num];
+>> +    VirtIOIOMMUEndpoint *ep;
 >> +
->> +    if (!iommu_pci_bus) {
->> +        GHashTableIter iter;
->> +
->> +        g_hash_table_iter_init(&iter, s->as_by_busptr);
->> +        while (g_hash_table_iter_next(&iter, NULL, (void **)&iommu_pci_bus)) {
->> +            if (pci_bus_num(iommu_pci_bus->bus) == bus_num) {
->> +                s->iommu_pcibus_by_bus_num[bus_num] = iommu_pci_bus;
->> +                return iommu_pci_bus;
->> +            }
->> +        }
+>> +    ep = g_tree_lookup(s->endpoints, GUINT_TO_POINTER(ep_id));
+>> +    if (ep) {
+>> +        return ep;
+>> +    }
+>> +    if (!virtio_iommu_mr(s, ep_id)) {
 > 
-> Btw, we may need to:
-> 
->            return NULL;
-Yes. By the way Yi's patch "intel_iommu: a fix to
-vtd_find_as_from_bus_num()" also applies to SMMU code. I will send a patch.
+> Could I ask when this will trigger?
+
+This can happen when a device is attached to a domain and its RID does
+not correspond to one of the devices protected by the iommu.
 
 Thanks
 
 Eric
 > 
-> here.
-> 
+>> +        return NULL;
 >> +    }
->> +    return iommu_pci_bus;
+>> +    ep = g_malloc0(sizeof(*ep));
+>> +    ep->id = ep_id;
+>> +    trace_virtio_iommu_get_endpoint(ep_id);
+>> +    g_tree_insert(s->endpoints, GUINT_TO_POINTER(ep_id), ep);
+>> +    return ep;
 >> +}
+> 
+> Thanks,
 > 
 
 
