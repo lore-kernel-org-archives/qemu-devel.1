@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 181B5C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FB3C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:06:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5FC52467C
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B33D24676
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 13:06:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emyApK6a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5FC52467C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXnRBssP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B33D24676
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irLtb-0007h3-DQ
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:06:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41187)
+	id 1irLu7-00007h-PF
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 08:06:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41092)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irLj3-00033t-Vs
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:23 -0500
+ (envelope-from <quintela@redhat.com>) id 1irLip-0002eg-Hc
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irLj0-0001nb-59
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:17 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35343
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <quintela@redhat.com>) id 1irLil-0001ix-KH
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43994
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLj0-0001n7-0A
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:55:14 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irLil-0001il-H5
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 07:54:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579006513;
+ s=mimecast20190719; t=1579006499;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a+D0Jhjaw7oJJMu/pHqSxLnV5MGTcL/XHY7MlyuPryQ=;
- b=emyApK6axfJWsHQKDHWQ7fcEZ6pc1XpFvvEuXPM5f3iGbZDLtqj5Fh4WbkyWsj5AZ8zPxA
- g+S1GNn9Z3CYhJAlrKVXn1oorPkfkbkArrKnFffak1psIiGBMpSroe+5Cn/EnVczw9xqmc
- ssGUzTTokniUKgNi/hLMg28oUs1v0bw=
+ bh=8PL3njRMZwxs9uKSpCL5NJoIzl7l80qAcMLLGRwuXdY=;
+ b=EXnRBssPexGp136GwJ6d57n4WVev8UTfFjxSa9gF7vBhwXavz9YRVmmDbVepmqLAhvtPVn
+ 8w0rUpWUiKRy9I7abArdMOkz+z6nT7ev+/3BH5qVuO6JzPSSa9PYTb8w5qx0GaZ1FEWabV
+ VbrzR+gjE6OTXQEXw3quNr/RHPiyN0Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-cATNDCvfOGqZhOhtdNQrfw-1; Tue, 14 Jan 2020 07:55:12 -0500
+ us-mta-167-CY-nTp_YNpCGSH-nt3m7Yw-1; Tue, 14 Jan 2020 07:54:57 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E05AA107ACC4;
- Tue, 14 Jan 2020 12:55:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0776189DF43;
+ Tue, 14 Jan 2020 12:54:55 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 441175DA76;
- Tue, 14 Jan 2020 12:55:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF08F5D9E5;
+ Tue, 14 Jan 2020 12:54:48 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/30] migration/ram: Yield periodically to the main loop
-Date: Tue, 14 Jan 2020 13:52:39 +0100
-Message-Id: <20200114125254.4515-16-quintela@redhat.com>
+Subject: [PULL 13/30] migration: add savevm_state_handler_remove()
+Date: Tue, 14 Jan 2020 13:52:37 +0100
+Message-Id: <20200114125254.4515-14-quintela@redhat.com>
 In-Reply-To: <20200114125254.4515-1-quintela@redhat.com>
 References: <20200114125254.4515-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: cATNDCvfOGqZhOhtdNQrfw-1
+X-MC-Unique: CY-nTp_YNpCGSH-nt3m7Yw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,8 +92,8 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
  Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Berger <stefanb@linux.ibm.com>, Yury Kotov <yury-kotov@yandex-team.ru>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Stefan Berger <stefanb@linux.ibm.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Scott Cheloha <cheloha@linux.vnet.ibm.com>,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  David Gibson <david@gibson.dropbear.id.au>
@@ -101,56 +101,59 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yury Kotov <yury-kotov@yandex-team.ru>
+From: Scott Cheloha <cheloha@linux.vnet.ibm.com>
 
-Usually, incoming migration coroutine yields to the main loop
-while its IO-channel is waiting for data to receive. But there is a case
-when RAM migration and data receive have the same speed: VM with huge
-zeroed RAM. In this case, IO-channel won't read and thus the main loop
-is stuck and for instance, it doesn't respond to QMP commands.
+Create a function to abstract common logic needed when removing a
+SaveStateEntry element from the savevm_state.handlers queue.
 
-For this case, yield periodically, but not too often, so as not to
-affect the speed of migration.
+For now we just remove the element.  Soon it will involve additional
+cleanup.
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Signed-off-by: Scott Cheloha <cheloha@linux.vnet.ibm.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ migration/savevm.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index aa6cc7d47a..0c6992db9a 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -4246,7 +4246,7 @@ static void colo_flush_ram_cache(void)
-  */
- static int ram_load_precopy(QEMUFile *f)
- {
--    int flags =3D 0, ret =3D 0, invalid_flags =3D 0, len =3D 0;
-+    int flags =3D 0, ret =3D 0, invalid_flags =3D 0, len =3D 0, i =3D 0;
-     /* ADVISE is earlier, it shows the source has the postcopy capability =
-on */
-     bool postcopy_advised =3D postcopy_is_advised();
-     if (!migrate_use_compression()) {
-@@ -4258,6 +4258,17 @@ static int ram_load_precopy(QEMUFile *f)
-         void *host =3D NULL;
-         uint8_t ch;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 59efc1981d..30d980caa2 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -725,6 +725,11 @@ static void savevm_state_handler_insert(SaveStateEntry=
+ *nse)
+     }
+ }
 =20
-+        /*
-+         * Yield periodically to let main loop run, but an iteration of
-+         * the main loop is expensive, so do it each some iterations
-+         */
-+        if ((i & 32767) =3D=3D 0 && qemu_in_coroutine()) {
-+            aio_co_schedule(qemu_get_current_aio_context(),
-+                            qemu_coroutine_self());
-+            qemu_coroutine_yield();
-+        }
-+        i++;
++static void savevm_state_handler_remove(SaveStateEntry *se)
++{
++    QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
++}
 +
-         addr =3D qemu_get_be64(f);
-         flags =3D addr & ~TARGET_PAGE_MASK;
-         addr &=3D TARGET_PAGE_MASK;
+ /* TODO: Individual devices generally have very little idea about the rest
+    of the system, so instance_id should be removed/replaced.
+    Meanwhile pass -1 as instance_id if you do not already have a clearly
+@@ -777,7 +782,7 @@ void unregister_savevm(VMStateIf *obj, const char *idst=
+r, void *opaque)
+=20
+     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
+         if (strcmp(se->idstr, id) =3D=3D 0 && se->opaque =3D=3D opaque) {
+-            QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
++            savevm_state_handler_remove(se);
+             g_free(se->compat);
+             g_free(se);
+         }
+@@ -841,7 +846,7 @@ void vmstate_unregister(VMStateIf *obj, const VMStateDe=
+scription *vmsd,
+=20
+     QTAILQ_FOREACH_SAFE(se, &savevm_state.handlers, entry, new_se) {
+         if (se->vmsd =3D=3D vmsd && se->opaque =3D=3D opaque) {
+-            QTAILQ_REMOVE(&savevm_state.handlers, se, entry);
++            savevm_state_handler_remove(se);
+             g_free(se->compat);
+             g_free(se);
+         }
 --=20
 2.24.1
 
