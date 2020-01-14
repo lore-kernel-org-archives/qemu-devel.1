@@ -2,63 +2,74 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7929BC33CAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 00:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E66FFC33CA9
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 00:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48B2C20678
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 00:45:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="ZABXNHTR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B2C20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFFB520678
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 00:51:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFFB520678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irALF-0006xo-DM
-	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 19:45:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36000)
+	id 1irAQc-0001FD-VB
+	for qemu-devel@archiver.kernel.org; Mon, 13 Jan 2020 19:51:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36546)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <d06e6257e5bce83c393df183514e61a380366f3a@lizzy.crudebyte.com>)
- id 1irAJS-0005PV-2Q
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:44:07 -0500
+ (envelope-from <bounces@canonical.com>) id 1irAPx-0000mb-6u
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:50:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <d06e6257e5bce83c393df183514e61a380366f3a@lizzy.crudebyte.com>)
- id 1irAJQ-0007MP-Sn
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:44:06 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:60919)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71)
- (envelope-from <d06e6257e5bce83c393df183514e61a380366f3a@lizzy.crudebyte.com>)
- id 1irAJQ-0006mq-Ev
- for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:44:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:Message-Id:Content-Type:
- Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Content-ID:
- Content-Description; bh=ZLIg8qwPtvXqEoy63HIHnfcQg889Yoc5UG7KUqwxvXk=; b=ZABXN
- HTRNcwa8futntB4df8n6jhQoH7qkbvuLTIGgRysyoCdjyMla7yIlV5k9tA5L8zNqNSNuUf0W2J4hq
- XVBav3Gy84/pcG6GaGtj7vUB83fjDrMWuw9dv2I1qoOCUH2wNA2B/scIUsgj2d2/4nMpIxvI8dCt2
- u/OvHIdRNzTfiU38y/LcYsJgd5KUt1/b+w6Z9mcrJtKFqRvfnC9xLhocqcKasM7yQ9IagONng4Erd
- MB7xmnwGT342VmiKUYffraJ/X1Wgnv9++ySuCVbOj4NtBrq+7Dzs+As3y2p8FRNpylo15SoR89Ouv
- cT7kMyO6lVAfOnZyBx4jjIfSF2qMQ==;
-Message-Id: <cover.1578957500.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 14 Jan 2020 00:18:20 +0100
-Subject: [PATCH v3 00/11] 9pfs: readdir optimization
+ (envelope-from <bounces@canonical.com>) id 1irAPv-0004q5-NJ
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:50:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33744)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1irAPv-0004oo-H7
+ for qemu-devel@nongnu.org; Mon, 13 Jan 2020 19:50:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1irAPt-0006Hu-9m
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 00:50:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 486542E80CC
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 00:50:45 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Jan 2020 00:44:18 -0000
+From: Benjamin David Lunt <1859359@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fysnet kraxel-redhat marcan42
+X-Launchpad-Bug-Reporter: Benjamin David Lunt (fysnet)
+X-Launchpad-Bug-Modifier: Benjamin David Lunt (fysnet)
+References: <157885971279.5587.15888635675000659382.malonedeb@gac.canonical.com>
+Message-Id: <157896265892.2574.9234280502246838128.malone@soybean.canonical.com>
+Subject: [Bug 1859359] Re: xHCI and event ring handling
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fababb5cc76c9c13c9349310cb909f4b5a6e4ffb
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.194.90.13
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,92 +78,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1859359 <1859359@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As previously mentioned, I was investigating performance issues with 9pfs.
-Raw file read/write of 9pfs is actually quite good, provided that client
-picked a reasonable high msize (maximum message size). I would recommend
-to log a warning on 9p server side if a client attached with a small msize
-that would cause performance issues for that reason.
+Hi Hector, guys,
 
-However there are other aspects where 9pfs currently performs suboptimally,
-especially readdir handling of 9pfs is extremely slow, a simple readdir
-request of a guest typically blocks for several hundred milliseconds or
-even several seconds, no matter how powerful the underlying hardware is.
-The reason for this performance issue: latency.
-Currently 9pfs is heavily dispatching a T_readdir request numerous times
-between main I/O thread and a background I/O thread back and forth; in fact
-it is actually hopping between threads even multiple times for every single
-directory entry during T_readdir request handling which leads in total to
-huge latencies for a single T_readdir request.
+I think I have found my/the error:
 
-This patch series aims to address this severe performance issue of 9pfs
-T_readdir request handling. The actual performance fix is patch 10. I also
-provided a convenient benchmark for comparing the performance improvements
-by using the 9pfs "synth" driver (see patch 8 for instructions how to run
-the benchmark), so no guest OS installation is required to peform this
-benchmark A/B comparison. With patch 10 I achieved a performance improvement
-of factor 40 on my test machine.
+xHCI, version 1.0, Page 136:
+"Note: The detection of a Cycle bit mismatch in an Event TRB processed =
 
-** NOTE: ** As outlined by patch 7 there seems to be an outstanding issue
-(both with current, unoptimized readdir code, as well as with new, optimized
-readdir code) causing a transport error with splitted readdir requests. This
-issue only occurs if patch 7 is applied. I haven't investigated the cause of
-this issue yet, it looks like a memory issue though. I am not sure if it is a
-problem with the actual 9p server or rather "just" with the test environment.
-Apart from that issue, the actual splitted readdir seems to work well with the
-new performance optimized readdir code as well though.
+ by software indicates the location of the xHC Event Ring Enqueue Pointer =
 
-v2->v3:
+ and that the Event Ring is empty. Software shall write the ERDP with the
+ address of this TRB to indicate that it has processed all Events in the
+ ring."
 
-  * NEW patch: require msize >= 4096 [patch 2].
+It does not state to advance the Consumer's internal Dequeue pointer.  =
 
-  * Shortened commit log message [patch 3]
-    (since previously mentioned issue now addressed by new patch 2).
+Just the register is mentioned.
 
-  * Merged previous 2 test case patches into one -> [patch 5]
-    (since trivial enough for one patch).
+This is my error.  I thought that it implied to advance the Consumer's
+internal Dequeue Pointer as well.  (Implied being the big word here)
 
-  * Fixed code style issue [patch 5].
+Sorry for the bother.  It was my error.  It took me a bit of (re)reading
+and a little more work to find that it was/is indeed my error.
 
-  * Fixed memory leak in test case [patch 5]
-    (missing v9fs_req_free() in v9fs_rreaddir()).
+Sorry and thank you for your time,
+Ben
 
-  * NEW patch: added splitted readdir test [patch 6].
+-- =
 
-  * NEW patch: Failing splitted readdir issue [patch 7]
-    (see issue description above).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1859359
 
-  * Adjusted commit log message [patch 9]
-    (that this patch would break the new splitted readdir test).
+Title:
+  xHCI and event ring handling
 
-  * Fixed comment in code [patch 10].
+Status in QEMU:
+  Invalid
 
-Christian Schoenebeck (11):
-  tests/virtio-9p: add terminating null in v9fs_string_read()
-  9pfs: require msize >= 4096
-  9pfs: validate count sent by client with T_readdir
-  hw/9pfs/9p-synth: added directory for readdir test
-  tests/virtio-9p: added readdir test
-  tests/virtio-9p: added splitted readdir test
-  tests/virtio-9p: failing splitted readdir test
-  9pfs: readdir benchmark
-  hw/9pfs/9p-synth: avoid n-square issue in synth_readdir()
-  9pfs: T_readdir latency optimization
-  hw/9pfs/9p.c: benchmark time on T_readdir request
+Bug description:
+  I believe that the Event Ring handling in QEMU is not correct.  For
+  example, an Event Ring may have multiple segments.  However, the code
+  in xhci_write_event()
+  (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
+  xhci.c;hb=3DHEAD#l645), starting with line 668, seems to only support a
+  single segment.
 
- hw/9pfs/9p-synth.c     |  48 ++++++-
- hw/9pfs/9p-synth.h     |   5 +
- hw/9pfs/9p.c           | 163 +++++++++++++----------
- hw/9pfs/9p.h           |  34 +++++
- hw/9pfs/codir.c        | 183 ++++++++++++++++++++++++--
- hw/9pfs/coth.h         |   3 +
- tests/virtio-9p-test.c | 287 ++++++++++++++++++++++++++++++++++++++++-
- 7 files changed, 640 insertions(+), 83 deletions(-)
+  Also, QEMU is sending a spurious interrupt after the Guest writes to
+  the ERDP register due to the fact that the address written does not
+  match the current index.  This is because the index is incremented
+  after sending the event.  The xHCI specification states in section
+  5.5.2.3.3 "When software finishes processing an Event TRB, it will
+  write the address of that Event TRB to the ERDP."
 
--- 
-2.20.1
+  Since xhci_write_event() has already incremented the index pointer
+  (intr->er_ep_idx), the check at line 3098
+  (https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/usb/hcd-
+  xhci.c;hb=3DHEAD#l3090) no longer is valid.
 
+  I have not studied QEMU's code enough yet to offer a patch.  However,
+  this should be a simple fix.
+
+  intr->er_ep_idx++;
+  if (intr->er_ep_idx >=3D intr->er_table[intr->er_segment].er_size) {
+    intr->er_ep_idx =3D 0;
+    intr->er_segment++;
+    if (intr->er_segment >=3D intr->er_table_size) {
+      intr->er_segment =3D 0;
+      intr->er_pcs =3D !intr->er_pcs;
+    }
+  }
+
+  Being sure to incorporate this new segment member into the above code
+  (possibly as shown) as well as change the lines at 665 to use the new
+  segment member of the structure, and of course in the initialization
+  portion of the event ring.
+
+  As for the spurious interrupt at line 3101, a new member will need to
+  be added to the code to keep track of the last inserted ED (TRB) into
+  the Event Ring and then of course checking against this new member,
+  not the now newly incremented member.
+
+  I have sent an email to the author listed at the top of the file as
+  well, not sure if this is proper bug reporting etiquette or not.
+
+  Thank you.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1859359/+subscriptions
 
