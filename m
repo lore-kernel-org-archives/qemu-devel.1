@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2482C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5641EC33CB7
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7FED2467D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:38:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7FED2467D
+	by mail.kernel.org (Postfix) with ESMTPS id 2C9CE2467D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:39:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C9CE2467D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNKU-0005nO-18
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:38:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60533)
+	id 1irNM9-0007SN-8G
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:39:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1irNJl-0005CF-FI
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:37:20 -0500
+ (envelope-from <laurent@vivier.eu>) id 1irNLN-0006jG-Ib
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:38:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1irNJh-0001vQ-5P
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:37:17 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:58939)
+ (envelope-from <laurent@vivier.eu>) id 1irNLL-0002QY-8e
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:38:56 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:33629)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNJf-0001uw-L3
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:37:12 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1irNLK-0002Q8-Ma
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:38:54 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mwwhv-1jbdFN0oP5-00ySOT; Tue, 14 Jan 2020 15:36:54 +0100
-Subject: Re: [PATCH v5 15/20] linux-user: Add support for
- FD<SETEMSGTRESH|SETMAXERRS|GETMAXERRS> ioctls
+ 1Mdvyo-1jPt8q1c3y-00b03c; Tue, 14 Jan 2020 15:38:38 +0100
+Subject: Re: [PATCH v5 16/20] linux-user: Add support for FDFMT<BEG|TRK|END>
+ ioctls
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1578947683-21011-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1578947683-21011-16-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1578947683-21011-17-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <67c734ed-ada4-44f1-0f61-fddc359ab684@vivier.eu>
-Date: Tue, 14 Jan 2020 15:36:52 +0100
+Message-ID: <e01d5e64-a6ac-bc34-864c-251cf18a77c6@vivier.eu>
+Date: Tue, 14 Jan 2020 15:38:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.1
 MIME-Version: 1.0
-In-Reply-To: <1578947683-21011-16-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1578947683-21011-17-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hfomYalZ/5W7OKxdJnNJ3vOySIr9rXBMMpyTvK4Ch4P9oLizgnH
- XueVv9WPrwbr1z1UdbRzm5JoONsBw+vZwLk72H6645JXeOpHCx9exqnrCNYm2XV51ynWqLs
- E2budXcf7KrHBFmtr6rP9wikW1Jb5gF7K0wRR2qxdhEYQ7T46x5JWoCcDdinB2FPqbEUQhh
- J7x59oaA3vSZKltn0jBQg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:j1mJ99U7s8I=:DXb2QhdEpXXr75klWoUNC0
- x+V6OFFhZg+gwhQFr+cyanjnoTSraR2ffSXjYikqxbplUtsg3xjnvNTTw7X3rtM75AGQsr6sn
- 3T4+ANTENYkmAxAKkhxvDpnl4irWjmjjPDbK1WcAyytsT23occSd5W3HrFsu5xw6z3lYJCIoS
- NK4rv2cIctP7Fm0rtGj7yJrI/vwsCuRgKjLt1IAYB9tgDXYle4ewFhiNGst546N3ayRqXX4OF
- HszUy1hCnhokTsAQEwzZW1IYQbLmdBreHVGuLUR8azxIXGvyaA3Lf7LnaQHED83IREF24rOrW
- miFc/TR7uyyQvZrmv8W5za6f3fl6t+plsiEA8B3XoPbDl1cj7n1cNwvuXpopg1tdahe0iFrbM
- qJCvprrjs4AnwTPQ1BvGLdEAZAgCKiZ2YjeLkB0bBoGnkcWpNzJR+gvZBG7+BfDE+CHou/Hvn
- PUTJrCSmsklBO9L35bJlfZelGj80J1Y4bf9RSxesb7tUlS7i5ZRZ7UpvW6yVeuJ9COEDzIZHY
- ZzbGapBHpQY4v+mNs5PzcyMmSYh0bWC6lNxGfuXzZck964o3w68x5IB184md++FSSDYC3qy0y
- N0pT3+lg5rrcmMVe+ivAqV1L0MwGLJ6dBbTD3Q7d3/6bI/HGLmJkjW4sNc2oirHhITqC8A+m3
- 3QGAo3NFLvsBV8ePs7EnqE9hIjg2ry1YQnC+TeWa02l2faaZdb4aUSdbQJl8eI5qohpOED/NO
- UhLB0vWIFMX7kK9Z6m8gxvz6Nu0lctwA0FtWBsWT1/ieAS2J0q8myOluWRuw/FXMB0Nbjkf8t
- qxo/jzXH38ZhZukh6VbpRbb+7RVy8UT0kFdtXOQHPeHF8Bdu/D9CaA2i1mXXUiMg3GGynJBiJ
- +vT6fjOcZkf3RL7ehbPQQvS+MP21l0JK8L5ucQk/Y=
+X-Provags-ID: V03:K1:omWqa0I1rrjIoNduvPc6jTwACrGJ+B3rp3WNPZiVbu4eGQWcIcO
+ 1sJ0YL9yk2BjnD2yWIdEkUojoYPFJgrz8mL7dTqjY1X5TcirA0FbBXalwjH45mbr8zrpfk6
+ O9fyAnoqKMpeplRp7T44odCXwTPmbc5pE5K9EMshK0p6uq38G6EWF4D8uqfUP9M6x50UgOp
+ Ix79QPiDEH81nyDxI9CIA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FEGcFtNr9go=:BQTS43FH+1PkBy3xew3vCd
+ pGXG3vKGGbs948+5/d7Kt0ocQW998uBgK2DfwEQi2/IgX6l32qs/qHEkKX00D0/bp7G2+a5ED
+ RDXDZtTP0anAa3cg6+lPNavMQXhVewjPtZ06Di2Yj4sltbQc7PjNiOvE9akwbcJ+yqxWuGKbq
+ vSvG3qJaIM04kz7lVNBplyzXLAqLbRVnQzj2tAK+UWQ/V0cjaYcBv6OAXz/qZw9JsstuWkDkG
+ M5+UTMaXdGsK3Xf+npkV7U4nlW4oWepupKcuryaiomUck/q/bkmT5f/k2DCvd3L+l1AG/FEjv
+ zGuHBSvwHRWuXwpMgc1m+UdBwntNnF379tvNIrBihIUDj2RKYsTydI94WMky99v6a9dhlOF0N
+ PS8/BCIWnwSRUHTwO9XW6EzoxtVYazfOVDJemWqfP/MM52wgSfqGPgXZb/Rg3uoWeXnq9F2to
+ MysJRFoU+CmWnP7On6iuT/pv763t8r3hQFlq+i+wsz7FNQr5blFMv8XO11ZubglwhfHMa3fpk
+ rDVaEpRJ0eFge3u7p5XNsWb+ocCp3jVHJHX4C04n7R/uIpc1jhnXIhW9PC1nV6XHhqmbbTu2t
+ S2GInR8A0DWFGlOoXPvxQGxw0jCkyd/WJ5IJLd8dQkmjOQRge41R9q+xUl6IPi3YtbpEiBoYb
+ guf4qiXefA43hAcMutPrCC/j24RuxokmUBupdIXD5yMXlf4giEwGNvvZKYIIEpWmD0tsoYuY2
+ ujXdGhsDGgLXzzakSh3pF4kh8P0eK3K8aNu6MDtas7pR+47/5M+jYzKQTG4iuFkG8TS/B0GPB
+ SlCUY0T7bMJVev/7l1t7gH3tuXNr6u29VWH29qgbzhb92jsgLHqij/2eAoAimh7DWD7anhQs4
+ 5m9i4OwjyVpKD/Pw1WPtmnEUhMgUJlo2c1BUnLMoE=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -132,89 +132,73 @@ Sender: "Qemu-devel"
 Le 13/01/2020 à 21:34, Aleksandar Markovic a écrit :
 > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > 
-> FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
-> for controlling error reporting of a floppy drive.
+> FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls provide means for controlling
+> formatting of a floppy drive.
 > 
-> FDSETEMSGTRESH's third agrument is a pointer to the structure:
+> FDFMTTRK's third agrument is a pointer to the structure:
 > 
-> struct floppy_max_errors {
->     unsigned int
->       abort,      /* number of errors to be reached before aborting */
->       read_track, /* maximal number of errors permitted to read an
->                    * entire track at once */
->       reset,      /* maximal number of errors before a reset is tried */
->       recal,      /* maximal number of errors before a recalibrate is
->                    * tried */
->       /*
->        * Threshold for reporting FDC errors to the console.
->        * Setting this to zero may flood your screen when using
->        * ultra cheap floppies ;-)
->        */
->       reporting;
+> struct format_descr {
+>     unsigned int device,head,track;
 > };
 > 
 > defined in Linux kernel header <linux/fd.h>.
 > 
 > Since all fields of the structure are of type 'unsigned int', there is
-> no need to define "target_floppy_max_errors".
+> no need to define "target_format_descr".
 > 
-> FDSETMAXERRS and FDGETMAXERRS ioctls do not use the third argument.
+> FDFMTBEG and FDFMTEND ioctls do not use the third argument.
 > 
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 > ---
 >  linux-user/ioctls.h        | 3 +++
 >  linux-user/syscall_defs.h  | 3 +++
->  linux-user/syscall_types.h | 7 +++++++
->  3 files changed, 13 insertions(+)
+>  linux-user/syscall_types.h | 5 +++++
+>  3 files changed, 11 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 66f8c4e..9e3ca90 100644
+> index 9e3ca90..e754a6b 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -114,7 +114,10 @@
->  
+> @@ -115,6 +115,9 @@
 >       IOCTL(FDMSGON, 0, TYPE_NULL)
 >       IOCTL(FDMSGOFF, 0, TYPE_NULL)
-> +     IOCTL(FDSETEMSGTRESH, 0, TYPE_NULL)
+>       IOCTL(FDSETEMSGTRESH, 0, TYPE_NULL)
+> +     IOCTL(FDFMTBEG, 0, TYPE_NULL)
+> +     IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
+> +     IOCTL(FDFMTEND, 0, TYPE_NULL)
 >       IOCTL(FDFLUSH, 0, TYPE_NULL)
-> +     IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-> +     IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
->       IOCTL(FDRESET, 0, TYPE_NULL)
->       IOCTL(FDRAWCMD, 0, TYPE_NULL)
->       IOCTL(FDTWADDLE, 0, TYPE_NULL)
+>       IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
+>       IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 6b88030..efe3860 100644
+> index efe3860..d85ab46 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -899,7 +899,10 @@ struct target_pollfd {
+> @@ -899,6 +899,9 @@ struct target_pollfd {
 >  
 >  #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
 >  #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
-> +#define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
+> +#define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
+> +#define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct format_descr)
+> +#define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
+>  #define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
 >  #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
-> +#define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c, struct floppy_max_errors)
-> +#define TARGET_FDGETMAXERRS  TARGET_IOR(2, 0x0e, struct floppy_max_errors)
->  #define TARGET_FDRESET        TARGET_IO(2, 0x54)
->  #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
->  #define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
+>  #define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c, struct floppy_max_errors)
 > diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-> index 4e36983..e4e0429 100644
+> index e4e0429..8ff78a6 100644
 > --- a/linux-user/syscall_types.h
 > +++ b/linux-user/syscall_types.h
-> @@ -261,6 +261,13 @@ STRUCT(blkpg_ioctl_arg,
+> @@ -261,6 +261,11 @@ STRUCT(blkpg_ioctl_arg,
 >         TYPE_INT, /* datalen */
 >         TYPE_PTRVOID) /* data */
 >  
-> +STRUCT(floppy_max_errors,
-> +       TYPE_INT, /* abort */
-> +       TYPE_INT, /* read_track */
-> +       TYPE_INT, /* reset */
-> +       TYPE_INT, /* recal */
-> +       TYPE_INT) /* reporting */
+> +STRUCT(format_descr,
+> +       TYPE_INT,     /* device */
+> +       TYPE_INT,     /* head */
+> +       TYPE_INT)     /* track */
 > +
->  #if defined(CONFIG_USBFS)
->  /* usb device ioctls */
->  STRUCT(usbdevfs_ctrltransfer,
+>  STRUCT(floppy_max_errors,
+>         TYPE_INT, /* abort */
+>         TYPE_INT, /* read_track */
 > 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
