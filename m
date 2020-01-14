@@ -8,79 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A21C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6484C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54F4824680
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:10:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9BB8424672
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 14:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7mjmYva"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F4824680
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u0zqmIOz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB8424672
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irMty-0004p2-6D
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:10:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54696)
+	id 1irMuI-0005W4-Bb
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 09:10:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54750)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1irMsb-0003D9-Ae
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:17 -0500
+ (envelope-from <coiby.xu@gmail.com>) id 1irMsm-0003X4-V6
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1irMsY-00085c-8Z
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:13 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39237)
+ (envelope-from <coiby.xu@gmail.com>) id 1irMsj-0008EF-NM
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:24 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:33261)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1irMsY-00084y-06
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:10 -0500
-Received: by mail-pf1-x444.google.com with SMTP id q10so6638894pfs.6
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 06:09:09 -0800 (PST)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1irMsj-0008Dc-Do
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 09:09:21 -0500
+Received: by mail-pl1-x641.google.com with SMTP id ay11so5294373plb.0
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 06:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GXYOj+U3hSVlshxwvSlfIFI4FVfmQN4qlRQUjp4L3yQ=;
- b=Y7mjmYva97pXNuTf+yaTXaat2icHcRUdnG5peuHL8sMssp0J9tlMDIm67TywwqxwV8
- 0O2p8wP0ictJPuMLwMms1MSl8p287s3uRfqzVsU7ve26132w6Sij/eIbEZJAfpH7/EtZ
- s28jpKo4TqNjrEfZom+4eVqhpQh3BQhnvbmy9qSJhClNejzOO2+QloXlZYCQlT69kf9K
- nKlr5wI6paMSs1am8d6gFa1eqIMXl0Tt6Pnb4tuBzShr8jdRnkjkrfuziYng5owWMjgR
- CXfvJZxvhl2FXpn8c/fTBb0d8p4OkURggVwMBuU/0GuiSHbyRzWSEZ/y4nz6Ijcs9h8f
- L5DA==
+ bh=FDXlkBcLpLf9BJh9up3G3wY7P/raOIBTXkdtxoet+D8=;
+ b=u0zqmIOzRBnnx8GvTyDdnn5/jfaEmDVSpdSqkobVfMhqzKcQoBNRHLIVBxAIArG1Je
+ ozDWyp1Qwqq9Mx/tzg4PLhfljoLpoTiNXJ/AKnYFFlgxEl7ZOhPkXk05bOFHzkHJ19yZ
+ oWH3af1TE/tA3ssrDDH5OF8z/RWUBl2xvyAu88i0FbKPyhb9DVaJ/eSZ0HZrG36GcMrx
+ oUTVj9y7cUXeJm3/6tzLI3qQ1/6arSaphSzvI/ggvPL+R7MtgkokJR5jPDhaiUpOpNUU
+ IrTmh24ObOX22Hpl1zE25UpASXZ0i+gnH7Dd66TaViAGJzdVW0wfgt+StdKFCpAgVzEe
+ ymRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GXYOj+U3hSVlshxwvSlfIFI4FVfmQN4qlRQUjp4L3yQ=;
- b=MzcRpi5gRpylAZNnHet62ZEnix7CzNXii4gCQ7Ziv/5qv90mfWvSMeTujHeKzym8ic
- RnLm0UFSiIbloqcxivaEDXynk0PPYari4LWEL2P+t4Uh7NYNliRR58KJToYS4Ssvoqyp
- c3WLm+zjetvwgPfvV7HmJTOT9RVCPefek4jTLQmTb3YVeiUv2UDJ16eo69AP2RVYOwt9
- Dd4+1DS5m7pbozJ2xin9llcm2FAfAGBUylupp4t+ut2qkznnHG6ZBuPuxXYDGdsgJGwC
- TFF9NtMmhegbzMCD3e7nrcMbNicD94oaQgeAgBS8PCiO3N9Vc7I3nfpw/l7kk5b3ALS5
- r9Wg==
-X-Gm-Message-State: APjAAAWewQwfjQLrCe91owaS32DVL5d1+xeCHuHkKeXBY8lrAvT/jYKn
- RsM7i67+fRd4STgI5+yU8U4PXLMtvbiE/g==
-X-Google-Smtp-Source: APXvYqx+zGkNgcb//AYNJDZVrxOc7j3KZldu0mGO2x+AApqeamjgBXdP5CJcOwlZVhy9WJkx0/e9IQ==
-X-Received: by 2002:aa7:98ca:: with SMTP id e10mr25754714pfm.24.1579010948233; 
- Tue, 14 Jan 2020 06:09:08 -0800 (PST)
+ bh=FDXlkBcLpLf9BJh9up3G3wY7P/raOIBTXkdtxoet+D8=;
+ b=KIe77C5fi/0LNR/z5DZ5k8DPe7bZ70ohLc61EKczQNU5O9L0sKVAGa18t8h6lsmSnb
+ zvKNRmPeNNq6Hs/WIOALuAmxt5SlNchsIau4lsdeo7ToEDBlcmnhW+NECVqtp2nL/dAh
+ GKhaknezFab2lIeRNfLprSh1Jt1GoYUkmPydwO3HVEFphK4mrtxwj/uSpS2/T94ziz0V
+ y+VcnOxxjYbpfmBmUqpLUXLizBBQz6PylMmaP4EpAH3bqwF4CfXiJS7LgYNMa/p3n4wN
+ opZcSnNGauXKNSFqYhN/Nd2klBgdxoJzsc6E31MKq+RsLsmjcIfcPmzrxk6jPoNXHqd6
+ iMgA==
+X-Gm-Message-State: APjAAAVaWogjOXAf6+17sqxTu/pnbpZZXQAWHHhFJVeMQy+6c9qxM2hs
+ k+iEifZwb0zIIbbhBDpkvOpsyX+gHHzpiw==
+X-Google-Smtp-Source: APXvYqzqufOzSN8+tlmOWsdARAPjSLAVzgWsWWfwZ/5gjfQS0p9UfLirb4gdUcMf97JTY3C0hU5hQQ==
+X-Received: by 2002:a17:90a:384f:: with SMTP id
+ l15mr29363917pjf.134.1579010959722; 
+ Tue, 14 Jan 2020 06:09:19 -0800 (PST)
 Received: from localhost.localdomain ([175.124.145.172])
- by smtp.googlemail.com with ESMTPSA id a17sm17264773pjv.6.2020.01.14.06.09.03
+ by smtp.googlemail.com with ESMTPSA id a17sm17264773pjv.6.2020.01.14.06.09.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 06:09:07 -0800 (PST)
+ Tue, 14 Jan 2020 06:09:19 -0800 (PST)
 From: Coiby Xu <coiby.xu@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/5] vhost-user block device backend
-Date: Tue, 14 Jan 2020 22:06:16 +0800
-Message-Id: <20200114140620.10385-2-coiby.xu@gmail.com>
+Subject: [PATCH v2 4/5] new qTest case for the vhost-user-blk device backend
+Date: Tue, 14 Jan 2020 22:06:19 +0800
+Message-Id: <20200114140620.10385-5-coiby.xu@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200114140620.10385-1-coiby.xu@gmail.com>
 References: <20200114140620.10385-1-coiby.xu@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,1098 +100,897 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By making use of libvhost, multiple block device drives can be exported and each drive can serve multiple clients simultaneously. Since vhost-user-server needs a block drive to be created first, delay the creation of this object.
+This test case has the same tests as tests/virtio-blk-test.c except for
+tests have block_resize.
 
 Signed-off-by: Coiby Xu <coiby.xu@gmail.com>
 ---
- blockdev-vu.c              | 1008 ++++++++++++++++++++++++++++++++++++
- include/block/vhost-user.h |   46 ++
- vl.c                       |    4 +
- 3 files changed, 1058 insertions(+)
- create mode 100644 blockdev-vu.c
- create mode 100644 include/block/vhost-user.h
+ tests/libqos/vhost-user-blk.c | 125 ++++++
+ tests/libqos/vhost-user-blk.h |  44 +++
+ tests/vhost-user-blk-test.c   | 691 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 860 insertions(+)
+ create mode 100644 tests/libqos/vhost-user-blk.c
+ create mode 100644 tests/libqos/vhost-user-blk.h
+ create mode 100644 tests/vhost-user-blk-test.c
 
-diff --git a/blockdev-vu.c b/blockdev-vu.c
+diff --git a/tests/libqos/vhost-user-blk.c b/tests/libqos/vhost-user-blk.c
 new file mode 100644
-index 0000000000..45f0bb43a7
+index 0000000000..1f8e6eec7e
 --- /dev/null
-+++ b/blockdev-vu.c
-@@ -0,0 +1,1008 @@
++++ b/tests/libqos/vhost-user-blk.c
+@@ -0,0 +1,125 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
 +#include "qemu/osdep.h"
-+#include "block/vhost-user.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-types-sockets.h"
-+#include "qapi/qapi-commands-block.h"
++#include "libqtest.h"
++#include "qemu/module.h"
++#include "standard-headers/linux/virtio_blk.h"
++#include "libqos/qgraph.h"
++#include "libqos/vhost-user-blk.h"
 +
-+#include "sysemu/block-backend.h"
-+#include "qemu/main-loop.h"
++#define PCI_SLOT                0x04
++#define PCI_FN                  0x00
 +
-+#include "qemu/units.h"
-+
-+#include "block/block.h"
-+
-+#include "qom/object_interfaces.h"
-+
-+#include <sys/eventfd.h>
-+
-+#include "hw/qdev-properties.h"
-+enum {
-+    VHOST_USER_BLK_MAX_QUEUES = 8,
-+};
-+
-+struct virtio_blk_inhdr {
-+    unsigned char status;
-+};
-+
-+
-+static QTAILQ_HEAD(, VubDev) vub_devs = QTAILQ_HEAD_INITIALIZER(vub_devs);
-+
-+
-+typedef struct VubReq {
-+    VuVirtqElement *elem;
-+    int64_t sector_num;
-+    size_t size;
-+    struct virtio_blk_inhdr *in;
-+    struct virtio_blk_outhdr out;
-+    VuClient *client;
-+    struct VuVirtq *vq;
-+} VubReq;
-+
-+static void
-+remove_watch(VuDev *vu_dev, int fd)
++/* virtio-blk-device */
++static void *qvhost_user_blk_get_driver(QVhostUserBlk *v_blk,
++                                    const char *interface)
 +{
-+    VuClient *client;
-+
-+    g_assert(vu_dev);
-+    g_assert(fd >= 0);
-+
-+    client = container_of(vu_dev, VuClient, parent);
-+    aio_set_fd_handler(client->blk->ctx, fd, false, NULL, NULL, NULL, NULL);
-+}
-+
-+static void close_client(VuClient *client)
-+{
-+    vu_deinit(&client->parent);
-+    /** g_source_destroy(vub_device->parent.src); */
-+    client->sioc = NULL;
-+    object_unref(OBJECT(client->ioc));
-+    client->closed = true;
-+
-+}
-+
-+static void vub_panic_cb(VuDev *vu_dev, const char *buf)
-+{
-+    if (buf) {
-+        g_warning("vu_panic: %s", buf);
++    if (!g_strcmp0(interface, "vhost-user-blk")) {
++        return v_blk;
++    }
++    if (!g_strcmp0(interface, "virtio")) {
++        return v_blk->vdev;
 +    }
 +
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    if (client->blk->exit_panic) {
-+        client->blk->close = true;
++    fprintf(stderr, "%s not present in vhost-user-blk-device\n", interface);
++    g_assert_not_reached();
++}
++
++static void *qvhost_user_blk_device_get_driver(void *object,
++                                           const char *interface)
++{
++    QVhostUserBlkDevice *v_blk = object;
++    return qvhost_user_blk_get_driver(&v_blk->blk, interface);
++}
++
++static void *vhost_user_blk_device_create(void *virtio_dev,
++                                      QGuestAllocator *t_alloc,
++                                      void *addr)
++{
++    QVhostUserBlkDevice *vhost_user_blk = g_new0(QVhostUserBlkDevice, 1);
++    QVhostUserBlk *interface = &vhost_user_blk->blk;
++
++    interface->vdev = virtio_dev;
++
++    vhost_user_blk->obj.get_driver = qvhost_user_blk_device_get_driver;
++
++    return &vhost_user_blk->obj;
++}
++
++/* virtio-blk-pci */
++static void *qvhost_user_blk_pci_get_driver(void *object, const char *interface)
++{
++    QVhostUserBlkPCI *v_blk = object;
++    if (!g_strcmp0(interface, "pci-device")) {
++        return v_blk->pci_vdev.pdev;
 +    }
-+    if (!client->closed) {
-+        close_client(client);
-+    }
++    return qvhost_user_blk_get_driver(&v_blk->blk, interface);
 +}
 +
-+
-+static void vub_req_complete(VubReq *req)
++static void *vhost_user_blk_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
++                                      void *addr)
 +{
-+    VuDev *vu_dev = &req->client->parent;
++    QVhostUserBlkPCI *vhost_user_blk = g_new0(QVhostUserBlkPCI, 1);
++    QVhostUserBlk *interface = &vhost_user_blk->blk;
++    QOSGraphObject *obj = &vhost_user_blk->pci_vdev.obj;
 +
-+    /* IO size with 1 extra status byte */
-+    vu_queue_push(vu_dev, req->vq, req->elem,
-+                  req->size + 1);
-+    vu_queue_notify(vu_dev, req->vq);
++    virtio_pci_init(&vhost_user_blk->pci_vdev, pci_bus, addr);
++    interface->vdev = &vhost_user_blk->pci_vdev.vdev;
 +
-+    if (req->elem) {
-+        free(req->elem);
-+    }
++    g_assert_cmphex(interface->vdev->device_type, ==, VIRTIO_ID_BLOCK);
 +
-+    g_free(req);
++    obj->get_driver = qvhost_user_blk_pci_get_driver;
++
++    return obj;
 +}
 +
-+
-+
-+static int
-+vub_discard_write_zeroes(VubReq *req, struct iovec *iov, uint32_t iovcnt,
-+                         uint32_t type)
++static void vhost_user_blk_register_nodes(void)
 +{
-+    struct virtio_blk_discard_write_zeroes *desc;
-+    ssize_t size;
-+    void *buf;
++    /* FIXME: every test using these two nodes needs to setup a
++     * -drive,id=drive0 otherwise QEMU is not going to start.
++     * Therefore, we do not include "produces" edge for virtio
++     * and pci-device yet.
++    */
 +
-+    size = iov_size(iov, iovcnt);
-+    if (size != sizeof(*desc)) {
-+        fprintf(stderr, "Invalid size %ld, expect %ld\n", size, sizeof(*desc));
-+        return -1;
-+    }
-+    buf = g_new0(char, size);
++    char *arg = g_strdup_printf("id=drv0,chardev=char1,addr=%x.%x",
++                                PCI_SLOT, PCI_FN);
 +
-+    iov_to_buf_full(iov, iovcnt, 0, buf, size);
-+
-+
-+    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
-+    VubDev *vdev_blk;
-+    VuClient *client = container_of(dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+    desc = (struct virtio_blk_discard_write_zeroes *)buf;
-+    uint64_t range[2] = { le64toh(desc->sector) << 9,
-+                          le32toh(desc->num_sectors) << 9 };
-+    if (type == VIRTIO_BLK_T_DISCARD) {
-+        if (blk_pdiscard(vdev_blk->blk, range[0], range[1]) == 0) {
-+            g_free(buf);
-+            return 0;
-+        }
-+    } else if (type == VIRTIO_BLK_T_WRITE_ZEROES) {
-+        if (blk_pwrite_zeroes(vdev_blk->blk, range[0], range[1]) == 0) {
-+            g_free(buf);
-+            return 0;
-+        }
-+    }
-+    #endif
-+
-+    g_free(buf);
-+    return -1;
-+}
-+
-+
-+static void
-+vub_flush(VubReq *req)
-+{
-+    VuClient *client = req->client;
-+    blk_co_flush(client->blk->backend);
-+}
-+
-+
-+#define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
-+typedef struct BlkRwCo {
-+    BlockBackend *blk;
-+    int64_t offset;
-+    void *iobuf;
-+    int ret;
-+    BdrvRequestFlags flags;
-+} BlkRwCo;
-+
-+static void blk_read_entry(void *opaque)
-+{
-+    BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
-+
-+    rwco->ret = blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
-+                              qiov, rwco->flags);
-+    aio_wait_kick();
-+}
-+
-+
-+static void blk_write_entry(void *opaque)
-+{
-+    BlkRwCo *rwco = opaque;
-+    QEMUIOVector *qiov = rwco->iobuf;
-+
-+    rwco->ret = blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
-+                              qiov, rwco->flags);
-+    aio_wait_kick();
-+}
-+
-+
-+static int blk_prw(BlockBackend *blk, QEMUIOVector *qiov, int64_t offset,
-+                   CoroutineEntry co_entry, BdrvRequestFlags flags)
-+{
-+
-+    BlkRwCo rwco = {
-+        .blk    = blk,
-+        .offset = offset,
-+        .iobuf  = qiov,
-+        .flags  = flags,
-+        .ret    = NOT_DONE,
++    QPCIAddress addr = {
++        .devfn = QPCI_DEVFN(PCI_SLOT, PCI_FN),
 +    };
 +
-+    if (qemu_in_coroutine()) {
-+        /* Fast-path if already in coroutine context */
-+        co_entry(&rwco);
-+    } else {
-+        Coroutine *co = qemu_coroutine_create(co_entry, &rwco);
-+        bdrv_coroutine_enter(blk_bs(blk), co);
-+        BDRV_POLL_WHILE(blk_bs(blk), rwco.ret == NOT_DONE);
-+    }
++    QOSGraphEdgeOptions opts = { };
 +
-+    return rwco.ret;
++    /* virtio-blk-device */
++    /** opts.extra_device_opts = "drive=drive0"; */
++    qos_node_create_driver("vhost-user-blk-device", vhost_user_blk_device_create);
++    qos_node_consumes("vhost-user-blk-device", "virtio-bus", &opts);
++    qos_node_produces("vhost-user-blk-device", "vhost-user-blk");
++
++    /* virtio-blk-pci */
++    opts.extra_device_opts = arg;
++    add_qpci_address(&opts, &addr);
++    qos_node_create_driver("vhost-user-blk-pci", vhost_user_blk_pci_create);
++    qos_node_consumes("vhost-user-blk-pci", "pci-bus", &opts);
++    qos_node_produces("vhost-user-blk-pci", "vhost-user-blk");
++
++    g_free(arg);
 +}
 +
++libqos_init(vhost_user_blk_register_nodes);
+diff --git a/tests/libqos/vhost-user-blk.h b/tests/libqos/vhost-user-blk.h
+new file mode 100644
+index 0000000000..ef4ef09cca
+--- /dev/null
++++ b/tests/libqos/vhost-user-blk.h
+@@ -0,0 +1,44 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2018 Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
 +
-+static ssize_t
-+vub_rwv(VubReq *req, struct iovec *iov,
-+        uint32_t iovcnt,
-+        CoroutineEntry co_entry)
-+{
-+    VuClient *client = req->client;
-+    ssize_t rc;
++#ifndef TESTS_LIBQOS_VHOST_USER_BLK_H
++#define TESTS_LIBQOS_VHOST_USER_BLK_H
 +
-+    if (!iovcnt) {
-+        fprintf(stderr, "Invalid Read/Write IOV count\n");
-+        return -1;
-+    }
++#include "libqos/qgraph.h"
++#include "libqos/virtio.h"
++#include "libqos/virtio-pci.h"
 +
-+    int64_t offset = req->sector_num * 512;
-+    QEMUIOVector *qiov = g_new0(QEMUIOVector, 1);
-+    qemu_iovec_init_external(qiov, iov, iovcnt);
-+    rc = blk_prw(client->blk->backend, qiov, offset, co_entry, 0);
++typedef struct QVhostUserBlk QVhostUserBlk;
++typedef struct QVhostUserBlkPCI QVhostUserBlkPCI;
++typedef struct QVhostUserBlkDevice QVhostUserBlkDevice;
 +
-+    req->size = iov_size(iov, iovcnt);
-+    if (rc < 0) {
-+        fprintf(stderr, "%s, Sector %"PRIu64", Size %lu failed with %s\n",
-+                client->blk->name, req->sector_num, req->size,
-+                strerror(errno));
-+        return -1;
-+    }
++struct QVhostUserBlk {
++    QVirtioDevice *vdev;
++};
 +
-+    return rc;
-+}
++struct QVhostUserBlkPCI {
++    QVirtioPCIDevice pci_vdev;
++    QVhostUserBlk blk;
++};
 +
-+static int vub_virtio_process_req(VuClient *client,
-+                                     VuVirtq *vq)
-+{
-+    VuDev *vu_dev = &client->parent;
-+    VuVirtqElement *elem;
++struct QVhostUserBlkDevice {
++    QOSGraphObject obj;
++    QVhostUserBlk blk;
++};
++
++#endif
+diff --git a/tests/vhost-user-blk-test.c b/tests/vhost-user-blk-test.c
+new file mode 100644
+index 0000000000..d54769dd7f
+--- /dev/null
++++ b/tests/vhost-user-blk-test.c
+@@ -0,0 +1,691 @@
++/*
++ * QTest testcase for VirtIO Block Device
++ *
++ * Copyright (c) 2014 SUSE LINUX Products GmbH
++ * Copyright (c) 2014 Marc Marí
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest-single.h"
++#include "qemu/bswap.h"
++#include "qemu/module.h"
++#include "standard-headers/linux/virtio_blk.h"
++#include "standard-headers/linux/virtio_pci.h"
++#include "libqos/qgraph.h"
++#include "libqos/vhost-user-blk.h"
++#include "libqos/libqos-pc.h"
++
++/* TODO actually test the results and get rid of this */
++#define qmp_discard_response(...) qobject_unref(qmp(__VA_ARGS__))
++
++#define TEST_IMAGE_SIZE         (64 * 1024 * 1024)
++#define QVIRTIO_BLK_TIMEOUT_US  (30 * 1000 * 1000)
++#define PCI_SLOT_HP             0x06
++
++typedef struct QVirtioBlkReq {
 +    uint32_t type;
-+    VubReq *req;
++    uint32_t ioprio;
++    uint64_t sector;
++    char *data;
++    uint8_t status;
++} QVirtioBlkReq;
 +
-+    elem = vu_queue_pop(vu_dev, vq, sizeof(VuVirtqElement) + sizeof(VubReq));
-+    if (!elem) {
-+        return -1;
++
++#ifdef HOST_WORDS_BIGENDIAN
++static const bool host_is_big_endian = true;
++#else
++static const bool host_is_big_endian; /* false */
++#endif
++
++static inline void virtio_blk_fix_request(QVirtioDevice *d, QVirtioBlkReq *req)
++{
++    if (qvirtio_is_big_endian(d) != host_is_big_endian) {
++        req->type = bswap32(req->type);
++        req->ioprio = bswap32(req->ioprio);
++        req->sector = bswap64(req->sector);
 +    }
++}
 +
-+    struct iovec *in_iov = elem->in_sg;
-+    struct iovec *out_iov = elem->out_sg;
-+    unsigned in_num = elem->in_num;
-+    unsigned out_num = elem->out_num;
-+    /* refer to hw/block/virtio_blk.c */
-+    if (elem->out_num < 1 || elem->in_num < 1) {
-+        fprintf(stderr, "virtio-blk request missing headers\n");
-+        free(elem);
-+        return -1;
++
++static inline void virtio_blk_fix_dwz_hdr(QVirtioDevice *d,
++    struct virtio_blk_discard_write_zeroes *dwz_hdr)
++{
++    if (qvirtio_is_big_endian(d) != host_is_big_endian) {
++        dwz_hdr->sector = bswap64(dwz_hdr->sector);
++        dwz_hdr->num_sectors = bswap32(dwz_hdr->num_sectors);
++        dwz_hdr->flags = bswap32(dwz_hdr->flags);
 +    }
++}
 +
-+    req = g_new0(VubReq, 1);
-+    req->client = client;
-+    req->vq = vq;
-+    req->elem = elem;
++static uint64_t virtio_blk_request(QGuestAllocator *alloc, QVirtioDevice *d,
++                                   QVirtioBlkReq *req, uint64_t data_size)
++{
++    uint64_t addr;
++    uint8_t status = 0xFF;
 +
-+    if (unlikely(iov_to_buf(out_iov, out_num, 0, &req->out,
-+                            sizeof(req->out)) != sizeof(req->out))) {
-+        fprintf(stderr, "virtio-blk request outhdr too short");
-+        goto err;
-+    }
-+
-+    iov_discard_front(&out_iov, &out_num, sizeof(req->out));
-+
-+    if (in_iov[in_num - 1].iov_len < sizeof(struct virtio_blk_inhdr)) {
-+        fprintf(stderr, "virtio-blk request inhdr too short");
-+        goto err;
-+    }
-+
-+    /* We always touch the last byte, so just see how big in_iov is.  */
-+    req->in = (void *)in_iov[in_num - 1].iov_base
-+              + in_iov[in_num - 1].iov_len
-+              - sizeof(struct virtio_blk_inhdr);
-+    iov_discard_back(in_iov, &in_num, sizeof(struct virtio_blk_inhdr));
-+
-+
-+    type = le32toh(req->out.type);
-+    switch (type & ~VIRTIO_BLK_T_BARRIER) {
++    switch (req->type) {
 +    case VIRTIO_BLK_T_IN:
-+    case VIRTIO_BLK_T_OUT: {
-+        ssize_t ret = 0;
-+        bool is_write = type & VIRTIO_BLK_T_OUT;
-+        req->sector_num = le64toh(req->out.sector);
-+        if (is_write) {
-+            ret = vub_rwv(req, out_iov, out_num, blk_write_entry);
-+        } else {
-+            ret = vub_rwv(req, in_iov, in_num, blk_read_entry);
-+        }
-+        if (ret >= 0) {
-+            req->in->status = VIRTIO_BLK_S_OK;
-+        } else {
-+            req->in->status = VIRTIO_BLK_S_IOERR;
-+        }
-+        vub_req_complete(req);
++    case VIRTIO_BLK_T_OUT:
++        g_assert_cmpuint(data_size % 512, ==, 0);
 +        break;
-+    }
-+    case VIRTIO_BLK_T_FLUSH:
-+        vub_flush(req);
-+        req->in->status = VIRTIO_BLK_S_OK;
-+        vub_req_complete(req);
-+        break;
-+    case VIRTIO_BLK_T_GET_ID: {
-+        size_t size = MIN(iov_size(&elem->in_sg[0], in_num),
-+                          VIRTIO_BLK_ID_BYTES);
-+        snprintf(elem->in_sg[0].iov_base, size, "%s", "vhost_user_blk");
-+        req->in->status = VIRTIO_BLK_S_OK;
-+        req->size = elem->in_sg[0].iov_len;
-+        vub_req_complete(req);
-+        break;
-+    }
 +    case VIRTIO_BLK_T_DISCARD:
-+    case VIRTIO_BLK_T_WRITE_ZEROES: {
-+        int rc;
-+        rc = vub_discard_write_zeroes(req, &elem->out_sg[1], out_num, type);
-+        if (rc == 0) {
-+            req->in->status = VIRTIO_BLK_S_OK;
-+        } else {
-+            req->in->status = VIRTIO_BLK_S_IOERR;
-+        }
-+        vub_req_complete(req);
++    case VIRTIO_BLK_T_WRITE_ZEROES:
++        g_assert_cmpuint(data_size %
++                         sizeof(struct virtio_blk_discard_write_zeroes), ==, 0);
 +        break;
-+    }
 +    default:
-+        req->in->status = VIRTIO_BLK_S_UNSUPP;
-+        vub_req_complete(req);
-+        break;
++        g_assert_cmpuint(data_size, ==, 0);
 +    }
 +
-+    return 0;
++    addr = guest_alloc(alloc, sizeof(*req) + data_size);
 +
-+err:
-+    free(elem);
-+    g_free(req);
-+    return -1;
++    virtio_blk_fix_request(d, req);
++
++    memwrite(addr, req, 16);
++    memwrite(addr + 16, req->data, data_size);
++    memwrite(addr + 16 + data_size, &status, sizeof(status));
++
++    return addr;
 +}
 +
-+
-+static void vub_process_vq(VuDev *vu_dev, int idx)
++/* Returns the request virtqueue so the caller can perform further tests */
++static QVirtQueue *test_basic(QVirtioDevice *dev, QGuestAllocator *alloc)
 +{
-+    VuClient *client;
-+    VuVirtq *vq;
-+    int ret;
-+
-+    client = container_of(vu_dev, VuClient, parent);
-+    assert(client);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    assert(vq);
-+
-+    while (1) {
-+        ret = vub_virtio_process_req(client, vq);
-+        if (ret) {
-+            break;
-+        }
-+    }
-+}
-+
-+
-+static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
-+{
-+    VuVirtq *vq;
-+
-+    assert(vu_dev);
-+
-+    vq = vu_get_queue(vu_dev, idx);
-+    vu_set_queue_handler(vu_dev, vq, started ? vub_process_vq : NULL);
-+}
-+
-+static uint64_t
-+vub_get_features(VuDev *dev)
-+{
++    QVirtioBlkReq req;
++    uint64_t req_addr;
++    uint64_t capacity;
 +    uint64_t features;
-+    VubDev *vdev_blk;
++    uint32_t free_head;
++    uint8_t status;
++    char *data;
++    QTestState *qts = global_qtest;
++    QVirtQueue *vq;
 +
-+    VuClient *client = container_of(dev, VuClient, parent);
-+    vdev_blk = client->blk;
++    features = qvirtio_get_features(dev);
++    features = features & ~(QVIRTIO_F_BAD_FEATURE |
++                    (1u << VIRTIO_RING_F_INDIRECT_DESC) |
++                    (1u << VIRTIO_RING_F_EVENT_IDX) |
++                    (1u << VIRTIO_BLK_F_SCSI));
++    qvirtio_set_features(dev, features);
 +
-+    features = 1ull << VIRTIO_BLK_F_SIZE_MAX |
-+               1ull << VIRTIO_BLK_F_SEG_MAX |
-+               1ull << VIRTIO_BLK_F_TOPOLOGY |
-+               1ull << VIRTIO_BLK_F_BLK_SIZE |
-+               1ull << VIRTIO_BLK_F_FLUSH |
-+               #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
-+               1ull << VIRTIO_BLK_F_DISCARD |
-+               1ull << VIRTIO_BLK_F_WRITE_ZEROES |
-+               #endif
-+               1ull << VIRTIO_BLK_F_CONFIG_WCE |
-+               1ull << VIRTIO_F_VERSION_1 |
-+               1ull << VIRTIO_RING_F_INDIRECT_DESC |
-+               1ull << VIRTIO_RING_F_EVENT_IDX |
-+               1ull << VHOST_USER_F_PROTOCOL_FEATURES;
++    capacity = qvirtio_config_readq(dev, 0);
++    g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
 +
-+    if (!vdev_blk->writable) {
-+        features |= 1ull << VIRTIO_BLK_F_RO;
++    vq = qvirtqueue_setup(dev, alloc, 0);
++
++    qvirtio_set_driver_ok(dev);
++
++    /* Write and read with 3 descriptor layout */
++    /* Write request */
++    req.type = VIRTIO_BLK_T_OUT;
++    req.ioprio = 1;
++    req.sector = 0;
++    req.data = g_malloc0(512);
++    strcpy(req.data, "TEST");
++
++    req_addr = virtio_blk_request(alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 16, 512, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++
++    qvirtqueue_kick(qts, dev, vq, free_head);
++
++    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                           QVIRTIO_BLK_TIMEOUT_US);
++    status = readb(req_addr + 528);
++    g_assert_cmpint(status, ==, 0);
++
++    guest_free(alloc, req_addr);
++
++    /* Read request */
++    req.type = VIRTIO_BLK_T_IN;
++    req.ioprio = 1;
++    req.sector = 0;
++    req.data = g_malloc0(512);
++
++    req_addr = virtio_blk_request(alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 16, 512, true, true);
++    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++
++    qvirtqueue_kick(qts, dev, vq, free_head);
++
++    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                           QVIRTIO_BLK_TIMEOUT_US);
++    status = readb(req_addr + 528);
++    g_assert_cmpint(status, ==, 0);
++
++    data = g_malloc0(512);
++    memread(req_addr + 16, data, 512);
++    g_assert_cmpstr(data, ==, "TEST");
++    g_free(data);
++
++    guest_free(alloc, req_addr);
++
++    if (features & (1u << VIRTIO_BLK_F_WRITE_ZEROES)) {
++        struct virtio_blk_discard_write_zeroes dwz_hdr;
++        void *expected;
++
++        /*
++         * WRITE_ZEROES request on the same sector of previous test where
++         * we wrote "TEST".
++         */
++        req.type = VIRTIO_BLK_T_WRITE_ZEROES;
++        req.data = (char *) &dwz_hdr;
++        dwz_hdr.sector = 0;
++        dwz_hdr.num_sectors = 1;
++        dwz_hdr.flags = 0;
++
++        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
++
++        req_addr = virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr));
++
++        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++        qvirtqueue_add(qts, vq, req_addr + 16, sizeof(dwz_hdr), false, true);
++        qvirtqueue_add(qts, vq, req_addr + 16 + sizeof(dwz_hdr), 1, true,
++                       false);
++
++        qvirtqueue_kick(qts, dev, vq, free_head);
++
++        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status = readb(req_addr + 16 + sizeof(dwz_hdr));
++        g_assert_cmpint(status, ==, 0);
++
++        guest_free(alloc, req_addr);
++
++        /* Read request to check if the sector contains all zeroes */
++        req.type = VIRTIO_BLK_T_IN;
++        req.ioprio = 1;
++        req.sector = 0;
++        req.data = g_malloc0(512);
++
++        req_addr = virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++        qvirtqueue_add(qts, vq, req_addr + 16, 512, true, true);
++        qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++
++        qvirtqueue_kick(qts, dev, vq, free_head);
++
++        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status = readb(req_addr + 528);
++        g_assert_cmpint(status, ==, 0);
++
++        data = g_malloc(512);
++        expected = g_malloc0(512);
++        memread(req_addr + 16, data, 512);
++        g_assert_cmpmem(data, 512, expected, 512);
++        g_free(expected);
++        g_free(data);
++
++        guest_free(alloc, req_addr);
 +    }
 +
-+    return features;
++    if (features & (1u << VIRTIO_BLK_F_DISCARD)) {
++        struct virtio_blk_discard_write_zeroes dwz_hdr;
++
++        req.type = VIRTIO_BLK_T_DISCARD;
++        req.data = (char *) &dwz_hdr;
++        dwz_hdr.sector = 0;
++        dwz_hdr.num_sectors = 1;
++        dwz_hdr.flags = 0;
++
++        virtio_blk_fix_dwz_hdr(dev, &dwz_hdr);
++
++        req_addr = virtio_blk_request(alloc, dev, &req, sizeof(dwz_hdr));
++
++        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++        qvirtqueue_add(qts, vq, req_addr + 16, sizeof(dwz_hdr), false, true);
++        qvirtqueue_add(qts, vq, req_addr + 16 + sizeof(dwz_hdr), 1, true, false);
++
++        qvirtqueue_kick(qts, dev, vq, free_head);
++
++        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status = readb(req_addr + 16 + sizeof(dwz_hdr));
++        g_assert_cmpint(status, ==, 0);
++
++        guest_free(alloc, req_addr);
++    }
++
++    if (features & (1u << VIRTIO_F_ANY_LAYOUT)) {
++        /* Write and read with 2 descriptor layout */
++        /* Write request */
++        req.type = VIRTIO_BLK_T_OUT;
++        req.ioprio = 1;
++        req.sector = 1;
++        req.data = g_malloc0(512);
++        strcpy(req.data, "TEST");
++
++        req_addr = virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head = qvirtqueue_add(qts, vq, req_addr, 528, false, true);
++        qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++        qvirtqueue_kick(qts, dev, vq, free_head);
++
++        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status = readb(req_addr + 528);
++        g_assert_cmpint(status, ==, 0);
++
++        guest_free(alloc, req_addr);
++
++        /* Read request */
++        req.type = VIRTIO_BLK_T_IN;
++        req.ioprio = 1;
++        req.sector = 1;
++        req.data = g_malloc0(512);
++
++        req_addr = virtio_blk_request(alloc, dev, &req, 512);
++
++        g_free(req.data);
++
++        free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++        qvirtqueue_add(qts, vq, req_addr + 16, 513, true, false);
++
++        qvirtqueue_kick(qts, dev, vq, free_head);
++
++        qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                               QVIRTIO_BLK_TIMEOUT_US);
++        status = readb(req_addr + 528);
++        g_assert_cmpint(status, ==, 0);
++
++        data = g_malloc0(512);
++        memread(req_addr + 16, data, 512);
++        g_assert_cmpstr(data, ==, "TEST");
++        g_free(data);
++
++        guest_free(alloc, req_addr);
++    }
++
++    return vq;
 +}
 +
-+static uint64_t
-+vub_get_protocol_features(VuDev *dev)
++static void basic(void *obj, void *data, QGuestAllocator *t_alloc)
 +{
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG |
-+           1ull << VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD;
++    QVhostUserBlk *blk_if = obj;
++    QVirtQueue *vq;
++
++    vq = test_basic(blk_if->vdev, t_alloc);
++    qvirtqueue_cleanup(blk_if->vdev->bus, vq, t_alloc);
++
 +}
 +
-+static int
-+vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
++static void indirect(void *obj, void *u_data, QGuestAllocator *t_alloc)
 +{
-+    VubDev *vdev_blk;
++    QVirtQueue *vq;
++    QVhostUserBlk *blk_if = obj;
++    QVirtioDevice *dev = blk_if->vdev;
++    QVirtioBlkReq req;
++    QVRingIndirectDesc *indirect;
++    uint64_t req_addr;
++    uint64_t capacity;
++    uint64_t features;
++    uint32_t free_head;
++    uint8_t status;
++    char *data;
++    QTestState *qts = global_qtest;
 +
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+    memcpy(config, &vdev_blk->blkcfg, len);
++    features = qvirtio_get_features(dev);
++    g_assert_cmphex(features & (1u << VIRTIO_RING_F_INDIRECT_DESC), !=, 0);
++    features = features & ~(QVIRTIO_F_BAD_FEATURE |
++                            (1u << VIRTIO_RING_F_EVENT_IDX) |
++                            (1u << VIRTIO_BLK_F_SCSI));
++    qvirtio_set_features(dev, features);
 +
-+    return 0;
++    capacity = qvirtio_config_readq(dev, 0);
++    g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
++
++    vq = qvirtqueue_setup(dev, t_alloc, 0);
++    qvirtio_set_driver_ok(dev);
++
++    /* Write request */
++    req.type = VIRTIO_BLK_T_OUT;
++    req.ioprio = 1;
++    req.sector = 0;
++    req.data = g_malloc0(512);
++    strcpy(req.data, "TEST");
++
++    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    indirect = qvring_indirect_desc_setup(qts, dev, t_alloc, 2);
++    qvring_indirect_desc_add(dev, qts, indirect, req_addr, 528, false);
++    qvring_indirect_desc_add(dev, qts, indirect, req_addr + 528, 1, true);
++    free_head = qvirtqueue_add_indirect(qts, vq, indirect);
++    qvirtqueue_kick(qts, dev, vq, free_head);
++
++    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                           QVIRTIO_BLK_TIMEOUT_US);
++    status = readb(req_addr + 528);
++    g_assert_cmpint(status, ==, 0);
++
++    g_free(indirect);
++    guest_free(t_alloc, req_addr);
++
++    /* Read request */
++    req.type = VIRTIO_BLK_T_IN;
++    req.ioprio = 1;
++    req.sector = 0;
++    req.data = g_malloc0(512);
++    strcpy(req.data, "TEST");
++
++    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    indirect = qvring_indirect_desc_setup(qts, dev, t_alloc, 2);
++    qvring_indirect_desc_add(dev, qts, indirect, req_addr, 16, false);
++    qvring_indirect_desc_add(dev, qts, indirect, req_addr + 16, 513, true);
++    free_head = qvirtqueue_add_indirect(qts, vq, indirect);
++    qvirtqueue_kick(qts, dev, vq, free_head);
++
++    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                           QVIRTIO_BLK_TIMEOUT_US);
++    status = readb(req_addr + 528);
++    g_assert_cmpint(status, ==, 0);
++
++    data = g_malloc0(512);
++    memread(req_addr + 16, data, 512);
++    g_assert_cmpstr(data, ==, "TEST");
++    g_free(data);
++
++    g_free(indirect);
++    guest_free(t_alloc, req_addr);
++    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
 +}
 +
-+static int
-+vub_set_config(VuDev *vu_dev, const uint8_t *data,
-+               uint32_t offset, uint32_t size, uint32_t flags)
++
++static void idx(void *obj, void *u_data, QGuestAllocator *t_alloc)
 +{
-+    VubDev *vdev_blk;
++    QVirtQueue *vq;
++    QVhostUserBlkPCI *blk = obj;
++    QVirtioPCIDevice *pdev = &blk->pci_vdev;
++    QVirtioDevice *dev = &pdev->vdev;
++    QVirtioBlkReq req;
++    uint64_t req_addr;
++    uint64_t capacity;
++    uint64_t features;
++    uint32_t free_head;
++    uint32_t write_head;
++    uint32_t desc_idx;
++    uint8_t status;
++    char *data;
++    QOSGraphObject *blk_object = obj;
++    QPCIDevice *pci_dev = blk_object->get_driver(blk_object, "pci-device");
++    QTestState *qts = global_qtest;
 +
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    vdev_blk = client->blk;
-+    uint8_t wce;
-+
-+    /* don't support live migration */
-+    if (flags != VHOST_SET_CONFIG_TYPE_MASTER) {
-+        return -1;
++    if (qpci_check_buggy_msi(pci_dev)) {
++        return;
 +    }
 +
++    qpci_msix_enable(pdev->pdev);
++    qvirtio_pci_set_msix_configuration_vector(pdev, t_alloc, 0);
 +
-+    if (offset != offsetof(struct virtio_blk_config, wce) ||
-+        size != 1) {
-+        return -1;
-+    }
++    features = qvirtio_get_features(dev);
++    features = features & ~(QVIRTIO_F_BAD_FEATURE |
++                            (1u << VIRTIO_RING_F_INDIRECT_DESC) |
++                            (1u << VIRTIO_F_NOTIFY_ON_EMPTY) |
++                            (1u << VIRTIO_BLK_F_SCSI));
++    qvirtio_set_features(dev, features);
 +
-+    wce = *data;
-+    if (wce == vdev_blk->blkcfg.wce) {
-+        /* Do nothing as same with old configuration */
-+        return 0;
-+    }
++    capacity = qvirtio_config_readq(dev, 0);
++    g_assert_cmpint(capacity, ==, TEST_IMAGE_SIZE / 512);
 +
-+    vdev_blk->blkcfg.wce = wce;
-+    blk_set_enable_write_cache(vdev_blk->backend, true);
-+    return 0;
++    vq = qvirtqueue_setup(dev, t_alloc, 0);
++    qvirtqueue_pci_msix_setup(pdev, (QVirtQueuePCI *)vq, t_alloc, 1);
++
++    qvirtio_set_driver_ok(dev);
++
++    /* Write request */
++    req.type = VIRTIO_BLK_T_OUT;
++    req.ioprio = 1;
++    req.sector = 0;
++    req.data = g_malloc0(512);
++    strcpy(req.data, "TEST");
++
++    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 16, 512, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++    qvirtqueue_kick(qts, dev, vq, free_head);
++
++    qvirtio_wait_used_elem(qts, dev, vq, free_head, NULL,
++                           QVIRTIO_BLK_TIMEOUT_US);
++
++    /* Write request */
++    req.type = VIRTIO_BLK_T_OUT;
++    req.ioprio = 1;
++    req.sector = 1;
++    req.data = g_malloc0(512);
++    strcpy(req.data, "TEST");
++
++    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    /* Notify after processing the third request */
++    qvirtqueue_set_used_event(qts, vq, 2);
++    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 16, 512, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++    qvirtqueue_kick(qts, dev, vq, free_head);
++    write_head = free_head;
++
++    /* No notification expected */
++    status = qvirtio_wait_status_byte_no_isr(qts, dev,
++                                             vq, req_addr + 528,
++                                             QVIRTIO_BLK_TIMEOUT_US);
++    g_assert_cmpint(status, ==, 0);
++
++    guest_free(t_alloc, req_addr);
++
++    /* Read request */
++    req.type = VIRTIO_BLK_T_IN;
++    req.ioprio = 1;
++    req.sector = 1;
++    req.data = g_malloc0(512);
++
++    req_addr = virtio_blk_request(t_alloc, dev, &req, 512);
++
++    g_free(req.data);
++
++    free_head = qvirtqueue_add(qts, vq, req_addr, 16, false, true);
++    qvirtqueue_add(qts, vq, req_addr + 16, 512, true, true);
++    qvirtqueue_add(qts, vq, req_addr + 528, 1, true, false);
++
++    qvirtqueue_kick(qts, dev, vq, free_head);
++
++    /* We get just one notification for both requests */
++    qvirtio_wait_used_elem(qts, dev, vq, write_head, NULL,
++                           QVIRTIO_BLK_TIMEOUT_US);
++    g_assert(qvirtqueue_get_buf(qts, vq, &desc_idx, NULL));
++    g_assert_cmpint(desc_idx, ==, free_head);
++
++    status = readb(req_addr + 528);
++    g_assert_cmpint(status, ==, 0);
++
++    data = g_malloc0(512);
++    memread(req_addr + 16, data, 512);
++    g_assert_cmpstr(data, ==, "TEST");
++    g_free(data);
++
++    guest_free(t_alloc, req_addr);
++
++    /* End test */
++    qpci_msix_disable(pdev->pdev);
++
++    qvirtqueue_cleanup(dev->bus, vq, t_alloc);
 +}
 +
++static void pci_hotplug(void *obj, void *data, QGuestAllocator *t_alloc)
++{
++    QVirtioPCIDevice *dev1 = obj;
++    QVirtioPCIDevice *dev;
++    QTestState *qts = dev1->pdev->bus->qts;
++
++    /* plug secondary disk */
++    qtest_qmp_device_add(qts, "vhost-user-blk-pci", "drv1",
++                         "{'addr': %s, 'chardev': 'char2'}",
++                         stringify(PCI_SLOT_HP) ".0");
++
++    dev = virtio_pci_new(dev1->pdev->bus,
++                         &(QPCIAddress) { .devfn = QPCI_DEVFN(PCI_SLOT_HP, 0) });
++    g_assert_nonnull(dev);
++    g_assert_cmpint(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
++    qvirtio_pci_device_disable(dev);
++    qos_object_destroy((QOSGraphObject *)dev);
++
++    /* unplug secondary disk */
++    qpci_unplug_acpi_device_test(qts, "drv1", PCI_SLOT_HP);
++}
 +
 +/*
-+ * When the client disconnects, it send a VHOST_USER_NONE request
-+ * and vu_process_message will simple call exit which cause the VM
-+ * to exit abruptly.
-+ * To avoid this issue,  process VHOST_USER_NONE request ahead
-+ * of vu_process_message.
-+ *
++ * Check that setting the vring addr on a non-existent virtqueue does
++ * not crash.
 + */
-+static int vub_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_reply)
++static void test_nonexistent_virtqueue(void *obj, void *data,
++                                       QGuestAllocator *t_alloc)
 +{
-+    if (vmsg->request == VHOST_USER_NONE) {
-+        dev->panic(dev, "disconnect");
-+        return true;
-+    }
-+    return false;
++    QVhostUserBlkPCI *blk = obj;
++    QVirtioPCIDevice *pdev = &blk->pci_vdev;
++    QPCIBar bar0;
++    QPCIDevice *dev;
++
++    dev = qpci_device_find(pdev->pdev->bus, QPCI_DEVFN(4, 0));
++    g_assert(dev != NULL);
++    qpci_device_enable(dev);
++
++    bar0 = qpci_iomap(dev, 0, NULL);
++
++    qpci_io_writeb(dev, bar0, VIRTIO_PCI_QUEUE_SEL, 2);
++    qpci_io_writel(dev, bar0, VIRTIO_PCI_QUEUE_PFN, 1);
++
++    g_free(dev);
 +}
 +
-+static void
-+vmsg_close_fds(VhostUserMsg *vmsg)
++static const char *qtest_qemu_vu_binary(void)
 +{
-+    int i;
-+    for (i = 0; i < vmsg->fd_num; i++) {
-+        close(vmsg->fds[i]);
++    const char *qemu_vu_bin;
++
++    qemu_vu_bin = getenv("QTEST_QEMU_VU_BINARY");
++    if (!qemu_vu_bin) {
++        fprintf(stderr, "Environment variable QTEST_QEMU_VU_BINARY required\n");
++        exit(0);
 +    }
++
++    return qemu_vu_bin;
 +}
 +
-+static bool
-+vu_message_read_co(VuDev *vu_dev, int conn_fd, VhostUserMsg *vmsg)
++static void drive_destroy(void *path)
 +{
-+    char control[CMSG_SPACE(VHOST_MEMORY_MAX_NREGIONS * sizeof(int))] = { };
-+    struct iovec iov = {
-+        .iov_base = (char *)vmsg,
-+        .iov_len = VHOST_USER_HDR_SIZE,
++    unlink(path);
++    g_free(path);
++    qos_invalidate_command_line();
++}
++
++
++static char *drive_create(void)
++{
++ int fd, ret;
++ /** vhost-user-blk won't recognize drive located in /tmp */
++ char *t_path = g_strdup("qtest.XXXXXX");
++
++ /** Create a temporary raw image */
++ fd = mkstemp(t_path);
++ g_assert_cmpint(fd, >=, 0);
++ ret = ftruncate(fd, TEST_IMAGE_SIZE);
++ g_assert_cmpint(ret, ==, 0);
++ close(fd);
++
++ g_test_queue_destroy(drive_destroy, t_path);
++ return t_path;
++}
++
++
++
++static void start_vhost_user_blk(const char *img_path, const char *sock_path)
++{
++    const char *vhost_user_blk_bin = qtest_qemu_vu_binary();
++    /* "qemu-vu -e" will exit when the client disconnects thus the launched
++     *  qemu-vu process will not block scripts/tap-driver.pl
++     */
++    gchar *command = g_strdup_printf("exec %s "
++                                     "-e "
++                                     "-k %s "
++                                     "-f raw "
++                                     "%s",
++                                     vhost_user_blk_bin,
++                                     sock_path, img_path);
++    g_test_message("starting vhost-user backend: %s", command);
++    pid_t pid = fork();
++    if (pid == 0) {
++        execlp("/bin/sh", "sh", "-c", command, NULL);
++        exit(1);
++    }
++    /*
++     * make sure qemu-vu i.e. socket server is started before tests
++     * otherwise qemu will complain,
++     * "Failed to connect socket ... Connection refused"
++     */
++    g_usleep(G_USEC_PER_SEC);
++}
++
++static void *vhost_user_blk_test_setup(GString *cmd_line, void *arg)
++{
++    /* create image file */
++    const char *img_path = drive_create();
++    const char *sock_path = "/tmp/vhost-user-blk_vhost.socket";
++    start_vhost_user_blk(img_path, sock_path);
++    /* "-chardev socket,id=char2" is used for pci_hotplug*/
++    g_string_append_printf(cmd_line,
++                           " -object memory-backend-memfd,id=mem,size=128M,share=on -numa node,memdev=mem "
++                           "-chardev socket,id=char1,path=%s "
++                           "-chardev socket,id=char2,path=%s",
++                           sock_path, sock_path);
++    return arg;
++}
++
++static void register_vhost_user_blk_test(void)
++{
++    QOSGraphTestOptions opts = {
++        .before = vhost_user_blk_test_setup,
 +    };
-+    struct msghdr msg = {
-+        .msg_iov = &iov,
-+        .msg_iovlen = 1,
-+        .msg_control = control,
-+        .msg_controllen = sizeof(control),
-+    };
-+    size_t fd_size;
-+    struct cmsghdr *cmsg;
-+    int rc;
-+    char buffer[100];
-+    VuClient *client = container_of(vu_dev, VuClient, parent);
-+    QIOChannel *ioc = client->ioc;
-+    do {
-+        rc = recvmsg(conn_fd, &msg, 0);
-+        if (rc < 0) {
-+            if (errno == EAGAIN) {
-+                if (qemu_in_coroutine()) {
-+                    qio_channel_yield(ioc, G_IO_IN);
-+                } else {
-+                    qio_channel_wait(ioc, G_IO_IN);
-+                }
-+                continue;
-+            } else if (errno == EINTR) {
-+                continue;
-+            }
-+        }
-+        break;
-+    } while (true);
-+
-+    if (rc < 0) {
-+        sprintf(buffer, "Error while recvmsg: %s", strerror(errno));
-+        vub_panic_cb(vu_dev, buffer);
-+        return false;
-+    }
-+
-+    assert(rc == VHOST_USER_HDR_SIZE || rc == 0);
-+
-+    vmsg->fd_num = 0;
-+    for (cmsg = CMSG_FIRSTHDR(&msg);
-+         cmsg != NULL;
-+         cmsg = CMSG_NXTHDR(&msg, cmsg))
-+    {
-+        if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == SCM_RIGHTS) {
-+            fd_size = cmsg->cmsg_len - CMSG_LEN(0);
-+            vmsg->fd_num = fd_size / sizeof(int);
-+            memcpy(vmsg->fds, CMSG_DATA(cmsg), fd_size);
-+            break;
-+        }
-+    }
-+
-+    if (vmsg->size > sizeof(vmsg->payload)) {
-+        sprintf(buffer,
-+                "Error: too big message request: %d, size: vmsg->size: %u, "
-+                "while sizeof(vmsg->payload) = %zu\n",
-+                vmsg->request, vmsg->size, sizeof(vmsg->payload));
-+        vub_panic_cb(vu_dev, buffer);
-+        goto fail;
-+    }
-+
-+    if (vmsg->size) {
-+        do {
-+            rc = read(conn_fd, &vmsg->payload, vmsg->size);
-+            if (rc < 0) {
-+                if (errno == EAGAIN) {
-+                    if (qemu_in_coroutine()) {
-+                        qio_channel_yield(ioc, G_IO_IN);
-+                    } else {
-+                        qio_channel_wait(ioc, G_IO_IN);
-+                    }
-+                    continue;
-+                } else if (errno == EINTR) {
-+                    continue;
-+                }
-+            }
-+            break;
-+        } while (true);
-+
-+        if (rc <= 0) {
-+            sprintf(buffer, "Error while reading: %s", strerror(errno));
-+            vub_panic_cb(vu_dev, buffer);
-+            goto fail;
-+        }
-+
-+        assert(rc == vmsg->size);
-+    }
-+
-+    return true;
-+
-+fail:
-+    vmsg_close_fds(vmsg);
-+
-+    return false;
-+}
-+
-+static void vub_kick_cb(void *opaque)
-+{
-+    vu_watch_cb_data *data = (vu_watch_cb_data *) opaque;
-+    int index = data->index;
-+    VuDev *dev = data->vu_dev;
-+    VuVirtq *vq = &dev->vq[index];
-+    int sock = vq->kick_fd;
-+    eventfd_t kick_data;
-+    ssize_t rc;
-+
-+    rc = eventfd_read(sock, &kick_data);
-+    if (rc == -1) {
-+        char buffer[100];
-+        sprintf(buffer, "kick eventfd_read(): %s", strerror(errno));
-+        vub_panic_cb(dev, buffer);
-+        g_free(data);
-+        dev->remove_watch(dev, dev->vq[index].kick_fd);
-+    } else {
-+        if (vq->handler) {
-+            vq->handler(dev, index);
-+        }
-+    }
-+}
-+
-+static const VuDevIface vub_iface = {
-+    .get_features = vub_get_features,
-+    .queue_set_started = vub_queue_set_started,
-+    .get_protocol_features = vub_get_protocol_features,
-+    .get_config = vub_get_config,
-+    .set_config = vub_set_config,
-+    .process_msg = vub_process_msg,
-+    .read_msg = vu_message_read_co,
-+    .kick_callback = vub_kick_cb,
-+};
-+
-+
-+void vub_free(VubDev *vub_dev, bool called_by_QOM)
-+{
-+    if (!vub_dev) {
-+        return;
-+    }
-+
-+    blk_unref(vub_dev->backend);
-+    g_free(vub_dev->name);
-+    g_free(vub_dev->unix_socket);
-+
-+    if (vub_dev->next.tqe_circ.tql_prev) {
-+        /*
-+         * if vub_dev->next.tqe_circ.tql_prev = null,
-+         * vub_dev hasn't been inserted into the queue and
-+         * vub_free is called by obj->instance_finalize.
-+         */
-+        QTAILQ_REMOVE(&vub_devs, vub_dev, next);
-+    }
-+    /*
-+     * Needn't to free vub_dev if called by QOM
-+     * because QOM will do the clean-up work.
-+     */
-+    if (!called_by_QOM) {
-+        g_free(vub_dev);
-+    }
-+}
-+
-+static coroutine_fn void vu_client_trip(void *opaque)
-+{
-+    VuClient *client = opaque;
-+
-+    while (!client->closed) {
-+        vu_dispatch(&client->parent);
-+    }
-+
-+    QTAILQ_REMOVE(&client->blk->clients, client, next);
-+
-+}
-+
-+static void vu_client_start(VuClient *client)
-+{
-+    Coroutine *co = qemu_coroutine_create(vu_client_trip, client);
-+    qemu_coroutine_enter(co);
-+}
-+
-+
-+G_STATIC_ASSERT((int)G_IO_IN == (int)VU_WATCH_IN);
-+G_STATIC_ASSERT((int)G_IO_OUT == (int)VU_WATCH_OUT);
-+G_STATIC_ASSERT((int)G_IO_PRI == (int)VU_WATCH_PRI);
-+G_STATIC_ASSERT((int)G_IO_ERR == (int)VU_WATCH_ERR);
-+G_STATIC_ASSERT((int)G_IO_HUP == (int)VU_WATCH_HUP);
-+
-+static void
-+set_watch(VuDev *vu_dev, int fd, int vu_evt,
-+          vu_watch_cb_packed_data cb, void *pvt)
-+{
-+    /*
-+     * since aio_dispatch can only pass one user data pointer to the
-+     * callback function, pack VuDev, pvt into a struct
-+     */
-+    VuClient *client;
-+
-+    g_assert(vu_dev);
-+    g_assert(fd >= 0);
-+    g_assert(cb);
-+    client = container_of(vu_dev, VuClient, parent);
-+    vu_watch_cb_data *cb_data = g_new0(vu_watch_cb_data, 1);
-+    cb_data->index = (intptr_t) pvt;
-+    cb_data->vu_dev = vu_dev;
-+    aio_set_fd_handler(client->blk->ctx, fd, false, (void *) cb,
-+                       NULL, NULL, cb_data);
-+}
-+
-+
-+void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
-+                gpointer opaque)
-+{
-+    VuClient *client;
-+    VubDev *vub_device = opaque;
-+    client = g_new0(VuClient, 1);
-+
-+    if (!vu_init_packed_data(&client->parent, VHOST_USER_BLK_MAX_QUEUES,
-+                             sioc->fd, vub_panic_cb, set_watch,
-+                             remove_watch, &vub_iface)) {
-+        fprintf(stderr, "Failed to initialized libvhost-user\n");
-+        g_free(client);
-+        return;
-+    }
-+
-+    client->blk = vub_device;
-+    client->refcount = 1;
-+    client->sioc = sioc;
-+    /*
-+     * increase the object reference, so cioc will not freed by
-+     * qio_net_listener_channel_func which will call object_unref(OBJECT(sioc))
-+     */
-+    object_ref(OBJECT(client->sioc));
-+    qio_channel_set_name(QIO_CHANNEL(sioc), "vhost-user client");
-+    client->ioc = QIO_CHANNEL(sioc);
-+    object_ref(OBJECT(client->ioc));
-+    object_ref(OBJECT(sioc));
-+
-+    qio_channel_set_blocking(QIO_CHANNEL(client->sioc), false, NULL);
-+    client->closed = false;
-+    QTAILQ_INSERT_TAIL(&client->blk->clients, client, next);
-+    vu_client_start(client);
-+}
-+
-+
-+void
-+vub_initialize_config(BlockDriverState *bs, struct virtio_blk_config *config)
-+{
-+    config->capacity = bdrv_getlength(bs) >> BDRV_SECTOR_BITS;
-+    config->blk_size = BDRV_SECTOR_SIZE;
-+    config->size_max = 65536;
-+    config->seg_max = 128 - 2;
-+    config->min_io_size = 1;
-+    config->opt_io_size = 1;
-+    config->num_queues = 1;
-+    #if defined(__linux__) && defined(BLKDISCARD) && defined(BLKZEROOUT)
-+    config->max_discard_sectors = 32768;
-+    config->max_discard_seg = 1;
-+    config->discard_sector_alignment = config->blk_size >> 9;
-+    config->max_write_zeroes_sectors = 32768;
-+    config->max_write_zeroes_seg = 1;
-+    #endif
-+}
-+
-+
-+static VubDev *vub_new(VubDev *vub_device, const char *name,
-+                       const char *unix_socket, bool writable, Error **errp)
-+{
-+
-+    BlockBackend *blk;
 +
 +    /*
-+     * Don't allow resize while the vhost user server is running,
-+     * otherwise we don't care what happens with the node.
++     * tests for vhost-user-blk and vhost-user-blk-pci
++     * The tests are borrowed from tests/virtio-blk-test.c. But some tests
++     * regarding block_resize don't work for vhost-user-blk.
++     * vhost-user-blk device doesn't have -drive, so tests containing
++     * block_resize are also abandoned,
++     *  - config
++     *  - resize
 +     */
-+    uint64_t perm = BLK_PERM_CONSISTENT_READ;
-+    int ret;
-+
-+    AioContext *ctx;
-+
-+    BlockDriverState *bs = bdrv_lookup_bs(name,
-+                                          name,
-+                                          errp);
-+
-+    if (!bs) {
-+        error_setg(errp,
-+                   "No drive with name '%s'."
-+                   " Please find the list of names with "
-+                   "'info block'", name);
-+        return NULL;
-+    }
-+
-+    if (bdrv_is_read_only(bs)) {
-+        writable = false;
-+    }
-+
-+    if (writable) {
-+        perm |= BLK_PERM_WRITE;
-+    }
-+
-+    ctx = bdrv_get_aio_context(bs);
-+    aio_context_acquire(ctx);
-+    bdrv_invalidate_cache(bs, NULL);
-+    aio_context_release(ctx);
-+
-+    blk = blk_new(bdrv_get_aio_context(bs), perm,
-+                  BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
-+                  BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD);
-+    ret = blk_insert_bs(blk, bs, errp);
-+
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-+
-+    blk_set_enable_write_cache(blk, false);
-+
-+    blk_set_allow_aio_context_change(blk, true);
-+
-+
-+    vub_device->name = g_strdup(name);
-+    vub_device->unix_socket = g_strdup(unix_socket);
-+    vub_device->writable = writable;
-+    vub_device->blkcfg.wce = 0;
-+    vub_device->backend = blk;
-+    vub_device->ctx = ctx;
-+    vub_initialize_config(bs, &vub_device->blkcfg);
-+    return vub_device;
-+
-+fail:
-+    blk_unref(blk);
-+    return NULL;
++    qos_add_test("basic", "vhost-user-blk", basic, &opts);
++    qos_add_test("indirect", "vhost-user-blk", indirect, &opts);
++    qos_add_test("idx", "vhost-user-blk-pci", idx, &opts);
++    qos_add_test("nxvirtq", "vhost-user-blk-pci",
++                      test_nonexistent_virtqueue, &opts);
++    qos_add_test("hotplug", "vhost-user-blk-pci", pci_hotplug, &opts);
 +}
 +
-+void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM)
-+{
-+    if (!vub_device) {
-+        return;
-+    }
-+
-+    VuClient *client, *next;
-+    QTAILQ_FOREACH_SAFE(client, &vub_device->clients, next, next) {
-+        if (!client->closed) {
-+            close_client(client);
-+        }
-+    }
-+
-+    if (vub_device->listener) {
-+        qio_net_listener_disconnect(vub_device->listener);
-+        object_unref(OBJECT(vub_device->listener));
-+    }
-+    vub_free(vub_device, called_by_QOM);
-+
-+}
-+
-+
-+VubDev *vub_dev_find(const char *name)
-+{
-+    VubDev *vub_device;
-+    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
-+        if (strcmp(name, vub_device->name) == 0) {
-+            return vub_device;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+
-+static VubDev *vub_dev_find_by_unix_socket(const char *unix_socket)
-+{
-+    VubDev *vub_device;
-+    QTAILQ_FOREACH(vub_device, &vub_devs, next) {
-+        if (strcmp(unix_socket, vub_device->unix_socket) == 0) {
-+            return vub_device;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static void vhost_user_server_start(VubDev *vub_device, const char *unix_socket,
-+                                    const char *name, bool writable,
-+                                    Error **errp)
-+{
-+
-+    if (vub_dev_find(name) || vub_dev_find_by_unix_socket(unix_socket)) {
-+        error_setg(errp, "Vhost user server with name '%s' or "
-+                "with socket_path '%s' has already been started",
-+                name, unix_socket);
-+        return;
-+    }
-+
-+
-+    if (!vub_new(vub_device, name, unix_socket, writable, errp)) {
-+        return;
-+    }
-+
-+
-+    vub_device->listener = qio_net_listener_new();
-+
-+    qio_net_listener_set_name(vub_device->listener,
-+                              "vhost-user-backend-listener");
-+
-+    SocketAddress *addr = g_new0(SocketAddress, 1);
-+    addr->u.q_unix.path = (char *) unix_socket;
-+    addr->type = SOCKET_ADDRESS_TYPE_UNIX;
-+    if (qio_net_listener_open_sync(vub_device->listener, addr, 1, errp) < 0) {
-+        goto error;
-+    }
-+
-+
-+    QTAILQ_INSERT_TAIL(&vub_devs, vub_device, next);
-+    QTAILQ_INIT(&vub_device->clients);
-+
-+    qio_net_listener_set_client_func(vub_device->listener,
-+                                     vub_accept,
-+                                     vub_device,
-+                                     NULL);
-+
-+    return;
-+
-+ error:
-+    vub_free(vub_device, false);
-+}
-+
-+static void vu_set_block_name(Object *obj, const char *value,
-+                                           Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+
-+    if (vus->name) {
-+        error_setg(errp, "evdev property already set");
-+        return;
-+    }
-+
-+    vus->name = g_strdup(value);
-+}
-+
-+static char *vu_get_block_name(Object *obj, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);
-+    return g_strdup(vus->name);
-+}
-+
-+
-+static void vu_set_unix_socket(Object *obj, const char *value,
-+                                            Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+
-+    if (vus->unix_socket) {
-+        error_setg(errp, "unix_socket property already set");
-+        return;
-+    }
-+
-+    vus->unix_socket = g_strdup(value);
-+    vhost_user_server_start(vus, value, vus->name,
-+                            vus->writable, errp);
-+}
-+
-+static char *vu_get_unix_socket(Object *obj, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+    return g_strdup(vus->unix_socket);
-+}
-+
-+static bool vu_get_block_writable(Object *obj, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);;
-+    return vus->writable;
-+}
-+
-+static void vu_set_block_writable(Object *obj, bool value, Error **errp)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);
-+
-+    vus->writable = value;
-+}
-+
-+static void vhost_user_server_instance_init(Object *obj)
-+{
-+
-+    object_property_add_bool(obj, "writable",
-+                            vu_get_block_writable,
-+                            vu_set_block_writable, NULL);
-+
-+    object_property_add_str(obj, "name",
-+                            vu_get_block_name,
-+                            vu_set_block_name, NULL);
-+
-+    object_property_add_str(obj, "unix_socket",
-+                            vu_get_unix_socket,
-+                            vu_set_unix_socket, NULL);
-+
-+}
-+
-+static void vhost_user_server_instance_finalize(Object *obj)
-+{
-+    VubDev *vus = VHOST_USER_SERVER(obj);
-+    vhost_user_server_free(vus, true);
-+    /* object_del shouldn't free this object struct */
-+    obj->free = NULL;
-+}
-+
-+static const TypeInfo vhost_user_server_info = {
-+    .name = TYPE_VHOST_USER_SERVER,
-+    .parent = TYPE_OBJECT,
-+    .instance_size = sizeof(VuDev),
-+    .instance_init = vhost_user_server_instance_init,
-+    .instance_finalize = vhost_user_server_instance_finalize,
-+    .interfaces = (InterfaceInfo[]) {
-+        {TYPE_USER_CREATABLE},
-+        {}
-+    },
-+};
-+
-+static void vhost_user_server_register_types(void)
-+{
-+    type_register_static(&vhost_user_server_info);
-+}
-+
-+type_init(vhost_user_server_register_types)
-+
-diff --git a/include/block/vhost-user.h b/include/block/vhost-user.h
-new file mode 100644
-index 0000000000..ef6d695244
---- /dev/null
-+++ b/include/block/vhost-user.h
-@@ -0,0 +1,46 @@
-+#include "io/channel-socket.h"
-+#include "io/net-listener.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "standard-headers/linux/virtio_blk.h"
-+typedef struct VubDev VubDev;
-+typedef struct VuClient VuClient;
-+#define TYPE_VHOST_USER_SERVER "vhost-user-server"
-+
-+#define VHOST_USER_SERVER(obj) \
-+   OBJECT_CHECK(VubDev, obj, TYPE_VHOST_USER_SERVER)
-+/* vhost user block device */
-+struct VubDev {
-+    Object parent_obj;
-+    char *name;
-+    char *unix_socket;
-+    bool exit_panic;
-+    bool close;
-+    BlockBackend *backend;
-+    AioContext *ctx;
-+    QIONetListener *listener;
-+    QIOChannelSocket *sioc;
-+    QTAILQ_HEAD(, VuClient) clients;
-+    QTAILQ_ENTRY(VubDev) next;
-+    struct virtio_blk_config blkcfg;
-+    bool writable;
-+};
-+
-+struct VuClient {
-+    VuDev parent;
-+    int refcount;
-+    VubDev *blk;
-+    QIOChannelSocket *sioc; /* The underlying data channel */
-+    QIOChannel *ioc; /* The current I/O channel */
-+    QTAILQ_ENTRY(VuClient) next;
-+    bool closed;
-+};
-+VubDev *vub_dev_find(const char *name);
-+
-+void vhost_user_server_free(VubDev *vub_device, bool called_by_QOM);
-+void vub_accept(QIONetListener *listener, QIOChannelSocket *sioc,
-+                gpointer opaque);
-+
-+void vub_free(VubDev *vub_dev, bool called_by_QOM);
-+
-+void vub_initialize_config(BlockDriverState *bs,
-+                           struct virtio_blk_config *config);
-diff --git a/vl.c b/vl.c
-index 86474a55c9..72ac506342 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2553,6 +2553,10 @@ static bool object_create_initial(const char *type, QemuOpts *opts)
-     }
- #endif
-
-+    /* Reason: vhost-user-server property "name" */
-+    if (g_str_equal(type, "vhost-user-server")) {
-+        return false;
-+    }
-     /*
-      * Reason: filter-* property "netdev" etc.
-      */
++libqos_init(register_vhost_user_blk_test);
 --
 2.24.1
 
