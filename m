@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BB6C33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:18:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C5CC33CB2
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:20:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A454222C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:18:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0ED8222C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 15:20:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fcSKaYL5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A454222C4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B/gINsO/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0ED8222C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irNy0-0007nI-8g
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:18:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37831)
+	id 1irNzY-0001PS-G0
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 10:20:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1irNpZ-0005B3-Q6
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:19 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1irNpl-0005Us-UC
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1irNpY-0007W4-5i
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:09 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36058)
+ (envelope-from <alex.bennee@linaro.org>) id 1irNpk-0007iI-IM
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:21 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38851)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1irNpX-0007UX-Ta
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:08 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z3so12530922wru.3
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:10:07 -0800 (PST)
+ id 1irNpj-0007b2-90
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 10:10:20 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y17so12536863wrh.5
+ for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 07:10:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gtTyiABJNzKbT4Hcxk69PnKRIOdsWQYqpdkNpdscjO8=;
- b=fcSKaYL5RIXTOvSeIFKI2+EUmiNjinug2EPGoLbooNYoru9YNGgl1x94qyPf3+AKVB
- BsattieJNQUdOz5YEZsdsxUbq5c6FtO5M8D9mr7c8vbR0MOcXo3gR9evm0XeUSjB01M4
- YhtpqauhM53Gn6c/YzV0rlGcNwKvH5CIYSgHV/RgZl8iNaNdg+MOd5lJUad6dQIgVgxE
- PeL7wVKIYyUVr7hgsm3HhKbuhh2VH4ypAjiyrzE868oRJKI4D58lGnrAIggDzhBMYOBS
- qPbay9MLlc1BznwI6AC+LtAoEDjvnFSGMvmzT2JvF/EV6Lh++chbkPMTO6dYaJK63cfO
- lC5w==
+ bh=9o0h/AvlZG4OInglAABEjBAMRDTZzGfk2bscVX4lDdE=;
+ b=B/gINsO/LWdL9RseVZOoQpoYVgFjbPv2x+l0FYIU0LhMwv6OXDxRo4Nt9xh8Ynjwt8
+ ZX/UGXyuual9QzI1Ht/ZUl0V3gBgRXHrjr/4Uyta6TWSy9zIS6pz6FhPfcHcmRs/2SKo
+ 9QFBXUVbvNRjt6WX8rEDdydqEBqJdcQSQVkVgCUgeIpibXnAOr6P2pZrUxMw5bAKg9NO
+ Ws3VojqO6KpxCYP1bSZhA5d9ZJowdNi0FhvKFPUv6TKpfH9ZEGKtCyn1OPZQqVF5ozIf
+ bzmk1BkbzuNbH2BtenRFt5K3t7i43HiVBvwHQjVLk6+Y0OC6EjKdYuZMzdql+93siPpc
+ gVyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gtTyiABJNzKbT4Hcxk69PnKRIOdsWQYqpdkNpdscjO8=;
- b=bwKSdSrsdBDN1w0FB63ohbFGuMl5FtGOztMoGzPEHwH0iOZnnxdllY3ToTXLcMJQx1
- IMgDmGZaa+cVu7C1isodepTpAEAriVU8U5sD77rLeQQb353k2bphXTXOqeoMU3LJ0W++
- O2Sy26gti8xSsj8r/S2w/+VhCWThktUoG+HAOGe+ekc8EydCI40VkqvB85UOdh7CUs7E
- Cpj1ur01OvjByTOH51LMS4R2iLzIDelPBHCMebFiSxESPMcZz86kGxpotcdshvln6yoT
- s0LfNvWmcWzPUFVvKnyJJiquVvEN0rs9TyrysY+W5/q9yOKCSU70fcHFk+VtDvLLLcOI
- Wc1g==
-X-Gm-Message-State: APjAAAVPFtzSiV2NHifNdybWVLYCXQ2pJiG+au4oP6ey57gqAc7uIgiJ
- pk9x4+Q+mhHu+thQTKlS9ay6qA==
-X-Google-Smtp-Source: APXvYqz13a11d6b0hnHET0gjRyEJNHXz97y3j8DQkqIRXr8efdvLoGwZzBxc9dV+Ra1TFFJZKpJifw==
-X-Received: by 2002:a5d:6a02:: with SMTP id m2mr24831190wru.52.1579014606899; 
- Tue, 14 Jan 2020 07:10:06 -0800 (PST)
+ bh=9o0h/AvlZG4OInglAABEjBAMRDTZzGfk2bscVX4lDdE=;
+ b=X03XGWIYMjLfOGOeoOVgS2Ftuw+CR/buwfk2ZBRapYbZOqFS+ZhmadQH47fPVWks/a
+ tTm+tuc1h1f1Ia+oOOSqakJsU7oreR3KKbHykUaktHi2EodhxoFb2KP6PN7lsu8FTqKy
+ PxBt/IdUEVGVAo/Pijh6MIbBTfDnfhQ35zEEvgeEnpfW8D4drXMIkh5JeFuUaAHeOz7a
+ 0JPWedyTlfNCpMftEwPq70RkaXum3eS39lBmYdaHvl4Gy5V95a4lTlfXUsxikkwdFAwI
+ 51UUuvXjaqOaL3Iqz/pb4Z8yWWZ1V0bE7YdOpaICdKu3BTpH+KKwTCBMut+2SdL8v9+a
+ YEgw==
+X-Gm-Message-State: APjAAAWtmrNkihAP5TWpsL1Rl8DkrDKG0ShGkh6+UvrkS2eYfPW5n8Yy
+ T07rjDf5x/yCqqmS73p2RO58UsYxFPc=
+X-Google-Smtp-Source: APXvYqyEFrJcgAfh9ObIQ6GwwCF7MJn74L4u61KdOMByxGKrBhGy5BtUtD6Y4qp/CIHxcl+lwjjByg==
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr24217264wrm.24.1579014613066; 
+ Tue, 14 Jan 2020 07:10:13 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o15sm20309211wra.83.2020.01.14.07.09.59
+ by smtp.gmail.com with ESMTPSA id q3sm18155438wmj.38.2020.01.14.07.10.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Jan 2020 07:10:02 -0800 (PST)
+ Tue, 14 Jan 2020 07:10:08 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0D12D1FF9A;
- Tue, 14 Jan 2020 15:09:56 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id D306C1FF8F;
+ Tue, 14 Jan 2020 15:09:57 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 11/22] target/arm: default SVE length to 64 bytes for
- linux-user
-Date: Tue, 14 Jan 2020 15:09:42 +0000
-Message-Id: <20200114150953.27659-12-alex.bennee@linaro.org>
+Subject: [PATCH  v5 22/22] gdbstub: do not split gdb_monitor_write payload
+Date: Tue, 14 Jan 2020 15:09:53 +0000
+Message-Id: <20200114150953.27659-23-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200114150953.27659-1-alex.bennee@linaro.org>
 References: <20200114150953.27659-1-alex.bennee@linaro.org>
@@ -97,47 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Linux kernel chooses the default of 64 bytes for SVE registers on
-the basis that it is the largest size on known hardware that won't
-grow the signal frame. We still honour the sve-max-vq property and
-userspace can expand the number of lanes by calling PR_SVE_SET_VL.
+From: Damien Hedde <damien.hedde@greensocs.com>
 
-This should not make any difference to SVE enabled software as the SVE
-is of course vector length agnostic.
+Since we can now send packets of arbitrary length:
+simplify gdb_monitor_write() and send the whole payload
+in one packet.
 
+Suggested-by: Luc Michel <luc.michel@greensocs.com>
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
+Message-Id: <20191211160514.58373-3-damien.hedde@greensocs.com>
 ---
-v2
-  - tweak zcr_el[1] instead
----
- target/arm/cpu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ gdbstub.c | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index d62fd5fdc6..1c1f34ee5d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -199,9 +199,9 @@ static void arm_cpu_reset(CPUState *s)
-         /* and to the SVE instructions */
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 16, 2, 3);
-         env->cp15.cptr_el[3] |= CPTR_EZ;
--        /* with maximum vector length */
-+        /* with reasonable vector length */
-         env->vfp.zcr_el[1] = cpu_isar_feature(aa64_sve, cpu) ?
--                             cpu->sve_max_vq - 1 : 0;
-+            MIN(cpu->sve_max_vq - 1, 3) : 0;
-         env->vfp.zcr_el[2] = env->vfp.zcr_el[1];
-         env->vfp.zcr_el[3] = env->vfp.zcr_el[1];
-         /*
+diff --git a/gdbstub.c b/gdbstub.c
+index b9fb8c0a95..6e461d871e 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -3200,28 +3200,11 @@ static void gdb_chr_event(void *opaque, QEMUChrEvent event)
+     }
+ }
+ 
+-static void gdb_monitor_output(const char *msg, int len)
+-{
+-    g_autoptr(GString) buf = g_string_new("O");
+-    memtohex(buf, (uint8_t *)msg, len);
+-    put_packet(buf->str);
+-}
+-
+ static int gdb_monitor_write(Chardev *chr, const uint8_t *buf, int len)
+ {
+-    const char *p = (const char *)buf;
+-    int max_sz;
+-
+-    max_sz = (MAX_PACKET_LENGTH / 2) + 1;
+-    for (;;) {
+-        if (len <= max_sz) {
+-            gdb_monitor_output(p, len);
+-            break;
+-        }
+-        gdb_monitor_output(p, max_sz);
+-        p += max_sz;
+-        len -= max_sz;
+-    }
++    g_autoptr(GString) hex_buf = g_string_new("O");
++    memtohex(hex_buf, buf, len);
++    put_packet(hex_buf->str);
+     return len;
+ }
+ 
 -- 
 2.20.1
 
