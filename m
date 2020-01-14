@@ -2,75 +2,78 @@ Return-Path: <SRS0=7MIY=3D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259EFC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81267C33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:42:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5B1924676
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E9FC24676
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 11:42:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WxzKwGAa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5B1924676
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxQzycRC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9FC24676
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irKZZ-0005nT-KN
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:41:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55272)
+	id 1irKa6-0006aK-U4
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 06:41:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irKXy-00040F-MY
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:39:51 -0500
+ (envelope-from <quintela@redhat.com>) id 1irKYG-0004ML-NK
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irKXt-0002jA-QQ
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:39:46 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20020
+ (envelope-from <quintela@redhat.com>) id 1irKYC-0002nu-PA
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:40:04 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24786
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKXt-0002iv-M8
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:39:41 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irKYC-0002nd-LO
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 06:40:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579001980;
+ s=mimecast20190719; t=1579002000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=s8kSibyGHEuvaMxZof1NYWLNsdwJUdVoF7uKbNL5N60=;
- b=WxzKwGAaPoDUj+tXut5EHe1nlPrsOx0ZYxsmnZMC0A0uKBh8YDiej1nZa+SPIa4oxxHYHZ
- AtJoStcJGhZH/HENp/dwnhRqOLxrbQEtn08nYPngxSGoP2wbP/xp0fW/wYrO/XneqHxP6p
- EDVpdsuhXZtKG+9S3bAIVwoCZ55u9is=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KP4JOgx0MH3utU/6sKW0BXPz8/EvSkOonQGNpzhU5Ck=;
+ b=UxQzycRC+GjrEu1X+vPq1WvAx/iFMS3bRb8oKtn7iZBumssYOSX8pkJ+VrUknmg5Ur0DyR
+ Xjb49m45RYK8YZ1mBk8cQo+4OHHhW+b1j6pv8T/IrX89WGMfyEBgmnu64yv9UHI0VFlDnv
+ Ty920FyH1LUnJgRdb1KPhcsZMLj7ydQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-3bRa8E_2PZiXq7t-_DdOkg-1; Tue, 14 Jan 2020 06:39:39 -0500
+ us-mta-323-EhzFe_qDN1KDj5-4ZYYqpA-1; Tue, 14 Jan 2020 06:39:58 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2905800D4C;
- Tue, 14 Jan 2020 11:39:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65E2D800D5E;
+ Tue, 14 Jan 2020 11:39:56 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 07BB15DA32;
- Tue, 14 Jan 2020 11:39:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7597C5DA32;
+ Tue, 14 Jan 2020 11:39:47 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/30] Migration pull patches (3rd try)
-Date: Tue, 14 Jan 2020 12:38:56 +0100
-Message-Id: <20200114113926.3556-1-quintela@redhat.com>
+Subject: [PULL 03/30] migration: Make sure that we don't call write() in case
+ of error
+Date: Tue, 14 Jan 2020 12:38:59 +0100
+Message-Id: <20200114113926.3556-4-quintela@redhat.com>
+In-Reply-To: <20200114113926.3556-1-quintela@redhat.com>
+References: <20200114113926.3556-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 3bRa8E_2PZiXq7t-_DdOkg-1
+X-MC-Unique: EhzFe_qDN1KDj5-4ZYYqpA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,117 +102,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 3c8a6575985b1652b45bfa670b5e1907d642cfa0=
-:
+If we are exiting due to an error/finish/.... Just don't try to even
+touch the channel with one IO operation.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200113-pull-reque=
-st' into staging (2020-01-13 14:19:57 +0000)
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/ram.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-are available in the Git repository at:
-
-  https://github.com/juanquintela/qemu.git tags/migration-pull-pull-request
-
-for you to fetch changes up to c3ff7ba64b1bb484a0b6339165627a196045a8c1:
-
-  multifd: Allocate uint64_t instead of ram_addr_t (2020-01-14 12:28:07 +01=
-00)
-
-----------------------------------------------------------------
-Migration pull request (take 3)
-
-Fix (yet more) places where ram_addr_t is not 64 bits.
-
-----------------------------------------------------------------
-
-Alexey Romko (1):
-  Bug #1829242 correction.
-
-Daniel Henrique Barboza (1):
-  ram.c: remove unneeded labels
-
-Dr. David Alan Gilbert (1):
-  migration: Rate limit inside host pages
-
-Eric Auger (1):
-  migration: Support QLIST migration
-
-Fangrui Song (1):
-  migration: Fix incorrect integer->float conversion caught by clang
-
-Jiahui Cen (2):
-  migration/multifd: fix nullptr access in terminating multifd threads
-  migration/multifd: fix destroyed mutex access in terminating multifd
-    threads
-
-Juan Quintela (5):
-  multifd: Initialize local variable
-  migration-test: Add migration multifd test
-  migration: Make sure that we don't call write() in case of error
-  migration-test: introduce functions to handle string parameters
-  multifd: Allocate uint64_t instead of ram_addr_t
-
-Laurent Vivier (2):
-  migration-test: ppc64: fix FORTH test program
-  runstate: ignore finishmigrate -> prelaunch transition
-
-Marc-Andr=C3=A9 Lureau (1):
-  misc: use QEMU_IS_ALIGNED
-
-Peter Xu (3):
-  migration: Define VMSTATE_INSTANCE_ID_ANY
-  migration: Change SaveStateEntry.instance_id into uint32_t
-  apic: Use 32bit APIC ID for migration instance ID
-
-Scott Cheloha (2):
-  migration: add savevm_state_handler_remove()
-  migration: savevm_state_handler_insert: constant-time element
-    insertion
-
-Wei Yang (8):
-  migration/postcopy: reduce memset when it is zero page and
-    matches_target_page_size
-  migration/postcopy: wait for decompress thread in precopy
-  migration/postcopy: count target page number to decide the
-    place_needed
-  migration/postcopy: set all_zero to true on the first target page
-  migration/postcopy: enable random order target page arrival
-  migration/postcopy: enable compress during postcopy
-  migration/multifd: clean pages after filling packet
-  migration/multifd: not use multifd during postcopy
-
-Yury Kotov (2):
-  migration: Fix the re-run check of the migrate-incoming command
-  migration/ram: Yield periodically to the main loop
-
- backends/dbus-vmstate.c      |   3 +-
- exec.c                       |   4 +-
- hw/arm/stellaris.c           |   2 +-
- hw/core/qdev.c               |   3 +-
- hw/display/ads7846.c         |   2 +-
- hw/i2c/core.c                |   2 +-
- hw/input/stellaris_input.c   |   3 +-
- hw/intc/apic_common.c        |   7 +-
- hw/misc/max111x.c            |   3 +-
- hw/net/eepro100.c            |   3 +-
- hw/pci/pci.c                 |   2 +-
- hw/ppc/spapr.c               |   2 +-
- hw/timer/arm_timer.c         |   2 +-
- hw/tpm/tpm_emulator.c        |   3 +-
- include/migration/register.h |   2 +-
- include/migration/vmstate.h  |  25 ++++-
- include/qemu/queue.h         |  39 ++++++++
- migration/migration.c        |  72 +++++++-------
- migration/migration.h        |   1 +
- migration/ram.c              | 185 ++++++++++++++++++++++++++---------
- migration/savevm.c           |  61 ++++++++----
- migration/trace-events       |   9 +-
- migration/vmstate-types.c    |  70 +++++++++++++
- stubs/vmstate.c              |   2 +-
- tests/qtest/migration-test.c |  97 +++++++++++++++++-
- tests/test-vmstate.c         | 170 ++++++++++++++++++++++++++++++++
- vl.c                         |  10 +-
- 27 files changed, 654 insertions(+), 130 deletions(-)
-
+diff --git a/migration/ram.c b/migration/ram.c
+index b9147bcca3..f946282adb 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -900,6 +900,12 @@ struct {
+     uint64_t packet_num;
+     /* send channels ready */
+     QemuSemaphore channels_ready;
++    /*
++     * Have we already run terminate threads.  There is a race when it
++     * happens that we got one error while we are exiting.
++     * We will use atomic operations.  Only valid values are 0 and 1.
++     */
++    int exiting;
+ } *multifd_send_state;
+=20
+ /*
+@@ -928,6 +934,10 @@ static int multifd_send_pages(RAMState *rs)
+     MultiFDPages_t *pages =3D multifd_send_state->pages;
+     uint64_t transferred;
+=20
++    if (atomic_read(&multifd_send_state->exiting)) {
++        return -1;
++    }
++
+     qemu_sem_wait(&multifd_send_state->channels_ready);
+     for (i =3D next_channel;; i =3D (i + 1) % migrate_multifd_channels()) =
+{
+         p =3D &multifd_send_state->params[i];
+@@ -1009,6 +1019,16 @@ static void multifd_send_terminate_threads(Error *er=
+r)
+         }
+     }
+=20
++    /*
++     * We don't want to exit each threads twice.  Depending on where
++     * we get the error, or if there are two independent errors in two
++     * threads at the same time, we can end calling this function
++     * twice.
++     */
++    if (atomic_xchg(&multifd_send_state->exiting, 1)) {
++        return;
++    }
++
+     for (i =3D 0; i < migrate_multifd_channels(); i++) {
+         MultiFDSendParams *p =3D &multifd_send_state->params[i];
+=20
+@@ -1118,6 +1138,10 @@ static void *multifd_send_thread(void *opaque)
+=20
+     while (true) {
+         qemu_sem_wait(&p->sem);
++
++        if (atomic_read(&multifd_send_state->exiting)) {
++            break;
++        }
+         qemu_mutex_lock(&p->mutex);
+=20
+         if (p->pending_job) {
+@@ -1224,6 +1248,7 @@ int multifd_save_setup(void)
+     multifd_send_state->params =3D g_new0(MultiFDSendParams, thread_count)=
+;
+     multifd_send_state->pages =3D multifd_pages_init(page_count);
+     qemu_sem_init(&multifd_send_state->channels_ready, 0);
++    atomic_set(&multifd_send_state->exiting, 0);
+=20
+     for (i =3D 0; i < thread_count; i++) {
+         MultiFDSendParams *p =3D &multifd_send_state->params[i];
 --=20
 2.24.1
 
