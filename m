@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1DFC33CB1
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 324DCC33CB1
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:40:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC3BB2084D
-	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:40:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F07872084D
+	for <qemu-devel@archiver.kernel.org>; Tue, 14 Jan 2020 09:40:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ThuxC087"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3BB2084D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3WLBqrY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F07872084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irIgG-0005k0-MV
-	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:40:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58434)
+	id 1irIgj-0006Xl-M8
+	for qemu-devel@archiver.kernel.org; Tue, 14 Jan 2020 04:40:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57586)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <quintela@redhat.com>) id 1irIWI-00012X-QO
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:29:55 -0500
+ (envelope-from <quintela@redhat.com>) id 1irIUJ-0006Np-Aq
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1irIWH-00073C-Kq
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:29:54 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26582
+ (envelope-from <quintela@redhat.com>) id 1irIUI-0006Z4-5I
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:51 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48545
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIWH-00072u-Fb
- for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:29:53 -0500
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1irIUG-0006Ya-9n
+ for qemu-devel@nongnu.org; Tue, 14 Jan 2020 04:27:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1578994191;
+ s=mimecast20190719; t=1578994066;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/qRvnKikU/zZW4H4BQbW8b5TjzE8O1lK0e+sh7nSqVM=;
- b=ThuxC087IEMfHJy3ls1gx47jT6vOV9YDEH8F4+tjRsIUGnazepaVEssfeKs2KgmIDsfln9
- dGu3kVmyRNHrpprgMBmqnaICl7gMzm11U++OZY60Nkgn/ecTLwy0OHFOYunLNdBr48scFJ
- ECwYSnde8itfMGj8moIucCB2NA+PZ9s=
+ bh=2p0QKCeBS4+LZOVYBokhIHTSESXgTmLYzL/BOFYcXF4=;
+ b=F3WLBqrYk5m+8ySvy16xSS9O11/gJV0uJckkKbHyUT54g5RoM/GUB+/Wk5r/7lg9hAMYd1
+ DrkuERF2NSGlrElXWNLXzE+v/KSaj653rJzCODYaX4R6Bf6Jhx8Hj/GHJDTp1buGOPBjOk
+ tnPn4q02o8CbjRVNEJnqbT5MFkOAo+k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-zJGkoKT3P_CcxqHYqR9lpg-1; Tue, 14 Jan 2020 04:29:48 -0500
+ us-mta-78--P1DntjqOB-9a_hfc6i3vg-1; Tue, 14 Jan 2020 04:27:45 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0025D800D41;
- Tue, 14 Jan 2020 09:29:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 299361951264;
+ Tue, 14 Jan 2020 09:27:43 +0000 (UTC)
 Received: from secure.mitica (ovpn-116-207.ams2.redhat.com [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7B73381;
- Tue, 14 Jan 2020 09:29:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AB61D384;
+ Tue, 14 Jan 2020 09:27:31 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/29] apic: Use 32bit APIC ID for migration instance ID
-Date: Tue, 14 Jan 2020 10:26:05 +0100
-Message-Id: <20200114092606.1761-29-quintela@redhat.com>
+Subject: [PULL 11/29] misc: use QEMU_IS_ALIGNED
+Date: Tue, 14 Jan 2020 10:25:48 +0100
+Message-Id: <20200114092606.1761-12-quintela@redhat.com>
 In-Reply-To: <20200114092606.1761-1-quintela@redhat.com>
 References: <20200114092606.1761-1-quintela@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: zJGkoKT3P_CcxqHYqR9lpg-1
+X-MC-Unique: -P1DntjqOB-9a_hfc6i3vg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -90,7 +90,8 @@ Cc: Laurent Vivier <lvivier@redhat.com>, Corey Minyard <cminyard@mvista.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>,
  Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
  =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
@@ -100,51 +101,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Migration is silently broken now with x2apic config like this:
-
-     -smp 200,maxcpus=3D288,sockets=3D2,cores=3D72,threads=3D2 \
-     -device intel-iommu,intremap=3Don,eim=3Don
-
-After migration, the guest kernel could hang at anything, due to
-x2apic bit not migrated correctly in IA32_APIC_BASE on some vcpus, so
-any operations related to x2apic could be broken then (e.g., RDMSR on
-x2apic MSRs could fail because KVM would think that the vcpu hasn't
-enabled x2apic at all).
-
-The issue is that the x2apic bit was never applied correctly for vcpus
-whose ID > 255 when migrate completes, and that's because when we
-migrate APIC we use the APICCommonState.id as instance ID of the
-migration stream, while that's too short for x2apic.
-
-Let's use the newly introduced initial_apic_id for that.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- hw/intc/apic_common.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ exec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index 54b8731fca..b5dbeb6206 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -268,7 +268,10 @@ static void apic_common_realize(DeviceState *dev, Erro=
-r **errp)
-     APICCommonState *s =3D APIC_COMMON(dev);
-     APICCommonClass *info;
-     static DeviceState *vapic;
--    uint32_t instance_id =3D s->id;
-+    uint32_t instance_id =3D s->initial_apic_id;
-+
-+    /* Normally initial APIC ID should be no more than hundreds */
-+    assert(instance_id !=3D VMSTATE_INSTANCE_ID_ANY);
+diff --git a/exec.c b/exec.c
+index d4b769d0d4..1feda49ca1 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3895,7 +3895,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t st=
+art, size_t length)
 =20
-     info =3D APIC_COMMON_GET_CLASS(s);
-     info->realize(dev, errp);
+     uint8_t *host_startaddr =3D rb->host + start;
+=20
+-    if ((uintptr_t)host_startaddr & (rb->page_size - 1)) {
++    if (!QEMU_PTR_IS_ALIGNED(host_startaddr, rb->page_size)) {
+         error_report("ram_block_discard_range: Unaligned start address: %p=
+",
+                      host_startaddr);
+         goto err;
+@@ -3903,7 +3903,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t st=
+art, size_t length)
+=20
+     if ((start + length) <=3D rb->used_length) {
+         bool need_madvise, need_fallocate;
+-        if (length & (rb->page_size - 1)) {
++        if (!QEMU_IS_ALIGNED(length, rb->page_size)) {
+             error_report("ram_block_discard_range: Unaligned length: %zx",
+                          length);
+             goto err;
 --=20
 2.24.1
 
