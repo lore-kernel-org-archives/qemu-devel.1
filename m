@@ -2,92 +2,84 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3AB2C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 08:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B0FC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 09:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFB8D2073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 08:42:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4E3D222C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 09:14:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XjYXY2dR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB8D2073A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYmWHG8V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4E3D222C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ireGB-0001Z7-UR
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 03:42:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47669)
+	id 1irekl-0005h8-KB
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 04:14:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51772)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sgarzare@redhat.com>) id 1ireFU-0000aA-SE
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 03:42:02 -0500
+ (envelope-from <thuth@redhat.com>) id 1irek2-0003qf-LB
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 04:13:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1ireFR-0002q2-Vw
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 03:41:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29369
+ (envelope-from <thuth@redhat.com>) id 1irejx-0001oV-GM
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 04:13:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37247
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1ireFR-0002pO-Or
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 03:41:57 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1irejx-0001nz-D1
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 04:13:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579077716;
+ s=mimecast20190719; t=1579079608;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/Li5yFHTZDnbommSICa/okdUUSjHqrhxj/alteQZt8Y=;
- b=XjYXY2dRsNljffu5v0RpdvohAIuyEUQSOfHn1Gs02wIbg+kiEe5wXgfc43txZyF9jIDhQG
- ONsd2L0/dtOvJkXzRYkR6ftDRPbhhe34w9sKfCEubD/cX9CWWcxqAN7lgXFyCRvS1OPN7j
- gGV5VCIl6r0PboMmG6pEzj3hEWucv+Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-9qddHU3mPQmteXcSLvVXkw-1; Wed, 15 Jan 2020 03:41:55 -0500
-Received: by mail-wr1-f70.google.com with SMTP id f17so7728259wrt.19
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 00:41:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=FyCCq0r7FL0R2BpGqamEHWOaR3qR6zg5T1gUXw1ybaI=;
- b=rRMjMRzaPdwuJTGNhbyPwPM5AOOVlmIbOsjKQii8dKB7yLYLQH7KFpnZD/l19SHhFg
- otCV8/j1yfKcJuZgSon5mOsvQtejqIfSpB/VdpqUKA82//UyDfocmZgVaWNVwGe2T5V8
- rQRpnPrXfRLcZhMqJPHcGAUhk49AusIs0tCVT36Uo/gIJIcIQa0WlPxJz/tLOOtDYXfb
- OrjgjK1iSwxdSA345NppZi0NTpl+aRbTvlFyEF29HPuWPiAPCiV8o0CGd69Hx6Wr+2sT
- EDOfpmb7gDE7ZvLJf2vjWaqPtFxm9MwSe4e6nKwq4txQrXGS1aUQda0jMKvPY9NdZED5
- GFKQ==
-X-Gm-Message-State: APjAAAVWeyZDAI3Jn7vMrAmXMD6S54fWj3GyKGyiJmVEzFuQN6p/ZXJB
- LeqiLHvj9R5SQy/QeSZlaehgyO4YQde6Wg5afeNgNY0byHs0NKA+aPOKPpuudE7KtxLOXjBSMk7
- HtShAdiv5oTnx8i8=
-X-Received: by 2002:a1c:8095:: with SMTP id b143mr33170416wmd.7.1579077714502; 
- Wed, 15 Jan 2020 00:41:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzpIfmJYSjBiO+CCgHAUylpSy5nKTN+tUHkIL1rNEsT5jsMswTU2Yt3kJ0MTSo5Zd9zIIZKVQ==
-X-Received: by 2002:a1c:8095:: with SMTP id b143mr33170400wmd.7.1579077714266; 
- Wed, 15 Jan 2020 00:41:54 -0800 (PST)
-Received: from steredhat (host84-49-dynamic.31-79-r.retail.telecomitalia.it.
- [79.31.49.84])
- by smtp.gmail.com with ESMTPSA id z83sm23139642wmg.2.2020.01.15.00.41.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 15 Jan 2020 00:41:53 -0800 (PST)
-Date: Wed, 15 Jan 2020 09:41:51 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: pannengyuan@huawei.com
-Subject: Re: [PATCH v2] vhost-vsock: delete vqs in vhost_vsock_unrealize to
- avoid memleaks
-Message-ID: <20200115084151.hetsvjih2dloxjsp@steredhat>
-References: <20200115062535.50644-1-pannengyuan@huawei.com>
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=EJaCDbJVWwSJ0OKlkvBHfOSaVp9ZbIrAvq/35EIGia4=;
+ b=eYmWHG8VtNb5UGoIfA3TlGr9kb7XzJi37CBRCK1hHn+hayJ+Ka0j+VCCFjjksvuujVIwfT
+ lSnP+qdmKH/Q+cXmG/+yivLfA+GPFq5hAiZiEKQnnN6QtP3RSubjHCYaNb3oglwVIHR5+V
+ BikDPhzdfECZyhEAJhv8DUWibn71w1M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-sK7AfAbyOBedqixvhd332g-1; Wed, 15 Jan 2020 04:13:27 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE46F107ACC7;
+ Wed, 15 Jan 2020 09:13:25 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 78597272A2;
+ Wed, 15 Jan 2020 09:13:24 +0000 (UTC)
+Subject: Re: [PATCH V2] vhost-user-test: fix a memory leak
+To: Pan Nengyuan <pannengyuan@huawei.com>
+References: <1576805214-2508-1-git-send-email-pannengyuan@huawei.com>
+ <072970b5-b7cc-ad71-d3e4-933e888b7093@redhat.com>
+ <3312978e-2bff-091a-b618-d9183b8c7252@redhat.com>
+ <b0a705c0-c734-c431-f8de-475c293092d2@huawei.com>
+ <c51b9011-9add-9dc3-6fdd-266ae4f81bc9@huawei.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <126ca72f-6a3a-a3bf-1202-0acb631a9b5f@redhat.com>
+Date: Wed, 15 Jan 2020 10:13:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200115062535.50644-1-pannengyuan@huawei.com>
-X-MC-Unique: 9qddHU3mPQmteXcSLvVXkw-1
+In-Reply-To: <c51b9011-9add-9dc3-6fdd-266ae4f81bc9@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: sK7AfAbyOBedqixvhd332g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -102,110 +94,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>,
- qemu-devel@nongnu.org, mst@redhat.com
+Cc: lvivier@redhat.com, pbonzini@redhat.com, zhang.zhanghailiang@huawei.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 15, 2020 at 02:25:35PM +0800, pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
+On 15/01/2020 04.10, Pan Nengyuan wrote:
 >=20
-> Receive/transmit/event vqs forgot to cleanup in vhost_vsock_unrealize. Th=
-is
-> patch save receive/transmit vq pointer in realize() and cleanup vqs
-> through those vq pointers in unrealize(). The leak stack is as follow:
+> On 1/13/2020 10:32 AM, Pan Nengyuan wrote:
+>>
+>> On 1/12/2020 6:39 PM, Thomas Huth wrote:
+[...]
+>>> ... and now I had to unqueue the patch again. It is reproducibly causin=
+g
+>>> one of the gitlab CI pipelines to fail with a timeout, e.g.:
+>>>
+>>>  https://gitlab.com/huth/qemu/-/jobs/400101552
+>>>
+>>> Not sure what is going on here, though, there is no obvious error
+>>> message in the output... this needs some more investigation... do you
+>>> have a gitlab account and could have a look?
+>>>
+>>
+>> OK, I will register a account and have a look.
+>>
 >=20
-> Direct leak of 21504 byte(s) in 3 object(s) allocated from:
->   #0 0x7f86a1356970 (/lib64/libasan.so.5+0xef970)  ??:?
->   #1 0x7f86a09aa49d (/lib64/libglib-2.0.so.0+0x5249d)  ??:?
->   #2 0x5604852f85ca (./x86_64-softmmu/qemu-system-x86_64+0x2c3e5ca)  /mnt=
-/sdb/qemu/hw/virtio/virtio.c:2333
->   #3 0x560485356208 (./x86_64-softmmu/qemu-system-x86_64+0x2c9c208)  /mnt=
-/sdb/qemu/hw/virtio/vhost-vsock.c:339
->   #4 0x560485305a17 (./x86_64-softmmu/qemu-system-x86_64+0x2c4ba17)  /mnt=
-/sdb/qemu/hw/virtio/virtio.c:3531
->   #5 0x5604858e6b65 (./x86_64-softmmu/qemu-system-x86_64+0x322cb65)  /mnt=
-/sdb/qemu/hw/core/qdev.c:865
->   #6 0x5604861e6c41 (./x86_64-softmmu/qemu-system-x86_64+0x3b2cc41)  /mnt=
-/sdb/qemu/qom/object.c:2102
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> ---
-> Changes V2 to V1:
-> - delete virtqueues after vhost cleanup to avoid use-after-free
-> - aslo delete virtqueues in the error path of realize()
-> ---
->  hw/virtio/vhost-vsock.c         | 12 ++++++++++--
->  include/hw/virtio/vhost-vsock.h |  2 ++
->  2 files changed, 12 insertions(+), 2 deletions(-)
+> I'm sorry, I build and test with the same params, but I can't reproduce i=
+t.
+> Could you add "V=3D1 or V=3D2" params to get more information ?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+It seems to hang forever in qos-test
+/arm/virt/virtio-mmio/virtio-bus/virtio-net-device/virtio-net/virtio-net-te=
+sts/announce-self
+:
 
->=20
-> diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-> index f5744363a8..b6cee479bb 100644
-> --- a/hw/virtio/vhost-vsock.c
-> +++ b/hw/virtio/vhost-vsock.c
-> @@ -335,8 +335,10 @@ static void vhost_vsock_device_realize(DeviceState *=
-dev, Error **errp)
->                  sizeof(struct virtio_vsock_config));
-> =20
->      /* Receive and transmit queues belong to vhost */
-> -    virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE, vhost_vsock_handle_ou=
-tput);
-> -    virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE, vhost_vsock_handle_ou=
-tput);
-> +    vsock->recv_vq =3D virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
-> +                                      vhost_vsock_handle_output);
-> +    vsock->trans_vq =3D virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
-> +                                       vhost_vsock_handle_output);
-> =20
->      /* The event queue belongs to QEMU */
->      vsock->event_vq =3D virtio_add_queue(vdev, VHOST_VSOCK_QUEUE_SIZE,
-> @@ -363,6 +365,9 @@ static void vhost_vsock_device_realize(DeviceState *d=
-ev, Error **errp)
->  err_vhost_dev:
->      vhost_dev_cleanup(&vsock->vhost_dev);
->  err_virtio:
-> +    virtio_delete_queue(vsock->recv_vq);
-> +    virtio_delete_queue(vsock->trans_vq);
-> +    virtio_delete_queue(vsock->event_vq);
->      virtio_cleanup(vdev);
->      close(vhostfd);
->      return;
-> @@ -379,6 +384,9 @@ static void vhost_vsock_device_unrealize(DeviceState =
-*dev, Error **errp)
->      vhost_vsock_set_status(vdev, 0);
-> =20
->      vhost_dev_cleanup(&vsock->vhost_dev);
-> +    virtio_delete_queue(vsock->recv_vq);
-> +    virtio_delete_queue(vsock->trans_vq);
-> +    virtio_delete_queue(vsock->event_vq);
->      virtio_cleanup(vdev);
->  }
-> =20
-> diff --git a/include/hw/virtio/vhost-vsock.h b/include/hw/virtio/vhost-vs=
-ock.h
-> index d509d67c4a..bc5a988ee5 100644
-> --- a/include/hw/virtio/vhost-vsock.h
-> +++ b/include/hw/virtio/vhost-vsock.h
-> @@ -33,6 +33,8 @@ typedef struct {
->      struct vhost_virtqueue vhost_vqs[2];
->      struct vhost_dev vhost_dev;
->      VirtQueue *event_vq;
-> +    VirtQueue *recv_vq;
-> +    VirtQueue *trans_vq;
->      QEMUTimer *post_load_timer;
-> =20
->      /*< public >*/
-> --=20
-> 2.21.0.windows.1
->=20
->=20
->=20
+ https://gitlab.com/huth/qemu/-/jobs/403472594
 
---=20
+It's completely weird, I also added some fprintf statements:
+
+ https://gitlab.com/huth/qemu/commit/8ae76c0cf37cf46d26620dd
+
+... but none of them show up in the output of the test run... so I'm
+currently completely puzzled what might be going wrong here... Any other
+ideas what we could try here?
+
+ Thomas
 
 
