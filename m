@@ -2,80 +2,81 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AD0C33CB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 14:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41880C33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 14:36:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E4FE2073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 14:28:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CB0C20728
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 14:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="VJCO24Va"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4FE2073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VwUUTzM+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB0C20728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irjep-0003hr-SZ
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 09:28:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41532)
+	id 1irjm5-0008Hg-6H
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 09:36:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shihpo.hung@sifive.com>) id 1irjeE-0003Eu-QB
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 09:27:55 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1irjlL-0007nm-Q7
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 09:35:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shihpo.hung@sifive.com>) id 1irjeD-0007Ru-7v
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 09:27:54 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37037)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <shihpo.hung@sifive.com>)
- id 1irjeC-0007QA-W4
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 09:27:53 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w15so15972851wru.4
- for <qemu-devel@nongnu.org>; Wed, 15 Jan 2020 06:27:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TTblYoglIXYAwtNqvTtUQH62e0FOZG9e0GefOBYk3fo=;
- b=VJCO24VaKi3Sza1b+i4wcrl51olDPxWJytBtrTqq2U7olM4++miyjpVQItzgRz6RrA
- QovBeF+N+v9+PX0EY89AoImKsXbCIzyX/Ist8ygjZeDBZ4ZgYIESGPEVq5EZKNWGp4nP
- D8/99MDOFd5xH1bp0V76RMnBn/k6GfaBOskuL0jIUsXdbDLeVQ+VB1UN/WXK2wRArCdH
- MD07Px3gzmNSNavHPn6Z6JRoHfKktcLm9An+ioRjiLV80do9DluGQRPBvR9vSElX7yix
- ahuIV7uTa4IVnSE4RLm6wBbzG/c0a2w1H4nY4ScEbz4/lUH5WPUK8CFxoCdjfJ2Tr9K5
- pt+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TTblYoglIXYAwtNqvTtUQH62e0FOZG9e0GefOBYk3fo=;
- b=pPZazcz/JTY3W4JB+CgzJr50QfH7f2R3VIkjXKrg8Z6/AxKtAVS4HHzjvy2AheuMB+
- pMGdQbsYLRqdBLnDkkR+/a0/pdjLEzarm1bL9Hy2fERwuWWQRZkZim6+mTdm8eBab39x
- RzTKkmPsP47AbfoMWwuV/JeqErUBgdKjEgyhnidwym1UkJXjIsLXtAn9ThoPPujspf2p
- GrrjRBF+BYMP6GVMJ78tbXlivkn2wAdm3VHxZpDHhOL2PKrknyr9chAosuQrBpBZc1hG
- vSI86IkrO59voPTDmryszsls9B0QN4Q5+6NsCfDzhoOr0qpu7/gfEjWDiq+bCup4v2yD
- /gVw==
-X-Gm-Message-State: APjAAAWEUaG8vGs0onNTTnKX39W/003hvFPDKKWC6alSzDwl/zKWUQSu
- mCm7tC2fXtRndqUfh+DYkPCLRYg7M3rEFuVuPDwf1w==
-X-Google-Smtp-Source: APXvYqz+YWkXkQ0FUbjuO6JaISI1Fx7eSgRHAxIySzvSeqLksyKZr70r/qT7v0pMnZIThR/m+QJhCoUAQ5c3f0LpQIY=
-X-Received: by 2002:a05:6000:12:: with SMTP id
- h18mr30011608wrx.87.1579098471220; 
- Wed, 15 Jan 2020 06:27:51 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1irjlH-0004qZ-Ch
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 09:35:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43630
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1irjlH-0004pR-5O
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 09:35:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579098909;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rUubML/dmF/piM8jSqKpQdKRe0+RBULdiSUo1yPP+f8=;
+ b=VwUUTzM+8uF9EJTim660dOWCt1jlemDHdSdSiLu2CA1NS2zz0qoHG7gPldrwyIkQGK1/ts
+ Fm8Dxw0srxnKui5R8Y3GQcifkidjTX3vyEXhDcA4IB1US47Sh7noBDceHhZGGZdeziH+AG
+ 6LJ26FXea6ejaFhqvcoQhpCOdN+BtFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-115-x5IXJUQqNVSEKOJJQpdtpQ-1; Wed, 15 Jan 2020 09:35:06 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 558C48C4A6A;
+ Wed, 15 Jan 2020 14:35:05 +0000 (UTC)
+Received: from work-vm (ovpn-117-231.ams2.redhat.com [10.36.117.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 05A6B842AB;
+ Wed, 15 Jan 2020 14:34:58 +0000 (UTC)
+Date: Wed, 15 Jan 2020 14:34:56 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Subject: Re: [PATCH 051/104] virtiofsd: Parse flag FUSE_WRITE_KILL_PRIV
+Message-ID: <20200115143456.GD3811@work-vm>
+References: <20191212163904.159893-52-dgilbert@redhat.com>
+ <20200115120603.3191-1-misono.tomohiro@jp.fujitsu.com>
 MIME-Version: 1.0
-References: <1579069053-22190-1-git-send-email-shihpo.hung@sifive.com>
- <CAKmqyKNeAFRP7eCLtw1b0P53ub3k--+dROpPRynzCwM8DF15ng@mail.gmail.com>
-In-Reply-To: <CAKmqyKNeAFRP7eCLtw1b0P53ub3k--+dROpPRynzCwM8DF15ng@mail.gmail.com>
-From: ShihPo Hung <shihpo.hung@sifive.com>
-Date: Wed, 15 Jan 2020 22:27:39 +0800
-Message-ID: <CALoQrwf6FEqKaSC1z3Kf1Mz0E0820dttHUFONE_-pP0U=T77_w@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] target/riscv: Fix tb->flags FS status
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000007162f6059c2e83ed"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <20200115120603.3191-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: x5IXJUQqNVSEKOJJQpdtpQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,86 +88,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007162f6059c2e83ed
-Content-Type: text/plain; charset="UTF-8"
+* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> > From: Vivek Goyal <vgoyal@redhat.com>
+> >=20
+> > Caller can set FUSE_WRITE_KILL_PRIV in write_flags. Parse it and pass i=
+t
+> > to the filesystem.
+> >=20
+> > Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
+> > ---
+> >  tools/virtiofsd/fuse_common.h   | 6 +++++-
+> >  tools/virtiofsd/fuse_lowlevel.c | 4 +++-
+> >  2 files changed, 8 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_commo=
+n.h
+> > index 147c043bd9..1e8191b7a6 100644
+> > --- a/tools/virtiofsd/fuse_common.h
+> > +++ b/tools/virtiofsd/fuse_common.h
+> > @@ -93,8 +93,12 @@ struct fuse_file_info {
+> >       */
+> >      unsigned int cache_readdir:1;
+> > =20
+> > +    /* Indicates that suid/sgid bits should be removed upon write */
+> > +    unsigned int kill_priv:1;
+> > +
+> > +
+> >      /** Padding.  Reserved for future use*/
+> > -    unsigned int padding:25;
+> > +    unsigned int padding:24;
+> >      unsigned int padding2:32;
+> > =20
+> >      /*
+> > diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_low=
+level.c
+> > index bd5ca2f157..c8a3b1597a 100644
+> > --- a/tools/virtiofsd/fuse_lowlevel.c
+> > +++ b/tools/virtiofsd/fuse_lowlevel.c
+> > @@ -1144,6 +1144,7 @@ static void do_write(fuse_req_t req, fuse_ino_t n=
+odeid,
+> >      memset(&fi, 0, sizeof(fi));
+> >      fi.fh =3D arg->fh;
+> >      fi.writepage =3D (arg->write_flags & FUSE_WRITE_CACHE) !=3D 0;
+> > +    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+> > =20
+> >      fi.lock_owner =3D arg->lock_owner;
+> >      fi.flags =3D arg->flags;
+> > @@ -1179,7 +1180,8 @@ static void do_write_buf(fuse_req_t req, fuse_ino=
+_t nodeid,
+> >      fi.lock_owner =3D arg->lock_owner;
+> >      fi.flags =3D arg->flags;
+> >      fi.fh =3D arg->fh;
+> > -    fi.writepage =3D arg->write_flags & FUSE_WRITE_CACHE;
+> > +    fi.writepage =3D !!(arg->write_flags & FUSE_WRITE_CACHE);
+> > +    fi.kill_priv =3D !!(arg->write_flags & FUSE_WRITE_KILL_PRIV);
+> > =20
+> >      if (ibufv->count =3D=3D 1) {
+> >          assert(!(tmpbufv.buf[0].flags & FUSE_BUF_IS_FD));
+> > --=20
+> > 2.23.0
+>=20
+> Reviewed-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-On Wed, Jan 15, 2020 at 2:29 PM Alistair Francis <alistair23@gmail.com>
-wrote:
+Thank you.
 
-> > -    *flags = cpu_mmu_index(env, 0);
-> > -    if (riscv_cpu_fp_enabled(env)) {
-> > -        *flags |= TB_FLAGS_MSTATUS_FS;
-> > -    }
-> > +    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
->
-> I don't think this is right, you should use the riscv_cpu_fp_enabled()
-> function.
->
-> Right now it's the same as env->mstatus & MSTATUS_FS but when the
-> Hypervisor extension goes in riscv_cpu_fp_enabled() will be more
-> complex.
->
-> Alistair
->
-> I agree using riscv_cpu_fp_enabled() to hide the complexity when checking
-FP,
-but here I only duplicate the FP status (disabled/initial/clean/dirty) to
-tb->flags
-no matter FP is enabled or not.
+> side-note: virtiofs uses write_buf() and therefore do_write() is never ca=
+lled.
+> How about cleanup the function?
 
-Is it still necessary to check this before duplicating it?
+Yes I think you're right; I need to go through and check there's no
+corner case which can get into the plain do_write.
 
-I think it is not as long as TB_FLAGS_MSTATUS_FS is equivalent to
-MSTATUS_FS.
-But I don't know what changes hypervisor extension brings, please correct
-me if I am wrong.
+Dave
 
-ShihPo
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
---0000000000007162f6059c2e83ed
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Jan 15, 2020 at 2:29 PM Alist=
-air Francis &lt;<a href=3D"mailto:alistair23@gmail.com">alistair23@gmail.co=
-m</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
-:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"=
->&gt; -=C2=A0 =C2=A0 *flags =3D cpu_mmu_index(env, 0);<br>
-&gt; -=C2=A0 =C2=A0 if (riscv_cpu_fp_enabled(env)) {<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 *flags |=3D TB_FLAGS_MSTATUS_FS;<br>
-&gt; -=C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 *flags =3D cpu_mmu_index(env, 0) | (env-&gt;mstatus &am=
-p; MSTATUS_FS);<br>
-<br>
-I don&#39;t think this is right, you should use the riscv_cpu_fp_enabled() =
-function.<br>
-<br>
-Right now it&#39;s the same as env-&gt;mstatus &amp; MSTATUS_FS but when th=
-e<br>
-Hypervisor extension goes in riscv_cpu_fp_enabled() will be more<br>
-complex.<br>
-<br>
-Alistair<br><br></blockquote><div>I agree using riscv_cpu_fp_enabled() to h=
-ide the complexity when checking FP,</div><div>but here I only duplicate th=
-e FP status (disabled/initial/clean/dirty) to tb-&gt;flags</div><div>no mat=
-ter FP is enabled or not.</div><div><br></div><div>Is it still necessary to=
- check this before duplicating it?</div><div><br></div><div>I think it is n=
-ot as long as=C2=A0TB_FLAGS_MSTATUS_FS is equivalent=C2=A0to MSTATUS_FS.</d=
-iv><div>But I don&#39;t know what changes hypervisor extension brings, plea=
-se correct me if I am wrong.</div><div><br></div><div>ShihPo</div><div><br>=
-</div></div></div>
-
---0000000000007162f6059c2e83ed--
 
