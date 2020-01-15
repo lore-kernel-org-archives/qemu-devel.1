@@ -2,56 +2,83 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7708C33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A30C32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E812206D7
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:31:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E812206D7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD5AC206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:33:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6DnYPh/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD5AC206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlaH-0005CA-Ds
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:31:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57071)
+	id 1irlcA-0006bM-IF
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:33:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53501)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0P-0005xH-8z
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:56 -0500
+ (envelope-from <pkrempa@redhat.com>) id 1irkhR-0000xP-To
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:35:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0L-0006Dj-6t
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:52 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34176 helo=mail.rt-rk.com)
+ (envelope-from <pkrempa@redhat.com>) id 1irkhO-0005pt-FW
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:35:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60171
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1irl0K-0005hY-Q7
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:49 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 08C6C1A219F;
- Wed, 15 Jan 2020 16:53:44 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id D01D71A2173;
- Wed, 15 Jan 2020 16:53:43 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 04/12] linux-user: Add support for getting/setting RTC wakeup
- alarm using ioctls
-Date: Wed, 15 Jan 2020 16:53:30 +0100
-Message-Id: <1579103618-20217-5-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1irkhO-0005oJ-AT
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:35:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1579102512;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9/uTMn24Zke4DRuhEw7wyZIybd89ak3R1ZI5+FRteL8=;
+ b=X6DnYPh/lpFiUVhDNsafA10R8XCBd1hS3TldemyxxNIXpY5N8d0MitlVO5vrqBCG6z6TUo
+ PdAN5dOG4BRQzHFWS84lRrbnn3gEJ+A6WynJY5Jb7LuGGmXsUqVutFk1KHi2HwTVDGcPgi
+ 3URailnTVVsBm+NRMc6Y6ntj/UiWoDQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-VBWK8jUzPMWpm1R8SUoEOQ-1; Wed, 15 Jan 2020 10:35:09 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C3F6928C3C;
+ Wed, 15 Jan 2020 15:35:07 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.43.2.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 063EC675AF;
+ Wed, 15 Jan 2020 15:34:55 +0000 (UTC)
+Date: Wed, 15 Jan 2020 16:34:53 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [libvirt] [PATCH v2 82/86] numa: forbid '-numa node, mem' for
+ 5.0 and newer machine types
+Message-ID: <20200115153453.GL3243410@angien.pipo.sk>
+References: <1579100861-73692-1-git-send-email-imammedo@redhat.com>
+ <1579100861-73692-83-git-send-email-imammedo@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <1579100861-73692-83-git-send-email-imammedo@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: VBWK8jUzPMWpm1R8SUoEOQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,97 +90,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, arnd@arndb.de,
- richard.henderson@linaro.org, laurent@vivier.eu, jcmvbkbc@gmail.com,
- amarkovic@wavecomp.com, philmd@redhat.com
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com, rth@twiddle.net,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionalities of following ioctls:
+On Wed, Jan 15, 2020 at 16:07:37 +0100, Igor Mammedov wrote:
+> Deprecation period is ran out and it's a time to flip the switch
+> introduced by cd5ff8333a.
+> Disable legacy option for new machine types and amend documentation.
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> CC: peter.maydell@linaro.org
+> CC: ehabkost@redhat.com
+> CC: marcel.apfelbaum@gmail.com
+> CC: mst@redhat.com
+> CC: pbonzini@redhat.com
+> CC: rth@twiddle.net
+> CC: david@gibson.dropbear.id.au
+> CC: libvir-list@redhat.com
+> CC: qemu-arm@nongnu.org
+> CC: qemu-ppc@nongnu.org
+> ---
+>  hw/arm/virt.c        |  2 +-
+>  hw/core/numa.c       |  6 ++++++
+>  hw/i386/pc.c         |  1 -
+>  hw/i386/pc_piix.c    |  1 +
+>  hw/i386/pc_q35.c     |  1 +
+>  hw/ppc/spapr.c       |  2 +-
+>  qemu-deprecated.texi | 16 ----------------
+>  qemu-options.hx      |  8 ++++----
+>  8 files changed, 14 insertions(+), 23 deletions(-)
 
-RTC_WKALM_SET, RTC_WKALM_GET - Getting/Setting wakeup alarm
+I'm afraid nobody bothered to fix it yet:
 
-    Some RTCs support a more powerful alarm interface, using these
-    ioctls to read or write the RTC's alarm time (respectively)
-    with this structure:
-
-        struct rtc_wkalrm {
-            unsigned char enabled;
-            unsigned char pending;
-            struct rtc_time time;
-        };
-
-    The enabled flag is used to enable or disable the alarm
-    interrupt, or to read its current status; when using these
-    calls, RTC_AIE_ON and RTC_AIE_OFF are not used. The pending
-    flag is used by RTC_WKALM_RD to report a pending interrupt
-    (so it's mostly useless on Linux, except when talking to the
-    RTC managed by EFI firmware). The time field is as used with
-    RTC_ALM_READ and RTC_ALM_SET except that the tm_mday, tm_mon,
-    and tm_year fields are also valid. A pointer to this structure
-    should be passed as the third ioctl's argument.
-
-Implementation notes:
-
-    All ioctls in this patch have a pointer to a structure
-    rtc_wkalrm as their third argument. That is the reason why
-    corresponding definition is added in linux-user/syscall_types.h.
-    Since all  elements of this structure are either of type
-    'unsigned char' or 'struct rtc_time' (that was covered in one
-    of previous patches), the rest of the implementation is
-    straightforward.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
----
- linux-user/ioctls.h        | 2 ++
- linux-user/syscall_defs.h  | 2 ++
- linux-user/syscall_types.h | 5 +++++
- 3 files changed, 9 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index accbdee..b09396e 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -85,6 +85,8 @@
-      IOCTL(RTC_IRQP_SET, IOC_W, TYPE_ULONG)
-      IOCTL(RTC_EPOCH_READ, IOC_R, MK_PTR(TYPE_ULONG))
-      IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
-+     IOCTL(RTC_WKALM_RD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
-+     IOCTL(RTC_WKALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
- 
-      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
-      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index bbfa935..37504a2 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -780,6 +780,8 @@ struct target_pollfd {
- #define TARGET_RTC_IRQP_SET         TARGET_IOW('p', 0x0c, abi_ulong)
- #define TARGET_RTC_EPOCH_READ       TARGET_IOR('p', 0x0d, abi_ulong)
- #define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
-+#define TARGET_RTC_WKALM_RD         TARGET_IOR('p', 0x10, struct rtc_wkalrm)
-+#define TARGET_RTC_WKALM_SET        TARGET_IOW('p', 0x0f, struct rtc_wkalrm)
- 
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index a35072a..820bc8e 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -266,6 +266,11 @@ STRUCT(rtc_time,
-        TYPE_INT, /* tm_yday */
-        TYPE_INT) /* tm_isdst */
- 
-+STRUCT(rtc_wkalrm,
-+       TYPE_CHAR, /* enabled */
-+       TYPE_CHAR, /* pending */
-+       MK_STRUCT(STRUCT_rtc_time)) /* time */
-+
- STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* op */
-        TYPE_INT, /* flags */
--- 
-2.7.4
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1783355
 
 
