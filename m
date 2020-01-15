@@ -2,85 +2,56 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB9AC32771
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C9FC32771
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:38:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBF232073A
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:38:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yq2k3pk7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBF232073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E2852073A
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 16:38:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E2852073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irlgX-0004Q5-LB
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:38:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36407)
+	id 1irlgb-0004Zb-2n
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 11:38:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1irlfJ-0002rJ-Tp
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 11:37:12 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0P-0005xl-Eq
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1irlfF-0005sw-2o
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 11:37:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25234
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1irl0L-0006DP-3v
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:52 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:34160 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1irlfD-0005pi-IK
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 11:37:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579106222;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=z0oQQH6PN0MtqXMirGfjHodXNGCxvcpzxeHJl6pTavA=;
- b=Yq2k3pk7h67Fmq5Xwzg9rK1eKkZExZKNphASwdS9pQpuqmlL/dRxa6fHZycwnJjYGAkmMR
- WUnqux6pZW/Ljc2zJiSpeoyPUgBAbN6XaqDrf66IWT+ZSwuhNnlEF0D89egBsJeODkO5q+
- rukaLj5Zgt/tgVBf6KyfUgjpV8dF05k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-hx0XVEXmNOuBxTCPbaEu8g-1; Wed, 15 Jan 2020 11:37:01 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A494A1800D48;
- Wed, 15 Jan 2020 16:36:59 +0000 (UTC)
-Received: from [10.36.117.108] (ovpn-117-108.ams2.redhat.com [10.36.117.108])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8037B5C651;
- Wed, 15 Jan 2020 16:36:52 +0000 (UTC)
-Subject: Re: [PATCH v12 09/13] virtio-iommu: Implement fault reporting
-To: Peter Xu <peterx@redhat.com>
-References: <20200109144319.15912-1-eric.auger@redhat.com>
- <20200109144319.15912-10-eric.auger@redhat.com>
- <20200114190433.GE225163@xz-x1>
- <2a060fcf-f9d6-c6bf-d444-018df532e475@redhat.com>
- <20200115150442.GD233443@xz-x1>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ece76aa3-f9fd-2834-0313-9c27a3c71f36@redhat.com>
-Date: Wed, 15 Jan 2020 17:36:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20200115150442.GD233443@xz-x1>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: hx0XVEXmNOuBxTCPbaEu8g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1irl0K-0005hH-PZ
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 10:54:49 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id C36961A2186;
+ Wed, 15 Jan 2020 16:53:43 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 9250D1A2173;
+ Wed, 15 Jan 2020 16:53:43 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 02/12] linux-user: Add support for getting/setting RTC time
+ and alarm using ioctls
+Date: Wed, 15 Jan 2020 16:53:28 +0100
+Message-Id: <1579103618-20217-3-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1579103618-20217-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,45 +63,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, tnowicki@marvell.com,
- quintela@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- jean-philippe@linaro.org, eric.auger.pro@gmail.com
+Cc: peter.maydell@linaro.org, berrange@redhat.com, arnd@arndb.de,
+ richard.henderson@linaro.org, laurent@vivier.eu, jcmvbkbc@gmail.com,
+ amarkovic@wavecomp.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
-On 1/15/20 4:04 PM, Peter Xu wrote:
-> On Wed, Jan 15, 2020 at 02:12:20PM +0100, Auger Eric wrote:
->>>> +static void virtio_iommu_report_fault(VirtIOIOMMU *viommu, uint8_t reason,
->>>> +                                      int flags, uint32_t endpoint,
->>>> +                                      uint64_t address)
->>>> +{
-> 
-> [...]
-> 
->>>> +        if (iov_size(elem->in_sg, elem->in_num) < sizeof(fault)) {
->>>> +            virtio_error(vdev, "error buffer of wrong size");
->>>> +            virtqueue_detach_element(vq, elem, 0);
->>>> +            g_free(elem);
->>>> +            continue;
->>>
->>> If virtio_error(), should we stop rather than continue?
->> My understanding is the buffer just popped had a wrong size so it is not
->> usable. We skip it we try to use another one if any. Does it make sense?
-> 
-> I'm not very familiar to virtio, but I see that virtio_error marks
-> vdev->broken to true.  If with that iiuc the next virtqueue_pop() will
-> fail directly (see the first call to virtio_device_disabled in
-> virtqueue_pop).  Then I don't see why retry any more...
-You're right. I will fix it.
+This patch implements functionalities of following ioctls:
 
-Thanks
+RTC_RD_TIME - Getting RTC time
 
-Eric
-> 
-> Thanks,
-> 
+    Returns this RTC's time in the following structure:
+
+        struct rtc_time {
+            int tm_sec;
+            int tm_min;
+            int tm_hour;
+            int tm_mday;
+            int tm_mon;
+            int tm_year;
+            int tm_wday;     /* unused */
+            int tm_yday;     /* unused */
+            int tm_isdst;    /* unused */
+        };
+
+    The fields in this structure have the same meaning and ranges
+    as the tm structure described in gmtime man page. A pointer
+    to this structure should be passed as the third ioctl's argument.
+
+RTC_SET_TIME - Setting RTC time
+
+    Sets this RTC's time to the time specified by the rtc_time
+    structure pointed to by the third ioctl's argument. To set
+    the RTC's time the process must be privileged (i.e., have the
+    CAP_SYS_TIME capability).
+
+RTC_ALM_READ, RTC_ALM_SET - Getting/Setting alarm time
+
+    Read and set the alarm time, for RTCs that support alarms.
+    The alarm interrupt must be separately enabled or disabled
+    using the RTC_AIE_ON, RTC_AIE_OFF requests. The third
+    ioctl's argument is a pointer to a rtc_time structure. Only
+    the tm_sec, tm_min, and tm_hour fields of this structure are
+    used.
+
+Implementation notes:
+
+    All ioctls in this patch have pointer to a structure rtc_time
+    as their third argument. That is the reason why corresponding
+    definition is added in linux-user/syscall_types.h. Since all
+    elements of this structure are of type 'int', the rest of the
+    implementation is straightforward.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ linux-user/ioctls.h        |  4 ++++
+ linux-user/syscall_defs.h  |  4 ++++
+ linux-user/syscall_types.h | 11 +++++++++++
+ 3 files changed, 19 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 97741c7..f472794 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -77,6 +77,10 @@
+      IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
+      IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
+      IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_ALM_READ, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
++     IOCTL(RTC_ALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
++     IOCTL(RTC_RD_TIME, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
++     IOCTL(RTC_SET_TIME, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_time)))
+ 
+      IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
+      IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index f91579a..f0bf09d 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -772,6 +772,10 @@ struct target_pollfd {
+ #define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
+ #define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
+ #define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
++#define TARGET_RTC_ALM_READ         TARGET_IOR('p', 0x08, struct rtc_time)
++#define TARGET_RTC_ALM_SET          TARGET_IOW('p', 0x07, struct rtc_time)
++#define TARGET_RTC_RD_TIME          TARGET_IOR('p', 0x09, struct rtc_time)
++#define TARGET_RTC_SET_TIME         TARGET_IOW('p', 0x0a, struct rtc_time)
+ 
+ #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
+        defined(TARGET_XTENSA)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4e36983..a35072a 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -255,6 +255,17 @@ STRUCT(blkpg_partition,
+        MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
+        MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
+ 
++STRUCT(rtc_time,
++       TYPE_INT, /* tm_sec */
++       TYPE_INT, /* tm_min */
++       TYPE_INT, /* tm_hour */
++       TYPE_INT, /* tm_mday */
++       TYPE_INT, /* tm_mon */
++       TYPE_INT, /* tm_year */
++       TYPE_INT, /* tm_wday */
++       TYPE_INT, /* tm_yday */
++       TYPE_INT) /* tm_isdst */
++
+ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* op */
+        TYPE_INT, /* flags */
+-- 
+2.7.4
 
 
