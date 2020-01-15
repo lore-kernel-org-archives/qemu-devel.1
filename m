@@ -2,84 +2,79 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4775DC33CB1
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8827CC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:09:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 121C12187F
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56AE12077B
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 12:09:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4lSQuYL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121C12187F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vq7nYAYx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56AE12077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irhNq-0003Lw-Tj
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:02:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44638)
+	id 1irhUb-0006lM-GA
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 07:09:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45776)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1irhMq-0002In-Cr
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:01:49 -0500
+ (envelope-from <imammedo@redhat.com>) id 1irhTx-0006KR-8L
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:09:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1irhMm-0003oH-T1
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:01:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56473
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1irhTw-0001Nd-0T
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:09:09 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54528
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1irhMm-0003nn-P4
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:01:44 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1irhTv-0001NB-Sn
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 07:09:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1579089703;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1579090146;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VNL7XQgd1dAdg58X2xci4SQJZmtzuDMfilC3kMoZ6YY=;
- b=i4lSQuYLiORURtitig6t+PIfqJ9ADXqMdO0RVi/t5NKLYrce3UW7OCwirKYrG1yKNqMpKa
- /idOnhoSIZNme9c/aRxzHjC8l8gwzQHGF99RaeV2oI0qvckzWLxy7Z5GHloO4JlY+f2lux
- T7amXTYks7WaKEaigibz+DByvH3Y7Sk=
+ bh=u6jrxvxNgWqf8gtvKohqKR5GH2PgnsfIlboycMtUEYs=;
+ b=Vq7nYAYxxvUMGbCEptLgpIrkYz/EQ6svYGiQH8hKYpPwde9eou9HsYvlO48Ob0Uvnp9G7v
+ kL0G4Kq+uD3wMDs6TyG9rhIX913zKym/ebmbxY6vQrUhXyEJkilJ4fwoYe+LiZSBUiZ05r
+ Q+pnhCaMu0qdpBNVQkp5MGQQuI6dWmo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-QyRRUrAbOBaV3_Ho4391-w-1; Wed, 15 Jan 2020 07:01:40 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-198-LqvdbqMWMYqCJQgwEag7Jg-1; Wed, 15 Jan 2020 07:09:05 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FF3A18A6ECA;
- Wed, 15 Jan 2020 12:01:39 +0000 (UTC)
-Received: from redhat.com (ovpn-112-60.ams2.redhat.com [10.36.112.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B0B860BF4;
- Wed, 15 Jan 2020 12:01:37 +0000 (UTC)
-Date: Wed, 15 Jan 2020 12:01:34 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [qemu-web PATCH] documentation: update links to readthedocs
-Message-ID: <20200115120134.GH93923@redhat.com>
-References: <20200113103550.1133-1-alex.bennee@linaro.org>
- <2331e0b7-cad9-7b53-3d30-7fb88d692c8a@redhat.com>
- <20200115111042.GA163546@stefanha-x1.localdomain>
- <87zhepkk6j.fsf@linaro.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D1E7800D41;
+ Wed, 15 Jan 2020 12:09:04 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 479E05DA32;
+ Wed, 15 Jan 2020 12:09:00 +0000 (UTC)
+Date: Wed, 15 Jan 2020 13:08:58 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [PATCH 2/2] arm/virt/acpi: remove _ADR from devices identified
+ by _HID
+Message-ID: <20200115130858.5cb90095@redhat.com>
+In-Reply-To: <20191219064759.35053-3-guoheyi@huawei.com>
+References: <20191219064759.35053-1-guoheyi@huawei.com>
+ <20191219064759.35053-3-guoheyi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <87zhepkk6j.fsf@linaro.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: QyRRUrAbOBaV3_Ho4391-w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: LqvdbqMWMYqCJQgwEag7Jg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,93 +86,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ wanghaibin.wang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jan 15, 2020 at 11:56:04AM +0000, Alex Benn=C3=A9e wrote:
->=20
-> Stefan Hajnoczi <stefanha@redhat.com> writes:
->=20
-> > On Tue, Jan 14, 2020 at 12:11:34PM +0100, Thomas Huth wrote:
-> >> On 13/01/2020 11.35, Alex Benn=C3=A9e wrote:
-> >> > ..and extemporise a little about their state.
-> >> >=20
-> >> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >> > ---
-> >> >  documentation.md | 9 ++++++---
-> >> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> >> >=20
-> >> > diff --git a/documentation.md b/documentation.md
-> >> > index f4ef9f4..55d5db6 100644
-> >> > --- a/documentation.md
-> >> > +++ b/documentation.md
-> >> > @@ -3,9 +3,12 @@ title: QEMU documentation
-> >> >  permalink: /documentation/
-> >> >  ---
-> >> > =20
-> >> > -The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can =
-be read online, courtesy of Stefan Weil.
-> >> > -More documentation is found in the <a href=3D"https://git.qemu.org/=
-?p=3Dqemu.git;a=3Dtree;f=3Ddocs;hb=3Dmaster">`docs`</a>
-> >> > -directory of the QEMU git tree.
-> >> > +The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can =
-be
-> >> > +read online, courtesy of Stefan Weil. There is a partial set of
-> >> > +[developer documentation](https://qemu.readthedocs.io/en/latest/)
-> >> > +which is generated from the QEMU git tree. The process of convertin=
-g
-> >> > +the rest of the [`docs`](https://git.qemu.org/?p=3Dqemu.git;a=3Dtre=
-e;f=3Ddocs;hb=3Dmaster)
-> >> > +directory is ongoing.
-> >>=20
-> >> This has a conflict with Stefan's patch to point to our documentation =
-on
-> >> www.qemu.org now instead:
-> >>=20
-> >>  https://patchwork.kernel.org/patch/11234545/
-> >>=20
-> >> ... Stefan, looks like the index.html page is still not there yet,
-> >> although your other patch that includes index.html.in in the sources i=
-s
-> >> in the repository now? What's the status here?
-> >
-> > The qemu.git/master docs are built nightly here (index.html is now
-> > visible!):
-> > https://www.qemu.org/docs/master/
-> >
-> > qemu.org's docs are more useful at the moment since they include the
-> > user documentation in addition to the developer documentation.
->=20
-> And I think we want to continue hosting them on qemu.org. Is it possible
-> to theme them under the website branding? Stefan's version includes a
-> banner and background icon so it would be nice to at least fit in with
-> the reset of the site.
+On Thu, 19 Dec 2019 14:47:59 +0800
+Heyi Guo <guoheyi@huawei.com> wrote:
 
-I did a demo of this a while back:
+> According to ACPI spec, _ADR should be used for device which is on a
+> bus that has a standard enumeration algorithm. It does not make sense
+> to have a _ADR object for devices which already have _HID and will be
+> enumerated by OSPM.
+> 
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-  https://www.mail-archive.com/qemu-devel@nongnu.org/msg578110.html
-
-Essentially you just need to strip the HTML header down to the
-<body> content. Then add the jekyll header and run its site
-generator which will add the new HTML header with theme.
-
-In my patches above I committed the ref docs .html files to qemu-web.git
-but this is not required. They just need to be placed in any directory
-on the server where jekyll build process runs, so that we can access
-them when building the static site content.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+> 
+> ---
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/arm/virt-acpi-build.c          |   8 --------
+>  tests/data/acpi/virt/DSDT         | Bin 18449 -> 18426 bytes
+>  tests/data/acpi/virt/DSDT.memhp   | Bin 19786 -> 19763 bytes
+>  tests/data/acpi/virt/DSDT.numamem | Bin 18449 -> 18426 bytes
+>  4 files changed, 8 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 9f4c7d1889..be752c0ad8 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -78,11 +78,6 @@ static void acpi_dsdt_add_uart(Aml *scope, const MemMapEntry *uart_memmap,
+>                               AML_EXCLUSIVE, &uart_irq, 1));
+>      aml_append(dev, aml_name_decl("_CRS", crs));
+>  
+> -    /* The _ADR entry is used to link this device to the UART described
+> -     * in the SPCR table, i.e. SPCR.base_address.address == _ADR.
+> -     */
+> -    aml_append(dev, aml_name_decl("_ADR", aml_int(uart_memmap->base)));
+> -
+>      aml_append(scope, dev);
+>  }
+>  
+> @@ -170,7 +165,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
+>      aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
+>      aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
+> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+>      aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
+>      aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
+>      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+> @@ -334,7 +328,6 @@ static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+>  {
+>      Aml *dev = aml_device("GPO0");
+>      aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
+> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+>      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+>  
+>      Aml *crs = aml_resource_template();
+> @@ -364,7 +357,6 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+>  {
+>      Aml *dev = aml_device(ACPI_POWER_BUTTON_DEVICE);
+>      aml_append(dev, aml_name_decl("_HID", aml_string("PNP0C0C")));
+> -    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+>      aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+>      aml_append(scope, dev);
+>  }
+> diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
+> index b5895cb22446860a0b9be3d32ec856feb388be4c..a759ff739a071d5fbf50519a6aea296e5e0f1e0c 100644
+> GIT binary patch
+> delta 72
+> zcmbO@f$>*ABbQ6COUN&G1_q{66S<_BT5Bh&t1wzk^tIeLL4lL8ZSqD=gU!!5x$Pt+
+> c1HyxxIO07#U3dfh0t}oDoEbRcLp@y>07w882mk;8  
+> 
+> delta 94
+> zcmey>&p2@cBbQ6CONgKc0|V26iCof5J#`b+RhV2^Ci+-%al|{i1o1F1FmP^cRp4ao  
+> tnY@hCfEg&X`7$S;oxFTNc#soEyoaX?Z-8HbfwO@#16Tu)4E1zj005fm7mWY_
+> 
+> diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSDT.memhp
+> index 69ad844f65d047973a3e55198beecd45a35b8fce..6e5cc61977e4cd24f765fec0693f75a528c144c1 100644
+> GIT binary patch
+> delta 72
+> zcmX>#i*fTTMlP3Nmk?uL1_q|eiCof5eHSLGt1wzk^tIeLL4lL8ZSqD=gU!!5U7RH)
+> c1HyxxIO07#U3dfh0t}oDoEbRcLp@y>03)CjmjD0&  
+> 
+> delta 94
+> zcmdlyi}BPfMlP3Nmk=*s1_q}3iCof5t(PXMt1!8;O!Tqj;)r*23F2X3VBp-?s=&$E
+> tGkF=O0W(l&^JPwVXL<R6@E|9Scn?n(-T=P<17`zg2CxPo8S3f6006qZ7#siq
+> 
+> diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/DSDT.numamem
+> index b5895cb22446860a0b9be3d32ec856feb388be4c..a759ff739a071d5fbf50519a6aea296e5e0f1e0c 100644
+> GIT binary patch
+> delta 72
+> zcmbO@f$>*ABbQ6COUN&G1_q{66S<_BT5Bh&t1wzk^tIeLL4lL8ZSqD=gU!!5x$Pt+
+> c1HyxxIO07#U3dfh0t}oDoEbRcLp@y>07w882mk;8  
+> 
+> delta 94
+> zcmey>&p2@cBbQ6CONgKc0|V26iCof5J#`b+RhV2^Ci+-%al|{i1o1F1FmP^cRp4ao  
+> tnY@hCfEg&X`7$S;oxFTNc#soEyoaX?Z-8HbfwO@#16Tu)4E1zj005fm7mWY_
+> 
 
 
