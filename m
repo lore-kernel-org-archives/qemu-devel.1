@@ -2,79 +2,55 @@ Return-Path: <SRS0=2fDQ=3E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19690C33CB2
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 07:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B52ACC33CB1
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 07:22:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCEDA2467C
-	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 07:02:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amioCn7N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCEDA2467C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E5A72187F
+	for <qemu-devel@archiver.kernel.org>; Wed, 15 Jan 2020 07:22:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E5A72187F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1irchH-0003cu-S0
-	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 02:02:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36451)
+	id 1ird03-00029e-LZ
+	for qemu-devel@archiver.kernel.org; Wed, 15 Jan 2020 02:21:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38429)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent.desnogues@gmail.com>) id 1ircgg-00033P-03
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 02:01:59 -0500
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1ircyt-00019M-4L
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 02:20:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent.desnogues@gmail.com>) id 1ircge-0008N3-QN
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 02:01:57 -0500
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:34020)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
- id 1ircge-0008MC-Lj
- for qemu-devel@nongnu.org; Wed, 15 Jan 2020 02:01:56 -0500
-Received: by mail-il1-x143.google.com with SMTP id s15so13964376iln.1
- for <qemu-devel@nongnu.org>; Tue, 14 Jan 2020 23:01:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=L/7uM1z04a3cmQI7L3hhEoytfKbw7NDu/46ErD1QMcA=;
- b=amioCn7NJhCGrwcpTU910RlYDxJecsyywDeWeYf/+qelvxgzk9SfQix9539CmfVIQz
- HDWfp3diTUfzq58N2EWbX7B6aklJ6912Zgg4W7WASnHEugClPm5i54ChaaYuMgKOushE
- fiqdzypnSewnYuFVhpoe2Tpzm2HCBm/6sDLJKAsuTxs2vVoi4npohv0oedTs4kx17XLW
- wycPZkhpP3m/McwxHWwi3KxBXsj91Jq+CO10Dxv7OKmQDe82x7J5KT4fw0/aHr954ZNT
- NLTBwYjj/3PT96gRGB3MFm2i9gJuPTghY3hHN5ChH/obie0NVR5DEenQYxE5eBhjXIXh
- cUKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=L/7uM1z04a3cmQI7L3hhEoytfKbw7NDu/46ErD1QMcA=;
- b=R+UJCzttZ6gMepkB5JZG5KacF98hUtW1SU3HCj5tCL1PaHsplGvLHsMF1Rip0OlP6Z
- +1af2StdjK0t4xwtMzw91Zok1QkjimUFfKuBDP+zCg73fSxW2UZWQsOKt8G89dtTVYO7
- fpy7JX6M1pT9a0eA1Y6c+KRZs406IIfAiJsyksP5eXUyn9uzQjULrCoJ8ca1BTpVx8uE
- E4lKPBqjR2MdTFANXvMamlKEL1Lk/4b5khKSwAn2G5s5xHVbIEt70r+OphvMpL5iPk4+
- WgQ/BiZj8i5si2CyC0rJVdKj+O7dYXyEf/O6e76L/jv8bG301XF3Pe+XByK4vtmA5IKz
- Mxpg==
-X-Gm-Message-State: APjAAAWdPYiRZYJepAybUteRVppvdPtwDqU/inpdrXbqe8G9la5RMjK3
- D0rl8zJG9H7gOWHmokuj7pDCapTOMyWsN8UXZYA=
-X-Google-Smtp-Source: APXvYqy3J8ybuwtxsWN+LG4LNJSTScxT39U07ILhL9TKthH1bd1VBI7CvAQ4fcYS48CKLig6QtNtHnWaEJv1l8yl2EA=
-X-Received: by 2002:a92:d2:: with SMTP id 201mr2379225ila.22.1579071715238;
- Tue, 14 Jan 2020 23:01:55 -0800 (PST)
+ (envelope-from <kuhn.chenqun@huawei.com>) id 1ircyo-0001dS-QU
+ for qemu-devel@nongnu.org; Wed, 15 Jan 2020 02:20:46 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:46742 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1ircyo-0001Tc-Fl; Wed, 15 Jan 2020 02:20:42 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 32628D11D13B8F2C3707;
+ Wed, 15 Jan 2020 15:20:29 +0800 (CST)
+Received: from HGHY4C002233111.china.huawei.com (10.133.205.93) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 15 Jan 2020 15:20:20 +0800
+From: <kuhn.chenqun@huawei.com>
+To: <qemu-devel@nongnu.org>, <dgilbert@redhat.com>
+Subject: [PATCH] monitor: fix memory leak in monitor_fdset_dup_fd_find_remove
+Date: Wed, 15 Jan 2020 15:20:16 +0800
+Message-ID: <20200115072016.167252-1-kuhn.chenqun@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
 MIME-Version: 1.0
-References: <20200114210921.11216-1-richard.henderson@linaro.org>
-In-Reply-To: <20200114210921.11216-1-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Wed, 15 Jan 2020 08:01:43 +0100
-Message-ID: <CABoDooOCOPzKR5N6OtYecZ88jUSpVk2Xp=bXoutfjGvuGE5_MA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] linux-user: Implement x86_64 vsyscalls
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::143
+Content-Type: text/plain
+X-Originating-IP: [10.133.205.93]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,27 +62,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-trivial@nongnu.org, Chen Qun <kuhn.chenqun@huawei.com>,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jan 14, 2020 at 10:09 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
-[...]
-> I vaguely remember someone (Paolo?) implementing something like
-> this many years ago, but clearly it never got merged.
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
-That was me back in 2009:
+When remove dup_fd in monitor_fdset_dup_fd_find_remove function,
+we need to free mon_fdset_fd_dup. ASAN shows memory leak stack:
 
-https://lists.gnu.org/archive/html/qemu-devel/2009-07/msg00881.html
+Direct leak of 96 byte(s) in 3 object(s) allocated from:
+    #0 0xfffd37b033b3 in __interceptor_calloc (/lib64/libasan.so.4+0xd33b3)
+    #1 0xfffd375c71cb in g_malloc0 (/lib64/libglib-2.0.so.0+0x571cb)
+    #2 0xaaae25bf1c17 in monitor_fdset_dup_fd_add /qemu/monitor/misc.c:1724
+    #3 0xaaae265cfd8f in qemu_open /qemu/util/osdep.c:315
+    #4 0xaaae264e2b2b in qmp_chardev_open_file_source /qemu/chardev/char-fd.c:122
+    #5 0xaaae264e47cf in qmp_chardev_open_file /qemu/chardev/char-file.c:81
+    #6 0xaaae264e118b in qemu_char_open /qemu/chardev/char.c:237
+    #7 0xaaae264e118b in qemu_chardev_new /qemu/chardev/char.c:964
+    #8 0xaaae264e1543 in qemu_chr_new_from_opts /qemu/chardev/char.c:680
+    #9 0xaaae25e12e0f in chardev_init_func /qemu/vl.c:2083
+    #10 0xaaae26603823 in qemu_opts_foreach /qemu/util/qemu-option.c:1170
+    #11 0xaaae258c9787 in main /qemu/vl.c:4089
+    #12 0xfffd35b80b9f in __libc_start_main (/lib64/libc.so.6+0x20b9f)
+    #13 0xaaae258d7b63  (/qemu/build/aarch64-softmmu/qemu-system-aarch64+0x8b7b63)
 
-Glad it will finally get an official fix.
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+---
+ monitor/misc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
+diff --git a/monitor/misc.c b/monitor/misc.c
+index a04d7edde0..cf79d36100 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -1744,6 +1744,7 @@ static int64_t monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+             if (mon_fdset_fd_dup->fd == dup_fd) {
+                 if (remove) {
+                     QLIST_REMOVE(mon_fdset_fd_dup, next);
++                    g_free(mon_fdset_fd_dup);
+                     if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
+                         monitor_fdset_cleanup(mon_fdset);
+                     }
+-- 
+2.23.0
 
-Laurent
+
 
